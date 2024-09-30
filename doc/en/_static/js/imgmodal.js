@@ -33,24 +33,34 @@ document.addEventListener("DOMContentLoaded", function () {
         currentScale = 1; // Reset scale value
     }
 
+    function handleImageClick(event) {
+        imgModal.style.display = "flex";
+        imgModal.style.justifyContent = 'center';
+        imgModal.style.alignItems = 'center';
+
+        imgInModal.src = this.src;
+        initModalImageSize();
+        document.documentElement.style.overflow = "hidden"; // Disable scrolling
+    }
+
     document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
-        imgItem.addEventListener('click', function (event) {
-            var parentElement = imgItem.parentElement;
-            if (parentElement && parentElement.tagName.toLowerCase() === 'a') {
+        var validImageRegex = /\.(jpe?g|png|gif|bmp|webp)$/i;
+        var parentElement = imgItem.parentElement;
+        var parentHref = parentElement.getAttribute('href');
+        // 父标签有 href 属性
+        if (parentHref) {
+            if(validImageRegex.test(parentHref.toLowerCase())) { // 父标签 href 属性为图片地址
                 // 阻止父a标签的点击事件
                 parentElement.addEventListener('click', function(aEvent) {
                     aEvent.preventDefault();
                 });
+                parentElement.classList.add('no-cursor-link');
+                imgItem.addEventListener('click', handleImageClick);
             }
-
-            imgModal.style.display = "flex";
-            imgModal.style.justifyContent = 'center';
-            imgModal.style.alignItems = 'center';
-
-            imgInModal.src = this.src;
-            initModalImageSize();
-            document.documentElement.style.overflow = "hidden"; // Disable scrolling
-        });
+        }
+        else { // 父标签没有 href 属性
+            imgItem.addEventListener('click', handleImageClick);
+        }
     });
 
     closeImgModal.onclick = function() {
