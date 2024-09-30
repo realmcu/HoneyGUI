@@ -30,6 +30,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     /* set Image data */
     dashboard_c_background = gui_img_create_from_mem(target_connected_display, "dashboard_c_background",
                                                      BACKGROUND_C_BIN, 0, 0, 800, 480);
+    gui_img_set_mode(dashboard_c_background, IMG_COVER_MODE);
     speed_high_c_digital = gui_img_create_from_mem(target_connected_display, "speed_high_c_digital",
                                                    SPED_C0_BIN, 214, 232, 27, 40);
     speed_low_c_digital = gui_img_create_from_mem(target_connected_display, "speed_low_c_digital",
@@ -121,7 +122,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     memcpy(&show_c_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
     short_c_message_data = gui_text_create(target_connected_display,  "short_c_message_data",  300, 10,
-                                           240, 50);
+                                           240, 64);
     gui_text_set(short_c_message_data, (char *)show_c_message_data, GUI_FONT_SRC_BMP,
                  gui_rgb(UINT8_MAX,
                          UINT8_MAX, UINT8_MAX), (current_message_status.wechat_msg_len - 1), 32);
