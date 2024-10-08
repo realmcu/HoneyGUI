@@ -62,16 +62,16 @@ Source code path:`HoneyGUI\gui_engine\3rd\litegfx`
                     lx_vglite_api.h
 
 ```
-### Widget adaptation layer
+### Widget Adaptation Layer
 
 The code in this directory is a wrapper layer provided by QuDai to adapt to HoneyGUI. The files `gui_widget_litegfx.c/h` are for the widgets, while files starting with `tab_` are sample code. 
 Users can refer to these sample codes to implement their own upper-layer effects. Note that essentially, using this method still involves calling the RealGUI engine to display related effects. This widget supports the tiled approach for FrameBuffer.
 
-### Platform adaptation layer
+### Platform Adaptation Layer
 
 This directory restructures some interfaces to accommodate different platforms for convenience. This includes debugging log output, memory management, the restructuring of some C++ functions like new, and system time-related functionalities.
 
-### Core lib
+### Core Lib
 
 It provides the Windows GCC version of `liblx_vglite_gcc.a` and the embedded environment version of `lx_vglite.lib`. Please pay attention to the compiler version.
 
