@@ -1301,8 +1301,12 @@ static void gui_kb_mode_switch(gui_kb_t *this, uint8_t mode)
     {
     case KB_MODE_BASIC_PY:
         {
+            gui_kb_set_letter_mode(this, mode);
+            gui_obj_show(this->win_num, false);
+            gui_obj_show(this->win_letter, true);
             gui_obj_show(this->win_ime, true);
         }
+        break;
     case KB_MODE_BASIC_ENG_LOWWER:
     case KB_MODE_BASIC_ENG_UPPER:
     case KB_MODE_BASIC_SYMBOL_EN:

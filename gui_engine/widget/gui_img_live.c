@@ -419,14 +419,14 @@ static void gui_img_live_file_init(gui_img_live_t  *this)
             fclose(fp);
             return;
         }
+
+        mjpeg_buff = gui_malloc(sz_mjpeg);
         if (!mjpeg_buff)
         {
             gui_log("Error: Memory allocation failed\n");
             fclose(fp);
             return;
         }
-        mjpeg_buff = gui_malloc(sz_mjpeg);
-        GUI_ASSERT(mjpeg_buff != NULL);
         memset(mjpeg_buff, 0, sz_mjpeg);
         rdlen = fread(mjpeg_buff, 1, sz_mjpeg, fp);
         fclose(fp);
