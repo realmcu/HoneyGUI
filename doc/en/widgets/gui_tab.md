@@ -2,7 +2,7 @@
 
 The tab widget enables you to create an unlimited number of tabs in both the x and y axes of the screen. Before integrating the tab widget, you must first establish a tabview widget to house the tabs. The direction of the generated tabs is denoted by idx and idy.
 
-For an introduction to idx and idy, please refer to: [tabview](./gui_tabview.md)
+For an introduction to idx and idy, please refer to: [Tabview](./gui_tabview.md)
 
 
 ## Usage
