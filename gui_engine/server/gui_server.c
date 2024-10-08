@@ -10,7 +10,6 @@
  */
 #include <guidef.h>
 #include <draw_img.h>
-#include <draw_font.h>
 #include <gui_fb.h>
 #include <gui_server.h>
 #include <gui_obj.h>
@@ -98,20 +97,38 @@ static void gui_server_entry(void *parameter)
                 {
                     extern gui_app_t *next_app;
                     extern gui_app_t *current_app;
-                    if (current_app->dtor != NULL)
+                    if (current_app != NULL)
                     {
-                        current_app->dtor(current_app);
+                        if (current_app->dtor != NULL)
+                        {
+                            current_app->dtor(current_app);
+                        }
+
+                        if (current_app->thread_entry != NULL)
+                        {
+                            gui_thread_delete(current_app->thread_id);
+                        }
+
+                        current_app->close = false;
                     }
-                    if (current_app->thread_entry != NULL)
+                    else
                     {
-                        gui_thread_delete(current_app->thread_id);
+                        gui_log("!!! current_app is null");
+                        return;
                     }
-                    current_app->close = false;
-                    gui_list_remove(&(next_app->screen.brother_list));
-                    next_app->screen.parent = 0;
-                    gui_obj_tree_free(&((gui_app_t *)app)->screen);
-                    current_app = next_app;
-                    next_app = 0;
+                    if (next_app != NULL)
+                    {
+                        gui_list_remove(&(next_app->screen.brother_list));
+                        next_app->screen.parent = 0;
+                        gui_obj_tree_free(&((gui_app_t *)app)->screen);
+                        current_app = next_app;
+                        next_app = NULL;
+                    }
+                    else
+                    {
+                        gui_log("!!! next_app is null");
+                        return;
+                    }
                     app = current_app;
                 }
                 else

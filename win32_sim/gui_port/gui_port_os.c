@@ -221,13 +221,13 @@ static void *rtk_gui_tick(void *arg)
 
     gettimeofday(&currentTime, NULL);
 
-    int64_t start_milliseconds = currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000;
+    int64_t start_milliseconds = ((int64_t)currentTime.tv_sec * 1000) + (currentTime.tv_usec / 1000);
     while (1)
     {
         struct timeval currentTime;
 
         gettimeofday(&currentTime, NULL);
-        gui_tick = currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000 - start_milliseconds;
+        gui_tick = ((int64_t)currentTime.tv_sec * 1000) + (currentTime.tv_usec / 1000) - start_milliseconds;
     }
 }
 

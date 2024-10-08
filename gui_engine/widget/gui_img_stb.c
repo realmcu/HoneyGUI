@@ -24,7 +24,6 @@
 #include "tp_algo.h"
 #include "gui_img_stb.h"
 #include "stb_image.h"
-#include "acc_init.h"
 #ifdef TJPG
 #define TJPGD_IMPLEMENTATION
 #include "../3rd/tjpgd/tjpgd.h"
