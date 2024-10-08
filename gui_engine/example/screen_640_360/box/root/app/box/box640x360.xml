@@ -44,6 +44,13 @@
         pause = "pause"
         repeatCount="indefinite">animateTranslate1
     </animateTransform>
+    <animateTransform
+        type="image frame"
+        from="app\\box\\resource\\frame"
+        to="app\\box\\resource\\frame"
+        dur="10s"
+        repeatCount="indefinite">animateFrame
+    </animateTransform>
     <screen
     w="640"
     h="360"
@@ -232,4 +239,18 @@
                 id="animateScale1">
             </onOn>
     </switch>
+    <img
+        x="0"
+        y="150"
+        file="app\\box\\resource\\frame\\car5.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">img_frame
+        <onLoad
+            to="img_frame"
+            type="animate" 
+            id="animateFrame">
+        </onLoad>
+    </img>
 </screen></app>

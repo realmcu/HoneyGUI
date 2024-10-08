@@ -175,7 +175,7 @@ static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
     gui_log("img_opacity_cb%d\n", opacity);
     gui_img_set_opacity(animate_params->img, opacity);
 }
-
+static void image_animate_callback(void *params, void *null, gui_animate_t *animate);
 static void multi_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
     image_animate_params_t *animate_params = (image_animate_params_t *)params;
@@ -251,19 +251,23 @@ static void multi_animate_callback(void *params, void *null, gui_animate_t *anim
         img_scale_cb(params, null, animate);
         img_opacity_cb(params, null, animate);
     }
+    else if (!strcmp(animate_params->animate_type, "image frame"))
+    {
+        image_animate_callback(params, null, animate);
+    }
 }
 
-static void image_animate_callback(void *params)
+static void image_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
-    static int current_image_index = 0;
+    int current_image_index = 0;
     image_animate_params_t *animate_params = (image_animate_params_t *)params;
 
     if (animate_params->image_count > 0)
     {
+        current_image_index = animate->progress_percent * (animate_params->image_count - 1);
         gui_img_set_attribute(animate_params->img, animate_params->img_name,
                               animate_params->image_arr[current_image_index], GET_BASE(animate_params->img)->x,
                               GET_BASE(animate_params->img)->y);
-        current_image_index = (current_image_index + 1) % animate_params->image_count;
     }
 
 }
@@ -739,8 +743,7 @@ static void sport_button_release(gui_button_t *b)
 }
 static void multi_level_ui_design(gui_multi_level_t *obj)
 {
-    extern void *get_app_xml(void);
-    create_tree_in_multi_level(get_app_xml(), obj);
+    create_tree_in_multi_level(gui_current_app(), obj);
 }
 struct on_click_jump_cb_param
 {
@@ -3548,8 +3551,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
                             else
                             {
-                                extern void *get_app_xml(void);
-                                f = ezxml_parse_file(((gui_app_t *)get_app_xml())->xml);
+                                f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                             }
                             foreach_create_animate(f, parent, gui_strdup(id));
                             gui_log(" ");
@@ -3641,6 +3643,8 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     float to_num_f[4];
                     memset(from_num_f, 0, sizeof(from_num_f));
                     memset(to_num_f, 0, sizeof(to_num_f));
+                    void **image_array = 0;
+                    int count = 0;
                     if (type && from && to && dur && repeatCount)
                     {
                         if (!strcmp(type, "rotate") || !strcmp(type, "scale") || !strcmp(type, "opacity") ||
@@ -3692,7 +3696,56 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                 gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                         }
+                        if (!strcmp(type, "image frame") && from)
+                        {
+                            int file_count = 0;
+                            {
+                                DIR *dir = NULL;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(from) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, from);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    return 0;
+                                }
+                                gui_free(path);
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        file_count++;
+                                    }
+                                }
+                                closedir(dir);
+                            }
 
+                            image_array = gui_malloc(file_count * sizeof(void *));
+                            {
+                                DIR *dir = NULL;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(from) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, from);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    return 0;
+                                }
+
+
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(from) + 2);
+                                        sprintf(path2, "%s/%s", from, entry->d_name);
+                                        image_array[count++] = gui_get_file_address(path2);
+                                    }
+                                }
+                                gui_free(path);
+                                closedir(dir);
+                            }
+                        }
 
 
                         int dur_num = 0;
@@ -3761,6 +3814,8 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->translate_from_y = from_num_f[1];
                         params->translate_to_x = to_num_f[0];
                         params->translate_to_y = to_num_f[1];
+                        params->image_arr = image_array;
+                        params->image_count = count;
                         gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
                                                gui_strdup(aniamte_name));
 
@@ -4265,8 +4320,7 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                     }
                     else
                     {
-                        extern void *get_app_xml(void);
-                        f = ezxml_parse_file(((gui_app_t *)get_app_xml())->xml);
+                        f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                     }
                     foreach_create_animate(f, to, to_name[1]);
                     gui_log(" ");
