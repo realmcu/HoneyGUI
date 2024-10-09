@@ -30,6 +30,7 @@
 #include "ezxml.h"
 #include "gui_return.h"
 #include "gui_slider.h"
+#include "gui_scroll_wheel_new.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -52,7 +53,6 @@ struct widget_create
     T_OBJ_TYPE type;
 };
 
-#define WIDGETS_NUM 26
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
 
 static struct widget_create widget[] =
@@ -90,6 +90,7 @@ static struct widget_create widget[] =
     {"onOn", MACRO_ONON},
     {"onOff", MACRO_ONOFF},
     {"onLoad", MACRO_ONLOAD},
+    {"roller", TYPE_SCROLL_WHEEL_NEW},
 };
 
 typedef struct
@@ -2924,139 +2925,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         0, 0, gui_get_screen_width(), gui_get_screen_height());
                 }
                 break;
-            // case MOVIE:
-            //     {
-            //         size_t i = 0;
-            //         int16_t x = 0;
-            //         int16_t y = 0;
-            //         char *folder = NULL;
-            //         uint32_t dur = 1000;
-            //         bool reverse = false;
-            //         int repeat = -1;
-            //         while (true)
-            //         {
-            //             if (!(p->attr[i]))
-            //             {
-            //                 break;
-            //             }
-            //             //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-            //             if (!strcmp(p->attr[i], "x"))
-            //             {
-            //                 x = atoi(p->attr[++i]);
-            //             }
-            //             else if (!strcmp(p->attr[i], "y"))
-            //             {
-            //                 y = atoi(p->attr[++i]);
-            //             }
-            //             else if (!strcmp(p->attr[i], "folder"))
-            //             {
-            //                 folder = gui_strdup(p->attr[++i]);
-            //             }
-            //             else if (!strcmp(p->attr[i], "dur"))
-            //             {
-            //                 char *d = p->attr[++i];
-            //                 dur = atoi(d);
-            //                 if (strstr(d, "ms") != NULL)
-            //                 {
-            //                     (void)(dur);
-            //                 }
-            //                 else if (strstr(d, "h") != NULL)
-            //                 {
-            //                     dur = dur * 60 * 60 * 1000;
-            //                 }
-            //                 else if (strstr(d, "s") != NULL)
-            //                 {
-            //                     dur = dur * 1000;
-            //                 }
-            //             }
-            //             else if (!strcmp(p->attr[i], "repeatCount"))
-            //             {
-
-            //                 char *r = p->attr[++i];
-            //                 if (strstr(r, "indefinite") != NULL)
-            //                 {
-            //                     repeat = -1;
-            //                 }
-            //                 else
-            //                 {
-            //                     repeat = atoi(r);
-            //                 }
-            //             }
-            //             else if (!strcmp(p->attr[i], "reverse"))
-            //             {
-            //                 char *r = p->attr[++i];
-            //                 if (strstr(r, "false") != NULL)
-            //                 {
-            //                     reverse = false;
-            //                 }
-            //                 else if (strstr(r, "true") != NULL)
-            //                 {
-            //                     reverse = true;
-            //                 }
-            //             }
-
-            //             i++;
-            //         }
-            //         int file_count = 0;
-            //         {
-            //             DIR *dir = 0;
-            //             struct dirent *entry;
-            //             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-            //             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-            //             if ((dir = opendir(path)) == NULL)
-            //             {
-            //                 gui_free(path);
-            //                 //perror("opendir() failed"); return;
-            //             }
-            //             gui_free(path);
-            //             while ((entry = readdir(dir)) != NULL)
-            //             {
-            //                 file_count++;
-            //             }
-            //             closedir(dir);
-            //         }
-            //         void **image_array = gui_malloc(file_count * sizeof(void *));
-            //         {
-            //             DIR *dir = 0;
-            //             struct dirent *entry;
-            //             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-            //             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-            //             if ((dir = opendir(path)) == NULL)
-            //             {
-            //                 gui_free(path);
-            //                 //perror("opendir() failed"); return;
-            //             }
-
-            //             int count = 0;
-            //             while ((entry = readdir(dir)) != NULL)
-            //             {
-            //                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-            //                 {
-            //                     char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-            //                     sprintf(path2, "%s/%s", folder, entry->d_name);
-            //                     image_array[count++] = gui_get_file_address(path2);
-            //                 }
-
-            //             }
-            //             gui_free(path);
-            //             closedir(dir);
-            //         }
-            //         uint32_t duration_time_ms = 0;
-            //         if (repeat == -1)
-            //         {
-            //             duration_time_ms = UINT32_MAX;
-            //         }
-            //         else
-            //         {
-            //             duration_time_ms = repeat * dur;
-            //         }
-
-
-            //         parent = (void *)gui_dynamic_create_from_mem(parent, "dm", image_array, x, y, file_count - 2,
-            //                                                      dur / (file_count - 5),
-            //                                                      INT32_MAX);
-            //     }
-            //     break;
             case JAVASCRIPT:
                 {
                     if (!strcmp(p->attr[0], "file"))
@@ -3407,7 +3275,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                        currentValue, slider_size);
                 }
                 break;
-
             case MACRO_ONCHANGE:
                 {
                     char *type = 0;
@@ -3615,6 +3482,113 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                 }
                 break;
+            case TYPE_SCROLL_WHEEL_NEW:
+                {
+                    /*<roller
+                        id="scrollWheel1"
+                        x="50"               <!-- X coordinate -->
+                        y="100"              <!-- Y coordinate -->
+                        w="200"              <!-- Width -->
+                        h="300"              <!-- Height -->
+                        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  <!-- Items displayed in each row of the scroll wheel -->
+                        itemCount="11"        <!-- Total number of items -->
+                        rowCount="3"         <!-- Number of visible rows in the scroll wheel -->
+                        rowSpacing="20"      <!-- Spacing between each row -->
+                    ></roller>*/
+
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    int16_t row_count = 0;
+                    int16_t row_spacing = 0;
+                    int16_t item_count = 0;
+                    const char *items = NULL;
+                    int column_offset = 0;
+                    const char *font = 0;
+                    int16_t font_size = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+
+                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemCount"))
+                        {
+                            item_count = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "rowCount"))
+                        {
+                            row_count = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "rowSpacing"))
+                        {
+                            row_spacing = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "items"))
+                        {
+                            items = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "font"))
+                        {
+                            font = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "fontSize"))
+                        {
+                            font_size = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+
+                    // Split items into an array of strings
+                    char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+                    const char **string_array = gui_malloc(item_count * sizeof(char *));
+                    char *token = strtok(items_copy, ",");
+                    int j = 0;
+                    while (token != NULL && j < item_count)
+                    {
+                        string_array[j++] = token;
+                        token = strtok(NULL, ",");
+                    }
+                    // Create the scroll wheel widget
+                    gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
+                                                               parent, x, y, w, row_spacing, row_count, string_array, item_count
+                                                           );
+                    gui_scroll_wheel_new_render_text(scroll_wheel, gui_get_file_address(font), font_size);
+                    if (scroll_wheel == NULL)
+                    {
+                        gui_log("Failed to create scroll wheel widget.\n");
+                        continue;;
+                    }
+                    parent = GUI_BASE(scroll_wheel);
+
+                }
+                break;
+
+
+
+
+            /*default*/
             default:
                 break;
             }
@@ -4297,6 +4271,9 @@ char *get_app_name(const char *xml)
 }
 void create_tree_nest(char *xml, void *obj)
 {
+    GUI_WIDGET_TRY_EXCEPT(obj);
+    gui_app_t *app = gui_obj_tree_get_app(obj);
+    app->xml = xml;
     ezxml_t f1 = ezxml_parse_file(xml);
     foreach_create(f1, obj);
 }

@@ -302,4 +302,16 @@
                 id="animateFrame2">
         </onClick>
 </icon>
+                    <roller
+                        x="50"              
+                        y="100"             
+                        w="200"           
+                        h="300"             
+                        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  
+                        itemCount="11"       
+                        rowCount="3"         
+                        rowSpacing="20"      
+                        fontSize="16"
+                        font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                    >scrollWheel1</roller>
 </screen></app>

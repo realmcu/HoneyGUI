@@ -292,6 +292,19 @@ bool gui_app_get_layer(void);
  * @param active_ms active ms times
  */
 void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms);
+/**
+ * @brief Retrieves the application object associated with the specified GUI object.
+ *
+ * This function traverses the object tree starting from the given GUI object until
+ * it finds the root object, and then returns the application object associated with
+ * that root.
+ *
+ * @param obj A pointer to a GUI object.
+ *
+ * @return A pointer to the application object if found. If the input object is NULL
+ *         or if no application object is found, the function returns NULL.
+ */
+gui_app_t *gui_obj_tree_get_app(gui_obj_t *obj);
 /** End of APP_Exported_Functions
   * @}
   */

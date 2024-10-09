@@ -60,6 +60,16 @@ void gui_app_startup(gui_app_t *app)
     gui_list_init(&app->screen.child_list);
     gui_list_init(&app->screen.brother_list);
     app->screen.opacity_value = UINT8_MAX;
+    app->screen.magic = GUI_MAGIC_NUMBER;
+    if (current_app && !current_app->close_sync)
+    {
+        next_app = app;
+        current_app->next = true;
+    }
+    else
+    {
+        current_app = app;
+    }
     app->ui_design(app);
     gui_obj_tree_print_mmd(&(app->screen));
     if (app->active_ms == 0)
@@ -71,15 +81,6 @@ void gui_app_startup(gui_app_t *app)
         app->thread_id = gui_thread_create(app->screen.name,
                                            app->thread_entry, app,
                                            1024 * 3, 25);
-    }
-    if (current_app && !current_app->close_sync)
-    {
-        next_app = app;
-        current_app->next = true;
-    }
-    else
-    {
-        current_app = app;
     }
     app->screen.opacity_value = UINT8_MAX;
     app->screen.matrix = gui_malloc(sizeof(struct gui_matrix));
@@ -145,4 +146,21 @@ void gui_switch_app(gui_app_t *from, gui_app_t *to)
 void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms)
 {
     app->active_ms = active_ms;
+}
+gui_app_t *gui_obj_tree_get_app(gui_obj_t *obj)
+{
+    gui_obj_t *child = obj;
+
+    while (true)
+    {
+        if (child->parent == NULL && child->type == SCREEN)
+        {
+            gui_log("gui_obj_tree_get_root = %s\n", child->name);
+            return (gui_app_t *)child;
+        }
+        else
+        {
+            child = child->parent;
+        }
+    }
 }

@@ -7,10 +7,9 @@
 #include <cstdio>
 #include <cmath>
 #include <box2d/box2d.h>
-#include <SDL.h>
 #include <vector>
 
-#include <nanovg.h>
+
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
