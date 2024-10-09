@@ -51,6 +51,13 @@
         dur="10s"
         repeatCount="indefinite">animateFrame
     </animateTransform>
+    <animateTransform
+        type="image frame"
+        from="app\\box\\resource\\frame"
+        to="app\\box\\resource\\frame"
+        dur="3s"
+        repeatCount="indefinite">animateFrame2
+    </animateTransform>
     <screen
     w="640"
     h="360"
@@ -238,11 +245,21 @@
                 type="animatePause" 
                 id="animateScale1">
             </onOn>
+            <onOff
+                to="img_frame2"
+                type="animatePause" 
+                id="animateFrame2">
+            </onOff>
+            <onOn
+                to="img_frame2"
+                type="animate" 
+                id="animateFrame2">
+            </onOn>
     </switch>
     <img
         x="0"
         y="150"
-        file="app\\box\\resource\\frame\\car5.bin"
+        file="app\\box\\resource\\frame\\car005.bin"
         blendMode="imgBypassMode"
         rotationAngle="0"
         scaleX="1"
@@ -253,4 +270,36 @@
             id="animateFrame">
         </onLoad>
     </img>
+    <img
+        x="450"
+        y="150"
+        file="app\\box\\resource\\frame\\car005.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">img_frame2
+    </img>
+    <icon
+        picture="app\\box\\resource\\lamp\\switchOff.bin"
+        highlightPicture="app\\box\\resource\\lamp\\switchOn.bin"
+        blendMode="imgBypassMode"
+        opacity="255"
+        pictureX="0"
+        pictureY="0"
+        rotationAngle="0"
+        textX="0"
+        textY="0"
+        fontColor="#ffffff"
+        mode="normal"
+        text=""
+        w="184"
+        h="97"
+        x="360"
+        y="0">btn_allon
+        <onClick
+                to="img_frame2"
+                type="animate" 
+                id="animateFrame2">
+        </onClick>
+</icon>
 </screen></app>

@@ -129,9 +129,9 @@ static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
 
     gui_img_translate(animate_params->img, animate_params->rotate_x,
                       animate_params->rotate_y);
-    gui_log("img_rotate_cb%f\n", animate_params->rotate_from + (animate_params->rotate_to -
-                                                                animate_params->rotate_from)*
-            animate->progress_percent);
+    // gui_log("img_rotate_cb%f\n", animate_params->rotate_from + (animate_params->rotate_to -
+    //                                                             animate_params->rotate_from)*
+    //         animate->progress_percent);
     gui_img_rotation(animate_params->img,
                      animate_params->rotate_from + (animate_params->rotate_to - animate_params->rotate_from)*
                      animate->progress_percent,
@@ -172,14 +172,14 @@ static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
 {
     uint8_t opacity = animate_params->opacity_from - animate->progress_percent *
                       (animate_params->opacity_from - animate_params->opacity);
-    gui_log("img_opacity_cb%d\n", opacity);
+    //gui_log("img_opacity_cb%d\n", opacity);
     gui_img_set_opacity(animate_params->img, opacity);
 }
 static void image_animate_callback(void *params, void *null, gui_animate_t *animate);
 static void multi_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
     image_animate_params_t *animate_params = (image_animate_params_t *)params;
-    gui_log("multi_animate_callback:%x,%s\n", animate_params, animate_params->animate_type);
+    //gui_log("multi_animate_callback:%x,%s\n", animate_params, animate_params->animate_type);
     if (!strcmp(animate_params->animate_type, "rotate"))
     {
         img_rotate_cb(params, null, animate);
@@ -265,7 +265,7 @@ static void image_animate_callback(void *params, void *null, gui_animate_t *anim
     if (animate_params->image_count > 0)
     {
         current_image_index = animate->progress_percent * (animate_params->image_count - 1);
-        gui_img_set_attribute(animate_params->img, animate_params->img_name,
+        gui_img_set_attribute(animate_params->img, GET_BASE(animate_params->img)->name,
                               animate_params->image_arr[current_image_index], GET_BASE(animate_params->img)->x,
                               GET_BASE(animate_params->img)->y);
     }
@@ -3127,6 +3127,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                 {
                     char *type = 0;
                     char *to = 0;
+                    char *id = 0;
                     int x = 0;
                     int y = 0;
                     size_t i = 0;
@@ -3149,6 +3150,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "id1"))
                         {
                             x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = p->attr[++i];
                         }
                         else if (!strcmp(p->attr[i], "id2"))
                         {
@@ -3211,6 +3216,52 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                             gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
 
+                        }
+                        else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+                        {
+                            char **param = gui_malloc(sizeof(char *) * 2);
+                            param[0] = gui_strdup(to);
+                            param[1] = gui_strdup(id);
+                            if (!strcmp(type, "animatePause"))
+                            {
+                                if (parent->type == BUTTON)
+                                {
+                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                                }
+                                else if (parent->type == WINDOW)
+                                {
+                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                                }
+                                else if (parent->type == CLICKSWITCH)
+                                {
+                                    GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                                     (param));
+                                    GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                                      (gui_event_cb_t)pause_animation_cb,
+                                                                      (param));
+                                }
+
+                            }
+                            else if (!strcmp(type, "animate"))
+                            {
+                                if (parent->type == BUTTON)
+                                {
+                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                                }
+                                else if (parent->type == WINDOW)
+                                {
+                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                                }
+                                else if (parent->type == CLICKSWITCH)
+                                {
+                                    GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                                     (param));
+                                    GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                                      (gui_event_cb_t)start_animation_cb,
+                                                                      (param));
+                                }
+
+                            }
                         }
                     }
                 }
