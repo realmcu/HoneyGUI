@@ -139,8 +139,9 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 }
 
 extern gui_win_t *win_main_display;
-void paint_connected_display_cb(gui_win_t *win)
+void paint_connected_display_cb(void *param1, void *param2, struct gui_animate *anim)
 {
+    gui_win_t *win = (gui_win_t *)param1;
     if (app_dashboard_data_get_show_main_display() == true)
     {
         win->base.not_show = app_dashboard_data_get_show_main_display();
@@ -164,6 +165,7 @@ void paint_connected_display_cb(gui_win_t *win)
     app_dashboard_data_get_message_data_update(&current_message_status);
     app_dashboard_update_connected_display_message_infor(&current_message_status);
 }
+
 
 void app_dashboard_update_connected_display_time_info(void)
 {

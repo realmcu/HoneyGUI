@@ -108,8 +108,9 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
 }
 
 extern gui_win_t *win_connected_display;
-void paint_main_display_cb(gui_win_t *win)
+void paint_main_display_cb(void *param1, void *param2, struct gui_animate *anim)
 {
+    gui_win_t *win = (gui_win_t *)param1;
     if (app_dashboard_data_get_show_main_display() == false)
     {
         win->base.not_show = !app_dashboard_data_get_show_main_display();
@@ -132,8 +133,8 @@ void paint_main_display_cb(gui_win_t *win)
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
     app_dashboard_update_main_display_message_infor(&current_message_status);
-
 }
+
 void app_dashboard_update_main_display_time_info(void)
 {
     uint32_t main_display_hour = app_dashboard_data_get_current_timer() / 3600;
