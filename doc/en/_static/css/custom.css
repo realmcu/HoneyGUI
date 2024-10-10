@@ -56,8 +56,7 @@ figcaption, figcaption p{
         background:rgba(0,0,0,.05);
     }
     .wy-nav-content {
-        width: calc(100% - var(--md-right-contents-width));
-        max-width: 1200px;
+        max-width: 100%;
         min-width: 500px;
         margin:0;
         padding: 1.618em 3.2%;
