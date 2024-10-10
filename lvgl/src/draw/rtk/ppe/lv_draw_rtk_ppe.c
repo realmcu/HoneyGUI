@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite.c
+ * @file lv_draw_rtk_ppe.c
  *
  */
 
@@ -48,6 +48,7 @@ static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_ds
  *      MACROS
  **********************/
 #include "lv_img.h"
+extern lv_img_dsc_t img_benchmark_cogwheel_rgb;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -290,4 +291,4 @@ static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_d
     }
 }
 
-#endif /*LV_USE_GPU_RTK_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_PPE*/

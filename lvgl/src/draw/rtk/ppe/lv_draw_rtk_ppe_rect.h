@@ -31,17 +31,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Draw rectangle background with effects (rounded corners, gradient)
- *
- * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
- * @param[in] dsc Description of the rectangle background
- *
- * @retval LV_RES_OK Draw completed
- * @retval LV_RES_INV Error occurred
- *
- */
 lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
                         const lv_area_t *clip_area,
                         const lv_draw_rect_dsc_t *dsc);

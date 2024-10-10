@@ -1,5 +1,5 @@
 /**
- * @file lv_vglite_utils.c
+ * @file lv_draw_rtk_ppe_utils.c
  *
  */
 
@@ -281,4 +281,4 @@ void lv_ppe_get_scale_point(const lv_point_t *pivot, const lv_area_t *coords, fl
     result->y = (lv_coord_t)((m_row0 * x) + (m_row1 * y) + (m_row2 * z));
 }
 
-#endif /*LV_USE_GPU_RTK_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_PPE*/

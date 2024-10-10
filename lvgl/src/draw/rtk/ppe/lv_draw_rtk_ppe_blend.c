@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_blend.c
+ * @file lv_draw_rtk_ppe_blend.c
  *
  */
 
@@ -25,19 +25,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-/**
- * Blit single image, with optional opacity.
- *
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] src_area Source area with relative coordinates of source buffer
- * @param[in] opa Opacity
- *
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred
- */
-static lv_res_t lv_ppe_blit_single(const lv_area_t *dest_area, const lv_area_t *src_area,
-                                   lv_opa_t opa);
 
 /**********************
  *  STATIC VARIABLES

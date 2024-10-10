@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite.h
+ * @file lv_draw_rtk_ppe.h
  *
  */
 
@@ -41,7 +41,7 @@ void lv_draw_ppe_ctx_deinit(struct _lv_disp_drv_t *drv, lv_draw_ctx_t *draw_ctx)
 /**********************
  *      MACROS
  **********************/
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_RTK_PPE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
