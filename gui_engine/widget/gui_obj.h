@@ -307,7 +307,11 @@ void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code);
   * \endcode
   */
 void gui_obj_tree_free(void *obj);
-
+/**
+  * @brief free the widget tree recursively, without the root. Preorder traversal.
+  * @param obj the root of the widget tree.
+  */
+void gui_obj_child_free(gui_obj_t *object);
 /**
   * @brief print the widget tree recursively,from the root to the leaves.Preorder traversal.
   * @param obj the root of the widget tree.

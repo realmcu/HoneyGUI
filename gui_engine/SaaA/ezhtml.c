@@ -290,7 +290,7 @@ typedef struct
 
 light_param_t lights[LIGHTS_NUM];
 
-char *read_file(const char *path)
+static char *read_file(const char *path)
 {
     FILE *file = fopen(path, "r");
     if (!file)

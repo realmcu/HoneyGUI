@@ -33,6 +33,7 @@
 #define APP_HEART_RATE
 #define APP_SOCCER
 #define APP_BOX2D_RING
+#define APP_CALENDAR
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 /*Define a app with name APP_STOPWATCH*/
 #define APP_STOPWATCH
@@ -55,6 +56,7 @@ GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 GUI_APP_DEFINE_NAME(APP_SOCCER)
 GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
+GUI_APP_DEFINE_NAME(APP_CALENDAR)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -2847,6 +2849,14 @@ GUI_APP_ENTRY(APP_MUSIC)
 {
     extern void app_music_ui_design(gui_obj_t *obj);
     app_music_ui_design(GUI_APP_ROOT_SCREEN);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
+}
+GUI_APP_ENTRY(APP_CALENDAR)
+{
+    extern void app_calender_ui_design(gui_obj_t *obj);
+    app_calender_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     gui_fps_create(GUI_APP_ROOT_SCREEN);

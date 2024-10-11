@@ -120,7 +120,11 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
         gui_free(obj);
     }
 }
-
+void gui_obj_child_free(gui_obj_t *object)
+{
+    gui_obj_tree_child_free(object);
+    gui_list_init(&object->child_list);
+}
 static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
 {
     gui_list_t *node = NULL;
