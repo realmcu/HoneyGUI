@@ -316,7 +316,7 @@ static void page_cb(gui_page_t *page)
 }
 static void win_cb(gui_win_t *win)
 {
-    GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui())
+    GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui());
     gui_tabview_t *tabview = 0;
     gui_obj_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", (void *)&tabview);
     if (tabview)

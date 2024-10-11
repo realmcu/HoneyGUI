@@ -218,8 +218,6 @@ static void cv_cb(gui_cardview_t *cv)
     {
         GUI_BASE(canvas)->not_show = 0;
         GUI_BASE(img)->not_show = 1;
-        // gui_img_set_attribute(img, "timecard", CARD_MUSIC_BIN, GUI_BASE(img)->x, GUI_BASE(img)->y);
-        // gui_img_set_opacity(img, (timecard_height + offset) / timecard_height * 255);
     }
     else
     {
