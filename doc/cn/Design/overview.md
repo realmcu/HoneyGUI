@@ -10,7 +10,7 @@ RealUI系统的工作流程主要分为四个步骤：
 
 ### 系统
 
-系统初始化主要包括系统时钟的初始化、外设的初始化以及项目的其他模块的初始化，例如[PSRAM](/Glossary.rst#term-PSRAM)、[LCD](/Glossary.rst#term-LCD)、[TP](/Glossary.rst#term-TP)和蓝牙。
+系统初始化主要包括系统时钟的初始化、外设的初始化以及项目的其他模块的初始化，例如 [PSRAM](/Glossary.rst#term-PSRAM)、[LCD](/Glossary.rst#term-LCD)、[TP](/Glossary.rst#term-TP) 和蓝牙。
 
 ### GUI服务器
 
@@ -27,8 +27,8 @@ GUI服务器是GUI任务的运行函数，它的具体运行过程分为六个�
 1. GUI应用程序存在性检查：首先，需要获取当前正在运行的GUI应用程序。当GUI检测到有正在运行的GUI应用程序时，会进入下一步；
 2. 获取LCD数据：获取屏幕的实时信息；
 3. 获取触摸板数据：获取触摸板的实时信息，并运行触摸算法；
-4. 获取[KB](/Glossary.rst#term-KB)数据：获取键盘的实时信息，并运行键盘算法；
+4. 获取 [KB](/Glossary.rst#term-KB) 数据：获取键盘的实时信息，并运行键盘算法；
 5. 对象绘制：在应用程序中绘制控件，包括功能操作和图像处理；
-6. 更新[FB](/Glossary.rst#term-FB)：将绘制的结果传递到屏幕上显示。
+6. 更新 [FB](/Glossary.rst#term-FB) ：将绘制的结果传递到屏幕上显示。
 
 更详细的GUI应用程序操作可以在在线文档中找到。
