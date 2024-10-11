@@ -210,7 +210,7 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
             }
         }
     }
-
+    this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
     gui_scroll_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
 

@@ -337,6 +337,7 @@ static void gui_text_prepare(gui_obj_t *obj)
         return;
     }
 
+    this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
@@ -559,6 +560,11 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 void gui_text_input_set(gui_text_t *this, bool inputable)
 {
     this->inputable = inputable;
+}
+
+void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)
+{
+    this->wordwrap = wordwrap;
 }
 
 void gui_text_set_min_scale(gui_text_t *this, float min_scale)
