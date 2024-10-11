@@ -1,6 +1,6 @@
 /* =========== Define common variables =========== */
 body {
-    --md-left-sider-width: 280px;
+    --md-left-sider-width: 350px;
     --md-right-contents-width: 250px;
 }
 /* =========== Define common variables =========== */
@@ -250,6 +250,9 @@ dl.c.unexpanded dd, dl.cpp.unexpanded dd {
 .wy-table-responsive {
     /* width: 100%;
   	overflow: auto; */
+}
+table, th, td {
+    border: 1px solid #e1e4e5;
 }
 table {
     border-collapse:collapse;
