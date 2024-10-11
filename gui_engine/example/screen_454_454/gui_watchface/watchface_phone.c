@@ -110,7 +110,7 @@ static void switch_disconnect_yes_action(void *obj)
 
 static void switch_disconnect_no_action(void *obj)
 {
-    gui_log("switch_disconnect_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_disconnect_no_action\n");
     app_watchface_switch_tabs(WATCHFACE_PHONE);
 }
 

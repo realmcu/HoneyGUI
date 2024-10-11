@@ -8,7 +8,7 @@
 
 static void gui_call_status_update_cb(void *obj, uint16_t event)
 {
-    gui_log("gui_call_status_update_cb\n", event);
+    gui_log("gui_call_status_update_cb event = %d\n", event);
     switch (event)
     {
     case GUI_EVENT_CALL_INCOMING:

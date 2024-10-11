@@ -171,7 +171,7 @@ static void switch_song_cb(void *obj, uint16_t event, void *param)
 
 static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_t *list_first)
 {
-    gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", (uint32_t *)list_first);
+    gui_log("pagelist_test_update_list_first_cb\n");
 
 #ifndef _WIN32
     slide_index++;
@@ -194,7 +194,7 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
 
 static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t *list_last)
 {
-    gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", (uint32_t *)list_last);
+    gui_log("pagelist_test_update_list_last_cb\n");
 
 #ifndef _WIN32
     slide_index--;

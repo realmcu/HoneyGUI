@@ -134,7 +134,6 @@ static int watch_app_init(void)
     }
     else
     {
-        close(fd);
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
