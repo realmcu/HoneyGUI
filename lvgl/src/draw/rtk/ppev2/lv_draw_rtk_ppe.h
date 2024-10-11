@@ -17,7 +17,7 @@ extern "C" {
 
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_GPU_RTK_PPE
+#if LV_USE_GPU_RTK_PPEV2
 #include "../../sw/lv_draw_sw.h"
 #include "lv_draw_rtk_ppe_utils.h"
 

@@ -8,7 +8,7 @@
  *********************/
 
 
-#if LV_USE_GPU_RTK_PPE
+#if LV_USE_GPU_RTK_PPEV2
 #include "lv_draw_rtk_ppe_blend.h"
 #include "lv_draw_rtk_ppe_utils.h"
 #include "rtl_PPEV2.h"
@@ -680,4 +680,4 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
 }
 
 
-#endif /*LV_USE_GPU_RTK_PPE*/
+#endif /*LV_USE_GPU_RTK_PPEV2*/

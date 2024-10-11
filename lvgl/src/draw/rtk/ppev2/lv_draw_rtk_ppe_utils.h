@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_GPU_RTK_PPE
+#if LV_USE_GPU_RTK_PPEV2
 #include "../../sw/lv_draw_sw.h"
 #include "../../../misc/lv_log.h"
 #include "rtl_PPEV2.h"
@@ -44,7 +44,7 @@ lv_res_t lv_ppe_buffer_copy(void *dest_buf, lv_coord_t dest_stride, const lv_are
  **********************/
 
 
-#endif /*LV_USE_GPU_RTK_PPE*/
+#endif /*LV_USE_GPU_RTK_PPEV2*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -9,7 +9,7 @@
  *********************/
 
 
-#if LV_USE_GPU_RTK_PPE
+#if LV_USE_GPU_RTK_PPEV2
 #include "lv_draw_rtk_ppe_rect.h"
 #include "rtl_PPEV2.h"
 #include <math.h>
@@ -79,4 +79,4 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_RTK_PPE*/
+#endif /*LV_USE_GPU_RTK_PPEV2*/
