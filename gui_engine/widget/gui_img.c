@@ -82,6 +82,9 @@
   * @{
   */
 static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
+static float gui_img_get_transform_t_y_old(gui_img_t *this);
+static float gui_img_get_transform_t_x_old(gui_img_t *this);
+static void gui_img_reset_translate(gui_img_t *this);
 void gui_img_set_animate(gui_img_t *this,
                          uint32_t   dur,
                          int        repeat_count,
@@ -164,7 +167,7 @@ static void gui_img_prepare(gui_obj_t *obj)
 
     this = (gui_img_t *)obj;
     tp = tp_get_info();
-
+    gui_img_reset_translate(this);
     matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
     matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
     matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
@@ -970,7 +973,12 @@ void gui_img_rotation(gui_img_t *this,
     get_transform(this)->c_x = c_x;
     get_transform(this)->c_y = c_y;
 }
-
+static void gui_img_reset_translate(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    get_transform(this)->t_x_old = 0;
+    get_transform(this)->t_y_old = 0;
+}
 void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
@@ -984,8 +992,10 @@ void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 void gui_img_translate(gui_img_t *this, float t_x, float t_y)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
-    get_transform(this)->t_x = t_x;
-    get_transform(this)->t_y = t_y;
+    get_transform(this)->t_x = t_x + get_transform(this)->t_x_old;
+    get_transform(this)->t_y = t_y + get_transform(this)->t_y_old;
+    get_transform(this)->t_x_old += t_x;
+    get_transform(this)->t_y_old += t_y;
 }
 float gui_img_get_transform_scale_x(gui_img_t *this)
 {
@@ -1049,6 +1059,24 @@ float gui_img_get_transform_t_y(gui_img_t *this)
         return this->transform->t_y;
     }
     return DEFAULT_TRANSFORM_T_Y;
+}
+static float gui_img_get_transform_t_y_old(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->t_y_old;
+    }
+    return DEFAULT_TRANSFORM_T_Y;
+}
+static float gui_img_get_transform_t_x_old(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->t_x_old;
+    }
+    return DEFAULT_TRANSFORM_T_X;
 }
 void gui_img_skew_x(gui_img_t *this, float degrees)
 {

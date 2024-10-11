@@ -60,6 +60,8 @@ struct gui_img_transform
     float scale_y;                      //!< float gui_img_get_transform_scale_y(gui_img_t *img);
     float t_x;                          //!< translate of screen x;  float gui_img_get_transform_t_x(gui_img_t *img);
     float t_y;                          //!< translate of screen y;  float gui_img_get_transform_t_y(gui_img_t *img);
+    float t_x_old;
+    float t_y_old;
 };
 
 typedef struct gui_img

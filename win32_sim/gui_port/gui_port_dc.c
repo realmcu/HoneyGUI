@@ -8,37 +8,6 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 
-
-
-
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-// default demo 480_480
-#define ENABLE_RTK_GUI_SAAA_DEMO 1
-
-#if (ENABLE_RTK_GUI_SAAA_DEMO == 1)
-
-// ENABLE_RTK_GUI_480_480_DEMO
-#define DRV_LCD_WIDTH   480
-#define DRV_LCD_HIGHT   480
-
-#elif (ENABLE_RTK_GUI_SAAA_DEMO == 2)
-// ENABLE_RTK_GUI_480_320_DEMO
-#define DRV_LCD_WIDTH   480
-#define DRV_LCD_HIGHT   320
-
-#elif (ENABLE_RTK_GUI_SAAA_DEMO == 3)
-//  ENABLE_RTK_GUI_320_240_DEMO
-#define DRV_LCD_WIDTH   320
-#define DRV_LCD_HIGHT   240
-
-#elif (ENABLE_RTK_GUI_SAAA_DEMO == 4)
-//  ENABLE_RTK_GUI_640_360_DEMO
-#define DRV_LCD_WIDTH   640
-#define DRV_LCD_HIGHT   360
-#endif
-
-#endif
-
 #ifndef DRV_LCD_WIDTH
 #define DRV_LCD_WIDTH   480
 #endif

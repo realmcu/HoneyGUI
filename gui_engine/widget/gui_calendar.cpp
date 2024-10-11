@@ -4,28 +4,30 @@
 #include <string>
 #include "gui_obj.h"
 #include "gui_text.h"
-#include "../root_image/ui_resource.h"
 #include "gui_tabview.h"
 #include "gui_tab.h"
 #include <iostream>
-float cellWidth ;
-float cellHeight;
-int currentDay, currentMonth, currentYear;
-char buffer[32];
-float margin = 20;
-float headerHeight = 50;
-gui_text_t *title;
-
-void getCurrentDate(int &day, int &month, int &year)
+#include "gui_win.h"
+static float cellWidth ;
+static float cellHeight;
+static int currentDay, currentMonth, currentYear;
+static char buffer[32];
+static float margin = 20;
+static float headerHeight = 50;
+static gui_text_t *title;
+static void *font_source;
+static int font_size = 16;
+static gui_color_t color;
+static void getCurrentDate(int &day, int &month, int &year)
 {
     time_t now = time(0);
     tm *ltm = localtime(&now);
     day = ltm->tm_mday;
-    month = 1 + ltm->tm_mon; // NanoVG月份是从1开始
+    month = 1 + ltm->tm_mon;
     year = 1900 + ltm->tm_year;
 }
 
-void getPreviousMonth(int month, int year, int &prevMonth, int &prevYear)
+static void getPreviousMonth(int month, int year, int &prevMonth, int &prevYear)
 {
     if (month == 1)
     {
@@ -39,7 +41,7 @@ void getPreviousMonth(int month, int year, int &prevMonth, int &prevYear)
     }
 }
 
-void getNextMonth(int month, int year, int &nextMonth, int &nextYear)
+static void getNextMonth(int month, int year, int &nextMonth, int &nextYear)
 {
     if (month == 12)
     {
@@ -53,21 +55,21 @@ void getNextMonth(int month, int year, int &nextMonth, int &nextYear)
     }
 }
 
-gui_text_t *displayText(gui_obj_t *parent, const char *text_string, int x, int y,
-                        gui_color_t color)
+static gui_text_t *displayText(gui_obj_t *parent, const char *text_string, int x, int y,
+                               gui_color_t color)
 {
     const char *text = gui_strdup(text_string);
-    int font_size = 16;
+
     gui_text_t *t = gui_text_create(parent, 0, x, y, gui_get_screen_width(), font_size);
     gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
-    void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+    void *addr1 = font_source;
     gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     gui_text_mode_set(t, MULTI_LEFT);
     return t;
 }
 
-void drawCalendar(gui_obj_t *parent, int windowWidth, int windowHeight, int month, int year,
-                  int cellWidth, int cellHeight)
+static void drawCalendar(gui_obj_t *parent, int windowWidth, int windowHeight, int month, int year,
+                         int cellWidth, int cellHeight)
 {
     time_t rawtime;
     struct tm *timeinfo;
@@ -76,7 +78,7 @@ void drawCalendar(gui_obj_t *parent, int windowWidth, int windowHeight, int mont
     timeinfo->tm_sec = 0;
     timeinfo->tm_min = 0;
     timeinfo->tm_hour = 0;
-    timeinfo->tm_mon = month - 1;  // tm_mon 是从0-11的
+    timeinfo->tm_mon = month - 1;
     timeinfo->tm_mday = 1;
     timeinfo->tm_year = year - 1900;
     mktime(timeinfo);
@@ -100,11 +102,10 @@ void drawCalendar(gui_obj_t *parent, int windowWidth, int windowHeight, int mont
         float x = margin + col * cellWidth;
         float y = margin + headerHeight + row * cellHeight + cellHeight;
 
-        // 判断是否为今天的日期
         if (dayNum == currentDay && month == currentMonth && year == currentYear)
         {
             gui_canvas_rect_create(parent, 0, x, y - cellHeight / 2, cellWidth - 1, cellHeight - 1,
-                                   gui_rgba(255, 0, 0, 255)); // 使用红色高亮
+                                   gui_rgba(255, 0, 0, 255));
         }
         else
         {
@@ -113,20 +114,21 @@ void drawCalendar(gui_obj_t *parent, int windowWidth, int windowHeight, int mont
         }
 
         snprintf(buffer, sizeof(buffer), "%d", dayNum);
-        displayText(parent, buffer, x + cellWidth / 2, y, gui_rgba(0, 0, 0, 255));
+        displayText(parent, buffer, x + cellWidth / 2, y, color);
     }
 }
 
-gui_tab_t *tabs[3]; // 定义一个包含三个标签页的数组
-int months_show; // 存储标签页对应月份
-int years_show;  // 存储标签页对应年份
+static gui_tab_t *tabs[3];
+static int months_show;
+static int years_show;
 
-void updateTabContent(int tabIndex, gui_obj_t *tab, int windowWidth, int windowHeight, int month,
-                      int year, int cellWidth, int cellHeight)
+static void updateTabContent(int tabIndex, gui_obj_t *tab, int windowWidth, int windowHeight,
+                             int month,
+                             int year, int cellWidth, int cellHeight)
 {
     drawCalendar(tab, windowWidth, windowHeight, month, year, cellWidth, cellHeight);
 }
-int get_left()
+static int get_left()
 {
     for (size_t i = 0; i < 3; i++)
     {
@@ -138,7 +140,7 @@ int get_left()
     }
     return 0;
 }
-int get_right()
+static int get_right()
 {
     for (size_t i = 0; i < 3; i++)
     {
@@ -160,8 +162,7 @@ static void tabview_change(void *obj, gui_event_t e, void *param)
     std::cout << cur_idx << tabs[0]->id.x << tabs[1]->id.x << tabs[2]->id.x << std::endl;
     if (cur_idx == 1)
     {
-        // 当前是显示在中间的标签是 tab1，位于中间
-        // 设置 tab2 左侧, tab0 右侧，然后更新其内容
+
         getNextMonth(months_show, years_show, nextMonth, nextYear);
         months_show = nextMonth;
         years_show = nextYear;
@@ -180,8 +181,7 @@ static void tabview_change(void *obj, gui_event_t e, void *param)
     }
     else if (cur_idx == -1)
     {
-        // 当前是显示在中间的标签是 tab2，位于中间
-        // 设置 tab0 左侧, tab1 右侧，然后更新其内容
+
         getPreviousMonth(months_show, years_show, prevMonth, prevYear);
         months_show = prevMonth;
         years_show = prevYear;
@@ -213,7 +213,7 @@ static void tabview_change(void *obj, gui_event_t e, void *param)
 
 }
 
-void setup_ui(gui_obj_t *parent, int windowWidth, int windowHeight, int month, int year)
+static void setup_ui(gui_obj_t *parent, int windowWidth, int windowHeight, int month, int year)
 {
     cellWidth = (windowWidth - 2 * margin) / 7;
     cellHeight = (windowHeight - headerHeight - 2 * margin) / 6;
@@ -250,9 +250,14 @@ void setup_ui(gui_obj_t *parent, int windowWidth, int windowHeight, int month, i
 }
 
 extern "C" {
-    void app_calender_ui_design(gui_obj_t *parent)
+    void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
+                             int font_size_p, gui_color_t color_p)
     {
-        getCurrentDate(currentDay, currentMonth, currentYear); // 获取当前日期的完整信息
-        setup_ui(parent, 454, 454, currentMonth, currentYear);
+        gui_win_t *win = gui_win_create(parent, 0, x, y, w, h);
+        font_source = font_source_p;
+        font_size = font_size_p;
+        color = color_p;
+        getCurrentDate(currentDay, currentMonth, currentYear);
+        setup_ui(GUI_BASE(win), w, h, currentMonth, currentYear);
     }
 }

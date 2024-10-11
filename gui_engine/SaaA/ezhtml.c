@@ -91,6 +91,7 @@ static struct widget_create widget[] =
     {"onOff", MACRO_ONOFF},
     {"onLoad", MACRO_ONLOAD},
     {"roller", TYPE_SCROLL_WHEEL_NEW},
+    {"calendar", MACRO_CALENDAR},
 };
 
 typedef struct
@@ -3584,7 +3585,75 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                 }
                 break;
+            case MACRO_CALENDAR:
+                {
+                    /*    <calendar
+                    x="0"
+                    y="360"
+                    w="800"
+                    h="400"
+                    fontColor="#ff000000"
+                    fontSize="16"
+                    font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
+                    </calendar>*/
 
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    uint32_t  color = {0};
+                    const char *font = 0;
+                    int16_t font_size = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+
+                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "fontColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "font"))
+                        {
+                            font = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "fontSize"))
+                        {
+                            font_size = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    gui_color_t color_font;
+                    color_font.color.argb_full = color;
+
+                    extern void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
+                                                    int font_size_p, gui_color_t color_p);
+                    gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_font);
+
+                }
+                break;
 
 
 
