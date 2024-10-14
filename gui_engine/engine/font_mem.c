@@ -541,7 +541,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
 
                 chr[i].y = rect->y1 + line * chr[i].h;
-                if (chr[i].y + chr[i].h > rect->y2)
+                if (chr[i].y + chr[i].h - 1 > rect->y2)
                 {
                     text->active_font_len = i;
                     break;
@@ -632,7 +632,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
 
                 chr[i].y = rect->y1 + line * chr[i].h;
-                if (chr[i].y + chr[i].h > rect->y2)
+                if (chr[i].y + chr[i].h - 1 > rect->y2)
                 {
                     text->active_font_len = i;
                     break;
