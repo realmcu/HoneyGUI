@@ -19,6 +19,6 @@ The GUI framework diagram is shown in the figure below:
     C-APP application<Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>
     Use ARM-2D Design An Application <ARM-2D/fwk_app_arm2d>
-    Use Script Design An Application <SaaA/index>
+    Use RVD Tool Design An Application <SaaA/index>
     Application Switching <Switch_APP/index>
 ```
