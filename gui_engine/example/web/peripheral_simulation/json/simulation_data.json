@@ -2,8 +2,8 @@
     "weather": [
         {
             "low": 18,
-            "high": 37,
-            "cur": 22,
+            "high": 28,
+            "cur": 24,
             "condition_1": "Cloudy",
             "condition_2": "Cloudy",
             "condition_3": "Cloudy",
@@ -13,22 +13,22 @@
     ],
     "compass": [
         {
-            "degree": 90
+            "degree": 121
         }
     ],
     "activity": [
         {
-            "move": 1,
-            "ex": 1,
-            "stand": 1
+            "move": 8677,
+            "ex": 10,
+            "stand": 19
         }
     ],
     "heart_rate": [
         {
-            "AM12": 98,
-            "AM6": 114,
-            "PM12": 75,
-            "PM6": 98
+            "AM12": 91,
+            "AM6": 86,
+            "PM12": 70,
+            "PM6": 70
         }
     ]
 }
