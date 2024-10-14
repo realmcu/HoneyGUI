@@ -1,6 +1,6 @@
-#  86box
+#  86Box
 
-本示例演示了如何开发一个 RealUI 86box APP，开发者可以从中学习和理解开发 UI APP 的基本方法和流程。
+本示例演示了如何开发一个 RealUI 86Box APP，开发者可以从中学习和理解开发 UI APP 的基本方法和流程。
 
 ## 源文件
 - APP package `gui_engine\example\screen_480_480\root\app\box`
@@ -8,7 +8,7 @@
 
 ## UI设计
 ### RVisualDesigner
-- RealUI 86box 使用 RVisualDesigner 来完成 UI 设计， 首次使用 RVisualDesigner 请参阅 `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` 获取详尽的使开发指南。
+- RealUI 86Box 使用 RVisualDesigner 来完成 UI 设计， 首次使用 RVisualDesigner 请参阅 `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` 获取详尽的使开发指南。
 
 - 在图示路径中找到并打开示例的 UI 设计工程：
 <br/>
