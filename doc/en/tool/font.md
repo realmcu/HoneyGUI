@@ -1,6 +1,7 @@
 # Font Convert Tool
 
 Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table .txt file, custom .cst file), and find the vector font data corresponding to characters according to the Unicode code from the font file (such as .ttf). Convert to a bitmap, and the output is a .bin file.
+Please refer to this section for the download link of the font conversion tool: [Tool](./index.md) 
 
 <div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1725358504194067891/e9f8aa2f_13674272.png" ></div>
 
