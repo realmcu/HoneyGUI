@@ -376,7 +376,7 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
 
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
-    root->type = VG_LITE_CUBE;
+    root->type = CUBE;
     root->obj_cb = gui_perspective_cb;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;

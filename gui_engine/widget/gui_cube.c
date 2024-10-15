@@ -540,7 +540,7 @@ static void gui_cube_ctor(gui_cube_t         *this,
     gui_obj_ctor(base, parent, name, x, y, w, h);
 
     //for root class
-    root->type = VG_LITE_CUBE;
+    root->type = CUBE;
     root->obj_cb = gui_cube_cb;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;

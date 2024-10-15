@@ -190,7 +190,7 @@ static void gui_canvas_widget_nanovg_ctor(gui_canvas_t *this,
     gui_obj_ctor(base, parent, name, x, y, w, h);
 
     //for root class
-    root->type = VG_LITE_CLOCK;
+    root->type = CANVAS;
     root->obj_cb = gui_canvas_cb;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;

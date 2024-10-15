@@ -1,6 +1,6 @@
 # Get Started
 
-## Source project download
+## Source Project Download
 
 - Download on GitHub: <https://github.com/realmcu/HoneyGUI>
 - Download on Gitee: <https://gitee.com/realmcu/HoneyGUI>
