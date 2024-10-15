@@ -16,7 +16,7 @@ The GUI framework diagram is shown in the figure below:
 .. toctree::
     :maxdepth: 2
 
-    C-APP application<Native/Native>
+    C-APP Application<Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>
     Use ARM-2D Design An Application <ARM-2D/fwk_app_arm2d>
     Use RVD Tool Design An Application <SaaA/index>
