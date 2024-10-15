@@ -214,4 +214,4 @@ void lv_ppe_get_transformed_area(lv_area_t *res, lv_coord_t w, lv_coord_t h, int
 #endif
 }
 
-#endif /*LV_USE_GPU_RTK_PPE*
+#endif /*LV_USE_GPU_RTK_PPE*/

@@ -341,7 +341,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     target.memory = (uint32_t *)target.address;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ABGR8888;
 
     source.address = (uint32_t)map_p;
     source.memory = (uint32_t *)source.address;
@@ -349,14 +349,11 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     source.height = coords->y2 - coords->y1 + 1;
     if (LV_COLOR_DEPTH == 16)
     {
-        if (cf == LV_IMG_CF_TRUE_COLOR)
-        {
-            source.format = PPE_BGR565;
-        }
-        else
-        {
-            return LV_RES_INV;
-        }
+        source.format = PPE_RGB565;
+    }
+    if (LV_COLOR_DEPTH == 32)
+    {
+        source.format = PPE_ARGB8888;
     }
     source.global_alpha_en = ENABLE;
     source.global_alpha = 0xFF - dsc->recolor_opa;
@@ -376,7 +373,24 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     lv_color32_t recolor_value = lv_ppe_toABGR8888(dsc->recolor);
     recolor_value.ch.alpha = dsc->recolor_opa;
 
-    ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
+    if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        recolor.color_key_en = ENABLE;
+        lv_color32_t chroma = lv_ppe_toABGR8888(LV_COLOR_CHROMA_KEY);
+        lv_color32_t combined_chroma;
+        combined_chroma.ch.alpha = (recolor_value.ch.alpha * recolor_value.ch.alpha +
+                                    (0xFF - recolor_value.ch.alpha) * chroma.ch.alpha) / 0xFF;
+        combined_chroma.ch.blue = (recolor_value.ch.red * recolor_value.ch.alpha +
+                                   (0xFF - recolor_value.ch.alpha) * chroma.ch.red) / 0xFF;
+        combined_chroma.ch.green = (recolor_value.ch.green * recolor_value.ch.alpha +
+                                    (0xFF - recolor_value.ch.alpha) * chroma.ch.green) / 0xFF;
+        combined_chroma.ch.red = (recolor_value.ch.blue * recolor_value.ch.alpha +
+                                  (0xFF - recolor_value.ch.alpha) * chroma.ch.blue) / 0xFF;
+        lv_color_t chroma_16 = lv_color_hex(combined_chroma.full);
+        recolor.color_key_value = chroma_16.full;
+    }
+
+    ppe_translate_t trans = {.x = coords->x1 - draw_ctx->buf_area->x1, .y = coords->y1 - draw_ctx->buf_area->y1};
     uint32_t image_size = source.width * source.height * LV_COLOR_DEPTH / 8;
     if (image_size <= buffer_size)
     {
@@ -410,11 +424,12 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
             }
             recolor.height = (rect.bottom - rect.top + 1);
             PPE_ERR err = lv_ppe_recolor(&source, &recolor, &rect, recolor_value.full);
+
             if (err != PPE_SUCCESS)
             {
                 return LV_RES_INV;
             }
-            trans.y = coords->y1 + y;
+            trans.y = coords->y1 + y - draw_ctx->buf_area->y1;
             err = PPE_blend(&recolor, &target, &trans, PPE_SRC_OVER_MODE);
             if (err != PPE_SUCCESS)
             {

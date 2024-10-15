@@ -41,20 +41,19 @@ lv_res_t lv_ppe_blit(lv_color_t *dest_buf, lv_area_t *dest_area, lv_coord_t dest
                      lv_opa_t opa);
 
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
-                               lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
-                                                              lv_point_t *base,
-                                                              const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);
+                               lv_point_t *base,
+                               const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);
 
-                               lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
-                                                          const lv_draw_img_dsc_t *dsc, const lv_area_t *coords);
+lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
+                           const lv_draw_img_dsc_t *dsc, const lv_area_t *coords);
 
-                               lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
-                                                            const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);
+lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
+                             const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);
 
-                               lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc);
-                               /**********************
-                                *      MACROS
-                                **********************/
+lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc);
+/**********************
+ *      MACROS
+ **********************/
 
 #endif /*LV_USE_GPU_RTK_PPE*/
 
