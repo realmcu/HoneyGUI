@@ -20,10 +20,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
-    float m[3][3];    /*! The 3x3 matrix itself, in [row][column] order. */
-} ppe_matrix_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -177,108 +173,45 @@ lv_color32_t lv_ppe_toABGR8888(lv_color_t color)
     return ABGR8888_color;
 }
 
-static void ppe_mat_multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult)
+void lv_ppe_get_transformed_area(lv_area_t *res, lv_coord_t w, lv_coord_t h, int16_t angle,
+                                 uint16_t zoom,
+                                 const lv_point_t *pivot)
 {
-    float m00, m01, m02, m10, m11, m12, m20, m21, m22;
-    m00 = matrix->m[0][0];
-    m01 = matrix->m[0][1];
-    m02 = matrix->m[0][2];
+#if LV_DRAW_COMPLEX
+    if (angle == 0 && zoom == LV_IMG_ZOOM_NONE)
+    {
+        res->x1 = 0;
+        res->y1 = 0;
+        res->x2 = w - 1;
+        res->y2 = h - 1;
+        return;
+    }
 
-    m10 = matrix->m[1][0];
-    m11 = matrix->m[1][1];
-    m12 = matrix->m[1][2];
-
-    m20 = matrix->m[2][0];
-    m21 = matrix->m[2][1];
-    m22 = matrix->m[2][2];
-
-    float t00, t01, t02, t10, t11, t12, t20, t21, t22;
-    t00 = mult->m[0][0];
-    t01 = mult->m[0][1];
-    t02 = mult->m[0][2];
-
-    t10 = mult->m[1][0];
-    t11 = mult->m[1][1];
-    t12 = mult->m[1][2];
-
-    t20 = mult->m[2][0];
-    t21 = mult->m[2][1];
-    t22 = mult->m[2][2];
-    /* Compute matrix entry. */
-    //row = 0;
-    matrix->m[0][0] = (m00 * t00) + (m01 * t10) + (m02 * t20);
-    matrix->m[0][1] = (m00 * t01) + (m01 * t11) + (m02 * t21);
-    matrix->m[0][2] = (m00 * t02) + (m01 * t12) + (m02 * t22);
-    //row = 1;
-    matrix->m[1][0] = (m10 * t00) + (m11 * t10) + (m12 * t20);
-    matrix->m[1][1] = (m10 * t01) + (m11 * t11) + (m12 * t21);
-    matrix->m[1][2] = (m10 * t02) + (m11 * t12) + (m12 * t22);
-    ///row = 2;
-    matrix->m[2][0] = (m20 * t00) + (m21 * t10) + (m22 * t20);
-    matrix->m[2][1] = (m20 * t01) + (m21 * t11) + (m22 * t21);
-    matrix->m[2][2] = (m20 * t02) + (m21 * t12) + (m22 * t22);
-}
-
-static void ppe_translate(float x, float y, ppe_matrix_t *matrix)
-{
-    /* Set translation matrix. */
-    ppe_matrix_t t = { { {1.0f, 0.0f, x},
-            {0.0f, 1.0f, y},
-            {0.0f, 0.0f, 1.0f}
-        }
+    lv_point_t p[4] =
+    {
+        {0, 0},
+        {w, 0},
+        {0, h},
+        {w, h},
     };
+    lv_point_transform(&p[0], angle, zoom, pivot);
+    lv_point_transform(&p[1], angle, zoom, pivot);
+    lv_point_transform(&p[2], angle, zoom, pivot);
+    lv_point_transform(&p[3], angle, zoom, pivot);
+    res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
+    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
 
-    /* Multiply with current matrix. */
-    ppe_mat_multiply(matrix, &t);
+#else
+    LV_UNUSED(angle);
+    LV_UNUSED(zoom);
+    LV_UNUSED(pivot);
+    res->x1 = 0;
+    res->y1 = 0;
+    res->x2 = w - 1;
+    res->y2 = h - 1;
+#endif
 }
 
-static void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix)
-{
-    /* Set scale matrix. */
-    ppe_matrix_t s = { { {scale_x, 0.0f, 0.0f},
-            {0.0f, scale_y, 0.0f},
-            {0.0f, 0.0f, 1.0f}
-        }
-    };
-
-    /* Multiply with current matrix. */
-    ppe_mat_multiply(matrix, &s);
-}
-
-void lv_ppe_get_scale_point(const lv_point_t *pivot, const lv_area_t *coords, float scale_ratio,
-                            lv_point_t *result)
-{
-    ppe_matrix_t matrix;
-    matrix.m[0][0] = 1.0f;
-    matrix.m[0][1] = 0.0f;
-    matrix.m[0][2] = 0.0f;
-    matrix.m[1][0] = 0.0f;
-    matrix.m[1][1] = 1.0f;
-    matrix.m[1][2] = 0.0f;
-    matrix.m[2][0] = 0.0f;
-    matrix.m[2][1] = 0.0f;
-    matrix.m[2][2] = 1.0f;
-
-    ppe_translate(coords->x1 + pivot->x, coords->y1 + pivot->y, &matrix);
-    ppe_scale(scale_ratio, scale_ratio, &matrix);
-    ppe_translate(-pivot->x, -pivot->y, &matrix);
-
-    float m_row0, m_row1, m_row2;
-
-    float x = 0;
-    float y = 0;
-    float z = 1;
-
-    /* Process all rows. */
-    m_row0 = matrix.m[0][0];
-    m_row1 = matrix.m[0][1];
-    m_row2 = matrix.m[0][2];
-    result->x = (lv_coord_t)((m_row0 * x) + (m_row1 * y) + (m_row2 * z));
-
-    m_row0 = matrix.m[1][0];
-    m_row1 = matrix.m[1][1];
-    m_row2 = matrix.m[1][2];
-    result->y = (lv_coord_t)((m_row0 * x) + (m_row1 * y) + (m_row2 * z));
-}
-
-#endif /*LV_USE_GPU_RTK_PPE*/
+#endif /*LV_USE_GPU_RTK_PPE*

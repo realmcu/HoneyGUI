@@ -48,7 +48,6 @@ static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_ds
  *      MACROS
  **********************/
 #include "lv_img.h"
-extern lv_img_dsc_t img_benchmark_cogwheel_rgb;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -58,7 +57,7 @@ void lv_draw_ppe_ctx_init(lv_disp_drv_t *drv, lv_draw_ctx_t *draw_ctx)
     lv_draw_sw_init_ctx(drv, draw_ctx);
     draw_ctx->draw_img = lv_draw_ppe_img;
     draw_ctx->draw_rect = lv_draw_ppe_rect;
-    draw_ctx->draw_img_decoded = lv_draw_ppe_img_decoded;
+//    draw_ctx->draw_img_decoded = lv_draw_ppe_img_decoded;
     draw_sw_ctx->blend = lv_draw_ppe_blend;
 }
 
@@ -163,30 +162,123 @@ static lv_res_t lv_draw_ppe_bg(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_t
 static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *draw_dsc,
                                 const lv_area_t *coords, const void *src)
 {
-    if (draw_dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+    bool done = false;
+    if (draw_dsc->opa <= LV_OPA_MIN) { return LV_RES_OK; }
+
+    _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
+
+    if (cdsc == NULL) { return LV_RES_INV; }
+
+    lv_img_cf_t cf;
+    if (lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) { cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED; }
+    else
+    {
+        switch (cdsc->dec_dsc.header.cf)
+        {
+        case LV_IMG_CF_ALPHA_8BIT:
+            cf = LV_IMG_CF_ALPHA_8BIT;
+            break;
+        case LV_IMG_CF_TRUE_COLOR:
+            cf = LV_IMG_CF_TRUE_COLOR;
+            break;
+        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+            cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            break;
+        case LV_IMG_CF_RGB888:
+            cf = LV_IMG_CF_RGB888;
+            break;
+        case LV_IMG_CF_RGBA8888:
+            cf = LV_IMG_CF_RGBA8888;
+            break;
+        case LV_IMG_CF_RGBX8888:
+            cf = LV_IMG_CF_RGBX8888;
+            break;
+        case LV_IMG_CF_RGB565:
+            cf = LV_IMG_CF_RGB565;
+            break;
+        case LV_IMG_CF_RGBA5658:
+            cf = LV_IMG_CF_RGBA5658;
+            break;
+        default:
+#if LV_IMG_CACHE_DEF_SIZE == 0
+            lv_img_decoder_close(&cdsc->dec_dsc);
+#else
+            LV_UNUSED(cache);
+#endif
+            return LV_RES_INV;
+        }
+    }
+
+    if (cdsc->dec_dsc.error_msg != NULL)
+    {
+        LV_LOG_WARN("Image draw error");
+
+        LV_ASSERT(cdsc->dec_dsc.error_msg == NULL);
+    }
+    /*The decoder could open the image and gave the entire uncompressed image.
+     *Just draw it!*/
+    else if (cdsc->dec_dsc.img_data)
+    {
+        lv_area_t map_area_rot;
+        lv_point_t base_coord;
+        lv_area_copy(&map_area_rot, coords);
+        if (draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE)
+        {
+            int32_t w = lv_area_get_width(coords);
+            int32_t h = lv_area_get_height(coords);
+            lv_ppe_get_transformed_area(&map_area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
+            map_area_rot.x1 += coords->x1;
+            map_area_rot.y1 += coords->y1;
+            map_area_rot.x2 += coords->x1;
+            map_area_rot.y2 += coords->y1;
+            base_coord.x = map_area_rot.x1;
+            base_coord.y = map_area_rot.y1;
+        }
+
+        lv_area_t clip_com; /*Common area of mask and coords*/
+        /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
+        if (_lv_area_intersect(&clip_com, draw_ctx->clip_area, &map_area_rot) == false)
+        {
+#if LV_IMG_CACHE_DEF_SIZE == 0
+            lv_img_decoder_close(&cdsc->dec_dsc);
+#else
+            LV_UNUSED(cache);
+#endif
+            return LV_RES_OK;
+        }
+
+        const lv_area_t *clip_area_ori = draw_ctx->clip_area;
+        draw_ctx->clip_area = &clip_com;
+        if (draw_dsc->recolor_opa != LV_OPA_TRANSP)
+        {
+            done = (LV_RES_OK == lv_ppe_blit_recolor(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf));
+        }
+        else
+        {
+            done = (LV_RES_OK == lv_ppe_blit_transform(draw_ctx, draw_dsc, &base_coord, coords,
+                                                       cdsc->dec_dsc.img_data, cf));
+        }
+        draw_ctx->clip_area = clip_area_ori;
+    }
+    /*The whole uncompressed image is not available. Try to read it line-by-line*/
+    else
+    {
+        done = false;
+    }
+
+#if LV_IMG_CACHE_DEF_SIZE == 0
+    lv_img_decoder_close(&cdsc->dec_dsc);
+#else
+    LV_UNUSED(cache);
+#endif
+    if (done)
     {
         return LV_RES_OK;
     }
-    if (draw_dsc->angle != 0)
+    else
     {
         return LV_RES_INV;
     }
-    lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if (!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
-    {
-        return LV_RES_OK;
-    }
-
-    /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    lv_img_dsc_t *img = (lv_img_dsc_t *)src;
-    if (img->header.cf == LV_IMG_CF_ALPHA_8BIT)
-    {
-        return lv_ppe_alpha_only(img, draw_ctx, draw_dsc, coords);
-    }
-    return LV_RES_INV;
 }
 
 static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
@@ -282,7 +374,7 @@ static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_d
     else if (!has_mask && !has_recolor &&
              lv_area_get_size(&blend_area) >= LV_PPE_SIZE_LIMIT)
     {
-        done = (lv_ppe_blit_transform(draw_ctx, dsc, coords, map_p, cf) == LV_RES_OK);
+//        done = (lv_ppe_blit_transform(draw_ctx, dsc, coords, map_p, cf) == LV_RES_OK);
     }
 
     if (!done)
