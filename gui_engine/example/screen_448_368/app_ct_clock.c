@@ -254,7 +254,7 @@ static char *read_file(const char *path)
 #include "tuya_ble_feature_weather.h"
 #include "watch_clock.h"
 
-static void json_refreash()
+void json_refreash()
 {
     uint16_t degree = xorshift16() % 359;
     uint16_t move = xorshift16() % 20000;
@@ -329,6 +329,7 @@ static void refreash_time()
 
 static void win_clock_cb(gui_win_t *win)
 {
+    bool slide_card_enable = true;
     if (win->animate->Beginning_frame)
     {
 #if defined __WIN32
@@ -351,7 +352,6 @@ static void win_clock_cb(gui_win_t *win)
         timeinfo = &watch_time;
         gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
         gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
-        json_refreash();
         tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
         refreash_time();
@@ -367,11 +367,13 @@ static void win_clock_cb(gui_win_t *win)
         {
             // GUI_BASE(win_watch)->opacity_value = 255;
             GUI_BASE(img_heart_rate)->event_dsc_cnt = 1;
+            slide_card_enable = true;
         }
         else
         {
             // GUI_BASE(win_watch)->opacity_value = 50;
             GUI_BASE(img_heart_rate)->event_dsc_cnt = 0; //block img_heart_rate cb func
+            slide_card_enable = false;
         }
     }
     touch_info_t *tp = tp_get_info();
@@ -387,7 +389,7 @@ static void win_clock_cb(gui_win_t *win)
     if (hold)
     {
         // enable slide card in ct_clock
-        if (tp->x > 50 && tp->x < 300 && tp->y > 220 && tp->y < 330)
+        if (slide_card_enable && tp->x > 50 && tp->x < 300 && tp->y > 220 && tp->y < 330)
         {
             gui_tabview_t *tv = 0;
             gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "clock_tv", (void *)&tv);
@@ -877,9 +879,9 @@ static void canvas_cb_heartbreak_bg(gui_canvas_t *canvas)
 
 static void win_hb_cb(gui_win_t *win)
 {
+#ifdef __WIN32
     if (win->animate->Beginning_frame)
     {
-#if defined __WIN32
         char *temp = cjson_content;
         cjson_content = read_file(filename);
         if (!cjson_content)
@@ -891,10 +893,8 @@ static void win_hb_cb(gui_win_t *win)
         {
             free(temp);
         }
-#else
-        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
-#endif
     }
+#endif
 }
 
 static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
@@ -1053,15 +1053,12 @@ static void win_hb_exit(void)
 }
 
 /*Define gui_app_return_array*/
-// const uint32_t *gui_app_return_array[] =
-// {
-//     UI_CLOCK_COMPASS_POINTER_ICON_BIN,
-//     UI_CLOCK_COMPASS_POINTER_ICON_BIN,
-//     UI_CLOCK_COMPASS_POINTER_ICON_BIN,
-// };
-
 const uint32_t *gui_app_return_array[] =
 {
+    UI_RETURN_0_BIN,
+    UI_RETURN_0_BIN,
+    UI_RETURN_0_BIN,
+    UI_RETURN_0_BIN,
     UI_RETURN_0_BIN,
     UI_RETURN_0_BIN,
     UI_RETURN_0_BIN,
@@ -1267,10 +1264,6 @@ void page_ct_clock(void *parent)
         perror("fopen");
     }
 #else
-//     cJSON_Hooks cJSONhooks_freeRTOS;
-//     cJSONhooks_freeRTOS.malloc_fn = gui_malloc;
-//     cJSONhooks_freeRTOS.free_fn   = gui_free;
-//     cJSON_InitHooks(&cJSONhooks_freeRTOS);
     extern char cjson_data[];
     cjson_content = cjson_data;
 #endif
@@ -1422,7 +1415,6 @@ void page_ct_clock(void *parent)
         GUI_BASE(watchface_1)->not_show = true;
         GUI_BASE(watchface_2)->not_show = true;
     }
-    gui_img_create_from_mem(win_watch, "", UI_RETURN_4_BIN, 0, 200, 0, 0);
     gui_win_set_animate(win_watch, 2000, -1, (gui_animate_callback_t)win_clock_cb, win_watch);
 }
 #endif
