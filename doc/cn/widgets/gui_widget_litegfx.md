@@ -5,7 +5,7 @@
 ## 使用方法
 
 HoneyGUI 已经做好了趣戴特效控件层的封装，因此不需要单独创建和配置控件。只需调用特效创建的API即可。
-如果要在模拟器上运行趣戴特效，请在 `menu_config.h` 中通过注释宏`CONFIG_REALTEK_BUILD_GUI_454_454_DEMO`关闭默认的示例，启用宏 `CONFIG_REALTEK_BUILD_LITE_GFX`将趣戴文件加入编译，启用宏`CONFIG_REALTEK_BUILD_REAL_LITEGFX_DEMO`打开趣戴示例，然后进行编译。
+如果要在模拟器上运行趣戴特效，请在 `menu_config.h` 中通过注释宏 `CONFIG_REALTEK_BUILD_GUI_454_454_DEMO` 关闭默认的示例，启用宏 `CONFIG_REALTEK_BUILD_LITE_GFX` 将趣戴文件加入编译，启用宏 `CONFIG_REALTEK_BUILD_REAL_LITEGFX_DEMO` 打开趣戴示例，然后进行编译。
 
 ## 示例
 
