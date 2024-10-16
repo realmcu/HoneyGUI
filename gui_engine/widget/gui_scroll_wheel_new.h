@@ -68,11 +68,14 @@ typedef struct gui_scroll_wheel_new
     int16_t count;
     int16_t touch_y, speed, text_image_map_length, col_offset, index_offset;
     gui_win_t *win;
+    gui_win_t *win2;
     int16_t recode[5];
     const struct gui_text_image_map *text_image_map;
     bool wheel_take_over;
     char time_array_offset;
     int history_y;
+    gui_color_t font_color;
+    gui_color_t font_color_highlight;
 } gui_scroll_wheel_new_t;
 
 _GUI_API_DEFINE(gui_scroll_wheel_new_t)

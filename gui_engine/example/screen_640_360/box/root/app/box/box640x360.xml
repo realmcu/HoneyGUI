@@ -311,17 +311,19 @@
                 id="animateFrame2">
         </onClick>
 </icon>
-                    <roller
+<roller
                         x="450"              
                         y="150"             
-                        w="200"           
-                        h="300"             
+                        w="50"           
+                        h="60"             
                         items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  
                         itemCount="11"       
                         rowCount="3"         
                         rowSpacing="20"      
                         fontSize="16"
                         font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                        fontColor="#ff0000ff"
+                        fontColorHighlight="#ff00ffff"
                     >scrollWheel1
                     </roller>
     <calendar

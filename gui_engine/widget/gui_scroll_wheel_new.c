@@ -117,6 +117,8 @@ static void ctor(struct gui_scroll_wheel_new *this,
     this->alien = 1;
     this->end_speed = 3;
     this->index_offset = (row_count + 2) / 2;
+    this->font_color = APP_COLOR_WHITE;
+    this->font_color_highlight = APP_COLOR_GRAY;
 }
 static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **text_widget_array,
                                       int array_count)
@@ -134,9 +136,9 @@ static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **
             return;
         }
 
-        if (obj->type == WINDOW)
+        if (obj && obj->type == WINDOW)
         {
-            gui_obj_t *text = gui_list_entry((&obj->child_list)->next, gui_obj_t, brother_list);
+            GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, obj)
             text_widget_array[count] = text;
             count++;
         }
@@ -238,14 +240,22 @@ static void override(gui_obj_t *win)
     if (!wheel_take_over)
     {
         int ax, ay;
-        gui_obj_absolute_xy(win, &ax, &ay);
-        if (touch->pressed && touch->x > ax - this->col_offset && touch->x < ax + win->w)
+        gui_obj_absolute_xy(GUI_BASE(this), &ax, &ay);
+        if (touch->pressed &&
+            touch->x > ax - this->col_offset &&
+            touch->x < ax + win->w &&
+            touch->y > ay &&
+            touch->y < ay + this->gap * this->count)
         {
             this->history_y = this->touch_y;
             this->speed = 0;
             memset(this->recode, 0, sizeof(this->recode));
         }
-        if (touch->pressing && touch->x > ax - this->col_offset && touch->x < ax + win->w)
+        if (touch->pressing &&
+            touch->x > ax - this->col_offset &&
+            touch->x < ax + win->w &&
+            touch->y > ay &&
+            touch->y < ay + this->gap * this->count)
         {
             this->touch_y = this->history_y + touch->deltaY;
             /**
@@ -350,6 +360,18 @@ static void override(gui_obj_t *win)
                     {
                         this->index_offset = index;
                     }
+                    if (win->y + this->win2->base.y + i * this->gap <= this->gap * this->count / 2 &&
+                        win->y + this->win2->base.y + i * this->gap + this->gap > this->gap * this->count / 2)
+                    {
+                        GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color_highlight;
+                    }
+                    else
+                    {
+                        GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color;
+                    }
+
+
+
                     render(text, (void *)text_widget_array[i], this->render_mode, this->text_image_map_length,
                            this->text_image_map);
                 }
@@ -447,7 +469,15 @@ static void override(gui_obj_t *win)
                     {
                         this->index_offset = index;
                     }
-
+                    if (win->y + this->win2->base.y + i * this->gap <= this->gap * this->count / 2 &&
+                        win->y + this->win2->base.y + i * this->gap + this->gap > this->gap * this->count / 2)
+                    {
+                        GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color_highlight;
+                    }
+                    else
+                    {
+                        GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color;
+                    }
                     render(text, (void *)text_widget_array[i], this->render_mode, this->text_image_map_length,
                            this->text_image_map);
                 }
@@ -554,16 +584,26 @@ void gui_scroll_wheel_new_render_text(gui_scroll_wheel_new_t *widget, const void
     {
         gui_win_t *win = gui_win_create(widget->win, 0, 0, widget->gap * i, GUI_BASE(widget)->w,
                                         widget->gap);
+        gui_color_t color = widget->font_color;
+        if (widget->win->base.y + widget->win2->base.y + i * widget->gap <= widget->gap * widget->count / 2
+            &&
+            widget->win->base.y + widget->win2->base.y + i * widget->gap + widget->gap > widget->gap *
+            widget->count / 2)
+        {
+            color = widget->font_color_highlight;
+        }
         {
             const char *text = widget->string_array[i];
+
             {
                 gui_text_t *t = gui_text_create(win, text, 0, 0, GUI_BASE(widget)->w,
                                                 font_size);
-                gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+                gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
                 const void *addr1 = font_file_pointer;
                 gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
                 gui_text_mode_set(t, LEFT);
                 gui_text_convert_to_img(t, ARGB8888);
+
             }
         }
     }
@@ -626,6 +666,7 @@ gui_scroll_wheel_new_t *gui_scroll_wheel_new_create(void    *parent,
         gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, w, row_gap * (row_count + 1));
         gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)override, timer1);
         this->win = timer1;
+        this->win2 = win;
 
     }
     return this;

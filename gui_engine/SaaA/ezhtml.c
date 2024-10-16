@@ -3509,6 +3509,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int column_offset = 0;
                     const char *font = 0;
                     int16_t font_size = 0;
+                    uint32_t  font_color = {0};
+                    uint32_t  font_color_highlight = {0};
+                    uint32_t  item_color = {0};
+                    uint32_t  item_color_highlight = {0};
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -3558,6 +3562,26 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             font_size = atoi(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "fontColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            font_color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "fontColorHighlight"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            font_color_highlight = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            item_color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemColorHighlight"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            item_color_highlight = string_rgb888(p->attr[++i]);
+                        }
                         i++;
                     }
 
@@ -3575,6 +3599,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
                                                                parent, x, y, w, row_spacing, row_count, string_array, item_count
                                                            );
+                    scroll_wheel->font_color.color.argb_full = font_color;
+                    scroll_wheel->font_color_highlight.color.argb_full = font_color_highlight;
+
                     gui_scroll_wheel_new_render_text(scroll_wheel, gui_get_file_address(font), font_size);
                     if (scroll_wheel == NULL)
                     {
