@@ -40,6 +40,7 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
                      const lv_draw_sw_blend_dsc_t *dsc);
 
 lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
+                          ppe_matrix_t *inverse,
                           const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
                                const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);

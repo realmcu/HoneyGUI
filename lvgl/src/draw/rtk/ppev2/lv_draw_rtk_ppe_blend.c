@@ -87,6 +87,7 @@ lv_res_t lv_ppe_bare_rect_copy(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
 }
 
 lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
+                          ppe_matrix_t *matrix,
                           const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf)
 {
     lv_area_t constraint_area;
@@ -209,10 +210,8 @@ lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
         return LV_RES_INV;
     }
 
-    ppe_matrix_t matrix, inverse, pre_trans;
-    lv_ppe_get_matrix(&matrix, coords, dsc);
-    memcpy(&inverse, &matrix, sizeof(ppe_matrix_t));
-    ppe_matrix_inverse(&inverse);
+    ppe_matrix_t inverse, pre_trans;
+    memcpy(&inverse, matrix, sizeof(ppe_matrix_t));
 
     ppe_rect_t image_area;
     if (!ppe_get_area(&image_area, &draw_area, &inverse, &source))

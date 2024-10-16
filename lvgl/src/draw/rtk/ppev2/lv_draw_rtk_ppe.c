@@ -260,14 +260,26 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
     {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
+        ppe_matrix_t matrix;
+        ppe_get_identity(&matrix);
+        lv_ppe_get_matrix(&matrix, coords, draw_dsc);
+        int32_t w = lv_area_get_width(coords);
+        int32_t h = lv_area_get_height(coords);
+        lv_int_get_transformed_area(&map_area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
+        map_area_rot.x1 += coords->x1;
+        map_area_rot.y1 += coords->y1;
+        map_area_rot.x2 += coords->x1;
+        map_area_rot.y2 += coords->y1;
+//        lv_ppe_get_transformed_area(&map_area_rot, w, h, &matrix);
         if (draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE)
         {
-            int32_t w = lv_area_get_width(coords);
-            int32_t h = lv_area_get_height(coords);
+            ppe_matrix_inverse(&matrix);
 
-            ppe_matrix_t matrix, inv_matrix;
-            lv_ppe_get_matrix(&matrix, coords, draw_dsc);
-            lv_ppe_get_transformed_area(&map_area_rot, w, h, &matrix);
+        }
+        else
+        {
+            matrix.m[0][2] = -matrix.m[0][2];
+            matrix.m[1][2] = -matrix.m[1][2];
         }
 
         lv_area_t clip_com; /*Common area of mask and coords*/
@@ -295,7 +307,8 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         }
         else
         {
-            done = (LV_RES_OK == lv_ppe_blend_img(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf));
+            done = (LV_RES_OK == lv_ppe_blend_img(draw_ctx, draw_dsc, &matrix, coords, cdsc->dec_dsc.img_data,
+                                                  cf));
         }
         draw_ctx->clip_area = clip_area_ori;
     }
