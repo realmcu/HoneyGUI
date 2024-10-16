@@ -253,6 +253,66 @@ static char *read_file(const char *path)
 #else
 #include "tuya_ble_feature_weather.h"
 #include "watch_clock.h"
+
+static void json_refreash()
+{
+    uint16_t degree = xorshift16() % 359;
+    uint16_t move = xorshift16() % 20000;
+    uint16_t ex = xorshift16() % 60;
+    uint16_t stand = xorshift16() % 30;
+    uint16_t AM12 = xorshift16() % 120;
+    uint16_t AM6 = xorshift16() % 120;
+    uint16_t PM12 = xorshift16() % 120;
+    uint16_t PM6 = xorshift16() % 120;
+
+    cJSON *root = cJSON_Parse(cjson_content);
+    if (!root)
+    {
+        return;
+    }
+    cJSON *compass_array = cJSON_GetObjectItem(root, "compass");
+    if (compass_array != NULL && cJSON_GetArraySize(compass_array) > 0)
+    {
+        cJSON *compass_item = cJSON_GetArrayItem(compass_array, 0);
+        cJSON_ReplaceItemInObject(compass_item, "degree", cJSON_CreateNumber(degree));
+    }
+
+    cJSON *activity_array = cJSON_GetObjectItem(root, "activity");
+    if (activity_array != NULL && cJSON_GetArraySize(activity_array) > 0)
+    {
+        cJSON *activity_item = cJSON_GetArrayItem(activity_array, 0);
+        cJSON_ReplaceItemInObject(activity_item, "move", cJSON_CreateNumber(move));
+        cJSON_ReplaceItemInObject(activity_item, "ex", cJSON_CreateNumber(ex));
+        cJSON_ReplaceItemInObject(activity_item, "stand", cJSON_CreateNumber(stand));
+    }
+
+    cJSON *heart_rate_array = cJSON_GetObjectItem(root, "heart_rate");
+    if (heart_rate_array != NULL && cJSON_GetArraySize(heart_rate_array) > 0)
+    {
+        cJSON *heart_rate_item = cJSON_GetArrayItem(heart_rate_array, 0);
+        {
+            AM12 = AM12 > 60 ? AM12 : 68;
+            cJSON_ReplaceItemInObject(heart_rate_item, "AM12", cJSON_CreateNumber(AM12));
+        }
+        {
+            AM6 = AM6 > 60 ? AM6 : 73;
+            cJSON_ReplaceItemInObject(heart_rate_item, "AM6", cJSON_CreateNumber(AM6));
+        }
+        {
+            PM12 = PM12 > 60 ? PM12 : 82;
+            cJSON_ReplaceItemInObject(heart_rate_item, "PM12", cJSON_CreateNumber(PM12));
+        }
+        {
+            PM6 = PM6 > 60 ? PM6 : 94;
+            cJSON_ReplaceItemInObject(heart_rate_item, "PM6", cJSON_CreateNumber(PM6));
+        }
+    }
+    char *temp = cJSON_PrintUnformatted(root);
+    sprintf(cjson_content, "%s", temp);
+    gui_log("cjson_content: %x\n", cjson_content);
+    gui_free(temp);
+    cJSON_Delete(root);
+}
 #endif
 
 extern char *day[];
@@ -291,7 +351,7 @@ static void win_clock_cb(gui_win_t *win)
         timeinfo = &watch_time;
         gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
         gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
-
+        json_refreash();
         tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
         refreash_time();
