@@ -15,7 +15,7 @@
 <div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1725515761517919126/033a0990_9218678.png"></div>
 <br/>
 
-- 依次点击 `Export` 和 `Simulate` 来完成导出和启动模拟，模拟器窗口启动后将显示 86box APP 图标，鼠标点击后进入对应的 APP。
+- 依次点击 `Export` 和 `Simulate` 来完成导出和启动模拟，模拟器窗口启动后将显示 86Box APP 图标，鼠标点击后进入对应的 APP。
 <br/>
 <div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1725515804906725239/f2b55fe1_9218678.png"></div>
 <br/>

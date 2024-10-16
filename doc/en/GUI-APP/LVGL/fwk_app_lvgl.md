@@ -31,16 +31,16 @@ Using a simulator has the following advantages:
 
 
 ### Run LVGL in HoneyGUI Simulator
-HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the "Getting Started - Installation" section.
+HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the [Getting Started - Installation](../../get-started/index.md) section.
 
 After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path `your HoneyGUI dir/win32_sim/` and open the file `menu_config.h`, which is the configuration file for the simulator. Under the section "HoneyGUI Demo Select", comment out all the demos. Under the section "HoneyGUI Enable LVGL", enable `CONFIG_REALTEK_BUILD_LVGL_GUI`. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
 
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1727156557578163348/cb760047_9218678.png" alt="lv_menu_config.png"></div><br/>
+<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1727156557578163348/cb760047_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
 1. If you need to modify the screen size, open the file `SConscript` under the directory `your HoneyGUI dir/gui_engine/example/demo/`, and modify the values of `DRV_LCD_WIDTH` and `DRV_LCD_HEIGHT` to the desired pixel values.
 
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png" alt="lv_menu_config.png"></div><br/>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
 
@@ -738,7 +738,7 @@ Extra PSRAM is required for RGB screen as a cache buffer. LVGL uses PSRAM comple
 
 #### Conclusion
 
-- **Applicable Scenarios**: For large screen sizes (e.g., 800x480) and full-frame drawing, HoneyGUI is recommended. For frequent partial screen refresh projects, LVGL is recommended. For block drawing when RAM resources are tight, HoneyGUI is recommended, with section recommended parameters set to 10.
+- **Applicable Scenarios**: For large screen sizes (e.g. 800x480) and full-frame drawing, HoneyGUI is recommended. For frequent partial screen refresh projects, LVGL is recommended. For block drawing when RAM resources are tight, HoneyGUI is recommended, with section recommended parameters set to 10.
 - **Rotation, Scaling**: LVGL performs faster in 2D rendering using a 2x2 matrix compared to HoneyGUI's 3x3 matrix, which handles more data for 2D rendering. For 2.5D or pseudo-3D effects, HoneyGUI will perform better.
 - In practical projects, select the suitable framework based on specific frame rate requirements, system resources, and other functional needs. Conduct specific performance testing and evaluation if possible.
 

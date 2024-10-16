@@ -16,7 +16,7 @@ GUI_INIT_APP_EXPORT(app_init);
     :maxdepth: 2
 
     Calculator <Calculator/Demo>
-    86box <86box/86box>
+    86Box <86box/86box>
     LiteGFX <LiteGFX/Demo>
     Status Bar <Status-bar/Status bar>
     Fruit Ninja <Fruit_Ninja/Demo>
