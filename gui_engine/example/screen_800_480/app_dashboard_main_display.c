@@ -25,6 +25,7 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     /* set Image data */
     dashboard_background = gui_img_create_from_mem(target_main_display, "dashboard_background",
                                                    BACKGROUND_BIN, 0, 0, 800, 480);
+    gui_img_set_mode(dashboard_background, IMG_COVER_MODE);
     speed_high_digital = gui_img_create_from_mem(target_main_display, "speed_high_digital", SPED0_BIN,
                                                  360, 202, 40, 60);
     speed_low_digital = gui_img_create_from_mem(target_main_display, "speed_low_digital", SPED0_BIN,
@@ -83,17 +84,17 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     gui_text_mode_set(short_tel_number, CENTER);
     short_tel_accept = gui_text_create(target_main_display, "short_tel_accept", 360, 415, 800, 30);
     gui_text_set(short_tel_accept, "calling", GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                        UINT8_MAX),
-                 7, 32);
+                                                                        UINT8_MAX), 7, 32);
 
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
     memcpy(&show_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
-    short_message_data = gui_text_create(target_main_display,  "short_message_data",  300, 10, 240, 50);
+    short_message_data = gui_text_create(target_main_display,  "short_message_data",  300, 10, 240, 64);
     gui_text_set(short_message_data, (char *)show_message_data, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), (current_message_status.wechat_msg_len - 1), 32);
     gui_text_mode_set(short_message_data, MULTI_LEFT);
+    gui_text_type_set(short_message_data, HARMONYOS_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
 
     /* Prepare the intial data */
     app_dashboard_update_main_display_time_info();
@@ -107,8 +108,9 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
 }
 
 extern gui_win_t *win_connected_display;
-void paint_main_display_cb(gui_win_t *win)
+void paint_main_display_cb(void *param1, void *param2, struct gui_animate *anim)
 {
+    gui_win_t *win = (gui_win_t *)param1;
     if (app_dashboard_data_get_show_main_display() == false)
     {
         win->base.not_show = !app_dashboard_data_get_show_main_display();
@@ -131,8 +133,8 @@ void paint_main_display_cb(gui_win_t *win)
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
     app_dashboard_update_main_display_message_infor(&current_message_status);
-
 }
+
 void app_dashboard_update_main_display_time_info(void)
 {
     uint32_t main_display_hour = app_dashboard_data_get_current_timer() / 3600;

@@ -6,6 +6,13 @@
     h="448"
     x="0"
     y="0">screen0
+<animateTransform
+      type="rotate"
+      from="0 2 200"
+      to="360 2 200"
+      dur="60s"
+      repeatCount="indefinite">animateRotate1
+</animateTransform>
 <img
       file="app/wf/resource/new_folder/rect1.bin"
       rotationAngle="0"
@@ -35,19 +42,20 @@
       scaleY="1">image2
 </img><img
       x="185"
-      y="1"
+      y="50"
       w="100"
       h="330"
       file="app/wf/resource/new_folder/rect2.bin"
       rotationAngle="0"
+      blendMode="imgBypassMode"
       scaleX="1"
       scaleY="1">image3
-<animateTransform
-      type="rotate"
-      from="0 184 224"
-      to="360 184 224"
-      dur="10s"
-      repeatCount="indefinite"> </animateTransform>
+      <onLoad
+            to="image3"
+            type="animate" 
+            id="animateRotate1">
+        </onLoad>
+
 </img><img
       x="169"
       y="217"

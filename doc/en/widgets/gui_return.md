@@ -6,7 +6,7 @@ The bubble-shaped curve that can be dragged out on the left side of the screen i
 
 ### Create A Return Widget
 
-Creating function is [gui_return_create](#gui_return_create). Users need to enter curve animation frame images file array ,and the return operation function.
+Creating function is [gui_return_create(void *parent, const uint32_t *frame_array[], int array_size, void *return_cb, gui_obj_t *ignore_gesture_widget)](#gui_return_create). Users need to enter curve animation frame images file array ,and the return operation function.
 
 ## Example
 

@@ -14,9 +14,9 @@
 | Linear gradient   | N        | Y        | N        | N        | Y   |
 | Radial gradient   | N        | N        | N        | N        | Y   |
 
-## Memory usage
+## Memory Usage
 
-### RTL8772F demo
+### RTL8772F Demo
 
 ```eval_rst
 .. raw:: html
@@ -31,7 +31,7 @@ The memory consumption statistics of this demo are as follows.
 | Framebuffer  |  screenWidth *pixelBytes* Lines |
 | Thread stack  |  10KB |
 
-### Widget memory usage
+### Widget Memory Usage
 
 | Widget | Memory(Byte) on ARM SoC | Memory(Byte) on Win_32 SIM |
 |---|---|---|

@@ -23,10 +23,8 @@
 #include "EventRecorder.h"
 #endif
 #include "Board_GLCD.h"
-#include "GLCD_Config.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
-#include "time.h"
 #include "cmsis_os2.h"                  // ARM::CMSIS:RTOS2:Keil RTX5
 
 

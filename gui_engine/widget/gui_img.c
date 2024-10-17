@@ -82,6 +82,9 @@
   * @{
   */
 static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
+static float gui_img_get_transform_t_y_old(gui_img_t *this);
+static float gui_img_get_transform_t_x_old(gui_img_t *this);
+static void gui_img_reset_translate(gui_img_t *this);
 void gui_img_set_animate(gui_img_t *this,
                          uint32_t   dur,
                          int        repeat_count,
@@ -164,7 +167,7 @@ static void gui_img_prepare(gui_obj_t *obj)
 
     this = (gui_img_t *)obj;
     tp = tp_get_info();
-
+    gui_img_reset_translate(this);
     matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
     matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
     matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
@@ -618,7 +621,11 @@ static void gui_img_rect_copy(uint8_t       *target,
 
     for (uint16_t i = 0; i < h; i++)
     {
-        memcpy(target + i * w * byte, source + i * dc->fb_width * byte, w * byte);
+        // Use size_t type for intermediate multiplications to avoid sign extension issues
+        size_t target_offset = (size_t)i * (size_t)w * (size_t)byte;
+        size_t source_offset = (size_t)i * (size_t)dc->fb_width * (size_t)byte;
+
+        memcpy(target + target_offset, source + source_offset, (size_t)w * (size_t)byte);
     }
 }
 
@@ -631,37 +638,43 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
     }
 
     float scale = 0.7f;
-    uint16_t w = dc->fb_width * scale;
-    uint16_t h = dc->fb_height * scale;
+    uint16_t w = (uint16_t)(dc->fb_width * scale);
+    uint16_t h = (uint16_t)(dc->fb_height * scale);
     uint16_t byte = dc->bit_depth / 8;
-    uint32_t total_section_cnt = (dc->screen_height / dc->fb_height + ((
-                                                                           dc->screen_height % dc->fb_height) ? 1 : 0));
+
+    uint32_t total_section_cnt = (uint32_t)(dc->screen_height / dc->fb_height);
+    if (dc->screen_height % dc->fb_height != 0)
+    {
+        total_section_cnt += 1;
+    }
 
     if (dc->type == DC_SINGLE)
     {
         for (uint16_t y = 0; y < h; y++)
         {
-            memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
+            size_t target_offset = 8 + (size_t)y * (size_t)w * (size_t)byte;
+            size_t source_offset = (size_t)y * (size_t)dc->fb_width * (size_t)byte;
+
+            memcpy(dc->shot_buf + target_offset, dc->frame_buf + source_offset, (size_t)w * (size_t)byte);
         }
         // gui_log("[GUI warning] please use user method for improve! \n");
     }
     else if (dc->type == DC_RAMLESS)
     {
+        uint8_t *dst = dc->shot_buf + 8 + (size_t)w * (size_t)dc->fb_height * (size_t)dc->section_count *
+                       (size_t)byte;
         if (dc->section_count == 0)
         {
-            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
         }
         else if (dc->section_count == total_section_cnt - 1)
         {
             uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
-            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
             // gui_log("[GUI warning] please use user method for improve! \n");
         }
         else
         {
-            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
         }
     }
@@ -960,7 +973,12 @@ void gui_img_rotation(gui_img_t *this,
     get_transform(this)->c_x = c_x;
     get_transform(this)->c_y = c_y;
 }
-
+static void gui_img_reset_translate(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    get_transform(this)->t_x_old = 0;
+    get_transform(this)->t_y_old = 0;
+}
 void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
@@ -974,8 +992,10 @@ void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 void gui_img_translate(gui_img_t *this, float t_x, float t_y)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
-    get_transform(this)->t_x = t_x;
-    get_transform(this)->t_y = t_y;
+    get_transform(this)->t_x = t_x + get_transform(this)->t_x_old;
+    get_transform(this)->t_y = t_y + get_transform(this)->t_y_old;
+    get_transform(this)->t_x_old += t_x;
+    get_transform(this)->t_y_old += t_y;
 }
 float gui_img_get_transform_scale_x(gui_img_t *this)
 {
@@ -1039,6 +1059,24 @@ float gui_img_get_transform_t_y(gui_img_t *this)
         return this->transform->t_y;
     }
     return DEFAULT_TRANSFORM_T_Y;
+}
+static float gui_img_get_transform_t_y_old(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->t_y_old;
+    }
+    return DEFAULT_TRANSFORM_T_Y;
+}
+static float gui_img_get_transform_t_x_old(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->t_x_old;
+    }
+    return DEFAULT_TRANSFORM_T_X;
 }
 void gui_img_skew_x(gui_img_t *this, float degrees)
 {
@@ -1119,24 +1157,24 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
     gui_free(dc_bak);
     gui_free(matrix_bak);
 }
-void gui_img_append_animate(gui_img_t *this,
-                            uint32_t   dur,
-                            int        repeat_count,
-                            gui_animate_callback_t callback,
-                            void      *p,
-                            const char *name)
+void gui_img_append_animate(gui_img_t              *_this,
+                            uint32_t                dur,
+                            int                     repeat_count,
+                            gui_animate_callback_t  callback,
+                            void                   *p,
+                            const char             *name)
 {
-    if (this->animate_array_length == 0 && this->animate)
+    if (_this->animate_array_length == 0 && _this->animate)
     {
-        memset(this->animate, 0, sizeof(*this->animate));
-        gui_free(this->animate);
-        this->animate = 0;
+        memset(_this->animate, 0, sizeof(*_this->animate));
+        gui_free(_this->animate);
+        _this->animate = 0;
     }
-    this->animate_array_length++;
-    this->animate = gui_realloc(this->animate, sizeof(gui_animate_t) * this->animate_array_length);
-    ((gui_animate_t **)(this->animate))[this->animate_array_length - 1] = gui_malloc(sizeof(
-                                                                              gui_animate_t));
-    gui_animate_t *animate = ((gui_animate_t **)(this->animate))[this->animate_array_length - 1];
+    _this->animate_array_length++;
+    _this->animate = gui_realloc(_this->animate, sizeof(gui_animate_t) * _this->animate_array_length);
+    ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1] = gui_malloc(sizeof(
+                                                                                gui_animate_t));
+    gui_animate_t *animate = ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1];
 
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;

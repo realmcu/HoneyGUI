@@ -115,6 +115,7 @@ typedef struct gui_text
     uint8_t font_height;
     uint8_t inputable : 1;    // support user input or not
     uint8_t ispasswd  : 1;    // is a passwd text, to inform kb
+    uint8_t wordwrap  : 1;
     uint8_t checksum;
     bool layout_refresh;
     bool content_refresh;
@@ -250,10 +251,18 @@ void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 /**
  * @brief set inputable.
  *
- * @param this_widget he text box widget pointer.
+ * @param this_widget the text box widget pointer.
  * @param inputable inputable.
  */
 void gui_text_input_set(gui_text_t *this_widget, bool inputable);
+
+/**
+ * @brief By setting wordwrap to enable English word wrapping..
+ *
+ * @param this_widget the text box widget pointer.
+ * @param wordwrap wordwrap.
+ */
+void gui_text_wordwrap_set(gui_text_t *this_widget, bool wordwrap);
 
 /**
  * @brief set text min scale.

@@ -31,16 +31,16 @@ LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。�
 
 
 ### 在 HoneyGUI 模拟器中运行 LVGL
-HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 `入门指南-安装` 章节。
+HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 [入门指南-安装](../../get-started/index.md) 章节。
 
 完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 `your HoneyGUI dir/win32_sim/` 下的 `menu_config.h` 文件为模拟器的配置文件，在 `HoneyGUI Demo Select` 下注释掉所有的 Demo，在 `HoneyGUI Enable LVGL` 下使能 `CONFIG_REALTEK_BUILD_LVGL_GUI`。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
 
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1727156557578163348/cb760047_9218678.png" alt="lv_menu_config.png"></div><br/>
+<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1727156557578163348/cb760047_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
 1. 当需要修改屏幕尺寸时，修改文件 `your HoneyGUI dir/gui_engine/example/demo/` 下的 `SConscript`
 文件，修改其中的屏幕宽度 `DRV_LCD_WIDTH` 和 屏幕高度`DRV_LCD_HIGHT`，均为像素单位。
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png" alt="lv_menu_config.png"></div><br/>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 <!-- - 运行流程，结构 -->
 
@@ -119,13 +119,13 @@ HoneyGUI Dir
 ```
 
 1. HoneyGUI 中 LVGL 源文件在目录 `your HoneyGUI dir/lvgl` 下：
-    - demos：存放 LVGL 一些综合的内置示例，部分示例可以在 [LVGL Demo](https://lvgl.io/demos) 中体验
-    - docs：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：[LVGL 在线文档](https://docs.lvgl.io/master/intro/index.html) 
-    - env_support：一些环境或者平台的支持
-    - examples：存放 LVGL 的内置示例，可在 [LVGL Example](https://docs.lvgl.io/8.3/examples.html) 中体验
-    - scripts：存放一些处理脚本，在使用 LVGL 时基本不会用到
-    - src：存放 LVGL 实际的源码，使用 LVGL 进行开发时，都是使用这里面的代码文件
-    - tests：存放一些 CI 测试文件，在使用LVGL时不会用到
+    - demos：存放 LVGL 一些综合的内置示例，部分示例可以在 [LVGL Demo](https://lvgl.io/demos) 中体验。
+    - docs：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：[LVGL 在线文档](https://docs.lvgl.io/master/intro/index.html)。
+    - env_support：一些环境或者平台的支持。
+    - examples：存放 LVGL 的内置示例，可在 [LVGL Example](https://docs.lvgl.io/8.3/examples.html) 中体验。
+    - scripts：存放一些处理脚本，在使用 LVGL 时基本不会用到。
+    - src：存放 LVGL 实际的源码，使用 LVGL 进行开发时，都是使用这里面的代码文件。
+    - tests：存放一些 CI 测试文件，在使用LVGL时不会用到。
 
 2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 `your HoneyGUI dir/gui_engine/example/demo` 下的 `app_ui_lvgl.c` 开始运行
 
@@ -523,7 +523,7 @@ LVGL 基准测试的官方文档位于 `your HoneyGUI dir/lvgl/demos/benchmark/R
 
 
 
-##  从 demo 入门开发
+##  从 Demo 入门开发
 - <a href="https://lvgl.io/demos">LVGL Demo</a>
 - [LVGL Example](https://docs.lvgl.io/8.3/examples.html)
 
@@ -692,6 +692,99 @@ LVGL 的博客是一个重要的资源，对于 LVGL 的开发者来说是了解
 - <a href="https://docs.lvgl.io/8.3/intro/index.html#faq">LVGL FAQ</a>
 
 <!-- （引导+在线文档新增FAQ） -->
+
+### HoneyGUI vs LVGL 绘制图片帧率
+
+#### GRAM屏幕（280x456）RAM 分块绘制
+背景：RGB565，非压缩图片，测试单张图片的显示绘制性能（HoneyGUI 矩形填充数据暂无，LVGL 暂时未适配 PPE 硬件加速处理图像缩放）。
+
+| 测试类型         | HoneyGUI 帧率(FPS) SW | HoneyGUI 帧率(FPS) PPE | LVGL 帧率(FPS) SW  | LVGL 帧率(FPS) PPE |
+|------------------|------------------------|------------------------|--------------------|--------------------|
+| 绘制图片         | 73（280x456）          | 74（280x456）          | 70（280x456）      | 73（280x456）      |
+| 填充矩形         | -                      | -                      | 74（280x456）      | 74（280x456）      |
+| 图像旋转45°      | 7（280x456）           | 7（280x456）           | 4（280x456）       | 4（280x456）       |
+| 图像放大 1.5 倍  | 3（280x456）           | 31（280x456）          | 3（280x456）       | -                  |
+| 图像缩小 0.5 倍  | 9（280x456）           | 73（280x456）          | 12（280x456）      | -                  |
+
+RAM分块绘制测试数据：
+
+| Section | HoneyGUI 帧率(FPS) | LVGL 帧率(FPS) |
+|---------|--------------------|----------------|
+| 10      | 70                 | 45             |
+| 20      | 73                 | 73             |
+| 30      | 74                 | 73             |
+
+
+#### 分析
+
+1. **绘制图片**:
+    - **HoneyGUI** 在 SW 和 PPE 模式下的帧率非常接近，分别为 73 和 74 FPS。
+    - **LVGL** 也表现良好，在 SW 和 PPE 模式下的帧率为 70 和 73 FPS。
+    - 两者在绘制图片时的性能非常接近，可以满足流畅的图像绘制需求。
+
+2. **填充矩形**:
+    - **HoneyGUI** 数据暂时未给出。
+    - **LVGL** 在 SW 和 PPE 模式下的帧率均为 74 FPS，表现非常稳定。
+
+3. **图像旋转**:
+    - **HoneyGUI** 在 SW 和 PPE 模式下的帧率均为 7 FPS，性能稳定。
+    - **LVGL** 在 SW 模式下的帧率为 4 FPS，在 PPE 模式下的数据缺失。
+    - 在这项测试中，HoneyGUI 明显优于 LVGL。
+
+4. **图像放大 1.5 倍**:
+    - **HoneyGUI** 在 SW 模式下的帧率为 3 FPS，而在 PPE 模式下的帧率显著提升至 31 FPS。
+    - **LVGL** 在 SW 模式下的帧率为 3 FPS，PPE 模式下暂时未适配。
+    - HoneyGUI 在硬件加速（PPE 模式）下表现出色。
+
+5. **图像缩小 0.5 倍**:
+    - **HoneyGUI** 在 SW 模式下的帧率为 9 FPS，在 PPE 模式下的帧率提升至 73 FPS。
+    - **LVGL** 在 SW 模式下的帧率为 12 FPS，在 PPE 模式下的数据缺失。
+    - HoneyGUI 在硬件加速（PPE 模式）下同样表现优异。
+
+#### PSRAM整帧buffer绘制（800x480）
+
+背景：rgb565，图片尺寸 315x316，非压缩图片，RGB 屏幕，测试单张图片的显示绘制性能。
+
+| 测试类型            | HoneyGUI SW (FPS) | HoneyGUI PPE (FPS) | LVGL SW (FPS) | LVGL PPE (FPS) |
+|---------------------|-------------------|--------------------|---------------|----------------|
+| 绘制图片            | 80 (316x315)      | 82 (316x315)       | 17 (316x315)  | 25 (316x315)   |
+| 填充矩形            | -                 | -                  | 25 (316x315)  | 26 (316x315)   |
+| 图像旋转            | 3 (316x315)       | 3 (316x315)        | 6 (316x315)   | 4 (316x315)    |
+| 中心图像放大1.5倍   | 2 (316x315)       | 23 (316x315)       | 3 (316x315)   | 13 (316x315)    |
+| 中心图像缩小0.5倍   | 10 (316x315)      | 82 (316x315)       | 13 (316x315)  | 50 (316x315)    |
+
+#### 分析
+对于 RGB 屏幕需要额外的 psram 作为缓存 buffer，LVGL完全使用psram作为图像缓存buffer，相比于 HoneyGUI 采用 ram 与 sram 结合的方式，LVGL 各方面性能表现较差；
+
+#### 结论
+
+- **适用场景**: 需要推动大尺寸的屏幕（例如 800x480），并且整帧绘制的情况，推荐旋转 HoneyGUI，对于需要频繁刷新脏块的项目，推荐使用 LVGL；分块绘制，在ram资源紧张的情况下，推荐使用 HoneyGUI，section 推荐参数 10。
+- **旋转，放大缩小**：LVGL 在图像旋转方面由于采用 2x2 的矩阵，在二维图渲染方面，相比于HoneyGUI的 3x3 矩阵，运算方面数据量更少，因此表现更快，而对于显示 2.5D，仿三维效果时，HoneyGUI将表现更好。
+- 在实际项目中，可以根据具体的帧率需求、系统资源情况以及其他功能需求，选择合适的显示框架。如果可行，进行具体的性能测试和评估是最为理想的做法。
+
+通过以上分析，可以为项目选择显示框架时提供参考，帮助决策人员根据实际需要做出最佳选择。
+
+### HoneyGUI vs LVGL RAM消耗
+
+#### GRAM 屏幕 (280x456) 动态 RAM 消耗
+
+| 测试类型       | HoneyGUI（Bytes） | LVGL 控件消耗（Bytes） | LVGL 整体消耗（Bytes） |
+| -------------- | :-----------: | :-----------------: | :----------------: |
+| 绘制图片       | 156           | 176                 | 3248               |
+| 填充矩形       | -             | 200                 | 3244               |
+| 图像旋转       | 156           | 208                 | 5240               |
+| 图像放大 1.5 倍 | 156           | 208                 | 3282               |
+| 图像缩小 0.5 倍 | 156           | 176                 | 3248               |
+
+#### GRAM 屏幕 (280x456) 静态 RAM 消耗
+
+| 测试类型       | HoneyGUI（Bytes） | LVGL 控件消耗（Bytes） |
+| -------------- | :-----------: | :-----------------: |
+| 绘制图片       | 41892（40KB）  | 55300（54KB）       |
+| 填充矩形       | -             | 55300（54KB）       |
+| 图像旋转       | 41892（40KB）  | 55300（54KB）       |
+| 图像放大 1.5 倍 | 41892（40KB）  | 55300（54KB）       |
+| 图像缩小 0.5 倍 | 41892（40KB）  | 55300（54KB）       |
 
 
 

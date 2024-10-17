@@ -23,10 +23,7 @@
 #include "gui_obj.h"
 #include "tp_algo.h"
 #include "gui_tabview.h"
-#include "gui_matrix.h"
-#include "gui_tab.h"
 #include "kb_algo.h"
-#include "gui_tabview_internal.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -575,12 +572,20 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
     {
         uint16_t w = this->base.w;
         uint16_t h = this->base.h;
-        this->center_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + w * h * dc->bit_depth /
-                                       8);
-        this->left_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + w * h * dc->bit_depth / 8);
-        this->right_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + w * h * dc->bit_depth /
-                                      8);
+        uint16_t bit_depth = dc->bit_depth;
+
+        uint32_t size = (uint32_t) w * h * bit_depth / 8;
+
+        this->center_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + size);
+        this->left_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + size);
+        this->right_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + size);
+
+        if (!this->center_shot || !this->left_shot || !this->right_shot)
+        {
+            gui_log("Error: Failed to allocate memory for pre-load shots.");
+        }
     }
+
 }
 
 gui_tabview_t *gui_tabview_create(void       *parent,

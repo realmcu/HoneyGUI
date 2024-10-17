@@ -30,6 +30,7 @@
 #include "ezxml.h"
 #include "gui_return.h"
 #include "gui_slider.h"
+#include "gui_scroll_wheel_new.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -52,7 +53,6 @@ struct widget_create
     T_OBJ_TYPE type;
 };
 
-#define WIDGETS_NUM 26
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
 
 static struct widget_create widget[] =
@@ -90,6 +90,8 @@ static struct widget_create widget[] =
     {"onOn", MACRO_ONON},
     {"onOff", MACRO_ONOFF},
     {"onLoad", MACRO_ONLOAD},
+    {"roller", TYPE_SCROLL_WHEEL_NEW},
+    {"calendar", MACRO_CALENDAR},
 };
 
 typedef struct
@@ -129,9 +131,9 @@ static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
 
     gui_img_translate(animate_params->img, animate_params->rotate_x,
                       animate_params->rotate_y);
-    gui_log("img_rotate_cb%f\n", animate_params->rotate_from + (animate_params->rotate_to -
-                                                                animate_params->rotate_from)*
-            animate->progress_percent);
+    // gui_log("img_rotate_cb%f\n", animate_params->rotate_from + (animate_params->rotate_to -
+    //                                                             animate_params->rotate_from)*
+    //         animate->progress_percent);
     gui_img_rotation(animate_params->img,
                      animate_params->rotate_from + (animate_params->rotate_to - animate_params->rotate_from)*
                      animate->progress_percent,
@@ -172,14 +174,14 @@ static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
 {
     uint8_t opacity = animate_params->opacity_from - animate->progress_percent *
                       (animate_params->opacity_from - animate_params->opacity);
-    gui_log("img_opacity_cb%d\n", opacity);
+    //gui_log("img_opacity_cb%d\n", opacity);
     gui_img_set_opacity(animate_params->img, opacity);
 }
-
+static void image_animate_callback(void *params, void *null, gui_animate_t *animate);
 static void multi_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
     image_animate_params_t *animate_params = (image_animate_params_t *)params;
-    gui_log("multi_animate_callback:%x,%s\n", animate_params, animate_params->animate_type);
+    //gui_log("multi_animate_callback:%x,%s\n", animate_params, animate_params->animate_type);
     if (!strcmp(animate_params->animate_type, "rotate"))
     {
         img_rotate_cb(params, null, animate);
@@ -251,19 +253,23 @@ static void multi_animate_callback(void *params, void *null, gui_animate_t *anim
         img_scale_cb(params, null, animate);
         img_opacity_cb(params, null, animate);
     }
+    else if (!strcmp(animate_params->animate_type, "image frame"))
+    {
+        image_animate_callback(params, null, animate);
+    }
 }
 
-static void image_animate_callback(void *params)
+static void image_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
-    static int current_image_index = 0;
+    int current_image_index = 0;
     image_animate_params_t *animate_params = (image_animate_params_t *)params;
 
     if (animate_params->image_count > 0)
     {
-        gui_img_set_attribute(animate_params->img, animate_params->img_name,
+        current_image_index = animate->progress_percent * (animate_params->image_count - 1);
+        gui_img_set_attribute(animate_params->img, GET_BASE(animate_params->img)->name,
                               animate_params->image_arr[current_image_index], GET_BASE(animate_params->img)->x,
                               GET_BASE(animate_params->img)->y);
-        current_image_index = (current_image_index + 1) % animate_params->image_count;
     }
 
 }
@@ -285,7 +291,7 @@ typedef struct
 
 light_param_t lights[LIGHTS_NUM];
 
-char *read_file(const char *path)
+static char *read_file(const char *path)
 {
     FILE *file = fopen(path, "r");
     if (!file)
@@ -739,8 +745,7 @@ static void sport_button_release(gui_button_t *b)
 }
 static void multi_level_ui_design(gui_multi_level_t *obj)
 {
-    extern void *get_app_xml(void);
-    create_tree_in_multi_level(get_app_xml(), obj);
+    create_tree_in_multi_level(gui_current_app(), obj);
 }
 struct on_click_jump_cb_param
 {
@@ -2921,139 +2926,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         0, 0, gui_get_screen_width(), gui_get_screen_height());
                 }
                 break;
-            // case MOVIE:
-            //     {
-            //         size_t i = 0;
-            //         int16_t x = 0;
-            //         int16_t y = 0;
-            //         char *folder = NULL;
-            //         uint32_t dur = 1000;
-            //         bool reverse = false;
-            //         int repeat = -1;
-            //         while (true)
-            //         {
-            //             if (!(p->attr[i]))
-            //             {
-            //                 break;
-            //             }
-            //             //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-            //             if (!strcmp(p->attr[i], "x"))
-            //             {
-            //                 x = atoi(p->attr[++i]);
-            //             }
-            //             else if (!strcmp(p->attr[i], "y"))
-            //             {
-            //                 y = atoi(p->attr[++i]);
-            //             }
-            //             else if (!strcmp(p->attr[i], "folder"))
-            //             {
-            //                 folder = gui_strdup(p->attr[++i]);
-            //             }
-            //             else if (!strcmp(p->attr[i], "dur"))
-            //             {
-            //                 char *d = p->attr[++i];
-            //                 dur = atoi(d);
-            //                 if (strstr(d, "ms") != NULL)
-            //                 {
-            //                     (void)(dur);
-            //                 }
-            //                 else if (strstr(d, "h") != NULL)
-            //                 {
-            //                     dur = dur * 60 * 60 * 1000;
-            //                 }
-            //                 else if (strstr(d, "s") != NULL)
-            //                 {
-            //                     dur = dur * 1000;
-            //                 }
-            //             }
-            //             else if (!strcmp(p->attr[i], "repeatCount"))
-            //             {
-
-            //                 char *r = p->attr[++i];
-            //                 if (strstr(r, "indefinite") != NULL)
-            //                 {
-            //                     repeat = -1;
-            //                 }
-            //                 else
-            //                 {
-            //                     repeat = atoi(r);
-            //                 }
-            //             }
-            //             else if (!strcmp(p->attr[i], "reverse"))
-            //             {
-            //                 char *r = p->attr[++i];
-            //                 if (strstr(r, "false") != NULL)
-            //                 {
-            //                     reverse = false;
-            //                 }
-            //                 else if (strstr(r, "true") != NULL)
-            //                 {
-            //                     reverse = true;
-            //                 }
-            //             }
-
-            //             i++;
-            //         }
-            //         int file_count = 0;
-            //         {
-            //             DIR *dir = 0;
-            //             struct dirent *entry;
-            //             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-            //             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-            //             if ((dir = opendir(path)) == NULL)
-            //             {
-            //                 gui_free(path);
-            //                 //perror("opendir() failed"); return;
-            //             }
-            //             gui_free(path);
-            //             while ((entry = readdir(dir)) != NULL)
-            //             {
-            //                 file_count++;
-            //             }
-            //             closedir(dir);
-            //         }
-            //         void **image_array = gui_malloc(file_count * sizeof(void *));
-            //         {
-            //             DIR *dir = 0;
-            //             struct dirent *entry;
-            //             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-            //             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-            //             if ((dir = opendir(path)) == NULL)
-            //             {
-            //                 gui_free(path);
-            //                 //perror("opendir() failed"); return;
-            //             }
-
-            //             int count = 0;
-            //             while ((entry = readdir(dir)) != NULL)
-            //             {
-            //                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-            //                 {
-            //                     char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-            //                     sprintf(path2, "%s/%s", folder, entry->d_name);
-            //                     image_array[count++] = gui_get_file_address(path2);
-            //                 }
-
-            //             }
-            //             gui_free(path);
-            //             closedir(dir);
-            //         }
-            //         uint32_t duration_time_ms = 0;
-            //         if (repeat == -1)
-            //         {
-            //             duration_time_ms = UINT32_MAX;
-            //         }
-            //         else
-            //         {
-            //             duration_time_ms = repeat * dur;
-            //         }
-
-
-            //         parent = (void *)gui_dynamic_create_from_mem(parent, "dm", image_array, x, y, file_count - 2,
-            //                                                      dur / (file_count - 5),
-            //                                                      INT32_MAX);
-            //     }
-            //     break;
             case JAVASCRIPT:
                 {
                     if (!strcmp(p->attr[0], "file"))
@@ -3124,6 +2996,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                 {
                     char *type = 0;
                     char *to = 0;
+                    char *id = 0;
                     int x = 0;
                     int y = 0;
                     size_t i = 0;
@@ -3146,6 +3019,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "id1"))
                         {
                             x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = p->attr[++i];
                         }
                         else if (!strcmp(p->attr[i], "id2"))
                         {
@@ -3208,6 +3085,52 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                             gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
 
+                        }
+                        else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+                        {
+                            char **param = gui_malloc(sizeof(char *) * 2);
+                            param[0] = gui_strdup(to);
+                            param[1] = gui_strdup(id);
+                            if (!strcmp(type, "animatePause"))
+                            {
+                                if (parent->type == BUTTON)
+                                {
+                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                                }
+                                else if (parent->type == WINDOW)
+                                {
+                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                                }
+                                else if (parent->type == CLICKSWITCH)
+                                {
+                                    GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                                     (param));
+                                    GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                                      (gui_event_cb_t)pause_animation_cb,
+                                                                      (param));
+                                }
+
+                            }
+                            else if (!strcmp(type, "animate"))
+                            {
+                                if (parent->type == BUTTON)
+                                {
+                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                                }
+                                else if (parent->type == WINDOW)
+                                {
+                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                                }
+                                else if (parent->type == CLICKSWITCH)
+                                {
+                                    GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                                     (param));
+                                    GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                                      (gui_event_cb_t)start_animation_cb,
+                                                                      (param));
+                                }
+
+                            }
                         }
                     }
                 }
@@ -3353,7 +3276,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                        currentValue, slider_size);
                 }
                 break;
-
             case MACRO_ONCHANGE:
                 {
                     char *type = 0;
@@ -3548,8 +3470,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
                             else
                             {
-                                extern void *get_app_xml(void);
-                                f = ezxml_parse_file(((gui_app_t *)get_app_xml())->xml);
+                                f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                             }
                             foreach_create_animate(f, parent, gui_strdup(id));
                             gui_log(" ");
@@ -3562,6 +3483,208 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                 }
                 break;
+            case TYPE_SCROLL_WHEEL_NEW:
+                {
+                    /*<roller
+                        id="scrollWheel1"
+                        x="50"               <!-- X coordinate -->
+                        y="100"              <!-- Y coordinate -->
+                        w="200"              <!-- Width -->
+                        h="300"              <!-- Height -->
+                        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  <!-- Items displayed in each row of the scroll wheel -->
+                        itemCount="11"        <!-- Total number of items -->
+                        rowCount="3"         <!-- Number of visible rows in the scroll wheel -->
+                        rowSpacing="20"      <!-- Spacing between each row -->
+                    ></roller>*/
+
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    int16_t row_count = 0;
+                    int16_t row_spacing = 0;
+                    int16_t item_count = 0;
+                    const char *items = NULL;
+                    int column_offset = 0;
+                    const char *font = 0;
+                    int16_t font_size = 0;
+                    uint32_t  font_color = {0};
+                    uint32_t  font_color_highlight = {0};
+                    uint32_t  item_color = {0};
+                    uint32_t  item_color_highlight = {0};
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+
+                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemCount"))
+                        {
+                            item_count = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "rowCount"))
+                        {
+                            row_count = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "rowSpacing"))
+                        {
+                            row_spacing = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "items"))
+                        {
+                            items = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "font"))
+                        {
+                            font = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "fontSize"))
+                        {
+                            font_size = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "fontColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            font_color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "fontColorHighlight"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            font_color_highlight = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            item_color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemColorHighlight"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            item_color_highlight = string_rgb888(p->attr[++i]);
+                        }
+                        i++;
+                    }
+
+                    // Split items into an array of strings
+                    char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+                    const char **string_array = gui_malloc(item_count * sizeof(char *));
+                    char *token = strtok(items_copy, ",");
+                    int j = 0;
+                    while (token != NULL && j < item_count)
+                    {
+                        string_array[j++] = token;
+                        token = strtok(NULL, ",");
+                    }
+                    // Create the scroll wheel widget
+                    gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
+                                                               parent, x, y, w, row_spacing, row_count, string_array, item_count
+                                                           );
+                    scroll_wheel->font_color.color.argb_full = font_color;
+                    scroll_wheel->font_color_highlight.color.argb_full = font_color_highlight;
+
+                    gui_scroll_wheel_new_render_text(scroll_wheel, gui_get_file_address(font), font_size);
+                    if (scroll_wheel == NULL)
+                    {
+                        gui_log("Failed to create scroll wheel widget.\n");
+                        continue;;
+                    }
+                    parent = GUI_BASE(scroll_wheel);
+
+                }
+                break;
+            case MACRO_CALENDAR:
+                {
+                    /*    <calendar
+                    x="0"
+                    y="360"
+                    w="800"
+                    h="400"
+                    fontColor="#ff000000"
+                    fontSize="16"
+                    font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
+                    </calendar>*/
+
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    uint32_t  color = {0};
+                    const char *font = 0;
+                    int16_t font_size = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+
+                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "fontColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "font"))
+                        {
+                            font = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "fontSize"))
+                        {
+                            font_size = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    gui_color_t color_font;
+                    color_font.color.argb_full = color;
+
+                    extern void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
+                                                    int font_size_p, gui_color_t color_p);
+                    gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_font);
+
+                }
+                break;
+
+
+
+            /*default*/
             default:
                 break;
             }
@@ -3641,6 +3764,8 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     float to_num_f[4];
                     memset(from_num_f, 0, sizeof(from_num_f));
                     memset(to_num_f, 0, sizeof(to_num_f));
+                    void **image_array = 0;
+                    int count = 0;
                     if (type && from && to && dur && repeatCount)
                     {
                         if (!strcmp(type, "rotate") || !strcmp(type, "scale") || !strcmp(type, "opacity") ||
@@ -3692,7 +3817,56 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                 gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                         }
+                        if (!strcmp(type, "image frame") && from)
+                        {
+                            int file_count = 0;
+                            {
+                                DIR *dir = NULL;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(from) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, from);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    return 0;
+                                }
+                                gui_free(path);
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        file_count++;
+                                    }
+                                }
+                                closedir(dir);
+                            }
 
+                            image_array = gui_malloc(file_count * sizeof(void *));
+                            {
+                                DIR *dir = NULL;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(from) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, from);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    return 0;
+                                }
+
+
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(from) + 2);
+                                        sprintf(path2, "%s/%s", from, entry->d_name);
+                                        image_array[count++] = gui_get_file_address(path2);
+                                    }
+                                }
+                                gui_free(path);
+                                closedir(dir);
+                            }
+                        }
 
 
                         int dur_num = 0;
@@ -3761,6 +3935,8 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->translate_from_y = from_num_f[1];
                         params->translate_to_x = to_num_f[0];
                         params->translate_to_y = to_num_f[1];
+                        params->image_arr = image_array;
+                        params->image_count = count;
                         gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
                                                gui_strdup(aniamte_name));
 
@@ -4191,6 +4367,9 @@ char *get_app_name(const char *xml)
 }
 void create_tree_nest(char *xml, void *obj)
 {
+    GUI_WIDGET_TRY_EXCEPT(obj);
+    gui_app_t *app = gui_obj_tree_get_app(obj);
+    app->xml = xml;
     ezxml_t f1 = ezxml_parse_file(xml);
     foreach_create(f1, obj);
 }
@@ -4265,8 +4444,7 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                     }
                     else
                     {
-                        extern void *get_app_xml(void);
-                        f = ezxml_parse_file(((gui_app_t *)get_app_xml())->xml);
+                        f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                     }
                     foreach_create_animate(f, to, to_name[1]);
                     gui_log(" ");

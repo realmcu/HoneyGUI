@@ -6,10 +6,10 @@ The menu cellular widget display a icons set as a honeycomb shape menu.
 
 ### Create Menu Cellular Widget
 
-Creating function is [gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],int array_size)](#gui_menu_cellular_create). Users need to enter icons set's image file array.
+Creating function is [gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[], int array_size)](#gui_menu_cellular_create). Users need to enter icons set's image file array.
 ### Config Offset
 
-Function is [void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y)](#gui_menu_cellular_create). Users are able to adjust horizontal and vertical offset for better dispaly.
+Function is [gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y)](#gui_menu_cellular_create). Users are able to adjust horizontal and vertical offset for better dispaly.
 
 ## Example
 <details> <summary>code</summary>

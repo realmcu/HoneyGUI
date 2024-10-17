@@ -120,7 +120,11 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
         gui_free(obj);
     }
 }
-
+void gui_obj_child_free(gui_obj_t *object)
+{
+    gui_obj_tree_child_free(object);
+    gui_list_init(&object->child_list);
+}
 static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
 {
     gui_list_t *node = NULL;
@@ -273,7 +277,7 @@ static const char *get_type_name(T_OBJ_TYPE type)
         ENUM_TO_STRING(WINDOWWITHBORDER)
         ENUM_TO_STRING(CANVAS)
         ENUM_TO_STRING(VG_LITE_CLOCK)
-        ENUM_TO_STRING(VG_LITE_CUBE)
+        ENUM_TO_STRING(CUBE)
         ENUM_TO_STRING(GRID)
         ENUM_TO_STRING(RADIO)
         ENUM_TO_STRING(RADIOSWITCH)
@@ -1169,7 +1173,12 @@ void gui_inertial(int *speed, int end_speed, int *offset)
         *speed += 1;
     }
 }
-
+void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y)
+{
+    GUI_WIDGET_TRY_EXCEPT(obj)
+    obj->x = x;
+    obj->y = y;
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

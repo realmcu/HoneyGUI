@@ -101,7 +101,7 @@ typedef struct
 typedef struct
 {
     uint32_t last_key_len: 8;           // last key len input
-    uint32_t char_len_byte: 8;          // how many bytes needed for one candidate word
+    uint16_t char_len_byte;          // how many bytes needed for one candidate word
     uint16_t cand_num;              // total number of candidate words from dictionary
     uint16_t cand_page_size;        // number of candidate words for each page
     uint16_t cand_page;             // candidate words page, count from 0

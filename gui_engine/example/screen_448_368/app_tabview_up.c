@@ -170,7 +170,7 @@ static void tv_clear(void *obj, gui_event_t e)
     }
     if (tv_array[0] || tv_array[1])
     {
-        gui_win_set_animate(win_clear, 500, 0, win_clear_cb, NULL);
+        gui_win_set_animate(win_clear, 500, 0, (gui_animate_callback_t)win_clear_cb, NULL);
     }
 }
 
@@ -212,7 +212,7 @@ static void win_message_clear_cb(gui_obj_t *obj)
 
 static void tv_message_clear(void *obj, gui_event_t e)
 {
-    gui_win_set_animate(win_clear, 500, 0, win_message_clear_cb, obj);
+    gui_win_set_animate(win_clear, 500, 0, (gui_animate_callback_t)win_message_clear_cb, obj);
 }
 
 static void canvas_cb_message_bg(gui_canvas_t *canvas)
@@ -279,7 +279,7 @@ static void message_more_cb(gui_obj_t *win)
         {
             if (tp->x > 15 && tp->x < 95)
             {
-                gui_win_set_animate(win_clear, 500, 0, message_cancel_cb, win);
+                gui_win_set_animate(win_clear, 500, 0, (gui_animate_callback_t)message_cancel_cb, win);
             }
         }
         else
@@ -404,7 +404,7 @@ static void view_more(gui_obj_t *obj)
         gui_text_mode_set(text, CENTER);
 
 
-        gui_win_set_animate(win_clear, 500, -1, message_more_cb, win);
+        gui_win_set_animate(win_clear, 500, -1, (gui_animate_callback_t)message_more_cb, win);
     }
 }
 
@@ -453,6 +453,7 @@ static void pagelist_message(void *parent)
                  32);
     gui_text_type_set(message_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(message_text, MULTI_LEFT);
+    gui_text_wordwrap_set(message_text, true);
 
     // option left
     char *option_content = "...";
@@ -494,7 +495,7 @@ static void win_os_clear_cb(gui_obj_t *obj)
 
 static void tv_os_information_clear(void *obj, gui_event_t  e)
 {
-    gui_win_set_animate(win_clear, 250, 0, win_os_clear_cb, obj);
+    gui_win_set_animate(win_clear, 250, 0, (gui_animate_callback_t)win_os_clear_cb, obj);
 }
 
 static void tv_os_information_more(void *obj, gui_event_t e)
@@ -538,6 +539,7 @@ static void os_information(void *parent)
                  32);
     gui_text_type_set(os_information_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(os_information_text, MULTI_LEFT);
+    gui_text_wordwrap_set(os_information_text, true);
 
     // option left
     char *option_content = "...";
@@ -569,7 +571,7 @@ static void canvas_cb_draw_bg(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                    50); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
+    nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 76));
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
@@ -704,5 +706,5 @@ void tabview_up_design(void *parent_widget)
     win_clear = gui_win_create(pg, "spare", 0, SCREEN_HEIGHT, SCREEN_WIDTH,
                                40);
 
-    gui_win_set_animate(win_design, 1000, -1, win_design_cb, NULL);
+    gui_win_set_animate(win_design, 1000, -1, (gui_animate_callback_t)win_design_cb, NULL);
 }

@@ -6,7 +6,7 @@
 
 ### 创建返回控件
 
-创建函数是 [gui_return_create](#gui_return_create)。用户需要提供曲线动画帧图像文件数组，以及返回操作函数。
+创建函数是 [gui_return_create(void *parent, const uint32_t *frame_array[], int array_size, void *return_cb, gui_obj_t *ignore_gesture_widget)](#gui_return_create)。用户需要提供曲线动画帧图像文件数组，以及返回操作函数。
 
 ## 示例
 

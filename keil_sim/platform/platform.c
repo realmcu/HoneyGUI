@@ -22,12 +22,9 @@
 #include "cmsis_compiler.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
-
-#include "SSE300MPS3.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push

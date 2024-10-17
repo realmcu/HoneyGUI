@@ -22,7 +22,6 @@
 #include "gui_obj.h"
 #include "draw_img.h"
 #include "tp_algo.h"
-#include "kb_algo.h"
 #include "acc_init.h"
 #include "gui_win.h"
 /** @defgroup WIDGET WIDGET

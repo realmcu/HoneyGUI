@@ -25,7 +25,7 @@
 
 ### 创建控件
 
-开发者可以利用 [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) 函数来创建一个页面列表控件。它的高度将根据子控件的总高度进行设置。
+开发者可以利用 [gui_pagelist_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_pagelist_create) 函数来创建一个页面列表控件。它的高度将根据子控件的总高度进行设置。
 
 ## 示例
 

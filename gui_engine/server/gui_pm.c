@@ -10,7 +10,6 @@
  */
 #include <guidef.h>
 #include <draw_img.h>
-#include <draw_font.h>
 #include <gui_fb.h>
 #include <gui_server.h>
 #include <gui_obj.h>

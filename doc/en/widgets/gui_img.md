@@ -1,60 +1,60 @@
 # Img
 <br>
 
-The image widget is the basic widget used to display image. Image widgets support moving, zooming, rotating, etc.
+The image widget is the basic widget used to display images. Image widgets support moving, zooming, rotating, etc.
 
 ## Usage
 
-### Create widget
+### Create Widget
 
-You can use [gui_img_create_from_mem(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_img_create_from_mem) to create an image widget from memory, or use [gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)](#gui_img_create_from_fs) to create an image widget from file. Alternatively, you can use [gui_img_create_from_ftl(void *parent, const char *name, void *ftl, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_img_create_from_ftl) to create an image widget from ftl.
+It is possible to use [gui_img_create_from_mem(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_img_create_from_mem) to create an image widget from memory, or use [gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)](#gui_img_create_from_fs) to create an image widget from a file. Alternatively, [gui_img_create_from_ftl(void *parent, const char *name, void *ftl, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_img_create_from_ftl) can be used to create an image widget from ftl.
 If the width or height of the image widget is set to `0`, the widget's size will be set according to the size of the image source automatically.
 
-### Update location
+### Update Location
 
-If you need to update the location of image widget, use [gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)](#gui_img_set_location) to relocate.
+If it is necessary to update the location of an image widget, use [gui_img_set_location(gui_img_t *_this, uint16_t x, uint16_t y)](#gui_img_set_location) to relocate.
 
-### Set attribute
+### Set Attribute
 
-You can use [gui_img_set_attribute(gui_img_t *this, const char *name, void *addr, int16_t x, int16_t y)](#gui_img_set_attribute) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
+It is possible to use [gui_img_set_attribute(gui_img_t *_this, const char *name, void *addr, int16_t x, int16_t y)](#gui_img_set_attribute) to set the attribute of an image widget, replace it with a new image, and set a new coordinate.
 
-### Get height/width
+### Get Height/Width
 
-If you want to get the height/width of image widget, you can do so with [gui_img_get_height(gui_img_t *this)](#gui_img_get_height) or [gui_img_get_width(gui_img_t *this)](#gui_img_get_width).
+If you want to get the height/width of image widget, do so with [gui_img_get_height(gui_img_t *_this)](#gui_img_get_height) or [gui_img_get_width(gui_img_t *_this)](#gui_img_get_width).
 
 ### Refresh
 
-You can refresh the image size using [gui_img_refresh_size(gui_img_t *_this)](#gui_img_refresh_size).
+Refresh the image size using [gui_img_refresh_size(gui_img_t *_this)](#gui_img_refresh_size).
 
-### Blend mode
+### Blend Mode
 
-You can set the image's blend mode using [gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)](#gui_img_set_mode).
+Set the image's blend mode using [gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)](#gui_img_set_mode).
 
 ### Translation
 
-Using [gui_img_translate(gui_img_t *this, float t_x, float t_y)](#gui_img_translate) to move the image widget.
+Use [gui_img_translate(gui_img_t *_this, float t_x, float t_y)](#gui_img_translate) to move the image widget.
 It can move an image widget to a new coordinate without changing the original coordinate in the widget's attribute.
 
 ### Rotation
 
-You can rotate the image widget around the center of the circle by this API [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#gui_img_rotation).
+Rotate the image widget around the center of the circle with this API [gui_img_rotation(gui_img_t *_this, float degrees, float c_x, float c_y)](#gui_img_rotation).
 
 ### Zoom
 
-You can adjust the size of the image widget to fit your requirements by this API [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#gui_img_scale).
+You can adjust the size of the image widget to fit your requirements by this API [gui_img_scale(gui_img_t *_this, float scale_x, float scale_y)](#gui_img_scale).
 
 ### Opacity
-The opacity value of the image is adjustable, and you can set it using [gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)](#gui_img_set_opacity).
+The opacity value of the image is adjustable, and it can be set using [gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)](#gui_img_set_opacity).
 
 ### Animation
-You can use the [gui_img_set_animate(gui_img_t *_this, uint32_t dur, int repeat_count, void *callback, void *p)](#gui_img_set_animate) to set the animation effects for the image widget.
+The [gui_img_set_animate(gui_img_t *_this, uint32_t dur, int repeat_count, void *callback, void *p)](#gui_img_set_animate) can be used to set the animation effects for the image widget.
 
 ### Quality
-You can set the image's quality using [gui_img_set_quality(gui_img_t *_this, bool high_quality)](#gui_img_set_quality).
+The image's quality can be set using [gui_img_set_quality(gui_img_t *_this, bool high_quality)](#gui_img_set_quality).
 
 ### Screenshot
 
-You can use [gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#gui_img_tree_convert_to_img) to save a fullscreen screenshot. Additionally, you can use [gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#gui_img_tree_convert_to_img_root_size) to save a screenshot of the current widget's size. The saved image will be in RGB format.
+The [gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#gui_img_tree_convert_to_img) can be used to save a fullscreen screenshot. Additionally, the [gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#gui_img_tree_convert_to_img_root_size) can be used to save a screenshot of the current widget's size. The saved image will be in RGB format.
 
 ## Example
 
@@ -163,11 +163,7 @@ void page_tb6(void *parent)
 <center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/img.gif" /></center>
 <br>
 
-<span id="api">
-
 ## API
-
-</span>
 
 ```eval_rst
 

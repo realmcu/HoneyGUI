@@ -31,7 +31,7 @@ extern "C" {
 #include "guidef.h"
 #include "gui_api.h"
 #include "nanovg.h"
-
+#include "gui_obj.h"
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{

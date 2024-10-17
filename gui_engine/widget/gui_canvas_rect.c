@@ -274,6 +274,7 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
     GET_BASE(canvas_rect)->create_done = true;
     canvas_rect->color = color;
     canvas_rect->opacity_value = UINT8_MAX;
+    GUI_BASE(canvas_rect)->type = RECTANGLE;
     return canvas_rect;
 }
 

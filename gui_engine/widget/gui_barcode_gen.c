@@ -504,7 +504,11 @@ INTERNAL void gui_barcode_gen_expand(struct barcode_symbol *symbol, const char d
 
     // we only use code128AUTO, update encoded data every time at the same row;
     // symbol->rows++;
-
+    if (row >= 1)
+    {
+        gui_log("Row index out of bounds");
+        return;
+    }
     memset(symbol->encoded_data[row], 0, 144);
     writer = 0;
     latch = 1;

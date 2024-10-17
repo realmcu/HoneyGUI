@@ -228,7 +228,7 @@ timestamps{
                                     bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-master"
 
                                     // run cov-analyze command
-                                    bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true -tp \"!file('Keil_v5_536/.*')&&!file('AppData/Local/Arm/Packs/.*')&&!file('Keil_v5/ARM/.*')&&!file('gui_engine/third_party/.*')&&!file('gui_engine/3rd/.*')&&!file('lvgl/.*')&&!file('rt-thread/.*')&&!file('vglite/.*')&&!file('Arm2D/.*')&&!file('gui_engine/3rd/.*')\""
+                                    bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true -tp \"!file('Keil_v5_536/.*')&&!file('AppData/Local/Arm/Packs/.*')&&!file('Keil_v5/ARM/.*')&&!file('gui_engine/third_party/.*')&&!file('gui_engine/3rd/.*')&&!file('lvgl/.*')&&!file('rt-thread/.*')&&!file('vglite/.*')&&!file('Arm2D/.*')&&!file('guiEngine-master/gui_engine/3rd/.*')\""
 
                                     // run cov-commit-defects command
                                     bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --host ${COVERITY_HOST} --dataport ${COVERITY_PORT} --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"

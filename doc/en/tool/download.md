@@ -24,7 +24,7 @@ Select the chip type and language in the MP Tool startup interface, taking RTL87
 
 * After the file preparation is completed, first check the UART port. If it is normal, it will display 'Ready'. Then open the UART port and display 'OK'. Once this is done, click 'Download' to start the burning process.
 <br/>
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1727331819737055516/15333172_13408154.png" 
+<div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1728973687663258532/d05f55d2_13408154.png" 
 alt="IMAGE"></div>
 <br/>
 

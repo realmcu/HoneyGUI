@@ -148,5 +148,6 @@ void design_tab_watchface_main(void *parent)
 
     gui_win_t *win_switch_to_perspective_app = gui_win_create(parent, "win_switch_to_perspective_app",
                                                               0, 0, 454, 454);
-    gui_win_click(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
+    gui_win_click(win_switch_to_perspective_app, (gui_event_cb_t)win_switch_to_perspective_app_touch_cb,
+                  NULL);
 }

@@ -24,6 +24,6 @@ MP Tool支持调试模式和批量生产模式，集成了打包和flash map生�
 
 * 文件准备完成后，先检测UART端口，正常则显示“Ready”，然后打开UART端口，显示“OK”后即可点击“Download”烧录。
 <br/>
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1727331819737055516/15333172_13408154.png" 
+<div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1728973687663258532/d05f55d2_13408154.png" 
 alt="IMAGE"></div>
 <br/>

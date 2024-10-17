@@ -1,36 +1,36 @@
 # Progressbar
 
-The progressbar widget allows you to create widgets with three different effects.
-After created a progressbar widget, you can set the percentage of the widget to display.
+The progressbar widget allows the creation of widgets with three different effects.
+After creating a progressbar widget, the percentage of the widget to display can be set.
 
 ## Usage
 
-### Create horizontal widget
+### Create Horizontal Widget
 
-You can create a horizontal style progressbar based on picture by this API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create).
+A horizontal style progressbar based on a picture can be created by this API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create).
 It's a normal single-picture progressbar.
 
-### Create vertical widget
+### Create Vertical Widget
 
-Similar to `Create horizontal widget` above, you can use [gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_v_create) to create a vertical style progressbar based on picture.
+Similar to `Create Horizontal Widget` above, [gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_v_create) can be used to create a vertical style progressbar based on a picture.
 
-### Create movie-style widget
+### Create Movie-Style Widget
 
-Unlike the above two normal single-picture progressbar, a movie-style progressbar consists of a series of pictures.
-You can create a movie style progressbar from memory address by using [gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create), and [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create_from_fs) from filesystem.
+Unlike the above two normal single-picture progressbars, a movie-style progressbar consists of a series of pictures.
+A movie style progressbar can be created from a memory address by using [gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create) , and [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create_from_fs) from a filesystem.
 The first picture is shown at 0% progress and the last picture is shown at 100% progress.
 
 ### Progress
 
-For example, if you want to create a movie-style progressbar, you need to use [gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)](#gui_progressbar_set_progress) to set the progress and [gui_progressbar_get_progress(gui_progressbar_t *this)](#gui_progressbar_get_progress) to get the progress.
+For example, if creating a movie-style progress bar is desired, [gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)](#gui_progressbar_set_progress) can be used to set the progress, and [gui_progressbar_get_progress(gui_progressbar_t *this)](#gui_progressbar_get_progress) can be used to get the progress.
 
 ### Percentage
 
-The above usage of (`Progress`) applies to movie-style progressbar. For a normal single-image progressbar, if you want to use a progressbar to show the progress of a song, you can use [gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)](#gui_progressbar_set_percentage) to set the current percentage progress after creating the progressbar. Additionally, you can also use [gui_progressbar_get_percentage(gui_progressbar_t *this)](#gui_progressbar_get_percentage) to get the current percentage progress.
+The above usage of (`Progress`) applies to a movie-style progress bar. For a normal single-image progress bar, if showing the progress of a song with a progress bar is desired, [gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)](#gui_progressbar_set_percentage) can be used to set the current percentage progress after creating the progress bar. Additionally, [gui_progressbar_get_percentage(gui_progressbar_t *this)](#gui_progressbar_get_percentage) can be used to get the current percentage progress.
 
-### Get max number
+### Get Max Number
 
-This API [gui_progressbar_get_max(gui_progressbar_t *this)](#gui_progressbar_get_max) is used to get the number of pictures in a movie style progressbar, so you can know how many pictures will be displayed in total.
+This API [gui_progressbar_get_max(gui_progressbar_t *this)](#gui_progressbar_get_max) is used to get the number of pictures in a movie-style progress bar, so the total number of pictures that will be displayed can be known.
 
 ## Example
 
@@ -108,15 +108,10 @@ void page_tb_three(void *parent)
 
 <center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/progressbar.gif" /></center>
 
-<span id="api">
-
 ## API
-
-</span>
 
 ```eval_rst
 
 .. doxygenfile:: gui_progressbar.h
 
 ```
-

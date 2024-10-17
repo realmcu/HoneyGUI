@@ -424,8 +424,9 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
 }
 
 // App callback function
-static void fruit_ninja_cb(gui_win_t *win)
+static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 {
+    gui_win_t *win = static_cast<gui_win_t *>(p);
     static b2World world(b2Vec2(0.0f, 9.8f)); // Create a Box2D world with gravity
     static b2Body *body_st, *body_ba, *body_pe, *body_wm,
            *body_bomb; // entities that simulate motion trajectories
@@ -638,7 +639,7 @@ static void fruit_ninja_design(gui_obj_t *obj)
                                     "FRUIT_NINJA_BOX2D", 0, 0, 0, 0);
 
     // Set the animation function of the window
-    gui_win_set_animate(win, 5000, -1, (void *)fruit_ninja_cb, win);
+    gui_win_set_animate(win, 5000, -1, fruit_ninja_cb, win);
     init_flag = true;
     fruit_cut_flag[0] = 0;
     fruit_cut_flag[1] = 0;

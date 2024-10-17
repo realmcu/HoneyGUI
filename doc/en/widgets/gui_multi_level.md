@@ -6,10 +6,10 @@ This widget can be used in GUI applications that require managing complex hierar
 
 ### Create Widget
 
-Creating function is [gui_multi_level_t *gui_multi_level_create(void *parent, const char *widget_name, void (*ui_design)(gui_obj_t *))](#gui_multi_level_create). This function creates and initializes a new instance of the gui_multi_level_t widget.
+Creating function is [gui_multi_level_create(void *parent, const char *widget_name, void (*ui_design)(gui_obj_t *))](#gui_multi_level_create). This function creates and initializes a new instance of the gui_multi_level_t widget.
 ### Jump to (Level, Index)
 
-Function is [gui_multi_level_jump(gui_multi_level_t  *this, int level, int index)](#gui_multi_level_jump). This function facilitates the jump operation to a specific level and index within the multi-level GUI structure.
+Function is [gui_multi_level_jump(gui_multi_level_t *this, int level, int index)](#gui_multi_level_jump). This function facilitates the jump operation to a specific level and index within the multi-level GUI structure.
 
 ## Example
 <br>

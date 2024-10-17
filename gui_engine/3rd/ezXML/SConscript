@@ -7,9 +7,7 @@ src = Split("""
 """)
 
 
-if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
-    src += ['ezxml.c']
-if GetDepend(['CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE']):
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI']):
     src += ['ezxml.c']
 
 

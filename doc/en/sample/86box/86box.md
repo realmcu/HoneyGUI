@@ -1,6 +1,6 @@
-#  86box
+#  86Box
 
-This example demostrates how to develop a RealUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
+This example demostrates how to develop a RealUI 86Box APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 
 ## Source File
 - APP package `gui_engine\example\screen_480_480\root\app\box`
@@ -8,14 +8,14 @@ This example demostrates how to develop a RealUI 86BOX APP, from which you can l
 
 ## UI Design
 ### RVisualDesigner
-- RealUI 86box utilizes `RVisualDesigner` to complete UI design. For the first-time usage of `RVisualDesigner`, please refer to `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` to obtain a detailed development guide.
+- RealUI 86Box utilizes `RVisualDesigner` to complete UI design. For the first-time usage of `RVisualDesigner`, please refer to `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` to obtain a detailed development guide.
 
 - Find and open the example UI design project in the specified path:
 <br/>
 <div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1725515761517919126/033a0990_9218678.png"></div>
 <br/>
 
-- Click on `Export` and then `Simulate` in succession to complete the export and launch the simulation. Once the simulator window is launched, the 86box APP icon will be displayed. Clicking on it will take you to the corresponding APP.
+- Click on `Export` and then `Simulate` in succession to complete the export and launch the simulation. Once the simulator window is launched, the 86Box APP icon will be displayed. Clicking on it will take you to the corresponding APP.
 
 <br/>
 <div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1725515804906725239/f2b55fe1_9218678.png"></div>
@@ -40,7 +40,7 @@ This example demostrates how to develop a RealUI 86BOX APP, from which you can l
 ### Gestures
 In the JS file `gui_engine\example\screen_480_480\root\app\box\box.js`, the control and interaction logic of the UI is implemented.
 
-#### Light control switch
+#### Light Control Switch
 
 <br/>
 <div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1725515850170490894/67696ea2_9218678.png"></div>
@@ -64,7 +64,7 @@ sw.switch_on(led1OnFunc)
 sw.switch_off(led1OffFunc)
 ```
 
-#### Tab jumping switch
+#### Tab Jumping Switch
 
 <br/>
 <div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/sample/86box/86box.gif"/></div>

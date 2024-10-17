@@ -2,10 +2,10 @@
     "weather": [
         {
             "low": 18,
-            "high": 37,
-            "cur": 22,
-            "condition_1": "Sunny",
-            "condition_2": "Heavy rain",
+            "high": 28,
+            "cur": 24,
+            "condition_1": "Cloudy",
+            "condition_2": "Cloudy",
             "condition_3": "Cloudy",
             "condition_4": "Cloudy",
             "condition_5": "Cloudy"
@@ -13,14 +13,22 @@
     ],
     "compass": [
         {
-            "degree": 90
+            "degree": 121
         }
     ],
     "activity": [
         {
-            "move": 1,
-            "ex": 1,
-            "stand": 1
+            "move": 8677,
+            "ex": 10,
+            "stand": 19
+        }
+    ],
+    "heart_rate": [
+        {
+            "AM12": 91,
+            "AM6": 86,
+            "PM12": 70,
+            "PM6": 70
         }
     ]
 }

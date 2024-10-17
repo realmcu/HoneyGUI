@@ -63,7 +63,7 @@ typedef struct gui_page
     gui_img_t *scroll_bar;
     int get_yend;
     gui_animate_t *animate;
-    void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *name, int16_t x,
+    void (*ctor)(struct gui_page *, gui_obj_t *parent, const char *name, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     bool release;
     bool press;
@@ -160,7 +160,7 @@ void gui_page_destory(gui_obj_t *obj);
  * @param h the hight.
  *
  */
-void gui_page_ctor(gui_page_t *this,
+void gui_page_ctor(gui_page_t *,
                    gui_obj_t  *parent,
                    const char *name,
                    int16_t     x,
@@ -201,7 +201,7 @@ gui_page_t *gui_page_create(void       *parent,
  * @param bar_pic bar picture address
  * @param src_mode image source mode, 0 memory and 1 file system
  */
-void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode);
+void gui_page_add_scroll_bar(gui_page_t *, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode);
 
 /**
  * @brief
@@ -209,7 +209,7 @@ void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic, IMG_SOURCE_MODE_TY
  * @param this widget object pointer
  * @param offset page offset
  */
-void gui_page_set_offset(gui_page_t *this, int offset);
+void gui_page_set_offset(gui_page_t *, int offset);
 
 /**
  * @brief
@@ -217,7 +217,7 @@ void gui_page_set_offset(gui_page_t *this, int offset);
  * @param  this widget object pointer
  * @return page offset
  */
-int gui_page_get_offset(gui_page_t *this);
+int gui_page_get_offset(gui_page_t *);
 
 /**
  * @brief
@@ -228,7 +228,7 @@ int gui_page_get_offset(gui_page_t *this);
  * @param callback animate frame callback
  * @param p parameter
  */
-void gui_page_set_animate(gui_page_t *this,
+void gui_page_set_animate(gui_page_t *,
                           uint32_t    dur,
                           int         repeat_count,
                           void       *callback,
@@ -240,7 +240,7 @@ void gui_page_set_animate(gui_page_t *this,
  * @param this widget object pointer
  * @param rebound true: config rebound; false: not rebound;
  */
-void gui_page_rebound(gui_page_t *this, bool rebound);
+void gui_page_rebound(gui_page_t *, bool rebound);
 
 /**
  * @brief automatic center alignment

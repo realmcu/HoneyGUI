@@ -1,6 +1,6 @@
 /* =========== Define common variables =========== */
 body {
-    --md-left-sider-width: 280px;
+    --md-left-sider-width: 350px;
     --md-right-contents-width: 250px;
 }
 /* =========== Define common variables =========== */
@@ -56,8 +56,7 @@ figcaption, figcaption p{
         background:rgba(0,0,0,.05);
     }
     .wy-nav-content {
-        width: calc(100% - var(--md-right-contents-width));
-        max-width: 1200px;
+        max-width: 100%;
         min-width: 500px;
         margin:0;
         padding: 1.618em 3.2%;
@@ -252,6 +251,9 @@ dl.c.unexpanded dd, dl.cpp.unexpanded dd {
     /* width: 100%;
   	overflow: auto; */
 }
+table, th, td {
+    border: 1px solid #e1e4e5;
+}
 table {
     border-collapse:collapse;
 	margin: 0 auto;
@@ -436,9 +438,9 @@ section[id*="deprecated-api"] dd dl {
 
 /* ====== Render image modal style ====== */
 /* 禁用点击图片跳转到图片地址的效果 */
-/* a.image-reference {
-    pointer-events: none;
-} */
+a.no-cursor-link {
+    cursor: default;
+}
 
 .img-modal {
     display: none;
@@ -471,7 +473,7 @@ section[id*="deprecated-api"] dd dl {
     position: fixed;
     top: 2%;
     right: 4%;
-    color: #fff;
+    color: darkred;
     font-size: 46px;
     font-weight: bold;
     transition: 0.3s;
@@ -479,7 +481,7 @@ section[id*="deprecated-api"] dd dl {
 }
 .img-modal-close:hover,
 .img-modal-close:focus {
-    color: #bbb;
+    color: #e60000;
     text-decoration: none;
     cursor: pointer;
 }

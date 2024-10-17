@@ -7,10 +7,9 @@
 #include <cstdio>
 #include <cmath>
 #include <box2d/box2d.h>
-#include <SDL.h>
 #include <vector>
 
-#include <nanovg.h>
+
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
@@ -60,7 +59,7 @@ void render(gui_canvas *this_widget);
 void maintainMinimumVelocity(b2Body *ball);
 void limitMaxAngularVelocity(b2Body *ball);
 // App callback function
-void app_box2d_cb(gui_win_t *win)
+GUI_ANIMATION_CALLBACK(app_box2d_cb)
 {
     for (const Ball &ball : balls)
     {
@@ -149,9 +148,9 @@ bool init()
     }
 
     // Set the animation function of the window
-    gui_win_set_animate(win, 1000, -1, (void *)app_box2d_cb, win);
-    gui_win_press(win, (void *)win_press_callback, win);
-    gui_win_release(win, (void *)win_release_callback, win);
+    gui_win_set_animate(win, 1000, -1, app_box2d_cb, win);
+    gui_win_press(win, win_press_callback, win);
+    gui_win_release(win, (gui_event_cb_t)win_release_callback, win);
     this_widget = gui_canvas_create(parent, "canvas", 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     if (!this_widget)
     {

@@ -9,20 +9,20 @@
 #include "stdlib.h"
 #include <gui_app.h>
 #include "tiger_blue.txt"
-#include "tiger_grey.txt"
-#include "tiger_laven.txt"
-#include "tiger_lime.txt"
+// #include "tiger_grey.txt"
+// #include "tiger_laven.txt"
+// #include "tiger_lime.txt"
 #include "tiger_turk.txt"
-#include "tiger_white.txt"
+// #include "tiger_white.txt"
 #include "tiger_yellow.txt"
 #include "gui_server.h"
 #include "gui_components_init.h"
-#include "gui_cube.h"
-#include "gui_win.h"
+// #include "gui_cube.h"
+// #include "gui_win.h"
 #include "gui_canvas_arc.h"
-#include "gui_canvas_round_rect.h"
+// #include "gui_canvas_round_rect.h"
 #include "tiger_blue_compressed.txt"
-#include "acc_sw_rle.h"
+// #include "acc_sw_rle.h"
 
 
 
@@ -52,27 +52,27 @@ static void app_ui_design(gui_app_t *app)
                             0);
     return;
 
-    gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, TAB_CUBE);
+    // gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
+    // gui_tabview_set_style(tv, TAB_CUBE);
 
-    gui_tabview_enable_pre_load(tv, true);
+    // gui_tabview_enable_pre_load(tv, true);
 
-    gui_tab_t *tab_1 = gui_tab_create(tv, "tb_1",    0, 0, 0, 0, 0, 0);
-    gui_tab_t *tab_2 = gui_tab_create(tv, "tb_2",    0, 0, 0, 0, 1, 0);
-
-
-    gui_img_t *img_blue = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_1),  "img_1_test",
-                                                  (void *)_actiger_blue, 0, 0, 0,
-                                                  0);
-    gui_img_t *img_yellow = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_1),  "img_1",
-                                                    (void *)_actiger_yellow, 250, 250,
-                                                    0, 0);
+    // gui_tab_t *tab_1 = gui_tab_create(tv, "tb_1",    0, 0, 0, 0, 0, 0);
+    // gui_tab_t *tab_2 = gui_tab_create(tv, "tb_2",    0, 0, 0, 0, 1, 0);
 
 
+    // gui_img_t *img_blue = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_1),  "img_1_test",
+    //                                               (void *)_actiger_blue, 0, 0, 0,
+    //                                               0);
+    // gui_img_t *img_yellow = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_1),  "img_1",
+    //                                                 (void *)_actiger_yellow, 250, 250,
+    //                                                 0, 0);
 
 
-    gui_img_t *img_2 = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_2),  "img_2",
-                                               (void *)_actiger_turk, 100, 100, 0, 0);
+
+
+    // gui_img_t *img_2 = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_2),  "img_2",
+    //                                            (void *)_actiger_turk, 100, 100, 0, 0);
 
 }
 

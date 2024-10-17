@@ -138,7 +138,7 @@ void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_info
 void app_dashboard_update_main_display_message_infor(app_message_data *app_message_information);
 
 /* Update main_display every frame */
-void paint_main_display_cb(gui_win_t *win);
+void paint_main_display_cb(void *param1, void *param2, struct gui_animate *anim) ;
 
 #ifdef __cplusplus
 }

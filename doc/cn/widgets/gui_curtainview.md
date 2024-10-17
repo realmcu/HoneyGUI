@@ -11,11 +11,11 @@
 
 ### 创建幕布容器控件
 
-使用 [gui_curtainview_create(parent, filename, x, y, w, h)](#gui_curtainview_create) 函数创建一个可以容纳幕布控件的容器。
+使用 [gui_curtainview_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_curtainview_create) 函数创建一个可以容纳幕布控件的容器。
 
 ### 回调函数
 
-幕布扩展完成后，可以使用 [gui_curtainview_set_done_cb (this, cb)](#gui_curtainview_set_done_cb) 函数来实现某些回调事件。
+幕布扩展完成后，可以使用 [gui_curtainview_set_done_cb(gui_curtainview_t *_this, void(*cb)(gui_curtainview_t *_this))](#gui_curtainview_set_done_cb) 函数来实现某些回调事件。
 
 ## 示例
 

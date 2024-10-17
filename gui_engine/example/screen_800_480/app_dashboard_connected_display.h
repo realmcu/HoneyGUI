@@ -147,7 +147,7 @@ void app_dashboard_update_connected_display_message_infor(app_message_data
                                                           *app_message_information);
 
 /* Update connected_display every frame */
-void paint_connected_display_cb(gui_win_t *win);
+void paint_connected_display_cb(void *param1, void *param2, struct gui_animate *anim) ;
 
 #ifdef __cplusplus
 }

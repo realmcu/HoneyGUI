@@ -5,10 +5,10 @@
 ## 用法
 
 ### 创建控件
-创建函数为 [gui_multi_level_t *gui_multi_level_create(void *parent, const char *widget_name, void (*ui_design)(gui_obj_t *))](#gui_multi_level_create)。此函数创建并初始化一个新的 gui_multi_level_t 控件实例。
+创建函数为 [gui_multi_level_create(void *parent, const char *widget_name, void (*ui_design)(gui_obj_t *))](#gui_multi_level_create)。此函数创建并初始化一个新的 gui_multi_level_t 控件实例。
 
 ### 跳转到（层次，索引）
-函数为 [gui_multi_level_jump(gui_multi_level_t  *this, int level, int index)](#gui_multi_level_jump)。此函数便于跳转到多层GUI结构中的特定层次和索引。
+函数为 [gui_multi_level_jump(gui_multi_level_t *this, int level, int index)](#gui_multi_level_jump)。此函数便于跳转到多层GUI结构中的特定层次和索引。
 
 ## 示例
 <br>

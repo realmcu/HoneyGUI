@@ -1,7 +1,8 @@
 /**
- * @file lv_draw_ppe_blend.h
+ * @file lv_draw_rtk_ppe_blend.h
  *
  */
+
 
 #ifndef LV_DRAW_PPE_BLEND_H
 #define LV_DRAW_PPE_BLEND_H
@@ -32,67 +33,15 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Fill area.
- *
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] color Color
- * @param[in] dsc Description of content
- *
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred
- */
 lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
                      const lv_draw_sw_blend_dsc_t *dsc);
 
-/**
- * Map area.
- *
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] draw_ctx Context for rendering
- * @param[in] dsc Description of content
- *
- * @retval LV_RES_OK Map completed
- * @retval LV_RES_INV Error occurred
- */
-lv_res_t lv_ppe_map(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
-                    const lv_draw_sw_blend_dsc_t *dsc);
-
-/**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
- * By default, image is copied directly, with optional opacity.
- *
- * @param[in/out] dest_buf Destination buffer
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] dest_stride Stride of destination buffer in pixels
- * @param[in] src_buf Source buffer
- * @param[in] src_area Source area with relative coordinates of source buffer
- * @param[in] src_stride Stride of source buffer in pixels
- * @param[in] opa Opacity
- *
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred
- */
 lv_res_t lv_ppe_blit(lv_color_t *dest_buf, lv_area_t *dest_area, lv_coord_t dest_stride,
                      const lv_color_t *src_buf, lv_area_t *src_area, lv_coord_t src_stride,
                      lv_opa_t opa);
 
-/**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
- * By default, image is copied directly, with optional opacity.
- *
- * @param[in/out] dest_buf Destination buffer
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] dest_stride Stride of destination buffer in pixels
- * @param[in] src_buf Source buffer
- * @param[in] src_area Source area with relative coordinates of source buffer
- * @param[in] src_stride Stride of source buffer in pixels
- * @param[in] dsc Image descriptor
- *
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred
- */
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
+                               lv_point_t *base,
                                const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);
 
 lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
@@ -106,7 +55,7 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_PPE*/
+#endif /*LV_USE_GPU_RTK_PPE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

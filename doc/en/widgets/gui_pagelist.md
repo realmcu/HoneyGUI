@@ -24,7 +24,7 @@ By using this API [gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_p
 
 ### Create Widget
 
-One can utilize the [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) function to establish a pagelist widget. Its height will be set according to the total height of child widgets.
+One can utilize the [gui_pagelist_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_pagelist_create) function to establish a pagelist widget. Its height will be set according to the total height of child widgets.
 
 ## Example
 

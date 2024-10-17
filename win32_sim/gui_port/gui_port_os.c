@@ -9,8 +9,6 @@
 #include "gui_queue.h"
 #include <unistd.h>
 #include <dirent.h>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 static volatile uint32_t gui_tick;
 
@@ -50,13 +48,29 @@ static Queue q;
 static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
 {
     void **queue = handle;
-    pthread_mutex_init(&port_mutex, NULL);
-    pthread_cond_init(&port_cond, NULL);
 
-    pthread_mutex_init(&queue_mutex, NULL);
+    if (pthread_mutex_init(&port_mutex, NULL) != 0)
+    {
+        return false;
+    }
+    if (pthread_cond_init(&port_cond, NULL) != 0)
+    {
+        pthread_mutex_destroy(&port_mutex);
+        return false;
+    }
+    if (pthread_mutex_init(&queue_mutex, NULL) != 0)
+    {
+        pthread_cond_destroy(&port_cond);
+        pthread_mutex_destroy(&port_mutex);
+        return false;
+    }
+
     QueueInit(&q);
     *queue = &q;
+
+    return true;
 }
+
 static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
     QuDataType data = {0};
@@ -207,13 +221,13 @@ static void *rtk_gui_tick(void *arg)
 
     gettimeofday(&currentTime, NULL);
 
-    int64_t start_milliseconds = currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000;
+    int64_t start_milliseconds = ((int64_t)currentTime.tv_sec * 1000) + (currentTime.tv_usec / 1000);
     while (1)
     {
         struct timeval currentTime;
 
         gettimeofday(&currentTime, NULL);
-        gui_tick = currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000 - start_milliseconds;
+        gui_tick = ((int64_t)currentTime.tv_sec * 1000) + (currentTime.tv_usec / 1000) - start_milliseconds;
     }
 }
 

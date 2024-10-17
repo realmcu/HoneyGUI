@@ -51,36 +51,12 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Premultiplies and swizzles given LVGL 32bit color to obtain vglite color.
- *
- * @param[in/out] vg_col32 The obtained vglite color
- * @param[in] lv_col32 The initial LVGL 32bit color
- * @param[in] opa The opacity to premultiply with
- * @param[in] vg_col_format The format of the resulting vglite color
- *
- * @retval LV_RES_OK Operation completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_VG_LITE_LOG_ERRORS)
- */
 lv_res_t lv_vglite_premult_and_swizzle(vg_lite_color_t *vg_col32, lv_color32_t lv_col32,
                                        lv_opa_t opa,
                                        vg_lite_buffer_format_t vg_col_format);
 
-/**
- * Get vglite blend mode.
- *
- * @param[in] lv_blend_mode The LVGL blend mode
- *
- * @retval The vglite blend mode
- */
 vg_lite_blend_t lv_vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
 
-/**
- * Clear cache and flush command to VG-Lite.
- *
- * @retval LV_RES_OK Run completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_VG_LITE_LOG_ERRORS)
- */
 lv_res_t lv_vglite_run(void);
 
 /**********************

@@ -74,12 +74,12 @@ static void app_ui_design(gui_app_t *app)
 <br/>
 
 ## API
-### Vector Graphics Api
+### Nanovg API
 Please refer to
 - <a href="https://openplanet.dev/docs/tutorials/nanovg-introduction">Nanovg Introduction</a>
 - [Nanovg Github](https://github.com/memononen/nanovg)
 
-### GUI widget api
+### RealGUI API
 
 ```eval_rst
 

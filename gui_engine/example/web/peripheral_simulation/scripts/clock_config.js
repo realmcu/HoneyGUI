@@ -26,7 +26,15 @@ function sendData() {
             {
                 move: parseInt(document.getElementById('activityMove').value),
                 ex: parseInt(document.getElementById('activityEx').value),
-                stand: parseInt(document.getElementById('activityStand').value)
+                stand: parseInt(document.getElementById('activityStand').value),
+            }
+        ],
+        heart_rate: [
+            {
+                AM12: parseInt(document.getElementById('heart_rate12AM').value),
+                AM6: parseInt(document.getElementById('heart_rate6AM').value),
+                PM12: parseInt(document.getElementById('heart_rate12PM').value),
+                PM6: parseInt(document.getElementById('heart_rate6PM').value)
             }
         ]
     };

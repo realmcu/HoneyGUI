@@ -25,25 +25,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#ifndef LV_GPU_VG_LITE_LOG_ERRORS
-/** Enable logging of VG-Lite errors (\see LV_LOG_ERROR)*/
-#define LV_GPU_VG_LITE_LOG_ERRORS 1
-#endif
-
-#ifndef LV_GPU_VG_LITE_LOG_TRACES
-/** Enable logging of VG-Lite traces (\see LV_LOG_ERROR)*/
-#define LV_GPU_VG_LITE_LOG_TRACES 0
-#endif
-
-
-/* The optimal Bezier control point offset for radial unit
- * see: https://spencermortensen.com/articles/bezier-circle/
- **/
-#define BEZIER_OPTIM_CIRCLE 0.552284749831f
-
-/* Draw lines for control points of Bezier curves */
-#define BEZIER_DBG_CONTROL_POINTS   0
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -55,8 +36,9 @@ lv_color32_t lv_ppe_toABGR8888(lv_color_t color);
 
 PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, ppe_rect_t *rect, uint32_t color);
 
-void lv_ppe_get_scale_point(const lv_point_t *pivot, const lv_area_t *coords, float scale_ratio,
-                            lv_point_t *result);
+void lv_ppe_get_transformed_area(lv_area_t *res, lv_coord_t w, lv_coord_t h, int16_t angle,
+                                 uint16_t zoom,
+                                 const lv_point_t *pivot);
 /**********************
  *      MACROS
  **********************/

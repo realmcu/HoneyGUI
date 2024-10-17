@@ -1,4 +1,4 @@
-# C-APP application
+# C-APP Application
 
 - In this chapter, we will explore the creation and management of C-APPs within GUI framework. A C-APP is essentially a application that users can develop to craft interactive and visually appealing user interfaces. Each C-APP can be opened, closed, switched between, and can incorporate dynamic transition effects during switching.
 

@@ -1,6 +1,7 @@
 # 字体转换工具
 
 字体转换工具功能：从标准内部码表（代码页文件）、自定义Unicode码表（或补充码表.txt文件，自定义.cst文件）中获取所有待转换字符对应的Unicode码。根据Unicode编码从字体文件（如.ttf）中找到相应字符的矢量字体数据。将其转换为位图，并输出为.bin文件。
+字体转换工具下载链接请参考该章节：[工具](./index.md) 
 
 <div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1725358504194067891/e9f8aa2f_13674272.png" ></div>
 

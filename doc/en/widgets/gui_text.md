@@ -24,15 +24,15 @@ Text widgets can support the following features.
 
 Using functions to load font files and display text.
 
-### Initialize The Font File
+### Initialize the Font File
 
 In order to draw text, font files containing glyph information need to be loaded into the system.
 
 The font file can be a standard .ttf file or a customized .bin file. The font file can be initialized ahead of time to avoid having to set the font type for each text widget.
 
-+ To initialize the new version customized bin font file, use `gui_font_mem_init(font_bin_addr)`.
++ To initialize the new version customized bin font file, use `gui_font_mem_init(uint8_t *font_bin_addr)`.
 
-+ To initialize the standard TTF file to draw text, use `gui_font_stb_init(font_ttf_addr)`.
++ To initialize the standard TTF file to draw text, use `gui_font_stb_init(void *font_ttf_addr)`.
 
 All customized bin font files are available from RTK technicians.
 
@@ -40,7 +40,7 @@ All customized bin font files are available from RTK technicians.
 
 ### Create Text Widget
 
-To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#gui_text_create), The coordinates on the screen and text box size have been identified after create. These attributes also can be modified whenever you want.
+To create a text widget, you can use [gui_text_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_text_create), The coordinates on the screen and text box size have been identified after create. These attributes also can be modified whenever you want.
 
 ```{Note}
 The size of the text box should be larger than the string to be shown; out-of-range text will be hidden.
@@ -50,7 +50,7 @@ The size of the text box should be larger than the string to be shown; out-of-ra
 
 #### Set Text
 
-To add some texts or characters to a text widget and set text attributes with [gui_text_set(this, text, text_type, color, length, font_size)](#gui_text_set).
+To add some texts or characters to a text widget and set text attributes with [gui_text_set(gui_text_t *this_widget, void *text, FONT_SRC_TYPE text_type, gui_color_t color, uint16_t length, uint8_t font_size)](#gui_text_set).
 
 ```{Note}
 The text length must be the same as the set character length, and the font size of the text must be the same as the size of the loaded font file.
@@ -59,21 +59,21 @@ The text length must be the same as the set character length, and the font size 
 #### Font Type
 
 The text widget support type setting. This function can be used to set the type. The type is a bin/ttf file address 
-[gui_text_type_set(this, type)](#gui_text_type_set).
+[gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode)](#gui_text_type_set).
 
 #### Text Content
 
 This interface can be used to set the content that needs to be displayed by the text widget 
-[gui_text_content_set(this, text, length)](#gui_text_content_set).
+[gui_text_content_set(gui_text_t *this_widget, void *text, uint16_t length)](#gui_text_content_set).
 
 #### Text Encoding
 
 The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, and this interface can be used to change the decoding method 
-[gui_text_encoding_set(this, charset)](#gui_text_encoding_set).
+[gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset)](#gui_text_encoding_set).
 
 #### Convert to Img
 
-By using this function [gui_text_convert_to_img(this, font_img_type)](#gui_text_convert_to_img), the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
+By using this function [gui_text_convert_to_img(gui_text_t *this_widget, GUI_FormatType font_img_type)](#gui_text_convert_to_img), the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
 
 ```{Note}
 Because the content and font size information of the text widget is needed, it should be called after set text. If the content, font size, position, and other attributes of the text have been modified, you need to reuse this interface for conversion.
@@ -81,15 +81,15 @@ Because the content and font size information of the text widget is needed, it s
 
 #### Text Input
 
-Text widget supports the input setting. You can use this function to set input [gui_text_input_set(this, inputable)](#gui_text_input_set).
+Text widget supports the input setting. You can use this function to set input [gui_text_input_set(gui_text_t *this_widget, bool inputable)](#gui_text_input_set).
 
 #### Text Click
 
-Text widget supports click. You can use this function to add the click event for text [gui_text_click(this, event_cb, parameter)](#gui_text_click).
+Text widget supports click. You can use this function to add the click event for text [gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter)](#gui_text_click).
 
 #### Text Mode
 
-Text widget supports seven typesetting modes. To set text typesetting mode, use: [gui_text_mode_set(this, mode)](#gui_text_mode_set).
+Text widget supports seven typesetting modes. To set text typesetting mode, use: [gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode)](#gui_text_mode_set).
 
 All typesetting modes are as follows.
 
@@ -119,11 +119,11 @@ All typesetting modes are as follows.
 
 #### Text Move
 
-It is possible to use this function [gui_text_move(this, x, y)](#gui_text_move) to move text to a specified location, but x and y cannot be larger than w and h of the text.
+It is possible to use this function [gui_text_move(gui_text_t *this_widget, int16_t x, int16_t y)](#gui_text_move) to move text to a specified location, but x and y cannot be larger than w and h of the text.
 
 #### Set Animate
 
-Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#gui_text_set_animate) to set the animation and implement the animation effect in the corresponding callback function.
+Using this function [gui_text_set_animate(void *o, uint32_t dur, int repeat_count, void *callback, void *p)](#gui_text_set_animate) to set the animation and implement the animation effect in the corresponding callback function.
 
 ## Example
 

@@ -41,6 +41,7 @@ static void calculator_cb(void);
 static void soccer_cb(void);
 static void box2d_ring_cb(void);
 static void music_cb(void);
+static void calendar_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -82,7 +83,7 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 void app_watch_mune_win_ani_cb(void *args, gui_win_t *win)
 {
     // Calculate the progress percentage of the animation
-    float pro = gui_win_get_aniamtion_progress_percent(win);
+    float pro = gui_win_get_animation_progress_percent(win);
 
     // Adjust the scale of the window based on sine function of the progress percentage
     // This will create a smooth scaling effect as the progress advances
@@ -104,7 +105,7 @@ void app_watch_mune_win_ani_cb(void *args, gui_win_t *win)
 void design_tab_menu(void *parent)
 {
     gui_win_t *win = gui_win_create(parent, MENU_WIN_NAME, 0, 0, 0, 0);
-    gui_win_set_animate(win, 2000, 0, app_watch_mune_win_ani_cb, 0);
+    gui_win_set_animate(win, 2000, 0, (gui_animate_callback_t)app_watch_mune_win_ani_cb, 0);
     gui_win_stop_animation(win);//aniamtion start to play until button click event
     /* app swap animation configration of the first app*/
     gui_canvas_rect_create((void *)win, "canvas_rect", 0, 0, gui_get_screen_width(),
@@ -143,6 +144,7 @@ void design_tab_menu(void *parent)
         ICON_MENU_BIN,
         ICON_MENU_BIN,
         ICON_MENU_BIN,
+        ICON_MENU_BIN,
     };
     static char *text_array[] =
     {
@@ -163,6 +165,7 @@ void design_tab_menu(void *parent)
         "Soccer",
         "Box2d ring",
         "Music",
+        "Calender",
     };
     int array_size = sizeof(array) / sizeof(array[0]);
     static gui_win_t *button_array[sizeof(array) / sizeof(array[0])];
@@ -171,8 +174,8 @@ void design_tab_menu(void *parent)
     {
 
         gui_win_t *button = gui_win_create(grid, 0, 0, 0, 400, 70);
-        gui_win_press(button, press_animate_cb, button);
-        gui_win_release(button, release_animate_callback, button);
+        gui_win_press(button, (gui_event_cb_t)press_animate_cb, button);
+        gui_win_release(button, (gui_event_cb_t)release_animate_callback, button);
         //
         {
             gui_img_t *img = gui_img_create_from_mem(button, 0, RECT1_BIN, 0, 0, 0, 0);
@@ -186,7 +189,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 17)
+        if (i < 18)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -197,23 +200,24 @@ void design_tab_menu(void *parent)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
-    gui_win_click(button_array[0],  heart_rate_cb,     button_array[0]);
-    gui_win_click(button_array[1],  menu_cb,           button_array[1]);
-    gui_win_click(button_array[2],  stopwatch_cb,      button_array[2]);
-    gui_win_click(button_array[3],  map_cb,            button_array[3]);
-    gui_win_click(button_array[4],  card_cb,           button_array[4]);
-    gui_win_click(button_array[5],  box2d_cb,          button_array[5]);
-    gui_win_click(button_array[6],  compass_cb,        button_array[6]);
-    gui_win_click(button_array[7],  volume_cb,         button_array[7]);
-    gui_win_click(button_array[8],  cycle_tracking_cb, button_array[8]);
-    gui_win_click(button_array[9],  setting_cb,        button_array[9]);
-    gui_win_click(button_array[10], web_cb,            button_array[10]);
-    gui_win_click(button_array[11], block_cb,          button_array[11]);
-    gui_win_click(button_array[12], fruit_ninja_cb,    button_array[12]);
-    gui_win_click(button_array[13], calculator_cb,     button_array[13]);
-    gui_win_click(button_array[14], soccer_cb,         button_array[14]);
-    gui_win_click(button_array[15], box2d_ring_cb,     button_array[15]);
-    gui_win_click(button_array[16], music_cb,          button_array[16]);
+    gui_win_click(button_array[0], (gui_event_cb_t)heart_rate_cb,     button_array[0]);
+    gui_win_click(button_array[1], (gui_event_cb_t)menu_cb,           button_array[1]);
+    gui_win_click(button_array[2], (gui_event_cb_t)stopwatch_cb,      button_array[2]);
+    gui_win_click(button_array[3], (gui_event_cb_t)map_cb,            button_array[3]);
+    gui_win_click(button_array[4], (gui_event_cb_t)card_cb,           button_array[4]);
+    gui_win_click(button_array[5], (gui_event_cb_t)box2d_cb,          button_array[5]);
+    gui_win_click(button_array[6], (gui_event_cb_t)compass_cb,        button_array[6]);
+    gui_win_click(button_array[7], (gui_event_cb_t)volume_cb,         button_array[7]);
+    gui_win_click(button_array[8], (gui_event_cb_t)cycle_tracking_cb, button_array[8]);
+    gui_win_click(button_array[9], (gui_event_cb_t)setting_cb,        button_array[9]);
+    gui_win_click(button_array[10], (gui_event_cb_t)web_cb,            button_array[10]);
+    gui_win_click(button_array[11], (gui_event_cb_t)block_cb,          button_array[11]);
+    gui_win_click(button_array[12], (gui_event_cb_t)fruit_ninja_cb,    button_array[12]);
+    gui_win_click(button_array[13], (gui_event_cb_t)calculator_cb,     button_array[13]);
+    gui_win_click(button_array[14], (gui_event_cb_t)soccer_cb,         button_array[14]);
+    gui_win_click(button_array[15], (gui_event_cb_t)box2d_ring_cb,     button_array[15]);
+    gui_win_click(button_array[16], (gui_event_cb_t)music_cb,          button_array[16]);
+    gui_win_click(button_array[17], (gui_event_cb_t)calendar_cb,          button_array[17]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -245,7 +249,7 @@ static void press_callback(gui_win_t *button)
 }
 static void press_animate_cb(gui_win_t *button)
 {
-    gui_win_set_animate(button, 1000, 0, press_callback, button);
+    gui_win_set_animate(button, 1000, 0, (gui_animate_callback_t)press_callback, button);
 }
 static void release_callback(gui_win_t *button)
 {
@@ -273,7 +277,7 @@ static void release_callback(gui_win_t *button)
 }
 static void release_animate_callback(gui_win_t *button)
 {
-    gui_win_set_animate(button, 1000, 0, release_callback, button);
+    gui_win_set_animate(button, 1000, 0, (gui_animate_callback_t)release_callback, button);
 }
 static void deal_win_in_page(gui_obj_t *object, int page_y)
 {
@@ -473,6 +477,10 @@ static void box2d_ring_cb()
 static void music_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MUSIC))
+}
+static void calendar_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALENDAR))
 }
 // Define an array for window list, containing 15 windows
 static gui_win_t *win_list_array[15];
@@ -819,7 +827,7 @@ static void page_scroll(gui_obj_t *parent)
     param[1] = win_list_array;
 
     // Set properties for the animated window: duration is 1000 ms, loop count is -1 (infinite loop), callback function is win_list_overwrite, with param as argument
-    gui_win_set_animate(win_animate, 1000, -1, win_list_overwrite, param);
+    gui_win_set_animate(win_animate, 1000, -1, (gui_animate_callback_t)win_list_overwrite, param);
 
     // Define the gap between windows
     int gap = win_list_gap;

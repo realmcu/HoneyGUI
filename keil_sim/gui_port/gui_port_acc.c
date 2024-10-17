@@ -1,5 +1,4 @@
 #include <draw_img.h>
-#include "gui_port.h"
 #include "gui_api.h"
 
 extern void sw_acc_init(void);

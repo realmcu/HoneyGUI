@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_rect.c
+ * @file lv_draw_rtk_ppe_rect.c
  *
  */
 
@@ -86,4 +86,4 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_RTK_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_PPE*/

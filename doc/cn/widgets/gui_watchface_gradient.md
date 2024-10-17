@@ -6,7 +6,7 @@
 
 ### 创建控件
 
-使用 [gui_watchface_gradient_create(parent, name, x, y, w, h)](#gui_watchface_gradient_create) 函数创建具有扫描效果的指针表盘控件。
+使用 [gui_watchface_gradient_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_watchface_gradient_create) 函数创建具有扫描效果的指针表盘控件。
 
 ## 示例
 

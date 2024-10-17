@@ -578,7 +578,7 @@ gui_map_t *gui_map_create(void *parent)
 #define _GUI_NEW_GUI_MAP_PARAM this, parent
     GUI_CREATE_HELPER(gui_map_t, ctor, _GUI_NEW_GUI_MAP_PARAM)
     gui_win_t *win = &(this->base);
-    gui_win_set_animate(win, 1000, -1, wincb, this);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)wincb, this);
     // Window size
     int windowWidth = WIN_W;
     int windowHeight = WIN_H;

@@ -1,4 +1,4 @@
-Script as an Application
+Use RVD Tool Design An Application
 *************
 
 
