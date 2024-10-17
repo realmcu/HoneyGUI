@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 判断是否存在锚点
         if (anchor) {
-            // 使用锚点查找页面中的元素
-            const element = document.querySelector(anchor);
+            // 转义id中可能存在的 . 字符以便于使用 querySelector
+            const safeAnchor = anchor.replace(/\./g, '\\.');
+            const element = document.querySelector(safeAnchor);
             
             // 如果找到了该元素
             if (element) {
