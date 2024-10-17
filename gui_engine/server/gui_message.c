@@ -41,7 +41,7 @@ void gui_recv_msg_to_server(void)
     if ((gui_ms_get() - app->start_ms) > app->active_ms)
     {
         gui_sleep_cb();
-        if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0x0FFFFFFF))
+        if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))
         {
             gui_server_msg_handler(&msg);
         }
