@@ -31,6 +31,7 @@
 #include "gui_return.h"
 #include "gui_slider.h"
 #include "gui_scroll_wheel_new.h"
+#include "gui_calendar.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -595,16 +596,9 @@ unsigned short string_rgb888_to_rgb565(const char *color)
     gui_log("color%s:%x,%x\n", color, c, RGB888ToRGB565(c));
     return RGB888ToRGB565(c);
 }
-uint32_t string_rgb888(const char *color)
+static gui_color_t string_rgb888(const char *color)
 {
-    if (*color != '#')
-    {
-        gui_log("color format wrong");
-        return 0;
-    }
-    uint32_t c = strtoul(color + 1, NULL, 16);
-
-    return (c);
+    return gui_color_css(color);
 }
 static void sport_button_press_ani_cb(gui_button_t *button)
 {
@@ -792,7 +786,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *font =
                         "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
 #endif
-                    size_t color = 0xffffffff;
+                    gui_color_t color = APP_COLOR_WHITE;
                     int fontSize = 32;
                     TEXT_MODE style = 0;
                     uint8_t inputable = false;
@@ -877,7 +871,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             t = gui_text_create(parent, ptxt, x, y, w, h);
                             gui_color_t color_temporary;
-                            color_temporary.color.argb_full = color;
+                            color_temporary = color;
                             gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
                             if (inputable)
                             {
@@ -942,7 +936,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                                                     strlen(text) * (fontSize / 4), h);
                             gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
                             gui_color_t color_temporary;
-                            color_temporary.color.argb_full = color;
+                            color_temporary = color;
                             gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_TTF, color_temporary,
                                                 strlen(text),
                                                 fontSize);
@@ -1248,8 +1242,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t r = 100; GUI_UNUSED(r);
                     int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
                     int cap = 0; GUI_UNUSED(cap);
-                    uint32_t fill = 0xff0000ff;
-                    uint32_t stroke = 0xff0000ff;
+                    gui_color_t fill = APP_COLOR_RED;
+                    gui_color_t stroke = APP_COLOR_RED;
                     float sd = 0; GUI_UNUSED(sd);
                     float ed = 100; GUI_UNUSED(ed);
                     while (true)
@@ -1302,12 +1296,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "fill"))
                         {
                             fill = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], fill);
                         }
                         else if (!strcmp(p->attr[i], "stroke") || !strcmp(p->attr[i], "color"))
                         {
                             stroke = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], stroke);
                         }
                         i++;
                     }
@@ -1333,8 +1325,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0; GUI_UNUSED(w);
                     int16_t h = 0; GUI_UNUSED(h);
-                    uint32_t color = 0xffffffaa;
-                    uint32_t highlightColor = 0xffffffff;
+                    gui_color_t color = APP_COLOR_WHITE_OPACITY;
+                    gui_color_t highlightColor = APP_COLOR_WHITE;
                     bool vh = false;
                     bool canvas = false;
                     char *picture = "app/system/resource/Progress bar_full.bin";
@@ -1452,8 +1444,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0; GUI_UNUSED(w);
                     int16_t h = 0; GUI_UNUSED(h);
-                    uint32_t color = 0xffffffaa;
-                    uint32_t highlightColor = 0xffffffff;
+                    gui_color_t color = APP_COLOR_WHITE_OPACITY;
+                    gui_color_t highlightColor = APP_COLOR_WHITE;
                     bool canvas = false;
                     bool arc = false;
                     char *picture = "app/system/resource/Progress bar_full.bin";
@@ -2050,7 +2042,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *text = NULL;
                     int text_x = 0;
                     int text_y = 0;
-                    uint32_t font_color = 0Xf0f0;
+                    gui_color_t font_color = APP_COLOR_RED;
                     uint32_t font_size = 32;
                     int picture_x = 0;
                     int picture_y = 0;
@@ -2196,7 +2188,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
 
                     gui_color_t color_temporary;
-                    color_temporary.color.argb_full = font_color;
+                    color_temporary = font_color;
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
@@ -3509,10 +3501,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int column_offset = 0;
                     const char *font = 0;
                     int16_t font_size = 0;
-                    uint32_t  font_color = {0};
-                    uint32_t  font_color_highlight = {0};
-                    uint32_t  item_color = {0};
-                    uint32_t  item_color_highlight = {0};
+                    gui_color_t  font_color = {0};
+                    gui_color_t  font_color_highlight = {0};
+                    gui_color_t  item_color = {0};
+                    gui_color_t  item_color_highlight = {0};
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -3599,8 +3591,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
                                                                parent, x, y, w, row_spacing, row_count, string_array, item_count
                                                            );
-                    scroll_wheel->font_color.color.argb_full = font_color;
-                    scroll_wheel->font_color_highlight.color.argb_full = font_color_highlight;
+                    scroll_wheel->font_color = font_color;
+                    scroll_wheel->font_color_highlight = font_color_highlight;
 
                     gui_scroll_wheel_new_render_text(scroll_wheel, gui_get_file_address(font), font_size);
                     if (scroll_wheel == NULL)
@@ -3614,6 +3606,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                 break;
             case MACRO_CALENDAR:
                 {
+
                     /*    <calendar
                     x="0"
                     y="360"
@@ -3629,7 +3622,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
-                    uint32_t  color = {0};
+                    gui_color_t color_p = gui_color_css("DarkSlateGray");
+                    gui_color_t font_color_highlight = gui_color_css("#FFFFFFFF");;
+                    gui_color_t item_color = gui_color_css("#FFFFFF");;
+                    gui_color_t item_color_highlight = gui_color_css("rgba(135, 206, 250, 1.0)");;
+                    gui_color_t title_color = gui_color_css("rgb(255, 255, 255)");;
+                    gui_color_t title_background_color = gui_color_css("hsl(203, 92%, 75%)");;
                     const char *font = 0;
                     int16_t font_size = 0;
                     while (true)
@@ -3660,7 +3658,32 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "fontColor"))
                         {
                             //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            color = string_rgb888(p->attr[++i]);
+                            color_p = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "fontColorHighlight"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            font_color_highlight = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            item_color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "itemColorHighlight"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            item_color_highlight = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "titleColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            title_color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "titleBackgroundColor"))
+                        {
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            title_background_color = string_rgb888(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "font"))
                         {
@@ -3672,12 +3695,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         i++;
                     }
-                    gui_color_t color_font;
-                    color_font.color.argb_full = color;
-
-                    extern void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
-                                                    int font_size_p, gui_color_t color_p);
-                    gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_font);
+                    gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_p,
+                                        font_color_highlight, item_color, item_color_highlight, title_color, title_background_color);
 
                 }
                 break;

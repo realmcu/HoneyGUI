@@ -322,8 +322,8 @@
                         rowSpacing="20"      
                         fontSize="16"
                         font="app/box/resource/font/arialbd_size16_bits4_font.bin"
-                        fontColor="#ff0000ff"
-                        fontColorHighlight="#ff00ffff"
+                        fontColor="#ffffff"
+                        fontColorHighlight="#888888"
                     >scrollWheel1
                     </roller>
     <calendar
@@ -331,7 +331,12 @@
         y="360"
         w="800"
         h="400"
-        fontColor="#ff000000"
+        fontColor="BLACK"
+        fontColorHighlight="#FFFFFFFF"
+        itemColor="#FFFFFF"
+        itemColorHighlight="rgba(135, 206, 250, 1.0)"
+        titleColor="rgb(255, 255, 255)"
+        titleBackgroundColor="hsl(203, 92%, 75%)"
         fontSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
     </calendar>

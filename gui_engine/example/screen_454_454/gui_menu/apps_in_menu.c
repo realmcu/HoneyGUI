@@ -14,6 +14,7 @@
 #include "gui_fps.h"
 #include<stdio.h>
 #include<time.h>
+#include "gui_calendar.h"
 //Please search app name macro for entry
 #define APP_CLOCK
 #define APP_WATCH_FACE
@@ -2855,10 +2856,14 @@ GUI_APP_ENTRY(APP_MUSIC)
 }
 GUI_APP_ENTRY(APP_CALENDAR)
 {
-    extern void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
-                                    int font_size_p, gui_color_t color_p);
+
     gui_calender_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_W, SCREEN_H, ARIALBD_SIZE16_BITS4_FONT_BIN,
-                        16, APP_COLOR_BLACK);
+                        16, gui_rgba(50, 50, 50, 255),
+                        gui_rgba(255, 255, 255, 255),
+                        gui_rgba(255, 255, 255, 255),
+                        gui_rgba(135, 206, 250, 255),
+                        gui_rgba(255, 255, 255, 255),
+                        gui_rgba(135, 206, 250, 255));
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     gui_fps_create(GUI_APP_ROOT_SCREEN);
