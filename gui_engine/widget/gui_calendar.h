@@ -60,15 +60,6 @@ typedef struct gui_calendar
     int years_show;
 } gui_calendar_t;
 _GUI_API_DEFINE(gui_calendar_t)
-/**
- * @brief jump to a specitf calendar widget.
- * @param this one of the calendar widgets in app.
- * @param level specitf level. 0,1,2...
- * @param index index in this level. 0,1,2...
- *
- */
-void (*jump)(gui_calendar_t *, int levle, int index);
-
 _GUI_API_DECLARE(gui_calendar_t)
 /*============================================================================*
  *                         Constants
