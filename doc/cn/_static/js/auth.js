@@ -6,8 +6,8 @@ $.ajax({
     xhrFields: {
         withCredentials: true // 发送请求时需携带cookie
     },
-    error: function (err) {
-        // console.log("-----------", err);
+    error: function (err) {   
+        window.location.href = `https://docs.realmcu.com/errorpage.html`;
     },
     success: function (resp) {
         var data = resp.Data;
