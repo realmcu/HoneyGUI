@@ -55,7 +55,26 @@ typedef struct
     float start_angle; // Starting angle of the sector (radians)
     float end_angle;   // Ending angle of the sector (radians)
 } sector_draw_shape_dsc_t;
+// Rounded rectangle drawing descriptor
+typedef struct
+{
+    color_t color;
+    uint8_t opa;
+    int32_t radius;
+    int32_t rect_x;
+    int32_t rect_y;
+    int32_t rect_w;
+    int32_t rect_h;
+} rounded_rect_draw_shape_dsc_t;
 
+// Clipping region structure
+typedef struct
+{
+    int32_t x;
+    int32_t y;
+    int32_t width;
+    int32_t height;
+} clip_rect_t;
 // Color mixing function
 static color_t color_mix(color_t c1, color_t c2, uint8_t ratio)
 {
@@ -79,8 +98,8 @@ static color_t color_mix(color_t c1, color_t c2, uint8_t ratio)
 
 // Determining if an angle is within a sector
 
-// Function to draw a circle
-static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc)
+// Function to draw a circle with clipping
+static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc, const clip_rect_t *clip_rect)
 {
     if (ctx == NULL || dsc == NULL) { return; }
 
@@ -102,6 +121,13 @@ static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc)
     {
         for (int32_t x = 0; x < buf_w; x++)
         {
+            // Skip the pixel if it's outside the clipping region
+            if (clip_rect != NULL && (x < clip_rect->x || x >= clip_rect->x + clip_rect->width ||
+                                      y < clip_rect->y || y >= clip_rect->y + clip_rect->height))
+            {
+                continue;
+            }
+
             // Calculate the distance from the center of this pixel to the center of the circle
             float dx = x - cx;
             float dy = y - cy;
@@ -150,7 +176,6 @@ static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc)
         }
     }
 }
-
 // Determine if an angle is within a sector's range
 static int is_within_sector(float angle, float start_angle, float end_angle)
 {
@@ -161,8 +186,9 @@ static int is_within_sector(float angle, float start_angle, float end_angle)
     return (angle >= start_angle && angle <= end_angle);
 }
 
-// Function to draw a circle or sector
-void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc)
+// Function to draw a circle or sector with clipping
+void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc,
+                           const clip_rect_t *clip_rect)
 {
     if (ctx == NULL || dsc == NULL) { return; }
 
@@ -186,6 +212,13 @@ void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc)
     {
         for (int32_t x = 0; x < buf_w; x++)
         {
+            // Skip the pixel if it's outside the clipping region
+            if (clip_rect != NULL && (x < clip_rect->x || x >= clip_rect->x + clip_rect->width ||
+                                      y < clip_rect->y || y >= clip_rect->y + clip_rect->height))
+            {
+                continue;
+            }
+
             // Calculate the distance from the center of this pixel to the center of the circle
             float dx = x - cx + 0.5f;
             float dy = y - cy + 0.5f;
@@ -262,10 +295,23 @@ static void renderer(gui_circle_t *widget)
         .opa = 255,                  // Circle opacity
         .radius = GUI_BASE(widget)->w / 2,         // Circle radius
         .cx = GUI_BASE(widget)->w / 2 + x,         // Circle center X coordinate
-        .cy = GUI_BASE(widget)->w / 2 + y          // Circle center Y coordinate
+        .cy = GUI_BASE(widget)->w / 2 + y - screen->fb_height * screen->section_count      // Circle center Y coordinate
     };
+    // Set the clipping area
+    clip_rect_t clip_area =
+    {
+        .x = GUI_BASE(widget)->x,   // X-coordinate of the top-left corner of the clipping area
+        .y = GUI_BASE(widget)->y,   // Y-coordinate of the top-left corner of the clipping area
+        .width = GUI_BASE(widget)->w, // Width of the clipping area
+        .height = GUI_BASE(widget)->h  // Height of the clipping area
+    };
+    if (screen->section_count)
+    {
+        clip_area.y = 0;
+        clip_area.height = screen->fb_height;
+    }
     // Call the function to draw the circle
-    draw_circle(&draw_ctx, &circle_dsc);
+    draw_circle(&draw_ctx, &circle_dsc, &clip_area);
 }
 
 static void sector_renderer(gui_sector_t *widget)
@@ -283,13 +329,25 @@ static void sector_renderer(gui_sector_t *widget)
         .opa = 255,                  // Sector opacity
         .radius = GUI_BASE(widget)->w / 2,        // Sector radius
         .cx = GUI_BASE(widget)->w / 2 + x,        // Circle center X coordinate
-        .cy = GUI_BASE(widget)->w / 2 + y,        // Circle center Y coordinate
+        .cy = GUI_BASE(widget)->w / 2 + y - screen->fb_height * screen->section_count,    // Circle center Y coordinate
         .end_angle = widget->end_angle,
         .start_angle = widget->start_angle,
     };
-
+// Set the clipping area
+    clip_rect_t clip_area =
+    {
+        .x = GUI_BASE(widget)->x,   // X-coordinate of the top-left corner of the clipping area
+        .y = GUI_BASE(widget)->y,   // Y-coordinate of the top-left corner of the clipping area
+        .width = GUI_BASE(widget)->w, // Width of the clipping area
+        .height = GUI_BASE(widget)->h  // Height of the clipping area
+    };
+    if (screen->section_count)
+    {
+        clip_area.y = 0;
+        clip_area.height = screen->fb_height;
+    }
     // Call the function to draw the sector
-    draw_circle_or_sector(&draw_ctx, &sector_dsc);
+    draw_circle_or_sector(&draw_ctx, &sector_dsc, &clip_area);
 }
 
 static void pipeline(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -332,26 +390,7 @@ static void sector_pipeline(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-// Rounded rectangle drawing descriptor
-typedef struct
-{
-    color_t color;
-    uint8_t opa;
-    int32_t radius;
-    int32_t rect_x;
-    int32_t rect_y;
-    int32_t rect_w;
-    int32_t rect_h;
-} rounded_rect_draw_shape_dsc_t;
 
-// Clipping region structure
-typedef struct
-{
-    int32_t x;
-    int32_t y;
-    int32_t width;
-    int32_t height;
-} clip_rect_t;
 
 // Check if a point is within a circle
 int is_within_round(int32_t x, int32_t y, int32_t cx, int32_t cy, int32_t radius)
@@ -469,7 +508,7 @@ static void rounded_rect_renderer(gui_rounded_rect_t *widget)
         .opa = 200,                // Opacity of the rounded rectangle
         .radius = widget->radius,  // Radius of the rounded corners
         .rect_x = GUI_BASE(widget)->x, // X-coordinate of the top-left corner of the rectangle
-        .rect_y = GUI_BASE(widget)->y, // Y-coordinate of the top-left corner of the rectangle
+        .rect_y = GUI_BASE(widget)->y - screen->fb_height * screen->section_count, // Y-coordinate of the top-left corner of the rectangle
         .rect_w = GUI_BASE(widget)->w, // Width of the rectangle
         .rect_h = GUI_BASE(widget)->h  // Height of the rectangle
     };
@@ -481,6 +520,13 @@ static void rounded_rect_renderer(gui_rounded_rect_t *widget)
         .width = GUI_BASE(widget)->w, // Width of the clipping area
         .height = GUI_BASE(widget)->h  // Height of the clipping area
     };
+    if (screen->section_count)
+    {
+        clip_area.y = 0;
+        clip_area.height = screen->fb_height;
+    }
+
+
     // Call the function to draw the rounded rectangle, effective only within the clipping area
     draw_rounded_rectangle(&draw_ctx, &rounded_rect_dsc, &clip_area);
 }
