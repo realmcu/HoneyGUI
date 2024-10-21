@@ -297,7 +297,7 @@ void gui_win_append_animate(gui_win_t  *win,
 {
     win->animate_array_length++;
     win->animate_array = gui_realloc(win->animate_array,
-                                     sizeof(gui_animate_t) * win->animate_array_length);
+                                     sizeof(*(win->animate_array)) * win->animate_array_length);
     win->animate_array[win->animate_array_length - 1] = gui_malloc(sizeof(gui_animate_t));
     gui_animate_t *animate = win->animate_array[win->animate_array_length - 1];
 

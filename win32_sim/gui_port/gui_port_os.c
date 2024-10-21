@@ -213,7 +213,6 @@ static void *rtk_gui_timer(void *arg)
 }
 #include <stdio.h>
 #include <sys/time.h>
-#include <inttypes.h>
 static void *rtk_gui_tick(void *arg)
 {
     struct timeval currentTime;

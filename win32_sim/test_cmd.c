@@ -40,9 +40,9 @@ GUI_EXPORT_CMD(gui_print_all, cmd_gui_print_all);
 
 void cmd_check_img_widget(void)
 {
-    gui_log("sizeof(gui_obj_t) = %d \n", sizeof(gui_obj_t));
-    gui_log("sizeof(gui_img_t) = %d \n", sizeof(gui_img_t));
-    gui_log("sizeof(draw_img_t) = %d \n", sizeof(draw_img_t));
+    gui_log("sizeof(gui_obj_t) = %zu \n", sizeof(gui_obj_t));
+    gui_log("sizeof(gui_img_t) = %zu \n", sizeof(gui_img_t));
+    gui_log("sizeof(draw_img_t) = %zu \n", sizeof(draw_img_t));
 }
 GUI_EXPORT_CMD(check_img_widget, cmd_check_img_widget);
 
