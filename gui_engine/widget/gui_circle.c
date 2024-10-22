@@ -2,6 +2,7 @@
 #include "gui_api.h"
 #include "gui_circle.h"
 #include "math.h"
+
 static void prepare(gui_circle_t *widget)
 {
     int last = widget->checksum;
@@ -26,28 +27,53 @@ typedef struct
     uint8_t a;  // Alpha channel for transparency
 } color_t;
 
-// Drawing context
-typedef struct
-{
-    color_t *buf;
-    int32_t buf_width;
-    int32_t buf_height;
-} draw_ctx_t;
 
-// Circle drawing descriptor
+typedef enum
+{
+    COLOR_FORMAT_RGBA,
+    COLOR_FORMAT_RGB565
+} color_format_t;
+
 typedef struct
 {
-    color_t color;
+    uint8_t b;
+    uint8_t g;
+    uint8_t r;
+    uint8_t a;  // Alpha channel for transparency
+
+} rgba_color_t;
+typedef struct
+{
+    uint16_t rgb565;
+    uint16_t b;
+    uint16_t g;
+    uint16_t r;
+
+} rgb565_color_t;
+typedef struct
+{
+    rgba_color_t color;
+    rgb565_color_t color_rgb565;
     uint8_t opa;
     int32_t radius;
     int32_t cx;
     int32_t cy;
 } draw_circle_dsc_t;
 
+typedef struct
+{
+    color_format_t format;
+    void *buf;
+    int32_t buf_width;
+    int32_t buf_height;
+} draw_ctx_t;
+
+
 // Circle or sector drawing descriptor
 typedef struct
 {
-    color_t color;
+    rgba_color_t color;
+    rgb565_color_t color_rgb565;
     uint8_t opa;
     int32_t radius;
     int32_t cx;
@@ -58,7 +84,8 @@ typedef struct
 // Rounded rectangle drawing descriptor
 typedef struct
 {
-    color_t color;
+    rgba_color_t color;
+    rgb565_color_t color_rgb565;
     uint8_t opa;
     int32_t radius;
     int32_t rect_x;
@@ -66,6 +93,9 @@ typedef struct
     int32_t rect_w;
     int32_t rect_h;
 } rounded_rect_draw_shape_dsc_t;
+// Define the RGB565 bit definitions
+#define RGB565(r, g, b)  ((((r) & 0xF8) << 8) | (((g) & 0xFC) << 3) | (((b) & 0xF8) >> 3))
+
 
 // Clipping region structure
 typedef struct
@@ -95,26 +125,78 @@ static color_t color_mix(color_t c1, color_t c2, uint8_t ratio)
     result.a = (c1.a * ratio + c2.a * (255 - ratio)) / 255;
     return result;
 }
+static rgba_color_t color_mix_rgba(rgba_color_t c1, rgba_color_t c2, uint8_t ratio)
+{
+    if (ratio == 255)
+    {
+        return c1;
+    }
+
+    rgba_color_t result;
+    uint8_t inv_ratio = 255 - ratio;
+
+    // Precompute some common terms
+    uint16_t r_term = ((uint16_t)c1.r * ratio + (uint16_t)c2.r * inv_ratio + 128) >> 8;
+    uint16_t g_term = ((uint16_t)c1.g * ratio + (uint16_t)c2.g * inv_ratio + 128) >> 8;
+    uint16_t b_term = ((uint16_t)c1.b * ratio + (uint16_t)c2.b * inv_ratio + 128) >> 8;
+    uint16_t a_term = ((uint16_t)c1.a * ratio + (uint16_t)c2.a * inv_ratio + 128) >> 8;
+
+    result.r = (uint8_t)r_term;
+    result.g = (uint8_t)g_term;
+    result.b = (uint8_t)b_term;
+    result.a = (uint8_t)a_term;
+
+    return result;
+}
+
+
+
+static uint16_t color_mix_rgb565(uint16_t c1, uint16_t c2, uint16_t r1, uint16_t g1, uint16_t b1,
+                                 uint8_t ratio)
+{
+    if (ratio == 255)
+    {
+        return c1;
+    }
+
+    uint8_t inv_ratio = 255 - ratio;
+
+    uint32_t r = (r1) * ratio + (c2 & 0xF800) * inv_ratio;
+    uint32_t g = (g1) * ratio + (c2 & 0x07E0) * inv_ratio;
+    uint32_t b = (b1) * ratio + (c2 & 0x001F) * inv_ratio;
+
+    r = (r >> 8) & 0xF800;
+    g = (g >> 8) & 0x07E0;
+    b = (b >> 8) & 0x001F;
+
+    return (uint16_t)(r | g | b);
+}
+
 
 // Determining if an angle is within a sector
 
 // Function to draw a circle with clipping
-static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc, const clip_rect_t *clip_rect)
+static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc,
+                        const clip_rect_t *clip_rect)
 {
     if (ctx == NULL || dsc == NULL) { return; }
 
-    color_t color = dsc->color;
+    rgba_color_t color = dsc->color;
     uint8_t opa = dsc->opa;
     int32_t radius = dsc->radius;
     int32_t cx = dsc->cx;
     int32_t cy = dsc->cy;
 
-    color_t *buf = ctx->buf;
+    rgba_color_t *buf_rgba = (rgba_color_t *)ctx->buf;
+    uint16_t *buf_rgb565 = (uint16_t *)ctx->buf;
     int32_t buf_w = ctx->buf_width;
     int32_t buf_h = ctx->buf_height;
 
     // Calculate the interval between each sample point
     float inv_samples = 1.0f / GRID_SAMPLES;
+
+    // Determine the color format of the output buffer
+    color_format_t format = ctx->format;
 
     // Iterate over each pixel in the buffer
     for (int32_t y = 0; y < buf_h; y++)
@@ -137,7 +219,16 @@ static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc, const cli
             if (distance <= radius - 1.0f)
             {
                 int32_t buf_index = y * buf_w + x;
-                buf[buf_index] = color_mix(color, buf[buf_index], opa);
+                if (format == COLOR_FORMAT_RGBA)
+                {
+                    buf_rgba[buf_index] = color_mix_rgba(color, ((rgba_color_t *)buf_rgba)[buf_index], opa);
+                }
+                else if (format == COLOR_FORMAT_RGB565)
+                {
+                    buf_rgb565[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                             ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                             opa);
+                }
             }
             // Otherwise, perform anti-aliasing
             else if (distance <= radius + 1.0f)
@@ -169,8 +260,18 @@ static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc, const cli
                 {
                     int32_t buf_index = y * buf_w + x;
                     uint8_t mixed_opa = opa * coverage_ratio;
+
                     // Mix colors based on coverage ratio
-                    buf[buf_index] = color_mix(color, buf[buf_index], mixed_opa);
+                    if (format == COLOR_FORMAT_RGBA)
+                    {
+                        buf_rgba[buf_index] = color_mix_rgba(color, ((rgba_color_t *)buf_rgba)[buf_index], mixed_opa);
+                    }
+                    else if (format == COLOR_FORMAT_RGB565)
+                    {
+                        buf_rgb565[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                 ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                 mixed_opa);
+                    }
                 }
             }
         }
@@ -192,7 +293,7 @@ void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc,
 {
     if (ctx == NULL || dsc == NULL) { return; }
 
-    color_t color = dsc->color;
+    rgba_color_t color = dsc->color;
     uint8_t opa = dsc->opa;
     int32_t radius = dsc->radius;
     int32_t cx = dsc->cx;
@@ -200,12 +301,14 @@ void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc,
     float start_angle = dsc->start_angle;
     float end_angle = dsc->end_angle;
 
-    color_t *buf = ctx->buf;
     int32_t buf_w = ctx->buf_width;
     int32_t buf_h = ctx->buf_height;
 
     // Calculate the interval between each sample point
     float inv_samples = 1.0f / GRID_SAMPLES;
+
+    // Determine the color format of the output buffer
+    color_format_t format = ctx->format;
 
     // Iterate over each pixel in the buffer
     for (int32_t y = 0; y < buf_h; y++)
@@ -231,13 +334,22 @@ void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc,
             // Check if the current pixel is within the sector's range
             int within_sector = is_within_sector(angle, start_angle, end_angle);
 
-            // If completely inside the circle (and within the sector's range), fill the color directly, no need for anti-aliasing
+            // Process if the pixel is within the circle and sector range
+            int32_t buf_index = y * buf_w + x;
             if (distance <= radius - 0.5f && within_sector)
             {
-                int32_t buf_index = y * buf_w + x;
-                buf[buf_index] = color_mix(color, buf[buf_index], opa);
+                if (format == COLOR_FORMAT_RGBA)
+                {
+                    ((rgba_color_t *)ctx->buf)[buf_index] = color_mix_rgba(color, ((rgba_color_t *)ctx->buf)[buf_index],
+                                                                           opa);
+                }
+                else if (format == COLOR_FORMAT_RGB565)
+                {
+                    ((uint16_t *)ctx->buf)[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                         ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                         opa);
+                }
             }
-            // Otherwise, perform anti-aliasing
             else if (distance <= radius + 0.5f)
             {
                 int inside_count = 0;
@@ -247,18 +359,14 @@ void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc,
                 {
                     for (int j = 0; j < GRID_SAMPLES; j++)
                     {
-                        // Calculate the position of each sub-pixel
                         float sub_x = x + (i + 0.5f) * inv_samples;
                         float sub_y = y + (j + 0.5f) * inv_samples;
-
-                        // Calculate the distance and angle of the sub-pixel from the center of the circle
                         float sub_dx = sub_x - cx;
                         float sub_dy = sub_y - cy;
                         float sub_distance = sqrtf(sub_dx * sub_dx + sub_dy * sub_dy);
                         float sub_angle = atan2f(sub_dy, sub_dx);
                         if (sub_angle < 0) { sub_angle += 2 * M_PI; }
 
-                        // Check if the sub-pixel is within the circle and the sector's range
                         if (sub_distance <= radius && is_within_sector(sub_angle, start_angle, end_angle))
                         {
                             inside_count++;
@@ -266,14 +374,21 @@ void draw_circle_or_sector(draw_ctx_t *ctx, const sector_draw_shape_dsc_t *dsc,
                     }
                 }
 
-                // Calculate the coverage ratio of sub-pixels
                 float coverage_ratio = inside_count * inv_samples * inv_samples;
                 if (coverage_ratio > 0)
                 {
-                    int32_t buf_index = y * buf_w + x;
                     uint8_t mixed_opa = opa * coverage_ratio;
-                    // Mix colors based on coverage ratio
-                    buf[buf_index] = color_mix(color, buf[buf_index], mixed_opa);
+                    if (format == COLOR_FORMAT_RGBA)
+                    {
+                        ((rgba_color_t *)ctx->buf)[buf_index] = color_mix_rgba(color, ((rgba_color_t *)ctx->buf)[buf_index],
+                                                                               mixed_opa);
+                    }
+                    else if (format == COLOR_FORMAT_RGB565)
+                    {
+                        ((uint16_t *)ctx->buf)[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                             ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                             mixed_opa);
+                    }
                 }
             }
         }
@@ -286,16 +401,28 @@ static void renderer(gui_circle_t *widget)
     int32_t buf_width = screen->fb_width;
     int32_t buf_height = screen->fb_height;
     color_t *buffer = (color_t *)screen->frame_buf;
-    draw_ctx_t draw_ctx = {buffer, buf_width, buf_height};
+    draw_ctx_t draw_ctx = {COLOR_FORMAT_RGB565, buffer, buf_width, buf_height};
+    if (screen->bit_depth == 32)
+    {
+        draw_ctx.format = COLOR_FORMAT_RGBA;
+    }
     int x = 0, y = 0;
     gui_obj_absolute_xy(GUI_BASE(widget), &x, &y);
+    uint16_t color_rgb565 = RGB565(widget->fill.color.rgba.r, widget->fill.color.rgba.g,
+                                   widget->fill.color.rgba.b);
     draw_circle_dsc_t circle_dsc =
     {
         .color = {widget->fill.color.rgba.b, widget->fill.color.rgba.g, widget->fill.color.rgba.r, widget->fill.color.rgba.a},   // Circle color
         .opa = 255,                  // Circle opacity
         .radius = GUI_BASE(widget)->w / 2,         // Circle radius
         .cx = GUI_BASE(widget)->w / 2 + x,         // Circle center X coordinate
-        .cy = GUI_BASE(widget)->w / 2 + y - screen->fb_height * screen->section_count      // Circle center Y coordinate
+        .cy = GUI_BASE(widget)->w / 2 + y - screen->fb_height * screen->section_count,      // Circle center Y coordinate
+        .color_rgb565 = {
+            .rgb565 = color_rgb565,
+            .b = color_rgb565 & 0x001F,
+            .g = color_rgb565 & 0x07E0,
+            .r = color_rgb565 & 0xF800,
+        }
     };
     // Set the clipping area
     clip_rect_t clip_area =
@@ -320,9 +447,15 @@ static void sector_renderer(gui_sector_t *widget)
     int32_t buf_width = screen->fb_width;
     int32_t buf_height = screen->fb_height;
     color_t *buffer = (color_t *)screen->frame_buf;
-    draw_ctx_t draw_ctx = {buffer, buf_width, buf_height};
+    draw_ctx_t draw_ctx = {COLOR_FORMAT_RGB565, buffer, buf_width, buf_height};
+    if (screen->bit_depth == 32)
+    {
+        draw_ctx.format = COLOR_FORMAT_RGBA;
+    }
     int x = 0, y = 0;
     gui_obj_absolute_xy(GUI_BASE(widget), &x, &y);
+    uint16_t color_rgb565 = RGB565(widget->base.fill.color.rgba.r, widget->base.fill.color.rgba.g,
+                                   widget->base.fill.color.rgba.b);
     sector_draw_shape_dsc_t sector_dsc =
     {
         .color = {widget->base.fill.color.rgba.b, widget->base.fill.color.rgba.g, widget->base.fill.color.rgba.r, widget->base.fill.color.rgba.a},   // Sector color
@@ -332,6 +465,12 @@ static void sector_renderer(gui_sector_t *widget)
         .cy = GUI_BASE(widget)->w / 2 + y - screen->fb_height * screen->section_count,    // Circle center Y coordinate
         .end_angle = widget->end_angle,
         .start_angle = widget->start_angle,
+        .color_rgb565 = {
+            .rgb565 = color_rgb565,
+            .b = color_rgb565 & 0x001F,
+            .g = color_rgb565 & 0x07E0,
+            .r = color_rgb565 & 0xF800,
+        }
     };
 // Set the clipping area
     clip_rect_t clip_area =
@@ -406,7 +545,7 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
 {
     if (ctx == NULL || dsc == NULL || clip == NULL) { return; }
 
-    color_t color = dsc->color;
+    rgba_color_t color = dsc->color;
     uint8_t opa = dsc->opa;
     int32_t radius = dsc->radius;
     int32_t x0 = dsc->rect_x;
@@ -414,7 +553,6 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
     int32_t w = dsc->rect_w;
     int32_t h = dsc->rect_h;
 
-    color_t *buf = ctx->buf;
     int32_t buf_w = ctx->buf_width;
     int32_t buf_h = ctx->buf_height;
 
@@ -424,6 +562,9 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
     // Define the center coordinates of the four corners
     int32_t cx[] = { x0 + radius,              x0 + w - radius,           x0 + radius,              x0 + w - radius };
     int32_t cy[] = { y0 + radius,              y0 + radius,               y0 + h - radius,          y0 + h - radius };
+
+    // Determine the color format of the output buffer
+    color_format_t format = ctx->format;
 
     // Iterate over each pixel in the buffer
     for (int32_t y = clip->y; y < clip->y + clip->height; y++)
@@ -438,7 +579,33 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
             if ((x >= x0 + radius && x < x0 + w - radius && y >= y0 && y < y0 + h) ||
                 (y >= y0 + radius && y < y0 + h - radius && x >= x0 && x < x0 + w))
             {
-                buf[buf_index] = color_mix(color, buf[buf_index], opa);
+                if (format == COLOR_FORMAT_RGBA)
+                {
+                    if (opa == 255)
+                    {
+                        ((rgba_color_t *)ctx->buf)[buf_index] = color_mix_rgba(color, color, opa);
+                    }
+                    else
+                    {
+                        ((rgba_color_t *)ctx->buf)[buf_index] = color_mix_rgba(color, ((rgba_color_t *)ctx->buf)[buf_index],
+                                                                               opa);
+                    }
+                }
+                else if (format == COLOR_FORMAT_RGB565)
+                {
+                    if (opa == 255)
+                    {
+                        ((uint16_t *)ctx->buf)[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565, 0,
+                                                                             dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b, opa);
+                    }
+                    else
+                    {
+                        ((uint16_t *)ctx->buf)[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                             ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                             opa);
+                    }
+
+                }
                 continue;
             }
 
@@ -452,7 +619,17 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
 
                 if (distance <= radius - 0.5f)
                 {
-                    buf[buf_index] = color_mix(color, buf[buf_index], opa);
+                    if (format == COLOR_FORMAT_RGBA)
+                    {
+                        ((rgba_color_t *)ctx->buf)[buf_index] = color_mix_rgba(color, ((rgba_color_t *)ctx->buf)[buf_index],
+                                                                               opa);
+                    }
+                    else if (format == COLOR_FORMAT_RGB565)
+                    {
+                        ((uint16_t *)ctx->buf)[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                             ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                             opa);
+                    }
                     within_corner = 1;
                     break;
                 }
@@ -481,7 +658,17 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
                     if (coverage_ratio > 0)
                     {
                         uint8_t mixed_opa = opa * coverage_ratio;
-                        buf[buf_index] = color_mix(color, buf[buf_index], mixed_opa);
+                        if (format == COLOR_FORMAT_RGBA)
+                        {
+                            ((rgba_color_t *)ctx->buf)[buf_index] = color_mix_rgba(color, ((rgba_color_t *)ctx->buf)[buf_index],
+                                                                                   mixed_opa);
+                        }
+                        else if (format == COLOR_FORMAT_RGB565)
+                        {
+                            ((uint16_t *)ctx->buf)[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                                 ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                                 mixed_opa);
+                        }
                     }
                     within_corner = 1;
                     break;
@@ -493,24 +680,37 @@ void draw_rounded_rectangle(draw_ctx_t *ctx, const rounded_rect_draw_shape_dsc_t
     }
 }
 
+
 static void rounded_rect_renderer(gui_rounded_rect_t *widget)
 {
     struct gui_dispdev *screen = gui_get_dc();
     int32_t buf_width = screen->fb_width;
     int32_t buf_height = screen->fb_height;
     color_t *buffer = (color_t *)screen->frame_buf;
-    draw_ctx_t draw_ctx = {buffer, buf_width, buf_height};
+    draw_ctx_t draw_ctx = {COLOR_FORMAT_RGB565, buffer, buf_width, buf_height};
+    if (screen->bit_depth == 32)
+    {
+        draw_ctx.format = COLOR_FORMAT_RGBA;
+    }
     int x = 0, y = 0;
     gui_obj_absolute_xy(GUI_BASE(widget), &x, &y);
+    uint16_t color_rgb565 = RGB565(widget->base.fill.color.rgba.r, widget->base.fill.color.rgba.g,
+                                   widget->base.fill.color.rgba.b);
     rounded_rect_draw_shape_dsc_t rounded_rect_dsc =
     {
         .color = {widget->base.fill.color.rgba.b, widget->base.fill.color.rgba.g, widget->base.fill.color.rgba.r, widget->base.fill.color.rgba.a},   // Color of the rounded rectangle
-        .opa = 200,                // Opacity of the rounded rectangle
+        .opa = 255,                // Opacity of the rounded rectangle
         .radius = widget->radius,  // Radius of the rounded corners
         .rect_x = GUI_BASE(widget)->x, // X-coordinate of the top-left corner of the rectangle
         .rect_y = GUI_BASE(widget)->y - screen->fb_height * screen->section_count, // Y-coordinate of the top-left corner of the rectangle
         .rect_w = GUI_BASE(widget)->w, // Width of the rectangle
-        .rect_h = GUI_BASE(widget)->h  // Height of the rectangle
+        .rect_h = GUI_BASE(widget)->h,  // Height of the rectangle
+        .color_rgb565 = {
+            .rgb565 = color_rgb565,
+            .b = color_rgb565 & 0x001F,
+            .g = color_rgb565 & 0x07E0,
+            .r = color_rgb565 & 0xF800,
+        }
     };
     // Set the clipping area
     clip_rect_t clip_area =
