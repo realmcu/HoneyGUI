@@ -1,5 +1,12 @@
 {% extends "!layout.html" %}
+
+{% block extrahead %}
 {{ super() }}
+
+<script type="text/javascript">
+    window.envtype = "{{ EnvType | e }}";
+</script>
+{% endblock %}
 
 
 {%- block extrabody %}
