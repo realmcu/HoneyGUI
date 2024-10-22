@@ -294,9 +294,11 @@ static void gui_svg_draw_cb(gui_obj_t *obj)
     vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                        (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
     nvgResetTransform(vg);
     nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
-                 obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
+                 obj->matrix->m[1][1], obj->matrix->m[0][2],
+                 obj->matrix->m[1][2] - dc->fb_height * dc->section_count);
 
     nvgTranslate(vg, this->t_x, this->t_y);
     nvgTranslate(vg, this->c_x, this->c_y);
