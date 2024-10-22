@@ -4,6 +4,11 @@
 // #define STB_REDUCE_MEMORY
 #define STB_REDUCE_MEMORY_FIXD
 // #define ALLOW_UNALIGNED_TRUETYPE
+#if  __ARM_FEATURE_MVE
+#define STB_TRUETYPE_USE_MVE
+#define FONT_STB_USE_MVE
+#include "arm_mve.h"
+#endif
 #include "stb_truetype.h"
 
 static stbtt_fontinfo font;
@@ -262,6 +267,92 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     }
     else if (dc_bytes_per_pixel == 2)
     {
+#ifdef FONT_STB_USE_MVE
+        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+        uint16_t color_output = rgba2565(text->color);
+        uint16_t color_back;
+        uint32_t section_width = dc->section.x2 - dc->section.x1 + 1;
+        uint32_t loopCount = (x_end - x_start) / 8;
+        uint32_t loopsLeft = (x_end - x_start) % 8;
+        bool max_opacity = false;
+        if (text->color.color.rgba.a == 0xff)
+        {
+            max_opacity = true;
+        }
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * section_width;
+            int dots_off = (i - font_y) * font_w - font_x;
+
+            /*helium code start*/
+            for (uint32_t loopc = 0; loopc < loopCount; loopc ++)
+            {
+                uint16_t js = x_start + 8 * loopc;
+                uint16x8_t jv = vidupq_n_u16(js, 1);
+
+                uint16_t alpha[8];
+                for (uint32_t i = 0; i < 8; i++)
+                {
+                    alpha[i] = dots[dots_off + js + i];
+                }
+                uint16x8_t alphav = vld1q(&alpha[0]);
+                if (vaddvq_u16(alphav) == 0)
+                {
+                    continue;
+                }
+                if (!max_opacity)
+                {
+                    alphav = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.a);
+                    alphav = vrshrq_n_u16(alphav, 8);
+                }
+
+                uint16x8_t outrv = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.r);
+                uint16x8_t outgv = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.g);
+                uint16x8_t outbv = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.b);
+
+                //read back color
+                uint16x8_t color_backv = vld1q(&writebuf[write_off + js - dc->section.x1]);
+
+                uint16x8_t color_backr = vbicq_n_u16(color_backv, 0x0700);
+                color_backr = vshrq_n_u16(color_backr, 8);
+                uint16x8_t color_backg = vbicq_n_u16(color_backv, 0xF800);
+                color_backg = vbicq_n_u16(color_backg, 0x001F);
+                color_backg = vshrq_n_u16(color_backg, 3);
+                uint16x8_t color_backb = vbicq_n_u16(color_backv, 0xFF00);
+                color_backb = vbicq_n_u16(color_backb, 0x00E0);
+                color_backb = vshlq_n_u16(color_backb, 3);
+
+                uint16x8_t alphabv = vdupq_n_u16(0xff);
+                alphabv = vsubq_u16(alphabv, alphav);
+
+                color_backr = vmulq_u16(color_backr, alphabv);
+                color_backg = vmulq_u16(color_backg, alphabv);
+                color_backb = vmulq_u16(color_backb, alphabv);
+
+                outrv = vaddq_u16(outrv, color_backr);
+                outgv = vaddq_u16(outgv, color_backg);
+                outbv = vaddq_u16(outbv, color_backb);
+
+                uint16x8_t resultv = vdupq_n_u16(0);
+                resultv = vsriq_n_u16(outbv, resultv, 5);
+                resultv = vsriq_n_u16(outgv, resultv, 6);
+                resultv = vsriq_n_u16(outrv, resultv, 5);
+
+                vst1q_u16(&writebuf[write_off + js - dc->section.x1], resultv);
+            }
+            /*helium code end*/
+            for (uint32_t j = x_end - loopsLeft; j < x_end; j++)
+            {
+                uint8_t alpha = dots[dots_off + j];
+                if (alpha != 0)
+                {
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
+                    color_back = writebuf[write_off + j - dc->section.x1];
+                    writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
+                }
+            }
+        }
+#else
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
         uint16_t color_output = rgba2565(text->color);
         uint16_t color_back;
@@ -281,6 +372,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 }
             }
         }
+#endif
     }
 }
 #endif // !RTK_GUI_FONT_ENABLE_TTF_SVG
