@@ -123,23 +123,23 @@ static bool creat_stb_screen(gui_text_t *text, gui_text_rect_t *rect, FONT_STB_S
 {
     if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
     {
-        screen->width = _UI_MIN(rect->x2 - rect->x1, _UI_MAX(text->char_width_sum, 0));
-        screen->height = _UI_MIN(text->font_height, rect->y2 - rect->y1);
+        screen->width = _UI_MIN(rect->x2 - rect->x1 + 1, _UI_MAX(text->char_width_sum, 0));
+        screen->height = _UI_MIN(text->font_height, rect->y2 - rect->y1 + 1);
     }
     else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
     {
-        screen->width = (rect->x2 - rect->x1) * text->base.matrix->m[0][0];
-        screen->height = rect->y2 - rect->y1;
+        screen->width = (rect->x2 - rect->x1 + 1) * text->base.matrix->m[0][0];
+        screen->height = rect->y2 - rect->y1 + 1;
     }
     else if (text->mode == SCROLL_X)
     {
-        screen->width =  rect->x2 - rect->x1;
-        screen->height = rect->y2 - rect->y1;
+        screen->width =  rect->x2 - rect->x1 + 1;
+        screen->height = rect->y2 - rect->y1 + 1;
     }
     else if (text->mode == SCROLL_Y)
     {
-        screen->width =  rect->x2 - rect->x1;
-        screen->height = rect->y2 - rect->y1;
+        screen->width =  rect->x2 - rect->x1 + 1;
+        screen->height = rect->y2 - rect->y1 + 1;
     }
     if (screen->width == 0 || screen->height == 0)
     {
@@ -263,19 +263,21 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     else if (dc_bytes_per_pixel == 2)
     {
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+        uint16_t color_output = rgba2565(text->color);
         uint16_t color_back;
+        uint32_t section_width = dc->section.x2 - dc->section.x1 + 1;
         for (uint32_t i = y_start; i < y_end; i++)
         {
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
+            int write_off = (i - dc->section.y1) * section_width;
+            int dots_off = (i - font_y) * font_w - font_x;
             for (uint32_t j = x_start; j < x_end; j++)
             {
-                uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
+                uint8_t alpha = dots[dots_off + j];
                 if (alpha != 0)
                 {
                     alpha = text->color.color.rgba.a * alpha / 0xff;
                     color_back = writebuf[write_off + j - dc->section.x1];
-                    writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(rgba2565(text->color), color_back,
-                                                                                alpha);
+                    writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
                 }
             }
         }
@@ -323,7 +325,6 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     baseline = ascent * scale;
-    // baseline = 900 * scale;
 
     gui_dispdev_t *dc = gui_get_dc();
     uint32_t *unicode_buf = NULL;
@@ -564,7 +565,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
             ypos = line_num * scale * (ascent - descent + lineGap);
             /*If a non-standard ttf font is used, the header information of the stb_screen memory may be lost because the drawing is out of bounds, triggering a free problem.*/
             stbtt_MakeCodepointBitmapSubpixel(&font,
-                                              &stb_screen->buf[((int)baseline + y0 + (int)ypos)*stb_screen->width + (int) xpos + x0],
+                                              &stb_screen->buf[((int)(baseline + 0.99999f) + y0 + (int)ypos)*stb_screen->width + (int) xpos + x0],
                                               x1 - x0, y1 - y0, stb_screen->width, scale, scale, x_shift, 0, unicode_buf[ch]);
             // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",unicode_buf[ch],ch,xpos,ypos);
             ++ch;
