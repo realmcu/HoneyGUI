@@ -98,10 +98,15 @@
 #include "time.h"
 #include "gui_curtainview.h"
 #include "gui_win.h"
-#define __CANVAS_NAME "canvas_timecard"
+#include "gui_canvas_img.h"
+#include "gui_img.h"
+
+#define __WIN_NAME "win_timecard"
 #define __IMG_NAME    "timecard"
-#define SCREEN_W ((int)gui_get_screen_width())
-#define SCREEN_H ((int)gui_get_screen_height())
+#define SCREEN_WIDTH 368
+#define SCREEN_HEIGHT 448
+#define SCREEN_X_OFF 0
+#define SCREEN_Y_OFF 0
 #define CARD_HEIGHT 157 + 10
 
 char *month[12] =
@@ -131,16 +136,13 @@ char *day[7] =
 };
 
 extern struct tm *timeinfo;
-static char time_content[10] = "00:00", date_content[20] = "October15\nThur";
-static char time_timecard_content[10] =  "00:00", date_timecard_content[10] = "Thur 15";
+static char time_content[10] = "00:00", date_content[20] = "January0\nSUN";
+static char time_timecard_content[10] =  "00:00", date_timecard_content[10] = "SUN 0";
 static gui_text_t *timecard_date_text, *timecard_time_text, *date_text, *time_text;
 
-static void *font_size_96_bin_addr = SOURCEHANSANSSC_SIZE96_BITS4_FONT_BIN;
 static void *font_size_64_bin_addr = SOURCEHANSANSSC_SIZE64_BITS4_FONT_BIN;
-static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS4_FONT_BIN;
 static void *font_size_40_bin_addr = SOURCEHANSANSSC_SIZE40_BITS4_FONT_BIN;
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS4_FONT_BIN;
-static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS4_FONT_BIN;
 
 static void display_time()
 {
@@ -167,8 +169,9 @@ static void display_time()
 
 static void canvas_cb_draw_bg(gui_canvas_t *canvas)
 {
-    nvgRoundedRect(canvas->vg, 0, 0, 368, 448, 50); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255 * 0.6)); //(255, 255, 255, 255 * 0.34)
+    nvgRoundedRect(canvas->vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                   50); // the X/Y-axis coordinate relative to parent widget
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
@@ -183,8 +186,13 @@ static void canvas_cb_draw_timecard(gui_canvas_t *canvas)
 // draw timecard and not display
 static void draw_timecard(void *parent_widget)
 {
-    gui_canvas_t *canvas_timecard = gui_canvas_create(parent_widget, __CANVAS_NAME, 0, 14, 0, 368, 60);
+    gui_win_t *win = gui_win_create(parent_widget, __WIN_NAME, 0, 0, SCREEN_WIDTH, 60);
+    gui_canvas_t *canvas_timecard = gui_canvas_create(win, "", 0, 14 + SCREEN_X_OFF, 0, SCREEN_WIDTH,
+                                                      60);
     gui_canvas_set_canvas_cb(canvas_timecard, canvas_cb_draw_timecard);
+    // gui_canvas_img_t *canvas_timecard = gui_canvas_img_create(win, "", 0, 14 + SCREEN_X_OFF, 0, SCREEN_WIDTH, 60);
+    // gui_canvas_img_set_canvas_cb(canvas_timecard, canvas_cb_draw_timecard);
+    // gui_canvas_img_set_update_cb(canvas_timecard, NULL);
 
     // text
     timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
@@ -194,13 +202,14 @@ static void draw_timecard(void *parent_widget)
     gui_text_type_set(timecard_date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
-    timecard_time_text = gui_text_create(canvas_timecard, "timecard_time",  -50, 20, 0, 0);
+    timecard_time_text = gui_text_create(canvas_timecard, "timecard_time",  -(50 + SCREEN_X_OFF), 20, 0,
+                                         0);
     gui_text_set(timecard_time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(time_content),
                  32);
     gui_text_type_set(timecard_time_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_time_text, RIGHT);
-    GUI_BASE(canvas_timecard)->not_show = 0;
+    GUI_BASE(win)->not_show = 0;
 }
 
 static void cv_cb(gui_cardview_t *cv)
@@ -209,19 +218,19 @@ static void cv_cb(gui_cardview_t *cv)
     {
         display_time();
     }
-    gui_canvas_t *canvas = 0;
+    gui_win_t *win = 0;
     gui_img_t *img = 0;
-    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __CANVAS_NAME, (void *)&canvas);
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __WIN_NAME, (void *)&win);
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __IMG_NAME, (void *)&img);
     int offset = cv->hold_y;
     if (offset + CARD_HEIGHT + 50 < 0)
     {
-        GUI_BASE(canvas)->not_show = 0;
+        GUI_BASE(win)->not_show = 0;
         GUI_BASE(img)->not_show = 1;
     }
     else
     {
-        GUI_BASE(canvas)->not_show = 1;
+        GUI_BASE(win)->not_show = 1;
         GUI_BASE(img)->not_show = 0;
     }
     gui_obj_t *obj = 0;
@@ -239,11 +248,16 @@ static void cv_cb(gui_cardview_t *cv)
 void curtain_down_design(void *parent_widget)
 {
     // draw transparently black background
-    gui_canvas_t *canvas_bg = gui_canvas_create(parent_widget, "background", 0, 0, 0, 368, 448);
+    gui_canvas_t *canvas_bg = gui_canvas_create(parent_widget, "background", 0, 0, 0, SCREEN_WIDTH,
+                                                SCREEN_HEIGHT);
     gui_canvas_set_canvas_cb(canvas_bg, canvas_cb_draw_bg);
+    // gui_canvas_img_t *canvas_bg = gui_canvas_img_create(parent_widget, "background", 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // gui_canvas_img_set_canvas_cb(canvas_bg, canvas_cb_draw_bg);
+    // gui_canvas_img_set_update_cb(canvas_bg, NULL);
 
     //clock circle
-    gui_img_t *img = gui_img_create_from_mem(parent_widget, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN, 17, 30,
+    gui_img_t *img = gui_img_create_from_mem(parent_widget, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN,
+                                             17 + SCREEN_X_OFF, 30,
                                              0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
@@ -263,7 +277,8 @@ void curtain_down_design(void *parent_widget)
     gui_text_mode_set(time_text, RIGHT);
 
 
-    gui_cardview_t *cv = gui_cardview_create(parent_widget, "cardview", 0, 0, 0, 448);
+    gui_cardview_t *cv = gui_cardview_create(parent_widget, "cardview",  SCREEN_X_OFF, 0,
+                                             SCREEN_WIDTH - SCREEN_X_OFF, SCREEN_HEIGHT);
     draw_timecard(parent_widget);
 
     gui_cardview_set_style(cv, REDUCTION);
