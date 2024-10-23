@@ -2856,14 +2856,14 @@ GUI_APP_ENTRY(APP_MUSIC)
 }
 GUI_APP_ENTRY(APP_CALENDAR)
 {
-
-    gui_calender_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_W, SCREEN_H, ARIALBD_SIZE16_BITS4_FONT_BIN,
-                        16, gui_rgba(50, 50, 50, 255),
-                        gui_rgba(255, 255, 255, 255),
-                        gui_rgba(255, 255, 255, 255),
-                        gui_rgba(135, 206, 250, 255),
-                        gui_rgba(255, 255, 255, 255),
-                        gui_rgba(135, 206, 250, 255));
+    extern void create_tree_nest(char *xml, void *obj);
+#if _WIN32
+    defaultPath = "gui_engine\\example\\screen_454_454\\root_image\\root\\";
+    create_tree_nest("gui_engine\\example\\screen_454_454\\root_image\\root\\stop_watch\\calnedar.xml",
+                     GUI_APP_ROOT_SCREEN);
+#else
+    create_tree_nest("stop_watch\\calnedar.xml", GUI_APP_ROOT_SCREEN);
+#endif
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     gui_fps_create(GUI_APP_ROOT_SCREEN);
