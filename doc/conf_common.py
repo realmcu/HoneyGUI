@@ -15,7 +15,6 @@ ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
 html_context = {
     'current_year': datetime.now().year, # Set the Copyright year of footer
     "show_sphinx": False, # remove 'Powered by Sphinx' at the bottom
-    "EnvType": os.getenv("EnvType", None)
 }
 
 project = 'RTKIOT GUI'

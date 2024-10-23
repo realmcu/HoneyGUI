@@ -142,7 +142,6 @@ for l, p in en_cn_build:
 
   os.chdir(doc_path)
   if release_build:
-    os.environ["EnvType"] = "Release"
     sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
     from script.jira_helper import *
     download_tool_list = download_tools(l_doc_path)
