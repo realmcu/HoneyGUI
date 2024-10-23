@@ -848,11 +848,18 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 style = SCROLL_Y;
                             }
-                            else if (!strcmp(p->attr[i], "horizontalscroll"))
+                            else if (!strcmp(p->attr[i], "left"))
                             {
-                                style = SCROLL_X;
+                                style = LEFT;
                             }
-
+                            else if (!strcmp(p->attr[i], "center"))
+                            {
+                                style = CENTER;
+                            }
+                            else if (!strcmp(p->attr[i], "right"))
+                            {
+                                style = RIGHT;
+                            }
                         }
                         else if (!strcmp(p->attr[i], "inputable"))
                         {
@@ -3505,6 +3512,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_color_t  font_color_highlight = {0};
                     gui_color_t  item_color = {0};
                     gui_color_t  item_color_highlight = {0};
+                    bool loop = 1;
+                    TEXT_MODE style = LEFT;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -3529,10 +3538,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "h"))
                         {
                             h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemCount"))
-                        {
-                            item_count = atoi(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "rowCount"))
                         {
@@ -3574,9 +3579,72 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             //font_color = string_rgb888_to_rgb565(p->attr[++i]);
                             item_color_highlight = string_rgb888(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "loop"))
+                        {
+                            if (!strcmp(p->attr[++i], "loop"))
+                            {
+                                loop = 1;
+                            }
+                            else if (!strcmp(p->attr[i], "true"))
+                            {
+                                loop = 1;
+                            }
+                            else if (!strcmp(p->attr[i], "false"))
+                            {
+                                loop = 0;
+                            }
+                            else if (!strcmp(p->attr[i], "disable"))
+                            {
+                                loop = 0;
+                            }
+                            else if (!strcmp(p->attr[i], "not loop"))
+                            {
+                                loop = 0;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "fontMode"))
+                        {
+                            char *s = p->attr[++i];
+                            if (!strcmp(p->attr[i], "truncate"))
+                            {
+                                style = 0;
+                            }
+                            else if (!strcmp(p->attr[i], "verticalscroll"))
+                            {
+                                style = SCROLL_Y;
+                            }
+                            else if (!strcmp(p->attr[i], "left"))
+                            {
+                                style = LEFT;
+                            }
+                            else if (!strcmp(p->attr[i], "center"))
+                            {
+                                style = CENTER;
+                            }
+                            else if (!strcmp(p->attr[i], "right"))
+                            {
+                                style = RIGHT;
+                            }
+                        }
                         i++;
                     }
-
+                    {
+                        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+                        char *token = strtok(items_copy, ",");
+                        int j = 0;
+                        while (token != NULL)
+                        {
+                            j++;
+                            token = strtok(NULL, ",");
+                        }
+                        item_count = j;
+                        gui_free(items_copy);
+                    }
+                    if (item_count == 0)
+                    {
+                        item_count = 1;
+                        items = "NULL";
+                    }
                     // Split items into an array of strings
                     char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
                     const char **string_array = gui_malloc(item_count * sizeof(char *));
@@ -3587,19 +3655,45 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         string_array[j++] = token;
                         token = strtok(NULL, ",");
                     }
+                    //gui_free(items_copy);
+                    if (item_count - 2 < row_count)
+                    {
+                        int item_count_temp = item_count;
+                        if (item_count > row_count)
+                        {
+                            item_count_temp = item_count * 2;
+                        }
+                        else
+                        {
+                            item_count_temp = (row_count / item_count + 2) * item_count;
+                        }
+                        const char **string_array_temp = gui_malloc(item_count_temp * sizeof(char *));
+                        for (size_t i = 0; i < item_count_temp; i++)
+                        {
+                            string_array_temp[i] = string_array[i % item_count];
+                        }
+                        gui_free(string_array);
+                        string_array = string_array_temp;
+                        item_count = item_count_temp;
+                    }
+
                     // Create the scroll wheel widget
                     gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
                                                                parent, x, y, w, row_spacing, row_count, string_array, item_count
                                                            );
-                    scroll_wheel->font_color = font_color;
-                    scroll_wheel->font_color_highlight = font_color_highlight;
-
-                    gui_scroll_wheel_new_render_text(scroll_wheel, gui_get_file_address(font), font_size);
                     if (scroll_wheel == NULL)
                     {
                         gui_log("Failed to create scroll wheel widget.\n");
                         continue;;
                     }
+                    scroll_wheel->font_color = font_color;
+                    scroll_wheel->font_color_highlight = font_color_highlight;
+                    extern void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
+                                                                       const void *font_file_pointer,
+                                                                       int font_size, TEXT_MODE mode);
+                    gui_scroll_wheel_new_render_text_alien(scroll_wheel, gui_get_file_address(font), font_size, style);
+                    scroll_wheel->loop = loop;
+
                     parent = GUI_BASE(scroll_wheel);
 
                 }
