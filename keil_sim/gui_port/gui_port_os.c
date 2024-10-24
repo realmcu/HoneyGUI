@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "cmsis_os2.h"                  // ARM::CMSIS:RTOS2:Keil RTX5
+#include "region_defs.h"
 
 void *port_thread_create(const char *name, void (*entry)(void *param), void *param,
                          uint32_t stack_size, uint8_t priority)
@@ -44,7 +45,7 @@ void port_free(void *rmem)
 
 #define PORT_MEMHEAP_SIZE       (1024*50)
 static uint32_t port_memheap[PORT_MEMHEAP_SIZE] = {0};
-//static uint8_t port_lower_memheap[PORT_MEMHEAP_SIZE] = {0};
+
 static struct gui_os_api os_api =
 {
     .name = "win_keil",
@@ -58,8 +59,8 @@ static struct gui_os_api os_api =
     .mem_addr = port_memheap,
     .mem_size = PORT_MEMHEAP_SIZE,
 
-    .lower_mem_addr = 0,
-    .lower_mem_size = 0,
+    .lower_mem_addr = (void *)S_DDR4_START,
+    .lower_mem_size = S_DDR4_SIZE,
     .mem_threshold_size = 10 * 1024,
 
     .log = (log_func_t)printf,

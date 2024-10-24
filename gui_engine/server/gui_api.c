@@ -449,7 +449,7 @@ void gui_log(const char *format, ...)
     }
     va_list args;
     va_start(args, format);
-    char buf[256];
+    char buf[1024];
     vsnprintf(buf, sizeof(buf), format, args);
     os_api->log(buf);
     va_end(args);

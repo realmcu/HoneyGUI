@@ -31,8 +31,8 @@ int main(int argc, char **argv)
 {
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", COMPANY_NAME,
            PROJECT_NAME, COMPILE_TIME);
-    extern int ExecuteBatchFile();
-    ExecuteBatchFile();
+    // extern int ExecuteBatchFile();
+    // ExecuteBatchFile();
     for (int count = 1; count < argc; count++)
     {
         if (!strcmp(argv[count], "-p") && count + 1 < argc)
