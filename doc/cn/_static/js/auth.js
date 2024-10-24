@@ -17,11 +17,11 @@ $.ajax({
         if(data.cls == "0") {
             if(data.code == "401"){
                 // console.log("Please Login ... ");
-                window.location.href = `https://www.realmcu.com/cn/Account/Login?ReturnUrl=${ReturnUrl}`;
+                window.location.href = `https://www.realmcu.com/zh/Account/Login?ReturnUrl=${ReturnUrl}`;
             }
             else if(data.code == "405") {
                 // console.log("Sorry, You don't have permission to view documents.");
-                window.location.href = `https://www.realmcu.com/cn/Account/MyInfo`;
+                window.location.href = `https://www.realmcu.com/zh/Account/MyInfo`;
             }
         }
     }
