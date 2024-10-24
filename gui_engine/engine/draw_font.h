@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+/** @brief  text rect struct start */
 typedef struct gui_text_rect
 {
     int16_t x1;
@@ -18,6 +19,7 @@ typedef struct gui_text_rect
     int16_t yboundtop;
     int16_t yboundbottom;
 } gui_text_rect_t;
+/** @brief  text rect struct end */
 
 /** @brief  text encoding format enum */
 typedef enum

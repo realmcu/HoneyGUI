@@ -85,6 +85,7 @@
 
 开发者可以调用函数 [gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter)](#gui_text_click) 添加文本点击事件。
 
+{#Text_Widget_Mode_CN}
 #### 文本模式
 
 文本控件支持七种排版模式，通过 [gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode)](#gui_text_mode_set) 来设置文本排版模式。

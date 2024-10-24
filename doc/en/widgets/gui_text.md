@@ -87,6 +87,7 @@ Text widget supports the input setting. You can use this function to set input [
 
 Text widget supports click. You can use this function to add the click event for text [gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter)](#gui_text_click).
 
+{#Text_Widget_Mode_EN}
 #### Text Mode
 
 Text widget supports seven typesetting modes. To set text typesetting mode, use: [gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode)](#gui_text_mode_set).
