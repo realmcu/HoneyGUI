@@ -1,12 +1,12 @@
 # 文本 (Text)
 
-文本控件是用于显示文本的基本小控件，可用于将不同字体、不同颜色和不同大小的文本输出到屏幕上。为了绘制文本，字体文件可以是标准的.ttf文件或自定义的.bin文件。
+文本控件是用于显示文本的基本控件，可用于将不同字体、不同颜色和不同大小的文本输出到屏幕上。为了绘制文本，字体文件可以是标准的.ttf文件或自定义的.bin文件。
 
 ## 特性
 
 文本控件能支持下面的特性。
 
-+ **支持UTF-8**
++ **支持UTF-8/UTF16/UTF-32**
 + **支持多语言**
 + **支持文本排版**
 + **自动换行和文本滚动**
@@ -15,7 +15,8 @@
 + **支持多种字体大小**
 + **支持32位真彩色**
 + **支持自定义动画效果**
-+ **支持自定义动画效果[^1]**
++ **支持EMOJI表情**
++ **支持标准TTF格式字体[^1]**
 + **支持自行开发的字体文件**
 
 [^1]: 只有部分芯片支持此功能
@@ -66,7 +67,7 @@
 
 #### 文本编码
 
-文本控件同时支持UTF-8编码和UTF-16编码输入格式，开发者可以使用 [gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset)](#gui_text_encoding_set) 更改编码方式。
+文本控件同时支持UTF-8编码、UTF-16编码和UTF32编码输入格式，开发者可以使用 [gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset)](#gui_text_encoding_set) 更改编码方式。
 
 #### 文本转换为图片
 
@@ -153,23 +154,23 @@ static void app_launcher_ui_design(gui_app_t *app)
 
     gui_text_t *text1 = gui_text_create(screen,  "text1",  10, 10, 100, 50);
     gui_text_set(text1, chinese, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(chinese), 24);
-    gui_text_type_set(text1, HARMONYOS_SIZE24_BITS1_FONT_BIN);
+    gui_text_type_set(text1, HARMONYOS_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text1, LEFT);
 
     gui_text_t *text2 = gui_text_create(screen,  "text2",  0, 50, 300, 50);
     gui_text_set(text2, "english", GUI_FONT_SRC_BMP, APP_COLOR_RED, 7, 16);
-    gui_text_type_set(text2, HARMONYOS_SIZE16_BITS4_FONT_BIN);
+    gui_text_type_set(text2, HARMONYOS_SIZE16_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text2, LEFT);
 
     char *string = "TEXT_WIDGET";
     gui_text_t *text3 = gui_text_create(screen,  "text3",  0, 90, 300, 50);
     gui_text_set(text3, string, GUI_FONT_SRC_BMP, APP_COLOR_BLUE, strlen(string), 32);
-    gui_text_type_set(text3, HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    gui_text_type_set(text3, HARMONYOS_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text3, CENTER);
 
     gui_text_t *text4 = gui_text_create(screen,  "text4",  0, 150, 100, 200);
     gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0xff), 24, 24);
-    gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN);
+    gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text4, MULTI_CENTER);
 }
 
@@ -197,18 +198,18 @@ void change_text_cb(gui_text_t *obj)
     if (obj->animate->current_frame > 0 && obj->animate->current_frame < 50)
     {
         gui_text_move(obj, 50, 150);
-        obj->utf_8 = "123456789";
+        gui_text_content_set(obj, "123456789", 9);
     }
     else if (obj->animate->current_frame > 50 && obj->animate->current_frame < 100)
     {
         gui_text_move(obj, 200, 150);
-        obj->utf_8 = "987654321";
+        gui_text_content_set(obj, "987654321", 9);
 
     }
     else
     {
         gui_text_move(obj, 125, 50);
-        obj->utf_8 = "abcdefghi";
+        gui_text_content_set(obj, "abcdefghi", 9);
     }
 }
 
@@ -218,7 +219,7 @@ void page_tb_activity(void *parent)
 
     gui_text_t *text = gui_text_create(parent,  "text",  0, 0, 100, 200);
     gui_text_set(text, "ABCDEFGHI", GUI_FONT_SRC_BMP, APP_COLOR_RED, 9, 24);
-    gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN);
+    gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MULTI_CENTER);
     gui_text_set_animate(text, 5000, 15, change_text_cb, text);
 }

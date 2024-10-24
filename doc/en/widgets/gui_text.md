@@ -6,7 +6,7 @@ The text widget is the basic widget used to display text, which can be used to o
 
 Text widgets can support the following features.
 
-+ **UTF-8 support**
++ **UTF-8/UTF16/UTF-32 support**
 + **Multi language support**
 + **Text typesetting support**
 + **Word wrap and texts scrolling**
@@ -14,6 +14,7 @@ Text widgets can support the following features.
 + **Multi fonts support**
 + **Multi font sizes support**
 + **Thirty-two bit true color support**
++ **Emoji support**
 + **Custom animation effects support**
 + **Standards TTF file support[^1]**
 + **Self-developed font files support**
@@ -58,18 +59,17 @@ The text length must be the same as the set character length, and the font size 
 
 #### Font Type
 
-The text widget support type setting. This function can be used to set the type. The type is a bin/ttf file address 
+The text widget support type setting. This function can be used to set the type. The type is a bin/ttf file address
 [gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode)](#gui_text_type_set).
 
 #### Text Content
 
-This interface can be used to set the content that needs to be displayed by the text widget 
+This interface can be used to set the content that needs to be displayed by the text widget
 [gui_text_content_set(gui_text_t *this_widget, void *text, uint16_t length)](#gui_text_content_set).
 
 #### Text Encoding
 
-The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, and this interface can be used to change the decoding method 
-[gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset)](#gui_text_encoding_set).
+The text control supports input formats in UTF-8, UTF-16, and UTF-32 encodings simultaneously. Developers can use [gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset)](#gui_text_encoding_set) to change the encoding format.
 
 #### Convert to Img
 
@@ -157,23 +157,23 @@ static void app_launcher_ui_design(gui_app_t *app)
 
     gui_text_t *text1 = gui_text_create(screen,  "text1",  10, 10, 100, 50);
     gui_text_set(text1, chinese, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(chinese), 24);
-    gui_text_type_set(text1, HARMONYOS_SIZE24_BITS1_FONT_BIN);
+    gui_text_type_set(text1, HARMONYOS_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text1, LEFT);
 
     gui_text_t *text2 = gui_text_create(screen,  "text2",  0, 50, 300, 50);
     gui_text_set(text2, "english", GUI_FONT_SRC_BMP, APP_COLOR_RED, 7, 16);
-    gui_text_type_set(text2, HARMONYOS_SIZE16_BITS4_FONT_BIN);
+    gui_text_type_set(text2, HARMONYOS_SIZE16_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text2, LEFT);
 
     char *string = "TEXT_WIDGET";
     gui_text_t *text3 = gui_text_create(screen,  "text3",  0, 90, 300, 50);
     gui_text_set(text3, string, GUI_FONT_SRC_BMP, APP_COLOR_BLUE, strlen(string), 32);
-    gui_text_type_set(text3, HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    gui_text_type_set(text3, HARMONYOS_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text3, CENTER);
 
     gui_text_t *text4 = gui_text_create(screen,  "text4",  0, 150, 100, 200);
     gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0xff), 24, 24);
-    gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN);
+    gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text4, MULTI_CENTER);
 }
 
@@ -201,18 +201,18 @@ void change_text_cb(gui_text_t *obj)
     if (obj->animate->current_frame > 0 && obj->animate->current_frame < 50)
     {
         gui_text_move(obj, 50, 150);
-        obj->utf_8 = "123456789";
+        gui_text_content_set(obj, "123456789", 9);
     }
     else if (obj->animate->current_frame > 50 && obj->animate->current_frame < 100)
     {
         gui_text_move(obj, 200, 150);
-        obj->utf_8 = "987654321";
+        gui_text_content_set(obj, "987654321", 9);
 
     }
     else
     {
         gui_text_move(obj, 125, 50);
-        obj->utf_8 = "abcdefghi";
+        gui_text_content_set(obj, "abcdefghi", 9);
     }
 }
 
@@ -222,7 +222,7 @@ void page_tb_activity(void *parent)
 
     gui_text_t *text = gui_text_create(parent,  "text",  0, 0, 100, 200);
     gui_text_set(text, "ABCDEFGHI", GUI_FONT_SRC_BMP, APP_COLOR_RED, 9, 24);
-    gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN);
+    gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MULTI_CENTER);
     gui_text_set_animate(text, 5000, 15, change_text_cb, text);
 }
