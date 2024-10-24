@@ -35,10 +35,13 @@
 #include "gui_page.h"
 #include "gui_app.h"
 #include "tp_algo.h"
+#include "gui_canvas_img.h"
 
 #define PAGE_NAME "_page_name"
 #define SCREEN_WIDTH 368
 #define SCREEN_HEIGHT 448
+#define SCREEN_X_OFF 0
+#define SCREEN_Y_OFF 0
 #define TAB_HEIGHT 220
 #define TAB_INTERVAL 20
 
@@ -64,7 +67,8 @@ view_more_RGB rgb_2 = {39, 43, 44};
 view_more_RGB rgb_3 = {39, 43, 44};
 static void canvas_cb_clear(gui_canvas_t *canvas)
 {
-    nvgRoundedRect(canvas->vg, 0, 0, 305, 80, 50); // the X/Y-axis coordinate relative to parent widget
+    nvgRoundedRect(canvas->vg, 31 + SCREEN_X_OFF, 0, 305, 80,
+                   50); // the X/Y-axis coordinate relative to parent widget
     nvgFillColor(canvas->vg, nvgRGBA(39, 43, 44, 255));
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
@@ -177,11 +181,15 @@ static void tv_clear(void *obj, gui_event_t e)
 static void pagelist_clear(gui_page_t *parent)
 {
     gui_text_t *clear_text;
-    gui_canvas_t *canvas = gui_canvas_create(parent, "canvas_clear", 0, 31, 40, SCREEN_WIDTH, 80);
+    gui_canvas_t *canvas = gui_canvas_create(parent, "canvas_clear", 0, 0, 40, SCREEN_WIDTH, 80);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_clear);
+    // gui_canvas_img_t *canvas = gui_canvas_img_create(parent, "canvas_clear", 0, 0, 40, SCREEN_WIDTH, 80);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_clear);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
+
     // text
     char *clear_content = "clear all";
-    clear_text = gui_text_create(canvas, "clear all",  -31, 0, 0, 0);
+    clear_text = gui_text_create(canvas, "clear all", 0, 0, 0, 0);
     gui_text_set(clear_text, (void *)clear_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(clear_content),
                  32);
@@ -219,7 +227,7 @@ static void canvas_cb_message_bg(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                    50); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
+    nvgFillColor(canvas->vg, nvgRGBA(1, 1, 1, 255));
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
@@ -227,21 +235,24 @@ static void canvas_cb_message_bg(gui_canvas_t *canvas)
 
 static void canvas_cb_view_more_1(gui_canvas_t *canvas)
 {
-    nvgRoundedRect(canvas->vg, 9, 0, 350, 80, 15); // the X/Y-axis coordinate relative to parent widget
+    nvgRoundedRect(canvas->vg, 9 + SCREEN_X_OFF, 0, 350, 80,
+                   15); // the X/Y-axis coordinate relative to parent widget
     nvgFillColor(canvas->vg, nvgRGBA(rgb_1.R, rgb_1.G, rgb_1.B, 255)); //R G B
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
 static void canvas_cb_view_more_2(gui_canvas_t *canvas)
 {
-    nvgRoundedRect(canvas->vg, 9, 0, 350, 80, 15); // the X/Y-axis coordinate relative to parent widget
+    nvgRoundedRect(canvas->vg, 9 + SCREEN_X_OFF, 0, 350, 80,
+                   15); // the X/Y-axis coordinate relative to parent widget
     nvgFillColor(canvas->vg, nvgRGBA(rgb_2.R, rgb_2.G, rgb_2.B, 255)); //R G B
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
 static void canvas_cb_view_more_3(gui_canvas_t *canvas)
 {
-    nvgRoundedRect(canvas->vg, 9, 0, 350, 80, 15); // the X/Y-axis coordinate relative to parent widget
+    nvgRoundedRect(canvas->vg, 9 + SCREEN_X_OFF, 0, 350, 80,
+                   15); // the X/Y-axis coordinate relative to parent widget
     nvgFillColor(canvas->vg, nvgRGBA(rgb_3.R, rgb_3.G, rgb_3.B, 255)); //R G B
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
@@ -263,7 +274,7 @@ static void message_cancel_cb(gui_obj_t *win)
 static void message_more_cb(gui_obj_t *win)
 {
     // enter animation
-    if (win->x < -40)
+    if (win->x < -(80 + SCREEN_X_OFF))
     {
         win->x = (win_clear->animate->progress_percent - 1) * SCREEN_WIDTH;
     }
@@ -277,7 +288,7 @@ static void message_more_cb(gui_obj_t *win)
     {
         if ((tp->y > 15 && tp->y < 47))
         {
-            if (tp->x > 15 && tp->x < 95)
+            if (tp->x > 16 + SCREEN_X_OFF && tp->x < 95 + SCREEN_X_OFF)
             {
                 gui_win_set_animate(win_clear, 500, 0, (gui_animate_callback_t)message_cancel_cb, win);
             }
@@ -285,7 +296,7 @@ static void message_more_cb(gui_obj_t *win)
         else
         {
             uint16_t base_y = 140, h = 80, interval = 10;
-            if (tp->x > 9 && tp->x < 359)
+            if (tp->x > 9 + SCREEN_X_OFF && tp->x < 359 + SCREEN_X_OFF)
             {
                 uint16_t y = base_y;
                 view_more_RGB temp = {255, 255, 255};
@@ -319,6 +330,7 @@ static void message_more_cb(gui_obj_t *win)
     rgb_3 = rgb_1;
 }
 // ... content
+static void canvas_cb_draw_bg(gui_canvas_t *canvas);
 static void view_more(gui_obj_t *obj)
 {
     gui_win_stop_animation(win_design);
@@ -333,15 +345,20 @@ static void view_more(gui_obj_t *obj)
         gui_canvas_t *canvas_bg = gui_canvas_create(win, "message_background", 0, 0, 0, SCREEN_WIDTH,
                                                     SCREEN_HEIGHT);
         gui_canvas_set_canvas_cb(canvas_bg, canvas_cb_message_bg);
+        // gui_canvas_img_t *canvas_bg = gui_canvas_img_create(win, "message_background", 0, 0, 0, SCREEN_WIDTH,
+        //                                             SCREEN_HEIGHT);
+        // gui_canvas_img_set_canvas_cb(canvas_bg, canvas_cb_message_bg);
+        // gui_canvas_img_set_update_cb(canvas_bg, NULL);
+
         char *content = "Cancel";
-        gui_text_t *text = gui_text_create(win, "cancel",  15, 15, 80, 32);
+        gui_text_t *text = gui_text_create(win, "cancel",  16 + SCREEN_X_OFF, 15, 80, 32);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
                      32);
         gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, LEFT);
-        content = "12:56";
-        text = gui_text_create(win, "time",  -15, 15, 0, 0);
+        content = "00:00";
+        text = gui_text_create(win, "time",  -(16 + SCREEN_X_OFF), 15, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
                      32);
@@ -351,30 +368,35 @@ static void view_more(gui_obj_t *obj)
         if (obj->name == tabview_array[0])
         {
             content = "\"message\" dialog\n10655810010" ;
-            text = gui_text_create(win, "message",  15, 70, 0, 0);
+            text = gui_text_create(win, "message",  16 + SCREEN_X_OFF, 70, 0, 0);
             gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, gui_rgba(153, 153, 153, UINT8_MAX),
                          strlen(content),
                          24);
             gui_text_type_set(text, font_size_24_bin_addr, FONT_SRC_MEMADDR);
             gui_text_mode_set(text, MULTI_LEFT);
 
-            gui_img_create_from_mem(win, "view_more person", UI_PERSON_ICON_BIN, 280, 20, 0, 0);
+            gui_img_create_from_mem(win, "view_more person", UI_PERSON_ICON_BIN, 279 + SCREEN_X_OFF, 20, 0, 0);
         }
         else
         {
             content = "\"OS\" dialog" ;
-            text = gui_text_create(win, "message",  15, 100, 0, 0);
+            text = gui_text_create(win, "message",  16 + SCREEN_X_OFF, 100, 0, 0);
             gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, gui_rgba(153, 153, 153, UINT8_MAX),
                          strlen(content),
                          24);
             gui_text_type_set(text, font_size_24_bin_addr, FONT_SRC_MEMADDR);
             gui_text_mode_set(text, LEFT);
 
-            gui_img_create_from_mem(win, "view_more watch", UI_IWATCH_32_ICON_BIN, 280, 20, 0, 0);
+            gui_img_create_from_mem(win, "view_more watch", UI_IWATCH_32_ICON_BIN, 279 + SCREEN_X_OFF, 20, 0,
+                                    0);
         }
 
         gui_canvas_t *canvas = gui_canvas_create(win, "canvas_1", 0, 0, 140, SCREEN_WIDTH, 80);
         gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_1);
+        // gui_canvas_img_t *canvas = gui_canvas_img_create(win, "canvas_1", 0, 0, 140, SCREEN_WIDTH, 80);
+        // gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_1);
+        // gui_canvas_img_set_update_cb(canvas, NULL);
+
         content = "Don't remind for an hour";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -385,6 +407,10 @@ static void view_more(gui_obj_t *obj)
 
         canvas = gui_canvas_create(win, "canvas_2", 0, 0, 230, SCREEN_WIDTH, 80);
         gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_2);
+        // canvas = gui_canvas_img_create(win, "canvas_2", 0, 0, 230, SCREEN_WIDTH, 80);
+        // gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_2);
+        // gui_canvas_img_set_update_cb(canvas, NULL);
+
         content = "Don't remind today";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -395,6 +421,10 @@ static void view_more(gui_obj_t *obj)
 
         canvas = gui_canvas_create(win, "canvas_3", 0, 0, 320, SCREEN_WIDTH, 80);
         gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_3);
+        // canvas = gui_canvas_img_create(win, "canvas_3", 0, 0, 320, SCREEN_WIDTH, 80);
+        // gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_3);
+        // gui_canvas_img_set_update_cb(canvas, NULL);
+
         content = "Add this to Summary";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -423,8 +453,12 @@ static void pagelist_message(void *parent)
     // message
     gui_text_t *message_number, *message_text, *message_time;
 
-    gui_canvas_t *canvas = gui_canvas_create(tb_message, "canvas_message", 0, 9, 0, 350, 220);
+    gui_canvas_t *canvas = gui_canvas_create(tb_message, "canvas_message", 0, 9 + SCREEN_X_OFF, 0, 350,
+                                             220);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_message);
+    // gui_canvas_img_t *canvas = gui_canvas_img_create(tb_message, "canvas_message", 0, 9 + SCREEN_X_OFF, 0, 350, 220);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_message);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
 
     gui_img_create_from_mem(canvas, "message icon", UI_MESSAGE_ICON_BIN, 10, -15, 0, 0);
 
@@ -457,8 +491,12 @@ static void pagelist_message(void *parent)
 
     // option left
     char *option_content = "...";
-    canvas = gui_canvas_create(tb_option, "message_left", 0, 9, 0, 170, 220);
+    canvas = gui_canvas_create(tb_option, "message_left", 0, 9 + SCREEN_X_OFF, 0, 170, 220);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_option);
+    // canvas = gui_canvas_img_create(tb_option, "message_left", 0, 9 + SCREEN_X_OFF, 0, 170, 220);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_option);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
+
     gui_text_t *text = gui_text_create(canvas, "canvas_option",  0, 0, 0, 0);
     gui_text_set(text, (void *)option_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(option_content),
@@ -468,8 +506,12 @@ static void pagelist_message(void *parent)
 
     //option right
     option_content = "X";
-    canvas = gui_canvas_create(tb_option, "message_right", 0, 189, 0, 170, 220);
+    canvas = gui_canvas_create(tb_option, "message_right", 0, 189 + SCREEN_X_OFF, 0, 170, 220);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_option);
+    // canvas = gui_canvas_img_create(tb_option, "message_right", 0, 189 + SCREEN_X_OFF, 0, 170, 220);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_option);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
+
     text = gui_text_create(canvas, "canvas_option",  0, 0, 0, 0);
     gui_text_set(text, (void *)option_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(option_content),
@@ -483,7 +525,6 @@ static void pagelist_message(void *parent)
 
 static void win_os_clear_cb(gui_obj_t *obj)
 {
-    static int16_t y;
     float percent = win_clear->animate->progress_percent;
     obj->x = (0 - percent * 2) * SCREEN_WIDTH;
     if (percent >= 1.0f)
@@ -511,8 +552,12 @@ static void os_information(void *parent)
 
     gui_text_t *os_information_text, *os_information_time, *os_version_text;
 
-    gui_canvas_t *canvas = gui_canvas_create(tb_message, "canvas_os_information", 0, 9, 0, 350, 220);
+    gui_canvas_t *canvas = gui_canvas_create(tb_message, "canvas_os_information", 0, 9 + SCREEN_X_OFF,
+                                             0, 350, 220);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_os_information);
+    // gui_canvas_img_t *canvas = gui_canvas_img_create(tb_message, "canvas_os_information", 0, 9 + SCREEN_X_OFF, 0, 350, 220);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_os_information);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
 
     gui_img_create_from_mem(canvas, "watch icon", UI_IWATCH_ICON_BIN, 10, -10, 0, 0);
     // text
@@ -543,8 +588,12 @@ static void os_information(void *parent)
 
     // option left
     char *option_content = "...";
-    canvas = gui_canvas_create(tb_option, "message_left1", 0, 9, 0, 170, 220);
+    canvas = gui_canvas_create(tb_option, "message_left1", 0, 9 + SCREEN_X_OFF, 0, 170, 220);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_option);
+    // canvas = gui_canvas_img_create(tb_option, "message_left1", 0, 9 + SCREEN_X_OFF, 0, 170, 220);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_option);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
+
     gui_text_t *text = gui_text_create(canvas, "canvas_option1",  0, 0, 0, 0);
     gui_text_set(text, (void *)option_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(option_content),
@@ -554,8 +603,12 @@ static void os_information(void *parent)
 
     //option right
     option_content = "X";
-    canvas = gui_canvas_create(tb_option, "message_right1", 0, 189, 0, 170, 220);
+    canvas = gui_canvas_create(tb_option, "message_right1", 0, 189 + SCREEN_X_OFF, 0, 170, 220);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_option);
+    // canvas = gui_canvas_img_create(tb_option, "message_right1", 0, 189 + SCREEN_X_OFF, 0, 170, 220);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_option);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
+
     text = gui_text_create(canvas, "canvas_option1",  0, 0, 0, 0);
     gui_text_set(text, (void *)option_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(option_content),
@@ -604,7 +657,7 @@ static void win_design_cb(void)
                 h = canvas->h;
                 if ((tp->y > y && tp->y < y + h))
                 {
-                    if (tp->x > 31 && tp->x < 336)
+                    if (tp->x > 31 + SCREEN_X_OFF && tp->x < 336 + SCREEN_X_OFF)
                     {
                         gui_obj_event_set(canvas, GUI_EVENT_1);
 
@@ -630,12 +683,12 @@ static void win_design_cb(void)
                         h = GUI_BASE(tv)->h;
                         if ((tp->y > y && tp->y < y + h))
                         {
-                            if (tp->x > 9 && tp->x < 179)
+                            if (tp->x > 9 + SCREEN_X_OFF && tp->x < 179 + SCREEN_X_OFF)
                             {
                                 gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_2);
                                 // gui_log("click left\r\n");
                             }
-                            else if (tp->x > 189 && tp->x < 359)
+                            else if (tp->x > 189 + SCREEN_X_OFF && tp->x < 359 + SCREEN_X_OFF)
                             {
                                 gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_1);
                                 // gui_log("click right\r\n");
@@ -651,7 +704,7 @@ static void win_design_cb(void)
     {
         // page part
         flag =  tp->deltaY < 0 && obj->y != 0 &&
-                obj->y <= (pg->start_y - (obj->h - (int)gui_get_screen_height())); //@BOTTOM
+                obj->y <= (pg->start_y - (obj->h - SCREEN_HEIGHT)); //@BOTTOM
         if (flag || tp->y > SCREEN_HEIGHT - 50)
         {
             gui_page_t *page = 0;
@@ -690,13 +743,20 @@ void tabview_up_design(void *parent_widget)
     gui_canvas_t *canvas = gui_canvas_create(win_design, "background", 0, 0, 0, SCREEN_WIDTH,
                                              SCREEN_HEIGHT);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_draw_bg);
-
-    pg = gui_page_create(win_design, PAGE_NAME, 0, 0, 0, 0);
+    // gui_canvas_img_t *canvas = gui_canvas_img_create(win_design, "background", 0, 0, 0, SCREEN_WIDTH,
+    //                                          SCREEN_HEIGHT);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_draw_bg);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
 
     // draw bottom line
-    canvas = gui_canvas_create(win_design, "line", 0, 160, 425, SCREEN_WIDTH, 10);
+    canvas = gui_canvas_create(win_design, "line", 0, 160 + SCREEN_X_OFF, SCREEN_HEIGHT - 25,
+                               SCREEN_WIDTH, 10);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_draw_line);
+    // canvas = gui_canvas_img_create(win_design, "line", 0, 160 + SCREEN_X_OFF, SCREEN_HEIGHT - 25, SCREEN_WIDTH, 10);
+    // gui_canvas_img_set_canvas_cb(canvas, canvas_cb_draw_line);
+    // gui_canvas_img_set_update_cb(canvas, NULL);
 
+    pg = gui_page_create(win_design, PAGE_NAME, 0, 0, 0, 0);
     // draw table content
     pagelist_clear(pg);
     pagelist_message(pg);

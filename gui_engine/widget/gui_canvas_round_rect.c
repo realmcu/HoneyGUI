@@ -213,56 +213,114 @@ static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, i
 
 static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
 {
-    touch_info_t *tp = tp_get_info();
-    gui_obj_t *obj = (gui_obj_t *)this;
-    gui_dispdev_t *dc = gui_get_dc();
-
-    GUI_UNUSED(this);
-    GUI_UNUSED(obj);
-    GUI_UNUSED(tp);
-    GUI_UNUSED(dc);
-
-    this->rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-
-
-    // set_rect_img(this, &this->rect_0, this->r, 0, this->base.w - 2 * this->r, this->r);
-    // set_rect_img(this, &this->rect_1, 0, this->r, this->base.w, this->base.h - 2 * this->r);
-    // set_rect_img(this, &this->rect_2, this->r, this->base.h - this->r, this->base.w - 2 * this->r,
-    //              this->r);
-    set_rect_img(this, &this->rect_0, \
-                 this->r - 1,  \
-                 0,
-                 this->base.w - 2 * this->r + 2, \
-                 this->r + 1);
-
-    set_rect_img(this, &this->rect_1, \
-                 0, \
-                 this->r - 1, \
-                 this->base.w, \
-                 this->base.h - 2 * this->r + 2);
-
-    set_rect_img(this, &this->rect_2, \
-                 this->r - 1,  \
-                 this->base.h - this->r - 1,
-                 this->base.w - 2 * this->r + 2, \
-                 this->r + 1);
-    if (this->use_external_picture == false)
+    if (this->color.color.rgba.a == 255)
     {
-        this->circle_data = gui_malloc((this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
-        memset(this->circle_data, 0x00, (this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
+        touch_info_t *tp = tp_get_info();
+        gui_obj_t *obj = (gui_obj_t *)this;
+        gui_dispdev_t *dc = gui_get_dc();
 
-        prepare_arc_img(this);
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
+        GUI_UNUSED(this);
+        GUI_UNUSED(obj);
+        GUI_UNUSED(tp);
+        GUI_UNUSED(dc);
 
-        set_arc_w_and_h(head, this->r + 1, this->r + 1, this->color);
+        this->rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
 
+
+        // set_rect_img(this, &this->rect_0, this->r, 0, this->base.w - 2 * this->r, this->r);
+        // set_rect_img(this, &this->rect_1, 0, this->r, this->base.w, this->base.h - 2 * this->r);
+        // set_rect_img(this, &this->rect_2, this->r, this->base.h - this->r, this->base.w - 2 * this->r,
+        //              this->r);
+        set_rect_img(this, &this->rect_0, \
+                     this->r - 1,  \
+                     0,
+                     this->base.w - 2 * this->r + 2, \
+                     this->r + 1);
+
+        set_rect_img(this, &this->rect_1, \
+                     0, \
+                     this->r - 1, \
+                     this->base.w, \
+                     this->base.h - 2 * this->r + 2);
+
+        set_rect_img(this, &this->rect_2, \
+                     this->r - 1,  \
+                     this->base.h - this->r - 1,
+                     this->base.w - 2 * this->r + 2, \
+                     this->r + 1);
+        if (this->use_external_picture == false)
+        {
+            this->circle_data = gui_malloc((this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
+            memset(this->circle_data, 0x00, (this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
+
+            prepare_arc_img(this);
+            gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
+
+            set_arc_w_and_h(head, this->r + 1, this->r + 1, this->color);
+
+        }
+        set_arc_img(this, &this->circle_00, -1, -1, 0);
+        set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 2, -1, 90);
+        set_arc_img(this, &this->circle_10, -1, this->base.h - 2 * this->r - 2, 270);
+        set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 2, this->base.h - 2 * this->r - 2,
+                    180);
+        gui_fb_change();
     }
-    set_arc_img(this, &this->circle_00, -1, -1, 0);
-    set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 2, -1, 90);
-    set_arc_img(this, &this->circle_10, -1, this->base.h - 2 * this->r - 2, 270);
-    set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 2, this->base.h - 2 * this->r - 2,
-                180);
-    gui_fb_change();
+    else
+    {
+        touch_info_t *tp = tp_get_info();
+        gui_obj_t *obj = (gui_obj_t *)this;
+        gui_dispdev_t *dc = gui_get_dc();
+
+        GUI_UNUSED(this);
+        GUI_UNUSED(obj);
+        GUI_UNUSED(tp);
+        GUI_UNUSED(dc);
+
+        this->rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
+
+
+        // set_rect_img(this, &this->rect_0, this->r, 0, this->base.w - 2 * this->r, this->r);
+        // set_rect_img(this, &this->rect_1, 0, this->r, this->base.w, this->base.h - 2 * this->r);
+        // set_rect_img(this, &this->rect_2, this->r, this->base.h - this->r, this->base.w - 2 * this->r,
+        //              this->r);
+        set_rect_img(this, &this->rect_0, \
+                     this->r,  \
+                     0,
+                     this->base.w - 2 * this->r, \
+                     this->r);
+
+        set_rect_img(this, &this->rect_1, \
+                     0, \
+                     this->r, \
+                     this->base.w, \
+                     this->base.h - 2 * this->r);
+
+        set_rect_img(this, &this->rect_2, \
+                     this->r,  \
+                     this->base.h - this->r,
+                     this->base.w - 2 * this->r, \
+                     this->r + 1);
+        if (this->use_external_picture == false)
+        {
+            this->circle_data = gui_malloc((this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
+            memset(this->circle_data, 0x00, (this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
+
+            prepare_arc_img(this);
+            gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
+
+            set_arc_w_and_h(head, this->r + 1, this->r + 1, this->color);
+
+        }
+        set_arc_img(this, &this->circle_00, -1, -1, 0);
+        set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 2, -1, 90);
+        set_arc_img(this, &this->circle_10, -1, this->base.h - 2 * this->r - 2, 270);
+        set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 2, this->base.h - 2 * this->r - 2,
+                    180);
+        gui_fb_change();
+    }
+
+
 
 }
 

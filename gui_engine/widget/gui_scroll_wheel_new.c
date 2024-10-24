@@ -119,6 +119,7 @@ static void ctor(struct gui_scroll_wheel_new *this,
     this->index_offset = (row_count + 2) / 2;
     this->font_color = APP_COLOR_WHITE;
     this->font_color_highlight = APP_COLOR_GRAY;
+    this->loop = 1;
 }
 static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **text_widget_array,
                                       int array_count)
@@ -194,7 +195,7 @@ static void render(const char *text, gui_obj_t *obj, unsigned char render_mode,
     case GUI_SCROLL_WHEEL_NEW_RENDER_TEXT:
         {
             gui_text_content_set((void *)obj, (void *)text, strlen(text));
-            gui_text_convert_to_img((void *)obj, ARGB8888);
+            gui_text_convert_to_img((void *)obj, RGB565);
         }
         break;
     case GUI_SCROLL_WHEEL_NEW_RENDER_IMAGE_ARRAY:
@@ -271,6 +272,18 @@ static void override(gui_obj_t *win)
         {
             inertial(this);
         }
+        if (!this->loop)
+        {
+            if (this->touch_y > this->gap * 2)
+            {
+                this->touch_y = this->gap * 2;
+            }
+            if (this->touch_y < -this->gap * (time_array_size) + GUI_BASE(this)->h)
+            {
+                this->touch_y = -this->gap * (time_array_size) + GUI_BASE(this)->h;
+            }
+        }
+
         if (this->render)
         {
             time_array_offset = -(this->touch_y / this->gap % time_array_size);
@@ -576,8 +589,10 @@ static void **get_image_pointers(const char *input, size_t *num_pointers,
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_scroll_wheel_new_render_text(gui_scroll_wheel_new_t *widget, const void *font_file_pointer,
-                                      int font_size)
+
+void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
+                                            const void *font_file_pointer,
+                                            int font_size, TEXT_MODE mode)
 {
     widget->render_mode = GUI_SCROLL_WHEEL_NEW_RENDER_TEXT;
     for (size_t i = 0; i < widget->count + 2; i++)
@@ -601,15 +616,18 @@ void gui_scroll_wheel_new_render_text(gui_scroll_wheel_new_t *widget, const void
                 gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
                 const void *addr1 = font_file_pointer;
                 gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
-                gui_text_mode_set(t, LEFT);
-                gui_text_convert_to_img(t, ARGB8888);
+                gui_text_mode_set(t, mode);
+                gui_text_convert_to_img(t, RGB565);
 
             }
         }
     }
 }
-
-
+void gui_scroll_wheel_new_render_text(gui_scroll_wheel_new_t *widget, const void *font_file_pointer,
+                                      int font_size)
+{
+    gui_scroll_wheel_new_render_text_alien(widget, font_file_pointer, font_size, LEFT);
+}
 void gui_scroll_wheel_new_render_image_array(gui_scroll_wheel_new_t *widget,
                                              const struct gui_text_image_map *map, int map_length)
 {

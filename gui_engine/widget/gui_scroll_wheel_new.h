@@ -72,6 +72,7 @@ typedef struct gui_scroll_wheel_new
     int16_t recode[5];
     const struct gui_text_image_map *text_image_map;
     bool wheel_take_over;
+    bool loop;
     char time_array_offset;
     int history_y;
     gui_color_t font_color;

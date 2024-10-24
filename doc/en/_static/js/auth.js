@@ -7,7 +7,10 @@ $.ajax({
         withCredentials: true // 发送请求时需携带cookie
     },
     error: function (err) {
-        // console.log("-----------", err);
+        let domain = window.location.hostname || "";
+        if (domain.toLowerCase() == 'docs.realmcu.com') {
+            window.location.href = `https://docs.realmcu.com/errorpage.html`;
+        }
     },
     success: function (resp) {
         var data = resp.Data;

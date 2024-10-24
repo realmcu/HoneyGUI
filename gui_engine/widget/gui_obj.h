@@ -120,6 +120,9 @@ typedef enum t_obj_type
     MACRO_ONOFF              = 0x0036,
     MACRO_ONLOAD,
     MACRO_CALENDAR,
+    MACRO_CIRCLE,
+    MACRO_SECTOR,
+    MACRO_ROUNDED_RECT,
 } T_OBJ_TYPE;
 typedef enum
 {

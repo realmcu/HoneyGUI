@@ -3,12 +3,12 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version
+  * @file gui_svg.h
+  * @brief svg widget
+  * @details svg widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2024/08/16
+  * @version 1.0
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>

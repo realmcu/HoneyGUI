@@ -341,13 +341,14 @@ bool gui_music_completion_status(void);
 /**
  * @brief Parses a CSS color string and converts it to a gui_color_t structure
  *
+ * @link https://www.w3schools.com/cssref/css_colors_legal.php
  * Supports the following formats:
  * - Hex (#RRGGBB or #RRGGBBAA)
  * - RGB (rgb(R, G, B))
  * - RGBA (rgba(R, G, B, A))
  * - HSL (hsl(H, S%, L%))
  * - HSLA (hsla(H, S%, L%, A))
- * - Named colors (e.g., "red", "blue")
+ * - Named colors (e.g., "red", "blue") https://www.w3schools.com/colors/colors_names.asp
  *
  * @param color_str CSS color string
  * @return gui_color_t structure with the parsed color, or a structure with all components set to 0 if invalid

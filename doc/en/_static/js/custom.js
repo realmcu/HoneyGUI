@@ -23,31 +23,37 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    function showHiddenElement(element) {
+    function showHiddenElement(element, curSafeHash) {
         const isHidden = getComputedStyle(element).display !== 'block';
+       
         if (isHidden) {
             // 修改目标元素的display属性
-            const parentDls = $(window.location.hash).parents('dl.unexpanded'); // jQuery
+            const parentDls = $(curSafeHash).parents('dl.unexpanded'); // jQuery
             parentDls.each(function(index, pitem) {
                 pitem.classList.remove('unexpanded');
                 pitem.classList.add('expanded');
             });
-        }     
+        }    
     }
 
     function adjustScroll() {
         const eleFixedNav = document.querySelector(".wy-nav-top");
         const fixedNavDisplay = window.getComputedStyle(eleFixedNav).display;
         const fixedNavHeight = fixedNavDisplay === "block" ? 65 : 0;
-        const hash = window.location.hash.substring(1);
-        const eleTarget = document.getElementById(hash);
-        if (eleTarget) {
-            showHiddenElement(eleTarget);
-            const offsetTop = eleTarget.getBoundingClientRect().top + window.pageYOffset - fixedNavHeight;
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'instant' /* Optional: for smooth scrolling */
-            });
+        const hash = window.location.hash;
+        if(hash) {
+            // 转义 . 字符
+            const safeHash = hash.replace(/\./g, '\\.');
+            // 使用 querySelector 选择带有特殊字符的元素
+            const eleTarget = document.querySelector(safeHash);
+            if (eleTarget) {
+                showHiddenElement(eleTarget, safeHash);
+                const offsetTop = eleTarget.getBoundingClientRect().top + window.pageYOffset - fixedNavHeight;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'instant'
+                });
+            }
         }
     }
 
