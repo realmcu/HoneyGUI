@@ -35,7 +35,7 @@ HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中�
 
 完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 `your HoneyGUI dir/win32_sim/` 下的 `menu_config.h` 文件为模拟器的配置文件，在 `HoneyGUI Demo Select` 下注释掉所有的 Demo，在 `HoneyGUI Enable LVGL` 下使能 `CONFIG_REALTEK_BUILD_LVGL_GUI`。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
 
-<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1727156557578163348/cb760047_9218678.png" alt="lv_menu_config.png"></div><br/>
+<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
 1. 当需要修改屏幕尺寸时，修改文件 `your HoneyGUI dir/gui_engine/example/demo/` 下的 `SConscript`

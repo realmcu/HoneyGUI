@@ -93,8 +93,11 @@ if platform.system() == 'Windows':
 # include app
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
-objs.extend(SConscript(os.path.join(ARM2D_ROOT, 'SConscript')))
-objs.extend(SConscript(os.path.join(LEGACY_UI, 'SConscript')))
+
+if os.path.exists(ARM2D_ROOT):
+    objs.extend(SConscript(os.path.join(ARM2D_ROOT, 'SConscript')))
+if os.path.exists(LEGACY_UI):
+    objs.extend(SConscript(os.path.join(LEGACY_UI, 'SConscript')))
 
 # bsp_vdir = 'build'
 

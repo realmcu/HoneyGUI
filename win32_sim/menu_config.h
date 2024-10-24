@@ -192,7 +192,7 @@
 // </c>
 
 // <c> HoneyGUI Enable LVGL RLOTTIE
-// #define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
+#define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
 // </c>
 
 #endif
