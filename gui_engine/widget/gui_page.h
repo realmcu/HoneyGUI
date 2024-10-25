@@ -193,6 +193,25 @@ gui_page_t *gui_page_create(void       *parent,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h);
+/**
+ * @brief create a page widget horizontal.
+ *
+ * @param parent the father widget the page nested in.
+ * @param filename the page widget name.
+ * @param x the X-axis coordinate.
+ * @param x the Y-axis coordinate.
+ * @param w the width.
+ * @param h the hight.
+ * @return return the widget object pointer
+ *
+ * \endcode
+ */
+gui_page_t *gui_page_create_horizontal(void       *parent,
+                                       const char *name,
+                                       int16_t     x,
+                                       int16_t     y,
+                                       int16_t     w,
+                                       int16_t     h);
 
 /**
  * @brief
@@ -241,7 +260,13 @@ void gui_page_set_animate(gui_page_t *,
  * @param rebound true: config rebound; false: not rebound;
  */
 void gui_page_rebound(gui_page_t *, bool rebound);
-
+/**
+ * @brief config rebound
+ *
+ * @param this widget object pointer
+ * @param rebound true: config rebound; false: not rebound;
+ */
+void gui_page_rebound_horizontal(gui_page_t *, bool rebound);
 /**
  * @brief automatic center alignment
  *

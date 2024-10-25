@@ -120,6 +120,46 @@ static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
     }
 }
 
+static void gui_page_set_width(gui_obj_t *object, gui_obj_t *page)
+{
+    if ((page->matrix != NULL))
+    {
+        if (page->matrix->m[0][0] != 1 || page->matrix->m[1][1] != 1)
+        {
+            page->w = INT16_MAX;
+            return;
+        }
+    }
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+
+        if (!obj->not_show)
+        {
+            if ((obj->matrix != NULL) && (obj->parent->matrix))
+            {
+                memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+                matrix_translate(obj->x, obj->y, obj->matrix);
+            }
+            if (obj->matrix == NULL || page->matrix == NULL)
+            {
+                gui_log("Error: obj->matrix is NULL\n");
+                return;
+            }
+            int ay = obj->matrix->m[0][2];
+            int buttom = ay + obj->w - page->matrix->m[0][2];
+
+
+
+            if (page->w < buttom)
+            {
+                page->w = buttom;
+            }
+        }
+        gui_page_set_height(obj, page);
+    }
+}
 void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode)
 {
     if (src_mode == IMG_SRC_MEMADDR)
@@ -269,6 +309,104 @@ static void gui_page_update_speed(gui_obj_t *obj)
     }
 }
 
+static void gui_page_update_speed_x(gui_obj_t *obj)
+{
+    gui_page_t *this = (gui_page_t *)obj;
+    touch_info_t *tp = tp_get_info();
+    int recode_num = 4;
+
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        this->recode[i] = this->recode[i + 1];
+    }
+
+    this->recode[recode_num] = tp->deltaX;
+    this->speed = this->recode[recode_num] - this->recode[0];
+    int max_speed = GUI_PAGE_MAX_SPEED;
+    int min_speed = GUI_PAGE_MIN_SPEED;
+
+    if (this->speed > max_speed)
+    {
+        this->speed = max_speed;
+    }
+    else if (this->speed < -max_speed)
+    {
+        this->speed = -max_speed;
+    }
+
+    if ((this->speed > 0) && (this->speed < min_speed))
+    {
+        this->speed = min_speed;
+    }
+    else if ((this->speed < 0) && (this->speed > -min_speed))
+    {
+        this->speed = -min_speed;
+    }
+
+    this->target = (this->speed * this->speed + _UI_ABS(this->speed)) / 2;
+
+    int top_height = -obj->x;
+    int buttom_height = obj->w + obj->x - (int)gui_get_screen_width();
+    gui_log("1111this->target:%d\n", this->target);
+    if (this->speed > 0)
+    {
+        if (this->target > top_height)
+        {
+            this->target = top_height;
+        }
+        this->target = obj->x + this->target;
+    }
+    else if (this->speed < 0)
+    {
+        if (this->target > buttom_height)
+        {
+            this->target = buttom_height;
+        }
+        this->target = obj->x - this->target;
+    }
+    else
+    {
+        this->target = obj->x;
+    }
+    gui_log("2222this->target:%d\n", this->target);
+    if (this->align_hight > 0)
+    {
+        int alien = _UI_ABS(this->target) % this->align_hight;
+        if (alien > this->align_hight / 2)
+        {
+            this->target = this->target - this->align_hight + alien;
+
+            if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
+            {
+                if (this->target > obj->x)
+                {
+                    this->speed = min_speed;
+                }
+                else
+                {
+                    this->speed = -min_speed;
+                }
+            }
+        }
+        else
+        {
+            this->target = this->target + alien;
+            if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
+            {
+                /* code */
+                if (this->target > obj->x)
+                {
+                    this->speed = min_speed;
+                }
+                else
+                {
+                    this->speed = -min_speed;
+                }
+            }
+        }
+    }
+    gui_log("3333this->target:%d\n", this->target);
+}
 static void gui_page_hold_y(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
@@ -292,6 +430,28 @@ static void gui_page_hold_y(gui_obj_t *obj)
     gui_page_update_speed(obj);
 }
 
+static void gui_page_hold_x(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_page_t *this = (gui_page_t *)obj;
+
+    obj->x = tp->deltaX + this->yold;
+    gui_obj_event_set(obj, GUI_EVENT_8);
+
+    if (obj->x > this->start_x)/*@TOP*/
+    {
+        obj->x = this->start_x;
+        gui_obj_event_set(obj, GUI_EVENT_7);
+    }
+    else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width()))
+             && obj->x != 0)/*@BOTTOM*/
+    {
+        gui_obj_event_set(obj, GUI_EVENT_7);
+        obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
+    }
+
+    gui_page_update_speed_x(obj);
+}
 static void gui_page_update_inertial(gui_obj_t *obj)
 {
     gui_page_t *this = (gui_page_t *)obj;
@@ -315,6 +475,28 @@ static void gui_page_update_inertial(gui_obj_t *obj)
     }
 }
 
+static void gui_page_update_inertial_x(gui_obj_t *obj)
+{
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (this->speed == 0)
+    {
+        this->release = false;
+    }
+
+    if (this->speed > 3)
+    {
+        obj->x += this->speed;
+        gui_obj_event_set(obj, GUI_EVENT_8);
+        this->speed -= 1;
+    }
+    else if (this->speed < -3)
+    {
+        obj->x += this->speed;
+        gui_obj_event_set(obj, GUI_EVENT_8);
+        this->speed += 1;
+    } gui_log("this->speed:%d\n", this->speed);
+}
 static void gui_page_update_boundary(gui_obj_t *obj)
 {
     gui_page_t *this = (gui_page_t *)obj;
@@ -333,7 +515,24 @@ static void gui_page_update_boundary(gui_obj_t *obj)
         gui_obj_event_set(obj, GUI_EVENT_7);
     }
 }
+static void  gui_page_update_boundary_x(gui_obj_t *obj)
+{
+    gui_page_t *this = (gui_page_t *)obj;
 
+    if (obj->x > this->start_x)/*@TOP*/
+    {
+        obj->x = this->start_x;
+        gui_obj_event_set(obj, GUI_EVENT_7);
+        this->release = false;
+    }
+    else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width()))
+             && obj->x != 0)/*@BOTTOM*/
+    {
+        this->release = false;
+        obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
+        gui_obj_event_set(obj, GUI_EVENT_7);
+    }
+}
 
 static void gui_page_update_alien(gui_obj_t *obj)
 {
@@ -367,7 +566,38 @@ static void gui_page_update_alien(gui_obj_t *obj)
         }
     }
 }
+static void gui_page_update_alien_x(gui_obj_t *obj)
+{
+    gui_page_t *this = (gui_page_t *)obj;
 
+    if ((this->speed <= 3) && (this->speed >= -3))
+    {
+        if (this->align_hight > 0)
+        {
+            if (((this->speed > 0) && (obj->x >= this->target))
+                || ((this->speed < 0) && (obj->x <= this->target)))
+            {
+                this->speed = 0;
+                this->release = false;
+                obj->x = this->target;
+                gui_obj_event_set(obj, GUI_EVENT_7);
+            }
+
+            obj->x += this->speed;
+
+            if (this->speed != 0)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_8);
+            }
+        }
+        else
+        {
+            this->speed = 0;
+            this->release = false;
+            gui_obj_event_set(obj, GUI_EVENT_7);
+        }
+    } gui_log("this->target:%d, obj->x :%d\n", this->target, obj->x);
+}
 void gui_page_input_prepare(gui_obj_t *obj)
 {
     if (obj->gesture)
@@ -505,6 +735,115 @@ void gui_page_update(gui_obj_t *obj)
         }
         gui_page_update_boundary(obj);
         this->yold = obj->y;
+    }
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_page_t));
+    if (last != this->checksum)
+    {
+        gui_fb_change();
+    }
+}
+
+void gui_page_update_x(gui_obj_t *obj)
+{
+    gui_page_update_att(obj);
+    obj->w = gui_get_screen_width();
+    gui_page_set_width(obj, obj);
+
+    touch_info_t *tp = tp_get_info();
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (this->gesture_flag)
+    {
+        return;
+    }
+
+    if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
+    {
+        return;
+    }
+
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    {
+        if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
+        {
+            if ((tp->y > this->start_y) && (tp->y < this->start_y + obj->h))
+            {
+                if ((tp->type == TOUCH_HOLD_X))
+                {
+                    gui_page_hold_x(obj);
+                }
+                else if (tp->released)
+                {
+                    int max_speed = GUI_PAGE_MAX_SPEED;
+
+                    if (tp->type == TOUCH_LEFT_SLIDE)
+                    {
+                        gui_log("page TOUCH_UP_SLIDE\n");
+
+                        if (this->speed == 0)
+                        {
+                            this->speed = -max_speed;
+                        }
+                    }
+                    else if (tp->type == TOUCH_RIGHT_SLIDE)
+                    {
+                        gui_log("page TOUCH_DOWN_SLIDE\n");
+
+                        if (this->speed == 0)
+                        {
+                            this->speed = max_speed;
+                        }
+                    }
+
+                    if (this->speed != 0)
+                    {
+                        this->release = true;
+                        gui_obj_event_set(obj, GUI_EVENT_8);
+                    }
+                    else
+
+                        if (this->align_hight > 0 && obj->x % this->align_hight != 0)
+                        {
+                            this->release = true;
+                            if (_UI_ABS(obj->x % this->align_hight) < this->align_hight / 2)
+                            {
+                                this->target = obj->x - (obj->x % this->align_hight);
+                                this->speed = GUI_PAGE_MIN_SPEED;
+                            }
+                            else
+                            {
+                                this->target = obj->x - this->align_hight + _UI_ABS(obj->x % this->align_hight);
+                                this->speed = -GUI_PAGE_MIN_SPEED;
+                            }
+                        }
+
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+
+                }
+                else if (tp->pressed)
+                {
+                    this->release = false;
+                    this->speed = 0;
+                    memset(this->recode, 0, 10);
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+
+
+            }
+        }
+
+    }
+    if (tp->type != TOUCH_HOLD_X)
+    {
+        if (this->release)
+        {
+            gui_page_update_inertial_x(obj);
+            gui_page_update_alien_x(obj);
+        }
+        gui_page_update_boundary_x(obj);
+        this->yold = obj->x;
     }
     uint8_t last = this->checksum;
     this->checksum = 0;
@@ -770,7 +1109,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
 
                 if (obj->y < this->start_y)/*@TOP*/
                 {
-                    obj->y = this->start_y;
+                    obj->x = this->start_x;
                     this->release = false;
                     gui_obj_event_set(obj, GUI_EVENT_7);
                 }
@@ -813,6 +1152,205 @@ void gui_page_update_rebound(gui_obj_t *obj)
             break;
         }
         this->yold = obj->y;
+    }
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_page_t));
+    if (last != this->checksum)
+    {
+        gui_fb_change();
+    }
+}
+void gui_page_update_rebound_x(gui_obj_t *obj)
+{
+    gui_page_update_att(obj);
+
+    obj->w = gui_get_screen_width();
+    gui_page_set_width(obj, obj);
+
+    touch_info_t *tp = tp_get_info();
+    touch_info_t *wheel = wheel_get_info();
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (obj->parent->matrix && obj->parent->matrix->m[0][2] != 0)
+    {
+        return;
+    }
+
+    if (tp->pressed && gui_obj_point_in_obj_rect(obj, tp->x, tp->y))
+    {
+        this->press = true;
+    }
+    if ((tp->y > this->start_y) && (tp->y < this->start_y + obj->h))
+    {
+        if ((tp->type == TOUCH_HOLD_X) && (this->press == true))
+        {
+            if (tp->deltaX + tp->x < 0)
+            {
+                tp->deltaX = -tp->x;
+            }
+
+            obj->x = tp->deltaX + this->yold;
+            gui_obj_event_set(obj, GUI_EVENT_8);
+
+            if (obj->x > this->start_x)
+            {
+                this->status = 1;
+            }
+            else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
+                     obj->x != 0)
+            {
+                this->status = 2;
+            }
+
+            gui_page_update_speed_x(obj);
+
+            if (this->status == 1)
+            {
+                this->speed = -40;
+            }
+            else if (this->status == 2)
+            {
+                this->speed = 40;
+            }
+        }
+        else if (tp->released)
+        {
+            int max_speed = GUI_PAGE_MAX_SPEED;
+            this->press = 0;
+
+            if (tp->type == TOUCH_LEFT_SLIDE)
+            {
+                gui_log("page TOUCH_UP_SLIDE\n");
+                if (this->speed == 0)
+                {
+                    this->speed = -max_speed;
+                }
+            }
+
+            else if (tp->type == TOUCH_RIGHT_SLIDE)
+            {
+                gui_log("page TOUCH_DOWN_SLIDE\n");
+                if (this->speed == 0)
+                {
+                    this->speed = max_speed;
+                }
+            }
+
+            if (this->speed != 0)
+            {
+                this->release = true;
+                gui_obj_event_set(obj, GUI_EVENT_8);
+            }
+            else
+            {
+                if (this->align_hight > 0 && obj->x % this->align_hight != 0)
+                {
+                    this->release = true;
+                    if (_UI_ABS(obj->x % this->align_hight) < this->align_hight / 2)
+                    {
+                        this->target = obj->x - (obj->x % this->align_hight);
+                        this->speed = GUI_PAGE_MIN_SPEED;
+                    }
+                    else
+                    {
+                        this->target = obj->x - this->align_hight + _UI_ABS(obj->x % this->align_hight);
+                        this->speed = -GUI_PAGE_MIN_SPEED;
+                    }
+                }
+                gui_obj_event_set(obj, GUI_EVENT_7);
+            }
+        }
+        else if (tp->pressed)
+        {
+            this->release = false;
+            this->speed = 0;
+            this->status = 0;
+            memset(this->recode, 0, 10);
+            gui_obj_event_set(obj, GUI_EVENT_7);
+        }
+    }
+    if (tp->type != TOUCH_HOLD_X)
+    {
+        switch (this->status)
+        {
+        case PAGE_REBOUND_NOT:
+            {
+                if (this->release)
+                {
+                    gui_page_update_inertial_x(obj);
+                    gui_page_update_alien_x(obj);
+                }
+
+                if (obj->x > this->start_x)/*@TOP*/
+                {
+                    obj->x = this->start_x;
+                    this->release = false;
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+                else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
+                         obj->x != 0)/*@BOTTOM*/
+                {
+                    this->release = false;
+                    obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+            }
+            break;
+
+        case PAGE_REBOUND_UP:
+            {
+                if (this->release)
+                {
+                    gui_page_update_inertial_x(obj);
+                    gui_page_update_alien_x(obj);
+                }
+
+                if (obj->x < this->start_x)/*@TOP*/
+                {
+                    obj->x = this->start_x;
+                    this->release = false;
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+                else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
+                         obj->x != 0)/*@BOTTOM*/
+                {
+                    this->release = false;
+                    obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+            }
+            break;
+
+        case PAGE_REBOUND_DOWN:
+            {
+                if (this->release)
+                {
+                    gui_page_update_inertial_x(obj);
+                    gui_page_update_alien_x(obj);
+                }
+
+                if (obj->x > this->start_x)/*@TOP*/
+                {
+                    obj->x = this->start_x;
+                    this->release = false;
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+                else if (obj->x > (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
+                         obj->x != 0)/*@BOTTOM*/
+                {
+                    this->release = false;
+                    obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
+        this->yold = obj->x;
     }
     uint8_t last = this->checksum;
     this->checksum = 0;
@@ -1153,6 +1691,29 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
+static void gui_page_cb_x(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_page_update_x(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_page_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
 static void gui_page_loop_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
@@ -1200,7 +1761,30 @@ static void gui_page_rebound_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
+static void gui_page_rebound_cb_x(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
 
+        case OBJ_PREPARE:
+
+            gui_page_update_rebound_x(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_page_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
 void gui_page_ctor(gui_page_t *this,
                    gui_obj_t  *parent,
                    const char *name,
@@ -1230,7 +1814,17 @@ gui_page_t *gui_page_create(void       *parent,
 #define _GUI_NEW_gui_page_create_param this, parent, name, x, y, w, h
     GUI_NEW(gui_page_t, gui_page_ctor, _GUI_NEW_gui_page_create_param)
 }
-
+gui_page_t *gui_page_create_horizontal(void       *parent,
+                                       const char *name,
+                                       int16_t     x,
+                                       int16_t     y,
+                                       int16_t     w,
+                                       int16_t     h)
+{
+    gui_page_t *page = gui_page_create(parent, name, x, y, w, h);
+    GUI_BASE(page)->obj_cb = gui_page_cb_x;
+    return page;
+}
 void gui_page_rebound(gui_page_t *this, bool rebound)
 {
     if (rebound)
@@ -1243,6 +1837,23 @@ void gui_page_rebound(gui_page_t *this, bool rebound)
     else
     {
         GET_BASE(this)->obj_cb = gui_page_cb;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
+    }
+}
+void gui_page_rebound_horizontal(gui_page_t *this, bool rebound)
+{
+    if (rebound)
+    {
+        GET_BASE(this)->obj_cb = gui_page_rebound_cb_x;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
+    }
+    else
+    {
+        GET_BASE(this)->obj_cb = gui_page_cb_x;
         GET_BASE(this)->has_input_prepare_cb = true;
         GET_BASE(this)->has_prepare_cb = true;
         GET_BASE(this)->has_destroy_cb = true;
