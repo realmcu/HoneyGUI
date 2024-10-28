@@ -223,6 +223,7 @@ static gui_turn_table_coordinate_t gui_turn_table_get_image_coordinate(gui_turn_
     {
     case TT_RESTING:
         input2 = input1;
+        break;
     case TT_ANTICLOCKWISE:
     case TT_CLOCKWISE:
         if (ratio <= 0)
