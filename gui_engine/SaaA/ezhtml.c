@@ -93,6 +93,7 @@ static struct widget_create widget[] =
     {"onLoad", MACRO_ONLOAD},
     {"roller", TYPE_SCROLL_WHEEL_NEW},
     {"calendar", MACRO_CALENDAR},
+    {"onTime", MACRO_ONTIME},
 };
 
 typedef struct
@@ -124,6 +125,8 @@ typedef struct
 static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
+static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate);
+static void text_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate);
 static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
@@ -760,6 +763,15 @@ static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_p
 
 
 }
+
+
+static void on_click_jump_to_app_cb(void *obj, gui_event_t e, gui_app_t *handle)
+{
+    if (handle)
+    {
+        gui_switch_app(gui_current_app(), handle);
+    }
+}
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
@@ -874,7 +886,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     if (text && font)
                     {
                         gui_text_t *t = 0;
-                        if (style == 0)
+                        if (style == 0 || style == CENTER || style == RIGHT || style == LEFT)
                         {
                             t = gui_text_create(parent, ptxt, x, y, w, h);
                             gui_color_t color_temporary;
@@ -899,7 +911,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     t->path = 0;
                                     t->font_type = GUI_FONT_SRC_BMP;
                                     gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-                                    gui_text_mode_set(t, LEFT);
+                                    gui_text_mode_set(t, style);
                                     // t->font_height = fontSize;
                                     //t->path = 0;
                                 }
@@ -2036,6 +2048,17 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
                     parent = (void *)gui_curtain_create(parent, ptxt, x, y, w, h, orientation, scope);
+                    if (orientation == CURTAIN_UP)
+                    {
+                        parent = (void *)gui_win_create(parent, 0,  0, (1 - scope) * gui_get_screen_height(), w, h * scope);
+                    }
+
+                    else if (orientation == CURTAIN_LEFT)
+                    {
+                        parent = (void *)gui_win_create(parent, 0, (1 - scope) * gui_get_screen_width(), 0, w * scope, h);
+                    }
+
+
                 }
                 break;
             case ICON:
@@ -2193,10 +2216,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_button_text_move((void *)parent, text_x, text_y);
                     gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
                     gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
+                    if (text && GUI_TYPE(gui_button_t, parent)->text)
+                    {
+                        gui_color_t color_temporary;
+                        color_temporary = font_color;
+                        GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
+                    }
 
-                    gui_color_t color_temporary;
-                    color_temporary = font_color;
-                    GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
+
                     if (style)
                     {
                         if (style == BUTTON_HIGHLIGHT_ARRAY)
@@ -2262,7 +2289,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
 
                     }
-
+                    if (text && GUI_TYPE(gui_button_t, parent)->text)
                     {
                         FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
                         if (strstr(font_type, ".bin") != NULL)
@@ -3052,6 +3079,18 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
                                     }
                                 }
+                                else if (!strcmp(to, "app"))
+                                {
+                                    if (parent->type == BUTTON)
+                                    {
+                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                                                       gui_app_get_by_name(id));
+                                    }
+                                    else if (parent->type == WINDOW)
+                                    {
+                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, 0);
+                                    }
+                                }
 
                                 gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
@@ -3794,7 +3833,77 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                 }
                 break;
+            case MACRO_ONTIME:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    char *id = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = (p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    switch (parent->type)
+                    {
+                    case IMAGE_FROM_MEM:
+                        {
+                            if (type)
+                            {
+                                if (!strcmp(type, "hour"))
+                                {
+#define HOUR_ANIMATION 1
+#define MINUTE_ANIMATION 2
+#define SECOND_ANIMATION 3
+                                    gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                           (void *)HOUR_ANIMATION, "hour");
+                                }
+                                else if (!strcmp(type, "minute"))
+                                {
+                                    gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                           (void *)MINUTE_ANIMATION, "minute");
+                                }
+                                else if (!strcmp(type, "second"))
+                                {
+                                    gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                           (void *)SECOND_ANIMATION, "second");
+                                }
+                            }
+                        }
+                        break;
+                    case TEXTBOX:
+                        {
+                            if (type)
+                            {
+                                gui_text_set_animate(parent, 1000, -1, text_animate_watchface_callback, gui_strdup(type));
+                            }
 
+
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+
+
+
+                }
+                break;
 
 
             /*default*/
@@ -3806,6 +3915,158 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
     return parent;
 
 
+}
+// Define various formats
+#define MON_FORMAT     0         // "MON"
+#define Mon_FORMAT     1         // "Mon"
+#define Mo_FORMAT      2         // "Mo"
+#define FULL_DATE      3         // "Mon, January 1"
+#define SHORT_DATE     4         // "Mon 1"
+#define TIME_24HR      5         // "00:00"
+#define PARTIAL_DATE   6         // "Mon, Jan 1"
+#define NUM_DATE       7         // "1/JANUARY"
+#define FULL_DAY       8         // "MONDAY"
+#define DEFAULT_FORMAT 100       // Default
+
+static int is_format(const char *src)
+{
+    if (!src) { return DEFAULT_FORMAT; }
+    if (strcmp(src, "MON") == 0) { return MON_FORMAT; }
+    if (strcmp(src, "Mon") == 0) { return Mon_FORMAT; }
+    if (strcmp(src, "Mo") == 0) { return Mo_FORMAT; }
+    if (strcmp(src, "Mon, January 1") == 0) { return FULL_DATE; }
+    if (strcmp(src, "Mon 1") == 0) { return SHORT_DATE; }
+    if (strcmp(src, "00:00") == 0) { return TIME_24HR; }
+    if (strcmp(src, "Mon, Jan 1") == 0) { return PARTIAL_DATE; }
+    if (strcmp(src, "1/JANUARY") == 0) { return NUM_DATE; }
+    if (strcmp(src, "MONDAY") == 0) { return FULL_DAY; }
+    return DEFAULT_FORMAT;
+}
+
+static void text_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
+{
+    const char *input_type = p;
+    gui_text_t *date_txt = this_widget;
+    if (date_txt)
+    {
+        size_t buffer_size = 100;
+        char *buffer = date_txt->content;
+        gui_free(buffer);
+        buffer = (char *)gui_malloc(buffer_size);
+        if (!buffer)
+        {
+            return;
+        }
+
+        int type = is_format(input_type);
+        time_t rawtime;
+        struct tm *timeinfo;
+
+#if _WIN32
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        // Choose the formatting string based on the type
+        switch (type)
+        {
+        case MON_FORMAT:
+            strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
+            for (char *p = buffer; *p; ++p) { *p = toupper(*p); } // Convert to uppercase (MON)
+            break;
+        case Mon_FORMAT:
+            strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
+            break;
+        case Mo_FORMAT:
+            strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
+            buffer[2] = '\0'; // Only display the first two letters (Mo)
+            break;
+        case FULL_DATE:
+            strftime(buffer, buffer_size, "%a, %B %d", timeinfo); // Display full date (Mon, January 1)
+            break;
+        case SHORT_DATE:
+            strftime(buffer, buffer_size, "%a %d", timeinfo); // Display short date (Mon 1)
+            break;
+        case TIME_24HR:
+            strftime(buffer, buffer_size, "%H:%M", timeinfo); // Display 24-hour format time (00:00)
+            break;
+        case PARTIAL_DATE:
+            strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Display partial date (Mon, Jan 1)
+            break;
+        case NUM_DATE:
+            strftime(buffer, buffer_size, "%d/%B", timeinfo); // Display numeric date (1/JANUARY)
+            // Convert the month part to uppercase
+            for (char *p = strchr(buffer, '/') + 1; *p; ++p) { *p = toupper(*p); }
+            break;
+        case FULL_DAY:
+            strftime(buffer, buffer_size, "%A", timeinfo); // Display full week name (Monday)
+            for (char *p = buffer; *p; ++p) { *p = toupper(*p); } // Convert to uppercase (MONDAY)
+            break;
+        default:
+            strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Default: (Mon, Jan 1)
+            break;
+        }
+#endif
+
+        date_txt->content = buffer;
+        gui_text_content_set(date_txt, buffer, strlen(buffer));
+    }
+}
+static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
+{
+#ifndef _WIN32
+    //uint16_t seconds = get_system_clock_second();
+    //uint16_t minute = RtkWristbandSys.Global_Time.minutes;
+    //uint16_t hour = RtkWristbandSys.Global_Time.hour;
+    //int millisecond = 0;
+    uint16_t seconds = 0;
+    uint16_t minute = 0;
+    uint16_t hour = 0;
+    int millisecond = 0;
+#else
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    uint16_t seconds = timeinfo->tm_sec;
+    uint16_t minute = timeinfo->tm_min;
+    uint16_t hour = timeinfo->tm_hour;
+    int millisecond = 0;
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    millisecond = spec.tv_nsec / 1000000;
+#endif
+    const float angle_per_second = 360.0f / 60.0f;
+    gui_img_t *hand = this_widget;
+    switch ((size_t)p)
+    {
+    case HOUR_ANIMATION:
+        {
+            float angle_hour = (hour % 12) * M_PI / 6 + minute * M_PI / 360;
+            gui_img_translate(hand, hand->base.w / 2, gui_get_screen_height() / 2 - hand->base.y);
+            gui_img_rotation(hand, angle_hour * 180 / M_PI,  hand->base.w / 2,
+                             gui_get_screen_height() / 2 - hand->base.y);
+        }
+        break;
+    case MINUTE_ANIMATION:
+        {
+            float angle_min  = minute * M_PI / 30 + seconds * M_PI / 1800;
+            gui_img_translate(hand, hand->base.w / 2, gui_get_screen_height() / 2 - hand->base.y);
+            gui_img_rotation(hand, angle_min * 180 / M_PI, hand->base.w / 2,
+                             gui_get_screen_height() / 2 - hand->base.y);
+        }
+        break;
+    case SECOND_ANIMATION:
+        {
+            float angle_sec = (seconds + millisecond / 1000.0f) * angle_per_second;
+            gui_img_translate(hand, hand->base.w / 2, gui_get_screen_height() / 2 - hand->base.y);
+            gui_img_rotation(hand, angle_sec,  hand->base.w / 2,
+                             gui_get_screen_height() / 2 - hand->base.y);
+        }
+        break;
+    default:
+        break;
+    }
 }
 gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniamte_name)
 {

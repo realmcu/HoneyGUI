@@ -123,6 +123,7 @@ typedef enum t_obj_type
     MACRO_CIRCLE,
     MACRO_SECTOR,
     MACRO_ROUNDED_RECT,
+    MACRO_ONTIME,
 } T_OBJ_TYPE;
 typedef enum
 {

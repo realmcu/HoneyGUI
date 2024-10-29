@@ -449,6 +449,12 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   VOLUME2_BIN                             (void *)(resource_root + 0x0117ffb8)
 #define   VOLUMEBACK_BIN                          (void *)(resource_root + 0x011805f8)
 #define   VOLUMEBACK2_BIN                         (void *)(resource_root + 0x01182e38)
+#define   ELLIPSE5_BIN                            (void *)(resource_root + 0x011834f8)
+#define   SLICE1_BIN                              (void *)(resource_root + 0x011835b8)
+#define   UNION_BIN                               (void *)(resource_root + 0x011befb8)
+#define   UNION2_BIN                              (void *)(resource_root + 0x011bfa78)
+#define   VECTOR7_BIN                             (void *)(resource_root + 0x011c0078)
+#define   WATCHFACE1_XML                          (void *)(resource_root + 0x011c0578)
 
 #else
 #define   A1_BIN                                  (void *)(0x04400b38)
@@ -899,5 +905,11 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   VOLUME2_BIN                             (void *)(0x0557ffb8)
 #define   VOLUMEBACK_BIN                          (void *)(0x055805f8)
 #define   VOLUMEBACK2_BIN                         (void *)(0x05582e38)
+#define   ELLIPSE5_BIN                            (void *)(0x055834f8)
+#define   SLICE1_BIN                              (void *)(0x055835b8)
+#define   UNION_BIN                               (void *)(0x055befb8)
+#define   UNION2_BIN                              (void *)(0x055bfa78)
+#define   VECTOR7_BIN                             (void *)(0x055c0078)
+#define   WATCHFACE1_XML                          (void *)(0x055c0578)
 
 #endif

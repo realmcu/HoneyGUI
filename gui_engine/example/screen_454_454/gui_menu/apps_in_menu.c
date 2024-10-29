@@ -16,10 +16,7 @@
 #include<time.h>
 #include "gui_calendar.h"
 //Please search app name macro for entry
-#define APP_CLOCK
-#define APP_WATCH_FACE
 #define APP_CALCULATOR
-#define APP_SPORT
 #define APP_MAP
 #define APP_CARDVIEW
 #define APP_BOX2D
@@ -2867,4 +2864,25 @@ GUI_APP_ENTRY(APP_CALENDAR)
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     gui_fps_create(GUI_APP_ROOT_SCREEN);
+}
+void apps_append_name()
+{
+    gui_app_append(GUI_APP_HANDLE(APP_CALCULATOR));
+    gui_app_append(GUI_APP_HANDLE(APP_MAP));
+    gui_app_append(GUI_APP_HANDLE(APP_CARDVIEW));
+    gui_app_append(GUI_APP_HANDLE(APP_BOX2D));
+    gui_app_append(GUI_APP_HANDLE(APP_COMPASS));
+    gui_app_append(GUI_APP_HANDLE(APP_SETTING));
+    gui_app_append(GUI_APP_HANDLE(APP_VOLUME));
+    gui_app_append(GUI_APP_HANDLE(APP_CYCLE_TRACKING));
+    gui_app_append(GUI_APP_HANDLE(APP_MUSIC));
+    gui_app_append(GUI_APP_HANDLE(APP_WEB));
+    gui_app_append(GUI_APP_HANDLE(APP_BLOCK));
+    gui_app_append(GUI_APP_HANDLE(APP_FRUIT_NINJA));
+    gui_app_append(GUI_APP_HANDLE(APP_HEART_RATE));
+    gui_app_append(GUI_APP_HANDLE(APP_SOCCER));
+    gui_app_append(GUI_APP_HANDLE(APP_BOX2D_RING));
+    gui_app_append(GUI_APP_HANDLE(APP_CALENDAR));
+    gui_app_append(GUI_APP_HANDLE(APP_STOPWATCH));
+    gui_app_append(GUI_APP_HANDLE(APP_MENU));
 }
