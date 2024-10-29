@@ -9,7 +9,6 @@
 #include "gui_card.h"
 #include "gui_tab.h"
 #include "gui_app.h"
-#include "root_image_hongkong/cjson_data.txt"
 
 // gui_win_t *win_watch;
 // gui_img_t *img;
@@ -187,6 +186,7 @@ struct tm *timeinfo;
 
 static gui_img_t *watchface_1, *watchface_2;
 static gui_tabview_t *tablist_tab;
+bool return_to_watchface_flag; //true: return to watchface; flases: return to app_menu
 
 static uint8_t canvas_update_flag = 0;
 static gui_canvas_t *canvas_temperature; //gui_canvas_img_t
@@ -1070,7 +1070,15 @@ static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
 extern void *get_app_hongkong(void);
 static void win_hb_exit(void)
 {
-    gui_switch_app(gui_current_app(), get_app_hongkong());
+    if (return_to_watchface_flag)
+    {
+        gui_switch_app(gui_current_app(), get_app_hongkong());
+    }
+    else
+    {
+        extern void *get_app_menu();
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
 }
 
 static bool canvas_hb_update(gui_canvas_img_t *canvas) //hb temperature activity
@@ -1109,32 +1117,29 @@ static bool canvas_activity_update(gui_canvas_img_t *canvas) //hb temperature ac
 /*Define gui_app_return_array*/
 const uint32_t *gui_app_return_array[] =
 {
-    UI_RETURN_0_BIN,
-    UI_RETURN_0_BIN,
-    UI_RETURN_0_BIN,
-    UI_RETURN_0_BIN,
-    UI_RETURN_0_BIN,
-    UI_RETURN_0_BIN,
-    UI_RETURN_0_BIN,
+    PATH04_BIN,
+    PATH05_BIN,
+    PATH07_BIN,
+    PATH08_BIN,
+    PATH09_BIN,
+    PATH11_BIN,
+    PATH12_BIN,
+    PATH14_BIN,
+    PATH15_BIN,
+    PATH16_BIN,
+    PATH18_BIN,
+    PATH19_BIN,
+    PATH20_BIN,
+    PATH22_BIN,
+    PATH23_BIN,
+    PATH24_BIN,
+    PATH25_BIN,
 };
-
-// const uint32_t *gui_app_return_array[] =
-// {
-//     PATH04_BIN,
-//     PATH04_BIN,
-//     PATH04_BIN,
-//     PATH04_BIN,
-//     PATH04_BIN,
-//     PATH04_BIN,
-//     PATH04_BIN,
-// };
 
 #include "gui_return.h"
 static void heart_rate_app(gui_app_t *app)
 {
     gui_log("current app:%s\n", gui_current_app()->screen.name);
-    gui_return_create(&app->screen, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_hb_exit, NULL);
     win_hb = gui_win_create(&app->screen, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
     gui_canvas_t *canvas_bg = gui_canvas_create(win_hb, "hb_background", 0, 0, 0, SCREEN_WIDTH,
@@ -1246,12 +1251,19 @@ static void heart_rate_app(gui_app_t *app)
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_48_bin_addr, FONT_SRC_MEMADDR);
     }
-
+    gui_return_create(&app->screen, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_hb_exit, NULL);
 }
 
-static void switch_heart_rate(void)
+void switch_heart_rate()
 {
     gui_switch_app(gui_current_app(), &_app_APP_HEART_RATE);
+}
+
+static void switch_app_menu()
+{
+    extern void *get_app_menu();
+    gui_switch_app(gui_current_app(), get_app_menu());
 }
 
 static void callback_time()
@@ -1325,15 +1337,12 @@ static void callback_touch_long(void *obj, gui_event_t e)
     gui_img_t *tablist_img_0 = gui_img_create_from_mem(tb_watchface_0, "img", UI_CLOCK_FACE_MAIN_BIN, 0,
                                                        0, 0, 0);
     gui_img_scale(tablist_img_0, 0.6, 0.6);
-    gui_img_set_mode(tablist_img_0, IMG_SRC_OVER_MODE);
     gui_img_t *tablist_img_1 = gui_img_create_from_mem(tb_watchface_1, "img", UI_CLOCK_FACE_SNOOBY_BIN,
                                                        0, 0, 0, 0);
     gui_img_scale(tablist_img_1, 0.6, 0.6);
-    gui_img_set_mode(tablist_img_1, IMG_SRC_OVER_MODE);
-    gui_img_t *tablist_img_2 = gui_img_create_from_mem(tb_watchface_2, "img", UI_CLOCK_FACE_SNOOBY_BIN,
+    gui_img_t *tablist_img_2 = gui_img_create_from_mem(tb_watchface_2, "img", UI_CLOCK_FACE_PERSON_BIN,
                                                        0, 0, 0, 0);
     gui_img_scale(tablist_img_2, 0.6, 0.6);
-    gui_img_set_mode(tablist_img_2, IMG_SRC_OVER_MODE);
 }
 /* callback_touch_long end*/
 
@@ -1346,11 +1355,11 @@ void page_ct_clock(void *parent)
         perror("fopen");
     }
 #else
-    extern char cjson_data[];
-    cjson_content = cjson_data;
+    cjson_content = gui_malloc(600);
+    memcpy(cjson_content, TUYA_CJSON_BIN, 0x240);
 #endif
     win_watch = gui_win_create(parent, "win_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+    return_to_watchface_flag = true;
     // card
     gui_tabview_t *tv = gui_tabview_create(win_watch, "clock_tv", 20 + SCREEN_X_OFF, 160 + SCREEN_Y_OFF,
                                            328, 150);
@@ -1362,10 +1371,11 @@ void page_ct_clock(void *parent)
 
     gui_img_t *img_weather = gui_img_create_from_mem(tb_0, "CLOCK_CARD_WEATHER",
                                                      UI_CLOCK_CARD_WEATHER_BIN, 0, 0, 0, 0);
+    gui_obj_add_event_cb(img_weather, (gui_event_cb_t)switch_app_menu, GUI_EVENT_1, NULL);
     gui_img_create_from_mem(tb_1, "CLOCK_CARD_COMPASS", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_2, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_3, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_4, "CLOCK_CARD_WORKOUT", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_2, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_MUSIC_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_3, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_ALARM_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_4, "CLOCK_CARD_WORKOUT", UI_CLOCK_CARD_WORKOUT_BIN, 0, 0, 0, 0);
     {
         // weather condition
         gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73, 0, 0);
@@ -1504,7 +1514,7 @@ void page_ct_clock(void *parent)
 
         watchface_1 = gui_img_create_from_mem(parent, "watchface", UI_CLOCK_FACE_SNOOBY_BIN, 0, 0, 0, 0);
         gui_img_scale(watchface_1, 0.95, 0.95);
-        watchface_2 = gui_img_create_from_mem(parent, "watchface", UI_CLOCK_FACE_SNOOBY_BIN, 0, 0, 0, 0);
+        watchface_2 = gui_img_create_from_mem(parent, "watchface", UI_CLOCK_FACE_PERSON_BIN, 0, 0, 0, 0);
         gui_img_scale(watchface_2, 0.95, 0.95);
         GUI_BASE(watchface_1)->not_show = true;
         GUI_BASE(watchface_2)->not_show = true;
