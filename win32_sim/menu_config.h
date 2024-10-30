@@ -123,10 +123,6 @@
 // #define CONFIG_REALTEK_BUILD_PPEV2
 // </c>
 
-// <c> MODULE NANOVG VGLITE
-//#define CONFIG_REALTEK_NANOVG_HW_VGLITE
-// </c>
-
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
