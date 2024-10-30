@@ -124,6 +124,7 @@ typedef enum t_obj_type
     MACRO_SECTOR,
     MACRO_ROUNDED_RECT,
     MACRO_ONTIME,
+    MACRO_COMBO,
 } T_OBJ_TYPE;
 typedef enum
 {
