@@ -377,8 +377,42 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
 }
 #endif // !RTK_GUI_FONT_ENABLE_TTF_SVG
 #include "nanosvg.h"
+#include "nanovg.h"
 //#include "nanosvgrast.h"
 #ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
+static void stb_draw_svg(gui_text_t *text, NSVGimage *image, int x_offset, int y_offset)
+{
+    NVGcontext *vg;
+
+    gui_dispdev_t *dc;
+    dc = gui_get_dc();
+    GUI_UNUSED(dc);
+
+    extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                     uint32_t h,
+                                     uint32_t stride,
+                                     enum     NVGtexture format,
+                                     uint8_t *data);
+    extern void nvgDeleteAGGE(NVGcontext * ctx);
+
+    vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                       (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+
+    nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
+    nvgResetTransform(vg);
+    nvgTranslate(vg, 0, - (float)dc->fb_height * (float)dc->section_count);
+    nvgTransform(vg, text->base.matrix->m[0][0], text->base.matrix->m[1][0], text->base.matrix->m[0][1],
+                 text->base.matrix->m[1][1], text->base.matrix->m[0][2], text->base.matrix->m[1][2]);
+
+    nvgTranslate(vg, x_offset, y_offset);
+    extern void gui_svg_nsvg_draw(NVGcontext * vg, NSVGimage * image, float alpha);
+    gui_svg_nsvg_draw(vg, image, 1.0);
+
+    nvgEndFrame(vg);
+    nvgDeleteAGGE(vg);
+}
+
 static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_count)
 {
     NSVGpath *path = NULL;
@@ -439,7 +473,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
         {
-            if (xpos + advance * scale > text->base.w)
+            if ((xpos + advance * scale > text->base.w) || unicode_buf[ch] == 0x0A)
             {
                 line_num ++;
                 xpos = 0;
@@ -451,16 +485,9 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         else if (text->mode == SCROLL_X)
         {
-            if (rect->x1 + xpos + advance * scale >= text->base.dx + text->base.w)
-            {
-                break;
-            }
-            if (rect->x1 + xpos < text->base.dx)
-            {
-                xpos += (advance * scale);
-                ch++;
-                continue;
-            }
+            xpos += (advance * scale);
+            ch++;
+            continue;
         }
         else if (text->mode == SCROLL_Y)
         {
@@ -486,7 +513,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
             GUI_ASSERT(NULL != NULL);
         }
         memset(font_svg, 0, sizeof(NSVGimage));
-        font_svg->height = baseline - y0;
+        font_svg->height = y1 - y0;
         font_svg->width = x1;
 
         NSVGshape *font_shape = gui_malloc(sizeof(NSVGshape));
@@ -496,7 +523,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         memset(font_shape, 0, sizeof(NSVGshape));
         font_shape->opacity = 1;
-        font_shape->fill.type = 1;
+        font_shape->fill.type = NSVG_PAINT_COLOR;
         font_shape->fill.d.color = text->color.color.argb_full;
         font_shape->flags = 1;
         // font_shape->bounds[0] = 0;
@@ -595,7 +622,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
             break;
         }
         // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",unicode_buf[ch],ch,xpos,ypos);
-        gui_get_acc()->draw_svg(font_svg, 1, dc, rect->x1 + xpos + offset, rect->y1 + ypos, 1, 0, 0, 0);
+        stb_draw_svg(text, font_svg, xpos + offset, ypos);
         extern void nsvgDelete(NSVGimage * image);
         nsvgDelete(font_svg);
         stbtt_FreeShape(&font, stbVertex);
