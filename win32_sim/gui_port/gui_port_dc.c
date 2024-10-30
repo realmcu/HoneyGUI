@@ -18,7 +18,7 @@
 #define DRV_PIXEL_BITS   16
 #endif
 
-#define USE_DC_PFB
+// #define USE_DC_PFB
 
 #ifdef USE_DC_PFB
 #define LCD_SECTION_HEIGHT 20
@@ -112,7 +112,7 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
     return;
 }
 
-static uint8_t sim_framebuffer[1080 * 1080 * DRV_PIXEL_BITS / 8] = {0};
+static uint8_t sim_framebuffer[DRV_LCD_WIDTH * DRV_LCD_HIGHT * DRV_PIXEL_BITS / 8] = {0};
 
 static struct gui_dispdev dc =
 {
