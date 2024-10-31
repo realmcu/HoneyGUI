@@ -3,6 +3,11 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 // #define STB_REDUCE_MEMORY
 #define STB_REDUCE_MEMORY_FIXD
+
+//Drawing scheme, default pure stb_truetype
+// #define RTK_GUI_FONT_ENABLE_TTF_NANOSVG
+// #define RTK_GUI_FONT_ENABLE_TTF_NANOVG
+
 // #define ALLOW_UNALIGNED_TRUETYPE
 #if  __ARM_FEATURE_MVE
 #define STB_TRUETYPE_USE_MVE
@@ -10,7 +15,11 @@
 #include "arm_mve.h"
 #endif
 #include "stb_truetype.h"
-
+#if defined RTK_GUI_FONT_ENABLE_TTF_NANOVG || defined RTK_GUI_FONT_ENABLE_TTF_NANOSVG
+#include "nanosvg.h"
+#include "nanovg.h"
+extern void nvgDeleteAGGE(NVGcontext *ctx);
+#endif
 static stbtt_fontinfo font;
 void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
 {
@@ -375,12 +384,11 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
 #endif
     }
 }
-#endif // !RTK_GUI_FONT_ENABLE_TTF_SVG
+#endif // !RTK_GUI_FONT_ENABLE_TTF_NANOSVG
+#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOSVG
 #include "nanosvg.h"
 #include "nanovg.h"
-//#include "nanosvgrast.h"
-#ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
-static void stb_draw_svg(gui_text_t *text, NSVGimage *image, int x_offset, int y_offset)
+static void stb_draw_svg(gui_text_t *text, NSVGimage *image, float x_offset, float y_offset)
 {
     NVGcontext *vg;
 
@@ -440,6 +448,92 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
     shape->paths = path;
 }
 #endif
+#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOVG
+static NVGcolor gui_svg_color(unsigned int c, float opacity)
+{
+    return nvgRGBA(c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF, opacity * 255);
+}
+static void stb_draw_vg(gui_text_t *text,
+                        int x_offset, int y_offset,
+                        stbtt_vertex *stbVertex, int verCount,
+                        int ascent, float scale)
+{
+    gui_dispdev_t *dc;
+    dc = gui_get_dc();
+    GUI_UNUSED(dc);
+
+    NVGcontext *vg;
+
+    float baseline = ascent * scale;
+    float alpha = 1.0;
+    extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                     uint32_t h,
+                                     uint32_t stride,
+                                     enum     NVGtexture format,
+                                     uint8_t *data);
+
+    vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                       (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+
+    nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
+    nvgResetTransform(vg);
+    nvgTranslate(vg, 0, - (float)dc->fb_height * (float)dc->section_count);
+    nvgTransform(vg, text->base.matrix->m[0][0], text->base.matrix->m[1][0], text->base.matrix->m[0][1],
+                 text->base.matrix->m[1][1], text->base.matrix->m[0][2], text->base.matrix->m[1][2]);
+
+    nvgTranslate(vg, x_offset, y_offset);
+
+    nvgBeginPath(vg);
+    bool pathHole = false;
+    bool firstpath = true;
+
+    float start_x, start_y;
+    for (int i = 0; i < verCount; i++)
+    {
+        switch (stbVertex[i].type)
+        {
+        case 1:
+            if (firstpath)
+            {
+                firstpath = false;
+            }
+            else
+            {
+                nvgLineTo(vg, start_x, start_y);
+            }
+            if (pathHole)
+            {
+                nvgPathWinding(vg, NVG_HOLE);
+            }
+            else
+            {
+                pathHole = true;
+            }
+            nvgMoveTo(vg, stbVertex[i].x * scale, baseline - stbVertex[i].y * scale);
+            start_x = stbVertex[i].x * scale;
+            start_y = baseline - stbVertex[i].y * scale;
+            break;
+        case 2:
+            nvgLineTo(vg, stbVertex[i].x * scale, baseline - stbVertex[i].y * scale);
+            break;
+        case 3:
+            nvgBezierTo(vg, stbVertex[i].cx * scale,  baseline - stbVertex[i].cy * scale,
+                        stbVertex[i].cx * scale,  baseline - stbVertex[i].cy * scale,
+                        stbVertex[i].x * scale,   baseline - stbVertex[i].y * scale);
+            break;
+        default:
+            break;
+        }
+    }
+
+    nvgFillColor(vg, gui_svg_color(text->color.color.argb_full, alpha));
+    nvgFill(vg);
+
+    nvgEndFrame(vg);
+    nvgDeleteAGGE(vg);
+}
+#endif
 void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     if (text->font_mode != FONT_SRC_MEMADDR)
@@ -457,7 +551,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
-#ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
+#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOSVG
     while (ch < unicode_len)
     {
         int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
@@ -625,6 +719,81 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         stb_draw_svg(text, font_svg, xpos + offset, ypos);
         extern void nsvgDelete(NSVGimage * image);
         nsvgDelete(font_svg);
+        stbtt_FreeShape(&font, stbVertex);
+
+        xpos += (advance * scale);
+        ++ch;
+    }
+#elif defined RTK_GUI_FONT_ENABLE_TTF_NANOVG
+    // while (ch < 1)
+    while (ch < unicode_len)
+    {
+        int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
+        int advance, lsb, x0, y0, x1, y1;
+        stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
+        // gui_log("unicode : %c\n", unicode_buf[ch]);
+        if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
+        {
+            if (xpos + advance * scale > text->base.w)
+            {
+                break;
+            }
+        }
+        else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
+        {
+            if ((xpos + advance * scale > text->base.w) || unicode_buf[ch] == 0x0A)
+            {
+                line_num ++;
+                xpos = 0;
+            }
+            if ((line_num + 1) *  scale * (ascent - descent + lineGap) > text->base.h)
+            {
+                break;
+            }
+        }
+        else if (text->mode == SCROLL_X)
+        {
+            xpos += (advance * scale);
+            ch++;
+            continue;
+        }
+        else if (text->mode == SCROLL_Y)
+        {
+            if (xpos + advance * scale > text->base.w)
+            {
+                line_num ++;
+                xpos = 0;
+            }
+        }
+        ypos = line_num * scale * (ascent - descent + lineGap);
+        stbtt_GetGlyphBox(&font, glyph_index, &x0, &y0, &x1, &y1);
+        // stbtt_GetGlyphBitmapBoxSubpixel(&font, glyph_index, scale, scale, 0, 0, &x0, &y0, &x1, &y1);
+        stbtt_GetGlyphBitmapBox(&font, glyph_index, scale, scale, &x0, &y0, &x1, &y1);
+        stbtt_vertex *stbVertex = NULL;
+
+        int verCount = 0;
+        verCount = stbtt_GetGlyphShape(&font, glyph_index, &stbVertex);
+
+        int offset = 0;
+        switch (text->mode)
+        {
+        case LEFT:
+        case CENTER:
+        case RIGHT:
+            offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0) * text->mode;
+            break;
+        case MULTI_LEFT:
+        case MULTI_CENTER:
+        case MULTI_RIGHT:
+            break;
+        case SCROLL_X:
+            break;
+        case SCROLL_Y:
+        default:
+            break;
+        }
+        // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",unicode_buf[ch],ch,xpos,ypos);
+        stb_draw_vg(text, xpos + offset, ypos, stbVertex, verCount, ascent, scale);
         stbtt_FreeShape(&font, stbVertex);
 
         xpos += (advance * scale);
