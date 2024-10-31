@@ -13,6 +13,7 @@
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
+#include "cJSON.h"
 static struct gui_indev *indev = NULL;
 static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
@@ -1282,4 +1283,61 @@ gui_color_t gui_color_css(const char *color_str)
 
     // Error case, return color with all components set to 0
     return color;
+}
+
+void gui_get_json_value(const char *path, const char *parent_key, const char *key, void *value)
+{
+    cJSON *root;
+    if (!path)
+    {
+        gui_log("path can't be NULL!\r\n");
+        return;
+    }
+    else
+    {
+        root = cJSON_Parse(path);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    // parse array
+    cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
+    if (!cJSON_IsArray(json_array))
+    {
+        gui_log("get %s_Array unsuccessful\n", parent_key);
+        return;
+    }
+    else
+    {
+        cJSON *obj = cJSON_GetArrayItem(json_array, 0);
+        if (!obj)
+        {
+            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            return;
+        }
+        else
+        {
+            cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
+            if (!obj)
+            {
+                gui_log("get %s_Key unsuccessful\n", key);
+                return;
+            }
+            else
+            {
+                if (strcmp(parent_key, "weather") == 0)
+                {
+                    sprintf((char *)value, "%s", json_key->valuestring);
+                }
+                else
+                {
+                    *((int *)value) = json_key->valueint;
+                }
+            }
+        }
+    }
+    // clear
+    cJSON_Delete(root);
 }

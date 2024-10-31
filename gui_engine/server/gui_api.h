@@ -354,6 +354,49 @@ bool gui_music_completion_status(void);
  * @return gui_color_t structure with the parsed color, or a structure with all components set to 0 if invalid
  */
 gui_color_t gui_color_css(const char *color_str);
+/**
+ * @brief Parses json string and get key' value.
+ *
+ * array       |key          |value type
+ *
+ * activity    |move         |int *
+ *
+ * activity    |ex           |int *
+ *
+ * activity    |stand        |int *
+ *
+ * weather     |low          |int *
+ *
+ * weather     |high         |int *
+ *
+ * weather     |cur          |int *
+ *
+ * weather     |condition_1  |char *
+ *
+ * weather     |condition_2  |char *
+  *
+ * weather     |condition_3  |char *
+ *
+ * weather     |condition_4  |char *
+  *
+ * weather     |condition_5  |char *
+ *
+ * compass     |degree       |int *
+ *
+ * heart_rate  |AM12         |int *
+ *
+ * heart_rate  |AM6          |int *
+
+ * heart_rate  |PM12         |int *
+ *
+ * heart_rate  |PM6          |int *
+ * @param path json string to prase
+ * @param parent_key string to get json_array
+ * @param key string to get json_key
+ * @param value point to value. If value type is "string", need to request enough memory
+ * before calling this function, at least 15 bytes.
+ */
+void gui_get_json_value(const char *path, const char *parent_key, const char *key, void *value);
 /** End of SERVER_Exported_Functions
   * @}
   */
