@@ -20,6 +20,20 @@ static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
 static struct gui_ftl *ftl = NULL;
 static struct acc_engine *acc = NULL;
+char *defaultPath = "gui_engine\\example\\screen_480_480\\root\\";
+
+void gui_change_default_path(int argc, char **argv)
+{
+    for (int count = 1; count < argc; count++)
+    {
+        if (!strcmp(argv[count], "-p") && count + 1 < argc)
+        {
+            char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
+            sprintf(path, "%s%s", argv[count + 1], "\\");
+            defaultPath = path;
+        }
+    }
+}
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {

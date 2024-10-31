@@ -24,28 +24,15 @@
 #define PROJECT_NAME                   "GUI Simulator"
 #define COMPANY_NAME                    "Realtek Semiconductor Corporation"
 
-char *defaultPath = "gui_engine\\example\\screen_480_480\\root\\";
-// char *defaultPath = "gui_engine\\example\\screen_480_480\\Visual Disigner Prj\\480x480\\Export\\root\\";
-// char *defaultPath = "gui_engine\\example\\screen_280_456\\root_image_8762g\\root\\";
+
+
 int main(int argc, char **argv)
 {
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", COMPANY_NAME,
            PROJECT_NAME, COMPILE_TIME);
-    // extern int ExecuteBatchFile();
-    // ExecuteBatchFile();
-    for (int count = 1; count < argc; count++)
-    {
-        if (!strcmp(argv[count], "-p") && count + 1 < argc)
-        {
-            char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
-            sprintf(path, "%s%s", argv[count + 1], "\\");
-            defaultPath = path;
-        }
-    }
-    printf("defaultPath path: %s\n", defaultPath);
 
+    gui_change_default_path(argc, argv);
     gui_components_init();
-
 
     while (1)
     {

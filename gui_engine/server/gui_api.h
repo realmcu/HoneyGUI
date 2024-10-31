@@ -397,6 +397,11 @@ gui_color_t gui_color_css(const char *color_str);
  * before calling this function, at least 15 bytes.
  */
 void gui_get_json_value(const char *path, const char *parent_key, const char *key, void *value);
+
+/**
+ *
+ */
+void gui_change_default_path(int argc, char **argv);
 /** End of SERVER_Exported_Functions
   * @}
   */
