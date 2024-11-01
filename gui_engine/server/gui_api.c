@@ -2,17 +2,16 @@
  * File      : gui_server.c
  */
 
-#include <guidef.h>
-#include <string.h>
-#include <gui_api.h>
 #include <stdarg.h>
-#include "tlsf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "tlsf.h"
 #include "cJSON.h"
 static struct gui_indev *indev = NULL;
 static struct gui_os_api *os_api = NULL;

@@ -17,11 +17,10 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <acc_sw_raster.h>
-#include <acc_sw_rle.h>
+#include "draw_img.h"
+#include "acc_sw_rle.h"
 
 
 static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, uint32_t image_off,

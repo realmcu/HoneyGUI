@@ -179,11 +179,6 @@ static void obj_draw_prepare(gui_obj_t *object)
     {
         GUI_ASSERT(node != NULL);
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == NULL)
-        {
-            gui_log("Error: obj is NULL\n");
-            return;
-        }
         if (!(obj->create_done))
         {
             continue;
