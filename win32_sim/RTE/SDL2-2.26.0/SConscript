@@ -1,0 +1,21 @@
+from building import *
+
+cwd = GetCurrentDir()
+
+src = []
+libs = ['']
+libs += ['SDL2main','SDL2']
+
+
+libpath = [cwd]
+libpath += [cwd + '/x86_64-w64-mingw32/lib']
+
+
+include = [cwd]        
+include += [cwd + '/x86_64-w64-mingw32/include']
+include += [cwd + '/x86_64-w64-mingw32/include/SDL2']
+
+
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+
+Return('group')

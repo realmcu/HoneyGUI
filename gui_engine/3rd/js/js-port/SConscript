@@ -1,4 +1,4 @@
-# RT-Thread building script for JerryScript RT port
+# HoneyGUI building script
 
 from building import *
 

@@ -1,0 +1,20 @@
+from building import *
+
+cwd = GetCurrentDir()
+
+src = []
+libs = ['']
+libs += ['glfw3','gdi32'] #carefully gdi32 must later than glfw3
+
+
+libpath = [cwd]
+libpath += [cwd + '/lib']
+
+
+include = [cwd]        
+include += [cwd + '/include']
+
+
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+
+Return('group')

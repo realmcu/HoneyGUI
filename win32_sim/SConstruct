@@ -31,6 +31,8 @@ env = Environment(tools = ['mingw'],
 
 #env.PrependENVPath('PATH', menu_config.EXEC_PATH)
 env.Append(LIBS = ['mingw32'])
+env.Append(LIBS = ['opengl32'])
+# env.Append(LIBS = ['gdi32'])
 
 
 

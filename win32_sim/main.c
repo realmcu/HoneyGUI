@@ -28,8 +28,10 @@
 
 int main(int argc, char **argv)
 {
-    printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", COMPANY_NAME,
-           PROJECT_NAME, COMPILE_TIME);
+    printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
+           COMPANY_NAME, \
+           PROJECT_NAME, \
+           COMPILE_TIME);
 
     gui_change_default_path(argc, argv);
     gui_components_init();
