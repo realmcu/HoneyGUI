@@ -14,6 +14,8 @@
 #include "lv_draw_rtk_ppe_utils.h"
 #include "rtl_ppe.h"
 #include "rtl_gdma.h"
+#include "hal_imdc.h"
+#include "rtl_imdc.h"
 /*********************
  *      DEFINES
  *********************/
@@ -95,7 +97,6 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
     }
 }
 
-#include "os_mem.h"
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
                                lv_point_t *base,
                                const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf)
@@ -117,7 +118,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     source.width = source_width;
     source.height = source_height;
     PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
-
+    bool compressed = false;
     switch (cf)
     {
     case LV_IMG_CF_ALPHA_8BIT:
@@ -148,10 +149,11 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     case LV_IMG_CF_RGB888:
         source.format = PPE_RGB888;
         break;
-    case LV_IMG_CF_RGBA8888:
-        source.format = PPE_RGBA8888;
-        mode = PPE_SRC_OVER_MODE;
-        break;
+//TODO: for temporarily use
+//    case LV_IMG_CF_RGBA8888:
+//        source.format = PPE_RGBA8888;
+//        mode = PPE_SRC_OVER_MODE;
+//        break;
     case LV_IMG_CF_RGBX8888:
         source.format = PPE_RGBX8888;
         mode = PPE_SRC_OVER_MODE;
@@ -176,6 +178,24 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             source.color_key_en = ENABLE;
             source.color_key_value = LV_COLOR_CHROMA_KEY.full;
             mode = PPE_SRC_OVER_MODE;
+        }
+        break;
+    case LV_IMG_CF_RGBA8888:
+        {
+            IMDC_file_header *header = (IMDC_file_header *)(map_p + 8);
+            if (header->algorithm_type.pixel_bytes == IMDC_PIXEL_16BIT)
+            {
+                source.format = PPE_RGB565;
+            }
+            else if (header->algorithm_type.pixel_bytes == IMDC_PIXEL_24BIT)
+            {
+                source.format = PPE_RGB888;
+            }
+            else
+            {
+                source.format = PPE_ARGB8888;
+            }
+            compressed = true;
         }
         break;
     default:
@@ -276,9 +296,31 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 {
                     break;
                 }
+                if (compressed)
+                {
+                    hal_imdc_decompress_info info;
+                    info.start_column = scale_rect.left;
+                    info.end_column = scale_rect.right;
+                    info.start_line = scale_rect.top;
+                    info.end_line = scale_rect.bottom;
+                    info.raw_data_address = (uint32_t)(map_p + 8);
+                    source.width = info.end_column - info.start_column + 1;
+                    source.height = info.end_line - info.start_line + 1;
+                    source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
+                    source.address = (uint32_t)source.memory;
+                    bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+                    scale_rect.top = 0;
+                    scale_rect.left = 0;
+                    scale_rect.right = source.width - 1;
+                    scale_rect.bottom = source.height - 1;
+                }
                 PPE_ERR err = PPE_Scale_Rect(&source, &zoom, zoom_ratio, zoom_ratio, &scale_rect);
                 if (err != PPE_SUCCESS)
                 {
+                    if (compressed)
+                    {
+                        lv_mem_free(source.memory);
+                    }
                     return LV_RES_INV;
                 }
                 trans.y = y - draw_ctx->buf_area->y1;
@@ -296,6 +338,10 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 }
                 zoom.height = actual_inc;
                 err = PPE_blend_rect(&zoom, &target, &trans, &blend_rect, mode);
+                if (compressed)
+                {
+                    lv_mem_free(source.memory);
+                }
                 if (err != PPE_SUCCESS)
                 {
                     return LV_RES_INV;
@@ -316,8 +362,27 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             source.global_alpha = dsc->opa;
             mode = PPE_SRC_OVER_MODE;
         }
+        if (compressed)
+        {
+            hal_imdc_decompress_info info;
+            info.start_column = constraint_area.x1 - base->x;
+            info.end_column = constraint_area.x2 - base->x;
+            info.start_line = constraint_area.y1 - base->y;
+            info.end_line = constraint_area.y2 - base->y;
+            info.raw_data_address = (uint32_t)(map_p + 8);
+            source.width = info.end_column - info.start_column + 1;
+            source.height = info.end_line - info.start_line + 1;
+            source.memory = (uint32_t *)lv_mem_alloc(source.width * source.height * pixel_byte);
+            bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+            trans.x = blend_rect.x1;
+            trans.y = blend_rect.y1;
+        }
         {
             PPE_ERR err = PPE_blend_rect(&source, &target, &trans, &blend_rect, mode);
+            if (compressed)
+            {
+                lv_mem_free(source.memory);
+            }
             if (err == PPE_SUCCESS)
             {
                 return LV_RES_OK;
