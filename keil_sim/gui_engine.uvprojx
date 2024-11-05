@@ -1253,6 +1253,16 @@
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_win.c</FilePath>
             </File>
+            <File>
+              <FileName>gui_combo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_combo.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_pagelist_new.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_pagelist_new.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

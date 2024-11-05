@@ -32,6 +32,8 @@
 #define APP_SOCCER
 #define APP_BOX2D_RING
 #define APP_CALENDAR
+#define APP_COMBOBOX
+#define APP_PAGE_LIST
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 /*Define a app with name APP_STOPWATCH*/
 #define APP_STOPWATCH
@@ -55,6 +57,8 @@ GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 GUI_APP_DEFINE_NAME(APP_SOCCER)
 GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
 GUI_APP_DEFINE_NAME(APP_CALENDAR)
+GUI_APP_DEFINE_NAME(APP_COMBOBOX)
+GUI_APP_DEFINE_NAME(APP_PAGE_LIST)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -2885,4 +2889,113 @@ void apps_append_name()
     gui_app_append(GUI_APP_HANDLE(APP_CALENDAR));
     gui_app_append(GUI_APP_HANDLE(APP_STOPWATCH));
     gui_app_append(GUI_APP_HANDLE(APP_MENU));
+    gui_app_append(GUI_APP_HANDLE(APP_COMBOBOX));
+}
+#include "gui_combo.h"
+GUI_APP_ENTRY(APP_COMBOBOX)
+{
+    static const char *items[] = {"item1", "item2", "item3", "item4", "item5",};
+    gui_combo_create(GUI_APP_ROOT_SCREEN, 100, 100, 220, 5, 48, items, ITEMBK_BIN, ITEMHIGHLIGHT_BIN,
+                     ITEMSELECTION_BIN, SELECTORUNFOLD_BIN, SELECTORUNFOLDHL_BIN, SELSECTOR_BIN, SELECTORHL_BIN,
+                     gui_color_css("white"), 16, gui_color_css("#1a1a1a"), MICHROMA_REGULAR_SIZE16_BITS4_FONT_BIN, 16,
+                     gui_color_css("#1a1a1a"), MICHROMA_BOLD_SIZE16_BITS4_FONT_BIN, gui_color_css("black"),
+                     IMG_SRC_OVER_MODE);
+
+    status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
+}
+#include "gui_pagelist_new.h"
+static gui_pagelist_new_t *pl_vertical;
+static gui_pagelist_new_t *pl_horizontal;
+static void ticket(void *obj, gui_event_t e, void *param);
+static void ticket_vertiacl(void *obj, gui_event_t e, void *param);
+static const gui_event_cb_t item_click_function_array_horizontal[] =
+{
+    ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
+    ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
+};
+static const gui_event_cb_t item_click_function_array[] =
+{
+    ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl,
+    ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl,
+    ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl, ticket_vertiacl,
+    ticket_vertiacl, ticket_vertiacl, ticket_vertiacl,
+};
+static const char *item_text_array[] =
+{
+    "TICKET 1",
+    "TICKET 2",
+    "TICKET 3",
+    "TICKET 4",
+    "TICKET 5",
+    "TICKET 6",
+    "TICKET 7",
+    "TICKET 8",
+    "TICKET 9",
+    "TICKET 10",
+    "TICKET 11",
+    "TICKET 12",
+    "TICKET 13",
+    "TICKET 14",
+    "TICKET 15",
+    "TICKET 16",
+    "TICKET 17",
+    "TICKET 18",
+    "TICKET 19",
+    "TICKET 20",
+    "TICKET 21",
+    "TICKET 22",
+    "TICKET 23",
+    "TICKET 24",
+};
+static void ticket(void *obj, gui_event_t e, void *param)
+{
+    gui_log("ticket%d\n", param);
+    static int i;
+    gui_page_list_new_render(pl_horizontal, ++i, item_click_function_array_horizontal, item_text_array);
+    if (i >= 24)
+    {
+        i = 0;
+    }
+
+
+}
+static void ticket_vertiacl(void *obj, gui_event_t e, void *param)
+{
+    gui_log("ticket%d\n", param);
+    static int i;
+    gui_page_list_new_render(pl_vertical, ++i, item_click_function_array, item_text_array);
+    if (i >= 24)
+    {
+        i = 0;
+    }
+}
+GUI_APP_ENTRY(APP_PAGE_LIST)
+{
+    pl_vertical = gui_pagelist_new_create(
+                      GUI_APP_ROOT_SCREEN,
+                      100, 0, 213, 42,  ITEMHIGHLIGHT_BIN, ITEMSELECTION_BIN,
+                      IMG_SRC_OVER_MODE,
+                      MICHROMA_BOLD_SIZE16_BITS4_FONT_BIN,
+                      16, APP_COLOR_RED
+                  );
+
+
+    gui_page_list_new_render(pl_vertical, 20, item_click_function_array, item_text_array);
+    pl_horizontal = gui_pagelist_new_create_horizontal(
+                        GUI_APP_ROOT_SCREEN,
+                        0, 200, 213, 42,  ITEMHIGHLIGHT_BIN, ITEMSELECTION_BIN,
+                        IMG_SRC_OVER_MODE,
+                        MICHROMA_BOLD_SIZE16_BITS4_FONT_BIN,
+                        16, APP_COLOR_RED
+                    );
+
+
+    gui_page_list_new_render(pl_horizontal, 20, item_click_function_array_horizontal, item_text_array);
+    status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
 }

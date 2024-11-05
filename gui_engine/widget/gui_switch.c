@@ -254,6 +254,10 @@ static void gui_switch_input_prepare(gui_obj_t *obj)
         {
             gui_obj_skip_other_short(obj);
         }
+        if (tp->pressed)
+        {
+            gui_obj_skip_other_pressed(obj);
+        }
     }
 
 }

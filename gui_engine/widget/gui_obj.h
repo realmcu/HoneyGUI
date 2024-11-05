@@ -125,6 +125,7 @@ typedef enum t_obj_type
     MACRO_ROUNDED_RECT,
     MACRO_ONTIME,
     MACRO_COMBO,
+    MACRO_PAGE_LIST_NEW,
 } T_OBJ_TYPE;
 typedef enum
 {
@@ -698,7 +699,7 @@ void gui_obj_hidden(gui_obj_t *obj, bool hidden);
 const char *gui_widget_name(gui_obj_t *widget, const char *name);
 
 /**
- * @brief update speed.
+ * @brief update touch pad speed vertical.
  *
  * This function updates the current speed and records the speed change history.
  *
@@ -729,7 +730,43 @@ void gui_obj_tree_print_mmd(gui_obj_t *obj);
  * @brief get widget count.
  */
 uint32_t gui_get_obj_count();
+/**
+ * @brief Set the location of a GUI object.
+ *
+ * This function sets the X and Y coordinates of the specified GUI object.
+ *
+ * @param obj Pointer to the GUI object to set location for.
+ * @param x The X coordinate to set.
+ * @param y The Y coordinate to set.
+ */
 void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y);
+
+/**
+ * @brief Retrieve a widget from the GUI object tree by type and index.
+ *
+ * This function searches the GUI object tree starting from the root and retrieves
+ * a widget of the specified type and index.
+ *
+ * @param root Pointer to the root of the GUI object tree.
+ * @param type The type of the object to find.
+ * @param output Pointer to where the found object should be stored.
+ * @param index The index of the object to retrieve.
+ */
+void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
+                                               int index);
+
+/**
+ * @brief Update the speed based on displacement.
+ *
+ * This function updates the speed value based on the given displacement.
+ * It also uses a speed record array to achieve this.
+ *
+ * @param speed Pointer to the speed variable to update.
+ * @param speed_recode Array holding the speed records.
+ * @param displacement The displacement value to consider for speed update.
+ */
+void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

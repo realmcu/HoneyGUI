@@ -973,6 +973,47 @@ void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t
         gui_obj_tree_get_widget_by_type(obj, type, output);
     }
 }
+static void obj_tree_get_widget_by_type_and_index(gui_obj_t *root,
+                                                  T_OBJ_TYPE type, gui_obj_t **output, int index, int *count, int *flag)
+{
+    if (*flag)
+    {
+        return;
+    }
+
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &root->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, root);
+            gui_log("@name:%s, @type:%d\n", root->name, root->type);
+            return;
+        }
+        if (type == obj->type)
+        {
+            if (index == *count)
+            {
+                *output = obj;
+                *flag = 1;
+                return;
+            }
+            (*count)++;
+            //gui_log("%d,%d\n", *count, index);
+        }
+
+        obj_tree_get_widget_by_type_and_index(obj, type, output, index, count, flag);
+    }
+}
+void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
+                                               int index)
+{
+    int count = 0;
+    int flag = 0;
+    obj_tree_get_widget_by_type_and_index(root, type, output, index, &count, &flag);
+}
 void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
 {
     uint32_t cur_time_gap;
@@ -1140,6 +1181,34 @@ void gui_update_speed(int *speed, int speed_recode[])
         speed_recode[i] = speed_recode[i + 1];
     }
     speed_recode[recode_num] = touch->deltaY;
+    *speed = speed_recode[recode_num] - speed_recode[0];
+    int max_speed = GUI_SPEED_MAX;
+    int min_speed = GUI_SPEED_MIN;
+    if (*speed > max_speed)
+    {
+        *speed = max_speed;
+    }
+    else if (*speed < -max_speed)
+    {
+        *speed = -max_speed;
+    }
+    if ((*speed > 0) && (*speed < min_speed))
+    {
+        *speed = min_speed;
+    }
+    else if ((*speed < 0) && (*speed > -min_speed))
+    {
+        *speed = -min_speed;
+    }
+}
+void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement)
+{
+    int recode_num = 4;
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        speed_recode[i] = speed_recode[i + 1];
+    }
+    speed_recode[recode_num] = displacement;
     *speed = speed_recode[recode_num] - speed_recode[0];
     int max_speed = GUI_SPEED_MAX;
     int min_speed = GUI_SPEED_MIN;

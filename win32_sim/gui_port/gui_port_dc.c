@@ -112,8 +112,6 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
     return;
 }
 
-static uint8_t sim_framebuffer[DRV_LCD_WIDTH * DRV_LCD_HIGHT * DRV_PIXEL_BITS / 8] = {0};
-
 static struct gui_dispdev dc =
 {
 #ifdef USE_DC_PFB
@@ -144,14 +142,8 @@ static struct gui_dispdev dc =
     .screen_height = DRV_LCD_HIGHT,
     .driver_ic_fps = 30,
     .driver_ic_active_width = DRV_LCD_WIDTH,
-
-    .section = {0, 0, 0, 0},
-    .section_count = 0,
     .scale_x = 1,
     .scale_y = 1,
-    .disp_buf_1 = NULL,
-    .disp_buf_2 = NULL,
-    .frame_buf = sim_framebuffer,
     .type = DC_SINGLE,
     .lcd_update = port_gui_lcd_update,
 #endif
@@ -328,6 +320,9 @@ void gui_port_dc_init(void)
     dc.fb_width = sim_screen_width;
     dc.screen_width = sim_screen_width;
     dc.screen_height = sim_screen_hight;
+#ifndef USE_DC_PFB
+    dc.fb_height = sim_screen_hight;
+#endif
 #endif
     pthread_mutex_init(&sdl_ok_mutex, NULL);
     pthread_cond_init(&sdl_ok_event, NULL);
@@ -347,7 +342,10 @@ void gui_port_dc_init(void)
 #ifdef USE_DC_PFB
     dc.disp_buf_1 =  malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
     dc.disp_buf_2 =  malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
+#else
+    dc.frame_buf = malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
 #endif
+
     dc.lcd_gram = surface->pixels;
 
 }
