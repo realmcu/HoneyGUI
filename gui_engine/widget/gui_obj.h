@@ -126,6 +126,7 @@ typedef enum t_obj_type
     MACRO_ONTIME,
     MACRO_COMBO,
     MACRO_PAGE_LIST_NEW,
+    MACRO_ON_PERIPHERAL,
 } T_OBJ_TYPE;
 typedef enum
 {

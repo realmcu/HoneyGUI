@@ -128,6 +128,12 @@
             fontSize="24"
             font="watchface_market/watchface1/MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_brightness
+            <onPeripheral 
+                type="Weather" 
+                to="txt_brightness" 
+                id="Current">
+            </onPeripheral>
+
             </textbox>
     </icon>
     <textbox

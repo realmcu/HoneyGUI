@@ -1340,7 +1340,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
             }
             else
             {
-                if (strcmp(parent_key, "weather") == 0)
+                if (strstr(key, "condition") != NULL)
                 {
                     sprintf((char *)value, "%s", json_key->valuestring);
                 }

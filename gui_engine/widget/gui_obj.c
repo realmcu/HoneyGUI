@@ -1021,6 +1021,10 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
     {
         animate->Beginning_frame = 0;
         animate->end_frame = 0;
+        if (animate->progress_percent == 0.0f)
+        {
+            animate->Beginning_frame = 1;
+        }
         if (animate->progress_percent == 0 && !animate->init)
         {
             animate->init = 1;
@@ -1055,6 +1059,8 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
 
                 animate->Beginning_frame = 1;
             }
+
+
             animate->last_per = animate->progress_percent;
             animate->callback(animate->p, obj, animate);
         }

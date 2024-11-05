@@ -99,6 +99,7 @@ static struct widget_create widget[] =
     {"calendar", MACRO_CALENDAR},
     {"onTime", MACRO_ONTIME},
     {"combo", MACRO_COMBO},
+    {"onPeripheral", MACRO_ON_PERIPHERAL},
 };
 
 typedef struct
@@ -127,12 +128,15 @@ typedef struct
     char *animate_type;
     gui_img_t *img;
 } image_animate_params_t;
+#define TEXT_WEATHER_CUR_ANIMATION 1
 static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
 static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate);
 static void text_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate);
 static const uint8_t *gui_get_image_file_address(const char *image_file_path);
+
+static void text_animate_weather_callback(void *p, void *this_widget, gui_animate_t *animate);
 static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
@@ -4086,7 +4090,71 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                 }
                 break;
+            case MACRO_ON_PERIPHERAL:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    char *id = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = (p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    switch (parent->type)
+                    {
+                    case IMAGE_FROM_MEM:
+                        {
 
+                        }
+                        break;
+                    case TEXTBOX:
+                        {
+                            if (type)
+                            {
+
+                            }
+                            if (type)
+                            {
+                                if (!strcmp(type, "Weather"))
+                                {
+
+
+                                    if (!strcmp(id, "Current"))
+                                    {
+
+                                        gui_text_set_animate(parent, 1000, -1, text_animate_weather_callback,
+                                                             (void *)TEXT_WEATHER_CUR_ANIMATION);
+                                    }
+
+                                }
+                            }
+
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+
+
+
+                }
+                break;
             /*default*/
             default:
                 break;
@@ -5129,4 +5197,39 @@ static const uint8_t *gui_get_image_file_address(const char *image_file_path)
         addr = image404;
     }
     return addr;
+}
+static void text_animate_weather_callback(void *p, void *this_widget, gui_animate_t *animate)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+
+    switch ((size_t)p)
+    {
+    case TEXT_WEATHER_CUR_ANIMATION:
+        {
+            int fd = gui_fs_open("gui_engine\\example\\web\\peripheral_simulation\\json\\simulation_data.json",
+                                 0);
+            int size = gui_fs_lseek(fd, 0, SEEK_END);
+            gui_fs_lseek(fd, 0, SEEK_SET);
+            char *json_string = gui_malloc(size + 1);
+            gui_fs_read(fd, json_string, size);
+            gui_fs_close(fd);
+            json_string[size] = '\0';
+            int move = 0;
+            //gui_log("%s\n",json_string);
+            gui_get_json_value(json_string, "weather", "cur", &move);
+            gui_free(json_string);
+            static char move_string[4];
+            memset(move_string, 0, GUI_ARRAY_SIZE(move_string));
+            sprintf(move_string, "%d", move);
+            gui_text_content_set(this_widget, move_string, strlen(move_string));
+        }
+        break;
+
+    default:
+        break;
+    }
+
 }
