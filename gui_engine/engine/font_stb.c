@@ -1,87 +1,116 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file font_stb.c
+  * @brief stb truetype engine
+  * @details stb truetype engine
+  * @author luke_sun@realsil.com.cn
+  * @date 2024/11/05
+  * @version v1.1
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "draw_font.h"
 #include "font_stb.h"
+
+/*stb truetype function macro*/
+
+/*enable stb truetype*/
 #define STB_TRUETYPE_IMPLEMENTATION
+
+/*reduce memory*/
 // #define STB_REDUCE_MEMORY
 #define STB_REDUCE_MEMORY_FIXD
 
-//Drawing scheme, default pure stb_truetype
-// #define RTK_GUI_FONT_ENABLE_TTF_NANOSVG
-// #define RTK_GUI_FONT_ENABLE_TTF_NANOVG
-
+/*unaligned*/
 // #define ALLOW_UNALIGNED_TRUETYPE
+
+/*MVE*/
 #if  __ARM_FEATURE_MVE
-#define STB_TRUETYPE_USE_MVE
+// #define STB_TRUETYPE_USE_MVE
 #define FONT_STB_USE_MVE
 #include "arm_mve.h"
 #endif
+
+/*stb true type source*/
 #include "stb_truetype.h"
-#if defined RTK_GUI_FONT_ENABLE_TTF_NANOVG || defined RTK_GUI_FONT_ENABLE_TTF_NANOSVG
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+//Change rawing scheme, default pure stb_truetype
+// #define RTK_GUI_FONT_ENABLE_TTF_NANOVG
+
+#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOVG
 #include "nanosvg.h"
 #include "nanovg.h"
 extern void nvgDeleteAGGE(NVGcontext *ctx);
 #endif
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
 static stbtt_fontinfo font;
-void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
-{
-    if (text->path)
-    {
-        gui_font_stb_init(text->path);
-    }
-    uint32_t *unicode_buf = NULL;
-    uint16_t unicode_len = 0;
-    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
-    text->font_len = unicode_len;
-    float all_char_w = 0;
-    float scale = 0;
-    int ch = 0, advance = 0, lsb = 0;
-    int line_flag = 0;
-    scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);
-    while (ch < unicode_len)
-    {
-        stbtt_GetCodepointHMetrics(&font, unicode_buf[ch++], &advance, &lsb);
-        all_char_w += advance * scale;
-    }
-    if (text->char_width_sum == 0)
-    {
-        switch (text->mode)
-        {
-        case LEFT:
-        case CENTER:
-        case RIGHT:
-            text->char_width_sum = all_char_w + 1;
-            text->char_line_sum = 1;
-            break;
-        case MULTI_LEFT:
-        case MULTI_CENTER:
-        case MULTI_RIGHT:
-            text->char_width_sum = all_char_w;
-            text->char_line_sum = all_char_w / text->base.w + 1 + line_flag;
-            break;
-        case SCROLL_X:
-            text->char_width_sum = (int)(all_char_w + 1);
-            text->char_line_sum = 1;
-            break;
-        case SCROLL_Y:
-            text->char_width_sum = all_char_w;
-            text->char_line_sum = all_char_w / text->base.w + 1;
-        default:
-            break;
-        }
-    }
-    gui_free(unicode_buf);
-}
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
-void gui_font_stb_unload(gui_text_t *text)
-{
-    if (text->data)
-    {
-        gui_free(((FONT_STB_SCREEN *)text->data)->buf);
-        gui_free((FONT_STB_SCREEN *)text->data);
-        text->data = NULL;
-    }
-}
-#ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+#ifndef RTK_GUI_FONT_ENABLE_TTF_NANOVG
 gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
 {
     uint32_t mix;
@@ -384,75 +413,22 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
 #endif
     }
 }
-#endif // !RTK_GUI_FONT_ENABLE_TTF_NANOSVG
-#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOSVG
-#include "nanosvg.h"
-#include "nanovg.h"
-static void stb_draw_svg(gui_text_t *text, NSVGimage *image, float x_offset, float y_offset)
-{
-    NVGcontext *vg;
-
-    gui_dispdev_t *dc;
-    dc = gui_get_dc();
-    GUI_UNUSED(dc);
-
-    extern NVGcontext *nvgCreateAGGE(uint32_t w,
-                                     uint32_t h,
-                                     uint32_t stride,
-                                     enum     NVGtexture format,
-                                     uint8_t *data);
-    extern void nvgDeleteAGGE(NVGcontext * ctx);
-
-    vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
-                       (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
-    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
-
-    nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
-    nvgResetTransform(vg);
-    nvgTranslate(vg, 0, - (float)dc->fb_height * (float)dc->section_count);
-    nvgTransform(vg, text->base.matrix->m[0][0], text->base.matrix->m[1][0], text->base.matrix->m[0][1],
-                 text->base.matrix->m[1][1], text->base.matrix->m[0][2], text->base.matrix->m[1][2]);
-
-    nvgTranslate(vg, x_offset, y_offset);
-    extern void gui_svg_nsvg_draw(NVGcontext * vg, NSVGimage * image, float alpha);
-    gui_svg_nsvg_draw(vg, image, 1.0);
-
-    nvgEndFrame(vg);
-    nvgDeleteAGGE(vg);
-}
-
-static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_count)
-{
-    NSVGpath *path = NULL;
-    path = gui_malloc(sizeof(NSVGpath));
-    if (path == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
-    memset(path, 0, sizeof(NSVGpath));
-
-    path->closed = 1;
-    path->npts = (line_count) * 3 + 1;
-
-    path->pts = (float *)gui_malloc(path->npts * 2 * sizeof(float));
-    memset(path->pts, 0, path->npts * 2 * sizeof(float));
-    if (path->pts == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
-
-    if (shape->paths)
-    {
-        path->next = shape->paths;
-    }
-    shape->paths = path;
-}
 #endif
 #ifdef RTK_GUI_FONT_ENABLE_TTF_NANOVG
 static NVGcolor gui_svg_color(unsigned int c, float opacity)
 {
     return nvgRGBA(c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF, opacity * 255);
 }
+static bool isHole(stbtt_vertex *vertices, int numVertices)
+{
+    int sum = 0;
+    for (int i = 0; i < numVertices - 1; i++)
+    {
+        sum += (vertices[i + 1].x - vertices[i].x) * (vertices[i + 1].y + vertices[i].y);
+    }
+    return sum > 0;
+}
+
 static void stb_draw_vg(gui_text_t *text,
                         int x_offset, int y_offset,
                         stbtt_vertex *stbVertex, int verCount,
@@ -489,44 +465,47 @@ static void stb_draw_vg(gui_text_t *text,
     bool firstpath = true;
 
     float start_x, start_y;
+    uint32_t last_path_index = 0;
     for (int i = 0; i < verCount; i++)
     {
         switch (stbVertex[i].type)
         {
-        case 1:
+        case STBTT_vmove:
             if (firstpath)
             {
                 firstpath = false;
             }
             else
             {
-                nvgLineTo(vg, start_x, start_y);
-            }
-            if (pathHole)
-            {
-                nvgPathWinding(vg, NVG_HOLE);
-            }
-            else
-            {
-                pathHole = true;
+                if (isHole(&stbVertex[last_path_index], i - last_path_index))
+                {
+                    nvgPathWinding(vg, NVG_HOLE);
+                }
+                last_path_index = i;
             }
             nvgMoveTo(vg, stbVertex[i].x * scale, baseline - stbVertex[i].y * scale);
-            start_x = stbVertex[i].x * scale;
-            start_y = baseline - stbVertex[i].y * scale;
+            // gui_log("nvgMoveTo %d %d \n",stbVertex[i].x, stbVertex[i].y);
             break;
-        case 2:
+        case STBTT_vline:
             nvgLineTo(vg, stbVertex[i].x * scale, baseline - stbVertex[i].y * scale);
+            // gui_log("nvgLineTo %d %d \n",stbVertex[i].x, stbVertex[i].y);
             break;
-        case 3:
+        case STBTT_vcurve:
             nvgBezierTo(vg, stbVertex[i].cx * scale,  baseline - stbVertex[i].cy * scale,
                         stbVertex[i].cx * scale,  baseline - stbVertex[i].cy * scale,
                         stbVertex[i].x * scale,   baseline - stbVertex[i].y * scale);
+            // gui_log("nvgBezierTo %d %d \n",stbVertex[i].x, stbVertex[i].y);
+            break;
+        case STBTT_vcubic:
             break;
         default:
             break;
         }
     }
-
+    if (isHole(&stbVertex[last_path_index], verCount - last_path_index))
+    {
+        nvgPathWinding(vg, NVG_HOLE);
+    }
     nvgFillColor(vg, gui_svg_color(text->color.color.argb_full, alpha));
     nvgFill(vg);
 
@@ -534,6 +513,72 @@ static void stb_draw_vg(gui_text_t *text,
     nvgDeleteAGGE(vg);
 }
 #endif
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
+{
+    if (text->path)
+    {
+        gui_font_stb_init(text->path);
+    }
+    uint32_t *unicode_buf = NULL;
+    uint16_t unicode_len = 0;
+    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
+
+    text->font_len = unicode_len;
+    float all_char_w = 0;
+    float scale = 0;
+    int ch = 0, advance = 0, lsb = 0;
+    int line_flag = 0;
+    scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);
+    while (ch < unicode_len)
+    {
+        stbtt_GetCodepointHMetrics(&font, unicode_buf[ch++], &advance, &lsb);
+        all_char_w += advance * scale;
+    }
+    if (text->char_width_sum == 0)
+    {
+        switch (text->mode)
+        {
+        case LEFT:
+        case CENTER:
+        case RIGHT:
+            text->char_width_sum = all_char_w + 1;
+            text->char_line_sum = 1;
+            break;
+        case MULTI_LEFT:
+        case MULTI_CENTER:
+        case MULTI_RIGHT:
+            text->char_width_sum = all_char_w;
+            text->char_line_sum = all_char_w / text->base.w + 1 + line_flag;
+            break;
+        case SCROLL_X:
+            text->char_width_sum = (int)(all_char_w + 1);
+            text->char_line_sum = 1;
+            break;
+        case SCROLL_Y:
+            text->char_width_sum = all_char_w;
+            text->char_line_sum = all_char_w / text->base.w + 1;
+        default:
+            break;
+        }
+    }
+    gui_free(unicode_buf);
+}
+
+void gui_font_stb_unload(gui_text_t *text)
+{
+    if (text->data)
+    {
+        gui_free(((FONT_STB_SCREEN *)text->data)->buf);
+        gui_free((FONT_STB_SCREEN *)text->data);
+        text->data = NULL;
+    }
+}
+
 void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     if (text->font_mode != FONT_SRC_MEMADDR)
@@ -551,181 +596,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
-#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOSVG
-    while (ch < unicode_len)
-    {
-        int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
-        int advance, lsb, x0, y0, x1, y1;
-        stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
-        // gui_log("unicode : %c\n", unicode_buf[ch]);
-        if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
-        {
-            if (xpos + advance * scale > text->base.w)
-            {
-                break;
-            }
-        }
-        else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
-        {
-            if ((xpos + advance * scale > text->base.w) || unicode_buf[ch] == 0x0A)
-            {
-                line_num ++;
-                xpos = 0;
-            }
-            if ((line_num + 1) *  scale * (ascent - descent + lineGap) > text->base.h)
-            {
-                break;
-            }
-        }
-        else if (text->mode == SCROLL_X)
-        {
-            xpos += (advance * scale);
-            ch++;
-            continue;
-        }
-        else if (text->mode == SCROLL_Y)
-        {
-            if (xpos + advance * scale > text->base.w)
-            {
-                line_num ++;
-                xpos = 0;
-            }
-        }
-        ypos = line_num * scale * (ascent - descent + lineGap);
-        stbtt_GetGlyphBox(&font, glyph_index, &x0, &y0, &x1, &y1);
-        // stbtt_GetGlyphBitmapBoxSubpixel(&font, glyph_index, scale, scale, 0, 0, &x0, &y0, &x1, &y1);
-        stbtt_GetGlyphBitmapBox(&font, glyph_index, scale, scale, &x0, &y0, &x1, &y1);
-        stbtt_vertex *stbVertex = NULL;
-
-        int verCount = 0;
-        verCount = stbtt_GetGlyphShape(&font, glyph_index, &stbVertex);
-
-//start fill svg
-        NSVGimage *font_svg = gui_malloc(sizeof(NSVGimage));
-        if (font_svg == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-        }
-        memset(font_svg, 0, sizeof(NSVGimage));
-        font_svg->height = y1 - y0;
-        font_svg->width = x1;
-
-        NSVGshape *font_shape = gui_malloc(sizeof(NSVGshape));
-        if (font_shape == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-        }
-        memset(font_shape, 0, sizeof(NSVGshape));
-        font_shape->opacity = 1;
-        font_shape->fill.type = NSVG_PAINT_COLOR;
-        font_shape->fill.d.color = text->color.color.argb_full;
-        font_shape->flags = 1;
-        // font_shape->bounds[0] = 0;
-        // font_shape->bounds[1] = 0;
-        // font_shape->bounds[2] = 20;
-        // font_shape->bounds[3] = 20;
-        font_svg->shapes = font_shape;
-
-        int path_count = 1, path_npts = 1;
-        for (int i = 0; i < verCount; i++)
-        {
-            switch (stbVertex[i].type)
-            {
-            case 1:
-                path_count++;
-                break;
-            case 2:
-            case 3:
-                path_npts += 3;
-                break;
-            default:
-                break;
-            }
-        }
-
-        int *path_num = gui_malloc(path_count * sizeof(int));
-        int cur_path = 0;
-        for (int i = 0; i < verCount; i++)
-        {
-            if (stbVertex[i].type == 1)
-            {
-                path_num[cur_path++] = i;
-            }
-        }
-        path_num[cur_path] = verCount - 1;
-
-        int  pts_count = 0;
-        float px, py, cx, cy;
-        for (int i = 0; i < cur_path; i++)
-        {
-            for (int j = path_num[i]; j <= path_num[i + 1]; j++)
-            {
-                px = (float)stbVertex[j].x * scale;
-                py = baseline - ((float)stbVertex[j].y * scale);
-                switch (stbVertex[j].type)
-                {
-                case 1:
-                    stb_add_path(font_shape, &stbVertex[path_num[i]], path_num[i + 1] - path_num[i]);
-                    pts_count = 0;
-                    font_shape->paths->pts[pts_count++] = px;
-                    font_shape->paths->pts[pts_count++] = py;
-                    break;
-                case 2:
-                    font_shape->paths->pts[pts_count++] = px;
-                    font_shape->paths->pts[pts_count++] = py;
-                    font_shape->paths->pts[pts_count++] = px;
-                    font_shape->paths->pts[pts_count++] = py;
-                    font_shape->paths->pts[pts_count++] = px;
-                    font_shape->paths->pts[pts_count++] = py;
-                    break;
-                case 3:
-                    cx = (float)stbVertex[j].cx * scale;
-                    cy = baseline - ((float)stbVertex[j].cy * scale);
-                    font_shape->paths->pts[pts_count++] = cx;
-                    font_shape->paths->pts[pts_count++] = cy;
-                    font_shape->paths->pts[pts_count++] = cx;
-                    font_shape->paths->pts[pts_count++] = cy;
-                    font_shape->paths->pts[pts_count++] = px;
-                    font_shape->paths->pts[pts_count++] = py;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-        gui_free(path_num);
-
-//svg fill ok
-        // gui_log("fill ok stb \n");
-        int offset = 0;
-        switch (text->mode)
-        {
-        case LEFT:
-        case CENTER:
-        case RIGHT:
-            offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0) * text->mode;
-            break;
-        case MULTI_LEFT:
-        case MULTI_CENTER:
-        case MULTI_RIGHT:
-            break;
-        case SCROLL_X:
-            break;
-        case SCROLL_Y:
-        default:
-            break;
-        }
-        // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",unicode_buf[ch],ch,xpos,ypos);
-        stb_draw_svg(text, font_svg, xpos + offset, ypos);
-        extern void nsvgDelete(NSVGimage * image);
-        nsvgDelete(font_svg);
-        stbtt_FreeShape(&font, stbVertex);
-
-        xpos += (advance * scale);
-        ++ch;
-    }
-#elif defined RTK_GUI_FONT_ENABLE_TTF_NANOVG
-    // while (ch < 1)
+#ifdef RTK_GUI_FONT_ENABLE_TTF_NANOVG
     while (ch < unicode_len)
     {
         int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
@@ -869,3 +740,11 @@ void gui_font_stb_init(void *font_ttf_addr)
 {
     stbtt_InitFont(&font, font_ttf_addr, 0);
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
