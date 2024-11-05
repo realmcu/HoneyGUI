@@ -163,6 +163,10 @@ static lv_res_t lv_draw_ppe_bg(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_t
 static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *draw_dsc,
                                 const lv_area_t *coords, const void *src)
 {
+    if (draw_dsc->angle != 0)
+    {
+        return LV_RES_INV;
+    }
     bool done = false;
     if (draw_dsc->opa <= LV_OPA_MIN) { return LV_RES_OK; }
     lv_img_dsc_t *dsc = (lv_img_dsc_t *)src;
@@ -198,7 +202,6 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
             cf = LV_IMG_CF_RGBA5658;
             break;
         case LV_IMG_CF_RAW:
-            //TODO: for future use
             cf = LV_IMG_CF_RAW;
             break;
         default:
@@ -211,7 +214,7 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         lv_area_t map_area_rot;
         lv_point_t base_coord;
         lv_area_copy(&map_area_rot, coords);
-        if (draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE)
+        if (draw_dsc->zoom != LV_IMG_ZOOM_NONE)
         {
             int32_t w = lv_area_get_width(coords);
             int32_t h = lv_area_get_height(coords);
