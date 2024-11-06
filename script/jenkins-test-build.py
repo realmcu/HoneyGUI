@@ -148,7 +148,7 @@ if __name__ == '__main__':
     parser.add_argument('--binDir', help='build output dir')
     parser.add_argument('--HoneyGUI_CMD', action = 'store_true', help = 'is need to test HoneyGUI_CMD')
     parser.add_argument('--HoneyGUI_Simulator', action = 'store_true', help='is need to test HoneyGUI_Simulator')
-    parser.add_argument('--HoneyGUI_Monkey_Test', action = 'store_true', help='is need to test HoneyGUI_Simulator')
+    parser.add_argument('--HoneyGUI_Monkey_Test', action = 'store_true', help='is need to test HoneyGUI_Monkey_Test')
 
 
     arg_dict = parser.parse_args()
@@ -158,6 +158,7 @@ if __name__ == '__main__':
 
     # HoneyPatch Repo root directory
     HONEYGUI_ROOT = os.environ['HONEYGUI_ROOT']
+    print("HONEYGUI_ROOT:", HONEYGUI_ROOT)
 
     module_input_parameters = {}
     for m in ["HoneyGUI_CMD", "HoneyGUI_Simulator", "HoneyGUI_Monkey_Test"]:

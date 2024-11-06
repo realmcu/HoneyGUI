@@ -16,9 +16,9 @@ class SSH():
 
     def get_ftp_credentials(self, key):
         if key == "RTFTP":
-            return os.getenv("RT_USER"), os.getenv("RT_PWD")
+            return os.getenv("RT_USER") or os.environ.get("RTFTP_USR_NAME"), os.getenv("RT_PWD") or os.environ.get("RTFTP_USR_PWD")
         else:
-            return os.getenv("RS_USER"), os.getenv("RS_PWD")
+            return os.getenv("RS_USER") or os.environ.get("RSFTP_USR_NAME"), os.getenv("RS_PWD") or os.environ.get("RSFTP_USR_PWD")
 
     def exec_command(self, command, timeout=6000):
         print(command, flush=True)
