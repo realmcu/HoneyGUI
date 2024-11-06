@@ -212,4 +212,49 @@ inline void pixel_blend(pixel16_bgr565 &t, const pixel32_rgba &s, uint8_t a)
     }
 }
 
+
+
+template <>
+inline void pixel_blend(pixel32_bgra &t, const agge::pixel32_rgba &s, uint8_t a)
+{
+    if (a > 0xf4)
+    {
+
+        {
+            t.r = s.r;
+            t.g = s.g;
+            t.b = s.b;
+        }
+        if (t.a > 0xf4)
+        {
+            t.a = 255;
+        }
+        else
+        {
+            t.a = s.a ;
+        }
+    }
+    else if (a > 0x01)
+    {
+        uint8_t m_a = 0xff - a;
+
+        {
+            t.r = (s.r * a + t.r * m_a) >> 8;
+            t.g = (s.g * a + t.g * m_a) >> 8;
+            t.b = (s.b * a + t.b * m_a) >> 8;
+        }
+        if ((t.a == 0))
+        {
+            t.a = s.a * a >> 8;
+        }
+        else if (t.a > 0xf4)
+        {
+            t.a = 255;
+        }
+        else
+        {
+            t.a = (s.a * a + t.a * m_a) >> 8;
+        }
+    }
+}
 }  // namespace agge
