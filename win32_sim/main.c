@@ -21,9 +21,8 @@
 
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
-#define PROJECT_NAME                   "GUI Simulator"
-#define COMPANY_NAME                    "Realtek Semiconductor Corporation"
-
+#define PROJECT_NAME                   "HoneyGUI Simulator"
+#define COMPANY_NAME                   "Realtek Semiconductor Corporation"
 
 
 int main(int argc, char **argv)

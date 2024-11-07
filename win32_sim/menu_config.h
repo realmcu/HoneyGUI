@@ -26,6 +26,9 @@
 //  #define CONFIG_REALTEK_BUILD_REAL_BASE
 // </c>
 
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_3D
+// </c>
 
 // <c> RTK GUI Paint Engine Demo
 // #define CONFIG_REALTEK_BUILD_REAL_PAINTENGINE
