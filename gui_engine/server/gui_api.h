@@ -359,17 +359,25 @@ gui_color_t gui_color_css(const char *color_str);
  *
  * array       |key          |value type
  *
+ * activity    |move_max     |int *
+ *
+ * activity    |exercise_max |int *
+ *
+ * activity    |stand_max    |int *
+ *
  * activity    |move         |int *
  *
- * activity    |ex           |int *
+ * activity    |exercise     |int *
  *
  * activity    |stand        |int *
  *
- * weather     |low          |int *
+ * weather     |range_min    |int *
+ *
+ * weather     |range_max    |int *
  *
  * weather     |high         |int *
  *
- * weather     |cur          |int *
+ * weather     |current      |int *
  *
  * weather     |condition_1  |char *
  *
@@ -382,6 +390,10 @@ gui_color_t gui_color_css(const char *color_str);
  * weather     |condition_5  |char *
  *
  * compass     |degree       |int *
+ *
+ * heart_rate  |range_min    |int *
+ *
+ * heart_rate  |range_max    |int *
  *
  * heart_rate  |AM12         |int *
  *
