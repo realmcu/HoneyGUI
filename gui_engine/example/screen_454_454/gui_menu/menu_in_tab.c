@@ -44,6 +44,7 @@ static void music_cb(void);
 static void calendar_cb(void);
 static void combobox_cb(void);
 static void page_list_cb(void);
+static void canvas_output_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -173,7 +174,7 @@ void design_tab_menu(void *parent)
         "Calender",
         "Combo box",
         "Page list",
-        "xxx",
+        "Canvas",
     };
     int array_size = sizeof(array) / sizeof(array[0]);
     static gui_win_t *button_array[sizeof(array) / sizeof(array[0])];
@@ -197,7 +198,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 20)
+        if (i < 21)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -228,6 +229,7 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[17], (gui_event_cb_t)calendar_cb,          button_array[17]);
     gui_win_click(button_array[18], (gui_event_cb_t)combobox_cb,          button_array[18]);
     gui_win_click(button_array[19], (gui_event_cb_t)page_list_cb,          button_array[19]);
+    gui_win_click(button_array[20], (gui_event_cb_t)canvas_output_cb,          button_array[20]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -499,6 +501,10 @@ static void combobox_cb()
 static void page_list_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_PAGE_LIST))
+}
+static void canvas_output_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CANVAS_OUTPUT))
 }
 // Define an array for window list, containing 15 windows
 static gui_win_t *win_list_array[15];

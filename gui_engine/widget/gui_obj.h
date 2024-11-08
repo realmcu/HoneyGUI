@@ -91,7 +91,7 @@ typedef enum t_obj_type
     GRID                     = 0x0019,
     RADIO                    = 0x001A,
     RADIOSWITCH              = 0x001B,
-    ARC                      = 0x001C,
+    MACRO_CANVAS_ARC         = 0x001C,
     JAVASCRIPT               = 0x001D,
     MOVIE                    = 0x001E,
     IMAGE_SCOPE              = 0x001F,

@@ -924,7 +924,17 @@ void gui_img_set_attribute(gui_img_t  *this,
 
     this->data = path;
 }
-
+void gui_img_set_image_data(gui_img_t  *this, const uint8_t *file_pointer)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(file_pointer != NULL);
+    this->data = (void *)file_pointer;
+}
+const uint8_t *gui_img_get_image_data(gui_img_t  *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    return this->data;
+}
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->opacity_value = opacity_value;

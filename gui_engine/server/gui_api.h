@@ -227,6 +227,21 @@ int gui_fs_ioctl(int fd, int cmd);
 gui_fs_dir *gui_fs_opendir(const char *name);
 struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d);
 void *gui_get_file_address(const char *file);
+/**
+ * @brief Resolves a relative file path to an absolute file path.
+ *
+ * This function takes a relative file path and returns the corresponding absolute
+ * file path.
+ *
+ * @param relative_path The relative path to be resolved. It should be a valid
+ *                      relative path string.
+ *
+ * @return A pointer to a string containing the absolute file path. The caller
+ *         is responsible for managing the memory of the returned path string.
+ *         If the relative path cannot be resolved, NULL may be returned.
+ */
+const char *gui_get_path_by_relative(const char *relative_path);
+
 char *gui_strdup(const char *s);
 char *gui_filepath_transforming(void *addr);
 

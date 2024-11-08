@@ -623,7 +623,13 @@ char *gui_filepath_transforming(void *addr)
     fclose(fd);
     return path;
 }
-
+const char *gui_get_path_by_relative(const char *relative_path)
+{
+    char *path = gui_malloc(strlen(relative_path) + strlen(GUI_ROOT_FOLDER) + 1);
+    GUI_ASSERT(path != NULL);
+    sprintf(path, "%s%s", GUI_ROOT_FOLDER, (char *)relative_path);
+    return path;
+}
 int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
 {
     if (ftl->read)

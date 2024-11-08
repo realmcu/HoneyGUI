@@ -403,6 +403,30 @@ typedef struct gui_animate
     bool Beginning_frame;
     bool end_frame;
 } gui_animate_t;
+/**
+ * @brief Macro that defines the parameters for an animation callback function.
+ *
+ * This macro specifies the parameters that an animation callback function must take.
+ * These parameters typically include a generic pointer `p`, a pointer to the widget
+ * being animated `this_widget`, and a pointer to an `animate` structure.
+ *
+ * @param p            A generic pointer parameter that can be used to pass custom data.
+ * @param this_widget  A pointer to the widget that is being animated.
+ * @param animate      A pointer to the structure containing animation details.
+ */
+#define GUI_ANIMATION_CALLBACK_PARAMETER void *p, void *this_widget, struct gui_animate *animate
+
+/**
+ * @brief Macro to define an animation callback function.
+ *
+ * This macro is used to define the signature of an animation callback function.
+ * The `function_name` parameter specifies the name of the function. The function
+ * will take the parameters defined by `GUI_ANIMATION_CALLBACK_PARAMETER`.
+ *
+ * @param function_name  The name of the animation callback function to define.
+ */
+#define GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(function_name) void function_name(GUI_ANIMATION_CALLBACK_PARAMETER)
+
 typedef void (* gui_animate_callback_t)(void *p, void *this_widget, gui_animate_t *animate);
 
 typedef struct _gui_rect_file_head

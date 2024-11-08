@@ -281,7 +281,7 @@ static const char *get_type_name(T_OBJ_TYPE type)
         ENUM_TO_STRING(GRID)
         ENUM_TO_STRING(RADIO)
         ENUM_TO_STRING(RADIOSWITCH)
-        ENUM_TO_STRING(ARC)
+        ENUM_TO_STRING(MACRO_CANVAS_ARC)
         ENUM_TO_STRING(JAVASCRIPT)
         ENUM_TO_STRING(MOVIE)
         ENUM_TO_STRING(IMAGE_SCOPE)
@@ -1058,6 +1058,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
             {
 
                 animate->Beginning_frame = 1;
+                animate->end_frame = 1;
             }
 
 

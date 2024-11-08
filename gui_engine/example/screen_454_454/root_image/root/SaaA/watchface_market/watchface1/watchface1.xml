@@ -3,7 +3,7 @@
             x="0"
             y="0"
             opacity="255"
-            file="watchface_market/watchface1/Slice1.bin"
+            file="SaaA/watchface_market/watchface1/Slice1.bin"
             blendMode="imgBypassMode"
             >watchface
     </img>
@@ -11,7 +11,7 @@
             x="221"
             y="146"
             opacity="255"
-            file="watchface_market/watchface1/Union2.bin"
+            file="SaaA/watchface_market/watchface1/Union2.bin"
             blendMode="imgSrcOverMode"
             >hour_hand
             <onTime
@@ -23,7 +23,7 @@
             x="222"
             y="66"
             opacity="255"
-            file="watchface_market/watchface1/Union.bin"
+            file="SaaA/watchface_market/watchface1/Union.bin"
             blendMode="imgSrcOverMode"
             >minute_hand
             <onTime
@@ -35,7 +35,7 @@
             x="228"
             y="100"
             opacity="255"
-            file="watchface_market/watchface1/Vector7.bin"
+            file="SaaA/watchface_market/watchface1/Vector7.bin"
             blendMode="imgSrcOverMode"
             >second_hand
             <onTime
@@ -47,14 +47,14 @@
             x="226"
             y="222"
             opacity="255"
-            file="watchface_market/watchface1/Ellipse5.bin"
+            file="SaaA/watchface_market/watchface1/Ellipse5.bin"
             blendMode="imgSrcOverMode"
             >mask
             
     </img>
     <icon
-            picture="watchface_market/watchface1/Group21.bin"
-            highlightPicture="watchface_market/watchface1/Group21hl.bin"
+            picture="SaaA/watchface_market/watchface1/Group21.bin"
+            highlightPicture="SaaA/watchface_market/watchface1/Group21hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -71,8 +71,8 @@
             </onClick>
     </icon>
     <icon
-            picture="watchface_market/watchface1/Group23.bin"
-            highlightPicture="watchface_market/watchface1/Group23hl.bin"
+            picture="SaaA/watchface_market/watchface1/Group23.bin"
+            highlightPicture="SaaA/watchface_market/watchface1/Group23hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -88,9 +88,25 @@
                     id="APP_MUSIC">
             </onClick>
     </icon>
+    <arc
+        centerX="85"
+        centerY="369"
+        radius="27"
+        strokeWidth="4"
+        strokeColor="yellow"
+        startAngle="0"
+        endAngle="3.14"
+        clockwise="CW"
+        cap="round">arc1
+        <onPeripheral 
+            type="activity" 
+            to="arc1" 
+            id="exercise">
+        </onPeripheral>
+    </arc>
     <icon
-            picture="watchface_market/watchface1/Group22.bin"
-            highlightPicture="watchface_market/watchface1/Group22hl.bin"
+            picture="SaaA/watchface_market/watchface1/Group22.bin"
+            highlightPicture="SaaA/watchface_market/watchface1/Group22hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -102,8 +118,8 @@
             y="342">btn_sport
     </icon>
     <icon
-            picture="watchface_market/watchface1/Ellipse19.bin"
-            highlightPicture="watchface_market/watchface1/Ellipse19hl.bin"
+            picture="SaaA/watchface_market/watchface1/Ellipse19.bin"
+            highlightPicture="SaaA/watchface_market/watchface1/Ellipse19hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -126,7 +142,7 @@
             h="49"
             text="97"
             fontSize="24"
-            font="watchface_market/watchface1/MichromaRegularSize24Bits4Font.bin"
+            font="SaaA/watchface_market/watchface1/MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_brightness
             <onPeripheral 
                 type="Weather" 
@@ -144,7 +160,7 @@
             h="49"
             text="SATURDAY"
             fontSize="24"
-            font="watchface_market/watchface1/MichromaRegularSize24Bits4Font.bin"
+            font="SaaA/watchface_market/watchface1/MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_week
             <onTime
                 type="MONDAY"
@@ -160,7 +176,7 @@
             h="49"
             text="12/MARCH"
             fontSize="16"
-            font="watchface_market/watchface1/MichromaRegularSize16Bits4Font.bin"
+            font="SaaA/watchface_market/watchface1/MichromaRegularSize16Bits4Font.bin"
             mode="center">txt_date
             <onTime
                 type="1/JANUARY"

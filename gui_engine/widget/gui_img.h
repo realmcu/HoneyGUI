@@ -445,6 +445,31 @@ void gui_img_append_animate(gui_img_t              *_this,
                             void                   *p,
                             const char              *name);
 
+/**
+ * @brief Sets the image data for a specified image widget.
+ *
+ * This function assigns the given image data to the specified image widget.
+ * The image data might correspond to various formats, and the format
+ * should be compatible with the handling of `gui_img_t`.
+ *
+ * @param widget          The pointer to the image widget (`gui_img_t`) for which the image data is to be set.
+ * @param image_data_pointer  The pointer to the image data to be set to the widget.
+ *                            The data should persist as long as the widget needs it or until it is explicitly updated.
+ */
+void gui_img_set_image_data(gui_img_t *widget, const uint8_t *image_data_pointer);
+
+/**
+ * @brief Gets the image data from a specified image widget.
+ *
+ * This function returns the current image data that is set in the specified image widget.
+ *
+ * @param widget The pointer to the image widget (`gui_img_t`) from which the image data should be retrieved.
+ *
+ * @return A pointer to the image data currently set in the widget. If no image data is set, the result may be `NULL`.
+ */
+const uint8_t *gui_img_get_image_data(gui_img_t *widget);
+
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

@@ -24,7 +24,7 @@
 #include "string.h"
 #include "stdio.h"
 #include <stdlib.h>
-#include <stdarg.h>
+
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
@@ -36,17 +36,14 @@
 
 
 
-#ifdef __arm__
-#include "romfs.h"
-#else
-#include <sys/stat.h>
-#include <fcntl.h>
-#endif
+
 
 #if defined __WIN32
 #include <dirent.h>
+//#include <sys/stat.h>
+#include <fcntl.h>
 #else
-
+#include "romfs.h"
 #endif
 
 #include "gui_api.h"
@@ -82,7 +79,7 @@ static struct widget_create widget[] =
     {"gallery", GALLERY},
     {"radio", RADIO},
     {"appendTexts", RADIOSWITCH},
-    {"arc", ARC},
+    {"arc", MACRO_CANVAS_ARC},
     {"movie", MOVIE},
     {"animateTransform", MACRO_ANIMATETRANSFORM},
     {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
@@ -128,15 +125,37 @@ typedef struct
     char *animate_type;
     gui_img_t *img;
 } image_animate_params_t;
+typedef struct arc_animation_param
+{
+    gui_color_t stroke;
+    float sd;
+    float ed;
+    int image_data_length;
+    int image_width;
+    int image_height;
+    uint8_t *target_buffer;
+    int16_t cx;
+    int16_t cy;
+    int16_t r;
+    int16_t stroke_width;
+    uint8_t cap;
+    uint8_t aniamtion_type;
+    uint8_t dir;
+
+} arc_animation_param_t;
+
 #define TEXT_WEATHER_CUR_ANIMATION 1
+#define ARC_ACTIVITY_EX_ANIMATION 2
 static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
-static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate);
-static void text_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate);
+
 static const uint8_t *gui_get_image_file_address(const char *image_file_path);
 
-static void text_animate_weather_callback(void *p, void *this_widget, gui_animate_t *animate);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_watchface_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback);
 static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
@@ -317,9 +336,10 @@ static char *read_file(const char *path)
     long length = ftell(file);
     fseek(file, 0, SEEK_SET);
     char *content = (char *)malloc(length + 1);
-    if (content)
+    //if (content)
     {
-        fread(content, 1, length, file);
+        size_t n = fread(content, 1, length, file);
+        gui_log("%d\n", n);
         content[length] = '\0';
     }
     fclose(file);
@@ -340,6 +360,11 @@ static void parse_json(const char *json_str)
         sscanf(ptr, "\"id\": %d", &lights[index].id);
 
         ptr = strstr(ptr, "\"state\"");
+        if (!ptr)
+        {
+            return;
+        }
+
         sscanf(ptr, "\"state\": \"%9[^\"]\"", state_buffer);
         lights[index].state = (strcmp(state_buffer, "on") == 0);
 
@@ -771,8 +796,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     const char *text = "text";
 #ifdef __WIN32
                     char *font = "app/system/resource/font/tangyuanti.ttf";
-#elif defined RTL8772F
-                    char *font = "app/system/resource/font/tangyuanti.ttf";
 #else
                     char *font =
                         "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
@@ -901,11 +924,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     t->path = gui_get_file_address(font);
                                     t->font_height = fontSize;
                                     t->font_type = GUI_FONT_SRC_TTF;
-#elif defined RTL8772F
-                                    font_type2 = GUI_FONT_SRC_TTF;
-                                    t->path = gui_get_file_address(font);
-                                    t->font_height = fontSize;
-                                    t->font_type = GUI_FONT_SRC_TTF;
 #else
                                     font_type =
                                         "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
@@ -954,7 +972,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *file = NULL;
                     char *folder = NULL;
                     int count = 0;
-                    uint32_t duration;
+                    uint32_t duration = 1000;
                     float scalex = 1;
                     float scaley = 1;
                     float angle = 0;
@@ -1232,7 +1250,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_tabview_loop_x((void *)parent, true);
                 }
                 break;
-            case ARC:
+            case MACRO_CANVAS_ARC:
                 {
                     size_t i = 0;
                     int16_t cx = 100; GUI_UNUSED(cx);
@@ -1240,10 +1258,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t r = 100; GUI_UNUSED(r);
                     int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
                     int cap = 0; GUI_UNUSED(cap);
-                    gui_color_t fill = APP_COLOR_RED;
                     gui_color_t stroke = APP_COLOR_RED;
                     float sd = 0; GUI_UNUSED(sd);
                     float ed = 100; GUI_UNUSED(ed);
+                    int dir;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1251,11 +1269,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             break;
                         }
                         //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX"))
+                        if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
                         {
                             cx = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centralY"))
+                        else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centerY") ||
+                                 !strcmp(p->attr[i], "centralY"))
                         {
                             cy = atoi(p->attr[++i]);
                         }
@@ -1263,11 +1282,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             r = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "startDegree"))
+                        else if (!strcmp(p->attr[i], "startDegree") || !strcmp(p->attr[i], "startAngle"))
                         {
                             sd = atof(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "endDegree"))
+                        else if (!strcmp(p->attr[i], "endDegree") || !strcmp(p->attr[i], "endAngle"))
                         {
                             ed = atof(p->attr[++i]);
                         }
@@ -1275,7 +1294,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             stroke_width = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode"))
+                        else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
+                                 !strcmp(p->attr[i], "cap"))
                         {
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "butt"))
@@ -1291,27 +1311,112 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 cap = NVG_SQUARE;
                             }
                         }
-                        else if (!strcmp(p->attr[i], "fill"))
-                        {
-                            fill = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "stroke") || !strcmp(p->attr[i], "color"))
+                        else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
                         {
                             stroke = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "direction") || !strcmp(p->attr[i], "clockwise"))
+                        {
+                            if (!strcmp(p->attr[++i], "CCW") || !strcmp(p->attr[i], "count clockwise"))
+                            {
+                                dir = NVG_CCW;
+                            }
+                            else if (!strcmp(p->attr[i], "CW") || !strcmp(p->attr[i], "clockwise"))
+                            {
+                                dir = NVG_CW;
+                            }
+
                         }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
-                    parent = (void *)gui_canvas_create(parent, ptxt, 0, 0, 454, 454, 0);
-                    gui_canvas_set_canvas_cb((void *)parent, draw_arc);
-                    /*GUI_TYPE(gui_canvas_t, parent)->draw = draw_arc;
-                    GUI_TYPE(gui_canvas_t, parent)->cx = cx;
-                    GUI_TYPE(gui_canvas_t, parent)->cy = cy;
-                    GUI_TYPE(gui_canvas_t, parent)->r = r;
-                    GUI_TYPE(gui_canvas_t, parent)->sw = stroke_width;
-                    GUI_TYPE(gui_canvas_t, parent)->s = stroke;
-                    GUI_TYPE(gui_canvas_t, parent)->ed = ed;
-                    GUI_TYPE(gui_canvas_t, parent)->sd = sd;*/
+                    //arc animation by user's buffer
+                    {
+                        int image_h = r * 2 + stroke_width * 2,
+                            image_w = image_h,
+                            pixel_bytes = 4,
+                            buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                        uint8_t *imgdata = gui_lower_malloc(buffer_size);
+                        memset(imgdata, 0, buffer_size);
+                        int format = GUI_CANVAS_OUTPUT_RGBA; bool compression = 0; int image_width = image_w;
+                        int image_height = image_h;  uint8_t *target_buffer = imgdata;
+                        {
+                            int pixel_length = 4;
+                            int data_length = 0;
+                            uint8_t *buffer = 0;
+                            uint8_t *output_data = 0;
+                            switch (format)
+                            {
+                            case GUI_CANVAS_OUTPUT_PNG:
+                            case GUI_CANVAS_OUTPUT_JPG:
+                                {
+                                    data_length = image_width * image_height * pixel_length;
+                                    buffer = gui_lower_malloc(data_length);
+                                    memset(buffer, 0, data_length);
+                                }
+                                break;
+                            case GUI_CANVAS_OUTPUT_RGBA:
+                                {
+                                    output_data = target_buffer;
+                                    buffer = output_data + sizeof(gui_rgb_data_head_t);
+                                    memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                                    gui_rgb_data_head_t *head = (void *)output_data;
+                                    head->type = ARGB8888;
+                                    head->w = image_width;
+                                    head->h = image_height;
+                                }
+                                break;
+                            case GUI_CANVAS_OUTPUT_RGB565:
+                                {
+                                    pixel_length = 2;
+                                    output_data = target_buffer;
+                                    memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                                    buffer = output_data + sizeof(gui_rgb_data_head_t);
+                                    gui_rgb_data_head_t *head = (void *)output_data;
+                                    head->type = RGB565;
+                                    head->w = image_width;
+                                    head->h = image_height;
+                                }
+                                break;
+                            default:
+                                break;
+                            }
+
+                            {
+                                NVGcontext *vg = 0;
+                                extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                                                 uint32_t h,
+                                                                 uint32_t stride,
+                                                                 enum     NVGtexture format,
+                                                                 uint8_t *data);
+                                extern void nvgDeleteAGGE(NVGcontext * ctx);
+                                vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
+                                                   (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
+                                nvgBeginFrame(vg, image_width, image_height, 1);
+
+                                nvgResetTransform(vg);
+                                float a0,  a1;
+                                a0 = sd;
+                                a1 = ed;
+                                if (a0 != a1)
+                                {
+                                    nvgArc(vg, r + stroke_width, r + stroke_width, r, sd, ed, dir);
+                                    nvgStrokeWidth(vg, stroke_width);
+                                    nvgStrokeColor(vg, nvgRGBA(stroke.color.rgba.r, stroke.color.rgba.g, stroke.color.rgba.b,
+                                                               stroke.color.rgba.a));
+                                    nvgStroke(vg);
+                                }
+
+
+                                nvgEndFrame(vg);
+                                nvgDeleteAGGE(vg);
+                            }
+                        }
+                        gui_img_t *img = gui_img_create_from_mem(parent, ptxt, imgdata, cx - image_w / 2, cy - image_h / 2,
+                                                                 0, 0);
+                        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                        parent = (void *)img;
+                    }
 
 
                 }
@@ -1370,12 +1475,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "color"))
                         {
                             color = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], color);
+                            //gui_log("color %s,%x\n", p->attr[i], color);
                         }
                         else if (!strcmp(p->attr[i], "highlightColor"))
                         {
                             highlightColor = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], highlightColor);
+                            //gui_log("color %s,%x\n", p->attr[i], highlightColor);
                         }
                         else if (!strcmp(p->attr[i], "orientation"))
                         {
@@ -1506,12 +1611,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "color"))
                         {
                             color = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], color);
+                            //gui_log("color %s,%x\n", p->attr[i], color);
                         }
                         else if (!strcmp(p->attr[i], "highlightColor"))
                         {
                             highlightColor = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], highlightColor);
+                            //gui_log("color %s,%x\n", p->attr[i], highlightColor);
                         }
                         else if (!strcmp(p->attr[i], "orientation"))
                         {
@@ -2293,10 +2398,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             font_type2 = GUI_FONT_SRC_TTF;
                             GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
                             GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
-#elif defined RTL8772F
-                            font_type2 = GUI_FONT_SRC_TTF;
-                            GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
-                            GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
+
 #else
                             font_type =
                                 "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
@@ -2799,7 +2901,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 addr = (void *)gui_get_image_file_address(file_path);
                                 if (!config.img_array)
                                 {
-                                    data = gui_malloc(sizeof(void *));
+                                    data = gui_malloc(sizeof(uint8_t *));
                                 }
                                 else
                                 {
@@ -2904,7 +3006,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     addr = (void *)gui_get_image_file_address(file_path);
                                     if (!config.img_array)
                                     {
-                                        data = gui_malloc(sizeof(void *));
+                                        data = gui_malloc(sizeof(uint8_t *));
                                     }
                                     else
                                     {
@@ -3075,7 +3177,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
                                 }
 
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
                             }
 
                         }
@@ -3104,7 +3206,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                             }
 
-                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
 
                         }
                         else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
@@ -4120,31 +4222,135 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                     case IMAGE_FROM_MEM:
                         {
+                            if (type)
+                            {
+                                if (!strcmp(type, "activity"))
+                                {
+                                    if (!strcmp(id, "exercise"))
+                                    {
+                                        arc_animation_param_t *param = 0;
+                                        ezxml_t pt = p->parent;
+                                        if (!strcmp(p->parent->name, "arc"))
+                                        {
+                                            ezxml_t p = pt;
+                                            size_t i = 0;
+                                            int16_t cx = 100; GUI_UNUSED(cx);
+                                            int16_t cy = 100; GUI_UNUSED(cy);
+                                            int16_t r = 100; GUI_UNUSED(r);
+                                            int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
+                                            int cap = 0; GUI_UNUSED(cap);
+                                            gui_color_t stroke = APP_COLOR_RED;
+                                            float sd = 0; GUI_UNUSED(sd);
+                                            float ed = 100; GUI_UNUSED(ed);
+                                            int dir;
+                                            while (true)
+                                            {
+                                                if (!(p->attr[i]))
+                                                {
+                                                    break;
+                                                }
+                                                //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                                                if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
+                                                {
+                                                    cx = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centerY") ||
+                                                         !strcmp(p->attr[i], "centralY"))
+                                                {
+                                                    cy = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "r") || !strcmp(p->attr[i], "radius"))
+                                                {
+                                                    r = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "startDegree") || !strcmp(p->attr[i], "startAngle"))
+                                                {
+                                                    sd = atof(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "endDegree") || !strcmp(p->attr[i], "endAngle"))
+                                                {
+                                                    ed = atof(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "strokeWidth") || !strcmp(p->attr[i], "stroke-width"))
+                                                {
+                                                    stroke_width = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
+                                                         !strcmp(p->attr[i], "cap"))
+                                                {
+                                                    char *s = p->attr[++i];
+                                                    if (!strcmp(p->attr[i], "butt"))
+                                                    {
+                                                        cap = NVG_BUTT;
+                                                    }
+                                                    else if (!strcmp(p->attr[i], "round"))
+                                                    {
+                                                        cap = NVG_ROUND;
+                                                    }
+                                                    else if (!strcmp(p->attr[i], "square"))
+                                                    {
+                                                        cap = NVG_SQUARE;
+                                                    }
+                                                }
+                                                else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
+                                                {
+                                                    stroke = string_rgb888(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "direction") || !strcmp(p->attr[i], "clockwise"))
+                                                {
+                                                    if (!strcmp(p->attr[++i], "CCW") || !strcmp(p->attr[i], "count clockwise"))
+                                                    {
+                                                        dir = NVG_CCW;
+                                                    }
+                                                    else if (!strcmp(p->attr[i], "CW") || !strcmp(p->attr[i], "clockwise"))
+                                                    {
+                                                        dir = NVG_CW;
+                                                    }
 
+                                                }
+                                                i++;
+                                            }
+                                            int image_h = r * 2 + stroke_width * 2,
+                                                image_w = image_h,
+                                                pixel_bytes = 4,
+                                                buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                                            param = gui_malloc(sizeof(arc_animation_param_t));
+                                            memset(param, 0, sizeof(arc_animation_param_t));
+                                            param->aniamtion_type = ARC_ACTIVITY_EX_ANIMATION;
+                                            param->cap = cap;
+                                            param->cx = cx;
+                                            param->cy = cy;
+                                            param->dir = dir;
+                                            param->ed = ed;
+                                            param->image_data_length = buffer_size;
+                                            param->r = r;
+                                            param->sd = sd;
+                                            param->stroke = stroke;
+                                            param->stroke_width = stroke_width;
+                                            param->image_width = image_w;
+                                            param->image_height = image_h;
+                                            param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
+
+                                        }
+                                        gui_img_set_animate((void *)parent, 1000, -1, arc_animate_activity_callback, (void *)param);
+                                    }
+                                }
+                            }
                         }
                         break;
                     case TEXTBOX:
                         {
                             if (type)
                             {
-
-                            }
-                            if (type)
-                            {
                                 if (!strcmp(type, "Weather"))
                                 {
-
-
                                     if (!strcmp(id, "Current"))
                                     {
-
                                         gui_text_set_animate(parent, 1000, -1, text_animate_weather_callback,
                                                              (void *)TEXT_WEATHER_CUR_ANIMATION);
                                     }
-
                                 }
                             }
-
                         }
                         break;
                     default:
@@ -4211,7 +4417,7 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
         time_t rawtime;
         struct tm *timeinfo;
 
-#if _WIN32
+#if __WIN32
         time(&rawtime);
         timeinfo = localtime(&rawtime);
 
@@ -4262,7 +4468,7 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
 }
 static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
 {
-#ifndef _WIN32
+#ifndef __WIN32
     //uint16_t seconds = get_system_clock_second();
     //uint16_t minute = RtkWristbandSys.Global_Time.minutes;
     //uint16_t hour = RtkWristbandSys.Global_Time.hour;
@@ -4415,7 +4621,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                         idcount++;
                                     }
                                 }
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                             {
                                 //to
@@ -4437,7 +4643,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                         idcount++;
                                     }
                                 }
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                         }
                         if (!strcmp(type, "image frame") && from)
@@ -4516,7 +4722,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                 dur_num = dur_num * 1000;
                             }
 
-                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
                         {
                             //repeatCount
@@ -4531,7 +4737,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                             }
                             repeat_num = repeatCount_num;
 
-                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
 
                         image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
@@ -5198,7 +5404,7 @@ static const uint8_t *gui_get_image_file_address(const char *image_file_path)
     }
     return addr;
 }
-static void text_animate_weather_callback(void *p, void *this_widget, gui_animate_t *animate)
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
 {
     if (!animate->Beginning_frame)
     {
@@ -5209,8 +5415,14 @@ static void text_animate_weather_callback(void *p, void *this_widget, gui_animat
     {
     case TEXT_WEATHER_CUR_ANIMATION:
         {
-            int fd = gui_fs_open("gui_engine\\example\\web\\peripheral_simulation\\json\\simulation_data.json",
-                                 0);
+            const char *path =
+                gui_get_path_by_relative("SaaA\\peripheral_simulation\\json\\simulation_data.json");
+            int fd = gui_fs_open(path, 0);
+            gui_free((void *)path);
+            if (fd < 1)
+            {
+                return;
+            }
             int size = gui_fs_lseek(fd, 0, SEEK_END);
             gui_fs_lseek(fd, 0, SEEK_SET);
             char *json_string = gui_malloc(size + 1);
@@ -5233,3 +5445,128 @@ static void text_animate_weather_callback(void *p, void *this_widget, gui_animat
     }
 
 }
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+    arc_animation_param_t *param = p;
+    switch (param->aniamtion_type)
+    {
+    case ARC_ACTIVITY_EX_ANIMATION:
+        {
+            const char *path =
+                gui_get_path_by_relative("SaaA\\peripheral_simulation\\json\\simulation_data.json");
+            int fd = gui_fs_open(path, 0);
+            gui_free((void *)path);
+            int size = gui_fs_lseek(fd, 0, SEEK_END);
+            gui_fs_lseek(fd, 0, SEEK_SET);
+            char *json_string = gui_malloc(size + 1);
+            gui_fs_read(fd, json_string, size);
+            gui_fs_close(fd);
+            json_string[size] = '\0';
+            int move = 0;
+            //gui_log("%s\n",json_string);
+            gui_get_json_value(json_string, "activity", "ex", &move);
+            gui_free(json_string);
+            int max = 60;
+            int min = 0;
+            float per = (float)(move - min) / (float)(max - min);
+            gui_log("%d,%f\n", move, per);
+            arc_animation_param_t *param = p;
+            {
+                memset(param->target_buffer, 0, param->image_data_length);
+                int format = GUI_CANVAS_OUTPUT_RGBA; bool compression = 0; int image_width = param->image_width;
+                int image_height = param->image_height;  uint8_t *target_buffer = param->target_buffer;
+                {
+                    int pixel_length = 4;
+                    int data_length = 0;
+                    uint8_t *buffer = 0;
+                    uint8_t *output_data = 0;
+                    switch (format)
+                    {
+                    case GUI_CANVAS_OUTPUT_PNG:
+                    case GUI_CANVAS_OUTPUT_JPG:
+                        {
+                            data_length = image_width * image_height * pixel_length;
+                            buffer = gui_lower_malloc(data_length);
+                            memset(buffer, 0, data_length);
+                        }
+                        break;
+                    case GUI_CANVAS_OUTPUT_RGBA:
+                        {
+                            output_data = target_buffer;
+                            buffer = output_data + sizeof(gui_rgb_data_head_t);
+                            memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                            gui_rgb_data_head_t *head = (void *)output_data;
+                            head->type = ARGB8888;
+                            head->w = image_width;
+                            head->h = image_height;
+                        }
+                        break;
+                    case GUI_CANVAS_OUTPUT_RGB565:
+                        {
+                            pixel_length = 2;
+                            output_data = target_buffer;
+                            memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                            buffer = output_data + sizeof(gui_rgb_data_head_t);
+                            gui_rgb_data_head_t *head = (void *)output_data;
+                            head->type = RGB565;
+                            head->w = image_width;
+                            head->h = image_height;
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+
+                    {
+                        NVGcontext *vg = 0;
+                        extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                                         uint32_t h,
+                                                         uint32_t stride,
+                                                         enum     NVGtexture format,
+                                                         uint8_t *data);
+                        extern void nvgDeleteAGGE(NVGcontext * ctx);
+                        vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
+                                           (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
+                        nvgBeginFrame(vg, image_width, image_height, 1);
+
+                        nvgResetTransform(vg);
+                        float a0,  a1;
+                        a0 = param->sd;
+                        a1 = (param->ed - param->sd) * per + param->sd;
+                        if (a0 != a1)
+                        {
+                            nvgArc(vg, param->r + param->stroke_width, param->r + param->stroke_width, param->r, a0, a1,
+                                   param->dir);
+                            nvgStrokeWidth(vg, param->stroke_width);
+                            nvgStrokeColor(vg, nvgRGBA(param->stroke.color.rgba.r, param->stroke.color.rgba.g,
+                                                       param->stroke.color.rgba.b, param->stroke.color.rgba.a));
+                            nvgStroke(vg);
+                        }
+
+
+
+                        nvgEndFrame(vg);
+                        nvgDeleteAGGE(vg);
+                    }
+                }
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+
+
+
+
+
+
+
+

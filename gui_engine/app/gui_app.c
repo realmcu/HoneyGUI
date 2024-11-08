@@ -187,7 +187,10 @@ void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms)
 gui_app_t *gui_obj_tree_get_app(gui_obj_t *obj)
 {
     gui_obj_t *child = obj;
-
+    if (!child)
+    {
+        return (gui_app_t *)0;
+    }
     while (true)
     {
         if (child->parent == NULL && child->type == SCREEN)
