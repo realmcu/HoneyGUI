@@ -49,6 +49,20 @@ typedef struct _gui_point4D
     float w;
 } gui_point_4d_t;
 
+typedef struct
+{
+    float x;
+    float y;
+} gui_3d_point_2d_t;
+
+typedef struct
+{
+    float ux;
+    float uy;
+    float uz;
+    float uw;
+} gui_vector_4d_t;
+
 typedef gui_point_4d_t gui_vector4D_t;
 
 typedef struct
@@ -62,8 +76,8 @@ typedef struct
 typedef struct
 {
     uint32_t            state;
-    gui_3d_vertex_t     vertex[3];
-    gui_3d_vertex_t     transform_vertex[3];
+    gui_3d_vertex_t     vertex[4];
+    gui_3d_vertex_t     transform_vertex[4];
 } gui_3d_face_t;
 
 typedef gui_3d_matrix_t gui_3d_world_t;
@@ -100,7 +114,12 @@ bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t camera
 
 void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera);
 
+void gui_3d_face_transform_local_to_local(gui_3d_face_t *face, gui_3d_matrix_t *m);
 
+void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *result, float px, float py, float pz,
+                                        float ux, float uy, float uz, float angle_degrees);
+
+bool gui_3d_generate_2d_matrix(gui_3d_point_2d_t *src, gui_3d_point_2d_t *dst, float *ret);
 #ifdef __cplusplus
 }
 #endif
