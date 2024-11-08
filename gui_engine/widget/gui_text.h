@@ -33,6 +33,7 @@ extern "C" {
 #include "gui_obj.h"
 #include "gui_img.h"
 #include "draw_font.h"
+#include "gui_win.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -102,33 +103,37 @@ typedef struct gui_text
 {
     gui_obj_t base;
     gui_color_t color;
+    gui_animate_t *animate;
+    gui_img_t *scale_img;
+    uint8_t *emoji_path;
+    float min_scale;
+    void *content;
+    void *data;
+    void *path;
+
     uint16_t len;
     uint16_t font_len;
     uint16_t active_font_len;
     int16_t char_width_sum;
     int16_t char_height_sum;
     int16_t char_line_sum;
+    int16_t offset_x;
+    int16_t offset_y;
+
     TEXT_MODE mode;
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
     FONT_SRC_MODE font_mode;
     uint8_t font_height;
-    uint8_t inputable : 1;    // support user input or not
-    uint8_t ispasswd  : 1;    // is a passwd text, to inform kb
-    uint8_t wordwrap  : 1;
+    uint8_t emoji_size;
     uint8_t checksum;
     bool layout_refresh;
     bool content_refresh;
-    gui_animate_t *animate;
-    void *content;
-    void *data;
-    void *path;//!<  address or path
-    int16_t offset_x;
-    int16_t offset_y;
-    float min_scale;
-    gui_img_t *scale_img;
-    uint8_t *emoji_path;
-    uint8_t emoji_size;
+
+    uint8_t inputable     : 1;
+    uint8_t ispasswd      : 1;
+    uint8_t wordwrap      : 1;
+    uint8_t scope         : 1;
 } gui_text_t;
 
 /** @brief  text line structure */

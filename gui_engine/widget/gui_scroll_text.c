@@ -182,6 +182,36 @@ static void gui_scroll_text_update_att(gui_obj_t *obj)
     gui_scroll_text_t *this = (void *)obj;
     animate_frame_update(this->base.animate, obj);
 }
+
+static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
+{
+    text->scope = 0;
+    gui_obj_t *o = (gui_obj_t *)text;
+    gui_win_t *win_scope = NULL;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+        {
+            text->scope = 1;
+            win_scope = (void *)o;
+            break;
+        }
+    }
+    if (text->scope && win_scope != NULL)
+    {
+        int scopex = win_scope->base.matrix->m[0][2];
+        int scopey = win_scope->base.matrix->m[1][2];
+        int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
+        int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
+
+        rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
+        rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
+        rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
+        rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+    }
+}
+
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
@@ -210,6 +240,21 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
             }
         }
     }
+#if 0 // font mat scale min scale function
+    if (this->base.matrix->m[0][0] < this->min_scale)
+    {
+        this->base.matrix->m[0][0] = this->min_scale;
+        this->scale_img->base.matrix->m[0][0] = this->min_scale;
+    }
+    if (this->base.matrix->m[1][1] < this->min_scale)
+    {
+        this->base.matrix->m[1][1] = this->min_scale;
+        this->scale_img->base.matrix->m[1][1] = this->min_scale;
+    }
+    // gui_log("text scale x %f, y %f ; img scale x %f, y %f",
+    //         this->base.matrix->m[0][0],this->base.matrix->m[1][1],
+    //         this->scale_img->base.matrix->m[0][0],this->scale_img->base.matrix->m[1][1]);
+#endif
     this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
     gui_scroll_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
@@ -308,6 +353,8 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         gui_scroll_text_font_load(&text->base, &draw_rect);
     }
+
+    gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
 
     if (text->duration_time_ms == 0)
     {

@@ -147,7 +147,7 @@ static NVGpaint gui_svg_create_radial_gradient(NVGcontext *vg, NSVGgradient *gra
     return paint;
 }
 
-static void gui_svg_nsvg_draw(NVGcontext *vg, NSVGimage *image, float alpha)
+void gui_svg_nsvg_draw(NVGcontext *vg, NSVGimage *image, float alpha)
 {
     int cap;
 

@@ -4,7 +4,7 @@
 	<screen w="800"
     h="800">screen_launcher
 				<win>win_launcher
-					<textbox text="APP列表,点击进入" fontColor="#ff0072">t1</textbox>
+					<textbox text="APP LIST" fontColor="#ff0072">t1</textbox>
 					<iconlist y="100">ic_launcher
 					</iconlist>
 				</win>

@@ -25,6 +25,7 @@ typedef struct
     uint8_t char_h;
 } GUI_CHAR_HEAD;
 
+/** @brief  mem char struct start */
 typedef struct
 {
     uint32_t unicode;
@@ -38,6 +39,7 @@ typedef struct
     uint8_t *dot_addr;
     gui_img_t *emoji_img;
 } mem_char_t;
+/** @brief  mem char struct end */
 
 typedef struct
 {

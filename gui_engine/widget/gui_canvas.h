@@ -130,6 +130,37 @@ gui_canvas_t *gui_canvas_create(void       *parent,
  * @param cb the callback function for drawing specific shapes
  */
 void gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t *this_widget));
+#define GUI_CANVAS_OUTPUT_PNG 1
+#define GUI_CANVAS_OUTPUT_JPG 2
+#define GUI_CANVAS_OUTPUT_RGBA 3
+#define GUI_CANVAS_OUTPUT_RGB565 4
+
+typedef void (*gui_canvas_render_function)(NVGcontext *vg);
+
+/**
+ * @brief Renders a canvas and outputs it in the specified format.
+ *
+ * This function renders a canvas using the provided renderer function and
+ * outputs the result in one of the specified formats. The output can be
+ * optionally compressed, depending on the format.
+ *
+ * @param output_format The format of the output image. Should be one of the following:
+ *                      - GUI_CANVAS_OUTPUT_PNG
+ *                      - GUI_CANVAS_OUTPUT_JPG
+ *                      - GUI_CANVAS_OUTPUT_RGBA
+ *                      - GUI_CANVAS_OUTPUT_RGB565
+ * @param compression   Whether to apply compression to the output (applicable for RGBA/RGB565 format).
+ * @param image_width   The width of the output image.
+ * @param image_height  The height of the output image.
+ * @param renderer      A function pointer to the rendering function that takes an NVGcontext.
+ *                      This function is responsible for all drawing operations.
+ *
+ * @return A pointer to the buffer containing the output image data. The format of
+ *         the data depends on the specified output_format. The user is responsible
+ *         for managing the memory associated with this buffer.
+ */
+const uint8_t *gui_canvas_output(int output_format, bool compression, int image_width,
+                                 int image_height, gui_canvas_render_function renderer);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

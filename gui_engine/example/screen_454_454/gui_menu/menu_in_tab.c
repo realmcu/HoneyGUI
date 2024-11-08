@@ -42,6 +42,8 @@ static void soccer_cb(void);
 static void box2d_ring_cb(void);
 static void music_cb(void);
 static void calendar_cb(void);
+static void combobox_cb(void);
+static void page_list_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -145,6 +147,9 @@ void design_tab_menu(void *parent)
         ICON_MENU_BIN,
         ICON_MENU_BIN,
         ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
     };
     static char *text_array[] =
     {
@@ -166,6 +171,9 @@ void design_tab_menu(void *parent)
         "Box2d ring",
         "Music",
         "Calender",
+        "Combo box",
+        "Page list",
+        "xxx",
     };
     int array_size = sizeof(array) / sizeof(array[0]);
     static gui_win_t *button_array[sizeof(array) / sizeof(array[0])];
@@ -189,7 +197,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 18)
+        if (i < 20)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -218,6 +226,8 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[15], (gui_event_cb_t)box2d_ring_cb,     button_array[15]);
     gui_win_click(button_array[16], (gui_event_cb_t)music_cb,          button_array[16]);
     gui_win_click(button_array[17], (gui_event_cb_t)calendar_cb,          button_array[17]);
+    gui_win_click(button_array[18], (gui_event_cb_t)combobox_cb,          button_array[18]);
+    gui_win_click(button_array[19], (gui_event_cb_t)page_list_cb,          button_array[19]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -481,6 +491,14 @@ static void music_cb()
 static void calendar_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALENDAR))
+}
+static void combobox_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_COMBOBOX))
+}
+static void page_list_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_PAGE_LIST))
 }
 // Define an array for window list, containing 15 windows
 static gui_win_t *win_list_array[15];

@@ -342,5 +342,28 @@
         fontSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
     </calendar>
-
+<combo
+    x="450"              
+    y="400"             
+    w="220"                      
+    items="Item1,Item2,Item3,Item4,Item5"             
+    rowSpacing="48"  
+    itemPicture="app\\box\\resource\\combo\\itembk.bin"
+    itemPictureHighlight="app\\box\\resource\\combo\\itemhighlight.bin"
+    itemPictureSelection="app\\box\\resource\\combo\\itemselection.bin"
+    selectionPictureCollapsed="app\\box\\resource\\combo\\selsector.bin"
+    selectionPicture="app\\box\\resource\\combo\\selectorunfold.bin"
+    selectionPictureCollapsedHighlight="app\\box\\resource\\combo\\selectorhl.bin"
+    selectionPictureHighlight="app\\box\\resource\\combo\\selectorunfoldhl.bin"
+    backgroundColor="#ffffff"
+    fontSize="16"
+    font="app/box/resource/font/Michroma_Regular_size16_bits4_font.bin"
+    fontColor="#484848"
+    fontSizeSelection="16"
+    fontSelection="app/box/resource/font/Michroma_bold_size16_bits4_font.bin"
+    fontColorSelection="#1a1a1a"   
+    fontColorHighlight="#000000" 
+    blendMode="imgSrcOverMode"  
+>combo1
+</combo>
 </screen></app>

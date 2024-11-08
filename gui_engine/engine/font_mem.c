@@ -76,11 +76,13 @@ void gui_font_get_dot_info(gui_text_t *text)
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
     GUI_ASSERT(font != 0)
-    uint8_t rendor_mode = 0;
-    if (font != NULL)
+    if (font == NULL)
     {
-        rendor_mode = font->rendor_mode;
+        GUI_ASSERT(font != NULL);
+        return;
     }
+    uint8_t rendor_mode = 0;
+    rendor_mode = font->rendor_mode;
     if (rendor_mode == 0)
     {
         rendor_mode = 1;

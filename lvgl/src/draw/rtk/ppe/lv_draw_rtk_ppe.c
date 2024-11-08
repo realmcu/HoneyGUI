@@ -13,7 +13,6 @@
 #include "lv_draw_rtk_ppe.h"
 #include "lv_draw_rtk_ppe_rect.h"
 #include "lv_draw_rtk_ppe_blend.h"
-#include "trace.h"
 
 //#if LV_COLOR_DEPTH != 32
 //#include "../../../core/lv_refr.h"
@@ -59,6 +58,8 @@ void lv_draw_ppe_ctx_init(lv_disp_drv_t *drv, lv_draw_ctx_t *draw_ctx)
     draw_ctx->draw_rect = lv_draw_ppe_rect;
 //    draw_ctx->draw_img_decoded = lv_draw_ppe_img_decoded;
     draw_sw_ctx->blend = lv_draw_ppe_blend;
+    uint8_t channel1 = 1, channel2 = 3;
+    hal_dma_channel_init(&channel1, &channel2);
 }
 
 void lv_draw_ppe_ctx_deinit(lv_disp_drv_t *drv, lv_draw_ctx_t *draw_ctx)
@@ -162,18 +163,19 @@ static lv_res_t lv_draw_ppe_bg(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_t
 static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *draw_dsc,
                                 const lv_area_t *coords, const void *src)
 {
+    if (draw_dsc->angle != 0)
+    {
+        return LV_RES_INV;
+    }
     bool done = false;
     if (draw_dsc->opa <= LV_OPA_MIN) { return LV_RES_OK; }
-
-    _lv_img_cache_entry_t *cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
-
-    if (cdsc == NULL) { return LV_RES_INV; }
+    lv_img_dsc_t *dsc = (lv_img_dsc_t *)src;
 
     lv_img_cf_t cf;
-    if (lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) { cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED; }
+    if (lv_img_cf_is_chroma_keyed(dsc->header.cf)) { cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED; }
     else
     {
-        switch (cdsc->dec_dsc.header.cf)
+        switch (dsc->header.cf)
         {
         case LV_IMG_CF_ALPHA_8BIT:
             cf = LV_IMG_CF_ALPHA_8BIT;
@@ -199,30 +201,20 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         case LV_IMG_CF_RGBA5658:
             cf = LV_IMG_CF_RGBA5658;
             break;
+        case LV_IMG_CF_RAW:
+            cf = LV_IMG_CF_RAW;
+            break;
         default:
-#if LV_IMG_CACHE_DEF_SIZE == 0
-            lv_img_decoder_close(&cdsc->dec_dsc);
-#else
-            LV_UNUSED(cache);
-#endif
             return LV_RES_INV;
         }
     }
 
-    if (cdsc->dec_dsc.error_msg != NULL)
-    {
-        LV_LOG_WARN("Image draw error");
-
-        LV_ASSERT(cdsc->dec_dsc.error_msg == NULL);
-    }
-    /*The decoder could open the image and gave the entire uncompressed image.
-     *Just draw it!*/
-    else if (cdsc->dec_dsc.img_data)
+    if (dsc->data)
     {
         lv_area_t map_area_rot;
         lv_point_t base_coord;
         lv_area_copy(&map_area_rot, coords);
-        if (draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE)
+        if (draw_dsc->zoom != LV_IMG_ZOOM_NONE)
         {
             int32_t w = lv_area_get_width(coords);
             int32_t h = lv_area_get_height(coords);
@@ -239,24 +231,18 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if (_lv_area_intersect(&clip_com, draw_ctx->clip_area, &map_area_rot) == false)
         {
-#if LV_IMG_CACHE_DEF_SIZE == 0
-            lv_img_decoder_close(&cdsc->dec_dsc);
-#else
-            LV_UNUSED(cache);
-#endif
             return LV_RES_OK;
         }
-
         const lv_area_t *clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
         if (draw_dsc->recolor_opa != LV_OPA_TRANSP)
         {
-            done = (LV_RES_OK == lv_ppe_blit_recolor(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf));
+            done = (LV_RES_OK == lv_ppe_blit_recolor(draw_ctx, draw_dsc, coords, dsc->data, cf));
         }
         else
         {
             done = (LV_RES_OK == lv_ppe_blit_transform(draw_ctx, draw_dsc, &base_coord, coords,
-                                                       cdsc->dec_dsc.img_data, cf));
+                                                       dsc->data, cf));
         }
         draw_ctx->clip_area = clip_area_ori;
     }
@@ -266,11 +252,6 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         done = false;
     }
 
-#if LV_IMG_CACHE_DEF_SIZE == 0
-    lv_img_decoder_close(&cdsc->dec_dsc);
-#else
-    LV_UNUSED(cache);
-#endif
     if (done)
     {
         return LV_RES_OK;

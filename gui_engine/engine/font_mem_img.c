@@ -123,9 +123,6 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
 
                 uint32_t color_output[4];
                 gui_color_t write_color = color;
-                uint8_t temp_b = write_color.color.rgba.b;
-                write_color.color.rgba.b = write_color.color.rgba.r;
-                write_color.color.rgba.r = temp_b;
                 int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
                 for (int i = 0; i < 1 << rendor_mode; i++)
                 {
@@ -202,9 +199,6 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
                 gui_color_t write_color = color;
-                uint8_t temp_b = write_color.color.rgba.b;
-                write_color.color.rgba.b = write_color.color.rgba.r;
-                write_color.color.rgba.r = temp_b;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i;
@@ -253,9 +247,6 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
                 gui_color_t write_color = color;
-                uint8_t temp_b = write_color.color.rgba.b;
-                write_color.color.rgba.b = write_color.color.rgba.r;
-                write_color.color.rgba.r = temp_b;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i;
@@ -302,9 +293,6 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
                 gui_color_t write_color = color;
-                uint8_t temp_b = write_color.color.rgba.b;
-                write_color.color.rgba.b = write_color.color.rgba.r;
-                write_color.color.rgba.r = temp_b;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i ;
@@ -401,8 +389,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
         break;
     }
 
-    uint32_t size = buf_width * buf_height * (uint32_t)font_img_pixel_bytes + sizeof(
-                        struct gui_rgb_data_head);
+    uint32_t size = buf_width * buf_height * (uint32_t)font_img_pixel_bytes +
+                    sizeof(struct gui_rgb_data_head);
     void *img_buf = FONT_MALLOC_PSRAM(size);
     memset(img_buf, 0x00, size);
 

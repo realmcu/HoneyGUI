@@ -277,6 +277,128 @@ static void draw_circle(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc,
         }
     }
 }
+
+// Function to draw a circle with clipping
+static void draw_circle_save(draw_ctx_t *ctx, const draw_circle_dsc_t *dsc
+                            )
+{
+    if (ctx == NULL || dsc == NULL) { return; }
+
+    rgba_color_t color = dsc->color;
+    uint8_t opa = dsc->opa;
+    int32_t radius = dsc->radius;
+    int32_t cx = dsc->cx;
+    int32_t cy = dsc->cy;
+
+    rgba_color_t *buf_rgba = (rgba_color_t *)ctx->buf;
+    uint16_t *buf_rgb565 = (uint16_t *)ctx->buf;
+    int32_t buf_w = ctx->buf_width;
+    int32_t buf_h = ctx->buf_height;
+
+    // Calculate the interval between each sample point
+    float inv_samples = 1.0f / GRID_SAMPLES;
+
+    // Determine the color format of the output buffer
+    color_format_t format = ctx->format;
+
+    // Iterate over each pixel in the buffer
+    for (int32_t y = 0; y < buf_h; y++)
+    {
+        for (int32_t x = 0; x < buf_w; x++)
+        {
+            // Skip the pixel if it's outside the clipping region
+
+            // Calculate the distance from the center of this pixel to the center of the circle
+            float dx = x - cx;
+            float dy = y - cy;
+            float distance = sqrtf(dx * dx + dy * dy);
+
+            // If completely inside the circle, fill the color directly, no need for anti-aliasing
+            if (distance <= radius - 1.0f)
+            {
+                int32_t buf_index = y * buf_w + x;
+                buf_rgba[buf_index] = color;
+
+            }
+            // Otherwise, perform anti-aliasing
+            else if (distance <= radius + 1.0f)
+            {
+                int inside_count = 0;
+
+                // Perform grid sampling for the current pixel
+                for (int i = 0; i < GRID_SAMPLES; i++)
+                {
+                    for (int j = 0; j < GRID_SAMPLES; j++)
+                    {
+                        // Calculate the position of each sub-pixel
+                        float sub_x = x + (i + 0.5f) * inv_samples;
+                        float sub_y = y + (j + 0.5f) * inv_samples;
+
+                        // Calculate the distance between the sub-pixel and the center of the circle
+                        float sub_dx = sub_x - cx;
+                        float sub_dy = sub_y - cy;
+                        if (sub_dx * sub_dx + sub_dy * sub_dy <= radius * radius)
+                        {
+                            inside_count++;
+                        }
+                    }
+                }
+
+                // Calculate the coverage ratio of sub-pixels
+                float coverage_ratio = inside_count * inv_samples * inv_samples;
+                if (coverage_ratio > 0)
+                {
+                    int32_t buf_index = y * buf_w + x;
+
+                    rgba_color_t color_temp = color;
+                    color_temp.a = opa * coverage_ratio;
+                    // Mix colors based on coverage ratio
+                    {
+                        buf_rgba[buf_index] = color_temp;
+                    }
+                }
+            }
+        }
+    }
+}
+
+static void *renderer_save(int r, gui_color_t color)
+{
+    struct gui_dispdev *screen = gui_get_dc();
+    int32_t buf_width = r * 2;
+    int32_t buf_height = buf_width;
+    uint8_t *file = gui_malloc(buf_width * buf_height * 4 + sizeof(gui_rgb_data_head_t));
+    memset(file, 0, buf_width * buf_height * 4 + sizeof(gui_rgb_data_head_t));
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)file;
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = ARGB8888;
+    head->version = 0;
+    head->rsvd2 = 0;
+    head->w = buf_width;
+    head->h = buf_height;
+    color_t *buffer = (color_t *)(file + sizeof(gui_rgb_data_head_t));
+    draw_ctx_t draw_ctx = {COLOR_FORMAT_RGBA, buffer, buf_width, buf_height};
+    int x = 0, y = 0;
+
+    draw_circle_dsc_t circle_dsc =
+    {
+        .color = {color.color.rgba.b, color.color.rgba.g, color.color.rgba.r, color.color.rgba.a},   // Circle color
+        .opa = 255,                  // Circle opacity
+        .radius = r,         // Circle radius
+        .cx = r,         // Circle center X coordinate
+        .cy = r,      // Circle center Y coordinate
+
+    };
+
+
+    // Call the function to draw the circle
+    draw_circle_save(&draw_ctx, &circle_dsc);
+    return file;
+}
 // Determine if an angle is within a sector's range
 static int is_within_sector(float angle, float start_angle, float end_angle)
 {
@@ -440,7 +562,267 @@ static void renderer(gui_circle_t *widget)
     // Call the function to draw the circle
     draw_circle(&draw_ctx, &circle_dsc, &clip_area);
 }
+typedef struct
+{
+    rgba_color_t color;
+    rgb565_color_t color_rgb565;
+    uint8_t opa;
+    int32_t outer_radius;   // Outer radius of the ring
+    int32_t inner_radius;   // Inner radius of the ring
+    int32_t cx;
+    int32_t cy;
+    float start_angle;      // Starting angle in radians
+    float end_angle;        // Ending angle in radians
+} draw_arc_dsc_t;
+static void draw_arc(draw_ctx_t *ctx, const draw_arc_dsc_t *dsc, const clip_rect_t *clip_rect)
+{
+    if (ctx == NULL || dsc == NULL) { return; }
 
+    rgba_color_t color = dsc->color;
+    uint8_t opa = dsc->opa;
+    int32_t outer_radius = dsc->outer_radius;
+    int32_t inner_radius = dsc->inner_radius;
+    int32_t cx = dsc->cx;
+    int32_t cy = dsc->cy;
+    float start_angle = dsc->start_angle;
+    float end_angle = dsc->end_angle;
+
+    // Ensure angles are in the range [0, 2*PI)
+    if (start_angle < 0 || start_angle >= 2 * M_PI) { return; }
+    if (end_angle < 0 || end_angle >= 2 * M_PI) { return; }
+
+    rgba_color_t *buf_rgba = (rgba_color_t *)ctx->buf;
+    uint16_t *buf_rgb565 = (uint16_t *)ctx->buf;
+    int32_t buf_w = ctx->buf_width;
+    int32_t buf_h = ctx->buf_height;
+
+    float inv_samples = 1.0f / GRID_SAMPLES;
+    color_format_t format = ctx->format;
+
+    for (int32_t y = 0; y < buf_h; y++)
+    {
+        for (int32_t x = 0; x < buf_w; x++)
+        {
+            if (clip_rect != NULL && (x < clip_rect->x || x >= clip_rect->x + clip_rect->width ||
+                                      y < clip_rect->y || y >= clip_rect->y + clip_rect->height))
+            {
+                continue;
+            }
+
+            float dx = x - cx;
+            float dy = y - cy;
+            float distance = sqrtf(dx * dx + dy * dy);
+            float angle = atan2f(dy, dx);
+            if (angle < 0)
+            {
+                angle += 2 * M_PI;
+            }
+
+            if (angle >= start_angle && angle <= end_angle)
+            {
+                // If the pixel is completely inside the outer radius and outside the inner radius
+                if (distance <= outer_radius - 1.0f && distance >= inner_radius + 1.0f)
+                {
+                    int32_t buf_index = y * buf_w + x;
+                    if (format == COLOR_FORMAT_RGBA)
+                    {
+                        buf_rgba[buf_index] = color_mix_rgba(color, ((rgba_color_t *)buf_rgba)[buf_index], opa);
+                    }
+                    else if (format == COLOR_FORMAT_RGB565)
+                    {
+                        buf_rgb565[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                 ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                 opa);
+                    }
+                }
+                // Perform anti-aliasing on the edges of the ring
+                else if ((distance > inner_radius - 1.0f && distance < inner_radius + 1.0f) ||
+                         (distance > outer_radius - 1.0f && distance < outer_radius + 1.0f) ||
+                         (fabsf(angle - start_angle) < 1e-3) || (fabsf(angle - end_angle) < 1e-3))
+                {
+                    int inside_count = 0;
+
+                    for (int i = 0; i < GRID_SAMPLES; i++)
+                    {
+                        for (int j = 0; j < GRID_SAMPLES; j++)
+                        {
+                            float sub_x = x + (i + 0.5f) * inv_samples;
+                            float sub_y = y + (j + 0.5f) * inv_samples;
+                            float sub_dx = sub_x - cx;
+                            float sub_dy = sub_y - cy;
+                            float sub_distance = sqrtf(sub_dx * sub_dx + sub_dy * sub_dy);
+                            float sub_angle = atan2f(sub_dy, sub_dx);
+                            if (sub_angle < 0)
+                            {
+                                sub_angle += 2 * M_PI;
+                            }
+
+                            if (sub_distance <= outer_radius && sub_distance >= inner_radius &&
+                                sub_angle >= start_angle && sub_angle <= end_angle)
+                            {
+                                inside_count++;
+                            }
+                        }
+                    }
+
+                    float coverage_ratio = inside_count * inv_samples * inv_samples;
+                    if (coverage_ratio > 0)
+                    {
+                        int32_t buf_index = y * buf_w + x;
+                        uint8_t mixed_opa = opa * coverage_ratio;
+
+                        if (format == COLOR_FORMAT_RGBA)
+                        {
+                            buf_rgba[buf_index] = color_mix_rgba(color, ((rgba_color_t *)buf_rgba)[buf_index], mixed_opa);
+                        }
+                        else if (format == COLOR_FORMAT_RGB565)
+                        {
+                            buf_rgb565[buf_index] = color_mix_rgb565(dsc->color_rgb565.rgb565,
+                                                                     ((uint16_t *)ctx->buf)[buf_index], dsc->color_rgb565.r, dsc->color_rgb565.g, dsc->color_rgb565.b,
+                                                                     mixed_opa);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+static void draw_arc_save(draw_ctx_t *ctx, const draw_arc_dsc_t *dsc)
+{
+    if (ctx == NULL || dsc == NULL) { return; }
+
+    rgba_color_t color = dsc->color;
+    uint8_t opa = dsc->opa;
+    int32_t outer_radius = dsc->outer_radius;
+    int32_t inner_radius = dsc->inner_radius;
+    int32_t cx = dsc->cx;
+    int32_t cy = dsc->cy;
+    float start_angle = dsc->start_angle;
+    float end_angle = dsc->end_angle;
+
+    // Ensure angles are in the range [0, 2*PI)
+    if (start_angle < 0 || start_angle >= 2 * M_PI) { return; }
+    if (end_angle < 0 || end_angle >= 2 * M_PI) { return; }
+
+    rgba_color_t *buf_rgba = (rgba_color_t *)ctx->buf;
+    uint16_t *buf_rgb565 = (uint16_t *)ctx->buf;
+    int32_t buf_w = ctx->buf_width;
+    int32_t buf_h = ctx->buf_height;
+
+    float inv_samples = 1.0f / GRID_SAMPLES;
+    color_format_t format = ctx->format;
+
+    for (int32_t y = 0; y < buf_h; y++)
+    {
+        for (int32_t x = 0; x < buf_w; x++)
+        {
+
+
+            float dx = x - cx;
+            float dy = y - cy;
+            float distance = sqrtf(dx * dx + dy * dy);
+            float angle = atan2f(dy, dx);
+            if (angle < 0)
+            {
+                angle += 2 * M_PI;
+            }
+
+            if (angle >= start_angle && angle <= end_angle)
+            {
+                // If the pixel is completely inside the outer radius and outside the inner radius
+                if (distance <= outer_radius - 1.0f && distance >= inner_radius + 1.0f)
+                {
+                    int32_t buf_index = y * buf_w + x;
+
+                    {
+                        buf_rgba[buf_index] = color;
+                    }
+
+                }
+                // Perform anti-aliasing on the edges of the ring
+                else if ((distance > inner_radius - 1.0f && distance < inner_radius + 1.0f) ||
+                         (distance > outer_radius - 1.0f && distance < outer_radius + 1.0f)
+                        )
+                {
+                    int inside_count = 0;
+
+                    for (int i = 0; i < GRID_SAMPLES; i++)
+                    {
+                        for (int j = 0; j < GRID_SAMPLES; j++)
+                        {
+                            float sub_x = x + (i + 0.5f) * inv_samples;
+                            float sub_y = y + (j + 0.5f) * inv_samples;
+                            float sub_dx = sub_x - cx;
+                            float sub_dy = sub_y - cy;
+                            float sub_distance = sqrtf(sub_dx * sub_dx + sub_dy * sub_dy);
+                            // float sub_angle = atan2f(sub_dy, sub_dx);
+                            // if (sub_angle < 0)
+                            // {
+                            //     sub_angle += 2 * M_PI;
+                            // }
+
+                            if (sub_distance <= outer_radius && sub_distance >= inner_radius)
+                            {
+                                inside_count++;
+                            }
+                        }
+                    }
+
+                    float coverage_ratio = inside_count * inv_samples * inv_samples;
+                    if (coverage_ratio > 0)
+                    {
+                        int32_t buf_index = y * buf_w + x;
+
+                        rgba_color_t color_temp = color;
+                        color_temp.a = opa * coverage_ratio;
+                        // Mix colors based on coverage ratio
+                        {
+                            buf_rgba[buf_index] = color_temp;
+                        }
+
+
+                    }
+                }
+            }
+        }
+    }
+}
+static void *renderer_save_arc(int r_in, int r_out, float start, float end, gui_color_t color)
+{
+    struct gui_dispdev *screen = gui_get_dc();
+    int32_t buf_width = r_out;
+    int32_t buf_height = r_out;
+    uint8_t *file = gui_malloc(buf_width * buf_height * 4 + sizeof(gui_rgb_data_head_t));
+    memset(file, 0, buf_width * buf_height * 4 + sizeof(gui_rgb_data_head_t));
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)file;
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = ARGB8888;
+    head->version = 0;
+    head->rsvd2 = 0;
+    head->w = buf_width;
+    head->h = buf_height;
+    color_t *buffer = (color_t *)(file + sizeof(gui_rgb_data_head_t));
+    draw_ctx_t draw_ctx = {COLOR_FORMAT_RGBA, buffer, buf_width, buf_height};
+    int x = 0, y = 0;
+    draw_arc_dsc_t arc_dsc =
+    {
+        .color = {color.color.rgba.b, color.color.rgba.g, color.color.rgba.r, color.color.rgba.a},
+        .opa = 255,
+        .outer_radius = r_out,
+        .inner_radius = r_in, // For example, you can pass it through widget too
+        .cx = 0,
+        .cy = 0,
+        .start_angle = start, // Pass start angle
+        .end_angle = end      // Pass end angle
+    };
+
+    draw_arc_save(&draw_ctx, &arc_dsc);
+    return file;
+}
 static void sector_renderer(gui_sector_t *widget)
 {
     struct gui_dispdev *screen = gui_get_dc();

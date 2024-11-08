@@ -305,6 +305,8 @@ void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms);
  *         or if no application object is found, the function returns NULL.
  */
 gui_app_t *gui_obj_tree_get_app(gui_obj_t *obj);
+void gui_app_append(gui_app_t *app);
+gui_app_t *gui_app_get_by_name(const char *name);
 /** End of APP_Exported_Functions
   * @}
   */

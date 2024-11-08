@@ -19,6 +19,7 @@
  *============================================================================*/
 #include <string.h>
 #include "gui_obj.h"
+#include "gui_fb.h"
 #include "gui_px.h"
 #include "tp_algo.h"
 
@@ -127,8 +128,32 @@ static void gui_px_draw(gui_px_t *this)
     gui_px_application_render(this, this->elapsed);
     pRenderSurface = &this->RenderSurface;
 
-    memcpy(dc->frame_buf, pRenderSurface->surfaceBuffer,
-           dc->fb_width * dc->fb_height * dc->bit_depth / 8);
+    if (dc->bit_depth == 32)
+    {
+        memcpy(dc->frame_buf, pRenderSurface->surfaceBuffer,
+               dc->fb_width * dc->fb_height * dc->bit_depth / 8);
+    }
+    else if (dc->bit_depth == 16)
+    {
+        for (uint32_t i = 0; i < dc->fb_width * dc->fb_height; i++)
+        {
+            px_color *pixel = pRenderSurface->surfaceBuffer + i;
+            uint8_t source_alpha = pixel->_argb.a;
+            uint8_t source_red = pixel->_argb.r;
+            uint8_t source_green = pixel->_argb.g;
+            uint8_t source_blue = pixel->_argb.b;
+
+            color_rgb565_t *write_pixel = (color_rgb565_t *)dc->frame_buf + i;
+            write_pixel->r = source_red >> 3;
+            write_pixel->g = source_green >> 2;
+            write_pixel->b = source_blue >> 3;
+        }
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+
 }
 
 static void gui_px_end(gui_px_t *this)

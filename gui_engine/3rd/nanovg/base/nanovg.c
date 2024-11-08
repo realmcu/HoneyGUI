@@ -1973,8 +1973,6 @@ void nvgCircle(NVGcontext *ctx, float cx, float cy, float r)
 void (*patch_nvg_fill)(NVGcontext *ctx) = NULL;
 void (*patch_nvg_stroke)(NVGcontext *ctx) = NULL;
 
-#ifndef RTL8762D
-
 void nvgFill(NVGcontext *ctx)
 {
     if (patch_nvg_fill != NULL)
@@ -2072,7 +2070,7 @@ void nvgStroke(NVGcontext *ctx)
         ctx->drawCallCount++;
     }
 }
-#endif
+
 
 
 // State setting
@@ -2465,193 +2463,6 @@ void patch_nvgStroke(NVGcontext *ctx)
         path = &ctx->cache->paths[i];
         ctx->strokeTriCount += path->nstroke - 2;
         ctx->drawCallCount++;
-    }
-}
-
-#endif
-
-#ifdef RTL8762D
-
-static void draw_line(float sx, float sy, float ex, float ey, float width, uint8_t a, uint8_t r,
-                      uint8_t g, uint8_t b)
-{
-    float dx, dy, d;
-    r = r >> 3;
-    b = b >> 3;
-    g = g >> g;
-    uint16_t color565 = r << 11 | g << 5 | b;
-    dx = ex - sx;
-    dy = ey - sy;
-    d = sqrtf(dx * dx + dy * dy);
-    gui_dispdev_t *dc = gui_get_dc();
-    int y_start = dc->section_count * dc->fb_height;
-    int y_end  = (dc->section_count + 1) * dc->fb_height;
-
-    if (d > 0.0001f)
-    {
-        dx /= d;
-        dy /= d;
-    }
-    else
-    {
-        dx = 0;
-        dy = 1;
-    }
-    float xx = sx;
-    float yy = sy;
-    uint32_t x = 0;
-    uint32_t y = 0;
-    for (uint32_t i = 0; i < (uint32_t)d; i++)
-    {
-        xx += dx;
-        yy += dy;
-
-        x = xx;
-        y = yy;
-
-        if ((y >= y_start)  && (y < y_end))
-        {
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            writebuf[dc->fb_width * (y - y_start) + x] = color565;
-//            writebuf[dc->fb_width * (y - y_start) + x + 1] = color565;
-//            writebuf[dc->fb_width * (y - y_start + 1) + x] = color565;
-//            writebuf[dc->fb_width * (y - y_start + 1) + x + 1] = color565;
-        }
-    }
-}
-
-void nvgStroke(NVGcontext *ctx)
-{
-    NVGstate *state = nvg__getState(ctx);
-    float scale = nvg__getAverageScale(state->xform);
-    float strokeWidth = nvg__clampf(state->strokeWidth * scale, 0.0f, 200.0f);
-    NVGpaint strokePaint = state->stroke;
-
-    if (strokeWidth < ctx->fringeWidth)
-    {
-        // If the stroke width is less than pixel size, use alpha to emulate coverage.
-        // Since coverage is area, scale by alpha*alpha.
-        float alpha = nvg__clampf(strokeWidth / ctx->fringeWidth, 0.0f, 1.0f);
-        strokePaint.innerColor.a *= alpha * alpha;
-        strokePaint.outerColor.a *= alpha * alpha;
-        strokeWidth = ctx->fringeWidth;
-    }
-
-    // Apply global alpha
-    strokePaint.innerColor.a *= state->alpha;
-    strokePaint.outerColor.a *= state->alpha;
-
-    if (ctx->params.edgeAntiAlias && state->shapeAntiAlias)
-    {
-        nvg__expandStroke(ctx, strokeWidth * 0.5f, ctx->fringeWidth, state->lineCap, state->lineJoin,
-                          state->miterLimit);
-    }
-    else
-    {
-        nvg__expandStroke(ctx, strokeWidth * 0.5f, 0.0f, state->lineCap, state->lineJoin,
-                          state->miterLimit);
-    }
-    nvg__flattenPaths(ctx);
-    if (ctx->params.edgeAntiAlias && state->shapeAntiAlias)
-    {
-        nvg__expandStroke(ctx, strokeWidth * 0.5f, ctx->fringeWidth, state->lineCap, state->lineJoin,
-                          state->miterLimit);
-    }
-    else
-    {
-        nvg__expandStroke(ctx, strokeWidth * 0.5f, 0.0f, state->lineCap, state->lineJoin,
-                          state->miterLimit);
-    }
-
-    gui_dispdev_t *dc = gui_get_dc();
-
-
-    NVGpaint *paint = &strokePaint;
-    NVGpath *paths = ctx->cache->paths;
-    int npaths = ctx->cache->npaths;
-
-
-    uint8_t a = paint->innerColor.a * 0xff;
-    uint8_t r = paint->innerColor.r * 0xff * paint->innerColor.a;
-    uint8_t g = paint->innerColor.g * 0xff * paint->innerColor.a;
-    uint8_t b = paint->innerColor.b * 0xff * paint->innerColor.a;
-
-
-
-    for (int i = 0; i < npaths; i++)
-    {
-        const NVGpath *p = paths + i;
-        float sx;
-        float sy;
-        for (int j = 0; j < p->nstroke; j++)
-        {
-            const NVGvertex *v = p->stroke + j;
-
-            if (j == 0)
-            {
-                sx = v->x;
-                sy = v->y;
-            }
-            else
-            {
-                draw_line(sx, sy, v->x, v->y, strokeWidth, a, r, g, b);
-                sx = v->x;
-                sy = v->y;
-            }
-
-        }
-    }
-
-
-    // Count triangles
-    for (uint32_t i = 0; i < ctx->cache->npaths; i++)
-    {
-        const NVGpath *path;
-        path = &ctx->cache->paths[i];
-        ctx->strokeTriCount += path->nstroke - 2;
-        ctx->drawCallCount++;
-    }
-}
-
-void nvgFill(NVGcontext *ctx)
-{
-    if (patch_nvg_fill != NULL)
-    {
-        patch_nvg_fill(ctx);
-        return;
-    }
-    //gui_dispdev_t *dc = gui_get_dc();
-    //nvgTranslate(ctx, (float)0.0, -(float)(dc->section_count * dc->fb_height));
-    NVGstate *state = nvg__getState(ctx);
-    const NVGpath *path;
-    NVGpaint fillPaint = state->fill;
-    int i;
-
-    nvg__flattenPaths(ctx);
-    if (ctx->params.edgeAntiAlias && state->shapeAntiAlias)
-    {
-        nvg__expandFill(ctx, ctx->fringeWidth, NVG_MITER, 2.4f);
-    }
-    else
-    {
-        nvg__expandFill(ctx, 0.0f, NVG_MITER, 2.4f);
-    }
-
-    // Apply global alpha
-    fillPaint.innerColor.a *= state->alpha;
-    fillPaint.outerColor.a *= state->alpha;
-
-    ctx->params.renderFill(ctx->params.userPtr, &fillPaint, state->compositeOperation, &state->scissor,
-                           ctx->fringeWidth,
-                           ctx->cache->bounds, ctx->cache->paths, ctx->cache->npaths);
-
-    // Count triangles
-    for (i = 0; i < ctx->cache->npaths; i++)
-    {
-        path = &ctx->cache->paths[i];
-        ctx->fillTriCount += path->nfill - 2;
-        ctx->fillTriCount += path->nstroke - 2;
-        ctx->drawCallCount += 2;
     }
 }
 

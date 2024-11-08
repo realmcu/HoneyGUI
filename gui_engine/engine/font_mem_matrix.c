@@ -440,6 +440,7 @@ static void gui_font_matrix_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
 
 static void gui_font_char_mat(gui_text_t *text)
 {
+    GUI_ASSERT(text->data != NULL)
     mem_char_t *chr = text->data;
     float scale_x = text->base.matrix->m[0][0];
     float scale_y = text->base.matrix->m[1][1];

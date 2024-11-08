@@ -2,23 +2,37 @@
  * File      : gui_server.c
  */
 
-#include <guidef.h>
-#include <string.h>
-#include <gui_api.h>
 #include <stdarg.h>
-#include "tlsf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "tlsf.h"
+#include "cJSON.h"
 static struct gui_indev *indev = NULL;
 static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
 static struct gui_ftl *ftl = NULL;
 static struct acc_engine *acc = NULL;
+char *defaultPath = "gui_engine\\example\\screen_480_480\\root\\";
+
+void gui_change_default_path(int argc, char **argv)
+{
+    for (int count = 1; count < argc; count++)
+    {
+        if (!strcmp(argv[count], "-p") && count + 1 < argc)
+        {
+            char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
+            sprintf(path, "%s%s", argv[count + 1], "\\");
+            defaultPath = path;
+        }
+    }
+}
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {
@@ -449,7 +463,7 @@ void gui_log(const char *format, ...)
     }
     va_list args;
     va_start(args, format);
-    char buf[256];
+    char buf[1024];
     vsnprintf(buf, sizeof(buf), format, args);
     os_api->log(buf);
     va_end(args);
@@ -1282,4 +1296,61 @@ gui_color_t gui_color_css(const char *color_str)
 
     // Error case, return color with all components set to 0
     return color;
+}
+
+void gui_get_json_value(const char *path, const char *parent_key, const char *key, void *value)
+{
+    cJSON *root;
+    if (!path)
+    {
+        gui_log("path can't be NULL!\r\n");
+        return;
+    }
+    else
+    {
+        root = cJSON_Parse(path);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    // parse array
+    cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
+    if (!cJSON_IsArray(json_array))
+    {
+        gui_log("get %s_Array unsuccessful\n", parent_key);
+        return;
+    }
+    else
+    {
+        cJSON *obj = cJSON_GetArrayItem(json_array, 0);
+        if (!obj)
+        {
+            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            return;
+        }
+        else
+        {
+            cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
+            if (!obj)
+            {
+                gui_log("get %s_Key unsuccessful\n", key);
+                return;
+            }
+            else
+            {
+                if (strstr(key, "condition") != NULL)
+                {
+                    sprintf((char *)value, "%s", json_key->valuestring);
+                }
+                else
+                {
+                    *((int *)value) = json_key->valueint;
+                }
+            }
+        }
+    }
+    // clear
+    cJSON_Delete(root);
 }

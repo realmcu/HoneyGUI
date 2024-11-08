@@ -3,7 +3,6 @@ import sys
 import argparse
 import git
 import subprocess
-import ignore_check_file
 
 
 honeyRepo_env = "HoneyRepo"

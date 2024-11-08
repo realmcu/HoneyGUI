@@ -35,7 +35,7 @@ HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be
 
 After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path `your HoneyGUI dir/win32_sim/` and open the file `menu_config.h`, which is the configuration file for the simulator. Under the section "HoneyGUI Demo Select", comment out all the demos. Under the section "HoneyGUI Enable LVGL", enable `CONFIG_REALTEK_BUILD_LVGL_GUI`. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
 
-<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1727156557578163348/cb760047_9218678.png" alt="lv_menu_config.png"></div><br/>
+<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
 1. If you need to modify the screen size, open the file `SConscript` under the directory `your HoneyGUI dir/gui_engine/example/demo/`, and modify the values of `DRV_LCD_WIDTH` and `DRV_LCD_HEIGHT` to the desired pixel values.

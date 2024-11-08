@@ -16,6 +16,10 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_BASE'):
     src += ['app_ui_realgui_base.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_3D'):
+    src += ['app_ui_realgui_3d.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PAINTENGINE'):
     src += ['app_ui_paintengine.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)

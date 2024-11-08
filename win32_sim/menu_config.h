@@ -26,6 +26,9 @@
 //  #define CONFIG_REALTEK_BUILD_REAL_BASE
 // </c>
 
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_3D
+// </c>
 
 // <c> RTK GUI Paint Engine Demo
 // #define CONFIG_REALTEK_BUILD_REAL_PAINTENGINE
@@ -123,10 +126,6 @@
 // #define CONFIG_REALTEK_BUILD_PPEV2
 // </c>
 
-// <c> MODULE NANOVG VGLITE
-//#define CONFIG_REALTEK_NANOVG_HW_VGLITE
-// </c>
-
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
@@ -192,7 +191,7 @@
 // </c>
 
 // <c> HoneyGUI Enable LVGL RLOTTIE
-// #define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
+#define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
 // </c>
 
 #endif

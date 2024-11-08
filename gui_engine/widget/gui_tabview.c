@@ -273,6 +273,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
                     }
                 }
 
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
                 //when current tab is the end,come back to current tab if sliding.
                 if ((tabview->cur_id.x == tabview->tab_cnt_right))
                 {
@@ -313,7 +314,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
                         break;
                     }
                 }
-
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
                 //when current tab is the end,come back to current tab if sliding.
                 if (tabview->cur_id.x == tabview->tab_cnt_left)
                 {

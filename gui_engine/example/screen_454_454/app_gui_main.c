@@ -107,6 +107,9 @@ static void design_app_watch_ui(gui_app_t *app)
     alipay_menu_ui(GUI_BASE(tab_alipay));
 #endif
     gui_fps_create(GUI_APP_ROOT_SCREEN);
+    extern void apps_append_name();
+    gui_app_append(app);
+    apps_append_name();
 }
 
 #if defined _WIN32

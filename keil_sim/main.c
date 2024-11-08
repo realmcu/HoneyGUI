@@ -58,11 +58,19 @@ void app_main(void *argument)
 /*----------------------------------------------------------------------------
   Main function
  *----------------------------------------------------------------------------*/
+#include "cmsis_compiler.h"
 int main(void)
 {
 #ifdef RTE_Compiler_IO_STDOUT_EVR
     EventRecorderInitialize(0, 1);
 #endif
+
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
     printf("Realtek Bee GUI Welcome \r\n");
     // ...
     osKernelInitialize();                 // Initialize CMSIS-RTOS

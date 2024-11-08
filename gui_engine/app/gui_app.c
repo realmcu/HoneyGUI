@@ -43,7 +43,43 @@ static void dtor(void *this)
 {
     GUI_ASSERT(this != NULL);
 }
+#define GUI_APP_MAX UINT8_MAX
+static gui_app_t *app_array[GUI_APP_MAX];
+static int app_array_count;
+void gui_app_append(gui_app_t *app)
+{
 
+
+    if (app && app_array_count < GUI_APP_MAX - 1)
+    {
+        app_array[app_array_count] = app;
+        app_array_count++;
+    }
+    else if (!app)
+    {
+        gui_log("gui_app_append NULL\n");
+    }
+    else if (!(app_array_count < GUI_APP_MAX - 1))
+    {
+        gui_log("gui_app_append app_array_count too much\n");
+    }
+
+}
+gui_app_t *gui_app_get_by_name(const char *name)
+{
+    if (name)
+    {
+        for (size_t i = 0; i < app_array_count; i++)
+        {
+            if (strcmp(app_array[i]->screen.name, name) == 0)
+            {
+                return app_array[i];
+            }
+        }
+    }
+    return 0;
+
+}
 void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry)
 {
 
@@ -53,6 +89,7 @@ void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry)
     app->thread_entry = (void (*)(void *))gui_app_entry;
     app->ui_design = (void (*)(gui_app_t *))ui_design;
     ctor(app);
+    gui_app_append(app);
 }
 
 void gui_app_startup(gui_app_t *app)

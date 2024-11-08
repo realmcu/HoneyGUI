@@ -119,7 +119,10 @@ static void win_switch_to_perspective_app_touch_cb(void *obj, uint16_t event)
 
     }
 }
-
+static void win_long_to_watchface_market(void *obj, gui_event_t e, void *param)
+{
+    GUI_APP_SWAP_HANDLE(gui_current_app(), GUI_APP_HANDLE(APP_WATCHFACE_MARKET))
+}
 void design_tab_watchface_main(void *parent)
 {
     gui_img_t *img_clock = gui_img_create_from_mem(parent, "img_clock", CLOCK_BASE_BIN, 0, 0, 454, 454);
@@ -150,4 +153,5 @@ void design_tab_watchface_main(void *parent)
                                                               0, 0, 454, 454);
     gui_win_click(win_switch_to_perspective_app, (gui_event_cb_t)win_switch_to_perspective_app_touch_cb,
                   NULL);
+    gui_win_long(win_switch_to_perspective_app, (gui_event_cb_t)win_long_to_watchface_market, NULL);
 }

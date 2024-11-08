@@ -47,7 +47,7 @@ extern "C" {
   */
 
 #define QRCODEGEN_VERSION_MIN   2  // The minimum version number supported in the QR Code Model 2 standard
-#define QRCODEGEN_VERSION_MAX  15
+#define QRCODEGEN_VERSION_MAX  25//15
 
 /** End of WIDGET_Exported_Macros
   * @}

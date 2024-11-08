@@ -13,8 +13,8 @@ px_void PX_3D_GPU_RenderListRasterization(px_surface *psurface, PX_3D_RenderList
     uint8_t *data = (uint8_t *)psurface->surfaceBuffer;
 
 
-    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
-                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, data);
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * 4, NVG_TEXTURE_BGRA,
+                                   data);
 
 
     nvgBeginFrame(vg, psurface->width, psurface->height, 1);
