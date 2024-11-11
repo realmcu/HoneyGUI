@@ -82,6 +82,8 @@ typedef struct _lv_fs_drv_t {
     void * (*dir_open_cb)(struct _lv_fs_drv_t * drv, const char * path);
     lv_fs_res_t (*dir_read_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
     lv_fs_res_t (*dir_close_cb)(struct _lv_fs_drv_t * drv, void * rddir_p);
+    
+    void *(*ioctl_cb)(struct _lv_fs_drv_t *drv, void *file_p, int cmd);
 
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom file user data*/

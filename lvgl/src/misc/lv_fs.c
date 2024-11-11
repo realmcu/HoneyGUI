@@ -390,6 +390,18 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
     return res;
 }
 
+lv_fs_res_t lv_fs_ioctl(lv_fs_file_t *file_p, void **file_addr, int cmd)
+{
+    if(file_p->drv == NULL) { return LV_FS_RES_INV_PARAM; }
+    if(file_p->drv->read_cb == NULL) { return LV_FS_RES_NOT_IMP; }
+
+    lv_fs_res_t res = LV_FS_RES_OK;
+
+    *file_addr = file_p->drv->ioctl_cb(file_p->drv, file_p->file_d, cmd);
+
+    return res;
+}
+
 void lv_fs_drv_init(lv_fs_drv_t * drv)
 {
     lv_memset_00(drv, sizeof(lv_fs_drv_t));
