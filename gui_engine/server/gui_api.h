@@ -406,17 +406,8 @@ gui_color_t gui_color_css(const char *color_str);
  *
  * compass     |degree       |int *
  *
- * heart_rate  |range_min    |int *
+ * heart_rate  |array        |int *
  *
- * heart_rate  |range_max    |int *
- *
- * heart_rate  |AM12         |int *
- *
- * heart_rate  |AM6          |int *
-
- * heart_rate  |PM12         |int *
- *
- * heart_rate  |PM6          |int *
  * @param path json string to prase
  * @param parent_key string to get json_array
  * @param key string to get json_key

@@ -23,7 +23,7 @@
         <section id="simulator-interface-section">
             <h2>Simulator Interface</h2>
             <div>
-                <h3>Weather:</h3>
+                <h3>weather:</h3>
                 <span>range_min:</span> 
                 <input type="number" id="tempMin" value="18" onchange="updateTempRange()"><br>
                 <span>range_max:</span> 
@@ -107,7 +107,9 @@
             </div>
             <div>
                 <h3>heart_rate:</h3>
-                <span>range_min:</span> 
+                <label for="arrayInput">array(enter  elements separated by commas):</label>
+                <input type="text" id="arrayInput">
+                 <!-- <span>range_min:</span> 
                 <input type="number" id="hrMin" value="40" onchange="updateHrRange()"><br>
                 <span>range_max:</span> 
                 <input type="number" id="hrMax" value="160" onchange="updateHrRange()"><br>
@@ -118,9 +120,10 @@
                 <span>12PM:</span> 
                 <input type="range" id="heart_rate12PM" min="40" max="160" value="70" oninput="updateValue('heart_rate12PM')"><span id="heart_rate12PMVal">70</span><br>
                 <span>6PM:</span> 
-                <input type="range" id="heart_rate6PM" min="40" max="160" value="70" oninput="updateValue('heart_rate6PM')"><span id="heart_rate6PMVal">70</span><br>
+                <input type="range" id="heart_rate6PM" min="40" max="160" value="70" oninput="updateValue('heart_rate6PM')"><span id="heart_rate6PMVal">70</span><br> --> 
             </div>
-            <pre id="output"></pre>
+            <button onclick="sendData()">Send Data</button>
+                         
         </section>
     </main>
     <script src="scripts/script.js"></script>
