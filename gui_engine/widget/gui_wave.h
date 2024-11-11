@@ -150,6 +150,34 @@ void gui_wave_set(gui_wave_t *this,
                   float       w,
                   float       h,
                   float       t);
+#include "nanovg.h"
+/**
+ * @brief Renders a waveform in a graphical user interface.
+ *
+ * This function renders a waveform based on the provided samples within the
+ * specified area, using the NanoVG context for drawing.
+ *
+ * @param vg           Pointer to the NanoVG context.
+ * @param x            X-coordinate of the top-left corner of the rendering area.
+ * @param y            Y-coordinate of the top-left corner of the rendering area.
+ * @param w            Width of the rendering area.
+ * @param h            Height of the rendering area.
+ * @param item_count   Number of samples in the waveform.
+ * @param samples      Array of sample values.
+ * @param color        Color of the waveform.
+ * @param max          Maximum value among the samples.
+ * @param min          Minimum value among the samples.
+ */
+void gui_wave_render(NVGcontext *vg,
+                     int16_t x,
+                     int16_t y,
+                     int16_t w,
+                     int16_t h,
+                     int16_t item_count,
+                     float *samples,
+                     gui_color_t color,
+                     int16_t max,
+                     int16_t min);
 
 
 /** End of WIDGET_Exported_GUI_Functions

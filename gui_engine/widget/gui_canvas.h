@@ -185,6 +185,37 @@ const uint8_t *gui_canvas_output(int output_format, bool compression, int image_
  */
 void gui_canvas_output_buffer(int format, bool compression, int image_width, int image_height,
                               gui_canvas_render_function renderer, uint8_t *target_buffer);
+
+
+#include "draw_img.h"
+/**
+ * @brief Initializes a blank output buffer for the canvas.
+ *
+ * This function initializes a NanoVG context with a blank output buffer
+ * and returns a pointer to the context. The buffer can be configured with
+ * the specified format, compression option, width, and height.
+ *
+ * @param format        The format of the output buffer.
+ * @param compression   Boolean flag indicating whether compression should be used.
+ * @param image_width   The width of the image.
+ * @param image_height  The height of the image.
+ * @param target_buffer Pointer to the target buffer where the output will be stored.
+ *
+ * @return A pointer to the initialized NanoVG context.
+ */
+NVGcontext *gui_canvas_output_buffer_blank(int format, bool compression, int image_width,
+                                           int image_height,
+                                           uint8_t *target_buffer);
+
+/**
+ * @brief Closes the canvas and frees resources.
+ *
+ * This function closes the NanoVG context created by gui_canvas_output_buffer_blank
+ *
+ * @param vg Pointer to the NanoVG context to be closed.
+ */
+void gui_canvas_output_buffer_blank_close(NVGcontext *vg);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

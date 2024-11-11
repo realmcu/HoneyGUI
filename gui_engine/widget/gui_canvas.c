@@ -240,8 +240,8 @@ gui_canvas_t *gui_canvas_create(void       *parent,
     return this;
 }
 #include "draw_img.h"
-void gui_canvas_output_buffer(int format, bool compression, int image_width, int image_height,
-                              gui_canvas_render_function renderer, uint8_t *target_buffer)
+NVGcontext *gui_canvas_output_buffer_blank(int format, bool compression, int image_width,
+                                           int image_height, uint8_t *target_buffer)
 {
     int pixel_length = 4;
     int data_length = 0;
@@ -297,12 +297,25 @@ void gui_canvas_output_buffer(int format, bool compression, int image_width, int
         nvgBeginFrame(vg, image_width, image_height, 1);
 
         nvgResetTransform(vg);
-
-        renderer(vg);
-
-        nvgEndFrame(vg);
-        nvgDeleteAGGE(vg);
+        return vg;
     }
+}
+void gui_canvas_output_buffer_blank_close(NVGcontext *vg)
+{
+    nvgEndFrame(vg);
+    extern void nvgDeleteAGGE(NVGcontext * ctx);
+    nvgDeleteAGGE(vg);
+}
+void gui_canvas_output_buffer(int format, bool compression, int image_width, int image_height,
+                              gui_canvas_render_function renderer, uint8_t *target_buffer)
+{
+    NVGcontext *vg = 0;
+    vg = gui_canvas_output_buffer_blank(format,  compression,  image_width,  image_height,
+                                        target_buffer);
+    renderer(vg);
+
+    gui_canvas_output_buffer_blank_close(vg);
+
 }
 const uint8_t *gui_canvas_output(int format, bool compression, int image_width, int image_height,
                                  gui_canvas_render_function renderer)
@@ -371,6 +384,7 @@ const uint8_t *gui_canvas_output(int format, bool compression, int image_width, 
     }
     return output_data;
 }
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

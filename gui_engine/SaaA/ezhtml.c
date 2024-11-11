@@ -33,7 +33,7 @@
 #include "gui_scroll_wheel_new.h"
 #include "gui_calendar.h"
 #include "gui_combo.h"
-
+#include "gui_wave.h"
 
 
 
@@ -97,6 +97,7 @@ static struct widget_create widget[] =
     {"onTime", MACRO_ONTIME},
     {"combo", MACRO_COMBO},
     {"onPeripheral", MACRO_ON_PERIPHERAL},
+    {"chart", MACRO_CHART},
 };
 
 typedef struct
@@ -810,7 +811,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1155,7 +1156,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1205,7 +1206,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1268,7 +1269,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
                         {
                             cx = atoi(p->attr[++i]);
@@ -1439,7 +1440,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1571,7 +1572,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1848,7 +1849,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1894,7 +1895,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1953,7 +1954,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -1992,7 +1993,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -2036,7 +2037,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         else if (!strcmp(p->attr[i], "w"))
                         {
                             w = atoi(p->attr[++i]);
@@ -2065,7 +2066,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -3059,7 +3060,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             break;
                         }
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                         if (!strcmp(p->attr[i], "x"))
                         {
                             x = atoi(p->attr[++i]);
@@ -3645,7 +3646,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             break;
                         }
 
-                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
 
                         if (!strcmp(p->attr[i], "x"))
                         {
@@ -3855,7 +3856,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             break;
                         }
 
-                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
 
                         if (!strcmp(p->attr[i], "x"))
                         {
@@ -4036,7 +4037,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             break;
                         }
 
-                        gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
 
                         if (!strcmp(p->attr[i], "x"))
                         {
@@ -4249,7 +4250,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                 {
                                                     break;
                                                 }
-                                                //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                                                ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                                                 if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
                                                 {
                                                     cx = atoi(p->attr[++i]);
@@ -4359,6 +4360,135 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
 
+                }
+                break;
+            case MACRO_CHART:
+                {
+                    /*  <chart
+                            w="55"
+                            h="55"
+                            x="342"
+                            y="342"
+                            color="yellow"
+                            items="100,200,0,44,50, 1000, -200,20,-30,88"
+                            max="400"
+                            min="-300"
+                            >chart1
+                        </chart>  */
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    int16_t item_count = 0;
+                    const char *items = NULL;
+                    gui_color_t  color = {0};
+                    int16_t max = 0;
+                    int16_t min = 0;
+
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+
+                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "items"))
+                        {
+                            items = p->attr[++i];
+                        }
+                        else if (!strcmp(p->attr[i], "color"))
+                        {
+                            color = string_rgb888(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "max"))
+                        {
+                            max = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "min"))
+                        {
+                            min = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    {
+                        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+                        char *token = strtok(items_copy, ",");
+                        int j = 0;
+                        while (token != NULL)
+                        {
+                            j++;
+                            token = strtok(NULL, ",");
+                        }
+                        item_count = j;
+                        gui_free(items_copy);
+                    }
+                    if (item_count == 0)
+                    {
+                        item_count = 1;
+                        items = "0";
+                    }
+                    float numbers[item_count];
+                    {
+                        const char delim[2] = ",";
+                        char *token;
+                        int i = 0;
+                        char *str_copy = gui_strdup(items);
+                        if (str_copy == NULL)
+                        {
+                            gui_log("strdup failed");
+                            return 0;
+                        }
+                        token = strtok(str_copy, delim);
+                        while (token != NULL)
+                        {
+                            numbers[i++] = atof(token);
+                            token = strtok(NULL, delim);
+                        }
+                        for (int j = 0; j < i; j++)
+                        {
+                            gui_log("%d ", numbers[j]);
+                        }
+                        gui_log("\n");
+                        gui_free(str_copy);
+                    }
+                    int
+                    pixel_bytes = 4;
+                    size_t buffer_size = h * w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                    uint8_t *buffer = gui_lower_malloc(buffer_size);
+                    memset(buffer, 0, buffer_size);
+                    NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
+                    gui_wave_render(vg, 0, 0, w,
+                                    h,
+                                    item_count,
+                                    numbers,
+                                    color,
+                                    max,
+                                    min);
+                    gui_canvas_output_buffer_blank_close(vg);
+                    char *ptxt = get_space_string_head(p->txt);
+                    gui_img_t *img = gui_img_create_from_mem(parent, ptxt, buffer, x, y,
+                                                             0, 0);
+                    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                    parent = (void *)img;
                 }
                 break;
             /*default*/
@@ -4884,7 +5014,7 @@ void level_scan(ezxml_t p, char **pic, char **text)
                 {
                     break;
                 }
-                //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                 if (!strcmp(i->attr[j], "iconPicture"))
                 {
                     *pic = gui_strdup(i->attr[++j]);
@@ -5105,7 +5235,7 @@ void level_scan_width_and_hight(ezxml_t p, int *width, int *hight)
                 {
                     break;
                 }
-                //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                ////gui_log("p->attr[i]:%s\n", p->attr[i]);
                 if (!strcmp(title->attr[j], "w"))
                 {
                     *width = atoi(title->attr[++j]); gui_log("widgt:%d\n", *width);
@@ -5155,7 +5285,7 @@ void get_system_screen(int *w, int *h)
         {
             break;
         }
-        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
         else if (!strcmp(t->attr[i], "w"))
         {
             *w = atoi(t->attr[++i]);

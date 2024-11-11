@@ -366,4 +366,27 @@
     blendMode="imgSrcOverMode"  
 >combo1
 </combo>
+    <arc
+        centerX="85"
+        centerY="369"
+        radius="27"
+        strokeWidth="4"
+        strokeColor="yellow"
+        startAngle="0"
+        endAngle="3.14"
+        clockwise="CW"
+        cap="round">arc1
+
+    </arc>
+    <chart
+        w="400"
+        h="300"
+        x="10"
+        y="10"
+        color="yellow"
+        items="100,200,300,400,-100,-200,0,50,333,-333,499"
+        max="400"
+        min="-300"  
+        >chart1
+    </chart>  
 </screen></app>

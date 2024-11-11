@@ -128,6 +128,7 @@ typedef enum t_obj_type
     MACRO_PAGE_LIST_NEW,
     MACRO_ON_PERIPHERAL,
     GUI_VENDOR_TYPE,
+    MACRO_CHART,
 } T_OBJ_TYPE;
 typedef enum
 {
