@@ -624,7 +624,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 
         if (bomb_flag)
         {
-            img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 59, 203, 0,
+            img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 0, 203, 0,
                                                    0);
             gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
             gui_win_stop_animation(win);

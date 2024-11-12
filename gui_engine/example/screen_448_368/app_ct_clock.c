@@ -162,34 +162,31 @@
 #include "cJSON.h"
 #include "gui_canvas_img.h"
 #include "gui_curtain.h"
+#include "gui_canvas_rect.h"
 
-#define SCREEN_WIDTH 368
-#define SCREEN_HEIGHT 448
-#define SCREEN_X_OFF 0
-#define SCREEN_Y_OFF 0
+#define SCREEN_WIDTH 368   //410
+#define SCREEN_HEIGHT 448  //502
+#define SCREEN_X_OFF 0     //21
+#define SCREEN_Y_OFF 0     //18
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
-static void *font_size_96_bin_addr = SOURCEHANSANSSC_SIZE96_BITS4_FONT_BIN;
-static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS4_FONT_BIN;
-static void *font_size_40_bin_addr = SOURCEHANSANSSC_SIZE40_BITS4_FONT_BIN;
-static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS4_FONT_BIN;
-static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS4_FONT_BIN;
+static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
+static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
+static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
 
 static uint8_t curtain_index = CURTAIN_MIDDLE;
-static gui_win_t *win_watch, *win_hb;
-static gui_text_t *time_text, *date_text;
-static char time_text_content[10], date_text_content[10];
+gui_win_t *win_watch;
+static gui_win_t *win_hb;
+static gui_text_t *date_text;
+static char date_text_content[10];
 static char weekday_content[30];
 static struct tm watch_time;
 struct tm *timeinfo;
 
-static gui_img_t *watchface_1, *watchface_2;
-static gui_tabview_t *tablist_tab;
 bool return_to_watchface_flag; //true: return to watchface; flases: return to app_menu
 
 static uint8_t canvas_update_flag = 0;
-static gui_canvas_t *canvas_temperature; //gui_canvas_img_t
 static gui_text_t *temperature_cur, *temperature_low, *temperature_high;
 static gui_text_t *weather_cur, *weather_range;
 static bool weather_syn_flag = false;
@@ -206,6 +203,22 @@ static char degree_content[5] = "0°", orien_content[3] = "N";
 static gui_img_t *img_heart_rate;
 
 char *cjson_content = NULL;
+
+/*Define watch_text_num_array*/
+void *text_num_array[] =
+{
+    UI_TEXT_0_BIN,
+    UI_TEXT_1_BIN,
+    UI_TEXT_2_BIN,
+    UI_TEXT_3_BIN,
+    UI_TEXT_4_BIN,
+    UI_TEXT_5_BIN,
+    UI_TEXT_6_BIN,
+    UI_TEXT_7_BIN,
+    UI_TEXT_8_BIN,
+    UI_TEXT_9_BIN,
+    UI_TEXT_COLON_BIN,
+};
 
 static uint16_t seed = 12345;
 uint16_t xorshift16()
@@ -229,8 +242,10 @@ static gui_app_t _app_APP_HEART_RATE =
     .ui_design = heart_rate_app,
     .active_ms = 100000,
 };
-static char hr_content[4];
-
+void *get_app_hr(void)
+{
+    return &_app_APP_HEART_RATE;
+}
 #if defined __WIN32
 const char *filename =
     "./gui_engine/example/web/peripheral_simulation/json/simulation_data.json";
@@ -273,7 +288,7 @@ void json_refreash()
     uint16_t PM12 = xorshift16() % 120;
     uint16_t PM6 = xorshift16() % 120;
     // gui_log("!cjson_content: %x %x %x %x %x\n", cjson_content[0], cjson_content[1], cjson_content[2], cjson_content[3], cjson_content[4]);
-    cjson_content[0] = 0x7b;
+
     cJSON *root = cJSON_Parse(cjson_content);
     if (!root)
     {
@@ -292,7 +307,7 @@ void json_refreash()
     {
         cJSON *activity_item = cJSON_GetArrayItem(activity_array, 0);
         cJSON_ReplaceItemInObject(activity_item, "move", cJSON_CreateNumber(move));
-        cJSON_ReplaceItemInObject(activity_item, "ex", cJSON_CreateNumber(ex));
+        cJSON_ReplaceItemInObject(activity_item, "exercise", cJSON_CreateNumber(ex));
         cJSON_ReplaceItemInObject(activity_item, "stand", cJSON_CreateNumber(stand));
     }
 
@@ -322,6 +337,7 @@ void json_refreash()
     gui_free(temp);
     cJSON_Delete(root);
     canvas_update_flag = 0b0111;
+    // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
     gui_log("cjson_content: %s\n", cjson_content);
 }
 #endif
@@ -329,13 +345,23 @@ void json_refreash()
 extern char *day[];
 static void refreash_time()
 {
-    sprintf(time_text_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-    gui_text_content_set(time_text, time_text_content, strlen(time_text_content));
-    // gui_text_convert_to_img(time_text, ARGB8888);
+    GUI_WIDGET_POINTER_BY_NAME(img_hour_decimal, "watch_hour_decimal");
+    gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
+                          text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
+    GUI_WIDGET_POINTER_BY_NAME(img_hour_single, "watch_hour_single");
+    gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
+                          text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
+
+    GUI_WIDGET_POINTER_BY_NAME(img_minute_decimal, "watch_minute_decimal");
+    gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
+                          text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
+    GUI_WIDGET_POINTER_BY_NAME(img_minute_single, "watch_minute_single");
+    gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
+                          text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
 
     sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set(date_text, date_text_content, strlen(date_text_content));
-    // gui_text_convert_to_img(date_text, ARGB8888);
+    gui_text_convert_to_img(date_text, RGB565);
 }
 
 static void win_clock_cb(gui_win_t *win)
@@ -358,8 +384,11 @@ static void win_clock_cb(gui_win_t *win)
         {
             free(temp);
         }
+        canvas_update_flag = 0b0111;
+        // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
-        // watch_time = watch_clock_get();
+        extern struct tm watch_clock_get(void);
+        watch_time = watch_clock_get();
         timeinfo = &watch_time;
         gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
         gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
@@ -447,10 +476,9 @@ static void win_clock_cb(gui_win_t *win)
         }
     }
 }
-static void arc_activity_cb(gui_canvas_t *canvas)
+static void arc_activity_cb(NVGcontext *vg)
 {
     cJSON *root;
-    NVGcontext *vg = canvas->vg;
     if (!cjson_content)
     {
         // automation
@@ -484,7 +512,7 @@ static void arc_activity_cb(gui_canvas_t *canvas)
     }
     else
     {
-        cjson_content[0] = 0x7b;
+
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -504,24 +532,24 @@ static void arc_activity_cb(gui_canvas_t *canvas)
         else
         {
             cJSON *move = cJSON_GetObjectItemCaseSensitive(act, "move");
-            cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "ex");
+            cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "exercise");
             cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
             nvgBeginPath(vg);
-            nvgArc(vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
                    M_PI * (1.5f + 2.0f * move->valuedouble / 20000.0f), NVG_CW);  // cap 20000 steps
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(230, 67, 79));
             nvgStroke(vg);
 
             nvgBeginPath(vg);
-            nvgArc(vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
                    M_PI * (1.5f + 2.0f * ex->valueint / 60.0f), NVG_CW);  // cap 60 min.
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(186, 253, 79));
             nvgStroke(vg);
 
             nvgBeginPath(vg);
-            nvgArc(vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
                    M_PI * (1.5f + 2.0f * stand->valueint / 30.0f), NVG_CW); // cap 30 times
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(117, 230, 229));
@@ -543,7 +571,6 @@ static void weather_cb(gui_img_t *parent)
         }
         else
         {
-            cjson_content[0] = 0x7b;
             root = cJSON_Parse(cjson_content);
             if (!root)
             {
@@ -565,13 +592,12 @@ static void weather_cb(gui_img_t *parent)
             {
                 cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
                 cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
-                cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "cur");
+                cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "current");
 
                 sprintf(content_cur, "%d°", cur->valueint);
                 gui_text_content_set(weather_cur, content_cur, strlen(content_cur));
                 sprintf(content_range, "H:%d° L:%d°", high->valueint, low->valueint);
                 gui_text_content_set(weather_range, content_range, strlen(content_range));
-
                 for (uint8_t i = 1; i <= 5; i++)
                 {
                     char key[15];
@@ -624,9 +650,8 @@ static void weather_cb(gui_img_t *parent)
     }
 }
 
-static void arc_temperature_cb(gui_canvas_t *canvas)
+static void arc_temperature_cb(NVGcontext *vg)
 {
-    NVGcontext *vg = canvas->vg;
     cJSON *root;
     if (!cjson_content)
     {
@@ -683,7 +708,7 @@ static void arc_temperature_cb(gui_canvas_t *canvas)
     }
     else
     {
-        cjson_content[0] = 0x7b;
+
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -704,7 +729,7 @@ static void arc_temperature_cb(gui_canvas_t *canvas)
         {
             cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
             cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
-            cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "cur");
+            cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "current");
             uint8_t low_val = low->valueint < 10 ? 10 : low->valueint;
             uint8_t high_val = high->valueint > 37 ? 37 : high->valueint;
             uint8_t cur_val = cur->valueint;
@@ -780,6 +805,7 @@ static void arc_temperature_cb(gui_canvas_t *canvas)
             {
                 sprintf(tempera_cur_content, "%d", cur_val);
                 gui_text_content_set(temperature_cur, tempera_cur_content, strlen(tempera_cur_content));
+                gui_text_convert_to_img(temperature_cur, RGB565);
                 sprintf(tempera_low_content, "%d", low_val);
                 gui_text_content_set(temperature_low, tempera_low_content, strlen(tempera_low_content));
                 sprintf(tempera_high_content, "%d", high_val);
@@ -833,7 +859,7 @@ static void compass_cb(void)
     }
     else
     {
-        cjson_content[0] = 0x7b;
+
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -885,14 +911,6 @@ static void compass_cb(void)
 }
 
 // heart_rate
-static void canvas_cb_heartbreak_bg(gui_canvas_t *canvas)
-{
-    nvgRoundedRect(canvas->vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                   50); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
-    nvgFill(canvas->vg);
-}
-
 static void win_hb_cb(gui_win_t *win)
 {
 #ifdef __WIN32
@@ -913,40 +931,38 @@ static void win_hb_cb(gui_win_t *win)
 #endif
 }
 
-static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
+static void heartbreak_graph(NVGcontext *vg)
 {
-    NVGcontext *vg = canvas->vg;
-
     // draw split line
     {
         nvgBeginPath(vg);
         nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 0, 60 + SCREEN_Y_OFF, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
-        nvgFillColor(vg, nvgRGBA(192, 192, 192, 100)); //silver
+        nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
         nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 1, 60 + SCREEN_Y_OFF, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
-        nvgFillColor(vg, nvgRGBA(192, 192, 192, 100)); //silver
+        nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
         nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 2, 60 + SCREEN_Y_OFF, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
-        nvgFillColor(vg, nvgRGBA(192, 192, 192, 100)); //silver
+        nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
         nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 3, 60 + SCREEN_Y_OFF, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
-        nvgFillColor(vg, nvgRGBA(192, 192, 192, 100)); //silver
+        nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
         nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 4, 60 + SCREEN_Y_OFF, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
-        nvgFillColor(vg, nvgRGBA(192, 192, 192, 100)); //silver
+        nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
     }
 
@@ -967,7 +983,7 @@ static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
     }
     else
     {
-        cjson_content[0] = 0x7b;
+
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -999,9 +1015,31 @@ static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
     // clear
     cJSON_Delete(root);
 
-    sprintf(hr_content, "%d", (uint8_t)samples[2]);
-    GUI_WIDGET_POINTER_BY_NAME(t, "HR_TXT");
-    gui_text_content_set((gui_text_t *)t, hr_content, strlen(hr_content));
+    // sprintf(hr_content, "%d", (uint8_t)samples[2]);
+    // GUI_WIDGET_POINTER_BY_NAME(t, "HR_TXT");
+    // gui_text_content_set((gui_text_t *)t, hr_content, strlen(hr_content));
+    static uint8_t number_last = 0;
+    uint8_t number = (uint8_t)samples[2];
+    if (number_last != number)
+    {
+        GUI_WIDGET_POINTER_BY_NAME(img_percentile, "hr_content_percentile");
+        if (number / 100)
+        {
+            img_percentile->not_show = 0;
+        }
+        else
+        {
+            img_percentile->not_show = 1;
+        }
+        gui_log("number = %d\n", number);
+        GUI_WIDGET_POINTER_BY_NAME(img_decimal, "hr_content_decimal");
+        gui_img_set_attribute((gui_img_t *)img_decimal, img_decimal->name,
+                              text_num_array[(number % 100) / 10], img_decimal->x, img_decimal->y);
+        GUI_WIDGET_POINTER_BY_NAME(img_single, "hr_content_single");
+        gui_img_set_attribute((gui_img_t *)img_single, img_single->name, text_num_array[number % 10],
+                              img_single->x, img_single->y);
+        number_last = number;
+    }
 
     for (i = 0; i < 4; i++)
     {
@@ -1009,9 +1047,8 @@ static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
         // sy[i] = y + h * samples[i] * 0.7f;
         sy[i] = y + h * (1 - (samples[i] - 40.0f) / 120.0f);
     }
-
     // Graph background
-    NVGpaint bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(255, 0, 0, 0), nvgRGBA(255, 0, 0, 64));
+    NVGpaint bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(255, 0, 0, 0), nvgRGBA(255, 0, 0, 150));
     nvgBeginPath(vg);
     nvgMoveTo(vg, sx[0], sy[0]);
     for (i = 1; i < 4; i++)
@@ -1023,7 +1060,6 @@ static void canvas_cb_heartbreak_graph(gui_canvas_t *canvas)
     nvgLineTo(vg, x, y + h);
     nvgFillPaint(vg, bg);
     nvgFill(vg);
-
     // Graph line
     nvgBeginPath(vg);
     nvgMoveTo(vg, sx[0], sy[0] + 2);
@@ -1081,37 +1117,46 @@ static void win_hb_exit(void)
     }
 }
 
-static bool canvas_hb_update(gui_canvas_img_t *canvas) //hb temperature activity
+static bool canvas_hb_update()
 {
     if ((canvas_update_flag & 0x01) && curtain_index)
     {
         canvas_update_flag &= 0b1110;
-        // gui_log("canvas_hb_update %x\n", canvas_update_flag);
         return true;
     }
     return false;
 }
 
-static bool canvas_temperature_update(gui_canvas_img_t *canvas) //hb temperature activity
+static bool canvas_temperature_update()
 {
     if ((canvas_update_flag & 0x02) && curtain_index)
     {
         canvas_update_flag &= 0b1101;
-        // gui_log("canvas_temperature_update %x\n", canvas_update_flag);
         return true;
     }
     return false;
 }
 
-static bool canvas_activity_update(gui_canvas_img_t *canvas) //hb temperature activity
+static bool canvas_activity_update()
 {
     if ((canvas_update_flag & 0x04) && curtain_index)
     {
         canvas_update_flag &= 0b1011;
-        // gui_log("canvas_activity_update %x\n", canvas_update_flag);
+        // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
         return true;
     }
     return false;
+}
+
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(hr_animation)
+{
+    if (canvas_hb_update())
+    {
+        uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
+        memset(img_data, 0, (size_t)p);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartbreak_graph, img_data);
+        gui_img_set_image_data(this_widget, img_data);
+    }
 }
 
 /*Define gui_app_return_array*/
@@ -1142,24 +1187,55 @@ static void heart_rate_app(gui_app_t *app)
     gui_log("current app:%s\n", gui_current_app()->screen.name);
     win_hb = gui_win_create(&app->screen, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
-    gui_canvas_t *canvas_bg = gui_canvas_create(win_hb, "hb_background", 0, 0, 0, SCREEN_WIDTH,
-                                                SCREEN_HEIGHT);
-    gui_canvas_set_canvas_cb(canvas_bg, canvas_cb_heartbreak_bg);
-    // gui_canvas_img_t *canvas_bg = gui_canvas_img_create(win_hb, "hb_background", 0, 0, 0, SCREEN_WIDTH,
-    //                                             SCREEN_HEIGHT);
-    // gui_canvas_img_set_canvas_cb(canvas_bg, canvas_cb_heartbreak_bg);
-    // gui_canvas_img_set_update_cb(canvas_bg, NULL);
-
-    gui_canvas_t *canvas_graph = gui_canvas_create(win_hb, "hb_graph", 0, 0, 0, SCREEN_WIDTH,
-                                                   SCREEN_HEIGHT);
-    gui_canvas_set_canvas_cb(canvas_graph, canvas_cb_heartbreak_graph);
-    // gui_canvas_img_t *canvas_graph = gui_canvas_img_create(win_hb, "hb_graph", 0, 0, 0, SCREEN_WIDTH,
-    //                                                SCREEN_HEIGHT);
-    // gui_canvas_img_set_canvas_cb(canvas_graph, canvas_cb_heartbreak_graph);
-    // gui_canvas_img_set_update_cb(canvas_graph, canvas_hb_update);
+    gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                           gui_rgb(0, 0, 0));
 
     gui_win_set_animate(win_hb, 2000, -1, (gui_animate_callback_t)win_hb_cb, win_hb);
-
+    {
+        char *text = "Current heartrate";
+        int font_size = 32;
+        gui_text_t *t = gui_text_create(win_hb, "txt", 30 + SCREEN_X_OFF, 270 + 30 + SCREEN_Y_OFF, 0,
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+        gui_text_mode_set(t, LEFT);
+        gui_text_type_set(t, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    }
+    {
+        // sprintf(hr_content, "69");
+        int text_w = 33;
+        // uint8_t number = atoi(hr_content);
+        gui_img_t *img = gui_img_create_from_mem(win_hb, "hr_content_percentile", text_num_array[1],
+                                                 30 + SCREEN_X_OFF, 270 + 80 + SCREEN_Y_OFF, 0, 0);
+        GUI_BASE(img)->not_show = 1;
+        img = gui_img_create_from_mem(win_hb, "hr_content_decimal", text_num_array[6],
+                                      30 + SCREEN_X_OFF + text_w, 270 + 80 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(win_hb, "hr_content_single", text_num_array[9],
+                                      30 + SCREEN_X_OFF + text_w * 2, 270 + 80 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        char *text = "times/min";
+        int font_size = 48;
+        gui_text_t *t = gui_text_create(win_hb, "txt", 30 + SCREEN_X_OFF + 105, 270 + 100 + SCREEN_Y_OFF, 0,
+                                        96);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
+        gui_text_mode_set(t, LEFT);
+        gui_text_type_set(t, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+    }
+    {
+        int image_h = 300,
+            image_w = SCREEN_WIDTH,
+            pixel_bytes = 4;
+        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        uint8_t *img_data = gui_lower_malloc(buffer_size);
+        memset(img_data, 0, buffer_size);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartbreak_graph, img_data);
+        gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
+                                                 SCREEN_HEIGHT);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_animate(img, 1000, -1, hr_animation, (void *)buffer_size);
+    }
     {
         char *text = "160";
         int font_size = 24;
@@ -1223,34 +1299,6 @@ static void heart_rate_app(gui_app_t *app)
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
     }
-    {
-        char *text = "Current heartrate";
-        int font_size = 32;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 30 + SCREEN_X_OFF, 270 + 30 + SCREEN_Y_OFF, 0,
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-        gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    }
-    {
-        sprintf(hr_content, "69");
-        int font_size = 96;
-        gui_text_t *t = gui_text_create(win_hb, "HR_TXT", 30 + SCREEN_X_OFF, 270 + 60 + SCREEN_Y_OFF, 0,
-                                        font_size);
-        gui_text_set(t, hr_content, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(hr_content),
-                     font_size);
-        gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_96_bin_addr, FONT_SRC_MEMADDR);
-    }
-    {
-        char *text = "times/min";
-        int font_size = 48;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 30 + SCREEN_X_OFF + 100, 270 + 100 + SCREEN_Y_OFF, 0,
-                                        96);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
-        gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_48_bin_addr, FONT_SRC_MEMADDR);
-    }
     gui_return_create(&app->screen, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_hb_exit, NULL);
 }
@@ -1266,85 +1314,27 @@ static void switch_app_menu()
     gui_switch_app(gui_current_app(), get_app_menu());
 }
 
-static void callback_time()
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 {
-    int idx = tablist_tab->cur_id.x;
-    gui_log("idx:%d\n", idx);
-    gui_app_t *app = get_app_hongkong();
-    gui_obj_t *screen = &(app->screen);
-    gui_obj_tree_free(screen);
-    app->ui_design(app);
-    switch (idx)
+    if (canvas_activity_update())
     {
-    case 0:
-        {
-            GUI_BASE(win_watch)->not_show = false;
-            GUI_BASE(watchface_1)->not_show = true;
-            GUI_BASE(watchface_2)->not_show = true;
-        }
-        break;
-    case 1:
-        {
-            GUI_BASE(win_watch)->not_show = true;
-            GUI_BASE(win_watch)->gesture = true;
-            GUI_BASE(watchface_1)->not_show = false;
-            GUI_BASE(watchface_2)->not_show = true;
-        }
-        break;
-    case 2:
-        {
-            GUI_BASE(win_watch)->not_show = true;
-            GUI_BASE(win_watch)->gesture = true;
-            GUI_BASE(watchface_1)->not_show = true;
-            GUI_BASE(watchface_2)->not_show = false;
-        }
-        break;
-    default:
-        break;
+        uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
+        memset(img_data, 0, (size_t)p);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
+        gui_img_set_image_data(this_widget, img_data);
     }
 }
 
-/* callback_touch_long start*/
-static void callback_touch_long(void *obj, gui_event_t e)
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_temperature_animation)
 {
-    gui_log("win widget long touch enter cb\n");
-    gui_app_t *app = (gui_app_t *)get_app_hongkong();
-    gui_obj_t *screen = &(app->screen);
-    int idx = 0;
-    if (!GUI_BASE(win_watch)->not_show)
+    if (canvas_temperature_update())
     {
-        idx = 0;
+        uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
+        memset(img_data, 0, (size_t)p);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb, img_data);
+        gui_img_set_image_data(this_widget, img_data);
     }
-    if (!GUI_BASE(watchface_1)->not_show)
-    {
-        idx = 1;
-    }
-    if (!GUI_BASE(watchface_2)->not_show)
-    {
-        idx = 2;
-    }
-
-    gui_obj_tree_free(screen);
-    gui_win_t *win = gui_win_create(screen, "win", 0, 0, 320, 320);
-    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_time, GUI_EVENT_TOUCH_CLICKED, NULL);
-
-    tablist_tab = gui_tabview_create(win, "tabview", 59, 84, 250, 300);
-    gui_tabview_set_style(tablist_tab, CLASSIC);
-    gui_tab_t *tb_watchface_2 = gui_tab_create(tablist_tab, "tb_watchface_2",   0, 0, 250, 0, 2, 0);
-    gui_tab_t *tb_watchface_1 = gui_tab_create(tablist_tab, "tb_watchface_1",   0, 0, 250, 0, 1, 0);
-    gui_tab_t *tb_watchface_0 = gui_tab_create(tablist_tab, "tb_watchface_0",   0, 0, 250, 0, 0, 0);
-    gui_tabview_jump_tab(tablist_tab, idx, 0);
-    gui_img_t *tablist_img_0 = gui_img_create_from_mem(tb_watchface_0, "img", UI_CLOCK_FACE_MAIN_BIN, 0,
-                                                       0, 0, 0);
-    gui_img_scale(tablist_img_0, 0.6, 0.6);
-    gui_img_t *tablist_img_1 = gui_img_create_from_mem(tb_watchface_1, "img", UI_CLOCK_FACE_SNOOBY_BIN,
-                                                       0, 0, 0, 0);
-    gui_img_scale(tablist_img_1, 0.6, 0.6);
-    gui_img_t *tablist_img_2 = gui_img_create_from_mem(tb_watchface_2, "img", UI_CLOCK_FACE_PERSON_BIN,
-                                                       0, 0, 0, 0);
-    gui_img_scale(tablist_img_2, 0.6, 0.6);
 }
-/* callback_touch_long end*/
 
 void page_ct_clock(void *parent)
 {
@@ -1355,8 +1345,8 @@ void page_ct_clock(void *parent)
         perror("fopen");
     }
 #else
-    cjson_content = gui_malloc(600);
-    memcpy(cjson_content, TUYA_CJSON_BIN, 0x240);
+    cjson_content = gui_malloc(700);
+    memcpy(cjson_content, TUYA_CJSON_BIN, 700);
 #endif
     win_watch = gui_win_create(parent, "win_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     return_to_watchface_flag = true;
@@ -1418,42 +1408,45 @@ void page_ct_clock(void *parent)
     gui_img_set_animate(img_weather, 3000, -1, weather_cb, img_weather);
 
     // temperature
-    canvas_temperature = gui_canvas_create(win_watch, "CLOCK_TEMPERATURE", 0, 16 + SCREEN_X_OFF,
-                                           330 + SCREEN_Y_OFF,
-                                           100, 100);
-    gui_canvas_set_canvas_cb(canvas_temperature, arc_temperature_cb);
-    // canvas_temperature = gui_canvas_img_create(win_watch, "CLOCK_TEMPERATURE", 0, 16 + SCREEN_X_OFF,
-    //                                        330 + SCREEN_Y_OFF,
-    //                                        100, 100);
-    // gui_canvas_img_set_canvas_cb(canvas_temperature, arc_temperature_cb);
-    // gui_canvas_img_set_update_cb(canvas_temperature, canvas_temperature_update);
+    {
+        int image_h = 100,
+            image_w = 100,
+            pixel_bytes = 4;
+        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        uint8_t *img_data = gui_lower_malloc(buffer_size);
+        memset(img_data, 0, buffer_size);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb, img_data);
+        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data, 16 + SCREEN_X_OFF,
+                                                 330 + SCREEN_Y_OFF, 100, 100);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_animate(img, 2000, -1, canvas_temperature_animation, (void *)buffer_size);
+        //text
+        sprintf(tempera_cur_content, "22");
+        temperature_cur = gui_text_create(img, "temperature_cur",  32, 16, 0, 0); //32
+        gui_text_set(temperature_cur, (void *)tempera_cur_content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
+                     strlen(tempera_cur_content),
+                     48);
+        gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(temperature_cur, LEFT);
 
+        sprintf(tempera_low_content, "18");
+        temperature_low = gui_text_create(img, "temperature_low",  19, 70, 0, 0);
+        gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
+                     APP_COLOR_WHITE, //gui_rgba(191, 220, 48, UINT8_MAX),
+                     strlen(tempera_low_content),
+                     32);
+        gui_text_type_set(temperature_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(temperature_low, LEFT);
 
-    sprintf(tempera_cur_content, "22");
-    temperature_cur = gui_text_create(canvas_temperature, "temperature_cur",  0, 16, 0, 0); //32
-    gui_text_set(temperature_cur, (void *)tempera_cur_content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
-                 strlen(tempera_cur_content),
-                 48);
-    gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(temperature_cur, CENTER);
-
-    sprintf(tempera_low_content, "18");
-    temperature_low = gui_text_create(canvas_temperature, "temperature_low",  19, 70, 0, 0);
-    gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
-                 APP_COLOR_WHITE, //gui_rgba(191, 220, 48, UINT8_MAX),
-                 strlen(tempera_low_content),
-                 32);
-    gui_text_type_set(temperature_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(temperature_low, LEFT);
-
-    sprintf(tempera_high_content, "37");
-    temperature_high = gui_text_create(canvas_temperature, "temperature_high",  56, 70, 0, 0);
-    gui_text_set(temperature_high, (void *)tempera_high_content, GUI_FONT_SRC_BMP,
-                 APP_COLOR_WHITE, //gui_rgba(250, 17, 79, UINT8_MAX),
-                 strlen(tempera_high_content),
-                 32);
-    gui_text_type_set(temperature_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(temperature_high, LEFT);
+        sprintf(tempera_high_content, "37");
+        temperature_high = gui_text_create(img, "temperature_high",  56, 70, 0, 0);
+        gui_text_set(temperature_high, (void *)tempera_high_content, GUI_FONT_SRC_BMP,
+                     APP_COLOR_WHITE, //gui_rgba(250, 17, 79, UINT8_MAX),
+                     strlen(tempera_high_content),
+                     32);
+        gui_text_type_set(temperature_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(temperature_high, LEFT);
+    }
 // #endif
 
     // date & time text
@@ -1461,27 +1454,43 @@ void page_ct_clock(void *parent)
     date_text = gui_text_create(win_watch, "date_text",  -35, 15 + SCREEN_Y_OFF, 0, 0);
     gui_text_set(date_text, (void *)date_text_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_text_content),
-                 40);
-    gui_text_type_set(date_text, font_size_40_bin_addr, FONT_SRC_MEMADDR);
+                 48);
+    gui_text_type_set(date_text, font_size_48_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, RIGHT);
-    sprintf(time_text_content, "00:00");
-    time_text = gui_text_create(win_watch, "time_text",  -20, 50 + SCREEN_Y_OFF, 0, 0);
-    gui_text_set(time_text, (void *)time_text_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 strlen(time_text_content),
-                 96);
-    gui_text_type_set(time_text, font_size_96_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(time_text, RIGHT);
+    gui_text_convert_to_img(date_text, RGB565);
+    {
+        int text_w = 35;
+        gui_img_t *img = gui_img_create_from_mem(win_watch, "watch_hour_decimal", text_num_array[0],
+                                                 190 + SCREEN_X_OFF, 70 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(win_watch, "watch_hour_single", text_num_array[0],
+                                      190 + SCREEN_X_OFF + text_w, 70 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(win_watch, "colon", text_num_array[10],
+                                      190 + SCREEN_X_OFF + text_w * 2 + 5, 70 + SCREEN_Y_OFF + 5, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(win_watch, "watch_minute_decimal", text_num_array[0],
+                                      190 + SCREEN_X_OFF + text_w * 2 + 17, 70 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(win_watch, "watch_minute_single", text_num_array[0],
+                                      190 + SCREEN_X_OFF + text_w * 3 + 17, 70 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
 
     // activity icon
-    gui_canvas_t *canvas_move_ring = gui_canvas_create(win_watch, "CLOCK_ACTIVITY_ICON", 0,
-                                                       0 + SCREEN_X_OFF, 50 + SCREEN_Y_OFF, 368,
-                                                       100);
-    gui_canvas_set_canvas_cb(canvas_move_ring, arc_activity_cb);
-    // gui_canvas_img_t *canvas_move_ring = gui_canvas_img_create(win_watch, "CLOCK_ACTIVITY_ICON", 0, 0 + SCREEN_X_OFF, 50 + SCREEN_Y_OFF, 368,
-    //                                                    100);
-    // gui_canvas_img_set_canvas_cb(canvas_move_ring, arc_activity_cb);
-    // gui_canvas_img_set_update_cb(canvas_move_ring, canvas_activity_update);
-
+    {
+        int image_h = 100,
+            image_w = 100,
+            pixel_bytes = 4;
+        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        uint8_t *img_data = gui_lower_malloc(buffer_size);
+        memset(img_data, 0, buffer_size);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
+        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data, 16 + SCREEN_X_OFF,
+                                                 50 + SCREEN_Y_OFF, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_animate(img, 1000, -1, canvas_activity_animation, (void *)buffer_size);
+    }
     // compass icon
     gui_img_t *img = gui_img_create_from_mem(win_watch, "CLOCK_COMPASS_DIAL",
                                              UI_CLOCK_COMPASS_DIAL_ICON_BIN, 134 + SCREEN_X_OFF, 330 + SCREEN_Y_OFF, 0, 0);
@@ -1507,18 +1516,6 @@ void page_ct_clock(void *parent)
                                              0);
     gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_heart_rate, GUI_EVENT_1, NULL);
 
-    // set other watchface
-    {
-        gui_win_t *win_touch = gui_win_create(parent, "win_touch", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        gui_obj_add_event_cb(win_touch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
-
-        watchface_1 = gui_img_create_from_mem(parent, "watchface", UI_CLOCK_FACE_SNOOBY_BIN, 0, 0, 0, 0);
-        gui_img_scale(watchface_1, 0.95, 0.95);
-        watchface_2 = gui_img_create_from_mem(parent, "watchface", UI_CLOCK_FACE_PERSON_BIN, 0, 0, 0, 0);
-        gui_img_scale(watchface_2, 0.95, 0.95);
-        GUI_BASE(watchface_1)->not_show = true;
-        GUI_BASE(watchface_2)->not_show = true;
-    }
     gui_win_set_animate(win_watch, 2000, -1, (gui_animate_callback_t)win_clock_cb, win_watch);
 }
 #endif
