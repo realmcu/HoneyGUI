@@ -144,9 +144,21 @@ typedef struct arc_animation_param
     uint8_t dir;
 
 } arc_animation_param_t;
+typedef struct chart_animation_param
+{
+    gui_color_t color;
+    int image_data_length;
+    int image_width;
+    int image_height;
+    uint8_t *target_buffer;
 
+    int *data_array;
+    int max, min;
+    uint8_t aniamtion_type;
+} chart_animation_param_t;
 #define TEXT_WEATHER_CUR_ANIMATION 1
 #define ARC_ACTIVITY_EX_ANIMATION 2
+#define CHART_HEART_RATE_DATA_ANIMATION 3
 static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
@@ -157,6 +169,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_watchface_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callback);
 static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
@@ -4336,6 +4349,88 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         gui_img_set_animate((void *)parent, 1000, -1, arc_animate_activity_callback, (void *)param);
                                     }
                                 }
+                                else if (!strcmp(type, "heart_rate"))
+                                {
+                                    if (!strcmp(id, "array"))
+                                    {
+                                        chart_animation_param_t *param = 0;
+                                        ezxml_t pt = p->parent;
+                                        if (!strcmp(p->parent->name, "chart"))
+                                        {
+                                            ezxml_t p = pt;
+                                            size_t i = 0;
+                                            int16_t x = 0;
+                                            int16_t y = 0;
+                                            int16_t w = 0;
+                                            int16_t h = 0;
+                                            int16_t item_count = 0;
+                                            const char *items = NULL;
+                                            gui_color_t  color = {0};
+                                            int16_t max = 0;
+                                            int16_t min = 0;
+
+                                            while (true)
+                                            {
+                                                if (!(p->attr[i]))
+                                                {
+                                                    break;
+                                                }
+
+                                                //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                                                if (!strcmp(p->attr[i], "x"))
+                                                {
+                                                    x = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "y"))
+                                                {
+                                                    y = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "w"))
+                                                {
+                                                    w = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "h"))
+                                                {
+                                                    h = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "items"))
+                                                {
+                                                    items = p->attr[++i];
+                                                }
+                                                else if (!strcmp(p->attr[i], "color"))
+                                                {
+                                                    color = string_rgb888(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "max"))
+                                                {
+                                                    max = atoi(p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "min"))
+                                                {
+                                                    min = atoi(p->attr[++i]);
+                                                }
+                                                i++;
+                                            }
+                                            int image_h = h,
+                                                image_w = w,
+                                                pixel_bytes = 4,
+                                                buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                                            param = gui_malloc(sizeof(chart_animation_param_t));
+                                            memset(param, 0, sizeof(chart_animation_param_t));
+                                            param->aniamtion_type = CHART_HEART_RATE_DATA_ANIMATION;
+                                            param->image_data_length = buffer_size;
+                                            param->image_width = image_w;
+                                            param->image_height = image_h;
+                                            param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
+                                            param->color = color;
+                                            param->max = max;
+                                            param->min = min;
+
+                                        }
+                                        gui_img_set_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback, (void *)param);
+                                    }
+                                }
                             }
                         }
                         break;
@@ -4345,7 +4440,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 if (!strcmp(type, "Weather"))
                                 {
-                                    if (!strcmp(id, "Current"))
+                                    if (!strcmp(id, "current"))
                                     {
                                         gui_text_set_animate(parent, 1000, -1, text_animate_weather_callback,
                                                              (void *)TEXT_WEATHER_CUR_ANIMATION);
@@ -5330,7 +5425,10 @@ void create_tree_nest(char *xml, void *obj)
     gui_app_t *app = gui_obj_tree_get_app(obj);
     app->xml = xml;
     ezxml_t f1 = ezxml_parse_file(xml);
-    foreach_create(f1, obj);
+    if (f1)
+    {
+        foreach_create(f1, obj);
+    }
 }
 static void setting_return_cb(void *obj, gui_event_t e, void *param)
 {
@@ -5546,7 +5644,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
     case TEXT_WEATHER_CUR_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("SaaA\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
             int fd = gui_fs_open(path, 0);
             gui_free((void *)path);
             if (fd < 1)
@@ -5561,7 +5659,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
             json_string[size] = '\0';
             int move = 0;
             //gui_log("%s\n",json_string);
-            gui_get_json_value(json_string, "weather", "cur", &move);
+            gui_get_json_value(json_string, "weather", "current", &move);
             gui_free(json_string);
             static char move_string[4];
             memset(move_string, 0, GUI_ARRAY_SIZE(move_string));
@@ -5587,7 +5685,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
     case ARC_ACTIVITY_EX_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("SaaA\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
             int fd = gui_fs_open(path, 0);
             gui_free((void *)path);
             int size = gui_fs_lseek(fd, 0, SEEK_END);
@@ -5598,7 +5696,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
             json_string[size] = '\0';
             int move = 0;
             //gui_log("%s\n",json_string);
-            gui_get_json_value(json_string, "activity", "ex", &move);
+            gui_get_json_value(json_string, "activity", "exercise", &move);
             gui_free(json_string);
             int max = 60;
             int min = 0;
@@ -5691,7 +5789,68 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
         break;
     }
 }
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callback)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+    chart_animation_param_t *param = p;
+    switch (param->aniamtion_type)
+    {
+    case CHART_HEART_RATE_DATA_ANIMATION:
+        {
+            const char *path =
+                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+            int fd = gui_fs_open(path, 0);
+            gui_free((void *)path);
+            int size = gui_fs_lseek(fd, 0, SEEK_END);
+            gui_fs_lseek(fd, 0, SEEK_SET);
+            char *json_string = gui_malloc(size + 1);
+            gui_fs_read(fd, json_string, size);
+            gui_fs_close(fd);
+            json_string[size] = '\0';
+            int array_length = 0;
+            //gui_log("%s\n",json_string);
+            float *array = gui_get_json_array(json_string, "heart_rate", "array", &array_length);
+            int max = 0, min = 0;
+            gui_get_json_value(json_string, "heart_rate", "range_min", &min);
+            gui_get_json_value(json_string, "heart_rate", "range_max", &max);
+            if (max != 0)
+            {
+                param->max = max;
+            }
+            if (min != 0)
+            {
+                param->min = min;
+            }
+            gui_free(json_string);
+            if (array_length == 0 || array == 0)
+            {
+                return;
+            }
 
+            int w = param->image_width;
+            int h = param->image_height;
+
+
+            uint8_t *buffer = param->target_buffer;
+            memset(buffer, 0, param->image_data_length);
+            NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
+            gui_wave_render(vg, 0, 0, w,
+                            h,
+                            array_length,
+                            array,
+                            param->color,
+                            param->max,
+                            param->min);
+            gui_free(array);
+            gui_canvas_output_buffer_blank_close(vg);
+            gui_img_set_image_data(this_widget, buffer);
+        }
+    }
+
+}
 
 
 

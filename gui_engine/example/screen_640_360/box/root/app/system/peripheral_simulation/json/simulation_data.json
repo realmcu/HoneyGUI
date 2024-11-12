@@ -1,0 +1,46 @@
+{
+    "weather": [
+        {
+            "range_min": 18,
+            "range_max": 37,
+            "low": 18,
+            "high": 37,
+            "current": 27,
+            "condition_1": "Cloudy",
+            "condition_2": "Cloudy",
+            "condition_3": "Cloudy",
+            "condition_4": "Cloudy",
+            "condition_5": "Cloudy"
+        }
+    ],
+    "compass": [
+        {
+            "degree": 90
+        }
+    ],
+    "activity": [
+        {
+            "move_max": 20000,
+            "exercise_max": 60,
+            "stand_max": 30,
+            "move": 1,
+            "exercise": 54,
+            "stand": 1
+        }
+    ],
+    "heart_rate": [
+        {
+            "array": [
+                111,
+                2,
+                222,
+                333,
+                -100,
+                123,
+                321,
+                111,
+                3.14159265
+            ]
+        }
+    ]
+}

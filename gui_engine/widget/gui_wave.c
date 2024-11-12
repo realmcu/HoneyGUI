@@ -312,9 +312,22 @@ void gui_wave_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
                      int16_t max,
                      int16_t min)
 {
+    if (!samples)
+    {
+        return;
+    }
+    if (!item_count)
+    {
+        return;
+    }
     NVGpaint bg;
     float sx[item_count], sy[item_count];
-    float dx = w / (item_count - 1);
+    float dx = w;
+    if (item_count != 1)
+    {
+        dx = w / (item_count - 1);
+    }
+
     int i;
     for (i = 0; i < item_count; i++)
     {
@@ -324,7 +337,7 @@ void gui_wave_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
 
     // Graph background
     bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(color.color.rgba.r, color.color.rgba.g,
-                                                       color.color.rgba.b, 0), nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b, 240));
+                                                       color.color.rgba.b, 50), nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b, 240));
     nvgBeginPath(vg);
     nvgMoveTo(vg, sx[0], sy[0]);
     for (i = 1; i < item_count; i++)

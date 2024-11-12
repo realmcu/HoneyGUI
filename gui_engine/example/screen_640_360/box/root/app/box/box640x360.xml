@@ -366,19 +366,24 @@
     blendMode="imgSrcOverMode"  
 >combo1
 </combo>
-    <arc
+
+<arc
         centerX="85"
         centerY="369"
         radius="27"
         strokeWidth="4"
         strokeColor="yellow"
-        startAngle="0"
+        startAngle="-1.6"
         endAngle="3.14"
         clockwise="CW"
         cap="round">arc1
-
-    </arc>
-    <chart
+        <onPeripheral 
+            type="activity" 
+            to="arc1" 
+            id="exercise">
+        </onPeripheral>
+</arc>   
+<chart
         w="400"
         h="300"
         x="10"
@@ -388,5 +393,10 @@
         max="400"
         min="-300"  
         >chart1
-    </chart>  
+        <onPeripheral 
+                type="heart_rate" 
+                to="chart1" 
+                id="array">
+            </onPeripheral>
+</chart>  
 </screen></app>
