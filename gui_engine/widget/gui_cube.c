@@ -28,59 +28,32 @@
 #include <math.h>
 #include "gui_fb.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
+
 #define CUBE_JUDEG_FULL_RANK(m) if(gui_cube_full_rank(m->matrix))  //!< JUDGE IF THIS IS FULL RANK
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_cube_scale(gui_vertex_t *vertex, float scale)
 {
     // Scale cube vertex coordinates to proper size.
@@ -762,10 +735,4 @@ gui_cube_t *gui_cube_create(void               *parent,
     GET_BASE(cube)->create_done = true;
     return cube;
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */

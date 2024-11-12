@@ -24,40 +24,20 @@
 #include "tp_algo.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 #define CIRCLE_BOUNDARY (180.0f/454.0F*((float)gui_get_screen_width()))
 #define SCREEN_W        ((float)gui_get_screen_width()-25.0f)
@@ -65,28 +45,15 @@
 #define SPEED_MAX       50
 #define SPEED_MIN       5
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static bool move_flag = 1;
 static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *parent)
 {
@@ -515,10 +482,4 @@ void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
         index++;
     }
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */

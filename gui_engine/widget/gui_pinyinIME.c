@@ -23,50 +23,25 @@
 
 #include "gui_pinyinIME.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
+
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
-
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
 static gui_ime_t *IME_pinyin;
 
@@ -306,10 +281,3 @@ void gui_IME_set_dict(gui_ime_t *this, void *file_dict_info, void *file_dict)
     }
 }
 
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

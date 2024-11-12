@@ -29,15 +29,11 @@
 #include <math.h>
 #include <gui_app.h>
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
+
 typedef struct gui_calculator
 {
     gui_obj_t base;                 //!< base structure
@@ -55,43 +51,24 @@ typedef enum
 
 };
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
+
 #define CAL_BUFF_INPUT_MAXLEN 128  //!<
 #define CAL_BUFF_OP_MAXLEN 64  //!<
 #define CAL_BUFF_NUM_MAXLEN 64  //!<
 #define CAL_BUFF_DISPLAY_MAXLEN 128 //!<
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
 static void app_calculator_ui_design(gui_app_t *app);
 
@@ -121,16 +98,10 @@ static bool flg_caldone = false;
 static bool flg_error = false;
 
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
-
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static uint8_t buff_input_push(char ch)
 {
     uint16_t len = buff_data_len[CAL_BUFF_INPUT_INDEX];
@@ -779,10 +750,4 @@ static void app_calculator_ui_design(gui_app_t *app)
                                     gui_get_screen_height());
     gui_calculator_create(&app->screen, "calculator", 0, 0, 454, 454);
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */

@@ -34,33 +34,10 @@ extern "C" {
 #include "guidef.h"
 #include <gui_api.h>
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
-/** @brief  ... */
-
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
-/*============================================================================*
- *                         Constants
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 typedef enum t_obj_type
 {
     SCREEN                   = 0x0000,
@@ -187,42 +164,26 @@ typedef struct _gui_obj_t
     gui_matrix_t *matrix;
 
 } gui_obj_t;
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
+
 /**
   * @param this_widget pointer to the GUI image object.
   * @param parent the father widget it nested in.
@@ -769,14 +730,6 @@ void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type,
  * @param displacement The displacement value to consider for speed update.
  */
 void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement);
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

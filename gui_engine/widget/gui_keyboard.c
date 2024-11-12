@@ -27,51 +27,29 @@
 #include "gui_button.h"
 #include "gui_keyboard.h"
 #include "gui_pinyinIME.h"
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
+
 #define KB_BUFF_INPUT_MAXLEN 128  //!<
 #define KB_BUFF_DISPLAY_MAXLEN 128 //!<
 #define KB_BUFF_KEY_MAXLEN 128
 #define KB_PSWD_KEY_MAXLEN 128
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
 static gui_kb_t *global_kb;
 static char buff_display[KB_BUFF_DISPLAY_MAXLEN];
@@ -1832,11 +1810,3 @@ gui_kb_t *gui_keyboard_create(void                    *parent,
     GET_BASE(this)->create_done = true;
     return this;
 }
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

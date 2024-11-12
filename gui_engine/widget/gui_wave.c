@@ -24,65 +24,33 @@
 #include "nanovg.h"
 #include "gui_wave.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
-  * @{
-  */
 
 extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
                                  uint8_t *data);
 extern void nvgDeleteAGGE(NVGcontext *ctx);
-/** End of SUBMOUDLE_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_wave_draw_graph(NVGcontext *vg,
                                 float       x,
                                 float       y,
@@ -423,10 +391,4 @@ void gui_wave_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
 
     nvgStrokeWidth(vg, 1.0f);
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */

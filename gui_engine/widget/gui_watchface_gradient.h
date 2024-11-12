@@ -36,18 +36,10 @@ extern "C" {
 #include "gui_canvas.h"
 #include "gui_watchface_gradient.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  ... */
 typedef struct
@@ -56,30 +48,15 @@ typedef struct
 } gui_watchface_gradient_t;
 
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
+
 #define WATCHFACE_GRADIENT_RING1     296.52f
 #define WATCHFACE_GRADIENT_RING2     192.17f
 #define WATCHFACE_GRADIENT_RING3     87.83f
@@ -90,30 +67,15 @@ extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride,
                                  enum NVGtexture format, uint8_t *data);
 extern void nvgDeleteAGGE(NVGcontext *ctx);
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
   * @brief  create watchface gradient
@@ -142,14 +104,6 @@ gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
                                                         int16_t     y,
                                                         int16_t     w,
                                                         int16_t     h);
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

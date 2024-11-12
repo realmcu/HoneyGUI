@@ -30,65 +30,18 @@ extern "C" {
  *============================================================================*/
 #include "guidef.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  image widget structure */
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
-/*============================================================================*
- *                         Constants
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 typedef enum
 {
     IME_PAGE_FORWARD    = 0,
     IME_PAGE_BACKWARD   = 1,
 
 } GUI_PINYIN_IME_t;
-
-
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
-
-/*============================================================================*
- *                         Macros
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
-
-#define CHAR_LEN_BYTE      (3) // depend on dictinary: UTF-8
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
-
-/*============================================================================*
- *                         Variables
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
 typedef struct
 {
@@ -126,17 +79,27 @@ typedef struct
 
 } gui_ime_api_t;
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+#define CHAR_LEN_BYTE      (3) // depend on dictinary: UTF-8
+
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
+
 /**
 * @brief set dictonary and info file for ime
 * @note
@@ -153,13 +116,6 @@ void gui_IME_set_dict(gui_ime_t *this, void *file_dict_info, void *file_dict);
  */
 gui_ime_t *gui_pinyin_IME_create(uint16_t kb_cand_page_size);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 #ifdef __cplusplus
 }

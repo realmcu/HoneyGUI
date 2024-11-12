@@ -29,33 +29,16 @@ extern "C" {
 #include "gui_fb.h"
 #include "gui_page.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
-
 
 #define SCROLL_WHEEL_ROW 20
 
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 typedef struct scroll_wheel_picture
 {
@@ -78,45 +61,19 @@ typedef struct gui_scroll_wheel
     IMG_SOURCE_MODE_TYPE src_mode;
 } gui_scroll_wheel_t;
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
-
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief Create a scroll_whell.https://drive.google.com/file/d/1VzPxmv5Cjtlzjs7UGs_dBfI7zKDI_nwV/view?usp=sharing
@@ -151,14 +108,6 @@ void gui_scroll_wheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_
  * @param num_pic_hl The picture(highlight) filepath.
  */
 void gui_scroll_wheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

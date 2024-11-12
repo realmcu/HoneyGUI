@@ -33,18 +33,10 @@ extern "C" {
 #include "gui_fb.h"
 #include "gui_obj.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /* T_GUI_GRID_STYLE enum start*/
 /** @brief  support two style */
@@ -55,41 +47,21 @@ typedef enum
 } T_GUI_GRID_STYLE;
 /* T_GUI_GRID_STYLE enum end*/
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
+
 typedef struct gui_grid
 {
     gui_obj_t base;
@@ -112,17 +84,10 @@ typedef struct gui_grid
     int change_threshold;
 } gui_grid_t;
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief create a grid widget.
@@ -198,13 +163,7 @@ gui_grid_t *gui_grid_create(void     *parent,
  */
 void gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

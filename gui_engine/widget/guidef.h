@@ -53,20 +53,9 @@ extern "C" {
 #error not supported tool chain
 #endif
 
-/** @defgroup SUBMOUDLE SUBMOUDLE
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Types SUBMOUDLE Exported Types
-  * @brief
-  * @{
-  */
-
-
 
 typedef struct touch_info
 {
@@ -460,28 +449,16 @@ typedef struct acc_engine
 } acc_engine_t;
 /* acc_engine_t struct define end */
 
-/** End of SUBMOUDLE_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Constants SUBMOUDLE Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
-  * @brief
+
+/** @brief
   * @{
   * The color used in the GUI:
   *
@@ -659,38 +636,17 @@ typedef int gui_error_t;
     this->animate = animate;
 #define GUI_STRINGS_EQUAL(string1, string2) (!strcmp(string1, string2))
 #define GUI_ANIMATION_CALLBACK(function_name) void function_name(void *p, void *this_widget, gui_animate_t *animate)
-/** End of SUBMOUDLE_Exported_Macros
-  * @}
-  */
+
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Functions SUBMOUDLE Exported Functions
-  * @brief
-  * @{
-  */
 
-/** End of SUBMOUDLE_Exported_Functions
-  * @}
-  */
-
-/** End of SUBMOUDLE
-  * @}
-  */
 
 
 #ifdef __cplusplus

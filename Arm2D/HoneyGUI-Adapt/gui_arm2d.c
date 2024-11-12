@@ -29,64 +29,29 @@
 #include "arm_2d_helper.h"
 
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
-
 
 static void gui_arm2d_prepare(gui_arm2d_t *this)
 {
@@ -107,7 +72,7 @@ static void gui_arm2d_draw(gui_arm2d_t *this)
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
-    while(arm_fsm_rt_cpl != disp_adapter0_task()); 
+    while (arm_fsm_rt_cpl != disp_adapter0_task());
 
     GUI_UNUSED(this);
     GUI_UNUSED(obj);
@@ -168,12 +133,12 @@ static void gui_arm2d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 }
 
 static void gui_arm2d_ctor(gui_arm2d_t *this,
-                                     gui_obj_t              *parent,
-                                     const char             *name,
-                                     int16_t                 x,
-                                     int16_t                 y,
-                                     int16_t                 w,
-                                     int16_t                 h)
+                           gui_obj_t              *parent,
+                           const char             *name,
+                           int16_t                 x,
+                           int16_t                 y,
+                           int16_t                 w,
+                           int16_t                 h)
 {
     //for obj class
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -203,12 +168,12 @@ static void gui_arm2d_ctor(gui_arm2d_t *this,
  * @return gui_arm2d_t*
  */
 gui_arm2d_t *gui_arm2d_create(void       *parent,
-                                          const char *name,
-                                          void (*cb)(gui_arm2d_t *this),
-                                          int16_t     x,
-                                          int16_t     y,
-                                          int16_t     w,
-                                          int16_t     h)
+                              const char *name,
+                              void (*cb)(gui_arm2d_t *this),
+                              int16_t     x,
+                              int16_t     y,
+                              int16_t     w,
+                              int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
@@ -232,7 +197,8 @@ gui_arm2d_t *gui_arm2d_create(void       *parent,
 
     GET_BASE(this)->create_done = true;
 
-    arm_irq_safe {
+    arm_irq_safe
+    {
         arm_2d_init();
     }
 
@@ -242,11 +208,3 @@ gui_arm2d_t *gui_arm2d_create(void       *parent,
     return this;
 }
 
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

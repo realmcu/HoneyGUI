@@ -32,21 +32,10 @@ extern "C" {
 #include "gui_api.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
-
-/** @brief  ... */
-
 
 #ifdef  __CC_ARM
 #pragma anon_unions
@@ -92,30 +81,14 @@ typedef struct
     uint8_t checksum;
 } gui_gallery_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
 #define RAD(d)        (d*3.1415926f/180.0f)     //!< angle to rad
 
@@ -123,17 +96,10 @@ typedef struct
 #define DEFAULT_SIDE_POS_PERCENT (0.1f)     //!< side area percent
 #define DEFAULT_SIDE_SCALE (0.4f)
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
 typedef enum
 {
@@ -149,19 +115,9 @@ typedef enum
 } GALLERY_IMG_IDX;
 
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
-
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
-
 
 /**
  * @brief set the perspective image's blend mode
@@ -218,13 +174,6 @@ gui_gallery_t *gui_gallery_create(void                      *parent,
                                   int16_t                    y,
                                   int16_t                    w,
                                   int16_t                    h);
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

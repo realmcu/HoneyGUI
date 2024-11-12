@@ -29,45 +29,21 @@ extern "C" {
  *============================================================================*/
 
 
-/** @defgroup APP APP
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup APP_Exported_Types APP Exported Types
-  * @brief
-  * @{
-  */
 
 typedef int (*gui_init_fn_t)(void);
 
-/** End of APP_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup APP_Exported_Constants APP Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of APP_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup APP_Exported_Macros APP Exported Macros
-  * @brief
-  * @{
-  */
 
 #define GUI_APP_USED                     __attribute__((used))
 #define GUI_APP_SECTION(x)                  __attribute__((section(x)))
@@ -92,30 +68,14 @@ typedef int (*gui_init_fn_t)(void);
 #define GUI_INIT_APP_EXPORT(fn)             GUI_APP_INIT_EXPORT(fn, "6")
 
 
-/** End of APP_Exported_Macros
-  * @}
-  */
-
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup APP_Exported_Variables APP Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of APP_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup APP_Exported_Functions APP Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief
@@ -123,13 +83,6 @@ typedef int (*gui_init_fn_t)(void);
  */
 void gui_components_init(void);
 
-/** End of APP_Exported_Functions
-  * @}
-  */
-
-/** End of APP
-  * @}
-  */
 
 #ifdef __cplusplus
 }

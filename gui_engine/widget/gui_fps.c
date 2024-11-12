@@ -25,50 +25,26 @@
 #include "gui_text.h"
 #include "font_mem.h"
 #include "gui_win.h"
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
+
 static gui_text_t *t;
 static gui_text_t *widget_count;
 static char fps[10];
@@ -77,16 +53,12 @@ static gui_text_t *mem;
 static gui_text_t *low_mem;
 static char mem_string[20];
 static char low_mem_string[20];
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
+
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_fps_cb(void *p, void *this_widget, gui_animate_t *animate)
 {
 
@@ -950,10 +922,3 @@ void gui_fps_create(void *parent)
     gui_text_type_set(low_mem, addr1, FONT_SRC_MEMADDR);
 }
 
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

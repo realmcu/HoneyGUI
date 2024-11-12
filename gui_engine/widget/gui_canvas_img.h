@@ -31,18 +31,10 @@ extern "C" {
 #include "gui_canvas.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
- * @brief
- * @{
- */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
- * @brief
- * @{
- */
 
 /** @brief  canvas structure */
 typedef struct _gui_canvas_img
@@ -57,60 +49,24 @@ typedef struct _gui_canvas_img
     bool (*fpCanvas_img_update_cb)(struct _gui_canvas_img *);
 } gui_canvas_img_t;
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-
-
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief create a canvas image widget used to drawing graphics in nanovg.
@@ -136,13 +92,6 @@ gui_canvas_img_t *gui_canvas_img_create(void *parent,  const char *name, void *a
 void gui_canvas_img_set_canvas_cb(gui_canvas_img_t *this,
                                   void (*cb)(gui_canvas_t *this));
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 void gui_canvas_img_set_update_cb(gui_canvas_img_t *this, bool (*cb)(gui_canvas_img_t *this));
 
 void gui_canvas_img_set_TransColor(gui_canvas_img_t *this, unsigned char r, unsigned char g,

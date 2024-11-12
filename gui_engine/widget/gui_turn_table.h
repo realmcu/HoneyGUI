@@ -37,58 +37,10 @@ extern "C" {
 #include "gui_img.h"
 #include "math.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
-
-/** @brief  support two style */
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
-/*============================================================================*
- *                         Constants
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
-
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
-
-/*============================================================================*
- *                         Macros
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
-
-#define TT_IMG_NAME_LENGTH  10 //strlen(tt_img_xxx)
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
-
-/*============================================================================*
- *                         Variables
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
 typedef enum turn_table_state
 {
@@ -141,17 +93,25 @@ typedef struct gui_turn_table
     bool need_update;
 } gui_turn_table_t;
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+#define TT_IMG_NAME_LENGTH  10 //strlen(tt_img_xxx)
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief crear turn table widget
@@ -296,13 +256,7 @@ void gui_turn_table_set_icon_scale(gui_turn_table_t *this,
 void gui_turn_table_add_icon_static(gui_turn_table_t *this,
                                     void *icon_addr);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

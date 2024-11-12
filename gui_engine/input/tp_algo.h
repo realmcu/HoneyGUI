@@ -29,45 +29,21 @@ extern "C" {
 #include <string.h>
 #include "guidef.h"
 
-/** @defgroup INPUT INPUT
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup INPUT_Exported_Types INPUT Exported Types
-  * @brief
-  * @{
-  */
 
-
-
-/** End of INPUT_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup INPUT_Exported_Constants INPUT Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of INPUT_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup INPUT_Exported_Macros INPUT Exported Macros
-  * @brief
-  * @{
-  */
+
 #define SAME_POINT_THR      5  //!< threshold for judging if finger don't move
 #define HALF_SCREEN_SIZE    (320/2) //!< half of screen size 
 
@@ -75,32 +51,15 @@ extern "C" {
 #define GUI_TOUCH_EVENT_NONE     0                //!<Touch none 
 #define GUI_TOUCH_EVENT_UP       1                //!< Touch up event 
 #define GUI_TOUCH_EVENT_DOWN     2                //!< Touch down event 
-/** End of INPUT_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup INPUT_Exported_Variables INPUT Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of INPUT_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup INPUT_Exported_Functions INPUT Exported Functions
-  * @brief
-  * @{
-  */
-
-
 
 /**
  * @brief algorithm process
@@ -117,13 +76,6 @@ struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data);
  */
 struct touch_info *tp_get_info(void);
 
-/** End of INPUT_Exported_Functions
-  * @}
-  */
-
-/** End of INPUT
-  * @}
-  */
 
 #ifdef __cplusplus
 }

@@ -32,48 +32,20 @@ extern "C" {
 #include <string.h>
 #include <guidef.h>
 
-/** @defgroup SERVER SERVER
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup SERVER_Exported_Types SERVER Exported Types
-  * @brief
-  * @{
-  */
 
-/** @brief  ... */
-
-
-
-/** End of SERVER_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup SERVER_Exported_Constants SERVER Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of SERVER_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup SERVER_Exported_Macros SERVER Exported Macros
-  * @brief
-  * @{
-  */
-
 
 #define GUI_ASSERT(EX)                                                         \
     if (!(EX))                                                                    \
@@ -143,19 +115,12 @@ extern "C" {
 #define APP_COLOR_GRAY                      gui_rgb(128,128,128)
 #define APP_COLOR_BLACK_OPACITY(opacity)    gui_rgba(0,0,0, opacity)
 #define APP_COLOR_GRAY_OPACITY(opacity)     gui_rgba(128,128,128, opacity)
-/** End of SERVER_Exported_Macros
-  * @}
-  */
 
 
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup SERVER_Exported_Functions SERVER Exported Functions
-  * @brief
-  * @{
-  */
 
 void gui_dc_info_register(struct gui_dispdev *info);
 void gui_acc_info_register(struct acc_engine *info);
@@ -420,13 +385,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
  *
  */
 void gui_change_default_path(int argc, char **argv);
-/** End of SERVER_Exported_Functions
-  * @}
-  */
 
-/** End of SERVER
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif
