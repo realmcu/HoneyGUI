@@ -174,7 +174,7 @@ void page_tb_control0(void *parent)
 
 <br>
 
-<center><img width="300" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/switch.gif"/></center>
+<center><img width="400" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/switch.gif"/></center>
 
 <br>
 

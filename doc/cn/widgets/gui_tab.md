@@ -80,7 +80,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 ```
 <br>
 
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1721901439083426379/8f8f9db8_10641540.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1721901439083426379/8f8f9db8_10641540.gif" width = "400" /></div>
 
 <br>
 
@@ -132,7 +132,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 ```
 <br>
 
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1721902043698157443/1cb14773_10641540.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1721902043698157443/1cb14773_10641540.gif" width = "400" /></div>
 <br>
 
 ### 选项卡循环显示
@@ -183,7 +183,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 }
 ```
 <br>
-<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview_loop.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview_loop.gif" width = "400" /></div>
 <br>
 
 

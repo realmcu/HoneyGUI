@@ -9,7 +9,7 @@ STB图像控件是用于显示图像的基本控件。可以设置左、中、�
 
 ### 创建控件
 
-使用[gui_img_stb_create_from_mem(void *parent, const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y)](#gui_img_stb_create_from_mem) 从内存中创建一个STB图像控件，注意需要确保类型和大小是正确的。
+使用 [gui_img_stb_create_from_mem(void *parent, const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y)](#gui_img_stb_create_from_mem) 从内存中创建一个STB图像控件，注意需要确保类型和大小是正确的。
 
 ### 设置属性
 
@@ -35,7 +35,7 @@ static void app_home_ui_design(gui_app_t *app)
 
 <br>
 
-<center><img width= "370" src="https://foruda.gitee.com/images/1703146027234656357/48137b9c_9325830.png" /></center>
+<center><img width= "400" src="https://foruda.gitee.com/images/1703146027234656357/48137b9c_9325830.png" /></center>
 <br>
 
 <span id="api">

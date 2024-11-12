@@ -255,13 +255,13 @@ RTKIOT 可视化设计工具支持以下功能：
 ### 设计视图/画布
 用户可以从工具箱面板中拖放控件到设计视图中，调整控件的布局并设置属性，以设计一个可以在瑞昱 IC中渲染的图形界面。
 
-<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png" width="680"></div>
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png" width="750"></div>
 
 
 #### 选项卡视图 - 创建/删除/插入选项卡
 从工具箱中拖放选项卡视图控件到设计视图中，创建出一个只包含一个主页选项卡（坐标（0,0））的选项卡视图，如下图所示。
 
-<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png" width="680"></div>
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png" width="750"></div>
 
 ##### 创建选项卡
 可以通过点击设计视图周围的按钮来创建新的选项卡。
@@ -285,11 +285,11 @@ RTKIOT 可视化设计工具支持以下功能：
 1.	将选项卡（2,0）及其右侧的选项卡的idx加一，如下图所示；
 2.	切换到选项卡（1,0），点击 创建新的选项卡（2,0）。
 
-<div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815120686817698/cdf44743_12407535.png" width="680"></div>
+<div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815120686817698/cdf44743_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815280073982051/68230d3d_12407535.png" width="680"></div>
+<div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815280073982051/68230d3d_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_7_c" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628460504196478/3446e06e_12407535.png" width="680"></div>
+<div id="figure_2_7_c" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628460504196478/3446e06e_12407535.png" width="750"></div>
 
 #### 选项卡视图概览图
 请点击 ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0dc_12407535.png)  查看选项卡视图概览图。
@@ -301,9 +301,9 @@ RTKIOT 可视化设计工具支持以下功能：
 ```
 
 
-<div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png" width="680"></div>
+<div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628633709549622/a41c6011_12407535.png" width="680"></div>
+<div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628633709549622/a41c6011_12407535.png" width="750"></div>
 
 #### 设计视图的缩放
 有三种方式可以对设计视图进行缩放。
@@ -311,12 +311,12 @@ RTKIOT 可视化设计工具支持以下功能：
 2.	点击“-”和“+”按钮。
 3.	拖动滑动条。
 
-<div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628744851323697/d56f9725_12407535.png" width="680"></div>
+<div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628744851323697/d56f9725_12407535.png" width="750"></div>
 
 ### 属性视图
 在控件树或设计视图中选择一个控件，可以显示出所有控件的属性值，用户可以根据需要进行修改。
 
-<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726814067710788486/a6564f40_12407535.png" width="680"></div>
+<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726814067710788486/a6564f40_12407535.png" width="750"></div>
 
 ### 控件树
 控件树用于向用户展示当前布局中控件之间的父子关系和兄弟关系。我们遵循以下约定：
@@ -325,9 +325,9 @@ RTKIOT 可视化设计工具支持以下功能：
 
 下图展示了主页选项卡和灯选项卡中的所有子控件，其中主页选项卡只有一个背景图片控件，而灯选项卡包含一个图片控件和多个开关控件。
 
-<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png" width="680"></div>
+<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png" width="680"></div>
+<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png" width="750"></div>
 <br/>
 
 控件树支持以下操作：
@@ -351,7 +351,7 @@ RTKIOT 可视化设计工具支持以下功能：
 只有预导入的图像和字体文件可以被GUI项目引用。本章重点介绍如何管理图像和字体资源。
 图像和字体资源管理器位于设计视图正下方，如下图所示。
 
-<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="680"></div>
+<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="750"></div>
 
 <a id="img_res_m_anchor"></a>
 
@@ -359,23 +359,23 @@ RTKIOT 可视化设计工具支持以下功能：
 
 点击 ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png)  打开图像管理器，如下图所示。
 
-<div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815968480737363/e2f46e96_12407535.png" width="400"></div>
+<div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815968480737363/e2f46e96_12407535.png" width="500"></div>
 
 ##### 添加图像
 通过以下步骤可以将图像添加到GUI项目中。
 1.	点击![icon](https://foruda.gitee.com/images/1710824254786867861/174e524d_12407535.png) ，创建一个新的图像文件夹并输入文件夹名称。创建的文件夹位于GUI项目目录下的```Resource\image```文件夹中。
 
-<div id="figure_3_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629445428238950/c3e216ca_12407535.png" width="400"></div>
+<div id="figure_3_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629445428238950/c3e216ca_12407535.png" width="500"></div>
 <br/>
 
 2.	选择创建的图像文件夹，然后点击 ![icon](https://foruda.gitee.com/images/1710824254769021374/55b6c303_12407535.png) 选择图像（支持多选），将它们添加到文件夹中。添加完成后，图像会被复制到```Resource\image\home```文件夹中。
 
-<div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629572036008240/98958d66_12407535.png" width="400"></div>
+<div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629572036008240/98958d66_12407535.png" width="500"></div>
 <br/>
 
-<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725412988097005313/b591b7ca_12407535.png" width="600"></div>
+<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725412988097005313/b591b7ca_12407535.png" width="750"></div>
 <br/>
-<div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629616915297638/de3a62a7_12407535.png" width="400"></div>
+<div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629616915297638/de3a62a7_12407535.png" width="500"></div>
 
 ##### 移除图像/图像文件夹
 选择要移除的图像或图像文件夹，然后点击 ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png)。
@@ -402,7 +402,7 @@ RTKIOT 可视化设计工具支持以下功能：
 #### 添加第三方字体
 如果需要使用第三方字体（.ttf），请先点击 ![icon](https://foruda.gitee.com/images/1710824482944711702/8b73005d_12407535.png) 导入资源，否则将使用本地安装的字体。
 
-<div id="figure_3_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483191984010/283b1f70_12407535.png" width="600"></div>
+<div id="figure_3_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483191984010/283b1f70_12407535.png" width="750"></div>
 
 #### 移除第三方字体
 选择要移除的字体，然后点击  ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png)。
@@ -419,7 +419,7 @@ RTKIOT 可视化设计工具支持以下功能：
 点击“打开项目”或选择一个```.rtkprj```文件并双击打开已存在的项目，或者点击“创建项目”来创建新项目，请参考 [如何创建项目](#how_to_create_anchor) 和 [如何打开项目](#how_to_open_anchor)。
 
 
-<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png" width="680"></div>
+<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png" width="750"></div>
 
 #### 保存
 保存项目的所有UI更改，快捷键是```Ctrl + S```。
@@ -444,12 +444,12 @@ RTKIOT 可视化设计工具支持以下功能：
 #### 转换项目
 转换项目窗口用于转换当前项目的IC类型和屏幕尺寸/分辨率。
 
-<div id="figure_4_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630083752972113/2f32ba1a_12407535.png" width="400"></div>
+<div id="figure_4_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630083752972113/2f32ba1a_12407535.png" width="500"></div>
 
 #### 修改项目名称
 修改项目名称窗口用于修改当前项目的名称。请在输入框中输入新名称。
  
-<div id="figure_4_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630055522858677/e4245c27_12407535.png" width="400"></div>
+<div id="figure_4_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630055522858677/e4245c27_12407535.png" width="500"></div>
 
 ### 设置
 
@@ -457,7 +457,7 @@ RTKIOT 可视化设计工具支持以下功能：
 #### 图像转换设置
 图像必须转换才能在IC上正确显示，因此用户需要设置正确的转换参数。所有可选参数如下图所示。
 
-<div id="figure_4_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630165031575995/1be72944_12407535.png" width="400"></div>
+<div id="figure_4_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630165031575995/1be72944_12407535.png" width="500"></div>
 <br/>
 
 参数描述如下。
@@ -489,9 +489,9 @@ RTKIOT 可视化设计工具支持以下功能：
 
     一种无损压缩算法。 如果选择RLE作为压缩模式，则需要设置RLE级别和RLE行程长度参数。
 
-<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818028936954872/d4977120_12407535.png" width="350"></div>
+<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818028936954872/d4977120_12407535.png" width="400"></div>
 <br/>
-<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818316484821859/eeb87b7f_12407535.png" width="350"></div>
+<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818316484821859/eeb87b7f_12407535.png" width="400"></div>
 <br/>
 
 | RLE 级别 |                      描述                      |
@@ -555,7 +555,7 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 要使用位图字体，您需要设置以下参数。
 
-<div id="figure_4_7" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630232320631022/466a71af_12407535.png" width="400"></div>
+<div id="figure_4_7" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630232320631022/466a71af_12407535.png" width="500"></div>
 <br/>
 
 下表列出了每个参数的描述。
@@ -574,7 +574,7 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 有关矢量字体的参数，请参考下图。
 
-<div id="figure_4_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630326763929958/7a1b4010_12407535.png" width="400"></div>
+<div id="figure_4_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630326763929958/7a1b4010_12407535.png" width="500"></div>
 
 ### 导出
 如果您已经完成了GUI项目的设计，并且想将其烧录到IC中，请点击“导出”，然后工具将执行以下操作：
@@ -584,7 +584,7 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 当上述操作完成后，会弹出一个消息框。
 
-<div id="figure_4_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630355854380192/60bbc0af_12407535.png" width="400"></div>
+<div id="figure_4_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630355854380192/60bbc0af_12407535.png" width="500"></div>
 <br/>
 
 ```.bin```文件可以烧录进您的IC中。
@@ -600,7 +600,7 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 下图显示为模拟器运行效果。
 
-<div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="350"></div>
+<div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="400"></div>
 
 <div STYLE="page-break-after: always;"></div> 
 
@@ -612,25 +612,25 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 ### 如何创建项目
 
-<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="680"></div>
+<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="750"></div>
 <br/>
 
 双击运行```RVisualDesigner.exe```，然后按照步骤（1~4）配置项目，点击“创建项目”（5）。
 创建项目后，GUI设计窗口将弹出。左侧是组件区域，中间是设计区域，右侧是部件属性设置区域。
 
-<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818698027723674/8962d02e_12407535.png" width="680"></div>
+<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818698027723674/8962d02e_12407535.png" width="750"></div>
 <br>
 
 ```{note}
 新创建的项目文件位于解决方案文件夹下的项目文件夹中。下图展示了一个示例。
 ```
 
-<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505762180091944/39be3e5a_12407535.png" width="330"></div>
+<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505762180091944/39be3e5a_12407535.png" width="400"></div>
 <br/>
 
 当在设计视图上拖放一个控件，并点击“文件 - 保存”或按下```Ctrl + S```时，将创建一个```.rtkui```文件。
 
-<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505619255178068/e89d3b76_12407535.png" width="330"></div>
+<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505619255178068/e89d3b76_12407535.png" width="400"></div>
 
 
 ### 如何编写 JavaScript 代码
@@ -640,13 +640,13 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 ### 如何打开项目
 
-<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="680"></div>
+<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="750"></div>
 <br/>
 
 有两种打开项目的方式：
 1.	点击“打开项目”，选择一个```.rtkprj```文件进行打开。
 
-<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1724911708175163337/8513c36b_12407535.png" width="680"></div>
+<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1724911708175163337/8513c36b_12407535.png" width="750"></div>
 <br/>
 
 2.	在“最近项目”区域选择一个```.rtkprj```文件进行打开。 如果最近项目中有所需的项目，则会弹出一个消息窗口。
@@ -659,7 +659,7 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 
 
 ### 如何导出/打包项目
-<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png" width="680"></div>
+<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png" width="750"></div>
 <br/>
 
 点击菜单栏中的 "导出"，导出结果会显示在下图中。
@@ -667,7 +667,7 @@ RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复�
 <br/>
 
 ### 如何进行模拟
-<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png" width="680"></div>
+<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png" width="750"></div>
 <br/>
 
 点击菜单栏上的 “模拟” 按钮。

@@ -40,7 +40,7 @@ void page_tb_grid(void *parent)
 }
 ```
 <br>
-<center><img width = "300" src= "https://foruda.gitee.com/images/1693896763454036220/6c0a498b_10088396.png"/></center>
+<center><img width = "400" src= "https://foruda.gitee.com/images/1693896763454036220/6c0a498b_10088396.png"/></center>
 <br>
 
 

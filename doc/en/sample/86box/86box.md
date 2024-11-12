@@ -12,22 +12,22 @@ This example demostrates how to develop a RealUI 86Box APP, from which you can l
 
 - Find and open the example UI design project in the specified path:
 <br/>
-<div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1725515761517919126/033a0990_9218678.png"></div>
+<div style="text-align: center"><img width="750" src="https://foruda.gitee.com/images/1725515761517919126/033a0990_9218678.png"></div>
 <br/>
 
 - Click on `Export` and then `Simulate` in succession to complete the export and launch the simulation. Once the simulator window is launched, the 86Box APP icon will be displayed. Clicking on it will take you to the corresponding APP.
 
 <br/>
-<div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1725515804906725239/f2b55fe1_9218678.png"></div>
+<div style="text-align: center"><img img width="750" src="https://foruda.gitee.com/images/1725515804906725239/f2b55fe1_9218678.png"></div>
 <br/>
 <br/>
-<div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1725515818032367801/cd5c125c_9218678.png"></div>
+<div style="text-align: center"><img img width="400" src="https://foruda.gitee.com/images/1725515818032367801/cd5c125c_9218678.png"></div>
 <br/>
 
 - When entering the APP, you will see the same UI content as in the `RVisualDesigner` design project in the simulator window. Therefore, this design mode has the feature of "What You See Is What You Get" (WYSIWYG). Developers can drag widgets from the ToolBox to the canvas to create widgets for the current page. After adding image resources to the project, the widgets can be configured and linked to custom images. The hierarchy relationship between widgets will be displayed through the Widget tree.
 
 <br/>
-<div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1725515836928906868/bf7c4fa0_9218678.png"></div>
+<div style="text-align: center"><img img width="750" src="https://foruda.gitee.com/images/1725515836928906868/bf7c4fa0_9218678.png"></div>
 <br/>
 
 - This tool requires adding pictures in advance, and then dragging the widgets in the `ToolBox` to the middle screen to lay out the same UI as the current `Widget tree`.
@@ -43,7 +43,7 @@ In the JS file `gui_engine\example\screen_480_480\root\app\box\box.js`, the cont
 #### Light Control Switch
 
 <br/>
-<div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1725515850170490894/67696ea2_9218678.png"></div>
+<div style="text-align: center"><img img width="400" src="https://foruda.gitee.com/images/1725515850170490894/67696ea2_9218678.png"></div>
 <br/>
 
 - The callback functions for opening and closing the switch control named "kitchen_switch" are registered sequentially. When the switch control "kitchen_switch" is opened, its callback function `led1OnFunc` will be triggered and called.
@@ -67,7 +67,7 @@ sw.switch_off(led1OffFunc)
 #### Tab Jumping Switch
 
 <br/>
-<div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/sample/86box/86box.gif"/></div>
+<div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/sample/86box/86box.gif"/></div>
 <br/>
 
 

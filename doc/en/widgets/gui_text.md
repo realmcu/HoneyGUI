@@ -182,7 +182,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 </details></br>
 
-<center><img  width="300" src= "https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "/></center></br>
+<center><img  width="400" src= "https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "/></center></br>
 
 ### Animate Text Widget
 
@@ -232,7 +232,7 @@ void page_tb_activity(void *parent)
 
 </details></br>
 
-<center><img width="300" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
+<center><img width="400" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
 
 <br>
 

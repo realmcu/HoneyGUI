@@ -8,7 +8,7 @@ The flowchart depicts the image resource processing flow accelerated by software
 - **Filter black**: The filtering technique effectively sifts out pixel data with a value of zero from the originating image data, which essentially means that black pixels are precluded from being inscribed into the frame buffer. This mechanism induces much swifter refresh dynamics. Pixels of any color other than black undergo the standard processing method and are duly recorded into the frame buffer.
 - **Source_over**: A blending method that combines image color data and frame buffer pixel color data to calculate the final color based on the opacity_value value `Sa`, and writes it to the corresponding location in the frame buffer. The formula is `((255 - Sa) * D + Sa * S) / 255)`, where `Sa` is the opacity_value of the original image, `D` is the frame buffer pixel data, and `S` is the source image pixel data.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1726135723241666402/b6cb0cbc_13671125.png"/></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1726135723241666402/b6cb0cbc_13671125.png" width="1200"/></div><br/>
 
 - The `img_type` can be obtained from the `head` of the image, where the structure of the image head is as follows.
 

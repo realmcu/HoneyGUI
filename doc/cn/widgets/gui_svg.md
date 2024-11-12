@@ -33,7 +33,7 @@ void page_tb_svg(void *parent)
 }
 ```
 <br/>
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598969684310669/2e2a68e7_13671125.png"/></div>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699598969684310669/2e2a68e7_13671125.png"/></div>
 <br/>
 
 ### SVG 旋转
@@ -48,7 +48,7 @@ void page_tb_svg(void *parent)
 }
 ```
 <br/>
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598974541085137/fcc74440_13671125.png"/></div>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699598974541085137/fcc74440_13671125.png"/></div>
 <br/>
 
 ### SVG 缩放
@@ -63,7 +63,7 @@ void page_tb_svg(void *parent)
 }
 ```
 <br/>
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598982107316449/af526d67_13671125.png"/></div>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699598982107316449/af526d67_13671125.png"/></div>
 <br/>
 
 ### SVG 平移
@@ -78,7 +78,7 @@ void page_tb_svg(void *parent)
 }
 ```
 <br/>
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598986751661244/ff6ea9cf_13671125.png"/></div>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699598986751661244/ff6ea9cf_13671125.png"/></div>
 <br/>
 
 ## API

@@ -45,7 +45,7 @@
 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1727059552792713966/15519dc3_10088396.gif" /></center>
+<center><img width= "400" src="https://foruda.gitee.com/images/1727059552792713966/15519dc3_10088396.gif" /></center>
 <br>
 
 The graph below shows the widget tree structure simplified:

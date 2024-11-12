@@ -37,7 +37,7 @@
 </details>
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width = "400" /></div>
 <br>
 
 <span id = "gui_watchface_gradient_create">

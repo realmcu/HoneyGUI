@@ -71,7 +71,7 @@ RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用�
 ### 添加头部信息
 使用MPPG Tool给用户数据文件添加头部信息，添加过程如下：
 <br/>
-<div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
+<div style="text-align: center"><img width= "900" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
 <br/>
 
 1.  在`Tool`菜单下选择`Prepend header for user data`。

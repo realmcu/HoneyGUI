@@ -44,7 +44,7 @@
 
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931734086261442/f0690691_10641540.png" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931734086261442/f0690691_10641540.png" width = "400" /></div>
 <br>
 
 <span id = "gui_watch_gradient_spot_create">

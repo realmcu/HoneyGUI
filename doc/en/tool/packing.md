@@ -64,7 +64,7 @@ The generated ui_resource.h requires the following code to be added manually
 ### Adding Header Information
 Using the MPPG Tool to add header information to user data files, the process is as follows:
 <br/>
-<div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
+<div style="text-align: center"><img width= "900" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
 <br/>   
 
 1. In the `Tool` menu, select `Prepend header for user data`.

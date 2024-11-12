@@ -23,7 +23,7 @@ The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run 
 ## Software Architecture
 
 
-<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png"/></div><br/>
+<div style="text-align: center"><img width= "800" src ="https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png"/></div><br/>
 
 
 ## Installation
@@ -55,7 +55,7 @@ Open a CMD window in the `HoneyGUI` folder, and then run the following command t
 The `scons` command to perform the build process and then execute `gui.exe` to run it.
 
 
-<div style="text-align: center"><img width= "600"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
+<div style="text-align: center"><img width= "700"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
 
 
 ### Startup by VSCode
@@ -71,11 +71,11 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
 You can select the `Run and Debug` options after entering the vscode interface, and then click the `Run` button.
 
 
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png"/></div><br/>
 
 
 ### Display the Watchface
 You can interact with it by swiping and long pressing.
 
 
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>

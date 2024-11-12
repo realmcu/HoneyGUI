@@ -101,7 +101,7 @@ void page_tb_three(void *parent)
 
 </details><br>
 
-<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/progressbar.gif" /></center>
+<center><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/progressbar.gif" /></center>
 
 ## API
 

@@ -38,7 +38,7 @@ There are five orientations in curtain widget.
 
 ```
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png" width = "400" /></div>
 <br>
 
 <span id="gui_curtain_create">

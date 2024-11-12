@@ -3,7 +3,7 @@
 HoneyGUI框架的结构图如下所示：
   
   
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1721199084691160190/537fa787_13408154.png" alt="app fw.png"></div><br/>
+<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1721199084691160190/537fa787_13408154.png" alt="app fw.png"></div><br/>
 
   +  在每个项目中可以同时存在多个应用程序，但同一时间只有一个应用程序可以处于运行状态，其他应用程序将处于挂起状态。
   +  使用不同的显示引擎时，应用程序的上层代码写法会有所不同。

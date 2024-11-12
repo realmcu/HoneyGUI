@@ -5,7 +5,7 @@
 对象控件实现了屏幕上控件的基本属性。屏幕控件是控件树的根节点。极坐标的原点在 Y 轴的负方向，极坐标的正方向为顺时针方向，屏幕坐标系设置如下所示。
 <br>
 
-<center><img width="200" img src="https://foruda.gitee.com/images/1718762967150637512/872c46fa_13408154.png" /></center>
+<center><img width="300" img src="https://foruda.gitee.com/images/1718762967150637512/872c46fa_13408154.png" /></center>
 
 ## 用法
 
