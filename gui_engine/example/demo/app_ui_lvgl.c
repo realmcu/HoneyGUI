@@ -50,47 +50,11 @@ static void event_handler(lv_event_t *e)
     }
 }
 
-static void load_font_bin_file(void)
-{
-    lv_font_t *my_font;
-    my_font = lv_font_load("F:/lv_font_harmony_32.bin");
-    lv_obj_t *label = lv_label_create(lv_scr_act());
-    lv_obj_set_style_text_font(label, my_font, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_label_set_text(label, "Hello LVGL! By bin file.");
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 60, 15);
-}
-static void load_img_bin_file(void)
-{
-    lv_obj_t *icon = lv_img_create(lv_scr_act());
-    lv_img_set_src(icon, "F:/lvgl_logo.bin");
-    lv_obj_set_pos(icon, 10, 10);
-}
-
-static void load_font_c_file(void)
-{
-    lv_obj_t *label = lv_label_create(lv_scr_act());
-    extern const lv_font_t lv_font_harmony_32;
-    lv_obj_set_style_text_font(label, &lv_font_harmony_32, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_label_set_text(label, "Hello LVGL! By C file.");
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 60, 105);
-}
-static void load_img_c_file(void)
-{
-    LV_IMG_DECLARE(img_demo_lvgl_logo);
-    lv_obj_t *icon = lv_img_create(lv_scr_act());
-    lv_img_set_src(icon, &img_demo_lvgl_logo);
-    lv_obj_set_pos(icon, 10, 100);
-}
-static void lv_tool_file_test(void)
-{
-//C file
-    load_img_c_file();
-    load_font_c_file();
-
-//bin file
-    load_img_bin_file();
-    load_font_bin_file();
-}
+extern void load_font_bin_file(void);
+extern void load_img_bin_file(void);
+extern void load_font_c_file(void);
+extern void load_img_c_file(void);
+extern void lv_tool_file_test(void);
 
 lv_img_dsc_t moto_800x480 =
 {
@@ -126,25 +90,16 @@ static void app_dialing_ui_design(gui_app_t *app)
 #endif
 #if LV_USE_DEMO_WIDGETS
     // lv_demo_widgets();
-    // lv_obj_t *btn2 = lv_btn_create(lv_scr_act());
-    // lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, NULL);
-    // lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 40);
-    // lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
-    // lv_obj_set_height(btn2, LV_SIZE_CONTENT);
-
-    // lv_obj_t *label = lv_label_create(btn2);
-    // lv_label_set_text(label, "Toggle");
-    // lv_obj_center(label);
 #endif
     // lv_example_arc_2();
     // lv_example_img_1();
     // lv_example_btn_1();
-    // lv_tool_file_test();
     // lv_example_btn_2();
     // lv_example_label_3();
 
+    // lv_tool_file_test();
 
-    lv_tool_file_test();
+    // fs api example
     if (0)
     {
         lv_fs_file_t f;

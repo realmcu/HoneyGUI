@@ -62,7 +62,7 @@ static void gui_pinyin_get_cand_from_page(gui_ime_t *this)
     }
 
     read_num = _UI_MIN(this->cand_page_size, this->cand_dict_info->num_wd - before);
-    memset(this->buff_cand, 0, this->cand_page_size * this->char_len_byte);
+    memset(this->buff_cand, 0, (uint64_t)this->cand_page_size * (uint64_t)this->char_len_byte);
 
     memcpy(this->buff_cand, this->dict_addr + cand_offset, this->char_len_byte * read_num);
     this->cand_num = read_num;
@@ -98,7 +98,7 @@ void gui_pinyin_clear_cand(gui_ime_t *this)
 {
     this->cand_num = 0;
     this->last_key_len = 0;
-    memset(this->buff_cand, 0, this->cand_page_size * this->char_len_byte);
+    memset(this->buff_cand, 0, (uint64_t)this->cand_page_size * (uint64_t)this->char_len_byte);
 }
 
 uint16_t gui_pinyin_get_page_size(gui_ime_t *this)
@@ -191,7 +191,8 @@ gui_ime_t *gui_pinyin_IME_create(uint16_t kb_cand_page_size)
     IME_pinyin = (gui_ime_t *)gui_malloc(sizeof(gui_ime_t));
     GUI_ASSERT(IME_pinyin != NULL);
     IME_pinyin->char_len_byte = CHAR_LEN_BYTE;
-    IME_pinyin->buff_cand = (uint8_t *)gui_malloc(kb_cand_page_size * IME_pinyin->char_len_byte);
+    IME_pinyin->buff_cand = (uint8_t *)gui_malloc((uint64_t)kb_cand_page_size *
+                                                  (uint64_t)IME_pinyin->char_len_byte);
     GUI_ASSERT(IME_pinyin->buff_cand != NULL);
     IME_pinyin->cand_page_size = kb_cand_page_size;
 

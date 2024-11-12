@@ -378,7 +378,7 @@ static void gui_img_live_file_init(gui_img_live_t  *this)
         sz_mjpeg = ftell(fp);
         fseek(fp, 0, SEEK_SET);
 
-        if (sz_mjpeg == 0)
+        if (sz_mjpeg <= 0)
         {
             gui_log("Error: sz_mjpeg cannot be negative.\n");
             fclose(fp);
