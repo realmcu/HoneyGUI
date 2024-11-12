@@ -24,18 +24,10 @@ extern "C" {
 #include <stdbool.h>
 #include <stdio.h>
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  ... */
 

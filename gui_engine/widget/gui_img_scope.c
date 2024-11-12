@@ -24,64 +24,31 @@
 #include "tp_algo.h"
 #include "acc_init.h"
 #include "gui_win.h"
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_img_scope_prepare(gui_obj_t *obj)
 {
     uint8_t last;
@@ -456,10 +423,3 @@ gui_img_scope_t *gui_img_scope_create_from_ftl(void    *parent,
     return img;
 }
 
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

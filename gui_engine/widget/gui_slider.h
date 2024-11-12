@@ -38,18 +38,10 @@ extern "C" {
 #include "gui_text.h"
 #include "math.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 typedef struct gui_slider
 {
@@ -77,56 +69,24 @@ void (*on_change)(gui_slider_t *this, gui_event_cb_t event_cb, void *parameter);
 uint16_t (*get_currentValue)(gui_slider_t *this);
 _GUI_API_DECLARE(gui_slider_t)
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief Create a slider widget.
@@ -156,13 +116,7 @@ gui_slider_t *gui_slider_create(void          *parent,
                                 uint16_t       currentValue,
                                 int16_t        slider_size);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

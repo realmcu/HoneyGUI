@@ -34,6 +34,7 @@
 #define APP_CALENDAR
 #define APP_COMBOBOX
 #define APP_PAGE_LIST
+#define APP_CANVAS_OUTPUT
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 /*Define a app with name APP_STOPWATCH*/
 #define APP_STOPWATCH
@@ -59,6 +60,7 @@ GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
 GUI_APP_DEFINE_NAME(APP_CALENDAR)
 GUI_APP_DEFINE_NAME(APP_COMBOBOX)
 GUI_APP_DEFINE_NAME(APP_PAGE_LIST)
+GUI_APP_DEFINE_NAME(APP_CANVAS_OUTPUT)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -2998,4 +3000,98 @@ GUI_APP_ENTRY(APP_PAGE_LIST)
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     gui_fps_create(GUI_APP_ROOT_SCREEN);
+}
+#include "math.h"
+#include "gui_canvas.h"
+#include "gui_img.h"
+static void rect_cb(NVGcontext *vg)
+{
+    nvgRoundedRect(vg, 10, 10, 348, 200, 30);
+    nvgFillColor(vg, nvgRGB(178, 34, 34));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, 10, 220, 348, 200, 30);
+    nvgFillColor(vg, nvgRGB(107, 142, 35));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, 110, 125, 148, 200, 30);
+    nvgFillColor(vg, nvgRGBA(30, 144, 255, 100));
+    nvgFill(vg);
+}
+static void arc_cb(NVGcontext *vg)
+{
+    static float  progress;
+    progress += 0.1;
+    nvgArc(vg, 150 + 20, 150 + 20, 150, 0, 3.14 * (sinf(progress) + 1), NVG_CCW);
+    nvgStrokeWidth(vg, 20);
+    nvgStrokeColor(vg, nvgRGB(178, 34, 34));
+    nvgStroke(vg);
+}
+static void arc_cb_buffer(NVGcontext *vg)
+{
+    static float  progress;
+    progress += 0.1;
+    nvgArc(vg, 150 + 20, 150 + 20, 150, 0, 3.14 * (sinf(progress) + 1), NVG_CCW);
+    nvgStrokeWidth(vg, 20);
+    nvgStrokeColor(vg, nvgRGBA(30, 144, 255, 100));
+    nvgStroke(vg);
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_arc_animation)
+{
+    if (animate->end_frame)
+    {
+        const uint8_t *img_data = gui_img_get_image_data(this_widget);
+        gui_lower_free((void *)img_data);
+        img_data = gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, 340, 340, arc_cb);
+        gui_img_set_image_data(this_widget, img_data);
+    }
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_arc_animation_buffer)
+{
+    if (animate->end_frame)
+    {
+        uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
+        memset(img_data, 0, (size_t)p);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 340, 340, arc_cb_buffer, img_data);
+        gui_img_set_image_data(this_widget, img_data);
+    }
+
+}
+GUI_APP_ENTRY(APP_CANVAS_OUTPUT)
+{
+    //round rect
+    {
+        const uint8_t *imgdata = gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, 358, 440, rect_cb);
+        gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, (void *)imgdata, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+        //arc animation
+        {
+            const uint8_t *imgdata = gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, 340, 340, arc_cb);
+            gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, (void *)imgdata, 50, 50, 0, 0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_img_set_animate(img, 1000, -1, canvas_arc_animation, 0);
+        }
+        //arc animation by user's buffer
+        {
+            int image_h = 340,
+                image_w = 340,
+                pixel_bytes = 4;
+            size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+            uint8_t *imgdata = gui_lower_malloc(buffer_size);
+            memset(imgdata, 0, buffer_size);
+            gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 340, 340, arc_cb_buffer, imgdata);
+            gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, imgdata, 0, 0, 0, 0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_img_set_animate(img, 1000, -1, canvas_arc_animation_buffer, (void *)buffer_size);
+        }
+        //system
+        {
+            status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
+            gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                              sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+            gui_fps_create(GUI_APP_ROOT_SCREEN);
+        }
+    }
 }

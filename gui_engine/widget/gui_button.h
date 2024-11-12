@@ -33,18 +33,10 @@ extern "C" {
 #include "gui_img.h"
 #include "gui_win.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  press effect style */
 typedef enum
@@ -92,56 +84,28 @@ void (*animate)(gui_button_t *,
                 void         *callback,
                 void         *p);
 _GUI_API_DECLARE(gui_button_t)
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
+
 #define BUTTON_COLOR 0xffffffff //!< default color
 #define BUTTON_HLCOLOR 0x0bffff //!< default highlight color
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief Creat a button widget from memory, images are loaded from memory address.
@@ -297,13 +261,7 @@ void gui_button_set_img(gui_button_t *,
  * @param enable enable.
  */
 void gui_button_set_enable(gui_button_t *, bool enable);
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

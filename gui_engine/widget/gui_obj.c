@@ -22,63 +22,31 @@
 #include "gui_obj.h"
 #include "gui_matrix.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** @brief  ... */
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_obj_destory_cb(gui_obj_t *obj)
 {
     //gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
@@ -281,7 +249,7 @@ static const char *get_type_name(T_OBJ_TYPE type)
         ENUM_TO_STRING(GRID)
         ENUM_TO_STRING(RADIO)
         ENUM_TO_STRING(RADIOSWITCH)
-        ENUM_TO_STRING(ARC)
+        ENUM_TO_STRING(MACRO_CANVAS_ARC)
         ENUM_TO_STRING(JAVASCRIPT)
         ENUM_TO_STRING(MOVIE)
         ENUM_TO_STRING(IMAGE_SCOPE)
@@ -1058,6 +1026,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
             {
 
                 animate->Beginning_frame = 1;
+                animate->end_frame = 1;
             }
 
 
@@ -1254,10 +1223,4 @@ void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y)
     obj->x = x;
     obj->y = y;
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */

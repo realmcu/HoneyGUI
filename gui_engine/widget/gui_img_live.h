@@ -34,18 +34,10 @@ extern "C" {
 #include "gui_img.h"
 #include "gui_fb.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 typedef enum
 {
@@ -83,58 +75,27 @@ typedef struct
     uint8_t state;          /* input state: 0 init, 1 inputing */
 } LIVE_IODEV;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
 #define IMG_LIVE_FPS (25)  // default 25 fps, 40 ms
 // #define IMG_LIVE_TJPGDEC
 
-/** End of WIDGET_Exported_Macros
- * @}
- */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief Creat a image live widget with buffer.
@@ -157,13 +118,6 @@ gui_img_live_t *gui_img_live_create_from_mem(void           *parent,
                                              int16_t         w,
                                              int16_t         h);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

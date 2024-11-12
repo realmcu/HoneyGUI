@@ -32,19 +32,10 @@ extern "C" {
 #include "gui_api.h"
 #include "PainterEngine.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
-
 
 /** @brief  structure */
 typedef struct gui_px
@@ -63,57 +54,24 @@ typedef struct gui_px
 } gui_px_t;
 
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
-
 
 /**
  * @brief
@@ -134,15 +92,6 @@ gui_px_t *gui_px_create(void        *parent,
                         int16_t      y,
                         int16_t      w,
                         int16_t      h);
-
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

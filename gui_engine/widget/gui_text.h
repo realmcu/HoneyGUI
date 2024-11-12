@@ -35,18 +35,9 @@ extern "C" {
 #include "draw_font.h"
 #include "gui_win.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  text mode enum start */
 typedef enum
@@ -143,56 +134,24 @@ typedef struct gui_text_line
     uint16_t line_dx;
 } gui_text_line_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief set textbox click event cb .
@@ -368,13 +327,6 @@ gui_text_t *gui_text_create(void       *parent,
                             int16_t     w,
                             int16_t     h);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

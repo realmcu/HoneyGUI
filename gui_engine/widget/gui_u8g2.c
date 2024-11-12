@@ -19,63 +19,30 @@
  *============================================================================*/
 #include "gui_u8g2.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_convert_b1_to_rgb(uint8_t *ptr, uint32_t height, uint32_t width)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -257,11 +224,3 @@ gui_u8g2_t *gui_u8g2_create(void       *parent,
     GET_BASE(this)->create_done = true;
     return this;
 }
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

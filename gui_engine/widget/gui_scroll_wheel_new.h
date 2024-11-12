@@ -27,32 +27,17 @@ extern "C" {
  *============================================================================*/
 #include "gui_win.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
+
 #define GUI_SCROLL_WHEEL_NEW_RENDER_TEXT 1
 #define GUI_SCROLL_WHEEL_NEW_RENDER_IMAGE_ARRAY 2
-
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
+
 struct gui_text_image_map
 {
     const char *text;
@@ -107,44 +92,21 @@ int (*get_index)(gui_scroll_wheel_new_t *widget);
  */
 int (*set_index)(gui_scroll_wheel_new_t *this, int index);
 _GUI_API_DECLARE(gui_scroll_wheel_new_t)
-/** End of WIDGET_Exported_Types
-  * @}
-  */
+
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
-
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief Create a new scroll wheel widget.
@@ -239,13 +201,6 @@ void **gui_scroll_wheel_new_get_image_pointers(const char *input, size_t *num_po
 void gui_scroll_wheel_new_render(const char *text, gui_obj_t *obj, unsigned char render_mode,
                                  int16_t text_image_map_length, const struct gui_text_image_map *text_image_map);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

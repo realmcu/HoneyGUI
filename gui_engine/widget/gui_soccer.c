@@ -28,26 +28,15 @@
 #include <math.h>
 #include "gui_fb.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
+
 const gui_vertex_t vertices[12] =
 {
     {-1,  1.61803f,  0}, { 1,  1.61803f,  0}, {-1, -1.61803f,  0}, { 1, -1.61803f,  0},
@@ -63,37 +52,20 @@ int faces[20][3] =
     {4, 9, 5}, {2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1}
 };
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
-
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_soccer_scale(gui_vertex_t *vertex, float scale)
 {
     // Scale soccer vertex coordinates to proper size.
@@ -730,11 +702,3 @@ void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
 }
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

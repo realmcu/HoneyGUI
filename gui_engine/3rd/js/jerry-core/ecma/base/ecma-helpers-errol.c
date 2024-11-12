@@ -56,11 +56,11 @@
 /**
  * Floating point format definitions (next float value)
  */
-#define ECMA_NEXT_FLOAT(value) (nextafter ((value), INFINITY))
+#define ECMA_NEXT_FLOAT(value) (nextafter ((value), HUGE_VALF))
 /**
  * Floating point format definitions (previous float value)
  */
-#define ECMA_PREV_FLOAT(value) (nextafter ((value), -INFINITY))
+#define ECMA_PREV_FLOAT(value) (nextafter ((value), -HUGE_VALF))
 
 /**
  * Value of epsilon
@@ -166,7 +166,7 @@ ecma_errol0_dtoa(double val,  /**< ecma number */
     high_bound.value = mid.value;
     high_bound.offset = mid.offset;
 
-    if (ECMA_NEXT_FLOAT(val) != INFINITY)
+    if (ECMA_NEXT_FLOAT(val) != HUGE_VALF)
     {
         high_bound.offset += (ECMA_NEXT_FLOAT(val) - val) * power_of_10 / (2.0 + ERROL0_EPSILON);
     }

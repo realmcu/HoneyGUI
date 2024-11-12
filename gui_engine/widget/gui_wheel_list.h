@@ -37,59 +37,10 @@ extern "C" {
 #include "gui_img.h"
 #include "math.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
-/** @brief  support two style */
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
-/*============================================================================*
- *                         Constants
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
-
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
-
-/*============================================================================*
- *                         Macros
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
-#define RADIAN_60    M_PI/3
-
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
-
-/*============================================================================*
- *                         Variables
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 typedef enum layer_state
 {
     RESTING,
@@ -113,17 +64,26 @@ typedef struct gui_wheel_list
     gui_img_t ** *icon_list;
 } gui_wheel_list_t;
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+#define RADIAN_60    M_PI/3
+
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief Create a scroll wheel icon list widget.
@@ -166,14 +126,6 @@ void gui_wheel_list_set_icon(gui_wheel_list_t *this,
                              uint8_t layer,
                              uint8_t index);
 
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

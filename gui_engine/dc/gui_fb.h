@@ -33,73 +33,29 @@ extern "C" {
 #include <gui_obj.h>
 
 
-/** @defgroup DC DC
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup DC_Exported_Types DC Exported Types
-  * @brief
-  * @{
-  */
 
-
-
-/** End of DC_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup DC_Exported_Constants DC Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of DC_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup DC_Exported_Macros DC Exported Macros
-  * @brief
-  * @{
-  */
 
-
-
-
-/** End of DC_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup DC_Exported_Variables DC Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of DC_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup DC_Exported_Functions DC Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief entire update process
@@ -115,15 +71,6 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event);
  */
 void gui_fb_change(void);
 
-
-
-/** End of DC_Exported_Functions
-  * @}
-  */
-
-/** End of DC
-  * @}
-  */
 
 
 

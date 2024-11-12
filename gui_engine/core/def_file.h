@@ -29,10 +29,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Types SUBMOUDLE Exported Types
-  * @brief
-  * @{
-  */
+
 typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;

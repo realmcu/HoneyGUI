@@ -29,40 +29,19 @@
 #include "gui_app.h"
 #include "gui_api.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{int
-  */
 
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
@@ -82,28 +61,17 @@
 #define PATH404 "map/icon/404.jpg"
 typedef long off_t;
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
 static int tile_size = TILE_SIZE;
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void free_for_rgb(void *p);
 // Convert longitude to tileX index at a certain zoom level
 static int long2tilex(double lon, int z)
@@ -687,14 +655,6 @@ gui_map_t *gui_map_create(void *parent)
     return this;
 }
 
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 

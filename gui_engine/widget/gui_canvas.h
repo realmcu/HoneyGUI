@@ -32,18 +32,10 @@ extern "C" {
 #include "gui_api.h"
 #include "nanovg.h"
 #include "gui_obj.h"
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  canvas structure */
 typedef struct gui_canvas
@@ -55,53 +47,25 @@ typedef struct gui_canvas
     uint8_t render;
 } gui_canvas_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief create a canvas widget used to drawing graphics in nanovg.
@@ -162,13 +126,60 @@ typedef void (*gui_canvas_render_function)(NVGcontext *vg);
 const uint8_t *gui_canvas_output(int output_format, bool compression, int image_width,
                                  int image_height, gui_canvas_render_function renderer);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
+/**
+ * @brief Renders a canvas and outputs the result to a target buffer in the specified format.
+ *
+ * This function uses the provided renderer function to render a canvas, and then
+ * writes the output image to the provided target buffer in the specified format.
+ * The output can be optionally compressed, depending on the format.
+ *
+ * @param format        The format of the output image. Should be one of the following:
+ *                      - GUI_CANVAS_OUTPUT_PNG
+ *                      - GUI_CANVAS_OUTPUT_JPG
+ *                      - GUI_CANVAS_OUTPUT_RGBA
+ *                      - GUI_CANVAS_OUTPUT_RGB565
+ * @param compression   Whether to apply compression to the output (applicable for RGBA/RGB565 format).
+ * @param image_width   The width of the output image.
+ * @param image_height  The height of the output image.
+ * @param renderer      A function pointer to the rendering function that takes an NVGcontext.
+ *                      This function is responsible for all drawing operations.
+ * @param target_buffer A pointer to the buffer where the rendered image data will be written.
+ *                      The buffer must be pre-allocated and large enough to hold the image data
+ *                      in the specified format.
+ */
+void gui_canvas_output_buffer(int format, bool compression, int image_width, int image_height,
+                              gui_canvas_render_function renderer, uint8_t *target_buffer);
 
-/** End of WIDGET
-  * @}
-  */
+
+#include "draw_img.h"
+/**
+ * @brief Initializes a blank output buffer for the canvas.
+ *
+ * This function initializes a NanoVG context with a blank output buffer
+ * and returns a pointer to the context. The buffer can be configured with
+ * the specified format, compression option, width, and height.
+ *
+ * @param format        The format of the output buffer.
+ * @param compression   Boolean flag indicating whether compression should be used.
+ * @param image_width   The width of the image.
+ * @param image_height  The height of the image.
+ * @param target_buffer Pointer to the target buffer where the output will be stored.
+ *
+ * @return A pointer to the initialized NanoVG context.
+ */
+NVGcontext *gui_canvas_output_buffer_blank(int format, bool compression, int image_width,
+                                           int image_height,
+                                           uint8_t *target_buffer);
+
+/**
+ * @brief Closes the canvas and frees resources.
+ *
+ * This function closes the NanoVG context created by gui_canvas_output_buffer_blank
+ *
+ * @param vg Pointer to the NanoVG context to be closed.
+ */
+void gui_canvas_output_buffer_blank_close(NVGcontext *vg);
+
 
 #ifdef __cplusplus
 }

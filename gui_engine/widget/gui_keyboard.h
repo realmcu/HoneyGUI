@@ -37,17 +37,10 @@ extern "C" {
 #include "gui_win.h"
 #include "gui_pinyinIME.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  image widget structure */
 #ifdef  __CC_ARM
@@ -96,17 +89,11 @@ typedef struct
     uint8_t checksum;
 } gui_kb_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
+
 typedef enum
 {
     KB_LAYOUT_BASIC,
@@ -177,17 +164,11 @@ typedef enum
 
 } KEYBOARD_CONST;
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
+
 // 32bit : 3bit pre
 #define KB_VALUE_PACK(pre, idx) (((uint32_t)pre << 29)|idx)
 #define KB_VALUE_AREA(val) ((uint32_t)val >> 29)
@@ -199,23 +180,11 @@ typedef enum
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief get input password
@@ -268,13 +237,6 @@ gui_kb_t *gui_keyboard_create(void       *parent,
                               int16_t     w,
                               int16_t     h);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 #ifdef __cplusplus
 }

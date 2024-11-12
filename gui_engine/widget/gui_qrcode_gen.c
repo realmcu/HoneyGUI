@@ -27,9 +27,6 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 #ifndef QRCODEGEN_TEST
 #define testable static  // Keep functions private
@@ -52,20 +49,10 @@
 
 #define QRCODEGEN_REED_SOLOMON_DEGREE_MAX    30  // Based on the table above
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
-
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
 typedef enum
 {
@@ -124,16 +111,10 @@ typedef struct
     //uint8_t* p_image_data;
 } T_APP_QRCODE;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
 static const char *ALPHANUMERIC_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
@@ -165,29 +146,17 @@ static const int PENALTY_N2 =  3;
 static const int PENALTY_N3 = 40;
 static const int PENALTY_N4 = 10;
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
-
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
 T_APP_QRCODE app_qrcode = {0};
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 
 /*============================================================================*
  *                           Public Functions
@@ -1920,11 +1889,3 @@ uint8_t *gui_qrcode_gen_get_data(unsigned char *data, uint16_t data_length, uint
 }
 
 #undef LENGTH_OVERFLOW
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

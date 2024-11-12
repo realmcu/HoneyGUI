@@ -33,18 +33,9 @@ extern "C" {
 #include "gui_curtain.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  PAGE widget structure */
 typedef struct gui_page
@@ -81,56 +72,28 @@ typedef enum
     PAGE_REBOUND_DOWN = 2,
 } T_PAGE_REBOUND_TYPE;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
 #define GUI_PAGE_MAX_SPEED 60
 #define GUI_PAGE_MIN_SPEED 7
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief update the page widget.
@@ -283,13 +246,6 @@ void gui_page_center_alignment(gui_page_t *page, int align_height);
  */
 void gui_page_set_only_top_slide(gui_page_t *page, bool flag);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

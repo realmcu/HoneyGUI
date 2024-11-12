@@ -27,64 +27,30 @@
 #include "gui_gallery.h"
 #include "gui_fb.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** @brief  ... */
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
-
 
 /**
   * @brief  ...
@@ -611,10 +577,4 @@ gui_gallery_t *gui_gallery_create(void                      *parent,
     GET_BASE(this)->create_done = true;
     return this;
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */

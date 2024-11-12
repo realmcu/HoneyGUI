@@ -77,6 +77,9 @@ void lv_extra_init(void)
 #if LV_USE_BMP
     lv_bmp_init();
 #endif
+#if LV_USE_RLE
+    lv_rle_init();
+#endif
 
 #if LV_USE_FREETYPE
     /*Init freetype library*/

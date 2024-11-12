@@ -34,18 +34,10 @@ extern "C" {
 #include <gui_matrix.h>
 #include "gui_obj.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
+
 typedef struct gui_canvas_rect
 {
     gui_obj_t base;
@@ -55,48 +47,21 @@ typedef struct gui_canvas_rect
     uint8_t tp_block : 1;
 } gui_canvas_rect_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Macros
- * @}
- */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
@@ -169,14 +134,6 @@ void gui_canvas_rect_set_location(gui_canvas_rect_t *, int x, int y);
  */
 void gui_canvas_rect_set_size(gui_canvas_rect_t *, int w, int h);
 
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
- * @}
- */
 
 
 #ifdef __cplusplus

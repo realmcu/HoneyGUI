@@ -124,6 +124,7 @@ static int watch_app_init(void)
     int fd;
     extern int open(const char *file, int flags, ...);
     extern int close(int fd);
+    defaultPath = "gui_engine\\example\\screen_454_454\\root_image\\root\\";
     fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {

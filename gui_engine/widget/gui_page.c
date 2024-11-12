@@ -25,59 +25,30 @@
 #include <gui_curtain.h>
 #include <tp_algo.h>
 #include "wheel_algo.h"
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
-  * @{
-  */
 
-/** End of SUBMOUDLE_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
-  * @{
-  */
 
-/** End of SUBMOUDLE_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
 
 static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
 {
@@ -1876,10 +1847,3 @@ void gui_page_set_only_top_slide(gui_page_t *this, bool flag)
     this->top_slide_only = flag;
 }
 
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

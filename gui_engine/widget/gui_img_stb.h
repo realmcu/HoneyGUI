@@ -33,18 +33,10 @@ extern "C" {
 #include "draw_img.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  stb img widget gif information structure */
 typedef struct gui_img_stb_gif_info
@@ -81,58 +73,28 @@ typedef struct
     uint8_t *fbuf;  /* Pointer to the work area */
     uint8_t *image; /* JPG image read into this buffer */
 } IODEV;
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
+
 //Use tjpgd to replace jpeg decoding in stb
 // #define TJPG
 
 
-/** End of WIDGET_Exported_Macros
- * @}
- */
-
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief set stb image widget attribute
@@ -196,14 +158,6 @@ gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
  * @param output output format
  */
 void gui_img_stb_set_output_format(gui_stb_img_t  *this, GUI_FormatType output);
-
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

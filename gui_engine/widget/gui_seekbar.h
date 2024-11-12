@@ -30,18 +30,10 @@ extern "C" {
 #include "gui_progressbar.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  ... */
 typedef struct gui_seekbar
@@ -72,56 +64,24 @@ void (*set_progress)(gui_seekbar_t *this, float progress);
 void (*on_change)(gui_seekbar_t *this, gui_event_cb_t function, void *param);
 _GUI_API_DECLARE(gui_seekbar_t)
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
   * @brief  create a vertical based on picture seekbar
@@ -238,13 +198,7 @@ gui_seekbar_t *gui_seekbar_create_movie_h_double(void      *parent,
                                                  uint16_t   array_length,
                                                  int16_t    x,
                                                  int16_t    y);
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

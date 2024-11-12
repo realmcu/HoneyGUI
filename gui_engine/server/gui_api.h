@@ -32,48 +32,20 @@ extern "C" {
 #include <string.h>
 #include <guidef.h>
 
-/** @defgroup SERVER SERVER
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup SERVER_Exported_Types SERVER Exported Types
-  * @brief
-  * @{
-  */
 
-/** @brief  ... */
-
-
-
-/** End of SERVER_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup SERVER_Exported_Constants SERVER Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of SERVER_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup SERVER_Exported_Macros SERVER Exported Macros
-  * @brief
-  * @{
-  */
-
 
 #define GUI_ASSERT(EX)                                                         \
     if (!(EX))                                                                    \
@@ -143,19 +115,12 @@ extern "C" {
 #define APP_COLOR_GRAY                      gui_rgb(128,128,128)
 #define APP_COLOR_BLACK_OPACITY(opacity)    gui_rgba(0,0,0, opacity)
 #define APP_COLOR_GRAY_OPACITY(opacity)     gui_rgba(128,128,128, opacity)
-/** End of SERVER_Exported_Macros
-  * @}
-  */
 
 
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup SERVER_Exported_Functions SERVER Exported Functions
-  * @brief
-  * @{
-  */
 
 void gui_dc_info_register(struct gui_dispdev *info);
 void gui_acc_info_register(struct acc_engine *info);
@@ -227,6 +192,21 @@ int gui_fs_ioctl(int fd, int cmd);
 gui_fs_dir *gui_fs_opendir(const char *name);
 struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d);
 void *gui_get_file_address(const char *file);
+/**
+ * @brief Resolves a relative file path to an absolute file path.
+ *
+ * This function takes a relative file path and returns the corresponding absolute
+ * file path.
+ *
+ * @param relative_path The relative path to be resolved. It should be a valid
+ *                      relative path string.
+ *
+ * @return A pointer to a string containing the absolute file path. The caller
+ *         is responsible for managing the memory of the returned path string.
+ *         If the relative path cannot be resolved, NULL may be returned.
+ */
+const char *gui_get_path_by_relative(const char *relative_path);
+
 char *gui_strdup(const char *s);
 char *gui_filepath_transforming(void *addr);
 
@@ -359,17 +339,25 @@ gui_color_t gui_color_css(const char *color_str);
  *
  * array       |key          |value type
  *
+ * activity    |move_max     |int *
+ *
+ * activity    |exercise_max |int *
+ *
+ * activity    |stand_max    |int *
+ *
  * activity    |move         |int *
  *
- * activity    |ex           |int *
+ * activity    |exercise     |int *
  *
  * activity    |stand        |int *
  *
- * weather     |low          |int *
+ * weather     |range_min    |int *
+ *
+ * weather     |range_max    |int *
  *
  * weather     |high         |int *
  *
- * weather     |cur          |int *
+ * weather     |current      |int *
  *
  * weather     |condition_1  |char *
  *
@@ -383,13 +371,8 @@ gui_color_t gui_color_css(const char *color_str);
  *
  * compass     |degree       |int *
  *
- * heart_rate  |AM12         |int *
+ * heart_rate  |array        |int *
  *
- * heart_rate  |AM6          |int *
-
- * heart_rate  |PM12         |int *
- *
- * heart_rate  |PM6          |int *
  * @param path json string to prase
  * @param parent_key string to get json_array
  * @param key string to get json_key
@@ -402,13 +385,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
  *
  */
 void gui_change_default_path(int argc, char **argv);
-/** End of SERVER_Exported_Functions
-  * @}
-  */
 
-/** End of SERVER
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif

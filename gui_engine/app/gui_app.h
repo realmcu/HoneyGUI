@@ -32,18 +32,10 @@ extern "C" {
 #include <guidef.h>
 #include <gui_fb.h>
 #include "gui_obj.h"
-/** @defgroup APP APP
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup APP_Exported_Types APP Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  APP structure */
 typedef struct gui_app gui_app_t;
@@ -65,31 +57,15 @@ struct gui_app
     bool close_sync;
 
 };
-/** End of APP_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup APP_Exported_Constants APP Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of APP_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup APP_Exported_Macros APP Exported Macros
-  * @brief
-  * @{
-  */
-
 
 /**
  * @brief Macro to define a GUI application.
@@ -219,30 +195,15 @@ struct gui_app
  */
 #define GUI_APP_ENTRY(APP_NAME) static void _##APP_NAME##_ui_design(gui_app_t* app)
 
-/** End of APP_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup APP_Exported_Variables APP Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of APP_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup APP_Exported_Functions APP Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief get current app pointer
@@ -307,13 +268,6 @@ void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms);
 gui_app_t *gui_obj_tree_get_app(gui_obj_t *obj);
 void gui_app_append(gui_app_t *app);
 gui_app_t *gui_app_get_by_name(const char *name);
-/** End of APP_Exported_Functions
-  * @}
-  */
-
-/** End of APP
-  * @}
-  */
 
 #ifdef __cplusplus
 }

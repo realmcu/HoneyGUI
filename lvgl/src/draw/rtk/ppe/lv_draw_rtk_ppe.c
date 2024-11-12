@@ -169,7 +169,40 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
     }
     bool done = false;
     if (draw_dsc->opa <= LV_OPA_MIN) { return LV_RES_OK; }
-    lv_img_dsc_t *dsc = (lv_img_dsc_t *)src;
+
+    lv_img_src_t src_type = lv_img_src_get_type(src);
+    lv_img_dsc_t img_dsc;
+    lv_img_dsc_t *dsc = &img_dsc;
+    if (src_type == LV_IMG_SRC_FILE)
+    {
+        uint8_t *rle_data;
+        lv_fs_file_t f;
+        lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
+        if (res != LV_FS_RES_OK) { return LV_RES_INV; }
+        lv_fs_ioctl(&f, (void **)&rle_data, 0);
+        lv_fs_close(&f);
+
+        if (strcmp(lv_fs_get_ext(src), "rle") == 0)
+        {
+            uint8_t headers[20];
+            memcpy(headers, rle_data, 20);
+            uint16_t width = headers[2] | (headers[3] << 8);
+            uint16_t height = headers[4] | (headers[5] << 8);
+            img_dsc.header.w = width;
+            img_dsc.header.h = height;
+            img_dsc.data = rle_data;
+            img_dsc.header.cf = LV_IMG_CF_RAW;
+        }
+        else
+        {
+            memcpy(&(img_dsc.header), rle_data, sizeof(lv_img_header_t));
+            img_dsc.data = rle_data + sizeof(lv_img_header_t);
+        }
+    }
+    else if (src_type == LV_IMG_SRC_VARIABLE)
+    {
+        dsc = (lv_img_dsc_t *)src;
+    }
 
     lv_img_cf_t cf;
     if (lv_img_cf_is_chroma_keyed(dsc->header.cf)) { cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED; }

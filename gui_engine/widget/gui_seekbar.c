@@ -24,50 +24,25 @@
 #include "tp_algo.h"
 
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-/** @brief  ... */
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
+
 extern void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *name,
                                  int16_t x, int16_t y, int16_t w, int16_t h);
 extern void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *name,
@@ -79,16 +54,11 @@ extern void gui_progressbar_h_img_ctor(gui_progressbar_t *this, gui_obj_t *paren
 extern void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent,
                                        void **picture_array, uint16_t array_number, int16_t x, int16_t y);
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static void gui_seekbar_update_att(gui_obj_t *obj)
 {
     gui_seekbar_t *this = (void *)obj;
@@ -847,11 +817,3 @@ gui_seekbar_t *gui_seekbar_create_movie_arc(void      *parent,
 
     return this;
 }
-
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

@@ -42,40 +42,20 @@
 /*stb true type source*/
 #include "stb_truetype.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
 //Change rawing scheme, default pure stb_truetype
 // #define RTK_GUI_FONT_ENABLE_TTF_NANOVG
@@ -86,29 +66,17 @@
 extern void nvgDeleteAGGE(NVGcontext *ctx);
 #endif
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
 static stbtt_fontinfo font;
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
 
 #ifndef RTK_GUI_FONT_ENABLE_TTF_NANOVG
 gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
@@ -741,10 +709,3 @@ void gui_font_stb_init(void *font_ttf_addr)
     stbtt_InitFont(&font, font_ttf_addr, 0);
 }
 
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

@@ -22,39 +22,21 @@
 #include "gui_barcode_gen.h"
 #include "gui_api.h"
 
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
+
 #define C128_MAX                        160
 
 #define C128_LATCHA                     'A'
@@ -328,15 +310,10 @@
         (s)->encoded_data[(y)][(x) >> 3] |= 1 << ((x)&0x07); \
     } while (0)
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
+
 INTERNAL_DATA const char C128Table[107][6] =  /* Used by CODABLOCKF and CODE16K also */
 {
     /* Code 128 character encodation - Table 1 (with final CODE16K-only character in place of Stop character) */
@@ -449,16 +426,10 @@ INTERNAL_DATA const char C128Table[107][6] =  /* Used by CODABLOCKF and CODE16K 
     {/* Only used by CODE16K */ '2', '1', '1', '1', '3', '3'}
 };
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
 
 /* Converts a character 0-9, A-F to its equivalent integer value */
 INTERNAL int gui_barcode_gen_ctoi(const char source);
@@ -1581,10 +1552,3 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
     return symbol;//error_number;
 }
 
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

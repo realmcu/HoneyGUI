@@ -623,7 +623,13 @@ char *gui_filepath_transforming(void *addr)
     fclose(fd);
     return path;
 }
-
+const char *gui_get_path_by_relative(const char *relative_path)
+{
+    char *path = gui_malloc(strlen(relative_path) + strlen(GUI_ROOT_FOLDER) + 1);
+    GUI_ASSERT(path != NULL);
+    sprintf(path, "%s%s", GUI_ROOT_FOLDER, (char *)relative_path);
+    return path;
+}
 int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
 {
     if (ftl->read)
@@ -1308,6 +1314,11 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
     }
     else
     {
+        if (!parent_key || !key)
+        {
+            gui_log("parent_key and key can't be NULL!\r\n");
+            return;
+        }
         root = cJSON_Parse(path);
         if (!root)
         {
@@ -1320,6 +1331,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
     if (!cJSON_IsArray(json_array))
     {
         gui_log("get %s_Array unsuccessful\n", parent_key);
+        cJSON_Delete(root);
         return;
     }
     else
@@ -1328,19 +1340,34 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
         if (!obj)
         {
             gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            cJSON_Delete(root);
             return;
         }
         else
         {
             cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
-            if (!obj)
+            if (!json_key)
             {
                 gui_log("get %s_Key unsuccessful\n", key);
+                cJSON_Delete(root);
                 return;
             }
             else
             {
-                if (strstr(key, "condition") != NULL)
+                if (strcmp(key, "array") == 0)
+                {
+                    int array_size = cJSON_GetArraySize(json_key);
+                    for (int i = 0; i < array_size; i++)
+                    {
+                        cJSON *array_item = cJSON_GetArrayItem(json_key, i);
+                        if (cJSON_IsNumber(array_item))
+                        {
+                            ((int *)value)[i] = array_item->valueint;
+                            printf("array[%d] = %d\n", i, array_item->valueint);
+                        }
+                    }
+                }
+                else if (strstr(key, "condition") != NULL)
                 {
                     sprintf((char *)value, "%s", json_key->valuestring);
                 }

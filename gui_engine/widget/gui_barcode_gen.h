@@ -33,18 +33,10 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 /*============================================================================*
  *                         Types
  *============================================================================*/
 
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 /* Main symbol structure */
 typedef struct barcode_symbol
 {
@@ -67,46 +59,25 @@ typedef struct barcode_symbol
     char errtxt[100];         /* Error message if an error or warning occurs, NUL-terminated (output only) */
 } barcode_symbol_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
+
+
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
-/** End of WIDGET_Exported_Macros
- * @}
- */
+
+
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
+
+
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
+
 /**
  * @brief barcode encode
  *
@@ -115,9 +86,6 @@ typedef struct barcode_symbol
  */
 barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int length);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

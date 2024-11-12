@@ -31,19 +31,10 @@ extern "C" {
 #include "guidef.h"
 #include "gui_api.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
-
 /** @brief  ... */
 
 typedef struct gui_arm2d
@@ -54,61 +45,24 @@ typedef struct gui_arm2d
 } gui_arm2d_t;
 
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-
-
-
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
-
 
 /**
  * @brief
@@ -132,19 +86,12 @@ gui_arm2d_t *gui_arm2d_create(void       *parent,
 
 
 /**
- * @brief 
- * 
- * @param this 
- * @param cb 
+ * @brief
+ *
+ * @param this
+ * @param cb
  */
 void gui_arm2d_set_cb(gui_arm2d_t *this, void (*cb)(gui_arm2d_t *this));
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

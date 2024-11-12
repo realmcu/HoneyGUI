@@ -22,64 +22,30 @@
 #include "tp_algo.h"
 #include "gui_img.h"
 
-
-
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
+
 #define TURN_TABLE_ROTATE_STEP 6
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
 
 static void turn_table_input_prepare(gui_obj_t *obj)
 {
@@ -743,15 +709,6 @@ void gui_turn_table_add_icon_static(gui_turn_table_t *this,
     gui_img_scale(this->static_icon, this->icon_scale, this->icon_scale);
     gui_img_set_quality(this->static_icon, true);
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
-
-
 
 
 

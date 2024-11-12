@@ -23,64 +23,31 @@
 #include "acc_init.h"
 #include "tp_algo.h"
 #include "gui_win.h"
-/** @defgroup WIDGET WIDGET
-  * @{
-  */
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @{
-  */
 
-
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
+
 static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
 static float gui_img_get_transform_t_y_old(gui_img_t *this);
 static float gui_img_get_transform_t_x_old(gui_img_t *this);
@@ -924,7 +891,17 @@ void gui_img_set_attribute(gui_img_t  *this,
 
     this->data = path;
 }
-
+void gui_img_set_image_data(gui_img_t  *this, const uint8_t *file_pointer)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(file_pointer != NULL);
+    this->data = (void *)file_pointer;
+}
+const uint8_t *gui_img_get_image_data(gui_img_t  *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    return this->data;
+}
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->opacity_value = opacity_value;
@@ -1188,10 +1165,3 @@ void gui_img_append_animate(gui_img_t              *_this,
     animate->p = p;
     animate->name = name;
 }
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */

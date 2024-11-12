@@ -27,65 +27,29 @@
 #include <acc_sw_raster.h>
 #include "acc_sw.h"
 
-/** @defgroup ENGINE ENGINE
-  * @{
-  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup ENGINE_Exported_Types ENGINE Exported Types
-  * @{
-  */
 
-
-/** End of ENGINE_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup ENGINE_Exported_Constants ENGINE Exported Constants
-  * @{
-  */
 
-
-/** End of ENGINE_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup ENGINE_Exported_Macros ENGINE Exported Macros
-  * @{
-  */
 
 
-/** End of ENGINE_Exported_Macros
-  * @}
-  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup ENGINE_Exported_Variables ENGINE Exported Variables
-  * @{
-  */
 
-
-/** End of ENGINE_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup ENGINE_Exported_Functions ENGINE Exported Functions
-  * @{
-  */
-
-
-
 
 
 void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
@@ -179,10 +143,4 @@ void sw_acc_init(void)
     draw_img_acc_prepare_cb = sw_acc_prepare_cb;
     draw_img_acc_end_cb = sw_acc_end_cb;
 }
-/** End of ENGINE_Exported_Functions
-  * @}
-  */
 
-/** End of ENGINE
-  * @}
-  */

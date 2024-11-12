@@ -33,18 +33,11 @@ extern "C" {
 #include "gui_api.h"
 #include "gui_img.h"
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
 
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
 /** @brief  Pagelistview widget structure */
 typedef struct gui_pagelistview
 {
@@ -55,53 +48,25 @@ typedef struct gui_pagelistview
     int16_t bottom_mask_border;
 } gui_pagelistview_t;
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Constants
- * @}
- */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief
@@ -139,13 +104,6 @@ void gui_pagelistview_add_top_mask(gui_pagelistview_t *this, gui_img_t *mask_top
  */
 void gui_pagelistview_add_bottom_mask(gui_pagelistview_t *this, gui_img_t *mask_bottom);
 
-/** End of WIDGET_Exported_GUI_Functions
-  * @}
-  */
-
-/** End of WIDGET
-  * @}
-  */
 
 #ifdef __cplusplus
 }
