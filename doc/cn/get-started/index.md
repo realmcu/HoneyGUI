@@ -26,14 +26,23 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 <div style="text-align: center"><img width= "800" src ="https://foruda.gitee.com/images/1720700131929539160/ec0dbbb9_1860080.png"/></div><br/>
 
 
-## 安装
+## 安装在Windows操作系统上
 
 {#Install_compiler_cn}
 ### 安装编译器
 下载 MinGW-w64 工具链，解压到 C 盘，并将其添加到系统环境变量 `Path`中。
 1.  [MinGW-w64 下载](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)
 2.  解压并复制到目录： `C:/mingw64`
-3.  添加一个环境变量： `C:/mingw64/bin`
+3.  添加一个环境变量： `C:/mingw64/bin`：
+      - 打开开始菜单，搜索`高级系统设置`。
+      - 显示`系统属性`，然后转到`高级`选项卡。
+      - 点击`环境变量`按钮。
+      - 在`用户变量`部分，找到并选择 `Path` 变量，然后点击`编辑`。
+      - 点击`新建`并添加 `C:/mingw64/bin`。
+      - 点击`确定`关闭所有对话框。
+
+### 安装 Python
+测试过 Python 3.9.7 版本.
 
 ### 安装scons
 打开一个 CMD 窗口，并执行以下命令来安装 Python 的 scons 库。
@@ -44,7 +53,7 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 安装 `MinGW-w64` 工具链和 `scons` 库后，可以通过两种方式启动应用程序：通过 CMD 启动或通过 GUI 启动。
 
 ### 通过CMD启动
-在 `HoneyGUI` 文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
+在 `HoneyGUI`或者`gui`文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
 
 ```shell
 > cd win32_sim

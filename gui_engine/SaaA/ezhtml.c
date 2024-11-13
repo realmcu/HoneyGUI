@@ -353,7 +353,7 @@ static char *read_file(const char *path)
     //if (content)
     {
         size_t n = fread(content, 1, length, file);
-        gui_log("%d\n", n);
+        //gui_log("%d\n", n);
         content[length] = '\0';
     }
     fclose(file);
@@ -793,7 +793,7 @@ static void on_click_jump_to_app_cb(void *obj, gui_event_t e, gui_app_t *handle)
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
-    gui_log("widget_create_handle:%s: %s", name, p->txt);
+    //gui_log("widget_create_handle:%s: %s", name, p->txt);
     for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
         if (!strcmp(widget[i].name, name))
@@ -3610,7 +3610,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                             }
                             foreach_create_animate(f, parent, gui_strdup(id));
-                            gui_log(" ");
+                            //gui_log(" ");
                             if (f1 == 0)
                             {
                                 ezxml_free(f);
@@ -4558,11 +4558,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             numbers[i++] = atof(token);
                             token = strtok(NULL, delim);
                         }
-                        for (int j = 0; j < i; j++)
-                        {
-                            gui_log("%d ", numbers[j]);
-                        }
-                        gui_log("\n");
+                        // for (int j = 0; j < i; j++)
+                        // {
+                        //     gui_log("%d ", numbers[j]);
+                        // }
+                        // gui_log("\n");
                         gui_free(str_copy);
                     }
                     int
@@ -4606,6 +4606,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #define PARTIAL_DATE   6         // "Mon, Jan 1"
 #define NUM_DATE       7         // "1/JANUARY"
 #define FULL_DAY       8         // "MONDAY"
+#define JUST_HOUR       9         // "hour"
+#define JUST_MINUTE       10      // "minute"
+#define JUST_SECOND      11       // "second"
 #define DEFAULT_FORMAT 100       // Default
 
 static int is_format(const char *src)
@@ -4620,6 +4623,9 @@ static int is_format(const char *src)
     if (strcmp(src, "Mon, Jan 1") == 0) { return PARTIAL_DATE; }
     if (strcmp(src, "1/JANUARY") == 0) { return NUM_DATE; }
     if (strcmp(src, "MONDAY") == 0) { return FULL_DAY; }
+    if (strcmp(src, "hour") == 0) { return JUST_HOUR; }
+    if (strcmp(src, "minute") == 0) { return JUST_MINUTE; }
+    if (strcmp(src, "second") == 0) { return JUST_SECOND; }
     return DEFAULT_FORMAT;
 }
 
@@ -4680,6 +4686,15 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
         case FULL_DAY:
             strftime(buffer, buffer_size, "%A", timeinfo); // Display full week name (Monday)
             for (char *p = buffer; *p; ++p) { *p = toupper(*p); } // Convert to uppercase (MONDAY)
+            break;
+        case JUST_HOUR:
+            strftime(buffer, buffer_size, "%H", timeinfo); // Display 24-hour format time (00:00)
+            break;
+        case JUST_MINUTE:
+            strftime(buffer, buffer_size, "%M", timeinfo); // Display 24-hour format time (00:00)
+            break;
+        case JUST_SECOND:
+            strftime(buffer, buffer_size, "%S", timeinfo); // Display 24-hour format time (00:00)
             break;
         default:
             strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Default: (Mon, Jan 1)
@@ -4769,7 +4784,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     {
                         continue;
                     }
-                    gui_log("animate_create_handle:%s: %s", name, p->txt);
+                    //gui_log("animate_create_handle:%s: %s", name, p->txt);
                     char *type = 0;
                     char *from = 0;
                     char *to = 0;
@@ -5013,7 +5028,7 @@ void foreach_create(ezxml_t p, gui_obj_t *parent)
     {
         if (parent->type == MULTI_LEVEL && strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0)
         {
-            gui_log("%s,%s\n", i->name, i->txt);
+            //gui_log("%s,%s\n", i->name, i->txt);
             foreach_create(i->child, parent);
         }
         else
@@ -5069,7 +5084,7 @@ void foreach_create_in_multilevel(ezxml_t p, gui_obj_t *parent)
     {
         if (strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0)
         {
-            gui_log("%s,%s\n", i->name, i->txt);
+            //gui_log("%s,%s\n", i->name, i->txt);
             foreach_create_in_multilevel(i->child, widget_create_handle(i, parent));
         }
 
@@ -5101,7 +5116,7 @@ void level_scan(ezxml_t p, char **pic, char **text)
         if (strcmp(i->name, "app") == 0)
         {
 
-            *text = get_space_string_head(i->txt); gui_log("level:%s\n", *text);
+            *text = get_space_string_head(i->txt); //gui_log("level:%s\n", *text);
             size_t j = 0;
             while (true)
             {
@@ -5261,7 +5276,7 @@ static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent
         f = ezxml_parse_file(app->xml);
     }
     foreach_create_for_multilevel(f, (gui_obj_t *)parent);
-    gui_log(" ");
+    //gui_log(" ");
     if (f1 == 0)
     {
         ezxml_free(f);
@@ -5504,7 +5519,7 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                     }
                     foreach_create_animate(f, to, to_name[1]);
-                    gui_log(" ");
+                    //gui_log(" ");
                     if (f1 == 0)
                     {
                         ezxml_free(f);
@@ -5701,7 +5716,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
             int max = 60;
             int min = 0;
             float per = (float)(move - min) / (float)(max - min);
-            gui_log("%d,%f\n", move, per);
+            //gui_log("%d,%f\n", move, per);
             arc_animation_param_t *param = p;
             {
                 memset(param->target_buffer, 0, param->image_data_length);
