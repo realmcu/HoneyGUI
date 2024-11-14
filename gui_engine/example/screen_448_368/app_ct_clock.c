@@ -362,6 +362,16 @@ static void refreash_time()
     sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set(date_text, date_text_content, strlen(date_text_content));
     gui_text_convert_to_img(date_text, RGB565);
+
+    // refreash weather date
+    GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
+    uint8_t index = timeinfo->tm_wday;
+
+    sprintf(weekday_content, "%s.  %s.  %s.  %s.", day[(index + 1) % 7], day[(index + 2) % 7],
+            day[(index + 3) % 7],
+            day[(index + 4) % 7]);
+    // gui_log("%s\r\n", weekday_content);
+    gui_text_content_set((gui_text_t *)obj, weekday_content, strlen(weekday_content));
 }
 
 static void win_clock_cb(gui_win_t *win)
@@ -637,16 +647,6 @@ static void weather_cb(gui_img_t *parent)
             }
         }
         cJSON_Delete(root);
-
-        // refreash date
-        GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
-        uint8_t index = timeinfo->tm_wday;
-
-        sprintf(weekday_content, "%s.  %s.  %s.  %s.", day[(index + 1) % 7], day[(index + 2) % 7],
-                day[(index + 3) % 7],
-                day[(index + 4) % 7]);
-        // gui_log("%s\r\n", weekday_content);
-        gui_text_content_set((gui_text_t *)obj, weekday_content, strlen(weekday_content));
     }
 }
 
@@ -1018,9 +1018,7 @@ static void heartbreak_graph(NVGcontext *vg)
     // sprintf(hr_content, "%d", (uint8_t)samples[2]);
     // GUI_WIDGET_POINTER_BY_NAME(t, "HR_TXT");
     // gui_text_content_set((gui_text_t *)t, hr_content, strlen(hr_content));
-    static uint8_t number_last = 0;
     uint8_t number = (uint8_t)samples[2];
-    if (number_last != number)
     {
         GUI_WIDGET_POINTER_BY_NAME(img_percentile, "hr_content_percentile");
         if (number / 100)
@@ -1038,7 +1036,6 @@ static void heartbreak_graph(NVGcontext *vg)
         GUI_WIDGET_POINTER_BY_NAME(img_single, "hr_content_single");
         gui_img_set_attribute((gui_img_t *)img_single, img_single->name, text_num_array[number % 10],
                               img_single->x, img_single->y);
-        number_last = number;
     }
 
     for (i = 0; i < 4; i++)
@@ -1106,7 +1103,8 @@ static void heartbreak_graph(NVGcontext *vg)
 extern void *get_app_hongkong(void);
 static void win_hb_exit(void)
 {
-    if (return_to_watchface_flag)
+    extern bool sidebar_flag;
+    if (return_to_watchface_flag || sidebar_flag)
     {
         gui_switch_app(gui_current_app(), get_app_hongkong());
     }
@@ -1182,9 +1180,12 @@ const uint32_t *gui_app_return_array[] =
 };
 
 #include "gui_return.h"
+void switch_heart_rate();
 static void heart_rate_app(gui_app_t *app)
 {
     gui_log("current app:%s\n", gui_current_app()->screen.name);
+    extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
+    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_heart_rate);
     win_hb = gui_win_create(&app->screen, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
     gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -1366,8 +1367,49 @@ void page_ct_clock(void *parent)
     gui_img_create_from_mem(tb_2, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_MUSIC_BIN, 0, 0, 0, 0);
     gui_img_create_from_mem(tb_3, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_ALARM_BIN, 0, 0, 0, 0);
     gui_img_create_from_mem(tb_4, "CLOCK_CARD_WORKOUT", UI_CLOCK_CARD_WORKOUT_BIN, 0, 0, 0, 0);
+
+    // temperature
     {
-        // weather condition
+        int image_h = 100,
+            image_w = 100,
+            pixel_bytes = 4;
+        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        uint8_t *img_data = gui_lower_malloc(buffer_size);
+        memset(img_data, 0, buffer_size);
+        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data, 16 + SCREEN_X_OFF,
+                                                 330 + SCREEN_Y_OFF, 100, 100);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_animate(img, 2000, -1, canvas_temperature_animation, (void *)buffer_size);
+        //text
+        sprintf(tempera_cur_content, "22");
+        temperature_cur = gui_text_create(img, "temperature_cur",  32, 16, 0, 0); //32
+        gui_text_set(temperature_cur, (void *)tempera_cur_content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
+                     strlen(tempera_cur_content),
+                     48);
+        gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(temperature_cur, LEFT);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb, img_data);
+        sprintf(tempera_low_content, "18");
+        temperature_low = gui_text_create(img, "temperature_low",  19, 70, 0, 0);
+        gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
+                     APP_COLOR_WHITE, //gui_rgba(191, 220, 48, UINT8_MAX),
+                     strlen(tempera_low_content),
+                     32);
+        gui_text_type_set(temperature_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(temperature_low, LEFT);
+
+        sprintf(tempera_high_content, "37");
+        temperature_high = gui_text_create(img, "temperature_high",  56, 70, 0, 0);
+        gui_text_set(temperature_high, (void *)tempera_high_content, GUI_FONT_SRC_BMP,
+                     APP_COLOR_WHITE, //gui_rgba(250, 17, 79, UINT8_MAX),
+                     strlen(tempera_high_content),
+                     32);
+        gui_text_type_set(temperature_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(temperature_high, LEFT);
+    }
+
+    // weather condition
+    {
         gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_2", UI_WEATHER_RAIN_L_BIN, 89, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_M_BIN, 150, 73, 0, 0);
@@ -1406,47 +1448,6 @@ void page_ct_clock(void *parent)
         gui_text_mode_set(weather_range, LEFT);
     }
     gui_img_set_animate(img_weather, 3000, -1, weather_cb, img_weather);
-
-    // temperature
-    {
-        int image_h = 100,
-            image_w = 100,
-            pixel_bytes = 4;
-        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        uint8_t *img_data = gui_lower_malloc(buffer_size);
-        memset(img_data, 0, buffer_size);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb, img_data);
-        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data, 16 + SCREEN_X_OFF,
-                                                 330 + SCREEN_Y_OFF, 100, 100);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_set_animate(img, 2000, -1, canvas_temperature_animation, (void *)buffer_size);
-        //text
-        sprintf(tempera_cur_content, "22");
-        temperature_cur = gui_text_create(img, "temperature_cur",  32, 16, 0, 0); //32
-        gui_text_set(temperature_cur, (void *)tempera_cur_content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
-                     strlen(tempera_cur_content),
-                     48);
-        gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
-        gui_text_mode_set(temperature_cur, LEFT);
-
-        sprintf(tempera_low_content, "18");
-        temperature_low = gui_text_create(img, "temperature_low",  19, 70, 0, 0);
-        gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
-                     APP_COLOR_WHITE, //gui_rgba(191, 220, 48, UINT8_MAX),
-                     strlen(tempera_low_content),
-                     32);
-        gui_text_type_set(temperature_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-        gui_text_mode_set(temperature_low, LEFT);
-
-        sprintf(tempera_high_content, "37");
-        temperature_high = gui_text_create(img, "temperature_high",  56, 70, 0, 0);
-        gui_text_set(temperature_high, (void *)tempera_high_content, GUI_FONT_SRC_BMP,
-                     APP_COLOR_WHITE, //gui_rgba(250, 17, 79, UINT8_MAX),
-                     strlen(tempera_high_content),
-                     32);
-        gui_text_type_set(temperature_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-        gui_text_mode_set(temperature_high, LEFT);
-    }
 // #endif
 
     // date & time text

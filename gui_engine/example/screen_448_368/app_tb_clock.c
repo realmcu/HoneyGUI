@@ -44,6 +44,8 @@ static gui_curtain_t *ct_control0;
 static gui_curtain_t *ct_left;
 static gui_curtain_t *ct_card;
 extern gui_win_t *win_market, *win_watch;
+bool sidebar_flag = 0;
+static uint8_t watchface_index = 0;
 static void curtain_ctr_cb()
 {
     // touch_info_t *tp = tp_get_info();
@@ -57,12 +59,18 @@ static void curtain_ctr_cb()
         GUI_BASE(ct_clock)->active = 0;
         GUI_BASE(ct_clock)->gesture = 1;
         GUI_BASE(ct_clock)->not_show = 1;
+        sidebar_flag = 0;
+    }
+    else if (ct->cur_curtain == CURTAIN_LEFT)
+    {
+        sidebar_flag = 1;
     }
     else
     {
         GUI_BASE(ct_clock)->active = 1;
         GUI_BASE(ct_clock)->gesture = 0;
         GUI_BASE(ct_clock)->not_show = 0;
+        sidebar_flag = 0;
     }
 }
 
@@ -90,14 +98,16 @@ static void callback_prism_touch_clicked()
     {
     case 0:
         {
-            GUI_BASE(win_watch)->not_show = false;
-            GUI_BASE(win_market)->not_show = true;
+            // GUI_BASE(win_watch)->not_show = false;
+            // GUI_BASE(win_market)->not_show = true;
+            watchface_index = 0;
         }
         break;
     case 1:
         {
-            GUI_BASE(win_watch)->not_show = true;
-            GUI_BASE(win_market)->not_show = false;
+            // GUI_BASE(win_watch)->not_show = true;
+            // GUI_BASE(win_market)->not_show = false;
+            watchface_index = 1;
         }
         break;
     default:
@@ -121,11 +131,11 @@ static void callback_touch_long(void *obj, gui_event_t e)
         .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
         .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
         .data_addr[0] = UI_CLOCK_FACE_MAIN_BIN,
-        .data_addr[1] = SLICE1_BIN,
+        .data_addr[1] = MARKET_WATCH_BASE_BIN,
         .data_addr[2] = UI_CLOCK_FACE_MAIN_BIN,
-        .data_addr[3] = SLICE1_BIN,
+        .data_addr[3] = MARKET_WATCH_BASE_BIN,
         .data_addr[4] = UI_CLOCK_FACE_MAIN_BIN,
-        .data_addr[5] = SLICE1_BIN
+        .data_addr[5] = MARKET_WATCH_BASE_BIN
     };
     perspect = gui_perspective_create(win, "test", &imgfile, 0, 0);
 
@@ -139,7 +149,7 @@ void page_tb_clock(void *parent)
     ct = gui_curtainview_create(parent, "ct_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ct_clock = gui_curtain_create(ct, "1", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_MIDDLE, 1);
     ct_control0 = gui_curtain_create(ct, "2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_UP, 1);
-    ct_left = gui_curtain_create(ct, "3", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_LEFT, 0.65f);
+    ct_left = gui_curtain_create(ct, "3", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_LEFT, 0.38f);
 
     ct_card = gui_curtain_create(ct, "card", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_DOWN, 1);
 
@@ -150,11 +160,31 @@ void page_tb_clock(void *parent)
     extern void page_ct_sidebar(void *parent);
     extern void tabview_up_design(void *parent_widget);
     extern void curtain_down_design(void *parent_widget);
-    app_watchface_market(ct_clock);
-    page_ct_clock(ct_clock);
+    // app_watchface_m
     page_ct_sidebar(ct_left);
     tabview_up_design(ct_control0);
     curtain_down_design(ct_card);
+    switch (watchface_index)
+    {
+    case 0:
+        {
+            page_ct_clock(ct_clock);
+        }
+        break;
+    case 1:
+        {
+            app_watchface_market(ct_clock);
+        }
+        break;
+    default:
+        page_ct_clock(ct_clock);
+        break;
+    }
+
+    if (sidebar_flag)
+    {
+        ct->cur_curtain = CURTAIN_LEFT;
+    }
     // GUI_BASE(win_watch)->not_show = 1;
     gui_win_t *win_touch = gui_win_create(ct_clock, "win_touch", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_obj_add_event_cb(win_touch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);

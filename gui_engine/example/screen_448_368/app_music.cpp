@@ -21,9 +21,10 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "tp_algo.h"
-#include<iostream>
+
 #include "gui_page.h"
 #include <vector>
+#include <string>
 namespace std
 {
 template<typename T, typename... Args>
@@ -59,17 +60,17 @@ public:
         touch_info_t *touch = tp_get_info();
         gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
         gui_obj_t *obj = GUI_BASE(this_widget);
-        // std::cout << "win_cover_gesture:" << win_cover_gesture << std::endl;
+        //std::cout << "win_cover_gesture:" << win_cover_gesture << std::endl;
         if (!win_cover_gesture)
         {
-            // std::cout << "1:" << std::endl;
+            //std::cout << "1:" << std::endl;
             if (touch->pressed && touch->y > SCREEN_H - MINIMIZE_WINDOW_HEIGHT)
             {
-                win_cover_gesture = true; std::cout << "2:" << std::endl;
+                win_cover_gesture = true; //std::cout << "2:" << std::endl;
             }
             else
             {
-                // std::cout << "3:" << std::endl;
+                //std::cout << "3:" << std::endl;
                 return;
             }
 
@@ -151,7 +152,7 @@ public:
     }
     void win_list_animation(void *p, void *this_widget, gui_animate_t *animate)
     {
-        std::cout << win_list_gesture_page_y << ";" << GUI_BASE(list_page)->y << std::endl;
+        // std::cout << win_list_gesture_page_y << ";" << GUI_BASE(list_page)->y << std::endl;
         GUI_BASE(list_page)->gesture = win_cover_gesture;
 
 
@@ -238,8 +239,7 @@ private:
     int value;
     static void switchOnCallback(void *null1, void *null2, void *param)
     {
-        // gui_music_play("gui_engine/example/screen_448_368/root_image_hongkong/root/music_player/sample_3s.mp3");
-        gui_log("play music!!\n");
+        gui_music_play("gui_engine\\example\\screen_454_454\\root_image\\root\\music_player\\sample_3s.mp3");
     }
     template<typename T>
     T lerp(T start, T end, float progress) const

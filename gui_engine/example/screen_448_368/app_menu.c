@@ -46,17 +46,18 @@ GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
 GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
 
-static void switch_BOX2D_RING()
+extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
+void switch_BOX2D_RING()
 {
     gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
 }
 
-static void switch_APP_FRUIT_NINJA()
+void switch_APP_FRUIT_NINJA()
 {
     gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
 }
 
-static void switch_APP_MUSIC()
+void switch_APP_MUSIC()
 {
     gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
 }
@@ -111,9 +112,31 @@ static void app_back2watchface_cb(void)
     gui_switch_app(gui_current_app(), get_app_hongkong());
 }
 
-static void app_back2menu_cb(void)
+static void app_back2prescreen_cb(void)
 {
-    gui_switch_app(gui_current_app(), get_app_menu());
+    extern bool sidebar_flag;
+    if (sidebar_flag)
+    {
+        gui_switch_app(gui_current_app(), get_app_hongkong());
+    }
+    else
+    {
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
+}
+
+static void app_BOX2D_RING_return_cb(void)
+{
+    extern bool sidebar_flag;
+    // app_box2d_ring_close();
+    if (sidebar_flag)
+    {
+        gui_switch_app(gui_current_app(), get_app_hongkong());
+    }
+    else
+    {
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
 }
 
 static void app_menu_design(gui_app_t *app)
@@ -123,7 +146,7 @@ static void app_menu_design(gui_app_t *app)
     */
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "win_app_menu", 0, 0, SCREEN_WIDTH,
                                     SCREEN_HEIGHT);
-    gui_win_set_animate(win, 2000, 0, (gui_animate_callback_t)menu_win_ani_cb,
+    gui_win_set_animate(win, 1000, 0, (gui_animate_callback_t)menu_win_ani_cb,
                         0);//aniamtion start to play at app startup
     /* app swap animation configration of the next app*/
     uint32_t *array[] =
@@ -216,25 +239,28 @@ static void app_menu_design(gui_app_t *app)
 
 GUI_APP_ENTRY(APP_BOX2D_RING)
 {
+    sidebar_app_array_fill(UI_CLOCK_BOX2D_RING_ICON_BIN, switch_BOX2D_RING);
     extern void app_box2d_ring_ui_design(gui_obj_t *obj);
     app_box2d_ring_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2menu_cb, (void *)0);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_BOX2D_RING_return_cb, (void *)0);
 }
 
 GUI_APP_ENTRY(APP_MUSIC)
 {
+    sidebar_app_array_fill(UI_CLOCK_MUSIC_ICON_BIN, switch_APP_MUSIC);
     extern void app_music_ui_design(gui_obj_t *obj);
     app_music_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2menu_cb, (void *)0);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
     // gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
 GUI_APP_ENTRY(APP_FRUIT_NINJA)
 {
+    sidebar_app_array_fill(UI_CLOCK_FRUIT_NINJA_ICON_BIN, switch_APP_FRUIT_NINJA);
     extern void app_fruit_ninja_design(gui_obj_t *obj);
     app_fruit_ninja_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2menu_cb, (void *)0);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
 }

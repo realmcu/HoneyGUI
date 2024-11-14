@@ -105,7 +105,11 @@ void win_release_callback()
     // Destroy temporary bodies after a short period
     for (b2Body *body : temporaryBodies)
     {
-        world->DestroyBody(body);
+        if (body)
+        {
+            world->DestroyBody(body);
+            body = nullptr;
+        }
     }
     temporaryBodies.clear();
 }
@@ -139,7 +143,7 @@ bool init()
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
-    INNER_RING_RADIUS = SCREEN_HEIGHT / 2.0f - RING_GAP; // Inner ring radius
+    INNER_RING_RADIUS = SCREEN_WIDTH / 2.0f - RING_GAP; // Inner ring radius
     gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     if (!win)
@@ -163,6 +167,25 @@ bool init()
 
 void close()
 {
+    for (Ball &ball : balls)
+    {
+        if (ball.body)
+        {
+            world->DestroyBody(ball.body);
+            ball.body = nullptr;
+        }
+    }
+    balls.clear();
+    // for (int i = 0; i < 5; ++i) {
+    //     b2BodyDef ballBodyDef;
+    //     ballBodyDef.type = b2_dynamicBody; // Set as dynamic body
+    //     b2Body *ballBody = world->CreateBody(&ballBodyDef);
+    //     NVGcolor color = nvgRGB(dis(gen), dis(gen), dis(gen));
+    //     std::cout << "Number of balls after creat: " << balls.size() << std::endl;
+    //     balls.push_back({ballBody, color}); // Add ball and color to vector
+    // }
+    std::cout << "Number of balls after cleanup: " << balls.size() << std::endl;
+    win_release_callback();
     delete world;
 }
 
@@ -224,6 +247,7 @@ void createBalls(b2World *world)
 
         // Assign random color to the ball
         NVGcolor color = nvgRGB(dis(gen), dis(gen), dis(gen));
+        std::cout << "Number of balls after cleanup: " << balls.size() << std::endl;
         balls.push_back({ballBody, color}); // Add ball and color to vector
     }
 }
@@ -255,7 +279,7 @@ void render(gui_canvas *this_widget)
     if (BACKGROUND_COLOR != nvgRGB(0, 0, 0))
     {
         nvgBeginPath(vg);
-        nvgRect(vg, 0, 0, 454, 454);
+        nvgRect(vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         nvgFillColor(vg, BACKGROUND_COLOR);
         nvgFill(vg);
     }
@@ -288,7 +312,7 @@ int ui_design(gui_obj_t *obj)
         std::cout << "Initialization failed!" << std::endl;
         return 1;
     }
-
+    close();
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
     world = new b2World(gravity);
 
@@ -305,6 +329,10 @@ extern "C" {
     void app_box2d_ring_ui_design(gui_obj_t *obj)
     {
         app_box2d_ring::ui_design(obj);
+    }
+    void app_box2d_ring_close()
+    {
+        app_box2d_ring::close();
     }
 }
 
