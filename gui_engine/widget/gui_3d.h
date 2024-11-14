@@ -44,12 +44,11 @@ typedef struct
 {
     gui_obj_t base;
 
-    draw_img_t *img;
+    void *obj_data; //obj file
+    uint32_t obj_len; //obj file length
 
-    void *test_img_data;
-
-    void *data; //obj file
-    uint32_t len; //obj file length
+    void *mtl_data; //mtl file
+    uint32_t mtl_len; //mtl file length
 
     // unsigned int flags = TINYOBJ_FLAG_TRIANGULATE;
     unsigned int flags;
@@ -61,6 +60,7 @@ typedef struct
     size_t num_materials;
 
     gui_3d_face_t *face;
+    draw_img_t *img;
 
 } gui_3d_t;
 
@@ -96,14 +96,13 @@ typedef struct
  */
 gui_3d_t *gui_3d_create(void       *parent,
                         const char *name,
-                        void       *data,
-                        uint32_t    len,
                         int16_t     x,
                         int16_t     y,
                         int16_t     w,
                         int16_t     h);
 
-
+void gui_3d_set_obj(gui_3d_t *this, void *data, uint32_t len);
+void gui_3d_set_mtl(gui_3d_t *this, void *data, uint32_t len);
 
 #ifdef __cplusplus
 }

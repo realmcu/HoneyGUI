@@ -13,7 +13,8 @@
 #include "gui_canvas.h"
 
 
-#include "cube_obj.txt"
+#include "3d/cube_obj.txt"
+#include "3d/cube_mtl.txt"
 #include "tiger_blue.txt"
 #include "def_3d.h"
 #include "gui_3d.h"
@@ -33,13 +34,11 @@
 static void app_ui_design(gui_app_t *app)
 {
 
-    gui_log("_accube = 0x%x \n", _accube);
+    gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", 0, 0, 480, 480);
 
-    gui_log("_accube len = 0x%x \n", sizeof(_accube));
+    gui_3d_set_obj(test_3d, (void *)_accube_obj, sizeof(_accube_obj));
+    gui_3d_set_mtl(test_3d, (void *)_accube_mtl, sizeof(_accube_mtl));
 
-    gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_accube, sizeof(_accube), 0,
-                                      0, 480, 480);
-    test_3d->test_img_data = (void *)_actiger_blue;
 
     return;
 
