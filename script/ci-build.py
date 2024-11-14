@@ -63,19 +63,19 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
-    #keil_sim scons --target=mdk5
-    os.chdir('./keil_sim')
+    #keil_sim/ac6 scons --target=mdk5
+    os.chdir('./keil_sim/ac6')
     try:
         result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
-        print("./keil_sim > scons.exe\r\n{}".format(result_lines))
+        print("./keil_sim/ac6 > scons.exe\r\n{}".format(result_lines))
         if 'warning:' in result_lines:
             os.chdir('./..')
             print(result_lines)
-            print("keil_sim: 'scons --target=mdk5' fail: has warning")
+            print("keil_sim/ac6: 'scons --target=mdk5' fail: has warning")
             return False
     except Exception as e:
         os.chdir('./..')
-        print("keil_sim: 'scons --target=mdk5' fail: {}".format(e.output))
+        print("keil_sim/ac6: 'scons --target=mdk5' fail: {}".format(e.output))
         return False
     os.chdir('./..')
 

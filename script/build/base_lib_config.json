@@ -2,7 +2,7 @@
     "guiEngine-master": {
         "mandatory": [],
         "temporary": [
-            ["keil_sim/gui_engine.uvprojx", "", "sdk"]
+            ["keil_sim/ac6/gui_engine.uvprojx", "", "sdk"]
         ]
     }
 }
