@@ -693,7 +693,7 @@ void gui_obj_tree_print_mmd(gui_obj_t *obj);
 /**
  * @brief get widget count.
  */
-uint32_t gui_get_obj_count();
+uint32_t gui_get_obj_count(void);
 /**
  * @brief Set the location of a GUI object.
  *

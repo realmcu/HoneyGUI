@@ -176,6 +176,7 @@ static void gui_3d_prepare(gui_3d_t *this)
                                      dc->screen_width, dc->screen_height);
         gui_3d_world_inititalize(&world, 0, 0, 3.0f, 50, 50, 0, 1);
         gui_3d_matrix_t result;
+        GUI_UNUSED(result);
         // gui_3d_generate_rotate_around_line(&result, 1, 1, 0, 0, 1, 0, -20);
         // gui_3d_face_transform_local_to_local(this->face + i, &result);
         gui_3d_scene(this->face + i, &world, &camera);
