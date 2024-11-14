@@ -26,6 +26,15 @@ typedef enum
     GUI_3D_FACE_TRANSFORM_GLOBAL_TO_GLOBAL,
 } GUI_3D_FACE_TRANSFORM;
 
+#ifdef  __CC_ARM
+#pragma push
+#endif
+
+
+#ifdef  __CC_ARM
+#pragma anon_unions
+#endif
+
 typedef struct _gui_3d_matrix
 {
     union
@@ -40,6 +49,10 @@ typedef struct _gui_3d_matrix
         float m[4][4];
     };
 } gui_3d_matrix_t;
+
+#ifdef  __CC_ARM
+#pragma pop
+#endif
 
 typedef struct _gui_point4D
 {

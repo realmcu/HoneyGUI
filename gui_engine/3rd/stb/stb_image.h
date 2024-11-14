@@ -2639,8 +2639,8 @@ stbi_inline static stbi_uc stbi__clamp(int x)
     return (stbi_uc) x;
 }
 
-#define stbi__f2f(x)  ((int) (((x) * 4096 + 0.5)))
-#define stbi__fsh(x)  ((x) * 4096)
+#define stbi__f2f(x)  ((int) (((x) * 4096.0f + 0.5f)))
+#define stbi__fsh(x)  ((x) * 4096.0f)
 
 // derived from jidctint -- DCT_ISLOW
 #define STBI__IDCT_1D(s0,s1,s2,s3,s4,s5,s6,s7) \
@@ -4724,19 +4724,18 @@ stbi_inline static int stbi__zhuffman_decode(stbi__zbuf *a, stbi__zhuffman *z)
 static int stbi__zexpand(stbi__zbuf *z, char *zout, int n)  // need to make room for n bytes
 {
     char *q;
-    unsigned int cur, limit, old_limit;
+    unsigned int cur, limit;
     z->zout = zout;
     if (!z->z_expandable) { return stbi__err("output buffer limit", "Corrupt PNG"); }
     cur   = (unsigned int)(z->zout - z->zout_start);
-    limit = old_limit = (unsigned)(z->zout_end - z->zout_start);
+    limit = (unsigned)(z->zout_end - z->zout_start);
     if (UINT_MAX - cur < (unsigned) n) { return stbi__err("outofmem", "Out of memory"); }
     while (cur + n > limit)
     {
         if (limit > UINT_MAX / 2) { return stbi__err("outofmem", "Out of memory"); }
         limit *= 2;
     }
-    q = (char *) STBI_REALLOC_SIZED(z->zout_start, old_limit, limit);
-    STBI_NOTUSED(old_limit);
+    q = (char *) STBI_REALLOC_SIZED(z->zout_start, 0/*change by howie*/, limit);
     if (q == NULL) { return stbi__err("outofmem", "Out of memory"); }
     z->zout_start = q;
     z->zout       = q + cur;
@@ -5824,15 +5823,13 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
                 if ((int)(ioff + c.length) < (int)ioff) { return 0; }
                 if (ioff + c.length > idata_limit)
                 {
-                    stbi__uint32 idata_limit_old = idata_limit;
                     stbi_uc *p;
                     if (idata_limit == 0) { idata_limit = c.length > 4096 ? c.length : 4096; }
                     while (ioff + c.length > idata_limit)
                     {
                         idata_limit *= 2;
                     }
-                    STBI_NOTUSED(idata_limit_old);
-                    p = (stbi_uc *) STBI_REALLOC_SIZED(z->idata, idata_limit_old, idata_limit);
+                    p = (stbi_uc *) STBI_REALLOC_SIZED(z->idata, 0/*change by howie*/, idata_limit);
                     if (p == NULL) { return stbi__err("outofmem", "Out of memory"); }
                     z->idata = p;
                 }

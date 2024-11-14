@@ -217,6 +217,7 @@ void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code)
     }
 }
 #define ENUM_TO_STRING(enum_value) case enum_value: return #enum_value;
+#if _WIN32
 static const char *get_type_name(T_OBJ_TYPE type)
 {
     switch (type)
@@ -280,6 +281,8 @@ static const char *get_type_name(T_OBJ_TYPE type)
     default: return "UNKNOWN_TYPE";
     }
 }
+#endif
+#if _WIN32
 static void sanitize_identifier(char *id)
 {
     for (char *p = id; *p; p++)
@@ -290,6 +293,7 @@ static void sanitize_identifier(char *id)
         }
     }
 }
+#endif
 #if _WIN32
 static void internal_gui_obj_tree_print_mmd(FILE *file, gui_obj_t *obj)
 {
@@ -452,7 +456,6 @@ gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)
 {
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
-    gui_obj_t *object = obj;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
