@@ -166,9 +166,9 @@ if __name__ == '__main__':
 
     build_dict_dir = os.path.join(os.environ.get("WORKSPACE"), arg_dict.binDir)
 
-    if os.path.exists(build_dict_dir):
+    if build_type not in ["Nightly"] and os.path.exists(build_dict_dir):
         shutil.rmtree(build_dict_dir)
-    os.makedirs(build_dict_dir)
+    os.makedirs(build_dict_dir, exist_ok=True)
 
     build_honeyGUI(build_type=build_type,
                    module_paratmeters=module_input_parameters)
