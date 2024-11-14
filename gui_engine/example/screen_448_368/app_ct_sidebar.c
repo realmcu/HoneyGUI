@@ -99,15 +99,16 @@ void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function)
         }
     }
     index--;
+    gui_log("index = %d\n", index);
     while (1)
     {
-        sidebar_app_array[index].callback_function = sidebar_app_array[index - 1].callback_function;
-        sidebar_app_array[index].img_addr = sidebar_app_array[index - 1].img_addr;
-        index--;
         if (index == 0)
         {
             break;
         }
+        sidebar_app_array[index].callback_function = sidebar_app_array[index - 1].callback_function;
+        sidebar_app_array[index].img_addr = sidebar_app_array[index - 1].img_addr;
+        index--;
     }
     sidebar_app_array[0].callback_function = callback_function;
     sidebar_app_array[0].img_addr = img_addr;

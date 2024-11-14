@@ -128,7 +128,6 @@ static void app_back2prescreen_cb(void)
 static void app_BOX2D_RING_return_cb(void)
 {
     extern bool sidebar_flag;
-    // app_box2d_ring_close();
     if (sidebar_flag)
     {
         gui_switch_app(gui_current_app(), get_app_hongkong());

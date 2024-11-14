@@ -1184,8 +1184,7 @@ void switch_heart_rate();
 static void heart_rate_app(gui_app_t *app)
 {
     gui_log("current app:%s\n", gui_current_app()->screen.name);
-    extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
-    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_heart_rate);
+
     win_hb = gui_win_create(&app->screen, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
     gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -1304,16 +1303,18 @@ static void heart_rate_app(gui_app_t *app)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_hb_exit, NULL);
 }
 
+extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
 void switch_heart_rate()
 {
+    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_heart_rate);
     gui_switch_app(gui_current_app(), &_app_APP_HEART_RATE);
 }
 
-static void switch_app_menu()
-{
-    extern void *get_app_menu();
-    gui_switch_app(gui_current_app(), get_app_menu());
-}
+// static void switch_app_menu()
+// {
+//     extern void *get_app_menu();
+//     gui_switch_app(gui_current_app(), get_app_menu());
+// }
 
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 {
@@ -1362,7 +1363,7 @@ void page_ct_clock(void *parent)
 
     gui_img_t *img_weather = gui_img_create_from_mem(tb_0, "CLOCK_CARD_WEATHER",
                                                      UI_CLOCK_CARD_WEATHER_BIN, 0, 0, 0, 0);
-    gui_obj_add_event_cb(img_weather, (gui_event_cb_t)switch_app_menu, GUI_EVENT_1, NULL);
+    // gui_obj_add_event_cb(img_weather, (gui_event_cb_t)switch_app_menu, GUI_EVENT_1, NULL);
     gui_img_create_from_mem(tb_1, "CLOCK_CARD_COMPASS", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
     gui_img_create_from_mem(tb_2, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_MUSIC_BIN, 0, 0, 0, 0);
     gui_img_create_from_mem(tb_3, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_ALARM_BIN, 0, 0, 0, 0);
