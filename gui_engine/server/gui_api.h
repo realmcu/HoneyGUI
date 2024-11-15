@@ -321,7 +321,7 @@ bool gui_music_completion_status(void);
 /**
  * @brief Parses a CSS color string and converts it to a gui_color_t structure
  *
- * @link https://www.w3schools.com/cssref/css_colors_legal.php
+ * https://www.w3schools.com/cssref/css_colors_legal.php
  * Supports the following formats:
  * - Hex (#RRGGBB or #RRGGBBAA)
  * - RGB (rgb(R, G, B))
@@ -385,6 +385,28 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
  *
  */
 void gui_change_default_path(int argc, char **argv);
+/**
+ * @brief Retrieves a JSON array from a JSON file.
+ *
+ * This function parses a JSON file located at the given path, navigates to
+ * the specified parent key, and retrieves an array identified by the given key.
+ * The length of the returned array is stored in the provided integer pointer.
+ *
+ * @param path          Path to the JSON file.
+ * @param parent_key    The parent key in the JSON structure where the desired array is located.
+ * @param key           The key identifying the desired array.
+ * @param array_length  Pointer to an integer where the length of the retrieved array will be stored.
+ *
+ * @return A pointer to a float array containing the values retrieved from the JSON array,
+ *         or NULL if the array could not be retrieved.
+ *
+ * @note The returned array is dynamically allocated and it is the caller's
+ *       responsibility to free the memory when it is no longer needed.
+ */
+float *gui_get_json_array(const char *path, const char *parent_key, const char *key,
+                          int *array_length);
+
+
 
 #ifdef __cplusplus
 }

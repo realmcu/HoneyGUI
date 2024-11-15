@@ -96,6 +96,7 @@ static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **
     gui_list_t *tmp = NULL;
     gui_obj_t *obj = GUI_BASE(this->win);
     gui_obj_t *object = obj;
+    GUI_UNUSED(object);
     int count = 0;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {

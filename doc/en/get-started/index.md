@@ -23,17 +23,27 @@ The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run 
 ## Software Architecture
 
 
-<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png"/></div><br/>
+<div style="text-align: center"><img width= "800" src ="https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png"/></div><br/>
 
 
-## Installation
+## Installation For Windows
 
 {#Install_compiler_en}
 ### Install Compiler
 Download the MinGW-w64 toolchain, unzip it to drive C, and add it to the system environment variable `Path`.
 1.  [MinGW-w64 Download](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)
-2.  Unzip and copy to directory: `C:/mingw64`
-3.  Add a environment variable: `C:/mingw64/bin`
+2.  Unzip and copy to directory: `C:\mingw64`
+3.  Add a environment variable: `C:\mingw64\bin`:
+      - Open the Start Menu and search for `Advanced system setting`.
+      - Show `System Properties` and then go to the `Advanced` tab.
+      - Click on the `Environment Variables` button.
+      - In the `User variables` section, find and select the Path variable and click `Edit`.
+      - Click `New` and add `C:\mingw64\bin`.
+      - Click `OK` to close all dialogs.
+
+
+### Install Python
+Python 3.9.7 is tested.
 
 ### Install Scons
 Open a CMD window and execute the following commands to install the Python scons library.
@@ -44,7 +54,7 @@ Open a CMD window and execute the following commands to install the Python scons
 After installing the `MinGW-w64` toolchain and `scons` library, you can launch the application in two ways: stratup by CMD or startup by GUI.
 
 ### Startup by CMD
-Open a CMD window in the `HoneyGUI` folder, and then run the following command to start the application.
+Open a CMD window in the `HoneyGUI` or `gui` folder, and then run the following command to start the application.
 
 ```shell
 > cd win32_sim
@@ -55,7 +65,7 @@ Open a CMD window in the `HoneyGUI` folder, and then run the following command t
 The `scons` command to perform the build process and then execute `gui.exe` to run it.
 
 
-<div style="text-align: center"><img width= "600"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
+<div style="text-align: center"><img width= "700"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
 
 
 ### Startup by VSCode
@@ -71,11 +81,20 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
 You can select the `Run and Debug` options after entering the vscode interface, and then click the `Run` button.
 
 
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png"/></div><br/>
 
 
-### Display the Watchface
-You can interact with it by swiping and long pressing.
 
 
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
+### Display
+#### Watch Project
+The watchface is displayed in the window, and you can interact with it by swiping and long pressing.
+
+
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
+
+#### Dashboard Project
+The dashboard is displayed in the window.
+
+
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1731649605724335535/042f1dcf_10088396.png"/></div><br/>

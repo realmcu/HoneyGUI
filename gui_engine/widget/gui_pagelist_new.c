@@ -51,13 +51,17 @@
 
 static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
 {
-    gui_log("index:%d,%x\n", index, obj);
-    GUI_WIDGET_POINTER_BY_TYPE(t, TEXTBOX, obj)gui_log("text:%x\n", t);
+    GUI_WIDGET_POINTER_BY_TYPE(t, TEXTBOX, obj)
     gui_text_content_set((void *)t, (void *)pl->item_text_array[index],
                          strlen(pl->item_text_array[index]));
     //change obj callback
-    obj->event_dsc->event_cb = pl->click_function_array[index];
-    obj->event_dsc->user_data = (void *)(size_t)index;
+    if (pl->click_function_array && pl->click_function_array[index])
+    {
+        obj->event_dsc->event_cb = pl->click_function_array[index];
+        obj->event_dsc->user_data = (void *)(size_t)index;
+    }
+
+
 
 }
 static void win_press(void *obj, gui_event_t e, void *param)
@@ -85,6 +89,10 @@ static void override(void *p, void *this_widget, gui_animate_t *animate)
 {
     gui_win_t *win = this_widget;
     gui_pagelist_new_t *pl = p;
+    if (GUI_BASE(pl)->gesture)
+    {
+        return;
+    }
     if (pl->item_count < pl->row_count - 1)
     {
         return;
@@ -379,6 +387,11 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
 {
     gui_win_t *win = this_widget;
     gui_pagelist_new_t *pl = p;
+    if (GUI_BASE(pl)->gesture)
+    {
+        return;
+    }
+
     if (pl->item_count < pl->row_count - 1)
     {
         return;
@@ -676,7 +689,7 @@ static void ctor(gui_pagelist_new_t *this, void       *parent,
                  uint16_t row_space,
                  const uint8_t *item_background_image,
                  const uint8_t *item_background_image_hl,
-                 IMG_SOURCE_MODE_TYPE item_background_blending_mode,
+                 BLEND_MODE_TYPE item_background_blending_mode,
                  const uint8_t *font,
                  uint16_t font_size,
                  gui_color_t font_color,
@@ -702,6 +715,7 @@ static void ctor(gui_pagelist_new_t *this, void       *parent,
 
 }
 
+
 gui_pagelist_new_t *gui_pagelist_new_create(void       *parent,
                                             int16_t     x,
                                             int16_t     y,
@@ -709,7 +723,7 @@ gui_pagelist_new_t *gui_pagelist_new_create(void       *parent,
                                             uint16_t item_space,
                                             const uint8_t *item_background_image,
                                             const uint8_t *item_background_image_highlight,
-                                            IMG_SOURCE_MODE_TYPE item_background_blending_mode,
+                                            BLEND_MODE_TYPE item_background_blending_mode,
                                             const uint8_t *font,
                                             uint16_t font_size,
                                             gui_color_t font_color
@@ -726,7 +740,7 @@ gui_pagelist_new_t *gui_pagelist_new_create_horizontal(void       *parent,
                                                        uint16_t     h,
                                                        const uint8_t *item_background_image,
                                                        const uint8_t *item_background_image_highlight,
-                                                       IMG_SOURCE_MODE_TYPE item_background_blending_mode,
+                                                       BLEND_MODE_TYPE item_background_blending_mode,
                                                        const uint8_t *font,
                                                        uint16_t font_size,
                                                        gui_color_t font_color
@@ -742,7 +756,7 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
                                      const char **item_text_array
                                     )
 {
-    if (!(item_count && item_click_function_array && item_text_array && pagelist_new))
+    if (!(item_count  && item_text_array && pagelist_new))
     {
         return GUI_ERROR_NULL;
     }
@@ -777,8 +791,12 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
                          pagelist_new->font_size);
             gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MID_CENTER);
+            if (item_click_function_array && pagelist_new->click_function_array[i])
+            {
+                gui_win_click(win, (void *)pagelist_new->click_function_array[i], (void *)i);
+            }
 
-            gui_win_click(win, (void *)pagelist_new->click_function_array[i], (void *)i);
+
             gui_win_press(win, win_press, (void *)i);
             gui_win_release(win, win_release, (void *)i);
         }
@@ -798,7 +816,10 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
             gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MID_CENTER);
 
-            gui_win_click(win, (void *)pagelist_new->click_function_array[i], (void *)i);
+            if (item_click_function_array && pagelist_new->click_function_array[i])
+            {
+                gui_win_click(win, (void *)pagelist_new->click_function_array[i], (void *)i);
+            }
             gui_win_press(win, win_press, (void *)i);
             gui_win_release(win, win_release, (void *)i);
         }

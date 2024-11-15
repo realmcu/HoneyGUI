@@ -776,6 +776,12 @@ ezxml_t ezxml_parse_file(const char *file)
     ezxml_t xml = ezxml_parse_fd(fd);
 
     if (fd >= 0) { close(fd); }
+    else
+    {
+        extern void gui_log(const char *format, ...);
+        gui_log("ERROR: ezxml open %s failed!\n", file);
+    }
+
     return xml;
 }
 

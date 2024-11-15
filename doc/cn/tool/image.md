@@ -7,7 +7,7 @@
 * 操作步骤及详细说明如下：
 
 <br/>
-<div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1725345166232084759/b1982ac0_13671125.png"></div>
+<div style="text-align: center"><img width= "900" src="https://foruda.gitee.com/images/1725345166232084759/b1982ac0_13671125.png"></div>
 <br/>
 
 1. 打开图片文件夹。
@@ -71,13 +71,13 @@
 ## 输出文件
 转换后，将生成以下文件。
 <br/>
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718776957325643948/803a9ab3_13408154.png"></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1718776957325643948/803a9ab3_13408154.png"></div>
 <br/>
 
 通过使用图像转换工具（ImageConvert Tool），开发者可以将三个`JPG文件（a、b和c）`转换为`二进制文件（a、b和c）`。
 
 接下来，开发者需要将这些`二进制文件`放置在打包目录的`根文件夹（root）`中。关于打包资源的过程，请参考[打包工具](./packing.md)章节。
 
-<div style="text-align: center"><img width= "230" src="https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png"></div>
+<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png"></div>
 <br/>
 

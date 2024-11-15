@@ -4,7 +4,7 @@ This example demostrates how to develop a simple "Calculator APP", from which yo
 The "Calculator" works just like a traditional calculator, using button widget for user input and text widget for display. Watch the demo video below to see its full functionality.
 
 <br>
-<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Calculator/calculator.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Calculator/calculator.gif" width = "400" /></div>
 <br>
 
 ## Source File

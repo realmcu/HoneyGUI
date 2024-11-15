@@ -45,7 +45,7 @@ static void app_ui_design(gui_app_t *app)
 }
 ```
 <br/>
-<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png"></div>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png"></div>
 <br/>
 
 ### 圆弧动画
@@ -71,7 +71,7 @@ static void app_ui_design(gui_app_t *app)
 }
 ```
 <br/>
-<div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/canvas_arc.gif"></div>
+<div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/canvas_arc.gif"></div>
 <br/>
 
 ## API

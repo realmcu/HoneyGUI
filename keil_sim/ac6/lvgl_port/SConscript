@@ -1,0 +1,14 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+CPPPATH = [cwd]
+
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

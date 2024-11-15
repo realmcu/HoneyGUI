@@ -33,7 +33,7 @@ static void app_home_ui_design(gui_app_t *app)
 
 <br>
 
-<center><img width= "370" src="https://foruda.gitee.com/images/1703146027234656357/48137b9c_9325830.png" /></center>
+<center><img width= "400" src="https://foruda.gitee.com/images/1703146027234656357/48137b9c_9325830.png" /></center>
 <br>
 
 <span id="api">

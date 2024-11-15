@@ -160,7 +160,7 @@ void page_tb6(void *parent)
 
 <br>
 
-<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/img.gif" /></center>
+<center><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/img.gif" /></center>
 <br>
 
 ## API

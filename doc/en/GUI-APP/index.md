@@ -3,7 +3,7 @@
 The GUI framework diagram is shown in the figure below:
   
   
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1721199084691160190/537fa787_13408154.png" alt="app fw.png"></div><br/>
+<div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1721199084691160190/537fa787_13408154.png" alt="app fw.png"></div><br/>
 
   +  In each project, multiple applications can exist simultaneously, but only one application can be in a running state at any given time, while the other applications will be in a suspended state.
   +  When using different rendering engines, the upper-layer implementation of the application will vary.

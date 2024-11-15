@@ -47,7 +47,7 @@ By default, the image blending mode is set to `IMG_SRC_OVER_MODE`, you can chang
 ```
 </details>
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png" width = "400" /></div>
 <br>
 
 <span id = "gui_perspective_create">

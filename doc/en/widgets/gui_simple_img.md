@@ -94,7 +94,7 @@ void page_tb3(void *parent)
 
 <br>
 
-<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/simple_img.gif" /></center>
+<center><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/simple_img.gif" /></center>
 <br>
 
 <span id="api">

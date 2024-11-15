@@ -51,7 +51,7 @@ void page_tb_cube(void *parent)
 }
 ```
 <br/>
-<div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube.gif"></div>
+<div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube.gif"></div>
 <br/>
 
 ## API

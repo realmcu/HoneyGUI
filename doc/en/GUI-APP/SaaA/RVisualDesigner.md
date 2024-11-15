@@ -253,12 +253,12 @@ Within the area defined by Win width and height, it can respond to various gestu
 ### Design View/Canvas
 Users can drag and drop widgets from the Toolbox panel into the Design View, adjust the widgets' layout, and set properties to design a graphical interface that can be rendered in the Realtek ICs.
 
-<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png" width="680"></div>
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png" width="750"></div>
 
 #### TabView - Create/Delete/Insert Tab
 Drag and drop the TabView widget from the Toolbox into the Design View, then a TabView that contains only a home tab (coordinates (0,0)) is created, as shown in the figure below.
 
-<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png" width="680"></div>
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png" width="750"></div>
 
 ##### Create Tab
 New tabs can be created by clicking the buttons around the Design View.
@@ -280,11 +280,11 @@ For example, if a tab needs to be inserted between tabs with coordinates (1, 0) 
 1.	Increase the idx of Tab (2, 0) and the tabs to its right by 1, as shown in the figure below;
 2.	Switch to Tab (1, 0) and click to create the new Tab (2, 0).
 
-<div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815120686817698/cdf44743_12407535.png" width="680"></div>
+<div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815120686817698/cdf44743_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815280073982051/68230d3d_12407535.png" width="680"></div>
+<div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815280073982051/68230d3d_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_7_c" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628460504196478/3446e06e_12407535.png" width="680"></div>
+<div id="figure_2_7_c" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628460504196478/3446e06e_12407535.png" width="750"></div>
 
 #### TabView Overview Window
 Please click ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0dc_12407535.png)  to show the 'TabView Overview Window'.
@@ -294,9 +294,9 @@ Please click ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0d
 2.	The Overview Chart labels each Tab with its coordinates. When simulated or rendered in ICs, the Tab with coordinates (0,0) is displayed on the Home page, and users can swipe up/down/left/right to display other Tabs.
 ```
 
-<div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png" width="680"></div>
+<div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628633709549622/a41c6011_12407535.png" width="680"></div>
+<div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628633709549622/a41c6011_12407535.png" width="750"></div>
 
 
 #### Zoom of Design View
@@ -305,12 +305,12 @@ There are 3 ways to zoom in the Design View.
 2.	Click the '-' and '+' buttons.
 3.	Drag the slider bar.
 
-<div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628744851323697/d56f9725_12407535.png" width="680"></div>
+<div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628744851323697/d56f9725_12407535.png" width="750"></div>
 
 ### Property View
 Selecting a widget in the Widget Tree or Design View exposes all of the widget's property values, which users can modify as needed.
 
-<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726814067710788486/a6564f40_12407535.png" width="680"></div>
+<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726814067710788486/a6564f40_12407535.png" width="750"></div>
 
 ### Widget Tree
 The Widget Tree is used to present to the users the parent/child/sibling relationship of the currently laid out widgets. And we have the following convention here.
@@ -319,9 +319,9 @@ The Widget Tree is used to present to the users the parent/child/sibling relatio
 
 The figure shows all the child widgets of the Home tab and Lamp tab, where the Home tab has only one Image child widget for setting the background, and the Lamp tab contains an Image widget and several Switch widgets.
 
-<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png" width="680"></div>
+<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png" width="750"></div>
 <br/>
-<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png" width="680"></div>
+<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png" width="750"></div>
 
 Widget Tree supports the following operations.
 1.	Select widget:
@@ -348,7 +348,7 @@ Click the button and lock the widget/widgets.
 Only pre-imported image and font files can be referenced by the GUI project. This chapter focuses on how to manage image and font resources.
 The image and font explorer is located directly below the design view, as shown in the figure below.
 
-<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="680"></div>
+<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="750"></div>
 
 <a id="img_res_m_anchor"></a>
 
@@ -356,24 +356,24 @@ The image and font explorer is located directly below the design view, as shown 
 
 Click ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png) to bring up the Image Management view.
 
-<div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815968480737363/e2f46e96_12407535.png" width="400"></div>
+<div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726815968480737363/e2f46e96_12407535.png" width="500"></div>
 
 ##### Add Images
 Images can be added to the GUI project by following the process below.
 1.	Click ![icon](https://foruda.gitee.com/images/1710824254786867861/174e524d_12407535.png) to create a new image folder and enter the folder name.
 The created folder is located in the ```Resource\image``` folder under the GUI project directory.
 
-<div id="figure_3_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629445428238950/c3e216ca_12407535.png" width="400"></div>
+<div id="figure_3_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629445428238950/c3e216ca_12407535.png" width="500"></div>
 <br/>
 
 2.	Select the created image folder and click ![icon](https://foruda.gitee.com/images/1710824254769021374/55b6c303_12407535.png) to select images (multiple selections are possible) to add them to the folder.
 As shown in the figure below, the images are copied to the ```Resource\image\home``` folder after the addition is completed.
 
-<div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629572036008240/98958d66_12407535.png" width="400"></div>
+<div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629572036008240/98958d66_12407535.png" width="500"></div>
 <br/>
-<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725412988097005313/b591b7ca_12407535.png" width="600"></div>
+<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725412988097005313/b591b7ca_12407535.png" width="750"></div>
 <br/>
-<div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629616915297638/de3a62a7_12407535.png" width="400"></div>
+<div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629616915297638/de3a62a7_12407535.png" width="500"></div>
 
 ##### Remove Images/Image Folder
 Select the image or image folder to be removed and click ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png).
@@ -399,7 +399,7 @@ Not recommended.
 #### Add Third-Party Font
 If a third-party font (```.ttf```) is needed, click ![icon](https://foruda.gitee.com/images/1710824482944711702/8b73005d_12407535.png) to import the resource first; otherwise, the locally installed font will be used.
 
-<div id="figure_3_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483191984010/283b1f70_12407535.png" width="600"></div>
+<div id="figure_3_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483191984010/283b1f70_12407535.png" width="750"></div>
 
 #### Remove Third-Party Font
 Select the font to be removed and click ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png).
@@ -415,7 +415,7 @@ Select the font to be removed and click ![icon](https://foruda.gitee.com/images/
 To close the current project and open an existing project or create a new project, open the Start Page by clicking 'File -> Start Page'. Click 'Open Project' or select a ```.rtkprj``` and double-click to open the existing project, or click 'Create Project' to create a new project. Please refer to [How to Create Project](#how_to_create_anchor) and [How to Open Project](#how_to_open_anchor).
 
 
-<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png" width="680"></div>
+<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png" width="750"></div>
 
 #### Save
 Save all the UI changes of the project, the shortcut is ```Ctrl + S```.
@@ -440,12 +440,12 @@ Redo: Do the change to the widget again, the shortcut is ```Ctrl + Y```.
 #### Convert Project
 The Convert Project window is used to convert the IC type and screen size/resolution for the current project.
 
-<div id="figure_4_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630083752972113/2f32ba1a_12407535.png" width="400"></div>
+<div id="figure_4_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630083752972113/2f32ba1a_12407535.png" width="500"></div>
 
 #### Project Name Modification
 The Project Name window is used to modify the current project name. Please enter the new name in the input box.
  
-<div id="figure_4_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630055522858677/e4245c27_12407535.png" width="400"></div>
+<div id="figure_4_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630055522858677/e4245c27_12407535.png" width="500"></div>
 
 ### Setting
 
@@ -454,7 +454,7 @@ The Project Name window is used to modify the current project name. Please enter
 
 The images must be converted to be displayed correctly on the IC, so users need to set the correct convert parameters. All the optional parameters are shown in the figure below.
 
-<div id="figure_4_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630165031575995/1be72944_12407535.png" width="400"></div>
+<div id="figure_4_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630165031575995/1be72944_12407535.png" width="500"></div>
 
 The parameters are described as follows.
 
@@ -486,9 +486,9 @@ The optional Compress Mode is as follows:
     Run-Length Encoding, a lossless compression algorithm.
 If selecting RLE as the Compress Mode, RLE Level and RLE Run Length parameters are mandatory to set.
 
-<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818028936954872/d4977120_12407535.png" width="350"></div>
+<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818028936954872/d4977120_12407535.png" width="400"></div>
 <br/>
-<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818316484821859/eeb87b7f_12407535.png" width="350"></div>
+<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818316484821859/eeb87b7f_12407535.png" width="400"></div>
 <br/>
 
 | RLE Level | Description |
@@ -549,7 +549,7 @@ A Font Convert Setting should be created, otherwise selecting a font for the tex
 
 To use Bitmap Fonts, set the following parameters.
 
-<div id="figure_4_7" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630232320631022/466a71af_12407535.png" width="400"></div>
+<div id="figure_4_7" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630232320631022/466a71af_12407535.png" width="500"></div>
 
 The following table lists the description of each parameter.
 
@@ -567,7 +567,7 @@ The following table lists the description of each parameter.
 
 Vector Font parameters are shown in the figure below.
 
-<div id="figure_4_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630326763929958/7a1b4010_12407535.png" width="400"></div>
+<div id="figure_4_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630326763929958/7a1b4010_12407535.png" width="500"></div>
 
 ### Export
 If you have finished designing the GUI project and want to program it to the IC, please click 'Export', then the Tool performs the following actions:
@@ -577,7 +577,7 @@ If you have finished designing the GUI project and want to program it to the IC,
 
 When the above actions are done, a message box pops up.
 
-<div id="figure_4_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630355854380192/60bbc0af_12407535.png" width="400"></div>
+<div id="figure_4_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630355854380192/60bbc0af_12407535.png" width="500"></div>
 
 The ```.bin ```can be programmed into your IC.
 
@@ -588,7 +588,7 @@ Simulate the project on UI.
 When simulating the project for the first time, please click 'Export' before clicking 'Simulate'. Then, there is no need to click 'Export' again if no image or font setting is modified.
 ```
 
-<div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="350"></div>
+<div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="400"></div>
 
 <div STYLE="page-break-after: always;"></div> 
 
@@ -601,24 +601,24 @@ When simulating the project for the first time, please click 'Export' before cli
 ### How to Create Project
 
 
-<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="680"></div>
+<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="750"></div>
 <br/>
 
 Double click and run ```RVisualDesigner.exe```, and then configure the project step by step (1~4) and click 'Create Project' (5).
 After creation, the GUI design window pops up. The left side is the component area, the center is the design area, and the right side is the widget property setting area.
 
-<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818698027723674/8962d02e_12407535.png" width="680"></div>
+<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818698027723674/8962d02e_12407535.png" width="750"></div>
 <br/>
 
 ```{note}
 The newly created project file is located in the project folder under the Solution Folder. There is an example as shown in the figure below.
 ```
 
-<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505762180091944/39be3e5a_12407535.png" width="330"></div>
+<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505762180091944/39be3e5a_12407535.png" width="400"></div>
 
 After you drag and drop a widget on Design View, and click 'File - Save' or press ```Ctrl + S```, the ```.rtkui``` file will be created.
 
-<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505619255178068/e89d3b76_12407535.png" width="330"></div>
+<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505619255178068/e89d3b76_12407535.png" width="400"></div>
 
 ### How to Write Javascript Code
 After the project is created, the ```xxx.js``` file is created. The ```xxx.js``` file is empty, please code here to implement the widgets' event callback.
@@ -627,12 +627,12 @@ After the project is created, the ```xxx.js``` file is created. The ```xxx.js```
 
 ### How to Open Project
 
-<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="680"></div>
+<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="750"></div>
 
 There are two ways to open a project.
 1.	Click 'Open Project' and select a ```.rtkprj``` file.
 
-<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1724911708175163337/8513c36b_12407535.png" width="680"></div>
+<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1724911708175163337/8513c36b_12407535.png" width="750"></div>
 
 2.	Select a ```.rtkprj``` in the Recent Project area.
 If the project is listed in the Recent Project area, a message window pops up.
@@ -645,7 +645,7 @@ Click 'File -> Start Page' on Menu Bar.
 
 
 ### How to Export/Pack Project
-<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png" width="680"></div>
+<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png" width="750"></div>
 <br/>
 
 Click 'Export' on Menu Bar. The output is shown in the figure below.
@@ -653,7 +653,7 @@ Click 'Export' on Menu Bar. The output is shown in the figure below.
 
 
 ### How to Simulate
-<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png" width="680"></div>
+<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png" width="750"></div>
 
 Click on the 'Simulate' button in the menu bar.
 

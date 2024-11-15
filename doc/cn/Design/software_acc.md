@@ -8,7 +8,7 @@
 - **滤黑 (Filter black)**: 滤波技术有效地从原始图像数据中筛选出像素值为零的像素数据，这意味着黑色像素不会被写入到帧缓冲区中。这种机制能够加快刷新速度。除黑色以外的任何颜色像素都会经过标准处理方法，并被记录到帧缓冲区中。
 - **源覆盖 (Source_over)**: 一种混合方法，将图像的颜色数据和帧缓冲区像素的颜色数据结合起来，基于不透明度值 `Sa` 计算最终的颜色，并将其写入到帧缓冲区的相应位置。计算公式为 `((255 - Sa) * D + Sa * S) / 255)`，其中 `Sa` 是原始图像的不透明度值，`D` 是帧缓冲区的像素数据，`S` 是源图像的像素数据。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1726135723241666402/b6cb0cbc_13671125.png"/></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1726135723241666402/b6cb0cbc_13671125.png" width="1200"/></div><br/>
 
 - `img_type` 可以从图像的头部 `head` 中获得，图像头部的结构如下：
 

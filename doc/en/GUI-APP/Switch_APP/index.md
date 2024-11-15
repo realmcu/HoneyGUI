@@ -5,7 +5,7 @@
 - The first app will gradually become transparent until it disappears when switching, and the second app will enlarge to fill the screen. 
 <br>
 
-<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/GUI-APP/Switch_APP/switch_app.gif" /></center>
+<center><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/GUI-APP/Switch_APP/switch_app.gif" /></center>
 <br>
 
 ### Source Code

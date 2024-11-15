@@ -49,8 +49,10 @@
  *============================================================================*/
 
 static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
+#if 0 //comment for dead code, AC5 compile warning
 static float gui_img_get_transform_t_y_old(gui_img_t *this);
 static float gui_img_get_transform_t_x_old(gui_img_t *this);
+#endif
 static void gui_img_reset_translate(gui_img_t *this);
 void gui_img_set_animate(gui_img_t *this,
                          uint32_t   dur,
@@ -1037,6 +1039,7 @@ float gui_img_get_transform_t_y(gui_img_t *this)
     }
     return DEFAULT_TRANSFORM_T_Y;
 }
+#if 0 //comment for dead code, AC5 compile warning
 static float gui_img_get_transform_t_y_old(gui_img_t *this)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
@@ -1055,6 +1058,7 @@ static float gui_img_get_transform_t_x_old(gui_img_t *this)
     }
     return DEFAULT_TRANSFORM_T_X;
 }
+#endif
 void gui_img_skew_x(gui_img_t *this, float degrees)
 {
 

@@ -8,16 +8,16 @@ Please refer to this section for the download link of the font conversion tool: 
 ## Font Bin Generation
 Please refer to the following steps for how to generate files:
 1. Copy the Font library file to the directory (`\Font Convert Tool\font`).
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
 2. Please refer to the documentation under the directory (`\Font Convert Tool\doc`) for the specific meanings of each parameter to configure font parameters by editing `FontConfig.json`.
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
 
 3. Please open `setting.ini` and modify the optional configuration items.
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724035284336578868/8affdd56_9325830.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724035284336578868/8affdd56_9325830.png" ></div>
 
 4. Double-click `fontDirctionary.exe` and the font bin will be generated.
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
 
 ## FontConfig.json Parameter Description
 

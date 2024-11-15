@@ -325,7 +325,12 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
 
     # parse menu_config.h to get used component
     PreProcessor = PatchedPreProcessor()
-    f = open('../win32_sim/menu_config.h', 'r', encoding='utf-8')
+
+    if os.path.exists('menu_config.h'):
+        f = open('menu_config.h', 'r', encoding='utf-8')
+    else:
+        f = open('../../win32_sim/menu_config.h', 'r', encoding='utf-8')
+    
     contents = f.read()
     f.close()
     PreProcessor.process_contents(contents)

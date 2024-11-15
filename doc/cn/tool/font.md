@@ -9,19 +9,19 @@
 如何生成对应的文件，请参考以下步骤:
 1. 将字体库文件复制到该目录（`\Font Convert Tool\font`）。
 
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
 2. 可以参考（`\Font Convert Tool\doc`）目录下的文档，了解每个参数的具体含义，通过编辑`FontConfig.json`配置字体参数。
 
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
 
 3. 打开`setting.ini`，修改可选配置项。
 
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724035284336578868/8affdd56_9325830.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724035284336578868/8affdd56_9325830.png" ></div>
 
 4. 双击`fontDirctionary.exe`生成font.bin。
 
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
 
 ## FontConfig.json参数说明
 

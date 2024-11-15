@@ -13,7 +13,7 @@
 #define __SHELL_CFG_H__
 
 #include "stdlib.h"
-unsigned int userGetTick();
+unsigned int userGetTick(void);
 
 #ifndef SHELL_TASK_WHILE
 /**

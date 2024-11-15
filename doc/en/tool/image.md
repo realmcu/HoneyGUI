@@ -6,7 +6,7 @@ Convert pictures in various formats into RGB raw pictures
 * The operation steps and detailed instructions are as follows:
 
 <br/>
-<div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1725345166232084759/b1982ac0_13671125.png"></div>
+<div style="text-align: center"><img width= "900" src="https://foruda.gitee.com/images/1725345166232084759/b1982ac0_13671125.png"></div>
 <br/>
 
 1. Open the image folder.
@@ -69,14 +69,14 @@ Convert pictures in various formats into RGB raw pictures
 ## Output Files
 The following files will be generated.
 <br/>
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718776957325643948/803a9ab3_13408154.png"></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1718776957325643948/803a9ab3_13408154.png"></div>
 <br/>
 
 By using the image conversion tool, we can convert the three `JPG files a, b, and c` into three `binary files a, b, and c`.
 
 Place the `binary file` into the `root` folder of the packaging directory. For the packaging process, please refer to the [Pack Tool](./packing.md) section.
 
-<div style="text-align: center"><img width= "230" src="https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png"></div>
+<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png"></div>
 <br/>
 
 

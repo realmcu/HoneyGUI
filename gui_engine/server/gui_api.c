@@ -1363,7 +1363,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
                         if (cJSON_IsNumber(array_item))
                         {
                             ((int *)value)[i] = array_item->valueint;
-                            printf("array[%d] = %d\n", i, array_item->valueint);
+                            //printf("array[%d] = %d\n", i, array_item->valueint);
                         }
                     }
                 }
@@ -1380,4 +1380,83 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
     }
     // clear
     cJSON_Delete(root);
+}
+float *gui_get_json_array(const char *path, const char *parent_key, const char *key,
+                          int *array_length)
+{
+    cJSON *root;
+    float *array = 0;
+    *array_length = 0;
+    if (!path)
+    {
+        gui_log("path can't be NULL!\r\n");
+        return 0;
+    }
+    else
+    {
+        if (!parent_key || !key)
+        {
+            gui_log("parent_key and key can't be NULL!\r\n");
+            return 0;
+        }
+        root = cJSON_Parse(path);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return 0;
+        }
+    }
+    // parse array
+    cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
+    if (!cJSON_IsArray(json_array))
+    {
+        gui_log("get %s_Array unsuccessful\n", parent_key);
+        cJSON_Delete(root);
+        return 0;
+    }
+    else
+    {
+        cJSON *obj = cJSON_GetArrayItem(json_array, 0);
+        if (!obj)
+        {
+            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            cJSON_Delete(root);
+            return 0;
+        }
+        else
+        {
+            cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
+            if (!json_key)
+            {
+                gui_log("get %s_Key unsuccessful\n", key);
+                cJSON_Delete(root);
+                return 0;
+            }
+            else
+            {
+                if (strcmp(key, "array") == 0)
+                {
+                    int array_size = cJSON_GetArraySize(json_key);
+                    array = gui_malloc((array_size) * sizeof(float));
+                    memset(array, 0, (array_size)*sizeof(float));
+                    for (int i = 0; i < array_size; i++)
+                    {
+                        cJSON *array_item = cJSON_GetArrayItem(json_key, i);
+                        if (cJSON_IsNumber(array_item))
+                        {
+                            array[i] = array_item->valuedouble;
+                            //printf("array[%d] = %d,%f\n", i, array_item->valueint, array_item->valuedouble);
+                        }
+                    }
+                    *array_length = array_size;
+
+
+                }
+
+            }
+        }
+    }
+    // clear
+    cJSON_Delete(root);
+    return array;
 }

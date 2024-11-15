@@ -1,14 +1,13 @@
 #include "gui_win.h"
 #include "gui_app.h"
 #include "gui_img.h"
-#include "root_image_hongkong/ui_resource.h"
 #include "box2d/box2d.h"
-#include "guidef.h"
 #include <iostream>
 #include <cstdio>
 #include <cmath>
 #include <box2d/box2d.h>
 #include <vector>
+
 
 #include "gui_canvas.h"
 #include "tp_algo.h"
@@ -139,7 +138,7 @@ bool init()
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
-    INNER_RING_RADIUS = SCREEN_HEIGHT / 2.0f - RING_GAP; // Inner ring radius
+    INNER_RING_RADIUS = OUTER_RING_RADIUS - RING_GAP; // Inner ring radius
     gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     if (!win)
@@ -195,6 +194,7 @@ void createRing(b2World *world, float radius, float restitution)
 
 void createBalls(b2World *world)
 {
+
     for (int i = 0; i < BALL_COUNT; ++i)
     {
         float angle = 2 * i * M_PI / BALL_COUNT;
@@ -226,6 +226,7 @@ void createBalls(b2World *world)
         NVGcolor color = nvgRGB(dis(gen), dis(gen), dis(gen));
         balls.push_back({ballBody, color}); // Add ball and color to vector
     }
+    gui_log(" ");
 }
 
 // Apply centripetal force to ensure balls move along the ring
@@ -290,6 +291,18 @@ int ui_design(gui_obj_t *obj)
     }
 
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
+
+    if (world != nullptr)
+    {
+        for (Ball body : balls)
+        {
+            world->DestroyBody(body.body);
+        }
+        balls.clear();
+        win_release_callback();
+        delete world;
+    }
+
     world = new b2World(gravity);
 
     createRing(world, OUTER_RING_RADIUS, BALL_RESTITUTION); // Create outer ring with restitution of 0.3
@@ -307,4 +320,3 @@ extern "C" {
         app_box2d_ring::ui_design(obj);
     }
 }
-

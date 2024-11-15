@@ -610,10 +610,10 @@ static char *my_strndup(const char *s, size_t len)
 char *dynamic_fgets(char **buf, size_t *size, FILE *file)
 {
     char *offset;
-    char *ret;
     size_t old_size;
+    char *ret = fgets(*buf, (int) * size, file);
 
-    if (!(ret = fgets(*buf, (int) * size, file)))
+    if (!ret)
     {
         return ret;
     }
@@ -692,9 +692,11 @@ static unsigned long hash_djb2(const unsigned char *str)
     unsigned long hash = 5381;
     int c;
 
-    while ((c = *str++))
+    c = (unsigned char) * str++;
+    while (c)
     {
-        hash = ((hash << 5) + hash) + (unsigned long)(c);
+        hash = ((hash << 5) + hash) + (unsigned long)c;
+        c = (unsigned char) * str++;
     }
 
     return hash;

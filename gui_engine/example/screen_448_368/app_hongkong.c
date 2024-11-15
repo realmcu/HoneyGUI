@@ -89,6 +89,7 @@ static int app_init(void)
 #endif
     gui_server_init();
     gui_app_startup(get_app_hongkong());
+    extern void *get_hr_hongkong(void);
     return 0;
 }
 
