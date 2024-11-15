@@ -73,7 +73,7 @@ if __name__ == '__main__':
         send_mail("win32_sim: 'scons' fail.", None)
         sys.exit("win32_sim: 'scons' fail, {}".format(e))
     os.chdir('./..')
-    #reset
+    '''#reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
     #keil_sim/ac6 scons --target=mdk5
@@ -81,10 +81,22 @@ if __name__ == '__main__':
     try:
         subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
-        os.chdir('./..')
+        os.chdir('./../..')
         send_mail("keil_sim/ac6: 'keil_sim/ac6: 'scons --target=mdk5' fail.", None)
         sys.exit("keil_sim/ac6: 'keil_sim/ac6: 'scons --target=mdk5' fail, {}".format(e))
-    os.chdir('./..')
+    os.chdir('./../..')
+    #reset
+    repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')
+    #keil_sim/ac5 scons --target=mdk5
+    os.chdir('./keil_sim/ac5')
+    try:
+        subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    except Exception as e:
+        os.chdir('./../..')
+        send_mail("keil_sim/ac5: 'keil_sim/ac5: 'scons --target=mdk5' fail.", None)
+        sys.exit("keil_sim/ac5: 'keil_sim/ac5: 'scons --target=mdk5' fail, {}".format(e))
+    os.chdir('./../..')'''
     #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
