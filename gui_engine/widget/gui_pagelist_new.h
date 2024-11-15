@@ -73,7 +73,7 @@ typedef struct gui_pagelist_new
 
     bool event5_flag;
     bool horizontal;
-    IMG_SOURCE_MODE_TYPE blending;
+    BLEND_MODE_TYPE blending;
 } gui_pagelist_new_t;
 
 
@@ -122,7 +122,7 @@ gui_pagelist_new_t *gui_pagelist_new_create(void *parent,
                                             uint16_t item_space,
                                             const uint8_t *item_background_image,
                                             const uint8_t *item_background_image_highlight,
-                                            IMG_SOURCE_MODE_TYPE item_background_blending_mode,
+                                            BLEND_MODE_TYPE item_background_blending_mode,
                                             const uint8_t *font,
                                             uint16_t font_size,
                                             gui_color_t font_color);
@@ -170,7 +170,7 @@ gui_pagelist_new_t *gui_pagelist_new_create_horizontal(void *parent,
                                                        uint16_t h,
                                                        const uint8_t *item_background_image,
                                                        const uint8_t *item_background_image_highlight,
-                                                       IMG_SOURCE_MODE_TYPE item_background_blending_mode,
+                                                       BLEND_MODE_TYPE item_background_blending_mode,
                                                        const uint8_t *font,
                                                        uint16_t font_size,
                                                        gui_color_t font_color);

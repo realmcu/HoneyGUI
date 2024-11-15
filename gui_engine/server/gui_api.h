@@ -321,7 +321,7 @@ bool gui_music_completion_status(void);
 /**
  * @brief Parses a CSS color string and converts it to a gui_color_t structure
  *
- * @link https://www.w3schools.com/cssref/css_colors_legal.php
+ * https://www.w3schools.com/cssref/css_colors_legal.php
  * Supports the following formats:
  * - Hex (#RRGGBB or #RRGGBBAA)
  * - RGB (rgb(R, G, B))

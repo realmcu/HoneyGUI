@@ -32,13 +32,13 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 ### 安装编译器
 下载 MinGW-w64 工具链，解压到 C 盘，并将其添加到系统环境变量 `Path`中。
 1.  [MinGW-w64 下载](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)
-2.  解压并复制到目录： `C:/mingw64`
-3.  添加一个环境变量： `C:/mingw64/bin`：
+2.  解压并复制到目录： `C:\mingw64`
+3.  添加一个环境变量： `C:\mingw64\bin`：
       - 打开开始菜单，搜索`高级系统设置`。
       - 显示`系统属性`，然后转到`高级`选项卡。
       - 点击`环境变量`按钮。
       - 在`用户变量`部分，找到并选择 `Path` 变量，然后点击`编辑`。
-      - 点击`新建`并添加 `C:/mingw64/bin`。
+      - 点击`新建`并添加 `C:\mingw64\bin`。
       - 点击`确定`关闭所有对话框。
 
 ### 安装 Python
@@ -83,8 +83,15 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 <div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png"/></div><br/>
 
 
-### 显示表盘
-您可以通过滑动和长按与其进行交互。
+### 显示
+#### 手表工程
+窗口中显示出表盘，您可以通过滑动和长按与其进行交互。
 
 
 <div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
+
+#### 仪表盘工程
+窗口中显示仪表盘。
+
+
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1731649605724335535/042f1dcf_10088396.png"/></div><br/>
