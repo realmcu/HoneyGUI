@@ -21,6 +21,25 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+#ifdef _MSC_VER // Microsoft's compiler
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
+#ifdef __GNUC__ // GCC Clang
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
+#if defined(__ARMCC_VERSION)&&__ARMCC_VERSION<6000000  // ARM Compiler v5
+
+#pragma diag_suppress 1293
+#pragma diag_suppress 186
+#pragma diag_suppress 68
+#endif
+
+
 #define EZXML_NOMMAP
 #include "string.h"
 #include <stdlib.h>

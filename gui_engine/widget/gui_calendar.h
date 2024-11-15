@@ -59,8 +59,7 @@ typedef struct gui_calendar
     int months_show;
     int years_show;
 } gui_calendar_t;
-_GUI_API_DEFINE(gui_calendar_t)
-_GUI_API_DECLARE(gui_calendar_t)
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/

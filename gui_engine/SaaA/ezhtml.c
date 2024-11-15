@@ -174,7 +174,7 @@ static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
 {
-    static  int i;
+
 
     gui_img_translate(animate_params->img, animate_params->rotate_x,
                       animate_params->rotate_y);
@@ -623,6 +623,7 @@ static gui_color_t string_rgb888(const char *color)
 }
 static void sport_button_press_ani_cb(gui_button_t *button)
 {
+    GUI_UNUSED(js);
     float per = (button->animate->progress_percent);
     float alpha_to = 100;
     static float alpha_from = 0;
@@ -661,24 +662,10 @@ static void reverse_array(void *arr[], int n)
         arr[n - i - 1] = temp;
     }
 }
-static void draw_arc(gui_canvas_t *c)
-{
 
-    nvgBeginPath(c->vg);
-    nvgLineCap(c->vg, NVG_ROUND);
-    /*can't get arc data*/
-    //nvgArc(c->vg, this->cx, this->cy, this->r, this->a0, this->a1, NVG_CW);
-    //nvgStrokeColor(c->vg, this->color);
-    //nvgStrokeWidth(c->vg, this->width);
-    nvgArc(c->vg, 100, 100, 20, 1, 2, NVG_CW);
-    nvgStrokeColor(c->vg, nvgRGBA(255, 255, 255, 255));
-    nvgStrokeWidth(c->vg, 3);
-    nvgStroke(c->vg);
-
-}
 static void button_press_ani_cb_array(int p, gui_button_t *button)
 {
-    float per = button->animate->progress_percent;
+
     if (p == -1)
     {
         button->img->data = button->off_pic_addr;
@@ -692,7 +679,7 @@ static void button_press_ani_cb_array(int p, gui_button_t *button)
 }
 static void switch_press_ani_cb_array(int p, gui_switch_t *button)
 {
-    float per = button->animate->progress_percent;
+
     if (p == -1)
     {
         button->switch_picture->data = button->off_pic_addr;
@@ -750,10 +737,7 @@ static void switch_press_array(gui_switch_t *b, void *code, int p)
 
 
 }
-static void switch_release_array(gui_switch_t *b, void *code, int p)
-{
-    b->switch_picture->data = ((void **)(b->data))[p - 1];
-}
+
 static void sport_button_release(gui_button_t *b)
 {
     gui_button_set_animate(b, 200, 0, sport_button_release_ani_cb, b);
@@ -816,7 +800,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #endif
                     gui_color_t color = APP_COLOR_WHITE;
                     int fontSize = 32;
-                    TEXT_MODE style = 0;
+                    TEXT_MODE style = (TEXT_MODE)0;
                     uint8_t inputable = false;
                     while (true)
                     {
@@ -870,7 +854,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "truncate"))
                             {
-                                style = 0;
+                                style = (TEXT_MODE)0;
                             }
                             else if (!strcmp(p->attr[i], "verticalscroll"))
                             {
@@ -1352,7 +1336,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
                         uint8_t *imgdata = gui_lower_malloc(buffer_size);
                         memset(imgdata, 0, buffer_size);
-                        int format = GUI_CANVAS_OUTPUT_RGBA; bool compression = 0; int image_width = image_w;
+                        int format = GUI_CANVAS_OUTPUT_RGBA;  int image_width = image_w;
                         int image_height = image_h;  uint8_t *target_buffer = imgdata;
                         {
                             int pixel_length = 4;
@@ -2799,12 +2783,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t h = 0;
 
                     gui_gallery_config_t config = {0};
-                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
                     char *folder = NULL;
 
                     // default image blend_mode
-                    uint8_t blendMode = IMG_FILTER_BLACK;
-                    uint8_t opacity = 255;
+                    uint8_t blendMode = IMG_FILTER_BLACK; GUI_UNUSED(blendMode);
+                    uint8_t opacity = 255; GUI_UNUSED(opacity);
 
                     memset(&config, 0, sizeof(config));
                     while (true)
@@ -2949,7 +2933,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                 {
                     size_t i = 0;
                     gui_kb_config_t config = {0};
-                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
                     // char *folder = NULL;
 
                     // default image blend_mode
@@ -2974,7 +2958,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     {
 #define PATH_PRE "app/system/resource/"
-                        char *floder_kb = PATH_PRE"keyboard";
+                        char *floder_kb = PATH_PRE"keyboard"; GUI_UNUSED(floder_kb);
                         char *floder_letter = PATH_PRE"keyboard/0_letter/";
                         char *floder_letter_upper = PATH_PRE"keyboard/1_letter_upper/";
                         char *floder_num = PATH_PRE"keyboard/2_number/";
@@ -3155,7 +3139,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         i++;
                     }
-                    int to_widget = 0;
+                    int to_widget = 0; GUI_UNUSED(to_widget);
                     if (type && to)
                     {
                         if (!strcmp(type, "jump"))
@@ -3327,7 +3311,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //font_size = 32;
-                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, 0, 0, 0);
+                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, 0, (T_BUTTON_BG_TYPE)0, 0);
                     parent->name = ptxt;
                     gui_button_t *button = (void *)parent;
                     button->img->blend_mode = IMG_SRC_OVER_MODE;
@@ -3572,7 +3556,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case MACRO_ONLOAD:
                 {
                     char *type = 0;
-                    char *to = 0;
+                    char *to = 0; GUI_UNUSED(to);
                     char *id = 0;
                     size_t i = 0;
                     while (true)
@@ -3638,18 +3622,18 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t x = 0;
                     int16_t y = 0;
                     int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t h = 0; GUI_UNUSED(h);
                     int16_t row_count = 0;
                     int16_t row_spacing = 0;
                     int16_t item_count = 0;
                     const char *items = NULL;
-                    int column_offset = 0;
+                    int column_offset = 0; GUI_UNUSED(column_offset);
                     const char *font = 0;
                     int16_t font_size = 0;
                     gui_color_t  font_color = {0};
                     gui_color_t  font_color_highlight = {0};
-                    gui_color_t  item_color = {0};
-                    gui_color_t  item_color_highlight = {0};
+                    gui_color_t  item_color = {0}; GUI_UNUSED(item_color);
+                    gui_color_t  item_color_highlight = {0}; GUI_UNUSED(item_color_highlight);
                     bool loop = 1;
                     TEXT_MODE style = LEFT;
                     while (true)
@@ -3745,7 +3729,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "truncate"))
                             {
-                                style = 0;
+                                style = (TEXT_MODE)0;
                             }
                             else if (!strcmp(p->attr[i], "verticalscroll"))
                             {
@@ -3935,8 +3919,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case MACRO_ONTIME:
                 {
                     char *type = 0;
-                    char *to = 0;
-                    char *id = 0;
+                    char *to = 0; GUI_UNUSED(to);
+                    char *id = 0; GUI_UNUSED(id);
                     size_t i = 0;
                     while (true)
                     {
@@ -4042,7 +4026,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_color_t  font_color_highlight = {0};
                     gui_color_t  background_color = {0};
                     // default image blend_mode
-                    uint8_t blendMode = IMG_FILTER_BLACK;
+                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -4209,7 +4193,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case MACRO_ON_PERIPHERAL:
                 {
                     char *type = 0;
-                    char *to = 0;
+                    char *to = 0; GUI_UNUSED(to);
                     char *id = 0;
                     size_t i = 0;
                     while (true)
@@ -4359,12 +4343,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         {
                                             ezxml_t p = pt;
                                             size_t i = 0;
-                                            int16_t x = 0;
-                                            int16_t y = 0;
+                                            int16_t x = 0; GUI_UNUSED(x);
+                                            int16_t y = 0; GUI_UNUSED(y);
                                             int16_t w = 0;
                                             int16_t h = 0;
-                                            int16_t item_count = 0;
-                                            const char *items = NULL;
+                                            int16_t item_count = 0; GUI_UNUSED(item_count);
+                                            const char *items = NULL; GUI_UNUSED(items);
                                             gui_color_t  color = {0};
                                             int16_t max = 0;
                                             int16_t min = 0;
@@ -4645,8 +4629,8 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
         }
 
         int type = is_format(input_type);
-        time_t rawtime;
-        struct tm *timeinfo;
+        time_t rawtime; GUI_UNUSED(rawtime);
+        struct tm *timeinfo; GUI_UNUSED(timeinfo);
 
 #if __WIN32
         time(&rawtime);
@@ -4790,10 +4774,10 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     char *to = 0;
                     char *dur = 0;
                     char *repeatCount = 0;
-                    char *pause = 0;
-                    float scale_x = 1;
-                    float scale_y = 1;
-                    uint8_t opacity = 255;
+                    char *pause = 0; GUI_UNUSED(pause);
+                    float scale_x = 1; GUI_UNUSED(scale_x);
+                    float scale_y = 1; GUI_UNUSED(scale_y);
+                    uint8_t opacity = 255; GUI_UNUSED(opacity);
                     size_t i = 0;
                     while (true)
                     {
@@ -4840,8 +4824,8 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         if (!strcmp(type, "rotate") || !strcmp(type, "scale") || !strcmp(type, "opacity") ||
                             !strcmp(type, "translate"))
                         {
-                            int dur_num = 0;
-                            int repeat_num = 0;
+                            int dur_num = 0; GUI_UNUSED(dur_num);
+                            int repeat_num = 0; GUI_UNUSED(repeat_num);
                             {
                                 //from
                                 int from_length = strlen(from);
@@ -5013,7 +4997,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     }
                     return 0;
                 }
-                break;
+
             default:
                 break;
             }
@@ -5079,6 +5063,7 @@ void foreach_scan_with_content(ezxml_t p, const char *element, ezxml_t *target, 
 static int level, order;
 void foreach_create_in_multilevel(ezxml_t p, gui_obj_t *parent)
 {
+    GUI_UNUSED(level); GUI_UNUSED(order);
     ezxml_t i;
     for (i = p; i != NULL; i = i->ordered)
     {
@@ -5265,7 +5250,7 @@ void create_tree(gui_app_t *app)
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent)
 {
     gui_obj_tree_print((gui_obj_t *)parent);
-    ezxml_t title = 0;
+    ezxml_t title = 0; GUI_UNUSED(title);
     ezxml_t f = 0;
     if (f1 != 0)
     {
@@ -5720,7 +5705,8 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
             arc_animation_param_t *param = p;
             {
                 memset(param->target_buffer, 0, param->image_data_length);
-                int format = GUI_CANVAS_OUTPUT_RGBA; bool compression = 0; int image_width = param->image_width;
+                int format = GUI_CANVAS_OUTPUT_RGBA; bool compression = 0; GUI_UNUSED(compression);
+                int image_width = param->image_width;
                 int image_height = param->image_height;  uint8_t *target_buffer = param->target_buffer;
                 {
                     int pixel_length = 4;
