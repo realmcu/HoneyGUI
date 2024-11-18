@@ -60,6 +60,7 @@ static void kb_button_cb()
     }
 #else
 #include "kb_algo.h"
+    extern gui_kb_port_data_t *port_kb_get_data(void);
     gui_kb_port_data_t *kb = port_kb_get_data();
     static uint8_t hold = 0;
     if (hold)
@@ -120,7 +121,10 @@ static int app_init(void)
 {
 #if defined _WIN32
     int fd;
-    fd = open("./gui_engine/example/screen_448_368/root_image_hongkong/root(0x4400000).bin", 0);
+    extern int open(const char *file, int flags, ...);
+    extern int read(int fd, void *buf, size_t len);
+    extern int close(int fd);
+    fd = open("./gui_engine/example/screen_410_502/root_image_hongkong/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");

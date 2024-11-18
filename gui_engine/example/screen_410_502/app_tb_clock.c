@@ -33,11 +33,12 @@
 #include "gui_app.h"
 #include "guidef.h"
 #include <tp_algo.h>
+#include "app_hongkong.h"
 
-#define SCREEN_WIDTH 368   //410
-#define SCREEN_HEIGHT 448  //502
-#define SCREEN_X_OFF 0     //21
-#define SCREEN_Y_OFF 0     //18
+#define SCREEN_WIDTH 410
+#define SCREEN_HEIGHT 502
+#define SCREEN_X_OFF 21
+#define SCREEN_Y_OFF 18
 
 static gui_curtainview_t *ct;
 static gui_curtain_t *ct_clock;
