@@ -45,17 +45,23 @@ GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
 
 extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
-void switch_BOX2D_RING()
+extern gui_app_t *_get_app_APP_HEART_RATE_handle(void);
+void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
+{
+    gui_switch_app(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+}
+
+void switch_BOX2D_RING(void *obj, gui_event_t e, void *param)
 {
     gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
 }
 
-void switch_APP_FRUIT_NINJA()
+void switch_APP_FRUIT_NINJA(void *obj, gui_event_t e, void *param)
 {
     gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
 }
 
-void switch_APP_MUSIC()
+void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 {
     gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
 }
@@ -200,30 +206,29 @@ static void app_menu_design(gui_app_t *app)
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -200, -416);
     {
-        extern void switch_heart_rate();
         extern bool return_to_watchface_flag;
         return_to_watchface_flag = false;
         struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
         {
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
-            {switch_heart_rate, NULL},
+            {switch_APP_HEART_RATE, (void *)1},
         };
         gui_menu_cellular_on_click(cell, gesture_parameter_array,
                                    sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

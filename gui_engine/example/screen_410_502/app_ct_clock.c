@@ -96,6 +96,11 @@ static gui_app_t _app_APP_HEART_RATE =
     .ui_design = heart_rate_app,
     .active_ms = 100000,
 };
+
+gui_app_t *_get_app_APP_HEART_RATE_handle(void)
+{
+    return &_app_APP_HEART_RATE;
+}
 void *get_app_hr(void)
 {
     return &_app_APP_HEART_RATE;
@@ -1043,7 +1048,8 @@ void switch_heart_rate();
 static void heart_rate_app(gui_app_t *app)
 {
     gui_log("current app:%s\n", gui_current_app()->screen.name);
-
+    extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
+    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, (gui_event_cb_t)switch_heart_rate);
     win_hb = gui_win_create(&app->screen, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
     gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -1162,10 +1168,8 @@ static void heart_rate_app(gui_app_t *app)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_hb_exit, NULL);
 }
 
-extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
 void switch_heart_rate()
 {
-    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_heart_rate);
     gui_switch_app(gui_current_app(), &_app_APP_HEART_RATE);
 }
 

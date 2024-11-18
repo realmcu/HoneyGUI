@@ -163,7 +163,7 @@ void page_tb_clock(void *parent)
     ct = gui_curtainview_create(parent, "ct_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ct_clock = gui_curtain_create(ct, "1", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_MIDDLE, 1);
     ct_control0 = gui_curtain_create(ct, "2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_UP, 1);
-    ct_left = gui_curtain_create(ct, "3", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_LEFT, 0.38f);
+    ct_left = gui_curtain_create(ct, "3", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_LEFT, 0.34f);
 
     ct_card = gui_curtain_create(ct, "card", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_DOWN, 1);
 
