@@ -611,10 +611,20 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 为了在 LVGL 中解码 RLE 压缩的图片资源，需要配置启用 RLE 解码器，并为其分配缓存空间。
 
 1. 启用 RLE 解码器：在配置文件 `lv_conf.h` 中找到 `LV_USE_RLE` 宏定义，并将其设置为启用（1）
-2. 分配解码缓存：
+2. 分配解码缓存：在 `lv_rle.c` 文件中配置以下参数：
+    - `LV_PSRAM_START`：缓存的起始地址
+    - `LV_PSRAM_SIZE`：缓存空间大小，确保此大小足够容纳所使用的最大整张图片的解码数据
 
 ```c
+// file: lv_conf.h
 #define LV_USE_RLE                1
+
+
+// file: lv_rle.c
+#define LV_PSRAM_SIZE       (MY_DISP_HOR_RES * MY_DISP_VER_RES * 4) //  screen size * 4(ARGB8888)
+#define LV_PSRAM_START      (0x08000000 + 2 * MY_DISP_HOR_RES * MY_DISP_VER_RES * LV_COLOR_DEPTH / 8)  // frame buffer offset
+#define LV_PSRAM_END        (LV_PSRAM_START + LV_PSRAM_SIZE)
+
 ```
 
 
