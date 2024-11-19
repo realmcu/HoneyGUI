@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <gui_matrix.h>
-#include <rtl_PPEV2.h>
+#include <rtl_ppe.h>
 #include <rtl_imdc.h>
 #include <rtl876x_rcc.h>
 #include <rtl876x_gdma.h>
@@ -19,8 +19,8 @@
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
-#define PPEV2_ACC_MIN_OPA       3
-#define PPEV2_TESS_LENGTH       92
+#define PPE_ACC_MIN_OPA       3
+#define PPE_TESS_LENGTH       92
 
 #include "section.h"
 #define CACHE_BUF_SIZE           (42 * 1024)
@@ -75,7 +75,7 @@ static void cache_on_psram(uint32_t size)
 
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
-    uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
+    uint8_t pixel_size = PPE_Get_Pixel_Size(source->format);
     if (p_rect->w * p_rect->h * pixel_size > CACHE_BUF_SIZE)
     {
         return false;
@@ -97,7 +97,7 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
 #if !F_APP_GUI_USE_PSRAM
-    uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
+    uint8_t pixel_size = PPE_Get_Pixel_Size(source->format);
     if (p_rect->w * p_rect->h * pixel_size > CACHE_BUF_SIZE)
     {
         return false;
@@ -125,7 +125,7 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
 void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
                       ppe_rect_t *dst_trans)
 {
-    uint8_t pixel_size = PPEV2_Get_Pixel_Size(target->format);
+    uint8_t pixel_size = PPE_Get_Pixel_Size(target->format);
     uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
                                  pixel_size;
     uint32_t src_start_address = source->address + (src_rect->x + src_rect->y * source->width) *
@@ -141,7 +141,7 @@ void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
 void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
                        ppe_rect_t *dst_trans)
 {
-    uint8_t pixel_size = PPEV2_Get_Pixel_Size(target->format);
+    uint8_t pixel_size = PPE_Get_Pixel_Size(target->format);
     uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
                                  pixel_size;
     hal_imdc_decompress_info info;
@@ -270,7 +270,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     {
         return;
     }
-    if (image->opacity_value <= PPEV2_ACC_MIN_OPA)
+    if (image->opacity_value <= PPE_ACC_MIN_OPA)
     {
         return;
     }
@@ -278,18 +278,18 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
     memset(&source, 0, sizeof(ppe_buffer_t));
-    PPEV2_BLEND_MODE mode = PPEV2_BYPASS_MODE;
+    PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
 
     switch (dc->bit_depth)
     {
     case 16:
-        target.format = PPEV2_RGB565;
+        target.format = PPE_RGB565;
         break;
     case 24:
-        target.format = PPEV2_RGB888;
+        target.format = PPE_RGB888;
         break;
     case 32:
-        target.format = PPEV2_ARGB8888;
+        target.format = PPE_ARGB8888;
         break;
     default:
         return;
@@ -311,19 +311,19 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     switch (head->type)
     {
     case RGB565:
-        source.format = PPEV2_RGB565;
+        source.format = PPE_RGB565;
         break;
     case RGB888:
-        source.format = PPEV2_RGB888;
+        source.format = PPE_RGB888;
         break;
     case ARGB8888:
-        source.format = PPEV2_ARGB8888;
+        source.format = PPE_ARGB8888;
         break;
     case ARGB8565:
-        source.format = PPEV2_ARGB8565;
+        source.format = PPE_ARGB8565;
         break;
     case XRGB8888:
-        source.format = PPEV2_XRGB8888;
+        source.format = PPE_XRGB8888;
         break;
     default:
         return;
@@ -332,7 +332,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     bool shape_transform = true;
     if (image->blend_mode == IMG_RECT)
     {
-        mode = PPEV2_CONST_MASK_MODE;
+        mode = PPE_CONST_MASK_MODE;
     }
     else if ((image->matrix.m[2][2] == 1 && image->matrix.m[0][1] == 0 && \
               image->matrix.m[1][0] == 0 && image->matrix.m[2][0] == 0 && \
@@ -429,76 +429,76 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     uint8_t tmp = color.color.rgba.b;
                     color.color.rgba.b = color.color.rgba.r;
                     color.color.rgba.r = tmp;
-                    PPEV2_Mask(&target, color.color.argb_full, &dst_rect);
+                    PPE_Mask(&target, color.color.argb_full, &dst_rect);
                 }
                 return;
             }
             else
             {
-                mode = PPEV2_SRC_OVER_MODE;
+                mode = PPE_SRC_OVER_MODE;
             }
         }
         else if (image->blend_mode == IMG_BYPASS_MODE)
         {
-            mode = PPEV2_BYPASS_MODE;
+            mode = PPE_BYPASS_MODE;
         }
         else if (image->blend_mode == IMG_RECT)
         {
-            mode = PPEV2_CONST_MASK_MODE;
+            mode = PPE_CONST_MASK_MODE;
         }
         else if (image->blend_mode == IMG_FILTER_BLACK)
         {
-            mode = PPEV2_SRC_OVER_MODE;
+            mode = PPE_SRC_OVER_MODE;
         }
         else
         {
-            if (source.format >= PPEV2_BGR888 && source.format <= PPEV2_RGB565 && image->opacity_value == 0xFF)
+            if (source.format >= PPE_BGR888 && source.format <= PPE_RGB565 && image->opacity_value == 0xFF)
             {
-                mode = PPEV2_BYPASS_MODE;
+                mode = PPE_BYPASS_MODE;
             }
             else
             {
-                mode = PPEV2_SRC_OVER_MODE;
+                mode = PPE_SRC_OVER_MODE;
             }
         }
     }
     else if (image->blend_mode == IMG_COVER_MODE)
     {
-        mode = PPEV2_BYPASS_MODE;
+        mode = PPE_BYPASS_MODE;
     }
     else if (image->blend_mode == IMG_SRC_OVER_MODE || image->blend_mode == IMG_FILTER_BLACK)
     {
-        mode = PPEV2_SRC_OVER_MODE;
+        mode = PPE_SRC_OVER_MODE;
     }
 
     if (image->blend_mode == IMG_FILTER_BLACK)
     {
-        source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
+        source.color_key_enable = PPE_COLOR_KEY_INSIDE;
         source.color_key_min = 0;
         source.color_key_max = 0x010101;
     }
     else if (image->blend_mode == IMG_BYPASS_MODE)
     {
-        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+        source.color_key_enable = PPE_COLOR_KEY_DISABLE;
     }
     else if (image->blend_mode == IMG_SRC_OVER_MODE)
     {
-        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+        source.color_key_enable = PPE_COLOR_KEY_DISABLE;
     }
     else if (image->blend_mode == IMG_RECT)
     {
-        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+        source.color_key_enable = PPE_COLOR_KEY_DISABLE;
     }
     else if (image->blend_mode == IMG_COVER_MODE)
     {
-        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+        source.color_key_enable = PPE_COLOR_KEY_DISABLE;
     }
     else
     {
         return;
     }
     ppe_rect_t constraint, old_rect;
-    int32_t tessalation_len = PPEV2_TESS_LENGTH;
+    int32_t tessalation_len = PPE_TESS_LENGTH;
     uint32_t block_num = dc->fb_width / tessalation_len;
     if (dc->fb_width % tessalation_len)
     {
@@ -575,7 +575,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         ret = ppe_get_area(&old_rect, &constraint, (ppe_matrix_t *)&image->inverse, &source);
         if (ret)
         {
-            if (old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) < CACHE_BUF_SIZE)
+            if (old_rect.w * old_rect.h * PPE_Get_Pixel_Size(source.format) < CACHE_BUF_SIZE)
             {
                 block_num = 1;
                 tessalation_len = dc->fb_width;
@@ -627,7 +627,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         ppe_matrix_t inverse;
         memcpy(&inverse, &image->inverse, sizeof(float) * 9);
         ppe_matrix_t pre_trans;
-        if (mode != PPEV2_CONST_MASK_MODE)
+        if (mode != PPE_CONST_MASK_MODE)
         {
             if (block_num != 1)
             {
@@ -659,7 +659,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     }
                 }
             }
-            uint32_t new_cache_size = old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) + 4;
+            uint32_t new_cache_size = old_rect.w * old_rect.h * PPE_Get_Pixel_Size(source.format) + 4;
             if (new_cache_size < (CACHE_BUF_SIZE - last_cache_size - 4))
             {
                 change_cache_buf(new_cache_size);
@@ -667,7 +667,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             else if (new_cache_size < CACHE_BUF_SIZE)
             {
-                PPEV2_Finish();
+                PPE_Finish();
                 restore_cache_buf();
                 last_cache_size = new_cache_size;
             }
@@ -676,7 +676,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             {
                 if (head->compress)
                 {
-                    PPEV2_Finish();
+                    PPE_Finish();
                     cache_on_psram(new_cache_size);
                     last_cache_size = 0;
                 }
@@ -768,15 +768,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             source.high_quality = false;
         }
-        PPEV2_Finish();
-        PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
-        if (err != PPEV2_SUCCESS)
+        PPE_Finish();
+        PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
+        if (err != PPE_SUCCESS)
         {
             DBG_DIRECT("PPE err %d", err);
 //                sw_acc_blit(image, dc, rect);
         }
     }
-    PPEV2_Finish();
+    PPE_Finish();
 }
 
 bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
@@ -977,7 +977,7 @@ void hw_acc_end_cb(draw_img_t *image)
 
 void hw_acc_init(void)
 {
-    PPEV2_CLK_ENABLE(ENABLE);
+    PPE_CLK_ENABLE(ENABLE);
     uint8_t dma_channel_1, dma_channel_2;
     hal_dma_channel_init(&dma_channel_1, &dma_channel_2);
     extern void (* draw_img_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
