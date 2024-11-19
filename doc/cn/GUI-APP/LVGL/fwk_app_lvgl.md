@@ -67,7 +67,8 @@ HoneyGUI Dir
 |     :
 |     :
 |     |__ screen_lvgl   
-|        |-- assets                       // LVGL 用户图片和字库 C 文件                 
+|        |-- assets                       // LVGL 用户图片和字库 C 文件 
+|        |  |__ lvgl_example_assets.c     // assets example 
 |        |-- root                         // LVGL 文件系统根目录
 |        |-- _bin_mkromfs.py
 |        |-- mkromfs_0x4600000.bat        // User Data 打包脚本
@@ -539,9 +540,9 @@ LVGL 提供了丰富的 Demo 和 example 来帮助开发者了解熟悉各个控
 - 在线文档 [LVGL Example](https://docs.lvgl.io/8.3/examples.html) 中展示了各个 example 的运行效果，其源码保存在目录 `your HoneyGUI dir/lvgl/src/example` 下，开发者可直接调用对应的 `lv_example_xxx()` 函数来熟悉控件和理解特性。
 
 
-## 资源在线转换器
+## 资源转换器
 <!-- （Img + font，介绍和演示） -->
-LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 APP image，bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。
+LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 APP image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下已提供 example `lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
 
 ### 图片转换器
 
@@ -555,7 +556,7 @@ LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，
 2. 选取图片文件
 3. 选择输出文件的颜色格式
 颜色格式的说明请参考 [LVGL Overview Images - color format](https://docs.lvgl.io/8.3/overview/image.html#color-formats)
-4. 选择输出图片的类型 (C array/bin file)
+4. 选择输出图片的类型 (C array/binary file)
 5. 点击转换获取输出文件
 
 在文档 [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
@@ -583,51 +584,45 @@ typedef struct {
     const uint8_t * data;   /**< Pointer to the data of the image*/
 } lv_img_dsc_t;
 ```
-#### HoneyGUI 图片转换器
-- 转换工具： [HoneyGUI Image Converter](https://docs.realmcu.com/HoneyGUI/cn/latest/tool/index.html)
-
-HoneyGUI 提供了一个图形界面工具:HoneyGUI Image Converter，用户可以通过该工具将图片资源转换为 RLE 压缩的二进制文件格式。该工具支持多种图片格式的输入，并能在界面上直观地配置输出图像的格式。
-
-- **主要功能**:
-  - 支持常见图片格式（如 PNG、JPEG 等）的输入
-  - 支持不同图片格式（如 RGB565、RGB888、ARGB8888 等）的输出
-  - 通过界面配置压缩参数（compress）
-  - 支持二进制文件格式的输出
-
-- 文档说明： [HoneyGUI Overview Images](https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html)
-
-- **RLE 压缩**:
-  - RLE 压缩是一种简单的无损算法，通过编码连续重复的像素值和重复次数来减少存储空间，计算复杂度低且压缩率较高，非常适合用于压缩GUI资源
-
-- **图片资源转换步骤**:
-  1. 打开 HoneyGUI Image Converter 工具
-  2. 选择需要压缩的图片文件（支持 PNG、JPEG 等格式）
-  3. 配置图片的压缩参数（compress、扫描方向和图片格式）
-  4. 生成压缩的二进制文件并修改文件后缀名为 `.rle`
-  5. 将生成的文件添加到项目资源文件夹中
-
-##### LVGL 使用 RLE 压缩资源
-
-为了在 LVGL 中使用 RLE 压缩格式的图片资源，需要进行一些必要的配置和操作。
 
 
-###### 配置文件 `lv_conf.h`
 
-- 启用 RLE 解析器回调：找到 `LV_USE_RLE` 宏定义，并将其设置为 1，启用 RLE 解析功能。
+#### HoneyGUI 图像转换工具
+- 转换工具下载链接： [HoneyGUI Image Convert Tool](https://docs.realmcu.com/HoneyGUI/cn/latest/tool/index.html)
+- 文档说明：[HoneyGUI Image Convert Tool - Doc](https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html)
+
+当需要进一步压缩图片资源占用空间时，HoneyGUI 图像转换工具支持对图片进行压缩转换，IC 支持软硬件解码。HoneyGUI 图像转换工具采用 RLE(Run-length Encoding) 压缩，该压缩算法是一种简单的无损算法，通过编码连续重复的像素值和重复次数来减少存储空间，计算复杂度低且压缩率较高，非常适合用于压缩 GUI 资源。
+
+##### 压缩图片
+用户可利用 HoneyGUI 图像转换工具将图片资源转换为 RLE 压缩的二进制文件格式，具体使用步骤请参考 [HoneyGUI Image Converter - Doc](https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html)：
+
+1. 选择需要压缩的图片文件（支持 PNG、JPEG 等格式）
+2. 配置图片的转换参数：启用 `Compress`，`Compress Mode` 选择 `RLE`， 启用 `Color Head`，`Color Space` 按需选择
+3. 点击转换生成压缩的二进制文件
+
+
+##### 导入 LVGL
+HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
+1. 若作为文件导入，则需修改文件扩展名为 `.rle` 即可放入文件系统使用
+2. 若作为 C 数组格式导入，则需使用 LVGL 图片转换工具来进行转换。与普通图片转换不同的是，上传文件应选择转换后的压缩文件，`Color format` 选项中应选择 **CF_RAW**
+
+##### LVGL 启用 RLE 解码器
+
+为了在 LVGL 中解码 RLE 压缩的图片资源，需要配置启用 RLE 解码器，并为其分配缓存空间。
+
+1. 启用 RLE 解码器：在配置文件 `lv_conf.h` 中找到 `LV_USE_RLE` 宏定义，并将其设置为启用（1）
+2. 分配解码缓存：
 
 ```c
 #define LV_USE_RLE                1
 ```
 
-###### 使用C数组的方式访问图像资源
 
-按照前面的步骤制作出binary文件后，我们可以使用LVGL在线转换工具将其转换为C数组格式。具体操作步骤如下：
+备注：
+- 使用 RLE 解码器 + ROMFS 时，解码器将会直接从文件系统即 FLASH 上获取图片，不做额外缓存；
 
-1. 打开 [LVGL Image Converter](https://lvgl.io/tools/imageconverter) 工具。
-2. 将生成的binary文件上传到工具中。
-3. 在 **Color format** 选项中选择 **CF_RAW**。
-4. 在 **Output format** 选项中选择 **C array**。
-5. 点击 **Convert** 按钮来输出C数组文件。
+
+
 
 ### 字库转换器
 - 在线转换工具：[LVGL Font Converter](https://lvgl.io/tools/fontconverter)
