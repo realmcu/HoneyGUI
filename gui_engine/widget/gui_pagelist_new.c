@@ -274,7 +274,7 @@ static void override(void *p, void *this_widget, gui_animate_t *animate)
                     {
                         index += time_array_size;
                     }
-                    const char *text = pl->item_text_array[index];
+                    const char *text = pl->item_text_array[index]; GUI_UNUSED(text);
                     if (i == (count) / 2)
                     {
                         (pl->index_offset) = index;
@@ -370,7 +370,7 @@ static void override(void *p, void *this_widget, gui_animate_t *animate)
                     {
                         index += time_array_size;
                     }
-                    const char *text = pl->item_text_array[index];
+                    const char *text = pl->item_text_array[index]; GUI_UNUSED(text);
                     if (i == (count) / 2)
                     {
                         (pl->index_offset) = index;
@@ -573,7 +573,7 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
                     {
                         index += time_array_size;
                     }
-                    const char *text = pl->item_text_array[index];
+                    const char *text = pl->item_text_array[index]; GUI_UNUSED(text);
                     if (i == (count) / 2)
                     {
                         (pl->index_offset) = index;
@@ -669,7 +669,7 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
                     {
                         index += time_array_size;
                     }
-                    const char *text = pl->item_text_array[index];
+                    const char *text = pl->item_text_array[index]; GUI_UNUSED(text);
                     if (i == (count) / 2)
                     {
                         (pl->index_offset) = index;
@@ -793,7 +793,7 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
             gui_text_mode_set(t, MID_CENTER);
             if (item_click_function_array && pagelist_new->click_function_array[i])
             {
-                gui_win_click(win, (void *)pagelist_new->click_function_array[i], (void *)i);
+                gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i], (gui_event_cb_t)i);
             }
 
 
@@ -818,7 +818,7 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
 
             if (item_click_function_array && pagelist_new->click_function_array[i])
             {
-                gui_win_click(win, (void *)pagelist_new->click_function_array[i], (void *)i);
+                gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i], (gui_event_cb_t)i);
             }
             gui_win_press(win, win_press, (void *)i);
             gui_win_release(win, win_release, (void *)i);

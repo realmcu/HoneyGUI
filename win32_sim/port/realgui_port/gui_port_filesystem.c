@@ -64,23 +64,73 @@ static int port_ftruncate(int fd, off_t length)
 
 }
 
+
+#endif
 /* directory api port*/
 static int port_closedir(gui_fs_dir *d)
 {
-    return closedir((DIR *)d);
+
+    int r = closedir((DIR *)(d->dir));
+    if (d->dirent)
+    {
+        if (d->dirent->d_name)
+        {
+            free(d->dirent->d_name);
+            d->dirent->d_name = 0;
+        }
+
+        free(d->dirent);
+        d->dirent = 0;
+    }
+    free(d);
+    return r;
 }
 
 static gui_fs_dir *port_opendir(const char *name)
 {
-    return (gui_fs_dir *)opendir(name);
+
+    DIR *dir = opendir(name);
+    if (!dir)
+    {
+        return 0;
+    }
+
+    gui_fs_dir *fs_dir = malloc(sizeof(gui_fs_dir));
+    memset(fs_dir, 0, sizeof(gui_fs_dir));
+    fs_dir->dir = dir;
+    return fs_dir;
 }
 
 static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
 {
-    return (struct gui_fs_dirent *)readdir((DIR *)d);
-}
-#endif
+    struct dirent *dirent = readdir((DIR *)(d->dir));
+    if (!dirent)
+    {
+        return 0;
+    }
 
+    struct gui_fs_dirent *fs_dirent = malloc(sizeof(struct gui_fs_dirent));
+    memset(fs_dirent, 0, sizeof(struct gui_fs_dirent));
+    if (d->dirent)
+    {
+        if (d->dirent->d_name)
+        {
+            free(d->dirent->d_name);
+            d->dirent->d_name = 0;
+        }
+        free(d->dirent);
+        d->dirent = 0;
+    }
+    d->dirent = fs_dirent;
+    int d_name_length = strlen(dirent->d_name) + 1;
+    fs_dirent->d_name = malloc(d_name_length);
+    memcpy(fs_dirent->d_name, dirent->d_name,  d_name_length);
+    fs_dirent->d_namlen = dirent->d_namlen;
+    fs_dirent->d_reclen = dirent->d_reclen;
+    fs_dirent->d_type = dirent->d_ino;
+    fs_dirent->dirent = dirent;
+    return fs_dirent;
+}
 static struct gui_fs fs_api =
 {
     /* file api port*/
@@ -90,9 +140,9 @@ static struct gui_fs fs_api =
     .write     = (int (*)(int, const void *, size_t))write,
     .lseek     = (int (*)(int, int, int))lseek,
     /* directory api port*/
-    .opendir   = (gui_fs_dir * (*)(const char *name))opendir,
-    .closedir  = (int (*)(gui_fs_dir * d))closedir,
-    .readdir   = (struct gui_fs_dirent * (*)(gui_fs_dir * d))readdir,
+    .opendir   = (gui_fs_dir * (*)(const char *name))port_opendir,
+    .closedir  = (int (*)(gui_fs_dir * d))port_closedir,
+    .readdir   = (struct gui_fs_dirent * (*)(gui_fs_dir * d))port_readdir,
 
 };
 

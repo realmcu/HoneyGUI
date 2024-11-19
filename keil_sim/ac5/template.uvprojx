@@ -416,6 +416,26 @@
           <targetInfo name="rtthread" versionMatchMode="fixed"/>
         </targetInfos>
       </package>
+      <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0">
+        <targetInfos>
+          <targetInfo name="gui_sim" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
+      <package name="ARM_Compiler" schemaVersion="1.6.3" url="http://www.keil.com/pack/" vendor="Keil" version="1.6.3">
+        <targetInfos>
+          <targetInfo name="gui_sim" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
+      <package name="MDK-Middleware" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="7.13.0">
+        <targetInfos>
+          <targetInfo name="gui_sim" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
+      <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0">
+        <targetInfos>
+          <targetInfo name="gui_sim" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
     </packages>
     <apis>
       <api Capiversion="1.0.0" Cclass="Board Support" Cgroup="Graphic LCD" exclusive="0">

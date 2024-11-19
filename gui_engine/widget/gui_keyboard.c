@@ -305,8 +305,7 @@ static void gui_kb_cursor_del()
         }
     }
 }
-static void gui_kb_input_prepare(gui_obj_t *obj)
-{}
+
 static void gui_kb_prepare(gui_obj_t *obj)
 {}
 static void gui_kb_draw_cb(gui_obj_t *obj)

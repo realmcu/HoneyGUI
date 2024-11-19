@@ -125,16 +125,23 @@ static void win_long_to_watchface_market(void *obj, gui_event_t e, void *param)
 }
 void design_tab_watchface_main(void *parent)
 {
-    gui_img_t *img_clock = gui_img_create_from_mem(parent, "img_clock", CLOCK_BASE_BIN, 0, 0, 454, 454);
+    gui_win_t *win_watchface = gui_win_create(parent, "_watchface_main_window_", 0, 0,
+                                              gui_get_screen_width(), gui_get_screen_height());
+    gui_img_t *img_clock = gui_img_create_from_mem(win_watchface, "img_clock", CLOCK_BASE_BIN, 0, 0,
+                                                   454, 454);
 
-    watchface_hour = gui_img_create_from_mem(parent, "hour", ICON_CLOCK_HOUR_HAND_BIN, 220, 129, 12,
+    watchface_hour = gui_img_create_from_mem(win_watchface, "hour", ICON_CLOCK_HOUR_HAND_BIN, 220, 129,
+                                             12,
                                              100);
-    watchface_minute = gui_img_create_from_mem(parent, "minute", ICON_CLOCK_MINUTE_HAND_BIN, 220, 97,
+    watchface_minute = gui_img_create_from_mem(win_watchface, "minute", ICON_CLOCK_MINUTE_HAND_BIN, 220,
+                                               97,
                                                12,
                                                132);
-    watchface_second = gui_img_create_from_mem(parent, "second", ICON_CLOCK_SECOND_HAND_BIN, 222, 81, 8,
+    watchface_second = gui_img_create_from_mem(win_watchface, "second", ICON_CLOCK_SECOND_HAND_BIN, 222,
+                                               81, 8,
                                                148);
-    gui_img_t *watchface_hand = gui_img_create_from_mem(parent, "hand", ICON_CLOCK_HAND_DOT_BIN, 218,
+    gui_img_t *watchface_hand = gui_img_create_from_mem(win_watchface, "hand", ICON_CLOCK_HAND_DOT_BIN,
+                                                        218,
                                                         218, 0, 0);
     gui_img_set_quality(watchface_hour, 1);
     gui_img_set_quality(watchface_second, 1);

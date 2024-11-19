@@ -69,7 +69,7 @@ typedef struct gui_pagelist_new
 
 
     bool wheel_take_over;
-    char time_array_offset;
+    int16_t time_array_offset;
 
     bool event5_flag;
     bool horizontal;

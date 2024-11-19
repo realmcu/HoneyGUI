@@ -21,7 +21,7 @@
 #include "guidef.h"
 #include "gui_obj.h"
 #include "gui_multi_level.h"
-
+#include "gui_api.h"
 
 /*============================================================================*
  *                           Types

@@ -405,9 +405,26 @@ void gui_change_default_path(int argc, char **argv);
  */
 float *gui_get_json_array(const char *path, const char *parent_key, const char *key,
                           int *array_length);
-
-
-
+/**
+ * @brief Extracts the preview image file path from an XML file.
+ *
+ * This function parses the given XML file and attempts to find the preview
+ * image file path by looking for specific tags within the XML.
+ *
+ * @param xml_file The path to the XML file to be parsed.
+ * @return A string containing the path to the preview image file. If the XML
+ *         file cannot be loaded or the preview image file path cannot be found,
+ *         returns NULL.
+ */
+char *gui_dom_get_preview_image_file(const char *xml);
+#include "gui_obj.h"
+/**
+ * @brief API to create a widget tree structure from an XML file and associate it with a parent widget.
+ *
+ * @param xml The path to the XML file to be parsed.
+ * @param parent_widget The parent widget to which the tree structure is to be associated.
+ */
+void gui_dom_create_tree_nest(const char *xml, gui_obj_t *parent_widget);
 #ifdef __cplusplus
 }
 #endif

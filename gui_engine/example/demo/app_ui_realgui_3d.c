@@ -13,8 +13,8 @@
 #include "gui_canvas.h"
 
 
-#include "3d/cube_obj.txt"
-#include "3d/cube_mtl.txt"
+#include "3d/rect_obj.txt"
+#include "3d/rect_mtl.txt"
 #include "tiger_blue.txt"
 #include "def_3d.h"
 #include "gui_3d.h"
@@ -26,7 +26,27 @@
 
 
 
+void cb(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera)
+{
+    gui_dispdev_t *dc = gui_get_dc();
 
+    if (s == 0)
+    {
+        gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 1), 1, 32767, 90,
+                                     dc->screen_width, dc->screen_height);
+        gui_3d_world_inititalize(world, 0, 0, 5.0f, 0, 40, 0, 1);
+    }
+    else
+    {
+        gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 1), 1, 32767, 90,
+                                     dc->screen_width, dc->screen_height);
+        gui_3d_world_inititalize(world, 0, 0, 5.0f, 0, 60, 0, 1);
+    }
+
+
+
+
+}
 
 
 
@@ -36,8 +56,10 @@ static void app_ui_design(gui_app_t *app)
 
     gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", 0, 0, 480, 480);
 
-    gui_3d_set_obj(test_3d, (void *)_accube_obj, sizeof(_accube_obj));
-    gui_3d_set_mtl(test_3d, (void *)_accube_mtl, sizeof(_accube_mtl));
+    gui_3d_set_obj(test_3d, (void *)_acrect_obj, sizeof(_acrect_obj));
+    gui_3d_set_mtl(test_3d, (void *)_acrect_mtl, sizeof(_acrect_mtl));
+
+    gui_3d_set_shape_transform_cb(test_3d, 0, cb);
 
 
     return;

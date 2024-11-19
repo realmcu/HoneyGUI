@@ -812,11 +812,6 @@ void *gui_get_file_address(const char *file)
         return NULL;
     }
     char *root_folder = GUI_ROOT_FOLDER;
-#ifdef ENABLE_RTK_GUI_WATCHFACE_UPDATE
-#ifdef _WIN32
-    root_folder = "gui_engine\\example\\screen_448_368\\root_image_hongkong\\watch_face_update\\";
-#endif
-#endif
 #if defined(_WIN32)
     {
         // gui_log("get file: %s\n", file);
@@ -824,16 +819,13 @@ void *gui_get_file_address(const char *file)
         FIEL_LOAD_NODE *file_node = fileload_get_node(file);
         if (file_node->mem_addr)
         {
-            gui_log(">loaded before\n");
+            //gui_log(">loaded before\n");
             return file_node->mem_addr;
         }
 
         char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
         sprintf(path, "%s%s", root_folder, file);
-#ifndef O_BINARY
-#define O_BINARY 0100000
-#endif
-        int fd = gui_fs_open(path,  O_BINARY);
+        int fd = gui_fs_open(path,  0);
 
         if (fd <= 0)
         {

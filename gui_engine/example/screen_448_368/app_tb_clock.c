@@ -32,7 +32,7 @@
 #include "gui_perspective.h"
 #include "gui_app.h"
 #include "guidef.h"
-#include "wheel_algo.h"
+#include <tp_algo.h>
 
 #define SCREEN_WIDTH 368   //410
 #define SCREEN_HEIGHT 448  //502
@@ -55,11 +55,11 @@ static void curtain_ctr_cb()
     // {
     //     gui_log("x = %d, y = %d\n", tp->x,  tp->y);
     // }
-    touch_info_t *wheel = wheel_get_info();
-    if (wheel->button_up)
-    {
-        gui_obj_event_set(GUI_BASE(win_touch), GUI_EVENT_4);
-    }
+    // touch_info_t *wheel = wheel_get_info();
+    // if (wheel->button_up)
+    // {
+    //     gui_obj_event_set(GUI_BASE(win_touch), GUI_EVENT_4);
+    // }
 
     if (ct->cur_curtain == CURTAIN_DOWN || ct->cur_curtain == CURTAIN_UP)
     {
@@ -198,10 +198,9 @@ void page_tb_clock(void *parent)
     {
         ct->cur_curtain = CURTAIN_LEFT;
     }
-    // GUI_BASE(win_watch)->not_show = 1;
     win_touch = gui_win_create(ct_clock, "win_touch", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_obj_add_event_cb(win_touch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
-    gui_obj_add_event_cb(win_touch, (gui_event_cb_t)switch_app_menu, GUI_EVENT_4, NULL);
+    // gui_obj_add_event_cb(win_touch, (gui_event_cb_t)switch_app_menu, GUI_EVENT_4, NULL);
 }
 /* curtain example end*/
 

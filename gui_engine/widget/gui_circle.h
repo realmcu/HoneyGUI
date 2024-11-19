@@ -19,8 +19,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_CALENDAR_H__
-#define __GUI_CALENDAR_H__
+#ifndef __GUI_CIRCLE_H__
+#define __GUI_CIRCLE_H__
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -137,7 +137,7 @@ static void item_button_cb(void *obj, gui_event_t e, void *param)
                 last_text->layout_refresh = true;
             }
             combo->current_item = (size_t)param;
-            combo->on_change_function ? combo->on_change_function(combo, 0,
+            combo->on_change_function ? combo->on_change_function(combo, (gui_event_t)0,
                                                                   combo->on_change_function_parameter) : (void)0;
 
         }
@@ -215,7 +215,8 @@ gui_combo_t *gui_combo_create(gui_obj_t *parent,
     for (size_t i = 0; i < item_count; i++)
     {
         gui_button_t *button_selector = gui_button_create(window_select, 0, (i) * item_height, w,
-                                                          item_height, (void *)item_background_image, (void *)item_background_highlight_image, 0, 0, 0);
+                                                          item_height, (void *)item_background_image, (void *)item_background_highlight_image, 0,
+                                                          (T_BUTTON_BG_TYPE)0, 0);
         GUI_API(gui_button_t).on_click(button_selector, item_button_cb, (void *)i);
         gui_button_img_move(button_selector, vertical_gap / 2, vertical_gap / 2);
         gui_img_set_mode(button_selector->img, image_blend_mode);

@@ -40,7 +40,7 @@ extern "C" {
  *============================================================================*/
 
 /** @brief  ... */
-typedef struct
+typedef struct gui_3d
 {
     gui_obj_t base;
 
@@ -61,6 +61,9 @@ typedef struct
 
     gui_3d_face_t *face;
     draw_img_t *img;
+
+    void (*shape_transform_cb)(struct gui_3d *this, size_t s/*shape_offset*/, gui_3d_world_t *world,
+                               gui_3d_camera_t *camera);
 
 } gui_3d_t;
 
@@ -103,6 +106,9 @@ gui_3d_t *gui_3d_create(void       *parent,
 
 void gui_3d_set_obj(gui_3d_t *this, void *data, uint32_t len);
 void gui_3d_set_mtl(gui_3d_t *this, void *data, uint32_t len);
+
+void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
+                                   void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera));
 
 #ifdef __cplusplus
 }

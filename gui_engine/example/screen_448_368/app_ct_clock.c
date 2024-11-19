@@ -336,7 +336,7 @@ void json_refreash()
     sprintf(cjson_content, "%s", temp);
     gui_free(temp);
     cJSON_Delete(root);
-    canvas_update_flag = 0b0111;
+    canvas_update_flag = 0b1101;
     // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
     gui_log("cjson_content: %s\n", cjson_content);
 }
@@ -394,7 +394,7 @@ static void win_clock_cb(gui_win_t *win)
         {
             free(temp);
         }
-        canvas_update_flag = 0b0111;
+        canvas_update_flag = 0b1111;
         // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
         extern struct tm watch_clock_get(void);
@@ -821,6 +821,11 @@ static void arc_temperature_cb(NVGcontext *vg)
 
 static void compass_cb(void)
 {
+    if (!(canvas_update_flag & 0x08) || !curtain_index)
+    {
+        return;
+    }
+    canvas_update_flag &= 0b0111;
     cJSON *root;
     if (!cjson_content)
     {

@@ -87,6 +87,94 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
     head->h = h;
 }
 
+static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
+                           gui_3d_world_t *world, gui_3d_camera_t *camera)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+
+    gui_3d_scene(this->face + i, world, camera);
+
+    float x0 = this->face[i].transform_vertex[0].position.x;
+    float y0 = this->face[i].transform_vertex[0].position.y;
+
+    float x1 = this->face[i].transform_vertex[1].position.x;
+    float y1 = this->face[i].transform_vertex[1].position.y;
+
+    float x2 = this->face[i].transform_vertex[2].position.x;
+    float y2 = this->face[i].transform_vertex[2].position.y;
+
+    float x3 = this->face[i].transform_vertex[3].position.x;
+    float y3 = this->face[i].transform_vertex[3].position.y;
+
+
+    int material_id = this->attrib.material_ids[i];
+
+    int width, height, channels;
+
+    char *path = gui_malloc(200);
+    sprintf(path, "%s%s", "gui_engine\\example\\demo\\3d\\",
+            this->materials[material_id].diffuse_texname);
+
+    unsigned char *img = stbi_load(path, &width, &height, &channels, 0);
+    gui_free(path);
+
+    if (img == NULL)
+    {
+        gui_log("Error loading image: %s\n", stbi_failure_reason());
+        GUI_ASSERT(img != NULL);
+    }
+
+
+    this->img[i].data = gui_malloc(width * height * channels + 8);
+    set_arc_w_and_h(this->img[i].data, width, height);
+    memcpy((unsigned char *)this->img[i].data + 8, img, width * height * channels);
+    stbi_image_free(img);
+
+    gui_3d_point_2d_t src[4] = {{0, 0}, {width, 0}, {width, height}, {0, height}};
+    gui_3d_point_2d_t dst[4] = {{x0, y0}, {x1, y1}, {x2, y2}, {x3, y3}};
+
+    gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
+    memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&this->img[i].inverse);
+
+    this->img[i].img_w = width;
+    this->img[i].img_h = height;
+    this->img[i].blend_mode = IMG_BYPASS_MODE;
+    this->img[i].high_quality = true;
+    this->img[i].opacity_value = UINT8_MAX;
+    draw_img_new_area(this->img + i, NULL);
+}
+
+static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
+{
+    size_t index_offset = 0;
+    for (size_t s = 0; s < i; s++)
+    {
+        index_offset += this->attrib.face_num_verts[i];
+    }
+
+    for (size_t j = 0; j < this->attrib.face_num_verts[i]; ++j)
+    {
+        tinyobj_vertex_index_t idx = this->attrib.faces[index_offset + j];
+
+        float *v = &this->attrib.vertices[3 * idx.v_idx];
+        float *vt = &this->attrib.texcoords[2 * idx.vt_idx];
+        float *vn = &this->attrib.normals[3 * idx.vn_idx];
+
+        this->face[i].vertex[j].position.x = v[0];
+        this->face[i].vertex[j].position.y = v[1];
+        this->face[i].vertex[j].position.z = v[2];
+        this->face[i].vertex[j].position.w = 1;
+
+        this->face[i].vertex[j].u = vt[0];
+        this->face[i].vertex[j].v = vt[1];
+
+        this->face[i].vertex[j].normal.x = vn[0];
+        this->face[i].vertex[j].normal.y = vn[1];
+        this->face[i].vertex[j].normal.z = vn[2];
+        this->face[i].vertex[j].normal.w = 1;
+    }
+}
 
 static void gui_3d_prepare(gui_3d_t *this)
 {
@@ -107,132 +195,23 @@ static void gui_3d_prepare(gui_3d_t *this)
     memset(this->img, 0x00, sizeof(draw_img_t) * this->attrib.num_face_num_verts);
 
 
-    for (uint32_t i = 0; i < this->attrib.num_face_num_verts; i++)
-    {
-        size_t index_offset = 0;
-        for (size_t s = 0; s < i; s++)
-        {
-            index_offset += this->attrib.face_num_verts[i];
-        }
 
-        for (size_t j = 0; j < this->attrib.face_num_verts[i]; ++j)
-        {
-            tinyobj_vertex_index_t idx = this->attrib.faces[index_offset + j];
-
-            float *v = &this->attrib.vertices[3 * idx.v_idx];
-            float *vt = &this->attrib.texcoords[2 * idx.vt_idx];
-            float *vn = &this->attrib.normals[3 * idx.vn_idx];
-
-            this->face[i].vertex[j].position.x = v[0];
-            this->face[i].vertex[j].position.y = v[1];
-            this->face[i].vertex[j].position.z = v[2];
-            this->face[i].vertex[j].position.w = 1;
-
-            this->face[i].vertex[j].u = vt[0];
-            this->face[i].vertex[j].v = vt[1];
-
-            this->face[i].vertex[j].normal.x = vn[0];
-            this->face[i].vertex[j].normal.y = vn[1];
-            this->face[i].vertex[j].normal.z = vn[2];
-            this->face[i].vertex[j].normal.w = 1;
-        }
-
-
-    }
-
-#if 0
-    for (size_t i = 0; i < this->num_materials; i++)
-    {
-        gui_log("material %s\n", this->materials[i].name);
-        gui_log("  Ka %f %f %f\n", this->materials[i].ambient[0], this->materials[i].ambient[1],
-                this->materials[i].ambient[2]);
-        gui_log("  Kd %f %f %f\n", this->materials[i].diffuse[0], this->materials[i].diffuse[1],
-                this->materials[i].diffuse[2]);
-        gui_log("  Ks %f %f %f\n", this->materials[i].specular[0], this->materials[i].specular[1],
-                this->materials[i].specular[2]);
-        gui_log("  Ke %f %f %f\n", this->materials[i].emission[0], this->materials[i].emission[1],
-                this->materials[i].emission[2]);
-        gui_log("  Ns %f\n", this->materials[i].shininess);
-        gui_log("  Ni %f\n", this->materials[i].ior);
-        gui_log("  d %f\n", this->materials[i].dissolve);
-        gui_log("  illum %d\n", this->materials[i].illum);
-
-        if (this->materials[i].ambient_texname) { gui_log("  map_Ka %s\n",  this->materials[i].ambient_texname); }
-        if (this->materials[i].diffuse_texname) { gui_log("  map_Kd %s\n",  this->materials[i].diffuse_texname); }
-        if (this->materials[i].specular_texname) { gui_log("  map_Ks %s\n",  this->materials[i].specular_texname); }
-        if (this->materials[i].alpha_texname) { gui_log("  map_d %s\n",   this->materials[i].alpha_texname); }
-        if (this->materials[i].bump_texname) { gui_log("  map_bump %s\n", this->materials[i].bump_texname); }
-        if (this->materials[i].displacement_texname) { gui_log("  disp %s\n",    this->materials[i].displacement_texname); }
-    }
-#endif
-
-
-    for (uint32_t i = 0; i < this->attrib.num_face_num_verts; i++)
+    for (size_t i = 0; i < this->num_shapes; i++)
     {
         gui_3d_world_t world;
         gui_3d_camera_t camera;
+        GUI_ASSERT(this->shape_transform_cb != NULL);
+        this->shape_transform_cb(this, i, &world, &camera);
 
-        gui_3d_camera_UVN_initialize(&camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 1), 1, 32767, 90,
-                                     dc->screen_width, dc->screen_height);
-        gui_3d_world_inititalize(&world, 0, 0, 3.0f, 50, 50, 0, 1);
-        gui_3d_matrix_t result;
-        GUI_UNUSED(result);
-        // gui_3d_generate_rotate_around_line(&result, 1, 1, 0, 0, 1, 0, -20);
-        // gui_3d_face_transform_local_to_local(this->face + i, &result);
-        gui_3d_scene(this->face + i, &world, &camera);
-
-        float x0 = this->face[i].transform_vertex[0].position.x;
-        float y0 = this->face[i].transform_vertex[0].position.y;
-
-        float x1 = this->face[i].transform_vertex[1].position.x;
-        float y1 = this->face[i].transform_vertex[1].position.y;
-
-        float x2 = this->face[i].transform_vertex[2].position.x;
-        float y2 = this->face[i].transform_vertex[2].position.y;
-
-        float x3 = this->face[i].transform_vertex[3].position.x;
-        float y3 = this->face[i].transform_vertex[3].position.y;
-
-
-        int material_id = this->attrib.material_ids[i];
-
-        int width, height, channels;
-
-        char *path = gui_malloc(200);
-        sprintf(path, "%s%s", "gui_engine\\example\\demo\\3d\\",
-                this->materials[material_id].diffuse_texname);
-
-        unsigned char *img = stbi_load(path, &width, &height, &channels, 0);
-        gui_free(path);
-
-        if (img == NULL)
+        for (size_t j = 0; j < this->shapes[i].length /*number of face*/; j++)
         {
-            gui_log("Error loading image: %s\n", stbi_failure_reason());
-            GUI_ASSERT(img != NULL);
+            // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->shapes[i].name, this->shapes[i].length, this->shapes[i].face_offset);
+            convert_to_face(this, this->shapes[i].face_offset);
+
+            face_transfrom(this, i, this->shapes[i].face_offset, &world, &camera);
         }
 
-
-        this->img[i].data = gui_malloc(width * height * channels + 8);
-        set_arc_w_and_h(this->img[i].data, width, height);
-        memcpy((unsigned char *)this->img[i].data + 8, img, width * height * channels);
-        stbi_image_free(img);
-
-        gui_3d_point_2d_t src[4] = {{0, 0}, {width, 0}, {width, height}, {0, height}};
-        gui_3d_point_2d_t dst[4] = {{x0, y0}, {x1, y1}, {x2, y2}, {x3, y3}};
-
-        gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
-        memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
-        matrix_inverse(&this->img[i].inverse);
-
-        this->img[i].img_w = width;
-        this->img[i].img_h = height;
-        this->img[i].blend_mode = IMG_BYPASS_MODE;
-        this->img[i].high_quality = true;
-        this->img[i].opacity_value = UINT8_MAX;
-        draw_img_new_area(this->img + i, NULL);
-
     }
-
 
 
     GUI_UNUSED(this);
@@ -365,6 +344,12 @@ void gui_3d_set_mtl(gui_3d_t *this, void *data, uint32_t len)
 {
     this->mtl_data = data;
     this->mtl_len = len;
+}
+
+void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
+                                   void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera))
+{
+    this->shape_transform_cb = cb;
 }
 
 /**
