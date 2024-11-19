@@ -88,6 +88,12 @@ typedef struct
 
 typedef struct
 {
+    gui_point_4d_t  point;
+    gui_point_4d_t  direct;
+} gui_3d_line_t;
+
+typedef struct
+{
     uint32_t            state;
     gui_3d_vertex_t     vertex[4];
     gui_3d_vertex_t     transform_vertex[4];
