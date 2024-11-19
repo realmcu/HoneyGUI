@@ -38,8 +38,8 @@ void ExecuteBatchFileInNewWindow(const char *batchFile)
 extern "C" {
     int ExecuteBatchFile()
     {
-        ExecuteBatchFileInNewWindow("gui_engine\\example\\web\\tree\\run_server.bat");
-        std::cout << std::endl << "TREE: http://localhost:8000/gui_engine/example/web/tree/" << std::endl <<
+        ExecuteBatchFileInNewWindow("realgui\\example\\web\\tree\\run_server.bat");
+        std::cout << std::endl << "TREE: http://localhost:8000/realgui/example/web/tree/" << std::endl <<
                   std::endl;
         return 0;
     }

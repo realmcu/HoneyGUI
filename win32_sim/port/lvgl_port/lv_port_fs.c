@@ -18,7 +18,7 @@
  *      DEFINES
  *********************/
 
-#define LV_ROOT_PATH "gui_engine\\example\\screen_lvgl\\root\\"
+#define LV_ROOT_PATH "realgui\\example\\screen_lvgl\\root\\"
 
 /**********************
  *      TYPEDEFS

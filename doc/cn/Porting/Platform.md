@@ -105,7 +105,7 @@
 - 结构体定义如下：
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_fs struct define start */
         :end-before: /* gui_fs struct define end */
@@ -119,7 +119,7 @@
 - 结构体定义如下:
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_ftl struct define start */
         :end-before: /* gui_ftl struct define end */
@@ -131,7 +131,7 @@
 - 输入设备包括触摸板、键盘和滚轮，输入信息的结构体如下：
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_indev struct define start */
         :end-before: /* gui_indev struct define end */
@@ -161,7 +161,7 @@
 - 需要定义线程、定时器、消息队列和内存管理的接口，结构体定义如下：
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_os_api struct define start */
         :end-before: /* gui_os_api struct define end */

@@ -4,7 +4,7 @@
 RTL87x2G is the abbreviation of a series IC type.
 The packaging process for the RTL87x2G and RTL8762D is the same. Take RTL8762G as an example as follows.
 
-Before starting, select the appropriate demo under the sdk directory (`\subsys\gui\gui_engine\example\screen_800_480\root_image_800_480`), or create a new packaging directory based on the example. 
+Before starting, select the appropriate demo under the sdk directory (`\subsys\gui\realgui\example\screen_800_480\root_image_800_480`), or create a new packaging directory based on the example. 
 Then copy the `bat and py scripts` to that directory, ensuring that the `root folder` and the `bat and py scripts` exist under the directory.
 <br/>
 <div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1726730622033771482/882af9c3_13671125.png"></div>

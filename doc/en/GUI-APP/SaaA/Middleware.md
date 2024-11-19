@@ -10,15 +10,15 @@ RVD exports the SaaA package. The firmware needs to parse and play it.
 * Packages are in the ```root/app``` folder of File system image, and a launcher in firmware will iterate through these packages and set a start button on the screen for each package .Click the button to start the corresponding package.
 ## Launcher
 
-* The implementation of the launcher is in this file ```gui_engine\SaaA\frontend_launcher.c```. 
+* The implementation of the launcher is in this file ```realgui\SaaA\frontend_launcher.c```. 
 *  It uses a grid widget to layout the apps' button. Then it iterates the ```app``` folder, to find all XML files, which represent apps. 
 * The launcher gets the title and icon of the APP, and use a button widget to display them. The click event of the registration button is to start the app.
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938973907688018/ce054910_10088396.png" alt ="launcher.png"></div><br/>
 
 ## XML
 * The xml file in the APP package describes the initial nested tree structure and specific parameters of the widget.
-* Using ```gui_engine\3rd\ezXML``` to convert xml to C language data format. Please refer to <https://ezxml.sourceforge.net/> for details.
-* The implementation of the xml parser is in this file ```gui_engine\SaaA\ezhtml.c```. You can read the syntax 
+* Using ```realgui\3rd\ezXML``` to convert xml to C language data format. Please refer to <https://ezxml.sourceforge.net/> for details.
+* The implementation of the xml parser is in this file ```realgui\SaaA\ezhtml.c```. You can read the syntax 
 description on the ```XML syntax``` page.
 * According to the syntax protocol, this function ```foreach_create``` uses a recursive strategy to traverse each tag of xml and map the tag to the widget, configure the tag's attributes to the widget.
 * After the xml traversal is completed, a C-APP has actually been created in the firmware, which is no different from the result of directly using the C-APP api.
@@ -27,8 +27,8 @@ description on the ```XML syntax``` page.
 
 ## JavaScript
 * JavaScript describes Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.
-* Based on JerryScript engine on ```gui_engine\3rd\js``` for common syntax. Please refer to <https://jerryscript.net/> for details.
-* The implementation of the JavaScript parser is files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
+* Based on JerryScript engine on ```realgui\3rd\js``` for common syntax. Please refer to <https://jerryscript.net/> for details.
+* The implementation of the JavaScript parser is files starting with js in this folder ```realgui\SaaA```. You can read the syntax 
 description on the ```JavaScript syntax``` page.
 * ```DECLARE_HANDLER``` is used to define a function as a C language implementation of a JavaScript function.
 * ```REGISTER_METHOD``` and ```REGISTER_METHOD_NAME``` are used to add a function to a javascript object, so you can call it in script.

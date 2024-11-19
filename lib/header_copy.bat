@@ -6,7 +6,7 @@ set "TARGET_DIR=%~dp0..\..\ui_lib"
 
 
 set "CURRENT_DIR=%~dp0"
-set "REAL_GUI_SOURCE_DIR=%~dp0..\gui_engine"
+set "REAL_GUI_SOURCE_DIR=%~dp0..\realgui"
 set "REAL_GUI_TARGET_DIR=%~dp0..\..\ui_lib\real_gui"
 
 

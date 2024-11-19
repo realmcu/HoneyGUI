@@ -105,7 +105,7 @@ The following table lists the LCD-related driver IC supported by mainstream chip
 - The structure definition is as follows:
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_fs struct define start */
         :end-before: /* gui_fs struct define end */
@@ -119,7 +119,7 @@ The following table lists the LCD-related driver IC supported by mainstream chip
 - The structure definition is as follows:
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_ftl struct define start */
         :end-before: /* gui_ftl struct define end */
@@ -131,7 +131,7 @@ The following table lists the LCD-related driver IC supported by mainstream chip
 - Input devices include touchpads, keyboards, and wheels. The structure for input information is as follows:
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_indev struct define start */
         :end-before: /* gui_indev struct define end */
@@ -161,7 +161,7 @@ The following table lists the Touch-related IC supported by all chips. If you wa
 - Define the interfaces for thread, timer, message queue, and memory management. The structure definition is as follows:
 
     ```eval_rst
-    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+    .. literalinclude:: ../../../realgui/widget/guidef.h
         :language: c
         :start-after: /* gui_os_api struct define start */
         :end-before: /* gui_os_api struct define end */

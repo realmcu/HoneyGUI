@@ -92,7 +92,7 @@ def walk_kconfig(RTT_ROOT, source_list):
 def bsp_copy_files(bsp_root, dist_dir):
     # copy BSP files
     do_copy_folder(os.path.join(bsp_root), dist_dir,
-        ignore_patterns('build', 'dist', '*.pyc', '*.old', '*.map', 'gui_engine.bin', '.sconsign.dblite', '*.elf', '*.axf', 'cconfig.h'))
+        ignore_patterns('build', 'dist', '*.pyc', '*.old', '*.map', 'realgui.bin', '.sconsign.dblite', '*.elf', '*.axf', 'cconfig.h'))
 
 def bsp_update_sconstruct(dist_dir):
     with open(os.path.join(dist_dir, 'SConstruct'), 'r') as f:

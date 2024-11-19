@@ -3,7 +3,7 @@
 本示例演示了如何开发一个 RealUI 86Box APP，开发者可以从中学习和理解开发 UI APP 的基本方法和流程。
 
 ## 源文件
-- APP package `gui_engine\example\screen_480_480\root\app\box`
+- APP package `realgui\example\screen_480_480\root\app\box`
 - UI 设计工程 `RVisualDesigner-v1.0.5.0\Demo\480x480\box\box480x480.rtkprj`
 
 ## UI设计
@@ -35,7 +35,7 @@
 
 
 ### 交互
-在 JS 文件 `gui_engine\example\screen_480_480\root\app\box\box.js` 中，实现了 UI 的控制和交互逻辑。
+在 JS 文件 `realgui\example\screen_480_480\root\app\box\box.js` 中，实现了 UI 的控制和交互逻辑。
 
 
 #### 灯光控制 switch

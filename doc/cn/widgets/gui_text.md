@@ -110,7 +110,7 @@
 | `VERTICAL_RIGHT`    | 多行           | 右对齐             | 由下向上           | 文本控件               |
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/gui_text.h
+.. literalinclude:: ../../../realgui/widget/gui_text.h
    :language: c
    :start-after: /** @brief  text mode enum start */
    :end-before: /** @brief  text mode enum end */

@@ -6,7 +6,7 @@ from building import *
 objs = []
 cwd  = GetCurrentDir()
 
-objs = objs + SConscript(cwd + '/gui_engine/SConscript')
+objs = objs + SConscript(cwd + '/realgui/SConscript')
 objs = objs + SConscript(cwd + '/lvgl/SConscript')
 
 

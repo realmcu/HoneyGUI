@@ -10,15 +10,15 @@ RVD导出了SaaA包。固件需要解析和播放它。
 * 包位于文件系统映像的 ```root/app``` 文件夹中，固件中的启动程序将遍历这些包并为每个包在屏幕上设置一个启动按钮。单击按钮启动相应的包。
 ## 启动器
 
-* 启动器的实现在 ```gui_engine\SaaA\frontend_launcher.c``` 文件中。
+* 启动器的实现在 ```realgui\SaaA\frontend_launcher.c``` 文件中。
 * 它使用网格控件来布局应用程序的按钮。然后它迭代 ```app``` 文件夹，查找所有表示应用程序的XML文件。
 * 启动器获取APP的标题和图标，并使用按钮控件来显示它们。注册按钮的点击事件是为了启动应用程序。
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938973907688018/ce054910_10088396.png" alt ="launcher.png"></div><br/>
 
 ## XML
 * APP包中的XML文件描述了控件的初始嵌套树结构和特定参数。
-* 使用 ```gui_engine\3rd\ezXML``` 将XML转换为C语言数据格式。详细信息请参考 <https://ezxml.sourceforge.net/>。
-* XML解析器的实现在该文件 ```gui_engine\SaaA\ezhtml.c```中。您可以在 ```XML syntax``` 页面上阅读语法说明。
+* 使用 ```realgui\3rd\ezXML``` 将XML转换为C语言数据格式。详细信息请参考 <https://ezxml.sourceforge.net/>。
+* XML解析器的实现在该文件 ```realgui\SaaA\ezhtml.c```中。您可以在 ```XML syntax``` 页面上阅读语法说明。
 * 根据语法规定，函数 ```foreach_create``` 使用递归策略遍历XML的每个标签，并将标签映射到控件，将标签的属性配置给控件。
 * XML遍历完成后，在固件中实际上创建了一个C-APP，与直接使用C-APP API的结果没有区别。
 * 然后将执行XML中提到的JavaScript文件。
@@ -26,8 +26,8 @@ RVD导出了SaaA包。固件需要解析和播放它。
 
 ## JavaScript
 * JavaScript描述了自定义行为，例如触发控件手势事件、外围操作、打印日志等。
-* 基于 ```gui_engine\3rd\js``` 上的JerryScript引擎，支持常见语法。详细信息请参考 <https://jerryscript.net/>。
-* JavaScript解析器的实现在该文件夹 ```gui_engine\SaaA``` 中以.js开头的文件中。您可以在 ```JavaScript syntax``` 页面上阅读语法说明。
+* 基于 ```realgui\3rd\js``` 上的JerryScript引擎，支持常见语法。详细信息请参考 <https://jerryscript.net/>。
+* JavaScript解析器的实现在该文件夹 ```realgui\SaaA``` 中以.js开头的文件中。您可以在 ```JavaScript syntax``` 页面上阅读语法说明。
 * 使用 ```DECLARE_HANDLER``` 将函数定义为JavaScript函数的C语言实现。
 * 使用 ```REGISTER_METHOD``` 和 ```REGISTER_METHOD_NAME``` 将函数添加到JavaScript对象中，以便在脚本中使用它。
 * 在JavaScript文件中，有一些变量定义、函数定义和函数调用。当应用程序启动时，如上所述，JavaScript文件将在XML解析结束时执行，其中的函数调用将被执行，主要是一些初始化行为和事件监听器的注册。

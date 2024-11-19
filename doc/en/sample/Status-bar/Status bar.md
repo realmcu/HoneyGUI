@@ -10,7 +10,7 @@
 
 ##  Implementation
 ###  File
- Function ```static void status_bar(void *parent, gui_obj_t *ignore_gesture)``` is located in file ```gui_engine\example\screen_454_454\gui_menu\apps_in_menu.c```.
+ Function ```static void status_bar(void *parent, gui_obj_t *ignore_gesture)``` is located in file ```realgui\example\screen_454_454\gui_menu\apps_in_menu.c```.
 ###  Design
 
 <br>

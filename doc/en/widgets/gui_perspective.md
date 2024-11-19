@@ -10,7 +10,7 @@ The perspective is a hexagonal prism-like widget that uses six tabs as column fa
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/widget/gui_perspective.h
+.. literalinclude:: ../../../realgui/widget/gui_perspective.h
    :language: c
    :start-after: /* perspective imgfile structure start*/
    :end-before: /* perspective imgfile structure end*/
@@ -26,7 +26,7 @@ By default, the image blending mode is set to `IMG_SRC_OVER_MODE`, you can chang
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/engine/draw_img.h
+.. literalinclude:: ../../../realgui/engine/draw_img.h
    :language: c
    :start-after: /* BLEND_MODE_TYPE structure start*/
    :end-before: /* BLEND_MODE_TYPE structure end*/
@@ -39,7 +39,7 @@ By default, the image blending mode is set to `IMG_SRC_OVER_MODE`, you can chang
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_prism.c
+.. literalinclude:: ../../../realgui/example/screen_448_368/app_prism.c
    :language: c
    :start-after: /* perspective example start*/
    :end-before: /* perspective example end*/

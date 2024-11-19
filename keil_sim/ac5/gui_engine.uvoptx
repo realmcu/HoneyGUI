@@ -349,7 +349,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\cJSON\cJSON.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\cJSON\cJSON.c</PathWithFileName>
       <FilenameWithoutPath>cJSON.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -361,7 +361,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\ezXML\ezxml.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\ezXML\ezxml.c</PathWithFileName>
       <FilenameWithoutPath>ezxml.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -373,7 +373,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\base\nanovg.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\base\nanovg.c</PathWithFileName>
       <FilenameWithoutPath>nanovg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -385,7 +385,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\agge\math.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\agge\math.cpp</PathWithFileName>
       <FilenameWithoutPath>math.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -397,7 +397,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\agge\stroke.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\agge\stroke.cpp</PathWithFileName>
       <FilenameWithoutPath>stroke.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -409,7 +409,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\agge\stroke_features.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\agge\stroke_features.cpp</PathWithFileName>
       <FilenameWithoutPath>stroke_features.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -421,7 +421,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\agge\vector_rasterizer.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\agge\vector_rasterizer.cpp</PathWithFileName>
       <FilenameWithoutPath>vector_rasterizer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -433,7 +433,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\agge\nanovg_agge.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\agge\nanovg_agge.cpp</PathWithFileName>
       <FilenameWithoutPath>nanovg_agge.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -445,7 +445,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\nanovg\agge\nanovg_vertex.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\nanovg\agge\nanovg_vertex.cpp</PathWithFileName>
       <FilenameWithoutPath>nanovg_vertex.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -457,7 +457,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\stb\stb_image.cpp</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\stb\stb_image.cpp</PathWithFileName>
       <FilenameWithoutPath>stb_image.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -469,7 +469,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\3rd\tjpgd\tjpgd.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\3rd\tjpgd\tjpgd.c</PathWithFileName>
       <FilenameWithoutPath>tjpgd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -489,7 +489,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\app\gui_app.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\app\gui_app.c</PathWithFileName>
       <FilenameWithoutPath>gui_app.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -501,7 +501,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\3d\def_3d.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\3d\def_3d.c</PathWithFileName>
       <FilenameWithoutPath>def_3d.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -521,7 +521,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\dc\gui_fb.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\dc\gui_fb.c</PathWithFileName>
       <FilenameWithoutPath>gui_fb.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -541,7 +541,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\draw_img.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\draw_img.c</PathWithFileName>
       <FilenameWithoutPath>draw_img.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -553,7 +553,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\gui_matrix.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\gui_matrix.c</PathWithFileName>
       <FilenameWithoutPath>gui_matrix.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -565,7 +565,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\draw_font.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\draw_font.c</PathWithFileName>
       <FilenameWithoutPath>draw_font.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -577,7 +577,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\font_mem.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\font_mem.c</PathWithFileName>
       <FilenameWithoutPath>font_mem.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -589,7 +589,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\font_mem_img.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\font_mem_img.c</PathWithFileName>
       <FilenameWithoutPath>font_mem_img.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -601,7 +601,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\font_mem_matrix.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\font_mem_matrix.c</PathWithFileName>
       <FilenameWithoutPath>font_mem_matrix.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -613,7 +613,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\font_stb.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\font_stb.c</PathWithFileName>
       <FilenameWithoutPath>font_stb.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -625,7 +625,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -637,7 +637,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_raster.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_raster.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_raster.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -649,7 +649,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_init.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_init.c</PathWithFileName>
       <FilenameWithoutPath>acc_init.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -661,7 +661,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_blend.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_blend.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_blend.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -673,7 +673,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_rle.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_rle.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -685,7 +685,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_cover.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_cover.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_cover.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -697,7 +697,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_bypass.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_bypass.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_bypass.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -709,7 +709,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_filter.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_filter.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_filter.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -721,7 +721,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_rle_bypass.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_rle_bypass.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle_bypass.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -733,7 +733,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_rle_cover.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_rle_cover.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle_cover.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -745,7 +745,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\engine\acc_sw_rle_filter.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\engine\acc_sw_rle_filter.c</PathWithFileName>
       <FilenameWithoutPath>acc_sw_rle_filter.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -765,7 +765,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\example\demo\app_ui_realgui_base.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\example\demo\app_ui_realgui_base.c</PathWithFileName>
       <FilenameWithoutPath>app_ui_realgui_base.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -785,7 +785,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\input\kb_algo.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\input\kb_algo.c</PathWithFileName>
       <FilenameWithoutPath>kb_algo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -797,7 +797,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\input\tp_algo.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\input\tp_algo.c</PathWithFileName>
       <FilenameWithoutPath>tp_algo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -809,7 +809,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\input\tp_algo_v2.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\input\tp_algo_v2.c</PathWithFileName>
       <FilenameWithoutPath>tp_algo_v2.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -821,7 +821,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\input\wheel_algo.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\input\wheel_algo.c</PathWithFileName>
       <FilenameWithoutPath>wheel_algo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -841,7 +841,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\misc\tlsf\tlsf.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\misc\tlsf\tlsf.c</PathWithFileName>
       <FilenameWithoutPath>tlsf.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -861,7 +861,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\server\gui_api.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\server\gui_api.c</PathWithFileName>
       <FilenameWithoutPath>gui_api.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -873,7 +873,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\server\gui_components_init.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\server\gui_components_init.c</PathWithFileName>
       <FilenameWithoutPath>gui_components_init.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -885,7 +885,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\server\gui_message.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\server\gui_message.c</PathWithFileName>
       <FilenameWithoutPath>gui_message.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -897,7 +897,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\server\gui_pm.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\server\gui_pm.c</PathWithFileName>
       <FilenameWithoutPath>gui_pm.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -909,7 +909,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\server\gui_server.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\server\gui_server.c</PathWithFileName>
       <FilenameWithoutPath>gui_server.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -929,7 +929,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_3d.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_3d.c</PathWithFileName>
       <FilenameWithoutPath>gui_3d.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -941,7 +941,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_barcode_gen.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_barcode_gen.c</PathWithFileName>
       <FilenameWithoutPath>gui_barcode_gen.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -953,7 +953,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_button.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_button.c</PathWithFileName>
       <FilenameWithoutPath>gui_button.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -965,7 +965,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_canvas.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_canvas.c</PathWithFileName>
       <FilenameWithoutPath>gui_canvas.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -977,7 +977,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_canvas_arc.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_canvas_arc.c</PathWithFileName>
       <FilenameWithoutPath>gui_canvas_arc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -989,7 +989,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_canvas_img.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_canvas_img.c</PathWithFileName>
       <FilenameWithoutPath>gui_canvas_img.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1001,7 +1001,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_canvas_rect.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_canvas_rect.c</PathWithFileName>
       <FilenameWithoutPath>gui_canvas_rect.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1013,7 +1013,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_canvas_round_rect.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_canvas_round_rect.c</PathWithFileName>
       <FilenameWithoutPath>gui_canvas_round_rect.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1025,7 +1025,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_card.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_card.c</PathWithFileName>
       <FilenameWithoutPath>gui_card.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1037,7 +1037,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_cardview.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_cardview.c</PathWithFileName>
       <FilenameWithoutPath>gui_cardview.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1049,7 +1049,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_colorwheel.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_colorwheel.c</PathWithFileName>
       <FilenameWithoutPath>gui_colorwheel.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1061,7 +1061,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_cube.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_cube.c</PathWithFileName>
       <FilenameWithoutPath>gui_cube.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1073,7 +1073,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_curtain.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_curtain.c</PathWithFileName>
       <FilenameWithoutPath>gui_curtain.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1085,7 +1085,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_curtainview.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_curtainview.c</PathWithFileName>
       <FilenameWithoutPath>gui_curtainview.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1097,7 +1097,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_eq.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_eq.c</PathWithFileName>
       <FilenameWithoutPath>gui_eq.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1109,7 +1109,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_fps.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_fps.c</PathWithFileName>
       <FilenameWithoutPath>gui_fps.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1121,7 +1121,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_gallery.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_gallery.c</PathWithFileName>
       <FilenameWithoutPath>gui_gallery.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1133,7 +1133,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_grid.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_grid.c</PathWithFileName>
       <FilenameWithoutPath>gui_grid.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1145,7 +1145,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_image_array.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_image_array.c</PathWithFileName>
       <FilenameWithoutPath>gui_image_array.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1157,7 +1157,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_img.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_img.c</PathWithFileName>
       <FilenameWithoutPath>gui_img.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1169,7 +1169,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_img_live.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_img_live.c</PathWithFileName>
       <FilenameWithoutPath>gui_img_live.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1181,7 +1181,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_img_scope.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_img_scope.c</PathWithFileName>
       <FilenameWithoutPath>gui_img_scope.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1193,7 +1193,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_img_stb.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_img_stb.c</PathWithFileName>
       <FilenameWithoutPath>gui_img_stb.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1205,7 +1205,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_map.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_map.c</PathWithFileName>
       <FilenameWithoutPath>gui_map.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1217,7 +1217,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_menu_cellular.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_menu_cellular.c</PathWithFileName>
       <FilenameWithoutPath>gui_menu_cellular.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1229,7 +1229,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_multi_level.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_multi_level.c</PathWithFileName>
       <FilenameWithoutPath>gui_multi_level.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1241,7 +1241,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_obj.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_obj.c</PathWithFileName>
       <FilenameWithoutPath>gui_obj.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1253,7 +1253,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_page.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_page.c</PathWithFileName>
       <FilenameWithoutPath>gui_page.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1265,7 +1265,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_pagelist.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_pagelist.c</PathWithFileName>
       <FilenameWithoutPath>gui_pagelist.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1277,7 +1277,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_pagelistview.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_pagelistview.c</PathWithFileName>
       <FilenameWithoutPath>gui_pagelistview.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1289,7 +1289,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_perspective.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_perspective.c</PathWithFileName>
       <FilenameWithoutPath>gui_perspective.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1301,7 +1301,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_pinyinIME.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_pinyinIME.c</PathWithFileName>
       <FilenameWithoutPath>gui_pinyinIME.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1313,7 +1313,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_progressbar.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_progressbar.c</PathWithFileName>
       <FilenameWithoutPath>gui_progressbar.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1325,7 +1325,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_qbcode.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_qbcode.c</PathWithFileName>
       <FilenameWithoutPath>gui_qbcode.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1337,7 +1337,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_qrcode_gen.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_qrcode_gen.c</PathWithFileName>
       <FilenameWithoutPath>gui_qrcode_gen.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1349,7 +1349,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_return.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_return.c</PathWithFileName>
       <FilenameWithoutPath>gui_return.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1361,7 +1361,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_scroll_text.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_scroll_text.c</PathWithFileName>
       <FilenameWithoutPath>gui_scroll_text.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1373,7 +1373,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_scroll_wheel_new.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_scroll_wheel_new.c</PathWithFileName>
       <FilenameWithoutPath>gui_scroll_wheel_new.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1385,7 +1385,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_seekbar.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_seekbar.c</PathWithFileName>
       <FilenameWithoutPath>gui_seekbar.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1397,7 +1397,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_simple_img.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_simple_img.c</PathWithFileName>
       <FilenameWithoutPath>gui_simple_img.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1409,7 +1409,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_slider.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_slider.c</PathWithFileName>
       <FilenameWithoutPath>gui_slider.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1421,7 +1421,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_soccer.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_soccer.c</PathWithFileName>
       <FilenameWithoutPath>gui_soccer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1433,7 +1433,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_svg.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_svg.c</PathWithFileName>
       <FilenameWithoutPath>gui_svg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1445,7 +1445,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_switch.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_switch.c</PathWithFileName>
       <FilenameWithoutPath>gui_switch.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1457,7 +1457,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tab.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tab.c</PathWithFileName>
       <FilenameWithoutPath>gui_tab.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1469,7 +1469,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tab_cube.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tab_cube.c</PathWithFileName>
       <FilenameWithoutPath>gui_tab_cube.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1481,7 +1481,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tab_fade.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tab_fade.c</PathWithFileName>
       <FilenameWithoutPath>gui_tab_fade.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1493,7 +1493,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tab_reduction.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tab_reduction.c</PathWithFileName>
       <FilenameWithoutPath>gui_tab_reduction.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1505,7 +1505,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tab_reduction_fade.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tab_reduction_fade.c</PathWithFileName>
       <FilenameWithoutPath>gui_tab_reduction_fade.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1517,7 +1517,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tab_rotate.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tab_rotate.c</PathWithFileName>
       <FilenameWithoutPath>gui_tab_rotate.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1529,7 +1529,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_tabview.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_tabview.c</PathWithFileName>
       <FilenameWithoutPath>gui_tabview.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1541,7 +1541,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_text.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_text.c</PathWithFileName>
       <FilenameWithoutPath>gui_text.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1553,7 +1553,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_turn_table.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_turn_table.c</PathWithFileName>
       <FilenameWithoutPath>gui_turn_table.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1565,7 +1565,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_watch_gradient_spot.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_watch_gradient_spot.c</PathWithFileName>
       <FilenameWithoutPath>gui_watch_gradient_spot.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1577,7 +1577,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_watchface_gradient.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_watchface_gradient.c</PathWithFileName>
       <FilenameWithoutPath>gui_watchface_gradient.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1589,7 +1589,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_wave.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_wave.c</PathWithFileName>
       <FilenameWithoutPath>gui_wave.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1601,7 +1601,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_wheel_list.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_wheel_list.c</PathWithFileName>
       <FilenameWithoutPath>gui_wheel_list.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1613,7 +1613,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_widget_template.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_widget_template.c</PathWithFileName>
       <FilenameWithoutPath>gui_widget_template.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1625,7 +1625,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\gui_engine\widget\gui_win.c</PathWithFileName>
+      <PathWithFileName>..\..\realgui\widget\gui_win.c</PathWithFileName>
       <FilenameWithoutPath>gui_win.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

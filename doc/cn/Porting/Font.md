@@ -45,7 +45,7 @@
 字库解析代码的目的是填充 `chr` 结构体数组，其结构如下
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/engine/font_mem.h
+.. literalinclude:: ../../../realgui/engine/font_mem.h
    :language: c
    :start-after: /** @brief  mem char struct start */
    :end-before: /** @brief  mem char struct end */
@@ -87,7 +87,7 @@
 `rect` 结构体数组结构如下：
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/engine/draw_font.h
+.. literalinclude:: ../../../realgui/engine/draw_font.h
    :language: c
    :start-after: /** @brief  text rect struct start */
    :end-before: /** @brief  text rect struct end */

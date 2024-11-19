@@ -37,7 +37,7 @@ env.Append(LIBS = ['opengl32'])
 
 
 
-RTK_GUI_ENGINE = os.path.abspath('./../gui_engine/')
+RTK_GUI_ENGINE = os.path.abspath('./../realgui/')
 LVGL_ROOT = os.path.abspath('./../lvgl/')
 ARM2D_ROOT = os.path.abspath('./../Arm2D/')
 PLATFORM = menu_config.PLATFORM

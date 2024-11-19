@@ -9,7 +9,7 @@
 使用 [gui_simple_img_create(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h, IMG_SOURCE_MODE_TYPE src_mode_type)](#gui_simple_img_create) 创建一个简单图像（simple img）控件。 其中，如果 `src_mode_type` 是 `IMG_SRC_MEMADDR`，图像将从内存地址加载；如果 `src_mode_type` 是 `IMG_SRC_FILESYS`，图像将从文件系统加载，`addr` 的值应该是图片路径。加载方式请参考下列枚举：
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/engine/draw_img.h
+.. literalinclude:: ../../../realgui/engine/draw_img.h
    :language: c
    :start-after: /* IMG_SOURCE_MODE_TYPE enum start*/
    :end-before: /* IMG_SOURCE_MODE_TYPE enum end*/

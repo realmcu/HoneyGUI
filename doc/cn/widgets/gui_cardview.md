@@ -18,7 +18,7 @@
 卡片容器控件有5种风格，开发者可以使用 [gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style)](#gui_cardview_set_style) 来设置风格。
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

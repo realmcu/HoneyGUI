@@ -13,22 +13,22 @@ To reate a new watchface gradient widget, you can call the function [gui_watchfa
 <details> <summary>code</summary>
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c
+.. literalinclude:: ../../../realgui/example/screen_448_368/app_ct_clock.c
    :language: c
    :start-after: /* watchface_watch_gradient_spot demo start*/
    :end-before: /* watchface_watch_gradient_spot demo end*/
 
-.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_tablist.c
+.. literalinclude:: ../../../realgui/example/screen_448_368/app_tablist.c
    :language: c
    :start-after: /* watchface start*/
    :end-before: /* watchface end*/
 
-.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c
+.. literalinclude:: ../../../realgui/example/screen_448_368/app_ct_clock.c
    :language: c
    :start-after: /* callback_touch_long start*/
    :end-before: /* callback_touch_long end*/
 
-.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c
+.. literalinclude:: ../../../realgui/example/screen_448_368/app_ct_clock.c
    :language: c
    :start-after: /* page_ct_clock start*/
    :end-before: /* page_ct_clock end*/

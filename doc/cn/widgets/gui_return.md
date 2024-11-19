@@ -42,7 +42,7 @@ gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
 ```eval_rst
 
 .. note::
-  详细信息请参阅 ```gui_engine\example\screen_454_454\gui_menu\apps.c```。
+  详细信息请参阅 ```realgui\example\screen_454_454\gui_menu\apps.c```。
 
 ```
 

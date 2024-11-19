@@ -10,7 +10,7 @@
 请参考[入门指南章节](../../get-started/index.md)的安装部分内容。
 
 ## 源文件
-为了帮助您学习和熟悉开发，您可以在`sdk\src\app\gui\gui_engine\example`路径下找到您可能需要的所有源文件。本演示的源文件是`app_fruit_ninja_box2d.cpp`，您可以在上述路径中找到它，了解更多详情。
+为了帮助您学习和熟悉开发，您可以在`sdk\src\app\gui\realgui\example`路径下找到您可能需要的所有源文件。本演示的源文件是`app_fruit_ninja_box2d.cpp`，您可以在上述路径中找到它，了解更多详情。
 
 ## 配置
 ```c

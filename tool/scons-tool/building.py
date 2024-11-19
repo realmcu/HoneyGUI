@@ -807,7 +807,7 @@ def GenTargetProject(program = None):
             else:
                 template = os.path.isfile('template.uvprojx')
                 if template:
-                    MDK5Project('gui_engine.uvprojx', Projects)
+                    MDK5Project('realgui.uvprojx', Projects)
                 else:
                     print ('No template project file found.')
 
@@ -817,7 +817,7 @@ def GenTargetProject(program = None):
 
     if GetOption('target') == 'mdk5':
         from keil import MDK5Project
-        MDK5Project('gui_engine.uvprojx', Projects)
+        MDK5Project('realgui.uvprojx', Projects)
 
     if GetOption('target') == 'iar':
         from iar import IARProject

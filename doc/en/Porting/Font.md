@@ -45,7 +45,7 @@ Since the font library tool has the `crop` attribute and two indexing modes, dif
 The purpose of the font library parsing code is to populate the `chr` structure array, which is structured as follows:
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/engine/font_mem.h
+.. literalinclude:: ../../../realgui/engine/font_mem.h
    :language: c
    :start-after: /** @brief  mem char struct start */
    :end-before: /** @brief  mem char struct end */
@@ -87,7 +87,7 @@ The specific layout functionality is located in the file `font_mem.c` in the fun
 The `rect` struct array is structured as follows:
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/engine/draw_font.h
+.. literalinclude:: ../../../realgui/engine/draw_font.h
    :language: c
    :start-after: /** @brief  text rect struct start */
    :end-before: /** @brief  text rect struct end */

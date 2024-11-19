@@ -17,7 +17,7 @@ Refer to the Installation section of [Get Started](../../get-started/index.md).
 ```
 
 ## Source File
-To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example`. The source file for this demostration is app_fruit_ninja_box2d.cpp, you can find it in the path mentioned for more details.
+To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\realgui\example`. The source file for this demostration is app_fruit_ninja_box2d.cpp, you can find it in the path mentioned for more details.
 
 ## Usage Steps
 

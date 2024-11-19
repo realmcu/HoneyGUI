@@ -38,7 +38,7 @@ After completing the environment setup for the HoneyGUI Simulator, when you star
 <div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
-1. If you need to modify the screen size, open the file `SConscript` under the directory `your HoneyGUI dir/gui_engine/example/demo/`, and modify the values of `DRV_LCD_WIDTH` and `DRV_LCD_HEIGHT` to the desired pixel values.
+1. If you need to modify the screen size, open the file `SConscript` under the directory `your HoneyGUI dir/realgui/example/demo/`, and modify the values of `DRV_LCD_WIDTH` and `DRV_LCD_HEIGHT` to the desired pixel values.
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png" alt="lv_menu_config.png"></div><br/>
 
@@ -53,7 +53,7 @@ HoneyGUI Dir
 |-- Arm2D
 |-- cmake
 |-- doc
-|-- gui_engine
+|-- realgui
 |  |-- 3rd
 |  |-- app
 |  |-- core
@@ -127,9 +127,9 @@ HoneyGUI Dir
    - src: Stores the actual source code of LVGL. When developing with LVGL, the code files from this directory are used.
    - tests: Contains some CI testing files that are not used when using LVGL.
 
-2. When running LVGL with the HoneyGUI simulator, the LVGL UI will start running from the file `app_ui_lvgl.c` under the directory `your HoneyGUI dir/gui_engine/example/demo`.
+2. When running LVGL with the HoneyGUI simulator, the LVGL UI will start running from the file `app_ui_lvgl.c` under the directory `your HoneyGUI dir/realgui/example/demo`.
 
-3. When running LVGL with the HoneyGUI simulator, the root directory pointed to by the LVGL file system interface is `your HoneyGUI dir/gui_engine/example/screen_lvgl/root/`.
+3. When running LVGL with the HoneyGUI simulator, the root directory pointed to by the LVGL file system interface is `your HoneyGUI dir/realgui/example/screen_lvgl/root/`.
 
 ## Porting
 - Documentation: [LVGL Porting](https://docs.lvgl.io/8.3/porting/index.html)
@@ -476,7 +476,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
 
 HoneyGUI provides support for packaging `romfs` file system images:
 
-1. The working directory is `your HoneyGUI dir/gui_engine/example/screen_lvgl/`. The packaging process requires Python environment support. The external file resources used in the project need to be packaged as a file system image and downloaded as `User Data`.
+1. The working directory is `your HoneyGUI dir/realgui/example/screen_lvgl/`. The packaging process requires Python environment support. The external file resources used in the project need to be packaged as a file system image and downloaded as `User Data`.
 
 2. Open the working directory and place the files to be packaged in the `root/` folder. Double-click the `mkromfs_0x4600000.bat` script to generate the file system image `root(0x4600000).bin` and the resource mapping address `resource.h`. The default base address of the files is `0x4600000`. `resource.h` records the mapping address of the packaged files. Since `romfs` supports direct access using physical addresses, developers can access the resource files directly through the mapping address.
 
@@ -527,7 +527,7 @@ To use images and fonts in LVGL, they need to be converted to formats that LVGL 
 
 In the C array format, the resources will be included in the compilation process. They will be compiled every time the program logic changes, and the size of the resources will be included in the APP image. 
 
-In the bin binary file format, the resources are not included in the compilation. They are stored separately and require a file system or other means to access them. An example `lvgl_example_assets.c` is provided in the path `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` to demonstrate how to configure resources of different formats for the widgets.
+In the bin binary file format, the resources are not included in the compilation. They are stored separately and require a file system or other means to access them. An example `lvgl_example_assets.c` is provided in the path `your HoneyGUI dir/realgui/example/screen_lvgl/assets/` to demonstrate how to configure resources of different formats for the widgets.
 
 ### LVGL Image Converter
 - Online conversion tool: [LVGL Image Converter](https://lvgl.io/tools/imageconverter)
@@ -541,7 +541,7 @@ Please refer to the following steps for usage in [LVGL Overview Images - Online 
 4. Choose the type of output image (C array/binary file).
 5. Click "Convert" to obtain the output file.
 
-The [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` directory.
+The [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory `your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
 
 It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of `4 Byte header + data`. The `header` contains information such as `Color format`, `width`, and `height`. To construct a complete `lv_img_dsc_t` to describe the image, you can calculate the `data_size` using the information from the `header`.
 
@@ -623,7 +623,7 @@ Please refer to the following steps for usage in [LVGL Overview Font - Add a new
 5. Select the font file (TTF/WOFF).
 6. Set the Unicode range of characters to convert, or directly list the characters that need to be converted.
 
-The [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, `lv_example_label_3()` demonstrates how to configure a specific font for a label control. To automatically build font resources generated as C arrays, place them under the directory `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` directory.
+The [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, `lv_example_label_3()` demonstrates how to configure a specific font for a label control. To automatically build font resources generated as C arrays, place them under the directory `your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
 
 LVGL provides built-in fonts, which are saved as arrays in the directory `your HoneyGUI dir/lvgl/src/font/`. Each font file specifies the included characters at the beginning of the file. The built-in fonts include a Chinese font, `lv_font_simsun_16_cjk.c`, which is a CJK (Chinese, Japanese, and Korean) 16px font, but it is a single font size with a limited character set.
 

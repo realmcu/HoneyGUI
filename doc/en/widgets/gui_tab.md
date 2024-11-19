@@ -15,7 +15,7 @@ If you want to exhibit various switching effects when switching tabs, you can ut
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

@@ -17,7 +17,7 @@
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /*Define APP_MENU's entry func */
    :end-before: /*Define APP_MENU's entry func end*/
