@@ -34,18 +34,6 @@
 #include "gui_calendar.h"
 #include "gui_combo.h"
 #include "gui_wave.h"
-
-
-
-
-#if defined __WIN32
-#include <dirent.h>
-//#include <sys/stat.h>
-#include <fcntl.h>
-#else
-#include "romfs.h"
-#endif
-
 #include "gui_api.h"
 #include "gui_multi_level.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
@@ -1064,40 +1052,40 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         int file_count = 0;
                         {
-                            DIR *dir = NULL;
-                            struct dirent *entry;
+                            gui_fs_dir *dir = NULL;
+                            struct gui_fs_dirent *entry;
                             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = opendir(path)) == NULL)
+                            if ((dir = gui_fs_opendir(path)) == NULL)
                             {
                                 gui_free(path);
                                 return 0;
                             }
                             gui_free(path);
-                            while ((entry = readdir(dir)) != NULL)
+                            while ((entry = gui_fs_readdir(dir)) != NULL)
                             {
                                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                 {
                                     file_count++;
                                 }
                             }
-                            closedir(dir);
+                            gui_fs_closedir(dir);
                         }
 
                         void **image_array = gui_malloc(file_count * sizeof(void *));
                         {
-                            DIR *dir = NULL;
-                            struct dirent *entry;
+                            gui_fs_dir *dir = NULL;
+                            struct gui_fs_dirent *entry;
                             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = opendir(path)) == NULL)
+                            if ((dir = gui_fs_opendir(path)) == NULL)
                             {
                                 gui_free(path);
                                 return 0;
                             }
 
 
-                            while ((entry = readdir(dir)) != NULL)
+                            while ((entry = gui_fs_readdir(dir)) != NULL)
                             {
                                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                 {
@@ -1107,7 +1095,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                             }
                             gui_free(path);
-                            closedir(dir);
+                            gui_fs_closedir(dir);
                         }
                         parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, image_array[0], x, y);
 
@@ -1728,17 +1716,17 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         int file_count = 0;
 
                         {
-                            DIR *dir = 0;
-                            struct dirent *entry;
+                            gui_fs_dir *dir = 0;
+                            struct gui_fs_dirent *entry;
                             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = opendir(path)) == NULL)
+                            if ((dir = gui_fs_opendir(path)) == NULL)
                             {
                                 gui_free(path);
                                 return 0;
                             }
                             gui_free(path);
-                            while ((entry = readdir(dir)) != NULL)
+                            while ((entry = gui_fs_readdir(dir)) != NULL)
                             {
                                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                 {
@@ -1747,22 +1735,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                             }
-                            closedir(dir);
+                            gui_fs_closedir(dir);
                         }
                         void **image_array = gui_malloc(file_count * sizeof(void *));
                         {
-                            DIR *dir = 0;
-                            struct dirent *entry;
+                            gui_fs_dir *dir = 0;
+                            struct gui_fs_dirent *entry;
                             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = opendir(path)) == NULL)
+                            if ((dir = gui_fs_opendir(path)) == NULL)
                             {
                                 gui_free(path);
                                 return 0;
                             }
 
                             int count = 0;
-                            while ((entry = readdir(dir)) != NULL)
+                            while ((entry = gui_fs_readdir(dir)) != NULL)
                             {
                                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                 {
@@ -1773,7 +1761,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                             }
                             gui_free(path);
-                            closedir(dir);
+                            gui_fs_closedir(dir);
                             if (reverse)
                             {
                                 reverse_array(image_array, count);
@@ -2317,16 +2305,16 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             int file_count = 0;
                             char *folder = hl_picture;
                             {
-                                DIR *dir = 0;
-                                struct dirent *entry;
+                                gui_fs_dir *dir = 0;
+                                struct gui_fs_dirent *entry;
                                 char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                                 sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = opendir(path)) == NULL)
+                                if ((dir = gui_fs_opendir(path)) == NULL)
                                 {
                                     GUI_ASSERT(0);
                                 }
                                 gui_free(path);
-                                while ((entry = readdir(dir)) != NULL)
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
                                 {
                                     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                     {
@@ -2335,22 +2323,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                                 }
-                                closedir(dir);
+                                gui_fs_closedir(dir);
                             }
                             void **image_array = gui_malloc(file_count * sizeof(void *));
                             {
-                                DIR *dir = 0;
-                                struct dirent *entry;
+                                gui_fs_dir *dir = 0;
+                                struct gui_fs_dirent *entry;
                                 char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                                 sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = opendir(path)) == NULL)
+                                if ((dir = gui_fs_opendir(path)) == NULL)
                                 {
                                     gui_free(path);
                                     return 0;
                                 }
 
                                 int count = 0;
-                                while ((entry = readdir(dir)) != NULL)
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
                                 {
                                     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                     {
@@ -2361,7 +2349,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                                 }
                                 gui_free(path);
-                                closedir(dir);
+                                gui_fs_closedir(dir);
                                 GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array,
                                                                (void *)(uintptr_t)file_count);
                                 GUI_TYPE(gui_button_t, parent)->data = image_array;
@@ -2676,16 +2664,16 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             int file_count = 0;
                             char *folder = hl_picture;
                             {
-                                DIR *dir = 0;
-                                struct dirent *entry;
+                                gui_fs_dir *dir = 0;
+                                struct gui_fs_dirent *entry;
                                 char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                                 sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = opendir(path)) == NULL)
+                                if ((dir = gui_fs_opendir(path)) == NULL)
                                 {
                                     GUI_ASSERT(0);
                                 }
                                 gui_free(path);
-                                while ((entry = readdir(dir)) != NULL)
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
                                 {
                                     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                     {
@@ -2694,22 +2682,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                                 }
-                                closedir(dir);
+                                gui_fs_closedir(dir);
                             }
                             void **image_array = gui_malloc(file_count * sizeof(void *));
                             {
-                                DIR *dir = 0;
-                                struct dirent *entry;
+                                gui_fs_dir *dir = 0;
+                                struct gui_fs_dirent *entry;
                                 char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
                                 sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = opendir(path)) == NULL)
+                                if ((dir = gui_fs_opendir(path)) == NULL)
                                 {
                                     gui_free(path);
                                     return 0;
                                 }
 
                                 int count = 0;
-                                while ((entry = readdir(dir)) != NULL)
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
                                 {
                                     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                     {
@@ -2720,7 +2708,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                                 }
                                 gui_free(path);
-                                closedir(dir);
+                                gui_fs_closedir(dir);
                                 GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array,
                                                                (void *)(uintptr_t)file_count);
                                 GUI_API(gui_switch_t).animate((void *)parent, dur, 0, switch_press_ani_cb_array, 0);
@@ -2873,20 +2861,20 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     else if (folder)
                     {
                         int file_count = 0;
-                        DIR *dir = 0;
-                        struct dirent *entry;
+                        gui_fs_dir *dir = 0;
+                        struct gui_fs_dirent *entry;
                         char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
 
                         // init image array
                         sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
-                        if ((dir = opendir(dir_path)) == NULL)
+                        if ((dir = gui_fs_opendir(dir_path)) == NULL)
                         {
                             gui_free(dir_path);
                             return 0;
                         }
                         gui_free(dir_path);
 
-                        while ((entry = readdir(dir)) != NULL)
+                        while ((entry = gui_fs_readdir(dir)) != NULL)
                         {
                             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                             {
@@ -2911,7 +2899,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 gui_free(file_path);
                             }
                         }
-                        closedir(dir);
+                        gui_fs_closedir(dir);
 
                         config.num_pic = file_count;
                     }
@@ -2970,8 +2958,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         config.mode = KB_MODE_BASIC_ENG_LOWWER;
 
                         uint16_t file_count = 0;
-                        DIR *dir = NULL;
-                        struct dirent *entry;
+                        gui_fs_dir *dir = NULL;
+                        struct gui_fs_dirent *entry;
                         char *folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
                         for (int i = 0; i < sizeof(folder_array) / sizeof(folder_array[0]); i++)
                         {
@@ -2980,17 +2968,17 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                             // init image array
                             sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = opendir(dir_path)) == NULL)
+                            if ((dir = gui_fs_opendir(dir_path)) == NULL)
                             {
                                 gui_free(dir_path);
                                 continue;
-                                //perror("opendir() failed"); return;
+                                //perror("gui_fs_opendir() failed"); return;
                             }
                             // gui_log("folder: %d %s\n", dir, folder);
                             gui_free(dir_path);
 
 
-                            while ((entry = readdir(dir)) != NULL)
+                            while ((entry = gui_fs_readdir(dir)) != NULL)
                             {
                                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                 {
@@ -3017,7 +3005,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
 
                             }
-                            closedir(dir);
+                            gui_fs_closedir(dir);
                             // gui_log("file_count %d, folder: %s\n", file_count, folder);
                             if (0 == strcmp(folder, floder_symbol))
                             {
@@ -4874,40 +4862,40 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         {
                             int file_count = 0;
                             {
-                                DIR *dir = NULL;
-                                struct dirent *entry;
+                                gui_fs_dir *dir = NULL;
+                                struct gui_fs_dirent *entry;
                                 char *path = gui_malloc(strlen(from) + strlen(GUI_ROOT_FOLDER) + 1);
                                 sprintf(path, "%s%s", GUI_ROOT_FOLDER, from);
-                                if ((dir = opendir(path)) == NULL)
+                                if ((dir = gui_fs_opendir(path)) == NULL)
                                 {
                                     gui_free(path);
                                     return 0;
                                 }
                                 gui_free(path);
-                                while ((entry = readdir(dir)) != NULL)
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
                                 {
                                     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                     {
                                         file_count++;
                                     }
                                 }
-                                closedir(dir);
+                                gui_fs_closedir(dir);
                             }
 
                             image_array = gui_malloc(file_count * sizeof(void *));
                             {
-                                DIR *dir = NULL;
-                                struct dirent *entry;
+                                gui_fs_dir *dir = NULL;
+                                struct gui_fs_dirent *entry;
                                 char *path = gui_malloc(strlen(from) + strlen(GUI_ROOT_FOLDER) + 1);
                                 sprintf(path, "%s%s", GUI_ROOT_FOLDER, from);
-                                if ((dir = opendir(path)) == NULL)
+                                if ((dir = gui_fs_opendir(path)) == NULL)
                                 {
                                     gui_free(path);
                                     return 0;
                                 }
 
 
-                                while ((entry = readdir(dir)) != NULL)
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
                                 {
                                     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                     {
@@ -4917,7 +4905,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                     }
                                 }
                                 gui_free(path);
-                                closedir(dir);
+                                gui_fs_closedir(dir);
                             }
                         }
 
@@ -5158,19 +5146,19 @@ static void load_return_array()
 {
     const char *folder = "app/system/resource/return_array";
     {
-        DIR *dir = 0;
-        struct dirent *entry;
+        gui_fs_dir *dir = 0;
+        struct gui_fs_dirent *entry;
 
         char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
         sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-        if ((dir = opendir(path)) == NULL)
+        if ((dir = gui_fs_opendir(path)) == NULL)
         {
             gui_free(path);
-            //perror("opendir() failed");
+            //perror("gui_fs_opendir() failed");
             return;
         }
         gui_free(path);
-        while ((entry = readdir(dir)) != NULL)
+        while ((entry = gui_fs_readdir(dir)) != NULL)
         {
             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
             {
@@ -5179,23 +5167,23 @@ static void load_return_array()
 
 
         }
-        closedir(dir);
+        gui_fs_closedir(dir);
     }
     image_array = gui_malloc(file_count * sizeof(void *));
     {
-        DIR *dir = 0;
-        struct dirent *entry;
+        gui_fs_dir *dir = 0;
+        struct gui_fs_dirent *entry;
         char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
         sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-        if ((dir = opendir(path)) == NULL)
+        if ((dir = gui_fs_opendir(path)) == NULL)
         {
             gui_free(path);
-            //perror("opendir() failed");
+            //perror("gui_fs_opendir() failed");
             return;
         }
 
         int count = 0;
-        while ((entry = readdir(dir)) != NULL)
+        while ((entry = gui_fs_readdir(dir)) != NULL)
         {
             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
             {
@@ -5206,7 +5194,7 @@ static void load_return_array()
 
         }
         gui_free(path);
-        closedir(dir);
+        gui_fs_closedir(dir);
 
 
     }
@@ -5419,7 +5407,42 @@ char *get_app_name(const char *xml)
     }
     return NULL;
 }
-void create_tree_nest(char *xml, void *obj)
+// Function that recursively searches for the <preview> tag at any level
+static void find_preview_tags(ezxml_t node, char **file_output)
+{
+    if (!node) { return; }
+    // If the node's name is "preview", print the file attribute
+    if (strcmp(node->name, "preview") == 0)
+    {
+        const char *file = ezxml_attr(node, "file");
+        if (file)
+        {
+            //gui_log("File attribute value: %s\n", file);
+            *file_output = (char *)file;
+            return;
+        }
+    }
+
+    // Recurse down to all children
+    ezxml_t child = node->child;
+    while (child)
+    {
+        find_preview_tags(child, file_output);
+        child = child->sibling;
+    }
+}
+char *gui_dom_get_preview_image_file(const char *xml_file)
+{
+    ezxml_t xml = ezxml_parse_file(xml_file);
+    if (!xml)
+    {
+        gui_log("Failed to load XML file.\n");
+    }
+    char *file_output = 0;
+    find_preview_tags(xml, &file_output);
+    return file_output;
+}
+void create_tree_nest(const char *xml, void *obj)
 {
     GUI_WIDGET_TRY_EXCEPT(obj);
     gui_app_t *app = gui_obj_tree_get_app(obj);
@@ -5429,6 +5452,10 @@ void create_tree_nest(char *xml, void *obj)
     {
         foreach_create(f1, obj);
     }
+}
+void gui_dom_create_tree_nest(const char *xml, gui_obj_t *parent_widget)
+{
+    create_tree_nest(xml, parent_widget);
 }
 static void setting_return_cb(void *obj, gui_event_t e, void *param)
 {

@@ -219,22 +219,21 @@ typedef struct draw_img
     //uint32_t color_mix; //todo for QuDai
     void *acc_user;
 } draw_img_t;
-typedef struct
-{
-    int fd;                  /* directory file */
-    char buf[512];
-    int num;
-    int cur;
-} gui_fs_dir;
+
 
 struct gui_fs_dirent
 {
     uint8_t d_type;           /* The type of the file */
     uint8_t d_namlen;         /* The length of the not including the terminating null file name */
     uint16_t d_reclen;        /* length of this record */
-    char d_name[256];         /* The null-terminated file name */
+    char *d_name;         /* The null-terminated file name */
+    void *dirent;
 };
-
+typedef struct
+{
+    void *dir;
+    struct gui_fs_dirent *dirent;
+} gui_fs_dir;
 /* gui_fs struct define start */
 struct gui_fs
 {

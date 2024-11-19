@@ -1,4 +1,8 @@
+
 <screen>
+<preview
+file="app/watchface1/wf1preview.bin">
+</preview>
     <img
             x="0"
             y="0"

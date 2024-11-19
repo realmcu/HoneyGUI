@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "gui_obj.h"
 #include "gui_matrix.h"
-
+#include "gui_api.h"
 
 /*============================================================================*
  *                           Types

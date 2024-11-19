@@ -20,6 +20,7 @@
 #else
 #endif
 #include "gui_components_init.h"
+#include "gui_api.h"
 static void app_launcher_frontend_ui_design(gui_app_t *app);
 static gui_app_t app_launcher_frontend =
 {
@@ -59,16 +60,6 @@ void *get_app_xml(void)
     return &app_xml;
 }
 
-#ifdef __arm__
-#include "romfs.h"
-#else
-#include <sys/stat.h>
-#include <fcntl.h>
-#endif
-
-#if defined __WIN32
-#include <dirent.h>
-#endif
 #include "draw_font.h"
 gui_grid_t *g;
 void button_cb(gui_button_t *b)
@@ -86,19 +77,19 @@ void button_release_cb(gui_button_t *b)
 {
     gui_img_set_opacity((void *)b->img, 255);
     button_click_cb(b);
-#ifdef RTL87x2G_DASHBOARD
+#ifdef ENABLE_APP_AUTOSTART
     b->flag = 0;
 #endif
 }
 void searchXmlFiles(char *dirPath, gui_app_t *app)
 {
-    DIR *dir = 0;
-    struct dirent *entry;
-    if ((dir = opendir(dirPath)) == NULL)
+    gui_fs_dir *dir = 0;
+    struct gui_fs_dirent *entry;
+    if ((dir = gui_fs_opendir(dirPath)) == NULL)
     {
-        gui_log("opendir(%s) failed", dirPath); return;
+        gui_log("gui_fs_opendir(%s) failed", dirPath); return;
     }
-    while ((entry = readdir(dir)) != NULL)
+    while ((entry = gui_fs_readdir(dir)) != NULL)
     {
 
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
@@ -107,13 +98,13 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
             gui_log("debug line%d , entry->d_name = %s\n", __LINE__, entry->d_name);
             char path2[512];
             sprintf(path2, "%s/%s", dirPath, entry->d_name);
-            DIR *dirr = 0;
-            if ((dirr = opendir(path2)) == NULL)
+            gui_fs_dir *dirr = 0;
+            if ((dirr = gui_fs_opendir(path2)) == NULL)
             {
-                gui_log("opendir(%s) failed", path2); return;
+                gui_log("gui_fs_opendir(%s) failed", path2); return;
             }
-            struct dirent *entryy;
-            while ((entryy = readdir(dirr)) != NULL)
+            struct gui_fs_dirent *entryy;
+            while ((entryy = gui_fs_readdir(dirr)) != NULL)
             {
                 if (strstr(entryy->d_name, ".xml") != NULL)
                 {
@@ -141,7 +132,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_button_press(button, (gui_event_cb_t)button_cb, button);
                     gui_button_release(button, (gui_event_cb_t)button_release_cb, button);
 
-#ifdef RTL87x2G_DASHBOARD
+#ifdef ENABLE_APP_AUTOSTART
                     gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);
                     button->flag = 1;
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
@@ -161,22 +152,24 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                 }
 
             }
-            closedir(dirr);
+            gui_fs_closedir(dirr);
         }
 
 
     }
-    closedir(dir);
+    gui_fs_closedir(dir);
 }
 void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
 {
-    DIR *dir = 0;
-    struct dirent *entry;
-    if ((dir = opendir(dirPath)) == NULL)
+    extern void gui_port_fs_init(void);
+    gui_port_fs_init();
+    gui_fs_dir *dir = 0;
+    struct gui_fs_dirent *entry;
+    if ((dir = gui_fs_opendir(dirPath)) == NULL)
     {
-        perror("opendir() failed"); return;
+        perror("gui_fs_opendir() failed"); return;
     }
-    while ((entry = readdir(dir)) != NULL)
+    while ((entry = gui_fs_readdir(dir)) != NULL)
     {
         //printf("dname:%s\n",entry->d_name);
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
@@ -184,13 +177,13 @@ void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
         {
             char path2[512];
             sprintf(path2, "%s/%s", dirPath, entry->d_name);
-            DIR *dirr = 0;
-            if ((dirr = opendir(path2)) == NULL)
+            gui_fs_dir *dirr = 0;
+            if ((dirr = gui_fs_opendir(path2)) == NULL)
             {
-                perror("opendir() failed"); return;
+                perror("gui_fs_opendir() failed"); return;
             }
-            struct dirent *entryy;
-            while ((entryy = readdir(dirr)) != NULL)
+            struct gui_fs_dirent *entryy;
+            while ((entryy = gui_fs_readdir(dirr)) != NULL)
             {
                 //printf("ddname:%s\n",entryy->d_name);
                 if (strstr(entryy->d_name, ".xml") != NULL)
@@ -215,12 +208,12 @@ void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
                 }
 
             }
-            closedir(dirr);
+            gui_fs_closedir(dirr);
         }
 
 
     }
-    closedir(dir);
+    gui_fs_closedir(dir);
 }
 static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
