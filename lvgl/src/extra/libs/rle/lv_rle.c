@@ -1,19 +1,12 @@
 #include "lvgl.h"
 
-#if LV_USE_RLE
+#if LV_USE_RTK_IDU
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "hal_imdc.h"
-
-/**********************
- * DEFINES
- **********************/
-#define LV_PSRAM_SIZE       (1 * 1024 * 1024) // 1MB
-#define LV_PSRAM_START      (0x08000000 + 2 * MY_DISP_HOR_RES * MY_DISP_VER_RES * LV_COLOR_DEPTH / 8)
-#define LV_PSRAM_END        (LV_PSRAM_START + LV_PSRAM_SIZE)
 
 /**********************
  * GLOBAL VARIABLES
@@ -138,7 +131,7 @@ static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *i
 /**********************
  * GLOBAL FUNCTIONS
  **********************/
-void lv_rle_init(void)
+void lv_rtk_idu_init(void)
 {
     lv_img_decoder_t *dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
