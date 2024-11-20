@@ -20,10 +20,6 @@ if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
 if not GetDepend(['CONFIG_REALTEK_BUILD_U8G2']):
     SrcRemove(src,'gui_u8g2.c')
 
-if not GetDepend(['CONFIG_REALTEK_BUILD_PINYIN']):
-    SrcRemove(src,'gui_pinyinIME.c')
-    SrcRemove(src,'gui_keyboard.c')
-
 CPPPATH = [cwd]
 
 objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)

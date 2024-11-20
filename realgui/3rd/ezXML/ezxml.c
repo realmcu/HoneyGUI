@@ -47,11 +47,16 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
+#include "guidef.h"
 
 extern void *gui_malloc(size_t n);
 extern void *gui_realloc(void *ptr_old, size_t n);
 extern void gui_free(void *rmem);
+extern void gui_fs_fstat(int fildes, gui_fs_stat_t *buf);
 
+extern int gui_fs_open(const char *file, int flags);
+extern int gui_fs_close(int d);
+extern int gui_fs_read(int fd, void *buf, size_t len);
 
 static void *xml_malloc(unsigned int size)
 {
@@ -68,17 +73,28 @@ static void xml_free(void *ptr)
     gui_free(ptr);
 }
 
+static char *ezxml_strdup(const char *s)
+{
+    size_t len = strlen(s) + 1;
+    char *tmp = (char *)gui_malloc(len);
+
+    if (!tmp)
+    {
+        return NULL;
+    }
+
+    memcpy(tmp, s, len);
+
+    return tmp;
+}
+
 
 
 
 //#include <unistd.h>
 //#include <sys/types.h>
 
-#ifdef __arm__
-#include "romfs.h"
-#elif defined OS_RTTHREAD
-#include "rtthread.h"
-#endif
+
 #ifndef EZXML_NOMMAP
 #include <sys/mman.h>
 #endif // EZXML_NOMMAP
@@ -381,7 +397,7 @@ void ezxml_proc_inst(ezxml_root_t root, char *s, size_t len)
         root->pi[i] = xml_malloc(sizeof(char *) * 3);
         root->pi[i][0] = target;
         root->pi[i][1] = (char *)(root->pi[i + 1] = NULL); // terminate pi list
-        root->pi[i][2] = strdup(""); // empty document position list
+        root->pi[i][2] = ezxml_strdup(""); // empty document position list
     }
 
     while (root->pi[i][j]) { j++; } // find end of instruction list for this target
@@ -750,22 +766,17 @@ ezxml_t ezxml_parse_fp(FILE *fp)
 // A wrapper for ezxml_parse_str() that accepts a file descriptor. First
 // attempts to mem map the file. Failing that, reads the file into memory.
 // Returns NULL on failure.
-#ifdef __arm__
-#include <romfs.h>
-#else
-#include <sys/stat.h>
-#include <fcntl.h>
-#endif
+
 
 ezxml_t ezxml_parse_fd(int fd)
 {
     ezxml_root_t root;
-    struct stat st;
+    struct gui_fs_stat st;
     size_t l;
     void *m;
 
     if (fd < 0) { return NULL; }
-    fstat(fd, &st);
+    gui_fs_fstat(fd, &st);
 
 #ifndef EZXML_NOMMAP
     l = (st.st_size + sysconf(_SC_PAGESIZE) - 1) & ~(sysconf(_SC_PAGESIZE) - 1);
@@ -779,7 +790,7 @@ ezxml_t ezxml_parse_fd(int fd)
     else   // mmap failed, read file into memory
     {
 #endif // EZXML_NOMMAP
-        l = read(fd, m = xml_malloc(st.st_size), st.st_size);
+        l = gui_fs_read(fd, m = xml_malloc(st.st_size), st.st_size);
         root = (ezxml_root_t)ezxml_parse_str(m, l);
         root->len = -1; // so we know to xml_free s in ezxml_free()
 #ifndef EZXML_NOMMAP
@@ -791,10 +802,10 @@ ezxml_t ezxml_parse_fd(int fd)
 // a wrapper for ezxml_parse_fd that accepts a file name
 ezxml_t ezxml_parse_file(const char *file)
 {
-    int fd = open(file, O_RDONLY, 0);
+    int fd = gui_fs_open(file, 0);
     ezxml_t xml = ezxml_parse_fd(fd);
 
-    if (fd >= 0) { close(fd); }
+    if (fd >= 0) { gui_fs_close(fd); }
     else
     {
         extern void gui_log(const char *format, ...);
@@ -1102,7 +1113,7 @@ ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value)
         if (xml->attr == EZXML_NIL)   // first attribute
         {
             xml->attr = xml_malloc(4 * sizeof(char *));
-            xml->attr[1] = strdup(""); // empty list of malloced names/vals
+            xml->attr[1] = ezxml_strdup(""); // empty list of malloced names/vals
         }
         else { xml->attr = xml_realloc(xml->attr, (l + 4) * sizeof(char *)); }
 

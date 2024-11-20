@@ -234,6 +234,13 @@ typedef struct
     void *dir;
     struct gui_fs_dirent *dirent;
 } gui_fs_dir;
+
+
+typedef struct gui_fs_stat
+{
+    void *information;//by howie
+    uint32_t  st_size;
+} gui_fs_stat_t;
 /* gui_fs struct define start */
 struct gui_fs
 {
@@ -247,6 +254,7 @@ struct gui_fs
     struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
     int (*closedir)(gui_fs_dir *d);
     int (*ioctl)(int fildes, int cmd, ...);
+    void (*fstat)(int fildes, gui_fs_stat_t *buf);
 };
 /* gui_fs struct define end */
 

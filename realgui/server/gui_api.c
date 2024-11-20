@@ -484,112 +484,65 @@ void gui_assert_handler(const char *ex_string, const char *func, uint32_t line)
 /* file api*/
 int gui_fs_open(const char *file, int flags)
 {
-    if (fs)
-    {
-        if (fs->open)
-        {
-            return fs->open(file, flags);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->open);
+    return fs->open(file, flags);
 }
+
 int gui_fs_close(int d)
-
 {
-    if (fs)
-    {
-        if (fs->close)
-        {
-            return fs->close(d);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->close);
+    return fs->close(d);
 }
 int gui_fs_read(int fd, void *buf, size_t len)
 {
-    if (fs)
-    {
-        if (fs->read)
-        {
-            return fs->read(fd, buf, len);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->read);
+    return fs->read(fd, buf, len);
 }
 int gui_fs_write(int fd, const void *buf, size_t len)
 {
-    if (fs)
-    {
-        if (fs->write)
-        {
-            return fs->write(fd, buf, len);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->write);
+    return fs->write(fd, buf, len);
 }
 int gui_fs_lseek(int fd, int offset, int whence)
 {
-    if (fs)
-    {
-        if (fs->lseek)
-        {
-            return fs->lseek(fd, offset, whence);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->lseek);
+    return fs->lseek(fd, offset, whence);
 }
 int gui_fs_ioctl(int fd, int cmd)
 {
-    if (fs)
-    {
-        if (fs->ioctl)
-        {
-            return fs->ioctl(fd, cmd);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->ioctl);
+    return fs->ioctl(fd, cmd);
 }
 int gui_fs_closedir(gui_fs_dir *d)
 {
-    if (fs)
-    {
-        if (fs->closedir)
-        {
-            return fs->closedir(d);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->closedir);
+    return fs->closedir(d);
 }
 gui_fs_dir *gui_fs_opendir(const char *name)
 {
-    if (fs)
-    {
-        if (fs->opendir)
-        {
-            return fs->opendir(name);
-        }
-    }
-
-    return 0;
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->opendir);
+    return fs->opendir(name);
 }
 struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d)
 {
-    if (fs)
-    {
-        if (fs->readdir)
-        {
-            return fs->readdir(d);
-        }
-    }
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->readdir);
+    return fs->readdir(d);
+}
 
-    return 0;
+void gui_fs_fstat(int fildes, gui_fs_stat_t *buf)
+{
+    GUI_ASSERT(fs);
+    GUI_ASSERT(fs->fstat);
+    fs->fstat(fildes, buf);
 }
 char *gui_strdup(const char *s)
 {

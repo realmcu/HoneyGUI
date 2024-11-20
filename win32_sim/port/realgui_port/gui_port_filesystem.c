@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #if 0
 /* file api port*/
@@ -131,6 +133,14 @@ static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
     fs_dirent->dirent = dirent;
     return fs_dirent;
 }
+
+void port_fstat(int fildes, gui_fs_stat_t *buf)
+{
+    struct stat st;
+    int fd = fildes;
+    fstat(fd, &st);
+    buf->st_size = st.st_size;
+}
 static struct gui_fs fs_api =
 {
     /* file api port*/
@@ -143,6 +153,7 @@ static struct gui_fs fs_api =
     .opendir   = (gui_fs_dir * (*)(const char *name))port_opendir,
     .closedir  = (int (*)(gui_fs_dir * d))port_closedir,
     .readdir   = (struct gui_fs_dirent * (*)(gui_fs_dir * d))port_readdir,
+    .fstat     = port_fstat,
 
 };
 

@@ -286,7 +286,7 @@ def MDK4Project(target, script):
     # copy uvopt file
     if os.path.exists('template.uvopt'):
         import shutil
-        shutil.copy2('template.uvopt', 'realgui.uvopt')
+        shutil.copy2('template.uvopt', 'HoneyGUI.uvopt')
 
 def MDK5Project(target, script):
 
@@ -301,7 +301,7 @@ def MDK5Project(target, script):
     # copy uvopt file
     if os.path.exists('template.uvoptx'):
         import shutil
-        shutil.copy2('template.uvoptx', 'realgui.uvoptx')
+        shutil.copy2('template.uvoptx', 'HoneyGUI.uvoptx')
 
 def MDKProject(target, script):
     template = open('template.Uv2', "r")
