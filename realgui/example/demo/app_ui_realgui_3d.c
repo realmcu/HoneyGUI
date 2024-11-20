@@ -13,13 +13,11 @@
 #include "gui_canvas.h"
 
 
-#include "3d/rect_obj.txt"
-#include "3d/rect_mtl.txt"
 #include "tiger_blue.txt"
 #include "def_3d.h"
 #include "gui_3d.h"
 
-
+#include "3d/desc.txt"
 
 
 
@@ -54,10 +52,7 @@ void cb(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera
 static void app_ui_design(gui_app_t *app)
 {
 
-    gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", 0, 0, 480, 480);
-
-    gui_3d_set_obj(test_3d, (void *)_acrect_obj, sizeof(_acrect_obj));
-    gui_3d_set_mtl(test_3d, (void *)_acrect_mtl, sizeof(_acrect_mtl));
+    gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
     gui_3d_set_shape_transform_cb(test_3d, 0, cb);
 
