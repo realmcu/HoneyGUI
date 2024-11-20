@@ -334,9 +334,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls />
-              <Define>ENABLE_HONEYGUI GUI_KEIL_SIM DRV_LCD_WIDTH=480 DRV_LCD_HIGHT=480 DRV_PIXEL_BITS=16</Define>
+              <Define>DRV_PIXEL_BITS=16 ENABLE_HONEYGUI GUI_KEIL_SIM DRV_LCD_HIGHT=480 DRV_LCD_WIDTH=480</Define>
               <Undefine />
-              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;platform;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\app;..\..\realgui\widget\3d;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\example\demo;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget</IncludePath>
+              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;platform;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\app;..\..\realgui\widget\3d;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\DOM;..\..\realgui\engine;..\..\realgui\example\demo;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -578,6 +578,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>realgui/dom</GroupName>
+          <Files>
+            <File>
+              <FileName>XML_DOM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\DOM\XML_DOM.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>realgui/engine</GroupName>
           <Files>
             <File>
@@ -754,16 +764,6 @@
               <FileName>tlsf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\misc\tlsf\tlsf.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>realgui/SaaA</GroupName>
-          <Files>
-            <File>
-              <FileName>ezhtml.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\SaaA\ezhtml.c</FilePath>
             </File>
           </Files>
         </Group>

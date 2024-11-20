@@ -18,7 +18,7 @@ RVD exports the SaaA package. The firmware needs to parse and play it.
 ## XML
 * The xml file in the APP package describes the initial nested tree structure and specific parameters of the widget.
 * Using ```realgui\3rd\ezXML``` to convert xml to C language data format. Please refer to <https://ezxml.sourceforge.net/> for details.
-* The implementation of the xml parser is in this file ```realgui\SaaA\ezhtml.c```. You can read the syntax 
+* The implementation of the xml parser is in this file ```realgui\DOM\XML_DOM.c```. You can read the syntax 
 description on the ```XML syntax``` page.
 * According to the syntax protocol, this function ```foreach_create``` uses a recursive strategy to traverse each tag of xml and map the tag to the widget, configure the tag's attributes to the widget.
 * After the xml traversal is completed, a C-APP has actually been created in the firmware, which is no different from the result of directly using the C-APP api.

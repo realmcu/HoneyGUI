@@ -10,9 +10,6 @@ CPPPATH = [cwd]
 if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
     src += Glob('./*.c')
     src += Glob('./js_ui/*.c')
-elif GetDepend(['CONFIG_REALTEK_BUILD_GUI']):
-    src += ['ezhtml.c']
-    #src += ['frontend_launcher.c']
 if GetDepend(['CONFIG_REALTEK_BUILD_WEB']):
     src += ['web/JsExecutor.cpp']+['web/web.cpp']+['web/font.c']
     CPPPATH += [cwd+'/web']

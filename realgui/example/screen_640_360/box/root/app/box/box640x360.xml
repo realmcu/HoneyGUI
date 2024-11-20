@@ -534,7 +534,7 @@
             h="49"
             text="12/MARCH"
             fontSize="16"
-            font="app/box/resource/font/Michroma_Regular_size16_bits4_font.bin"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
             mode="center">txt_date7
             <onTime
                 type="00:00"
@@ -566,7 +566,7 @@
             h="49"
             text="12/MARCH"
             fontSize="16"
-            font="app/box/resource/font/Michroma_Regular_size16_bits4_font.bin"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
             mode="center">txt_date9
             <onTime
                 type="hour"
@@ -582,7 +582,7 @@
             h="49"
             text="12/MARCH"
             fontSize="16"
-            font="app/box/resource/font/Michroma_Regular_size16_bits4_font.bin"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
             mode="center">txt_date10
             <onTime
                 type="minute"
@@ -598,7 +598,7 @@
             h="49"
             text="12/MARCH"
             fontSize="16"
-            font="app/box/resource/font/Michroma_Regular_size16_bits4_font.bin"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
             mode="center">txt_date11
             <onTime
                 type="second"

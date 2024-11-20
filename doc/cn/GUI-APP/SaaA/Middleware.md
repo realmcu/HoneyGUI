@@ -18,7 +18,7 @@ RVD导出了SaaA包。固件需要解析和播放它。
 ## XML
 * APP包中的XML文件描述了控件的初始嵌套树结构和特定参数。
 * 使用 ```realgui\3rd\ezXML``` 将XML转换为C语言数据格式。详细信息请参考 <https://ezxml.sourceforge.net/>。
-* XML解析器的实现在该文件 ```realgui\SaaA\ezhtml.c```中。您可以在 ```XML syntax``` 页面上阅读语法说明。
+* XML解析器的实现在该文件 ```realgui\DOM\XML_DOM.c```中。您可以在 ```XML syntax``` 页面上阅读语法说明。
 * 根据语法规定，函数 ```foreach_create``` 使用递归策略遍历XML的每个标签，并将标签映射到控件，将标签的属性配置给控件。
 * XML遍历完成后，在固件中实际上创建了一个C-APP，与直接使用C-APP API的结果没有区别。
 * 然后将执行XML中提到的JavaScript文件。
