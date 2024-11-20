@@ -205,10 +205,10 @@ static void gui_3d_prepare(gui_3d_t *this)
 
         for (size_t j = 0; j < this->shapes[i].length /*number of face*/; j++)
         {
-            // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->shapes[i].name, this->shapes[i].length, this->shapes[i].face_offset);
-            convert_to_face(this, this->shapes[i].face_offset);
+            // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->shapes[i].name, this->shapes[i].length, this->shapes[i].face_offset + j);
+            convert_to_face(this, this->shapes[i].face_offset + j);
 
-            face_transfrom(this, i, this->shapes[i].face_offset, &world, &camera);
+            face_transfrom(this, i, this->shapes[i].face_offset + j, &world, &camera);
         }
 
     }
