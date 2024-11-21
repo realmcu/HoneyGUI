@@ -2,8 +2,8 @@
     "guiEngine-master": {
         "mandatory": [],
         "temporary": [
-            ["keil_sim/ac5/HoneyGui.uvprojx", "", "sdk"],
-            ["keil_sim/ac6/HoneyGui.uvprojx", "", "sdk"]
+            ["keil_sim/ac5/HoneyGUI.uvprojx", "", "sdk"],
+            ["keil_sim/ac6/HoneyGUI.uvprojx", "", "sdk"]
         ]
     }
 }
