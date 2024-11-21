@@ -144,6 +144,8 @@ static void app_BOX2D_RING_return_cb(void)
 
 static void app_menu_design(gui_app_t *app)
 {
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
     /**
      * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
     */
@@ -242,6 +244,9 @@ static void app_menu_design(gui_app_t *app)
 GUI_APP_ENTRY(APP_BOX2D_RING)
 {
     sidebar_app_array_fill(UI_CLOCK_BOX2D_RING_ICON_BIN, switch_BOX2D_RING);
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
+
     extern void app_box2d_ring_ui_design(gui_obj_t *obj);
     app_box2d_ring_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
@@ -251,6 +256,9 @@ GUI_APP_ENTRY(APP_BOX2D_RING)
 GUI_APP_ENTRY(APP_MUSIC)
 {
     sidebar_app_array_fill(UI_CLOCK_MUSIC_ICON_BIN, switch_APP_MUSIC);
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
+
     extern void app_music_ui_design(gui_obj_t *obj);
     app_music_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
@@ -261,6 +269,9 @@ GUI_APP_ENTRY(APP_MUSIC)
 GUI_APP_ENTRY(APP_FRUIT_NINJA)
 {
     sidebar_app_array_fill(UI_CLOCK_FRUIT_NINJA_ICON_BIN, switch_APP_FRUIT_NINJA);
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
+
     extern void app_fruit_ninja_design(gui_obj_t *obj);
     app_fruit_ninja_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,

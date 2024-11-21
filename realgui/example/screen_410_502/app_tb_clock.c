@@ -152,12 +152,6 @@ static void callback_touch_long(void *obj, gui_event_t e)
     gui_fb_change();
 }
 
-static void switch_app_menu()
-{
-    extern void *get_app_menu();
-    gui_switch_app(gui_current_app(), get_app_menu());
-}
-
 void page_tb_clock(void *parent)
 {
     ct = gui_curtainview_create(parent, "ct_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -174,6 +168,7 @@ void page_tb_clock(void *parent)
     extern void page_ct_sidebar(void *parent);
     extern void tabview_up_design(void *parent_widget);
     extern void curtain_down_design(void *parent_widget);
+
     // app_watchface_m
     page_ct_sidebar(ct_left);
     tabview_up_design(ct_control0);
@@ -201,7 +196,6 @@ void page_tb_clock(void *parent)
     }
     win_touch = gui_win_create(ct_clock, "win_touch", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_obj_add_event_cb(win_touch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
-    // gui_obj_add_event_cb(win_touch, (gui_event_cb_t)switch_app_menu, GUI_EVENT_4, NULL);
 }
 /* curtain example end*/
 

@@ -1048,6 +1048,8 @@ void switch_heart_rate();
 static void heart_rate_app(gui_app_t *app)
 {
     gui_log("current app:%s\n", gui_current_app()->screen.name);
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
     extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
     sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, (gui_event_cb_t)switch_heart_rate);
     win_hb = gui_win_create(&app->screen, "hb_win", 0, 0, SCREEN_WIDTH,

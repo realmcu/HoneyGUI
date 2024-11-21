@@ -80,17 +80,4 @@ void page_ct_sidebar(void *parent)
             break;
         }
     }
-
-    // gui_img_t *img = gui_img_create_from_mem(win, 0, UI_CLOCK_HEARTRATE_ICON_BIN, SCREEN_WIDTH - 120, 10, 0, 0);
-    // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    // gui_obj_add_event_cb(GUI_BASE(img), switch_heart_rate, GUI_EVENT_1, NULL);
-    // img = gui_img_create_from_mem(win, 0, UI_CLOCK_MUSIC_ICON_BIN, SCREEN_WIDTH - 120, 10 + 105, 0, 0);
-    // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    // gui_obj_add_event_cb(GUI_BASE(img), switch_APP_MUSIC, GUI_EVENT_1, NULL);
-    // img = gui_img_create_from_mem(win, 0, UI_CLOCK_FRUIT_NINJA_ICON_BIN, SCREEN_WIDTH - 120, 10 + 105 * 2, 0, 0);
-    // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    // gui_obj_add_event_cb(GUI_BASE(img), switch_APP_FRUIT_NINJA, GUI_EVENT_1, NULL);
-    // img = gui_img_create_from_mem(win, 0, UI_CLOCK_BOX2D_RING_ICON_BIN, SCREEN_WIDTH - 120, 10 + 105 * 3, 0, 0);
-    // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    // gui_obj_add_event_cb(GUI_BASE(img), switch_BOX2D_RING, GUI_EVENT_1, NULL);
 }
