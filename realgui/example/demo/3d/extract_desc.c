@@ -309,11 +309,17 @@ void binary_to_txt_array(const char *binary_filename, const char *txt_filename)
     free(buffer);
     fclose(txt_file);
 
-    printf("Converted binary file to txt array file successfully!\n");
+    printf("Convert binary file to txt array file successfully!\n");
 }
 
 int main(int argc, char **argv)
 {
+    int result = system("python png2c.py");
+    if (result == -1)
+    {
+        fprintf(stderr, "Failed to run png2c.py\n");
+    }
+
     const char *obj_filename = argv[1];
     gui_3d_description_t *desc = malloc(sizeof(gui_3d_description_t));
 

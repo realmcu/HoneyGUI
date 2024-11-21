@@ -84,7 +84,6 @@ def process_png_file(filename):
 
 def process_files_in_directory():
     current_directory = os.getcwd()
-    print(current_directory)
 
     png_files = [f for f in os.listdir(current_directory) if f.endswith('.png')]
 
