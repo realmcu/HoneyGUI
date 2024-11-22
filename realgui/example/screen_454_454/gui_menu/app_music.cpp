@@ -597,7 +597,7 @@ private:
         char dummy = ':';
         std::istringstream timeStream(timePart);
         timeStream >> minutes >> dummy >> seconds;
-        return minutes * 60 + seconds;
+        return (int)(minutes * 60 + seconds);
     }
 
 // Function to get metadata

@@ -2954,7 +2954,6 @@ static const char *item_text_array[] =
 };
 static void ticket(void *obj, gui_event_t e, void *param)
 {
-    gui_log("ticket%d\n", param);
     static int i;
     gui_page_list_new_render(pl_horizontal, ++i, item_click_function_array_horizontal, item_text_array);
     if (i >= 24)
@@ -2966,7 +2965,6 @@ static void ticket(void *obj, gui_event_t e, void *param)
 }
 static void ticket_vertiacl(void *obj, gui_event_t e, void *param)
 {
-    gui_log("ticket%d\n", param);
     static int i;
     gui_page_list_new_render(pl_vertical, ++i, item_click_function_array, item_text_array);
     if (i >= 24)

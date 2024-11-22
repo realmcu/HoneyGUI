@@ -24,23 +24,21 @@
             "exercise_max": 60,
             "stand_max": 30,
             "move": 1,
-            "exercise": 54,
+            "exercise": 50,
             "stand": 1
         }
     ],
     "heart_rate": [
         {
             "array": [
-                111,
-                2,
-                222,
-                333,
-                -100,
-                123,
-                321,
-                111,
-                3.14159265
+                100,180,110,50,90
             ]
+        }
+    ],
+    "battery": [
+        {
+            
+            "capacity": 68
         }
     ]
 }

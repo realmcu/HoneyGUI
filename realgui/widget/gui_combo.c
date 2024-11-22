@@ -30,6 +30,7 @@ static void pipeline(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         {
         case OBJ_INPUT_PREPARE:
             input_prepare();
+            break;
         case OBJ_PREPARE:
             prepare(obj);
             break;

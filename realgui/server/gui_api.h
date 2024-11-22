@@ -115,6 +115,7 @@ extern "C" {
 #define APP_COLOR_GRAY                      gui_rgb(128,128,128)
 #define APP_COLOR_BLACK_OPACITY(opacity)    gui_rgba(0,0,0, opacity)
 #define APP_COLOR_GRAY_OPACITY(opacity)     gui_rgba(128,128,128, opacity)
+#define GUI_FS_O_BINARY 0100000
 
 
 

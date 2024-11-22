@@ -193,14 +193,17 @@ gui_app_t *gui_obj_tree_get_app(gui_obj_t *obj)
     }
     while (true)
     {
-        if (child->parent == NULL && child->type == SCREEN)
+        if (child)
         {
-            gui_log("gui_obj_tree_get_root = %s\n", child->name);
-            return (gui_app_t *)child;
-        }
-        else
-        {
-            child = child->parent;
+            if (child->parent == NULL && child->type == SCREEN)
+            {
+                gui_log("gui_obj_tree_get_root = %s\n", child->name);
+                return (gui_app_t *)child;
+            }
+            else
+            {
+                child = child->parent;
+            }
         }
     }
 }

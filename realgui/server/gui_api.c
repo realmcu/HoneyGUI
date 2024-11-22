@@ -778,7 +778,7 @@ void *gui_get_file_address(const char *file)
 
         char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
         sprintf(path, "%s%s", root_folder, file);
-        int fd = gui_fs_open(path,  0);
+        int fd = gui_fs_open(path,  GUI_FS_O_BINARY);
 
         if (fd <= 0)
         {

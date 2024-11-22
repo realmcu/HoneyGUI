@@ -28,7 +28,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
-#include "gui_return.h"
+
 #include "gui_slider.h"
 #include "gui_scroll_wheel_new.h"
 #include "gui_calendar.h"
@@ -147,6 +147,9 @@ typedef struct chart_animation_param
 #define TEXT_WEATHER_CUR_ANIMATION 1
 #define ARC_ACTIVITY_EX_ANIMATION 2
 #define CHART_HEART_RATE_DATA_ANIMATION 3
+#define TEXT_HEART_RATE_CUR_ANIMATION 4
+#define TEXT_ACTIVITY_EX_ANIMATION 5
+#define TEXT_BATTERY_CAPACITY_ANIMATION 6
 static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
@@ -158,6 +161,9 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animation_hr_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_activity_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_battery_callback);
 static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
@@ -340,7 +346,7 @@ static char *read_file(const char *path)
     char *content = (char *)malloc(length + 1);
     //if (content)
     {
-        size_t n = fread(content, 1, length, file);
+        fread(content, 1, length, file);
         //gui_log("%d\n", n);
         content[length] = '\0';
     }
@@ -1247,7 +1253,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_color_t stroke = APP_COLOR_RED;
                     float sd = 0; GUI_UNUSED(sd);
                     float ed = 100; GUI_UNUSED(ed);
-                    int dir;
+                    int dir = NVG_CW;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -4418,6 +4424,30 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                              (void *)TEXT_WEATHER_CUR_ANIMATION);
                                     }
                                 }
+                                else if (!strcmp(type, "heart_rate"))
+                                {
+                                    if (!strcmp(id, "current"))
+                                    {
+                                        gui_text_set_animate(parent, 1000, -1, text_animation_hr_callback,
+                                                             (void *)TEXT_HEART_RATE_CUR_ANIMATION);
+                                    }
+                                }
+                                else if (!strcmp(type, "activity"))
+                                {
+                                    if (!strcmp(id, "exercise"))
+                                    {
+                                        gui_text_set_animate(parent, 1000, -1, text_animate_activity_callback,
+                                                             (void *)TEXT_ACTIVITY_EX_ANIMATION);
+                                    }
+                                }
+                                else if (!strcmp(type, "battery"))
+                                {
+                                    if (!strcmp(id, "capacity"))
+                                    {
+                                        gui_text_set_animate(parent, 1000, -1, text_animate_battery_callback,
+                                                             (void *)TEXT_BATTERY_CAPACITY_ANIMATION);
+                                    }
+                                }
                             }
                         }
                         break;
@@ -5700,6 +5730,124 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
     }
 
 }
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animation_hr_callback)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+
+    switch ((size_t)p)
+    {
+    case TEXT_HEART_RATE_CUR_ANIMATION:
+        {
+            const char *path =
+                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+            int fd = gui_fs_open(path, 0);
+            gui_free((void *)path);
+            int size = gui_fs_lseek(fd, 0, SEEK_END);
+            gui_fs_lseek(fd, 0, SEEK_SET);
+            char *json_string = gui_malloc(size + 1);
+            gui_fs_read(fd, json_string, size);
+            gui_fs_close(fd);
+            json_string[size] = '\0';
+            int array_length = 0;
+            //gui_log("%s\n",json_string);
+            float *array = gui_get_json_array(json_string, "heart_rate", "array", &array_length);
+            gui_free(json_string);
+            if (array_length == 0 || array == 0)
+            {
+                return;
+            }
+            static char move_string[4];
+            memset(move_string, 0, GUI_ARRAY_SIZE(move_string));
+            sprintf(move_string, "%d", (int)array[array_length - 1]);
+            gui_text_content_set(this_widget, move_string, strlen(move_string));
+            gui_free(array);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_activity_callback)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+
+    switch ((size_t)p)
+    {
+    case TEXT_ACTIVITY_EX_ANIMATION:
+        {
+            const char *path =
+                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+            int fd = gui_fs_open(path, 0);
+            gui_free((void *)path);
+            int size = gui_fs_lseek(fd, 0, SEEK_END);
+            gui_fs_lseek(fd, 0, SEEK_SET);
+            char *json_string = gui_malloc(size + 1);
+            gui_fs_read(fd, json_string, size);
+            gui_fs_close(fd);
+            json_string[size] = '\0';
+            int move = 0;
+            //gui_log("%s\n",json_string);
+            gui_get_json_value(json_string, "activity", "exercise", &move);
+            gui_free(json_string);
+
+            static char move_string[4];
+            memset(move_string, 0, GUI_ARRAY_SIZE(move_string));
+            sprintf(move_string, "%d", (int)move);
+            gui_text_content_set(this_widget, move_string, strlen(move_string));
+        }
+        break;
+
+    default:
+        break;
+    }
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_battery_callback)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+
+    switch ((size_t)p)
+    {
+    case TEXT_BATTERY_CAPACITY_ANIMATION:
+        {
+            const char *path =
+                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+            int fd = gui_fs_open(path, 0);
+            gui_free((void *)path);
+            int size = gui_fs_lseek(fd, 0, SEEK_END);
+            gui_fs_lseek(fd, 0, SEEK_SET);
+            char *json_string = gui_malloc(size + 1);
+            gui_fs_read(fd, json_string, size);
+            gui_fs_close(fd);
+            json_string[size] = '\0';
+            int move = 0;
+            //gui_log("%s\n",json_string);
+            gui_get_json_value(json_string, "battery", "capacity", &move);
+            gui_free(json_string);
+
+            static char move_string[4];
+            memset(move_string, 0, GUI_ARRAY_SIZE(move_string));
+            sprintf(move_string, "%d", (int)move);
+            gui_text_content_set(this_widget, move_string, strlen(move_string));
+        }
+        break;
+
+    default:
+        break;
+    }
+
+}
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
 {
     if (!animate->Beginning_frame)
@@ -5732,51 +5880,58 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
             arc_animation_param_t *param = p;
             {
                 memset(param->target_buffer, 0, param->image_data_length);
-                int format = GUI_CANVAS_OUTPUT_RGBA; bool compression = 0; GUI_UNUSED(compression);
+                //int format = GUI_CANVAS_OUTPUT_RGBA;
+                bool compression = 0; GUI_UNUSED(compression);
                 int image_width = param->image_width;
                 int image_height = param->image_height;  uint8_t *target_buffer = param->target_buffer;
                 {
                     int pixel_length = 4;
-                    int data_length = 0;
+                    //int data_length = 0;
                     uint8_t *buffer = 0;
                     uint8_t *output_data = 0;
-                    switch (format)
-                    {
-                    case GUI_CANVAS_OUTPUT_PNG:
-                    case GUI_CANVAS_OUTPUT_JPG:
-                        {
-                            data_length = image_width * image_height * pixel_length;
-                            buffer = gui_lower_malloc(data_length);
-                            memset(buffer, 0, data_length);
-                        }
-                        break;
-                    case GUI_CANVAS_OUTPUT_RGBA:
-                        {
-                            output_data = target_buffer;
-                            buffer = output_data + sizeof(gui_rgb_data_head_t);
-                            memset(output_data, 0, sizeof(gui_rgb_data_head_t));
-                            gui_rgb_data_head_t *head = (void *)output_data;
-                            head->type = ARGB8888;
-                            head->w = image_width;
-                            head->h = image_height;
-                        }
-                        break;
-                    case GUI_CANVAS_OUTPUT_RGB565:
-                        {
-                            pixel_length = 2;
-                            output_data = target_buffer;
-                            memset(output_data, 0, sizeof(gui_rgb_data_head_t));
-                            buffer = output_data + sizeof(gui_rgb_data_head_t);
-                            gui_rgb_data_head_t *head = (void *)output_data;
-                            head->type = RGB565;
-                            head->w = image_width;
-                            head->h = image_height;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-
+                    // switch (format)
+                    // {
+                    // case GUI_CANVAS_OUTPUT_PNG:
+                    // case GUI_CANVAS_OUTPUT_JPG:
+                    //     {
+                    //         data_length = image_width * image_height * pixel_length;
+                    //         buffer = gui_lower_malloc(data_length);
+                    //         memset(buffer, 0, data_length);
+                    //     }
+                    //     break;
+                    // case GUI_CANVAS_OUTPUT_RGBA:
+                    //     {
+                    //         output_data = target_buffer;
+                    //         buffer = output_data + sizeof(gui_rgb_data_head_t);
+                    //         memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                    //         gui_rgb_data_head_t *head = (void *)output_data;
+                    //         head->type = ARGB8888;
+                    //         head->w = image_width;
+                    //         head->h = image_height;
+                    //     }
+                    //     break;
+                    // case GUI_CANVAS_OUTPUT_RGB565:
+                    //     {
+                    //         pixel_length = 2;
+                    //         output_data = target_buffer;
+                    //         memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                    //         buffer = output_data + sizeof(gui_rgb_data_head_t);
+                    //         gui_rgb_data_head_t *head = (void *)output_data;
+                    //         head->type = RGB565;
+                    //         head->w = image_width;
+                    //         head->h = image_height;
+                    //     }
+                    //     break;
+                    // default:
+                    //     break;
+                    // }
+                    output_data = target_buffer;
+                    buffer = output_data + sizeof(gui_rgb_data_head_t);
+                    memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                    gui_rgb_data_head_t *head = (void *)output_data;
+                    head->type = ARGB8888;
+                    head->w = image_width;
+                    head->h = image_height;
                     {
                         NVGcontext *vg = 0;
                         extern NVGcontext *nvgCreateAGGE(uint32_t w,
@@ -5785,8 +5940,10 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
                                                          enum     NVGtexture format,
                                                          uint8_t *data);
                         extern void nvgDeleteAGGE(NVGcontext * ctx);
+                        // vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
+                        //                    (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
                         vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
-                                           (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
+                                           NVG_TEXTURE_BGRA, buffer);
                         nvgBeginFrame(vg, image_width, image_height, 1);
 
                         nvgResetTransform(vg);
