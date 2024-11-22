@@ -21,7 +21,7 @@ class GuiRGBDataHeader:
     def pack(self):
         # 打包数据到二进制格式
         first_byte = (self.scan & 0x01) | ((self.align & 0x01) << 1) | ((self.resize & 0x03) << 2) | ((self.compress & 0x01) << 4) | ((self.rsvd & 0x07) << 5)
-        return struct.pack('=BBhhbb', first_byte, self.type, self.w, self.h, self.version, self.rsvd2)
+        return struct.pack("<BBhhBB", first_byte, self.type, self.w, self.h, self.version, self.rsvd2)
     
 def rgb_to_rgb565(r, g, b):
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
@@ -35,19 +35,27 @@ def convert_to_rgb565(pixels):
         rgb565_data.append(rgb_to_rgb565(r, g, b))
     return rgb565_data
 
+def convert_to_BGRA8888(rgba_bytes):
+    bgra_bytes = bytearray()
+    for i in range(0, len(rgba_bytes), 4):
+        r, g, b, a = rgba_bytes[i], rgba_bytes[i+1], rgba_bytes[i+2], rgba_bytes[i+3]
+        bgra_bytes.extend([b, g, r, a])
+    return bytes(bgra_bytes)
+
 def png_to_c_with_header(input_file, output_file):
     header = GuiRGBDataHeader()
-    header.type = 0
+    header.type = 4
 
     with Image.open(input_file) as img:
-        img = img.convert("RGB")
+        img = img.convert("RGBA")
         header.w, header.h = img.size
-        pixels = img.tobytes()
+        rgba_pixels  = img.tobytes()
+        pixels = convert_to_BGRA8888(rgba_pixels)
 
-    rgb565_pixels = convert_to_rgb565(pixels)
+    # rgb565_pixels = convert_to_rgb565(pixels)
     header_bytes = header.pack()
     array_name = "_ac" + os.path.splitext(os.path.basename(input_file))[0]
-    total_length = len(header_bytes) + len(rgb565_pixels)*2
+    total_length = len(header_bytes) + len(pixels)
 
     with open(output_file, 'w') as f:
         f.write(f"static const unsigned char {array_name}[{total_length}] = {{")
@@ -58,13 +66,23 @@ def png_to_c_with_header(input_file, output_file):
                 f.write("\n")
             f.write(f"0x{b:02x}, ")
         # 写入图像数据
-        for i, b in enumerate(rgb565_pixels):
-            if (i + len(header_bytes)) % 40 == 0:
-                f.write("\n")
-            if i == len(rgb565_pixels) - 1:
-                f.write(f"0x{b & 0xFF:02x}, 0x{(b >> 8) & 0xFF:02x}")
+        # for i, b in enumerate(pixels):
+        #     if (i + len(header_bytes)) % 40 == 0:
+        #         f.write("\n")
+        #     if i == len(pixels) - 1:
+        #         f.write(f"0x{b & 0xFF:02x}, 0x{(b >> 8) & 0xFF:02x}")
+        #     else:
+        #         f.write(f"0x{b & 0xFF:02x}, 0x{(b >> 8) & 0xFF:02x}, ")
+            
+        for i in range(0, len(pixels), 4):  # 每个像素4个字节(ARGB)
+            b, g, r, a = pixels[i], pixels[i+1], pixels[i+2], pixels[i+3]
+            if (i // 4 + len(header_bytes)) % 20 == 0:
+                f.write("\n    ")
+            if i == len(pixels) - 4:
+                f.write(f"0x{b:02x}, 0x{g:02x}, 0x{r:02x}, 0x{a:02x}")
             else:
-                f.write(f"0x{b & 0xFF:02x}, 0x{(b >> 8) & 0xFF:02x}, ")
+                f.write(f"0x{b:02x}, 0x{g:02x}, 0x{r:02x}, 0x{a:02x}, ")
+
         f.write("\n};\n")
     print(f"Convert {input_file} to {output_file} successfully!")
     

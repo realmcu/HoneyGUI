@@ -59,19 +59,6 @@ static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*
 
     gui_3d_scene(this->face + i, world, camera);
 
-    float x0 = this->face[i].transform_vertex[0].position.x;
-    float y0 = this->face[i].transform_vertex[0].position.y;
-
-    float x1 = this->face[i].transform_vertex[1].position.x;
-    float y1 = this->face[i].transform_vertex[1].position.y;
-
-    float x2 = this->face[i].transform_vertex[2].position.x;
-    float y2 = this->face[i].transform_vertex[2].position.y;
-
-    float x3 = this->face[i].transform_vertex[3].position.x;
-    float y3 = this->face[i].transform_vertex[3].position.y;
-
-
     int material_id = this->desc->attrib.material_ids[i];
     this->img[i].data = (void *)this->desc->textures[material_id];
 
@@ -79,8 +66,16 @@ static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*
     float width = head->w;
     float height = head->h;
 
-    gui_3d_point_2d_t src[4] = {{0, 0}, {width, 0}, {width, height}, {0, height}};
-    gui_3d_point_2d_t dst[4] = {{x0, y0}, {x1, y1}, {x2, y2}, {x3, y3}};
+    gui_3d_point_2d_t src[4];
+    gui_3d_point_2d_t dst[4];
+    for (size_t j = 0; j < 4; ++j)
+    {
+        src[j].x = this->face[i].vertex[j].u * width;
+        src[j].y = (1.0f - this->face[i].vertex[j].v) * height;
+
+        dst[j].x = this->face[i].transform_vertex[j].position.x;
+        dst[j].y = this->face[i].transform_vertex[j].position.y;
+    }
 
     gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
     memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
@@ -88,7 +83,7 @@ static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*
 
     this->img[i].img_w = width;
     this->img[i].img_h = height;
-    this->img[i].blend_mode = IMG_BYPASS_MODE;
+    this->img[i].blend_mode = IMG_SRC_OVER_MODE;
     this->img[i].high_quality = true;
     this->img[i].opacity_value = UINT8_MAX;
     draw_img_new_area(this->img + i, NULL);
