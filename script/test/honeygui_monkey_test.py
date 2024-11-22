@@ -81,7 +81,6 @@ class HoneyguiMonkeyTest():
             if self.test_type in ['Nightly']:
                 hrs_pip_name = self.project + "_" + self.module + "_HoneyRobotLight"
             
-            """
             if get_slave_property_value(self.chip_type, "need_tscon"):
                 run_id = self.getSessionID()
                 tool_base = ToolBase(cmd_line=[r'tscon', run_id, r'/v', r'/dest:console'], wait=False, timeout=100, delay=60)
@@ -90,7 +89,6 @@ class HoneyguiMonkeyTest():
                 except Exception as e:
                     print("tscon run fail: {}".format(e))
                 self.getSessionID()
-            """
 
             hrs_tool = HoneyRobotLight(project=self.project, branch=self.branch, chip_type=self.chip_type,
                                     test_type=self.test_type, sequence_index=self.sequence_index,
