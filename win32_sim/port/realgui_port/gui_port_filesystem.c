@@ -141,10 +141,15 @@ void port_fstat(int fildes, gui_fs_stat_t *buf)
     fstat(fd, &st);
     buf->st_size = st.st_size;
 }
+static int port_open(const char *file, int flags, ...)
+{
+    return open(file, flags | O_BINARY);
+}
+
 static struct gui_fs fs_api =
 {
     /* file api port*/
-    .open      = open,
+    .open      = port_open,
     .close     = close,
     .read      = (int (*)(int, void *, size_t))read,
     .write     = (int (*)(int, const void *, size_t))write,
