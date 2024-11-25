@@ -13,6 +13,127 @@
   ***************************************************************************************
   */
 
+extern "C" {
+
+
+#include "guidef.h"
+    /**
+     * @brief Play the specified music file.
+     *
+     * This function starts playing the music file specified by the path `music_file`.
+     *
+     * @param[in] music_file The path to the music file to play.
+     *
+     * @return #GUI_SUCCESS if the operation was successful.
+     */
+    gui_error_t gui_music_play(const char *music_file);
+
+    /**
+     * @brief Stop the currently playing music.
+     *
+     * This function stops playback of any music currently being played.
+     *
+     * @return #GUI_SUCCESS if the music was successfully stopped.
+     */
+    gui_error_t gui_music_stop(void);
+
+    /**
+     * @brief Check if the music playback has completed.
+     *
+     * This function checks if the currently playing music has finished playing.
+     *
+     * @return true if the music playback has completed.
+     * @return false if the music is still playing.
+     */
+    bool gui_music_completion_status(void);
+    /**
+     * @brief Get the length of the loaded music track.
+     *
+     * This function returns the total length of the currently loaded music track in seconds.
+     *
+     * @return The total length of the music track, in seconds. Returns 0 if no music is loaded.
+     */
+    float gui_music_length(void);
+
+    /**
+     * @brief Get the current playback time of the music track.
+     *
+     * This function returns the current playback position of the loaded music track in seconds.
+     *
+     * @return The current playback position, in seconds. Returns 0 if no music is loaded.
+     */
+    float gui_music_current_time(void);
+
+    /**
+     * @brief Load a music file.
+     *
+     * This function loads a music file for playback. The file specified by `music_file` will
+     * be loaded and can be played using other functions in this module.
+     *
+     * @param music_file The path to the music file to be loaded.
+     * @return A gui_error_t error code.
+     *         - GUI_SUCCESS if the file is loaded successfully.
+     *         - GUI_ERROR_NULL if the `music_file` parameter is null.
+     *         - GUI_ERROR_FORMAT if the file format is unsupported.
+     *         - GUI_ERROR for any other generic error condition.
+     */
+    gui_error_t gui_music_load(const char *music_file);
+    gui_error_t gui_music_play(const char *music_file)
+    {
+#if _WIN32
+        extern int win32_play_music(const char *music_file);
+        win32_play_music(music_file);
+#endif
+        return GUI_SUCCESS;
+    }
+    gui_error_t gui_music_stop()
+    {
+#if _WIN32
+        extern int win32_stop_music(void);
+        win32_stop_music();
+#endif
+        return GUI_SUCCESS;
+    }
+    bool gui_music_completion_status()
+    {
+#if _WIN32
+        extern bool win32_music_completion_status(void);
+        return win32_music_completion_status();
+#endif
+        return 0;
+    }
+    float gui_music_length()
+    {
+        float length = 0;
+#if _WIN32
+        extern double win32_music_get_music_length();
+        length = (float)win32_music_get_music_length();
+#endif
+        return length;
+    }
+    float gui_music_current_time()
+    {
+        float time = 0;
+#if _WIN32
+        extern  double win32_music_get_music_current_time();
+        time = (float)win32_music_get_music_current_time();
+#endif
+        return time;
+    }
+    gui_error_t gui_music_load(const char *music_file)
+    {
+        gui_error_t e = GUI_ERROR;
+#if _WIN32
+        extern int win32_load_music(const char *music_file);
+        int rst = win32_load_music(music_file);
+        if (rst == 0)
+        {
+            e = GUI_SUCCESS;
+        }
+#endif
+        return e;
+    }
+}
 #include<memory>
 #include "gui_switch.h"
 #include "../root_image/ui_resource.h"
@@ -23,10 +144,13 @@
 #include "tp_algo.h"
 #include "gui_pagelist_new.h"
 #include "gui_page.h"
+#include "gui_text.h"
 #include <vector>
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <iomanip> // for std::setw and std::setfill
+
 namespace std
 {
 template<typename T, typename... Args>
@@ -46,6 +170,13 @@ constexpr int MINIMIZE_WINDOW_HEIGHT = 60;
 constexpr int MINIMIZE_COVER_HEIGHT = 50;
 constexpr int LIST_COVER_H = 120;
 constexpr int LIST_SONG_H = 65;
+std::string mp3_file =
+    "realgui\\example\\screen_454_454\\root_image\\SDCARD\\music\\Free_Test_Data_5MB_MP3.mp3";
+gui_text_t *current_time;
+gui_canvas_rect_t *current_time_bar;
+gui_pagelist_new_t *pl;
+int page_list_item_space;
+int lyrics_array_length;
 class MusicPlayer
 {
 public:
@@ -345,9 +476,11 @@ private:
     bool win_lrc_gesture = true;
     bool win_list_gesture = true;
     int win_list_gesture_page_y = 0;
+    bool playing_flag;
     gui_page_t *list_page;
     int value;
-    gui_pagelist_new_t *pl;
+
+
 //static void ticket(void *obj, gui_event_t e, void *param);
 // static const void *item_click_function_array[] =
 // {
@@ -427,7 +560,9 @@ private:
 
     static void switchOnCallback(void *null1, void *null2, void *param)
     {
-        gui_music_play("realgui\\example\\screen_454_454\\root_image\\root\\music_player\\sample_3s.mp3");
+        //gui_music_play("realgui\\example\\screen_454_454\\root_image\\root\\music_player\\sample_3s.mp3");
+        gui_music_play(mp3_file.c_str());
+
     }
     template<typename T>
     T lerp(T start, T end, float progress) const
@@ -447,6 +582,20 @@ private:
     }
     static void onCompletion(void *p, void *this_widget, gui_animate_t *animate)
     {
+        static char current_time_array[6];
+        memset(current_time_array, 0, 6);
+        float time = gui_music_current_time();
+        float duration = gui_music_length();
+        //gui_log("gui_music_current_time():%f\n", time);
+        std::string current_time_string = formatTime(time);
+
+        memcpy(current_time_array, current_time_string.c_str(), 6);
+        //gui_log("current_time_array:%s\n", current_time_array);
+        gui_text_content_set(current_time, current_time_array, 5);
+        gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
+        pl->app_y = -(time / duration * (page_list_item_space * lyrics_array_length -
+                                         gui_get_screen_height() / 2));
+        pl->app_take_over = true;
         if (gui_music_completion_status())
         {
             GUI_API(gui_switch_t).turn_off_no_event(static_cast<gui_switch_t *>(this_widget));
@@ -464,8 +613,8 @@ private:
     {
         //gui_obj_hidden(param, false);
     }
-    void displayText(gui_obj_t *parent,  const char *text_string, int x, int y,
-                     gui_color_t &color) const
+    gui_text_t *displayText(gui_obj_t *parent,  const char *text_string, int x, int y,
+                            gui_color_t &color) const
     {
         // This function is to create text GUI element
         const char *text = text_string;
@@ -477,6 +626,7 @@ private:
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MULTI_LEFT);
+        return t;
     }
 
     static void cover_animation(void *p, void *this_widget, gui_animate_t *animate);
@@ -519,8 +669,8 @@ private:
         gui_canvas_rect_create(GUI_BASE(lrc_win), 0, 0, 0, SCREEN_W, SCREEN_H, gui_color_css("GhostWhite"));
         int arrayLength = 0;
         char **allLyricsArray = getLyricAtTime(arrayLength, lrcContent);
-
-
+        lyrics_array_length = arrayLength;
+        page_list_item_space = 40;
 
         // std::cout << "Lyrics from 0 to 60 seconds:" << std::endl;
         for (int i = 0; allLyricsArray[i] != nullptr; ++i)
@@ -535,7 +685,8 @@ private:
 
         pl = gui_pagelist_new_create(
                  lrc_win,
-                 0, 0, WINDOW_WIGTH, 40, (const uint8_t *)SKIPBACK_BIN, (const uint8_t *)SKIPBACK_BIN,
+                 0, 0, WINDOW_WIGTH, page_list_item_space, (const uint8_t *)SKIPBACK_BIN,
+                 (const uint8_t *)SKIPBACK_BIN,
                  IMG_SRC_OVER_MODE,
                  (const uint8_t *)MICHROMA_REGULAR_SIZE16_BITS4_FONT_BIN,
                  16, APP_COLOR_RED
@@ -572,19 +723,23 @@ private:
                                                    MINIMIZE_WINDOW_HEIGHT);
         gui_win_press(win_cover_head, win_cover_head_callback, win_cover_head);
         // Display artist, song, and album name
-
-        artistName = "Doja Cat,";
-        albumName = "The Weekend";
-        songName = "You Right";
+        gui_music_load(mp3_file.c_str());
+        float length = gui_music_length();
+        artistName = "FreeTestData.com";
+        albumName = "Sample Audio";
+        songName = "Free_Test_Data_5MB_MP3";
+        std::string length_string = formatTime(length);
         displayText(parent, songName.c_str(), COVER_X, COVER_Y + COVER_W, color);
         displayText(parent, artistName.c_str(), COVER_X, COVER_Y + COVER_W + 18, color_artistName);
-        displayText(parent, albumName.c_str(), COVER_X + 80, COVER_Y + COVER_W + 18, color_artistName);
+        displayText(parent, albumName.c_str(), COVER_X + 180, COVER_Y + COVER_W + 18, color_artistName);
         gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, COVER_W, 3,
                                color_artistName);
-        gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, progressbar_width, 3,
-                               color);
-        displayText(parent, "1:24", COVER_X, COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
-        displayText(parent, "3:58", COVER_X + COVER_W - 30, COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
+        current_time_bar = gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16,
+                                                  progressbar_width, 3,
+                                                  color);
+        current_time = displayText(parent, "0:00", COVER_X, COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
+        displayText(parent, gui_strdup(length_string.c_str()), COVER_X + COVER_W - 30,
+                    COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
         gui_img_scale(img_cover, 0.5, 0.5);
 
     }
@@ -815,6 +970,15 @@ private:
         cArray[lines.size()] = nullptr;  // NULL terminator for the array
 
         return cArray;
+    }
+    static std::string formatTime(double seconds)
+    {
+        int minutes = static_cast<int>(seconds) / 60;
+        int sec = static_cast<int>(seconds) % 60;
+
+        std::ostringstream oss;
+        oss << minutes << ':' << std::setfill('0') << std::setw(2) << sec;
+        return oss.str();
     }
 };
 std::unique_ptr<MusicPlayer> player = nullptr;

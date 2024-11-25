@@ -59,7 +59,7 @@ typedef struct gui_pagelist_new
 
 
     int history_y;
-    int touch_y, speed, index_offset;
+    int touch_y, speed, index_offset, app_y;
     uint16_t row_count;
     uint16_t current_item_index;
     uint16_t item_count;
@@ -69,6 +69,7 @@ typedef struct gui_pagelist_new
 
 
     bool wheel_take_over;
+    bool app_take_over;
     int16_t time_array_offset;
 
     bool event5_flag;

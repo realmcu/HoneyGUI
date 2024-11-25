@@ -115,11 +115,110 @@ static void override(void *p, void *this_widget, gui_animate_t *animate)
     {
         (pl->wheel_take_over) = 0;
     }
+    int ax, ay;
+    gui_obj_absolute_xy(GUI_BASE(win), &ax, &ay);
+    if ((touch->pressed && touch->x > ax && touch->x < ax + GUI_BASE(win)->w) || touch->released ||
+        touch->pressing)
+    {
+        pl->app_take_over = 0;
+    }
+    if (pl->app_take_over)
+    {
+        pl->app_take_over = 0;
+        pl->touch_y = pl->app_y;
+        {
+            (pl->time_array_offset) = -(pl->touch_y / gap % time_array_size);
+            int widget_offset = pl->touch_y % gap;
+            GUI_BASE(timer1)->y = widget_offset;
+            if (pl->alien && widget_offset == 0 && (pl->speed) <= pl->end_speed &&
+                (pl->speed) >= -pl->end_speed)
+            {
+                pl->render_flag = 0;
+            }
+            if (pl->alien && widget_offset != 0)
+            {
+                if ((pl->speed) > 0 && (pl->speed) <= pl->end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= pl->end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        pl->touch_y += pl->end_speed;
+                    }
+                }
+                else if ((pl->speed) < 0 && (pl->speed) >= -pl->end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= pl->end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        pl->touch_y -= pl->end_speed;
+                    }
+                }
+                else if ((pl->speed) == 0)
+                {
+                    if (_UI_ABS(widget_offset) <= pl->end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    if (widget_offset > 0)
+                    {
+                        if (widget_offset > gap / 2)
+                        {
+                            pl->touch_y += pl->end_speed;
+                        }
+                        else
+                        {
+                            pl->touch_y -= pl->end_speed;
+                        }
+                    }
+                    else if (widget_offset < 0)
+                    {
+                        if (-widget_offset > gap / 2)
+                        {
+                            pl->touch_y -= pl->end_speed;
+                        }
+                        else
+                        {
+                            pl->touch_y += pl->end_speed;
+                        }
+                    }
+                }
+            }
+            {
+                for (size_t i = 0; i < count; i++)
+                {
+
+                    int index = (pl->time_array_offset) + i;
+                    if (index >= time_array_size)
+                    {
+                        index -= time_array_size;
+                    }
+                    if (index < 0)
+                    {
+                        index += time_array_size;
+                    }
+                    const char *text = pl->item_text_array[index]; GUI_UNUSED(text);
+                    if (i == (count) / 2)
+                    {
+                        (pl->index_offset) = index;
+                    }
+                    gui_obj_t *output = 0;
+                    gui_obj_tree_get_widget_by_type_and_index((void *)timer1, WINDOW, &output, i);
+                    render(index, output, pl);
+                }
+            }
+        }
+        return;
+    }
 
     if (!(pl->wheel_take_over))
     {
-        int ax, ay;
-        gui_obj_absolute_xy(GUI_BASE(win), &ax, &ay);
+
         if (touch->pressed && touch->x > ax && touch->x < ax + GUI_BASE(win)->w)
         {
             (pl->history_y) = pl->touch_y;

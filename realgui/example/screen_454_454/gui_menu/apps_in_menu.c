@@ -2855,7 +2855,7 @@ GUI_APP_ENTRY(APP_MUSIC)
     app_music_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
-    gui_fps_create(GUI_APP_ROOT_SCREEN);
+    //gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 GUI_APP_ENTRY(APP_CALENDAR)
 {
