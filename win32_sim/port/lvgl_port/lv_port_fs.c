@@ -13,7 +13,7 @@
 #include "lvgl.h"
 #include <stdio.h>
 #include <dirent.h>
-
+#include <sys/stat.h>
 /*********************
  *      DEFINES
  *********************/
@@ -41,7 +41,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p);
 static void *fs_dir_open(lv_fs_drv_t *drv, const char *path);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *rddir_p, char *fn);
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t *drv, void *rddir_p);
-
+static void *fs_ioctl(struct _lv_fs_drv_t *drv, void *file_p, int cmd);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -85,6 +85,7 @@ void lv_port_fs_init(void)
     fs_drv.dir_close_cb = fs_dir_close;
     fs_drv.dir_open_cb = fs_dir_open;
     fs_drv.dir_read_cb = fs_dir_read;
+    fs_drv.ioctl_cb = fs_ioctl;
 
     lv_fs_drv_register(&fs_drv);
 }
@@ -288,6 +289,32 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t *drv, void *rddir_p)
     return res;
 }
 
+static void *fs_ioctl(struct _lv_fs_drv_t *drv, void *file_p, int cmd)
+{
+    lv_fs_res_t res = LV_FS_RES_OK;
+
+    /*Add your code here*/
+    struct stat file_stat;
+    if (fstat(file_p, &file_stat) == -1)
+    {
+        gui_log("fs_ioctl err");
+        close(file_p);  // close file
+        return 0;
+    }
+
+    off_t file_size = file_stat.st_size;
+    void *buffer = (void *)malloc(file_size);
+    if (!buffer || !file_size)
+    {
+        gui_log("fs_ioctl err");
+        return 0;
+    }
+    uint32_t btr = file_size;
+    read((int)file_p, buffer, btr);
+
+    return (void *)buffer;
+
+}
 #else /*Enable this file at the top*/
 
 /*This dummy typedef exists purely to silence -Wpedantic.*/

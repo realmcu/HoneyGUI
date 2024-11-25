@@ -642,6 +642,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*GIF decoder library*/
 #define LV_USE_GIF 0
 
+/*RTK_IDU decoder library*/
+#define LV_USE_RTK_IDU 0
+
 /*QR code library*/
 #define LV_USE_QRCODE 0
 

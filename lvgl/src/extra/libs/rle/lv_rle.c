@@ -6,12 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef LV_USE_GPU_RTK_PPE
 #include "hal_imdc.h"
+#endif
 
 /**********************
  * GLOBAL VARIABLES
  **********************/
-static uint32_t lv_psram_decoder_rle_addr = LV_PSRAM_START;
+
 static uint8_t *decompress_flag = NULL;
 static uint8_t *psram_img_cache = NULL;  // PSRAM image decode data
 static uint32_t psram_img_cache_size = 0;  // cache size
@@ -97,14 +99,14 @@ typedef struct
 /**********************
  * UTILS
  **********************/
-void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) // RGB565
+static void rle_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) // RGB565
 {
     for (uint32_t i = 0; i < len; i++)
     {
         addr[i] = pixel;
     }
 }
-void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len) // ARGB8888
+static void rle_memset32(uint32_t *addr, uint32_t pixel, uint32_t len) // ARGB8888
 {
     for (uint32_t i = 0; i < len; i++)
     {
@@ -128,6 +130,11 @@ static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *i
 static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height);
 
+#ifdef LV_USE_GPU_RTK_PPE
+static lv_res_t hw_acc_imdc_decode(const uint8_t *image, uint8_t *output, uint16_t width,
+                                   uint16_t height);
+#endif
+
 /**********************
  * GLOBAL FUNCTIONS
  **********************/
@@ -138,6 +145,10 @@ void lv_rtk_idu_init(void)
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 
+#ifdef LV_USE_GPU_RTK_PPE
+    uint8_t channel1 = 1, channel2 = 3;
+    hal_dma_channel_init(&channel1, &channel2);
+#endif
     LV_LOG_INFO("RLE decoder initialized");
 }
 
@@ -159,6 +170,7 @@ static uint8_t get_bytes_per_pixel(uint8_t raw_bytes_per_pixel)
     default: return 0; // ???
     }
 }
+
 static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_header_t *header)
 {
     LV_UNUSED(decoder);
@@ -168,6 +180,7 @@ static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_
     if (src_type == LV_IMG_SRC_FILE)
     {
         const char *fn = src;
+        LV_ASSERT(strcmp(lv_fs_get_ext(fn), "rle") == 0);
         if (strcmp(lv_fs_get_ext(fn), "rle") == 0)               /*Check the extension*/
         {
             /*Save the data in the header*/
@@ -252,13 +265,16 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
             lv_fs_ioctl(&f, (void **)&rle_data, 0);
             memcpy(headers, rle_data, 20);
+            uint8_t idu_type = headers[8] & 0x03;// Lowest 2 bits
             uint16_t width = headers[2] | (headers[3] << 8);
             uint16_t height = headers[4] | (headers[5] << 8);
             uint8_t raw_bytes_per_pixel = headers[8] >> 6;
             uint8_t bytes_per_pixel = get_bytes_per_pixel(raw_bytes_per_pixel);
+
+            lv_fs_close(&f);
             dsc->header.w = width;
             dsc->header.h = height;
-            lv_fs_close(&f);
+            LV_ASSERT(idu_type == 0); //source RLE
 
             if (decompress_flag == (uint8_t *)rle_data)
             {
@@ -266,16 +282,24 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
                 return LV_RES_OK;
             }
             uint32_t img_size = width * height * bytes_per_pixel;
-            if (lv_psram_decoder_rle_addr + img_size > LV_PSRAM_END)
-            {
-                LV_LOG_ERROR("PSRAM out of memory");
-                return LV_RES_INV; // no memory left in PSRAM
-            }
-            psram_img_cache = (uint8_t *)lv_psram_decoder_rle_addr;
+            uint8_t *img_data = lv_mem_alloc(img_size);
 
-            uint8_t *img_data = (uint8_t *)lv_psram_decoder_rle_addr;
+            psram_img_cache = (uint8_t *)img_data;
+
             imdc_file_t *file = (imdc_file_t *)(rle_data + 8);
             lv_res_t ret;
+
+#ifdef LV_USE_GPU_RTK_PPE
+            ret = hw_acc_imdc_decode(rle_data, img_data, width, height);
+
+            if (ret == LV_RES_OK)
+            {
+                decompress_flag = (uint8_t *)rle_data;
+                dsc->img_data = (uint8_t *)img_data;
+                LV_LOG_INFO("Hardware decode succeeded.");
+                return LV_RES_OK;
+            }
+#endif
             char input_type = headers[1];
             switch (input_type)
             {
@@ -299,14 +323,15 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
             if (ret != LV_RES_OK)
             {
                 LV_LOG_ERROR("Software decode failed.");
+                lv_mem_free(img_data);
                 return ret;
             }
             else
             {
-                LV_LOG_USER("Software decode succeeded.");
+                LV_LOG_INFO("Software decode succeeded.");
             }
             decompress_flag = (uint8_t *)rle_data;
-            dsc->img_data = (uint8_t *)lv_psram_decoder_rle_addr;
+            dsc->img_data = (uint8_t *)img_data;
 
             return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
         }
@@ -315,11 +340,13 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
     else if (dsc->src_type == LV_IMG_SRC_VARIABLE)
     {
         const lv_img_dsc_t *src_dsc = (const lv_img_dsc_t *)dsc->src;
+        LV_ASSERT(src_dsc != NULL);
         const uint8_t *data = src_dsc->data;
         uint16_t width = data[2] | (data[3] << 8);
         uint16_t height = data[4] | (data[5] << 8);
 
         uint8_t raw_bytes_per_pixel = data[8] >> 6;
+        uint8_t idu_type = data[8] & 0x03;
         uint8_t bytes_per_pixel = get_bytes_per_pixel(raw_bytes_per_pixel);
 
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)src_dsc->data;
@@ -329,21 +356,32 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
         imdc_file_t *file = (imdc_file_t *)rle_header;
 
         uint32_t img_size = width * height * bytes_per_pixel;
+        dsc->header.w = width;
+        dsc->header.h = height;
+
+        LV_ASSERT(idu_type == 0); //source RLE
+
         if (decompress_flag == (uint8_t *)src_dsc->data)
         {
             dsc->img_data = psram_img_cache;
             return LV_RES_OK;
         }
+        uint8_t *img_data = lv_mem_alloc(img_size); //(uint8_t *)lv_psram_decoder_rle_addr;
+        psram_img_cache = (uint8_t *)img_data;
 
-        if (lv_psram_decoder_rle_addr + img_size > LV_PSRAM_END)
-        {
-            LV_LOG_ERROR("PSRAM out of memory");
-            return LV_RES_INV; // no memory left in PSRAM
-        }
-        psram_img_cache = (uint8_t *)lv_psram_decoder_rle_addr;
-
-        uint8_t *img_data = (uint8_t *)lv_psram_decoder_rle_addr;
         lv_res_t ret;
+
+#ifdef LV_USE_GPU_RTK_PPE
+        ret = hw_acc_imdc_decode(data, img_data, width, height);
+
+        if (ret == LV_RES_OK)
+        {
+            decompress_flag = (uint8_t *)data;
+            dsc->img_data = (uint8_t *)img_data;
+            LV_LOG_INFO("Hardware decode succeeded.");
+            return LV_RES_OK;
+        }
+#endif
         switch (input_type)
         {
         case RGB565:
@@ -365,16 +403,17 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
         if (ret != LV_RES_OK)
         {
+            lv_mem_free(img_data);
             LV_LOG_ERROR("Software decode failed.");
             return ret;
         }
         else
         {
-            LV_LOG_USER("Software decode succeeded.");
+            LV_LOG_INFO("Software decode succeeded.");
         }
 
         decompress_flag = (uint8_t *)src_dsc->data;
-        dsc->img_data = (uint8_t *)lv_psram_decoder_rle_addr;
+        dsc->img_data = (uint8_t *)img_data;
 
         return LV_RES_OK;
     }
@@ -393,10 +432,41 @@ static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
     }
     LV_LOG_INFO("Closed RLE image");
 }
+#if LV_USE_GPU_RTK_PPE
+static lv_res_t hw_acc_imdc_decode(const uint8_t *image, uint8_t *output, uint16_t width,
+                                   uint16_t height)
+{
+    if (image == NULL || output == NULL)
+    {
+        LV_ASSERT(image != NULL && output != NULL);
+        return LV_RES_INV;
+    }
 
+    hal_imdc_decompress_info info;
+    info.start_column = 0;
+    info.end_column = width - 1;
+    info.start_line = 0;
+    info.end_line = height - 1;
+    info.raw_data_address = (uint32_t)(image + 8);
+
+    bool ret = hal_imdc_decompress(&info, output);
+
+    if (!ret)
+    {
+        return LV_RES_OK;
+    }
+    else
+    {
+        return LV_RES_INV;
+    }
+}
+#endif
 static lv_res_t decompress_rle_rgb565_data(const imdc_file_t *file, uint8_t *img_data,
                                            uint16_t width, uint16_t height)
 {
+    LV_ASSERT(file != NULL && img_data != NULL);
+    LV_ASSERT(width > 0 && height > 0);
+
     uint16_t *linebuf = (uint16_t *)img_data;
     for (uint32_t y = 0; y < height; y++)
     {
@@ -405,7 +475,7 @@ static lv_res_t decompress_rle_rgb565_data(const imdc_file_t *file, uint8_t *img
         for (uint32_t addr = start; addr < end;)
         {
             imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)(uintptr_t)addr;
-            gui_memset16(linebuf, node->pixel16, node->len);
+            rle_memset16(linebuf, node->pixel16, node->len);
             addr += sizeof(imdc_rgb565_node_t);
             linebuf += node->len;
         }
@@ -416,6 +486,9 @@ static lv_res_t decompress_rle_rgb565_data(const imdc_file_t *file, uint8_t *img
 static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height)
 {
+    LV_ASSERT(file != NULL && img_data != NULL);
+    LV_ASSERT(width > 0 && height > 0);
+
     uint8_t *linebuf = (uint8_t *)img_data;
     for (uint32_t line = 0; line < height; line++)
     {
@@ -442,6 +515,9 @@ static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *i
 static lv_res_t decompress_rle_rgb888_data(const imdc_file_t *file, uint8_t *img_data,
                                            uint16_t width, uint16_t height)
 {
+    LV_ASSERT(file != NULL && img_data != NULL);
+    LV_ASSERT(width > 0 && height > 0);
+
     uint8_t *linebuf = (uint8_t *)img_data;
     for (uint32_t line = 0; line < height; line++)
     {
@@ -468,6 +544,9 @@ static lv_res_t decompress_rle_rgb888_data(const imdc_file_t *file, uint8_t *img
 static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height)
 {
+    LV_ASSERT(file != NULL && img_data != NULL);
+    LV_ASSERT(width > 0 && height > 0);
+
     uint32_t *linebuf = (uint32_t *)img_data;
     for (uint32_t line = 0; line < height; line++)
     {
@@ -477,7 +556,7 @@ static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *i
         for (uint32_t addr = start; addr < end;)
         {
             imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)(uintptr_t)addr;
-            gui_memset32(linebuf, node->pixel32, node->len);
+            rle_memset32(linebuf, node->pixel32, node->len);
 
             addr += sizeof(imdc_argb8888_node_t);
             linebuf += node->len;
@@ -487,4 +566,4 @@ static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *i
 }
 
 
-#endif /* LV_USE_RLE */
+#endif /* LV_USE_RTK_IDU */
