@@ -10,7 +10,7 @@
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/widget/gui_qbcode.h
+.. literalinclude:: ../../../realgui/widget/gui_qbcode.h
    :language: c
    :start-after: /** @brief  T_QBCODE_ENCODE_TYPE structure */
    :end-before: /** @brief  T_QBCODE_DISPLAY_TYPE structure */

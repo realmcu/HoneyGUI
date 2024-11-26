@@ -9,7 +9,7 @@ The simple img widget is a simplified version of the img control, lacking transf
 Use [gui_simple_img_create(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h, IMG_SOURCE_MODE_TYPE src_mode_type)](#gui_simple_img_create) to create a simple image widget. If `src_mode_type` is `IMG_SRC_MEMADDR`, the image will be loaded from a memory address; if `src_mode_type` is `IMG_SRC_FILESYS`, the image will be loaded from the file system, with `addr` being the path to the image. Refer to the following enumeration for loading methods:
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/engine/draw_img.h
+.. literalinclude:: ../../../realgui/engine/draw_img.h
    :language: c
    :start-after: /* IMG_SOURCE_MODE_TYPE enum start*/
    :end-before: /* IMG_SOURCE_MODE_TYPE enum end*/

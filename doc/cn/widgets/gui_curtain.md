@@ -21,7 +21,7 @@
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/widget/gui_curtainview.h
+.. literalinclude:: ../../../realgui/widget/gui_curtainview.h
    :language: c
    :start-after: /* T_GUI_CURTAIN_ENUM start*/
    :end-before: /* T_GUI_CURTAIN_ENUM end*/
@@ -31,7 +31,7 @@
 ## 示例
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_tb_clock.c
+.. literalinclude:: ../../../realgui/example/screen_448_368/app_tb_clock.c
    :language: c
    :start-after: /* curtain example start*/
    :end-before: /* curtain example end*/

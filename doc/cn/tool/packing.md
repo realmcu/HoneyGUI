@@ -4,7 +4,7 @@
 RTL87x2G 是一系列IC类型的缩写。
 RTL87x2G和RTL8762D的打包流程一样，以下以RTL8762G为例进行说明。
 
-在开始之前，请在SDK目录下的（`\subsys\gui\gui_engine\example\screen_800_480\root_image_800_480`）选择一个合适的示例，或者基于示例创建一个新的打包目录。
+在开始之前，请在SDK目录下的（`\subsys\gui\realgui\example\screen_800_480\root_image_800_480`）选择一个合适的示例，或者基于示例创建一个新的打包目录。
 然后，将bat和py脚本复制到该目录中，确保root文件夹以及bat和py脚本都处于该目录下。
 
 用户数据生成流程如下：

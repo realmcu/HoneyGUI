@@ -40,11 +40,6 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     global Keil_path
     repo = git.Repo(search_parent_directories=True)
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
-    keil_builder = SDKBuild(manifest_path, repo_home, chip_type)
-    print("call build {}".format(chip_type))
-    if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=Keil_path):
-        print("build {} fail".format(chip_type))
-        return False
     #win32_sim scons
     os.chdir('./win32_sim')
     try:
@@ -60,24 +55,6 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         print("win32_sim: 'scons' fail: {}".format(e.output))
         return False
     os.chdir('./..')
-    #reset
-    '''repo.git.checkout('--', '.')
-    repo.git.clean('-dfx')
-    #keil_sim/ac6 scons --target=mdk5
-    os.chdir('./keil_sim/ac6')
-    try:
-        result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
-        print("./keil_sim/ac6 > scons.exe\r\n{}".format(result_lines))
-        if 'warning:' in result_lines:
-            os.chdir('./../..')
-            print(result_lines)
-            print("keil_sim/ac6: 'scons --target=mdk5' fail: has warning")
-            return False
-    except Exception as e:
-        os.chdir('./../..')
-        print("keil_sim/ac6: 'scons --target=mdk5' fail: {}".format(e.output))
-        return False
-    os.chdir('./../..')
     #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
@@ -95,7 +72,34 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         os.chdir('./../..')
         print("keil_sim/ac5: 'scons --target=mdk5' fail: {}".format(e.output))
         return False
-    os.chdir('./../..')'''
+    os.chdir('./../..')
+    #reset
+    '''repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')'''
+    #keil_sim/ac6 scons --target=mdk5
+    os.chdir('./keil_sim/ac6')
+    try:
+        result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+        print("./keil_sim/ac6 > scons.exe\r\n{}".format(result_lines))
+        if 'warning:' in result_lines:
+            os.chdir('./../..')
+            print(result_lines)
+            print("keil_sim/ac6: 'scons --target=mdk5' fail: has warning")
+            return False
+    except Exception as e:
+        os.chdir('./../..')
+        print("keil_sim/ac6: 'scons --target=mdk5' fail: {}".format(e.output))
+        return False
+    os.chdir('./../..')
+    #reset
+    '''repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')'''
+    #build keil
+    keil_builder = SDKBuild(manifest_path, repo_home, chip_type)
+    print("call build {}".format(chip_type))
+    if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=Keil_path):
+        print("build {} fail".format(chip_type))
+        return False
 
     return True
 
@@ -140,7 +144,7 @@ def App_handler(module, submodule, manifest_path, repo_home, chip_type):
 
 def Debug_handler(module, submodule, manifest_path, repo_home, chip_type):
     print('Bypass Module \'{}\''.format(module), flush=True)
-    return False
+    return True
 
 
 def Keyword_handler(module, submodule, manifest_path, repo_home, chip_type):
@@ -162,9 +166,9 @@ module_table =  (
                     ['sdk', 'Doc',          '',         DOC_handler ],
 
                     ['sdk', 'Script',       'CI',            SDK_handler ],
-                    ['sdk', 'Script',       'Other',         SDK_handler ],
-                    ['sdk', 'Script',       'Nightly',       SDK_handler ],
-                    ['sdk', 'Script',       'Release',       SDK_handler ],
+                    ['sdk', 'Script',       'Other',         Debug_handler ],
+                    ['sdk', 'Script',       'Nightly',       Debug_handler ],
+                    ['sdk', 'Script',       'Release',       Debug_handler ],
 
                     ['sdk', 'Debug',        '',       Debug_handler ],
             )

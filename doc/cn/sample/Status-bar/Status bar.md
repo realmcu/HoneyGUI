@@ -10,7 +10,7 @@
 
 ##  实现
 ###  文件
- 函数 ```static void status_bar(void *parent, gui_obj_t *ignore_gesture)``` 位于 ```gui_engine\example\screen_454_454\gui_menu\apps_in_menu.c``` 中。
+ 函数 ```static void status_bar(void *parent, gui_obj_t *ignore_gesture)``` 位于 ```realgui\example\screen_454_454\gui_menu\apps_in_menu.c``` 中。
 ###  设计
 
 <br>

@@ -18,7 +18,7 @@ When the state of the cardview changes, it triggers a callback, and the callback
 There are five styles in the cardview widget [gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style)](#gui_cardview_set_style).
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

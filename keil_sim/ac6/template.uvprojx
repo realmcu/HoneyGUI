@@ -596,7 +596,7 @@
   <LayerInfo>
     <Layers>
       <Layer>
-        <LayName>gui_engine</LayName>
+        <LayName>realgui</LayName>
         <LayPrjMark>1</LayPrjMark>
       </Layer>
     </Layers>

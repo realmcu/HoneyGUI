@@ -11,7 +11,7 @@
 开发者可以使用[gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style)](#gui_grid_style) 进行设置样式，总共有以下两种样式。
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/gui_grid.h
+.. literalinclude:: ../../../realgui/widget/gui_grid.h
    :language: c
    :start-after: /* T_GUI_GRID_STYLE enum start*/
    :end-before: /* T_GUI_GRID_STYLE enum end*/

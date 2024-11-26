@@ -61,7 +61,7 @@ The code implementation of the touchpad algorithm processing is in the `tp_algo_
 
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
+.. literalinclude:: ../../../realgui/widget/guidef.h
    :language: c
    :start-after: /* T_GUI_INPUT_TYPE enum start*/
    :end-before: /* T_GUI_INPUT_TYPE enum end*/

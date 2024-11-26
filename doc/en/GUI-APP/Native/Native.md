@@ -13,7 +13,7 @@
 
 ```eval_rst
 
-.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /*Define a app with name APP_STOPWATCH*/
    :end-before: /*Define a app with name APP_STOPWATCH end*/
@@ -29,7 +29,7 @@
 
 ```eval_rst
 
-.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /*define the app's ui design*/
    :end-before: /*define the app's ui design end*/

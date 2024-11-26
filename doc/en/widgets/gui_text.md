@@ -112,7 +112,7 @@ All typesetting modes are as follows.
 | `VERTICAL_RIGHT`   | Multi-line    | Right            | Bottom to Top    | Text widget              |
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/gui_text.h
+.. literalinclude:: ../../../realgui/widget/gui_text.h
    :language: c
    :start-after: /** @brief  text mode enum start */
    :end-before: /** @brief  text mode enum end */

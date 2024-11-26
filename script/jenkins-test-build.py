@@ -57,7 +57,7 @@ def HoneyGUI_Monkey_Test_afterBuild():
 
 
 def HoneyGUI_Monkey_Test_CopyRoot(dst):
-    root_file = r'gui_engine\example\screen_454_454\root_image\root(0x4400000).bin'
+    root_file = r'realgui\example\screen_454_454\root_image\root(0x4400000).bin'
     root_dir = os.path.dirname(root_file)
     dst = os.path.join(dst, root_dir)
 

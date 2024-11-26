@@ -24,7 +24,7 @@ QuDai Technology is a software service company that leverages its self-developed
 ## Source Code
 QuDai components are integrated into HoneyGUI as a third-party library and used as a Widget in the RealGUI engine. This integration includes three main parts: core library, control adaptation, and platform support.
 
-Source code path:`HoneyGUI\gui_engine\3rd\litegfx`
+Source code path:`HoneyGUI\realgui\3rd\litegfx`
 
 
 ```eval_rst

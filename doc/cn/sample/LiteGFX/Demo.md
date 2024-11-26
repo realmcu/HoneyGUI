@@ -24,7 +24,7 @@
 ## 源文件
 趣戴组件作为第三方库的形式集成到HoneyGUI中，并作为RealGUI 引擎的一个控件使用，包含核心lib，控件适配，平台支持三个部分:
 
-相关代码路径：`HoneyGUI\gui_engine\3rd\litegfx`
+相关代码路径：`HoneyGUI\realgui\3rd\litegfx`
 
 
 ```eval_rst

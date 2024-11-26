@@ -3,7 +3,7 @@
 This example demostrates how to develop a RealUI 86Box APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 
 ## Source File
-- APP package `gui_engine\example\screen_480_480\root\app\box`
+- APP package `realgui\example\screen_480_480\root\app\box`
 - UI Design project `RVisualDesigner-v1.0.5.0\Demo\480x480\box\box480x480.rtkprj`
 
 ## UI Design
@@ -38,7 +38,7 @@ This example demostrates how to develop a RealUI 86Box APP, from which you can l
 
 
 ### Gestures
-In the JS file `gui_engine\example\screen_480_480\root\app\box\box.js`, the control and interaction logic of the UI is implemented.
+In the JS file `realgui\example\screen_480_480\root\app\box\box.js`, the control and interaction logic of the UI is implemented.
 
 #### Light Control Switch
 

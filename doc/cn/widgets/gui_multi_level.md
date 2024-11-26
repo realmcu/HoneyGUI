@@ -18,7 +18,7 @@
 - 在0~2层级中创建多级菜单，根据嵌套结构。
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /* Create multi levels in 0~2 level*/
    :end-before: /* GUI_APP_ENTRY(APP_SETTING) end */
@@ -28,7 +28,7 @@
 - ui_design_xx 函数将在显示特定（层次，索引）多层窗口时创建显示内容。
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /* define of ui_design_0 of (0,0)*/
    :end-before: /* define of ui_design_1_0 of (1,0)*/

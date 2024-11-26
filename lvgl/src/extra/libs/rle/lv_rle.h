@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_rle_init(void);
+void lv_rtk_idu_init(void);
 
 /**********************
  *      MACROS

@@ -11,7 +11,7 @@ Use [gui_grid_create(void *parent, int16_t x, int16_t y, int16_t row, int16_t co
 There are two styles in the grid widget [gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style)](#gui_grid_style).
 
 ```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/gui_grid.h
+.. literalinclude:: ../../../realgui/widget/gui_grid.h
    :language: c
    :start-after: /* T_GUI_GRID_STYLE enum start*/
    :end-before: /* T_GUI_GRID_STYLE enum end*/

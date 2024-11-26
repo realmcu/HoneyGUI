@@ -38,7 +38,7 @@ HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中�
 <div style="text-align: center"><img width= "800" src="https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png" alt="lv_menu_config.png"></div><br/>
 
 
-1. 当需要修改屏幕尺寸时，修改文件 `your HoneyGUI dir/gui_engine/example/demo/` 下的 `SConscript`
+1. 当需要修改屏幕尺寸时，修改文件 `your HoneyGUI dir/realgui/example/demo/` 下的 `SConscript`
 文件，修改其中的屏幕宽度 `DRV_LCD_WIDTH` 和 屏幕高度`DRV_LCD_HIGHT`，均为像素单位。
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png" alt="lv_menu_config.png"></div><br/>
 
@@ -53,7 +53,7 @@ HoneyGUI Dir
 |-- Arm2D
 |-- cmake
 |-- doc
-|-- gui_engine
+|-- realgui
 |  |-- 3rd
 |  |-- app
 |  |-- core
@@ -128,9 +128,9 @@ HoneyGUI Dir
     - src：存放 LVGL 实际的源码，使用 LVGL 进行开发时，都是使用这里面的代码文件。
     - tests：存放一些 CI 测试文件，在使用LVGL时不会用到。
 
-2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 `your HoneyGUI dir/gui_engine/example/demo` 下的 `app_ui_lvgl.c` 开始运行
+2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 `your HoneyGUI dir/realgui/example/demo` 下的 `app_ui_lvgl.c` 开始运行
 
-3. 使用 HoneyGUI 模拟器运行 LVGL 时，调用的 LVGL 文件系统接口所指向的根目录为 `your HoneyGUI dir/gui_engine/example/screen_lvgl/root/`
+3. 使用 HoneyGUI 模拟器运行 LVGL 时，调用的 LVGL 文件系统接口所指向的根目录为 `your HoneyGUI dir/realgui/example/screen_lvgl/root/`
 
 
 
@@ -483,7 +483,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
 #### romfs 文件系统镜像
 
 HoneyGUI 提供 `romfs` 文件系统镜像的打包支持：
-1. 工作路径为`your HoneyGUI dir/gui_engine/example/screen_lvgl/`，执行打包过程需要有 python 环境支持，工程用到的外部文件资源需要打包为文件系统镜像最终作为 `User Data` 下载。
+1. 工作路径为`your HoneyGUI dir/realgui/example/screen_lvgl/`，执行打包过程需要有 python 环境支持，工程用到的外部文件资源需要打包为文件系统镜像最终作为 `User Data` 下载。
 
 2. 打开工作路径，将需要打包的文件放置于 `root/` 文件夹下，双击脚本 `mkromfs_0x4600000.bat` 生成文件系统镜像 `root(0x4600000).bin` 和资源映射地址 `resource.h`。文件的默认 base address 为 `0x4600000`，`resource.h` 中记录了打包文件的映射地址，由于 `romfs` 支持物理地址直接访问，开发者可通过映射地址直接访问资源文件。
 
@@ -542,7 +542,7 @@ LVGL 提供了丰富的 Demo 和 example 来帮助开发者了解熟悉各个控
 
 ## 资源转换器
 <!-- （Img + font，介绍和演示） -->
-LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 APP image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下已提供 example `lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
+LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 APP image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 `your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下已提供 example `lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
 
 ### 图片转换器
 
@@ -559,7 +559,7 @@ LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，
 4. 选择输出图片的类型 (C array/binary file)
 5. 点击转换获取输出文件
 
-在文档 [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
+在文档 [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 `your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 
 值得一提的是，使用 bin 文件的图片资源时，bin 文件中数据的格式为 `4 Byte header + data`, 其中 `header` 中包含有 `Color format`, `width` 和 `height`，此时利用 `header` 信息来计算出 `data_size` 即可构建一个完整的 `lv_img_dsc_t ` 来描述图片。
 
@@ -649,7 +649,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 6. 设定需要转换的字符 Unicode 范围，也可直接列出需要转换的字符
 
 
-在文档 [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 `lv_example_label_3()` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
+在文档 [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 `lv_example_label_3()` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 `your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 
 在 LVGL 中提供了内置的字库，以数组的形式保存在目录 `your HoneyGUI dir/lvgl/src/font/` 下，每份字库所包含的字符均注明在文件开头。内置字库中包含有一份汉字字库 `lv_font_simsun_16_cjk.c` cjk 16 号字库，但为单一字号，字符数有限。
 

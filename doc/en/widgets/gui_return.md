@@ -12,12 +12,12 @@ Creating function is [gui_return_create(void *parent, const uint32_t *frame_arra
 
 ```eval_rst
 
-.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /*Define gui_app_return_array*/
    :end-before: /*Define gui_app_return_array end*/
 
-.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /*gui_return_create*/
    :end-before: /*gui_return_create end*/
@@ -31,7 +31,7 @@ Creating function is [gui_return_create(void *parent, const uint32_t *frame_arra
 ```eval_rst
 
 .. note::
-  Please refer to ``gui_engine\example\screen_454_454\gui_menu\apps_in_menu.c`` for details.
+  Please refer to ``realgui\example\screen_454_454\gui_menu\apps_in_menu.c`` for details.
 
 ```
 
