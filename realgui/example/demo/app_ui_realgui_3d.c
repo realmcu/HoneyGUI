@@ -17,35 +17,65 @@
 #include "def_3d.h"
 #include "gui_3d.h"
 
-#include "3d/desc.txt"
+#include "butterfly/desc.txt"
+#include "math.h"
 
 
+static int frame_counter = 0;
+static float wing_angle = 0.0f;
+static float butterfly_x = 0.0f;
+static float butterfly_y = 0.0f;
+static float butterfly_z = 0.0f;
+static float butterfly_rz = 0.0f;
 
+void update_animation()
+{
+    frame_counter++;
+    wing_angle = 70.0f * sinf(frame_counter * 0.1f);
 
+    float radius = 4.0f;
+    float theta = frame_counter * 0.01f;
 
+    butterfly_x = radius * cosf(theta);
+    butterfly_y = radius * sinf(theta);
+
+    butterfly_z = 6.0f + 0.5f * sinf(frame_counter * 0.05f);
+
+    butterfly_rz = theta * (180.0f / M_PI);
+}
 
 void cb(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
+    gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 1), gui_point_4d(0, 0, 0), 1, 32767, 90,
+                                 dc->screen_width, dc->screen_height);
     if (s == 0)
     {
-        gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 1), 1, 32767, 90,
-                                     dc->screen_width, dc->screen_height);
-        gui_3d_world_inititalize(world, 0, 0, 5.0f, 0, 40, 0, 1);
+        gui_3d_world_inititalize(world, butterfly_x, butterfly_y, butterfly_z, -wing_angle, 0, butterfly_rz,
+                                 1);
+    }
+    else if (s == 1)
+    {
+        gui_3d_world_inititalize(world, butterfly_x, butterfly_y, butterfly_z, wing_angle, 0, butterfly_rz,
+                                 1);
+    }
+    else if (s == 2)
+    {
+        gui_3d_world_inititalize(world, butterfly_x, butterfly_y, butterfly_z, -wing_angle, 10,
+                                 butterfly_rz, 1);
+    }
+    else if (s == 3)
+    {
+        gui_3d_world_inititalize(world, butterfly_x, butterfly_y, butterfly_z, wing_angle, 10, butterfly_rz,
+                                 1);
     }
     else
     {
-        gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 1), 1, 32767, 90,
-                                     dc->screen_width, dc->screen_height);
-        gui_3d_world_inititalize(world, 0, 0, 5.0f, 0, 60, 0, 1);
+        gui_3d_world_inititalize(world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz, 1);
     }
 
-
-
-
 }
-
 
 
 
@@ -55,6 +85,8 @@ static void app_ui_design(gui_app_t *app)
     gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
     gui_3d_set_shape_transform_cb(test_3d, 0, cb);
+
+    gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
 
 
     return;

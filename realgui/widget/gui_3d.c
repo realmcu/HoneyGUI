@@ -26,6 +26,7 @@
 #include "draw_img.h"
 #include "acc_init.h"
 #include "gui_fb.h"
+#include <guidef.h>
 #define TINYOBJ_LOADER_C_IMPLEMENTATION
 #include "tinyobj_loader_c.h"
 
@@ -120,10 +121,20 @@ static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
     }
 }
 
+static void gui_3d_update_att(gui_obj_t *obj)
+{
+    gui_3d_t *this = (void *)obj;
+    if (this->animate)
+    {
+        animate_frame_update(this->animate, obj);
+    }
+}
+
 static void gui_3d_prepare(gui_3d_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
+    gui_3d_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
 
     // this->flags = TINYOBJ_FLAG_TRIANGULATE;
@@ -140,14 +151,15 @@ static void gui_3d_prepare(gui_3d_t *this)
         gui_3d_world_t world;
         gui_3d_camera_t camera;
         GUI_ASSERT(this->shape_transform_cb != NULL);
-        this->shape_transform_cb(this, i, &world, &camera);
 
         for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
         {
+            this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera);
             // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->desc->shapes[i].name, this->desc->shapes[i].length, this->desc->shapes[i].face_offset + j);
             convert_to_face(this, this->desc->shapes[i].face_offset + j);
 
             face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
+
         }
 
     }
@@ -407,6 +419,15 @@ void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
                                    void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera))
 {
     this->shape_transform_cb = cb;
+}
+
+void gui_3d_set_animate(gui_3d_t     *this,
+                        uint32_t      dur,
+                        int           repeat_count,
+                        void         *callback,
+                        void         *p)
+{
+    GUI_SET_ANIMATE_HELPER
 }
 
 /**

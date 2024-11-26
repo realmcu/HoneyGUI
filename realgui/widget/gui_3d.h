@@ -66,6 +66,7 @@ typedef struct gui_3d
 
     gui_3d_face_t *face;
     draw_img_t *img;
+    gui_animate_t *animate;
 
     void (*shape_transform_cb)(struct gui_3d *this, size_t s/*shape_offset*/, gui_3d_world_t *world,
                                gui_3d_camera_t *camera);
@@ -114,6 +115,11 @@ gui_3d_t *gui_3d_create(void       *parent,
 void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
                                    void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera));
 
+void gui_3d_set_animate(gui_3d_t     *this,
+                        uint32_t      dur,
+                        int           repeat_count,
+                        void         *callback,
+                        void         *p);
 #ifdef __cplusplus
 }
 #endif
