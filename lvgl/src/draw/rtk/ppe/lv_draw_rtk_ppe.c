@@ -259,6 +259,11 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
             base_coord.x = map_area_rot.x1;
             base_coord.y = map_area_rot.y1;
         }
+        else
+        {
+            base_coord.x = coords->x1;
+            base_coord.y = coords->y1;
+        }
 
         lv_area_t clip_com; /*Common area of mask and coords*/
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
