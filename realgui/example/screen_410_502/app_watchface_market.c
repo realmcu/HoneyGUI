@@ -12,6 +12,6 @@ void app_watchface_market(void *parent)
     create_tree_nest("realgui\\example\\screen_448_368\\root_image_hongkong\\root\\watchface\\watchface410x502.xml",
                      win_market);
 #else
-    create_tree_nest("stop_watch\\calnedar.xml", win_market);
+    create_tree_nest("watchface/watchface410x502.xml", win_market);
 #endif
 }

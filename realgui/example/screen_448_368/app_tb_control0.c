@@ -28,66 +28,78 @@ static void reset_animate()
     img->animate->current_repeat_count = 0;
     img->animate->progress_percent = 0;
 }
-static void callback_disturb_on()
+static void callback_disturb_on(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = WURAOKAI_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = WURAOKAI_BIN;
 }
-static void callback_disturb_off()
+static void callback_disturb_off(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = WURAOGUAN_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = WURAOGUAN_BIN;
 }
-static void callback_mute_on()
+static void callback_mute_on(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = JINGYINKAI_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = JINGYINKAI_BIN;
 }
-static void callback_mute_off()
+static void callback_mute_off(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = JINGYINGUAN_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = JINGYINGUAN_BIN;
 }
-static void callback_call_on()
+static void callback_call_on(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = DIANHUAKAI_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = DIANHUAKAI_BIN;
 }
-static void callback_call_off()
+static void callback_call_off(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = DIANHUAGUAN_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = DIANHUAGUAN_BIN;
 }
 
-static void callback_bright_on()
+static void callback_bright_on(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = LIANGDUKAI_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = LIANGDUKAI_BIN;
 }
-static void callback_bright_off()
+static void callback_bright_off(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = LIANGDUGUAN_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = LIANGDUGUAN_BIN;
 }
-static void callback_watch_on()
+static void callback_watch_on(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = SHIZHONGKAI_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = SHIZHONGKAI_BIN;
 }
-static void callback_watch_off()
+static void callback_watch_off(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = SHIZHONGGUAN_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = SHIZHONGGUAN_BIN;
 }
-static void callback_set_on()
+static void callback_set_on(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = SHEZHIKAI_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = SHEZHIKAI_BIN;
 }
-static void callback_set_off()
+static void callback_set_off(void *obj, gui_event_t e, void *param)
 {
     reset_animate();
-    img->draw_img->data = SHEZHIGUAN_BIN;
+    gui_img_t *img = (gui_img_t *)obj;
+    img->data = SHEZHIGUAN_BIN;
 }
 void page_tb_control0(void *parent)
 {

@@ -124,11 +124,6 @@ static void switch_app_menu()
 //     //     GUI_API(gui_multi_level_t).jump(ml0, 0, 1);
 //     // }
 // }
-
-static void m10_cb(gui_obj_t *parent)
-{
-
-}
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
@@ -170,6 +165,7 @@ static int app_init(void)
     extern int open(const char *file, int flags, ...);
     extern int read(int fd, void *buf, size_t len);
     extern int close(int fd);
+    defaultPath = "realgui\\example\\screen_454_454\\root_image\\root\\";
     int fd;
     fd = open("./realgui/example/screen_410_502/root_image_hongkong/root(0x4400000).bin", 0);
     if (fd > 0)

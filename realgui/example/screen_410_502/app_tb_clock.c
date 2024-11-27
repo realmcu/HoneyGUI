@@ -1,28 +1,3 @@
-// /* curtain example start*/
-// #include "root_image_hongkong/ui_resource.h"
-// #include <gui_img.h>
-// #include "gui_curtainview.h"
-// #include "gui_curtain.h"
-
-// void page_tb_clock(void *parent)
-// {
-//     gui_curtainview_t *ct = gui_curtainview_create(parent, "ct_clock", 0, 0, 368, 448);
-//     gui_curtain_t *ct_clock = gui_curtain_create(ct, "1", 0, 0, 368, 448, CURTAIN_MIDDLE, 1);
-//     gui_curtain_t *ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
-//     gui_curtain_t *ct_left = gui_curtain_create(ct, "3", 0, 0, 368, 448, CURTAIN_LEFT, 0.65f);
-
-//     gui_curtain_t *ct_card = gui_curtain_create(ct, "card", 0, 0, 368, 448, CURTAIN_DOWN, 1);
-//     extern void page_ct_clock(void *parent);
-//     extern void page_ct_sidebar(void *parent);
-//     extern void tabview_up_design(void *parent_widget);
-//     extern void curtain_down_design(void *parent_widget);
-//     page_ct_clock(ct_clock);
-//     page_ct_sidebar(ct_left);
-//     tabview_up_design(ct_control0);
-//     curtain_down_design(ct_card);
-// }
-// /* curtain example end*/
-
 /* curtain example start*/
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_img.h>
@@ -48,7 +23,7 @@ static gui_curtain_t *ct_card;
 extern gui_win_t *win_market, *win_watch;
 static gui_win_t *win_touch;
 bool sidebar_flag = 0;
-static uint8_t watchface_index = 0;
+uint8_t watchface_index = 0;
 static void curtain_ctr_cb()
 {
     // touch_info_t *tp = tp_get_info();
@@ -128,34 +103,39 @@ static void callback_prism_touch_clicked()
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
-    gui_app_t *app = (gui_app_t *)get_app_hongkong();
-    gui_obj_t *screen = &(app->screen);
+    extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
+    gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+    return;
 
-    gui_obj_tree_free(screen);
-    gui_win_t *win = gui_win_create(screen, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // gui_app_t *app = (gui_app_t *)get_app_hongkong();
+    // gui_obj_t *screen = &(app->screen);
 
-    gui_perspective_imgfile_t imgfile =
-    {
-        .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
-        .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
-        .data_addr[0] = UI_CLOCK_FACE_MAIN_BIN,
-        .data_addr[1] = MARKET_WATCH_BASE_BIN,
-        .data_addr[2] = UI_CLOCK_FACE_MAIN_BIN,
-        .data_addr[3] = MARKET_WATCH_BASE_BIN,
-        .data_addr[4] = UI_CLOCK_FACE_MAIN_BIN,
-        .data_addr[5] = MARKET_WATCH_BASE_BIN
-    };
-    perspect = gui_perspective_create(win, "test", &imgfile, 0, 0);
+    // gui_obj_tree_free(screen);
+    // gui_win_t *win = gui_win_create(screen, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
-                         NULL);
-    gui_fb_change();
+    // gui_perspective_imgfile_t imgfile =
+    // {
+    //     .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
+    //     .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
+    //     .data_addr[0] = UI_CLOCK_FACE_MAIN_BIN,
+    //     .data_addr[1] = MARKET_WATCH_BASE_BIN,
+    //     .data_addr[2] = UI_CLOCK_FACE_MAIN_BIN,
+    //     .data_addr[3] = MARKET_WATCH_BASE_BIN,
+    //     .data_addr[4] = UI_CLOCK_FACE_MAIN_BIN,
+    //     .data_addr[5] = MARKET_WATCH_BASE_BIN
+    // };
+    // perspect = gui_perspective_create(win, "test", &imgfile, 0, 0);
+
+    // gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
+    //                      NULL);
+    // gui_fb_change();
 }
 
 void page_tb_clock(void *parent)
 {
     ct = gui_curtainview_create(parent, "ct_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    ct_clock = gui_curtain_create(ct, "1", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_MIDDLE, 1);
+    ct_clock = gui_curtain_create(ct, "_watchface_main_window_", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                                  CURTAIN_MIDDLE, 1);
     ct_control0 = gui_curtain_create(ct, "2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_UP, 1);
     ct_left = gui_curtain_create(ct, "3", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_LEFT, 0.34f);
 
@@ -186,7 +166,7 @@ void page_tb_clock(void *parent)
         }
         break;
     default:
-        page_ct_clock(ct_clock);
+        // page_ct_clock(ct_clock);
         break;
     }
 

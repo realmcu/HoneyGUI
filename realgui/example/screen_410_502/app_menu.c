@@ -15,6 +15,7 @@
 #include "gui_menu_cellular.h"
 #include "math.h"
 #include "gui_return.h"
+#include "guidef.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -22,56 +23,78 @@
 #define APP_MUSIC
 #define APP_FRUIT_NINJA
 #define APP_BOX2D_RING
+#define APP_HEART_RATE
 
 #define GUI_APP_DEFINE_NAME(APP_NAME) \
     static void _##APP_NAME##_ui_design(gui_app_t*); \
-    static gui_app_t _app_##APP_NAME = \
-                                       { \
-                                         .screen = \
-                                                   { \
-                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
-                                                     .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
-                                                   }, \
-                                         .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
-                                         .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
-                                       }; \
-    gui_app_t *_get_app_##APP_NAME##_handle(void) \
+    static gui_app_t _##APP_NAME = \
+                                   { \
+                                     .screen = \
+                                               { \
+                                                 .name = #APP_NAME, /**< The screen name is set to the application name. */ \
+                                                 .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
+                                               }, \
+                                     .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
+                                     .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                   }; \
+    gui_app_t *_get_##APP_NAME##_handle(void) \
     { \
-        return &_app_##APP_NAME; \
+        return &_##APP_NAME; \
     }
 
 GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
 GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
+GUI_APP_DEFINE_NAME(APP_HEART_RATE)
 
 extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
-extern gui_app_t *_get_app_APP_HEART_RATE_handle(void);
-void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
-{
-    gui_switch_app(gui_current_app(), _get_app_APP_HEART_RATE_handle());
-}
 
 void switch_BOX2D_RING(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+    gui_switch_app(gui_current_app(), _get_APP_BOX2D_RING_handle());
 }
 
 void switch_APP_FRUIT_NINJA(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+    gui_switch_app(gui_current_app(), _get_APP_FRUIT_NINJA_handle());
 }
 
 void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
+    gui_switch_app(gui_current_app(), _get_APP_MUSIC_handle());
+}
+
+void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
+{
+    gui_switch_app(gui_current_app(), _get_APP_HEART_RATE_handle());
 }
 
 // static void switch_APP_CALCULATOR()
 // {
-//     gui_switch_app(gui_current_app(), _get_app_APP_CALCULATOR_handle());
+//     gui_switch_app(gui_current_app(), _get_APP_CALCULATOR_handle());
 // }
 
-extern const uint32_t *gui_app_return_array[17];
+/*Define gui_app_return_array*/
+static const uint32_t *gui_app_return_array[] =
+{
+    PATH04_BIN,
+    PATH05_BIN,
+    PATH07_BIN,
+    PATH08_BIN,
+    PATH09_BIN,
+    PATH11_BIN,
+    PATH12_BIN,
+    PATH14_BIN,
+    PATH15_BIN,
+    PATH16_BIN,
+    PATH18_BIN,
+    PATH19_BIN,
+    PATH20_BIN,
+    PATH22_BIN,
+    PATH23_BIN,
+    PATH24_BIN,
+    PATH25_BIN,
+};
 
 static void app_menu_design(gui_app_t *app);
 static gui_app_t app_menu =
@@ -89,7 +112,7 @@ static gui_app_t app_menu =
     .active_ms = 1000000,
 };
 
-void *get_app_menu()
+gui_app_t *get_app_menu()
 {
     return &app_menu;
 }
@@ -119,6 +142,35 @@ static void app_back2watchface_cb(void)
 static void app_back2prescreen_cb(void)
 {
     extern bool sidebar_flag;
+    if (sidebar_flag)
+    {
+        gui_switch_app(gui_current_app(), get_app_hongkong());
+    }
+    else
+    {
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
+}
+
+static void app_HR_back2prescreen_cb(void)
+{
+    extern bool sidebar_flag;
+    extern bool return_to_watchface_flag;
+    if (return_to_watchface_flag || sidebar_flag)
+    {
+        gui_switch_app(gui_current_app(), get_app_hongkong());
+    }
+    else
+    {
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
+}
+
+static void app_FN_back2prescreen_cb(void)
+{
+    extern bool sidebar_flag;
+    extern void close_FN_APP();
+    close_FN_APP();
     if (sidebar_flag)
     {
         gui_switch_app(gui_current_app(), get_app_hongkong());
@@ -275,5 +327,17 @@ GUI_APP_ENTRY(APP_FRUIT_NINJA)
     extern void app_fruit_ninja_design(gui_obj_t *obj);
     app_fruit_ninja_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_FN_back2prescreen_cb, (void *)0);
+}
+
+GUI_APP_ENTRY(APP_HEART_RATE)
+{
+    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_APP_HEART_RATE);
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
+
+    extern void heart_rate_app(gui_obj_t *obj);
+    heart_rate_app(GUI_APP_ROOT_SCREEN);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_HR_back2prescreen_cb, (void *)0);
 }
