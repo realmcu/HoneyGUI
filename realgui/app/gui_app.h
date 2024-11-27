@@ -230,12 +230,12 @@ gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_e
  */
 void gui_switch_app(gui_app_t *from, gui_app_t *to);
 /**
- * @brief set next app top layer
+ * @brief Set next app top layer, call this function before the context of the next app startup.
  *
  */
 void gui_app_layer_top(void);
 /**
- * @brief set next app button layer
+ * @brief Set next app button layer, call this function before the context of the next app startup.
  *
  */
 void gui_app_layer_buttom(void);
