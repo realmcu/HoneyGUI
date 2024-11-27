@@ -159,17 +159,9 @@ GUI_INIT_APP_EXPORT(watch_app_init);
 void return_home(void *msg)
 {
     gui_app_t *app = gui_current_app();
-    if (app == get_app_watch_ui())
-    {
-        tabview_main->cur_id.x = 0;
-        tabview_main->cur_id.y = 0;
-    }
-    else
-    {
-        tabview_main->cur_id.x = 0;
-        tabview_main->cur_id.y = 0;
-        gui_switch_app(app, get_app_watch_ui());
-    }
+    tabview_main->cur_id.x = 0;
+    tabview_main->cur_id.y = 0;
+    gui_switch_app(app, get_app_watch_ui());
     gui_log("return_home done \n");
 }
 void cmd_return_home(void)
