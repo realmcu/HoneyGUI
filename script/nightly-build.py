@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-import git
 import subprocess
 import os
 import re
@@ -29,6 +28,19 @@ sys.path.append(honeyRepo_uitl_dir)
 from repo_helper import *
 from jenkins_base import JenkinsCheckBase
 from keil_build import *
+
+test_module_map = {
+    "HoneyGUI_Monkey_Test": {
+        "Nightly": {
+            "issue_key": "BEE4BUG-1733",
+            "owner": [r'liang_zhou']
+        },
+        "CI": {
+            "issue_key": "BEE4BUG-1768",
+            "owner": [r'liang_zhou']
+        }
+    }
+}
 
 
 def send_mail(err_msg = None, attachment_file = None):
@@ -59,6 +71,7 @@ if __name__ == '__main__':
     arg_dict = parser.parse_args()
     chip_type = arg_dict.chipType
 
+    import git
     repo = git.Repo(search_parent_directories=True)
     repo.git.clean('-dfx')
     print("\n================ build {} ====================\n".format(chip_type), flush=True)

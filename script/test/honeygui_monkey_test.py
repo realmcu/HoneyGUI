@@ -80,7 +80,7 @@ class HoneyguiMonkeyTest():
             hrs_pip_name = ""
             if self.test_type in ['Nightly']:
                 hrs_pip_name = self.project + "_" + self.module + "_HoneyRobotLight"
-            
+
             if get_slave_property_value(self.chip_type, "need_tscon"):
                 run_id = self.getSessionID()
                 tool_base = ToolBase(cmd_line=[r'tscon', run_id, r'/v', r'/dest:console'], wait=False, timeout=100, delay=60)

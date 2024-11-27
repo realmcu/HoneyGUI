@@ -159,6 +159,15 @@ def is_gui_module(){
 }
 
 
+def get_module_version_info(module_dir){
+    dir(module_dir){
+        res = bat(encoding: 'utf-8', label: '', returnStdout: true, script: """@echo off
+        git log -1 HEAD --pretty=%%H""")
+        return res
+    }
+}
+
+
 def do_ci_build(current_project_detail, all_project, manifest_len, HoneyRepo_Home, Manifest_Path, chip_type){
     timestamps{
         stage("CIBuild"){
@@ -191,6 +200,7 @@ def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_H
 
         stage("CITestBuild"){
             set_submodule_info(all_project, HoneyRepo_Home)
+            SDK_BRANCH_COMMIT_ID = get_module_version_info("${SDK_PATH_RELATIVE_TO_WORKSPACE}")
             set_test_script_name()
             build_cmd = "python ${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script/${jenkins_test_build_name} CI"
             for(module in test_module_map.keySet()){
@@ -222,8 +232,8 @@ def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_H
             }
 
             dir("${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script"){
-                stash includes: "base/parse_json.py, \
-                                 ftp/ftp_helper.py, ftp/copy_script.py, \
+                stash includes: "*.xls, *.xlsx, base/parse_json.py, report/create_jira.py, report/create_jira_config.py, \
+                                 jenkins_test_target_config.py, ftp/ftp_helper.py, ftp/copy_script.py, \
                                 report/generate_test_report.py, report/__init__.py, \
                                 ", name: "Dump-Files", allowEmpty: true
             }
@@ -298,6 +308,15 @@ def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home
                                                 }catch(dump_err){
                                                     echo "${dump_err}"
                                                 }
+                                                def read_report_cmd = ''
+                                                try{
+                                                    withEnv(["HoneyGUI_BranchName=${SDK_BRANCH}", "HoneyGUI_CommitID=${SDK_BRANCH_COMMIT_ID}"]){
+                                                        read_report_cmd = "python ${WORKSPACE}/script/report/create_jira.py --chipType rtl87x2g --testType CI --dir ${WORKSPACE}/SRC/report --testModule ${test_module} --step Read"
+                                                        exe_cmd(read_report_cmd)
+                                                    }
+                                                }catch(err1){
+                                                    echo "${err1}"
+                                                }
                                                 stash includes: "SRC/report/jira_info~*.json", name: "Jira-Info-${test_module}", allowEmpty: true
                                             }catch(err){
                                                 echo "${err.message}"
@@ -325,19 +344,59 @@ def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home
     }
 
     node("keilBuildServerPushJira"){
-        stage("generate report"){
-            emptyFolder("script")
-            emptyFolder("SRC/report")
-            dir("script"){
-                unstash "Dump-Files"
-            }
-            for(module in test_module_map.keySet()){
-                if(test_module_map[module]["Test"] > 0){
-                    unstash "Jira-Info-${module}"
+        stage("create jira"){
+            try{
+                emptyFolder("script")
+                emptyFolder("SRC/report")
+                dir("script"){
+                    unstash "Test-Script"
+                    unstash "Dump-Files"
                 }
-            }
+                withEnv(["HoneyGUI_BranchName=${SDK_BRANCH}","HoneyGUI_CommitID=${SDK_BRANCH_COMMIT_ID}"]){
+                    for(module in test_module_map.keySet()){
+                        if(test_module_map[module]["Test"] > 0){
+                            create_issue = true
+                            try{
+                                unstash "Jira-Info-${module}"
+                            }catch(err){
+                                echo "unstash Jira-Info-${module} fail"
+                                create_issue = false
+                            }
+                            if(test_module_map[module]["testResult"] == false){
+                                echo "${module} test fail, prepare to report to jira"
+                                if(create_issue){
+                                    try{
+                                        withCredentials([usernamePassword(credentialsId:'JIRA_ACCOUNT',passwordVariable:'JIRA_PWD',usernameVariable:'JIRA_USR_NAME')]){
+                                            def create_jira_cmd = ''
+                                            create_jira_cmd = "python ${WORKSPACE}/script/report/create_jira.py --chipType rtl87x2g --testModule ${module} --testType CI --dir ${WORKSPACE}/SRC/report --output ${WORKSPACE}/SRC/report/detail.txt  --step Create"
+                                            exe_cmd(create_jira_cmd)
+                                            detail_file = new File("${WORKSPACE}/SRC/report/detail.txt")
+                                            if(!detail_file.exists()){
+                                                echo "No eror info, no need to record"
+                                            }else{
+                                                file_contents = readFile "SRC/report/detail.txt"
+                                                error_detail_log_record_file = new File("D:\\jenkins\\local\\error_detail_log_record.txt")
+                                                if(!error_detail_log_record_file.exists()){
+                                                    error_detail_log_record_file.createNewFile()
+                                                }
+                                                out = new FileOutputStream(error_detail_log_record_file, true)
+                                                out.write(file_contents.getBytes())
+                                                out.flush()
+                                                out.close()
+                                            }
+                                        }
+                                    }catch(err){
+                                        echo "${err}"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
-            catchError{
+            }catch(err){
+                echo "${err}"
+            }finally{
                 try{
                     withEnv(["Test_Result=${currentBuild.currentResult}"]){
                         bat "python ${WORKSPACE}/script/report/generate_test_report.py"
@@ -352,7 +411,6 @@ def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home
                     echo "${error}"
                 }
             }
-
             try{
                 remove_script_cmd = "python ${WORKSPACE}/script/ftp/copy_script.py --step removeZip"
                 exe_cmd(remove_script_cmd)

@@ -35,7 +35,7 @@ def copy_report(project,  module, sequence_index, test_type, is_dryrun, compiler
     abs_log_path = "log"
     test_info_path = os.path.join(r"{}".format(module))
     ftp_log_path = os.path.join(quote(get_ftp_folder()[0], "utf-8"), test_info_path, abs_log_path)
-    print("log to {}".format(os.path.join(test_info_path, abs_log_path)))
+    print("copy log to {}".format(os.path.join(test_info_path, abs_log_path)))
 
     try:
         if module in ["HoneyGUI_CMD"]:
