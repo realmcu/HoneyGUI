@@ -222,190 +222,105 @@ void quaternion_to_matrix(gui_quaternion_t *quaternion, gui_matrix_t *matrix)
     matrix->m[2][2] = 1 - 2 * (xx + yy);
 }
 
+static float calculate_scale_factor(int x, int y, int center_x, int center_y, float base_scale)
+{
+    float distance = sqrt((x - center_x) * (x - center_x) + (y - center_y) * (y - center_y)) / 100.0f;
+    return base_scale / (distance + 1);
+}
+
+static void update_rotation(int new_x, int new_y, touch_info_t *tp, gui_soccer_t *this)
+{
+    float scale_factor = calculate_scale_factor(new_x, new_y, this->c_x, this->c_y, 190.0f);
+    float delta_angle_y = (new_x - tp->history_x) / scale_factor;
+    float delta_angle_x = -(new_y - tp->history_y) / scale_factor;
+
+    gui_quaternion_t rotation_y = quat_identity();
+    gui_quaternion_t rotation_x = quat_identity();
+    gui_quaternion_t rotation_z = quat_identity();
+
+    if (abs(tp->deltaX) > 10)
+    {
+        rotation_y = quaternion_from_angle_axis(delta_angle_y, 0, 1, 0);
+    }
+
+    if (abs(tp->deltaY) > 10)
+    {
+        rotation_x = quaternion_from_angle_axis(delta_angle_x, 1, 0, 0);
+    }
+
+    if (fabs(tp->x - this->c_x) > 100 || fabs(tp->y - this->c_y) > 100)
+    {
+        float delta_angle_z = sqrt(delta_angle_x * delta_angle_x + delta_angle_y * delta_angle_y);
+        if (tp->y >= this->c_y)
+        {
+            delta_angle_z = tp->deltaX < 0 ? delta_angle_z : -delta_angle_z;
+        }
+        else
+        {
+            delta_angle_z = tp->deltaX > 0 ? delta_angle_z : -delta_angle_z;
+        }
+        rotation_z = quaternion_from_angle_axis(delta_angle_z, 0, 0, 1);
+    }
+
+    if (abs(tp->deltaX) > 10 && abs(tp->deltaY) > 10)
+    {
+        this->rotation = quaternion_multiply(rotation_y, this->rotation);
+        this->rotation = quaternion_multiply(rotation_x, this->rotation);
+        this->rotation = quaternion_multiply(rotation_z, this->rotation);
+    }
+    else if (abs(tp->deltaX) > 10)
+    {
+        this->rotation = quaternion_multiply(rotation_y, this->rotation);
+    }
+    else if (abs(tp->deltaY) > 10)
+    {
+        this->rotation = quaternion_multiply(rotation_x, this->rotation);
+    }
+}
+
+static float velocity_x, velocity_y;
 static void gui_soccer_prepare(gui_obj_t *obj)
 {
     gui_soccer_t *this = (gui_soccer_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = (touch_info_t *)tp_get_info();
 
-    this->yrot = 1;
-    this->rotation = quaternion_multiply(quaternion_from_angle_axis(this->yrot / 180.0f * PHI, 0, 1, 0),
-                                         this->rotation);
     float scsize = this->scsize;
     float xoff = (this->c_x - dc->screen_width / 2) + dc->screen_width / 2;
     float yoff = (this->c_y - dc->screen_height / 2) + dc->screen_height / 2;
 
-    switch (tp->type)
+    if ((tp->pressed || tp->pressing) &&
+        ((tp->x - this->c_x) * (tp->x - this->c_x) + (tp->y - this->c_y) * (tp->y - this->c_y)) <
+        this->slide_range * this->slide_range)
     {
-    case TOUCH_HOLD_X:
-        if (tp->x <= this->c_x && tp->y <= this->c_y)
-        {
-            if (tp->deltaX * tp->deltaY < 0 && abs(tp->deltaY) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX > 0 && tp->deltaY > 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 1, 0),
-                                                     this->rotation);
-            }
-        }
-        else if (tp->x >= this->c_x && tp->y <= this->c_y)
-        {
-            if (tp->deltaX * tp->deltaY > 0 && abs(tp->deltaY) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX < 0 && tp->deltaY > 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 1, 0),
-                                                     this->rotation);
-            }
-        }
-        else if (tp->x <= this->c_x && tp->y >= this->c_y)
-        {
-            if (tp->deltaX * tp->deltaY > 0 && abs(tp->deltaY) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaX / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX > 0 && tp->deltaY < 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 1, 0),
-                                                     this->rotation);
-            }
-        }
-        else if (tp->x >= this->c_x && tp->y >= this->c_y)
-        {
-            if (tp->deltaX * tp->deltaY < 0 && abs(tp->deltaY) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaX / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX < 0 && tp->deltaY < 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 1, 0),
-                                                     this->rotation);
-            }
-        }
-        break;
+        int new_x = tp->x + tp->deltaX;
+        int new_y = tp->y + tp->deltaY;
 
-    case TOUCH_HOLD_Y:
-        if (tp->x <= this->c_x && tp->y <= this->c_y)
+        if (new_x != tp->history_x || new_y != tp->history_y)
         {
-            if (tp->deltaY * tp->deltaX < 0 && abs(tp->deltaX) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX > 0 && tp->deltaY > 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0),
-                                                     this->rotation);
-            }
-        }
-        else if (tp->x >= this->c_x && tp->y <= this->c_y)
-        {
-            if (tp->deltaY * tp->deltaX > 0 && abs(tp->deltaX) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaY / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX < 0 && tp->deltaY > 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0),
-                                                     this->rotation);
-            }
-        }
-        else if (tp->x <= this->c_x && tp->y >= this->c_y)
-        {
-            if (tp->deltaY * tp->deltaX > 0 && abs(tp->deltaX) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX > 0 && tp->deltaY < 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0),
-                                                     this->rotation);
-            }
-        }
-        else if (tp->x >= this->c_x && tp->y >= this->c_y)
-        {
-            if (tp->deltaY * tp->deltaX < 0 && abs(tp->deltaX) > 5)
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaY / 360.0f, 0, 0, 1),
-                                                     this->rotation);
-            }
-            else if (tp->deltaX < 0 && tp->deltaY < 0)
-            {
-                this->rotation = quaternion_multiply(quaternion_multiply(quaternion_from_angle_axis(
-                                                                             tp->deltaX / 360.0f, 0, 1, 0),
-                                                                         quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0)),
-                                                     this->rotation);
-            }
-            else
-            {
-                this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0),
-                                                     this->rotation);
-            }
-        }
-        break;
+            update_rotation(new_x, new_y, tp, this);
 
-    default:
-        break;
+            velocity_x = (new_x - tp->history_x) * 1.0f;
+            velocity_y = (new_y - tp->history_y) * 1.0f;
+
+            tp->history_x = new_x;
+            tp->history_y = new_y;
+        }
     }
+    else
+    {
+        if (fabs(velocity_x) > 1.0f || fabs(velocity_y) > 1.0f)
+        {
+            int new_x = tp->x + tp->deltaX + velocity_x;
+            int new_y = tp->y + tp->deltaY + velocity_y;
+            update_rotation(new_x, new_y, tp, this);
+
+            velocity_x *= 0.9f;
+            velocity_y *= 0.9f;
+        }
+    }
+
+
 
     for (int i = 0; i < 20; i++)
     {
@@ -471,7 +386,7 @@ static void gui_soccer_prepare(gui_obj_t *obj)
         matrix_transfrom_rotate(&rotate_3D, &qv1, &qrv1, xoff, yoff, 0);
         matrix_transfrom_rotate(&rotate_3D, &qv2, &qrv2, xoff, yoff, 0);
         matrix_transfrom_rotate(&rotate_3D, &qv3, &qrv3, xoff, yoff, 0);
-        gui_soccer_transfrom_blit(100, 100, &qrv1, &qrv0, &qrv3, &qrv2, &matrix);
+        gui_soccer_transfrom_blit(98, 98, &qrv1, &qrv0, &qrv3, &qrv2, &matrix);
 
 
         gui_matrix_t tmp;
@@ -604,10 +519,11 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
 
     gui_dispdev_t *dc = gui_get_dc();
     this->scsize = 100;
+    this->slide_range = 200;
     this->c_x = (dc->fb_width - this->scsize) / 2.0f;
     this->c_y = (dc->fb_width - this->scsize) / 2.0f;
 
-    this->rotation = quat_identity();
+    this->rotation = quaternion_from_angle_axis(1, 0, 1, 0);
     this->press_face = -1;
 }
 
@@ -696,6 +612,11 @@ void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y)
 void gui_soccer_set_size(gui_soccer_t *this, float size)
 {
     this->scsize = size;
+}
+
+void gui_soccer_set_slide_range(gui_soccer_t *this, float range)
+{
+    this->slide_range = range;
 }
 
 void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter)

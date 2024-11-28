@@ -64,6 +64,7 @@ typedef struct gui_soccer
     gui_vertex_t normal[20];
     gui_quaternion_t rotation;
     // float nz[20];
+    float slide_range;
 
 } gui_soccer_t;
 
@@ -185,6 +186,14 @@ void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y);
  * @param size scale size
  */
 void gui_soccer_set_size(gui_soccer_t *this, float size);
+
+/**
+ * @brief set slide range
+ *
+ * @param this widget pointer
+ * @param range slide range
+ */
+void gui_soccer_set_slide_range(gui_soccer_t *this, float range);
 
 /**
  * @brief set on_click event
