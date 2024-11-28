@@ -126,6 +126,11 @@ gui_point_4d_t gui_point_4d(float x, float y, float z);
 void gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z, float rotX,
                               float rotY, float rotZ, float scale);
 
+void gui_3d_calculator_matrix(gui_3d_matrix_t *world, \
+                              float x, float y, float z, \
+                              gui_point_4d_t point, gui_vector_4d_t vector, float degrees, \
+                              float scale);
+
 bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t cameraPosition,
                                   gui_point_4d_t cameraTarget, float near, float far, float fov, float viewPortWidth,
                                   float viewPortHeight);
@@ -135,10 +140,20 @@ void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *c
 
 void gui_3d_face_transform_local_to_local(gui_3d_face_t *face, gui_3d_matrix_t *m);
 
-void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *result, float px, float py, float pz,
-                                        float ux, float uy, float uz, float angle_degrees);
-
 bool gui_3d_generate_2d_matrix(gui_3d_point_2d_t *src, gui_3d_point_2d_t *dst, float *ret);
+
+gui_vector_4d_t gui_3d_vector(float ux, float uy, float uz);
+gui_point_4d_t gui_3d_point(float x, float y, float z);
+
+gui_3d_matrix_t gui_3d_matrix_multiply(gui_3d_matrix_t Mat1, gui_3d_matrix_t Mat2);
+
+
+void gui_3d_matrix_identity(gui_3d_matrix_t *m);
+void gui_3d_matrix_translate(gui_3d_matrix_t *m, float t_x, float t_y, float t_z);
+void gui_3d_matrix_rotateY(gui_3d_matrix_t *m, float rotY);
+void gui_3d_matrix_rotateX(gui_3d_matrix_t *m, float rotX);
+void gui_3d_matrix_rotateZ(gui_3d_matrix_t *m, float rotZ);
+void gui_3d_matrix_scale(gui_3d_matrix_t *m, float scale_x, float scale_y, float scale_z);
 #ifdef __cplusplus
 }
 #endif

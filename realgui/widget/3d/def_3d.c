@@ -345,8 +345,20 @@ gui_3d_matrix_t gui_3d_matrix_multiply(gui_3d_matrix_t Mat1, gui_3d_matrix_t Mat
 }
 
 
-void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *result, float px, float py, float pz,
-                                        float ux, float uy, float uz, float angle_degrees)
+
+gui_point_4d_t gui_3d_point4D_mul_matrix(gui_point_4d_t p, gui_3d_matrix_t mat)
+{
+    gui_point_4d_t point;
+    point.x = p.x * mat._11 + p.y * mat._21 + p.z * mat._31 + 1 * mat._41;
+    point.y = p.x * mat._12 + p.y * mat._22 + p.z * mat._32 + 1 * mat._42;
+    point.z = p.x * mat._13 + p.y * mat._23 + p.z * mat._33 + 1 * mat._43;
+    point.w = p.x * mat._14 + p.y * mat._24 + p.z * mat._34 + 1 * mat._44;
+    return point;
+}
+
+
+static void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *mrot, float px, float py, float pz,
+                                               float ux, float uy, float uz, float angle_degrees)
 {
     // Convert degrees to radians
     float angle = angle_degrees * (3.141562f / 180.0f);
@@ -414,19 +426,54 @@ void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *result, float px, float
     gui_3d_matrix_t temp3 = gui_3d_matrix_multiply(temp2, Ry);
     gui_3d_matrix_t temp4 = gui_3d_matrix_multiply(temp3, Rx);
     gui_3d_matrix_t temp5 = gui_3d_matrix_multiply(temp4, T1);
-    *result = gui_3d_matrix_multiply(T2, temp5);
+    *mrot = gui_3d_matrix_multiply(T2, temp5);
 }
 
-gui_point_4d_t gui_3d_point4D_mul_matrix(gui_point_4d_t p, gui_3d_matrix_t mat)
+gui_point_4d_t gui_3d_point(float x, float y, float z)
 {
     gui_point_4d_t point;
-    point.x = p.x * mat._11 + p.y * mat._21 + p.z * mat._31 + 1 * mat._41;
-    point.y = p.x * mat._12 + p.y * mat._22 + p.z * mat._32 + 1 * mat._42;
-    point.z = p.x * mat._13 + p.y * mat._23 + p.z * mat._33 + 1 * mat._43;
-    point.w = p.x * mat._14 + p.y * mat._24 + p.z * mat._34 + 1 * mat._44;
+    point.x = x;
+    point.y = y;
+    point.z = z;
+    point.w = 1.0f;
     return point;
 }
 
+gui_vector_4d_t gui_3d_vector(float ux, float uy, float uz)
+{
+    gui_vector_4d_t vector;
+    vector.ux = ux;
+    vector.uy = uy;
+    vector.uz = uz;
+    vector.uw = 1.0f;
+    return vector;
+}
+
+void gui_3d_calculator_matrix(gui_3d_matrix_t *matrix, \
+                              float x, float y, float z, \
+                              gui_point_4d_t point, gui_vector_4d_t vector, float degrees, \
+                              float scale)
+{
+    gui_3d_matrix_t mrot, mscale, mtrans;
+    float px = point.x;
+    float py = point.y;
+    float pz = point.z;
+    float ux = vector.ux;
+    float uy = vector.uy;
+    float uz = vector.uz;
+    gui_3d_matrix_identity(matrix);
+
+    gui_3d_generate_rotate_around_line(&mrot, px, py, pz, ux, uy, uz, degrees);
+
+    gui_3d_matrix_scale(&mscale, scale, scale, scale);
+    gui_3d_matrix_translate(&mtrans, x, y, z);
+
+    *matrix = gui_3d_matrix_multiply(*matrix, mscale);
+
+    *matrix = gui_3d_matrix_multiply(*matrix, mrot);
+
+    *matrix = gui_3d_matrix_multiply(*matrix, mtrans);
+}
 
 void gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z, float rotX,
                               float rotY, float rotZ, float scale)
@@ -442,8 +489,11 @@ void gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z,
     *world = gui_3d_matrix_multiply(*world, mscale);
     *world = gui_3d_matrix_multiply(*world, mrotx);
     *world = gui_3d_matrix_multiply(*world, mroty);
+
     *world = gui_3d_matrix_multiply(*world, mrotz);
     *world = gui_3d_matrix_multiply(*world, mtrans);
+
+
 }
 
 bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t cameraPosition,
