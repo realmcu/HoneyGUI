@@ -36,6 +36,10 @@ if GetDepend('CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'):
     src += ['app_ui_lvgl.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
+if GetDepend('CONFIG_REALTEK_BUILD_LVGLV9_DEMO_APP'):
+    src += ['app_ui_lvglv9.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
 if GetDepend('CONFIG_REALTEK_BUILD_ARM2D_DEMO_APP'):
     src += ['app_ui_arm2d.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)

@@ -183,6 +183,7 @@
 
 // <e> HoneyGUI Enable LVGL
 #define CONFIG_REALTEK_BUILD_LVGL_GUI     0
+#define CONFIG_REALTEK_BUILD_LVGL_V9      0
 
 #if (CONFIG_REALTEK_BUILD_LVGL_GUI == 1)
 
@@ -196,6 +197,23 @@
 
 // <c> HoneyGUI Enable LVGL RLOTTIE
 #define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
+// </c>
+
+#endif
+
+
+#if (CONFIG_REALTEK_BUILD_LVGL_V9 == 1)
+
+// <c> HoneyGUI Enalbe LVGL V9 APP
+#define CONFIG_REALTEK_BUILD_LVGLV9_DEMO_APP
+// </c>
+
+// <c> HoneyGUI Enable LVGL V9 EXAMPLES
+#define CONFIG_REALTEK_BUILD_LVGLV9_EXAMPLES
+// </c>
+
+// <c> HoneyGUI Enable LVGL V9 RLOTTIE
+#define CONFIG_REALTEK_BUILD_LVGLV9_RLOTTIE
 // </c>
 
 #endif

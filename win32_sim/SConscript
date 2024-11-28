@@ -6,7 +6,7 @@ Import('RTK_GUI_ENGINE')
 from building import *
 
 cwd = GetCurrentDir()
-CPPPATH = [cwd, 
+CPPPATH = [cwd,
            RTK_GUI_ENGINE + '/example/root_image/']
 
 
@@ -27,6 +27,12 @@ if GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
     CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']
     CPPDEFINES += ['LV_USE_DEMO_BENCHMARK']
     CPPDEFINES += ['LV_USE_DEMO_WIDGETS']
+
+if GetDepend('CONFIG_REALTEK_BUILD_LVGL_V9'):
+    CPPDEFINES += ['LV_KCONFIG_IGNORE']
+    CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']
+    # CPPDEFINES += ['LV_USE_DEMO_BENCHMARK']
+    # CPPDEFINES += ['LV_USE_DEMO_WIDGETS']
 
 objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
