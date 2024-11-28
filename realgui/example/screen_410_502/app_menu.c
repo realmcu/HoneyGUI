@@ -24,6 +24,7 @@
 #define APP_FRUIT_NINJA
 #define APP_BOX2D_RING
 #define APP_HEART_RATE
+#define APP_ACTIVITY
 
 #define GUI_APP_DEFINE_NAME(APP_NAME) \
     static void _##APP_NAME##_ui_design(gui_app_t*); \
@@ -46,6 +47,7 @@ GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
 GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
 GUI_APP_DEFINE_NAME(APP_HEART_RATE)
+GUI_APP_DEFINE_NAME(APP_ACTIVITY)
 
 extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
 
@@ -67,6 +69,11 @@ void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
 {
     gui_switch_app(gui_current_app(), _get_APP_HEART_RATE_handle());
+}
+
+void switch_APP_ACTIVITY(void *obj, gui_event_t e, void *param)
+{
+    gui_switch_app(gui_current_app(), _get_APP_ACTIVITY_handle());
 }
 
 // static void switch_APP_CALCULATOR()
@@ -183,6 +190,8 @@ static void app_FN_back2prescreen_cb(void)
 
 static void app_BOX2D_RING_return_cb(void)
 {
+    extern void close_box2d_ring(void);
+    close_box2d_ring();
     extern bool sidebar_flag;
     if (sidebar_flag)
     {
@@ -212,47 +221,47 @@ static void app_menu_design(gui_app_t *app)
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_MUSIC_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_COMPASS_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
         UI_CLOCK_HEARTRATE_ICON_BIN,
     };
 
@@ -265,23 +274,23 @@ static void app_menu_design(gui_app_t *app)
         struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
         {
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
-            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {app_menu_cb, (void *)1},
+            {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
         };
         gui_menu_cellular_on_click(cell, gesture_parameter_array,
@@ -340,4 +349,16 @@ GUI_APP_ENTRY(APP_HEART_RATE)
     heart_rate_app(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_HR_back2prescreen_cb, (void *)0);
+}
+
+GUI_APP_ENTRY(APP_ACTIVITY)
+{
+    sidebar_app_array_fill(UI_CLOCK_ACTIVITY_ICON_BIN, switch_APP_ACTIVITY);
+    extern void page_tb_control_enter(void *parent);
+    page_tb_control_enter(&app->screen);
+
+    extern void activity_app(gui_obj_t *obj);
+    activity_app(GUI_APP_ROOT_SCREEN);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
 }
