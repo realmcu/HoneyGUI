@@ -13,7 +13,8 @@ const int SCREEN_HEIGHT = 454;
 const float M2P =
     20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
 const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
-b2World world(b2Vec2(0.0f, -9.8f)); // Create a Box2D world with gravity
+b2World *world = nullptr; // Box2D world
+// b2World world(b2Vec2(0.0f, -9.8f)); // Create a Box2D world with gravity
 b2Body *ballBody;
 gui_img_t *img;
 
@@ -22,7 +23,7 @@ void app_box2d_cb(void *p, void *this_widget, gui_animate_t *animate)
 {
     gui_win_t *win = (gui_win_t *)p;
     // Update the physics world
-    world.Step(1 / 60.f, 8, 3);
+    world->Step(1 / 60.f, 8, 3);
 
     // Get the position of the ball
     b2Vec2 position = ballBody->GetPosition();
@@ -56,6 +57,14 @@ void ui_design(gui_obj_t *obj)
     // Create an image for displaying on the window
     img = gui_img_create_from_mem(win, "img", ICON_BUDS_ON_BIN, 0, 0, 0, 0);
 
+    b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
+
+    if (world != nullptr)
+    {
+        world->DestroyBody(ballBody);
+        delete world;
+    }
+    world = new b2World(gravity);
     // Define the ground
     b2EdgeShape groundEdge;
     groundEdge.SetTwoSided(b2Vec2(-100.0f, 0.0f), b2Vec2(100.0f, 0.0f));
@@ -63,7 +72,7 @@ void ui_design(gui_obj_t *obj)
     // Define the boundaries
     b2BodyDef wallsBodyDef;
     wallsBodyDef.position.Set(0, 0);
-    b2Body *wallsBody = world.CreateBody(&wallsBodyDef);
+    b2Body *wallsBody = world->CreateBody(&wallsBodyDef);
 
     // Define the walls
     b2EdgeShape topWall, bottomWall, leftWall, rightWall;
@@ -86,7 +95,7 @@ void ui_design(gui_obj_t *obj)
     ballBodyDef.position.Set(SCREEN_WIDTH / 1.5 * P2M, SCREEN_HEIGHT / 1.5 * P2M);
     ballBodyDef.angularVelocity = -314;    //-PI rad/s
     ballBodyDef.linearVelocity.Set(100, 50);
-    ballBody = world.CreateBody(&ballBodyDef);
+    ballBody = world->CreateBody(&ballBodyDef);
 
     b2CircleShape circleShape;
     circleShape.m_radius = 20 *
