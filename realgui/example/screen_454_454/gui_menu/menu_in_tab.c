@@ -426,6 +426,7 @@ static void menu_cb(gui_obj_t *obj)
 /* In the button click callback, execute the next app startup.*/
 static void stopwatch_cb()
 {
+    gui_app_layer_top();
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
 }
 static void map_cb()

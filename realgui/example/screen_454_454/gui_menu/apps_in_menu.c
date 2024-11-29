@@ -38,7 +38,7 @@
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 /*Define a app with name APP_STOPWATCH*/
 #define APP_STOPWATCH
-GUI_APP_DEFINE_NAME(APP_STOPWATCH)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_STOPWATCH, GUI_APP_ANIMATION_1, GUI_APP_ANIMATION_5)
 /*Define a app with name APP_STOPWATCH end*/
 /*Define a app with name APP_MENU and entry func app_menu*/
 #define APP_MENU
@@ -320,6 +320,7 @@ static void page_cb(gui_page_t *page)
 }
 static void win_cb(gui_win_t *win)
 {
+    gui_app_layer_buttom();
     GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui());
     gui_tabview_t *tabview = 0;
     gui_obj_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", (void *)&tabview);

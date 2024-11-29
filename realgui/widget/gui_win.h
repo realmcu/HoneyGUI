@@ -272,6 +272,37 @@ void gui_win_append_animate(gui_win_t  *win,
                             void       *callback,
                             void       *p,
                             const char *name);
+/**
+ * @brief Move the GUI window to the specified coordinates.
+ *
+ * This function repositions a GUI window to the specified (x, y) coordinates on the screen.
+ *
+ * @param win Pointer to the GUI window that needs to be moved.
+ * @param x The new x-coordinate for the window.
+ * @param y The new y-coordinate for the window.
+ */
+void gui_win_move(gui_win_t *win, int x, int y);
+
+/**
+ * @brief Get the current x-coordinate of the GUI window.
+ *
+ * This function returns the current x-coordinate of the specified GUI window.
+ *
+ * @param win Pointer to the GUI window.
+ * @return The current x-coordinate of the window.
+ */
+int gui_win_get_x(gui_win_t *win);
+
+/**
+ * @brief Get the current y-coordinate of the GUI window.
+ *
+ * This function returns the current y-coordinate of the specified GUI window.
+ *
+ * @param win Pointer to the GUI window.
+ * @return The current y-coordinate of the window.
+ */
+int gui_win_get_y(gui_win_t *win);
+
 #ifdef __cplusplus
 }
 #endif

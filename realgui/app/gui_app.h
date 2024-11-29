@@ -32,7 +32,7 @@ extern "C" {
 #include <guidef.h>
 #include <gui_fb.h>
 #include "gui_obj.h"
-
+#include "gui_win.h"
 /*============================================================================*
  *                         Types
  *============================================================================*/
@@ -43,6 +43,7 @@ struct gui_app
 {
     gui_obj_t screen;               //!< widget tree root
     const char *xml;                //!< widget tree design file
+    gui_win_t *window;      //!< app transition window
     uint32_t active_ms;             //!< screen shut down delay
     uint32_t start_ms;             //!< screen shut down delay
     void *thread_id;                //!< thread handle(optional)
@@ -55,7 +56,8 @@ struct gui_app
     bool close;
     bool next;
     bool close_sync;
-
+    unsigned char startup_animation_flag;
+    unsigned char shutdown_animation_flag;
 };
 
 /*============================================================================*
@@ -142,7 +144,7 @@ struct gui_app
  *
  * @return A pointer to the root screen of the current application.
  */
-#define GUI_APP_ROOT_SCREEN &(app->screen)
+#define GUI_APP_ROOT_SCREEN ((void *)(app->window))
 
 /**
  * @brief Macro to swap between two GUI applications using their handle functions.
@@ -185,7 +187,41 @@ struct gui_app
     { \
         return &_app_##APP_NAME; \
     }
-
+/**
+ * @brief Defines a GUI application with a startup and shutdown animation.
+ *
+ * This macro creates a definition for a GUI application:
+ * - `APP_NAME`: The name of the application.
+ * - `STARTUP_ANIMATION`: The animation used when the application starts.
+ * - `SHUTDOWN_ANIMATION`: The animation used when the application shuts down.
+ *
+ * @param APP_NAME Name of the application.
+ * @param STARTUP_ANIMATION The animation type used for startup (of type `gui_app_animation_t`).
+ * @param SHUTDOWN_ANIMATION The animation type used for shutdown (of type `gui_app_animation_t`).
+ */
+#define GUI_APP_DEFINE_NAME_ANIMATION(APP_NAME, STARTUP_ANIMATION, SHUTDOWM_ANIMATION) \
+    static void _##APP_NAME##_ui_design(gui_app_t*); \
+    static gui_app_t _app_##APP_NAME = \
+                                       { \
+                                         .screen = \
+                                                   { \
+                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
+                                                     .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
+                                                   }, \
+                                         .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
+                                         .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                         .startup_animation_flag = STARTUP_ANIMATION,\
+                                         .shutdown_animation_flag = SHUTDOWM_ANIMATION,\
+                                       }; \
+    /**
+     * @brief Function to get the handle of the application.
+     *
+     * @return A pointer to the application instance.
+     */ \
+    gui_app_t *_get_app_##APP_NAME##_handle(void) \
+    { \
+        return &_app_##APP_NAME; \
+    }
 /**
  * @brief Macro to declare the entry point of a GUI application's UI design function.
  *
@@ -194,8 +230,18 @@ struct gui_app
  * @param APP_NAME The name of the application.
  */
 #define GUI_APP_ENTRY(APP_NAME) static void _##APP_NAME##_ui_design(gui_app_t* app)
-
-
+typedef unsigned char gui_app_animation_t;
+#define GUI_APP_ANIMATION_NULL (gui_app_animation_t)0
+#define GUI_APP_ANIMATION_1 (gui_app_animation_t)1 ///< Recommended for startup
+#define GUI_APP_ANIMATION_2 (gui_app_animation_t)2 ///< Recommended for startup
+#define GUI_APP_ANIMATION_3 (gui_app_animation_t)3 ///< Recommended for startup
+#define GUI_APP_ANIMATION_4 (gui_app_animation_t)4 ///< Recommended for startup
+#define GUI_APP_ANIMATION_5 (gui_app_animation_t)5 ///< Recommended for shutdown
+#define GUI_APP_ANIMATION_6 (gui_app_animation_t)6 ///< Recommended for shutdown
+#define GUI_APP_ANIMATION_7 (gui_app_animation_t)7 ///< Recommended for shutdown
+#define GUI_APP_ANIMATION_8 (gui_app_animation_t)8 ///< Recommended for shutdown
+#define GUI_APP_ANIMATION_9 (gui_app_animation_t)9 ///< Recommended for startup
+#define GUI_APP_ANIMATION_10 (gui_app_animation_t)10 ///< Recommended for shutdown
 /*============================================================================*
  *                         Variables
  *============================================================================*/

@@ -51,6 +51,8 @@ static gui_app_t app_watch_ui =
     .ui_design = design_app_watch_ui,
     .thread_entry = NULL,
     .active_ms = 10000,
+    .shutdown_animation_flag = GUI_APP_ANIMATION_10,
+    .startup_animation_flag = GUI_APP_ANIMATION_9,
 };
 
 gui_app_t *get_app_watch_ui(void)
@@ -74,7 +76,7 @@ static void design_app_watch_ui(gui_app_t *app)
 #include "mem_config.h"
     //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
 #endif
-    tabview_main = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
+    tabview_main = gui_tabview_create(app->window, "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tabview_main, TAB_CUBE);
     gui_tabview_enable_pre_load(tabview_main, true);
 
