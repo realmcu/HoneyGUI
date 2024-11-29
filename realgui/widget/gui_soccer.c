@@ -230,7 +230,7 @@ static float calculate_scale_factor(int x, int y, int center_x, int center_y, fl
 
 static void update_rotation(int new_x, int new_y, touch_info_t *tp, gui_soccer_t *this)
 {
-    float scale_factor = calculate_scale_factor(new_x, new_y, this->c_x, this->c_y, 190.0f);
+    float scale_factor = calculate_scale_factor(new_x, new_y, this->c_x, this->c_y, 200.0f);
     float delta_angle_y = (new_x - tp->history_x) / scale_factor;
     float delta_angle_x = -(new_y - tp->history_y) / scale_factor;
 
@@ -289,34 +289,36 @@ static void gui_soccer_prepare(gui_obj_t *obj)
     float xoff = (this->c_x - dc->screen_width / 2) + dc->screen_width / 2;
     float yoff = (this->c_y - dc->screen_height / 2) + dc->screen_height / 2;
 
-    if ((tp->pressed || tp->pressing) &&
-        ((tp->x - this->c_x) * (tp->x - this->c_x) + (tp->y - this->c_y) * (tp->y - this->c_y)) <
-        this->slide_range * this->slide_range)
+    int new_x = tp->x + tp->deltaX;
+    int new_y = tp->y + tp->deltaY;
+
+    if (((new_x - this->c_x) * (new_x - this->c_x) + (new_y - this->c_y) *
+         (new_y - this->c_y)) < this->slide_range * this->slide_range)
     {
-        int new_x = tp->x + tp->deltaX;
-        int new_y = tp->y + tp->deltaY;
-
-        if (new_x != tp->history_x || new_y != tp->history_y)
+        if ((tp->pressed || tp->pressing))
         {
-            update_rotation(new_x, new_y, tp, this);
+            if (new_x != tp->history_x || new_y != tp->history_y)
+            {
+                update_rotation(new_x, new_y, tp, this);
 
-            velocity_x = (new_x - tp->history_x) * 1.0f;
-            velocity_y = (new_y - tp->history_y) * 1.0f;
+                velocity_x = (new_x - tp->history_x) * 1.0f;
+                velocity_y = (new_y - tp->history_y) * 1.0f;
 
-            tp->history_x = new_x;
-            tp->history_y = new_y;
+                tp->history_x = new_x;
+                tp->history_y = new_y;
+            }
         }
-    }
-    else
-    {
-        if (fabs(velocity_x) > 1.0f || fabs(velocity_y) > 1.0f)
+        else
         {
-            int new_x = tp->x + tp->deltaX + velocity_x;
-            int new_y = tp->y + tp->deltaY + velocity_y;
-            update_rotation(new_x, new_y, tp, this);
+            if (fabs(velocity_x) > 1.0f || fabs(velocity_y) > 1.0f)
+            {
+                new_x += velocity_x;
+                new_y += velocity_y;
+                update_rotation(new_x, new_y, tp, this);
 
-            velocity_x *= 0.9f;
-            velocity_y *= 0.9f;
+                velocity_x *= 0.9f;
+                velocity_y *= 0.9f;
+            }
         }
     }
 
