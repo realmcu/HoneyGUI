@@ -17,9 +17,13 @@
 #define SCREEN_HEIGHT 502
 
 extern char *cjson_content;
+static uint8_t *img_data = NULL;
 static float progress = 0;
 static bool animate_flag = 0;
 static bool draw_flag = 0;
+static char text_content[30] = "";
+
+static gui_text_t *move_text, *ex_text, *stand_text;
 
 static void arc_activity_cb(NVGcontext *vg)
 {
@@ -61,65 +65,78 @@ static void arc_activity_cb(NVGcontext *vg)
                 move_val = move->valueint;
                 ex_val = ex->valueint;
                 stand_val = stand->valueint;
+
+                {
+                    sprintf(text_content, "Move: %d/20000 steps", move_val);
+                    gui_text_content_set((gui_text_t *)move_text, text_content, strlen(text_content));
+                    gui_text_convert_to_img((gui_text_t *)move_text, RGB565);
+                }
+                {
+                    sprintf(text_content, "Exercise: %d/60 min", ex_val);
+                    gui_text_content_set(ex_text, text_content, strlen(text_content));
+                    gui_text_convert_to_img(ex_text, RGB565);
+                }
+                {
+                    sprintf(text_content, "Stand: %d/30 times", stand_val);
+                    gui_text_content_set(stand_text, text_content, strlen(text_content));
+                    gui_text_convert_to_img(stand_text, RGB565);
+                }
             }
         }
         // clear
         cJSON_Delete(root);
     }
 
-    float line_width = 25.0f;
-    float radius_max = SCREEN_WIDTH / 2.0f - 40.0f;
-    float interval = 10.0f;
+    uint8_t line_width = 16;
+    uint8_t radius_max = 100 - line_width / 2;
+    uint8_t interval = 5;
 
     nvgBeginPath(vg);
-    nvgArc(vg, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, radius_max, 3 * M_PI / 2,
+    nvgArc(vg, 100, 100, radius_max, 3 * M_PI / 2,
            M_PI * 3.5f, NVG_CW);
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(58, 23, 29));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, radius_max, 3 * M_PI / 2,
+    nvgArc(vg, 100, 100, radius_max, 3 * M_PI / 2,
            M_PI * (1.5f + 2.0f * move_val * progress / 20000.0f), NVG_CW);  // cap 20000 steps
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(230, 67, 79));
     nvgStroke(vg);
 
     nvgBeginPath(vg);
-    nvgArc(vg, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, radius_max - (line_width + interval), 3 * M_PI / 2,
+    nvgArc(vg, 100, 100, radius_max - (line_width + interval), 3 * M_PI / 2,
            M_PI * 3.5f, NVG_CW);
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(30, 55, 25));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, radius_max - (line_width + interval), 3 * M_PI / 2,
+    nvgArc(vg, 100, 100, radius_max - (line_width + interval), 3 * M_PI / 2,
            M_PI * (1.5f + 2.0f * ex_val * progress / 60.0f), NVG_CW);  // cap 60 min.
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(186, 253, 79));
     nvgStroke(vg);
 
     nvgBeginPath(vg);
-    nvgArc(vg, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, radius_max - 2 * (line_width + interval),
-           3 * M_PI / 2,
+    nvgArc(vg, 100, 100, radius_max - 2 * (line_width + interval), 3 * M_PI / 2,
            M_PI * 3.5f, NVG_CW);
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(22, 50, 47));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, radius_max - 2 * (line_width + interval),
-           3 * M_PI / 2,
+    nvgArc(vg, 100, 100, radius_max - 2 * (line_width + interval), 3 * M_PI / 2,
            M_PI * (1.5f + 2.0f * stand_val * progress / 30.0f), NVG_CW); // cap 30 times
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(117, 230, 229));
     nvgStroke(vg);
     gui_fb_change();
-    // gui_log("progress: %f\n", progress);
+    gui_log("progress: %f\n", progress);
 }
 
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 {
     if (animate_flag)
     {
-        draw_flag = 0;
         progress = ((gui_img_t *)this_widget)->animate->progress_percent;
         if (progress == 1.0f)
         {
@@ -127,27 +144,54 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
         }
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, SCREEN_WIDTH, arc_activity_cb,
-                                 img_data);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 200, 200, arc_activity_cb, img_data);
         gui_img_set_image_data(this_widget, img_data);
     }
 }
 
 void activity_app(gui_obj_t *obj)
 {
-    // gui_win_t *win = gui_win_create(obj, "app_activity_win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // text
+    if (!move_text)
     {
-        int image_h = SCREEN_WIDTH,
-            image_w = SCREEN_WIDTH,
+        move_text = gui_text_create(obj, "move_text", 150, 300, 0, 0);
+        gui_text_set(move_text, (void *)move_text, GUI_FONT_SRC_BMP, gui_rgb(230, 67, 79),
+                     strlen(text_content), 32);
+        gui_text_type_set(move_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(move_text, LEFT);
+        gui_text_convert_to_img(move_text, RGB565);
+
+        ex_text = gui_text_create(obj, "ex_text", 150, 350, 0, 0);
+        gui_text_set(ex_text, (void *)ex_text, GUI_FONT_SRC_BMP, gui_rgb(186, 253, 79),
+                     strlen(text_content), 32);
+        gui_text_type_set(ex_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(ex_text, LEFT);
+        gui_text_convert_to_img(ex_text, RGB565);
+
+        stand_text = gui_text_create(obj, "stand_text", 150, 400, 0, 0);
+        gui_text_set(stand_text, (void *)stand_text, GUI_FONT_SRC_BMP, gui_rgb(117, 230, 229),
+                     strlen(text_content), 32);
+        gui_text_type_set(stand_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(stand_text, LEFT);
+        gui_text_convert_to_img(stand_text, RGB565);
+    }
+
+    {
+        int image_h = 200,
+            image_w = 200,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        uint8_t *img_data = gui_lower_malloc(buffer_size);
+        if (img_data == NULL)
+        {
+            img_data = gui_lower_malloc(buffer_size);
+        }
         memset(img_data, 0, buffer_size);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
-        gui_img_t *img = gui_img_create_from_mem(obj, 0, (void *)img_data, 0,
-                                                 45, 0, 0);
+        gui_img_t *img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
+                                                 50, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
     }
     animate_flag = 1;
+    draw_flag = 0;
 }

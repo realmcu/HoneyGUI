@@ -26,59 +26,49 @@
 #define APP_HEART_RATE
 #define APP_ACTIVITY
 
-#define GUI_APP_DEFINE_NAME(APP_NAME) \
-    static void _##APP_NAME##_ui_design(gui_app_t*); \
-    static gui_app_t _##APP_NAME = \
-                                   { \
-                                     .screen = \
-                                               { \
-                                                 .name = #APP_NAME, /**< The screen name is set to the application name. */ \
-                                                 .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
-                                               }, \
-                                     .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
-                                     .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
-                                   }; \
-    gui_app_t *_get_##APP_NAME##_handle(void) \
-    { \
-        return &_##APP_NAME; \
-    }
-
-GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
-GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
-GUI_APP_DEFINE_NAME(APP_MUSIC)
-GUI_APP_DEFINE_NAME(APP_HEART_RATE)
-GUI_APP_DEFINE_NAME(APP_ACTIVITY)
+//cppcheck-suppress syntaxError
+GUI_APP_DEFINE_NAME_ANIMATION(APP_BOX2D_RING, GUI_APP_ANIMATION_9,
+                              GUI_APP_ANIMATION_10)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_FRUIT_NINJA, GUI_APP_ANIMATION_2, GUI_APP_ANIMATION_5)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_MUSIC, GUI_APP_ANIMATION_3, GUI_APP_ANIMATION_7)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_HEART_RATE, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_5)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_ACTIVITY, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_5)
+// GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
+// GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
+// GUI_APP_DEFINE_NAME(APP_MUSIC)
+// GUI_APP_DEFINE_NAME(APP_HEART_RATE)
+// GUI_APP_DEFINE_NAME(APP_ACTIVITY)
 
 extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
 
 void switch_BOX2D_RING(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_APP_BOX2D_RING_handle());
+    gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
 }
 
 void switch_APP_FRUIT_NINJA(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_APP_FRUIT_NINJA_handle());
+    gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
 }
 
 void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_APP_MUSIC_handle());
+    gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
 }
 
 void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_APP_HEART_RATE_handle());
+    gui_switch_app(gui_current_app(), _get_app_APP_HEART_RATE_handle());
 }
 
 void switch_APP_ACTIVITY(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_APP_ACTIVITY_handle());
+    gui_switch_app(gui_current_app(), _get_app_APP_ACTIVITY_handle());
 }
 
 // static void switch_APP_CALCULATOR()
 // {
-//     gui_switch_app(gui_current_app(), _get_APP_CALCULATOR_handle());
+//     gui_switch_app(gui_current_app(), _get_app_APP_CALCULATOR_handle());
 // }
 
 /*Define gui_app_return_array*/
@@ -161,8 +151,12 @@ static void app_back2prescreen_cb(void)
 
 static void app_HR_back2prescreen_cb(void)
 {
+    extern void clear_heart_rate_app(void);
+    clear_heart_rate_app();
+
     extern bool sidebar_flag;
     extern bool return_to_watchface_flag;
+
     if (return_to_watchface_flag || sidebar_flag)
     {
         gui_switch_app(gui_current_app(), get_app_hongkong());

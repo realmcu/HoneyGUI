@@ -79,17 +79,22 @@ static void display_time()
         gui_text_content_set(date_text, date_content, strlen(date_content));
         gui_text_convert_to_img(date_text, RGB565);
 
-        GUI_WIDGET_POINTER_BY_NAME(img_hour_decimal, "circle_hour_decimal");
+        extern gui_app_t *get_app_hongkong(void);
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "circle_hour_decimal",
+                                        &(get_app_hongkong()->screen));
         gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
                               text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
-        GUI_WIDGET_POINTER_BY_NAME(img_hour_single, "circle_hour_single");
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "circle_hour_single",
+                                        &(get_app_hongkong()->screen));
         gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
                               text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
 
-        GUI_WIDGET_POINTER_BY_NAME(img_minute_decimal, "circle_minute_decimal");
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "circle_minute_decimal",
+                                        &(get_app_hongkong()->screen));
         gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
                               text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
-        GUI_WIDGET_POINTER_BY_NAME(img_minute_single, "circle_minute_single");
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "circle_minute_single",
+                                        &(get_app_hongkong()->screen));
         gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
                               text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
 
@@ -127,10 +132,11 @@ static void cv_cb(gui_cardview_t *cv)
     {
         display_time();
     }
-    gui_win_t *win = 0;
-    gui_img_t *img = 0;
-    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __WIN_NAME, (void *)&win);
-    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __IMG_NAME, (void *)&img);
+
+    extern gui_app_t *get_app_hongkong(void);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(win, __WIN_NAME, &(get_app_hongkong()->screen));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img, __IMG_NAME, &(get_app_hongkong()->screen));
+
     int offset = cv->hold_y;
     if (offset + CARD_HEIGHT + 50 < 0)
     {

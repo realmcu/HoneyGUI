@@ -22,11 +22,6 @@ typedef struct gui_sidebar_app
 
 gui_sidebar_app_t sidebar_app_array[APP_NUM] = {0};
 
-extern void switch_BOX2D_RING();
-extern void switch_APP_FRUIT_NINJA();
-extern void switch_APP_MUSIC();
-extern void switch_heart_rate();
-
 void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function)
 {
     uint8_t index;
@@ -57,11 +52,6 @@ void page_ct_sidebar(void *parent)
 {
     gui_canvas_round_rect_t *canvas_timecard = gui_canvas_round_rect_create(GUI_BASE(parent), "",
                                                                             0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 20, gui_rgba(39, 43, 44, 255 * 0.7));
-
-    extern void switch_BOX2D_RING();
-    extern void switch_APP_FRUIT_NINJA();
-    extern void switch_APP_MUSIC();
-    extern void switch_heart_rate();
 
     gui_win_t *win = gui_win_create(parent, NULL, 0, 0, 0, 0);
     uint8_t index = 0;
