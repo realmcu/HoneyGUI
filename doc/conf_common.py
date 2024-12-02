@@ -7,14 +7,16 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import os
-
+import sys
 from datetime import datetime
+from docutils import nodes
+from docutils.parsers.rst import roles
 
 ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
  
 html_context = {
-    'current_year': datetime.now().year, # Set the Copyright year of footer
-    "show_sphinx": False, # remove 'Powered by Sphinx' at the bottom
+    'current_year': datetime.now().year,
+    "EnvType": os.getenv("EnvType", None)
 }
 
 project = 'RTKIOT GUI'
@@ -25,12 +27,12 @@ release = 'v0.0.0.1'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["breathe", 
-              "myst_parser", 
+extensions = ["breathe",
+              "myst_parser",
+              "sphinx_copybutton",
               "sphinx_rtd_theme",
               "sphinx.ext.intersphinx",
-              "sphinxcontrib.mermaid",
-              "sphinx_copybutton"]
+              "sphinxcontrib.mermaid"]
 
 myst_enable_extensions = [
     # "amsmath",
@@ -59,7 +61,7 @@ exclude_patterns = []
 
 # The default language to highlight source code in. The default is 'python'.
 # The value should be a valid Pygments lexer name, see Showing code examples for more details.
-highlight_language = 'c'
+highlight_language = 'cpp'
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -82,6 +84,7 @@ templates_path = ['_templates']
 #
 html_show_sourcelink = False
 html_show_copyright = False
+html_show_sphinx = False
 
 html_static_path = ['_static']
 html_js_files = [
@@ -177,9 +180,28 @@ texinfo_documents = [
 
 breathe_projects = {"HoneyGUI": os.path.join(os.path.dirname(__file__), r"./doxyxml/xml")}
 breathe_default_project = "HoneyGUI"
-breathe_domain_by_extension = {"h" : "c"}
+breathe_domain_by_extension = {
+    'h': 'cpp',
+    'hpp': 'cpp',
+    'c': 'cpp',
+    'cpp': 'cpp',
+    'py': 'py'
+}
 breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
 
+breathe_default_members = ('inner', 'members', 'protected-members', 'private-members', 'undoc-members')
+breathe_show_include = False
+# breathe_debug_trace_directives = True
+# breathe_debug_trace_qualification = True
+
+numfig = False
+
+
+def custom_role(role_name, rawtext, text, lineno, inliner, options={}, content=[]):
+    node = nodes.inline(rawtext, text, classes=[role_name])
+    return [node], []
+
+custom_role_list = ['red-text', 'bolditalic']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 
@@ -193,3 +215,8 @@ def setup(app):
     app.add_css_file('css/custom.css')
     app.add_css_file('css/fontawesome.min.css')
     app.add_css_file('css/auto.number.title.css')
+    # register custom class role
+    for role in custom_role_list:
+        app.add_role(role, custom_role)
+    # app.add_css_file('css/customdoxygen.css')
+    # app.add_css_file('css/my_customdoxygen.css')

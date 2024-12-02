@@ -10,15 +10,25 @@ html,body {
 	width: 100%;
     height: 100%;
 }
-
+footer {
+    margin-top: 28px;
+}
 p {
-    margin-bottom: 10px;
+    margin: 5px 0;
     line-height: 28px;
 }
-
 /* =========== Render Common Style =========== */
+
+
+/* ======== Render Main Content Style ========= */
 .wy-nav-content-wrap {
     overflow-x: auto;
+}
+.wy-breadcrumbs {
+    text-align: left;
+}
+.wy-nav-content a:visited {
+    color: #2980b9;
 }
 .rst-content div, 
 .rst-content p {
@@ -27,18 +37,7 @@ p {
     overflow-wrap: break-word;
 }
 
-figcaption, figcaption p{
-    text-align: center !important;
-}
-
-.wy-breadcrumbs {
-    text-align: left;
-}
-
-/*.wy-nav-side {
-     overflow:auto; 
-}*/
-/* =========== Render sm-screen Style =========== */
+/* --------- Render sm-screen Style --------- */
 @media screen and (min-width: 768px) {
     /* ----- left sider ----- */
     .wy-nav-side {
@@ -56,6 +55,7 @@ figcaption, figcaption p{
         background:rgba(0,0,0,.05);
     }
     .wy-nav-content {
+        /*width: calc(100% - var(--md-right-contents-width));*/
         max-width: 100%;
         min-width: 500px;
         margin:0;
@@ -100,9 +100,9 @@ figcaption, figcaption p{
         left: 0;
     }
 }
-/* =========== Render sm-screen Style =========== */
+/* --------- Render sm-screen Style --------- */
 
-/* =========== Render xs-screen Style =========== */
+/* --------- Render xs-screen Style --------- */
 @media screen and (max-width: 768px) {
     .resize-handle-left, 
     .resize-handle-right {
@@ -136,19 +136,8 @@ figcaption, figcaption p{
         display: block;
     }
 }
-/* =========== Render xs-screen Style =========== */
-
-/* ======= Render List Style ======== */
-
-.rst-content ol ol li {
-    list-style-type: lower-latin !important;
-}
-.rst-content ol ol ol li {
-    list-style-type: lower-roman !important;
-}
-
-/* ======= Render List Style ======== */
-
+/* --------- Render xs-screen Style --------- */
+/* ======== Render Main Content Style ========= */
 
 /* =========== Render Sider Style ============ */
 /* div[role="search"] style */
@@ -173,9 +162,7 @@ li[class*="toctree-"] * {
 .wy-menu-vertical li.current>a, .wy-menu-vertical li.on a {
     color: #004d88;
 }
-
 /* =========== Render Sider Style ============ */
-
 
 /* ====== Render version selector style ====== */
 .version-container {
@@ -189,28 +176,153 @@ li[class*="toctree-"] * {
 /* ====== Render version selector style ====== */
 
 
-/* ======== Render Main Content Style ========= */
-.wy-nav-content a:visited {
-    color: #2980b9;
+/* ============ Render Title Style ============ */
+h1, h2, h3, h4, h5, h6 {
+	-webkit-transition: text-shadow 0.5s linear;
+	-moz-transition: text-shadow 0.5s linear;
+	-ms-transition: text-shadow 0.5s linear;
+	-o-transition: text-shadow 0.5s linear;
+	transition: text-shadow 0.5s linear;
+	margin-right: 15px;
+	font-family: Arial,sans-serif;
+    margin: 24px 0;
 }
-/* ======== Render Main Content Style ========= */
+
+/* 禁止标题自动编号 */
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+    content: none !important;
+}
+
+.rst-content h1 {
+    font-size: 38px;
+    font-weight: 400;
+}
+.rst-content h2 {
+    font-size: 32px;
+	font-weight: 400;
+	margin-top: 48px;
+	margin-bottom: 32px;
+}
+.rst-content h3 {
+    font-size: 28px;
+	font-weight: 400;
+	margin-top: 42px;
+	margin-bottom: 28px;
+}
+.rst-content h4 {
+    font-size: 24px;
+	font-weight: 400;
+	margin-top: 36px;
+	margin-bottom: 24px;
+}
+.rst-content h5 {
+    font-size: 20px;
+	font-weight: 400;
+	margin-top: 30px;
+	margin-bottom: 20px;
+}
+.rst-content h6 {
+    font-size: 18px;
+	font-weight: 400;
+	margin-top: 24px;
+	margin-bottom: 18px;
+}
+/* ============ Render Title Style ============ */
+
+
+/* ========= Render Image Style ========= */
+figcaption, figcaption p{
+    text-align: center !important;
+}
+.rst-content img{
+    height: auto !important;
+    cursor: pointer;
+}
+.img-border {
+    border: 1px solid #000;
+}
+/* ========= Render Image Style ========= */
+
+/* ======= Render List Style ======== */
+.rst-content section ol li>p,
+.rst-content section ol li>p:last-child,
+.rst-content section ul li>p,
+.rst-content section ul li>p:last-child {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+.rst-content ol ol li {
+    list-style-type: lower-latin !important;
+}
+.rst-content ol ol ol li {
+    list-style-type: lower-roman !important;
+}
+.rst-content ol ol li p,
+.rst-content ol ol ol li p {
+    display: inline !important;
+}
+
+.rst-content section ol,
+.rst-content section ol.arabic,
+.rst-content section ul {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+}
+
+/* rst output list */
+html.writer-html5 .rst-content dl.field-list {
+    grid-template-columns: auto 1fr;
+}
+html.writer-html5 .rst-content dl.field-list dt,
+html.writer-html5 .rst-content dl.field-list dd {
+  overflow-wrap: break-word; /* 长词换行 */
+  word-wrap: break-word;     /* 确保兼容性 */
+  overflow: hidden;          /* 防止溢出 */
+  text-overflow: ellipsis;   /* 可选：在溢出时显示省略号 */
+}
+html.writer-html5 .rst-content dl.field-list>dt {
+    padding-top: 7px;
+}
+/* ======= Render List Style ======== */
 
 
 /* ========= Render Code Block Style ========= */
-.rst-content code, .rst-content tt, code {
-    white-space: normal;
-}
-
 .highlight {
     background:rgba(223, 233, 243,0.4);
 }
-
+.rst-content code, .rst-content tt, code {
+    white-space: normal;
+}
+.rtk-inline-code,
+.rst-content code {
+    border:1px solid #e1e4e5;
+    background-color: rgba(223, 233, 243,0.4);
+}
+.rtk-inline-code {
+    padding: 4px 5px;
+    font-weight: 700;
+}
+.rst-content code {
+    color: #e74c3c;
+}
+.rst-content code.xref {
+    color: unset;
+}
+.rst-content div[class^=highlight], .rst-content pre.literal-block {
+    margin: 1px 0 12px;
+}
 .rst-content dl dd {
     margin-right: 12px;
 }
 .rst-content div[itemprop="articleBody"] section > dl > dd {
     margin-left: 0;
 }
+
 dl.c.unexpanded dd, dl.cpp.unexpanded dd {
     display: none;
 }
@@ -229,20 +341,6 @@ dl.c.unexpanded dd, dl.cpp.unexpanded dd {
 .unexpanded .rtk-api-expansion-button::before {
     content: "\f0da \00a0";
 }
-/*
-.rst-content code {
-    border:1px solid #e1e4e5;
-    background-color: rgba(223, 233, 243,0.4);
-    font-size: 14px;
-}
-
-.rst-content code {
-    color: #e74c3c;
-}
-.rst-content div[class^=highlight], .rst-content pre.literal-block {
-    margin: 1px 0 12px;
-}
-*/
 /* ========= Render Code Block Style ========= */
 
 
@@ -276,64 +374,6 @@ table th {
 /* ============ Render Table Style ============ */
 
 
-/* ============ Render Title Style ============ */
-h1, h2, h3, h4, h5, h6 {
-	-webkit-transition: text-shadow 0.5s linear;
-	-moz-transition: text-shadow 0.5s linear;
-	-ms-transition: text-shadow 0.5s linear;
-	-o-transition: text-shadow 0.5s linear;
-	transition: text-shadow 0.5s linear;
-	margin-right: 15px;
-	font-family: Arial,sans-serif;
-    margin: 24px 0;
-}
-
-/* 禁止标题自动编号 */
-h1::before,
-h2::before,
-h3::before,
-h4::before,
-h5::before,
-h6::before {
-    content: none !important;
-}
-/* ============ Render Title Style ============ */
-.rst-content h1 {
-    font-size: 38px;
-    font-weight: 400;
-    margin-bottom: 48px;
-}
-.rst-content h2 {
-    font-size: 32px;
-	font-weight: 400;
-	margin-top: 48px;
-	margin-bottom: 32px;
-}
-.rst-content h3 {
-    font-size: 28px;
-	font-weight: 400;
-	margin-top: 42px;
-	margin-bottom: 28px;
-}
-.rst-content h4 {
-    font-size: 24px;
-	font-weight: 400;
-	margin-top: 36px;
-	margin-bottom: 24px;
-}
-.rst-content h5 {
-    font-size: 20px;
-	font-weight: 400;
-	margin-top: 30px;
-	margin-bottom: 20px;
-}
-.rst-content h6 {
-    font-size: 18px;
-	font-weight: 400;
-	margin-top: 24px;
-	margin-bottom: 18px;
-}
-
 /* ========= Render Quote Block Style ========= */
 /*
 blockquote {
@@ -348,15 +388,38 @@ blockquote p {
 */
 /* ========= Render Quote Block Style ========= */
 
+/* ========= Render Tab Style ========= */
+.sphinx-tabs::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height:1px;
+    border: none;
+    border-top: 1px solid #e1e4e5;
+    margin: 8px 0 12px;
+    padding: 0;
+}
+/* ========= Render Tab Style ========= */
+
 
 /* ========= Render Note Style ========= */
 html.writer-html5 .rst-content dl.field-list {
-    /* grid-template-columns: auto auto; */
+    grid-template-columns: auto 1fr;
+}
+html.writer-html5 .rst-content dl.field-list dt,
+html.writer-html5 .rst-content dl.field-list dd {
+  overflow-wrap: break-word; /* 长词换行 */
+  word-wrap: break-word;     /* 确保兼容性 */
+  overflow: hidden;          /* 防止溢出 */
+  text-overflow: ellipsis;   /* 可选：在溢出时显示省略号 */
 }
 /* ========= Render Note Style ========= */
 
 
 /* ========= Render added-api & deprecared-api Style ========= */
+section:not(#glossary) > dl > dt {
+    display: none;
+}
 /*
 section[id*="added-api"] dd dl,
 section[id*="deprecated-api"] dd dl {
@@ -372,15 +435,6 @@ section[id*="deprecated-api"] dd dl {
 */
 /* ========= Render added-api & deprecared-api Style ========= */
 
-/* ========= Render Image Style ========= */
-.rst-content img{
-    height: auto !important;
-    cursor: pointer;
-}
-.img-border {
-    border: 1px solid #000;
-}
-/* ========= Render Image Style ========= */
 
 /* ========= Render text color ========= */
 .red-text {
@@ -422,18 +476,6 @@ section[id*="deprecated-api"] dd dl {
     background-color: #064778;
 }
 /* ==== Render back-to-top icon style ==== */
-
-
-.sphinx-tabs::after {
-    content: "";
-    display: block;
-    width: 100%;
-    height:1px;
-    border: none;
-    border-top: 1px solid #e1e4e5;
-    margin: 8px 0 12px;
-    padding: 0;
-}
 
 
 /* ====== Render image modal style ====== */
