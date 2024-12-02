@@ -141,10 +141,7 @@ void gui_app_startup(gui_app_t *app)
     matrix_identity(app->screen.matrix);
     app->screen.w = gui_get_screen_width();
     app->screen.h = gui_get_screen_height();
-#ifdef ENABLE_GUI_CONTAIN_FUNCTION
-    app->screen.range_w = gui_get_screen_width();
-    app->screen.range_h = gui_get_screen_height();
-#endif
+
     app->screen.create_done = true;
     app->start_ms = gui_ms_get();
 }
