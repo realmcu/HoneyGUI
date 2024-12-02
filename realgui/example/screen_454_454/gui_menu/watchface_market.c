@@ -4,7 +4,7 @@
 #include "gui_api.h"
 
 #define APP_WATCHFACE_MARKET
-GUI_APP_DEFINE_NAME(APP_WATCHFACE_MARKET)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_WATCHFACE_MARKET, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_7)
 #define APP_WATCHFACE_MARKET_MAX_COUNT 50
 static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
 {
@@ -85,8 +85,10 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
 
 
     extern gui_app_t *get_app_watch_ui(void);
+    gui_app_layer_buttom();
     GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui());
-    GUI_WIDGET_POINTER_BY_NAME(wathcface_window, "_watchface_main_window_")
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(wathcface_window, "_watchface_main_window_",
+                                    &(get_app_watch_ui()->screen));
     gui_obj_child_free(wathcface_window);
     create_tree_nest((void *)path, wathcface_window);
     gui_free((void *)path);

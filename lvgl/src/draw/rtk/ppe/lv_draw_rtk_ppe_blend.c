@@ -14,8 +14,8 @@
 #include "lv_draw_rtk_ppe_utils.h"
 #include "rtl_ppe.h"
 #include "rtl_gdma.h"
-#include "hal_imdc.h"
-#include "rtl_imdc.h"
+#include "hal_idu.h"
+#include "rtl_idu.h"
 /*********************
  *      DEFINES
  *********************/
@@ -181,12 +181,12 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         break;
     case LV_IMG_CF_RAW:
         {
-            IMDC_file_header *header = (IMDC_file_header *)(map_p + 8);
-            if (header->algorithm_type.pixel_bytes == IMDC_PIXEL_16BIT)
+            IDU_file_header *header = (IDU_file_header *)(map_p + 8);
+            if (header->algorithm_type.pixel_bytes == IDU_PIXEL_16BIT)
             {
                 source.format = PPE_RGB565;
             }
-            else if (header->algorithm_type.pixel_bytes == IMDC_PIXEL_24BIT)
+            else if (header->algorithm_type.pixel_bytes == IDU_PIXEL_24BIT)
             {
                 source.format = PPE_RGB888;
             }
@@ -253,7 +253,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 ppe_rect_t scale_rect = {.x1 = 0, .x2 = source.width - 1, \
                                          .y1 = 0, .y2 = source.height - 1
                                         };
-                hal_imdc_decompress_info info;
+                hal_idu_decompress_info info;
                 info.start_column = scale_rect.left;
                 info.end_column = scale_rect.right;
                 info.start_line = scale_rect.top;
@@ -263,7 +263,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 source.height = info.end_line - info.start_line + 1;
                 source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
                 source.address = (uint32_t)source.memory;
-                bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+                bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
                 scale_rect.top = 0;
                 scale_rect.left = 0;
                 scale_rect.right = source.width - 1;
@@ -329,7 +329,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 }
                 if (compressed)
                 {
-                    hal_imdc_decompress_info info;
+                    hal_idu_decompress_info info;
                     info.start_column = scale_rect.left;
                     info.end_column = scale_rect.right;
                     info.start_line = scale_rect.top;
@@ -339,7 +339,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                     source.height = info.end_line - info.start_line + 1;
                     source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
                     source.address = (uint32_t)source.memory;
-                    bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+                    bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
                     scale_rect.top = 0;
                     scale_rect.left = 0;
                     scale_rect.right = source.width - 1;
@@ -395,7 +395,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         }
         if (compressed)
         {
-            hal_imdc_decompress_info info;
+            hal_idu_decompress_info info;
             info.start_column = constraint_area.x1 - base->x;
             info.end_column = constraint_area.x2 - base->x;
             info.start_line = constraint_area.y1 - base->y;
@@ -404,7 +404,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             source.width = info.end_column - info.start_column + 1;
             source.height = info.end_line - info.start_line + 1;
             source.memory = (uint32_t *)lv_mem_alloc(source.width * source.height * pixel_byte);
-            bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+            bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
             trans.x = blend_rect.x1;
             trans.y = blend_rect.y1;
         }

@@ -11,25 +11,38 @@
 #include <cmath>
 #include <math.h>
 #include <stdint.h>
+#include "gui_api.h"
+#include <vector>
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 #define HEIGHT_OFFSET 100
 namespace app_fruit_ninja
 {
-const float M2P =
+static const float M2P =
     20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
-const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
-const int RADIUS_ST = 72 / 2;   // st: 68*72  pixels
-const int RADIUS_BA = 126 / 2;  // ba: 126*50 pixels
-const int RADIUS_PE = 62 / 2;   // pe: 62*59  pixels
-const int RADIUS_WM = 98 / 2;   // wm: 98*85  pixels
-const int RADIUS_BB = 50 / 2;   // wm: 50*51  pixels
+static const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
+static const int RADIUS_ST = 72 / 2;   // st: 68*72  pixels
+static const int RADIUS_BA = 126 / 2;  // ba: 126*50 pixels
+static const int RADIUS_PE = 62 / 2;   // pe: 62*59  pixels
+static const int RADIUS_WM = 98 / 2;   // wm: 98*85  pixels
+static const int RADIUS_BB = 50 / 2;   // wm: 50*51  pixels
 
-int16_t fruit_score = 0;
-bool init_flag = true;
-bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
+static int16_t fruit_score = 0;
+static bool init_flag = true;
+static bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
 
+static b2World *world = nullptr; // Box2D world
+static b2Body *body_st, *body_ba, *body_pe, *body_wm,
+       *body_bomb; // entities that simulate motion trajectories
+std::vector<b2Body *> temporaryBodies;
+
+static gui_img_t *img_strawberry, *img_banana,
+       *img_peach, *img_watermelon,
+       *img_gameover, *img_bg, *img_bomb;
+static gui_text_t *score_board;
+static gui_img_t
+*img_cut_arry[4]; // img_strawberry_cut, *img_banana_cut, *img_peach_cut, *img_watermelon_cut;
 /* Define a point structure */
 typedef struct
 {
@@ -39,6 +52,16 @@ typedef struct
 static bool get_init_flag(void)
 {
     return init_flag;
+}
+
+void clear_world()
+{
+    for (b2Body *body : temporaryBodies)
+    {
+        world->DestroyBody(body);
+    }
+    temporaryBodies.clear();
+    gui_free(world);
 }
 /* rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)
@@ -180,7 +203,7 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
 
 static uint16_t seed = 12345;
 
-static uint16_t xorshift32()
+static uint16_t xorshift16()
 {
     seed ^= seed << 6;
     seed ^= seed >> 9;
@@ -193,18 +216,18 @@ static bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
 {
     if (y < -70 || y > 550 || x < -70 || x > SCREEN_WIDTH + 70)
     {
-        b2Vec2 position((100 + xorshift32() % (354 - 100 + 1)) * P2M, 550 * P2M);
+        b2Vec2 position((100 + xorshift16() % (354 - 100 + 1)) * P2M, 550 * P2M);
         // gui_log("x=%f,y=%f\r\n", position.x, position.y);
         b2Vec2 lv; //speed
-        body->SetTransform(position, xorshift32() % (360 + 1));
+        body->SetTransform(position, xorshift16() % (360 + 1));
         if (position.x * M2P > 227) // if position left, velocity right
         {
-            lv.Set(-(10 + xorshift32() % (15 - 10 + 1)),
-                   -(22 + xorshift32() % (22 - 20 + 1))); // velocity x:10~15; y: 18~20
+            lv.Set(-(10 + xorshift16() % (15 - 10 + 1)),
+                   -(22 + xorshift16() % (22 - 20 + 1))); // velocity x:10~15; y: 18~20
         }
         else
         {
-            lv.Set((10 + xorshift32() % (15 - 10 + 1)), -(22 + xorshift32() % (22 - 20 + 1)));
+            lv.Set((10 + xorshift16() % (15 - 10 + 1)), -(22 + xorshift16() % (22 - 20 + 1)));
         }
         body->SetLinearVelocity(lv);
         body->SetAngularVelocity(-314);
@@ -427,39 +450,34 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
 static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 {
     gui_win_t *win = static_cast<gui_win_t *>(p);
-    static b2World world(b2Vec2(0.0f, 9.8f)); // Create a Box2D world with gravity
-    static b2Body *body_st, *body_ba, *body_pe, *body_wm,
-           *body_bomb; // entities that simulate motion trajectories
-    static gui_img_t *img_strawberry, *img_banana,
-           *img_peach, *img_watermelon,
-           *img_gameover, *img_bg, *img_bomb;
-    static gui_text_t *score_board;
-    static gui_img_t
-    *img_cut_arry[4]; // img_strawberry_cut, *img_banana_cut, *img_peach_cut, *img_watermelon_cut;
 
 
     if (get_init_flag())
     {
+        // Create a Box2D world with gravity
+        void *mem = gui_malloc(sizeof(b2World));
+        b2Vec2 gravity(0.0f, 9.8f);
+        world = new (mem) b2World(gravity);
+
         // Add dynamic bodys
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody;
         ballBodyDef.position.Set(4, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
         ballBodyDef.angularVelocity = -314;    //-PI rad/s
         ballBodyDef.linearVelocity.Set(10, -20); // move up
-        body_st = world.CreateBody(&ballBodyDef);
+        body_st = world->CreateBody(&ballBodyDef);
 
         ballBodyDef.position.Set(8, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
-        body_ba = world.CreateBody(&ballBodyDef);
+        body_ba = world->CreateBody(&ballBodyDef);
 
         ballBodyDef.position.Set(12, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
-        body_pe = world.CreateBody(&ballBodyDef);
+        body_pe = world->CreateBody(&ballBodyDef);
 
         ballBodyDef.position.Set(16, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
-        body_wm = world.CreateBody(&ballBodyDef);
+        body_wm = world->CreateBody(&ballBodyDef);
 
         ballBodyDef.position.Set(20, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
-        body_bomb = world.CreateBody(&ballBodyDef);
-
+        body_bomb = world->CreateBody(&ballBodyDef);
         //creat body shape and attach the shape to the Body
         b2CircleShape circleShape;
         circleShape.m_radius = 0.2; //RADIUS_ST * P2M; small number reducing the impact of collisions
@@ -478,6 +496,12 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         body_wm->CreateFixture(&FixtureDef);
 
         body_bomb->CreateFixture(&FixtureDef);
+
+        temporaryBodies.push_back(body_st);
+        temporaryBodies.push_back(body_ba);
+        temporaryBodies.push_back(body_pe);
+        temporaryBodies.push_back(body_wm);
+        temporaryBodies.push_back(body_bomb);
 
         // Create bg and whole fruits for displaying on the window
         img_bg = gui_img_create_from_mem(win, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,
@@ -522,7 +546,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         // Set score_board
         score_board = gui_text_create(win, "score_board",  10, 10, 100, 50);
         gui_text_set(score_board, (void *)"SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"),
-                     16);
+                     24);
         void *addr1 = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
         gui_text_type_set(score_board, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(score_board, LEFT);
@@ -531,7 +555,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
     }
 
     // Update the physics world
-    world.Step(1 / 60.f, 8, 3);
+    world->Step(1 / 60.f, 8, 3);
     // Get the position of the ball then set the image location and rotate it on the GUI
     {
         b2Vec2 position = body_st->GetPosition();
@@ -653,6 +677,10 @@ extern "C" {
     void app_fruit_ninja_design(gui_obj_t *obj)
     {
         app_fruit_ninja::fruit_ninja_design(obj);
+    }
+    void close_FN_APP()
+    {
+        app_fruit_ninja::clear_world();
     }
 }
 

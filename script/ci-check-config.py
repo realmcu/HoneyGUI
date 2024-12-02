@@ -1,27 +1,27 @@
 ci_check_config = {
     "commit_labels":{
         'GUI': {
-            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently 
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         },
         'DOC': {
-            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently 
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         },
         'Script-CI': {
-            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently 
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         },
         'Script-Nightly': {
-            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently 
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         },
         'Script-Release': {
-            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently 
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         },
         'Script-Other': {
-            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently 
+            "check_handler": "default_handler", # will call default_handler to check this commit, not used currently
             "build_handler": None
         }
     },
@@ -29,16 +29,18 @@ ci_check_config = {
         r"win32_sim/RTE/",
         r"realgui/3rd/",
         r"lvgl/",
+        r"lvgl_v9/",
         r"realgui/example/screen_454_454",
         r"realgui/example/screen_320_385",
         r"doc/cn",
         r"doc/en/_templates/",
         r"menu_config_win.py"
     ],
-    "ignore_cpp_astyle_check":[ 
+    "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",
         r"realgui/3rd/",
         r"lvgl/",
+        r"lvgl_v9/",
     ],
     "commit_version_check": {
         "ANCESTOR_ACCEPT_LENGTH": 5, # the 5th commit is the parent, ok // first priority

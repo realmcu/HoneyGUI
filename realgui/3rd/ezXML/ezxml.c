@@ -27,9 +27,15 @@
 #endif
 
 #ifdef __GNUC__ // GCC Clang
+#if defined(__ARMCC_VERSION)&&__ARMCC_VERSION<6000000  // ARM Compiler v5
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+//#pragma GCC diagnostic ignored "-Wunused-variable"
+#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
 #endif
 
 #if defined(__ARMCC_VERSION)&&__ARMCC_VERSION<6000000  // ARM Compiler v5

@@ -39,6 +39,7 @@ env.Append(LIBS = ['opengl32'])
 
 RTK_GUI_ENGINE = os.path.abspath('./../realgui/')
 LVGL_ROOT = os.path.abspath('./../lvgl/')
+LVGLV9_ROOT = os.path.abspath('./../lvgl_v9/')
 ARM2D_ROOT = os.path.abspath('./../Arm2D/')
 PLATFORM = menu_config.PLATFORM
 
@@ -46,6 +47,7 @@ Export('PLATFORM')
 Export('TOOL_ROOT')
 Export('RTK_GUI_ENGINE')
 Export('LVGL_ROOT')
+Export('LVGLV9_ROOT')
 LEGACY_UI = os.path.abspath('./../rtkv0/')
 
 
@@ -57,6 +59,7 @@ print("LINKFLAGS: ", env['LINKFLAGS'])
 print('TOOL ROOT = ' + TOOL_ROOT)
 print('RTK GUI ENGINE ROOT = ' + RTK_GUI_ENGINE)
 print('LVGL ROOT = ' + LVGL_ROOT)
+print('LVGLV9 ROOT = ' + LVGLV9_ROOT)
 
 # prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
@@ -95,6 +98,7 @@ if platform.system() == 'Windows':
 # include app
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
+objs.extend(SConscript(os.path.join(LVGLV9_ROOT, 'SConscript')))
 
 if os.path.exists(ARM2D_ROOT):
     objs.extend(SConscript(os.path.join(ARM2D_ROOT, 'SConscript')))

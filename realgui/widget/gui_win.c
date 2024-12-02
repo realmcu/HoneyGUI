@@ -383,6 +383,22 @@ void gui_win_set_scope(gui_win_t *win, bool enable)
     }
     win->scope = enable;
 }
+void gui_win_move(gui_win_t *win, int x, int y)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(win, WINDOW)
+    GUI_BASE(win)->x = x;
+    GUI_BASE(win)->y = y;
+}
+int gui_win_get_x(gui_win_t *win)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(win, WINDOW)
+    return GUI_BASE(win)->x;
+}
+int gui_win_get_y(gui_win_t *win)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(win, WINDOW)
+    return GUI_BASE(win)->y;
+}
 void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)
 {
     if (win == NULL)

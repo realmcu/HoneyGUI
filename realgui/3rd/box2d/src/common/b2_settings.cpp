@@ -27,17 +27,20 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include "gui_api.h"
+
+
 b2Version b2_version = {2, 4, 1};
 
 // Memory allocators. Modify these to use your own allocator.
 void *b2Alloc_Default(int32 size)
 {
-    return malloc(size);
+    return gui_malloc(size);
 }
 
 void b2Free_Default(void *mem)
 {
-    free(mem);
+    gui_free(mem);
 }
 
 // You can modify this to use your logging facility.

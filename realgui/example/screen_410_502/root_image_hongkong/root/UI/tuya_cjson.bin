@@ -3,7 +3,7 @@
         {
             "low": 18,
             "high": 37,
-            "cur": 22,
+            "current": 22,
             "condition_1": "Cloudy",
             "condition_2": "Heavy rain",
             "condition_3": "Moderate rain",
@@ -19,7 +19,7 @@
     "activity": [
         {
             "move": 1,
-            "ex": 1,
+            "exercise": 1,
             "stand": 1
         }
     ],

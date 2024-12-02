@@ -2078,10 +2078,18 @@ CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToArray(cJSON *array, cJSON *item)
 }
 
 #if defined(__clang__) || (defined(__GNUC__)  && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 5))))
+#if defined(__ARMCC_VERSION)&&__ARMCC_VERSION<6000000  // ARM Compiler v5
+//#pragma GCC diagnostic push
+#else
 #pragma GCC diagnostic push
 #endif
+#endif
 #ifdef __GNUC__
+#if defined(__ARMCC_VERSION)&&__ARMCC_VERSION<6000000  // ARM Compiler v5
+//#pragma GCC diagnostic ignored "-Wcast-qual"
+#else
 #pragma GCC diagnostic ignored "-Wcast-qual"
+#endif
 #endif
 /* helper function to cast away const */
 static void *cast_away_const(const void *string)
@@ -2089,7 +2097,11 @@ static void *cast_away_const(const void *string)
     return (void *)string;
 }
 #if defined(__clang__) || (defined(__GNUC__)  && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 5))))
+#if defined(__ARMCC_VERSION)&&__ARMCC_VERSION<6000000  // ARM Compiler v5
+//#pragma GCC diagnostic pop
+#else
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 

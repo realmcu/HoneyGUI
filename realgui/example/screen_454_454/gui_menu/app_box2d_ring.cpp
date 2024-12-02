@@ -12,6 +12,7 @@
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
+#include "gui_canvas_rect.h"
 namespace app_box2d_ring
 {
 
@@ -38,10 +39,12 @@ float OUTER_RING_RADIUS; // Outer ring radius
 float INNER_RING_RADIUS; // Inner ring radius
 int SCREEN_WIDTH; // Screen width
 int SCREEN_HEIGHT; // Screen height
+
 struct Ball
 {
     b2Body *body;
     NVGcolor color;
+    gui_img_t *img;
 };
 
 std::vector<Ball> balls; // Vector to store balls and their colors
@@ -54,7 +57,7 @@ void close();
 void createRing(b2World *world, float radius, float restitution);
 void createBalls(b2World *world);
 void applyCentripetalForce(b2Body *ball);
-void render(gui_canvas *this_widget);
+void render();
 void maintainMinimumVelocity(b2Body *ball);
 void limitMaxAngularVelocity(b2Body *ball);
 // App callback function
@@ -65,6 +68,10 @@ GUI_ANIMATION_CALLBACK(app_box2d_cb)
         applyCentripetalForce(ball.body); // Apply centripetal force
         limitMaxAngularVelocity(ball.body); // Limit the maximum angular velocity
         maintainMinimumVelocity(ball.body); // Ensure minimum motion
+        float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
+        float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
+        GUI_BASE(ball.img)->x = ballX - BALL_RADIUS;
+        GUI_BASE(ball.img)->y = ballY - BALL_RADIUS;
     }
 
     world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS); // Update the physics world
@@ -135,10 +142,7 @@ void limitMaxAngularVelocity(b2Body *ball)
 bool init()
 {
     GUI_WIDGET_TRY_EXCEPT(parent)
-    SCREEN_WIDTH = gui_get_screen_width(); // Screen width
-    SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
-    OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
-    INNER_RING_RADIUS = OUTER_RING_RADIUS - RING_GAP; // Inner ring radius
+
     gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     if (!win)
@@ -150,13 +154,7 @@ bool init()
     gui_win_set_animate(win, 1000, -1, app_box2d_cb, win);
     gui_win_press(win, win_press_callback, win);
     gui_win_release(win, (gui_event_cb_t)win_release_callback, win);
-    this_widget = gui_canvas_create(parent, "canvas", 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (!this_widget)
-    {
-        return false; // Handle canvas creation failure
-    }
-
-    gui_canvas_set_canvas_cb(this_widget, render);
+    render();
     return true;
 }
 
@@ -200,7 +198,7 @@ void createBalls(b2World *world)
         float ballX = (SCREEN_WIDTH / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * cos(
                            angle)); // Position the ball between two rings
         float ballY = (SCREEN_HEIGHT / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * sin(angle));
-
+        gui_log("%f,%f\n", ballX, ballY);
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody; // Set as dynamic body
         ballBodyDef.position.Set(ballX / PIXELS_PER_METER, ballY / PIXELS_PER_METER);
@@ -245,48 +243,65 @@ bool operator!=(const NVGcolor &c1, const NVGcolor &c2)
 {
     return !(c1.r == c2.r && c1.g == c2.g && c1.b == c2.b && c1.a == c2.a);
 }
-
+static int count;
 // Render function
-void render(gui_canvas *this_widget)
+void canvas_callback(NVGcontext *vg)
+
 {
-    // Clear background color
-    vg = this_widget->vg;
-    if (BACKGROUND_COLOR != nvgRGB(0, 0, 0))
-    {
-        nvgBeginPath(vg);
-        nvgRect(vg, 0, 0, 454, 454);
-        nvgFillColor(vg, BACKGROUND_COLOR);
-        nvgFill(vg);
-    }
 
 
-    // Draw balls
-    for (const Ball &ball : balls)
+
+
+    // Draw ball
+    const Ball &ball = balls.at(count++);
     {
-        float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
-        float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
+
+
 
         // Draw ball
-        NVGpaint ballPaint = nvgRadialGradient(vg, ballX, ballY, 1, BALL_RADIUS,
+        NVGpaint ballPaint = nvgRadialGradient(vg, BALL_RADIUS, BALL_RADIUS, 1, BALL_RADIUS,
                                                ball.color, nvgRGBA(ball.color.r * UINT8_MAX, ball.color.g * UINT8_MAX, ball.color.b * UINT8_MAX,
                                                                    0));
         nvgBeginPath(vg);
-        nvgCircle(vg, ballX, ballY, BALL_RADIUS);
+        nvgCircle(vg, BALL_RADIUS, BALL_RADIUS, BALL_RADIUS);
         nvgFillPaint(vg, ballPaint); // Set gradient color
         nvgFill(vg);
     }
-    this_widget->render = 1;
+}
+// Render function
+void render()
+{
+
+    if (BACKGROUND_COLOR != nvgRGB(0, 0, 0))
+    {
+        gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                               gui_rgba(BACKGROUND_COLOR.r * 255, BACKGROUND_COLOR.g * 255, BACKGROUND_COLOR.b * 255,
+                                        BACKGROUND_COLOR.a * 255));
+    }
+
+    count = 0;
+    // Draw balls
+    for (Ball &ball : balls)
+    {
+
+        float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
+        float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
+
+
+        const uint8_t *img_data =  gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
+                                                     BALL_RADIUS * 2, canvas_callback);
+        gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)img_data, ballX - BALL_RADIUS,
+                                                 ballY - BALL_RADIUS, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        ball.img = img;
+    }
 }
 
 // Main function
 int ui_design(gui_obj_t *obj)
 {
     parent = obj;
-    if (!init())
-    {
-        std::cout << "Initialization failed!" << std::endl;
-        return 1;
-    }
+
 
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
 
@@ -302,11 +317,18 @@ int ui_design(gui_obj_t *obj)
     }
 
     world = new b2World(gravity);
-
+    SCREEN_WIDTH = gui_get_screen_width(); // Screen width
+    SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
+    OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
+    INNER_RING_RADIUS = OUTER_RING_RADIUS - RING_GAP; // Inner ring radius
     createRing(world, OUTER_RING_RADIUS, BALL_RESTITUTION); // Create outer ring with restitution of 0.3
     createRing(world, INNER_RING_RADIUS, BALL_RESTITUTION); // Create inner ring with restitution of 0.3
     createBalls(world); // Create balls
-
+    if (!init())
+    {
+        std::cout << "Initialization failed!" << std::endl;
+        return 1;
+    }
     return 0;
 }
 }

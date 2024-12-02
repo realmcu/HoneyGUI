@@ -121,6 +121,7 @@ static void win_switch_to_perspective_app_touch_cb(void *obj, uint16_t event)
 }
 static void win_long_to_watchface_market(void *obj, gui_event_t e, void *param)
 {
+    gui_app_layer_top();
     GUI_APP_SWAP_HANDLE(gui_current_app(), GUI_APP_HANDLE(APP_WATCHFACE_MARKET))
 }
 void design_tab_watchface_main(void *parent)

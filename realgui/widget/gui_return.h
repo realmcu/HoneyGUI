@@ -52,7 +52,7 @@ typedef struct gui_return
  *============================================================================*/
 
 #define RETURN_HEIGHT           100 //widget hight
-#define RETURN_ENABLE_THREHOLD  10 //threhold to drag
+#define RETURN_ENABLE_THREHOLD  20 //threhold to drag
 #define RETURN_THREHOLD         80 //threhold to return
 
 /*============================================================================*
