@@ -11,9 +11,10 @@
 - **滤黑 (Filter black)**: 滤波技术有效地从原始图像数据中筛选出像素值为零的像素数据，这意味着黑色像素不会被写入到帧缓冲区中。这种机制能够加快刷新速度。除黑色以外的任何颜色像素都会经过标准处理方法，并被记录到帧缓冲区中。
 - **源覆盖 (Source_over)**: 一种混合方法，将图像的颜色数据和帧缓冲区像素的颜色数据结合起来，基于不透明度值 Sa 计算最终的颜色，并将其写入到帧缓冲区的相应位置。计算公式为 ((255 - Sa) * D + Sa * S) / 255)，其中 Sa 是原始图像的不透明度值，D 是帧缓冲区的像素数据，S 是源图像的像素数据。
 
-.. figure:: ../../figures/sw_acc.*
+
+.. figure:: https://foruda.gitee.com/images/1726135914549506931/43192327_13671125.png
        :align: center
-       :scale: 45%
+       :width: 1200px
        :name: 图-sw_acc
         
        软件加速
@@ -104,9 +105,9 @@
 
 以下流程描述了 No RLE 压缩图像的 Cover mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/cover_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135750546602965/e70749d0_13671125.png
        :align: center
-       :scale: 45%
+       :width: 800px
        :name: 图-cover_mode_path
         
        Cover Mode Path
@@ -115,25 +116,26 @@
 - dc_bytes_per_pixel 表示显示设备的像素字节数，计算方式为 dc->bit_depth >> 3，其中 bit_depth 为显示设备的位深度。以位深度为24的显示设备为例，其像素字节数为3。
 
 无RLE覆盖模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Uncompressed images 写入帧缓冲区的 Cover mode处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/cover_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135919132573906/4e4cb2fd_13671125.png
        :align: center
-       :scale: 45%
+       :width: 400px
        :name: 图-cover_blit_2_rgb565
         
        Cover_blit_2_rgb565
 
 无RLE覆盖模式（带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Cover mode with matrix operations 将 Uncompressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/cover_matrix_blit_2_rgb565.*
+
+.. figure:: https://foruda.gitee.com/images/1726135926171202621/00c62b0c_13671125.png
        :align: center
-       :scale: 45%
+       :width: 550px
        :name: 图-cover_matrix_blit_2_rgb565
         
        Cover_matrix_blit_2_rgb565
@@ -143,9 +145,9 @@
 
 以下流程描述了 No RLE 压缩图像的 Bypass mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/bypass_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135755236374806/661c982d_13671125.png
        :align: center
-       :scale: 45%
+       :width: 800px
        :name: 图-bypass_mode_path
         
        Bypass_mode_path
@@ -154,81 +156,85 @@
 - dc_bytes_per_pixel 表示显示设备的像素字节数，计算方式为 dc->bit_depth >> 3，其中 bit_depth 为显示设备的位深度。以位深度为24的显示设备为例，其像素字节数为3。
   
 无RLE旁路模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Uncompressed images 写入帧缓冲区的 Bypass mode处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/Bypass_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135755236374806/661c982d_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-Bypass_blit_2_rgb565
         
        Bypass_blit_2_rgb565
 
 1. 根据 img_type 执行不同的处理步骤。
 2. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
+
     - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
     - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
     - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 无RLE旁路模式（带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Blend mode with matrix operations 将 Uncompressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/bypass_matrix_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135932315321260/e1dc02cc_13671125.png
        :align: center
-       :scale: 45%
-       :name: 图-bypass_matrix_blit_2_rgb565
+       :width: 900px
+       :name: 图-Bypass_matrix_blit_2_rgb565
         
        Bypass_matrix_blit_2_rgb565
 
 1. 根据 img_type 执行不同的处理步骤。
 2. 执行矩阵计算，将目标区域的写入点映射到图像像素，并获取图像像素的像素值。
 3. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
+
     - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
     - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
     - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 无RLE滤黑模式概述
-----------------
+------------------
 
 以下流程描述了 No RLE 压缩图像的Filter mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/filter_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135914549506931/43192327_13671125.png
        :align: center
-       :scale: 45%
-       :name: 图-filter_mode_path
+       :width: 900px
+       :name: 图-Filter_mode_path
         
        Filter_mode_path
 
 无RLE滤黑模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 uncompressed images 写入帧缓冲区的 filter mode处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/filter_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135936809407977/178a3356_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-filter_blit_2_rgb565
         
        Filter_blit_2_rgb565
 
+
 1. 根据 img_type 执行不同的处理步骤。
 2. 如果像素值为0，则跳过处理；否则，执行后续写入操作。
 3. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
+
     - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
     - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
     - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 无RLE旁路模式（带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Filter mode with matrix operations 将 Uncompressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/filter_matrix_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135941645383326/65173b6c_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-filter_matrix_blit_2_rgb565
         
        Filter_matrix_blit_2_rgb565
@@ -237,77 +243,80 @@
 2. 执行矩阵计算，将目标区域的写入点映射到图像像素，并获取图像像素的像素值。
 3. 如果像素值为0，则跳过处理；否则，执行后续写入操作。
 4. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
-无RLE源覆盖模式概述
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
+
+无RLE混合模式概述
 -------------------
 
 以下流程描述了 No RLE 压缩图像的 source_over mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/alpha_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135811742209771/c8bad88f_13671125.png
        :align: center
-       :scale: 45%
+       :width: 1000px
        :name: 图-alpha_mode_path
         
        Alpha_mode_path
 
+
 无RLE混合覆盖模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Uncompressed images 写入帧缓冲区的 Source_over mode处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/alpha_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135946825496906/bafaabe5_13671125.png
        :align: center
-       :scale: 45%
+       :width: 500px
        :name: 图-alpha_blit_2_rgb565
         
        Alpha_blit_2_rgb565
 
 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-  - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-  - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-  - 如果 opacity_value 介于 0 和 255 之间，执行do_blending_acc_2_rgb565_opacity 对源图像像素与相应的帧缓冲区像素进行混合，将混合结果写入帧缓冲区。
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行do_blending_acc_2_rgb565_opacity 对源图像像素与相应的帧缓冲区像素进行混合，将混合结果写入帧缓冲区。
 
-无RLE源覆盖模式（带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+无RLE混合覆盖模式（带矩阵变换）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Source_over mode with matrix operations 将 Uncompressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/alpha_matrix_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726135953438894385/7422d479_13671125.png
        :align: center
-       :scale: 45%
+       :width: 500px
        :name: 图-alpha_matrix_blit_2_rgb565
         
        Alpha_matrix_blit_2_rgb565
 
 1. 执行矩阵计算，将目标区域的写入点映射到图像像素，并获取图像像素的像素值。
 2. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行 do_blending_acc_2_rgb565_opacity 对源图像像素与相应的帧缓冲区像素进行混合，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行 do_blending_acc_2_rgb565_opacity 对源图像像素与相应的帧缓冲区像素进行混合，将混合结果写入帧缓冲区。
 
 RLE覆盖模式概述
----------------
+-----------------
 
 以下流程描述了 RLE 压缩图像的 Cover mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/rle_cover_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135823311485058/2b8f94bf_13671125.png
        :align: center
-       :scale: 45%
+       :width: 800px
        :name: 图-rle_cover_mode_path
         
        Rle_cover_mode_path
 
 RLE覆盖模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Compressed images 写入帧缓冲区的 Cover mode 处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_cover_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136024470398285/83f66a60_13671125.png
        :align: center
-       :scale: 45%
+       :width: 700px
        :name: 图-rle_cover_blit_2_rgb565
         
        Rle_cover_blit_2_rgb565
@@ -317,12 +326,13 @@ RLE覆盖模式（不带矩阵变换）
 3. 将像素结果写入帧缓冲区。
 
 RLE覆盖模式（带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 下面的流程图描述了使用 Cover mode with matrix operations 将 Compressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_cover_matrix_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136030945132846/70e37d28_13671125.png
        :align: center
-       :scale: 45%
+       :width: 700px
        :name: 图-rle_cover_matrix_blit_2_rgb565
         
        Rle_cover_matrix_blit_2_rgb565
@@ -337,21 +347,21 @@ RLE旁路模式概述
 
 以下流程描述了 RLE 压缩图像的 Bypass mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/rle_bypass_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135816836257523/3224601d_13671125.png
        :align: center
-       :scale: 45%
+       :width: 800px
        :name: 图-rle_bypass_mode_path
         
        Rle_bypass_mode_path
 
 RLE旁路模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Bypass images 写入帧缓冲区的 Cover mode处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_bypass_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136019654689664/085ffd2a_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-rle_bypass_blit_2_rgb565
         
        Rle_bypass_blit_2_rgb565
@@ -359,18 +369,19 @@ RLE旁路模式（不带矩阵变换）
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
 3. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 RLE旁路模式（带矩阵变换）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Bypass mode with matrix operations 将 Compressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_bypass_matrix_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136035401068218/cd9d0da1_13671125.png
        :align: center
-       :scale: 45%
+       :width: 45%
        :name: 图-rle_bypass_matrix_blit_2_rgb565
         
        Rle_bypass_matrix_blit_2_rgb565
@@ -379,30 +390,31 @@ RLE旁路模式（带矩阵变换）
 2. 对压缩图像数据进行解压。
 3. 进行矩阵计算，将目标区域的写入点映射到图像像素，并获得图像像素的像素值。
 4. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 RLE滤黑模式概述
 ---------------
 
 以下流程描述了 RLE 压缩图像的 Filter mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/rle_filter_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135828203631320/cee92853_13671125.png
        :align: center
-       :scale: 45%
+       :width: 800px
        :name: 图-rle_filter_mode_path
         
        Rle_filter_mode_path
 
 RLE滤黑模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Compressed images 写入帧缓冲区的 Filter mode 处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_filter_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136039315952991/89ee16cb_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-rle_filter_blit_2_rgb565
         
        Rle_filter_blit_2_rgb565
@@ -411,18 +423,19 @@ RLE滤黑模式（不带矩阵变换）
 2. 对压缩图像数据进行解压。
 3. 如果像素值为 0 ，则跳过处理；否则，执行后续写入操作。
 4. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 RLE滤黑模式（带矩阵变换）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Filter mode with matrix operations 将 Compressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_filter_matrix_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136044246530066/3cb24841_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-rle_filter_matrix_blit_2_rgb565
         
        Rle_filter_matrix_blit_2_rgb565
@@ -432,30 +445,31 @@ RLE滤黑模式（带矩阵变换）
 3. 进行矩阵计算，将目标区域的写入点映射到图像像素，并获得图像像素的像素值。
 4. 如果像素值为 0 ，则跳过处理；否则，执行后续写入操作。
 5. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255，将源图像像素转换为RGB565格式，并写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 ((255 - Sa) * D + Sa * S) / 255)，将混合结果写入帧缓冲区。
 
 RLE混合模式概述
 ----------------
 
 以下流程描述了 RLE 压缩图像的 source_over mode 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-.. figure:: ../../figures/rle_alpha_mode_path.*
+.. figure:: https://foruda.gitee.com/images/1726135833249440419/4bf65309_13671125.png
        :align: center
-       :scale: 45%
+       :width: 800px
        :name: 图-rle_alpha_mode_path
         
        Rle_alpha_mode_path
 
 RLE混合模式（不带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了将 Compressed images 写入帧缓冲区的 source_over mode 处理过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_alpha_blit_2_rgb565.*
+.. figure:: https://foruda.gitee.com/images/1726136048376898937/05600e92_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-rle_alpha_blit_2_rgb565
         
        Rle_alpha_blit_2_rgb565
@@ -463,29 +477,33 @@ RLE混合模式（不带矩阵变换）
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
 3. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255， 当源图像为RGB565格式时，直接将其写入帧缓冲区。否则，执行相应的混合操作 Do blend ，并将混合结果写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行适当的混合操作 do_blending 来混合源图像像素与相应的帧缓冲区像素，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255， 当源图像为RGB565格式时，直接将其写入帧缓冲区。否则，执行相应的混合操作 Do blend ，并将混合结果写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行适当的混合操作 do_blending 来混合源图像像素与相应的帧缓冲区像素，将混合结果写入帧缓冲区。
 
 RLE源覆盖模式（带矩阵变换）
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 下面的流程图描述了使用 Source_over mode with matrix operations 将 Compressed images 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-.. figure:: ../../figures/rle_alpha_matrix_blit_2_rgb565.*
+
+.. figure:: https://foruda.gitee.com/images/1726136052909602952/42461659_13671125.png
        :align: center
-       :scale: 45%
+       :width: 900px
        :name: 图-rle_alpha_matrix_blit_2_rgb565
         
        Rle_alpha_matrix_blit_2_rgb565
+
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
 3. 进行矩阵计算，将目标区域的写入点映射到图像像素，并获得图像像素的像素值。
 4. 基于 opacity_value 执行相应的操作将图像像素写入帧缓冲区。
-    - 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
-    - 如果 opacity_value 为 255， 当源图像为RGB565格式时，直接将其写入帧缓冲区。否则，执行相应的混合操作 Do blend ，并将混合结果写入帧缓冲区。
-    - 如果 opacity_value 介于 0 和 255 之间，执行适当的混合操作 do_blending 来混合源图像像素与相应的帧缓冲区像素，将混合结果写入帧缓冲区。
+
+- 如果 opacity_value 为 0，表示图像不显示，直接跳出处理流程。
+- 如果 opacity_value 为 255， 当源图像为RGB565格式时，直接将其写入帧缓冲区。否则，执行相应的混合操作 Do blend ，并将混合结果写入帧缓冲区。
+- 如果 opacity_value 介于 0 和 255 之间，执行适当的混合操作 do_blending 来混合源图像像素与相应的帧缓冲区像素，将混合结果写入帧缓冲区。
 
 
 .. note:: 
@@ -493,15 +511,19 @@ RLE源覆盖模式（带矩阵变换）
 
 
 支持的输入类型和输出类型
-----------------------
+-------------------------
 
-|输入类型|输出类型|
-|---|---|
-|RGB565|RGB565|
-|RGB888|RGB888|
-|ARGB8888|ARGB8888|
-|ARGB8565|ARGB8565|
-|RLE_RGB565|RLE_RGB565|
-|RLE_RGB888|RLE_RGB888|
-|RLE_ARGB8888|RLE_ARGB8888|
-|RLE_ARGB8565|RLE_ARGB8565|
+.. csv-table:: 
+  :header: 输入类型, 输出类型
+  :stub-columns: 1
+  :align: left
+  :name: 图-图片源输入输出类型
+
+  RGB565, RGB565
+  RGB888, RGB888
+  ARGB8888, RLE_ARGB8888
+  ARGB8565, ARGB8565
+  RLE_RGB565, RLE_RGB565
+  RLE_RGB888, RLE_RGB888
+  RLE_ARGB8888, RLE_ARGB8888
+  RLE_ARGB8565, RLE_ARGB8565
