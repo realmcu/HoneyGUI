@@ -140,9 +140,11 @@ static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *pare
             }
 
             gui_img_scale((void *)obj, scale, scale);
-            gui_img_rotation((void *)obj, 0, gui_img_get_width((void *)obj) / 2,
+            int img_width = gui_img_get_width((void *)obj);
+            int img_hight = gui_img_get_height((void *)obj);
+            gui_img_rotation((void *)obj, 0, img_width / 2,
                              gui_img_get_height((void *)obj) / 2);
-            gui_img_translate((void *)obj, gui_img_get_width((void *)obj) / 2,
+            gui_img_translate((void *)obj, img_width / 2,
                               gui_img_get_height((void *)obj) / 2);
 
             if (_UI_ABS(x) > CIRCLE_BOUNDARY)
@@ -150,14 +152,14 @@ static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *pare
                 tx = (SCREEN_W / 2.0f - (float)obj->x) *
                      (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
                      * (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
-                     + ((float)(gui_img_get_width((void *)obj) / 2))
+                     + ((float)(img_width / 2))
                      * (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)
                      * ((SCREEN_W / 2.0f
                          - (float)obj->x) / (SCREEN_W / 2.0f));
                 ty = (SCREEN_H / 2.0f - (float)obj->y)  *
                      (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
                      * (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
-                     + ((float)(gui_img_get_height((void *)obj) / 2))
+                     + ((float)(img_hight / 2))
                      * (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_H / 2.0f - CIRCLE_BOUNDARY)
                      * ((SCREEN_H / 2.0f
                          - (float)obj->y) / (SCREEN_H / 2.0f));
@@ -443,7 +445,72 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
     }
     return (void *)win;
 }
+gui_menu_cellular_t *gui_menu_cellular_create_ftl(void     *parent,
+                                                  int       icon_size,
+                                                  uint32_t *icon_array[],
+                                                  int       array_size)
+{
+#define _GUI_NEW_GUI_MENU_CELLULAR_PARAM this, parent
+    GUI_CREATE_HELPER(gui_menu_cellular_t, gui_menu_cellular_ctor, _GUI_NEW_GUI_MENU_CELLULAR_PARAM)
+    gui_win_t *win = &(this->base);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)gui_menu_cellular_wincb, win);
+#define ICON_SIZE (icon_size)
+#define WIDTH_GAP (ICON_SIZE)
+#define HEIGHT_GAP (ICON_SIZE-ICON_SIZE/7)
+#define INIT_OFFSET_X (0)
+#define INIT_OFFSET_Y (0)
 
+    for (size_t i = 0; i < array_size; i++)
+    {
+        if (i < 3)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i], INIT_OFFSET_X + WIDTH_GAP * 2, INIT_OFFSET_Y, 0, 0);
+        }
+        else if (i < 9)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 3) + (WIDTH_GAP / 2),
+                                    INIT_OFFSET_Y + HEIGHT_GAP, 0, 0);
+        }
+        else if (i < 16)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 9) + (WIDTH_GAP / 2) * 0,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 2, 0, 0);
+        }
+        else if (i < 24)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 17) + (WIDTH_GAP / 2) * 1,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 3, 0, 0);
+        }
+        else if (i < 31)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 24) + (WIDTH_GAP / 2) * 0,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 4, 0, 0);
+        }
+        else if (i < 37)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 31) + (WIDTH_GAP / 2) * 1,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 5, 0, 0);
+        }
+        else if (i < 42)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 36) + (WIDTH_GAP / 2) * 0,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 6, 0, 0);
+        }
+        else if (i < 46)
+        {
+            gui_img_create_from_ftl(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 41) + (WIDTH_GAP / 2) * 1,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 7, 0, 0);
+        }
+    }
+    return (void *)win;
+}
 void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y)
 {
     gui_list_t *node = NULL;

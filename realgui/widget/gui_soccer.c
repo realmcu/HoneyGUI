@@ -437,7 +437,62 @@ static void gui_soccer_draw_cb(gui_obj_t *obj)
         }
     }
 }
+static void gui_soccer_draw_cb_ftl(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_soccer_t *this = (gui_soccer_t *)obj;
+    static void *data_buffer[20];
+    for (uint8_t i = 0; i < 20; i++)
+    {
+        draw_img_t *draw_img = &this->draw_img[i];
+        data_buffer[i] = draw_img->data;
+        if (this->normal[i].z >= 0.0f)
+        {
+            if (matrix_is_full_rank(&draw_img->matrix))
+            {
+                draw_img_t *image = draw_img;
+                if (dc->section_count == 0)
+                {
 
+
+                    gui_rgb_data_head_t head;
+                    uint32_t base = (uint32_t)(uintptr_t)image->data;
+                    gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
+                    uint8_t *data = NULL;
+                    if (head.compress == true)
+                    {
+                        uint32_t end = 0;
+                        gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t) + 4 * (head.h),
+                                     (uint8_t *)&end, 4);
+                        uint32_t size = end  + sizeof(gui_rgb_data_head_t);
+                        data = (uint8_t *)gui_malloc(size);
+                        GUI_ASSERT(data != NULL);
+                        gui_ftl_read(base, data, size);
+                    }
+                    else
+                    {
+                        draw_img_get_header(image, IMG_SRC_FTL);
+                        uint8_t pixel_byte = draw_img_get_pixel_byte(image, IMG_SRC_FTL);
+                        uint32_t size = head.w * head.h * pixel_byte;
+                        data = (uint8_t *)gui_malloc(size);
+                        GUI_ASSERT(data != NULL);
+                        gui_ftl_read(base, data, size);
+                    }
+                    image->data = data;
+
+                }
+                gui_acc_blit_to_dc(draw_img, dc, NULL);
+                if (!(dc->section_count != dc->section_total - 1))
+                {
+                    gui_free(image->data);
+                }
+
+            }
+
+        }
+        draw_img->data = data_buffer[i];
+    }
+}
 static void gui_soccer_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -484,7 +539,33 @@ static void gui_soccer_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
+static void gui_soccer_cb_ftl(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_soccer_prepare(obj);
+            break;
 
+        case OBJ_DRAW:
+            gui_soccer_draw_cb_ftl(obj);
+            break;
+
+        case OBJ_END:
+            gui_soccer_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_soccer_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
 static void gui_soccer_ctor(gui_soccer_t       *this,
                             gui_obj_t          *parent,
                             const char         *name,
@@ -528,7 +609,49 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
     this->rotation = quaternion_from_angle_axis(1, 0, 1, 0);
     this->press_face = -1;
 }
+static void gui_soccer_ctor_ftl(gui_soccer_t       *this,
+                                gui_obj_t          *parent,
+                                const char         *name,
+                                uint32_t           *frame_array[],
+                                int16_t             x,
+                                int16_t             y,
+                                int16_t             w,
+                                int16_t             h)
+{
+    gui_obj_t *base = (gui_obj_t *)this;
+    gui_obj_t *root = (gui_obj_t *)this;
 
+    //for base class
+    gui_obj_ctor(base, parent, name, x, y, w, h);
+
+    //for root class
+    root->type = VG_LITE_SOCCER;
+    root->obj_cb = gui_soccer_cb_ftl;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
+
+    //for self
+
+    for (int i = 0; i < 20; i++)
+    {
+        this->draw_img[i].opacity_value = UINT8_MAX;
+        this->draw_img[i].blend_mode = IMG_SRC_OVER_MODE;
+        this->draw_img[i].data = frame_array[i];
+        this->draw_img[i].img_w = 100;
+        this->draw_img[i].img_h = 100;
+    }
+
+    gui_dispdev_t *dc = gui_get_dc();
+    this->scsize = 100;
+    this->slide_range = 200;
+    this->c_x = (dc->fb_width - this->scsize) / 2.0f;
+    this->c_y = (dc->fb_width - this->scsize) / 2.0f;
+
+    this->rotation = quaternion_from_angle_axis(1, 0, 1, 0);
+    this->press_face = -1;
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -562,7 +685,33 @@ gui_soccer_t *gui_soccer_create(void               *parent,
     GET_BASE(soccer)->create_done = true;
     return soccer;
 }
+gui_soccer_t *gui_soccer_create_ftl(void               *parent,
+                                    const char         *name,
+                                    uint32_t           *frame_array[],
+                                    int16_t             x,
+                                    int16_t             y)
+{
+    GUI_ASSERT(parent != NULL);
 
+    if (name == NULL)
+    {
+        name = "DEFAULT_SOCCER";
+    }
+
+    gui_soccer_t *soccer = gui_malloc(sizeof(gui_soccer_t));
+    GUI_ASSERT(soccer != NULL);
+    memset(soccer, 0x00, sizeof(gui_soccer_t));
+
+    gui_soccer_ctor_ftl(soccer, (gui_obj_t *)parent, name, frame_array, x, y, 0, 0);
+    gui_list_init(&(GET_BASE(soccer)->child_list));
+    if ((GET_BASE(soccer)->parent) != NULL)
+    {
+        gui_list_insert_before(&((GET_BASE(soccer)->parent)->child_list),
+                               &(GET_BASE(soccer)->brother_list));
+    }
+    GET_BASE(soccer)->create_done = true;
+    return soccer;
+}
 BLEND_MODE_TYPE gui_soccer_get_mode(gui_soccer_t *soccer)
 {
     GUI_ASSERT(soccer != NULL);

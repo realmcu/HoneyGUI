@@ -158,6 +158,18 @@ void gui_scroll_wheel_new_render_text(gui_scroll_wheel_new_t *widget, const void
 void gui_scroll_wheel_new_render_image_array(gui_scroll_wheel_new_t *widget,
                                              const struct gui_text_image_map *map, int map_length);
 /**
+ * @brief Render images on the scroll wheel widget(ftl address mode).
+ *
+ * This function renders a series of images on the provided scroll wheel widget.
+ * The images and their corresponding text mappings are provided in a gui_text_image_map array.
+ *
+ * @param[in]  widget      Pointer to the scroll wheel widget.
+ * @param[in]  map         Array of text-image mappings to render(ftl address mode).
+ * @param[in]  map_length  Length of the text-image mappings array.
+ */
+void gui_scroll_wheel_new_render_image_array_ftl(gui_scroll_wheel_new_t *widget,
+                                                 const struct gui_text_image_map *map, int map_length);
+/**
  * @brief Set the column offset for a scroll wheel widget.
  *
  * This function sets the column offset for the specified scroll wheel widget.

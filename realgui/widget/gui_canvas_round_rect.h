@@ -97,7 +97,36 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
                                                       int          h,
                                                       int          r,
                                                       gui_color_t  color);
-
+/**
+ * @brief Creates and initializes a new rounded rectangle (ftl address mode).
+ *
+ * This function sets up a new rounded rectangle graphical object within a specified
+ * parent GUI container. The rectangle will be drawn with the given dimensions, radius,
+ * and color, and positioned at the specified coordinates.
+ *
+ * @param parent Pointer to the parent GUI object, which will contain the rounded
+ *               rectangle.
+ * @param name A string representing the name of the rounded rectangle object.
+ * @param x The x-coordinate of the top-left corner where the rounded rectangle will
+ *          be placed within the parent component's coordinate system.
+ * @param y The y-coordinate of the top-left corner where the rounded rectangle will
+ *          be placed within the parent component's coordinate system.
+ * @param w The width of the rounded rectangle.
+ * @param h The height of the rounded rectangle.
+ * @param r The radius of the corners of the rounded rectangle.
+ * @param color The color to fill the rounded rectangle.
+ *
+ * @return A pointer to the newly created `gui_canvas_round_rect_t` instance, or NULL
+ *         if the creation fails due to memory allocation issues or invalid parameters.
+ */
+gui_canvas_round_rect_t *gui_canvas_round_rect_create_ftl(gui_obj_t   *parent,
+                                                          const char *name,
+                                                          int          x,
+                                                          int          y,
+                                                          int          w,
+                                                          int          h,
+                                                          int          r,
+                                                          gui_color_t  color);
 /**
  * @brief Set the opacity of the canvas round rectangle.
  *

@@ -106,8 +106,19 @@ void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset
  */
 void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
                                 struct gui_menu_cellular_gesture_parameter *para_array, int array_length);
-
-
+/**
+ * @brief Create a honeycomb effect widget (ftl address mode),
+ *
+ * @param parent the father widget nested in
+ * @param icon_size icon's width(px)
+ * @param icon_array icons set's file address array (ftl address mode)
+ * @param array_size the array's size
+ * @return gui_menu_cellular_t*
+ */
+gui_menu_cellular_t *gui_menu_cellular_create_ftl(void     *parent,
+                                                  int       icon_size,
+                                                  uint32_t *icon_array[],
+                                                  int       array_size);
 #ifdef __cplusplus
 }
 #endif

@@ -203,7 +203,31 @@ void gui_soccer_set_slide_range(gui_soccer_t *this, float range);
  * @param parameter callback function parameter
  */
 void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter);
-
+/**
+ * @brief Creates and initializes a new GUI soccer instance (ftl address mode).
+ *
+ * This function sets up a new soccer GUI widget. It initializes the
+ * necessary components and prepares it for display.
+ *
+ * @param parent Pointer to the parent GUI component. This is typically a window
+ *               or a container that will hold the soccer game widget.
+ * @param name A string representing the name of the GUI soccer widget. This
+ *             can be used for identification purposes within the parent.
+ * @param frame_array Array of pointers to uint32_t, representing the frames of the
+ *                    soccer game animation or graphics (ftl address mode).
+ * @param x The x-coordinate where the soccer widget will be placed within the
+ *          parent component's coordinate system.
+ * @param y The y-coordinate where the soccer widget will be placed within the
+ *          parent component's coordinate system.
+ *
+ * @return A pointer to the newly created `gui_soccer_t` instance, or NULL if
+ *         the creation fails due to memory allocation issues or invalid parameters.
+ */
+gui_soccer_t *gui_soccer_create_ftl(void               *parent,
+                                    const char         *name,
+                                    uint32_t           *frame_array[],
+                                    int16_t             x,
+                                    int16_t             y);
 
 #ifdef __cplusplus
 }
