@@ -12,8 +12,8 @@ file="app/watchface5/wf5preview.bin">
             >watchface
     </img>
     <img
-            x="221"
-            y="155"
+            x="199"
+            y="191"
             opacity="255"
             file="app/watchface5/w5hh.bin"
             blendMode="imgSrcOverMode"
@@ -24,8 +24,8 @@ file="app/watchface5/wf5preview.bin">
             </onTime>
     </img>
     <img
-            x="221"
-            y="89"
+            x="199"
+            y="113"
             opacity="255"
             file="app/watchface5/w5mh.bin"
             blendMode="imgSrcOverMode"
@@ -36,8 +36,8 @@ file="app/watchface5/wf5preview.bin">
             </onTime>
     </img>
     <img
-            x="228"
-            y="115"
+            x="206"
+            y="139"
             opacity="255"
             file="app/watchface5/w5sh.bin"
             blendMode="imgSrcOverMode"
@@ -48,8 +48,8 @@ file="app/watchface5/wf5preview.bin">
             </onTime>
     </img>
     <img
-            x="225"
-            y="225"
+            x="203"
+            y="249"
             opacity="255"
             file="app/watchface5/w5m.bin"
             blendMode="imgSrcOverMode"
@@ -58,7 +58,7 @@ file="app/watchface5/wf5preview.bin">
     </img>
     <arc
         centerX="45"
-        centerY="40"
+        centerY="64"
         radius="20"
         strokeWidth="6"
         strokeColor="#FC8045"
@@ -89,10 +89,16 @@ file="app/watchface5/wf5preview.bin">
         </textbox>
     </arc>
  
-
+    <img
+        x="25"
+        y="410"
+        opacity="255"
+        file="app/watchface5/w5battery.bin"
+        blendMode="imgBypassMode">battery
+    </img>
     <textbox
-            x="70"
-            y="400"
+            x="58"
+            y="420"
             color="#FC8045"
             w="55"
             h="49"
@@ -100,17 +106,17 @@ file="app/watchface5/wf5preview.bin">
             fontSize="24"
             font="app/watchface5/MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_bat
-           <onPeripheral 
+            <onPeripheral 
                 type="battery" 
                 to="txt_bat" 
                 id="capacity">
             </onPeripheral>
-        </textbox>
+    </textbox>
  <chart
         w="70"
         h="40"
-        x="320"
-        y="15"
+        x="298"
+        y="39"
         color="#FC8045"
         items="100,200,100,0,110,50,150,100"
         max="200"
@@ -122,7 +128,7 @@ file="app/watchface5/wf5preview.bin">
                 id="array">
             </onPeripheral>
             <textbox
-            x="75"
+            x="60"
             y="14"
             color="#FC8045"
             w="55"
@@ -143,7 +149,7 @@ file="app/watchface5/wf5preview.bin">
             x="0"
             y="255"
             color="white"
-            w="454"
+            w="410"
             h="24"
             text="SATURDAY"
             fontSize="24"
@@ -159,7 +165,7 @@ file="app/watchface5/wf5preview.bin">
             x="0"
             y="285"
             color="white"
-            w="454"
+            w="410"
             h="24"
             text="12/MARCH"
             fontSize="16"

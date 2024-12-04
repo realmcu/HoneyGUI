@@ -12,8 +12,8 @@ file="app/watchface1/wf1preview.bin">
             >watchface
     </img>
     <img
-            x="221"
-            y="146"
+            x="199"
+            y="170"
             opacity="255"
             file="app/watchface1/Union2.bin"
             blendMode="imgSrcOverMode"
@@ -24,8 +24,8 @@ file="app/watchface1/wf1preview.bin">
             </onTime>
     </img>
     <img
-            x="222"
-            y="66"
+            x="200"
+            y="90"
             opacity="255"
             file="app/watchface1/Union.bin"
             blendMode="imgSrcOverMode"
@@ -36,8 +36,8 @@ file="app/watchface1/wf1preview.bin">
             </onTime>
     </img>
     <img
-            x="228"
-            y="100"
+            x="206"
+            y="124"
             opacity="255"
             file="app/watchface1/Vector7.bin"
             blendMode="imgSrcOverMode"
@@ -48,8 +48,8 @@ file="app/watchface1/wf1preview.bin">
             </onTime>
     </img>
     <img
-            x="226"
-            y="222"
+            x="204"
+            y="246"
             opacity="255"
             file="app/watchface1/Ellipse5.bin"
             blendMode="imgSrcOverMode"
@@ -66,7 +66,7 @@ file="app/watchface1/wf1preview.bin">
             rotationAngle="0"
             w="55"
             h="55"
-            x="57"
+            x="35"
             y="57">btn_music
             <onClick
                     to="app"
@@ -84,8 +84,8 @@ file="app/watchface1/wf1preview.bin">
             rotationAngle="0"
             w="55"
             h="55"
-            x="57"
-            y="342">btn_light
+            x="35"
+            y="366">btn_light
             <onClick
                     to="app"
                     type="jump" 
@@ -93,8 +93,8 @@ file="app/watchface1/wf1preview.bin">
             </onClick>
     </icon>
     <arc
-        centerX="85"
-        centerY="369"
+        centerX="63"
+        centerY="393"
         radius="27"
         strokeWidth="4"
         strokeColor="yellow"
@@ -118,8 +118,8 @@ file="app/watchface1/wf1preview.bin">
             rotationAngle="0"
             w="55"
             h="55"
-            x="342"
-            y="342">btn_sport
+            x="320"
+            y="366">btn_sport
     </icon>
     <icon
             picture="app/watchface1/Ellipse19.bin"
@@ -131,7 +131,7 @@ file="app/watchface1/wf1preview.bin">
             rotationAngle="0"
             w="55"
             h="55"
-            x="342"
+            x="320"
             y="57">btn_step
             <onClick
                     to="app"
@@ -160,7 +160,7 @@ file="app/watchface1/wf1preview.bin">
             x="0"
             y="130"
             color="white"
-            w="454"
+            w="410"
             h="49"
             text="SATURDAY"
             fontSize="24"
@@ -176,7 +176,7 @@ file="app/watchface1/wf1preview.bin">
             x="0"
             y="160"
             color="white"
-            w="454"
+            w="410"
             h="49"
             text="12/MARCH"
             fontSize="16"

@@ -12,8 +12,8 @@ file="app/watchface3/wf3preview.bin">
             >watchface
     </img>
         <img
-            x="222"
-            y="222"
+            x="200"
+            y="246"
             opacity="255"
             file="app/watchface3/w3m1.bin"
             blendMode="imgSrcOverMode"
@@ -21,8 +21,8 @@ file="app/watchface3/wf3preview.bin">
             
     </img>
     <img
-            x="221"
-            y="141"
+            x="199"
+            y="165"
             opacity="255"
             file="app/watchface3/w3hh.bin"
             blendMode="imgSrcOverMode"
@@ -33,8 +33,8 @@ file="app/watchface3/wf3preview.bin">
             </onTime>
     </img>
     <img
-            x="222"
-            y="70"
+            x="200"
+            y="94"
             opacity="255"
             file="app/watchface3/w3mh.bin"
             blendMode="imgSrcOverMode"
@@ -45,8 +45,8 @@ file="app/watchface3/wf3preview.bin">
             </onTime>
     </img>
     <img
-            x="226"
-            y="100"
+            x="204"
+            y="124"
             opacity="255"
             file="app/watchface3/w3sh.bin"
             blendMode="imgSrcOverMode"
@@ -57,8 +57,8 @@ file="app/watchface3/wf3preview.bin">
             </onTime>
     </img>
         <img
-            x="224"
-            y="224"
+            x="202"
+            y="248"
             opacity="255"
             file="app/watchface3/w3m2.bin"
             blendMode="imgSrcOverMode"
@@ -75,7 +75,7 @@ file="app/watchface3/wf3preview.bin">
             rotationAngle="0"
             w="64"
             h="64"
-            x="57"
+            x="35"
             y="57">btn_music
             <onClick
                     to="app"
@@ -93,8 +93,8 @@ file="app/watchface3/wf3preview.bin">
             rotationAngle="0"
             w="55"
             h="55"
-            x="57"
-            y="342">btn_activity
+            x="35"
+            y="390">btn_activity
             <onClick
                     to="app"
                     type="jump" 
@@ -112,8 +112,8 @@ file="app/watchface3/wf3preview.bin">
             rotationAngle="0"
             w="55"
             h="55"
-            x="342"
-            y="342">btn_light
+            x="320"
+            y="390">btn_light
     </switch>
     <icon
             picture="app/watchface3/w3weather.bin"
@@ -125,7 +125,7 @@ file="app/watchface3/wf3preview.bin">
             rotationAngle="0"
             w="64"
             h="64"
-            x="342"
+            x="320"
             y="57">btn_step
             <onClick
                     to="app"
@@ -167,7 +167,7 @@ file="app/watchface3/wf3preview.bin">
             x="0"
             y="260"
             color="white"
-            w="454"
+            w="410"
             h="49"
             text="Mon 1"
             fontSize="24"
@@ -183,7 +183,7 @@ file="app/watchface3/wf3preview.bin">
             x="0"
             y="300"
             color="white"
-            w="454"
+            w="410"
             h="49"
             text="00:00"
             fontSize="80"
@@ -196,8 +196,8 @@ file="app/watchface3/wf3preview.bin">
             </onTime>
     </textbox> 
  <img
-            x="221"
-            y="400"
+            x="199"
+            y="426"
             opacity="255"
             file="app/watchface3/w3hr.bin"
             blendMode="imgSrcOverMode"
@@ -206,9 +206,9 @@ file="app/watchface3/wf3preview.bin">
     </img>
     <textbox
             x="0"
-            y="410"
+            y="436"
             color="#F44101"
-            w="454"
+            w="410"
             h="49"
             text="97"
             fontSize="24"

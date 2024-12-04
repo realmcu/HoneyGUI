@@ -12,7 +12,7 @@ file="app/watchface2/wf2preview.bin">
             >watchface
     </img>
     <textbox
-            x="60"
+            x="35"
             y="230"
             color="white"
             w="55"
@@ -40,7 +40,7 @@ file="app/watchface2/wf2preview.bin">
     <chart
         w="300"
         h="40"
-        x="15"
+        x="24"
         y="30"
         color="#F44101"
         items="100,200,100,0,110,50,150,100"
@@ -56,8 +56,8 @@ file="app/watchface2/wf2preview.bin">
 </chart>  
             </textbox>
             <img
-            x="222"
-            y="222"
+            x="200"
+            y="246"
             opacity="255"
             file="app/watchface2/w2m1.bin"
             blendMode="imgSrcOverMode"
@@ -65,8 +65,8 @@ file="app/watchface2/wf2preview.bin">
             
     </img>
     <img
-            x="221"
-            y="141"
+            x="199"
+            y="165"
             opacity="255"
             file="app/watchface2/w2hh.bin"
             blendMode="imgSrcOverMode"
@@ -77,8 +77,8 @@ file="app/watchface2/wf2preview.bin">
             </onTime>
     </img>
     <img
-            x="222"
-            y="70"
+            x="200"
+            y="94"
             opacity="255"
             file="app/watchface2/w2mh.bin"
             blendMode="imgSrcOverMode"
@@ -89,8 +89,8 @@ file="app/watchface2/wf2preview.bin">
             </onTime>
     </img>
     <img
-            x="226"
-            y="100"
+            x="204"
+            y="124"
             opacity="255"
             file="app/watchface2/w2sh.bin"
             blendMode="imgSrcOverMode"
@@ -101,8 +101,8 @@ file="app/watchface2/wf2preview.bin">
             </onTime>
     </img>
         <img
-            x="224"
-            y="224"
+            x="202"
+            y="248"
             opacity="255"
             file="app/watchface2/w2m2.bin"
             blendMode="imgSrcOverMode"
@@ -119,7 +119,7 @@ file="app/watchface2/wf2preview.bin">
             rotationAngle="0"
             w="61"
             h="61"
-            x="100"
+            x="78"
             y="380">btn_music
             <onClick
                     to="app"
@@ -129,7 +129,7 @@ file="app/watchface2/wf2preview.bin">
     </icon>
 
     <arc
-        centerX="80"
+        centerX="58"
         centerY="80"
         radius="27"
         strokeWidth="6"
@@ -145,7 +145,7 @@ file="app/watchface2/wf2preview.bin">
         </onPeripheral>
     </arc>
         <arc
-        centerX="80"
+        centerX="58"
         centerY="80"
         radius="17"
         strokeWidth="6"
@@ -161,7 +161,7 @@ file="app/watchface2/wf2preview.bin">
         </onPeripheral>
     </arc>
         <arc
-        centerX="80"
+        centerX="58"
         centerY="80"
         radius="7"
         strokeWidth="6"
@@ -177,7 +177,7 @@ file="app/watchface2/wf2preview.bin">
         </onPeripheral>
     </arc>
     <arc
-        centerX="80"
+        centerX="58"
         centerY="80"
         radius="27"
         strokeWidth="6"
@@ -189,7 +189,7 @@ file="app/watchface2/wf2preview.bin">
 
     </arc>
         <arc
-        centerX="80"
+        centerX="58"
         centerY="80"
         radius="17"
         strokeWidth="6"
@@ -201,7 +201,7 @@ file="app/watchface2/wf2preview.bin">
 
     </arc>
         <arc
-        centerX="80"
+        centerX="58"
         centerY="80"
         radius="7"
         strokeWidth="6"
@@ -215,7 +215,7 @@ file="app/watchface2/wf2preview.bin">
     <chart
         w="70"
         h="40"
-        x="350"
+        x="328"
         y="50"
         color="#F44101"
         items="100,200,100,0,110,50,150,100"
@@ -239,7 +239,7 @@ file="app/watchface2/wf2preview.bin">
             rotationAngle="0"
             w="61"
             h="61"
-            x="197"
+            x="175"
             y="380">btn_activity
     </icon>
     <icon
@@ -252,7 +252,7 @@ file="app/watchface2/wf2preview.bin">
             rotationAngle="0"
             w="61"
             h="61"
-            x="297"
+            x="275"
             y="380">btn_step
             <textbox
             x="0"

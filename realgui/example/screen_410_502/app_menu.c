@@ -149,6 +149,24 @@ static void app_back2prescreen_cb(void)
     }
 }
 
+static void app_AT_back2prescreen_cb(void)
+{
+    extern void clear_activity_app(void);
+    clear_activity_app();
+
+    extern bool sidebar_flag;
+    extern bool return_to_watchface_flag;
+
+    if (return_to_watchface_flag || sidebar_flag)
+    {
+        gui_switch_app(gui_current_app(), get_app_hongkong());
+    }
+    else
+    {
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
+}
+
 static void app_HR_back2prescreen_cb(void)
 {
     extern void clear_heart_rate_app(void);
@@ -351,8 +369,11 @@ GUI_APP_ENTRY(APP_ACTIVITY)
     extern void page_tb_control_enter(void *parent);
     page_tb_control_enter(&app->screen);
 
+    extern void clear_activity_app(void);
+    clear_activity_app();
+
     extern void activity_app(gui_obj_t *obj);
     activity_app(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_AT_back2prescreen_cb, (void *)0);
 }
