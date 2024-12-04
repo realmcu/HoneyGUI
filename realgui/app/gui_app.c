@@ -13,6 +13,7 @@
 gui_app_t *current_app;
 gui_app_t *next_app;
 static bool app_layer;
+static void app_shutdown(gui_app_t *app);
 void gui_app_layer_top()
 {
     app_layer = true;
@@ -98,6 +99,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_transition_animation_function)
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function);
 void gui_app_startup(gui_app_t *app)
 {
+    app->close_sync = 0;
+    if (current_app == app)
+    {
+        app_shutdown(current_app);
+        current_app = 0;
+    }
+
     gui_list_init(&app->screen.child_list);
     gui_list_init(&app->screen.brother_list);
     app->screen.opacity_value = UINT8_MAX;
@@ -150,6 +158,7 @@ static void app_shutdown(gui_app_t *app)
     if (app->next)
     {
         app->close = true;
+        app->next = false;
         gui_log("app_shutdown async\n");
     }
     else
@@ -176,6 +185,7 @@ static void app_shutdown(gui_app_t *app)
 }
 void gui_app_shutdown(gui_app_t *app)
 {
+    app->close_sync = 0;
     if (app->shutdown_animation_flag != GUI_APP_ANIMATION_NULL)
     {
         if (app->window != GUI_TYPE(gui_win_t, &(app->screen)))
@@ -494,7 +504,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_transition_animation_function)
     gui_app_t *app = p;
     gui_app_animation_t flag = app->startup_animation_flag;
     gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
-    float pro = gui_win_get_animation_progress_percent(win); gui_log("%f\n", pro);
+    float pro = gui_win_get_animation_progress_percent(win); gui_log("startup%f\n", pro);
     gui_error_t e = animation_case(flag, app, win, pro);
     if (e == GUI_SUCCESS)
     {
@@ -515,7 +525,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_
     gui_app_t *app = p;
     gui_app_animation_t flag = app->shutdown_animation_flag;
     gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
-    float pro = gui_win_get_animation_progress_percent(win); gui_log("%f\n", pro);
+    float pro = gui_win_get_animation_progress_percent(win); gui_log("shutdowm%f\n", pro);
     gui_error_t e = animation_case(flag, app, win, pro);
     if (e == GUI_SUCCESS)
     {
