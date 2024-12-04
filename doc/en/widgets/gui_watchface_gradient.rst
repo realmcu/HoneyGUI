@@ -1,18 +1,19 @@
-# Watchface Gradient
+===================
+Watchface Gradient
+===================
 
 The watchface gradient widget allows you to create a pointer watchface with a scanning effect for each pointer.
 
-## Usage
+Usage
+-----
 
-### Create Widget
+Create Widget
+~~~~~~~~~~~~~~
+To reate a new watchface gradient widget, you can call the function :cpp:any:`gui_watchface_gradient_create` to achieve it.
 
-To reate a new watchface gradient widget, you can call the function [gui_watchface_gradient_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_watchface_gradient_create) to achieve it.
+Example
+--------
 
-## Example
-
-<details> <summary>code</summary>
-
-```eval_rst
 .. literalinclude:: ../../../realgui/example/screen_448_368/app_ct_clock.c
    :language: c
    :start-after: /* watchface_watch_gradient_spot demo start*/
@@ -32,22 +33,18 @@ To reate a new watchface gradient widget, you can call the function [gui_watchfa
    :language: c
    :start-after: /* page_ct_clock start*/
    :end-before: /* page_ct_clock end*/
-```
 
-</details>
 
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width = "400" /></div>
-<br>
 
-<span id = "gui_watchface_gradient_create">
+.. raw:: html
 
-## API
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width= "400" /></div>
+   <br>
+   
 
-</span>
-
-```eval_rst
+API
+----
 
 .. doxygenfile:: gui_watchface_gradient.h
 
-```

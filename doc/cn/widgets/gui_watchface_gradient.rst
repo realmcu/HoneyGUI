@@ -1,18 +1,18 @@
-# 表盘渐变 (Watchface Gradient)
+=============================
+表盘渐变 (Watchface Gradient)
+=============================
 
 表盘渐变是指具有指针扫描效果的指针表盘控件。
 
-## 用法
+用法
+-----
+创建控件
+~~~~~~~~
+使用 :cpp:any:`gui_watchface_gradient_create` 函数创建具有扫描效果的指针表盘控件。
 
-### 创建控件
+示例
+-----
 
-使用 [gui_watchface_gradient_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_watchface_gradient_create) 函数创建具有扫描效果的指针表盘控件。
-
-## 示例
-
-<details> <summary>代码</summary>
-
-```eval_rst
 .. literalinclude:: ../../../realgui/example/screen_448_368/app_ct_clock.c
    :language: c
    :start-after: /* watchface_watch_gradient_spot demo start*/
@@ -32,22 +32,17 @@
    :language: c
    :start-after: /* page_ct_clock start*/
    :end-before: /* page_ct_clock end*/
-```
 
-</details>
 
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width = "400" /></div>
-<br>
 
-<span id = "gui_watchface_gradient_create">
+.. raw:: html
 
-## API
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width= "400" /></div>
+   <br>
 
-</span>
-
-```eval_rst
+API
+-----
 
 .. doxygenfile:: gui_watchface_gradient.h
 
-```
