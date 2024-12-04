@@ -18,6 +18,7 @@
 #include "gui_curtain.h"
 #include "gui_canvas_rect.h"
 #include "guidef.h"
+#include "app_hongkong.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -55,6 +56,9 @@ static gui_text_t *compass_degree, *compass_orien;
 static char degree_content[5] = "0°", orien_content[3] = "N";
 
 static gui_img_t *img_heart_rate;
+
+static uint8_t *img_data_temperature,
+       *img_data_activity;
 
 char *cjson_content = NULL;
 
@@ -191,17 +195,21 @@ void json_refreash()
 extern char *day[];
 static void refreash_time()
 {
-    GUI_WIDGET_POINTER_BY_NAME(img_hour_decimal, "watch_hour_decimal");
+    // GUI_WIDGET_POINTER_BY_NAME(img_hour_decimal, "watch_hour_decimal");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", win_watch);
     gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
                           text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
-    GUI_WIDGET_POINTER_BY_NAME(img_hour_single, "watch_hour_single");
+    // GUI_WIDGET_POINTER_BY_NAME(img_hour_single, "watch_hour_single");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
     gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
                           text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
 
-    GUI_WIDGET_POINTER_BY_NAME(img_minute_decimal, "watch_minute_decimal");
+    // GUI_WIDGET_POINTER_BY_NAME(img_minute_decimal, "watch_minute_decimal");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", win_watch);
     gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
                           text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
-    GUI_WIDGET_POINTER_BY_NAME(img_minute_single, "watch_minute_single");
+    // GUI_WIDGET_POINTER_BY_NAME(img_minute_single, "watch_minute_single");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", win_watch);
     gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
                           text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
 
@@ -210,7 +218,8 @@ static void refreash_time()
     gui_text_convert_to_img(date_text, RGB565);
 
     // refreash weather date
-    GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
+    // GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "weather_text", win_watch)
     uint8_t index = timeinfo->tm_wday;
 
     sprintf(weekday_content, "%s.  %s.  %s.  %s.", day[(index + 1) % 7], day[(index + 2) % 7],
@@ -478,7 +487,8 @@ static void weather_cb(gui_img_t *parent)
                     char key[15];
                     sprintf(key, "condition_%d", i);
                     // gui_log("%s\r\n", key);
-                    GUI_WIDGET_POINTER_BY_NAME(obj, key);
+                    // GUI_WIDGET_POINTER_BY_NAME(obj, key);
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, key, win_watch);
                     cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
                     if (strcmp(condition->valuestring, "Sunny") == 0)
                     {
@@ -861,9 +871,10 @@ void page_ct_clock(void *parent)
             image_w = 100,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        uint8_t *img_data = gui_lower_malloc(buffer_size);
-        memset(img_data, 0, buffer_size);
-        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data, 16 + SCREEN_X_OFF,
+        img_data_temperature = gui_lower_malloc(buffer_size);
+        memset(img_data_temperature, 0, buffer_size);
+        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_temperature,
+                                                 16 + SCREEN_X_OFF,
                                                  330 + SCREEN_Y_OFF, 100, 100);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_animate(img, 2000, -1, canvas_temperature_animation, (void *)buffer_size);
@@ -875,7 +886,8 @@ void page_ct_clock(void *parent)
                      48);
         gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(temperature_cur, LEFT);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb, img_data);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
+                                 img_data_temperature);
         sprintf(tempera_low_content, "18");
         temperature_low = gui_text_create(img, "temperature_low",  19, 70, 0, 0);
         gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
@@ -971,10 +983,10 @@ void page_ct_clock(void *parent)
             image_w = 100,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        uint8_t *img_data = gui_lower_malloc(buffer_size);
-        memset(img_data, 0, buffer_size);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
-        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data, 16 + SCREEN_X_OFF,
+        img_data_activity = gui_lower_malloc(buffer_size);
+        memset(img_data_activity, 0, buffer_size);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data_activity);
+        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 16 + SCREEN_X_OFF,
                                                  50 + SCREEN_Y_OFF, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_animate(img, 1000, -1, canvas_activity_animation, (void *)buffer_size);

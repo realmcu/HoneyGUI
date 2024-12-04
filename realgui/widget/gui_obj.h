@@ -132,7 +132,7 @@ typedef struct _gui_obj_t
     //start of run time
     void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
     //end of run time
-    T_OBJ_TYPE type; //no need this , only use name
+    T_OBJ_TYPE type;                      //no need this , only use name
     uint32_t active               : 1;    // this_widget flag means obj location in screen
     uint32_t not_show             : 1;
 
@@ -143,9 +143,9 @@ typedef struct _gui_obj_t
     uint32_t skip_tp_short        : 1;
     uint32_t skip_tp_long         : 1;
     uint32_t skip_tp_pressed      : 1;
-    uint32_t create_done          : 1;
-    uint32_t flag_3d              : 1;
     uint32_t gesture              : 1;
+
+    uint32_t create_done          : 1;
     uint32_t event_dsc_cnt        : 5;
     uint32_t opacity_value        : 8;
     uint32_t has_input_prepare_cb : 1;

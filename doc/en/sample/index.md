@@ -20,4 +20,5 @@ GUI_INIT_APP_EXPORT(app_init);
     LiteGFX <LiteGFX/Demo>
     Status Bar <Status-bar/Status bar>
     Fruit Ninja <Fruit_Ninja/Demo>
+    Music Player <MusicPlayer/Music Player>
 ```

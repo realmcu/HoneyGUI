@@ -28,8 +28,8 @@ static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
 
-static gui_img_t *img_heart_rate;
 static gui_win_t *win_hb;
+static uint8_t *img_data = NULL;
 
 extern void *text_num_array[];
 extern char *cjson_content;
@@ -58,7 +58,7 @@ static void win_hb_cb(gui_win_t *win)
 #endif
 }
 
-static void heartbreak_graph(NVGcontext *vg)
+static void heartrate_graph(NVGcontext *vg)
 {
     // draw split line
     {
@@ -110,7 +110,6 @@ static void heartbreak_graph(NVGcontext *vg)
     }
     else
     {
-
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -147,7 +146,7 @@ static void heartbreak_graph(NVGcontext *vg)
     // gui_text_content_set((gui_text_t *)t, hr_content, strlen(hr_content));
     uint8_t number = (uint8_t)samples[2];
     {
-        GUI_WIDGET_POINTER_BY_NAME(img_percentile, "hr_content_percentile");
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_percentile, "hr_content_percentile", win_hb);
         if (number / 100)
         {
             img_percentile->not_show = 0;
@@ -156,11 +155,11 @@ static void heartbreak_graph(NVGcontext *vg)
         {
             img_percentile->not_show = 1;
         }
-        gui_log("number = %d\n", number);
-        GUI_WIDGET_POINTER_BY_NAME(img_decimal, "hr_content_decimal");
+        // gui_log("number = %d\n", number);
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_decimal, "hr_content_decimal", win_hb);
         gui_img_set_attribute((gui_img_t *)img_decimal, img_decimal->name,
                               text_num_array[(number % 100) / 10], img_decimal->x, img_decimal->y);
-        GUI_WIDGET_POINTER_BY_NAME(img_single, "hr_content_single");
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_single, "hr_content_single", win_hb);
         gui_img_set_attribute((gui_img_t *)img_single, img_single->name, text_num_array[number % 10],
                               img_single->x, img_single->y);
     }
@@ -228,8 +227,6 @@ static void heartbreak_graph(NVGcontext *vg)
     nvgStrokeWidth(vg, 1.0f);
 }
 
-extern void *get_app_hongkong(void);
-
 static bool canvas_hb_update()
 {
     if ((canvas_update_flag & 0x01))// && curtain_index)
@@ -246,9 +243,17 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(hr_animation)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartbreak_graph, img_data);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartrate_graph, img_data);
         gui_img_set_image_data(this_widget, img_data);
     }
+}
+void clear_heart_rate_app(void)
+{
+    // if (img_data)
+    // {
+    //     gui_lower_free(img_data);
+    //     img_data = NULL;
+    // }
 }
 
 void heart_rate_app(gui_obj_t *obj)
@@ -298,9 +303,13 @@ void heart_rate_app(gui_obj_t *obj)
             image_w = SCREEN_WIDTH,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        uint8_t *img_data = gui_lower_malloc(buffer_size);
+        if (img_data == NULL)
+        {
+            img_data = gui_lower_malloc(buffer_size);
+        }
+        // uint8_t *img_data = gui_lower_malloc(buffer_size);
         memset(img_data, 0, buffer_size);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartbreak_graph, img_data);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartrate_graph, img_data);
         gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
                                                  SCREEN_HEIGHT);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);

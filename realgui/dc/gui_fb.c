@@ -23,7 +23,11 @@ static uint8_t event_cnt = 0;
 static bool fb_change = false;
 static uint32_t gui_obj_count;
 static uint32_t obj_count;
-uint32_t gui_get_obj_count()
+static int frame_count_per_second;
+static uint32_t spf = 5;
+
+
+uint32_t gui_get_obj_count(void)
 {
     return gui_obj_count;
 }
@@ -141,30 +145,31 @@ static bool obj_is_active(gui_obj_t *obj)
     return false;
 }
 
-static void obj_input_prepare(gui_obj_t *obj)
+static void obj_input_prepare(gui_obj_t *object)
 {
+    GUI_ASSERT(object->name != NULL);
     gui_list_t *node = NULL;
 
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_for_each(node, &object->child_list)
     {
+        GUI_ASSERT(node != NULL);
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->not_show)
         {
             continue;
         }
+        if (obj->parent->matrix)
+        {
+            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+        }
+        matrix_translate(obj->x, obj->y, obj->matrix);
         if (obj->has_input_prepare_cb)
         {
-            if (obj->parent->matrix)
-            {
-                memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
-            }
-            matrix_translate(obj->x, obj->y, obj->matrix);
             obj->obj_cb(obj, OBJ_INPUT_PREPARE);
-
-            if (obj_is_active(obj) == false)
-            {
-                continue;
-            }
+        }
+        if (obj_is_active(obj) == false)
+        {
+            continue;
         }
         obj_input_prepare(obj);
     }
@@ -194,7 +199,6 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         if (obj->has_prepare_cb)
         {
-            // gui_log("obj_draw_prepare act %d %s\n", obj->active, obj->name);
             if (!obj->gesture)
             {
                 obj->obj_cb(obj, OBJ_PREPARE);
@@ -369,7 +373,7 @@ static void gui_fb_draw(gui_obj_t *root)
 
     }
 }
-static int frame_count_per_second;
+
 uint32_t gui_fps()
 {
     return frame_count_per_second;
@@ -378,7 +382,7 @@ void gui_fb_change(void)
 {
     fb_change = true;
 }
-static uint32_t spf = 5;
+
 uint32_t gui_spf()
 {
     return spf;

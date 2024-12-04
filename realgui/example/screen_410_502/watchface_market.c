@@ -7,38 +7,9 @@
 
 
 #define APP_WATCHFACE_MARKET
-
-#define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT((obj&&GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
-#define GUI_WIDGET_POINTER_BY_NAME(pointer, name) gui_obj_t *pointer = 0;\
-    extern void gui_obj_tree_get_widget_by_name(gui_obj_t *, const char *, gui_obj_t **);\
-    extern gui_app_t *gui_current_app(void);\
-    gui_obj_tree_get_widget_by_name((void *)gui_current_app(), name, &pointer);\
-    GUI_WIDGET_TRY_EXCEPT(pointer)
-
-#define GUI_APP_DEFINE_NAME(APP_NAME) \
-    static void _##APP_NAME##_ui_design(gui_app_t*); \
-    static gui_app_t _app_##APP_NAME = \
-                                       { \
-                                         .screen = \
-                                                   { \
-                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
-                                                     .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
-                                                   }, \
-                                         .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
-                                         .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
-                                       }; \
-    /**
-         * @brief Function to get the handle of the application.
-         *
-         * @return A pointer to the application instance.
-         */ \
-    gui_app_t *_get_app_##APP_NAME##_handle(void) \
-    { \
-        return &_app_##APP_NAME; \
-    }
-
-
-GUI_APP_DEFINE_NAME(APP_WATCHFACE_MARKET)
+// cppcheck-suppress syntaxError
+GUI_APP_DEFINE_NAME_ANIMATION(APP_WATCHFACE_MARKET, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_7)
+// GUI_APP_DEFINE_NAME(APP_WATCHFACE_MARKET)
 #define APP_WATCHFACE_MARKET_MAX_COUNT 50
 static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
 {
@@ -119,6 +90,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     {
         watchface_index = 0;
         extern gui_app_t *get_app_hongkong(void);
+        gui_app_layer_buttom();
         GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_hongkong());
         return;
     }
@@ -128,10 +100,12 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     watchface_index = 3;
 
     extern gui_app_t *get_app_hongkong(void);
+    gui_app_layer_buttom();
     GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_hongkong());
-    GUI_WIDGET_POINTER_BY_NAME(wathcface_window, "_watchface_main_window_")
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(watchface_window, "_watchface_main_window_",
+                                    &(get_app_hongkong()->screen))  // cppcheck-suppress syntaxError
     // gui_obj_child_free(wathcface_window);
-    create_tree_nest((void *)path, wathcface_window);
+    create_tree_nest((void *)path, watchface_window);
     gui_free((void *)path);
 }
 GUI_APP_ENTRY(APP_WATCHFACE_MARKET)

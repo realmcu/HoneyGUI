@@ -603,27 +603,106 @@ typedef struct {
 
 ##### 导入 LVGL
 HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
-1. 若作为文件导入，则需修改文件扩展名为 `.rle` 即可放入文件系统使用
-2. 若作为 C 数组格式导入，则需使用 LVGL 图片转换工具来进行转换。与普通图片转换不同的是，上传文件应选择转换后的压缩文件，`Color format` 选项中应选择 **CF_RAW**
+1. **若作为文件导入**
 
+   **注意**: 修改文件扩展名为 `.rle` ,即可放入文件系统使用`(SDK/subsys/gui/realgui/example/screen_lvgl/root)`
+
+   ```c
+   //file: lvgl_example_assets.c
+   void load_img_rle_file(void)
+   {
+       lv_obj_t *icon = lv_img_create(lv_scr_act());
+       lv_img_set_src(icon, "F:/logo_lvgl.rle");
+       lv_obj_set_pos(icon, 0, 0);
+   }
+   ```
+   **备注**：使用 RLE 解码器 + ROMFS 时，解码器将会直接从文件系统即 FLASH 上获取图片，不做额外缓存,需要做缓存处理的情况请参考 [文件系统](#文件系统)；
+2. **若作为 C 数组格式导入**
+
+ - a. 打开LVGL图片转换工具并上传要转换的压缩文件
+ - b. 在`Color format`选项中，务必选择 **CF_RAW**
+ - c. 将转换后的图片文件导出为C文件格式，例如 `logo_lvgl_rle.c`
+
+    **注意1：转换结果文件的存放路径:** 将转换后的C文件存放在以下参考路径：
+    `SDK/subsys/gui/realgui/example/screen_lvgl/assets`
+    
+    **注意2：修改图像描述符中的色彩格式 cf:** 导出的C文件，例如`logo_lvgl_rle.c`，需要对其中的图像描述符进行修改，保证 `cf` 设置为 `LV_IMG_CF_RAW`：
+    ```c
+    //file:logo_lvgl_rle.c
+    const lv_img_dsc_t logo_lvgl_rle = {
+      .header.cf = LV_IMG_CF_RAW,
+      .header.always_zero = 0,
+      .header.reserved = 0,
+      .header.w = 0,
+      .header.h = 0,
+      .data_size = 1889,
+      .data = logo_lvgl_rle_map,
+    };
+    ```
+ - d. 在项目中包含生成的C文件
+   创建图像对象
+   ```c
+   //file:lvgl_example_assets.c
+   void load_img_rle_c_file(void)
+   {
+       LV_IMG_DECLARE(logo_lvgl_rle);
+       lv_obj_t *icon = lv_img_create(lv_scr_act());
+       lv_img_set_src(icon, &logo_lvgl_rle);
+       lv_obj_set_pos(icon, 0, 0);
+   }
+   ```
+
+3. 若作为文件导入,以文件地址的方式访问图片资源
+ - a. 构建LVGL image header，例如：
+   ```c
+   //file:lvgl_example_assets.c
+   #include "resource.h" 
+   
+   const lv_img_dsc_t lvgl_test_img_rle = {
+     .header.cf = LV_IMG_CF_RAW, 
+     .header.always_zero = 0,
+     .header.reserved = 0,
+     .header.w = 0,
+     .header.h = 0,
+     .data_size = 0,
+     .data = LOGO_LVGL_RLE,
+   };
+   ```
+   **注意：图像描述符中的色彩格式设置为 cf = LV_IMG_CF_RAW**
+
+  - b. 图片资源访问，控件创建：
+   ```c
+   //file: lvgl_example_assets.c
+   void load_img_rle_dataAddr_file(void)
+   {
+       lv_obj_t *icon = lv_img_create(lv_scr_act());
+       lv_img_set_src(icon, &lvgl_test_img_rle);
+       lv_obj_set_pos(icon, 0, 0);
+   }
+   ```
 ##### LVGL 启用 RLE 解码器
 
 为了在 LVGL 中解码 RLE 压缩的图片资源，需要配置启用 RLE 解码器，并为其分配缓存空间。
 
-1. 启用 RLE 解码器：在配置文件 `lv_conf.h` 中找到 `LV_USE_RLE` 宏定义，并将其设置为启用（1）
-2. 分配解码缓存：在 `lv_rle.c` 文件中配置以下参数：
+1. 启用 RLE 解码器：在配置文件 `lv_conf.h` 中找到 `LV_USE_RTK_IDU` 宏定义，并将其设置为启用（1）
+2. 分配解码缓存：在 `lv_conf.h` 文件中配置以下参数：
     - `LV_PSRAM_START`：缓存的起始地址
     - `LV_PSRAM_SIZE`：缓存空间大小，确保此大小足够容纳所使用的最大整张图片的解码数据
 
 ```c
 // file: lv_conf.h
-#define LV_USE_RLE                1
 
+/*RTK_IDU decoder library*/
+#define LV_USE_RTK_IDU 1
 
-// file: lv_rle.c
-#define LV_PSRAM_SIZE       (MY_DISP_HOR_RES * MY_DISP_VER_RES * 4) //  screen size * 4(ARGB8888)
-#define LV_PSRAM_START      (0x08000000 + 2 * MY_DISP_HOR_RES * MY_DISP_VER_RES * LV_COLOR_DEPTH / 8)  // frame buffer offset
-#define LV_PSRAM_END        (LV_PSRAM_START + LV_PSRAM_SIZE)
+#ifdef LV_USE_RTK_IDU
+#define LV_MEM_PSRAM_ADR    0x08000000
+#define LV_PSRAM_SIZE       (MY_DISP_HOR_RES * MY_DISP_VER_RES * 4)
+#define LV_PSRAM_START      (LV_MEM_PSRAM_ADR + 2 * MY_DISP_HOR_RES * MY_DISP_VER_RES * LV_COLOR_DEPTH / 8)
+#ifndef LV_MEM_ADR
+#define LV_MEM_ADR LV_PSRAM_START
+#endif
+#endif
 
 ```
 
@@ -752,10 +831,10 @@ LVGL 的博客是一个重要的资源，对于 LVGL 的开发者来说是了解
 | 测试类型         | HoneyGUI 帧率(FPS) SW | HoneyGUI 帧率(FPS) PPE | LVGL 帧率(FPS) SW  | LVGL 帧率(FPS) PPE |
 |------------------|------------------------|------------------------|--------------------|--------------------|
 | 绘制图片         | 73（280x456）          | 74（280x456）          | 70（280x456）      | 73（280x456）      |
-| 填充矩形         | -                      | -                      | 74（280x456）      | 74（280x456）      |
+| 填充矩形         | 1（280x456）           | 1（280x456）           | 74（280x456）      | 74（280x456）      |
 | 图像旋转45°      | 7（280x456）           | 7（280x456）           | 4（280x456）       | 4（280x456）       |
-| 图像放大 1.5 倍  | 3（280x456）           | 31（280x456）          | 3（280x456）       | -                  |
-| 图像缩小 0.5 倍  | 9（280x456）           | 73（280x456）          | 12（280x456）      | -                  |
+| 图像放大 1.5 倍  | 3（280x456）           | 31（280x456）          | 3（280x456）       | 25（280x456）      |
+| 图像缩小 0.5 倍  | 9（280x456）           | 73（280x456）          | 12（280x456）      | 25（280x456）      |
 
 RAM分块绘制测试数据：
 
@@ -819,13 +898,13 @@ RAM分块绘制测试数据：
 
 #### GRAM 屏幕 (280x456) 动态 RAM 消耗
 
-| 测试类型       | HoneyGUI（Bytes） | LVGL 控件消耗（Bytes） | LVGL 整体消耗（Bytes） |
-| -------------- | :-----------: | :-----------------: | :----------------: |
-| 绘制图片       | 156           | 176                 | 3248               |
-| 填充矩形       | -             | 200                 | 3244               |
-| 图像旋转       | 156           | 208                 | 5240               |
-| 图像放大 1.5 倍 | 156           | 208                 | 3282               |
-| 图像缩小 0.5 倍 | 156           | 176                 | 3248               |
+| 测试类型       | HoneyGUI（Bytes） | LVGL 控件消耗（Bytes） | 
+| -------------- | :-----------: | :-----------------: |
+| 绘制图片       | 156           | 176                 | 
+| 填充矩形       | -             | 200                 | 
+| 图像旋转       | 156           | 208                 | 
+| 图像放大 1.5 倍 | 156           | 208                 |
+| 图像缩小 0.5 倍 | 156           | 176                 |
 
 #### GRAM 屏幕 (280x456) 静态 RAM 消耗
 

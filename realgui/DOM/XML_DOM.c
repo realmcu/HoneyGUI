@@ -4631,6 +4631,79 @@ static int is_format(const char *src)
     return DEFAULT_FORMAT;
 }
 
+static size_t my_strftime(char *__restrict__ buf, size_t maxsize, const char *__restrict__ format,
+                          const struct tm *__restrict__ tm)
+{
+    size_t pos = 0;
+
+    const char *days[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    const char *full_days[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+    const char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    const char *full_months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
+    while (*format && pos < maxsize)
+    {
+        if (*format == '%')
+        {
+            format++;
+            if (!*format) { break; }
+
+            switch (*format)
+            {
+            case 'a': // Abbreviated weekday name
+                pos += snprintf(buf + pos, maxsize - pos, "%s", days[tm->tm_wday]);
+                break;
+            case 'A': // Full weekday name
+                pos += snprintf(buf + pos, maxsize - pos, "%s", full_days[tm->tm_wday]);
+                break;
+            case 'b': // Abbreviated month name
+                pos += snprintf(buf + pos, maxsize - pos, "%s", months[tm->tm_mon]);
+                break;
+            case 'B': // Full month name
+                pos += snprintf(buf + pos, maxsize - pos, "%s", full_months[tm->tm_mon]);
+                break;
+            case 'Y': // Year
+                pos += snprintf(buf + pos, maxsize - pos, "%d", 1900 + tm->tm_year);
+                break;
+            case 'm': // Month (01-12)
+                pos += snprintf(buf + pos, maxsize - pos, "%02d", tm->tm_mon + 1);
+                break;
+            case 'd': // Day (01-31)
+                pos += snprintf(buf + pos, maxsize - pos, "%02d", tm->tm_mday);
+                break;
+            case 'H': // Hour (00-23)
+                pos += snprintf(buf + pos, maxsize - pos, "%02d", tm->tm_hour);
+                break;
+            case 'M': // Minute (00-59)
+                pos += snprintf(buf + pos, maxsize - pos, "%02d", tm->tm_min);
+                break;
+            case 'S': // Second (00-59)
+                pos += snprintf(buf + pos, maxsize - pos, "%02d", tm->tm_sec);
+                break;
+            default: // Unknown specifier
+                if (pos < maxsize) { buf[pos++] = '%'; }
+                if (pos < maxsize) { buf[pos++] = *format; }
+                break;
+            }
+        }
+        else
+        {
+            buf[pos++] = *format;
+        }
+        format++;
+    }
+
+    if (pos >= maxsize)
+    {
+        if (maxsize > 0) { buf[maxsize - 1] = '\0'; }
+        return 0;
+    }
+
+    buf[pos] = '\0';
+    return pos;
+}
+
 static void text_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
 {
     const char *input_type = p;
@@ -4653,56 +4726,61 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
 #if __WIN32
         time(&rawtime);
         timeinfo = localtime(&rawtime);
-
+#else
+        // extern struct tm watch_clock_get(void);
+        // struct tm watch_time = watch_clock_get();
+        // timeinfo = &watch_time;
+        // gui_log("mday: %d, month: %d\n", timeinfo->tm_mday, timeinfo->tm_mon);
+#endif
         // Choose the formatting string based on the type
         switch (type)
         {
         case MON_FORMAT:
-            strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
+            my_strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
             for (char *p = buffer; *p; ++p) { *p = toupper(*p); } // Convert to uppercase (MON)
             break;
         case Mon_FORMAT:
-            strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
+            my_strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
             break;
         case Mo_FORMAT:
-            strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
+            my_strftime(buffer, buffer_size, "%a", timeinfo); // Display short week name (Mon)
             buffer[2] = '\0'; // Only display the first two letters (Mo)
             break;
         case FULL_DATE:
-            strftime(buffer, buffer_size, "%a, %B %d", timeinfo); // Display full date (Mon, January 1)
+            my_strftime(buffer, buffer_size, "%a, %B %d", timeinfo); // Display full date (Mon, January 1)
             break;
         case SHORT_DATE:
-            strftime(buffer, buffer_size, "%a %d", timeinfo); // Display short date (Mon 1)
+            my_strftime(buffer, buffer_size, "%a %d", timeinfo); // Display short date (Mon 1)
             break;
         case TIME_24HR:
-            strftime(buffer, buffer_size, "%H:%M", timeinfo); // Display 24-hour format time (00:00)
+            my_strftime(buffer, buffer_size, "%H:%M", timeinfo); // Display 24-hour format time (00:00)
             break;
         case PARTIAL_DATE:
-            strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Display partial date (Mon, Jan 1)
+            my_strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Display partial date (Mon, Jan 1)
             break;
         case NUM_DATE:
-            strftime(buffer, buffer_size, "%d/%B", timeinfo); // Display numeric date (1/JANUARY)
+            my_strftime(buffer, buffer_size, "%d/%B", timeinfo); // Display numeric date (1/JANUARY)
             // Convert the month part to uppercase
             for (char *p = strchr(buffer, '/') + 1; *p; ++p) { *p = toupper(*p); }
             break;
         case FULL_DAY:
-            strftime(buffer, buffer_size, "%A", timeinfo); // Display full week name (Monday)
+            my_strftime(buffer, buffer_size, "%A", timeinfo); // Display full week name (Monday)
             for (char *p = buffer; *p; ++p) { *p = toupper(*p); } // Convert to uppercase (MONDAY)
             break;
         case JUST_HOUR:
-            strftime(buffer, buffer_size, "%H", timeinfo); // Display 24-hour format time (00:00)
+            my_strftime(buffer, buffer_size, "%H", timeinfo); // Display 24-hour format time (00:00)
             break;
         case JUST_MINUTE:
-            strftime(buffer, buffer_size, "%M", timeinfo); // Display 24-hour format time (00:00)
+            my_strftime(buffer, buffer_size, "%M", timeinfo); // Display 24-hour format time (00:00)
             break;
         case JUST_SECOND:
-            strftime(buffer, buffer_size, "%S", timeinfo); // Display 24-hour format time (00:00)
+            my_strftime(buffer, buffer_size, "%S", timeinfo); // Display 24-hour format time (00:00)
             break;
         default:
-            strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Default: (Mon, Jan 1)
+            my_strftime(buffer, buffer_size, "%a, %b %d", timeinfo); // Default: (Mon, Jan 1)
             break;
         }
-#endif
+// #endif
 
         date_txt->content = buffer;
         gui_text_content_set(date_txt, buffer, strlen(buffer));
@@ -4711,14 +4789,18 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
 static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
 {
 #ifndef __WIN32
-    //uint16_t seconds = get_system_clock_second();
-    //uint16_t minute = RtkWristbandSys.Global_Time.minutes;
-    //uint16_t hour = RtkWristbandSys.Global_Time.hour;
-    //int millisecond = 0;
+    // extern struct tm watch_clock_get(void);
+    // extern uint16_t millisecond_cnt;
+    // struct tm watch_time = watch_clock_get();
+    // int millisecond = millisecond_cnt;
+    // uint16_t seconds = watch_time.tm_sec;
+    // uint16_t minute = watch_time.tm_min;
+    // uint16_t hour = watch_time.tm_hour;
+
+    int millisecond = 0;
     uint16_t seconds = 0;
     uint16_t minute = 0;
     uint16_t hour = 0;
-    int millisecond = 0;
 #else
     time_t rawtime;
     struct tm *timeinfo;
@@ -5701,7 +5783,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
     case TEXT_WEATHER_CUR_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app/system/peripheral_simulation/json/simulation_data.json");
             int fd = gui_fs_open(path, 0);
             gui_free((void *)path);
             if (fd < 1)
@@ -5742,8 +5824,12 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animation_hr_callback)
     case TEXT_HEART_RATE_CUR_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app/system/peripheral_simulation/json/simulation_data.json");
             int fd = gui_fs_open(path, 0);
+            if (fd < 1)
+            {
+                return;
+            }
             gui_free((void *)path);
             int size = gui_fs_lseek(fd, 0, SEEK_END);
             gui_fs_lseek(fd, 0, SEEK_SET);
@@ -5784,8 +5870,12 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_activity_callback)
     case TEXT_ACTIVITY_EX_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app/system/peripheral_simulation/json/simulation_data.json");
             int fd = gui_fs_open(path, 0);
+            if (fd < 1)
+            {
+                return;
+            }
             gui_free((void *)path);
             int size = gui_fs_lseek(fd, 0, SEEK_END);
             gui_fs_lseek(fd, 0, SEEK_SET);
@@ -5822,8 +5912,12 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_battery_callback)
     case TEXT_BATTERY_CAPACITY_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app/system/peripheral_simulation/json/simulation_data.json");
             int fd = gui_fs_open(path, 0);
+            if (fd < 1)
+            {
+                return;
+            }
             gui_free((void *)path);
             int size = gui_fs_lseek(fd, 0, SEEK_END);
             gui_fs_lseek(fd, 0, SEEK_SET);
@@ -5860,8 +5954,12 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
     case ARC_ACTIVITY_EX_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app/system/peripheral_simulation/json/simulation_data.json");
             int fd = gui_fs_open(path, 0);
+            if (fd < 1)
+            {
+                return;
+            }
             gui_free((void *)path);
             int size = gui_fs_lseek(fd, 0, SEEK_END);
             gui_fs_lseek(fd, 0, SEEK_SET);
@@ -5986,8 +6084,12 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
     case CHART_HEART_RATE_DATA_ANIMATION:
         {
             const char *path =
-                gui_get_path_by_relative("app\\system\\peripheral_simulation\\json\\simulation_data.json");
+                gui_get_path_by_relative("app/system/peripheral_simulation/json/simulation_data.json");
             int fd = gui_fs_open(path, 0);
+            if (fd < 1)
+            {
+                return;
+            }
             gui_free((void *)path);
             int size = gui_fs_lseek(fd, 0, SEEK_END);
             gui_fs_lseek(fd, 0, SEEK_SET);
