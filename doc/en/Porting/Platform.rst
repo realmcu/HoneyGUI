@@ -1,8 +1,8 @@
 .. _Platform_Porting_EN:
 
-================
+=================
 Platform Porting
-================
+=================
 
 The porting files are located in the ``gui_port`` folder.
 Six files need to be modified, with their filenames and functions as follows.

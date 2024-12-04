@@ -1,8 +1,8 @@
 .. _Font_Porting_EN:
 
-============
+=============
 Font Porting
-============
+=============
 
 This chapter will analyze the font library code segment and explain how to replace HoneyGUI's native font library with a custom one provided by the developer, or how to add customized features.
 
@@ -15,7 +15,9 @@ Glyph Loading
 Text Encoding Conversion
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the file ``font_mem.c``, within the function ``gui_font_get_dot_info``, ``process_content_by_charset`` parses the text content of the text control and saves it as Unicode (UTF-32) in ``unicode_buf``. The number of Unicode characters is returned in ``unicode_len``.
+In the file ``font_mem.c``, within the function :cpp:any:`gui_font_get_dot_info`,
+:cpp:any:`process_content_by_charset` parses the text content of the text control and saves it as Unicode (UTF-32) in ``unicode_buf``.
+The number of Unicode characters is returned in ``unicode_len``.
 
 .. code-block:: c
 
@@ -29,7 +31,7 @@ In the file ``font_mem.c``, within the function ``gui_font_get_dot_info``, ``pro
         return;
     }
 
-For the specific implementation of ``process_content_by_charset``, please refer to ``draw_font.c``.
+For the specific implementation of :cpp:any:`process_content_by_charset`, please refer to ``draw_font.c``.
 
 .. note::
 
@@ -37,7 +39,8 @@ For the specific implementation of ``process_content_by_charset``, please refer 
 
 Subsequently, Unicode information in ``unicode_buf`` will be used to index text data from the font library.
 
-Text encoding conversion for minor languages, such as Arabic character concatenation and other calculations involving Unicode, can be performed either before or after the encoding conversion. If the conversion is done later, ``unicode_len`` must be updated accordingly.
+Text encoding conversion for minor languages, such as Arabic character concatenation and other calculations involving Unicode,
+can be performed either before or after the encoding conversion. If the conversion is done later, ``unicode_len`` must be updated accordingly.
 
 .. note::
 
@@ -46,9 +49,11 @@ Text encoding conversion for minor languages, such as Arabic character concatena
 Font Library Indexing
 ^^^^^^^^^^^^^^^^^^^^^
 
-In the file ``font_mem.c``, within the function ``gui_font_get_dot_info``, the Unicode value is parsed and then used to index glyph information from the font library designated by the text widget.
+In the file ``font_mem.c``, within the function :cpp:any:`gui_font_get_dot_info`,
+the Unicode value is parsed and then used to index glyph information from the font library designated by the text widget.
 
-Since the font library tool has the ``crop`` attribute and two indexing modes, different parsing code is used to find text data and dot matrix data in the font library file using the Unicode value.
+Since the font library tool has the ``crop`` attribute and two indexing modes,
+different parsing code is used to find text data and dot matrix data in the font library file using the Unicode value.
 
 The purpose of the font library parsing code is to populate the ``chr`` structure array, which is structured as follows:
 
@@ -82,16 +87,20 @@ During the font library indexing phase, all members of ``chr`` except for the ``
 
     Due to differences in data storage rules under different modes, the drawing areas also vary. For example, ``char_y`` and ``char_h`` are only effective when ``crop=1`` and ``index_method=0``.
 
-Since this stage involves using the Unicode to look up width information for the dot matrix text and the dot matrix data pointer, it's best to complete the Unicode-level text transformations before this step. For example, Arabic script ligatures should be handled in this stage, whereas Thai glyph fusion should be handled during the layout stage.
+Since this stage involves using the Unicode to look up width information for the dot matrix text and the dot matrix data pointer,
+it's best to complete the Unicode-level text transformations before this step.
+For example, Arabic script ligatures should be handled in this stage, whereas Thai glyph fusion should be handled during the layout stage.
 
-If you are porting using your custom font library, you can populate the ``chr`` data structures using information from your custom font library. The default parts can be used for the subsequent layout and drawing stages.
+If you are porting using your custom font library, you can populate the ``chr`` data structures using information from your custom font library.
+The default parts can be used for the subsequent layout and drawing stages.
 
 Layout
 ~~~~~~
 
-The text widget supports various layout modes. For more details, see `Text Widget Mode <#Text_Widget_Mode_EN>`_.
+The text widget supports various layout modes.
 
-The specific layout functionality is located in the file ``font_mem.c`` in the function ``gui_font_mem_layout``. Each layout mode has a different layout logic; however, all depend on the glyph information ``chr`` and the boundary information ``rect`` provided by the text widget.
+The specific layout functionality is located in the file ``font_mem.c`` in the function :cpp:any:`gui_font_mem_layout`.
+Each layout mode has a different layout logic; however, all depend on the glyph information ``chr`` and the boundary information ``rect`` provided by the text widget.
 
 The ``rect`` struct array is structured as follows:
 
@@ -100,21 +109,40 @@ The ``rect`` struct array is structured as follows:
    :start-after: /** @brief  text rect struct start */
    :end-before: /** @brief  text rect struct end */
 
-The ``rect`` is the display range of the widget passed from the control layer. In this structure, ``x1`` and ``x2`` represent the X-coordinates of the left and right borders, respectively, while ``y1`` and ``y2`` represent the Y-coordinates of the top and bottom borders, respectively. These values are calculated internally by the widget based on its position and size at the time of creation. From the four coordinates of ``rect``, you can calculate ``rect_w`` (width) and ``rect_h`` (height).
+The ``rect`` is the display range of the widget passed from the control layer. In this structure,
+``x1`` and ``x2`` represent the X-coordinates of the left and right borders, respectively,
+while ``y1`` and ``y2`` represent the Y-coordinates of the top and bottom borders, respectively.
 
-There are also four ``bound`` values used by the scrolling text widget (``scroll_text``) to handle display boundaries. These ``bound`` values are currently not used by the regular text widget (``text``).
+These values are calculated internally by the widget based on its position and size at the time of creation.
+From the four coordinates of ``rect``, you can calculate ``rect_w`` (width) and ``rect_h`` (height).
+
+There are also four ``bound`` values used by the scrolling text widget (``scroll_text``) to handle display boundaries.
+These ``bound`` values are currently not used by the regular text widget (``text``).
 
 Developers can add new layout modes as per their requirements.
 
-By enabling the English word wrapping feature (``wordwrap``) via the function ``gui_text_wordwrap_set``, the multi-line layout will adhere to English word wrapping rules to prevent words from being split across lines.
+By enabling the English word wrapping feature (``wordwrap``) via the function ``gui_text_wordwrap_set``,
+the multi-line layout will adhere to English word wrapping rules to prevent words from being split across lines.
 
 Character Rendering
 ~~~~~~~~~~~~~~~~~~~~
 
-The code for rendering bitmap characters is located in the ``rtk_draw_unicode`` function in ``font_mem.c``. You can enable matrix operations for the text widget to support text scaling effects; the rendering code for this feature is in ``rtk_draw_unicode_matrix`` in ``font_mem_matrix.c``. Additionally, you can enable a feature to convert text into an image for achieving complex effects; this rendering code is found in ``gui_font_bmp2img_one_char`` in ``font_mem_img.c``.
+The code for rendering bitmap characters is located in the :cpp:any:`rtk_draw_unicode` function in ``font_mem.c``.
+
+You can enable matrix operations for the text widget to support text scaling effects;
+the rendering code for this feature is in :cpp:any:`rtk_draw_unicode_matrix` in ``font_mem_matrix.c``.
+
+Additionally, you can enable a feature to convert text into an image for achieving complex effects;
+this rendering code is found in :cpp:any:`gui_font_bmp2img_one_char` in ``font_mem_img.c``.
 
 The character rendering stage does not involve any layout information; it only reads the glyph information and renders it to the screen buffer.
 
 Each character's rendering is constrained by three boundaries: the widget's boundary, the screen's boundary, and the current character's boundary.
 
 If developers wish to use a special font library for rendering, they need to modify the bitmap data parsing code and draw the pixels into the screen buffer.
+
+API
+---
+
+.. doxygenfile:: font_mem.h
+.. doxygenfile:: draw_font.h
