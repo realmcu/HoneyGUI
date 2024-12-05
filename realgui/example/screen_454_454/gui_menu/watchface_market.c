@@ -6,6 +6,9 @@
 #define APP_WATCHFACE_MARKET
 GUI_APP_DEFINE_NAME_ANIMATION(APP_WATCHFACE_MARKET, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_7)
 #define APP_WATCHFACE_MARKET_MAX_COUNT 50
+
+static char **xml_file_array = NULL;
+
 static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
 {
     *xml_file_counts = 0;
@@ -55,6 +58,7 @@ static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
 
     }
     gui_fs_closedir(dir);
+    xml_file_array[*xml_file_counts] = NULL;
     return xml_file_array;
 }
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_press_animation_cb)
@@ -91,7 +95,22 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
                                     &(get_app_watch_ui()->screen));
     gui_obj_child_free(wathcface_window);
     create_tree_nest((void *)path, wathcface_window);
-    gui_free((void *)path);
+    // gui_free((void *)path);
+    int count = 0;
+    while (1)
+    {
+        if (xml_file_array[count])
+        {
+            gui_log("count = %d, param = 0x%x, path = %s\n", count, xml_file_array[count],
+                    xml_file_array[count]);
+            gui_free(xml_file_array[count++]);
+        }
+        else
+        {
+            break;
+        }
+    }
+    xml_file_array = NULL;
 }
 GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
 {
@@ -105,7 +124,7 @@ GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
     const int space_y = 250;
     const int space_x = 200;
     const int col = 2;
-    char **xml_file_array = find_all_xml_files(gui_get_path_by_relative("app"), &count);
+    xml_file_array = find_all_xml_files(gui_get_path_by_relative("app"), &count);
     for (size_t i = 0; i < count / col + 1; i++)
     {
         for (size_t ii = 0; ii < col; ii++)

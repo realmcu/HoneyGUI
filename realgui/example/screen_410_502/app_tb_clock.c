@@ -24,6 +24,7 @@ extern gui_win_t *win_market, *win_watch;
 static gui_win_t *win_touch;
 bool sidebar_flag = 0;
 uint8_t watchface_index = 0;
+char watchface_path[100];
 static void curtain_ctr_cb()
 {
     // touch_info_t *tp = tp_get_info();
@@ -166,6 +167,11 @@ void page_tb_clock(void *parent)
             app_watchface_market(ct_clock);
         }
         break;
+    case 2:
+        {
+            extern void create_tree_nest(const char *xml, void *obj);
+            create_tree_nest((void *)watchface_path, ct_clock);
+        }
     default:
         // page_ct_clock(ct_clock);
         break;

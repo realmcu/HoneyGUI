@@ -21,6 +21,7 @@ static void app_hongkong_ui_design(gui_app_t *app);
 static gui_tabview_t *tv;
 static gui_win_t *win_hk; //, *win_control;
 bool control_flag = 0;
+static bool enter_menu_flag = 0;
 
 static gui_app_t app_hongkong =
 {
@@ -90,9 +91,13 @@ static void kb_button_cb()
 
 static void switch_app_menu()
 {
-    gui_log("enter menu\n");
-    extern void *get_app_menu();
-    gui_switch_app(gui_current_app(), get_app_menu());
+    if (!enter_menu_flag)
+    {
+        enter_menu_flag = 1;
+        gui_log("enter menu\n");
+        extern void *get_app_menu();
+        gui_switch_app(gui_current_app(), get_app_menu());
+    }
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)
@@ -113,6 +118,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_win_set_animate(win_hk, 1000, -1, kb_button_cb, NULL);
     gui_obj_add_event_cb(win_hk, (gui_event_cb_t)switch_app_menu, GUI_EVENT_8,
                          app->window); //GUI_EVENT_8
+    enter_menu_flag = 0;
     gui_tabview_set_style(tv, TAB_CUBE);
     gui_tabview_enable_pre_load(tv, true);
     extern void page_tb_control_enter(void *parent);
