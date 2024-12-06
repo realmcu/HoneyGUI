@@ -1,22 +1,15 @@
 /* API collapsing */
 document.addEventListener('DOMContentLoaded', (event) => {
     document.querySelectorAll("dl.cpp,dl.c").forEach(cppListing => {
-        const curHash = location.hash.substring(1);
+        cppListing.classList.add("expanded");
         const dt = cppListing.querySelector("dt");
-        const span = cppListing.querySelector(`[id="${curHash}" ]`);
-        let shouldBeExpanded = false;
-
-        if(dt.id.toLocaleLowerCase() == curHash.toLocaleLowerCase() || span != null) {
-            shouldBeExpanded = true;
-        }    
-        cppListing.classList.add(shouldBeExpanded ? "expanded" : "unexpanded");
         const button = document.createElement("span");
         button.classList.add("rtk-api-expansion-button");
         button.addEventListener("click", () => {
             cppListing.classList.toggle("unexpanded");
             cppListing.classList.toggle("expanded");
         });
-        
+       
         dt.insertBefore(button, dt.firstChild);
     });
 })
