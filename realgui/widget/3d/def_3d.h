@@ -95,8 +95,10 @@ typedef struct
 typedef struct
 {
     uint32_t            state;
+    uint32_t            order;
     gui_3d_vertex_t     vertex[4];
     gui_3d_vertex_t     transform_vertex[4];
+    gui_point_4d_t      center;
 } gui_3d_face_t;
 
 typedef gui_3d_matrix_t gui_3d_world_t;

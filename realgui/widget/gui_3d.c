@@ -53,6 +53,39 @@
  *                           Private Functions
  *============================================================================*/
 
+static void compare_face_order(gui_3d_face_t *face, unsigned int num_faces)
+{
+    uint32_t *order_array = (uint32_t *)gui_malloc(num_faces * sizeof(size_t));
+
+    for (uint32_t i = 0; i < num_faces; i++)
+    {
+        order_array[i] = i;
+    }
+
+    for (uint32_t i = 0; i < num_faces; i++)
+    {
+        uint32_t min_index = i;
+        for (uint32_t j = i + 1; j < num_faces; j++)
+        {
+            if (face[order_array[j]].center.z < face[order_array[min_index]].center.z)
+            {
+                min_index = j;
+            }
+        }
+
+        if (min_index != i)
+        {
+            uint32_t temp = order_array[i];
+            order_array[i] = order_array[min_index];
+            order_array[min_index] = temp;
+        }
+        face[order_array[i]].order = i;
+    }
+    face[order_array[num_faces - 1]].order = num_faces - 1;
+
+    gui_free(order_array);
+}
+
 static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
                            gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
@@ -86,7 +119,8 @@ static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*
     this->img[i].img_h = height;
     this->img[i].blend_mode = IMG_SRC_OVER_MODE;
     this->img[i].high_quality = true;
-    this->img[i].opacity_value = UINT8_MAX;
+    this->img[i].opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
+
     draw_img_new_area(this->img + i, NULL);
 }
 
@@ -118,7 +152,10 @@ static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
         this->face[i].vertex[j].normal.y = vn[1];
         this->face[i].vertex[j].normal.z = vn[2];
         this->face[i].vertex[j].normal.w = 1;
+
+        this->face[i].center.z += this->face[i].transform_vertex[j].position.z;
     }
+    this->face[i].center.z /= this->desc->attrib.face_num_verts[i];
 }
 
 static void gui_3d_update_att(gui_obj_t *obj)
@@ -161,8 +198,9 @@ static void gui_3d_prepare(gui_3d_t *this)
             face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
 
         }
-
     }
+    compare_face_order(this->face, this->desc->attrib.num_face_num_verts);
+
     gui_fb_change();
 
     GUI_UNUSED(this);
@@ -182,11 +220,25 @@ static void gui_3d_draw(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
+
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        draw_img_cache(this->img + i, IMG_SRC_MEMADDR);
-        gui_acc_blit_to_dc(this->img + i, dc, NULL);
-        draw_img_free(this->img + i, IMG_SRC_MEMADDR);
+        int32_t current_face_index = -1;
+        for (uint32_t j = 0; j < this->desc->attrib.num_face_num_verts; j++)
+        {
+            if (this->face[j].order == i)
+            {
+                // gui_log("this->face[%d].order: %d\n", j, this->face[j].order);
+                current_face_index = j;
+                break;
+            }
+        }
+        if (current_face_index != -1)
+        {
+            draw_img_cache(this->img + current_face_index, IMG_SRC_MEMADDR);
+            gui_acc_blit_to_dc(this->img + current_face_index, dc, NULL);
+            draw_img_free(this->img + current_face_index, IMG_SRC_MEMADDR);
+        }
     }
 
 }
