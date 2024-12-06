@@ -306,9 +306,7 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         return;
     }
-    /*Temp fix text missing bug, when parent's opacity_value<255*/
-    this->color.color.rgba.a =  this->base.parent->opacity_value;
-    //this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
+
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];

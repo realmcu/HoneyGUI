@@ -1513,6 +1513,8 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
         font = (GUI_FONT_HEAD *)text->path;
     }
     uint8_t rendor_mode = font->rendor_mode;
+    gui_color_t outcolor = text->color;
+    outcolor.color.rgba.a = text->color.color.rgba.a * text->base.parent->opacity_value / 0xff;
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         if (chr[i].unicode >= 0x10000)
@@ -1521,7 +1523,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         else
         {
-            rtk_draw_unicode(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop);
+            rtk_draw_unicode(chr + i, outcolor, rendor_mode, rect, font->font_mode_detail.detail.crop);
         }
     }
 }
