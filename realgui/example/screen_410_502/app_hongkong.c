@@ -95,6 +95,9 @@ static void switch_app_menu()
     {
         enter_menu_flag = 1;
         gui_log("enter menu\n");
+        extern void close_box2d_ring(void);
+        close_box2d_ring();
+
         extern void *get_app_menu();
         gui_switch_app(gui_current_app(), get_app_menu());
     }

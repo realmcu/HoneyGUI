@@ -180,13 +180,17 @@ bool init()
 
 void close()
 {
-    for (Ball body : balls)
+    if (world)
     {
-        world->DestroyBody(body.body);
+        for (Ball body : balls)
+        {
+            world->DestroyBody(body.body);
+        }
+        balls.clear();
+        win_release_callback();
+        deallocate(world);
+        world = nullptr;
     }
-    balls.clear();
-    win_release_callback();
-    deallocate(world);
 }
 
 void createRing(b2World *world, float radius, float restitution)

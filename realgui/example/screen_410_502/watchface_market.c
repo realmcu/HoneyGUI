@@ -95,7 +95,14 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     extern char watchface_path[];
     if (param == NULL)
     {
-        watchface_index = 0;
+        if (strcmp(GUI_BASE(obj)->name, "wf_UI") == 0)
+        {
+            watchface_index = 0;
+        }
+        else if (strcmp(GUI_BASE(obj)->name, "wf_ring") == 0)
+        {
+            watchface_index = 1;
+        }
     }
     else
     {
@@ -144,15 +151,29 @@ GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
         {
             if (i * col + ii >= count)
             {
-                gui_win_t *win = gui_win_create(page, 0, 0 * space_x + (gui_get_screen_width() - space_x * 2) / 2,
-                                                2 * space_y + 5, space_x - 1, space_y - 1);
+                {
+                    gui_win_t *win = gui_win_create(page, "wf_UI",
+                                                    0 * space_x + (gui_get_screen_width() - space_x * 2) / 2,
+                                                    2 * space_y + 5, space_x - 1, space_y - 1);
 
-                gui_img_t *img = gui_img_create_from_mem(win, 0, UI_CLOCK_FACE_MAIN_BIN, 0, 0, 0, 0);
-                gui_img_scale(img, 0.5, 0.5);
-                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-                gui_win_press(win, win_press_cb, NULL);
-                gui_win_release(win, win_release_cb, NULL);
-                gui_win_click(win, win_click_cb, NULL);
+                    gui_img_t *img = gui_img_create_from_mem(win, 0, UI_CLOCK_FACE_MAIN_BIN, 0, 0, 0, 0);
+                    gui_img_scale(img, 0.5, 0.5);
+                    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                    gui_win_press(win, win_press_cb, NULL);
+                    gui_win_release(win, win_release_cb, NULL);
+                    gui_win_click(win, win_click_cb, NULL);
+                }
+                {
+                    gui_win_t *win = gui_win_create(page, "wf_ring",
+                                                    1 * space_x + (gui_get_screen_width() - space_x * 2) / 2,
+                                                    2 * space_y + 5, space_x - 1, space_y - 1);
+
+                    gui_img_t *img = gui_img_create_from_mem(win, 0, WATCHFACE_RING_BIN, 0, 0, 0, 0);
+                    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                    gui_win_press(win, win_press_cb, NULL);
+                    gui_win_release(win, win_release_cb, NULL);
+                    gui_win_click(win, win_click_cb, NULL);
+                }
                 return;
             }
             char *file_output = gui_dom_get_preview_image_file(xml_file_array[i * col + ii]);

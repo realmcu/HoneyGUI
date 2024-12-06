@@ -9,23 +9,26 @@
 #include "guidef.h"
 #include <tp_algo.h>
 #include "app_hongkong.h"
+#include <time.h>
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
-#define SCREEN_X_OFF 21
-#define SCREEN_Y_OFF 18
 
 static gui_curtainview_t *ct;
 static gui_curtain_t *ct_clock;
 static gui_curtain_t *ct_control0;
 static gui_curtain_t *ct_left;
 static gui_curtain_t *ct_card;
-extern gui_win_t *win_market, *win_watch;
+extern gui_win_t *win_watch; // *win_market;
 static gui_win_t *win_touch;
 bool sidebar_flag = 0;
 uint8_t watchface_index = 0;
 char watchface_path[100];
-static void curtain_ctr_cb()
+
+struct tm *timeinfo;
+static struct tm watch_time;
+
+static void curtain_ctr_cb(gui_win_t *win)
 {
     // touch_info_t *tp = tp_get_info();
     // if (tp->pressing)
@@ -56,6 +59,19 @@ static void curtain_ctr_cb()
         GUI_BASE(ct_clock)->not_show = 0;
         sidebar_flag = 0;
     }
+    // update time
+    // if (win->animate->Beginning_frame)
+    // {
+#if defined __WIN32
+    time_t rawtime;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+#else
+    extern struct tm watch_clock_get(void);
+    watch_time = watch_clock_get();
+    timeinfo = &watch_time;
+#endif
+    // }
 }
 
 gui_perspective_t *perspect;
@@ -104,33 +120,13 @@ static void callback_prism_touch_clicked()
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
+    extern void close_box2d_ring(void);
+    close_box2d_ring();
+
     extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
     gui_app_layer_top();
     gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
     return;
-
-    // gui_app_t *app = (gui_app_t *)get_app_hongkong();
-    // gui_obj_t *screen = &(app->screen);
-
-    // gui_obj_tree_free(screen);
-    // gui_win_t *win = gui_win_create(screen, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    // gui_perspective_imgfile_t imgfile =
-    // {
-    //     .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
-    //     .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
-    //     .data_addr[0] = UI_CLOCK_FACE_MAIN_BIN,
-    //     .data_addr[1] = MARKET_WATCH_BASE_BIN,
-    //     .data_addr[2] = UI_CLOCK_FACE_MAIN_BIN,
-    //     .data_addr[3] = MARKET_WATCH_BASE_BIN,
-    //     .data_addr[4] = UI_CLOCK_FACE_MAIN_BIN,
-    //     .data_addr[5] = MARKET_WATCH_BASE_BIN
-    // };
-    // perspect = gui_perspective_create(win, "test", &imgfile, 0, 0);
-
-    // gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
-    //                      NULL);
-    // gui_fb_change();
 }
 
 void page_tb_clock(void *parent)
@@ -144,9 +140,8 @@ void page_tb_clock(void *parent)
     ct_card = gui_curtain_create(ct, "card", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_DOWN, 1);
 
     gui_win_t *win = gui_win_create(parent, "", 0, 0, 0, 0);
-    gui_win_set_animate(win, 1000, -1, curtain_ctr_cb, NULL);
+    gui_win_set_animate(win, 10000, -1, (gui_animate_callback_t)curtain_ctr_cb, (void *)win);
     extern void page_ct_clock(void *parent);
-    extern void app_watchface_market(void *parent);
     extern void page_ct_sidebar(void *parent);
     extern void tabview_up_design(void *parent_widget);
     extern void curtain_down_design(void *parent_widget);
@@ -164,7 +159,8 @@ void page_tb_clock(void *parent)
         break;
     case 1:
         {
-            app_watchface_market(ct_clock);
+            extern void create_watchface_ring(void *parent);
+            create_watchface_ring(ct_clock);
         }
         break;
     case 2:

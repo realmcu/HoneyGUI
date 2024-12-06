@@ -390,7 +390,7 @@ static void pagelist_message(void *parent)
     gui_text_type_set(message_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(message_text, MULTI_LEFT);
     gui_text_wordwrap_set(message_text, true);
-    gui_text_convert_to_img(message_text, RGB565);
+    // gui_text_convert_to_img(message_text, RGB565);
 
     // option left
     char *option_content = "...";
@@ -479,7 +479,7 @@ static void os_information(void *parent)
     gui_text_type_set(os_information_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(os_information_text, MULTI_LEFT);
     gui_text_wordwrap_set(os_information_text, true);
-    gui_text_convert_to_img(os_information_text, RGB565);
+    // gui_text_convert_to_img(os_information_text, RGB565);
 
     // option left
     char *option_content = "...";

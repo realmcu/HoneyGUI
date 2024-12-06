@@ -77,7 +77,7 @@ static void display_time()
         sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
                 day[timeinfo->tm_wday]);
         gui_text_content_set(date_text, date_content, strlen(date_content));
-        gui_text_convert_to_img(date_text, RGB565);
+        // gui_text_convert_to_img(date_text, RGB565);
 
         extern gui_app_t *get_app_hongkong(void);
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "circle_hour_decimal",
@@ -208,7 +208,7 @@ void curtain_down_design(void *parent_widget)
                  32);
     gui_text_type_set(date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, MULTI_LEFT);
-    gui_text_convert_to_img(date_text, RGB565);
+    // gui_text_convert_to_img(date_text, RGB565);
 
     gui_cardview_t *cv = gui_cardview_create(parent_widget, "cardview", SCREEN_X_OFF, 0,
                                              SCREEN_WIDTH - SCREEN_X_OFF, SCREEN_HEIGHT);

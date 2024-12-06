@@ -5,6 +5,6 @@
 
 void page_tb_heart(void *parent)
 {
-    extern void heart_rate_app(gui_obj_t *obj);
-    heart_rate_app((gui_obj_t *)parent);
+    // extern void heart_rate_app(gui_obj_t *obj);
+    // heart_rate_app((gui_obj_t *)parent);
 }

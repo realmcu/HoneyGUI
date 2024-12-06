@@ -43,6 +43,9 @@ extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_funct
 
 void switch_BOX2D_RING(void *obj, gui_event_t e, void *param)
 {
+    extern void close_box2d_ring(void);
+    close_box2d_ring();
+
     gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
 }
 
@@ -170,7 +173,7 @@ static void app_AT_back2prescreen_cb(void)
 static void app_HR_back2prescreen_cb(void)
 {
     extern void clear_heart_rate_app(void);
-    clear_heart_rate_app();
+
 
     extern bool sidebar_flag;
     extern bool return_to_watchface_flag;
@@ -183,6 +186,7 @@ static void app_HR_back2prescreen_cb(void)
     {
         gui_switch_app(gui_current_app(), get_app_menu());
     }
+    clear_heart_rate_app();
 }
 
 static void app_FN_back2prescreen_cb(void)

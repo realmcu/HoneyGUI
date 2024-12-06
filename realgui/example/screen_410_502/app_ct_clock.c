@@ -36,8 +36,7 @@ gui_win_t *win_watch;
 static gui_text_t *date_text;
 static char date_text_content[10];
 static char weekday_content[30];
-static struct tm watch_time;
-struct tm *timeinfo;
+extern struct tm *timeinfo;
 
 bool return_to_watchface_flag; //true: return to watchface; flases: return to app_menu
 
@@ -188,7 +187,7 @@ void json_refreash()
     cJSON_Delete(root);
     canvas_update_flag = 0b1101;
     // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
-    gui_log("cjson_content: %s\n", cjson_content);
+//    gui_log("cjson_content: %s\n", cjson_content);
 }
 #endif
 
@@ -215,7 +214,7 @@ static void refreash_time()
 
     sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set(date_text, date_text_content, strlen(date_text_content));
-    gui_text_convert_to_img(date_text, RGB565);
+    // gui_text_convert_to_img(date_text, RGB565);
 
     // refreash weather date
     // GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
@@ -235,9 +234,9 @@ static void win_clock_cb(gui_win_t *win)
     if (win->animate->Beginning_frame)
     {
 #if defined __WIN32
-        time_t rawtime;
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
+        // time_t rawtime;
+        // time(&rawtime);
+        // timeinfo = localtime(&rawtime);
         char *temp = cjson_content;
         cjson_content = read_file(filename);
         if (!cjson_content)
@@ -252,13 +251,13 @@ static void win_clock_cb(gui_win_t *win)
         canvas_update_flag = 0b1111;
         // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
-        extern struct tm watch_clock_get(void);
-        watch_time = watch_clock_get();
-        timeinfo = &watch_time;
-        gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
-        gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
+        // extern struct tm watch_clock_get(void);
+        // watch_time = watch_clock_get();
+        // timeinfo = &watch_time;
+        // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
+        // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
         // json_refreash();
-        // tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
+//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
         refreash_time();
     }
@@ -680,7 +679,7 @@ static void arc_temperature_cb(NVGcontext *vg)
             {
                 sprintf(tempera_cur_content, "%d", cur_val);
                 gui_text_content_set(temperature_cur, tempera_cur_content, strlen(tempera_cur_content));
-                gui_text_convert_to_img(temperature_cur, RGB565);
+                // gui_text_convert_to_img(temperature_cur, RGB565);
                 sprintf(tempera_low_content, "%d", low_val);
                 gui_text_content_set(temperature_low, tempera_low_content, strlen(tempera_low_content));
                 sprintf(tempera_high_content, "%d", high_val);
@@ -871,7 +870,10 @@ void page_ct_clock(void *parent)
             image_w = 100,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        img_data_temperature = gui_lower_malloc(buffer_size);
+        if (!img_data_temperature)
+        {
+            img_data_temperature = gui_lower_malloc(buffer_size);
+        }
         memset(img_data_temperature, 0, buffer_size);
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_temperature,
                                                  16 + SCREEN_X_OFF,
@@ -957,7 +959,7 @@ void page_ct_clock(void *parent)
                  48);
     gui_text_type_set(date_text, font_size_48_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, RIGHT);
-    gui_text_convert_to_img(date_text, RGB565);
+    // gui_text_convert_to_img(date_text, RGB565);
     {
         int text_w = 35;
         gui_img_t *img = gui_img_create_from_mem(win_watch, "watch_hour_decimal", text_num_array[0],
@@ -983,7 +985,10 @@ void page_ct_clock(void *parent)
             image_w = 100,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        img_data_activity = gui_lower_malloc(buffer_size);
+        if (!img_data_activity)
+        {
+            img_data_activity = gui_lower_malloc(buffer_size);
+        }
         memset(img_data_activity, 0, buffer_size);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data_activity);
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 16 + SCREEN_X_OFF,
