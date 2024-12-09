@@ -1,7 +1,7 @@
 #pragma once
 
 #include "config.h"
-#include "memory.h"
+#include "nanovg_memory.h"
 
 namespace agge
 {
