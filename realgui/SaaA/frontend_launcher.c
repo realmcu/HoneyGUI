@@ -38,27 +38,11 @@ void *get_app_launcher_frontend(void)
 {
     return &app_launcher_frontend;
 }
-static void app_xml_ui_design(gui_app_t *app);
-static gui_app_t app_xml =
-{
-    .screen =
-    {
-        .name = "app_xml",
-        .x    = 0,
-        .y    = 0,
-    },
-    /*
-    * Default no sleep, no active time limitation.
-    * Please set active time by api(gui_set_app_active_time) if power control is needed.
-    */
-    .active_ms = (uint32_t) - 1,
-    .ui_design = app_xml_ui_design,
-};
 
-void *get_app_xml(void)
-{
-    return &app_xml;
-}
+
+
+extern void *get_app_xml(void);
+
 
 #include "draw_font.h"
 gui_grid_t *g;
@@ -112,17 +96,16 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     char path[512];
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     extern void get_app(gui_app_t *app, char **pic, char **text);
-                    char *pic = "app/system/resource/icMenuBird.bin";
-                    char *text = "bird";
+                    char *pic = 0;
+                    char *text = "app";
                     app->xml = path;
 
 
                     get_app(app, &pic, &text);
                     gui_log("get:%s,%s\n", pic, text);
                     void *img1;
-                    {
-                        img1 = gui_get_file_address(pic);
-                    }
+                    extern const uint8_t *gui_dom_get_image_file_address(const char *image_file_path);
+                    img1 = gui_dom_get_image_file_address(pic);
                     if (strcmp(text, "launcher") == 0)
                     {
                         continue;
@@ -140,7 +123,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     button->data = gui_strdup(path);
 
 
-                    gui_button_text_move(button, 0, 70);
+                    gui_button_text_move(button, -70, 73);
                     {
                         int font_size = 16;
                         gui_text_set(button->text, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
@@ -148,6 +131,8 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         void *addr1 = gui_get_file_address("app/system/resource/font/arialbd_size16_bits4_font.bin");
                         //gui_font_mem_init(addr1);
                         gui_text_type_set(button->text, addr1, FONT_SRC_MEMADDR);
+                        gui_text_mode_set(button->text, CENTER);
+                        GUI_BASE(button->text)->w = 70 * 3;
                     }
                 }
 
@@ -226,14 +211,7 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
     char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);
     sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);
     searchXmlFiles(path, app);
+    gui_app_append(app);
+}
 
-}
-static void app_xml_ui_design(gui_app_t *app)
-{
-    extern void create_tree(gui_app_t *app);
-    create_tree(app);
-#if defined(_WIN32)
-    // gui_return_create(&app->screen);
-#endif
-}
 GUI_INIT_APP_EXPORT(gui_server_init);

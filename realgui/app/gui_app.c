@@ -44,7 +44,7 @@ static void dtor(void *this)
 {
     GUI_ASSERT(this != NULL);
 }
-#define GUI_APP_MAX UINT8_MAX
+#define GUI_APP_MAX 32
 static gui_app_t *app_array[GUI_APP_MAX];
 static int app_array_count;
 void gui_app_append(gui_app_t *app)

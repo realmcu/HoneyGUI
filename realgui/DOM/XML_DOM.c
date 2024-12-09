@@ -143,7 +143,14 @@ typedef struct chart_animation_param
     int *data_array;
     int max, min;
     uint8_t aniamtion_type;
+    uint8_t chart_type;
+    int16_t stroke_width;
 } chart_animation_param_t;
+typedef struct
+{
+    int num1;
+    int num2;
+} two_integers;
 #define TEXT_WEATHER_CUR_ANIMATION 1
 #define ARC_ACTIVITY_EX_ANIMATION 2
 #define CHART_HEART_RATE_DATA_ANIMATION 3
@@ -164,6 +171,11 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animation_hr_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_activity_callback);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_battery_callback);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback_hour);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback_minute);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback_second);
+static void get_2_int_from_string(const char *input, int *int1, int *int2);
+static bool ends_with_xml(const char *str);
 static ezxml_t f1;
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
@@ -519,6 +531,8 @@ static void **image_array;
 static void *return_image;
 static void *return_image_hl;
 static int file_count;
+
+
 static void seekbar_ani_cb(int args, gui_seekbar_t *this)
 {
     switch (args)
@@ -596,16 +610,26 @@ static gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, v
 static char *get_space_string_head(const char *string)
 {
     char *s = gui_strdup(string);
-    size_t length = strlen(s);
-    for (int i = length - 1; i >= 0; i--)
+    char *rst = 0;
+    if (s == 0)
     {
-        if (!((s[i] >= 8) && (s[i] <= 32)))
+        return rst;
+    }
+    size_t length = strlen(s);
+    for (int i = 0; i <= length - 1; i++)
+    {
+        if (!((s[i] >= 32) && (s[i] <= 126)))
         {
-            s[i + 1] = '\0';
+            s[i] = '\0';
             break;
         };
     }
-    return s;
+    if (strlen(s) > 0)
+    {
+        rst = gui_strdup(s);
+    }
+    gui_free(s);
+    return rst;
 }
 static char *js;
 
@@ -742,26 +766,52 @@ static void multi_level_ui_design(gui_multi_level_t *obj)
 }
 struct on_click_jump_cb_param
 {
+    const char *to_widget_name;
     int id1;
     int id2;
 };
 
 static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
 {
+    GUI_WIDGET_POINTER_BY_TYPE(ml, MULTI_LEVEL, &(gui_current_app()->screen))
     if (param->id1 < 0)
     {
         setting_return_cb(obj, e, (void *)param);
     }
     else
     {
-        GUI_API(gui_multi_level_t).jump(obj, param->id1, param->id2);
+        GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
     }
 
 
 }
+static void on_click_jump_cb_tabview(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
+{
+    if (param->to_widget_name)
+    {
+        GUI_WIDGET_POINTER_BY_NAME(tabview, param->to_widget_name);
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+    }
+    else
+    {
+        GUI_WIDGET_POINTER_BY_TYPE(tabview, TABVIEW, &(gui_current_app()->screen));
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+    }
 
 
-static void on_click_jump_to_app_cb(void *obj, gui_event_t e, gui_app_t *handle)
+
+}
+static void on_click_jump_to_app_cb(void *obj, gui_event_t e, const char *new_xml)
+{
+    if (new_xml)
+    {
+        extern void *get_app_xml(void);
+        gui_app_t *app2 = (gui_app_t *)get_app_xml();
+        app2->xml = new_xml;
+        gui_switch_app(gui_current_app(), app2);
+    }
+}
+static void on_click_jump_to_capp_cb(void *obj, gui_event_t e, gui_app_t *handle)
 {
     if (handle)
     {
@@ -3090,7 +3140,21 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case MULTI_LEVEL:
                 {
                     char *ptxt = get_space_string_head(p->txt);
+                    static unsigned char ml_count;
                     //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+                    if (ptxt && ptxt[0] == 0)
+                    {
+                        gui_free(ptxt);
+                        ptxt = 0;
+                    }
+                    if (!ptxt)
+                    {
+
+                        char buffer[20];
+                        sprintf(buffer, "__ml%d_", ml_count++);
+                        ptxt = gui_strdup(buffer);
+                    }
+
                     parent = (void *)gui_multi_level_create(parent, ptxt, (void(*)(gui_obj_t *))multi_level_ui_design);
 
                 }
@@ -3145,6 +3209,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     //GUI_API(gui_multi_level_t).jump(parent, x, y);
                                     struct on_click_jump_cb_param *param;
                                     param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                                    if (id)
+                                    {
+                                        get_2_int_from_string(id, &x, &y);
+                                    }
+
+
                                     param->id1 = x;
                                     param->id2 = y;
                                     if (parent->type == BUTTON)
@@ -3158,17 +3228,89 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                                 else if (!strcmp(to, "app"))
                                 {
+                                    if (ends_with_xml(id))
+                                    {
+                                        if (parent->type == BUTTON)
+                                        {
+                                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                                                           (void *)gui_get_path_by_relative(id));
+                                        }
+                                        else if (parent->type == WINDOW)
+                                        {
+                                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        gui_log("[SaaA] error app jump format\n");
+                                    }
+
+
+
+                                }
+                                else if (!strcmp(to, "C-APP"))
+                                {
                                     if (parent->type == BUTTON)
                                     {
-                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
                                                                        gui_app_get_by_name(id));
                                     }
                                     else if (parent->type == WINDOW)
                                     {
-                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, 0);
+                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
                                     }
                                 }
+                                else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                                {
+                                    //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                                    struct on_click_jump_cb_param *param;
+                                    param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                                    char *tabview_name = 0;
+                                    if (id)
+                                    {
+                                        get_2_int_from_string(id, &x, &y);
 
+                                        {
+                                            // Find the first comma in the string
+                                            const char *first_comma = strchr(id, ',');
+
+                                            if (first_comma != NULL)
+                                            {
+                                                // Find the second comma starting from the character after the first comma
+                                                const char *second_comma = strchr(first_comma + 1, ',');
+
+                                                // If the second comma was found and it's not at the end of the string
+                                                if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                                {
+                                                    tabview_name = gui_strdup(second_comma + 1);
+                                                }
+                                                else
+                                                {
+                                                    // Handle the case where the second comma is not found or is at the end
+                                                    gui_log("The second comma does not exist or is at the end.\n");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // Handle the case where the first comma is not found
+                                                gui_log("The first comma is not found.\n");
+                                            }
+                                        }
+                                    }
+
+                                    param->id1 = x;
+                                    param->id2 = y;
+                                    param->to_widget_name = tabview_name;
+                                    if (parent->type == BUTTON)
+                                    {
+                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                                       param);
+                                    }
+                                    else if (parent->type == WINDOW)
+                                    {
+                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                                    }
+                                }
 
                             }
 
@@ -3942,23 +4084,65 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             if (type)
                             {
-                                if (!strcmp(type, "hour"))
+                                if (id)
                                 {
+                                    char *token;
+                                    int numbers[2];
+                                    int index = 0;
+                                    token = strtok(id, ",");
+                                    while (token != NULL && index < 2)
+                                    {
+                                        numbers[index] = atoi(token);
+                                        index++;
+                                        token = strtok(NULL, ",");
+                                    }
+
+                                    two_integers *data = (two_integers *)gui_malloc(sizeof(two_integers));
+                                    if (data)
+                                    {
+
+
+                                        data->num1 = numbers[0];
+                                        data->num2 = numbers[1];
+
+                                        if (!strcmp(type, "hour"))
+                                        {
+
+                                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_hour,
+                                                                   (void *)data, "hour");
+                                        }
+                                        else if (!strcmp(type, "minute"))
+                                        {
+                                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_minute,
+                                                                   (void *)data, "minute");
+                                        }
+                                        else if (!strcmp(type, "second"))
+                                        {
+                                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_second,
+                                                                   (void *)data, "second");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (!strcmp(type, "hour"))
+                                    {
 #define HOUR_ANIMATION 1
 #define MINUTE_ANIMATION 2
 #define SECOND_ANIMATION 3
-                                    gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
-                                                           (void *)HOUR_ANIMATION, "hour");
-                                }
-                                else if (!strcmp(type, "minute"))
-                                {
-                                    gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
-                                                           (void *)MINUTE_ANIMATION, "minute");
-                                }
-                                else if (!strcmp(type, "second"))
-                                {
-                                    gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
-                                                           (void *)SECOND_ANIMATION, "second");
+                                        gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                               (void *)HOUR_ANIMATION, "hour");
+                                    }
+                                    else if (!strcmp(type, "minute"))
+                                    {
+                                        gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                               (void *)MINUTE_ANIMATION, "minute");
+                                    }
+                                    else if (!strcmp(type, "second"))
+                                    {
+                                        gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                               (void *)SECOND_ANIMATION, "second");
+                                    }
                                 }
                             }
                         }
@@ -4346,7 +4530,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                             gui_color_t  color = {0};
                                             int16_t max = 0;
                                             int16_t min = 0;
-
+                                            const char *style = "waveform";
+                                            int16_t stroke_width = 4;
                                             while (true)
                                             {
                                                 if (!(p->attr[i]))
@@ -4388,6 +4573,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                 {
                                                     min = atoi(p->attr[++i]);
                                                 }
+                                                else if (!strcmp(p->attr[i], "style"))
+                                                {
+                                                    style = (p->attr[++i]);
+                                                }
+                                                else if (!strcmp(p->attr[i], "strokeWidth"))
+                                                {
+                                                    stroke_width = atoi(p->attr[++i]);
+                                                }
                                                 i++;
                                             }
                                             int image_h = h,
@@ -4404,6 +4597,23 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                             param->color = color;
                                             param->max = max;
                                             param->min = min;
+                                            param->stroke_width = stroke_width;
+                                            if (!strcmp(style, "waveform"))
+                                            {
+                                                param->chart_type = 1;
+                                            }
+                                            else if (!strcmp(style, "bar"))
+                                            {
+                                                param->chart_type = 2;
+                                            }
+                                            else if (!strcmp(style, "line"))
+                                            {
+                                                param->chart_type = 3;
+                                            }
+                                            else
+                                            {
+                                                param->chart_type = 1;
+                                            }
 
                                         }
                                         gui_img_set_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback, (void *)param);
@@ -4482,7 +4692,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_color_t  color = {0};
                     int16_t max = 0;
                     int16_t min = 0;
-
+                    const char *style = "waveform";
+                    int16_t stroke_width = 4;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -4523,6 +4734,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "min"))
                         {
                             min = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "style"))
+                        {
+                            style = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "strokeWidth"))
+                        {
+                            stroke_width = atoi(p->attr[++i]);
                         }
                         i++;
                     }
@@ -4573,13 +4792,47 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     uint8_t *buffer = gui_lower_malloc(buffer_size);
                     memset(buffer, 0, buffer_size);
                     NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
-                    gui_wave_render(vg, 0, 0, w,
-                                    h,
-                                    item_count,
-                                    numbers,
-                                    color,
-                                    max,
-                                    min);
+                    if (!strcmp(style, "waveform"))
+                    {
+                        gui_wave_render(vg, 0, 0, w,
+                                        h,
+                                        item_count,
+                                        numbers,
+                                        color,
+                                        max,
+                                        min);
+                    }
+                    else if (!strcmp(style, "bar"))
+                    {
+                        gui_bar_render(vg, 0, 0, w,
+                                       h,
+                                       item_count,
+                                       numbers,
+                                       color,
+                                       max,
+                                       min, stroke_width);
+                    }
+                    else if (!strcmp(style, "line"))
+                    {
+                        gui_line_render(vg, 0, 0, w,
+                                        h,
+                                        item_count,
+                                        numbers,
+                                        color,
+                                        max,
+                                        min, stroke_width);
+                    }
+                    else
+                    {
+                        gui_wave_render(vg, 0, 0, w,
+                                        h,
+                                        item_count,
+                                        numbers,
+                                        color,
+                                        max,
+                                        min);
+                    }
+
                     gui_canvas_output_buffer_blank_close(vg);
                     char *ptxt = get_space_string_head(p->txt);
                     gui_img_t *img = gui_img_create_from_mem(parent, ptxt, buffer, x, y,
@@ -4786,7 +5039,15 @@ static void text_animate_watchface_callback(void *p, void *this_widget, gui_anim
         gui_text_content_set(date_txt, buffer, strlen(buffer));
     }
 }
-static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
+
+#define GET_TIME \
+    uint16_t seconds = 0;\
+    uint16_t minute = 0;\
+    uint16_t hour = 0;\
+    int millisecond = 0;\
+    get_time(&seconds, &minute, &hour, &millisecond);
+
+static void get_time(uint16_t *seconds, uint16_t *minute, uint16_t *hour, int *millisecond)
 {
 #ifndef __WIN32
     // extern struct tm watch_clock_get(void);
@@ -4797,24 +5058,28 @@ static void img_animate_watchface_callback(void *p, void *this_widget, gui_anima
     // uint16_t minute = watch_time.tm_min;
     // uint16_t hour = watch_time.tm_hour;
 
-    int millisecond = 0;
-    uint16_t seconds = 0;
-    uint16_t minute = 0;
-    uint16_t hour = 0;
+    *millisecond = 0;
+    *seconds = 0;
+    *minute = 0;
+    *hour = 0;
 #else
     time_t rawtime;
     struct tm *timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-    uint16_t seconds = timeinfo->tm_sec;
-    uint16_t minute = timeinfo->tm_min;
-    uint16_t hour = timeinfo->tm_hour;
-    int millisecond = 0;
+    *seconds = timeinfo->tm_sec;
+    *minute = timeinfo->tm_min;
+    *hour = timeinfo->tm_hour;
+    *millisecond = 0;
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
-    millisecond = spec.tv_nsec / 1000000;
+    *millisecond = spec.tv_nsec / 1000000;
 #endif
+}
+static void img_animate_watchface_callback(void *p, void *this_widget, gui_animate_t *animate)
+{
+    GET_TIME
     const float angle_per_second = 360.0f / 60.0f;
     gui_img_t *hand = this_widget;
     switch ((size_t)p)
@@ -4845,6 +5110,44 @@ static void img_animate_watchface_callback(void *p, void *this_widget, gui_anima
         break;
     default:
         break;
+    }
+}
+static void img_animate_watchface_callback_hour(void *p, void *this_widget, gui_animate_t *animate)
+{
+    GET_TIME
+
+    gui_img_t *hand = this_widget;
+    {
+        two_integers *cxcy = p;
+        float angle_hour = (hour % 12) * M_PI / 6 + minute * M_PI / 360;
+        gui_img_translate(hand, cxcy->num1, cxcy->num2);
+        gui_img_rotation(hand, angle_hour * 180 / M_PI,  cxcy->num1, cxcy->num2);
+    }
+}
+static void img_animate_watchface_callback_minute(void *p, void *this_widget,
+                                                  gui_animate_t *animate)
+{
+    GET_TIME
+
+    gui_img_t *hand = this_widget;
+    {
+        two_integers *cxcy = p;
+        float angle_min  = minute * M_PI / 30 + seconds * M_PI / 1800;
+        gui_img_translate(hand, cxcy->num1, cxcy->num2);
+        gui_img_rotation(hand, angle_min * 180 / M_PI, cxcy->num1, cxcy->num2);
+    }
+}
+static void img_animate_watchface_callback_second(void *p, void *this_widget,
+                                                  gui_animate_t *animate)
+{
+    GET_TIME
+    const float angle_per_second = 360.0f / 60.0f;
+    gui_img_t *hand = this_widget;
+    {
+        two_integers *cxcy = p;
+        float angle_sec = (seconds + millisecond / 1000.0f) * angle_per_second;
+        gui_img_translate(hand, cxcy->num1, cxcy->num2);
+        gui_img_rotation(hand, angle_sec,  cxcy->num1, cxcy->num2);
     }
 }
 gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniamte_name)
@@ -5771,6 +6074,22 @@ static const uint8_t *gui_get_image_file_address(const char *image_file_path)
     }
     return addr;
 }
+/**
+ * @brief Retrieves the address of an image file.
+ *
+ * This function takes the file path of an image and returns the memory address
+ * where the image data is stored. It is used to access image files in the GUI domain.
+ *
+ * @param image_file_path The path to the image file whose address is to be retrieved.
+ *                        This should be a null-terminated string representing the file path.
+ *
+ * @return A pointer to a uint8_t representing the address of the image file data.
+ *         If the file cannot be found or accessed, the function may return a error image data.
+ */
+const uint8_t *gui_dom_get_image_file_address(const char *image_file_path)
+{
+    return gui_get_image_file_address(image_file_path);
+}
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
 {
     if (!animate->Beginning_frame)
@@ -6045,9 +6364,22 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
                         nvgBeginFrame(vg, image_width, image_height, 1);
 
                         nvgResetTransform(vg);
-                        float a0,  a1;
+                        float a0 = 0,  a1 = 0;
                         a0 = param->sd;
-                        a1 = (param->ed - param->sd) * per + param->sd;
+                        if (param->dir == NVG_CW)
+                        {
+                            a1 = (param->ed - param->sd) * per + param->sd;
+                        }
+                        else if (param->dir == NVG_CCW)
+                        {
+                            a1 = ((2 * M_PI - (param->ed - param->sd)) * (1 - per) + param->ed);
+                            if (per == 0)
+                            {
+                                a1 = a0;
+                            }
+                        }
+
+
                         if (a0 != a1)
                         {
                             nvgArc(vg, param->r + param->stroke_width, param->r + param->stroke_width, param->r, a0, a1,
@@ -6124,13 +6456,46 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
             uint8_t *buffer = param->target_buffer;
             memset(buffer, 0, param->image_data_length);
             NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
-            gui_wave_render(vg, 0, 0, w,
-                            h,
-                            array_length,
-                            array,
-                            param->color,
-                            param->max,
-                            param->min);
+            if (param->chart_type == 1)
+            {
+                gui_wave_render(vg, 0, 0, w,
+                                h,
+                                array_length,
+                                array,
+                                param->color,
+                                param->max,
+                                param->min);
+            }
+            else if (param->chart_type == 2)
+            {
+                gui_bar_render(vg, 0, 0, w,
+                               h,
+                               array_length,
+                               array,
+                               param->color,
+                               param->max,
+                               param->min, param->stroke_width);
+            }
+            else if (param->chart_type == 3)
+            {
+                gui_line_render(vg, 0, 0, w,
+                                h,
+                                array_length,
+                                array,
+                                param->color,
+                                param->max,
+                                param->min, param->stroke_width);
+            }
+            else
+            {
+                gui_wave_render(vg, 0, 0, w,
+                                h,
+                                array_length,
+                                array,
+                                param->color,
+                                param->max,
+                                param->min);
+            }
             gui_free(array);
             gui_canvas_output_buffer_blank_close(vg);
             gui_img_set_image_data(this_widget, buffer);
@@ -6138,8 +6503,73 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
     }
 
 }
+static void get_2_int_from_string(const char *input, int *int1, int *int2)
+{
+    char *token;
+    int numbers[2];
+    numbers[0] = 0;
+    numbers[1] = 0;
+    int index = 0;
+    char *buffer = gui_strdup(input);
+    token = strtok(buffer, ",");
+    while (token != NULL && index < 2)
+    {
+        numbers[index] = atoi(token);
+        index++;
+        token = strtok(NULL, ",");
+    }
 
 
+    *int1 = numbers[0];
+    *int2 = numbers[1];
+    gui_free(buffer);
+}
+static bool ends_with_xml(const char *str)
+{
+    if (str == NULL)
+    {
+        return false; // Handle null pointer input gracefully
+    }
+
+    // Define the suffix we are looking for
+    const char *suffix = ".xml";
+    size_t str_len = strlen(str);
+    size_t suffix_len = strlen(suffix);
+
+    // If the string is shorter than the suffix, it cannot end with the suffix
+    if (str_len < suffix_len)
+    {
+        return false;
+    }
+
+    // Compare the end of the string with the suffix
+    return strcmp(str + str_len - suffix_len, suffix) == 0;
+}
+static void app_xml_ui_design(gui_app_t *app)
+{
+    extern void create_tree(gui_app_t *app);
+    create_tree(app);
+}
+static gui_app_t app_xml =
+{
+    .screen =
+    {
+        .name = "app_xml",
+        .x    = 0,
+        .y    = 0,
+    },
+    /*
+    * Default no sleep, no active time limitation.
+    * Please set active time by api(gui_set_app_active_time) if power control is needed.
+    */
+    .active_ms = (uint32_t) - 1,
+    .ui_design = app_xml_ui_design,
+};
+
+void *get_app_xml(void)
+{
+    return &app_xml;
+}
 
 
 

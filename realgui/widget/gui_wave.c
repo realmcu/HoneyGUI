@@ -405,3 +405,146 @@ void gui_wave_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
     nvgStrokeWidth(vg, 1.0f);
 }
 
+void gui_bar_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
+                    int16_t h,
+                    int16_t item_count,
+                    float *samples,
+                    gui_color_t color,
+                    int16_t max,
+                    int16_t min,
+                    int16_t bar_width
+                   )
+{
+    if (!samples || item_count <= 0 || bar_width <= 0)
+    {
+        return;
+    }
+
+    float range = max - min;
+    if (range <= 0)
+    {
+        return; // Prevent division by zero
+    }
+    float radius = 4;
+    float space_between = (w - (item_count * bar_width)) / (item_count -
+                                                            1); // Calculate spacing between bars
+
+    int i;
+    for (i = 0; i < item_count; i++)
+    {
+        float normalized_height = (samples[i] - min) / range;
+        float bar_height = h * normalized_height;
+        float bar_x = x + i * (bar_width + space_between);
+        float bar_y = y + (h - bar_height);
+
+        // Ensure the corner radius is not greater than the bar height
+        float effective_radius = bar_height < radius ? bar_height : radius;
+        effective_radius = bar_width / 2 < radius ? bar_width / 2 : radius;
+        // Draw each bar with rounded corners
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, bar_x, bar_y, bar_width, bar_height, effective_radius);
+
+        // Set the fill color of the bar
+        nvgFillColor(vg, nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b,
+                                 color.color.rgba.a));
+        nvgFill(vg);
+
+        // Optional: Draw the border of the bar
+        nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 255)); // Black border
+        nvgStrokeWidth(vg, 1.0f);
+        nvgStroke(vg);
+    }
+}
+
+void gui_line_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
+                     int16_t h,
+                     int16_t item_count,
+                     float *samples,
+                     gui_color_t color,
+                     int16_t max,
+                     int16_t min,
+                     int16_t line_width)
+{
+    if (!samples || item_count <= 0 || line_width <= 0)
+    {
+        return;
+    }
+
+    float range = max - min;
+    if (range <= 0)
+    {
+        return; // Prevent division by zero
+    }
+
+    float step = w / (item_count - 1);
+    float sx[item_count];
+    float sy[item_count];
+
+    // Calculate the position of each sample point
+    for (int i = 0; i < item_count; ++i)
+    {
+        sx[i] = x + i * step;
+        float normalized_value = (samples[i] - min) / range;
+        sy[i] = y + h - (h * normalized_value);
+    }
+
+    // Draw the gradient fill below the line
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    for (int i = 1; i < item_count; ++i)
+    {
+        nvgLineTo(vg, sx[i], sy[i]);
+    }
+    nvgLineTo(vg, x + w, y + h); // Move to the bottom-right corner of the rectangle
+    nvgLineTo(vg, x, y + h); // Move to the bottom-left corner of the rectangle
+    nvgClosePath(vg);
+
+    NVGpaint bg = nvgLinearGradient(vg, x, y, x, y + h,
+                                    nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b, 50),
+                                    nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b, 240));
+    nvgFillPaint(vg, bg);
+    nvgFill(vg);
+
+    // Draw the line
+    nvgBeginPath(vg);
+    nvgStrokeWidth(vg, (float)line_width);
+    nvgStrokeColor(vg, nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b,
+                               color.color.rgba.a));
+
+    for (int i = 0; i < item_count; ++i)
+    {
+        if (i == 0)
+        {
+            nvgMoveTo(vg, sx[i], sy[i]);
+        }
+        else
+        {
+            nvgLineTo(vg, sx[i], sy[i]);
+        }
+    }
+    nvgStroke(vg);
+
+    // Draw shadows and the points themselves for each item
+    for (int i = 0; i < item_count; i++)
+    {
+        // // Draw shadow
+        // NVGpaint shadow = nvgRadialGradient(vg, sx[i], sy[i] + 2, 3.0f, 8.0f,
+        //                                     nvgRGBA(0, 0, 0, 32), nvgRGBA(0, 0, 0, 0));
+        // nvgBeginPath(vg);
+        // nvgRect(vg, sx[i] - 10, sy[i] - 10 + 2, 20, 20);
+        // nvgFillPaint(vg, shadow);
+        // nvgFill(vg);
+
+        // Draw the point
+        nvgBeginPath(vg);
+        nvgCircle(vg, sx[i], sy[i], 4.0f);
+        nvgFillColor(vg, nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b,
+                                 color.color.rgba.a));
+        nvgFill(vg);
+
+        nvgBeginPath(vg);
+        nvgCircle(vg, sx[i], sy[i], 2.0f);
+        nvgFillColor(vg, nvgRGBA(220, 220, 220, 255));
+        nvgFill(vg);
+    }
+}

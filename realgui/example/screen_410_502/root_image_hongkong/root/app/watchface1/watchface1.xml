@@ -69,7 +69,7 @@ file="app/watchface1/wf1preview.bin">
             x="35"
             y="57">btn_music
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_MUSIC">
             </onClick>
@@ -87,7 +87,7 @@ file="app/watchface1/wf1preview.bin">
             x="35"
             y="366">btn_light
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_MUSIC">
             </onClick>
@@ -134,7 +134,7 @@ file="app/watchface1/wf1preview.bin">
             x="320"
             y="57">btn_step
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_MUSIC">
             </onClick>

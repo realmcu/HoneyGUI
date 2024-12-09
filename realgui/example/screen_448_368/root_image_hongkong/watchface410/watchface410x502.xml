@@ -64,7 +64,7 @@
                 x="26"
                 y="35">btn_music
                 <onClick
-                        to="app"
+                        to="C-APP"
                         type="jump" 
                         id="APP_MUSIC">
                 </onClick>
@@ -82,7 +82,7 @@
                 x="26"
                 y="358">btn_light
                 <onClick
-                        to="app"
+                        to="C-APP"
                         type="jump" 
                         id="APP_MUSIC">
                 </onClick>
@@ -113,7 +113,7 @@
                 x="297"
                 y="358">btn_step
                 <onClick
-                        to="app"
+                        to="C-APP"
                         type="jump" 
                         id="APP_MUSIC">
                 </onClick>

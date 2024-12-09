@@ -78,7 +78,7 @@ file="app/watchface3/wf3preview.bin">
             x="35"
             y="57">btn_music
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_MUSIC">
             </onClick>
@@ -96,7 +96,7 @@ file="app/watchface3/wf3preview.bin">
             x="35"
             y="390">btn_activity
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_ACTIVITY">
             </onClick>
@@ -128,7 +128,7 @@ file="app/watchface3/wf3preview.bin">
             x="320"
             y="57">btn_step
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_WEATHER">
             </onClick>
