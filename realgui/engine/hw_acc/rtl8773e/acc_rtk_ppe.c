@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <gui_matrix.h>
 #include <rtl_ppe.h>
-#include <rtl_imdc.h>
+#include <rtl_idu.h>
 #include <rtl876x_rcc.h>
 #include <rtl876x_gdma.h>
 #include <dma_channel.h>
@@ -14,7 +14,7 @@
 #include "math.h"
 #include "fmc_api_ext.h"
 #include "os_sync.h"
-#include "hal_imdc.h"
+#include "hal_idu.h"
 
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
@@ -80,7 +80,7 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
     {
         return false;
     }
-    hal_imdc_dma_info info;
+    hal_idu_dma_info info;
     info.length = p_rect->w * pixel_size;
     info.dst_stride = p_rect->w * pixel_size;
     info.src_stride = source->width * pixel_size;
@@ -94,7 +94,7 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 
 
 
-static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
+static bool memcpy_by_idu(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
 #if !F_APP_GUI_USE_PSRAM
     uint8_t pixel_size = PPE_Get_Pixel_Size(source->format);
@@ -103,13 +103,13 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
         return false;
     }
 #endif
-    hal_imdc_decompress_info info;
+    hal_idu_decompress_info info;
     info.start_column = p_rect->x;
     info.end_column = p_rect->x + p_rect->w - 1;
     info.start_line = p_rect->y;
     info.end_line = p_rect->y + p_rect->h - 1;
     info.raw_data_address = source->address;
-    if (hal_imdc_decompress(&info, cache_buf))
+    if (hal_idu_decompress(&info, cache_buf))
     {
         source->address = (uint32_t)cache_buf;
         return true;
@@ -130,7 +130,7 @@ void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
                                  pixel_size;
     uint32_t src_start_address = source->address + (src_rect->x + src_rect->y * source->width) *
                                  pixel_size;
-    hal_imdc_dma_info info;
+    hal_idu_dma_info info;
     info.length = src_rect->w * pixel_size;
     info.src_stride = source->width * pixel_size;
     info.dst_stride = target->width * pixel_size;
@@ -138,13 +138,13 @@ void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
     hal_dma_copy(&info, (uint8_t *)src_start_address, (uint8_t *)dst_start_address);
 }
 
-void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
-                       ppe_rect_t *dst_trans)
+void bare_blit_by_idu(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
+                      ppe_rect_t *dst_trans)
 {
     uint8_t pixel_size = PPE_Get_Pixel_Size(target->format);
     uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
                                  pixel_size;
-    hal_imdc_decompress_info info;
+    hal_idu_decompress_info info;
     info.start_line = src_rect->y;
     info.end_line = src_rect->y + src_rect->h - 1;
     info.start_column = src_rect->x;
@@ -152,7 +152,7 @@ void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *s
     info.length = src_rect->w * pixel_size;
     info.dst_stride = target->width * pixel_size;
     info.raw_data_address = source->address;
-    hal_imdc_decompress_rect(&info, (uint8_t *)dst_start_address);
+    hal_idu_decompress_rect(&info, (uint8_t *)dst_start_address);
 }
 
 static float get_x(float *line, float y)
@@ -408,7 +408,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     {
                         uint32_t s;
                         s = os_lock();
-                        bare_blit_by_imdc(&target, &source, &src_rect, &dst_rect);
+                        bare_blit_by_idu(&target, &source, &src_rect, &dst_rect);
                         os_unlock(s);
                     }
                     else
@@ -699,7 +699,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             if (head->compress)
             {
                 uint32_t s = os_lock();
-                ret = memcpy_by_imdc(&old_rect, &source);
+                ret = memcpy_by_idu(&old_rect, &source);
                 os_unlock(s);
             }
             else
@@ -779,7 +779,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     PPE_Finish();
 }
 
-bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
+bool hw_acc_idu_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
 {
     if (image == NULL || rect == NULL || output == NULL)
     {
@@ -789,8 +789,8 @@ bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
     struct gui_rgb_data_head output_header;
     struct gui_rgb_data_head *head = (struct gui_rgb_data_head *)image;
     memset(&output_header, 0, sizeof(struct gui_rgb_data_head));
-    const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image + sizeof(
-                                                              struct gui_rgb_data_head));
+    const IDU_file_header *header = (IDU_file_header *)((uint32_t)image + sizeof(
+                                                            struct gui_rgb_data_head));
     switch (head->type)
     {
     case RGB565:
@@ -808,8 +808,8 @@ bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
     default:
         return false;
     }
-    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
-    hal_imdc_decompress_info info;
+    RCC_PeriphClockCmd(APBPeriph_IDU, APBPeriph_IDU_CLOCK, ENABLE);
+    hal_idu_decompress_info info;
     info.raw_data_address = (uint32_t)header;
     info.start_column = rect->x1;
     info.end_column = rect->x2;
@@ -817,7 +817,7 @@ bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
     info.end_line = rect->y2;
     output_header.w = info.end_column - info.start_column + 1;
     output_header.h = info.end_line - info.start_line + 1;
-    if (hal_imdc_decompress(&info, output + 8))
+    if (hal_idu_decompress(&info, output + 8))
     {
         memcpy(output, &output_header, sizeof(struct gui_rgb_data_head));
         return true;
