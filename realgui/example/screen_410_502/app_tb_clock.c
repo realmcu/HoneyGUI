@@ -16,7 +16,7 @@
 
 static gui_curtainview_t *ct;
 static gui_curtain_t *ct_clock;
-static gui_curtain_t *ct_control0;
+static gui_curtain_t *ct_inform;
 static gui_curtain_t *ct_left;
 static gui_curtain_t *ct_card;
 extern gui_win_t *win_watch; // *win_market;
@@ -134,7 +134,7 @@ void page_tb_clock(void *parent)
     ct = gui_curtainview_create(parent, "ct_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ct_clock = gui_curtain_create(ct, "_watchface_main_window_", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                                   CURTAIN_MIDDLE, 1);
-    ct_control0 = gui_curtain_create(ct, "2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_UP, 1);
+    ct_inform = gui_curtain_create(ct, "2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_UP, 1);
     ct_left = gui_curtain_create(ct, "3", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_LEFT, 0.34f);
 
     ct_card = gui_curtain_create(ct, "card", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_DOWN, 1);
@@ -148,7 +148,7 @@ void page_tb_clock(void *parent)
 
     // app_watchface_m
     page_ct_sidebar(ct_left);
-    tabview_up_design(ct_control0);
+    tabview_up_design(ct_inform);
     curtain_down_design(ct_card);
     switch (watchface_index)
     {

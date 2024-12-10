@@ -191,9 +191,10 @@ static void app_HR_back2prescreen_cb(void)
 
 static void app_FN_back2prescreen_cb(void)
 {
-    extern bool sidebar_flag;
     extern void close_FN_APP();
     close_FN_APP();
+
+    extern bool sidebar_flag;
     if (sidebar_flag)
     {
         gui_switch_app(gui_current_app(), get_app_hongkong());
@@ -202,12 +203,14 @@ static void app_FN_back2prescreen_cb(void)
     {
         gui_switch_app(gui_current_app(), get_app_menu());
     }
+
 }
 
 static void app_BOX2D_RING_return_cb(void)
 {
     extern void close_box2d_ring(void);
     close_box2d_ring();
+
     extern bool sidebar_flag;
     if (sidebar_flag)
     {

@@ -75,10 +75,10 @@ void create_watchface_ring(void *parent)
     extern void app_box2d_ring_ui_design(gui_obj_t *obj);
     app_box2d_ring_ui_design((gui_obj_t *)win);
 
+    gui_img_create_from_mem(win, "mask", WATCH_MASK_BIN, 200, 242, 0, 0);
     h_hand = gui_img_create_from_mem(win, "h_hand", WATCH_HOUR_HAND_BIN, 200, 163, 0, 0);
     m_hand = gui_img_create_from_mem(win, "m_hand", WATCH_MINUTE_HAND_BIN, 200, 87, 0, 0);
     s_hand = gui_img_create_from_mem(win, "s_hand", WATCH_SECOND_HAND_BIN, 206, 123, 0, 0);
-    gui_img_create_from_mem(win, "mask", WATCH_MASK_BIN, 200, 242, 0, 0);
 
     gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)win_cb, NULL);
 }

@@ -15,6 +15,7 @@
 #include "guidef.h"
 #include "wheel_algo.h"
 #include "kb_algo.h"
+#include <time.h>
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
@@ -154,6 +155,26 @@ static void app_hongkong_ui_design(gui_app_t *app)
 //     }
 // }
 
+typedef enum
+{
+    MESSAGE = 0,
+    OS,
+} app_name;
+static void inform_generate_task_entry()
+{
+    while (true)
+    {
+        extern void pagelist_create(const char *informer, const char *content, const char *time,
+                                    app_name app);
+        char *content = "Watch will attempt to install this update later tonight.";
+        extern struct tm *timeinfo;
+        char time[10];
+        sprintf(time, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
+        pagelist_create("watchOS 10.3.1", content, time, OS);
+        gui_thread_mdelay(2000);
+    }
+}
+
 uint8_t resource_root[1024 * 1024 * 20];
 static int app_init(void)
 {
@@ -178,8 +199,9 @@ static int app_init(void)
     }
 #endif
     gui_server_init();
-    // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
     gui_app_startup(get_app_hongkong());
+    // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
+    // gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     return 0;
 }
 

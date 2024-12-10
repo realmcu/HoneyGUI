@@ -94,7 +94,10 @@ void app_box2d_cb(void *p, void *this_widget, gui_animate_t *animate)
         GUI_BASE(ball.img)->y = ballY - BALL_RADIUS;
     }
 
-    world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS); // Update the physics world
+    if (world)
+    {
+        world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS); // Update the physics world
+    }
 }
 void win_press_callback(void *obj, gui_event_t e, void *param)
 {
@@ -185,11 +188,13 @@ void close()
         for (Ball body : balls)
         {
             world->DestroyBody(body.body);
+            // gui_free(body.img);
         }
         balls.clear();
         win_release_callback();
         deallocate(world);
         world = nullptr;
+        gui_log("close world done\n");
     }
 }
 
@@ -250,7 +255,6 @@ void createBalls(b2World *world)
         ballBody->SetLinearVelocity(b2Vec2(vx, vy));
 
         // Assign random color to the ball
-
         NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
         balls.push_back({ballBody, color}); // Add ball and color to vector
     }
@@ -277,17 +281,10 @@ bool operator!=(const NVGcolor &c1, const NVGcolor &c2)
 static int count;
 // Render function
 void canvas_callback(NVGcontext *vg)
-
 {
-
-
-
     // Draw ball
     const Ball &ball = balls.at(count++);
     {
-
-
-
         // Draw ball
         NVGpaint ballPaint = nvgRadialGradient(vg, BALL_RADIUS, BALL_RADIUS, 1, BALL_RADIUS,
                                                ball.color, nvgRGBA(ball.color.r * UINT8_MAX, ball.color.g * UINT8_MAX, ball.color.b * UINT8_MAX,
@@ -314,7 +311,6 @@ void render()
     // Draw balls
     for (Ball &ball : balls)
     {
-
         float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
         float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
 

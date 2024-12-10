@@ -56,12 +56,18 @@ static bool get_init_flag(void)
 
 void clear_world()
 {
-    for (b2Body *body : temporaryBodies)
+    if (world)
     {
-        world->DestroyBody(body);
+        for (b2Body *body : temporaryBodies)
+        {
+            world->DestroyBody(body);
+        }
+        temporaryBodies.clear();
+        gui_free(world);
+        world = nullptr;
+        gui_log("close world done\n");
     }
-    temporaryBodies.clear();
-    gui_free(world);
+
 }
 /* rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)
@@ -553,106 +559,109 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 
         init_flag = false;
     }
-
-    // Update the physics world
-    world->Step(1 / 60.f, 8, 3);
-    // Get the position of the ball then set the image location and rotate it on the GUI
+    if (world)
     {
-        b2Vec2 position = body_st->GetPosition();
-        if (position_refresh((int)(position.x * M2P - RADIUS_ST), (int)(position.y * M2P - RADIUS_ST),
-                             img_strawberry, body_st))
+        // Get the position of the ball then set the image location and rotate it on the GUI
         {
-            gui_img_set_attribute(img_strawberry, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
-                                  img_strawberry->base.x, img_strawberry->base.y);
-            fruit_cut_flag[0] = false;
-            gui_img_set_location(img_cut_arry[0], 0, 550);
-        }
-        // gui_log("img_strawberry->degrees: %f\r\n", img_strawberry->degrees);
+            b2Vec2 position = body_st->GetPosition();
+            if (position_refresh((int)(position.x * M2P - RADIUS_ST), (int)(position.y * M2P - RADIUS_ST),
+                                 img_strawberry, body_st))
+            {
+                gui_img_set_attribute(img_strawberry, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
+                                      img_strawberry->base.x, img_strawberry->base.y);
+                fruit_cut_flag[0] = false;
+                gui_img_set_location(img_cut_arry[0], 0, 550);
+            }
+            // gui_log("img_strawberry->degrees: %f\r\n", img_strawberry->degrees);
 
-        position = body_ba->GetPosition();
-        if (position_refresh((int)(position.x * M2P - RADIUS_BA), (int)(position.y * M2P - RADIUS_BA),
-                             img_banana, body_ba))
+            position = body_ba->GetPosition();
+            if (position_refresh((int)(position.x * M2P - RADIUS_BA), (int)(position.y * M2P - RADIUS_BA),
+                                 img_banana, body_ba))
+            {
+                gui_img_set_attribute(img_banana, "img_banana", FRUIT_NINJA_BANANA_BIN, img_banana->base.x,
+                                      img_banana->base.y);
+                fruit_cut_flag[1] = false;
+                gui_img_set_location(img_cut_arry[1], 0, 550);
+            }
+
+            position = body_pe->GetPosition();
+            if (position_refresh((int)(position.x * M2P - RADIUS_PE), (int)(position.y * M2P - RADIUS_PE),
+                                 img_peach, body_pe))
+            {
+                gui_img_set_attribute(img_peach, "img_peach", FRUIT_NINJA_PEACH_BIN, img_peach->base.x,
+                                      img_peach->base.y);
+                fruit_cut_flag[2] = false;
+                gui_img_set_location(img_cut_arry[2], 0, 550);
+            }
+
+            position = body_wm->GetPosition();
+            if (position_refresh((int)(position.x * M2P - RADIUS_WM), (int)(position.y * M2P - RADIUS_WM),
+                                 img_watermelon, body_wm))
+            {
+                gui_img_set_attribute(img_watermelon, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN,
+                                      img_watermelon->base.x, img_watermelon->base.y);
+                fruit_cut_flag[3] = false;
+                gui_img_set_location(img_cut_arry[3], 0, 550);
+            }
+
+            position = body_bomb->GetPosition();
+            position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB), img_bomb,
+                             body_bomb);
+
+            // Refresh half-cut fruits pos
+            if (fruit_cut_flag[0])
+            {
+                gui_img_set_location(img_cut_arry[0],  GUI_BASE(img_strawberry)->x + 10,
+                                     GUI_BASE(img_strawberry)->y + 10);
+                gui_img_rotation(img_cut_arry[0], gui_img_get_transform_degrees(img_strawberry),
+                                 gui_img_get_width(img_cut_arry[0]) / 2,
+                                 gui_img_get_height(img_cut_arry[0]) / 2);
+            }
+            if (fruit_cut_flag[1])
+            {
+                gui_img_set_location(img_cut_arry[1],  GUI_BASE(img_banana)->x + 10, GUI_BASE(img_banana)->y + 10);
+                gui_img_rotation(img_cut_arry[1], gui_img_get_transform_degrees(img_banana),
+                                 gui_img_get_width(img_cut_arry[1]) / 2,
+                                 gui_img_get_height(img_cut_arry[1]) / 2);
+            }
+            if (fruit_cut_flag[2])
+            {
+                gui_img_set_location(img_cut_arry[2],  GUI_BASE(img_peach)->x + 10, GUI_BASE(img_peach)->y + 10);
+                gui_img_rotation(img_cut_arry[2], gui_img_get_transform_degrees(img_peach),
+                                 gui_img_get_width(img_cut_arry[2]) / 2,
+                                 gui_img_get_height(img_cut_arry[2]) / 2);
+            }
+            if (fruit_cut_flag[3])
+            {
+                gui_img_set_location(img_cut_arry[3],  GUI_BASE(img_watermelon)->x + 10,
+                                     GUI_BASE(img_watermelon)->y + 10);
+                gui_img_rotation(img_cut_arry[3], gui_img_get_transform_degrees(img_watermelon),
+                                 gui_img_get_width(img_cut_arry[3]) / 2,
+                                 gui_img_get_height(img_cut_arry[3]) / 2);
+            }
+        }
+        //cutting judgment
+        GUI_TOUCHPAD_IMPORT_AS_TP // get touchpoint
+        if (tp->released)
         {
-            gui_img_set_attribute(img_banana, "img_banana", FRUIT_NINJA_BANANA_BIN, img_banana->base.x,
-                                  img_banana->base.y);
-            fruit_cut_flag[1] = false;
-            gui_img_set_location(img_cut_arry[1], 0, 550);
+            bool bomb_flag = cutting_judgment(win, img_strawberry, img_banana, img_peach, img_watermelon,
+                                              img_bomb, tp, img_cut_arry, fruit_cut_flag);
+
+            static char text_content[16];
+            sprintf(text_content, "SCORE: %d", fruit_score);
+            gui_text_content_set(score_board, text_content, strlen(text_content));
+
+            if (bomb_flag)
+            {
+                img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
+                                                       0);
+                gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
+                gui_win_stop_animation(win);
+            }
         }
 
-        position = body_pe->GetPosition();
-        if (position_refresh((int)(position.x * M2P - RADIUS_PE), (int)(position.y * M2P - RADIUS_PE),
-                             img_peach, body_pe))
-        {
-            gui_img_set_attribute(img_peach, "img_peach", FRUIT_NINJA_PEACH_BIN, img_peach->base.x,
-                                  img_peach->base.y);
-            fruit_cut_flag[2] = false;
-            gui_img_set_location(img_cut_arry[2], 0, 550);
-        }
-
-        position = body_wm->GetPosition();
-        if (position_refresh((int)(position.x * M2P - RADIUS_WM), (int)(position.y * M2P - RADIUS_WM),
-                             img_watermelon, body_wm))
-        {
-            gui_img_set_attribute(img_watermelon, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN,
-                                  img_watermelon->base.x, img_watermelon->base.y);
-            fruit_cut_flag[3] = false;
-            gui_img_set_location(img_cut_arry[3], 0, 550);
-        }
-
-        position = body_bomb->GetPosition();
-        position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB), img_bomb,
-                         body_bomb);
-
-        // Refresh half-cut fruits pos
-        if (fruit_cut_flag[0])
-        {
-            gui_img_set_location(img_cut_arry[0],  GUI_BASE(img_strawberry)->x + 10,
-                                 GUI_BASE(img_strawberry)->y + 10);
-            gui_img_rotation(img_cut_arry[0], gui_img_get_transform_degrees(img_strawberry),
-                             gui_img_get_width(img_cut_arry[0]) / 2,
-                             gui_img_get_height(img_cut_arry[0]) / 2);
-        }
-        if (fruit_cut_flag[1])
-        {
-            gui_img_set_location(img_cut_arry[1],  GUI_BASE(img_banana)->x + 10, GUI_BASE(img_banana)->y + 10);
-            gui_img_rotation(img_cut_arry[1], gui_img_get_transform_degrees(img_banana),
-                             gui_img_get_width(img_cut_arry[1]) / 2,
-                             gui_img_get_height(img_cut_arry[1]) / 2);
-        }
-        if (fruit_cut_flag[2])
-        {
-            gui_img_set_location(img_cut_arry[2],  GUI_BASE(img_peach)->x + 10, GUI_BASE(img_peach)->y + 10);
-            gui_img_rotation(img_cut_arry[2], gui_img_get_transform_degrees(img_peach),
-                             gui_img_get_width(img_cut_arry[2]) / 2,
-                             gui_img_get_height(img_cut_arry[2]) / 2);
-        }
-        if (fruit_cut_flag[3])
-        {
-            gui_img_set_location(img_cut_arry[3],  GUI_BASE(img_watermelon)->x + 10,
-                                 GUI_BASE(img_watermelon)->y + 10);
-            gui_img_rotation(img_cut_arry[3], gui_img_get_transform_degrees(img_watermelon),
-                             gui_img_get_width(img_cut_arry[3]) / 2,
-                             gui_img_get_height(img_cut_arry[3]) / 2);
-        }
-    }
-    //cutting judgment
-    GUI_TOUCHPAD_IMPORT_AS_TP // get touchpoint
-    if (tp->released)
-    {
-        bool bomb_flag = cutting_judgment(win, img_strawberry, img_banana, img_peach, img_watermelon,
-                                          img_bomb, tp, img_cut_arry, fruit_cut_flag);
-
-        static char text_content[16];
-        sprintf(text_content, "SCORE: %d", fruit_score);
-        gui_text_content_set(score_board, text_content, strlen(text_content));
-
-        if (bomb_flag)
-        {
-            img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 20, 203, 0,
-                                                   0);
-            gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
-            gui_win_stop_animation(win);
-        }
+        // Update the physics world
+        world->Step(1 / 60.f, 8, 3);
     }
 }
 
