@@ -534,10 +534,8 @@ bool gui_obj_in_rect(gui_obj_t *obj,
 
     gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
 
-    if ((m_x >= x)
-        && ((m_x + m_w) <= (x + w))
-        && (m_y >= y)
-        && ((m_y + m_h) <= (y + h)))
+    if ((m_x < x + w) && (m_x + m_w > x) &&
+        (m_y < y + h) && (m_y + m_h > y))
     {
         return true;
     }
