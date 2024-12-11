@@ -105,7 +105,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_log("get:%s,%s\n", pic, text);
                     void *img1;
                     extern const uint8_t *gui_dom_get_image_file_address(const char *image_file_path);
-                    img1 = gui_dom_get_image_file_address(pic);
+                    img1 = (void *)gui_dom_get_image_file_address(pic);
                     if (strcmp(text, "launcher") == 0)
                     {
                         continue;
