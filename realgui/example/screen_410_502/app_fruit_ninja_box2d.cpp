@@ -29,6 +29,7 @@ static const int RADIUS_WM = 98 / 2;   // wm: 98*85  pixels
 static const int RADIUS_BB = 50 / 2;   // wm: 50*51  pixels
 
 static int16_t fruit_score = 0;
+static uint8_t fruit_cut_cnt = 0;
 static bool init_flag = true;
 static bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
 
@@ -40,7 +41,9 @@ std::vector<b2Body *> temporaryBodies;
 static gui_img_t *img_strawberry, *img_banana,
        *img_peach, *img_watermelon,
        *img_gameover, *img_bg, *img_bomb;
-static gui_text_t *score_board;
+static gui_text_t *score_board, *time_counter;
+static void *time_counter_content = NULL;
+static uint8_t game_time;
 static gui_img_t
 *img_cut_arry[4]; // img_strawberry_cut, *img_banana_cut, *img_peach_cut, *img_watermelon_cut;
 /* Define a point structure */
@@ -258,6 +261,7 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
                              gui_img_t *WM,
                              gui_img_t *BB, touch_info_t *tp, gui_img_t *img_cut_arry[], bool *fruit_cut_flag)
 {
+    fruit_cut_cnt = 0;
     /* strawberry */
     {
         int img_w = GUI_BASE(ST)->w;
@@ -294,7 +298,7 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
                                      gui_img_get_height(img_cut_arry[0]) / 2);
                     fruit_cut_flag[0] = true;
 
-                    fruit_score += 10;
+                    fruit_cut_cnt++;
                     // }
                 }
             }
@@ -336,7 +340,7 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
                                          gui_img_get_height(img_cut_arry[1]) / 2);
                         fruit_cut_flag[1] = true;
 
-                        fruit_score += 10;
+                        fruit_cut_cnt++;
                     }
                 }
             }
@@ -377,7 +381,7 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
                                          gui_img_get_height(img_cut_arry[2]) / 2);
                         fruit_cut_flag[2] = true;
 
-                        fruit_score += 10;
+                        fruit_cut_cnt++;
                     }
                 }
             }
@@ -417,7 +421,7 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
                                          gui_img_get_height(img_cut_arry[3]) / 2);
                         fruit_cut_flag[3] = true;
 
-                        fruit_score += 10;
+                        fruit_cut_cnt++;
                     }
                 }
             }
@@ -456,7 +460,10 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
 static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 {
     gui_win_t *win = static_cast<gui_win_t *>(p);
-
+    if (win->animate->end_frame)
+    {
+        game_time--;
+    }
 
     if (get_init_flag())
     {
@@ -468,25 +475,25 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         // Add dynamic bodys
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody;
-        ballBodyDef.position.Set(4, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
+        ballBodyDef.position.Set(4, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
         ballBodyDef.angularVelocity = -314;    //-PI rad/s
-        ballBodyDef.linearVelocity.Set(10, -20); // move up
+        ballBodyDef.linearVelocity.Set(5, -20); // move up
         body_st = world->CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(8, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
+        ballBodyDef.position.Set(8, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
         body_ba = world->CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(12, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
+        ballBodyDef.position.Set(12, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
         body_pe = world->CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(16, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
+        ballBodyDef.position.Set(16, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
         body_wm = world->CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(20, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
+        ballBodyDef.position.Set(20, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
         body_bomb = world->CreateBody(&ballBodyDef);
         //creat body shape and attach the shape to the Body
         b2CircleShape circleShape;
-        circleShape.m_radius = 0.2; //RADIUS_ST * P2M; small number reducing the impact of collisions
+        circleShape.m_radius = 0.01; //RADIUS_ST * P2M; small number reducing the impact of collisions
         b2FixtureDef FixtureDef;
         FixtureDef.shape = &circleShape;
         FixtureDef.density = 1;
@@ -550,17 +557,38 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         gui_img_set_mode(img_cut_arry[3], IMG_SRC_OVER_MODE);
 
         // Set score_board
-        score_board = gui_text_create(win, "score_board",  10, 10, 100, 50);
+        score_board = gui_text_create(win, "score_board",  10, 10, 150, 50);
         gui_text_set(score_board, (void *)"SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"),
-                     24);
-        void *addr1 = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
+                     32);
+        void *addr1 = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
         gui_text_type_set(score_board, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(score_board, LEFT);
+
+        // Set time counter
+        time_counter_content = gui_malloc(10);
+        sprintf((char *)time_counter_content, "TIME: 60");
+        time_counter = gui_text_create(win, "0", 310, 10, 150, 50);
+        gui_text_set(time_counter, time_counter_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                     strlen((char *)time_counter_content),
+                     32);
+        gui_text_type_set(time_counter, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(time_counter, LEFT);
 
         init_flag = false;
     }
     if (world)
     {
+        sprintf((char *)time_counter_content, "TIME: %d", game_time);
+        gui_text_content_set(time_counter, time_counter_content, strlen((char *)time_counter_content));
+        if (game_time == 0)
+        {
+            img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
+                                                   0);
+            gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
+            // gui_win_stop_animation(win);
+            return;
+        }
+
         // Get the position of the ball then set the image location and rotate it on the GUI
         {
             b2Vec2 position = body_st->GetPosition();
@@ -646,17 +674,19 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         {
             bool bomb_flag = cutting_judgment(win, img_strawberry, img_banana, img_peach, img_watermelon,
                                               img_bomb, tp, img_cut_arry, fruit_cut_flag);
-
-            static char text_content[16];
-            sprintf(text_content, "SCORE: %d", fruit_score);
-            gui_text_content_set(score_board, text_content, strlen(text_content));
-
             if (bomb_flag)
             {
                 img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
                                                        0);
                 gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
                 gui_win_stop_animation(win);
+            }
+            else
+            {
+                fruit_score += (fruit_cut_cnt * fruit_cut_cnt * 10);
+                static char text_content[16];
+                sprintf(text_content, "SCORE: %d", fruit_score);
+                gui_text_content_set(score_board, text_content, strlen(text_content));
             }
         }
 
@@ -672,13 +702,14 @@ static void fruit_ninja_design(gui_obj_t *obj)
                                     "FRUIT_NINJA_BOX2D", 0, 0, 0, 0);
 
     // Set the animation function of the window
-    gui_win_set_animate(win, 5000, -1, fruit_ninja_cb, win);
+    gui_win_set_animate(win, 1000, 60, fruit_ninja_cb, win);
     init_flag = true;
     fruit_cut_flag[0] = 0;
     fruit_cut_flag[1] = 0;
     fruit_cut_flag[2] = 0;
     fruit_cut_flag[3] = 0;
     fruit_score = 0;
+    game_time = 60;
 }
 }
 

@@ -14,7 +14,6 @@
 #include "gui_canvas_round_rect.h"
 #include "guidef.h"
 
-#define PAGE_NAME "_page_name"
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 #define SCREEN_X_OFF 21
@@ -22,7 +21,7 @@
 #define TAB_HEIGHT 220
 #define TAB_INTERVAL 20
 #define TAB_START 140
-#define TAB_ARRAY_NUM 10
+#define TAB_ARRAY_NUM 4
 
 typedef enum
 {
@@ -36,9 +35,11 @@ static gui_page_t *pg;
 static gui_win_t *win_animate, *win_design;
 static gui_obj_t *tv_array[TAB_ARRAY_NUM] = {0};
 static gui_curtain_t *ct_parent;
+static bool close_flag = 0;
 
 static void win_clear_all_cb(void)
 {
+    close_flag = 1;
     float percent = win_animate->animate->progress_percent;
     uint8_t index = 0;
     while (tv_array[index])
@@ -49,14 +50,24 @@ static void win_clear_all_cb(void)
             gui_obj_tree_free(tv_array[index]);
             tv_array[index] = NULL;
             GUI_BASE(pg)->h = GUI_BASE(pg)->h - (TAB_HEIGHT + TAB_INTERVAL);
+            if (index == TAB_ARRAY_NUM - 1 || tv_array[index + 1] == NULL)
+            {
+                close_flag = 0;
+                return;
+            }
         }
         index++;
+        if (index == TAB_ARRAY_NUM)
+        {
+            break;
+        }
     }
 }
 
 static void tv_clear_all(void *obj, gui_event_t e)
 {
     uint8_t index = 0;
+    close_flag = 1;
     while (tv_array[index])
     {
         gui_tabview_t *tv = (gui_tabview_t *)tv_array[index];
@@ -79,6 +90,10 @@ static void tv_clear_all(void *obj, gui_event_t e)
             }
         }
         index++;
+        if (index == TAB_ARRAY_NUM)
+        {
+            break;
+        }
     }
     if (index != 0)
     {
@@ -105,15 +120,17 @@ static void pagelist_clear(gui_page_t *parent)
 
 static void win_clear_cb(gui_obj_t *obj)
 {
+    close_flag = 1;
     float percent = win_animate->animate->progress_percent;
     obj->x = (0 - percent * 2) * SCREEN_WIDTH;
     uint8_t index = 0;
     while (1)
     {
-        if (tv_array[index++] == obj)
+        if (tv_array[index] == obj)
         {
             break;
         }
+        index++;
     }
     if (percent >= 1.0f)
     {
@@ -121,21 +138,44 @@ static void win_clear_cb(gui_obj_t *obj)
         GUI_BASE(pg)->h = GUI_BASE(pg)->h - (TAB_HEIGHT + TAB_INTERVAL);
         while (1)
         {
-            tv_array[index - 1] = tv_array[index];
+            if (index == TAB_ARRAY_NUM - 1)
+            {
+                tv_array[index] = NULL;
+                break;
+            }
+
+            tv_array[index] = tv_array[index + 1];
             if (!tv_array[index])
             {
                 break;
             }
             index++;
         }
+        close_flag = 0;
     }
     if (percent > 0.5f)
     {
+        if (index == TAB_ARRAY_NUM - 1)
+        {
+            return;
+        }
+        index++;
         while (tv_array[index])
         {
-            tv_array[index]->y = TAB_START + (index - 1 + 2 * (1 - percent)) * (TAB_HEIGHT + TAB_INTERVAL);
+            if (percent > 0.95f)
+            {
+                tv_array[index]->y = TAB_START + (index - 1) * (TAB_HEIGHT + TAB_INTERVAL);
+            }
+            else
+            {
+                tv_array[index]->y = TAB_START + (index - 1 + 2 * (1 - percent)) * (TAB_HEIGHT + TAB_INTERVAL);
+            }
             index++;
             // gui_log("y = %d\r\n", tv_os->y);
+            if (index == TAB_ARRAY_NUM)
+            {
+                break;
+            }
         }
     }
 }
@@ -243,6 +283,12 @@ static void view_more_enter(void *obj, gui_event_t e, void *param)
 
 void pagelist_create(const char *informer, const char *content, const char *time, app_name app)
 {
+    if (close_flag)
+    {
+        gui_log("During close animation, can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
+        return;
+    }
+
     // move current information, then add new information on the top
     uint8_t index = 0;
     while (1)
@@ -504,6 +550,10 @@ static void win_design_cb(void)
                     break;
                 }
                 index++;
+                if (index == TAB_ARRAY_NUM)
+                {
+                    break;
+                }
             }
             for (uint8_t i = 0; i < index; i++)
             {
@@ -540,29 +590,14 @@ static void win_design_cb(void)
                 obj->y <= (pg->start_y - (obj->h - SCREEN_HEIGHT)); //@BOTTOM
         if (flag || tp->y > SCREEN_HEIGHT - 50)
         {
-            gui_page_t *page = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
-            GUI_BASE(page)->gesture = 1;
-            gui_curtain_t *c_up = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "2",
-                                            (void *)&c_up); //  can find "2" in "app_tb_clock.c"
-            if (c_up)
-            {
-                GUI_BASE(c_up)->gesture = 0;
-            }
+            GUI_BASE(pg)->gesture = 1;
+            GUI_BASE(ct_parent)->gesture = 0;
             // gui_log("curtain down\n");
         }
         else
         {
-            gui_page_t *page = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
-            GUI_BASE(page)->gesture = 0;
-            gui_curtain_t *c_up = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "2", (void *)&c_up);
-            if (c_up)
-            {
-                GUI_BASE(c_up)->gesture = 1;
-            }
+            GUI_BASE(pg)->gesture = 0;
+            GUI_BASE(ct_parent)->gesture = 1;
             // gui_log("page down\n");
         }
     }
@@ -581,7 +616,7 @@ void tabview_up_design(void *parent_widget)
     gui_canvas_round_rect_t *canvas_line = gui_canvas_round_rect_create(GUI_BASE(win_design), "line",
                                                                         160 + SCREEN_X_OFF, SCREEN_HEIGHT - 25, 48, 6, 4, gui_rgb(39, 43, 44));
 
-    pg = gui_page_create(win_design, PAGE_NAME, 0, 0, 0, 0);
+    pg = gui_page_create(win_design, "ct_up_page", 0, 0, 0, 0);
     // draw table content
     pagelist_clear(pg);
 
