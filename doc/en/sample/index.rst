@@ -28,4 +28,5 @@ The entry point for any application is:
     Status Bar <Status-bar/Status bar>
     Fruit Ninja <Fruit_Ninja/Demo>
     Music Player <MusicPlayer/Music Player>
-
+    Timer <Timer/Timer>
+    Watchface Market <WatchfaceMarket/WatchfaceMarket>
