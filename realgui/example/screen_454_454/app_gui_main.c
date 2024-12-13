@@ -128,24 +128,24 @@ static int watch_app_init(void)
     extern int close(int fd);
     defaultPath = "realgui\\example\\screen_454_454\\root_image\\root\\";
     fd = open("./realgui/example/screen_454_454/root_image/root(0x4400000).bin", 0);
-    if (fd > 0)
-    {
-        if (read(fd, resource_root, 1024 * 1024 * 20) == -1)
-        {
-            printf("open root(0x4400000).bin read fail!");
-            close(fd);
-            return 0;
-        }
-        printf("open root(0x4400000).bin Successful!\n");
-    }
-    else
+
+    if (fd < 0)
     {
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         return 0;
     }
+
+    if (read(fd, resource_root, 1024 * 1024 * 20) == -1)
+    {
+        printf("open root(0x4400000).bin read fail!");
+        close(fd);
+        return 0;
+    }
     close(fd);
+    printf("open root(0x4400000).bin Successful!\n");
+
 #endif
     extern int gui_server_init(void);
     gui_server_init();
