@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rtk_ppe.c
+ * @file lv_draw_rtk_ppe_v2.c
  *
  */
 
@@ -7,14 +7,14 @@
  *      INCLUDES
  *********************/
 
-
+#include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
 #include <math.h>
-#include "lv_draw_rtk_ppe.h"
-#include "lv_draw_rtk_ppe_rect.h"
-#include "lv_draw_rtk_ppe_blend.h"
+#include "lv_draw_rtk_ppe_v2.h"
+#include "lv_draw_rtk_ppe_rect_v2.h"
+#include "lv_draw_rtk_ppe_blend_v2.h"
 #include "trace.h"
-#include "hal_imdc.h"
+#include "hal_idu.h"
 
 //#if LV_COLOR_DEPTH != 32
 //#include "../../../core/lv_refr.h"

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-
+#include "lvgl.h"
 #if LV_USE_GPU_RTK_PPE
 #include <math.h>
 #include "lv_draw_rtk_ppe.h"

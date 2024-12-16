@@ -7,11 +7,11 @@
  *      INCLUDES
  *********************/
 
-
+#include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
-#include "lv_draw_rtk_ppe_blend.h"
-#include "lv_draw_rtk_ppe_utils.h"
-#include "rtl_PPEV2.h"
+#include "lv_draw_rtk_ppe_blend_v2.h"
+#include "lv_draw_rtk_ppe_utils_v2.h"
+#include "rtl_ppe.h"
 #include "trace.h"
 /*********************
  *      DEFINES
@@ -45,14 +45,14 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
     target.address = (uint32_t)draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPEV2_RGB565 : PPEV2_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     target.opacity = dsc->opa;
     lv_color32_t bg_color = lv_ppe_toABGR8888(dsc->color);
     ppe_rect_t rect = {.x = dest_area->x1, .w = dest_area->x2 - dest_area->x1 + 1,
                        .y = dest_area->y1, .h = dest_area->y2 - dest_area->y1 + 1
                       };
-    PPEV2_err err = PPEV2_Mask(&target, bg_color.full, &rect);
-    if (err == PPEV2_SUCCESS)
+    PPE_err err = PPE_Mask(&target, bg_color.full, &rect);
+    if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
     }
@@ -109,7 +109,7 @@ lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
     target.address = (uint32_t)draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPEV2_RGB565 : PPEV2_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     target.win_x_min = 0;
     target.win_x_max = lv_area_get_width(draw_ctx->buf_area);
     target.win_y_min = 0;
@@ -124,57 +124,57 @@ lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
     source.win_x_max = target.win_x_max;
     source.win_y_min = target.win_y_min;
     source.win_y_max = target.win_y_max;
-    PPEV2_BLEND_MODE mode = PPEV2_SRC_OVER_MODE;
+    PPE_BLEND_MODE mode = PPE_SRC_OVER_MODE;
 
     switch (cf)
     {
     case LV_IMG_CF_ALPHA_8BIT:
-        source.format = PPEV2_A8;
+        source.format = PPE_A8;
         break;
     case LV_IMG_CF_TRUE_COLOR:
         if (LV_COLOR_DEPTH == 16)
         {
-            source.format = PPEV2_RGB565;
+            source.format = PPE_RGB565;
         }
         if (LV_COLOR_DEPTH == 32)
         {
-            source.format = PPEV2_ARGB8888;
+            source.format = PPE_ARGB8888;
         }
         break;
     case LV_IMG_CF_TRUE_COLOR_ALPHA:
         if (LV_COLOR_DEPTH == 16)
         {
-            source.format = PPEV2_ARGB8565;
+            source.format = PPE_ARGB8565;
         }
         if (LV_COLOR_DEPTH == 32)
         {
-            source.format = PPEV2_ARGB8888;
+            source.format = PPE_ARGB8888;
         }
         break;
     case LV_IMG_CF_RGB888:
-        source.format = PPEV2_RGB888;
+        source.format = PPE_RGB888;
         break;
     case LV_IMG_CF_RGBA8888:
-        source.format = PPEV2_RGBA8888;
+        source.format = PPE_RGBA8888;
         break;
     case LV_IMG_CF_RGBX8888:
-        source.format = PPEV2_RGBX8888;
+        source.format = PPE_RGBX8888;
         break;
     case LV_IMG_CF_RGB565:
-        source.format = PPEV2_RGB565;
+        source.format = PPE_RGB565;
         break;
     case LV_IMG_CF_RGBA5658:
-        source.format = PPEV2_RGBA5658;
+        source.format = PPE_RGBA5658;
         break;
     case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
         {
             if (LV_COLOR_DEPTH == 16)
             {
-                source.format = PPEV2_ARGB8565;
+                source.format = PPE_ARGB8565;
             }
             if (LV_COLOR_DEPTH == 32)
             {
-                source.format = PPEV2_ARGB8888;
+                source.format = PPE_ARGB8888;
             }
             lv_color32_t min = lv_ppe_toABGR8888(LV_COLOR_CHROMA_KEY);
             lv_color32_t max = {.full = min.full};
@@ -220,14 +220,14 @@ lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
     }
     uint32_t size = 0;
     uint8_t *pic_buffer = lv_ppe_get_buffer(&size);
-    if (image_area.w * image_area.h * PPEV2_Get_Pixel_Size(source.format) <= size)
+    if (image_area.w * image_area.h * PPE_Get_Pixel_Size(source.format) <= size)
     {
         lv_area_t lv_src_area = {.x1 = image_area.x, .x2 = image_area.x + image_area.w - 1, \
                                  .y1 = image_area.y, .y2 = image_area.y + image_area.h - 1
                                 };
         lv_area_t lv_dst_area = {.x1 = 0, .x2 = image_area.w - 1, .y1 = 0, .y2 = image_area.h - 1};
         lv_ppe_buffer_copy(pic_buffer, image_area.w, &lv_dst_area, (const void *)map_p, \
-                           source.width, &lv_src_area, PPEV2_Get_Pixel_Size(source.format));
+                           source.width, &lv_src_area, PPE_Get_Pixel_Size(source.format));
         ppe_get_identity(&pre_trans);
         pre_trans.m[0][2] = image_area.x * -1.0f;
         pre_trans.m[1][2] = image_area.y * -1.0f;
@@ -253,9 +253,9 @@ lv_res_t lv_ppe_blend_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
     {
         source.high_quality = true;
     }
-    PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
-    PPEV2_Finish();
-    if (err == PPEV2_SUCCESS)
+    PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
+    PPE_Finish();
+    if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
     }
@@ -284,7 +284,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     target.address = (uint32_t)draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPEV2_RGB565 : PPEV2_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     target.win_x_min = 0;
     target.win_x_max = lv_area_get_width(draw_ctx->buf_area);
     target.win_y_min = 0;
@@ -299,21 +299,21 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     source.win_x_max = target.win_x_max;
     source.win_y_min = target.win_y_min;
     source.win_y_max = target.win_y_max;
-    PPEV2_BLEND_MODE mode = PPEV2_SRC_OVER_MODE;
+    PPE_BLEND_MODE mode = PPE_SRC_OVER_MODE;
 
     if (LV_COLOR_DEPTH == 16)
     {
         if (cf == LV_IMG_CF_TRUE_COLOR)
         {
-            source.format = PPEV2_RGB565;
+            source.format = PPE_RGB565;
         }
         else if (cf == LV_IMG_CF_TRUE_COLOR_ALPHA)
         {
-            source.format = PPEV2_ARGB8565;
+            source.format = PPE_ARGB8565;
         }
         if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
         {
-            source.format = PPEV2_RGB565;
+            source.format = PPE_RGB565;
             lv_color32_t min = lv_ppe_toABGR8888(LV_COLOR_CHROMA_KEY);
             lv_color32_t max = {.full = min.full};
             source.color_key_enable = true;
@@ -351,10 +351,10 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     }
     else if (LV_COLOR_DEPTH == 32)
     {
-        source.format = PPEV2_ARGB8888;
+        source.format = PPE_ARGB8888;
         if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
         {
-            source.format = PPEV2_ARGB8888;
+            source.format = PPE_ARGB8888;
             lv_color32_t min = lv_ppe_toABGR8888(LV_COLOR_CHROMA_KEY);
             lv_color32_t max = {.full = min.full};
             source.color_key_enable = true;
@@ -388,7 +388,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     }
     else if (cf == LV_IMG_CF_RGB888)
     {
-        source.format = PPEV2_RGB888;
+        source.format = PPE_RGB888;
     }
     else
     {
@@ -406,14 +406,14 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     }
     uint32_t size = 0;
     uint8_t *pic_buffer = lv_ppe_get_buffer(&size);
-    if (image_area.w * image_area.h * PPEV2_Get_Pixel_Size(source.format) <= size)
+    if (image_area.w * image_area.h * PPE_Get_Pixel_Size(source.format) <= size)
     {
         lv_area_t lv_src_area = {.x1 = image_area.x, .x2 = image_area.x + image_area.w - 1, \
                                  .y1 = image_area.y, .y2 = image_area.y + image_area.h - 1
                                 };
         lv_area_t lv_dst_area = {.x1 = 0, .x2 = image_area.w - 1, .y1 = 0, .y2 = image_area.h - 1};
         lv_ppe_buffer_copy(pic_buffer, image_area.w, &lv_dst_area, (const void *)map_p, \
-                           source.width, &lv_src_area, PPEV2_Get_Pixel_Size(source.format));
+                           source.width, &lv_src_area, PPE_Get_Pixel_Size(source.format));
         ppe_get_identity(&pre_trans);
         pre_trans.m[0][2] = image_area.x * -1.0f;
         pre_trans.m[1][2] = image_area.y * -1.0f;
@@ -439,9 +439,9 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     {
         source.high_quality = true;
     }
-    PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
-    PPEV2_Finish();
-    if (err == PPEV2_SUCCESS)
+    PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
+    PPE_Finish();
+    if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
     }
@@ -471,7 +471,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     target.address = (uint32_t)draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPEV2_RGB565 : PPEV2_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     target.win_x_min = 0;
     target.win_x_max = lv_area_get_width(draw_ctx->buf_area);
     target.win_y_min = 0;
@@ -486,57 +486,57 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     source.win_x_max = target.win_x_max;
     source.win_y_min = target.win_y_min;
     source.win_y_max = target.win_y_max;
-    PPEV2_BLEND_MODE mode = PPEV2_SRC_OVER_MODE;
+    PPE_BLEND_MODE mode = PPE_SRC_OVER_MODE;
 
     switch (cf)
     {
     case LV_IMG_CF_ALPHA_8BIT:
-        source.format = PPEV2_A8;
+        source.format = PPE_A8;
         break;
     case LV_IMG_CF_TRUE_COLOR:
         if (LV_COLOR_DEPTH == 16)
         {
-            source.format = PPEV2_RGB565;
+            source.format = PPE_RGB565;
         }
         if (LV_COLOR_DEPTH == 32)
         {
-            source.format = PPEV2_ARGB8888;
+            source.format = PPE_ARGB8888;
         }
         break;
     case LV_IMG_CF_TRUE_COLOR_ALPHA:
         if (LV_COLOR_DEPTH == 16)
         {
-            source.format = PPEV2_ARGB8565;
+            source.format = PPE_ARGB8565;
         }
         if (LV_COLOR_DEPTH == 32)
         {
-            source.format = PPEV2_ARGB8888;
+            source.format = PPE_ARGB8888;
         }
         break;
     case LV_IMG_CF_RGB888:
-        source.format = PPEV2_RGB888;
+        source.format = PPE_RGB888;
         break;
     case LV_IMG_CF_RGBA8888:
-        source.format = PPEV2_RGBA8888;
+        source.format = PPE_RGBA8888;
         break;
     case LV_IMG_CF_RGBX8888:
-        source.format = PPEV2_RGBX8888;
+        source.format = PPE_RGBX8888;
         break;
     case LV_IMG_CF_RGB565:
-        source.format = PPEV2_RGB565;
+        source.format = PPE_RGB565;
         break;
     case LV_IMG_CF_RGBA5658:
-        source.format = PPEV2_RGBA5658;
+        source.format = PPE_RGBA5658;
         break;
     case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
         {
             if (LV_COLOR_DEPTH == 16)
             {
-                source.format = PPEV2_ARGB8565;
+                source.format = PPE_ARGB8565;
             }
             if (LV_COLOR_DEPTH == 32)
             {
-                source.format = PPEV2_ARGB8888;
+                source.format = PPE_ARGB8888;
             }
             if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
             {
@@ -586,14 +586,14 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     }
     uint32_t size = 0;
     uint8_t *pic_buffer = lv_ppe_get_buffer(&size);
-    if (image_area.w * image_area.h * PPEV2_Get_Pixel_Size(source.format) <= size)
+    if (image_area.w * image_area.h * PPE_Get_Pixel_Size(source.format) <= size)
     {
         lv_area_t lv_src_area = {.x1 = image_area.x, .x2 = image_area.x + image_area.w - 1, \
                                  .y1 = image_area.y, .y2 = image_area.y + image_area.h - 1
                                 };
         lv_area_t lv_dst_area = {.x1 = 0, .x2 = image_area.w - 1, .y1 = 0, .y2 = image_area.h - 1};
         lv_ppe_buffer_copy(pic_buffer, image_area.w, &lv_dst_area, (const void *)map_p, \
-                           source.width, &lv_src_area, PPEV2_Get_Pixel_Size(source.format));
+                           source.width, &lv_src_area, PPE_Get_Pixel_Size(source.format));
         ppe_get_identity(&pre_trans);
         pre_trans.m[0][2] = image_area.x * -1.0f;
         pre_trans.m[1][2] = image_area.y * -1.0f;
@@ -613,7 +613,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     recolor_value.ch.alpha = dsc->recolor_opa;
     source.opacity = 0xFF;
     ppe_rect_t recolor_rect = {.x = 0, .y = 0, .w = source.width, .h = source.height};
-    PPEV2_Mask(&source, recolor_value.full, &recolor_rect);
+    PPE_Mask(&source, recolor_value.full, &recolor_rect);
 
     source.opacity = dsc->opa;
 
@@ -626,9 +626,9 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     {
         source.high_quality = true;
     }
-    PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
-    PPEV2_Finish();
-    if (err == PPEV2_SUCCESS)
+    PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
+    PPE_Finish();
+    if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
     }
@@ -643,7 +643,7 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     target.address = (uint32_t)draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPEV2_RGB565 : PPEV2_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     target.win_x_min = 0;
     target.win_x_max = lv_area_get_width(draw_ctx->buf_area);
     target.win_y_min = 0;
@@ -652,11 +652,11 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     source.address = (uint32_t)dsc->mask_buf;
     source.width = dsc->mask_area->x2 - dsc->mask_area->x1 + 1;
     source.height = dsc->mask_area->y2 - dsc->mask_area->y1 + 1;
-    source.format = PPEV2_A8;
-    target.win_x_min = target.win_x_min;
-    target.win_x_max = target.win_x_max;
-    target.win_y_min = target.win_y_min;
-    target.win_y_max = target.win_y_max;
+    source.format = PPE_A8;
+    // target.win_x_min = target.win_x_min;
+    // target.win_x_max = target.win_x_max;
+    // target.win_y_min = target.win_y_min;
+    // target.win_y_max = target.win_y_max;
 
     ppe_matrix_t inverse;
     ppe_get_identity(&inverse);
@@ -666,9 +666,9 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
                             .w = constraint_area.x2 - constraint_area.x1 + 1, \
                             .h = constraint_area.y2 - constraint_area.y1 + 1
                            };
-    PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &draw_rect, PPEV2_SRC_OVER_MODE);
-    PPEV2_Finish();
-    if (err == PPEV2_SUCCESS)
+    PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &draw_rect, PPE_SRC_OVER_MODE);
+    PPE_Finish();
+    if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
     }
@@ -679,4 +679,4 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
 }
 
 
-#endif /*LV_USE_GPU_RTK_PPEV2*/
+#endif /*LV_USE_GPU_RTK_PPE*/

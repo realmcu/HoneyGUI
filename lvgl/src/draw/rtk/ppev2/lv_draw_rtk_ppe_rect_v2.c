@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rtk_ppe_rect.c
+ * @file lv_draw_rtk_ppe_rect_v2.c
  *
  */
 
@@ -8,10 +8,10 @@
  *      INCLUDES
  *********************/
 
-
+#include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
-#include "lv_draw_rtk_ppe_rect.h"
-#include "rtl_PPEV2.h"
+#include "lv_draw_rtk_ppe_rect_v2.h"
+#include "rtl_ppe.h"
 #include <math.h>
 #include "trace.h"
 
@@ -54,7 +54,7 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
     target.address = (uint32_t)draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
-    target.format = sizeof(lv_color_t) == 2 ? PPEV2_RGB565 : PPEV2_ARGB8888;
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     lv_color32_t bg_color = lv_ppe_toABGR8888(dsc->bg_color);
 
     target.win_x_min = coords->x1;
@@ -64,8 +64,8 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
     target.opacity = dsc->bg_opa;
 
     ppe_rect_t rect = {.x = coords->x1, .w = coords->x2 - coords->x1 + 1, .y = coords->y1, .h = coords->y2 - coords->y1 + 1};
-    PPEV2_err err = PPEV2_Mask(&target, bg_color.full, &rect);
-    if (err == PPEV2_SUCCESS)
+    PPE_err err = PPE_Mask(&target, bg_color.full, &rect);
+    if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
     }

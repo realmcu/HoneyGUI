@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rtk_ppe_utils.c
+ * @file lv_draw_rtk_ppe_utils_v2.c
  *
  */
 
@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 
-
+#include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
-#include "lv_draw_rtk_ppe_utils.h"
+#include "lv_draw_rtk_ppe_utils_v2.h"
 #include "../../../core/lv_refr.h"
 #include "section.h"
 
@@ -127,7 +127,7 @@ lv_res_t lv_ppe_buffer_copy(void *dest_buf, lv_coord_t dest_stride, const lv_are
                             const void *src_buf, lv_coord_t src_stride, const lv_area_t *src_area, uint8_t unit_size)
 {
 //    SCB_InvalidateDCache();
-    hal_imdc_dma_info copy_info = {0};
+    hal_idu_dma_info copy_info = {0};
     copy_info.dst_stride = dest_stride * unit_size;
     copy_info.src_stride = src_stride * unit_size;
     copy_info.length = lv_area_get_width(src_area) * unit_size;

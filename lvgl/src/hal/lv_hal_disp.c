@@ -29,7 +29,7 @@
 #include "../draw/rtk/ppe/lv_draw_rtk_ppe.h"
 #endif
 #if LV_USE_GPU_RTK_PPEV2
-#include "../draw/rtk/ppev2/lv_draw_rtk_ppe.h"
+#include "../draw/rtk/ppev2/lv_draw_rtk_ppe_v2.h"
 #endif
 
 #if LV_USE_THEME_DEFAULT

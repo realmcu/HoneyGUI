@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifdef LV_USE_GPU_RTK_PPE
-#include "hal_imdc.h"
+#include "hal_idu.h"
 #endif
 
 /**********************
@@ -36,25 +36,25 @@ typedef struct
 {
     uint8_t len;
     uint16_t pixel16;  //rgb565
-} imdc_rgb565_node_t;
-typedef struct imdc_argb8565_node
+} idu_rgb565_node_t;
+typedef struct idu_argb8565_node
 {
     uint8_t len;
     uint16_t pixel;  //argb8565
     uint8_t alpha;
-} imdc_argb8565_node_t;
-typedef struct imdc_rgb888_node
+} idu_argb8565_node_t;
+typedef struct idu_rgb888_node
 {
     uint8_t len;
     uint8_t pixel_b;  //rgb888
     uint8_t pixel_g;
     uint8_t pixel_r;
-} imdc_rgb888_node_t;
-typedef struct imdc_argb8888_node
+} idu_rgb888_node_t;
+typedef struct idu_argb8888_node
 {
     uint8_t len;
     uint32_t pixel32;    //argb8888
-} imdc_argb8888_node_t;
+} idu_argb8888_node_t;
 #pragma pack()
 
 typedef struct gui_rgb_data_head
@@ -82,7 +82,7 @@ typedef struct
     uint8_t reserved[3];
     uint32_t raw_pic_width;
     uint32_t raw_pic_height;
-} imdc_file_header_t;
+} idu_file_header_t;
 typedef enum
 {
     RGB565 = 0, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, pls refs def_def.h
@@ -92,9 +92,9 @@ typedef enum
 } GUI_FormatType;
 typedef struct
 {
-    imdc_file_header_t header;
+    idu_file_header_t header;
     uint32_t compressed_addr[1024]; // adjust size accordingly
-} imdc_file_t;
+} idu_file_t;
 
 /**********************
  * UTILS
@@ -121,18 +121,18 @@ static uint8_t get_bytes_per_pixel(uint8_t raw_bytes_per_pixel);
 static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_header_t *header);
 static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc);
 static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc);
-static lv_res_t decompress_rle_rgb565_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_rgb565_data(const idu_file_t *file, uint8_t *img_data,
                                            uint16_t width, uint16_t height);
-static lv_res_t decompress_rle_rgb888_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_rgb888_data(const idu_file_t *file, uint8_t *img_data,
                                            uint16_t width, uint16_t height);
-static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height);
-static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height);
 
 #ifdef LV_USE_GPU_RTK_PPE
-static lv_res_t hw_acc_imdc_decode(const uint8_t *image, uint8_t *output, uint16_t width,
-                                   uint16_t height);
+static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_t width,
+                                  uint16_t height);
 #endif
 
 /**********************
@@ -286,11 +286,11 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
             psram_img_cache = (uint8_t *)img_data;
 
-            imdc_file_t *file = (imdc_file_t *)(rle_data + 8);
+            idu_file_t *file = (idu_file_t *)(rle_data + 8);
             lv_res_t ret;
 
 #ifdef LV_USE_GPU_RTK_PPE
-            ret = hw_acc_imdc_decode(rle_data, img_data, width, height);
+            ret = hw_acc_idu_decode(rle_data, img_data, width, height);
 
             if (ret == LV_RES_OK)
             {
@@ -353,7 +353,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
         char input_type = head->type;
 
         const uint8_t *rle_header = data + 8;
-        imdc_file_t *file = (imdc_file_t *)rle_header;
+        idu_file_t *file = (idu_file_t *)rle_header;
 
         uint32_t img_size = width * height * bytes_per_pixel;
         dsc->header.w = width;
@@ -372,7 +372,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
         lv_res_t ret;
 
 #ifdef LV_USE_GPU_RTK_PPE
-        ret = hw_acc_imdc_decode(data, img_data, width, height);
+        ret = hw_acc_idu_decode(data, img_data, width, height);
 
         if (ret == LV_RES_OK)
         {
@@ -433,8 +433,8 @@ static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
     LV_LOG_INFO("Closed RLE image");
 }
 #if LV_USE_GPU_RTK_PPE
-static lv_res_t hw_acc_imdc_decode(const uint8_t *image, uint8_t *output, uint16_t width,
-                                   uint16_t height)
+static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_t width,
+                                  uint16_t height)
 {
     if (image == NULL || output == NULL)
     {
@@ -442,14 +442,14 @@ static lv_res_t hw_acc_imdc_decode(const uint8_t *image, uint8_t *output, uint16
         return LV_RES_INV;
     }
 
-    hal_imdc_decompress_info info;
+    hal_idu_decompress_info info;
     info.start_column = 0;
     info.end_column = width - 1;
     info.start_line = 0;
     info.end_line = height - 1;
     info.raw_data_address = (uint32_t)(image + 8);
 
-    bool ret = hal_imdc_decompress(&info, output);
+    bool ret = hal_idu_decompress(&info, output);
 
     if (!ret)
     {
@@ -461,7 +461,7 @@ static lv_res_t hw_acc_imdc_decode(const uint8_t *image, uint8_t *output, uint16
     }
 }
 #endif
-static lv_res_t decompress_rle_rgb565_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_rgb565_data(const idu_file_t *file, uint8_t *img_data,
                                            uint16_t width, uint16_t height)
 {
     LV_ASSERT(file != NULL && img_data != NULL);
@@ -474,16 +474,16 @@ static lv_res_t decompress_rle_rgb565_data(const imdc_file_t *file, uint8_t *img
         uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[y + 1];
         for (uint32_t addr = start; addr < end;)
         {
-            imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)(uintptr_t)addr;
+            idu_rgb565_node_t *node = (idu_rgb565_node_t *)(uintptr_t)addr;
             rle_memset16(linebuf, node->pixel16, node->len);
-            addr += sizeof(imdc_rgb565_node_t);
+            addr += sizeof(idu_rgb565_node_t);
             linebuf += node->len;
         }
     }
 
     return LV_RES_OK;
 }
-static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height)
 {
     LV_ASSERT(file != NULL && img_data != NULL);
@@ -496,14 +496,14 @@ static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *i
         uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
         for (uint32_t addr = start; addr < end;)
         {
-            imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)(uintptr_t)addr;
+            idu_argb8565_node_t *node = (idu_argb8565_node_t *)(uintptr_t)addr;
             for (uint32_t i = 0; i < node->len; i++)
             {
                 linebuf[i * 3 + 0] = node->pixel & 0xff;
                 linebuf[i * 3 + 1] = (node->pixel >> 8) & 0xff;
                 linebuf[i * 3 + 2] = node->alpha;
             }
-            addr += sizeof(imdc_argb8565_node_t);
+            addr += sizeof(idu_argb8565_node_t);
             linebuf += node->len * 3;
         }
     }
@@ -512,7 +512,7 @@ static lv_res_t decompress_rle_argb8565_data(const imdc_file_t *file, uint8_t *i
 }
 
 
-static lv_res_t decompress_rle_rgb888_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_rgb888_data(const idu_file_t *file, uint8_t *img_data,
                                            uint16_t width, uint16_t height)
 {
     LV_ASSERT(file != NULL && img_data != NULL);
@@ -527,21 +527,21 @@ static lv_res_t decompress_rle_rgb888_data(const imdc_file_t *file, uint8_t *img
 
         for (uint32_t addr = start; addr < end;)
         {
-            imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)(uintptr_t)addr;
+            idu_rgb888_node_t *node = (idu_rgb888_node_t *)(uintptr_t)addr;
             for (uint32_t i = 0; i < node->len; i++)
             {
                 linebuf[i * 3]     = node->pixel_b;
                 linebuf[i * 3 + 1] = node->pixel_g;
                 linebuf[i * 3 + 2] = node->pixel_r;
             }
-            addr += sizeof(imdc_rgb888_node_t);
+            addr += sizeof(idu_rgb888_node_t);
             linebuf += node->len * 3;
         }
     }
     return LV_RES_OK;
 }
 
-static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *img_data,
+static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height)
 {
     LV_ASSERT(file != NULL && img_data != NULL);
@@ -555,10 +555,10 @@ static lv_res_t decompress_rle_argb8888_data(const imdc_file_t *file, uint8_t *i
 
         for (uint32_t addr = start; addr < end;)
         {
-            imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)(uintptr_t)addr;
+            idu_argb8888_node_t *node = (idu_argb8888_node_t *)(uintptr_t)addr;
             rle_memset32(linebuf, node->pixel32, node->len);
 
-            addr += sizeof(imdc_argb8888_node_t);
+            addr += sizeof(idu_argb8888_node_t);
             linebuf += node->len;
         }
     }

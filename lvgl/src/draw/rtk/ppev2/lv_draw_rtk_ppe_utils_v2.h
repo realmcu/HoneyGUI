@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rtk_ppe_utils.h
+ * @file lv_draw_rtk_ppe_utils_v2.h
  *
  */
 
@@ -18,8 +18,8 @@ extern "C" {
 #if LV_USE_GPU_RTK_PPEV2
 #include "../../sw/lv_draw_sw.h"
 #include "../../../misc/lv_log.h"
-#include "rtl_PPEV2.h"
-#include "hal_imdc.h"
+#include "rtl_ppe.h"
+#include "hal_idu.h"
 #include "rtl876x_rcc.h"
 
 /*********************

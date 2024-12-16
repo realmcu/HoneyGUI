@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rtk_ppe_blend.h
+ * @file lv_draw_rtk_ppe_blend_v2.h
  *
  */
 
@@ -19,7 +19,7 @@ extern "C" {
 #if LV_USE_GPU_RTK_PPEV2
 #include "../misc/lv_area.h"
 #include "../../sw/lv_draw_sw.h"
-#include "lv_draw_rtk_ppe.h"
+#include "lv_draw_rtk_ppe_v2.h"
 
 /*********************
  *      DEFINES
