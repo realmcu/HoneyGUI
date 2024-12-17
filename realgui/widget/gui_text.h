@@ -39,7 +39,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  text mode enum start */
+/* TEXT_MODE start */
 typedef enum
 {
     /* TOP */
@@ -62,7 +62,7 @@ typedef enum
     VERTICAL_LEFT      = 0x40,
     VERTICAL_RIGHT     = 0x41,
 } TEXT_MODE;
-/** @brief  text mode enum end */
+/* TEXT_MODE end */
 
 /** @brief  font type enum */
 typedef enum
