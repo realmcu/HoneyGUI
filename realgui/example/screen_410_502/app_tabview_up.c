@@ -29,6 +29,14 @@ typedef enum
     OS,
 } app_name;
 
+typedef struct information
+{
+    const char *informer;
+    const char *content;
+    const char *time;
+    app_name app
+} information_t;
+
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
 static gui_page_t *pg;
@@ -281,14 +289,13 @@ static void view_more_enter(void *obj, gui_event_t e, void *param)
     gui_win_set_animate(win_animate, 500, -1, (gui_animate_callback_t)view_more_cb, param);
 }
 
-void pagelist_create(const char *informer, const char *content, const char *time, app_name app)
+void pagelist_create(gui_msg_t *msg)
 {
     if (close_flag)
     {
         gui_log("During close animation, can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
         return;
     }
-
     // move current information, then add new information on the top
     uint8_t index = 0;
     while (1)
@@ -317,6 +324,11 @@ void pagelist_create(const char *informer, const char *content, const char *time
             index--;
         }
     }
+    information_t *payload = (information_t *)msg->payload;
+    const char *informer = payload->informer;
+    const char *content = payload->content;
+    const char *time = payload->time;
+    app_name app = payload->app;
 
     gui_tabview_t *tv = gui_tabview_create(pg, "0", 0, TAB_START, SCREEN_WIDTH, 220);
     gui_tab_t *tb_inform = gui_tab_create(tv, "tab_0", 0, 0, 0, 0, 0, 0);
@@ -366,17 +378,17 @@ void pagelist_create(const char *informer, const char *content, const char *time
         char *content_new = gui_malloc(105);
         strncpy(content_new, content, 100);
         strcat(content_new, " ...");
-        gui_text_set(text_content, (void *)content_new, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+        gui_text_set(text_content, (void *)content_new, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(content_new),
                      32);
     }
     else
     {
-        gui_text_set(text_content, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+        gui_text_set(text_content, (void *)content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(content),
                      32);
     }
-    gui_text_type_set(text_content, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_content, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_content, MULTI_LEFT);
     gui_text_wordwrap_set(text_content, true);
     // gui_text_convert_to_img(message_text, RGB565);
@@ -507,6 +519,38 @@ static void win_design_cb(void)
     int16_t y;
     int16_t h;
 
+    {
+        uint8_t index = 0;
+        while (1)
+        {
+            if (!tv_array[index])
+            {
+                break;
+            }
+            index++;
+            if (index == TAB_ARRAY_NUM)
+            {
+                break;
+            }
+        }
+        for (uint8_t i = 0; i < index; i++)
+        {
+            gui_tabview_t *tv = (gui_tabview_t *)tv_array[i];
+            y = GUI_BASE(tv)->y + obj->y;
+            if (y > 510)
+            {
+                GUI_BASE(tv)->not_show = 1;
+                // GUI_BASE(tv)->active = 0;
+                // gui_log("tv_%d, y = %d\n", i, y);
+            }
+            else
+            {
+                GUI_BASE(tv)->not_show = 0;
+                // GUI_BASE(tv)->active = 1;
+            }
+        }
+    }
+
     touch_info_t *tp = tp_get_info();
     static bool hold;
     if (tp->pressed)
@@ -610,7 +654,7 @@ void tabview_up_design(void *parent_widget)
     win_design = gui_win_create(parent_widget, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // draw black background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(win_design), "background", 0, 0,
-                                                            SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(255, 255, 255, 76));
+                                                            SCREEN_WIDTH, SCREEN_HEIGHT + TAB_HEIGHT + 30, gui_rgba(255, 255, 255, 76));
 
     // draw bottom line
     gui_canvas_round_rect_t *canvas_line = gui_canvas_round_rect_create(GUI_BASE(win_design), "line",
@@ -624,14 +668,10 @@ void tabview_up_design(void *parent_widget)
     {
         tv_array[index] = NULL;
     }
-    char *content =
-        "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.";
-    pagelist_create("10655810010", content, "YTD morning 10:24", MESSAGE);
+    // char *content =
+    //     "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.";
     // pagelist_create("10655810010", content, "YTD morning 10:24", MESSAGE);
-    // pagelist_create("10655810010", content, "YTD morning 10:24", MESSAGE);
-    content = "Watch will attempt to install this update later tonight.";
-    pagelist_create("watchOS 10.3.1", content, "Now", OS);
-    // pagelist_create("watchOS 10.3.1", content, "Now", OS);
+    // content = "Watch will attempt to install this update later tonight.";
     // pagelist_create("watchOS 10.3.1", content, "Now", OS);
     // bottom space to slide when tv all clear
     win_animate = gui_win_create(pg, "0", 0, SCREEN_HEIGHT, SCREEN_WIDTH,

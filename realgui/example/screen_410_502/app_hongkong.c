@@ -46,48 +46,28 @@ void *get_app_hongkong(void)
 
 static void kb_button_cb()
 {
-#ifdef _WIN32
-    touch_info_t *wheel = wheel_get_info();
-    // kb_info_t *kb = kb_get_info();
-    static bool hold = 0;
-    // static bool kb_hold = 0;
-    if (hold)
-    {
-        if (wheel->button_up)
-        {
-            gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
-        }
-    }
-    if (wheel->button_hold)
-    {
-        hold = 1;
-    }
-    else
-    {
-        hold = 0;
-    }
-#else
-#include "kb_algo.h"
     extern gui_kb_port_data_t *port_kb_get_data(void);
     gui_kb_port_data_t *kb = port_kb_get_data();
-    // static uint8_t hold = 0;
-    // if (hold)
-    // {
-    //     if (kb->event == GUI_KB_EVENT_UP)
-    //     {
-
-    //     }
-    // }
-    if (kb->event == GUI_KB_EVENT_DOWN)
+    static uint32_t time_press = 0;
+    static uint8_t hold = 0;
+    if (hold)
     {
-        // hold = 1;
-        gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
+        if (kb->event == GUI_KB_EVENT_UP)
+        {
+            hold = 0;
+            uint32_t time = kb->timestamp_ms_release - time_press;
+            if (time <= 500)
+            {
+                gui_log("pressing time = %d\n", time);
+                gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
+            }
+        }
     }
-    // else
-    // {
-    //     hold = 0;
-    // }
-#endif
+    if (kb->event == GUI_KB_EVENT_DOWN && !hold)
+    {
+        time_press = kb->timestamp_ms_press;
+        hold = 1;
+    }
 }
 
 static void switch_app_menu()
@@ -160,17 +140,41 @@ typedef enum
     MESSAGE = 0,
     OS,
 } app_name;
+
+typedef struct information
+{
+    const char *informer;
+    const char *content;
+    const char *time;
+    app_name app
+} information_t;
+
 static void inform_generate_task_entry()
 {
     while (true)
     {
-        extern void pagelist_create(const char *informer, const char *content, const char *time,
-                                    app_name app);
         char *content = "Watch will attempt to install this update later tonight.";
         extern struct tm *timeinfo;
         char time[10];
         sprintf(time, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
-        pagelist_create("watchOS 10.3.1", content, time, OS);
+
+        information_t payload =
+        {
+            "watchOS 10.3.1",
+            content,
+            time,
+            OS
+        };
+        extern void pagelist_create(information_t *payload);
+        gui_msg_t msg =
+        {
+            .event = GUI_EVENT_USER_DEFINE,
+            .payload = &payload,
+            .cb = (gui_msg_cb)pagelist_create,
+        };
+
+        gui_send_msg_to_server(&msg);
+
         gui_thread_mdelay(2000);
     }
 }
@@ -201,7 +205,7 @@ static int app_init(void)
     gui_server_init();
     gui_app_startup(get_app_hongkong());
     // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
-    // gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
+    gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     return 0;
 }
 

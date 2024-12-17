@@ -74,7 +74,7 @@ static void prepare(gui_obj_t *obj)
 
     gui_win_update_att(obj);
 
-    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0) && !(obj->event_dsc->event_code))
     {
         gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
@@ -143,7 +143,10 @@ static void prepare(gui_obj_t *obj)
     {
         this->press_flag = false;
         this->release_flag = false;
-        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        if (obj->event_dsc_cnt && obj->event_dsc->event_code == GUI_EVENT_INVALIDE)
+        {
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        }
         this->long_flag = false;
     }
 

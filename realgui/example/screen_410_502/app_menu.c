@@ -281,7 +281,6 @@ static void app_menu_design(gui_app_t *app)
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
         UI_CLOCK_BOX2D_RING_ICON_BIN,
         UI_CLOCK_ACTIVITY_ICON_BIN,
-        UI_CLOCK_HEARTRATE_ICON_BIN,
     };
 
     gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
@@ -310,7 +309,6 @@ static void app_menu_design(gui_app_t *app)
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
             {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
-            {switch_APP_HEART_RATE, (void *)1},
         };
         gui_menu_cellular_on_click(cell, gesture_parameter_array,
                                    sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

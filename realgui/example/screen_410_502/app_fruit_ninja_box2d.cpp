@@ -557,7 +557,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         gui_img_set_mode(img_cut_arry[3], IMG_SRC_OVER_MODE);
 
         // Set score_board
-        score_board = gui_text_create(win, "score_board",  10, 10, 150, 50);
+        score_board = gui_text_create(win, "score_board",  30, 30, 150, 50);
         gui_text_set(score_board, (void *)"SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"),
                      32);
         void *addr1 = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
@@ -567,7 +567,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         // Set time counter
         time_counter_content = gui_malloc(10);
         sprintf((char *)time_counter_content, "TIME: 60");
-        time_counter = gui_text_create(win, "0", 310, 10, 150, 50);
+        time_counter = gui_text_create(win, "0", 280, 30, 150, 50);
         gui_text_set(time_counter, time_counter_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen((char *)time_counter_content),
                      32);
@@ -723,11 +723,3 @@ extern "C" {
         app_fruit_ninja::clear_world();
     }
 }
-
-
-
-
-
-
-
-

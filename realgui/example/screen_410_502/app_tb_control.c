@@ -8,6 +8,7 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include <gui_app.h>
+#include "kb_algo.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -153,9 +154,11 @@ static void page_tb_control(gui_obj_t *parent)
 
 void win_control_enter_cb()
 {
-    kb_info_t *kb = kb_get_info();
+    extern gui_kb_port_data_t *port_kb_get_data(void);
+    gui_kb_port_data_t *kb = port_kb_get_data();
     static bool kb_hold = 0;
     static bool win_control_release = 0;
+    static uint32_t time_press = 0;
     if (enter_flag)
     {
         {
@@ -222,22 +225,23 @@ void win_control_enter_cb()
                 // gui_log(" %s-->%s \n", obj->name, obj->parent->name);
             }
         }
-
         if (kb_hold)
         {
-            if (kb->released)
+            if (kb->event == GUI_KB_EVENT_UP)
             {
-                gui_log("kb_hold %d\n", kb->released);
-                gui_obj_event_set(GUI_BASE(win_control_enter), GUI_EVENT_8);
+                kb_hold = 0;
+                uint32_t time = kb->timestamp_ms_release - time_press;
+                if (time > 500)
+                {
+                    gui_log("pressing time = %d\n", time);
+                    gui_obj_event_set(GUI_BASE(win_control_enter), GUI_EVENT_8);
+                }
             }
         }
-        if (kb->pressed)
+        if (kb->event == GUI_KB_EVENT_DOWN && !kb_hold)
         {
+            time_press = kb->timestamp_ms_press;
             kb_hold = 1;
-        }
-        else
-        {
-            kb_hold = 0;
         }
     }
 }

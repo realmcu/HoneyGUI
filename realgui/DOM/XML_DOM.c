@@ -5053,11 +5053,10 @@ static void get_time(uint16_t *seconds, uint16_t *minute, uint16_t *hour, int *m
     // extern struct tm watch_clock_get(void);
     // extern uint16_t millisecond_cnt;
     // struct tm watch_time = watch_clock_get();
-    // int millisecond = millisecond_cnt;
-    // uint16_t seconds = watch_time.tm_sec;
-    // uint16_t minute = watch_time.tm_min;
-    // uint16_t hour = watch_time.tm_hour;
-
+    // *millisecond = millisecond_cnt;
+    // *seconds = watch_time.tm_sec;
+    // *minute = watch_time.tm_min;
+    // *hour = watch_time.tm_hour;
     *millisecond = 0;
     *seconds = 0;
     *minute = 0;
