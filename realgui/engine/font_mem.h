@@ -15,7 +15,7 @@ extern "C" {
 #define FONT_MALLOC_PSRAM(x)  gui_malloc(x)
 #define FONT_FREE_PSRAM(x)  gui_free(x)
 
-#define FONT_FILE_FLAG 0x01
+#define FONT_FILE_BMP_FLAG 0x01
 
 typedef struct
 {
@@ -53,7 +53,7 @@ typedef struct
 typedef struct
 {
     uint8_t head_length;               /*font file head length*/
-    uint8_t file_type;                 /*0x1-FONT_FILE_FLAG is font file*/
+    uint8_t file_type;                 /*0x1-FONT_FILE_BMP_FLAG is font file*/
     uint8_t version[4];                /*version*/
     uint8_t font_size;                 /*font size*/
     uint8_t rendor_mode;               /*support 1/2/4/8*/

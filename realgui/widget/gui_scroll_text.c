@@ -20,6 +20,7 @@
 #include "gui_scroll_text.h"
 #include "font_mem.h"
 #include "font_stb.h"
+#include "font_ttf.h"
 #include "font_mem_matrix.h"
 #include "gui_fb.h"
 
@@ -76,7 +77,7 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-    case GUI_FONT_SRC_TTF:
+    case GUI_FONT_SRC_STB:
         {
             gui_font_stb_load(text, rect);
         }
@@ -85,6 +86,12 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
     case GUI_FONT_SRC_MAT:
         {
             gui_font_mat_load(text, rect);
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_ttf_load(text, rect);
         }
         break;
 
@@ -103,7 +110,7 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
-    case GUI_FONT_SRC_TTF:
+    case GUI_FONT_SRC_STB:
         {
             gui_font_stb_draw(text, rect);
         }
@@ -112,6 +119,12 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
     case GUI_FONT_SRC_MAT:
         {
             gui_font_mat_draw(text, rect);
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_ttf_draw(text, rect);
         }
         break;
 
@@ -130,7 +143,7 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
         }
         break;
 
-    case GUI_FONT_SRC_TTF:
+    case GUI_FONT_SRC_STB:
         {
             gui_font_stb_unload(text);
         }
@@ -139,6 +152,12 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
     case GUI_FONT_SRC_MAT:
         {
             gui_font_mat_unload(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_ttf_unload(text);
         }
         break;
 

@@ -1538,7 +1538,7 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
     gui_ftl_read((uintptr_t)font_bin_addr, data, sizeof(GUI_FONT_HEAD));
 
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)data;
-    if (font->file_type != FONT_FILE_FLAG)
+    if (font->file_type != FONT_FILE_BMP_FLAG)
     {
         gui_log("this font file is not valid \n");
         gui_free(data);
@@ -1598,7 +1598,7 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
         return UINT8_MAX;
     }
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)font_bin_addr;
-    if (font->file_type != 0x01)
+    if (font->file_type != FONT_FILE_BMP_FLAG)
     {
         gui_log("this font file is not valid \n");
         return UINT8_MAX;
