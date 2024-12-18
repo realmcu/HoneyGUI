@@ -46,8 +46,8 @@ void *get_app_hongkong(void)
 
 static void kb_button_cb()
 {
-    extern gui_kb_port_data_t *port_kb_get_data(void);
-    gui_kb_port_data_t *kb = port_kb_get_data();
+    extern gui_kb_port_data_t *kb_get_data(void);
+    gui_kb_port_data_t *kb = kb_get_data();
     static uint32_t time_press = 0;
     static uint8_t hold = 0;
     if (hold)

@@ -19,7 +19,7 @@ file="app/watchface2/wf2preview.bin">
             h="49"
             text="90"
             fontSize="16"
-            font="app/watchface2/MichromaRegularSize16Bits4Font.bin"
+            font="app/watchface2/w2MichromaRegularSize16Bits4Font.bin"
             mode="center">txt_HR
            <onPeripheral 
                 type="heart_rate" 
@@ -34,7 +34,7 @@ file="app/watchface2/wf2preview.bin">
             h="49"
             text="BPM NOW"
             fontSize="16"
-            font="app/watchface2/MichromaRegularSize16Bits4Font.bin"
+            font="app/watchface2/w2MichromaRegularSize16Bits4Font.bin"
             mode="left">txt_bpmnow
     </textbox>
     <chart
@@ -262,7 +262,7 @@ file="app/watchface2/wf2preview.bin">
             h="49"
             text="97"
             fontSize="16"
-            font="app/watchface2/MichromaRegularSize16Bits4Font.bin"
+            font="app/watchface2/w2MichromaRegularSize16Bits4Font.bin"
             mode="center">txt_weather
             <onPeripheral 
                 type="Weather" 

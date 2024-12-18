@@ -291,6 +291,12 @@ static void view_more_enter(void *obj, gui_event_t e, void *param)
 
 void pagelist_create(gui_msg_t *msg)
 {
+    if (strcmp(gui_current_app()->screen.name, "app_hongkong") != 0)
+    {
+        // gui_log("Current APP can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
+        return;
+    }
+
     if (close_flag)
     {
         gui_log("During close animation, can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
@@ -307,7 +313,7 @@ void pagelist_create(gui_msg_t *msg)
         index++;
         if (index == TAB_ARRAY_NUM)
         {
-            gui_log("Can't add more tab!!! %s, %d\n", __FUNCTION__, __LINE__);
+            // gui_log("Can't add more tab!!! %s, %d\n", __FUNCTION__, __LINE__);
             return;
         }
     }

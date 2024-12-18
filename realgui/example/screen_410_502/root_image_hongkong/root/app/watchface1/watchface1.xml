@@ -7,7 +7,7 @@ file="app/watchface1/wf1preview.bin">
             x="0"
             y="0"
             opacity="255"
-            file="app/watchface1/Slice1.bin"
+            file="app/watchface1/w1Slice1.bin"
             blendMode="imgBypassMode"
             >watchface
     </img>
@@ -15,7 +15,7 @@ file="app/watchface1/wf1preview.bin">
             x="199"
             y="170"
             opacity="255"
-            file="app/watchface1/Union2.bin"
+            file="app/watchface1/w1Union2.bin"
             blendMode="imgSrcOverMode"
             >hour_hand
             <onTime
@@ -27,7 +27,7 @@ file="app/watchface1/wf1preview.bin">
             x="200"
             y="90"
             opacity="255"
-            file="app/watchface1/Union.bin"
+            file="app/watchface1/w1Union.bin"
             blendMode="imgSrcOverMode"
             >minute_hand
             <onTime
@@ -39,7 +39,7 @@ file="app/watchface1/wf1preview.bin">
             x="206"
             y="124"
             opacity="255"
-            file="app/watchface1/Vector7.bin"
+            file="app/watchface1/w1Vector7.bin"
             blendMode="imgSrcOverMode"
             >second_hand
             <onTime
@@ -51,14 +51,14 @@ file="app/watchface1/wf1preview.bin">
             x="204"
             y="246"
             opacity="255"
-            file="app/watchface1/Ellipse5.bin"
+            file="app/watchface1/w1Ellipse5.bin"
             blendMode="imgSrcOverMode"
             >mask
             
     </img>
     <icon
-            picture="app/watchface1/Group21.bin"
-            highlightPicture="app/watchface1/Group21hl.bin"
+            picture="app/watchface1/w1Group21.bin"
+            highlightPicture="app/watchface1/w1Group21hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -75,8 +75,8 @@ file="app/watchface1/wf1preview.bin">
             </onClick>
     </icon>
     <icon
-            picture="app/watchface1/Group23.bin"
-            highlightPicture="app/watchface1/Group23hl.bin"
+            picture="app/watchface1/w1Group23.bin"
+            highlightPicture="app/watchface1/w1Group23hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -109,8 +109,8 @@ file="app/watchface1/wf1preview.bin">
         </onPeripheral>
     </arc>
     <icon
-            picture="app/watchface1/Group22.bin"
-            highlightPicture="app/watchface1/Group22hl.bin"
+            picture="app/watchface1/w1Group22.bin"
+            highlightPicture="app/watchface1/w1Group22hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -122,8 +122,8 @@ file="app/watchface1/wf1preview.bin">
             y="366">btn_sport
     </icon>
     <icon
-            picture="app/watchface1/Ellipse19.bin"
-            highlightPicture="app/watchface1/Ellipse19hl.bin"
+            picture="app/watchface1/w1Ellipse19.bin"
+            highlightPicture="app/watchface1/w1Ellipse19hl.bin"
             blendMode="imgSrcOverMode"
             opacity="255"
             pictureX="0"
@@ -146,7 +146,7 @@ file="app/watchface1/wf1preview.bin">
             h="49"
             text="97"
             fontSize="24"
-            font="app/watchface1/MichromaRegularSize24Bits4Font.bin"
+            font="app/watchface1/w1MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_brightness
             <onPeripheral 
                 type="Weather" 
@@ -164,7 +164,7 @@ file="app/watchface1/wf1preview.bin">
             h="49"
             text="SATURDAY"
             fontSize="24"
-            font="app/watchface1/MichromaRegularSize24Bits4Font.bin"
+            font="app/watchface1/w1MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_week
             <onTime
                 type="MONDAY"
@@ -180,7 +180,7 @@ file="app/watchface1/wf1preview.bin">
             h="49"
             text="12/MARCH"
             fontSize="16"
-            font="app/watchface1/MichromaRegularSize16Bits4Font.bin"
+            font="app/watchface1/w1MichromaRegularSize16Bits4Font.bin"
             mode="center">txt_date
             <onTime
                 type="1/JANUARY"

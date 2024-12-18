@@ -140,7 +140,7 @@ file="app/watchface3/wf3preview.bin">
             h="49"
             text="97"
             fontSize="24"
-            font="app/watchface3/earthorbiter_size24_bits4_font.bin"
+            font="app/watchface3/w3earthorbiter_size24_bits4_font.bin"
             mode="center">txt_weather
             <onPeripheral 
                 type="Weather" 
@@ -157,7 +157,7 @@ file="app/watchface3/wf3preview.bin">
             h="49"
             text=" C"
             fontSize="24"
-            font="app/watchface3/earthorbiter_size24_bits4_font.bin"
+            font="app/watchface3/w3earthorbiter_size24_bits4_font.bin"
             mode="center">txt_weather
      
 
@@ -171,7 +171,7 @@ file="app/watchface3/wf3preview.bin">
             h="49"
             text="Mon 1"
             fontSize="24"
-            font="app/watchface3/earthorbiter_size24_bits4_font.bin"
+            font="app/watchface3/w3earthorbiter_size24_bits4_font.bin"
             mode="center">txt_date1
             <onTime
                 type="Mon 1"
@@ -187,7 +187,7 @@ file="app/watchface3/wf3preview.bin">
             h="49"
             text="00:00"
             fontSize="80"
-            font="app/watchface3/earthorbiter_size80_bits4_font.bin"
+            font="app/watchface3/w3earthorbiter_size80_bits4_font.bin"
             mode="center">txt_date2
             <onTime
                 type="00:00"
@@ -212,7 +212,7 @@ file="app/watchface3/wf3preview.bin">
             h="49"
             text="97"
             fontSize="24"
-            font="app/watchface3/earthorbiter_size24_bits4_font.bin"
+            font="app/watchface3/w3earthorbiter_size24_bits4_font.bin"
             mode="center">txt_hr
             <onPeripheral 
                 type="heart_rate" 
