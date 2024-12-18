@@ -146,14 +146,18 @@ typedef struct information
     const char *informer;
     const char *content;
     const char *time;
-    app_name app
+    app_name app;
 } information_t;
-
+static char *content = NULL;
 static void inform_generate_task_entry()
 {
     while (true)
     {
-        char *content = "Watch will attempt to install this update later tonight.";
+        if (!content)
+        {
+            content = gui_malloc(60);
+            sprintf(content, "Watch will attempt to install this update later tonight.");
+        }
         extern struct tm *timeinfo;
         char time[10];
         sprintf(time, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);

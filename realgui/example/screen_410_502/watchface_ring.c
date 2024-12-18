@@ -37,7 +37,6 @@ void win_cb()
     // uint16_t minute = watch_time.tm_min;
     // uint16_t hour = watch_time.tm_hour;
 
-    int millisecond = 0;
     uint16_t seconds = 0;
     uint16_t minute = 0;
     uint16_t hour = 0;

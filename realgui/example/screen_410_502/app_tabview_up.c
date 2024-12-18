@@ -34,7 +34,7 @@ typedef struct information
     const char *informer;
     const char *content;
     const char *time;
-    app_name app
+    app_name app;
 } information_t;
 
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
@@ -384,17 +384,17 @@ void pagelist_create(gui_msg_t *msg)
         char *content_new = gui_malloc(105);
         strncpy(content_new, content, 100);
         strcat(content_new, " ...");
-        gui_text_set(text_content, (void *)content_new, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+        gui_text_set(text_content, (void *)content_new, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content_new),
                      32);
     }
     else
     {
-        gui_text_set(text_content, (void *)content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+        gui_text_set(text_content, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
                      32);
     }
-    gui_text_type_set(text_content, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(text_content, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_content, MULTI_LEFT);
     gui_text_wordwrap_set(text_content, true);
     // gui_text_convert_to_img(message_text, RGB565);

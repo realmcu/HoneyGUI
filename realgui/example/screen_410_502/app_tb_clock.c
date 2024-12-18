@@ -67,65 +67,66 @@ static void curtain_ctr_cb(gui_win_t *win)
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 #else
-    extern struct tm watch_clock_get(void);
-    watch_time = watch_clock_get();
+    // extern struct tm watch_clock_get(void);
+    // watch_time = watch_clock_get();
     timeinfo = &watch_time;
 #endif
     // }
 }
 
-gui_perspective_t *perspect;
-static void callback_prism_touch_clicked()
-{
-    int angle = perspect->release_x;
-    gui_log("angel1 = %d\n", angle);
-    if (angle < 0)
-    {
-        angle += 360;
-    }
-    angle = (angle % 360) / (360 / 6);
-    gui_log("angel2 = %d\n", angle);
-    if (angle < 0 || angle > 5)
-    {
-        angle = 0;
-    }
+// gui_perspective_t *perspect;
+// static void callback_prism_touch_clicked()
+// {
+//     int angle = perspect->release_x;
+//     gui_log("angel1 = %d\n", angle);
+//     if (angle < 0)
+//     {
+//         angle += 360;
+//     }
+//     angle = (angle % 360) / (360 / 6);
+//     gui_log("angel2 = %d\n", angle);
+//     if (angle < 0 || angle > 5)
+//     {
+//         angle = 0;
+//     }
 
-    gui_app_t *app = get_app_hongkong();
-    gui_obj_t *screen = &(app->screen);
-    gui_obj_tree_free(screen);
-    app->ui_design(app);
-    switch (angle % 2)
-    {
-    case 0:
-        {
-            // GUI_BASE(win_watch)->not_show = false;
-            // GUI_BASE(win_market)->not_show = true;
-            watchface_index = 0;
-        }
-        break;
-    case 1:
-        {
-            // GUI_BASE(win_watch)->not_show = true;
-            // GUI_BASE(win_market)->not_show = false;
-            watchface_index = 1;
-        }
-        break;
-    default:
-        break;
-    }
-    gui_fb_change();
-}
+//     gui_app_t *app = get_app_hongkong();
+//     gui_obj_t *screen = &(app->screen);
+//     gui_obj_tree_free(screen);
+//     app->ui_design(app);
+//     switch (angle % 2)
+//     {
+//     case 0:
+//         {
+//             // GUI_BASE(win_watch)->not_show = false;
+//             // GUI_BASE(win_market)->not_show = true;
+//             watchface_index = 0;
+//         }
+//         break;
+//     case 1:
+//         {
+//             // GUI_BASE(win_watch)->not_show = true;
+//             // GUI_BASE(win_market)->not_show = false;
+//             watchface_index = 1;
+//         }
+//         break;
+//     default:
+//         break;
+//     }
+//     gui_fb_change();
+// }
 
 /* callback_touch_long start*/
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
-    extern void close_box2d_ring(void);
-    close_box2d_ring();
+    // extern void close_box2d_ring(void);
+    // close_box2d_ring();
 
-    extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
-    gui_app_layer_top();
-    gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+    // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
+    // extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
+    // gui_app_layer_top();
+    // gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
     return;
 }
 

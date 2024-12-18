@@ -107,7 +107,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     else
     {
         watchface_index = 2;
-        sprintf(watchface_path, "%s", param);
+        sprintf(watchface_path, "%s", (char *)param);
     }
     extern gui_app_t *get_app_hongkong(void);
     gui_app_layer_buttom();
@@ -132,6 +132,8 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     }
     xml_file_array = NULL;
 }
+
+// if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
 GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
 {
     // win2 = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, gui_get_screen_width(),
