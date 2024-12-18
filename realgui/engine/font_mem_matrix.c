@@ -496,11 +496,11 @@ void gui_font_mat_load(gui_text_t *text, gui_text_rect_t *rect)
 void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
-    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
+    GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)text->path;
     uint8_t rendor_mode = font->rendor_mode;
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
-        rtk_draw_unicode_matrix(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop,
+        rtk_draw_unicode_matrix(chr + i, text->color, rendor_mode, rect, font->crop,
                                 text->base.matrix->m[0][0]);
     }
 }

@@ -119,7 +119,7 @@ static const uint8_t lookup_table_4b[16] =
  *                           Private Functions
  *============================================================================*/
 
-static void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
+void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
 {
     if (p1.y < p2.y)
     {
@@ -186,10 +186,10 @@ gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
     return (uint16_t)((result >> 16) | result); // contract result
 }
 
-static void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
-                                         gui_text_rect_t *rect,
-                                         int x, int y,
-                                         int w, int h)
+void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
+                                  gui_text_rect_t *rect,
+                                  int x, int y,
+                                  int w, int h)
 {
     gui_dispdev_t *dc = gui_get_dc();
     uint8_t *dots = buf;
@@ -348,10 +348,11 @@ static void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
     }
 }
 
-static int getGlyphOffsetFromMemory(uint16_t unicode, FontSet *ttfbin)
+int getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
 {
-    uint8_t *ptr = (uint8_t *)ttfbin + offsetof(FontSet, fontName) + ttfbin->fontNameLength;
-    int indexEntries = ttfbin->indexAreaSize / (sizeof(uint16_t) + sizeof(int));
+    uint8_t *ptr = (uint8_t *)ttfbin + offsetof(GUI_FONT_HEAD_TTF,
+                                                font_name) + ttfbin->font_name_length;
+    int indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(int));
     for (int i = 0; i < indexEntries; ++i)
     {
         uint16_t currentUnicode = *(uint16_t *)ptr;
@@ -434,31 +435,28 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
                 {
                     continue;
                 }
-
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 0] = lookup_table_4b[(pixel1 >> 28)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 28) & 0xf] + lookup_table_4b[(pixel3 >> 28) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 28) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 1] = lookup_table_4b[(pixel1 >> 24)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 24) & 0xf] + lookup_table_4b[(pixel3 >> 24) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 24) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 2] = lookup_table_4b[(pixel1 >> 20)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 20) & 0xf] + lookup_table_4b[(pixel3 >> 20) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 20) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 3] = lookup_table_4b[(pixel1 >> 16)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 16) & 0xf] + lookup_table_4b[(pixel3 >> 16) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 16) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 4] = lookup_table_4b[(pixel1 >> 12)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 12) & 0xf] + lookup_table_4b[(pixel3 >> 12) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 12) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 5] = lookup_table_4b[(pixel1 >> 8)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 8) & 0xf] + lookup_table_4b[(pixel3 >> 8) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 8) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 6] = lookup_table_4b[(pixel1 >> 4)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 4) & 0xf] + lookup_table_4b[(pixel3 >> 4) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 4) & 0xf];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 7] = lookup_table_4b[(pixel1 >> 0)
-                                                                                      & 0xf] + lookup_table_4b[(pixel2 >> 0) & 0xf] + lookup_table_4b[(pixel3 >> 0) & 0xf] +
-                                                                                      lookup_table_4b[(pixel4 >> 0) & 0xf];
+                uint32_t offset = y / raster_prec * out_w + ux * block_bit / raster_prec;
+                img_out[offset + 0] = lookup_table_4b[(pixel1 >> 28) & 0xf] + lookup_table_4b[(pixel2 >> 28) & 0xf]
+                                      +
+                                      lookup_table_4b[(pixel3 >> 28) & 0xf] + lookup_table_4b[(pixel4 >> 28) & 0xf];
+                img_out[offset + 1] = lookup_table_4b[(pixel1 >> 24) & 0xf] + lookup_table_4b[(pixel2 >> 24) & 0xf]
+                                      +
+                                      lookup_table_4b[(pixel3 >> 24) & 0xf] + lookup_table_4b[(pixel4 >> 24) & 0xf];
+                img_out[offset + 2] = lookup_table_4b[(pixel1 >> 20) & 0xf] + lookup_table_4b[(pixel2 >> 20) & 0xf]
+                                      +
+                                      lookup_table_4b[(pixel3 >> 20) & 0xf] + lookup_table_4b[(pixel4 >> 20) & 0xf];
+                img_out[offset + 3] = lookup_table_4b[(pixel1 >> 16) & 0xf] + lookup_table_4b[(pixel2 >> 16) & 0xf]
+                                      +
+                                      lookup_table_4b[(pixel3 >> 16) & 0xf] + lookup_table_4b[(pixel4 >> 16) & 0xf];
+                img_out[offset + 4] = lookup_table_4b[(pixel1 >> 12) & 0xf] + lookup_table_4b[(pixel2 >> 12) & 0xf]
+                                      +
+                                      lookup_table_4b[(pixel3 >> 12) & 0xf] + lookup_table_4b[(pixel4 >> 12) & 0xf];
+                img_out[offset + 5] = lookup_table_4b[(pixel1 >> 8) & 0xf] + lookup_table_4b[(pixel2 >> 8) & 0xf] +
+                                      lookup_table_4b[(pixel3 >> 8) & 0xf] + lookup_table_4b[(pixel4 >> 8) & 0xf];
+                img_out[offset + 6] = lookup_table_4b[(pixel1 >> 4) & 0xf] + lookup_table_4b[(pixel2 >> 4) & 0xf] +
+                                      lookup_table_4b[(pixel3 >> 4) & 0xf] + lookup_table_4b[(pixel4 >> 4) & 0xf];
+                img_out[offset + 7] = lookup_table_4b[(pixel1 >> 0) & 0xf] + lookup_table_4b[(pixel2 >> 0) & 0xf] +
+                                      lookup_table_4b[(pixel3 >> 0) & 0xf] + lookup_table_4b[(pixel4 >> 0) & 0xf];
             }
         }
     }
@@ -474,39 +472,34 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
                 {
                     continue;
                 }
-
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 0] =  lookup_table_2b[(pixel1 >>
-                                                                                       30) & 0x3] + lookup_table_2b[(pixel2 >> 30) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 1] =  lookup_table_2b[(pixel1 >>
-                                                                                       28) & 0x3] + lookup_table_2b[(pixel2 >> 28) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 2] =  lookup_table_2b[(pixel1 >>
-                                                                                       26) & 0x3] + lookup_table_2b[(pixel2 >> 26) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 3] =  lookup_table_2b[(pixel1 >>
-                                                                                       24) & 0x3] + lookup_table_2b[(pixel2 >> 24) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 4] =  lookup_table_2b[(pixel1 >>
-                                                                                       22) & 0x3] + lookup_table_2b[(pixel2 >> 22) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 5] =  lookup_table_2b[(pixel1 >>
-                                                                                       20) & 0x3] + lookup_table_2b[(pixel2 >> 20) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 6] =  lookup_table_2b[(pixel1 >>
-                                                                                       18) & 0x3] + lookup_table_2b[(pixel2 >> 18) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 7] =  lookup_table_2b[(pixel1 >>
-                                                                                       16) & 0x3] + lookup_table_2b[(pixel2 >> 16) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 8] =  lookup_table_2b[(pixel1 >>
-                                                                                       14) & 0x3] + lookup_table_2b[(pixel2 >> 14) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 9] =  lookup_table_2b[(pixel1 >>
-                                                                                       12) & 0x3] + lookup_table_2b[(pixel2 >> 12) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 10] = lookup_table_2b[(pixel1 >>
-                                                                                       10) & 0x3] + lookup_table_2b[(pixel2 >> 10) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 11] = lookup_table_2b[(pixel1 >> 8)
-                                                                                       & 0x3] + lookup_table_2b[(pixel2 >> 8) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 12] = lookup_table_2b[(pixel1 >> 6)
-                                                                                       & 0x3] + lookup_table_2b[(pixel2 >> 6) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 13] = lookup_table_2b[(pixel1 >> 4)
-                                                                                       & 0x3] + lookup_table_2b[(pixel2 >> 4) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 14] = lookup_table_2b[(pixel1 >> 2)
-                                                                                       & 0x3] + lookup_table_2b[(pixel2 >> 2) & 0x3];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 15] = lookup_table_2b[(pixel1 >> 0)
-                                                                                       & 0x3] + lookup_table_2b[(pixel2 >> 0) & 0x3];
+                uint32_t offset = y / raster_prec * out_w + ux * block_bit / raster_prec;
+                img_out[offset + 0] =  lookup_table_2b[(pixel1 >> 30) & 0x3] + lookup_table_2b[(pixel2 >> 30) &
+                                                                                               0x3];
+                img_out[offset + 1] =  lookup_table_2b[(pixel1 >> 28) & 0x3] + lookup_table_2b[(pixel2 >> 28) &
+                                                                                               0x3];
+                img_out[offset + 2] =  lookup_table_2b[(pixel1 >> 26) & 0x3] + lookup_table_2b[(pixel2 >> 26) &
+                                                                                               0x3];
+                img_out[offset + 3] =  lookup_table_2b[(pixel1 >> 24) & 0x3] + lookup_table_2b[(pixel2 >> 24) &
+                                                                                               0x3];
+                img_out[offset + 4] =  lookup_table_2b[(pixel1 >> 22) & 0x3] + lookup_table_2b[(pixel2 >> 22) &
+                                                                                               0x3];
+                img_out[offset + 5] =  lookup_table_2b[(pixel1 >> 20) & 0x3] + lookup_table_2b[(pixel2 >> 20) &
+                                                                                               0x3];
+                img_out[offset + 6] =  lookup_table_2b[(pixel1 >> 18) & 0x3] + lookup_table_2b[(pixel2 >> 18) &
+                                                                                               0x3];
+                img_out[offset + 7] =  lookup_table_2b[(pixel1 >> 16) & 0x3] + lookup_table_2b[(pixel2 >> 16) &
+                                                                                               0x3];
+                img_out[offset + 8] =  lookup_table_2b[(pixel1 >> 14) & 0x3] + lookup_table_2b[(pixel2 >> 14) &
+                                                                                               0x3];
+                img_out[offset + 9] =  lookup_table_2b[(pixel1 >> 12) & 0x3] + lookup_table_2b[(pixel2 >> 12) &
+                                                                                               0x3];
+                img_out[offset + 10] = lookup_table_2b[(pixel1 >> 10) & 0x3] + lookup_table_2b[(pixel2 >> 10) &
+                                                                                               0x3];
+                img_out[offset + 11] = lookup_table_2b[(pixel1 >> 8) & 0x3] + lookup_table_2b[(pixel2 >> 8) & 0x3];
+                img_out[offset + 12] = lookup_table_2b[(pixel1 >> 6) & 0x3] + lookup_table_2b[(pixel2 >> 6) & 0x3];
+                img_out[offset + 13] = lookup_table_2b[(pixel1 >> 4) & 0x3] + lookup_table_2b[(pixel2 >> 4) & 0x3];
+                img_out[offset + 14] = lookup_table_2b[(pixel1 >> 2) & 0x3] + lookup_table_2b[(pixel2 >> 2) & 0x3];
+                img_out[offset + 15] = lookup_table_2b[(pixel1 >> 0) & 0x3] + lookup_table_2b[(pixel2 >> 0) & 0x3];
             }
         }
     }
@@ -571,25 +564,26 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
                 uint32_t pixel7 = img[(y + 6) * line_word + ux];
                 uint32_t pixel8 = img[(y + 7) * line_word + ux];
 
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 0] = lookup_table_8b[(pixel1 >> 24)
-                                                                                      & 0xff] + lookup_table_8b[(pixel2 >> 24) & 0xff] + lookup_table_8b[(pixel3 >> 24) & 0xff] +
-                                                                                      lookup_table_8b[(pixel4 >> 24) & 0xff] + lookup_table_8b[(pixel5 >> 24) & 0xff] +
-                                                                                      lookup_table_8b[(pixel6 >> 24) & 0xff] + lookup_table_8b[(pixel7 >> 24) & 0xff] +
-                                                                                      lookup_table_8b[(pixel8 >> 24) & 0xff];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 1] = lookup_table_8b[(pixel1 >> 16)
-                                                                                      & 0xff] + lookup_table_8b[(pixel2 >> 16) & 0xff] + lookup_table_8b[(pixel3 >> 16) & 0xff] +
-                                                                                      lookup_table_8b[(pixel4 >> 16) & 0xff] + lookup_table_8b[(pixel5 >> 16) & 0xff] +
-                                                                                      lookup_table_8b[(pixel6 >> 16) & 0xff] + lookup_table_8b[(pixel7 >> 16) & 0xff] +
-                                                                                      lookup_table_8b[(pixel8 >> 16) & 0xff];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 2] = lookup_table_8b[(pixel1 >> 8)
-                                                                                      & 0xff] + lookup_table_8b[(pixel2 >> 8) & 0xff] + lookup_table_8b[(pixel3 >> 8) & 0xff] +
-                                                                                      lookup_table_8b[(pixel4 >> 8) & 0xff] + lookup_table_8b[(pixel5 >> 8) & 0xff] +
-                                                                                      lookup_table_8b[(pixel6 >> 8) & 0xff] + lookup_table_8b[(pixel7 >> 8) & 0xff] +
-                                                                                      lookup_table_8b[(pixel8 >> 8) & 0xff];
-                img_out[y / raster_prec * out_w + ux * block_bit / raster_prec + 3] = lookup_table_8b[pixel1 & 0xff]
-                                                                                      + lookup_table_8b[pixel2 & 0xff] + lookup_table_8b[pixel3 & 0xff] + lookup_table_8b[pixel4 & 0xff] +
-                                                                                      lookup_table_8b[pixel5 & 0xff] + lookup_table_8b[pixel6 & 0xff] + lookup_table_8b[pixel7 & 0xff] +
-                                                                                      lookup_table_8b[pixel8 & 0xff];
+                uint32_t offset = y / raster_prec * out_w + ux * block_bit / raster_prec;
+                img_out[offset + 0] = lookup_table_8b[(pixel1 >> 24) & 0xff] + lookup_table_8b[(pixel2 >> 24) &
+                                                                                               0xff] +
+                                      lookup_table_8b[(pixel3 >> 24) & 0xff] + lookup_table_8b[(pixel4 >> 24) & 0xff] +
+                                      lookup_table_8b[(pixel5 >> 24) & 0xff] + lookup_table_8b[(pixel6 >> 24) & 0xff] +
+                                      lookup_table_8b[(pixel7 >> 24) & 0xff] + lookup_table_8b[(pixel8 >> 24) & 0xff];
+                img_out[offset + 1] = lookup_table_8b[(pixel1 >> 16) & 0xff] + lookup_table_8b[(pixel2 >> 16) &
+                                                                                               0xff] +
+                                      lookup_table_8b[(pixel3 >> 16) & 0xff] + lookup_table_8b[(pixel4 >> 16) & 0xff] +
+                                      lookup_table_8b[(pixel5 >> 16) & 0xff] + lookup_table_8b[(pixel6 >> 16) & 0xff] +
+                                      lookup_table_8b[(pixel7 >> 16) & 0xff] + lookup_table_8b[(pixel8 >> 16) & 0xff];
+                img_out[offset + 2] = lookup_table_8b[(pixel1 >> 8) & 0xff] + lookup_table_8b[(pixel2 >> 8) & 0xff]
+                                      +
+                                      lookup_table_8b[(pixel3 >> 8) & 0xff] + lookup_table_8b[(pixel4 >> 8) & 0xff] +
+                                      lookup_table_8b[(pixel5 >> 8) & 0xff] + lookup_table_8b[(pixel6 >> 8) & 0xff] +
+                                      lookup_table_8b[(pixel7 >> 8) & 0xff] + lookup_table_8b[(pixel8 >> 8) & 0xff];
+                img_out[offset + 3] = lookup_table_8b[pixel1 & 0xff] + lookup_table_8b[pixel2 & 0xff] +
+                                      lookup_table_8b[pixel3 & 0xff] + lookup_table_8b[pixel4 & 0xff] +
+                                      lookup_table_8b[pixel5 & 0xff] + lookup_table_8b[pixel6 & 0xff] +
+                                      lookup_table_8b[pixel7 & 0xff] + lookup_table_8b[pixel8 & 0xff];
 
             }
         }
@@ -669,9 +663,9 @@ void makeImageBuffer(uint8_t *img_out, const uint8_t *img, uint8_t raster_prec, 
  *============================================================================*/
 void gui_font_get_ttf_info(gui_text_t *text)
 {
-    FontSet *ttfbin = (FontSet *)text->path;
+    GUI_FONT_HEAD_TTF *ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
     GUI_ASSERT(ttfbin != NULL);
-    if (ttfbin->fileFlag != FONT_FILE_TTF_FLAG)
+    if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
     {
         gui_log("this ttf-bin font file is not valid \n");
         return;
@@ -761,7 +755,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
     }
     text->char_width_sum = all_char_w;
     text->char_line_sum = line_flag;
-    text->font_len = chr_i;
+    text->font_len = unicode_len;
     text->active_font_len = chr_i;
     gui_free(unicode_buf);
 }
@@ -797,6 +791,14 @@ void gui_font_ttf_unload(gui_text_t *text)
 {
     if (text->data)
     {
+        mem_char_t *chr = text->data;
+        for (int i = 0; i < text->font_len; i++)
+        {
+            if (chr[i].buf != NULL)
+            {
+                gui_free(chr[i].buf);
+            }
+        }
         gui_free(text->data);
         text->data = NULL;
     }
@@ -805,8 +807,8 @@ void gui_font_ttf_unload(gui_text_t *text)
 
 void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
-    FontSet *ttfbin = (FontSet *)text->path;
-    if (ttfbin->fileFlag != FONT_FILE_TTF_FLAG)
+    GUI_FONT_HEAD_TTF *ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
+    if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
     {
         gui_log("this ttf-bin font file is not valid \n");
         return;
@@ -827,11 +829,15 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
     ascent = ttfbin->ascent;
     descent = ttfbin->descent;
     scale = text->font_height * text->base.matrix->m[0][0] / (ascent - descent);
+    if (scale <= 0)
+    {
+        return;
+    }
 
 //    baseline = ascent * scale;
 
-    uint8_t raster_prec = ttfbin->renderMode;
-    raster_prec = 1 << text->rendermode;
+    // uint8_t raster_prec = ttfbin->rendor_mode;
+    uint8_t raster_prec = 1 << text->rendermode;
 
     gui_dispdev_t *dc = gui_get_dc();
 
@@ -843,15 +849,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         FontGlyphData *glyphData = (FontGlyphData *)chr[index].dot_addr;
 
-        uint8_t *winding_lengths = chr[index].dot_addr + offsetof(FontGlyphData, winding_lengths);
-        FontWindings *windings = (FontWindings *)(winding_lengths + glyphData->winding_count);
         float render_scale = scale * raster_prec;
-
-        int line_count = 0;
-        for (int i = 0; i < glyphData->winding_count; i++)
-        {
-            line_count += winding_lengths[i];
-        }
 
         int glyph_w = render_scale * (glyphData->x1 - glyphData->x0 + 1) + 2;
         int glyph_h = render_scale * (glyphData->y1 - glyphData->y0 + 1) + 2;
@@ -892,6 +890,27 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 #endif
         // int out_x1 = out_x0 + out_w;
         // int out_y1 = out_y0 + out_h;
+
+#if USE_BIT_BUF
+        uint32_t block_bit = 32;
+        render_w = ALIGN_TO(render_w, block_bit);
+        uint32_t line_word = render_w / block_bit;
+        out_w = render_w / raster_prec;
+#endif
+        if (chr[index].buf)
+        {
+            font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x + out_x0,
+                                         chr[index].y + out_y0, out_w, out_h);
+            continue;;
+        }
+
+        uint8_t *winding_lengths = chr[index].dot_addr + offsetof(FontGlyphData, winding_lengths);
+        FontWindings *windings = (FontWindings *)(winding_lengths + glyphData->winding_count);
+        int line_count = 0;
+        for (int i = 0; i < glyphData->winding_count; i++)
+        {
+            line_count += winding_lengths[i];
+        }
 
 #if defined FONT_TTF_USE_MVE && 0
         //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
@@ -989,33 +1008,18 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         //             i,line_list[i].x0,line_list[i].y0,line_list[i].y1,line_list[i].dxy);
         // }
 #if USE_BIT_BUF
-        uint32_t block_bit = 32;
-        render_w = ALIGN_TO(render_w, block_bit);
-        uint32_t line_word = render_w / block_bit;
-        out_w = render_w / raster_prec;
         uint32_t render_size = render_w * render_h / 8;
         uint32_t *img = gui_malloc(render_size);
         memset(img, 0, render_size);
-#else
-        uint32_t render_size = render_w * render_h;
-        uint8_t *img = gui_malloc(render_size);
-        memset(img, 0, render_size);
-#endif
+
         uint32_t out_size = out_w * out_h;
         uint8_t *img_out = gui_malloc(out_size);
 
-
-#if USE_BIT_BUF
         for (int i = 0; i < lint_count_actual; i++)
         {
             for (int y = line_list[i].y0; y < line_list[i].y1; y++)
             {
                 float xi = line_list[i].x0 + line_list[i].dxy * y;
-                if (xi < 0.0f)
-                {
-                    xi = 0.0f;
-                    // continue;
-                }
                 uint32_t xint = (uint32_t)(xi);
                 img[y * line_word + xint / block_bit] ^= masks[xint % block_bit];
                 for (uint32_t li = xint / block_bit + 1; li < line_word; li++)
@@ -1024,7 +1028,16 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
         }
+        makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h, line_word, block_bit);
+
 #else
+        uint32_t render_size = render_w * render_h;
+        uint8_t *img = gui_malloc(render_size);
+        memset(img, 0, render_size);
+
+        uint32_t out_size = out_w * out_h;
+        uint8_t *img_out = gui_malloc(out_size);
+
         for (int i = 0; i < lint_count_actual; i++)
         {
             for (int y = line_list[i].y0; y < line_list[i].y1; y++)
@@ -1039,11 +1052,6 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
         }
-#endif
-
-#if USE_BIT_BUF
-        makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h, line_word, block_bit);
-#else
         makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h);
 #endif
 
@@ -1053,8 +1061,16 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
         gui_free(windingsf);
         gui_free(line_list);
-        gui_free(img_out);
         gui_free(img);
+
+        if (dc->type == DC_RAMLESS)
+        {
+            chr[index].buf = img_out;
+        }
+        else
+        {
+            gui_free(img_out);
+        }
     }
 }
 

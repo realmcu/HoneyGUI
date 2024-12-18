@@ -536,6 +536,7 @@ static int app_init(void)
 #if defined _WIN32
     int fd;
     fd = open("./realgui/example/screen_280_456/root_image_8762g/root(0x4400000).bin", 0);
+    defaultPath = "realgui\\example\\screen_280_456\\root_image_8762g\\root\\";
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");

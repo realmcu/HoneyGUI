@@ -41,23 +41,24 @@ extern "C" {
 #pragma pack(1)
 typedef struct
 {
-    char length;
-    char fileFlag;
-    char version[4];
-    char fontSize;
-    char renderMode;
-    unsigned char bold : 1;
-    unsigned char italic : 1;
-    unsigned char scanMode : 1;
-    unsigned char indexMethod : 1;
-    unsigned char rsvd : 4;
-    int indexAreaSize;
-    uint8_t fontNameLength;
-    short ascent;
-    short descent;
-    short lineGap;
-    char *fontName;
-} FontSet;
+    uint8_t head_length;                /*font file head length*/
+    uint8_t file_type;                  /*0x2-FONT_FILE_TTF_FLAG is font file*/
+    uint8_t version[4];                 /*version*/
+    uint8_t font_size;                  /*font size*/
+    uint8_t rendor_mode;                /*support 1/2/4/8*/
+    uint8_t bold :          1;          /*bold*/
+    uint8_t italic :        1;          /*italic*/
+    uint8_t scan_mode :     1;          /*scan_mode*/
+    uint8_t index_method :  1;          /*0 offset ; 1 address*/
+    uint8_t crop :          1;          /*Unavailable*/
+    uint8_t rsvd :          3;          /*rsvd*/
+    uint32_t index_area_size;           /*length of index area*/
+    uint8_t font_name_length;           /*length of font name*/
+    int16_t ascent;
+    int16_t descent;
+    int16_t lineGap;
+    uint8_t *font_name;
+} GUI_FONT_HEAD_TTF;
 
 typedef struct
 {

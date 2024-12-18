@@ -37,6 +37,7 @@ typedef struct
     uint8_t char_w;
     uint8_t char_h;
     uint8_t *dot_addr;
+    uint8_t *buf;
     gui_img_t *emoji_img;
 } mem_char_t;
 /** @brief  mem char struct end */
@@ -52,28 +53,21 @@ typedef struct
 #pragma pack(1)
 typedef struct
 {
-    uint8_t head_length;               /*font file head length*/
-    uint8_t file_type;                 /*0x1-FONT_FILE_BMP_FLAG is font file*/
-    uint8_t version[4];                /*version*/
-    uint8_t font_size;                 /*font size*/
-    uint8_t rendor_mode;               /*support 1/2/4/8*/
-    union
-    {
-        uint8_t value;
-        struct
-        {
-            uint8_t bold : 1;          /*bold*/
-            uint8_t italic : 1;        /*italic*/
-            uint8_t scan_mode : 1;     /*scan_mode*/
-            uint8_t index_method : 1;  /*0 offset ; 1 address*/
-            uint8_t crop : 1;          /*enable crop can crop font file*/
-            uint8_t rsvd : 3;          /*rsvd*/
-        } detail;
-    } font_mode_detail;                /*detail information*/
-    uint32_t index_area_size;          /*length of index area*/
-    uint8_t font_name_length;          /*length of font name*/
-    // uint8_t* font_name;
-} GUI_FONT_HEAD;
+    uint8_t head_length;                /*font file head length*/
+    uint8_t file_type;                  /*0x1-FONT_FILE_BMP_FLAG is font file*/
+    uint8_t version[4];                 /*version*/
+    uint8_t font_size;                  /*font size*/
+    uint8_t rendor_mode;                /*support 1/2/4/8*/
+    uint8_t bold :          1;          /*bold*/
+    uint8_t italic :        1;          /*italic*/
+    uint8_t scan_mode :     1;          /*scan_mode*/
+    uint8_t index_method :  1;          /*0 offset ; 1 address*/
+    uint8_t crop :          1;          /*enable crop can crop font file*/
+    uint8_t rsvd :          3;          /*rsvd*/
+    uint32_t index_area_size;           /*length of index area*/
+    uint8_t font_name_length;           /*length of font name*/
+    uint8_t *font_name;
+} GUI_FONT_HEAD_BMP;
 #pragma pack()
 
 /**
