@@ -30,17 +30,6 @@ static struct tm watch_time;
 
 static void curtain_ctr_cb(gui_win_t *win)
 {
-    // touch_info_t *tp = tp_get_info();
-    // if (tp->pressing)
-    // {
-    //     gui_log("x = %d, y = %d\n", tp->x,  tp->y);
-    // }
-    // touch_info_t *wheel = wheel_get_info();
-    // if (wheel->button_up)
-    // {
-    //     gui_obj_event_set(GUI_BASE(win_touch), GUI_EVENT_4);
-    // }
-
     if (ct->cur_curtain == CURTAIN_DOWN || ct->cur_curtain == CURTAIN_UP)
     {
         GUI_BASE(ct_clock)->active = 0;
@@ -120,13 +109,13 @@ static void curtain_ctr_cb(gui_win_t *win)
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
-    // extern void close_box2d_ring(void);
-    // close_box2d_ring();
+    extern void close_box2d_ring(void);
+    close_box2d_ring();
 
     // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
-    // extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
-    // gui_app_layer_top();
-    // gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+    extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
+    gui_app_layer_top();
+    gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
     return;
 }
 

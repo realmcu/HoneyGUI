@@ -658,7 +658,7 @@ void tabview_up_design(void *parent_widget)
 {
     ct_parent = (gui_curtain_t *)parent_widget;
     win_design = gui_win_create(parent_widget, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    // draw black background
+    // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(win_design), "background", 0, 0,
                                                             SCREEN_WIDTH, SCREEN_HEIGHT + TAB_HEIGHT + 30, gui_rgba(255, 255, 255, 76));
 

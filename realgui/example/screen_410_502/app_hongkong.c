@@ -79,7 +79,7 @@ static void switch_app_menu()
         extern void close_box2d_ring(void);
         close_box2d_ring();
 
-        extern void *get_app_menu();
+        extern gui_app_t *get_app_menu();
         gui_switch_app(gui_current_app(), get_app_menu());
     }
 }
@@ -101,10 +101,11 @@ static void app_hongkong_ui_design(gui_app_t *app)
     win_hk = gui_win_create(app->window, "window_hongkong", 0, 0, 0, 0);
     gui_win_set_animate(win_hk, 1000, -1, kb_button_cb, NULL);
     gui_obj_add_event_cb(win_hk, (gui_event_cb_t)switch_app_menu, GUI_EVENT_8,
-                         app->window); //GUI_EVENT_8
+                         app->window);
     enter_menu_flag = 0;
     gui_tabview_set_style(tv, TAB_CUBE);
     gui_tabview_enable_pre_load(tv, true);
+
     extern void page_tb_control_enter(void *parent);
     page_tb_control_enter(app->window);
 
@@ -115,14 +116,14 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
     gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
-    // page_tb_clock(win);
+
     page_tb_clock(gui_tab_get_rte_obj(tb_clock));
-    // page_tb_control(gui_tab_get_rte_obj(tb_activity));
     page_tb_activity(gui_tab_get_rte_obj(tb_activity));
     page_tb_heart(gui_tab_get_rte_obj(tb_heart));
     page_tb_cube(gui_tab_get_rte_obj(tb_cube));
     page_tb_weather(gui_tab_get_rte_obj(tb_weather));
     page_tb_music(gui_tab_get_rte_obj(tb_music));
+    gui_tab_update_preload(GUI_BASE(tb_clock));
 }
 
 // static void data_generate_task_entry()
@@ -160,7 +161,10 @@ static void inform_generate_task_entry()
         }
         extern struct tm *timeinfo;
         char time[10];
-        sprintf(time, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
+        if (timeinfo)
+        {
+            sprintf(time, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
+        }
 
         information_t payload =
         {

@@ -844,6 +844,7 @@ void page_ct_clock(void *parent)
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, TUYA_CJSON_BIN, 700);
 #endif
+    canvas_update_flag = 0b1101;
     gui_canvas_create(parent, NULL, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); //fb_change
     win_watch = gui_win_create(parent, "win_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     return_to_watchface_flag = true;

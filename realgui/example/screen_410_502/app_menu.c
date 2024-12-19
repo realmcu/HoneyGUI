@@ -285,7 +285,7 @@ static void app_menu_design(gui_app_t *app)
 
     gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
-    gui_menu_cellular_offset((void *)cell, -200, -416);
+    // gui_menu_cellular_offset((void *)cell, -200, -416);
     {
         extern bool return_to_watchface_flag;
         return_to_watchface_flag = false;
