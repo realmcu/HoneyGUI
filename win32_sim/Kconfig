@@ -1,0 +1,76 @@
+menu "Example Configuration"
+
+config EXAMPLE_TYPE
+    help
+      Select the type of example you are configuring:
+      * Watch
+      * Dashboard
+      * Smart Home
+
+choice
+    prompt "Select Example"
+    default WATCH
+
+config WATCH
+    bool "Watch"
+    help
+      Configure settings for a Watch example.
+
+config DASHBOARD
+    bool "Dashboard"
+    help
+      Configure settings for a Dashboard example.
+
+config SMART_HOME
+    bool "Smart Home"
+    help
+      Configure settings for a Smart Home example.
+
+endchoice
+# Automatically set CONFIG_JAVASCRIPT_PARSER if SMART_HOME is selected
+config JAVASCRIPT_PARSER_SaaA
+    bool
+    default y if SMART_HOME
+choice
+    depends on WATCH
+    prompt "Watch Resolution"
+    default WATCH_RESOLUTION_454x454
+    help
+      Choose the screen resolution for the Watch example.
+
+config WATCH_RESOLUTION_454x454
+    bool "454x454 Resolution"
+
+config WATCH_RESOLUTION_410x502
+    bool "410x502 Resolution"
+
+endchoice
+
+choice
+    depends on DASHBOARD
+    prompt "Dashboard Resolution"
+    default DASHBOARD_RESOLUTION_800x480
+    help
+      Choose the screen resolution for the Dashboard example.
+
+config DASHBOARD_RESOLUTION_800x480
+    bool "800x480 Resolution"
+
+endchoice
+
+choice
+    depends on SMART_HOME
+    prompt "Smart Home Resolution"
+    default SMART_HOME_RESOLUTION_480x480
+    help
+      Choose the screen resolution for the Smart Home example.
+
+config SMART_HOME_RESOLUTION_480x480
+    bool "480x480 Resolution"
+
+config SMART_HOME_RESOLUTION_480x320
+    bool "480x320 Resolution"
+
+endchoice
+
+endmenu

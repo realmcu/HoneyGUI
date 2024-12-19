@@ -1,0 +1,20 @@
+
+
+
+if(CONFIG_WATCH_RESOLUTION_454x454)
+    message(STATUS "*****WATCH 454x454*****")
+    add_subdirectory(screen_454_454)
+elseif(CONFIG_WATCH_RESOLUTION_410x502)
+    message(STATUS "*****WATCH 410x502*****")
+    add_subdirectory(screen_410_502)
+elseif(CONFIG_DASHBOARD_RESOLUTION_800x480)
+    message(STATUS  "*****DASHBOARD 800x480*****")
+    add_subdirectory(screen_800_480)
+elseif(CONFIG_SMART_HOME_RESOLUTION_480x480)
+    message(STATUS "*****SMART HOME 480x480*****")
+    add_subdirectory(screen_480_480)
+elseif(CONFIG_SMART_HOME_RESOLUTION_480x320)
+    message(STATUS "*****SMART HOME 480x320*****")
+    add_subdirectory(screen_480_320)
+endif()
+
