@@ -197,13 +197,24 @@ static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_
             header->h = height;
             header->always_zero = 0;
             lv_fs_close(&f);
-#if LV_COLOR_DEPTH == 32
-            uint16_t bpp;
-            memcpy(&bpp, headers + 8, 2);
-            header->cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
-#else
-            header->cf = LV_IMG_CF_TRUE_COLOR;
-#endif
+            char input_type = headers[1];
+
+            if (input_type == RGB565)
+            {
+                header->cf = LV_IMG_CF_TRUE_COLOR;
+            }
+            else if (input_type == RGB888)
+            {
+                header->cf = LV_IMG_CF_TRUE_COLOR;
+            }
+            else if (input_type == ARGB8565)
+            {
+                header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            }
+            else if (input_type == ARGB8888)
+            {
+                header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            }
             LV_LOG_INFO("decoder_info RLE %d %d %d", header->w, header->h, header->cf);
             return LV_RES_OK;
         }
@@ -220,26 +231,23 @@ static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_
         uint8_t raw_bytes_per_pixel = data[8] & 0x03;
         uint8_t bytes_per_pixel = get_bytes_per_pixel(raw_bytes_per_pixel);
 
-#if LV_COLOR_DEPTH == 32
-        if (raw_bytes_per_pixel == 2)
+        uint8_t input_type = data[1];
+        if (input_type == RGB565)
         {
             header->cf = LV_IMG_CF_TRUE_COLOR;
         }
-        else if (raw_bytes_per_pixel == 3)
+        else if (input_type == RGB888)
+        {
+            header->cf = LV_IMG_CF_TRUE_COLOR;
+        }
+        else if (input_type == ARGB8565)
         {
             header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
         }
-        else if (raw_bytes_per_pixel == 4)
+        else if (input_type == ARGB8888)
         {
             header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
         }
-        else
-        {
-            header->cf = LV_IMG_CF_RAW_CHROMA_KEYED;
-        }
-#else
-        header->cf = LV_IMG_CF_TRUE_COLOR;
-#endif
 
         header->w = width;
         header->h = height;

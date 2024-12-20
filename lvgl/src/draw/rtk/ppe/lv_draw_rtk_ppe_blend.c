@@ -117,6 +117,8 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     uint32_t source_height = coords->y2 - coords->y1 + 1;
     source.width = source_width;
     source.height = source_height;
+    const uint8_t *img_data = (uint8_t *)map_p;
+    source.format = img_data[1];
     PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
     bool compressed = false;
     switch (cf)
@@ -188,7 +190,15 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             }
             else if (header->algorithm_type.pixel_bytes == IDU_PIXEL_24BIT)
             {
-                source.format = PPE_RGB888;
+                if (source.format == 1) //ARGB8565
+                {
+                    source.format = PPE_ARGB8565;
+                    mode = PPE_SRC_OVER_MODE;
+                }
+                else if (source.format == 3) //RGB888
+                {
+                    source.format = PPE_RGB888;
+                }
             }
             else
             {
