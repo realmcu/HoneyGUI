@@ -1,5 +1,5 @@
 file(GLOB gui_engine_sources *.c)
-file(GLOB_RECURSE gui_engine_remove_sources  acc_sw_ppe_sim.c font_freetype.c acc_rtk_ppe.c acc_rtk_ppev2.c acc_vg_lite.c acc_arm_2d.c image_compress.c image_rgb_fs.c image_rgb_mem.c)
+file(GLOB_RECURSE gui_engine_remove_sources  acc_sw_ppe_sim.c font_freetype.c acc_rtk_ppe.c acc_vg_lite.c acc_arm_2d.c)
 list(REMOVE_ITEM gui_engine_sources ${gui_engine_remove_sources})
 set(gui_engine_sources ${gui_engine_sources} CACHE INTERNAL  "gui engine sources ")
 
