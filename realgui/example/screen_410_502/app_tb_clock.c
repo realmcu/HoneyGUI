@@ -10,6 +10,7 @@
 #include <tp_algo.h>
 #include "app_hongkong.h"
 #include <time.h>
+#include "gui_tab.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -49,8 +50,6 @@ static void curtain_ctr_cb(gui_win_t *win)
         sidebar_flag = 0;
     }
     // update time
-    // if (win->animate->Beginning_frame)
-    // {
 #if defined __WIN32
     time_t rawtime;
     time(&rawtime);
@@ -60,7 +59,6 @@ static void curtain_ctr_cb(gui_win_t *win)
     // watch_time = watch_clock_get();
     timeinfo = &watch_time;
 #endif
-    // }
 }
 
 // gui_perspective_t *perspect;
@@ -130,7 +128,7 @@ void page_tb_clock(void *parent)
     ct_card = gui_curtain_create(ct, "card", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_DOWN, 1);
 
     gui_win_t *win = gui_win_create(parent, "", 0, 0, 0, 0);
-    gui_win_set_animate(win, 10000, -1, (gui_animate_callback_t)curtain_ctr_cb, (void *)win);
+    gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)curtain_ctr_cb, (void *)win);
     extern void page_ct_clock(void *parent);
     extern void page_ct_sidebar(void *parent);
     extern void tabview_up_design(void *parent_widget);
@@ -154,6 +152,12 @@ void page_tb_clock(void *parent)
         }
         break;
     case 2:
+        {
+            extern void create_watchface_bf(void *parent);
+            create_watchface_bf(ct_clock);
+        }
+        break;
+    case 3:
         {
             extern void create_tree_nest(const char *xml, void *obj);
             create_tree_nest((void *)watchface_path, ct_clock);

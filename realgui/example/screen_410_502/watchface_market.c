@@ -103,10 +103,14 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
         {
             watchface_index = 1;
         }
+        else if (strcmp(GUI_BASE(obj)->name, "wf_butterfly") == 0)
+        {
+            watchface_index = 2;
+        }
     }
     else
     {
-        watchface_index = 2;
+        watchface_index = 3;
         sprintf(watchface_path, "%s", (char *)param);
     }
     extern gui_app_t *get_app_hongkong(void);
@@ -171,6 +175,17 @@ GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
                                                     2 * space_y + 5, space_x - 1, space_y - 1);
 
                     gui_img_t *img = gui_img_create_from_mem(win, 0, WATCHFACE_RING_BIN, 0, 0, 0, 0);
+                    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                    gui_win_press(win, win_press_cb, NULL);
+                    gui_win_release(win, win_release_cb, NULL);
+                    gui_win_click(win, win_click_cb, NULL);
+                }
+                {
+                    gui_win_t *win = gui_win_create(page, "wf_butterfly",
+                                                    0 * space_x + (gui_get_screen_width() - space_x * 2) / 2,
+                                                    3 * space_y + 5, space_x - 1, space_y - 1);
+
+                    gui_img_t *img = gui_img_create_from_mem(win, 0, WATCHFACE_BUTTERFLY_BIN, 0, 0, 0, 0);
                     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
                     gui_win_press(win, win_press_cb, NULL);
                     gui_win_release(win, win_release_cb, NULL);

@@ -13,7 +13,7 @@
 static gui_img_t *h_hand, *m_hand, *s_hand;
 
 
-void win_cb()
+static void win_cb()
 {
 
     int millisecond = 0;
@@ -32,7 +32,7 @@ void win_cb()
     // extern struct tm watch_clock_get(void);
     // extern uint16_t millisecond_cnt;
     // struct tm watch_time = watch_clock_get();
-    // int millisecond = millisecond_cnt;
+    // millisecond = millisecond_cnt;
     // uint16_t seconds = watch_time.tm_sec;
     // uint16_t minute = watch_time.tm_min;
     // uint16_t hour = watch_time.tm_hour;
