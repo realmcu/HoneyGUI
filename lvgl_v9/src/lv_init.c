@@ -70,6 +70,10 @@
     #include "drivers/windows/lv_windows_context.h"
 #endif
 
+#if LV_USE_PPE
+    #include "lv_draw_ppe.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -237,6 +241,10 @@ void lv_init(void)
 
 #if LV_USE_WINDOWS
     lv_windows_platform_init();
+#endif
+
+#if LV_USE_PPE
+    lv_draw_ppe_init();
 #endif
 
     lv_obj_style_init();
