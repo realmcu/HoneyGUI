@@ -8,7 +8,7 @@
  *********************/
 
 
-#if 1
+#if LV_USE_PPE
 #include "lv_ppe_utils.h"
 #include "../../../core/lv_refr.h"
 /*********************
