@@ -177,6 +177,10 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_animate_watchface_callback_sec
 static void get_2_int_from_string(const char *input, int *int1, int *int2);
 static bool ends_with_xml(const char *str);
 static ezxml_t f1;
+static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
 {
@@ -1103,6 +1107,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
+
                     //gui_log("x:%d,y:%d,w:%dh:%d,file:%s\n", x, y, w, h, file);
                     if (folder)
                     {
@@ -1168,6 +1173,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     else if (file)
                     {
                         void *imgbuf = (void *)gui_get_image_file_address(file);
+                        gui_free(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
                         if (scalex != 1 || scaley != 1)
                         {
@@ -1180,6 +1186,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         gui_img_set_mode((gui_img_t *)parent, blendMode);
                         gui_img_set_opacity((gui_img_t *)parent, opacity);
+                        parent->obj_cb = img_render;
                     }
                 }
                 break;
@@ -1458,6 +1465,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                                  0, 0);
                         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
                         parent = (void *)img;
+                        parent->obj_cb = gui_canvas_img_cb;
                     }
 
 
@@ -2331,11 +2339,13 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     void *img2;
                     {
                         img1 = (void *)gui_get_image_file_address(picture);
+                        gui_free(picture);
                         img2 = img1;
                     }
                     if (style != BUTTON_HIGHLIGHT_ARRAY)
                     {
                         img2 = (void *)gui_get_image_file_address(hl_picture);
+                        gui_free(hl_picture);
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //font_size = 32;
@@ -2352,7 +2362,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         color_temporary = font_color;
                         GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     }
-
+                    parent->obj_cb = button_render;
+                    parent->has_destroy_cb = true;
 
                     if (style)
                     {
@@ -2426,13 +2437,13 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             font_type2 = GUI_FONT_SRC_BMP;
                             void *addr1 = gui_get_file_address(font_type);
-                            //gui_font_mem_init(addr1);
+//gui_font_mem_init(addr1);
                             GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
                             GUI_TYPE(gui_button_t, parent)->text->path = 0;
                             gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1, FONT_SRC_MEMADDR);
                             gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
-                            // t->font_height = fontSize;
-                            //t->path = 0;
+// t->font_height = fontSize;
+//t->path = 0;
                         }
                         else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
                         {
@@ -2454,7 +2465,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
                                                                                                      ".bin;") - a + strlen(".bin;")));
                                 void *addr2 = gui_get_file_address(b);
-                                // gui_set_font_mem_resourse(32, addr1,  addr2);
+// gui_set_font_mem_resourse(32, addr1,  addr2);
                                 GUI_TYPE(gui_button_t, parent)->text->path = 0;
                                 GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_BMP;
                             }
@@ -4121,6 +4132,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                             gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_second,
                                                                    (void *)data, "second");
                                         }
+                                        parent->obj_cb = img_ontime_render;
                                     }
                                 }
                                 else
@@ -4145,6 +4157,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
                                 }
                             }
+
                         }
                         break;
                     case TEXTBOX:
@@ -4508,7 +4521,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                             param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
 
                                         }
-                                        gui_img_set_animate((void *)parent, 1000, -1, arc_animate_activity_callback, (void *)param);
+                                        gui_img_append_animate((void *)parent, 1000, -1, arc_animate_activity_callback, (void *)param, 0);
+                                        parent->obj_cb = img_ontime_render;
                                     }
                                 }
                                 else if (!strcmp(type, "heart_rate"))
@@ -4616,7 +4630,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                             }
 
                                         }
-                                        gui_img_set_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback, (void *)param);
+                                        gui_img_append_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback,
+                                                               (void *)param, 0);
+                                        parent->obj_cb = img_ontime_render;
                                     }
                                 }
                             }
@@ -4838,7 +4854,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_img_t *img = gui_img_create_from_mem(parent, ptxt, buffer, x, y,
                                                              0, 0);
                     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
                     parent = (void *)img;
+                    parent->obj_cb = gui_canvas_img_cb;
                 }
                 break;
             /*default*/
@@ -5828,7 +5846,7 @@ static void find_preview_tags(ezxml_t node, char **file_output)
     // If the node's name is "preview", print the file attribute
     if (strcmp(node->name, "preview") == 0)
     {
-        const char *file = ezxml_attr(node, "file");
+        const char *file = gui_strdup(ezxml_attr(node, "file"));
         if (file)
         {
             //gui_log("File attribute value: %s\n", file);
@@ -5854,6 +5872,7 @@ char *gui_dom_get_preview_image_file(const char *xml_file)
     }
     char *file_output = 0;
     find_preview_tags(xml, &file_output);
+    ezxml_free(xml);
     return file_output;
 }
 void create_tree_nest(const char *xml, void *obj)
@@ -5866,6 +5885,7 @@ void create_tree_nest(const char *xml, void *obj)
     {
         foreach_create(f1, obj);
     }
+    ezxml_free(f1);
 }
 void gui_dom_create_tree_nest(const char *xml, gui_obj_t *parent_widget)
 {
@@ -6569,9 +6589,193 @@ void *get_app_xml(void)
 {
     return &app_xml;
 }
+extern void gui_img_destory(gui_obj_t *obj);
+extern void gui_img_input_prepare(gui_obj_t *obj);
+extern void gui_img_prepare(gui_obj_t *obj);
+extern void gui_img_draw_cb(gui_obj_t *obj);
+extern void gui_img_end(gui_obj_t *obj);
+static void canvas_img_destory(gui_obj_t *obj)
+{
+    gui_img_destory(obj);
+    gui_free(GUI_TYPE(gui_img_t, obj)->data);
+}
+
+static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
+        case OBJ_PREPARE:
+            {
+                gui_img_prepare(obj);
+            }
+            break;
+
+        case OBJ_DRAW:
+            {
+                gui_img_draw_cb(obj);
+            }
+            break;
+
+        case OBJ_END:
+            {
+                gui_img_end(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                canvas_img_destory(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+static void img_ontime_destory(gui_obj_t *obj)
+{
+    gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+    for (size_t i = 0; i < img->animate_array_length; i++)
+    {
+        gui_animate_t *animate = ((gui_animate_t **)(img->animate))[i];
+        gui_free(animate->p);
+    }
+    gui_img_destory(obj);
+}
+static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
+        case OBJ_PREPARE:
+            {
+                gui_img_prepare(obj);
+            }
+            break;
+
+        case OBJ_DRAW:
+            {
+                gui_img_draw_cb(obj);
+            }
+            break;
+
+        case OBJ_END:
+            {
+                gui_img_end(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                img_ontime_destory(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static void img_destory(gui_obj_t *obj)
+{
+    gui_free((void *)obj->name);
+    gui_img_destory(obj);
+}
+static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
+        case OBJ_PREPARE:
+            {
+                gui_img_prepare(obj);
+            }
+            break;
+
+        case OBJ_DRAW:
+            {
+                gui_img_draw_cb(obj);
+            }
+            break;
+
+        case OBJ_END:
+            {
+                gui_img_end(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                img_destory(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+static void gui_button_destory(gui_obj_t *obj)
+{
+    gui_button_t *button = GUI_TYPE(gui_button_t, obj);
+    if (button && button->text && button->text->content)
+    {
+        gui_free(button->text->content);
+    }
+    if (obj)
+    {
+        gui_free((void *)obj->name);
+    }
 
 
 
-
-
+}
+extern void gui_button_prepare(gui_obj_t *obj);
+extern void gui_button_input_prepare(gui_obj_t *obj);
+static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_button_input_prepare(obj);
+            break;
+        case OBJ_PREPARE:
+            gui_button_prepare(obj);
+            break;
+        case OBJ_DESTORY:
+            {
+                gui_button_destory(obj);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
 

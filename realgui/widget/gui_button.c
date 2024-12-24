@@ -51,7 +51,14 @@ static void gui_button_update_att(gui_obj_t *obj)
     gui_button_t *this = (void *)obj;
     animate_frame_update(this->animate, GUI_BASE(this));
 }
-static void gui_button_input_prepare(gui_obj_t *obj)
+/**
+ * @brief Prepares the GUI button input for processing.
+ *
+ *
+ * @param[in] obj A pointer to the `gui_obj_t` object related to the button
+ *                This object should have been previously initialized.
+ */
+void gui_button_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_button_t *this = (gui_button_t *)obj;
@@ -85,7 +92,13 @@ static void gui_button_input_prepare(gui_obj_t *obj)
 
 
 }
-static void gui_button_prepare(gui_obj_t *obj)
+/**
+ * @brief Prepares the GUI button associated with the specified object.
+ *
+ * @param[in] obj A pointer to the `gui_obj_t` object. This object must be properly
+ *                initialized before passing to this function.
+ */
+void gui_button_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_button_t *this = (void *)obj;

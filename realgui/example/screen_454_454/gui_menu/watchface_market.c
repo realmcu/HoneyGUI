@@ -7,7 +7,7 @@
 GUI_APP_DEFINE_NAME_ANIMATION(APP_WATCHFACE_MARKET, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_7)
 #define APP_WATCHFACE_MARKET_MAX_COUNT 50
 
-static char **xml_file_array = NULL;
+static char **xml_array = NULL;
 
 static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
 {
@@ -20,6 +20,7 @@ static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
         gui_log("opendir(%s) failed", dirPath); return xml_file_array;
     }
     xml_file_array = gui_malloc(APP_WATCHFACE_MARKET_MAX_COUNT * sizeof(char *));
+    memset(xml_file_array, 0, APP_WATCHFACE_MARKET_MAX_COUNT * sizeof(char *));
     while ((entry = gui_fs_readdir(dir)) != NULL)
     {
 
@@ -99,19 +100,33 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     int count = 0;
     while (1)
     {
-        if (xml_file_array[count])
+        if (xml_array[count])
         {
-            gui_log("count = %d, param = 0x%x, path = %s\n", count, xml_file_array[count],
-                    xml_file_array[count]);
-            gui_free(xml_file_array[count++]);
+            gui_log("count = %d, param = 0x%x, path = %s\n", count, xml_array[count],
+                    xml_array[count]);
+            gui_free(xml_array[count++]);
         }
         else
         {
             break;
         }
     }
-    xml_file_array = NULL;
+    gui_free(xml_array);
+    xml_array = NULL;
 }
+static gui_img_t **watchface_img_array;
+static int img_array_count = 0;
+static void dtor(gui_app_t *app)
+{
+#if _WIN32
+    for (size_t i = 0; i < img_array_count; i++)
+    {
+        //gui_free(watchface_img_array[i]->data);
+    }
+#endif
+    gui_free(watchface_img_array);
+}
+
 GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
 {
     win2 = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, gui_get_screen_width(),
@@ -124,28 +139,34 @@ GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
     const int space_y = 250;
     const int space_x = 200;
     const int col = 2;
-    xml_file_array = find_all_xml_files(gui_get_path_by_relative("app"), &count);
+    xml_array = find_all_xml_files(gui_get_path_by_relative("app"), &count);
+    gui_img_t *img_array[(count / col + 1)*col];
+    img_array_count = 0;
     for (size_t i = 0; i < count / col + 1; i++)
     {
         for (size_t ii = 0; ii < col; ii++)
         {
             if (i * col + ii >= count)
             {
-                return;
+                break;
             }
-            char *file_output = gui_dom_get_preview_image_file(xml_file_array[i * col + ii]);
+            char *file_output = gui_dom_get_preview_image_file(xml_array[i * col + ii]);
             gui_win_t *win = gui_win_create(page, 0, ii * space_x + (gui_get_screen_width() - space_x * 2) / 2,
                                             i * space_y + 5, space_x - 1, space_y - 1);
             const uint8_t *img_addr = gui_get_file_address(file_output);
+            gui_free(file_output);
             if (img_addr)
             {
-                gui_img_t *img = gui_img_create_from_mem(win, 0, gui_get_file_address(file_output), 0, 0, 0, 0);
+                gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)img_addr, 0, 0, 0, 0);
                 gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                img_array[img_array_count++] = img;
                 gui_win_press(win, win_press_cb, NULL);
                 gui_win_release(win, win_release_cb, NULL);
-                gui_win_click(win, win_click_cb, xml_file_array[i * col + ii]);
+                gui_win_click(win, win_click_cb, xml_array[i * col + ii]);
             }
         }
     }
-
+    watchface_img_array = gui_malloc(img_array_count * sizeof(gui_img_t *));
+    memcpy(watchface_img_array, img_array, img_array_count * sizeof(gui_img_t *));
+    app->dtor = (void *)dtor;
 }
