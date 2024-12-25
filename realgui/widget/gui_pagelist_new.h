@@ -74,6 +74,7 @@ typedef struct gui_pagelist_new
 
     bool event5_flag;
     bool horizontal;
+    bool append;
     BLEND_MODE_TYPE blending;
 } gui_pagelist_new_t;
 
@@ -175,8 +176,31 @@ gui_pagelist_new_t *gui_pagelist_new_create_horizontal(void *parent,
                                                        const uint8_t *font,
                                                        uint16_t font_size,
                                                        gui_color_t font_color);
+/**
+ * @brief Adds a new item to the end of the page list.
+ *
+ * This function adds a new item to the end of the `gui_pagelist_new_t` structure.
+ * The item will contain the specified text and an associated click event callback function.
+ *
+ * @param pagelist_new Pointer to the page list where the item will be added.
+ * @param item_click_function Callback function that will be triggered when the item is clicked.
+ * @param item_text Text to be displayed on the new item.
+ */
+void gui_page_list_new_pushback(gui_pagelist_new_t *pagelist_new,
+                                const gui_event_cb_t item_click_function,
+                                const char *item_text);
 
-
+/**
+ * @brief Removes an item from the page list by its ID.
+ *
+ * This function removes the item identified by the given ID from the
+ * `gui_pagelist_new_t` structure. If the ID is not valid, the behavior
+ * of this function is unspecified.
+ *
+ * @param pagelist_new Pointer to the page list from which the item will be removed.
+ * @param id The ID of the item to be removed.
+ */
+void gui_page_list_new_erase(gui_pagelist_new_t *pagelist_new, int id);
 #ifdef __cplusplus
 }
 #endif

@@ -860,6 +860,21 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
     }
     gui_obj_child_free((void *)pagelist_new);
     {
+        if (pagelist_new->click_function_array)
+        {
+            if (pagelist_new->append)
+            {
+                gui_free((void *)pagelist_new->click_function_array);
+            }
+        }
+        if (pagelist_new->item_text_array)
+        {
+            if (pagelist_new->append)
+            {
+                gui_free(pagelist_new->item_text_array);
+            }
+        }
+        pagelist_new->append = false;
         pagelist_new->item_count = item_count;
         pagelist_new->click_function_array = item_click_function_array;
         pagelist_new->item_text_array = item_text_array;
@@ -894,7 +909,6 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
                 gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i], (gui_event_cb_t)i);
             }
 
-
             gui_win_press(win, win_press, (void *)i);
             gui_win_release(win, win_release, (void *)i);
         }
@@ -924,4 +938,85 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
     }
     return GUI_SUCCESS;
 
+}
+void gui_page_list_new_pushback(gui_pagelist_new_t *pagelist_new,
+                                const gui_event_cb_t item_click_function,
+                                const char *item_text)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(pagelist_new, MACRO_PAGE_LIST_NEW)
+    gui_event_cb_t *item_click_function_array = gui_malloc(sizeof(gui_event_cb_t) *
+                                                           (++pagelist_new->item_count));
+    char **item_text_array = gui_malloc(sizeof(char *) * (pagelist_new->item_count));
+
+    if (item_click_function_array && item_text_array)
+    {
+        if (pagelist_new->click_function_array)
+        {
+            for (size_t i = 0; i < pagelist_new->item_count - 1; i++)
+            {
+                item_click_function_array[i] = pagelist_new->click_function_array[i];
+            }
+        }
+        if (pagelist_new->item_text_array)
+        {
+            for (size_t i = 0; i < pagelist_new->item_count - 1; i++)
+            {
+                item_text_array[i] = (void *)pagelist_new->item_text_array[i];
+            }
+        }
+        item_click_function_array[pagelist_new->item_count - 1] = item_click_function;
+        item_text_array[pagelist_new->item_count - 1] = (void *)item_text;
+        gui_page_list_new_render(pagelist_new, pagelist_new->item_count, item_click_function_array,
+                                 (void *)item_text_array);
+    }
+    pagelist_new->append = true;
+}
+void gui_page_list_new_erase(gui_pagelist_new_t *pagelist_new, int id)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(pagelist_new, MACRO_PAGE_LIST_NEW)
+    if (id + 1 > pagelist_new->item_count)
+    {
+        return;
+    }
+
+    gui_event_cb_t *item_click_function_array = gui_malloc(sizeof(gui_event_cb_t) *
+                                                           (--pagelist_new->item_count));
+    char **item_text_array = gui_malloc(sizeof(char *) * (pagelist_new->item_count));
+    if (item_click_function_array && item_text_array)
+    {
+        if (pagelist_new->click_function_array)
+        {
+            int id_new = 0, id_old = 0;
+            for (size_t i = 0; i < pagelist_new->item_count; i++)
+            {
+
+                if (i == id)
+                {
+                    id_old++;
+                }
+
+                item_click_function_array[id_new] = pagelist_new->click_function_array[id_old];
+                id_new++;
+                id_old++;
+            }
+        }
+        if (pagelist_new->item_text_array)
+        {
+            int id_new = 0, id_old = 0;
+            for (size_t i = 0; i < pagelist_new->item_count; i++)
+            {
+
+                if (i == id)
+                {
+                    id_old++;
+                }
+                item_text_array[id_new] = (void *)pagelist_new->item_text_array[id_old];
+                id_new++;
+                id_old++;
+            }
+        }
+        gui_page_list_new_render(pagelist_new, pagelist_new->item_count, item_click_function_array,
+                                 (void *)item_text_array);
+    }
+    pagelist_new->append = true;
 }
