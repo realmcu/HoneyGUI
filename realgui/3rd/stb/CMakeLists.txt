@@ -1,5 +1,21 @@
+set(sources_name gui_3rd_common_sources)
+set(headers_name gui_3rd_common_headers)
 
-set(gui_3rd_stb_sources  CACHE INTERNAL  "sources ")
-set(gui_3rd_stb_headers ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL  "headers ")
 
-target_compile_definitions(gui PRIVATE STBIDEF=extern)
+
+file(GLOB ${sources_name} *.c)
+
+set(${sources_name} ${${sources_name}} CACHE INTERNAL  "sources")
+
+HEADER_DIRECTORIES(${headers_name} ./)
+
+set(${headers_name} ${${headers_name}} CACHE INTERNAL  "headers")
+
+
+
+if(gui_debug_enable)  
+   message(--------------gui 3rd stb-------------)
+foreach(ITEM ${${sources_name}})
+   message(${ITEM})
+endforeach()
+endif()
