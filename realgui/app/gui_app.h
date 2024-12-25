@@ -48,6 +48,7 @@ struct gui_app
     uint32_t start_ms;             //!< screen shut down delay
     void *thread_id;                //!< thread handle(optional)
     void (* thread_entry)(void *_this); //!< thread entry
+    void (* server_hook)(void *_this); //!< thread entry
     void (* ctor)(void *_this);      //!< constructor
     void (* dtor)(void *_this);      //!< destructor
     void (* ui_design)(gui_app_t *); //!< ui create entry
@@ -131,13 +132,13 @@ struct gui_app
 /**
  * @brief Macro to swap between two GUI applications.
  *
- * This macro allows switching from one application to another by calling gui_switch_app
+ * This macro allows switching from one application to another by calling gui_app_switch
  * and passing the handles of the current and next application.
  *
  * @param APP_NAME The name of the current application.
  * @param APP_NAME_NEXT The name of the next application.
  */
-#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME##_handle(), _get_app_##APP_NAME##_handle_next());
+#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_app_switch(_get_app_##APP_NAME##_handle(), _get_app_##APP_NAME##_handle_next());
 
 /**
  * @brief Macro to get a pointer to the root screen of the current application.
@@ -157,7 +158,7 @@ struct gui_app
 #define GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC) \
     extern gui_app_t *HANDLE_FUNC; \
     extern gui_app_t *HANDLE_NEXT_FUNC; \
-    gui_switch_app(HANDLE_FUNC, HANDLE_NEXT_FUNC);
+    gui_app_switch(HANDLE_FUNC, HANDLE_NEXT_FUNC);
 
 /**
  * @brief Macro to define a GUI application with a specific name.
@@ -274,7 +275,7 @@ gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_e
  * @param from A pointer
  * @param to B pointer
  */
-void gui_switch_app(gui_app_t *from, gui_app_t *to);
+void gui_app_switch(gui_app_t *from, gui_app_t *to);
 /**
  * @brief Set next app top layer, call this function before the context of the next app startup.
  *

@@ -8,6 +8,7 @@
 #include <guidef.h>
 #include <gui_app.h>
 #include <gui_obj.h>
+#include <gui_message.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

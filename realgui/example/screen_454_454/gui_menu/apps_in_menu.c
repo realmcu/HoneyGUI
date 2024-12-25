@@ -2802,7 +2802,7 @@ static void app_soccer_cb(void *obj, gui_event_t e, void *param)
     switch (soccer->press_face)
     {
     case 0:
-        gui_switch_app(gui_current_app(), get_call_app());
+        gui_app_switch(gui_current_app(), get_call_app());
         break;
     default:
         break;

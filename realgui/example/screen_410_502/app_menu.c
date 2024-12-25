@@ -46,32 +46,32 @@ void switch_BOX2D_RING(void *obj, gui_event_t e, void *param)
     extern void close_box2d_ring(void);
     close_box2d_ring();
 
-    gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
 }
 
 void switch_APP_FRUIT_NINJA(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
 }
 
 void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
 }
 
 void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
 }
 
 void switch_APP_ACTIVITY(void *obj, gui_event_t e, void *param)
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_ACTIVITY_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_ACTIVITY_handle());
 }
 
 // static void switch_APP_CALCULATOR()
 // {
-//     gui_switch_app(gui_current_app(), _get_app_APP_CALCULATOR_handle());
+//     gui_app_switch(gui_current_app(), _get_app_APP_CALCULATOR_handle());
 // }
 
 /*Define gui_app_return_array*/
@@ -136,7 +136,7 @@ static void app_menu_cb(void *obj, gui_event_t e, void *param)
 
 static void app_back2watchface_cb(void)
 {
-    gui_switch_app(gui_current_app(), get_app_hongkong());
+    gui_app_switch(gui_current_app(), get_app_hongkong());
 }
 
 static void app_back2prescreen_cb(void)
@@ -146,11 +146,11 @@ static void app_back2prescreen_cb(void)
 
     if (return_to_watchface_flag || sidebar_flag)
     {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
+        gui_app_switch(gui_current_app(), get_app_hongkong());
     }
     else
     {
-        gui_switch_app(gui_current_app(), get_app_menu());
+        gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
 

@@ -1111,12 +1111,12 @@ static void win_hb_exit(void)
     extern bool sidebar_flag;
     if (return_to_watchface_flag || sidebar_flag)
     {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
+        gui_app_switch(gui_current_app(), get_app_hongkong());
     }
     else
     {
         extern void *get_app_menu();
-        gui_switch_app(gui_current_app(), get_app_menu());
+        gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
 
@@ -1312,13 +1312,13 @@ extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_funct
 void switch_heart_rate()
 {
     sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_heart_rate);
-    gui_switch_app(gui_current_app(), &_app_APP_HEART_RATE);
+    gui_app_switch(gui_current_app(), &_app_APP_HEART_RATE);
 }
 
 // static void switch_app_menu()
 // {
 //     extern void *get_app_menu();
-//     gui_switch_app(gui_current_app(), get_app_menu());
+//     gui_app_switch(gui_current_app(), get_app_menu());
 // }
 
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)

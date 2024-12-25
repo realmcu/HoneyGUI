@@ -216,12 +216,16 @@ gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_e
     return app;
 }
 
-void gui_switch_app(gui_app_t *from, gui_app_t *to)
+void gui_app_switch(gui_app_t *from, gui_app_t *to)
 {
+    if (from == NULL)
+    {
+        from = current_app;
+    }
     gui_app_shutdown(from);
 
     gui_app_startup(to);
-    gui_log("gui_switch_app from %s to %s\n", from->screen.name, to->screen.name);
+    gui_log("gui_app_switch from %s to %s\n", from->screen.name, to->screen.name);
 }
 
 void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms)

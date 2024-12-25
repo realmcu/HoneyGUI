@@ -246,22 +246,22 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     if (strcmp(obj_name, "music") == 0)
     {
         extern gui_app_t *_get_app_APP_MUSIC_handle(void);
-        gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
+        gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
     }
     else if (strcmp(obj_name, "FJ") == 0)
     {
         extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
-        gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+        gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
     }
     else if (strcmp(obj_name, "HR") == 0)
     {
         extern gui_app_t *_get_app_APP_HEART_RATE_handle();
-        gui_switch_app(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+        gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
     }
     else if (strcmp(obj_name, "appview") == 0)
     {
         extern gui_app_t *get_app_menu();
-        gui_switch_app(gui_current_app(), get_app_menu());
+        gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
 

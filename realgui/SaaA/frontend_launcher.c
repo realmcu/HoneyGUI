@@ -55,7 +55,7 @@ void button_click_cb(gui_button_t *b)
 {
     gui_app_t *app = get_app_xml();
     app->xml = b->data;
-    gui_switch_app(get_app_launcher_frontend(), app);
+    gui_app_switch(get_app_launcher_frontend(), app);
 }
 void button_release_cb(gui_button_t *b)
 {

@@ -370,7 +370,7 @@ static void curtain_center(gui_curtainview_t *curtainview)
 }
 static void switch_to_wheel(void *obj, gui_event_t event, void *param)
 {
-    gui_switch_app(get_launcher_app(), get_wheel_app());
+    gui_app_switch(get_launcher_app(), get_wheel_app());
 }
 static void curtain_up(gui_curtainview_t *curtainview)
 {
@@ -499,7 +499,7 @@ static void wheel_cb(void *obj, gui_event_t event, void *param)
 }
 static void switch_to_launcher(void *obj, gui_event_t event, void *param)
 {
-    gui_switch_app(get_wheel_app(), get_launcher_app());
+    gui_app_switch(get_wheel_app(), get_launcher_app());
 }
 static void app_wheel_ui_design(gui_app_t *app)
 {

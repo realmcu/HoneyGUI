@@ -91,7 +91,7 @@ In :cpp:any:`gui_wheel_list_add_icon_default`
     }
     static void switch_to_launcher(void *obj, gui_event_t event)
     {
-        gui_switch_app(get_wheel_app(), get_launcher_app());
+        gui_app_switch(get_wheel_app(), get_launcher_app());
     }
     static void app_wheel_ui_design(gui_app_t *app)
     {
@@ -192,7 +192,7 @@ In :cpp:any:`gui_wheel_list_set_icon`
     }
     static void switch_to_launcher(void *obj, gui_event_t event)
     {
-        gui_switch_app(get_wheel_app(), get_launcher_app());
+        gui_app_switch(get_wheel_app(), get_launcher_app());
     }
     static void app_wheel_ui_design(gui_app_t *app)
     {

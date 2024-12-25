@@ -113,7 +113,7 @@ static void callback_touch_long(void *obj, gui_event_t e)
     // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
     extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
     gui_app_layer_top();
-    gui_switch_app(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
     return;
 }
 

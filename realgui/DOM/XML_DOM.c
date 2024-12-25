@@ -825,14 +825,14 @@ static void on_click_jump_to_app_cb(void *obj, gui_event_t e, const char *new_xm
         extern void *get_app_xml(void);
         gui_app_t *app2 = (gui_app_t *)get_app_xml();
         app2->xml = new_xml;
-        gui_switch_app(gui_current_app(), app2);
+        gui_app_switch(gui_current_app(), app2);
     }
 }
 static void on_click_jump_to_capp_cb(void *obj, gui_event_t e, gui_app_t *handle)
 {
     if (handle)
     {
-        gui_switch_app(gui_current_app(), handle);
+        gui_app_switch(gui_current_app(), handle);
     }
 }
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)

@@ -322,7 +322,7 @@ DECLARE_HANDLER(open)
         extern void *get_app_xml(void);
         gui_app_t *app2 = (gui_app_t *)get_app_xml();
         app2->xml = new_xml;
-        gui_switch_app(app, app2);
+        gui_app_switch(app, app2);
     }
     return jerry_create_undefined();
 }

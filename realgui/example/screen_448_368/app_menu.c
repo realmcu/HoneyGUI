@@ -49,22 +49,22 @@ GUI_APP_DEFINE_NAME(APP_MUSIC)
 extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
 void switch_BOX2D_RING()
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
 }
 
 void switch_APP_FRUIT_NINJA()
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
 }
 
 void switch_APP_MUSIC()
 {
-    gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
+    gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
 }
 
 // static void switch_APP_CALCULATOR()
 // {
-//     gui_switch_app(gui_current_app(), _get_app_APP_CALCULATOR_handle());
+//     gui_app_switch(gui_current_app(), _get_app_APP_CALCULATOR_handle());
 // }
 
 extern const uint32_t *gui_app_return_array[17];
@@ -109,7 +109,7 @@ static void app_menu_cb(void *obj, gui_event_t e, void *param)
 
 static void app_back2watchface_cb(void)
 {
-    gui_switch_app(gui_current_app(), get_app_hongkong());
+    gui_app_switch(gui_current_app(), get_app_hongkong());
 }
 
 static void app_back2prescreen_cb(void)
@@ -117,11 +117,11 @@ static void app_back2prescreen_cb(void)
     extern bool sidebar_flag;
     if (sidebar_flag)
     {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
+        gui_app_switch(gui_current_app(), get_app_hongkong());
     }
     else
     {
-        gui_switch_app(gui_current_app(), get_app_menu());
+        gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
 
@@ -130,11 +130,11 @@ static void app_BOX2D_RING_return_cb(void)
     extern bool sidebar_flag;
     if (sidebar_flag)
     {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
+        gui_app_switch(gui_current_app(), get_app_hongkong());
     }
     else
     {
-        gui_switch_app(gui_current_app(), get_app_menu());
+        gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
 

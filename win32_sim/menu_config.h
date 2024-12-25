@@ -23,7 +23,11 @@
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
-//  #define CONFIG_REALTEK_BUILD_REAL_BASE
+// #define CONFIG_REALTEK_BUILD_REAL_BASE
+// </c>
+
+// <c> RTK GUI Base Demo
+// #define CONFIG_REALTEK_BUILD_MULTI_APP
 // </c>
 
 // <c> RTK GUI 3D Demo

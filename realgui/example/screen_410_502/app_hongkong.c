@@ -82,7 +82,7 @@ static void switch_app_menu()
         close_box2d_ring();
 
         extern gui_app_t *get_app_menu();
-        gui_switch_app(gui_current_app(), get_app_menu());
+        gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
 
@@ -90,13 +90,13 @@ static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
     // extern gui_app_t *_get_app_APP_MUSIC_handle(void);
-    // gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
     // extern gui_app_t *get_app_menu();
-    // gui_switch_app(gui_current_app(), get_app_menu());
+    // gui_app_switch(gui_current_app(), get_app_menu());
     // extern gui_app_t *_get_app_APP_BOX2D_RING_handle();
-    // gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
     // extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
-    // gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
     // return;
 
     tv = gui_tabview_create(app->window, "hongkong_tabview", 0, 0, 0, 0);

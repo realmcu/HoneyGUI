@@ -154,7 +154,7 @@ static void callback_touch_long(void *obj, gui_event_t e)
 static void switch_app_menu()
 {
     extern void *get_app_menu();
-    gui_switch_app(gui_current_app(), get_app_menu());
+    gui_app_switch(gui_current_app(), get_app_menu());
 }
 
 void page_tb_clock(void *parent)

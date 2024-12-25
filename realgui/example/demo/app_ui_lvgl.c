@@ -42,7 +42,7 @@ static void event_handler(lv_event_t *e)
     if (code == LV_EVENT_CLICKED)
     {
         LV_LOG_USER("Clicked");
-        //gui_switch_app(gui_current_app(), get_app_hongkong());
+        //gui_app_switch(gui_current_app(), get_app_hongkong());
     }
     else if (code == LV_EVENT_VALUE_CHANGED)
     {

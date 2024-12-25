@@ -99,7 +99,7 @@ UI系统可以接收设备中其他外设的输入，典型的输入设备有触
     void enter_homelist(void *obj, gui_event_t e)
     {
         gui_log("enter_tablist \n");
-        gui_switch_app(gui_current_app(), get_app_homelist());
+        gui_app_switch(gui_current_app(), get_app_homelist());
     }
     void design_tab_home(void *parent)
     {

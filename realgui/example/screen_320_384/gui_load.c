@@ -23,7 +23,7 @@ void enter_tablist(void *obj, gui_event_t e)
 {
     gui_log("enter_tablist \n");
     LAST_TABHOME_X = home_tab->cur_id.x;
-    gui_switch_app(get_app_home(), get_app_tablist());
+    gui_app_switch(get_app_home(), get_app_tablist());
     tablist_tab->cur_id.x = LAST_TABHOME_X - 1;
 }
 
@@ -31,30 +31,30 @@ void exit_tablist(void *obj, gui_event_t e)
 {
     gui_log("exit_tablist \n");
     LAST_TABLIST_X = tablist_tab->cur_id.x;
-    gui_switch_app(get_app_tablist(), get_app_home());
+    gui_app_switch(get_app_tablist(), get_app_home());
     home_tab->cur_id.x = LAST_TABLIST_X + 1;
 }
 void enter_homelist(void *obj, gui_event_t e)
 {
     gui_log("enter_tablist \n");
-    gui_switch_app(gui_current_app(), get_app_homelist());
+    gui_app_switch(gui_current_app(), get_app_homelist());
 }
 
 void exit_homelist(void *obj, gui_event_t e)
 {
     gui_log("exit_tablist \n");
-    gui_switch_app(get_app_homelist(), get_app_home());
+    gui_app_switch(get_app_homelist(), get_app_home());
 }
 void enter_app_set_start(void *obj, gui_event_t e)
 {
     gui_log("enter_app_set_start \n");
-    gui_switch_app(get_app_home(), get_app_set_start());
+    gui_app_switch(get_app_home(), get_app_set_start());
 }
 extern void switch_dynamic_island(void *obj, gui_event_t e);
 void exit_app_set_start(void *obj, gui_event_t e)
 {
     gui_log("exit_app_set_start \n");
-    gui_switch_app(get_app_set_start(), get_app_home());
+    gui_app_switch(get_app_set_start(), get_app_home());
 
     extern uint8_t dynamic_island_count;
     dynamic_island_count = 0;

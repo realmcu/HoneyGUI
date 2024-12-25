@@ -84,7 +84,7 @@ static void switch_app_menu()
 {
     gui_log("enter menu\n");
     extern void *get_app_menu();
-    gui_switch_app(gui_current_app(), get_app_menu());
+    gui_app_switch(gui_current_app(), get_app_menu());
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)
