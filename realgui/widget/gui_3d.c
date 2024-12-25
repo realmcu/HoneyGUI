@@ -18,6 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include <string.h>
+#include <math.h>
 #include "guidef.h"
 #include "gui_obj.h"
 #include "gui_3d.h"
@@ -52,8 +53,22 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static float calculate_cosin(gui_vector4D_t normal, gui_3d_camera_t *camera)
+{
+    gui_vector4D_t viewDirection;
+    viewDirection.x = camera->targetDirection.x - camera->position.x;
+    viewDirection.y = camera->targetDirection.y - camera->position.y;
+    viewDirection.z = camera->targetDirection.z - camera->position.z;
 
-static void compare_face_order(gui_3d_face_t *face, unsigned int num_faces)
+    float magN = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+    float magV = sqrt(viewDirection.x * viewDirection.x + viewDirection.y * viewDirection.y +
+                      viewDirection.z * viewDirection.z);
+
+    return (normal.x * viewDirection.x + normal.y * viewDirection.y + normal.z * viewDirection.z) /
+           (magN * magV);
+}
+
+static void compare_face_order(gui_3d_face_t *face, unsigned int num_faces, gui_3d_camera_t *camera)
 {
     uint32_t *order_array = (uint32_t *)gui_malloc(num_faces * sizeof(size_t));
 
@@ -65,9 +80,12 @@ static void compare_face_order(gui_3d_face_t *face, unsigned int num_faces)
     for (uint32_t i = 0; i < num_faces; i++)
     {
         uint32_t min_index = i;
+        float result = calculate_cosin(face[i].transform_vertex[0].normal, camera);
+
         for (uint32_t j = i + 1; j < num_faces; j++)
         {
-            if (face[order_array[j]].center.z < face[order_array[min_index]].center.z)
+            if (calculate_cosin(face[order_array[j]].transform_vertex[0].normal,
+                                camera) > calculate_cosin(face[order_array[min_index]].transform_vertex[0].normal, camera))
             {
                 min_index = j;
             }
@@ -84,6 +102,129 @@ static void compare_face_order(gui_3d_face_t *face, unsigned int num_faces)
     face[order_array[num_faces - 1]].order = num_faces - 1;
 
     gui_free(order_array);
+}
+
+float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, float point_z)
+{
+    gui_point_4d_t lightToPoint =
+    {
+        .x = point_x - light->position.x,
+        .y = point_y - light->position.y,
+        .z = point_z - light->position.z,
+    };
+    lightToPoint = gui_point_4d_unit(lightToPoint);
+
+    gui_point_4d_t lightDirection =
+    {
+        .x = light->targetDirection.x - light->position.x,
+        .y = light->targetDirection.y - light->position.y,
+        .z = light->targetDirection.z - light->position.z,
+    };
+    lightDirection = gui_point_4d_unit(lightDirection);
+
+
+    float cosTheta = gui_point4D_dot(lightDirection, lightToPoint);
+    float angleToPixel = acos(cosTheta) * (180.0f / M_PI);
+
+    float halfAngle = light->included_angle / 2.0f;
+    float innerCircleRadius = halfAngle * (1.0f - light->blend_ratio);
+    float outerCircleRadius = halfAngle;
+
+    if (angleToPixel <= innerCircleRadius)
+    {
+        return 1.0f;
+    }
+    else if (angleToPixel <= outerCircleRadius)
+    {
+        float blendFactor = (angleToPixel - innerCircleRadius) / (outerCircleRadius - innerCircleRadius);
+        return 1.0f - blendFactor;
+    }
+
+    return 0;
+}
+
+gui_point_4d_t calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1, gui_point_4d_t P2,
+                                       gui_point_4d_t P3, float u, float v)
+{
+    gui_point_4d_t point;
+
+    // Horizontal interpolation
+    gui_point_4d_t Q0, Q1;
+    Q0.x = (1 - u) * P3.x + u * P0.x;
+    Q0.y = (1 - u) * P3.y + u * P0.y;
+    Q0.z = (1 - u) * P3.z + u * P0.z;
+
+    Q1.x = (1 - u) * P2.x + u * P1.x;
+    Q1.y = (1 - u) * P2.y + u * P1.y;
+    Q1.z = (1 - u) * P2.z + u * P1.z;
+
+    // Vertical interpolation
+    point.x = (1 - v) * Q1.x + v * Q0.x;
+    point.y = (1 - v) * Q1.y + v * Q0.y;
+    point.z = (1 - v) * Q1.z + v * Q0.z;
+
+    return point;
+
+}
+static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
+                        gui_3d_world_t *world, gui_3d_camera_t *camera, gui_3d_light_t *light)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
+    float width = head->w;
+    float height = head->h;
+    int data_size = sizeof(gui_rgb_data_head_t) + width * height * 4;
+
+    memcpy(this->mask_img + i, this->img + i, sizeof(draw_img_t));
+    this->mask_img[i].data = (unsigned char *)gui_malloc(data_size);
+    memcpy(this->mask_img[i].data, this->img[i].data, data_size);
+
+    //light intense
+    float distance = pow(light->position.x - light->targetDirection.x, 2) +
+                     pow(light->position.y - light->targetDirection.y, 2) +
+                     pow(light->position.z - light->targetDirection.z, 2);
+    float intense = light->color.a / (1.0f + 0.1f * sqrt(distance));
+
+    unsigned char mask_color[4] = {light->color.r, light->color.g, light->color.b, intense};
+    float alpha = mask_color[3] / 255.0f;
+
+    for (int p_y = 0; p_y < height; p_y++)
+    {
+        for (int p_x = 0; p_x < width; p_x++)
+        {
+            float u = (float)p_x / (width - 1);
+
+            float v = (float)p_y / (height - 1);
+
+            if (this->face[i].vertex[0].v == 1)
+            {
+                v = 1.0f - v;
+            }
+
+            gui_point_4d_t point = calculate_point_in_quad(this->face[i].transform_world_vertex[0].position,
+                                                           this->face[i].transform_world_vertex[1].position,
+                                                           this->face[i].transform_world_vertex[2].position,
+                                                           this->face[i].transform_world_vertex[3].position, u, v);
+
+            float intensity = calculateLight2Point(light, point.x, point.y, point.z);
+
+            if (intensity != 0)
+            {
+                unsigned char *origin_pixel = (unsigned char *)this->img[i].data + sizeof(gui_rgb_data_head_t) +
+                                              (p_y * head->w + p_x) * 4;
+                unsigned char *pixel = (unsigned char *)this->mask_img[i].data + sizeof(gui_rgb_data_head_t)  +
+                                       (p_y * head->w + p_x) * 4;
+
+                for (int c = 0; c < 3; ++c)
+                {
+                    pixel[c] = (unsigned char)(mask_color[c] * alpha * intensity + origin_pixel[c] *
+                                               (1 - alpha * intensity));
+                }
+            }
+
+        }
+    }
+
 }
 
 static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
@@ -153,9 +294,7 @@ static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
         this->face[i].vertex[j].normal.z = vn[2];
         this->face[i].vertex[j].normal.w = 1;
 
-        this->face[i].center.z += this->face[i].transform_vertex[j].position.z;
     }
-    this->face[i].center.z /= this->desc->attrib.face_num_verts[i];
 }
 
 static void gui_3d_update_att(gui_obj_t *obj)
@@ -172,7 +311,6 @@ static void gui_3d_prepare(gui_3d_t *this)
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_3d_update_att(obj);
-    gui_dispdev_t *dc = gui_get_dc();
 
     // this->flags = TINYOBJ_FLAG_TRIANGULATE;
     this->flags = 0;
@@ -182,31 +320,38 @@ static void gui_3d_prepare(gui_3d_t *this)
     this->img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
 
+    this->mask_img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
+    memset(this->mask_img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
 
+    gui_3d_camera_t camera;
+    gui_3d_light_t light;
+    light.initialized = false;
     for (size_t i = 0; i < this->desc->num_shapes; i++)
     {
         gui_3d_world_t world;
-        gui_3d_camera_t camera;
         GUI_ASSERT(this->shape_transform_cb != NULL);
 
         for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
         {
-            this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera);
+            this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
             // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->desc->shapes[i].name, this->desc->shapes[i].length, this->desc->shapes[i].face_offset + j);
             convert_to_face(this, this->desc->shapes[i].face_offset + j);
 
             face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
 
+            if (light.initialized)
+            {
+                light_apply(this, i, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
+            }
         }
     }
-    compare_face_order(this->face, this->desc->attrib.num_face_num_verts);
+    compare_face_order(this->face, this->desc->attrib.num_face_num_verts, &camera);
 
     gui_fb_change();
 
     GUI_UNUSED(this);
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
-    GUI_UNUSED(dc);
 }
 
 static void gui_3d_draw(gui_3d_t *this)
@@ -235,9 +380,19 @@ static void gui_3d_draw(gui_3d_t *this)
         }
         if (current_face_index != -1)
         {
-            draw_img_cache(this->img + current_face_index, IMG_SRC_MEMADDR);
-            gui_acc_blit_to_dc(this->img + current_face_index, dc, NULL);
-            draw_img_free(this->img + current_face_index, IMG_SRC_MEMADDR);
+            if (this->mask_img->data != NULL)
+            {
+                draw_img_cache(this->mask_img + current_face_index, IMG_SRC_MEMADDR);
+                gui_acc_blit_to_dc(this->mask_img + current_face_index, dc, NULL);
+                draw_img_free(this->mask_img + current_face_index, IMG_SRC_MEMADDR);
+            }
+            else
+            {
+                draw_img_cache(this->img + current_face_index, IMG_SRC_MEMADDR);
+                gui_acc_blit_to_dc(this->img + current_face_index, dc, NULL);
+                draw_img_free(this->img + current_face_index, IMG_SRC_MEMADDR);
+            }
+
         }
     }
 
@@ -258,6 +413,20 @@ static void gui_3d_end(gui_3d_t *this)
     {
         gui_free(this->img);
         this->img = NULL;
+    }
+
+    if (this->mask_img != NULL)
+    {
+        for (int i = 0; i < this->desc->attrib.num_face_num_verts; i++)
+        {
+            if (this->mask_img[i].data != NULL)
+            {
+                gui_free(this->mask_img[i].data);
+                this->mask_img[i].data = NULL;
+            }
+        }
+        gui_free(this->mask_img);
+        this->mask_img = NULL;
     }
 
     gui_free(this->face);
@@ -468,7 +637,8 @@ static void gui_3d_ctor(gui_3d_t               *this,
  *============================================================================*/
 
 void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
-                                   void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera))
+                                   void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                              gui_3d_light_t *light))
 {
     this->shape_transform_cb = cb;
 }

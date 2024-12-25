@@ -66,10 +66,11 @@ typedef struct gui_3d
 
     gui_3d_face_t *face;
     draw_img_t *img;
+    draw_img_t *mask_img;
     gui_animate_t *animate;
 
     void (*shape_transform_cb)(struct gui_3d *this, size_t s/*shape_offset*/, gui_3d_world_t *world,
-                               gui_3d_camera_t *camera);
+                               gui_3d_camera_t *camera, gui_3d_light_t *light);
 
 } gui_3d_t;
 
@@ -92,16 +93,16 @@ typedef struct gui_3d
 
 
 /**
- * @brief
+ * @brief 3d widget create
  *
- * @param parent
- * @param name
- * @param addr
- * @param x
- * @param y
- * @param w
- * @param h
- * @return gui_3d_t*
+ * @param parent parent widget
+ * @param name widget name
+ * @param desc_addr description file data
+ * @param x the X-axis coordinate relative to parent widget
+ * @param y the Y-axis coordinate relative to parent widget
+ * @param w width
+ * @param h height
+ * @return return the widget object pointer
  */
 gui_3d_t *gui_3d_create(void       *parent,
                         const char *name,
@@ -111,10 +112,27 @@ gui_3d_t *gui_3d_create(void       *parent,
                         int16_t     w,
                         int16_t     h);
 
+/**
+ * @brief set shape transform callback
+ *
+ * @param this the 3d widget pointer
+ * @param face face offset
+ * @param cb Set callback functions for the world coordinate system, camera coordinate system,
+ *           and light source for the specified face
+ */
+void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t face,
+                                   void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                              gui_3d_light_t *light));
 
-void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
-                                   void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera));
-
+/**
+ * @brief set 3D animation effects
+ *
+ * @param this the 3d widget pointer
+ * @param dur animation time cost in ms
+ * @param repeat_count rounds to repeat
+ * @param callback every frame callback
+ * @param p callback's parameter
+ */
 void gui_3d_set_animate(gui_3d_t     *this,
                         uint32_t      dur,
                         int           repeat_count,

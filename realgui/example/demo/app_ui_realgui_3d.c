@@ -45,7 +45,7 @@ void update_animation()
 }
 
 static void cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
-               gui_3d_camera_t *camera)
+               gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_3d_matrix_t face_matrix;

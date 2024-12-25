@@ -533,6 +533,18 @@ bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t camera
     return true;
 }
 
+
+void gui_3d_light_inititalize(gui_3d_light_t *light, gui_point_4d_t lightPosition,
+                              gui_point_4d_t lightTarget, float included_angle, float blend_ratio, gui_3d_RGBAcolor_t color)
+{
+    light->position = lightPosition;
+    light->targetDirection = lightTarget;
+    light->included_angle = included_angle;
+    light->blend_ratio = blend_ratio;
+    light->color = color;
+    light->initialized = true;
+}
+
 void gui_3d_face_transform(gui_3d_face_t *face, gui_3d_matrix_t mat, GUI_3D_FACE_TRANSFORM mode)
 {
     switch (mode)
@@ -564,6 +576,12 @@ void gui_3d_face_transform(gui_3d_face_t *face, gui_3d_matrix_t mat, GUI_3D_FACE
                 face->transform_vertex[1].position = gui_3d_point4D_mul_matrix(face->vertex[1].position, mat);
                 face->transform_vertex[2].position = gui_3d_point4D_mul_matrix(face->vertex[2].position, mat);
                 face->transform_vertex[3].position = gui_3d_point4D_mul_matrix(face->vertex[3].position, mat);
+
+                face->transform_world_vertex[0].position = face->transform_vertex[0].position;
+                face->transform_world_vertex[1].position = face->transform_vertex[1].position;
+                face->transform_world_vertex[2].position = face->transform_vertex[2].position;
+                face->transform_world_vertex[3].position = face->transform_vertex[3].position;
+
             }
             break;
         }

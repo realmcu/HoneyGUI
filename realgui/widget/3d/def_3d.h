@@ -98,7 +98,7 @@ typedef struct
     uint32_t            order;
     gui_3d_vertex_t     vertex[4];
     gui_3d_vertex_t     transform_vertex[4];
-    gui_point_4d_t      center;
+    gui_3d_vertex_t     transform_world_vertex[4];
 } gui_3d_face_t;
 
 typedef gui_3d_matrix_t gui_3d_world_t;
@@ -123,7 +123,29 @@ typedef struct
     float *zbuffer;
 } gui_3d_camera_t;
 
+typedef struct
+{
+    uint8_t b; ///< Blue color component, at the lowest address
+    uint8_t g; ///< Green color component
+    uint8_t r; ///< Red color component
+    uint8_t a; ///< Alpha channel for transparency, at the highest address
+} gui_3d_RGBAcolor_t;
+
+typedef struct
+{
+    bool initialized;
+    float included_angle;
+    float blend_ratio;
+    gui_point_4d_t position;
+    gui_point_4d_t targetDirection;
+    gui_3d_RGBAcolor_t color;
+} gui_3d_light_t;
+
 gui_point_4d_t gui_point_4d(float x, float y, float z);
+
+float gui_point4D_dot(gui_point_4d_t p1, gui_point_4d_t p2);
+
+gui_point_4d_t gui_point_4d_unit(gui_point_4d_t p);
 
 void gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z, float rotX,
                               float rotY, float rotZ, float scale);
@@ -137,6 +159,8 @@ bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t camera
                                   gui_point_4d_t cameraTarget, float near, float far, float fov, float viewPortWidth,
                                   float viewPortHeight);
 
+void gui_3d_light_inititalize(gui_3d_light_t *light, gui_point_4d_t lightPosition,
+                              gui_point_4d_t lightTarget, float included_angle, float blend_ratio, gui_3d_RGBAcolor_t color);
 
 void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera);
 
