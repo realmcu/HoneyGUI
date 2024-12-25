@@ -43,6 +43,7 @@ static gui_page_t *pg;
 static gui_win_t *win_animate, *win_design;
 static gui_obj_t *tv_array[TAB_ARRAY_NUM] = {0};
 static gui_curtain_t *ct_parent;
+static gui_img_t *arrow;
 static bool close_flag = 0;
 
 static void win_clear_all_cb(void)
@@ -524,40 +525,28 @@ static void win_design_cb(void)
     bool flag = false;
     int16_t y;
     int16_t h;
+    static bool curtain_change = 0;
+    uint8_t index = 0;
 
+    while (1)
     {
-        uint8_t index = 0;
-        while (1)
+        if (!tv_array[index])
         {
-            if (!tv_array[index])
-            {
-                break;
-            }
-            index++;
-            if (index == TAB_ARRAY_NUM)
-            {
-                break;
-            }
+            break;
         }
-        for (uint8_t i = 0; i < index; i++)
+        index++;
+        if (index == TAB_ARRAY_NUM)
         {
-            gui_tabview_t *tv = (gui_tabview_t *)tv_array[i];
-            y = GUI_BASE(tv)->y + obj->y;
-            if (y > 502 - 100)
-            {
-                GUI_BASE(tv)->not_show = 1;
-                // GUI_BASE(tv)->active = 0;
-                // gui_log("tv_%d, y = %d\n", i, y);
-            }
-            else
-            {
-                GUI_BASE(tv)->not_show = 0;
-                // GUI_BASE(tv)->active = 1;
-            }
+            break;
         }
     }
 
     touch_info_t *tp = tp_get_info();
+    if (!GUI_BASE(ct_parent)->gesture && tp->deltaY < -(SCREEN_HEIGHT / 2))
+    {
+        curtain_change = 1;
+    }
+
     static bool hold;
     if (tp->pressed)
     {
@@ -566,7 +555,11 @@ static void win_design_cb(void)
     if (tp->released)
     {
         hold = 0;
-
+        gui_img_set_image_data(arrow, UI_LINE_STILL_BIN);
+        if (!curtain_change) //still curtain_up, show all pages
+        {
+            GUI_BASE(pg)->gesture = 0;
+        }
         // clear all
         gui_obj_t *canvas = 0;
         gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "canvas_clear", (void *)&canvas);
@@ -592,19 +585,6 @@ static void win_design_cb(void)
         // clear tabview
         if (tp->deltaY < 30 && tp->deltaX < 30)
         {
-            uint8_t index = 0;
-            while (1)
-            {
-                if (!tv_array[index])
-                {
-                    break;
-                }
-                index++;
-                if (index == TAB_ARRAY_NUM)
-                {
-                    break;
-                }
-            }
             for (uint8_t i = 0; i < index; i++)
             {
                 gui_tabview_t *tv = (gui_tabview_t *)tv_array[i];
@@ -650,8 +630,53 @@ static void win_design_cb(void)
             GUI_BASE(ct_parent)->gesture = 1;
             // gui_log("page down\n");
         }
-    }
 
+        if (tp->deltaY > 0)
+        {
+            gui_img_set_image_data(arrow, UI_ARROW_DOWN_BIN);
+        }
+        else if (tp->deltaY < 0)
+        {
+            gui_img_set_image_data(arrow, UI_ARROW_UP_BIN);
+        }
+    }
+    // not show pages out of screen
+    gui_curtainview_t *curtainview = (gui_curtainview_t *)(GUI_BASE(ct_parent)->parent);
+    if (curtainview->cur_curtain == CURTAIN_UP)
+    {
+        for (uint8_t i = 0; i < index; i++)
+        {
+            gui_tabview_t *tv = (gui_tabview_t *)tv_array[i];
+            y = GUI_BASE(tv)->y + obj->y;
+            if (y > SCREEN_HEIGHT - TAB_HEIGHT && GUI_BASE(pg)->gesture)
+            {
+                GUI_BASE(tv)->not_show = 1;
+            }
+            else
+            {
+                GUI_BASE(tv)->not_show = 0;
+            }
+        }
+    }
+    // enter curtain_up, show all pages
+    else
+    {
+        for (uint8_t i = 0; i < index; i++)
+        {
+            gui_tabview_t *tv = (gui_tabview_t *)tv_array[i];
+            y = GUI_BASE(tv)->y + obj->y;
+            if (y > SCREEN_HEIGHT - TAB_HEIGHT)
+            {
+                GUI_BASE(tv)->not_show = 1;
+            }
+            else
+            {
+                GUI_BASE(tv)->not_show = 0;
+            }
+        }
+        GUI_BASE(pg)->gesture = 0;
+        curtain_change = 0;
+    }
 }
 
 void tabview_up_design(void *parent_widget)
@@ -660,9 +685,9 @@ void tabview_up_design(void *parent_widget)
     win_design = gui_win_create(parent_widget, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(win_design), "background", 0, 0,
-                                                            SCREEN_WIDTH, SCREEN_HEIGHT + 120, gui_rgba(255, 255, 255, 76));
+                                                            SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(255, 255, 255, 76));
 
-    pg = gui_page_create(win_design, "ct_up_page", 0, 0, 0, 0);
+    pg = gui_page_create(canvas_rect, "ct_up_page", 0, 0, 0, 0);
     // draw table content
     pagelist_clear(pg);
 
@@ -675,9 +700,10 @@ void tabview_up_design(void *parent_widget)
     // pagelist_create("10655810010", content, "YTD morning 10:24", MESSAGE);
     // content = "Watch will attempt to install this update later tonight.";
     // pagelist_create("watchOS 10.3.1", content, "Now", OS);
-    // bottom space to slide when tv all clear
-    win_animate = gui_win_create(pg, "0", 0, SCREEN_HEIGHT, SCREEN_WIDTH,
+    win_animate = gui_win_create(pg, "0", 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                                  40);
-
+    arrow = gui_img_create_from_mem(canvas_rect, "arrow", UI_LINE_STILL_BIN, 181, SCREEN_HEIGHT - 25, 0,
+                                    0);
+    gui_img_set_mode(arrow, IMG_SRC_OVER_MODE);
     gui_win_set_animate(win_design, 1000, -1, (gui_animate_callback_t)win_design_cb, NULL);
 }

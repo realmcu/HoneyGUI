@@ -160,7 +160,7 @@ static void inform_generate_task_entry()
         char time[10];
         if (timeinfo)
         {
-            sprintf(time, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
+            sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
         }
 
         information_t payload =
@@ -215,4 +215,3 @@ static int app_init(void)
 }
 
 GUI_INIT_APP_EXPORT(app_init);
-

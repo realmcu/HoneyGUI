@@ -194,30 +194,23 @@ void json_refreash()
 extern char *day[];
 static void refreash_time()
 {
-    // GUI_WIDGET_POINTER_BY_NAME(img_hour_decimal, "watch_hour_decimal");
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
-                          text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
-    // GUI_WIDGET_POINTER_BY_NAME(img_hour_single, "watch_hour_single");
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
-                          text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
+    gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
 
-    // GUI_WIDGET_POINTER_BY_NAME(img_minute_decimal, "watch_minute_decimal");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
+    gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10]);
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
-                          text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
-    // GUI_WIDGET_POINTER_BY_NAME(img_minute_single, "watch_minute_single");
+    gui_img_set_image_data((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10]);
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
-                          text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
+    gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
 
     sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set(date_text, date_text_content, strlen(date_text_content));
     // gui_text_convert_to_img(date_text, RGB565);
 
     // refreash weather date
-    // GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
     GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "weather_text", win_watch)
     uint8_t index = timeinfo->tm_wday;
 

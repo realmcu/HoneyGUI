@@ -65,6 +65,7 @@ static gui_cardview_t *cv;
 
 extern uint8_t *img_data_activity;
 static char *move_content, *ex_content, *stand_content;
+uint8_t *img_data_bg = NULL;
 
 static void display_time()
 {
@@ -264,6 +265,13 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     }
 }
 
+static void img_bg_cb(NVGcontext *vg)
+{
+    nvgRoundedRect(vg, 0, 0, 352, 157, 20);
+    nvgFillColor(vg, nvgRGB(98, 101, 102));
+    nvgFill(vg);
+}
+
 void curtain_down_design(void *parent_widget)
 {
     // draw background
@@ -326,13 +334,26 @@ void curtain_down_design(void *parent_widget)
     img = gui_img_create_from_mem(cv_weather, "weather", UI_CARD_WEATHER_BIN, 8, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
+    {
+        int image_h = 157,
+            image_w = 352,
+            pixel_bytes = 2;
+        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        if (!img_data_bg)
+        {
+            img_data_bg = gui_lower_malloc(buffer_size);
+        }
+        memset(img_data_bg, 0, buffer_size);
+        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, img_bg_cb, img_data_bg);
+    }
+
     // cv_activity
     {
         // img = gui_img_create_from_mem(cv_activity, "activity", UI_CARD_ACTIVITY_BIN, 8, 0, 0, 0);
         // gui_img_set_mode(img, IMG_BYPASS_MODE);
-        gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(cv_activity), "app", 8, 0,
-                                                                       352, 157, 20, gui_rgb(98, 101,
-                                                                               102));
+        gui_img_t *canvas = gui_img_create_from_mem(cv_activity, "cv_ac", (void *)img_data_bg, 8,
+                                                    0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(canvas, "ac_bg", UI_BG_ICON_BIN, 22, 33, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_scale(img, 0.9f, 0.9f);
@@ -369,9 +390,8 @@ void curtain_down_design(void *parent_widget)
     {
         // img = gui_img_create_from_mem(cv_app, "app", UI_CARD_APP_BIN, 8, 0, 0, 0);
         // gui_img_set_mode(img, IMG_BYPASS_MODE);
-        gui_canvas_round_rect_t *canvas_app = gui_canvas_round_rect_create(GUI_BASE(cv_app), "app_ac", 8, 0,
-                                                                           352, 157, 20, gui_rgb(98, 101,
-                                                                                   102));
+        gui_img_t *canvas_app = gui_img_create_from_mem(cv_app, "cv_ac", (void *)img_data_bg, 8,
+                                                        0, 0, 0);
         img = gui_img_create_from_mem(canvas_app, "music", UI_CLOCK_MUSIC_ICON_BIN, 17, 28, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
