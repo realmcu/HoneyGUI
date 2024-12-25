@@ -142,7 +142,9 @@ static void app_back2watchface_cb(void)
 static void app_back2prescreen_cb(void)
 {
     extern bool sidebar_flag;
-    if (sidebar_flag)
+    extern bool return_to_watchface_flag;
+
+    if (return_to_watchface_flag || sidebar_flag)
     {
         gui_switch_app(gui_current_app(), get_app_hongkong());
     }
@@ -160,32 +162,14 @@ static void app_AT_back2prescreen_cb(void)
     extern bool sidebar_flag;
     extern bool return_to_watchface_flag;
 
-    if (return_to_watchface_flag || sidebar_flag)
-    {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
-    }
-    else
-    {
-        gui_switch_app(gui_current_app(), get_app_menu());
-    }
+    app_back2prescreen_cb();
 }
 
 static void app_HR_back2prescreen_cb(void)
 {
     extern void clear_heart_rate_app(void);
 
-
-    extern bool sidebar_flag;
-    extern bool return_to_watchface_flag;
-
-    if (return_to_watchface_flag || sidebar_flag)
-    {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
-    }
-    else
-    {
-        gui_switch_app(gui_current_app(), get_app_menu());
-    }
+    app_back2prescreen_cb();
     clear_heart_rate_app();
 }
 
@@ -194,16 +178,7 @@ static void app_FN_back2prescreen_cb(void)
     extern void close_FN_APP();
     close_FN_APP();
 
-    extern bool sidebar_flag;
-    if (sidebar_flag)
-    {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
-    }
-    else
-    {
-        gui_switch_app(gui_current_app(), get_app_menu());
-    }
-
+    app_back2prescreen_cb();
 }
 
 static void app_BOX2D_RING_return_cb(void)
@@ -211,15 +186,7 @@ static void app_BOX2D_RING_return_cb(void)
     extern void close_box2d_ring(void);
     close_box2d_ring();
 
-    extern bool sidebar_flag;
-    if (sidebar_flag)
-    {
-        gui_switch_app(gui_current_app(), get_app_hongkong());
-    }
-    else
-    {
-        gui_switch_app(gui_current_app(), get_app_menu());
-    }
+    app_back2prescreen_cb();
 }
 
 static void app_menu_design(gui_app_t *app)

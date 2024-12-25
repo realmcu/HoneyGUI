@@ -134,10 +134,6 @@ void page_tb_clock(void *parent)
     extern void tabview_up_design(void *parent_widget);
     extern void curtain_down_design(void *parent_widget);
 
-    // app_watchface_m
-    page_ct_sidebar(ct_left);
-    tabview_up_design(ct_inform);
-    curtain_down_design(ct_card);
     switch (watchface_index)
     {
     case 0:
@@ -166,6 +162,9 @@ void page_tb_clock(void *parent)
         // page_ct_clock(ct_clock);
         break;
     }
+    page_ct_sidebar(ct_left);
+    tabview_up_design(ct_inform);
+    curtain_down_design(ct_card);
 
     if (sidebar_flag)
     {

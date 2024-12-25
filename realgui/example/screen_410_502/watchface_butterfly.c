@@ -91,7 +91,7 @@ static void win_cb(gui_obj_t *obj)
     }
 }
 
-void update_animation()
+static void update_animation()
 {
     frame_counter++;
 
@@ -99,7 +99,7 @@ void update_animation()
     {
         if (radius < 20.0f)
         {
-            radius += 0.1f;
+            radius += 0.5f;
         }
         theta += 0.01f;
     }
@@ -107,7 +107,7 @@ void update_animation()
     {
         if (radius > 0)
         {
-            radius -= 1.0f;
+            radius -= 0.5f;
             theta += 0.01f;
         }
     }

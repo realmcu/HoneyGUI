@@ -130,7 +130,7 @@ static void arc_activity_cb(NVGcontext *vg)
     nvgStrokeColor(vg, nvgRGB(117, 230, 229));
     nvgStroke(vg);
     gui_fb_change();
-    gui_log("progress: %f\n", progress);
+    // gui_log("progress: %f\n", progress);
 }
 // cppcheck-suppress syntaxError
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)

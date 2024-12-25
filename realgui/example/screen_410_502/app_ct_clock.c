@@ -38,7 +38,7 @@ static char date_text_content[10];
 static char weekday_content[30];
 extern struct tm *timeinfo;
 
-bool return_to_watchface_flag; //true: return to watchface; flases: return to app_menu
+bool return_to_watchface_flag; //true: return to watchface; false: return to app_menu
 
 uint8_t canvas_update_flag = 0;
 static gui_text_t *temperature_cur, *temperature_low, *temperature_high;
@@ -56,8 +56,8 @@ static char degree_content[5] = "0°", orien_content[3] = "N";
 
 static gui_img_t *img_heart_rate;
 
-static uint8_t *img_data_temperature,
-       *img_data_activity;
+static uint8_t *img_data_temperature;
+uint8_t *img_data_activity;
 
 char *cjson_content = NULL;
 

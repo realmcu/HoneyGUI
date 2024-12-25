@@ -543,7 +543,7 @@ static void win_design_cb(void)
         {
             gui_tabview_t *tv = (gui_tabview_t *)tv_array[i];
             y = GUI_BASE(tv)->y + obj->y;
-            if (y > 510)
+            if (y > 502 - 100)
             {
                 GUI_BASE(tv)->not_show = 1;
                 // GUI_BASE(tv)->active = 0;
@@ -660,11 +660,7 @@ void tabview_up_design(void *parent_widget)
     win_design = gui_win_create(parent_widget, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(win_design), "background", 0, 0,
-                                                            SCREEN_WIDTH, SCREEN_HEIGHT + TAB_HEIGHT + 30, gui_rgba(255, 255, 255, 76));
-
-    // draw bottom line
-    gui_canvas_round_rect_t *canvas_line = gui_canvas_round_rect_create(GUI_BASE(win_design), "line",
-                                                                        160 + SCREEN_X_OFF, SCREEN_HEIGHT - 25, 48, 6, 4, gui_rgb(39, 43, 44));
+                                                            SCREEN_WIDTH, SCREEN_HEIGHT + 120, gui_rgba(255, 255, 255, 76));
 
     pg = gui_page_create(win_design, "ct_up_page", 0, 0, 0, 0);
     // draw table content
