@@ -28,7 +28,7 @@ ci_check_config = {
     "ignore_file_encoding":[
         r"win32_sim/RTE/",
         r"realgui/3rd/",
-        r"lvgl/",
+        r"lvgl_v8/",
         r"lvgl_v9/",
         r"realgui/example/screen_454_454",
         r"realgui/example/screen_320_385",
@@ -39,7 +39,7 @@ ci_check_config = {
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",
         r"realgui/3rd/",
-        r"lvgl/",
+        r"lvgl_v8/",
         r"lvgl_v9/",
     ],
     "commit_version_check": {

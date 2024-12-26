@@ -10,7 +10,7 @@ set "REAL_GUI_SOURCE_DIR=%~dp0..\realgui"
 set "REAL_GUI_TARGET_DIR=%~dp0..\..\ui_lib\real_gui"
 
 
-set "LVGL_SOURCE_DIR=%~dp0..\lvgl"
+set "LVGL_SOURCE_DIR=%~dp0..\lvgl_v8\lvgl"
 set "LVGL_TARGET_DIR=%~dp0..\..\ui_lib\lvgl"
 
 
