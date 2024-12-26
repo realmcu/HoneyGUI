@@ -319,6 +319,10 @@ html.writer-html5 .rst-content dl.field-list>dt {
 .rst-content dl dd {
     margin-right: 12px;
 }
+.rst-content div[itemprop="articleBody"] dl.c > dd, 
+.rst-content div[itemprop="articleBody"] dl.cpp  > dd {
+    margin: 0 0 12px 24px;
+}
 .rst-content div[itemprop="articleBody"] section > dl > dd {
     margin-left: 0;
 }
@@ -417,9 +421,7 @@ html.writer-html5 .rst-content dl.field-list dd {
 
 
 /* ========= Render added-api & deprecared-api Style ========= */
-section:not(#glossary) > dl > dt {
-    display: none;
-}
+
 /*
 section[id*="added-api"] dd dl,
 section[id*="deprecated-api"] dd dl {

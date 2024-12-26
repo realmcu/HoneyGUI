@@ -27,5 +27,5 @@
     86Box <86box/86box>
     LiteGFX <LiteGFX/Demo>
     状态栏 <Status-bar/Status bar>
-    水果忍者 <Fruit_Ninja/Demo>
+    水果忍者 <Fruit_Ninja/Fruit_Ninja>
 

@@ -26,7 +26,7 @@ The entry point for any application is:
     86Box <86box/86box>
     LiteGFX <LiteGFX/Demo>
     Status Bar <Status-bar/Status bar>
-    Fruit Ninja <Fruit_Ninja/Demo>
+    Fruit Ninja <Fruit_Ninja/Fruit_Ninja>
     Music Player <MusicPlayer/Music Player>
     Timer <Timer/Timer>
     Watchface Market <WatchfaceMarket/WatchfaceMarket>

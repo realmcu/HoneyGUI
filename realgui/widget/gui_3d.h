@@ -3,12 +3,12 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version
+  * @file gui_3d.h
+  * @brief 3D widget
+  * @details 3D widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2024/11/16
+  * @version 1.0
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
@@ -102,7 +102,7 @@ typedef struct gui_3d
  * @param y the Y-axis coordinate relative to parent widget
  * @param w width
  * @param h height
- * @return return the widget object pointer
+ * @return the widget object pointer
  */
 gui_3d_t *gui_3d_create(void       *parent,
                         const char *name,

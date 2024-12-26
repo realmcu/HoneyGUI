@@ -146,3 +146,4 @@
     多级菜单 (Multi Level) <gui_multi_level>
     趣戴特效 (LiteGFX) <gui_widget_litegfx>
     2.5D足球 (2.5D Soccer) <gui_soccer>
+    3D模型 (3D Model) <gui_3D>

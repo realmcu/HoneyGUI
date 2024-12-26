@@ -636,8 +636,8 @@ static void gui_3d_ctor(gui_3d_t               *this,
  *                           Public Functions
  *============================================================================*/
 
-void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t s/*shape_offset*/,
-                                   void (*cb)(gui_3d_t *this, size_t s, gui_3d_world_t *world, gui_3d_camera_t *camera,
+void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t face/*face_offset*/,
+                                   void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
                                               gui_3d_light_t *light))
 {
     this->shape_transform_cb = cb;

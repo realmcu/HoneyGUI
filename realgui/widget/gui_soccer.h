@@ -99,6 +99,7 @@ typedef struct gui_soccer
  * @param x  left
  * @param y top
  * @return gui_soccer_t* widget pointer
+ *
  * <b>Example usage</b>
  * \code{.c}
  *{

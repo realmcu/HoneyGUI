@@ -145,3 +145,4 @@ Widgets                              Brief
     Multi Level <gui_multi_level>
     LiteGFX <gui_widget_litegfx>
     2.5D Soccer <gui_soccer>
+    3D Model <gui_3D>
