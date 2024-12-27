@@ -21,6 +21,8 @@
 #include "font_ttf.h"
 #include "font_mem.h"
 #include <stddef.h>
+#include <math.h>
+
 
 /*============================================================================*
  *                           Types
@@ -51,22 +53,10 @@ static const uint32_t masks[32] =
 
 static const uint8_t lookup_table_8b[256] =
 {
-    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+#   define B2(n) n,     n+1,     n+1,     n+2
+#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
+#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
+    B6(0), B6(1), B6(1), B6(2)
 };
 
 static const uint8_t lookup_table_2b[4] =
@@ -699,6 +689,11 @@ void gui_font_get_ttf_info(gui_text_t *text)
 //    short advance = 0;
 
     scale = text->font_height * text->base.matrix->m[0][0] / (ttfbin->ascent - ttfbin->descent);
+    int16_t scale_height = (int16_t)ceil(text->font_height * text->base.matrix->m[0][0]);
+    if (scale_height < 1)
+    {
+        scale_height = 1;
+    }
 
     for (uni_i = 0; uni_i < unicode_len; uni_i++)
     {
@@ -710,7 +705,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].x = 0;
             // chr[chr_i].y = 0;
             // chr[chr_i].w = 0;
-            chr[chr_i].h = text->font_height;
+            chr[chr_i].h = scale_height;
             // chr[chr_i].char_y = 0;
             chr[chr_i].char_w = 0;
             chr[chr_i].char_h = 0;
@@ -722,10 +717,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].x = 0;
             // chr[chr_i].y = 0;
             // chr[chr_i].w = 0;
-            chr[chr_i].h = text->font_height;
+            chr[chr_i].h = scale_height;
             // chr[chr_i].char_y = 0;
-            chr[chr_i].char_w = text->font_height / 2;
-            chr[chr_i].char_h = text->font_height / 2;
+            chr[chr_i].char_w = (scale_height + 1) / 2;
+            chr[chr_i].char_h = (scale_height + 1) / 2;
             // chr[chr_i].dot_addr = 0;
         }
         else
@@ -743,10 +738,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].x = 0;
             // chr[chr_i].y = 0;
             // chr[chr_i].w = 0;
-            chr[chr_i].h = text->font_height;
+            chr[chr_i].h = scale_height;
             // chr[chr_i].char_y = 0;
             chr[chr_i].char_w = glyphData->advance * scale;
-            chr[chr_i].char_h = text->font_height;
+            chr[chr_i].char_h = scale_height;
             chr[chr_i].dot_addr = font_ptr;
         }
 
@@ -758,6 +753,18 @@ void gui_font_get_ttf_info(gui_text_t *text)
     text->font_len = unicode_len;
     text->active_font_len = chr_i;
     gui_free(unicode_buf);
+}
+
+static void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
+{
+    float scale_x = text->base.matrix->m[0][0];
+    float scale_y = text->base.matrix->m[1][1];
+
+    rect->x2 = (rect->x2 - rect->x1) * scale_x + rect->x1;
+    rect->y2 = (rect->y2 - rect->y1) * scale_y + rect->y1;
+
+    rect->xboundright = (rect->xboundright - rect->xboundleft) * scale_x + rect->xboundleft;
+    rect->yboundbottom = (rect->yboundbottom - rect->yboundtop) * scale_y + rect->yboundtop;
 }
 
 void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)
@@ -782,6 +789,7 @@ void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)
     {
         if (text != NULL)
         {
+            gui_font_ttf_adapt_rect(text, rect);
             gui_font_mem_layout(text, rect);
         }
     }
