@@ -34,7 +34,9 @@ ci_check_config = {
         r"realgui/example/screen_320_385",
         r"doc/cn",
         r"doc/en/_templates/",
-        r"menu_config_win.py"
+        r"menu_config_win.py",
+        r"README.md",
+        r"README_zh.md"
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",

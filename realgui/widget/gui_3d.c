@@ -444,6 +444,12 @@ static void gui_3d_destory(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
+    for (int i = 0; i < this->desc->num_materials; i++)
+    {
+        gui_free(this->desc->textures[i]);
+        this->desc->textures[i] = NULL;
+    }
+
     tinyobj_attrib_free(&this->desc->attrib);
     tinyobj_shapes_free(this->desc->shapes, this->desc->num_shapes);
     tinyobj_materials_free(this->desc->materials, this->desc->num_materials);
@@ -652,18 +658,7 @@ void gui_3d_set_animate(gui_3d_t     *this,
     GUI_SET_ANIMATE_HELPER
 }
 
-/**
- * @brief
- *
- * @param parent
- * @param name
- * @param data
- * @param x
- * @param y
- * @param w
- * @param h
- * @return gui_3d_t*
- */
+
 gui_3d_t *gui_3d_create(void       *parent,
                         const char *name,
                         void       *desc_addr,
