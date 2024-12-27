@@ -32,6 +32,9 @@ void gui_change_default_path(int argc, char **argv)
         {
             char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
             sprintf(path, "%s%s", argv[count + 1], "\\");
+            static char *buffer;
+            buffer = defaultPath;
+            GUI_UNUSED(buffer);
             defaultPath = path;
         }
     }
@@ -109,7 +112,6 @@ void gui_os_api_register(gui_os_api_t *info)
     {
         lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
     }
-
     os_api = info;
 }
 

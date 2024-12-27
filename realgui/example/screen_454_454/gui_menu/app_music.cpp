@@ -753,7 +753,16 @@ private:
         char dummy = ':';
         std::istringstream timeStream(timePart);
         timeStream >> minutes >> dummy >> seconds;
-        return (int)(minutes * 60 + seconds);
+        int rst = 0;
+        if (minutes * 60 + seconds > INT_MAX)
+        {
+            rst = INT_MAX;
+        }
+        else
+        {
+            rst = minutes * 60 + seconds;
+        }
+        return rst;
     }
 
 // Function to get metadata

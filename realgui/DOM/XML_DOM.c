@@ -359,11 +359,24 @@ static char *read_file(const char *path)
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
     fseek(file, 0, SEEK_SET);
+    if (length <= 0)
+    {
+        fclose(file);
+        return 0;
+    }
     char *content = (char *)malloc(length + 1);
     //if (content)
     {
-        fread(content, 1, length, file);
-        //gui_log("%d\n", n);
+        size_t size = fread(content, 1, length, file);
+        if (size != length)
+        {
+            gui_log("%d\n", size);
+            gui_free(content);
+            fclose(file);
+            return 0;
+        }
+
+
         content[length] = '\0';
     }
     fclose(file);

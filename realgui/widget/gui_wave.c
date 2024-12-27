@@ -426,8 +426,12 @@ void gui_bar_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
         return; // Prevent division by zero
     }
     float radius = 4;
-    float space_between = (w - (item_count * bar_width)) / (item_count -
-                                                            1); // Calculate spacing between bars
+    float space_between = 0;
+    if (!(item_count - 1 <= 0))
+    {
+        space_between = ((float)(w - (item_count * bar_width))) / ((float)(item_count -
+                                                                           1)); // Calculate spacing between bars
+    }
 
     int i;
     for (i = 0; i < item_count; i++)
@@ -439,7 +443,7 @@ void gui_bar_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
 
         // Ensure the corner radius is not greater than the bar height
         float effective_radius = bar_height < radius ? bar_height : radius;
-        effective_radius = bar_width / 2 < radius ? bar_width / 2 : radius;
+        effective_radius = (float)bar_width / 2.0f < radius ? (float)bar_width / 2.0f : radius;
         // Draw each bar with rounded corners
         nvgBeginPath(vg);
         nvgRoundedRect(vg, bar_x, bar_y, bar_width, bar_height, effective_radius);
@@ -475,8 +479,11 @@ void gui_line_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
     {
         return; // Prevent division by zero
     }
-
-    float step = w / (item_count - 1);
+    float step = 0;
+    if (!(item_count - 1 <= 0))
+    {
+        step = (float)w / ((float)item_count - 1.0f);
+    }
     float sx[item_count];
     float sy[item_count];
 

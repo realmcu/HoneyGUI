@@ -125,8 +125,8 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     {
         if (xml_file_array[count])
         {
-            gui_log("count = %d, param = 0x%x, path = %s\n", count, xml_file_array[count],
-                    xml_file_array[count]);
+            // gui_log("count = %d, param = 0x%x, path = %s\n", count, xml_file_array[count],
+            //         xml_file_array[count]);
             gui_free(xml_file_array[count++]);
         }
         else
