@@ -53,7 +53,7 @@ Open a CMD window and execute the following commands to install the Python scons
 
 After installing the `MinGW-w64` toolchain and `scons` library, you can launch the application in two ways: stratup by CMD or startup by GUI.
 
-### Startup by CMD
+### Startup by CMD (scons)
 Open a CMD window in the `HoneyGUI` or `gui` folder, and then run the following command to start the application.
 
 ```shell
@@ -66,6 +66,35 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
 
 
 <div style="text-align: center"><img width= "700"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
+
+### Startup by CMD (CMake)
+
+- Dependency Software
+    
+     **CMake** (tested with version 3.31.2): [Download here](https://cmake.org/download/)
+    
+     **MinGW-w64**: mentioned before
+- Initialization: In the ```HoneyGUI``` folder
+```shell
+cd win32_sim
+mkdir build
+cd build
+cmake -G "MinGW Makefiles" ..
+```
+- Compilation: In the ```HoneyGUI/win32_sim/build``` folder
+
+```shell
+cmake -G "MinGW Makefiles" ..
+mingw32-make -j 32
+```
+- Configuration: In the ```HoneyGUI/win32_sim/build``` folder
+```shell
+cmake --build . --target menuconfig
+```
+- Run: In the ```HoneyGUI``` folder
+```shell
+.\win32_sim\gui.exe
+```
 
 
 ### Startup by VSCode
