@@ -55,7 +55,8 @@
  *============================================================================*/
 
 static bool move_flag = 1;
-static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *parent)
+static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *parent, int deltaX,
+                                    int deltaY)
 {
     gui_list_t *node = NULL;
     touch_info_t *tp = tp_get_info();
@@ -70,8 +71,8 @@ static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *pare
             if ((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_HOLD_Y))
             {
 
-                obj->x += tp->deltaX - parent->x;
-                obj->y += tp->deltaY - parent-> y;
+                obj->x += deltaX - parent->x;
+                obj->y += deltaY - parent-> y;
             }
             else
             {
@@ -172,7 +173,7 @@ static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *pare
 
             gui_img_translate((void *)obj, tx, ty);
         }
-        gui_menu_cellular_image(obj, parent);
+        gui_menu_cellular_image(obj, parent, deltaX, deltaY);
     }
 }
 
@@ -206,7 +207,7 @@ static void gui_menu_cellular_wincb(gui_win_t *win)
     if (move_flag)
     {
         //move_flag = 0;
-        bool render = 1;
+        //bool render = 1;
         if ((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_HOLD_Y))
         {
 
@@ -222,74 +223,42 @@ static void gui_menu_cellular_wincb(gui_win_t *win)
                 parent->top_offset  += parent->speed[1];
             }
         }
-        if (_UI_ABS(parent->left_offset) >= _UI_ABS(parent->right - parent->left) / 2)
+        static int deltaX_old;
+        int deltaX;
+        if ((_UI_ABS(parent->left_offset) > (_UI_ABS(parent->right) * 2 / 3)) ||
+            ((parent->left_offset > _UI_ABS(parent->left) * 2 / 3)))
         {
-            render = 0;
-            if (parent->left_offset > 0)
-            {
-                parent->left_offset = _UI_ABS(parent->right - parent->left) / 2;
-            }
-            else
-            {
-                parent->left_offset = -_UI_ABS(parent->right - parent->left) / 2;
-            }
-            if ((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_HOLD_Y))
-            {
-                parent->top_offset -= tp->deltaY - parent-> y;
-
-            }
-            else
-            {
-                if (parent->speed[0] != 0 || parent->speed[1] != 0)
-                {
-                    parent->top_offset  -= parent->speed[1];
-                }
-            }
+            deltaX = deltaX_old;
+            parent->speed[0] = 0;
         }
-        if (_UI_ABS(parent->top_offset) >= _UI_ABS(parent->bottom - parent->top) / 2)
+        else
         {
-            render = 0;
-            if (parent->top_offset > 0)
-            {
-                parent->top_offset = _UI_ABS(parent->bottom - parent->top) / 2;
-            }
-            else
-            {
-                parent->top_offset = -_UI_ABS(parent->bottom - parent->top) / 2;
-            }
-            if ((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_HOLD_Y))
-            {
-
-                parent->left_offset -= tp->deltaX - parent->x;
-            }
-            else
-            {
-                if (parent->speed[0] != 0 || parent->speed[1] != 0)
-                {
-                    parent->left_offset -= parent->speed[0];
-                }
-            }
+            deltaX = tp->deltaX;
+            deltaX_old = deltaX;
         }
-        if (render)
+        static int deltaY_old;
+        int deltaY;
+        if ((_UI_ABS(parent->top_offset) > _UI_ABS(parent->bottom) * 2 / 3) ||
+            ((parent->top_offset > _UI_ABS(parent->top) * 2 / 3)))
+        {
+            deltaY = deltaY_old;
+            parent->speed[1] = 0;
+        }
+        else
+        {
+            deltaY = tp->deltaY;
+            deltaY_old = deltaY;
+        }
+
         {
             parent->left_offset = INT16_MAX;
             parent->top_offset = INT16_MAX;
             parent->right_offset = 0;
             parent->bottom_offset = 0;
-            gui_menu_cellular_image((void *)win, (void *)win);
+            gui_menu_cellular_image((void *)win, (void *)win, deltaX, deltaY);
             GUI_TYPE(gui_menu_cellular_t, win)->render = 1;
         }
-        else
-        {
-            for (size_t i = 0; i < recode_num + 1; i++)
-            {
-                recode[0][i] = 0;
-                recode[1][i] = 0;
-            }
 
-            parent->speed[0] = 0;
-            parent->speed[1] = 0;
-        }
 
 
 
@@ -398,7 +367,8 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
     {
         if (i < 3)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], INIT_OFFSET_X + WIDTH_GAP * 2, INIT_OFFSET_Y, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i], INIT_OFFSET_X + WIDTH_GAP * (i + 2), INIT_OFFSET_Y,
+                                    0, 0);
         }
         else if (i < 9)
         {
