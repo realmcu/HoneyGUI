@@ -1,3 +1,4 @@
+/* 3d butterfly demo start*/
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_tabview.h"
@@ -11,15 +12,11 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-
-
-#include "tiger_blue.txt"
 #include "def_3d.h"
 #include "gui_3d.h"
 
 #include "butterfly/desc.txt"
 #include "math.h"
-
 
 static int frame_counter = 0;
 static float wing_angle = 0.0f;
@@ -104,7 +101,7 @@ static void app_ui_design(gui_app_t *app)
     return;
 
 }
-
+/* 3d butterfly demo end*/
 
 static gui_app_t rtk_gui_demo =
 {
