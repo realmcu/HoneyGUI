@@ -139,6 +139,18 @@ void gui_3d_set_animate(gui_3d_t     *this,
                         void         *callback,
                         void         *p);
 
+/**
+ * @brief 3d widget constructor
+ *
+ * @param this the 3d widget pointer
+ * @param parent parent widget
+ * @param name widget name
+ * @param desc_addr description file data
+ * @param x the X-axis coordinate relative to parent widget
+ * @param y the Y-axis coordinate relative to parent widget
+ * @param w width
+ * @param h height
+ */
 void gui_3d_ctor(gui_3d_t               *this,
                  gui_obj_t              *parent,
                  const char             *name,
@@ -148,7 +160,15 @@ void gui_3d_ctor(gui_3d_t               *this,
                  int16_t                 w,
                  int16_t                 h);
 
+/**
+ * @brief set on_click event
+ *
+ * @param this the 3d widget pointer
+ * @param callback callback function
+ * @param parameter callback function parameter
+ */
 void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter);
+
 #ifdef __cplusplus
 }
 #endif

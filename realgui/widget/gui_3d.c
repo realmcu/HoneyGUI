@@ -112,6 +112,13 @@ float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, 
         .y = point_y - light->position.y,
         .z = point_z - light->position.z,
     };
+    float distance = sqrt(lightToPoint.x * lightToPoint.x + lightToPoint.y * lightToPoint.y +
+                          lightToPoint.z * lightToPoint.z);
+
+    // Distance attenuation
+    float constant = 1.0f, linear = 0.1f;
+    float disAttenuation = 1.0f / (constant + linear * distance);
+
     lightToPoint = gui_point_4d_unit(lightToPoint);
 
     gui_point_4d_t lightDirection =
@@ -122,24 +129,24 @@ float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, 
     };
     lightDirection = gui_point_4d_unit(lightDirection);
 
-
     float cosTheta = gui_point4D_dot(lightDirection, lightToPoint);
-    float angleToPixel = acos(cosTheta) * (180.0f / M_PI);
 
     float halfAngle = light->included_angle / 2.0f;
-    float innerCircleRadius = halfAngle * (1.0f - light->blend_ratio);
-    float outerCircleRadius = halfAngle;
+    float innerCircleRadius = halfAngle * (1.0f - light->blend_ratio) * (M_PI / 180.0f);
+    float outerCircleRadius = halfAngle * (M_PI / 180.0f);
 
-    if (angleToPixel <= innerCircleRadius)
-    {
-        return 1.0f;
-    }
-    else if (angleToPixel <= outerCircleRadius)
-    {
-        float blendFactor = (angleToPixel - innerCircleRadius) / (outerCircleRadius - innerCircleRadius);
-        return 1.0f - blendFactor;
-    }
+    float innerCos = cosf(innerCircleRadius);
+    float outerCos = cosf(outerCircleRadius);
 
+    if (cosTheta >= innerCos)
+    {
+        return disAttenuation;
+    }
+    else if (cosTheta >= outerCos)
+    {
+        float angleAttenuation = (cosTheta - outerCos) / (innerCos - outerCos);
+        return disAttenuation * angleAttenuation;
+    }
     return 0;
 }
 
@@ -167,9 +174,8 @@ gui_point_4d_t calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1, gui
 
 }
 static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
-                        gui_3d_world_t *world, gui_3d_camera_t *camera, gui_3d_light_t *light)
+                        gui_3d_world_t *world, gui_3d_light_t *light)
 {
-    gui_dispdev_t *dc = gui_get_dc();
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
     float width = head->w;
     float height = head->h;
@@ -179,13 +185,8 @@ static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*fac
     this->mask_img[i].data = (unsigned char *)gui_malloc(data_size);
     memcpy(this->mask_img[i].data, this->img[i].data, data_size);
 
-    //light intense
-    float distance = pow(light->position.x - light->targetDirection.x, 2) +
-                     pow(light->position.y - light->targetDirection.y, 2) +
-                     pow(light->position.z - light->targetDirection.z, 2);
-    float intense = light->color.a / (1.0f + 0.1f * sqrt(distance));
 
-    unsigned char mask_color[4] = {light->color.r, light->color.g, light->color.b, intense};
+    unsigned char mask_color[4] = {light->color.r, light->color.g, light->color.b, light->color.a};
     float alpha = mask_color[3] / 255.0f;
 
     for (int p_y = 0; p_y < height; p_y++)
@@ -341,7 +342,7 @@ static void gui_3d_prepare(gui_3d_t *this)
 
             if (light.initialized)
             {
-                light_apply(this, i, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
+                light_apply(this, i, this->desc->shapes[i].face_offset + j, &world, &light);
             }
         }
     }
