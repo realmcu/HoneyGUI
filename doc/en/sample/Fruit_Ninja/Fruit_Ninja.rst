@@ -15,7 +15,7 @@ This example demonstrates how to develop a simple "Fruit Ninja" APP, from which 
 .. _Requirements:
 Requirements
 --------
-Refer to the Installation section of `Get Started`_.
+Refer to the Installation section of :ref:`Get Started` .
 
 .. _Source File:
 Source File
