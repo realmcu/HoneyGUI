@@ -85,11 +85,13 @@ static const uint8_t lookup_table_4b[16] =
     Ensure it is always enabled if there are no issues.
 */
 #define USE_BIT_BUF          1
+
 /*
     USE_FLOAT_RECT_SIZE uses float to calculate the rendering boundaries, which can increase data precision.
     If there are no issues, make sure it is always enabled.
 */
 #define USE_FLOAT_RECT_SIZE  1
+
 /*
     FIX_AUTO_VECTORIZE is used to adapt to auto-vectorization,
     and it only needs to be enabled when the compiler's auto-vectorization feature is turned on.
@@ -338,22 +340,35 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
     }
 }
 
-int getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
+uint32_t getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
 {
-    uint8_t *ptr = (uint8_t *)ttfbin + offsetof(GUI_FONT_HEAD_TTF,
-                                                font_name) + ttfbin->font_name_length;
-    int indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(int));
-    for (int i = 0; i < indexEntries; ++i)
+    if (ttfbin->index_method == 0)
     {
-        uint16_t currentUnicode = *(uint16_t *)ptr;
-        ptr += sizeof(uint16_t);
-
-        int glyphOffset = *(int *)ptr;
-        ptr += sizeof(int);
-
-        if (currentUnicode == unicode)
+        uint8_t *ptr = (uint8_t *)ttfbin + offsetof(GUI_FONT_HEAD_TTF,
+                                                    font_name) + ttfbin->font_name_length;
+        uint32_t glyphOffset = *((uint32_t *)ptr + unicode);
+        if (glyphOffset != 0xffffffff)
         {
             return glyphOffset;
+        }
+    }
+    else
+    {
+        uint8_t *ptr = (uint8_t *)ttfbin + offsetof(GUI_FONT_HEAD_TTF,
+                                                    font_name) + ttfbin->font_name_length;
+        uint32_t indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(uint32_t));
+        for (uint32_t i = 0; i < indexEntries; ++i)
+        {
+            uint16_t currentUnicode = *(uint16_t *)ptr;
+            ptr += sizeof(uint16_t);
+
+            uint32_t glyphOffset = *(uint32_t *)ptr;
+            ptr += sizeof(uint32_t);
+
+            if (currentUnicode == unicode)
+            {
+                return glyphOffset;
+            }
         }
     }
     return 0;
@@ -725,7 +740,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
         }
         else
         {
-            int ttfoffset = getGlyphOffsetFromMemory(unicode_buf[uni_i], ttfbin);
+            uint32_t ttfoffset = getGlyphOffsetFromMemory(unicode_buf[uni_i], ttfbin);
             if (ttfoffset == 0)
             {
                 gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
@@ -919,6 +934,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         {
             line_count += winding_lengths[i];
         }
+        GUI_ASSERT(line_count != 0);
 
 #if defined FONT_TTF_USE_MVE && 0
         //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
