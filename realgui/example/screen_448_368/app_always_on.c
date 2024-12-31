@@ -25,33 +25,66 @@
 #include "gui_perspective.h"
 #include "gui_perspective.h"
 
+
+/** @defgroup EXAMPLE EXAMPLE
+  * @{
+  */
 /*============================================================================*
  *                           Types
  *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Types EXAMPLE Exported Types
+  * @{
+  */
+
+
+/** End of EXAMPLE_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Constants EXAMPLE Exported Constants
+  * @{
+  */
 
+
+/** End of EXAMPLE_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Macros EXAMPLE Exported Macros
+  * @{
+  */
 
 
+/** End of EXAMPLE_Exported_Macros
+  * @}
+  */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-
+/** @defgroup EXAMPLE_Exported_Variables EXAMPLE Exported Variables
+  * @{
+  */
 gui_win_t *win_always_on;
 gui_perspective_t *per;
 extern gui_tabview_t *tv;
 static bool always_on_flag;
 
+/** End of EXAMPLE_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Functions EXAMPLE Exported Functions
+  * @{
+  */
 
 /**
  * @brief Animation callback. If animation ends, always-on shows.
@@ -138,6 +171,14 @@ void always_on_ui_design(gui_obj_t *parent)
     gui_win_set_animate(win_always_on, 8000, 0, always_on_animate_cb, win_always_on);
 
 }
+
+/** End of EXAMPLE_Exported_Functions
+  * @}
+  */
+
+/** End of EXAMPLE
+  * @}
+  */
 
 
 

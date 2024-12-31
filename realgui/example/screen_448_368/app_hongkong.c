@@ -12,13 +12,11 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include <stdio.h>
-#include "guidef.h"
-#include "wheel_algo.h"
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
+
 gui_tabview_t *tv;
-gui_win_t *win_hk;
 
 static gui_app_t app_hongkong =
 {
@@ -30,6 +28,7 @@ static gui_app_t app_hongkong =
         .parent = NULL,
     },
     .ui_design = app_hongkong_ui_design,
+    .thread_entry = NULL,
     .active_ms = 1000000,
 };
 
@@ -38,62 +37,20 @@ void *get_app_hongkong(void)
     return &app_hongkong;
 }
 
-static void kb_button_cb()
+static void kb_button_cb(void *obj, gui_event_t e)
 {
-#ifdef _WIN32
-    touch_info_t *wheel = wheel_get_info();
-    static uint8_t hold = 0;
-    if (hold)
-    {
-        if (wheel->button_up)
-        {
-            gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
-        }
-    }
-    if (wheel->button_hold)
-    {
-        hold = 1;
-    }
-    else
-    {
-        hold = 0;
-    }
-#else
-#include "kb_algo.h"
-    gui_kb_port_data_t *kb = port_kb_get_data();
-    static uint8_t hold = 0;
-    if (hold)
-    {
-        if (kb->event == GUI_KB_EVENT_UP)
-        {
-            gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
-        }
-    }
-    if (kb->event == GUI_KB_EVENT_DOWN)
-    {
-        hold = 1;
-    }
-    else
-    {
-        hold = 0;
-    }
-#endif
-}
-
-static void switch_app_menu()
-{
-    gui_log("enter menu\n");
-    extern void *get_app_menu();
-    gui_app_switch(gui_current_app(), get_app_menu());
+    gui_log("line = %d \n", __LINE__);
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
-    tv = gui_tabview_create(&(app->screen), "hongkong_tabview", 0, 0, 0, 0);
-    win_hk = gui_win_create(&(app->screen), "window_hongkong", 0, 0, 0, 0);
-    gui_win_set_animate(win_hk, 1000, -1, kb_button_cb, NULL);
-    gui_obj_add_event_cb(win_hk, (gui_event_cb_t)switch_app_menu, GUI_EVENT_8, NULL);
+    // gui_img_t *time =  gui_img_create_from_mem(&(app->screen), "time", TIME_BIN, 142, 20, 0, 0);
+    // return;
+
+    tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
+    gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
     gui_tabview_set_style(tv, TAB_CUBE);
     gui_tabview_enable_pre_load(tv, true);
 
@@ -104,8 +61,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
     gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
-
-    // page_tb_clock(win);
     page_tb_clock(gui_tab_get_rte_obj(tb_clock));
     page_tb_activity(gui_tab_get_rte_obj(tb_activity));
     page_tb_heart(gui_tab_get_rte_obj(tb_heart));
