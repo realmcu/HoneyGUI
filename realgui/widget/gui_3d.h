@@ -63,7 +63,7 @@ typedef struct gui_3d
     unsigned int flags;
 
     gui_3d_description_t *desc;
-
+    uint8_t face_flags;
     gui_3d_face_t *face;
     draw_img_t *img;
     draw_img_t *mask_img;
@@ -138,6 +138,17 @@ void gui_3d_set_animate(gui_3d_t     *this,
                         int           repeat_count,
                         void         *callback,
                         void         *p);
+
+void gui_3d_ctor(gui_3d_t               *this,
+                 gui_obj_t              *parent,
+                 const char             *name,
+                 void                   *desc_addr,
+                 int16_t                 x,
+                 int16_t                 y,
+                 int16_t                 w,
+                 int16_t                 h);
+
+void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter);
 #ifdef __cplusplus
 }
 #endif

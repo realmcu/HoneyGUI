@@ -347,6 +347,33 @@ static void gui_3d_prepare(gui_3d_t *this)
     }
     compare_face_order(this->face, this->desc->attrib.num_face_num_verts, &camera);
 
+    if (tp->type == TOUCH_SHORT)
+    {
+        // Cache the num_face_num_verts
+        const int num_face_vertices = this->desc->attrib.num_face_num_verts;
+
+        for (int i = 0; i < num_face_vertices; ++i)
+        {
+            // Cache the img_target and face attributes
+            const int target_x = this->img[i].img_target_x;
+            const int target_y = this->img[i].img_target_y;
+            const int target_w = this->img[i].img_target_w;
+            const int target_h = this->img[i].img_target_h;
+            const int half_num_face_vertices = num_face_vertices / 2;
+
+            if (tp->x >= target_x &&
+                tp->x <= (target_x + target_w) &&
+                tp->y >= target_y &&
+                tp->y <= (target_y + target_h) &&
+                this->face[i].order > half_num_face_vertices)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_1);
+                this->face_flags = i;
+                break;
+            }
+        }
+    }
+
     gui_fb_change();
 
     GUI_UNUSED(this);
@@ -615,14 +642,14 @@ static gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
 
 
 
-static void gui_3d_ctor(gui_3d_t               *this,
-                        gui_obj_t              *parent,
-                        const char             *name,
-                        void                   *desc_addr,
-                        int16_t                 x,
-                        int16_t                 y,
-                        int16_t                 w,
-                        int16_t                 h)
+void gui_3d_ctor(gui_3d_t               *this,
+                 gui_obj_t              *parent,
+                 const char             *name,
+                 void                   *desc_addr,
+                 int16_t                 x,
+                 int16_t                 y,
+                 int16_t                 w,
+                 int16_t                 h)
 {
     //for obj class
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -690,4 +717,7 @@ gui_3d_t *gui_3d_create(void       *parent,
     GET_BASE(this)->create_done = true;
     return this;
 }
-
+void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+}
