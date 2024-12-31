@@ -59,16 +59,16 @@ static void gui_server_entry(void *parameter)
     gui_server_msg_init();
     while (1)
     {
-        gui_app_t *app = gui_current_app();
+        gui_app_t *app_current = gui_current_app();
         gui_app_t *app_next = gui_next_app();
-        while (app == NULL)
+        while (app_current == NULL)
         {
             gui_thread_mdelay(1000);
-            app = gui_current_app();
+            app_current = gui_current_app();
             gui_log("!!! GUI APP NOT READY! \n");
         }
 
-        gui_obj_t *screen = &app->screen;
+        gui_obj_t *screen = &app_current->screen;
         GUI_ASSERT(screen != NULL);
 
         /*exe some app action, like kick watchdog*/
@@ -92,14 +92,21 @@ static void gui_server_entry(void *parameter)
             gui_send_msg_to_server(&msg);
         }
 
-        if ((app->lvgl == true) || (app->arm2d == true))
+        if ((app_current->lvgl == true) || (app_current->arm2d == true))
         {
             continue;
         }
+
+        if (app_current->server_hook)
+        {
+            app_current->server_hook(app_current);
+        }
+
         bool next_app_top_layer = gui_app_get_layer();
-        handle_binary_app_transition(&app, app_next, &screen, next_app_top_layer);
+
+        handle_binary_app_transition(&app_current, app_next, &screen, next_app_top_layer);
         gui_fb_disp(screen, true);
-        handle_binary_app_delete(&app_next, app, next_app_top_layer);
+        handle_binary_app_delete(&app_next, app_current, next_app_top_layer);
 
 
 #ifdef _WIN32

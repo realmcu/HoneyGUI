@@ -16,7 +16,6 @@ if not GetDepend('CONFIG_REALTEK_BUILD_PAINTER_ENGINE'):
 
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_hongkong']
-print(CPPPATH)
 
 CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_410_502_DEMO'):

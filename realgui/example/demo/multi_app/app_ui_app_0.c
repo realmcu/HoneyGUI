@@ -26,13 +26,9 @@ static void app_0_ui_design(gui_app_t *app)
     return;
 }
 
-static void loop(void *tihs)
+static void app_hook(void *tihs)
 {
-    while ((1))
-    {
-        gui_thread_mdelay(1000);
-        gui_log("I am in gui app 0 task \n");
-    }
+    gui_log("I am in gui app 0 task \n");
 }
 
 gui_app_t realgui_base_demo_app_0 =
@@ -45,7 +41,7 @@ gui_app_t realgui_base_demo_app_0 =
     },
     .ui_design = app_0_ui_design,
     .active_ms = 1000 * 60 * 60,
-    // .thread_entry = loop,
+    .server_hook = app_hook,
 };
 
 static int app_init(void)

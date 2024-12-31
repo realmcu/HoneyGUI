@@ -8,7 +8,6 @@ src = Split("""
 
 src = Glob('*.c')
 CPPPATH = [cwd]
-print(CPPPATH)
 group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_320_384_DEMO'], CPPPATH = CPPPATH)
 
 Return('group')
