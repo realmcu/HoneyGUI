@@ -11,7 +11,7 @@ Download to the EVB
 -------------------
 Select the chip type and language in the MP Tool startup interface, taking RTL8762G as an example.
 
-.. figure:: https://foruda.gitee.com/images/1727331633078866623/859a389b_13408154.png
+.. figure:: https://foruda.gitee.com/images/1735624989517380575/77a119ab_13408154.png
    :width: 800px
    :align: center
 

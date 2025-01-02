@@ -162,7 +162,7 @@ Example
    <br>
 
 
-3D Cube
+3D Prism
 ~~~~~~~~
 .. code-block:: c
 

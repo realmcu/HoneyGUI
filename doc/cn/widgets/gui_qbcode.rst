@@ -52,7 +52,7 @@
    gui_qbcode_config(qrcode, str, strlen(str), 3);
 
 
-.. figure:: https://foruda.gitee.com/images/1713239098192542999/e635ea60_10641540.jpeg
+.. figure:: https://foruda.gitee.com/images/1735625417520694131/22cd8acc_13408154.jpeg
    :align: center
    :width: 300px
 
@@ -83,7 +83,7 @@
 
 
 
-.. figure:: https://foruda.gitee.com/images/1713341892058343798/70403721_10641540.jpeg
+.. figure:: https://foruda.gitee.com/images/1735625432077099404/d426bd63_13408154.jpeg
    :align: center
    :width: 300px
 
