@@ -62,6 +62,11 @@
 // #define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
 // </c>
 
+// <c> RTK GUI Demo 410 502 Lvgl
+// #define CONFIG_REALTEK_BUILD_GUI_410_502_LVGL_DEMO
+// </c>
+
+
 // <c> RTK GUI TEST
 // #define CONFIG_REALTEK_BUILD_TEST
 // </c>
