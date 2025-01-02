@@ -11,18 +11,18 @@ Features
 
 Text widgets can support the following features.
 
-+ **UTF-8/UTF16/UTF-32 support**
-+ **Multi language support**
-+ **Text typesetting support**
-+ **Word wrap and texts scrolling**
-+ **Anti-aliasing**
-+ **Multi fonts support**
-+ **Multi font sizes support**
-+ **Thirty-two bit true color support**
-+ **Emoji support**
-+ **Custom animation effects support**
-+ **Standards TTF file support**\ :sup:`①`
-+ **Self-developed font files support**
++ UTF-8/UTF16/UTF-32 support
++ Multi language support
++ Text typesetting support
++ Word wrap and texts scrolling
++ Anti-aliasing
++ Multi fonts support
++ Multi font sizes support
++ Thirty-two bit true color support
++ Emoji support
++ Custom animation effects support
++ Standards TTF file support\ :sup:`①`
++ Self-developed font files support
 
 \ :sup:`①`: Only part of the chip support this feature.
 
@@ -204,7 +204,7 @@ Multiple Text Widget
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1735807151359177257/828c2835_13674272.png" width= "400" /></div>
    <br>
 
 
