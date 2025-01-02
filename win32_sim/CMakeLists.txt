@@ -20,15 +20,29 @@ set(GUI_BASE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 message("HoneyGUI base path ${GUI_BASE_PATH}")
 
 add_subdirectory(../ HoneyGUI.out)
-add_subdirectory(port//realgui_port)
+if(CONFIG_LVGL)
 
-list(APPEND gui_sources 
+    add_subdirectory(port//lvgl_port)
+        list(APPEND gui_sources 
+			${lvgl_port_src}
+			)
+
+    list(APPEND gui_headers
+    ${lvgl_port_inc}
+    )
+
+endif()
+    add_subdirectory(port//realgui_port)
+    list(APPEND gui_sources 
 			${realgui_port_src}
 			)
 
-list(APPEND gui_headers
-${realgui_port_inc}
-)
+    list(APPEND gui_headers
+    ${realgui_port_inc}
+    )
+
+
+
 
 target_sources(gui PRIVATE ${gui_sources})
 

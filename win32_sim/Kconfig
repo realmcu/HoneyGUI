@@ -6,6 +6,7 @@ config EXAMPLE_TYPE
       * Watch
       * Dashboard
       * Smart Home
+      * LVGL
 
 choice
     prompt "Select Example"
@@ -26,11 +27,18 @@ config SMART_HOME
     help
       Configure settings for a Smart Home example.
 
+config LVGL
+    bool "LVGL"
+    help
+      Configure settings for an LVGL example.
+
 endchoice
-# Automatically set CONFIG_JAVASCRIPT_PARSER if SMART_HOME is selected
+
+# Automatically set config options
 config JAVASCRIPT_PARSER_SaaA
     bool
     default y if SMART_HOME
+
 choice
     depends on WATCH
     prompt "Watch Resolution"
@@ -70,6 +78,24 @@ config SMART_HOME_RESOLUTION_480x480
 
 config SMART_HOME_RESOLUTION_480x320
     bool "480x320 Resolution"
+
+endchoice
+
+choice
+    depends on LVGL
+    prompt "LVGL Demo Selection"
+    default LVGL_WIDGETS_DEMO
+    help
+      Select the LVGL demo you want to configure.
+
+config LVGL_WIDGETS_DEMO
+    bool "Widgets Demo"
+
+config LVGL_BENCHMARK
+    bool "Benchmark"
+
+config LVGL_ARC_2
+    bool "Arc 2"
 
 endchoice
 

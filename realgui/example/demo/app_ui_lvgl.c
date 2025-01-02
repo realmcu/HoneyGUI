@@ -78,6 +78,26 @@ static void app_dialing_ui_design(gui_app_t *app)
     lv_port_disp_init();
     lv_port_indev_init();
     lv_port_fs_init();
+#ifdef LV_USE_CMAKE_KCONFIG
+
+#if LVGL_BENCHMARK_ENABLED
+
+
+    LV_LOG("Running LVGL Benchmark... \n");
+    LV_LOG("Please stand by... \n");
+    LV_LOG("NOTE: You will NOT see anything until the end. \n");
+
+    lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
+    lv_demo_benchmark_set_max_speed(true);
+    lv_demo_benchmark();
+#elif LVGL_WIDGETS_DEMO_ENABLED
+
+    lv_demo_widgets();
+#elif LVGL_ARC_2_ENABLED
+
+    lv_example_arc_2();
+#endif
+#else
 
 #if LV_USE_DEMO_BENCHMARK
     LV_LOG("Running LVGL Benchmark... \n");
@@ -100,6 +120,7 @@ static void app_dialing_ui_design(gui_app_t *app)
     // lv_tool_file_test();
 
     // fs api example
+#endif
     if (0)
     {
         lv_fs_file_t f;

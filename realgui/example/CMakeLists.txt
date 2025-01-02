@@ -16,5 +16,8 @@ elseif(CONFIG_SMART_HOME_RESOLUTION_480x480)
 elseif(CONFIG_SMART_HOME_RESOLUTION_480x320)
     message(STATUS "*****SMART HOME 480x320*****")
     add_subdirectory(screen_480_320)
+elseif(CONFIG_LVGL)
+    message(STATUS "*****LVGL*****")
+    add_subdirectory(demo)
 endif()
 
