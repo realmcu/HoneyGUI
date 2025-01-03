@@ -885,7 +885,7 @@ void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *c
     gui_3d_face_transform_camera(face, camera);
     gui_3d_face_cull_region(face, camera);
     gui_3d_face_calculate_normal(face);
-    gui_3d_face_update_back_face(face, GUI_3D_CULLMODE_NONE);
+    gui_3d_face_update_back_face(face, GUI_3D_CULLMODE_CCW);
     gui_3d_face_transform_perspective(face, camera);
     gui_3d_face_cull_out_side(face, camera);
     gui_3d_face_transform_screen(face, camera);

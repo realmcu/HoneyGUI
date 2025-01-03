@@ -63,7 +63,6 @@ typedef struct gui_3d
     unsigned int flags;
 
     gui_3d_description_t *desc;
-    uint8_t face_flags;
     gui_3d_face_t *face;
     draw_img_t *img;
     draw_img_t *mask_img;

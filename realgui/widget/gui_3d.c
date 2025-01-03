@@ -33,77 +33,6 @@
 
 
 
-
-/*============================================================================*
- *                           Types
- *============================================================================*/
-
-/*============================================================================*
- *                           Constants
- *============================================================================*/
-
-/*============================================================================*
- *                            Macros
- *============================================================================*/
-
-/*============================================================================*
- *                            Variables
- *============================================================================*/
-
-/*============================================================================*
- *                           Private Functions
- *============================================================================*/
-static float calculate_cosin(gui_vector4D_t normal, gui_3d_camera_t *camera)
-{
-    gui_vector4D_t viewDirection;
-    viewDirection.x = camera->targetDirection.x - camera->position.x;
-    viewDirection.y = camera->targetDirection.y - camera->position.y;
-    viewDirection.z = camera->targetDirection.z - camera->position.z;
-
-    float magN = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-    float magV = sqrt(viewDirection.x * viewDirection.x + viewDirection.y * viewDirection.y +
-                      viewDirection.z * viewDirection.z);
-
-    return (normal.x * viewDirection.x + normal.y * viewDirection.y + normal.z * viewDirection.z) /
-           (magN * magV);
-}
-
-static void compare_face_order(gui_3d_face_t *face, unsigned int num_faces, gui_3d_camera_t *camera)
-{
-    uint32_t *order_array = (uint32_t *)gui_malloc(num_faces * sizeof(size_t));
-
-    for (uint32_t i = 0; i < num_faces; i++)
-    {
-        order_array[i] = i;
-    }
-
-    for (uint32_t i = 0; i < num_faces; i++)
-    {
-        uint32_t min_index = i;
-        float result = calculate_cosin(face[i].transform_vertex[0].normal, camera);
-
-        for (uint32_t j = i + 1; j < num_faces; j++)
-        {
-            if (calculate_cosin(face[order_array[j]].transform_vertex[0].normal,
-                                camera) > calculate_cosin(face[order_array[min_index]].transform_vertex[0].normal, camera))
-            {
-                min_index = j;
-            }
-        }
-
-        if (min_index != i)
-        {
-            uint32_t temp = order_array[i];
-            order_array[i] = order_array[min_index];
-            order_array[min_index] = temp;
-        }
-        face[order_array[i]].order = i;
-    }
-    face[order_array[num_faces - 1]].order = num_faces - 1;
-
-    gui_free(order_array);
-}
-
 float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, float point_z)
 {
     gui_point_4d_t lightToPoint =
@@ -129,6 +58,7 @@ float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, 
     };
     lightDirection = gui_point_4d_unit(lightDirection);
 
+    // Angle attenuation
     float cosTheta = gui_point4D_dot(lightDirection, lightToPoint);
 
     float halfAngle = light->included_angle / 2.0f;
@@ -274,7 +204,7 @@ static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
         index_offset += this->desc->attrib.face_num_verts[i];
     }
 
-    for (size_t j = 0; j < this->desc->attrib.face_num_verts[i]; ++j)
+    for (size_t j = 0; j < this->desc->attrib.face_num_verts[i]; j++)
     {
         tinyobj_vertex_index_t idx = this->desc->attrib.faces[index_offset + j];
 
@@ -317,6 +247,7 @@ static void gui_3d_prepare(gui_3d_t *this)
     this->flags = 0;
 
     this->face = gui_malloc(sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
+    memset(this->face, 0x00, sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
 
     this->img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
@@ -346,7 +277,6 @@ static void gui_3d_prepare(gui_3d_t *this)
             }
         }
     }
-    compare_face_order(this->face, this->desc->attrib.num_face_num_verts, &camera);
 
     if (tp->type == TOUCH_SHORT)
     {
@@ -360,16 +290,13 @@ static void gui_3d_prepare(gui_3d_t *this)
             const int target_y = this->img[i].img_target_y;
             const int target_w = this->img[i].img_target_w;
             const int target_h = this->img[i].img_target_h;
-            const int half_num_face_vertices = num_face_vertices / 2;
 
             if (tp->x >= target_x &&
                 tp->x <= (target_x + target_w) &&
                 tp->y >= target_y &&
-                tp->y <= (target_y + target_h) &&
-                this->face[i].order > half_num_face_vertices)
+                tp->y <= (target_y + target_h))
             {
                 gui_obj_event_set(obj, GUI_EVENT_1);
-                this->face_flags = i;
                 break;
             }
         }
@@ -396,31 +323,41 @@ static void gui_3d_draw(gui_3d_t *this)
 
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        int32_t current_face_index = -1;
-        for (uint32_t j = 0; j < this->desc->attrib.num_face_num_verts; j++)
+        if (!(this->face[i].state & GUI_3D_FACESTATE_BACKFACE)) // Non-backfaces
         {
-            if (this->face[j].order == i)
-            {
-                // gui_log("this->face[%d].order: %d\n", j, this->face[j].order);
-                current_face_index = j;
-                break;
-            }
+            continue;
         }
-        if (current_face_index != -1)
+        if (this->mask_img->data != NULL)
         {
-            if (this->mask_img->data != NULL)
-            {
-                draw_img_cache(this->mask_img + current_face_index, IMG_SRC_MEMADDR);
-                gui_acc_blit_to_dc(this->mask_img + current_face_index, dc, NULL);
-                draw_img_free(this->mask_img + current_face_index, IMG_SRC_MEMADDR);
-            }
-            else
-            {
-                draw_img_cache(this->img + current_face_index, IMG_SRC_MEMADDR);
-                gui_acc_blit_to_dc(this->img + current_face_index, dc, NULL);
-                draw_img_free(this->img + current_face_index, IMG_SRC_MEMADDR);
-            }
+            draw_img_cache(this->mask_img + i, IMG_SRC_MEMADDR);
+            gui_acc_blit_to_dc(this->mask_img + i, dc, NULL);
+            draw_img_free(this->mask_img + i, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            draw_img_cache(this->img + i, IMG_SRC_MEMADDR);
+            gui_acc_blit_to_dc(this->img + i, dc, NULL);
+            draw_img_free(this->img + i, IMG_SRC_MEMADDR);
+        }
+    }
 
+    for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
+    {
+        if (this->face[i].state & GUI_3D_FACESTATE_BACKFACE)  // backfaces
+        {
+            continue;
+        }
+        if (this->mask_img->data != NULL)
+        {
+            draw_img_cache(this->mask_img + i, IMG_SRC_MEMADDR);
+            gui_acc_blit_to_dc(this->mask_img + i, dc, NULL);
+            draw_img_free(this->mask_img + i, IMG_SRC_MEMADDR);
+        }
+        else
+        {
+            draw_img_cache(this->img + i, IMG_SRC_MEMADDR);
+            gui_acc_blit_to_dc(this->img + i, dc, NULL);
+            draw_img_free(this->img + i, IMG_SRC_MEMADDR);
         }
     }
 
@@ -439,6 +376,13 @@ static void gui_3d_end(gui_3d_t *this)
 
     if (this->img != NULL)
     {
+        for (int i = 0; i < this->desc->attrib.num_face_num_verts; i++)
+        {
+            if (draw_img_acc_end_cb != NULL)
+            {
+                draw_img_acc_end_cb(this->img + i);
+            }
+        }
         gui_free(this->img);
         this->img = NULL;
     }
@@ -453,9 +397,9 @@ static void gui_3d_end(gui_3d_t *this)
                 this->mask_img[i].data = NULL;
             }
         }
-        gui_free(this->mask_img);
-        this->mask_img = NULL;
     }
+    gui_free(this->mask_img);
+    this->mask_img = NULL;
 
     gui_free(this->face);
     this->face = NULL;
