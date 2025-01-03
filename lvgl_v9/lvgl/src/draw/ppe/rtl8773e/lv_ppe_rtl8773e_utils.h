@@ -15,19 +15,17 @@ extern "C" {
  *********************/
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_PPE
+#if LV_USE_DRAW_PPE_RTL8773E
 #include "../../sw/lv_draw_sw.h"
 #include "../../../misc/lv_log.h"
 #include "rtl_ppe.h"
-#include "rtl_rcc.h"
+#include "rtl876x_rcc.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_PPE_MAX_BUFFER_SIZE  (20 * 1024)
-#if LV_MEM_SIZE < LV_PPE_MAX_BUFFER_SIZE
-#error "PPE buffer size cannot be larger than LV heap size"
-#endif
+#define LV_PPE_MAX_BUFFER_SIZE  (40 * 1024)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -37,11 +35,14 @@ extern "C" {
  **********************/
 uint32_t lv_ppe_get_color(lv_color_t color, uint8_t opa);
 
-PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, ppe_rect_t *rect, uint32_t color);
+PPE_err lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, ppe_rect_t *rect, uint32_t color);
 
 uint8_t *lv_ppe_get_buffer(uint32_t size);
 
 PPE_PIXEL_FORMAT lv_ppe_get_format(lv_color_format_t cf, const uint8_t *content);
+
+lv_area_t lv_ppe_get_matrix_area(ppe_matrix_t *matrix, const lv_area_t *coords,
+                                 const lv_draw_image_dsc_t *draw_dsc);
 /**********************
  *      MACROS
  **********************/

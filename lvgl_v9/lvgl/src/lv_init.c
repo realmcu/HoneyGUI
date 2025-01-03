@@ -70,8 +70,12 @@
     #include "drivers/windows/lv_windows_context.h"
 #endif
 
-#if LV_USE_PPE
-    #include "lv_draw_ppe.h"
+#if LV_USE_DRAW_PPE_RTL87x2G
+    #include "lv_draw_ppe_rtl87x2g.h"
+#endif
+
+#if LV_USE_DRAW_PPE_RTL8773E
+    #include "lv_draw_ppe_rtl8773e.h"
 #endif
 
 /*********************
@@ -243,7 +247,7 @@ void lv_init(void)
     lv_windows_platform_init();
 #endif
 
-#if LV_USE_PPE
+#if LV_USE_DRAW_PPE_RTL87x2G || LV_USE_DRAW_PPE_RTL8773E
     lv_draw_ppe_init();
 #endif
 

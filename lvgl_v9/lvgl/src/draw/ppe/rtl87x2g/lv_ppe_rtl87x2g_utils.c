@@ -7,10 +7,10 @@
  *      INCLUDES
  *********************/
 
-
-#if LV_USE_PPE
-#include "lv_ppe_utils.h"
 #include "../../../core/lv_refr.h"
+#if LV_USE_DRAW_PPE_RTL872xG
+#include "lv_ppe_rtl87x2g_utils.h"
+
 /*********************
  *      DEFINES
  *********************/

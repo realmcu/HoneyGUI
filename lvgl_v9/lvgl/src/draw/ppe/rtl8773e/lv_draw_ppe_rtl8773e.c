@@ -6,11 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_ppe.h"
-#include "lv_draw_sw_private.h"
 #include "../lv_draw_private.h"
-#if LV_USE_PPE
-
+#if LV_USE_DRAW_PPE_RTL8773E
+#include "lv_draw_ppe_rtl8773e.h"
+#include "lv_draw_sw_private.h"
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
@@ -52,12 +51,6 @@ static int32_t lv_draw_ppe_delete(lv_draw_unit_t *draw_unit);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-extern void lv_draw_ppe_image(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
-                              const lv_area_t *coords);
-
-extern void lv_draw_ppe_fill(lv_draw_unit_t *draw_unit, lv_draw_fill_dsc_t *dsc,
-                             const lv_area_t *coords);
-
 void lv_draw_ppe_init(void)
 {
     lv_draw_ppe_unit_t *draw_ppe_unit = lv_draw_create_unit(sizeof(lv_draw_ppe_unit_t));
@@ -66,9 +59,10 @@ void lv_draw_ppe_init(void)
     draw_ppe_unit->idx = 0;
     draw_ppe_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_ppe_delete : NULL;
     draw_ppe_unit->base_unit.name = "PPE";
-    uint8_t idu_tx = 3;
-    uint8_t idu_rx = 1;
+    uint8_t idu_tx = 0xFF;
+    uint8_t idu_rx = 0xFF;
     hal_dma_channel_init(&idu_rx, &idu_tx);
+    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
 #if LV_USE_OS
     lv_thread_init(&draw_ppe_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb,
                    LV_DRAW_THREAD_STACK_SIZE, draw_ppe_unit);
@@ -77,9 +71,6 @@ void lv_draw_ppe_init(void)
 
 void lv_draw_ppe_deinit(void)
 {
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-    tvg_engine_term(TVG_ENGINE_SW);
-#endif
 }
 
 static int32_t lv_draw_ppe_delete(lv_draw_unit_t *draw_unit)
@@ -101,7 +92,6 @@ static int32_t lv_draw_ppe_delete(lv_draw_unit_t *draw_unit)
     return 0;
 #endif
 }
-#include "trace.h"
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -142,7 +132,7 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
             const lv_draw_image_dsc_t *draw_dsc = (lv_draw_image_dsc_t *) task->draw_dsc;
             lv_layer_t *layer = (lv_layer_t *)draw_dsc->src;
 
-            if (lv_ppe_get_format(layer->color_format) == PPE_FORMAT_NOT_SUPPORT)
+            if (lv_ppe_get_format(layer->color_format, layer->draw_buf->data) == PPE_FORMAT_NOT_SUPPORT)
             {
                 return 0;
             }
@@ -156,7 +146,7 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
             if (task->preference_score > 80)
             {
                 task->preference_score = 80;
-                task->preferred_draw_unit_id = DRAW_UNIT_ID_PPE;
+                //task->preferred_draw_unit_id = DRAW_UNIT_ID_PPE;
             }
             return 1;
         }
@@ -165,13 +155,13 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
             lv_draw_image_dsc_t *draw_dsc = task->draw_dsc;
 
             /* not support skew */
-            if (draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0 || draw_dsc->rotation != 0)
+            if (draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0)
             {
                 return 0;
             }
             const lv_image_dsc_t *img_dsc = draw_dsc->src;
             if (draw_dsc->clip_radius > 0 || \
-                (draw_dsc->recolor_opa < LV_OPA_MAX && draw_dsc->recolor_opa > LV_OPA_MIN && \
+                (draw_dsc->recolor_opa > LV_OPA_MIN && \
                  (img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888 || img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8565 \
                   || img_dsc->header.cf == LV_COLOR_FORMAT_XRGB8888)))
             {

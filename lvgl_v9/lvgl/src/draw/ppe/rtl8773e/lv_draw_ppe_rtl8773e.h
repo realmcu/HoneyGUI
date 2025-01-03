@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_draw.h"
-#if LV_USE_PPE
+#if LV_USE_DRAW_PPE_RTL8773E
 
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
@@ -23,7 +23,7 @@ extern "C" {
 
 #include "../lv_draw_rect.h"
 #include "../lv_draw_image.h"
-
+#include "lv_ppe_rtl8773e_utils.h"
 #include "lv_draw_sw_utils.h"
 
 /*********************
@@ -49,6 +49,8 @@ void lv_draw_ppe_fill(lv_draw_unit_t *draw_unit, lv_draw_fill_dsc_t *dsc, const 
 void lv_draw_ppe_image(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
                        const lv_area_t *coords);
 
+void lv_draw_ppe_layer(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
+                       const lv_area_t *coords);
 /***********************
  * GLOBAL VARIABLES
  ***********************/

@@ -6,13 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_draw_private.h"
+#if LV_USE_DRAW_PPE_RTL872xG
 #include "../../misc/lv_area_private.h"
 #include "blend/lv_draw_sw_blend_private.h"
 #include "../lv_image_decoder_private.h"
 #include "../lv_draw_image_private.h"
-#include "../lv_draw_private.h"
-#if LV_USE_PPE
-
 #include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
 #include "../../misc/lv_log.h"
@@ -23,13 +22,12 @@
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 
-#include "lv_ppe_utils.h"
+#include "lv_ppe_rtl87x2g_utils.h"
 #include "hal_idu.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) (4 * lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing()) * lv_color_format_get_size(lv_display_get_color_format(lv_refr_get_disp_refreshing())))
 
 /**********************
  *      TYPEDEFS
@@ -106,7 +104,6 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
     }
     bool scale = (draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE);
 
-    uint32_t recolor = lv_ppe_get_color(draw_dsc->recolor, 0);
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
     memset(&source, 0, sizeof(ppe_buffer_t));
@@ -383,7 +380,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         ppe_translate_t trans = {.x = area_rot.x1 - draw_unit->target_layer->buf_area.x1,
                                  .y = area_rot.y1 - draw_unit->target_layer->buf_area.y1
                                 };
-        if (draw_dsc->recolor_opa < LV_OPA_MAX && draw_dsc->recolor_opa > LV_OPA_MIN)
+        if (draw_dsc->recolor_opa >= LV_OPA_MIN)
         {
             ppe_buffer_t recolor;
             memset(&recolor, 0, sizeof(ppe_buffer_t));
@@ -606,8 +603,10 @@ static void lv_draw_ppe_tile(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_
             lv_area_t clipped_img_area;
             if (lv_area_intersect(&clipped_img_area, &tile_area, coords))
             {
-                ppe_rect_t draw_rect = {.x1 = clipped_img_area.x1, .x2 = clipped_img_area.x2,
-                                        .y1 = clipped_img_area.y1, .y2 = clipped_img_area.y2
+                ppe_rect_t draw_rect = {.x1 = clipped_img_area.x1 - draw_unit->target_layer->buf_area.x1,
+                                        .x2 = clipped_img_area.x2 - draw_unit->target_layer->buf_area.x1,
+                                        .y1 = clipped_img_area.y1 - draw_unit->target_layer->buf_area.y1,
+                                        .y2 = clipped_img_area.y2 - draw_unit->target_layer->buf_area.y1
                                        };
                 ppe_translate_t trans_pos = {.x = tile_area.x1 - draw_unit->target_layer->buf_area.x1,
                                              .y = tile_area.y1 - draw_unit->target_layer->buf_area.y1

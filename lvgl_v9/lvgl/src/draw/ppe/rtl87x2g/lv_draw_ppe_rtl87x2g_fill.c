@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
+#if LV_USE_PPEE_RTL872xG
 #include "../../misc/lv_area_private.h"
 #include "lv_draw_sw_mask_private.h"
 #include "../lv_draw_private.h"
-#include "lv_draw_ppe.h"
-#if LV_USE_PPE
-
+#include "lv_draw_ppe_rtl87x2g.h"
 #include "blend/lv_draw_sw_blend_private.h"
 #include "lv_draw_sw_gradient_private.h"
 #include "../../misc/lv_math.h"
