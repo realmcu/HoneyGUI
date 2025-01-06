@@ -12,6 +12,13 @@ This control supports loading 3D prism mirror models consisting of OBJ and MTL f
    </div>
    <br>
 
+Running the Prismatic Effect on the Simulator
+----------------------------------------------
+
+1. In :file:`menu_config.h` ( :file:`HoneyGUI\\win32_sim\\menu_config.h`), enable the macro definition CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D;
+
+2. Compile and run the simulator, and the effect in the video at the beginning of the document will appear;
+
 .. _GUI Load Prism Mirror Model:
 
 GUI Load Prism Mirror Model
@@ -35,207 +42,227 @@ GUI Load Prism Mirror Model
 
 Prism Mirror Control Usage
 ---------------------------
-Create Control
+Create Widget
 ~~~~~~~~~~~~~~
-Use the function :cpp:any:`gui_prism_mirror3d_create` to create a prism mirror mirror model. The parameter ``desc_addr`` contains the parsed data extracted from the script.
+Create a prism model using the :cpp:any:`gui_prism_mirror3d_create` function. This function requires providing a parent object, name, descriptive data, as well as position and size parameters. The number of faces, automatic rotation, and input sensitivity of the prism can be specified through the optional configuration structure (`prism_mirror3d_comfig_t`). The parameter 'desc_add' file contains parsed data extracted from the script
+
+**Parameters:**
+
+- `parent`: The parent object, the new prism model will be attached to this GUI component.
+- `name`: Used as a name to identify and manage 3D objects.
+- `desc_add`: descriptor address, containing visualized parsing data.
+- `x`: The x coordinate in the parent component coordinate system.
+- `y`: The y coordinate in the parent component coordinate system.
+- `w`: The width of the control.
+- `h`: The height of the control.
+- `config`: A pointer to the configuration structure used to configure features such as face count and rotation.
+
+**Example:**
+
+.. code-block:: c
+
+    gui_obj_t *parent = &(app->screen);
+    const char *name = "prism_demo";
+    uint16_t x = 100, y = 100, w = 300, h = 300;
+    prism_mirror3d_config_t config = {6, true, 0.05f};
+
+    gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(parent, name, desc_addr, x, y, w, h, &config);
 
 Add Dynamic Effects
 ~~~~~~~~~~~~~~~~~~~
-Use the function :cpp:any:`gui_prism_mirror3d_enter_animate` to add dynamic effects to the prism mirror model, such as auto-rotation and interactive rotation. This function takes the created ``prism_mirror3d`` as a parameter, and by default, the model will rotate around the x-axis automatically.
+Use the function :cpp:any:`gui_prism_mirror3d_enter_animate` to add dynamic effects to the prism mirror model, such as auto-rotation and interactive rotation. This function takes the created ``prism_mirror3d`` as a parameter, and by default, the model will rotate around the y-axis automatically.
+
+**Parameters:**
+
+- `Prism-mirror3d`: A prism model object that has already been created.
+
+**Example:**
+
+.. code-block:: c
+
+    if (prism_demo) {
+        gui_prism_mirror3d_enter_animate(prism_demo);
+    }
 
 Add App Switch Effect
 ~~~~~~~~~~~~~~~~~~~~~
 Use the function :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` to add click event response effects for the prism mirror model, enabling app switching. The parameter ``callback`` is the corresponding callback function.
 
-Set Size
+**Parameters:**
+
+- `Prism-mirror3d`: A prism model object that has already been created, waiting to add a click event.
+- `Callback`: A callback function used to handle the application switching logic after a click event.
+
+**Example:**
+
+.. code-block:: c
+
+    void onSwitchAppCallback(gui_event_t e) {
+        //Handling application switching logic
+    }
+
+    gui_prism_mirror3d_click_switch_app_add_event(prism, onSwitchAppCallback);
+
+Set size
 ~~~~~~~~
-Use the function :cpp:any:`gui_prism_mirror3d_set_scale` to set the size of the prism mirror model.
+Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Adjust the scaling factor to suit the requirements of the scene.
 
-Set Position
-~~~~~~~~~~~~
-Use the function :cpp:any:`gui_prism_mirror3d_set_position` to set the position of the prism mirror model.
+**Parameters:**
 
-Set Orientation
-~~~~~~~~~~~~~~~
-Use the function :cpp:any:`gui_prism_mirror3d_set_rotation_angles` to set the orientation of the prism mirror model.
+- `prism_mirror3d`: The prism mirror object.
+- `scale`: The scale factor.
+
+**Example:**
+
+.. code-block::  c
+
+   gui_prism_mirror3d_set_scale(prism, 1.0f);
+
+Set location
+~~~~~~~~~~~~~
+Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism model. This function requires x, y. The z-coordinate is used to define the position of the model in 3D space.
+
+**Parameters:**
+
+- `prism_mirror3d`: The prism mirror object.
+- `x`: The X coordinate.
+- `y`: The Y coordinate.
+- `z`: The Z coordinate.
+
+**Example:**
+
+.. code-block::  c   
+
+   gui_prism_mirror3d_set_position(prism, 0, 50, 0);
+
+Set orientation
+~~~~~~~~~~~~~~~~
+Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mirror3d_set_rotation_angles`. This feature helps adjust the orientation of the model in the 3D environment.
+
+**Parameters:**
+
+- `prism_mirror3d`: The prism mirror object.
+- `x`: The rotation angle around the X axis.
+- `y`: The rotation angle around the Y axis.
+- `z`: The rotation angle around the Z axis.
+
+**Example:**
+
+.. code-block::  c
+
+   gui_prism_mirror3d_set_rotation_angles(prism, 0, 60, 0);
+
+Set original state
+~~~~~~~~~~~~~~~~~~~
+Use the cpp: any function to set the original state of the 3D prism model as :cpp:any:`gui_prism_mirror3d_det_raw_date`. This function sets the initial position, camera position, rotation angle, and scaling ratio of the prism in the 3D world. Usually called immediately after the control is initialized to define the initial display state.
+
+**Parameters:**
+
+- `prism-mirror3d`: The prism model object to be configured.
+- `world_position`: A floating-point array of length 3, specifying the x of the prism in the world coordinate system, y. Z coordinate.
+- `camera_position`: A floating-point array of length 3 that specifies the position of the camera relative to the prism, denoted as x, y. Z coordinate.
+- `rot_x`: The rotation angle (in degrees) around the X-axis.
+- `rot_y`: The rotation angle around the Y-axis (in degrees).
+- `rot_z`: The rotation angle (in degrees) around the Z-axis.
+- `scale`: The scaling ratio of a prism.
+
+**Example:**
+
+.. code-block::  c
+
+   float raw_world_position[3] = {0, 25, 180};
+   float raw_camera_position[3] = {0, 5, 60};
+   gui_prism_mirror3d_set_raw_state(prism_demo, raw_world_position, raw_camera_position, 0, 0, 0, 13);
+
+Set target status
+~~~~~~~~~~~~~~~~~~
+
+Use the cpp: any function to define the target state that the 3D prism model will achieve in animation or interaction. This feature is particularly suitable for creating smooth transition effects, such as changing from one position to another.
+
+**Parameters:**
+
+- `prism-mirror3d`: The prism model object to be adjusted.
+- `world_position`: x in the target world coordinate system, y. Z coordinate (floating point array).
+- `camera_position`: an array of target position coordinates for the camera, specifying x relative to the prism, y, z。
+- `rot_x`: The rotation angle of the target around the X-axis.
+- `rot_y`: The rotation angle of the target around the Y-axis.
+- `rot_z`: The rotation angle of the target around the Z-axis.
+- `scale`: The target scaling ratio of a prism.
+
+**Example:**
+
+.. code-block::  c
+
+   float target_world_position[3] = {0, 35, 162};
+   float target_camera_position[3] = {0, 0, 80};
+   gui_prism_mirror3d_set_target_state(prism_demo, target_world_position, target_camera_position, 0, 0, 0, 14);
+   
+These two functions enable the prism model to have appropriate views and states during initialization, and ensure that the given target state is achieved during animation or interaction, providing users with a smooth visual experience.
+
+Prism Mirror Configuration
+----------------------------
+
+For customizing the behavior of the 3D prism mirror, the following adjustments have been made directly to the configuration settings within the code. This section describes the effective parameters used for disabling automatic rotation and setting touch sensitivity.
+
+Automatic Rotation and Sensitivity Settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The prism mirror is configured with specific parameters to control its basic properties. Here's an overview of the settings applied:
+
+- **Number of Faces**: Defines the number of visible faces of the prism. This is set to `6` to have a hexagonal prism shape.
+
+- **Automatic Rotation**: By default, the prism mirror rotates automatically. In this configuration, automatic rotation is enabled. However, if you want to disable it, this should be done through additional logic in the application code if required, as the default setting here keeps it active.
+
+- **Touch Sensitivity**: This parameter controls how responsive the prism is to touch inputs. The sensitivity is set to `0.05f`, which specifies a medium level of responsiveness, allowing for smooth user interaction.
+
+**Configuration Code Set:**
+
+.. code-block:: c
+
+    prism_demo->conf.auto_rotation = true;
+    prism_demo->conf.face_nums = 6;
+    prism_demo->conf.sensitivity = 0.05f;
+
+Configuration Explanation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Face Number**: Adjusts the geometric complexity of the prism mirror, currently supports 6-prism effect.
+
+- **Auto Rotation**: Enable or disable the feature where the prism rotates automatically. A value of `1` means the feature is active.
+
+- **Sensitivity**: Controls how the prism responds to touch gestures. Setting this to `0.05f` provides a well-balanced responsivenes
 
 .. _Prism Mirror Control Usage Notes:
 
 Prism Mirror Control Usage Notes
 ---------------------------------
 
-1. All image resources must be in PNG format.
-2. The default demo effect is a 454 by 454 square display design. If you use a display with other ratios, in order to obtain better visual effects, you need to use 3D software to re-model, export the corresponding OBJ file, and make a description file that can be loaded by the GUI (for specific steps, please refer to :ref:`GUI Load Prism Mirror Model`).
-3. The OBJ file exported by 3D modeling needs to be configured with the Y-axis as the forward axis.
-4. Please obtain the necessary files for the prism information descriptor from the following path:
-  
-   + File Path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`
-   + Required Files: :file:`extract_desc.exe` and :file:`png2c.py`
+1. If you use the current default 3D modeling effect, The default demo effect is a 480 by 480 square display design:
+
+   1. All image resources must be in PNG format.
+
+   2. Replace the demo hexagonal prism effect image. Please change the image name to "image1, image2, ..., image6".
+
+   3. Please obtain the conversion file required for the prism information descriptor from the following path:
+
+      + File path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`, required files: :file:`extract_desc.exe` and :file:`png2c.py`.
+
+      + File path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`, required files: :file:`extract_desc.exe` and :file:`png2c.py`.
+
+2. If you use a display screen with other ratios, in order to obtain better visual effects, you need to use 3D software to re-model, export the corresponding OBJ file, and make a description file that can be loaded by GUI (for specific steps, please refer to :ref:`GUI loads prism model`).
+3. The OBJ file exported by 3D modeling needs to configure the Y axis as the forward axis.
+4. The default prism will automatically rotate after creation. To turn off this function, please set the AUTO_ROTATION parameter to 0 in :file:`gui_prism_mirror.h`;
+5. To modify the follower sensitivity of the prism control, please adjust SENSITIVITY in :file:`gui_prism_mirror. h`;
 
 Example
 -------
-Prism
-~~~~~
-.. code-block:: c
+Prism Mirror
+~~~~~~~~~~~~~~
 
-   #include "guidef.h"
-   #include "gui_tabview.h"
-   #include "gui_tab.h"
-   #include "gui_img.h"
-   #include "gui_obj.h"
-   #include "string.h"
-   #include "stdio.h"
-   #include "stdlib.h"
-   #include <gui_app.h>
-   #include "gui_server.h"
-   #include "gui_components_init.h"
-   #include "gui_canvas.h"
-   #include "def_3d.h"
-   #include "gui_3d.h"
-   #include "math.h"
-
-   #include "gui_prism_mirror3d.h"
-   #include <tp_algo.h>
-   #include "prism3d/desc.txt"
-
-   #include "prism3d/root/homelist_dog.c"
-   #include "prism3d/root/homelist_line_black.c"
-   #include "prism3d/root/homelist_line_orange.c"
-   #include "prism3d/root/homelist_number.c"
-   #include "prism3d/root/homelist_watch_black.c"
-   #include "prism3d/root/homelist_watch_white.c"
-
-
-   void callback_touch_clike_return();
-   void app_cb(void *p);
-
-   static void app_ui_design(gui_app_t *app)
-   {
-      gui_dispdev_t *dc = gui_get_dc();
-      touch_info_t *tp = tp_get_info();
-      gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(&(app->screen), "prism_3d", (void *)_acdesc, 0, 0,
-                                                   dc->screen_width,
-                                                   dc->screen_height);
-
-      gui_prism_mirror3d_click_switch_app_add_event(prism_demo, app_cb);
-      gui_prism_mirror3d_enter_animate(prism_demo);
-
-   }
-   uint8_t face_nums_flags = 0;
-   static void app_ui_design_switch(gui_app_t *app)
-   {
-      touch_info_t *tp = tp_get_info();
-      gui_img_t *image;
-      if (face_nums_flags == 0)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_dog, 0, 0, 454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 1)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_line_black, 0, 0, 454,
-                                          454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 2)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_line_orange, 0, 0,
-                                          454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 3)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_number, 0, 0, 454,
-                                          454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 4)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_watch_black, 0, 0,
-                                          454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 5)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_watch_white, 0, 0,
-                                          454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-
-      gui_obj_add_event_cb(image, callback_touch_clike_return, GUI_EVENT_1, NULL);
-
-      return;
-
-   }
-
-   static gui_app_t rtk_gui_demo =
-   {
-      .screen = {
-         .name = "rtk_gui_demo",
-         .x    = 0,
-         .y    = 0,
-      },
-      .ui_design = app_ui_design,
-      .active_ms = 1000 * 60 * 60,
-   };
-
-   static gui_app_t rtk_gui_demo_switch_image1 =
-   {
-      .screen = {
-         .name = "rtk_gui_demo_switch_image1",
-         .x    = 0,
-         .y    = 0,
-      },
-      .ui_design = app_ui_design_switch,
-      .active_ms = 1000 * 60 * 60,
-   };
-
-   void *get_app_rtk_gui_demo(void)
-   {
-      return &rtk_gui_demo;
-   }
-
-   static int app_init(void)
-   {
-      gui_server_init();
-      gui_app_startup(&rtk_gui_demo);
-      return 0;
-   }
-
-   void app_cb(void *p)
-   {
-      gui_prism_mirror3d_t *prism_3d = (gui_prism_mirror3d_t *)p;
-      face_nums_flags = gui_prism_mirror3d_get_enter_face();
-      switch (prism_3d->face_flags)
-      {
-      case 0:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 1:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 2:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 3:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 4:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 5:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      default:
-         break;
-      }
-   }
-   void callback_touch_clike_return()
-   {
-      gui_app_switch(gui_current_app(), &rtk_gui_demo);
-   }
-
-   GUI_INIT_APP_EXPORT(app_init);
+.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d_prism_mirror.c
+   :language: c
+   :start-after: /* 3d prism mirror demo start*/
+   :end-before: /* 3d prism mirror demo end*/
 
 
 

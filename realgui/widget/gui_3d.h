@@ -139,16 +139,16 @@ void gui_3d_set_animate(gui_3d_t     *this,
                         void         *p);
 
 /**
- * @brief 3d widget constructor
+ * @brief Constructor for a 3D widget, initializing its attributes.
  *
- * @param this the 3d widget pointer
- * @param parent parent widget
- * @param name widget name
- * @param desc_addr description file data
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
+ * @param this Pointer to the 3D widget.
+ * @param parent Pointer to the parent GUI object.
+ * @param name Name of the widget.
+ * @param desc_addr Pointer to description data.
+ * @param x X-axis coordinate.
+ * @param y Y-axis coordinate.
+ * @param w Width of the widget.
+ * @param h Height of the widget.
  */
 void gui_3d_ctor(gui_3d_t               *this,
                  gui_obj_t              *parent,
@@ -160,11 +160,11 @@ void gui_3d_ctor(gui_3d_t               *this,
                  int16_t                 h);
 
 /**
- * @brief set on_click event
+ * @brief Set a callback function for when the 3D widget is clicked.
  *
- * @param this the 3d widget pointer
- * @param callback callback function
- * @param parameter callback function parameter
+ * @param this Pointer to the 3D widget.
+ * @param callback Callback function to execute on click.
+ * @param parameter Additional parameter for the callback.
  */
 void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter);
 

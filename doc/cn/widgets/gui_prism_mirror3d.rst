@@ -12,6 +12,12 @@
    </div>
    <br>
 
+模拟器运行棱镜效果
+------------------
+
+1. 在 :file:`menu_config.h` 中（ :file:`HoneyGUI\\win32_sim\\menu_config.h` ），开启宏定义CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D；
+2. 编译运行模拟器，可以出现文档开头的视频效果；
+
 .. _GUI加载棱镜模型:
 
 GUI加载棱镜模型
@@ -39,205 +45,226 @@ GUI加载棱镜模型
 -------------
 创建控件
 ~~~~~~~~
-使用 :cpp:any:`gui_prism_mirror3d_create` 函数来创建棱镜模型。参数 ``desc_addr`` 文件包含从脚本中提取的解析数据。
+使用 :cpp:any:`gui_prism_mirror3d_create` 函数来创建棱镜模型。此函数需要提供父对象、名称、描述数据、以及位置和大小参数。通过可选的配置结构（`prism_mirror3d_config_t`）可以指定棱镜的面数、自动旋转和输入灵敏度。参数 `desc_addr` 文件包含从脚本中提取的解析数据
+
+**参数:**
+
+- `parent`: 父对象，新的棱镜模型将附加到此 GUI 组件中。
+- `name`: 作名称，用于标识和管理 3D 对象。
+- `desc_addr`: 描述符地址，包含可视化的解析数据。
+- `x`: 在父组件坐标系中的 X 坐标。
+- `y`: 在父组件坐标系中的 Y 坐标。
+- `w`: 控件的宽度。
+- `h`: 控件的高度。
+- `config`: 指向配置结构体的指针，用于配置面数、旋转等特性。
+
+**示例:**
+
+.. code-block:: c
+
+    gui_obj_t *parent = &(app->screen);
+    const char *name = "prism_demo";
+    uint16_t x = 100, y = 100, w = 300, h = 300;
+    prism_mirror3d_config_t config = {6, true, 0.05f};
+
+    gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(parent, name, desc_addr, x, y, w, h, &config);
 
 添加动态效果
 ~~~~~~~~~~~~~
-使用 :cpp:any:`gui_prism_mirror3d_enter_animate` 为棱镜模型添加动态效果，比如自动旋转和交互式旋转。此函数接收创建的 ``prism_mirror3d`` 作为参数，默认情况下模型会绕x轴自动旋转。
+使用 :cpp:any:`gui_prism_mirror3d_enter_animate` 为棱镜模型添加动态效果，比如自动旋转和交互式旋转。此函数接收创建的 ``prism_mirror3d`` 作为参数，默认情况下模型会绕 y 轴自动旋转。
+
+**参数:**
+
+- `prism_mirror3d`:已经创建的棱镜模型对象。
+
+**示例:**
+
+.. code-block:: c
+
+    if (prism_demo) {
+        gui_prism_mirror3d_enter_animate(prism_demo);
+    }
 
 添加app切换效果
 ~~~~~~~~~~~~~~~
 使用 :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` 为棱镜模型添加点击事件响应效果，实现应用切换。参数 ``callback`` 为对应的回调函数。
 
+**参数:**
+
+- `prism_mirror3d`:已经创建的棱镜模型对象，待添加点击事件。
+
+- `callback`:回调函数，用于处理点击事件后的应用切换逻辑。
+
+**示例:**
+
+.. code-block:: c
+
+    void onSwitchAppCallback(gui_event_t e) {
+        // 处理应用切换逻辑
+    }
+
+    gui_prism_mirror3d_click_switch_app_add_event(prism, onSwitchAppCallback);
+
 设置大小
 ~~~~~~~~
-使用 :cpp:any:`gui_prism_mirror3d_set_scale` 来设定棱镜模型的大小。
+使用 :cpp:any:`gui_prism_mirror3d_set_scale` 来设定棱镜模型的大小。调整比例因子以适合场景需求。
+
+**参数:**
+
+- `prism_mirror3d`: 棱镜模型对象。
+- `scale`: 缩放因子。
+
+**示例:**
+
+.. code-block:: c
+
+    gui_prism_mirror3d_set_scale(prism, 1.0f);
 
 设置位置
 ~~~~~~~~
-使用 :cpp:any:`gui_prism_mirror3d_set_position` 来设置棱镜模型的位置。
+使用 :cpp:any:`gui_prism_mirror3d_set_position` 来设置棱镜模型的位置。此函数需要 x, y, z 坐标来定义模型在 3D 空间中的位置。
+
+**参数:**
+
+- `prism_mirror3d`: 棱镜模型对象。
+- `x`: X 坐标。
+- `y`: Y 坐标。
+- `z`: Z 坐标。
+
+**示例:**
+
+.. code-block:: c
+
+    gui_prism_mirror3d_set_position(prism, 0, 50, 0);
+
 
 设置方位
 ~~~~~~~~
-使用 :cpp:any:`gui_prism_mirror3d_set_rotation_angles` 来设置棱镜模型的方位。
+使用 :cpp:any:`gui_prism_mirror3d_set_rotation_angles` 来设置棱镜模型的方位。此功能帮助调节模型在 3D 环境中的方向。
+
+**参数:**
+
+- `prism_mirror3d`: 棱镜模型对象。
+- `x`: 围绕 X 轴的旋转角度。
+- `y`: 围绕 Y 轴的旋转角度。
+- `z`: 围绕 Z 轴的旋转角度。
+
+**示例:**
+
+.. code-block:: cpp
+
+    gui_prism_mirror3d_set_rotation_angles(prism, 0, 60, 0);
+
+设置原始状态
+~~~~~~~~~~~~~~
+
+使用 :cpp:any:`gui_prism_mirror3d_set_raw_state` 函数来设置 3D 棱镜模型的原始状态。此函数设定棱镜在3D世界中的初始位置、相机位置、旋转角度和缩放比例。通常在控件初始化后立即调用，以便定义初始显示状态。
+
+**参数:**
+
+- `prism_mirror3d`: 要进行配置的棱镜模型对象。
+- `world_position`: 长度为 3 的浮点数组，指定棱镜在世界坐标系中的 x, y, z 坐标。
+- `camera_position`: 长度为 3 的浮点数组，指定相机相对于棱镜位置的 x, y, z 坐标。
+- `rot_x`: 围绕 X 轴的旋转角度（以度为单位）。
+- `rot_y`: 围绕 Y 轴的旋转角度（以度为单位）。
+- `rot_z`: 围绕 Z 轴的旋转角度（以度为单位）。
+- `scale`: 棱镜的缩放比例。
+
+**示例:**
+
+.. code-block:: c
+
+    float raw_world_position[3] = {0, 25, 180};
+    float raw_camera_position[3] = {0, 5, 60};
+    gui_prism_mirror3d_set_raw_state(prism_demo, raw_world_position, raw_camera_position, 0, 0, 0, 13);
+
+设置目标状态
+~~~~~~~~~~~~
+
+使用 :cpp:any:`gui_prism_mirror3d_set_target_state` 函数来定义 3D 棱镜模型在动画或交互中将要达到的目标状态。此功能特别适用于制作平滑的过渡效果，比如从一个位置变换到另一个位置。
+
+**参数:**
+
+- `prism_mirror3d`: 要调整的棱镜模型对象。
+- `world_position`: 目标世界坐标系中的 x, y, z 坐标（浮点数组）。
+- `camera_position`: 相机的目标位置坐标数组，指定相对于棱镜的 x, y, z。
+- `rot_x`: 目标围绕 X 轴的旋转角度。
+- `rot_y`: 目标围绕 Y 轴的旋转角度。
+- `rot_z`: 目标围绕 Z 轴的旋转角度。
+- `scale`: 棱镜的目标缩放比例。
+
+**示例:**
+
+.. code-block:: c
+
+    float target_world_position[3] = {0, 35, 162};
+    float target_camera_position[3] = {0, 0, 80};
+    gui_prism_mirror3d_set_target_state(prism_demo, target_world_position, target_camera_position, 0, 0, 0, 14);
+
+这两个函数使得棱镜模型能够在初始化时拥有适当的视图和状态，并确保动画或交互期间达到给定的目标状态，为用户提供流畅的视觉体验。
+
+棱镜控件配置
+-----------
+
+为了自定义3D棱镜控件的行为，以下配置已直接在代码中进行调整。本节描述了禁用自动旋转和设定触摸灵敏度的有效参数。
+
+自动旋转与灵敏度设置
+~~~~~~~~~~~~~~~~~~~
+
+棱镜控件通过特定的参数来控制其基本属性。以下是应用的设置概述：
+
+- **面数**：定义棱镜的可见面数量。此设置为 `6`，表示棱镜为六边形结构。
+
+- **自动旋转**：默认情况下，棱镜控件会自动旋转。在此配置中，自动旋转功能是启用的。若需禁用该功能，应在应用代码中通过额外的逻辑来实现，因为此默认设置保持功能激活。
+
+- **触摸灵敏度**：该参数控制棱镜对触摸输入的响应。灵敏度设置为 `0.05f`，指定了中等水平的响应性，允许用户进行流畅的交互。
+
+**配置代码设置：**
+
+.. code-block:: c
+
+    prism_demo->conf.auto_rotation = true;
+    prism_demo->conf.face_nums = 6;
+    prism_demo->conf.sensitivity = 0.05f;
+
+配置解释
+~~~~~~~~
+
+- **面数量** (`face_nums`)：调整棱镜的几何复杂性，目前支持6棱柱效果。
+
+- **自动旋转** (`auto_rotation`)：启用或禁用棱镜自动旋转的功能。值为 `true` 表示功能处于激活状态。
+
+- **灵敏度** (`sensitivity`)：控制棱镜响应触摸手势的程度。将此值默认设置为 `0.05f` 提供了良好的响应性，适合绝大多数用户交互场景的流畅操作。
 
 .. _棱镜控件使用注意事项:
 
 棱镜控件使用注意事项
 ----------------------
 
-1. 所有图片资源必须为PNG格式。
-2. 默认demo效果为454x454的方形显示屏设计。如果使用其他比例的显示屏，为获得更佳的视觉效果，需要重新使用三维软件建模，并导出相应的OBJ文件，制作GUI可以加载的描述文件（具体步骤请参考 :ref:`GUI加载棱镜模型` ）。
-3. 三维建模导出的OBJ文件需要配置Y轴为前进轴。
-4. 请从以下路径获取棱镜信息描述子所需的转换文件：
+1. 若使用目前默认的三维建模效果，默认demo效果为480x480的方形显示屏设计：
 
-   + 文件路径： :file:`HoneyGUI\\realgui\\example\\demo\\3d` 
-   + 所需文件： :file:`extract_desc.exe` 和 :file:`png2c.py`
+   1. 所有图片资源必须为PNG格式，
+   2. 更换demo六棱柱效果图，替换图片命名请改为“image1、image2、......、image6”。
+   3. 请从以下路径获取棱镜信息描述子所需的转换文件：
+
+      + 文件路径： :file:`HoneyGUI\\realgui\\example\\demo\\3d` ，所需文件： :file:`extract_desc.exe` 和 :file:`png2c.py`。
+      + 文件路径： :file:`HoneyGUI\\realgui\\example\\demo\\3d` ，所需文件： :file:`extract_desc.exe` 和 :file:`png2c.py`。
+
+
+2. 如果使用其他比例的显示屏，为获得更佳的视觉效果，需要重新使用三维软件建模，并导出相应的OBJ文件，制作GUI可以加载的描述文件（具体步骤请参考 :ref:`GUI加载棱镜模型` ）。
+3. 三维建模导出的OBJ文件需要配置Y轴为前进轴。
+4. 棱镜默认创建后会自动旋转，关闭这个功能，请在 :file:`gui_prism_mirror.h` 将AUTO_ROTATION参数置0；
+5. 修改棱镜控件的跟手灵敏度，请在 :file:`gui_prism_mirror.h` 调整SENSITIVITY；
 
 示例
 ----
 棱镜
 ~~~~~~~~
-.. code-block:: c
 
-   #include "guidef.h"
-   #include "gui_tabview.h"
-   #include "gui_tab.h"
-   #include "gui_img.h"
-   #include "gui_obj.h"
-   #include "string.h"
-   #include "stdio.h"
-   #include "stdlib.h"
-   #include <gui_app.h>
-   #include "gui_server.h"
-   #include "gui_components_init.h"
-   #include "gui_canvas.h"
-   #include "def_3d.h"
-   #include "gui_3d.h"
-   #include "math.h"
-
-   #include "gui_prism_mirror3d.h"
-   #include <tp_algo.h>
-   #include "prism3d/desc.txt"
-
-   #include "prism3d/root/homelist_dog.c"
-   #include "prism3d/root/homelist_line_black.c"
-   #include "prism3d/root/homelist_line_orange.c"
-   #include "prism3d/root/homelist_number.c"
-   #include "prism3d/root/homelist_watch_black.c"
-   #include "prism3d/root/homelist_watch_white.c"
-
-
-   void callback_touch_clike_return();
-   void app_cb(void *p);
-
-   static void app_ui_design(gui_app_t *app)
-   {
-      gui_dispdev_t *dc = gui_get_dc();
-      touch_info_t *tp = tp_get_info();
-      gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(&(app->screen), "prism_3d", (void *)_acdesc, 0, 0,
-                                                   dc->screen_width,
-                                                   dc->screen_height);
-
-      gui_prism_mirror3d_click_switch_app_add_event(prism_demo, app_cb);
-      gui_prism_mirror3d_enter_animate(prism_demo);
-
-   }
-   uint8_t face_nums_flags = 0;
-   static void app_ui_design_switch(gui_app_t *app)
-   {
-      touch_info_t *tp = tp_get_info();
-      gui_img_t *image;
-      if (face_nums_flags == 0)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_dog, 0, 0, 454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 1)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_line_black, 0, 0, 454,
-                                          454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 2)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_line_orange, 0, 0,
-                                          454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 3)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_number, 0, 0, 454,
-                                          454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 4)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_watch_black, 0, 0,
-                                          454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-      if (face_nums_flags == 5)
-      {
-         image = gui_img_create_from_mem(&(app->screen), "image0", (void *)_achomelist_watch_white, 0, 0,
-                                          454, 454);
-         gui_img_scale(image, 2.27, 1.89);
-      }
-
-      gui_obj_add_event_cb(image, callback_touch_clike_return, GUI_EVENT_1, NULL);
-
-      return;
-
-   }
-
-   static gui_app_t rtk_gui_demo =
-   {
-      .screen = {
-         .name = "rtk_gui_demo",
-         .x    = 0,
-         .y    = 0,
-      },
-      .ui_design = app_ui_design,
-      .active_ms = 1000 * 60 * 60,
-   };
-
-   static gui_app_t rtk_gui_demo_switch_image1 =
-   {
-      .screen = {
-         .name = "rtk_gui_demo_switch_image1",
-         .x    = 0,
-         .y    = 0,
-      },
-      .ui_design = app_ui_design_switch,
-      .active_ms = 1000 * 60 * 60,
-   };
-
-   void *get_app_rtk_gui_demo(void)
-   {
-      return &rtk_gui_demo;
-   }
-
-   static int app_init(void)
-   {
-      gui_server_init();
-      gui_app_startup(&rtk_gui_demo);
-      return 0;
-   }
-
-   void app_cb(void *p)
-   {
-      gui_prism_mirror3d_t *prism_3d = (gui_prism_mirror3d_t *)p;
-      face_nums_flags = gui_prism_mirror3d_get_enter_face();
-      switch (prism_3d->face_flags)
-      {
-      case 0:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 1:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 2:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 3:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 4:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      case 5:
-         gui_app_switch(gui_current_app(), &rtk_gui_demo_switch_image1);
-         break;
-      default:
-         break;
-      }
-   }
-   void callback_touch_clike_return()
-   {
-      gui_app_switch(gui_current_app(), &rtk_gui_demo);
-   }
-
-   GUI_INIT_APP_EXPORT(app_init);
+.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d_prism_mirror.c
+   :language: c
+   :start-after: /* 3d prism mirror demo start*/
+   :end-before: /* 3d prism mirror demo end*/
 
 API
 ---
