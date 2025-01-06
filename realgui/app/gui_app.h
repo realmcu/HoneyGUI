@@ -52,6 +52,8 @@ struct gui_app
     void (* ctor)(void *_this);      //!< constructor
     void (* dtor)(void *_this);      //!< destructor
     void (* ui_design)(gui_app_t *); //!< ui create entry
+    gui_animate_callback_t startup_animation;
+    gui_animate_callback_t shutdown_animation;
     bool lvgl;
     bool arm2d;
     bool close;
@@ -59,6 +61,7 @@ struct gui_app
     bool close_sync;
     unsigned char startup_animation_flag;
     unsigned char shutdown_animation_flag;
+
 };
 
 /*============================================================================*
@@ -213,6 +216,29 @@ struct gui_app
                                          .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
                                          .startup_animation_flag = STARTUP_ANIMATION,\
                                          .shutdown_animation_flag = SHUTDOWM_ANIMATION,\
+                                       }; \
+    /**
+     * @brief Function to get the handle of the application.
+     *
+     * @return A pointer to the application instance.
+     */ \
+    gui_app_t *_get_app_##APP_NAME##_handle(void) \
+    { \
+        return &_app_##APP_NAME; \
+    }
+#define GUI_APP_DEFINE_NAME_ANIMATION_FUNC_CUSTOM(APP_NAME, STARTUP_ANIMATION_FUNC, SHUTDOWM_ANIMATION_FUNC) \
+    static void _##APP_NAME##_ui_design(gui_app_t*); \
+    static gui_app_t _app_##APP_NAME = \
+                                       { \
+                                         .screen = \
+                                                   { \
+                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
+                                                     .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
+                                                   }, \
+                                         .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
+                                         .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                         .startup_animation = STARTUP_ANIMATION_FUNC,\
+                                         .shutdown_animation = SHUTDOWM_ANIMATION_FUNC,\
                                        }; \
     /**
      * @brief Function to get the handle of the application.

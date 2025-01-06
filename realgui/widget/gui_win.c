@@ -202,6 +202,7 @@ static void gui_win_destory(gui_obj_t *obj)
             gui_free(this->animate_array[i]);
             this->animate_array[i] = NULL;
         }
+        gui_free(this->animate_array);
         this->animate_array = 0;
         this->animate_array_length = 0;
     }

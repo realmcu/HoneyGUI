@@ -97,6 +97,7 @@ void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry)
 #define APP_TRANSITION_DURATION_MS 1000
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_transition_animation_function);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function_custom);
 void gui_app_startup(gui_app_t *app)
 {
     app->close_sync = 0;
@@ -130,6 +131,16 @@ void gui_app_startup(gui_app_t *app)
             gui_win_set_animate(win, APP_TRANSITION_DURATION_MS, 0,  app_transition_animation_function, app);
         }
     }
+    else if (app->startup_animation || app->shutdown_animation)
+    {
+        gui_win_t *win = gui_win_create(&(app->screen), APP_WINDOW_NAME, 0, 0, 0, 0);
+        app->window = win;
+        if (app->startup_animation)
+        {
+            gui_win_set_animate(win, APP_TRANSITION_DURATION_MS, 0,  app->startup_animation, app);
+        }
+    }
+
 
 
     app->ui_design(app);
@@ -200,7 +211,22 @@ void gui_app_shutdown(gui_app_t *app)
         }
 
     }
+    else if (app->shutdown_animation)
+    {
+        if (app->window != GUI_TYPE(gui_win_t, &(app->screen)))
+        {
+            gui_win_append_animate(app->window, APP_TRANSITION_DURATION_MS, 0,
+                                   app->shutdown_animation, app, "customShutdowm");
+            gui_win_append_animate(app->window, APP_TRANSITION_DURATION_MS, 0,
+                                   app_shutdowm_transition_animation_function_custom, app, "customShutdowm");
+            return;
+        }
+        else
+        {
+            gui_log("[APP ANIMATION]Please use GUI_APP_DEFINE_NAME_ANIMATION_FUNC_CUSTOM to make a APP");
+        }
 
+    }
     app_shutdown(app);
 
 }
@@ -544,5 +570,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_
     else
     {
         return;
+    }
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function_custom)
+{
+    gui_app_t *app = p;
+    if (animate->end_frame)
+    {
+        app_shutdown(app);
     }
 }
