@@ -19,7 +19,7 @@
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
-static gui_tabview_t *tv;
+gui_tabview_t *tv;
 static gui_win_t *win_hk; //, *win_control;
 bool control_flag = 0;
 static bool enter_menu_flag = 0;
@@ -98,7 +98,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
     // extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
     // gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
     // return;
-
     tv = gui_tabview_create(app->window, "hongkong_tabview", 0, 0, 0, 0);
     win_hk = gui_win_create(app->window, "window_hongkong", 0, 0, 0, 0);
     gui_win_set_animate(win_hk, 1000, -1, kb_button_cb, NULL);

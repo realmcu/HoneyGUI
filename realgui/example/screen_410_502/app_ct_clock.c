@@ -194,6 +194,10 @@ void json_refreash()
 extern char *day[];
 static void refreash_time()
 {
+    if (!timeinfo)
+    {
+        return;
+    }
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", win_watch);
     gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
 

@@ -112,6 +112,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     {
         watchface_index = 3;
         sprintf(watchface_path, "%s", (char *)param);
+        gui_log("%s\n", watchface_path);
     }
     extern gui_app_t *get_app_hongkong(void);
     gui_app_layer_buttom();

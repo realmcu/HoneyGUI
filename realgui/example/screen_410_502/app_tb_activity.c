@@ -16,7 +16,7 @@
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 
-static gui_tabview_t *tv = NULL;
+extern gui_tabview_t *tv;
 static float progress = 0;
 static bool tab_change = 0;
 static bool draw_flag = 0;
@@ -26,13 +26,13 @@ static void win_cb(gui_obj_t *obj)
     // gui_log("tv_name: %s, tv->cur_id.x = %d\n", GUI_BASE(tv)->name, tv->cur_id.x);
     if (!tab_change)
     {
-        if (tv->cur_id.x == 1)
+        if (tv->cur_id.x == 2)
         {
             extern void activity_app(gui_obj_t *obj);
             activity_app(obj);
         }
     }
-    if (tv->cur_id.x != 1)
+    if (tv->cur_id.x != 2)
     {
         tab_change = 0;
     }
@@ -44,7 +44,7 @@ static void win_cb(gui_obj_t *obj)
 
 void page_tb_activity(void *parent)
 {
-    tv = (gui_tabview_t *)(GUI_BASE(parent)->parent->parent);
+    // tv = (gui_tabview_t *)(GUI_BASE(parent)->parent->parent);
 
     gui_win_t *win = gui_win_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)win_cb, GUI_BASE(win));

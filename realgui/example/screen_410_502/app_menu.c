@@ -156,9 +156,6 @@ static void app_back2prescreen_cb(void)
 
 static void app_AT_back2prescreen_cb(void)
 {
-    extern void clear_activity_app(void);
-    clear_activity_app();
-
     extern bool sidebar_flag;
     extern bool return_to_watchface_flag;
 
@@ -340,9 +337,6 @@ GUI_APP_ENTRY(APP_ACTIVITY)
     sidebar_app_array_fill(UI_CLOCK_ACTIVITY_ICON_BIN, switch_APP_ACTIVITY);
     extern void page_tb_control_enter(void *parent);
     page_tb_control_enter(&app->screen);
-
-    extern void clear_activity_app(void);
-    clear_activity_app();
 
     extern void activity_app(gui_obj_t *obj);
     activity_app(GUI_APP_ROOT_SCREEN);

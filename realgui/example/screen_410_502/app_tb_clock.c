@@ -20,7 +20,7 @@ static gui_curtain_t *ct_clock;
 static gui_curtain_t *ct_inform;
 static gui_curtain_t *ct_left;
 static gui_curtain_t *ct_card;
-extern gui_win_t *win_watch; // *win_market;
+extern gui_win_t *win_watch;
 static gui_win_t *win_touch;
 bool sidebar_flag = 0;
 uint8_t watchface_index = 0;
@@ -112,8 +112,14 @@ static void callback_touch_long(void *obj, gui_event_t e)
 
     // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
     extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
+    extern gui_app_t  *_get_app_APP_WATCHFACE_PRISM3D_handle(void);
     gui_app_layer_top();
-    gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+    extern void *get_app_hongkong(void);
+    gui_app_t *app_hongkong = (gui_app_t *)get_app_hongkong();
+    app_hongkong->startup_animation_flag = GUI_APP_ANIMATION_NULL;
+
+    gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_PRISM3D_handle());
     return;
 }
 

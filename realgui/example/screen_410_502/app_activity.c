@@ -149,17 +149,9 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
     }
 }
 
-void clear_activity_app(void)
-{
-    move_text = NULL;
-    ex_text = NULL;
-    stand_text = NULL;
-}
-
 void activity_app(gui_obj_t *obj)
 {
     // text
-    if (!move_text)
     {
         move_text = gui_text_create(obj, "move_text", 150, 300, 0, 0);
         gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_BMP, gui_rgb(230, 67, 79),

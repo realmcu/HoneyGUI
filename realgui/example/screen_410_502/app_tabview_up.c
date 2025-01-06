@@ -516,7 +516,7 @@ void pagelist_create(gui_msg_t *msg)
     gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
 
-    gui_obj_add_event_cb(tv, (gui_event_cb_t)tv_clear, GUI_EVENT_1, win);
+    gui_obj_add_event_cb(tv, (gui_event_cb_t)tv_clear, GUI_EVENT_1, (void *)win);
 }
 
 static void win_design_cb(void)
