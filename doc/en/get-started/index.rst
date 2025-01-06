@@ -1,11 +1,15 @@
-# Get Started
+=================
+Get Started
+=================
 
-## Source Project Download
+Source Project Download
+-----------------------
 
 - Download on GitHub: <https://github.com/realmcu/HoneyGUI>
 - Download on Gitee: <https://gitee.com/realmcu/HoneyGUI>
 
-## Description
+Description
+-----------
 
 HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (GUI) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
@@ -20,16 +24,20 @@ Here are several common methods for APP development:
 
 The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run on a variety of chips and [OS](/Glossary.rst#term-OS). PC Windows version is provided.
 
-## Software Architecture
+Software Architecture
+-----------------------
 
 
 <div style="text-align: center"><img width= "800" src ="https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png"/></div><br/>
 
 
-## Installation For Windows
+Installation For Windows
+-------------------------
 
-{#Install_compiler_en}
-### Install Compiler
+
+Install Compiler
+^^^^^^^^^^^^^^^^
+
 Download the MinGW-w64 toolchain, unzip it to drive C, and add it to the system environment variable `Path`.
 1.  [MinGW-w64 Download](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)
 2.  Unzip and copy to directory: `C:\mingw64`
@@ -42,10 +50,14 @@ Download the MinGW-w64 toolchain, unzip it to drive C, and add it to the system 
       - Click `OK` to close all dialogs.
 
 
-### Install Python
+Install Python
+^^^^^^^^^^^^^^^^
+
 Python 3.9.7 is tested.
 
-### Install Scons
+Install Scons
+^^^^^^^^^^^^^^^^
+
 Open a CMD window and execute the following commands to install the Python scons library.
 ```
 > pip install scons==4.4.0
@@ -56,18 +68,22 @@ After installing the `MinGW-w64` toolchain and `scons` library, you can launch t
 ### Startup by CMD (scons)
 Open a CMD window in the `HoneyGUI` or `gui` folder, and then run the following command to start the application.
 
-```shell
-> cd win32_sim
-> scons
-> cd ..
-> .\win32_sim\gui.exe
-```
+.. code-block:: shell
+
+   > cd win32_sim
+   > scons
+   > cd ..
+   > .\win32_sim\gui.exe
+
 The `scons` command to perform the build process and then execute `gui.exe` to run it.
 
 
-<div style="text-align: center"><img width= "700"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
+.. image:: https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png
+   :align: center
+   :width: 700
 
-### Startup by CMD (CMake)
+Startup by CMD (CMake)
+^^^^^^^^^^^^^^^^^^^^^^^
 
 - Dependency Software
     
@@ -75,38 +91,50 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
     
      **MinGW-w64**: mentioned before
 - Initialization: In the ```HoneyGUI``` folder
-```shell
-cd win32_sim
-mkdir build
-cd build
-cmake -G "MinGW Makefiles" ..
-```
+
+.. code-block:: shell
+
+   > cd win32_sim
+   > mkdir build
+   > cd build
+   > cmake -G "MinGW Makefiles" ..
+
 - Compilation: In the ```HoneyGUI/win32_sim/build``` folder
 
-```shell
-cmake -G "MinGW Makefiles" ..
-mingw32-make -j 32
-```
+.. code-block:: shell
+      
+   > cmake -G "MinGW Makefiles" ..
+   > mingw32-make -j 32
+
 - Configuration: In the ```HoneyGUI/win32_sim/build``` folder
-```shell
-cmake --build . --target menuconfig
-```
+
+.. code-block:: shell
+   > cmake --build . --target menuconfig
+
 - Run: In the ```HoneyGUI``` folder
-```shell
-.\win32_sim\gui.exe
-```
+
+.. code-block:: shell
+   > .\win32_sim\gui.exe
 
 
-### Startup by VSCode
 
-#### Install VSCode
-- <a href="https://code.visualstudio.com/">Download VSCode</a>
-- [Install C/C++ plug-in](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+Startup by VSCode
+^^^^^^^^^^^^^^^^^^^^
 
-#### Open Project
+Install VSCode
+"""""""""""""""
+
+- `Download VSCode <https://code.visualstudio.com/>`_
+- `Install C/C++ plug-in <https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools>`_
+
+Open Project
+"""""""""""""""
+
    - Click `HoneyGUI.code-workspace` file
 
-#### Run Project
+Run Project
+"""""""""""""""
+
 You can select the `Run and Debug` options after entering the vscode interface, and then click the `Run` button.
 
 
@@ -115,14 +143,20 @@ You can select the `Run and Debug` options after entering the vscode interface, 
 
 
 
-### Display
-#### Watch Project
+Display
+^^^^^^^^
+
+Watch Project
+"""""""""""""""
+
 The watchface is displayed in the window, and you can interact with it by swiping and long pressing.
 
 
 <div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
 
-#### Dashboard Project
+Dashboard Project
+"""""""""""""""
+
 The dashboard is displayed in the window.
 
 
