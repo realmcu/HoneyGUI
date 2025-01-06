@@ -79,7 +79,13 @@ RTL8772F示例
 
 .. raw:: html
 
-   <div style="text-align: center"><iframe src="https://docs.realmcu.com/HoneyGUI/image/FAQ/8772F_demo.mp4" width="640" height="480" allow="autoplay"></iframe></div><br>
+   <div style="text-align: center">
+       <video width="640" height="480" controls>
+           <source src="https://docs.realmcu.com/HoneyGUI/image/FAQ/8772F_demo.mp4" type="video/mp4">
+           您的浏览器不支持 HTML5 视频。
+       </video>
+   </div>
+   <br>
 
 该示例的内存消耗统计如下：
 

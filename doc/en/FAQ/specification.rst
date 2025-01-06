@@ -77,6 +77,16 @@ Memory Usage
 RTL8772F Demo
 ~~~~~~~~~~~~~
 
+.. raw:: html
+
+   <div style="text-align: center">
+       <video width="640" height="480" controls>
+           <source src="https://docs.realmcu.com/HoneyGUI/image/FAQ/8772F_demo.mp4" type="video/mp4">
+           Your browser does not support HTML5 video.
+       </video>
+   </div>
+   <br>
+
 The memory consumption statistics of this demo are as follows.
 
 .. list-table::
