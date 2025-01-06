@@ -137,8 +137,7 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
                 return 0;
             }
 
-            if (draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0 || \
-                draw_dsc->clip_radius > 0 || draw_dsc->rotation != 0)
+            if (draw_dsc->clip_radius > 0)
             {
                 return 0;
             }
@@ -146,7 +145,7 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
             if (task->preference_score > 80)
             {
                 task->preference_score = 80;
-                //task->preferred_draw_unit_id = DRAW_UNIT_ID_PPE;
+                task->preferred_draw_unit_id = DRAW_UNIT_ID_PPE;
             }
             return 1;
         }
@@ -154,11 +153,6 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
         {
             lv_draw_image_dsc_t *draw_dsc = task->draw_dsc;
 
-            /* not support skew */
-            if (draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0)
-            {
-                return 0;
-            }
             const lv_image_dsc_t *img_dsc = draw_dsc->src;
             if (draw_dsc->clip_radius > 0 || \
                 (draw_dsc->recolor_opa > LV_OPA_MIN && \
@@ -169,7 +163,10 @@ static int32_t ppe_evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
             }
 
             bool masked = draw_dsc->bitmap_mask_src != NULL;
-            if (masked) { return 0; }
+            if (masked)
+            {
+                return 0;
+            }
 
             lv_color_format_t cf = draw_dsc->header.cf;
             PPE_PIXEL_FORMAT format = lv_ppe_get_format(img_dsc->header.cf, img_dsc->data);

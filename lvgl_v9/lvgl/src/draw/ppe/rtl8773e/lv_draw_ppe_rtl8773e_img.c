@@ -103,8 +103,8 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
     {
         return;
     }
-    bool scale = (draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE ||
-                  draw_dsc->rotation != 0);
+    bool transform = (draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE\
+                      || draw_dsc->rotation != 0 || draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0);
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
     memset(&source, 0, sizeof(ppe_buffer_t));
@@ -144,6 +144,9 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
 
     source.format = lv_ppe_get_format(img_dsc->header.cf, img_dsc->data);
     uint8_t pixel_byte = PPE_Get_Pixel_Size(source.format);
+
+
+
     source.address = (uint32_t)img_dsc->data;
     source.width = img_dsc->header.w;
     source.height = img_dsc->header.h;
@@ -174,6 +177,23 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         draw_rect.y = constraint_area.y1;
         draw_rect.w = lv_area_get_width(&constraint_area);
         draw_rect.h = lv_area_get_height(&constraint_area);
+    }
+    if (!transform && draw_dsc->opa >= LV_OPA_MAX && draw_dsc->recolor_opa == 0 &&
+        target.format == source.format)
+    {
+        int16_t target_x = constraint_area.x1 - draw_unit->target_layer->buf_area.x1;
+        int16_t target_y = constraint_area.y1 - draw_unit->target_layer->buf_area.y1;
+        draw_rect.x = constraint_area.x1 - coords->x1;
+        draw_rect.y = constraint_area.y1 - coords->y1;
+        hal_idu_dma_info copy_info;
+        copy_info.length = draw_rect.w * pixel_byte;
+        copy_info.height = draw_rect.h;
+        copy_info.src_stride = img_dsc->header.stride;
+        copy_info.dst_stride = target.width * pixel_byte;
+        uint32_t src_addr = source.address + (source.stride * draw_rect.y + draw_rect.x) * pixel_byte;
+        uint32_t dst_addr = target.address + (target.stride * target_y + target_x) * pixel_byte;
+        hal_dma_copy(&copy_info, (uint8_t *)src_addr, (uint8_t *)dst_addr);
+        return;
     }
     ppe_rect_t image_area;
     memcpy(&inverse, &matrix, sizeof(ppe_matrix_t));
@@ -223,7 +243,6 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         ppe_translate(draw_unit->target_layer->buf_area.x1, draw_unit->target_layer->buf_area.y1,
                       &pre_trans);
         memcpy(&inverse, &pre_trans, sizeof(float) * 9);
-
     }
     else
     {
