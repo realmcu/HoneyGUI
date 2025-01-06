@@ -7,13 +7,13 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1718762967150637512/872c46fa_13408154.png" width= "300" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1736157372928188062/5a732127_13671147.png" width= "300" /></div>
    <br>
 
 用法
 ----
 
-.. table:: Gui_Obj Table
+.. table:: Gui_Obj 表格
    :widths: 100 100
    :align: center
    :name: Gui_Obj_Table

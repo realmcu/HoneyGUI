@@ -7,7 +7,7 @@ The Object implements the basic properties of widgets on a screen. The screen wi
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1718762967150637512/872c46fa_13408154.png" width= "300" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1736157403669807769/b83ae9f8_13671147.png" width= "300" /></div>
    <br>
 
 Usage
