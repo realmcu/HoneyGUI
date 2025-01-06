@@ -5,7 +5,7 @@
 ==================
 
 RTL87x2G and RTL8762D
------------------
+-----------------------
 RTL87x2G 是一系列IC类型的缩写。
 
 RTL87x2G和RTL8762D的打包流程一样，以下以RTL8762G为例进行说明。
@@ -26,11 +26,11 @@ RTL87x2G和RTL8762D的打包流程一样，以下以RTL8762G为例进行说明�
 
 
 RTL8763E and RTL8773DO
------------------
+-----------------------
 
 RTL8763E是一个IC系列的名称，包含RTL8763EWE-VP和RTL8763EW-VC。RTL8763E和RTL877DO打包流程类似。
 
-在开始之前，请在SDK目录下的（``\tool\Gadgets\gui_package_tool``）选择对应IC的目录，8763EW请选择 ``8763E``目录，8773DO请选择 ``87x3D``目录。
+在开始之前，请在SDK目录下的（ ``\tool\Gadgets\gui_package_tool`` ）选择对应IC的目录，8763EW请选择 ``8763E`` 目录，8773DO请选择 ``87x3D`` 目录。
 
 生成用户数据过程如下：
 
@@ -66,6 +66,7 @@ RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用�
     生成的 ui_resource.h 文件需要手动添加以下代码。
 
 .. code-block:: c
+   
     #if defined _WIN32
     #else
     #include "flash_map.h"

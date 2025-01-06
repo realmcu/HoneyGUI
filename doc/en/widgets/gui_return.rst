@@ -8,20 +8,8 @@ Usage
 
 Create A Return Widget
 ~~~~~~~~~~~~~~~~~~~~~~
-Creating function is :ref:`gui_return_create`. Users need to enter curve animation frame images file array and the return operation function.
+Creating function is :cpp:any:`gui_return_create`. Users need to enter curve animation frame images file array and the return operation function.
 
-.. _gui_return_create:
-
-.. function:: gui_obj_t* gui_return_create(void *parent, const uint32_t *frame_array[], int array_size, void *return_cb, gui_obj_t *ignore_gesture_widget)
-
-   Create a return widget with the given parameters.
-
-   :param parent: Pointer to the parent object.
-   :param frame_array: Array of frame images for the animation.
-   :param array_size: Number of frames in the array.
-   :param return_cb: Callback function to perform the return operation.
-   :param ignore_gesture_widget: Pointer to a widget that should ignore gesture events.
-   :return: Pointer to the created return widget object.
 
 Example
 -------

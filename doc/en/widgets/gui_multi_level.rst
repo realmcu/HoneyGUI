@@ -8,32 +8,14 @@ Usage
 
 Create Widget
 ~~~~~~~~~~~~~
-Creating function is :ref:`gui_multi_level_create`. This function creates and initializes a new instance of the `gui_multi_level_t` widget.
+Creating function is :cpp:any:`gui_multi_level_create`. This function creates and initializes a new instance of the :cpp:any:`gui_multi_level_t` widget.
 
-.. _gui_multi_level_create:
-
-.. function:: gui_obj_t* gui_multi_level_create(void *parent, const char *widget_name, void (*ui_design)(gui_obj_t *))
-
-   Creates a new multi-level widget.
-
-   :param parent: Pointer to the parent object.
-   :param widget_name: Name of the widget for identification.
-   :param ui_design: Pointer to a function that designs the UI for each level.
-   :return: Pointer to the created multi-level widget object.
 
 Jump to (Level, Index)
 ~~~~~~~~~~~~~~~~~~~~~~
-Function is :ref:`gui_multi_level_jump`. This function facilitates the jump operation to a specific level and index within the multi-level GUI structure.
+Function is :cpp:any:`gui_multi_level_jump`. This function facilitates the jump operation to a specific level and index within the multi-level GUI structure.
 
-.. _gui_multi_level_jump:
 
-.. function:: void gui_multi_level_jump(gui_multi_level_t *this, int level, int index)
-
-   Jumps to a specified level and index.
-
-   :param this: Pointer to the multi-level widget instance.
-   :param level: The level to jump to.
-   :param index: The index within the level to display.
 
 Example
 -------
@@ -44,6 +26,7 @@ Example
    <br>
    <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/multi_level.gif" width= "400" /></div>
    <br>
+
 - Create multi levels in 0~2 level, according to the nested structure. 
 
 

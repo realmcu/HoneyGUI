@@ -1,9 +1,11 @@
+.. _Image Convert Tool:
+
 ==================
 Image Convert Tool
 ==================
 
 Image Format Conversion
------------------
+-------------------------
 Convert pictures in various formats into RGB raw pictures
 
 * Open the converter. Please refer to this section for the download link of the image conversion tool: :ref:`Tool`.
@@ -92,7 +94,7 @@ The following files will be generated.
 
 By using the image conversion tool, we can convert the three ``JPG files a, b, and c`` into three ``binary files a, b, and c``.
 
-Place the ``binary file`` into the ``root`` folder of the packaging directory. For the packaging process, please refer to the ``Pack Tool`` section.
+Place the ``binary file`` into the ``root`` folder of the packaging directory. For the packaging process, please refer to the :ref:`Pack Tool` section.
 
 .. figure:: https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png
    :align: center

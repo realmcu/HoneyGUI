@@ -44,13 +44,13 @@ def add_download_link(download_tool_list, language_path):
   with open(index_file, mode='r', newline='', errors='surrogateescape') as fd:
     stream = fd.read()
     download_link = '''
-```eval_rst
+
 Image Convert Tool: :download:`Image Convert Tool <../{}>`
 
 Font Convert Tool: :download:`Font Convert Tool <../{}>`
 
 RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
-```
+
 '''.format(download_tool_list[0], download_tool_list[1], download_tool_list[2])
     stream = re.sub(r'(<!-- Add tool downlod link here -->\n)', lambda objs: objs.group(1) + download_link, stream, count=0, flags=re.M)
   with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:

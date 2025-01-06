@@ -39,7 +39,7 @@ Opacity
 If you want the image to fade or opacity set :cpp:any:`gui_svg_set_opacity`.
 
 Example
------
+--------
 
 Creat Simple SVG
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -16,13 +16,13 @@ Creat Canvas
 :cpp:any:`gui_canvas_create` creates a canvas.
 
 Add Callback Function
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 :cpp:any:`gui_canvas_set_canvas_cb` sets the callback function for drawing specific shapes.
 
 Example
 ------------
 Rounded Rectangle
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 A simple example of drawing three rounded rectangles of different colors.
 

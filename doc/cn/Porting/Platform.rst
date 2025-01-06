@@ -225,8 +225,8 @@
 
   .. literalinclude:: ../../../realgui/widget/guidef.h
      :language: c
-     :start-after: /* ui_fs struct define start */
-     :end-before: /* ui_fs struct define end */
+     :start-after: /* gui_fs struct define start */
+     :end-before: /* gui_fs struct define end */
 
 闪存转换层
 ----------

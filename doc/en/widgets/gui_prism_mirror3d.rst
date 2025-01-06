@@ -13,6 +13,7 @@ This control supports loading 3D prism mirror models consisting of OBJ and MTL f
    <br>
 
 .. _GUI Load Prism Mirror Model:
+
 GUI Load Prism Mirror Model
 -----------------------------
 1. Add all necessary files for the prism model to a separate folder, including 6 PNG images, geometric information files for the 3D model (:file:`.obj`), and corresponding material information files (:file:`.mtl`).
@@ -59,6 +60,7 @@ Set Orientation
 Use the function :cpp:any:`gui_prism_mirror3d_set_rotation_angles` to set the orientation of the prism mirror model.
 
 .. _Prism Mirror Control Usage Notes:
+
 Prism Mirror Control Usage Notes
 ---------------------------------
 

@@ -1,11 +1,11 @@
 .. _Pack Tool:
 
-=======
+==========
 Pack Tool
-=======
+==========
 
 RTL87x2G and RTL8762D
------------------
+----------------------
 
 RTL87x2G is the abbreviation of a series IC type.
 
@@ -21,11 +21,11 @@ Then copy the ``bat and py scripts`` to that directory, ensuring that the ``root
 1. Copy ``resource`` all the generated bin files to the ``root`` folder.
 2. Double-click the batch file ( ``.bat`` ) to run it, which will execute the packaging process and generate ``.bin`` file and ``.h`` file.
 3. The ``.h`` is the address offset of each file in the file system, which can be accessed directly without using the file system. Before developing gui code, please add the folder containing ``.h`` to the include directory.
-4. Use the MPTool tool to burn the ``.bin `` file into Flash memory.
+4. Use the MPTool tool to burn the ``.bin`` file into Flash memory.
 
 
 RTL8763E and RTL8773DO
------------------
+----------------------
 RTL8763E is the name of a series IC type, including RTL8763EWE-VP/RTL8763EW-VC. The packaging process for RTL877DO is similar to that of RTL8763E.
 
 Before starting, navigate to the SDK directory (``\tool\Gadgets\gui_package_tool``) and choose the appropriate IC directory. Select the ``8763E`` directory for ``RTL8763EW`` and the ``87x3D`` directory for ``RTL8773DO``.
@@ -62,6 +62,7 @@ Generate Root Bin
 
 
 .. code-block:: c
+   
     #if defined _WIN32
     #else
     #include "flash_map.h"
@@ -74,7 +75,7 @@ Generate Root Bin
 
 
 Adding Header Information
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 Using the MPPG Tool to add header information to user data files, the process is as follows:
 
 .. figure:: https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png

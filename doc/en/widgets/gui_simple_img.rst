@@ -1,8 +1,8 @@
 .. _Simple Image:
 
-========
+============
 Simple Image
-========
+============
 
 The simple img widget is a simplified version of the img control, lacking transformation operations such as rotation, translation, and scaling.
 
@@ -36,7 +36,7 @@ Get Height/Width
 If you want to get the height/width of image widget, you can do so with :cpp:any:`gui_simple_img_get_height` or :cpp:any:`gui_simple_img_get_width`.
 
 Example
------
+--------
 
 .. code-block:: c
 

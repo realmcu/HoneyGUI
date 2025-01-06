@@ -20,7 +20,7 @@ JS（JavaScript）包含在 GUI 模块中，JS 使用的堆空间可能会受到
 GUI 任务不支持喂狗功能，因此应用程序应在 APP 注册的 hook 函数中进行喂狗操作，并由 GUI 使用。注册函数为 ``void gui_task_ext_execution_sethook(void (*hook)(void))``。
 
 不支持FPU
---------
+---------
 
 如果 SoC 不支持 FPU，一些头文件和代码不应该包含在内，例如 RTL8763EP。
 

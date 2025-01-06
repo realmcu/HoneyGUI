@@ -5,7 +5,7 @@
 The widget supports loading 3D models composed of obj and mtl files, and supports adding animation effects.
 
 GUI Loading 3D Models
--------------
+----------------------
 1. Components of a 3D Model
 
    + OBJ file: Stores the geometric data of the 3D model, including vertices, normals, texture coordinates, faces, etc.
@@ -20,7 +20,7 @@ GUI Loading 3D Models
 
 2. Parsing the 3D Model and Generating a 3D Information Descriptor
 
-   + Invoke a script to process the obj file
+   + Invoke a script to process the obj file.
 
    .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
       :width: 800px
@@ -28,7 +28,7 @@ GUI Loading 3D Models
 
       Script Processing
    
-   + Generate binary arrays for image and 3D information descriptors
+   + Generate binary arrays for image and 3D information descriptors.
 
    .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
       :width: 800px
@@ -42,7 +42,7 @@ GUI Loading 3D Models
 
 
 3D Widget Usage
--------------
+----------------
 Create Widget
 ~~~~~~~~~~~~~~
 Use :cpp:any:`gui_3d_create` to create the 3D model. The imported ``desc_addr`` file is the parsed data extracted by the script.
@@ -120,14 +120,20 @@ The initialization function is ``gui_3d_light_inititalize(gui_3d_light_t *light,
 
 + ``lightTarget``: The target position of the light source, defining the direction of illumination;
 
-+ ``included_angle``: The cone angle of the light (in degrees), determining the illumination range of the spotlight, i.e., the outer range of the spotlight shown in the figure below;
++ ``included_angle``: The cone angle of the light (in degrees),  represented as angle :math:`\alpha` in the diagram. It determines the illumination range of the spotlight, which corresponds to the outer circle of the spotlight in the diagram;
 
-+ ``blend_ratio``: The illumination blend ratio, describing the range from the inner to outer cone of the spotlight. Within the inner cone, the illumination intensity is consistent; from the inner to the outer cone, the intensity gradually fades;
++ ``blend_ratio``: The ratio of the light blending region, defining the softness of the spotlight's edge. It ranges from 0 to 1 and determines angle :math:`\beta` in the diagram. The value is calculated using the following formula:
+
+   .. math::
+   
+      β = α (1 - ratio)
+
+   The blending region extends from the inner circle to the outer circle of the spotlight. Within the inner circle, the light intensity is constant, while it gradually diminishes from the inner to the outer circle;
 
 + ``color``: The color of the light source and its transparency;
 
-.. figure:: https://foruda.gitee.com/images/1735198123133205835/9d235df7_13408154.png
-   :width: 200px
+.. figure:: https://foruda.gitee.com/images/1735889400996762341/a4f7e0c8_13408154.png
+   :width: 400px
    :align: center
 
    Example of Spotlight Effect

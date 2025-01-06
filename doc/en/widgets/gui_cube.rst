@@ -39,7 +39,7 @@ The rotation direction of this cube can be achieved by calling :cpp:any:`gui_cub
 
 
 Example
------
+-------
 
 .. code-block:: c
 

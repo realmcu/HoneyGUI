@@ -516,7 +516,7 @@ RLE源覆盖模式（带矩阵变换）
 .. csv-table:: 
   :header: 输入类型, 输出类型
   :stub-columns: 1
-  :align: left
+  :align: center
   :name: 图-图片源输入输出类型
 
   RGB565, RGB565
