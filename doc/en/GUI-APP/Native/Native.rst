@@ -12,12 +12,18 @@ Define A C-APP
 
 - Define app handle using a specific name with ``GUI_APP_DEFINE_NAME`` API:
 
-
+.. literalinclude:: ../../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
+   :language: c
+   :start-after: /*Define a app with name APP_STOPWATCH*/
+   :end-before: /*Define a app with name APP_STOPWATCH end*/
 
 - Define app UI design entry function with ``GUI_APP_ENTRY`` API. 
 - The UI design entry function will be executed once when the app is created.
 
-
+.. literalinclude:: ../../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
+   :language: c
+   :start-after: /*define the app's ui design*/
+   :end-before: /*define the app's ui design end*/
 
 - There are also other ways available to define the app, such as ``GUI_APP_DEFINEE`` or ``struct gui_app``
 
@@ -26,7 +32,11 @@ Create The Widget Tree of A C-APP
 
 This is a clock app, serving as an example for this section. In the image below, you can see that the app interface has options for a stopwatch and a countdown timer. Clicking on these options allows you to switch between them.
 
+.. raw:: html
 
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1727059552792713966/15519dc3_10088396.gif" width= "400" /></div>
+   <br>
 
 The graph below shows the widget tree structure simplified:
 
