@@ -83,9 +83,9 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
     hal_idu_dma_info info;
     info.length = p_rect->w * pixel_size;
     info.dst_stride = p_rect->w * pixel_size;
-    info.src_stride = source->width * pixel_size;
+    info.src_stride = source->stride * pixel_size;
     info.height = p_rect->h;
-    uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * pixel_size;
+    uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->stride) * pixel_size;
     hal_dma_copy(&info, (uint8_t *)start_address, cache_buf);
     source->address = (uint32_t)cache_buf;
     return true;
@@ -126,14 +126,14 @@ void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
                       ppe_rect_t *dst_trans)
 {
     uint8_t pixel_size = PPE_Get_Pixel_Size(target->format);
-    uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
+    uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->stride) *
                                  pixel_size;
-    uint32_t src_start_address = source->address + (src_rect->x + src_rect->y * source->width) *
+    uint32_t src_start_address = source->address + (src_rect->x + src_rect->y * source->stride) *
                                  pixel_size;
     hal_idu_dma_info info;
     info.length = src_rect->w * pixel_size;
-    info.src_stride = source->width * pixel_size;
-    info.dst_stride = target->width * pixel_size;
+    info.src_stride = source->stride * pixel_size;
+    info.dst_stride = target->stride * pixel_size;
     info.height = src_rect->h;
     hal_dma_copy(&info, (uint8_t *)src_start_address, (uint8_t *)dst_start_address);
 }
@@ -142,7 +142,7 @@ void bare_blit_by_idu(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
                       ppe_rect_t *dst_trans)
 {
     uint8_t pixel_size = PPE_Get_Pixel_Size(target->format);
-    uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
+    uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->stride) *
                                  pixel_size;
     hal_idu_decompress_info info;
     info.start_line = src_rect->y;
@@ -150,7 +150,7 @@ void bare_blit_by_idu(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
     info.start_column = src_rect->x;
     info.end_column = src_rect->x + src_rect->w - 1;
     info.length = src_rect->w * pixel_size;
-    info.dst_stride = target->width * pixel_size;
+    info.dst_stride = target->stride * pixel_size;
     info.raw_data_address = source->address;
     hal_idu_decompress_rect(&info, (uint8_t *)dst_start_address);
 }
@@ -297,16 +297,18 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     target.address = (uint32_t)dc->frame_buf;
     target.width = dc->fb_width;
     target.height = dc->fb_height;
+    target.stride = dc->fb_width;
     target.const_color = 0;
     target.win_x_min = 0;
-    target.win_x_max = target.width;
+    target.win_x_max = target.width - 1;
     target.win_y_min = 0;
-    target.win_y_max = target.height;
+    target.win_y_max = target.height - 1;
 
     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
     source.opacity = image->opacity_value;
     source.width = image->img_w;
     source.height = image->img_h;
+    source.stride = image->img_w;
     struct gui_rgb_data_head *head = image->data;
     switch (head->type)
     {
@@ -385,6 +387,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
                     source.width = image->img_w;
                     source.height = image->img_h;
+                    source.stride = image->img_w;
                     bool ret = ppe_get_area(&src_rect, &dst_rect, &inv_matrix, &source);
                     if (src_rect.w % 2)
                     {
@@ -600,12 +603,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             continue;
         }
         source.win_x_min = 0;
-        source.win_x_max = target.width;
+        source.win_x_max = target.width - 1;
         source.win_y_min = 0;
-        source.win_y_max = target.height;
+        source.win_y_max = target.height - 1;
         source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
         source.width = image->img_w;
         source.height = image->img_h;
+        source.stride = image->img_w;
         float x_ref = 0, y_ref = 0;
         ppe_rect_t ppe_rect = {0};
         memcpy(&ppe_rect, &constraint, sizeof(ppe_rect_t));
@@ -720,6 +724,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 memcpy(&inverse, &pre_trans, sizeof(float) * 9);
                 source.width = old_rect.w;
                 source.height = old_rect.h;
+                source.stride = old_rect.w;
             }
             else
             {
