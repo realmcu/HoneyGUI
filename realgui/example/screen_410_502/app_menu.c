@@ -16,6 +16,7 @@
 #include "math.h"
 #include "gui_return.h"
 #include "guidef.h"
+#include "gui_soccer.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -186,18 +187,43 @@ static void app_BOX2D_RING_return_cb(void)
     app_back2prescreen_cb();
 }
 
+static void app_soccer_cb(void *obj, gui_event_t e, void *param)
+{
+    gui_soccer_t *soccer = (gui_soccer_t *)obj;
+    switch (soccer->press_face % 5)
+    {
+    case 0:
+        gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+        break;
+    case 1:
+        gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
+        break;
+    case 2:
+        gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+        break;
+    case 3:
+        gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+        break;
+    case 4:
+        gui_app_switch(gui_current_app(), _get_app_APP_ACTIVITY_handle());
+        break;
+    default:
+        break;
+    }
+}
+
 static void app_menu_design(gui_app_t *app)
 {
     extern void page_tb_control_enter(void *parent);
     page_tb_control_enter(&app->screen);
-    /**
-     * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
-    */
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "win_app_menu", 0, 0, SCREEN_WIDTH,
                                     SCREEN_HEIGHT);
     gui_win_set_animate(win, 1000, 0, (gui_animate_callback_t)menu_win_ani_cb,
                         0);//aniamtion start to play at app startup
-    /* app swap animation configration of the next app*/
+
+    extern bool return_to_watchface_flag;
+    return_to_watchface_flag = false;
+#if 0
     uint32_t *array[] =
     {
         UI_CLOCK_HEARTRATE_ICON_BIN,
@@ -246,13 +272,10 @@ static void app_menu_design(gui_app_t *app)
         UI_CLOCK_BOX2D_RING_ICON_BIN,
         UI_CLOCK_ACTIVITY_ICON_BIN,
     };
-
-    gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
+    gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
-    // gui_menu_cellular_offset((void *)cell, -200, -416);
+    // gui_menu_cellular_offset((void *)menu, -200, -416);
     {
-        extern bool return_to_watchface_flag;
-        return_to_watchface_flag = false;
         struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
         {
             {switch_APP_HEART_RATE, (void *)1},
@@ -274,13 +297,41 @@ static void app_menu_design(gui_app_t *app)
             {switch_APP_HEART_RATE, (void *)1},
             {switch_APP_MUSIC, (void *)1}, {switch_APP_FRUIT_NINJA, (void *)1}, {switch_BOX2D_RING, (void *)1}, {switch_APP_ACTIVITY, (void *)1},
         };
-        gui_menu_cellular_on_click(cell, gesture_parameter_array,
+        gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                    sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));
 
     }
-    //status_bar(win, (void *)cell);
+#else
+    uint32_t *array[] =
+    {
+        SOCCER_HR_BIN,
+        SOCCER_MUSIC_BIN,
+        SOCCER_FRUIT_NINJA_BIN,
+        SOCCER_BOX2DRING_BIN,
+        SOCCER_ACTIVITY_BIN,
+        SOCCER_HR_BIN,
+        SOCCER_MUSIC_BIN,
+        SOCCER_FRUIT_NINJA_BIN,
+        SOCCER_BOX2DRING_BIN,
+        SOCCER_ACTIVITY_BIN,
+        SOCCER_HR_BIN,
+        SOCCER_MUSIC_BIN,
+        SOCCER_FRUIT_NINJA_BIN,
+        SOCCER_BOX2DRING_BIN,
+        SOCCER_ACTIVITY_BIN,
+        SOCCER_HR_BIN,
+        SOCCER_MUSIC_BIN,
+        SOCCER_FRUIT_NINJA_BIN,
+        SOCCER_BOX2DRING_BIN,
+        SOCCER_ACTIVITY_BIN,
+    };
+    gui_soccer_t *menu = gui_soccer_create(win, "soccer", array, 0, 0);
+    gui_soccer_set_center(menu, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    gui_soccer_on_click(menu, app_soccer_cb, NULL);
+#endif
+    //status_bar(win, (void *)menu);
     gui_return_create(win, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2watchface_cb, (void *)cell);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2watchface_cb, (void *)menu);
 }
 
 GUI_APP_ENTRY(APP_BOX2D_RING)

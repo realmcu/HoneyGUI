@@ -16,6 +16,7 @@
 #include "wheel_algo.h"
 #include "kb_algo.h"
 #include <time.h>
+#include "gui_fps.h"
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
@@ -119,7 +120,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_activity(gui_tab_get_rte_obj(tb_activity));
     page_tb_heart(gui_tab_get_rte_obj(tb_heart));
     page_tb_music(gui_tab_get_rte_obj(tb_music));
-    gui_tab_update_preload(GUI_BASE(tb_clock));
+    // gui_tab_update_preload(GUI_BASE(tb_clock));
+    // gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
 // static void data_generate_task_entry()

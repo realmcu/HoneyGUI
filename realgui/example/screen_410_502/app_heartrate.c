@@ -19,8 +19,6 @@
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
-#define SCREEN_X_OFF 21
-#define SCREEN_Y_OFF 18
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
@@ -63,38 +61,38 @@ static void heartrate_graph(NVGcontext *vg)
     // draw split line
     {
         nvgBeginPath(vg);
-        nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 0, 60 + SCREEN_Y_OFF, 5,
+        nvgRect(vg, 31 + 86 * 0, 78, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
         nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
-        nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 1, 60 + SCREEN_Y_OFF, 5,
+        nvgRect(vg, 31 + 86 * 1, 78, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
         nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
-        nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 2, 60 + SCREEN_Y_OFF, 5,
+        nvgRect(vg, 31 + 86 * 2, 78, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
         nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
-        nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 3, 60 + SCREEN_Y_OFF, 5,
+        nvgRect(vg, 31 + 86 * 3, 78, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
         nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
 
         nvgBeginPath(vg);
-        nvgRect(vg, 10 + SCREEN_X_OFF + 86 * 4, 60 + SCREEN_Y_OFF, 5,
+        nvgRect(vg, 31 + 86 * 4, 78, 5,
                 210); // the X/Y-axis coordinate relative to parent widget
         nvgFillColor(vg, nvgRGBA(192, 192, 192, 255)); //silver
         nvgFill(vg);
     }
 
-    float x = 15.0f + SCREEN_X_OFF;
-    float y = 60.0f + SCREEN_Y_OFF;
+    float x = 36.0f;
+    float y = 78.0f;
     float w = 344.0f;
     float h = 210.0f;
 
@@ -269,7 +267,7 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "Current heartrate";
         int font_size = 32;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 30 + SCREEN_X_OFF, 270 + 30 + SCREEN_Y_OFF, 0,
+        gui_text_t *t = gui_text_create(win_hb, "txt", 51, 318, 0,
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
@@ -280,19 +278,19 @@ void heart_rate_app(gui_obj_t *obj)
         int text_w = 33;
         // uint8_t number = atoi(hr_content);
         gui_img_t *img = gui_img_create_from_mem(win_hb, "hr_content_percentile", text_num_array[1],
-                                                 30 + SCREEN_X_OFF, 270 + 80 + SCREEN_Y_OFF, 0, 0);
+                                                 51, 368, 0, 0);
         GUI_BASE(img)->not_show = 1;
         img = gui_img_create_from_mem(win_hb, "hr_content_decimal", text_num_array[6],
-                                      30 + SCREEN_X_OFF + text_w, 270 + 80 + SCREEN_Y_OFF, 0, 0);
+                                      51 + text_w, 368, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win_hb, "hr_content_single", text_num_array[9],
-                                      30 + SCREEN_X_OFF + text_w * 2, 270 + 80 + SCREEN_Y_OFF, 0, 0);
+                                      51 + text_w * 2, 368, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     {
         char *text = "times/min";
         int font_size = 48;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 30 + SCREEN_X_OFF + 105, 270 + 100 + SCREEN_Y_OFF, 0,
+        gui_text_t *t = gui_text_create(win_hb, "txt", 156, 388, 0,
                                         96);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
@@ -318,7 +316,7 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "160";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", -(14 + SCREEN_X_OFF), 60 + SCREEN_Y_OFF + 70 * 0, 0,
+        gui_text_t *t = gui_text_create(win_hb, "txt", -35, 78 + 70 * 0, 0,
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
@@ -327,7 +325,7 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "120";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", -(14 + SCREEN_X_OFF), 60 + SCREEN_Y_OFF + 70 * 1, 0,
+        gui_text_t *t = gui_text_create(win_hb, "txt", -35, 78 + 70 * 1, 0,
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
@@ -336,7 +334,7 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "80";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", -(14 + SCREEN_X_OFF), 60 + SCREEN_Y_OFF + 70 * 2, 0,
+        gui_text_t *t = gui_text_create(win_hb, "txt", -35, 78 + 70 * 2, 0,
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
@@ -345,8 +343,8 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "12AM";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 15 + SCREEN_X_OFF + 87 * 0,
-                                        270 + SCREEN_Y_OFF - font_size, 0, font_size);
+        gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 0,
+                                        288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
@@ -354,8 +352,8 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "6AM";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 15 + SCREEN_X_OFF + 87 * 1,
-                                        270 + SCREEN_Y_OFF - font_size, 0, font_size);
+        gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 1,
+                                        288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
@@ -363,8 +361,8 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "12PM";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 15 + SCREEN_X_OFF + 87 * 2,
-                                        270 + SCREEN_Y_OFF - font_size, 0, font_size);
+        gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 2,
+                                        288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
@@ -372,8 +370,8 @@ void heart_rate_app(gui_obj_t *obj)
     {
         char *text = "6PM";
         int font_size = 24;
-        gui_text_t *t = gui_text_create(win_hb, "txt", 15 + SCREEN_X_OFF + 87 * 3,
-                                        270 + SCREEN_Y_OFF - font_size, 0, font_size);
+        gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 3,
+                                        288 - font_size, 0, font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);

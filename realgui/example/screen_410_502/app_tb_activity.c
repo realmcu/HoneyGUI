@@ -26,13 +26,13 @@ static void win_cb(gui_obj_t *obj)
     // gui_log("tv_name: %s, tv->cur_id.x = %d\n", GUI_BASE(tv)->name, tv->cur_id.x);
     if (!tab_change)
     {
-        if (tv->cur_id.x == 2)
+        if (tv->cur_id.x == 1)
         {
             extern void activity_app(gui_obj_t *obj);
             activity_app(obj);
         }
     }
-    if (tv->cur_id.x != 2)
+    if (tv->cur_id.x != 1)
     {
         tab_change = 0;
     }

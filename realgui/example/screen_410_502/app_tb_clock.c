@@ -61,48 +61,6 @@ static void curtain_ctr_cb(gui_win_t *win)
 #endif
 }
 
-// gui_perspective_t *perspect;
-// static void callback_prism_touch_clicked()
-// {
-//     int angle = perspect->release_x;
-//     gui_log("angel1 = %d\n", angle);
-//     if (angle < 0)
-//     {
-//         angle += 360;
-//     }
-//     angle = (angle % 360) / (360 / 6);
-//     gui_log("angel2 = %d\n", angle);
-//     if (angle < 0 || angle > 5)
-//     {
-//         angle = 0;
-//     }
-
-//     gui_app_t *app = get_app_hongkong();
-//     gui_obj_t *screen = &(app->screen);
-//     gui_obj_tree_free(screen);
-//     app->ui_design(app);
-//     switch (angle % 2)
-//     {
-//     case 0:
-//         {
-//             // GUI_BASE(win_watch)->not_show = false;
-//             // GUI_BASE(win_market)->not_show = true;
-//             watchface_index = 0;
-//         }
-//         break;
-//     case 1:
-//         {
-//             // GUI_BASE(win_watch)->not_show = true;
-//             // GUI_BASE(win_market)->not_show = false;
-//             watchface_index = 1;
-//         }
-//         break;
-//     default:
-//         break;
-//     }
-//     gui_fb_change();
-// }
-
 /* callback_touch_long start*/
 static void callback_touch_long(void *obj, gui_event_t e)
 {

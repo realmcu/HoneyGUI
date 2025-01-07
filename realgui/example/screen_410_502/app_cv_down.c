@@ -22,8 +22,6 @@
 #define __IMG_NAME    "timecard"
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
-#define SCREEN_X_OFF 21
-#define SCREEN_Y_OFF 18
 #define CARD_HEIGHT 157 + 10
 
 char *month[12] =
@@ -113,7 +111,7 @@ static void draw_timecard(void *parent_widget)
 {
     gui_win_t *win = gui_win_create(parent_widget, __WIN_NAME, 0, 0, SCREEN_WIDTH, 60);
     gui_canvas_round_rect_t *canvas_timecard = gui_canvas_round_rect_create(GUI_BASE(win), "",
-                                                                            14 + SCREEN_X_OFF, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
+                                                                            35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
 
     // text
     timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
@@ -279,7 +277,7 @@ void curtain_down_design(void *parent_widget)
                            0));
     //clock circle
     gui_img_t *img_clock = gui_img_create_from_mem(parent_widget, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN,
-                                                   17 + SCREEN_X_OFF, 30,
+                                                   38, 30,
                                                    0, 0);
     gui_img_set_mode(img_clock, IMG_SRC_OVER_MODE);
     {
@@ -313,8 +311,8 @@ void curtain_down_design(void *parent_widget)
     gui_text_mode_set(date_text, MULTI_LEFT);
 
     // gui_text_convert_to_img(date_text, RGB565);
-    cv = gui_cardview_create(parent_widget, "cardview", SCREEN_X_OFF, 0,
-                             SCREEN_WIDTH - SCREEN_X_OFF, SCREEN_HEIGHT);
+    cv = gui_cardview_create(parent_widget, "cardview", 21, 0,
+                             SCREEN_WIDTH - 21, SCREEN_HEIGHT);
     gui_cardview_set_style(cv, REDUCTION);
     // change timecard img and canvas
     gui_cardview_set_animate(cv, 2000, -1, cv_cb, cv);

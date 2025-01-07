@@ -16,8 +16,6 @@
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
-#define SCREEN_X_OFF 21
-#define SCREEN_Y_OFF 18
 #define TAB_HEIGHT 220
 #define TAB_INTERVAL 20
 #define TAB_START 140
@@ -114,7 +112,7 @@ static void pagelist_clear(gui_page_t *parent)
 {
     gui_text_t *clear_text;
     gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(parent), "canvas_clear",
-                                                                   31 + SCREEN_X_OFF, 40, 305, 80, 40, gui_rgb(39, 43, 44));
+                                                                   52, 40, 305, 80, 40, gui_rgb(39, 43, 44));
     // text
     char *clear_content = "clear all";
     clear_text = gui_text_create(canvas, "clear all", 0, 0, 0, 0);
@@ -228,7 +226,7 @@ static void view_more_cb(gui_obj_t *win)
         {
             if ((tp->y > 15 && tp->y < 47))
             {
-                if (tp->x > 16 + SCREEN_X_OFF && tp->x < 95 + SCREEN_X_OFF)
+                if (tp->x > 37 && tp->x < 116)
                 {
                     gui_win_set_animate(win_animate, 500, 0, (gui_animate_callback_t)cancel_cb, win);
                 }
@@ -236,7 +234,7 @@ static void view_more_cb(gui_obj_t *win)
             else
             {
                 uint16_t base_y = 140, h = 80, interval = 10;
-                if (tp->x > 9 + SCREEN_X_OFF && tp->x < 359 + SCREEN_X_OFF)
+                if (tp->x > 30 && tp->x < 380)
                 {
                     uint16_t y = base_y;
                     if ((tp->y > y && tp->y < y + h))
@@ -344,7 +342,7 @@ void pagelist_create(gui_msg_t *msg)
     // message
     gui_text_t *text_informer, *text_content, *text_time;
     gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(tb_inform),
-                                                                   "0", 9 + SCREEN_X_OFF, 0, 350, 220, 35, gui_rgb(39, 43, 44));
+                                                                   "0", 30, 0, 350, 220, 35, gui_rgb(39, 43, 44));
     void *img_path = NULL;
     switch (app)
     {
@@ -403,7 +401,7 @@ void pagelist_create(gui_msg_t *msg)
     // option left
     char *option_content = "...";
     gui_canvas_round_rect_t *canvas_left = gui_canvas_round_rect_create(GUI_BASE(tb_option), "0",
-                                                                        9 + SCREEN_X_OFF, 0, 170,
+                                                                        30, 0, 170,
                                                                         220, 35, gui_rgb(39, 43, 44));
 
     gui_text_t *text = gui_text_create(canvas_left, "0",  0, 0, 0, 0);
@@ -423,7 +421,7 @@ void pagelist_create(gui_msg_t *msg)
                                                               SCREEN_HEIGHT, gui_rgb(0, 0, 0));
 
         char *content = "Cancel";
-        gui_text_t *text = gui_text_create(win, "cancel",  16 + SCREEN_X_OFF, 15, 80, 32);
+        gui_text_t *text = gui_text_create(win, "cancel",  37, 15, 80, 32);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
                      32);
@@ -444,7 +442,7 @@ void pagelist_create(gui_msg_t *msg)
             {
                 char *name = gui_malloc(40);
                 sprintf(name, "\"message\" dialog\n%s", informer);
-                text = gui_text_create(win, "message",  16 + SCREEN_X_OFF, 70, 0, 0);
+                text = gui_text_create(win, "message",  37, 70, 0, 0);
                 gui_text_set(text, (void *)name, GUI_FONT_SRC_BMP, gui_rgb(153, 153, 153),
                              strlen(name),
                              24);
@@ -457,7 +455,7 @@ void pagelist_create(gui_msg_t *msg)
         case OS:
             {
                 content = "\"OS\" dialog" ;
-                text = gui_text_create(win, "0",  16 + SCREEN_X_OFF, 100, 0, 0);
+                text = gui_text_create(win, "0",  37, 100, 0, 0);
                 gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, gui_rgb(153, 153, 153),
                              strlen(content),
                              24);
@@ -472,7 +470,7 @@ void pagelist_create(gui_msg_t *msg)
 
         // options
         gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_1",
-                                                                       9 + SCREEN_X_OFF, 140, 350, 80, 15, gui_rgb(39, 43, 44));
+                                                                       30, 140, 350, 80, 15, gui_rgb(39, 43, 44));
         content = "Don't remind for an hour";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
@@ -481,7 +479,7 @@ void pagelist_create(gui_msg_t *msg)
         gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, CENTER);
 
-        canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_2", 9 + SCREEN_X_OFF, 230, 350, 80, 15,
+        canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_2", 30, 230, 350, 80, 15,
                                               gui_rgb(39, 43, 44));
         content = "Don't remind today";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
@@ -491,7 +489,7 @@ void pagelist_create(gui_msg_t *msg)
         gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, CENTER);
 
-        canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_3", 9 + SCREEN_X_OFF, 320, 350, 80, 15,
+        canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_3", 30, 320, 350, 80, 15,
                                               gui_rgb(39, 43, 44));
         content = "Add this to Summary";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
@@ -506,7 +504,7 @@ void pagelist_create(gui_msg_t *msg)
     //option right
     option_content = "X";
     gui_canvas_round_rect_t *canvas_right = gui_canvas_round_rect_create(GUI_BASE(tb_option), "0",
-                                                                         189 + SCREEN_X_OFF, 0,
+                                                                         210, 0,
                                                                          170, 220, 35, gui_rgb(39, 43, 44));
 
     text = gui_text_create(canvas_right, "0",  0, 0, 0, 0);
@@ -571,7 +569,7 @@ static void win_design_cb(void)
                 h = canvas->h;
                 if ((tp->y > y && tp->y < y + h))
                 {
-                    if (tp->x > 31 + SCREEN_X_OFF && tp->x < 336 + SCREEN_X_OFF)
+                    if (tp->x > 52 && tp->x < 357)
                     {
                         gui_obj_event_set(canvas, GUI_EVENT_1);
 
@@ -596,12 +594,12 @@ static void win_design_cb(void)
                         h = GUI_BASE(tv)->h;
                         if ((tp->y > y && tp->y < y + h))
                         {
-                            if (tp->x > 9 + SCREEN_X_OFF && tp->x < 179 + SCREEN_X_OFF)
+                            if (tp->x > 30 && tp->x < 200)
                             {
                                 gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_2);
                                 // gui_log("click left\r\n");
                             }
-                            else if (tp->x > 189 + SCREEN_X_OFF && tp->x < 359 + SCREEN_X_OFF)
+                            else if (tp->x > 210 && tp->x < 380)
                             {
                                 gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_1);
                                 // gui_log("click right\r\n");

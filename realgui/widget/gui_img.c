@@ -665,7 +665,7 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
         return;
     }
 
-    float scale = 0.7f;
+    float scale = 1;
     uint16_t w = (uint16_t)(dc->fb_width * scale);
     uint16_t h = (uint16_t)(dc->fb_height * scale);
     uint16_t byte = dc->bit_depth / 8;
@@ -1135,7 +1135,7 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
     gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
     memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
     memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
-    matrix_scale(0.7f, 0.7f, obj->matrix);
+    matrix_scale(1.0f, 1.0f, obj->matrix);
 
     dc->bit_depth = 16;
 
@@ -1148,14 +1148,14 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
 
     head->scan = 0;
     head->align = 0;
-    head->resize = 2;//0-no resize;1-50%(x&y);2-70%;3-80%
+    head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
     head->type = 0;
     head->version = 0;
     head->rsvd2 = 0;
-    head->w = obj->w * 0.7f;
-    head->h = obj->h * 0.7f;
+    head->w = obj->w * 1.0f;
+    head->h = obj->h * 1.0f;
 
     memcpy(dc, dc_bak, sizeof(gui_dispdev_t));
     memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
