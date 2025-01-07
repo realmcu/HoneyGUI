@@ -55,24 +55,24 @@ static void gui_tabview_input_prepare(gui_obj_t *obj)
     gui_tabview_t *this = (gui_tabview_t *)obj;
     GUI_UNUSED(tp);
     GUI_UNUSED(this);
-    // if (this->tab_cnt_left < this->cur_id.x)
-    // {
-    //     gui_obj_skip_other_right_hold(obj);
-    // }
-    // if (this->tab_cnt_right > this->cur_id.x)
-    // {
-    //     gui_obj_skip_other_left_hold(obj);
-    // }
+    if (this->tab_cnt_left < this->cur_id.x)
+    {
+        gui_obj_skip_other_right_hold(obj);
+    }
+    if (this->tab_cnt_right > this->cur_id.x)
+    {
+        gui_obj_skip_other_left_hold(obj);
+    }
 
-    // if (this->tab_cnt_up < this->cur_id.y)
-    // {
-    //     gui_obj_skip_other_down_hold(obj);
-    // }
+    if (this->tab_cnt_up < this->cur_id.y)
+    {
+        gui_obj_skip_other_down_hold(obj);
+    }
 
-    // if (this->tab_cnt_down > this->cur_id.y)
-    // {
-    //     gui_obj_skip_other_up_hold(obj);
-    // }
+    if (this->tab_cnt_down > this->cur_id.y)
+    {
+        gui_obj_skip_other_up_hold(obj);
+    }
     obj->skip_tp_left_hold = false;
     obj->skip_tp_right_hold = false;
 }
