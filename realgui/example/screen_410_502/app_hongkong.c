@@ -152,6 +152,8 @@ static void inform_generate_task_entry()
 {
     while (true)
     {
+        gui_thread_mdelay(2000);
+
         if (!content)
         {
             content = gui_malloc(60);
@@ -180,8 +182,6 @@ static void inform_generate_task_entry()
         };
 
         gui_send_msg_to_server(&msg);
-
-        gui_thread_mdelay(2000);
     }
 }
 

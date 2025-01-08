@@ -8,7 +8,7 @@ void scr_left_curtain_cb(lv_event_t *e)
     if (event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT)
     {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OVER_LEFT, 500, 0, &lv_watchface_init);
+        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_LEFT, 500, 0, &lv_watchface_init);
     }
     if (event_code == LV_EVENT_SCREEN_LOAD_START)
     {

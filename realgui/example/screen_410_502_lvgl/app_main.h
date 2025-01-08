@@ -25,7 +25,10 @@ void lv_left_curtain_init(void);
 void lv_right_curtain_init(void);
 
 
-// UI INIT
+// FONTS
+LV_FONT_DECLARE(SourceHanSansSC_size24_bits1_font);
+LV_FONT_DECLARE(SourceHanSansSC_size32_bits1_font);
+LV_FONT_DECLARE(SourceHanSansSC_size48_bits1_font);
 
 
 #ifdef __cplusplus

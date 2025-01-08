@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "lvgl.h"
+
 extern const lv_image_dsc_t control_lte_off;
 extern const lv_image_dsc_t control_lte_on;
 extern const lv_image_dsc_t control_mute_off;

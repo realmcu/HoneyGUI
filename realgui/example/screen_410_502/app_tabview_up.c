@@ -13,6 +13,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
 #include "guidef.h"
+#include "def_list.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -37,7 +38,7 @@ typedef struct information
 
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
-static gui_page_t *pg;
+static gui_page_t *pg = NULL;
 static gui_win_t *win_animate, *win_design;
 static gui_obj_t *tv_array[TAB_ARRAY_NUM] = {0};
 static gui_curtain_t *ct_parent;
@@ -59,6 +60,21 @@ static void win_clear_all_cb(void)
             GUI_BASE(pg)->h = GUI_BASE(pg)->h - (TAB_HEIGHT + TAB_INTERVAL);
             if (index == TAB_ARRAY_NUM - 1 || tv_array[index + 1] == NULL)
             {
+                gui_list_t *node = NULL;
+                gui_list_t *tmp = NULL;
+                // clear "win_view_more"
+                gui_list_for_each_safe(node, tmp, &(GUI_BASE(ct_parent)->child_list))
+                {
+                    gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                    if (obj->magic != GUI_MAGIC_NUMBER)
+                    {
+                        break;
+                    }
+                    if (strcmp("win_view_more", obj->name) == 0)
+                    {
+                        gui_obj_tree_free(obj);
+                    }
+                }
                 close_flag = 0;
                 return;
             }
@@ -202,6 +218,7 @@ static void cancel_cb(gui_obj_t *win)
     if (percent >= 1)
     {
         gui_win_start_animation(win_design);
+        GUI_BASE(pg)->gesture = 0;
         // gui_obj_tree_free(win);
     }
 }
@@ -290,7 +307,7 @@ static void view_more_enter(void *obj, gui_event_t e, void *param)
 
 void pagelist_create(gui_msg_t *msg)
 {
-    if (strcmp(gui_current_app()->screen.name, "app_hongkong") != 0)
+    if (strcmp(gui_current_app()->screen.name, "app_hongkong") != 0 || !pg)
     {
         // gui_log("Current APP can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
         return;
@@ -414,7 +431,7 @@ void pagelist_create(gui_msg_t *msg)
     // view more
     gui_win_t *win;
     {
-        win = gui_win_create(ct_parent, "0", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
+        win = gui_win_create(ct_parent, "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
                              SCREEN_HEIGHT);
         gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), "0", 0, 0,
                                                               SCREEN_WIDTH,
@@ -532,6 +549,8 @@ static void win_design_cb(void)
         {
             break;
         }
+        GUI_BASE(tv_array[index])->skip_tp_left_hold = 0;
+        GUI_BASE(tv_array[index])->skip_tp_right_hold = 0;
         index++;
         if (index == TAB_ARRAY_NUM)
         {
@@ -561,7 +580,7 @@ static void win_design_cb(void)
         // clear all
         gui_obj_t *canvas = 0;
         gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "canvas_clear", (void *)&canvas);
-        if (tp->deltaY < 30 && tp->deltaX < 30) //prevent slide from triggering clear
+        if (tp->deltaY < 15 && tp->deltaX < 15) //prevent slide from triggering clear
         {
             if (canvas)
             {
@@ -629,11 +648,11 @@ static void win_design_cb(void)
             // gui_log("page down\n");
         }
 
-        if (tp->deltaY > 0)
+        if (tp->deltaY > 15)
         {
             gui_img_set_image_data(arrow, UI_ARROW_DOWN_BIN);
         }
-        else if (tp->deltaY < 0)
+        else if (tp->deltaY < 15)
         {
             gui_img_set_image_data(arrow, UI_ARROW_UP_BIN);
         }

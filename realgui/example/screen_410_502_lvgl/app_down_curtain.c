@@ -17,7 +17,7 @@ void scr_down_curtain_cb(lv_event_t *e)
         lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM)
     {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0, &lv_watchface_init);
+        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_BOTTOM, 500, 0, &lv_watchface_init);
     }
 }
 
