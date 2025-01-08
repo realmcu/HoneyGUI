@@ -1,3 +1,5 @@
+.. _Get Started:
+
 =================
 Get Started
 =================
@@ -42,12 +44,13 @@ Download the MinGW-w64 toolchain, unzip it to drive C, and add it to the system 
 1.  [MinGW-w64 Download](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)
 2.  Unzip and copy to directory: `C:\mingw64`
 3.  Add a environment variable: `C:\mingw64\bin`:
-      - Open the Start Menu and search for `Advanced system setting`.
-      - Show `System Properties` and then go to the `Advanced` tab.
-      - Click on the `Environment Variables` button.
-      - In the `User variables` section, find and select the Path variable and click `Edit`.
-      - Click `New` and add `C:\mingw64\bin`.
-      - Click `OK` to close all dialogs.
+
+   - Open the Start Menu and search for `Advanced system setting`.
+   - Show `System Properties` and then go to the `Advanced` tab.
+   - Click on the `Environment Variables` button.
+   - In the `User variables` section, find and select the Path variable and click `Edit`.
+   - Click `New` and add `C:\mingw64\bin`.
+   - Click `OK` to close all dialogs.
 
 
 Install Python
@@ -109,6 +112,7 @@ Startup by CMD (CMake)
 - Configuration: In the ```HoneyGUI/win32_sim/build``` folder
 
 .. code-block:: shell
+
    > cmake --build . --target menuconfig
 
 - Run: In the ```HoneyGUI``` folder

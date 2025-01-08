@@ -27,7 +27,7 @@
 --------
 
 创建窗口控件
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 可以通过 :cpp:any:`gui_win_create` 函数创建一个窗口控件。
 
@@ -43,7 +43,7 @@
 并且也可以使用以下的函数来给窗口控件注册按下/释放/长按/点击事件：:cpp:any:`gui_win_press` , :cpp:any:`gui_win_release` , :cpp:any:`gui_win_long` , :cpp:any:`gui_win_click`。
 
 设置触摸保持状态
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 使用函数 :cpp:any:`gui_win_hold_tp` 来设置触摸保持'hold_tp'的状态。
 

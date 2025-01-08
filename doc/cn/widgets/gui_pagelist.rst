@@ -34,7 +34,7 @@
 通过此API :cpp:any:`gui_pagelist_add_scroll_bar`, 可以为pagelist控件添加滚动条图像，文件来源可以是内存地址。
 
 创建控件
-~~~~~~~
+~~~~~~~~~
 
 开发者可以利用 :cpp:any:`gui_pagelist_create` 函数来创建一个页面列表控件。它的高度将根据子控件的总高度进行设置。
 
