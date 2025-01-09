@@ -183,7 +183,7 @@ void json_refreash()
     sprintf(cjson_content, "%s", temp);
     gui_free(temp);
     cJSON_Delete(root);
-    canvas_update_flag = 0b1101;
+    canvas_update_flag = 0b1111;
     // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
 //    gui_log("cjson_content: %s\n", cjson_content);
 }

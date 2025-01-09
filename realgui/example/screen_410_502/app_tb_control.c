@@ -231,7 +231,7 @@ void win_control_enter_cb()
             {
                 kb_hold = 0;
                 uint32_t time = kb->timestamp_ms_release - time_press;
-                if (time > 500)
+                if (time > 1000)
                 {
                     gui_log("pressing time = %d\n", time);
                     gui_obj_event_set(GUI_BASE(win_control_enter), GUI_EVENT_8);
