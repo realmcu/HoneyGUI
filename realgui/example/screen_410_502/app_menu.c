@@ -69,6 +69,8 @@ void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 
 void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
 {
+    extern void clear_activity(void);
+    clear_activity();
     gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
 }
 
@@ -167,15 +169,17 @@ static void app_AT_back2prescreen_cb(void)
     extern bool sidebar_flag;
     extern bool return_to_watchface_flag;
 
+    extern void clear_activity(void);
+    clear_activity();
     app_back2prescreen_cb();
 }
 
 static void app_HR_back2prescreen_cb(void)
 {
-    extern void clear_heart_rate_app(void);
+    // extern void clear_heart_rate_app(void);
 
     app_back2prescreen_cb();
-    clear_heart_rate_app();
+    // clear_heart_rate_app();
 }
 
 static void app_FN_back2prescreen_cb(void)
@@ -437,7 +441,6 @@ GUI_APP_ENTRY(APP_MUSIC)
     app_music_ui_design(GUI_APP_ROOT_SCREEN);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
-    // gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
 GUI_APP_ENTRY(APP_FRUIT_NINJA)

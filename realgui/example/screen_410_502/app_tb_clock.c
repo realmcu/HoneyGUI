@@ -67,6 +67,8 @@ static void callback_touch_long(void *obj, gui_event_t e)
     gui_log("win widget long touch enter cb\n");
     extern void close_box2d_ring(void);
     close_box2d_ring();
+    extern void clear_activity(void);
+    clear_activity();
 
     // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
     extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);

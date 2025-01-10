@@ -24,6 +24,14 @@ static bool draw_flag = 0;
 static char move_content[30], ex_content[30], stand_content[30];
 
 static gui_text_t *move_text, *ex_text, *stand_text;
+static gui_img_t *img;
+
+void clear_activity(void)
+{
+    move_text = NULL;
+    ex_text = NULL;
+    stand_text = NULL;
+}
 
 static void arc_activity_cb(NVGcontext *vg)
 {
@@ -152,6 +160,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 void activity_app(gui_obj_t *obj)
 {
     // text
+    if (!move_text)
     {
         move_text = gui_text_create(obj, "move_text", 150, 300, 0, 0);
         gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_BMP, gui_rgb(230, 67, 79),
@@ -174,7 +183,6 @@ void activity_app(gui_obj_t *obj)
         gui_text_mode_set(stand_text, LEFT);
         // gui_text_convert_to_img(stand_text, RGB565);
     }
-
     {
         int image_h = 200,
             image_w = 200,
@@ -187,10 +195,22 @@ void activity_app(gui_obj_t *obj)
         }
         memset(img_data, 0, buffer_size);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
-        gui_img_t *img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
-                                                 50, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
+        if (!img)
+        {
+            img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
+                                          50, 0, 0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
+        }
+        else
+        {
+            // reset animate
+            img->animate->animate = true;
+            img->animate->current_frame = 0;
+            img->animate->current_repeat_count = 0;
+            img->animate->progress_percent = 0;
+        }
+
     }
     animate_flag = 1;
     draw_flag = 0;

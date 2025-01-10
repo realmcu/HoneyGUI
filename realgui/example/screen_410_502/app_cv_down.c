@@ -239,6 +239,8 @@ static void switch_app_cb(void *obj, gui_event_t e, void *param)
     gui_log("enter switch_app_cb\n");
     extern void close_box2d_ring(void);
     close_box2d_ring();
+    extern void clear_activity(void);
+    clear_activity();
 
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "music") == 0)

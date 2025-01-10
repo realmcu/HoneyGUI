@@ -98,6 +98,8 @@ static void switch_app_menu()
         gui_log("enter menu\n");
         extern void close_box2d_ring(void);
         close_box2d_ring();
+        extern void clear_activity(void);
+        clear_activity();
 
         extern gui_app_t *get_app_menu();
         gui_app_switch(gui_current_app(), get_app_menu());
@@ -138,7 +140,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_heart(gui_tab_get_rte_obj(tb_heart));
     // page_tb_music(gui_tab_get_rte_obj(tb_music));
     // gui_tab_update_preload(GUI_BASE(tb_clock));
-    // gui_fps_create(GUI_APP_ROOT_SCREEN);
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
 // static void data_generate_task_entry()
@@ -226,6 +228,8 @@ static int app_init(void)
     }
 #endif
     gui_server_init();
+    // extern gui_app_t *_get_app_APP_MUSIC_handle(void);
+    // gui_app_startup(_get_app_APP_MUSIC_handle());
     gui_app_startup(get_app_hongkong());
     // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
     gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);

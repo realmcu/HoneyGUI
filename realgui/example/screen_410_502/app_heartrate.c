@@ -40,19 +40,22 @@ static void win_hb_cb(gui_win_t *win)
     extern char *read_file(const char *file_path);
     if (win->animate->Beginning_frame)
     {
-        char *temp = cjson_content;
-        cjson_content = read_file(NULL);
-        if (!cjson_content)
+        if (strcmp(gui_current_app()->screen.name, "app_hongkong") != 0)
         {
-            cjson_content = temp;
-            perror("fopen");
+            char *temp = cjson_content;
+            cjson_content = read_file(NULL);
+            if (!cjson_content)
+            {
+                cjson_content = temp;
+                perror("fopen");
+            }
+            else
+            {
+                free(temp);
+            }
         }
-        else
-        {
-            free(temp);
-        }
+        canvas_update_flag = 0b1111;
     }
-    canvas_update_flag = 0b1111;
 #endif
 }
 
@@ -225,20 +228,11 @@ static void heartrate_graph(NVGcontext *vg)
     nvgStrokeWidth(vg, 1.0f);
 }
 
-static bool canvas_hb_update()
-{
-    if ((canvas_update_flag & 0x01))// && curtain_index)
-    {
-        canvas_update_flag &= 0b1110;
-        return true;
-    }
-    return false;
-}
-
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(hr_animation)
 {
-    if (canvas_hb_update())
+    if (canvas_update_flag & 0x01)
     {
+        canvas_update_flag &= 0b1110;
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartrate_graph, img_data);
@@ -305,7 +299,6 @@ void heart_rate_app(gui_obj_t *obj)
         {
             img_data = gui_lower_malloc(buffer_size);
         }
-        // uint8_t *img_data = gui_lower_malloc(buffer_size);
         memset(img_data, 0, buffer_size);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartrate_graph, img_data);
         gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
