@@ -43,7 +43,7 @@ static void app_ui_design(gui_app_t *app)
     float raw_camera_position[3] = {0, 3, 60};
     gui_prism_mirror3d_set_raw_state(prism_demo, raw_world_position, raw_camera_position, 0, 0, 0, 19);
 
-    float target_world_position[3] = {0, 11, 109};
+    float target_world_position[3] = {0, 10.5, 109};
     float target_camera_position[3] = {0, 0, 80};
     gui_prism_mirror3d_set_target_state(prism_demo, target_world_position, target_camera_position, 0, 0,
                                         0, 19);
@@ -52,7 +52,6 @@ static void app_ui_design(gui_app_t *app)
     prism_demo->conf.sensitivity = 0.05f;
     gui_prism_mirror3d_click_switch_app_add_event(prism_demo, (gui_event_cb_t)app_cb);
     gui_prism_mirror3d_enter_animate(prism_demo);
-
 
 }
 uint16_t face_nums_flags = 0;

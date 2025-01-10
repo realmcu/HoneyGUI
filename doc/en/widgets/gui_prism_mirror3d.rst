@@ -249,10 +249,39 @@ Prism Mirror Control Usage Notes
 
       + File path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`, required files: :file:`extract_desc.exe` and :file:`png2c.py`.
 
-2. If you use a display screen with other ratios, in order to obtain better visual effects, you need to use 3D software to re-model, export the corresponding OBJ file, and make a description file that can be loaded by GUI (for specific steps, please refer to :ref:`GUI loads prism model`).
+2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`: Create a description file that can be loaded into the GUI (please refer to: ref: GUI loading prism model for specific steps).
 3. The OBJ file exported by 3D modeling needs to configure the Y axis as the forward axis.
 4. The default prism will automatically rotate after creation. To turn off this function, please set the AUTO_ROTATION parameter to 0 in :file:`gui_prism_mirror.h`;
 5. To modify the follower sensitivity of the prism control, please adjust SENSITIVITY in :file:`gui_prism_mirror. h`;
+
+.. _Prism Widget to Modify 3D Model:
+Prism Widget to Modify 3D Model
+-------------------------------
+This routine uses Blender software as a demonstration.
+
+1. Use 3D modeling software to open the file: ` prism. obj `, switch view effects, shortcut key: English mode, press the top left corner of the keyboard: kbd:`·`， Select the view and press: kbd:`Bottom`。
+
+.. figure:: https://foruda.gitee.com/images/1736508668989561574/99180bb7_13406851.jpeg
+   :align: center
+   :width: 800px
+
+   Modify Prism Mirror 3D View
+
+2. In object mode, select all objects for scaling (taking the 410 * 502 screen as an example, with an aspect ratio of 1:1.224), pull up the object, and the custom scaling will appear in the lower left corner. Modify the y value to 1.224.  
+
+.. figure:: https://foruda.gitee.com/images/1736508578410723528/ba011e3a_13406851.jpeg
+   :align: center
+   :width: 800px
+
+   Scale Prism Mirror 3D
+
+3. Export file
+
+.. figure:: https://foruda.gitee.com/images/1736732505811582125/f24394ef_13406851.jpeg
+   :align: center
+   :width: 800px
+
+   Export Prism Mirror 3D Object Document
 
 Example
 -------

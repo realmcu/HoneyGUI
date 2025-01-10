@@ -291,7 +291,7 @@ void gui_prism_mirror3d_set_rotation_angles(gui_prism_mirror3d_t *prism_mirror3d
     GUI_ASSERT(prism_mirror3d != NULL);
     prism_mirror3d->interpolated_state.rot_x = x;
     prism_mirror3d->interpolated_state.rot_y = y;
-    prism_mirror3d->interpolated_state.rot_y = z;
+    prism_mirror3d->interpolated_state.rot_z = z;
 
     // Adjust the raw_state and target_state rotation angles to match the new angles
     prism_mirror3d->raw_state.rot_x = x;

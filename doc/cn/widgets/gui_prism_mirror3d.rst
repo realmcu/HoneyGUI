@@ -19,7 +19,6 @@
 2. 编译运行模拟器，可以出现文档开头的视频效果；
 
 .. _GUI加载棱镜模型:
-
 GUI加载棱镜模型
 ---------------
 1. 棱镜模型组成需要的所以文件添加到单独的文件夹内：包含6张PNG图片，3D模型的几何信息文件（ :file:`.obj` ）和对应的材质信息文件（ :file:`.mtl` ）
@@ -251,10 +250,39 @@ GUI加载棱镜模型
       + 文件路径： :file:`HoneyGUI\\realgui\\example\\demo\\3d` ，所需文件： :file:`extract_desc.exe` 和 :file:`png2c.py`。
 
 
-2. 如果使用其他比例的显示屏，为获得更佳的视觉效果，需要重新使用三维软件建模，并导出相应的OBJ文件，制作GUI可以加载的描述文件（具体步骤请参考 :ref:`GUI加载棱镜模型` ）。
+2. 如果使用其他比例的显示屏，为获得更佳的视觉效果，需要重新使用三维软件建模，并导出相应的OBJ文件，(参考 :ref:`棱镜控件修改3D模型` )制作GUI可以加载的描述文件（具体步骤请参考 :ref:`GUI加载棱镜模型` ）。
 3. 三维建模导出的OBJ文件需要配置Y轴为前进轴。
 4. 棱镜默认创建后会自动旋转，关闭这个功能，请在 :file:`gui_prism_mirror.h` 将AUTO_ROTATION参数置0；
 5. 修改棱镜控件的跟手灵敏度，请在 :file:`gui_prism_mirror.h` 调整SENSITIVITY；
+
+.. _棱镜控件修改3D模型:
+棱镜控件修改3D模型
+------------------
+本例程使用blender软件作为演示。
+
+1. 使用三维建模软件打开 :file:`prism.obj` 文件，切换视图效果，快捷键：英文模式按下键盘左上角处 :kbd:`·`，出现视图选择按下 :kbd:`Bottom`。
+
+.. figure:: https://foruda.gitee.com/images/1736508668989561574/99180bb7_13406851.jpeg
+   :align: center
+   :width: 800px
+
+   调整模型视图
+
+2. 物体模式下，选中所有物体进行缩放，（以410*502屏幕为例，长宽比例1:1.224，），拉升物体，左下角出现缩放自定义，修改y值为1.224。
+
+.. figure:: https://foruda.gitee.com/images/1736508578410723528/ba011e3a_13406851.jpeg
+   :align: center
+   :width: 800px
+
+   缩放模型比例
+
+3. 导出文件
+
+.. figure:: https://foruda.gitee.com/images/1736732505811582125/f24394ef_13406851.jpeg
+   :align: center
+   :width: 800px
+
+   导出模型obj文件
 
 示例
 ----
