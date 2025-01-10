@@ -97,11 +97,11 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
     {
         if (strcmp(GUI_BASE(obj)->name, "wf_UI") == 0)
         {
-            watchface_index = 0;
+            watchface_index = 1;
         }
         else if (strcmp(GUI_BASE(obj)->name, "wf_ring") == 0)
         {
-            watchface_index = 1;
+            watchface_index = 3;
         }
         else if (strcmp(GUI_BASE(obj)->name, "wf_butterfly") == 0)
         {
@@ -113,6 +113,22 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
         watchface_index = 3;
         sprintf(watchface_path, "%s", (char *)param);
         gui_log("%s\n", watchface_path);
+        if (strstr(watchface_path, "watchface1.xml"))
+        {
+            watchface_index = 0;
+        }
+        else if (strstr(watchface_path, "watchface2.xml"))
+        {
+            watchface_index = 5;
+        }
+        else if (strstr(watchface_path, "watchface3.xml"))
+        {
+            watchface_index = 4;
+        }
+        else
+        {
+            watchface_index = 0;
+        }
     }
     extern gui_app_t *get_app_hongkong(void);
     gui_app_layer_buttom();

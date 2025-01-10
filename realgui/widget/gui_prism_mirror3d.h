@@ -181,7 +181,7 @@ void gui_prism_mirror3d_click_switch_app_add_event(gui_prism_mirror3d_t *prism_m
  *
  * @return The active face index.
  */
-uint8_t gui_prism_mirror3d_get_enter_face(void);
+int16_t *gui_prism_mirror3d_get_enter_face(void);
 
 /**
  * @brief Sets the animation parameters for a prism mirror.

@@ -23,7 +23,7 @@ static gui_curtain_t *ct_card;
 extern gui_win_t *win_watch;
 static gui_win_t *win_touch;
 bool sidebar_flag = 0;
-uint8_t watchface_index = 0;
+uint8_t watchface_index = 1;
 char watchface_path[100];
 
 struct tm *timeinfo;
@@ -70,17 +70,37 @@ static void callback_touch_long(void *obj, gui_event_t e)
     extern void clear_activity(void);
     clear_activity();
 
-    // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
-    extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
-    extern gui_app_t  *_get_app_APP_WATCHFACE_PRISM3D_handle(void);
     gui_app_layer_top();
-    // gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
-    extern void *get_app_hongkong(void);
-    gui_app_t *app_hongkong = (gui_app_t *)get_app_hongkong();
-    app_hongkong->startup_animation_flag = GUI_APP_ANIMATION_NULL;
+    extern uint8_t menu_style;
+    switch (menu_style)
+    {
+    case 0:
+        {
+            extern void *get_app_hongkong(void);
+            gui_app_t *app_hongkong = (gui_app_t *)get_app_hongkong();
+            app_hongkong->startup_animation_flag = GUI_APP_ANIMATION_NULL;
+            app_hongkong->shutdown_animation_flag = GUI_APP_ANIMATION_NULL;
 
-    gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_PRISM3D_handle());
-    return;
+            extern gui_app_t  *_get_app_APP_WATCHFACE_PRISM3D_handle(void);
+            gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_PRISM3D_handle());
+        }
+        break;
+    case 1:
+        {
+            extern gui_app_t  *_get_app_APP_WATCHFACE_CUBE_handle(void);
+            gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_CUBE_handle());
+        }
+        break;
+    case 2:
+        {
+            // !!!if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
+            extern gui_app_t  *_get_app_APP_WATCHFACE_MARKET_handle(void);
+            gui_app_switch(gui_current_app(), _get_app_APP_WATCHFACE_MARKET_handle());
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void page_tb_clock(void *parent)
@@ -104,13 +124,13 @@ void page_tb_clock(void *parent)
     {
     case 0:
         {
-            page_ct_clock(ct_clock);
+            extern void create_tree_nest(const char *xml, void *obj);
+            create_tree_nest((void *)watchface_path, ct_clock);
         }
         break;
     case 1:
         {
-            extern void create_watchface_ring(void *parent);
-            create_watchface_ring(ct_clock);
+            page_ct_clock(ct_clock);
         }
         break;
     case 2:
@@ -121,9 +141,22 @@ void page_tb_clock(void *parent)
         break;
     case 3:
         {
+            extern void create_watchface_ring(void *parent);
+            create_watchface_ring(ct_clock);
+        }
+    case 4:
+        {
+            extern void create_tree_nest(const char *xml, void *obj);
+            create_tree_nest((void *)watchface_path, ct_clock);
+
+        }
+        break;
+    case 5:
+        {
             extern void create_tree_nest(const char *xml, void *obj);
             create_tree_nest((void *)watchface_path, ct_clock);
         }
+        break;
     default:
         // page_ct_clock(ct_clock);
         break;

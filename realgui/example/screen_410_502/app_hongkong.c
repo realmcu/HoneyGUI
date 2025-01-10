@@ -48,6 +48,7 @@ void *get_app_hongkong(void)
 static void kb_button_cb()
 {
     app_hongkong.startup_animation_flag = GUI_APP_ANIMATION_9;
+    app_hongkong.shutdown_animation_flag = GUI_APP_ANIMATION_10;
 
     extern gui_kb_port_data_t *kb_get_data(void);
     gui_kb_port_data_t *kb = kb_get_data();

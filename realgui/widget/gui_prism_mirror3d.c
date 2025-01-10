@@ -38,7 +38,7 @@
  *============================================================================*/
 
 bool enter_flag = true;
-int16_t enter_face_flags = 1;
+static int16_t enter_face_flags = 1;
 
 /*============================================================================*
  *                           Private Functions
@@ -312,9 +312,9 @@ void gui_prism_mirror3d_enter_animate(gui_prism_mirror3d_t *prism_mirror3d)
                                                (enter_face_flags - 1);
     gui_prism_render_interpolated_animate(prism_mirror3d);
 }
-uint8_t gui_prism_mirror3d_get_enter_face(void)
+int16_t *gui_prism_mirror3d_get_enter_face(void)
 {
-    return enter_face_flags;
+    return &enter_face_flags;
 }
 
 void gui_prism_mirror3d_set_raw_state(gui_prism_mirror3d_t *prism_mirror3d, float world_position[3],

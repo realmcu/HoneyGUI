@@ -55,7 +55,7 @@ static void app_ui_design(gui_app_t *app)
 
 
 }
-uint8_t face_nums_flags = 0;
+uint16_t face_nums_flags = 0;
 static void app_ui_design_switch(gui_app_t *app)
 {
     touch_info_t *tp = tp_get_info();
@@ -143,7 +143,7 @@ GUI_INIT_APP_EXPORT(app_init);
 void app_cb(gui_obj_t *obj, void *event_param)
 {
     gui_prism_mirror3d_t *prism_3d = (gui_prism_mirror3d_t *)obj;
-    face_nums_flags = gui_prism_mirror3d_get_enter_face();
+    face_nums_flags = *gui_prism_mirror3d_get_enter_face();
     switch (face_nums_flags)
     {
     case 0:

@@ -31,7 +31,7 @@ static gui_app_t _app_APP_WATCHFACE_PRISM3D =
 };
 gui_app_t *_get_app_APP_WATCHFACE_PRISM3D_handle(void) { return &_app_APP_WATCHFACE_PRISM3D; }
 
-
+extern uint8_t watchface_index;
 void app_cb(void *p);
 static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *app)
 {
@@ -53,39 +53,37 @@ static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *app)
     prism_watchface->conf.face_nums = 6;
     prism_watchface->conf.sensitivity = 0.05f;
 
-    // prism_watchface->raw_state = (gui_prism_transform_state_t) {.worldPosition = {0, 23, 60}, .cameraPosition = {0, 4, 4}, .rot_x = 90, .rot_y = 0, .rot_z = 0, .scale = 22};
-    // prism_watchface->target_state = (gui_prism_transform_state_t) {.worldPosition = {0, 22, 60}, .cameraPosition = {0, 0, 4}, .rot_x = 90, .rot_y = 0, .rot_z = 0, .scale = 29};
+    int16_t *face = gui_prism_mirror3d_get_enter_face();
+    *face = watchface_index;
     gui_prism_mirror3d_click_switch_app_add_event(prism_watchface, (gui_event_cb_t)app_cb);
     gui_prism_mirror3d_enter_animate(prism_watchface);
-
 }
 
 void app_cb(void *p)
 {
-    extern uint8_t watchface_index;
     extern char *defaultPath;
     extern char watchface_path[];
-    switch (gui_prism_mirror3d_get_enter_face())
+    switch (*gui_prism_mirror3d_get_enter_face())
     {
     case 0:
-        watchface_index = 3;
+        watchface_index = 0;
         sprintf(watchface_path, "%sapp/watchface1/watchface1.xml", GUI_ROOT_FOLDER);
         break;
     case 1:
-        watchface_index = 0;
+        watchface_index = 1;
         break;
     case 2:
         watchface_index = 2;
         break;
     case 3:
-        watchface_index = 1;
+        watchface_index = 3;
         break;
     case 4:
-        watchface_index = 3;
+        watchface_index = 4;
         sprintf(watchface_path, "%sapp/watchface3/watchface3.xml", GUI_ROOT_FOLDER);
         break;
     case 5:
-        watchface_index = 3;
+        watchface_index = 5;
         sprintf(watchface_path, "%sapp/watchface2/watchface2.xml", GUI_ROOT_FOLDER);
         break;
     default:
