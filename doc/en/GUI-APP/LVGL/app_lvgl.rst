@@ -920,15 +920,15 @@ The LVGL blog covers the following content:
 The LVGL blog is an important resource for developers to understand and master LVGL. By reading the blog, developers can gain insights on the latest LVGL developments, learning materials, and technical insights, helping them utilize LVGL to build excellent graphical interfaces.
 
 FAQ
-==========================
+=======
 - `LVGL FAQ <https://docs.lvgl.io/8.3/intro/index.html#faq>`_
 
 HoneyGUI vs LVGL Picture Drawing Frame Rate
------------------------------------
+--------------------------------------------
 
 
 GRAM Screen (280x456) RAM Block Drawing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Background: RTL8772G, RGB565, uncompressed images, test for the performance of displaying a single image (HoneyGUI rectangle fill data is temporarily unavailable; LVGL has not adapted PPE hardware acceleration for image scaling yet).
 
 .. csv-table:: RAM Block Drawing
@@ -936,8 +936,8 @@ Background: RTL8772G, RGB565, uncompressed images, test for the performance of d
   :align: center
   
   Draw Image,             73,     74,     70,     73
-  Fill Rectangle,          1,      1,     74,     74
-  Rotate Image 45°,        7,      7,      4,      4
+  Fill Rectangle,          3,     85,     74,     74
+  Rotate Image 45°,        3,      3,      4,      4
   Scale Up 1.5x ,          3,     31,      3,     25
   Scale Down 0.5x ,        9,     73,     12,     25
 
@@ -960,8 +960,8 @@ Background: RTL8772G, RGB565, image size 315x316, uncompressed images, RGB scree
   :header: Test Case, HoneyGUI FPS (SW), HoneyGUI FPS (PPE), LVGL FPS (SW), LVGL FPS (PPE)
   :align: center
   
-  Draw Image,             80,     82,     17,     25
-  Fill Rectangle,         --,     --,     25,     26
+  Draw Image,             76,     76,     17,     25
+  Fill Rectangle,          4,     78,     25,     26
   Rotate Image 45°,        3,      3,      6,      4
   Scale Up 1.5x ,          2,     23,      3,     13
   Scale Down 0.5x ,       10,     82,     13,     50
@@ -982,7 +982,7 @@ HoneyGUI vs LVGL RAM Consumption
   :align: center
   
   Draw Image,          156,     176
-  Fill Rectangle,       --,     200
+  Fill Rectangle,       64,     200
   Rotate Image 45°,    156,     208
   Scale Up 1.5x ,      156,     208
   Scale Down 0.5x ,    156,     176
@@ -994,7 +994,7 @@ HoneyGUI vs LVGL RAM Consumption
   :align: center
   
   Draw Image,           41892(40KB),     55300(54KB)
-  Fill Rectangle,                --,     55300(54KB)
+  Fill Rectangle,       41892(40KB),     55300(54KB)
   Rotate Image 45°,     41892(40KB),     55300(54KB)
   Scale Up 1.5x ,       41892(40KB),     55300(54KB)
   Scale Down 0.5x ,     41892(40KB),     55300(54KB)
@@ -1002,7 +1002,7 @@ HoneyGUI vs LVGL RAM Consumption
 
 
 Conclusion
-----------------------------------
+------------
 
 - **Applicable Scenarios**: For large screen sizes (e.g. 800x480) and full-frame drawing, HoneyGUI is recommended. For frequent partial screen refresh projects, LVGL is recommended. For block drawing when RAM resources are tight, HoneyGUI is recommended, with section recommended parameters set to 10.
 - **Rotation, Scaling**: LVGL performs faster in 2D rendering using a 2x2 matrix compared to HoneyGUI's 3x3 matrix, which handles more data for 2D rendering. For 2.5D or pseudo-3D effects, HoneyGUI will perform better.
