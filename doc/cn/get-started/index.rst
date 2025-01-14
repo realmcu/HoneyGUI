@@ -57,7 +57,7 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 测试过 Python 3.9.7 版本。
 
-安装scons
+安装Scons
 ^^^^^^^^^
 
 打开一个 CMD 窗口，并执行以下命令来安装 Python 的 scons 库：
@@ -66,10 +66,10 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
    > pip install scons==4.4.0
 
-安装 `MinGW-w64` 工具链和 `scons` 库后，可以通过两种方式启动应用程序：通过 CMD 启动或通过 GUI 启动。
+安装 ``MinGW-w64`` 工具链和 ``scons`` 库后，可以通过两种方式启动应用程序：通过 CMD 启动或通过 GUI 启动。
 
-通过CMD启动
-^^^^^^^^^^^
+通过CMD启动（Scons）
+^^^^^^^^^^^^^^^^^^^^^
 
 在 ``HoneyGUI`` 或 ``gui`` 文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
 
@@ -85,6 +85,43 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 .. image:: https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png
    :align: center
    :width: 700
+
+通过CMD启动（CMake）
+^^^^^^^^^^^^^^^^^^^^^
+
+- 依赖软件
+    
+     **CMake** （测试版本为3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
+    
+     **MinGW-w64**：如前所述
+
+- 初始化：在 ``HoneyGUI`` 文件夹中
+
+.. code-block:: shell
+
+   > cd win32_sim
+   > mkdir build
+   > cd build
+   > cmake -G "MinGW Makefiles" ..
+
+- 编译：在 ``HoneyGUI/win32_sim/build`` 文件夹中
+
+.. code-block:: shell
+      
+   > cmake -G "MinGW Makefiles" ..
+   > mingw32-make -j 32
+
+- 配置：在 ``HoneyGUI/win32_sim/build`` 文件夹中
+
+.. code-block:: shell
+
+   > cmake --build . --target menuconfig
+
+- 运行：在 ``HoneyGUI`` 文件夹中
+
+.. code-block:: shell
+   
+   > .\win32_sim\gui.exe
 
 通过VSCode启动
 ^^^^^^^^^^^^^^^

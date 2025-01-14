@@ -152,15 +152,22 @@ This page shows how the UI switch corresponds to the peripheral switch.
 Light Switch Data
 -----------------
 
-+----------------+--------------+--------------------------------------------------------+
-| Data           | Value type   | Brief                                                  |
-+================+==============+========================================================+
-| gpio           | number       | index of light                                         |
-+----------------+--------------+--------------------------------------------------------+
-| direction      | out / in     | direction of signal                                    |
-+----------------+--------------+--------------------------------------------------------+
-| write value    | number       | 0 for turning off / 1 for turning on                  |
-+----------------+--------------+--------------------------------------------------------+
+.. list-table::
+   :header-rows: 1
+
+   * - Data 
+     - Value type
+     - Brief
+   * - gpio
+     - number
+     - index of light
+   * - direction
+     - out / in
+     - direction of signal
+   * - write value
+     - number
+     - 0 for turning off / 1 for turning on
+
 
 - Refer to `onoff npm package usage <https://www.npmjs.com/package/onoff#usage>`_ for more information.
 

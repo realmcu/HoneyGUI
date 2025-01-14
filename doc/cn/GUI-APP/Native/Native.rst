@@ -26,10 +26,11 @@ C-APP应用程序
    :language: c
    :start-after: /*define the app's ui design*/
    :end-before: /*define the app's ui design end*/
+   
 - 还有其他方式可以定义应用程序，例如  ``GUI_APP_DEFINEE`` 和 ``struct gui_app``。
 
 创建一个C-APP的控件树
---------------------
+-----------------------
 - 这是一个时钟应用程序，作为本节的示例。在下图中，您可以看到应用程序界面有秒表和倒计时器选项。点击这些选项可以在它们之间切换。
 
 .. raw:: html

@@ -38,7 +38,7 @@ p {
 }
 
 /* --------- Render sm-screen Style --------- */
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 769px) {
     /* ----- left sider ----- */
     .wy-nav-side {
         width: var(--md-left-sider-width);
@@ -292,6 +292,17 @@ html.writer-html5 .rst-content dl.field-list>dt {
 
 
 /* ========= Render Code Block Style ========= */
+.rst-content .guilabel {
+    line-height: 1.3rem
+}
+
+/* code copy button style */
+button.copybtn {
+    opacity: 1;
+}
+button.copybtn.o-tooltip--left:after {
+    display: none;
+}
 .highlight {
     background:rgba(223, 233, 243,0.4);
 }
@@ -376,7 +387,9 @@ table th {
     margin-bottom: 0;
 }
 /* ============ Render Table Style ============ */
-
+table code {
+    line-height: 22px; /* 修正表格中代码块换行重叠 */
+}
 
 /* ========= Render Quote Block Style ========= */
 /*

@@ -160,16 +160,11 @@ function backToTop() {
 }
 
 /* ============= Toggle Languages ============= */
-function change_language(lang)
-{
-    var url = window.location.pathname;
-    var newUrl = "";
-    if(lang.toLowerCase() == 'en')
-    {
-        newUrl = url.replace(/\/en\//gi, '/cn/');
-    }
-    else {
-        newUrl = url.replace(/\/cn\//gi, '/en/');
-    }  
-    window.location.href = newUrl;
-}
+document.addEventListener("DOMContentLoaded", function () {
+    let currentUrl = window.location.href;
+    let newEnUrl = currentUrl.replace(/\/cn\//gi, '/en/');
+    let newCnUrl = currentUrl.replace(/\/en\//gi, '/cn/');
+ 
+    document.getElementById('toEN').href = newEnUrl;
+    document.getElementById('toCN').href = newCnUrl;
+})

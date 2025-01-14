@@ -635,6 +635,7 @@ LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，
 
 
 .. _LVGL 在线转换工具:
+
 LVGL 在线转换工具
 ~~~~~~~~~~~~~~~~~~
 
@@ -647,7 +648,8 @@ LVGL 在线转换工具
 1. 选择 LVGL 版本
 2. 选取图片文件
 3. 选择输出文件的颜色格式
-  颜色格式的说明请参考 `LVGL Overview Images - color format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_
+   
+   颜色格式的说明请参考 `LVGL Overview Images - color format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_
 4. 选择输出图片的类型 (C array/binary file)
 5. 点击转换获取输出文件
 
@@ -758,6 +760,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
 
 3. 若作为文件导入,以文件地址的方式访问图片资源
+
  - a. 构建 :c:type:`lv_img_dsc_t` ，例如：
    
    .. code-block:: c
@@ -837,7 +840,8 @@ LVGL 启用 RLE 解码器
 1. 设定输出字库的名字
 2. 设定字体的高度 height，像素单位
 3. 设定字体的 bpp(bit-per-piel)
-  表示采用多少个 bit 来描述一个像素，当数值越大时，字符的抗锯齿效果越好，边缘越平滑，字库占用空间越大
+   
+   表示采用多少个 bit 来描述一个像素，当数值越大时，字符的抗锯齿效果越好，边缘越平滑，字库占用空间越大
 4. 选择输出字库的类型 (C array/bin file)
 5. 选择字体文件 (TTF/WOFF)
 6. 设定需要转换的字符 Unicode 范围，也可直接列出需要转换的字符
@@ -994,7 +998,7 @@ GRAM 屏幕 (280x456)SRAM 分块绘制
 
 
 PSRAM 整帧 buffer 绘制（800x480）
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 背景：RTL8772G 平台，rgb565，图片尺寸 315x316，非压缩图片，RGB 屏幕，测试单张图片的显示绘制性能。
 

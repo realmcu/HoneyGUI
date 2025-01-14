@@ -249,12 +249,13 @@ Prism Mirror Control Usage Notes
 
       + File path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`, required files: :file:`extract_desc.exe` and :file:`png2c.py`.
 
-2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`: Create a description file that can be loaded into the GUI (please refer to: ref: GUI loading prism model for specific steps).
+2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`), and create a description file that can be loaded into the GUI (please refer to :ref:`GUI Load Prism Mirror Model` for specific steps).
 3. The OBJ file exported by 3D modeling needs to configure the Y axis as the forward axis.
 4. The default prism will automatically rotate after creation. To turn off this function, please set the AUTO_ROTATION parameter to 0 in :file:`gui_prism_mirror.h`;
 5. To modify the follower sensitivity of the prism control, please adjust SENSITIVITY in :file:`gui_prism_mirror. h`;
 
 .. _Prism Widget to Modify 3D Model:
+
 Prism Widget to Modify 3D Model
 -------------------------------
 This routine uses Blender software as a demonstration.
