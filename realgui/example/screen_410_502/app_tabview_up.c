@@ -652,7 +652,7 @@ static void win_design_cb(void)
         {
             gui_img_set_image_data(arrow, UI_ARROW_DOWN_BIN);
         }
-        else if (tp->deltaY < 15)
+        else if (tp->deltaY < -15)
         {
             gui_img_set_image_data(arrow, UI_ARROW_UP_BIN);
         }

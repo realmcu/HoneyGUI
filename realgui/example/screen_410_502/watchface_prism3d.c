@@ -32,7 +32,7 @@ static gui_app_t _app_APP_WATCHFACE_PRISM3D =
 gui_app_t *_get_app_APP_WATCHFACE_PRISM3D_handle(void) { return &_app_APP_WATCHFACE_PRISM3D; }
 
 extern uint8_t watchface_index;
-void app_cb(void *p);
+static void app_cb(void *p);
 static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *app)
 {
     gui_prism_mirror3d_t *prism_watchface = gui_prism_mirror3d_create(&(app->screen), "prism_3d",
@@ -59,7 +59,7 @@ static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *app)
     gui_prism_mirror3d_enter_animate(prism_watchface);
 }
 
-void app_cb(void *p)
+static void app_cb(void *p)
 {
     extern char *defaultPath;
     extern char watchface_path[];

@@ -29,7 +29,7 @@ char watchface_path[100];
 struct tm *timeinfo;
 static struct tm watch_time;
 
-static void curtain_ctr_cb(gui_win_t *win)
+static void curtain_ctr_cb(void)
 {
     if (ct->cur_curtain == CURTAIN_DOWN || ct->cur_curtain == CURTAIN_UP)
     {
@@ -114,7 +114,8 @@ void page_tb_clock(void *parent)
     ct_card = gui_curtain_create(ct, "card", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CURTAIN_DOWN, 1);
 
     gui_win_t *win = gui_win_create(parent, "", 0, 0, 0, 0);
-    gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)curtain_ctr_cb, (void *)win);
+    gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)curtain_ctr_cb, NULL);
+    curtain_ctr_cb();
     extern void page_ct_clock(void *parent);
     extern void page_ct_sidebar(void *parent);
     extern void tabview_up_design(void *parent_widget);
@@ -144,11 +145,11 @@ void page_tb_clock(void *parent)
             extern void create_watchface_ring(void *parent);
             create_watchface_ring(ct_clock);
         }
+        break;
     case 4:
         {
             extern void create_tree_nest(const char *xml, void *obj);
             create_tree_nest((void *)watchface_path, ct_clock);
-
         }
         break;
     case 5:

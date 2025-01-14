@@ -31,6 +31,7 @@ void clear_activity(void)
     move_text = NULL;
     ex_text = NULL;
     stand_text = NULL;
+    img = NULL;
 }
 
 static void arc_activity_cb(NVGcontext *vg)
@@ -195,22 +196,14 @@ void activity_app(gui_obj_t *obj)
         }
         memset(img_data, 0, buffer_size);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
-        if (!img)
+        if (img)
         {
-            img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
-                                          50, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-            gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
+            gui_obj_tree_free(img);
         }
-        else
-        {
-            // reset animate
-            img->animate->animate = true;
-            img->animate->current_frame = 0;
-            img->animate->current_repeat_count = 0;
-            img->animate->progress_percent = 0;
-        }
-
+        img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
+                                      50, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
     }
     animate_flag = 1;
     draw_flag = 0;

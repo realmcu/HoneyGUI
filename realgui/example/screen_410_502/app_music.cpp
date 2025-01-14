@@ -643,7 +643,7 @@ private:
     {
         /*LIST WINDOW*/
         list_win = gui_win_create(parent, "win list", 0, 0, SCREEN_W, SCREEN_H);
-        gui_win_set_animate(list_win, 1000, -1, list_animation, list_win);
+
         gui_canvas_rect_create(GUI_BASE(list_win), 0, 0, 0, SCREEN_W, SCREEN_H, color_list);
         list_page = gui_page_create(list_win, "list_page", 0, 0, SCREEN_W, 0);
         std::vector<void *> img_file_vec = {GROUP1000000745_BIN, GROUP1000000744_BIN, GROUP1000000746_BIN, GROUP1000000747_BIN, GROUP1000000748_BIN, GROUP1000000749_BIN};
@@ -708,7 +708,7 @@ private:
 
         /*COVER WINDOW*/
         win_cover = gui_win_create(parent, "win cover", 0, 0, SCREEN_W, SCREEN_H);
-        gui_win_set_animate(win_cover, 1000, -1, cover_animation, win_cover);
+
         parent = GUI_BASE(win_cover);
         gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H, APP_COLOR_SILVER);
         img_cover = (gui_img_create_from_mem(parent, "cover", RECTANGLE86_BIN, COVER_X, COVER_Y, 0, 0));
@@ -719,7 +719,7 @@ private:
         GUI_API(gui_switch_t).on_turn_on(sw, (gui_event_cb_t)switchOnCallback, nullptr);
         GUI_API(gui_switch_t).on_turn_off(sw, (gui_event_cb_t)switchOffCallback, nullptr);
         gui_img_set_mode(static_cast<gui_img_t *>(sw->switch_picture), IMG_SRC_OVER_MODE);
-        GUI_API(gui_switch_t).animate(sw, 1000, -1, (void *)onCompletion, nullptr);
+
 
         skipBack = (gui_button_create(parent, SWITCH_X - SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPBACK_BIN,
                                       SKIPBACKHL_BIN, nullptr,
@@ -750,6 +750,9 @@ private:
                     COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
         gui_img_scale(img_cover, 0.5, 0.5);
 
+        gui_win_set_animate(win_cover, 1000, -1, cover_animation, win_cover);
+        GUI_API(gui_switch_t).animate(sw, 1000, -1, (void *)onCompletion, nullptr);
+        gui_win_set_animate(list_win, 1000, -1, list_animation, list_win);
     }
 
 
@@ -760,7 +763,16 @@ private:
         char dummy = ':';
         std::istringstream timeStream(timePart);
         timeStream >> minutes >> dummy >> seconds;
-        return (int)(minutes * 60 + seconds);
+        int rst = 0;
+        if (minutes * 60 + seconds > INT_MAX)
+        {
+            rst = INT_MAX;
+        }
+        else
+        {
+            rst = minutes * 60 + seconds;
+        }
+        return rst;
     }
 
 // Function to get metadata
@@ -1009,11 +1021,9 @@ void appMusicUIDesign(gui_obj_t *parent)
 }
 
 
-
 extern "C" {
     void app_music_ui_design(gui_obj_t *parent)
     {
-
         gui_music_app::appMusicUIDesign(parent);
     }
 }

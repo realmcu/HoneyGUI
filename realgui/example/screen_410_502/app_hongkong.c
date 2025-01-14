@@ -134,13 +134,15 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    // gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 3, 0);
+    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 3, 0);
 
+    page_tb_music(gui_tab_get_rte_obj(tb_music));
+    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
     page_tb_clock(gui_tab_get_rte_obj(tb_clock));
     page_tb_activity(gui_tab_get_rte_obj(tb_activity));
-    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
-    // page_tb_music(gui_tab_get_rte_obj(tb_music));
-    // gui_tab_update_preload(GUI_BASE(tb_clock));
+    // page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+
+    gui_tab_update_preload(GUI_BASE(tb_clock));
     gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
@@ -229,8 +231,6 @@ static int app_init(void)
     }
 #endif
     gui_server_init();
-    // extern gui_app_t *_get_app_APP_MUSIC_handle(void);
-    // gui_app_startup(_get_app_APP_MUSIC_handle());
     gui_app_startup(get_app_hongkong());
     // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
     gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);

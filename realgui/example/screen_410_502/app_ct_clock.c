@@ -882,6 +882,7 @@ void page_ct_clock(void *parent)
                                       211 + text_w * 3 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
+    refreash_time();
 
     // activity icon
     {
