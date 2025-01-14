@@ -1,22 +1,27 @@
+
 ==========
-XML Syntax
+XML 语法
 ==========
 
-Element
+
+元素
 -------
 
-- Element corresponding widget.
-- Element's attributes corresponding widget's attributes (0 value can be ignored).
-- Text content is the widget instance's name.
+- 元素对应控件
+- 元素的属性对应控件的属性（0 值可以忽略）
+- 文本内容对应控件实例的名称
 
 .. code-block:: xml
 
    <type a1="xx" a2="xx" a3="xx" a4="xx">name</type> 
 
-Nesting
--------
 
-The nesting structure of elements is consistent with the nesting structure of actual widgets.
+嵌套
+-----
+
+元素的嵌套结构与实际控件的嵌套结构一致
+
+
 
 .. raw:: html
 
@@ -54,32 +59,31 @@ The nesting structure of elements is consistent with the nesting structure of ac
        </childType> 
    </fatherType> 
 
-Specifications
-==============
-
+规格 
+==========
 
 .. list-table::
    :header-rows: 1
    :widths: 10 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8
 
-   * - Element
-     - Attributes1
-     - Attributes2
-     - Attributes3
-     - Attributes4
-     - Attributes5
-     - Attributes6
-     - Attributes7
-     - Attributes8
-     - Attributes9
-     - Attributes10
-     - Attributes11
-     - Attributes12
-     - Attributes13
-     - Attributes14
-     - Attributes15
-     - Attributes16
-     - Attributes17
+   * - 元素
+     - 属性1
+     - 属性2
+     - 属性3
+     - 属性4
+     - 属性5
+     - 属性6
+     - 属性7
+     - 属性8
+     - 属性9
+     - 属性10
+     - 属性11
+     - 属性12
+     - 属性13
+     - 属性14
+     - 属性15
+     - 属性16
+     - 属性17
    * - win
      - x
      - y
@@ -465,198 +469,196 @@ Specifications
    :header-rows: 1
    :widths: 6 10 20
 
-   * - Attribute
-     - Description
-     - Values
+   * - 属性
+     - 简介
+     - 值
    * - x
-     - Relative left coordinate
+     - 相对左坐标
      - number
    * - y
-     - Relative top coordinate
+     - 相对上坐标
      - number
    * - w
-     - Width
+     - 宽度
      - number
    * - h
-     - Height
+     - 高度
      - number
    * - hidden
-     - Hidden
+     - 隐藏
      - hidden
    * - text
-     - Text string
+     - 文本字符串
      - string
    * - font
-     - Font file
+     - 字体文件
      - file path
    * - fontSize
-     - Font size
+     - 字号
      - number
    * - color
-     - RGB hex color
+     - 三原色十六进制色彩
      - #RRGGBB
    * - mode(textbox)
-     - Text effect
+     - 文本特效
      - truncate, verticalscroll, horizontalscroll, transition
    * - mode(icon)
-     - Highlight effect on press
+     - 按压高亮效果
      - normal, fade, scale, fadeScale, array
    * - mode(switch)
-     - Highlight effect on press
+     - 按压高亮效果
      - array
    * - inputable
-     - Soft keyboard
+     - 软键盘
      - boolean
    * - scaleX
-     - Horizontal scaling ratio
+     - 水平缩放比例
      - number
    * - scaleY
-     - Vertical scaling ratio
+     - 竖直缩放比例
      - number
    * - rotationAngle
-     - Rotation angle
+     - 旋转角度
      - number
    * - blendMode
-     - Image blend mode
+     - 图片混合模式
      - imgBypassMode, imgFilterBlack, imgSrcOverMode, imgCoverMode
    * - opacity
-     - Opacity from 0 to 255
+     - 不透明度 从零到二百五十五
      - number
    * - file
-     - File path
+     - 文件路径
      - string
    * - folder
-     - Folder path
+     - 文件夹路径
      - string
    * - duration
-     - Animation duration (milliseconds)
+     - 动画时长（毫秒）
      - number
    * - picture
-     - Image file path
+     - 图片文件路径
      - string
    * - orientation(seekbar)
-     - Orientation
+     - 方向
      - vertical, V, horizontal, H, arc
    * - orientation(curtain)
-     - Direction
+     - 方向
      - middle, up, down, left, right
    * - centralX
-     - Arc center x-coordinate
+     - 圆弧中心横坐标
      - number
    * - centralY
-     - Arc center y-coordinate
+     - 圆弧中心纵坐标
      - number
    * - startDegree
-     - Arc starting angle
+     - 圆弧起始角
      - number
    * - endDegree
-     - Arc ending angle
+     - 圆弧结束角
      - number
    * - transition
-     - Transformation effect
+     - 变换特效
      - normal, fade, scale, fadeScale
    * - idx
-     - Horizontal index
+     - 水平索引
      - number
    * - idy
-     - Vertical index
+     - 竖直索引
      - number
    * - scope
-     - Range (from 0 to 1)
+     - 范围（从零到一）
      - number
    * - highlightPicture
-     - Highlight image file path
+     - 高亮图片文件路径
      - string
    * - fontColor
-     - RGB hex color
+     - 三原色十六进制色彩
      - #RRGGBB
    * - textX
-     - Relative x-coordinate of text
+     - 文字相对横坐标
      - number
    * - textY
-     - Relative y-coordinate of text
+     - 文字相对纵坐标
      - number
    * - pictureX
-     - Relative x-coordinate of image
+     - 图片相对横坐标
      - number
    * - pictureY
-     - Relative y-coordinate of image
+     - 图片相对纵坐标
      - number
    * - rowNumber
-     - Number of rows
+     - 行数
      - number
    * - colNumber
-     - Number of columns
+     - 列数
      - number
    * - rowGap
-     - Row spacing
+     - 行间距
      - number
    * - colGap
-     - Column spacing
+     - 列间距
      - number
    * - mainBg
-     - Main background image file path
+     - 主要背景图片文件路径
      - string
    * - centerBg
-     - Center background image file path
+     - 中央背景图片文件路径
      - string
    * - centerPercent
-     - Center area percentage
+     - 中央区域占比
      - number
    * - sideScale
-     - Default scaling ratio for side images
+     - 侧边图片默认缩放比例
      - number
    * - sidePosPercent
-     - Side image position percentage
+     - 侧边图片位置占比
      - number
    * - type(animateTransform)
-     - Animation type
+     - 动画类型
      - rotate
    * - from
-     - Starting value of animation
+     - 动画起始值
      - number
    * - to(animateTransform)
-     - End value of animation
+     - 动画终点值
      - number
    * - dur
-     - Animation duration
+     - 动画时长
      - number
    * - repeatCount
-     - Number of animation repetitions
+     - 动画重复次数
      - number
    * - switchOpen
-     - Motorized curtain open button name
+     - 电动窗帘开启按钮名称
      - string
    * - switchClose
-     - Motorized curtain close button name
+     - 电动窗帘关闭按钮名称
      - string
    * - pauseOpen
-     - Motorized curtain pause button name
+     - 电动窗帘暂停按钮名称
      - string
    * - ime
-     - Input method
+     - 输入法
      - null, pinyin
    * - type(onClick)
-     - Behavior type triggered by click event
+     - 点击事件触发的行为类型
      - jump, control
    * - to(onClick)
-     - Action target
+     - 行为目标
      - light, multiLevel
    * - id1
-     - Main parameter
+     - 主参数
      - number
    * - id2
-     - Secondary parameter
+     - 次参数
      - number
 
 
-
-
-Example
+示例
 =======
 
-Win 
----
+窗口 
+------
 
 .. code-block:: xml
 
@@ -667,8 +669,8 @@ Win
        h="480">cool_win
    </win>
 
-Img 
----
+图片
+------
 
 .. code-block:: xml
 
@@ -684,3 +686,10 @@ Img
        scaleX="1"
        scaleY="1">image3
    </img>
+
+
+
+
+
+
+

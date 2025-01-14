@@ -28,4 +28,6 @@
     LiteGFX <LiteGFX/Demo>
     状态栏 <Status-bar/Status bar>
     水果忍者 <Fruit_Ninja/Fruit_Ninja>
-
+    音乐播放器 <MusicPlayer/Music Player>
+    计时器 <Timer/Timer>
+    表盘市场 <WatchfaceMarket/WatchfaceMarket>
