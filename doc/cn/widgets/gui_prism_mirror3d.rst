@@ -15,8 +15,24 @@
 模拟器运行棱镜效果
 ------------------
 
-1. 在 :file:`menu_config.h` 中（ :file:`HoneyGUI\\win32_sim\\menu_config.h` ），开启宏定义CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D；
-2. 编译运行模拟器，可以出现文档开头的视频效果；
+HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南`  章节。
+
+完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。在 :file:`menu_config.h` 中（ :file:`your HoneyGUI dir/win32_sim/menu_config.h` ），开启宏定义 **CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D** ；
+
+.. figure:: https://foruda.gitee.com/images/1736838781027776182/64086e10_13406851.jpeg
+   :align: center
+   :width: 400px
+
+   模拟器运行棱镜效果
+
+1. 当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript`
+文件，修改其中的屏幕宽度 :c:macro:`DRV_LCD_WIDTH` 和 屏幕高度 :c:macro:`DRV_LCD_HIGHT`，均为像素单位。
+
+.. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
+   :align: center
+   :width: 400  
+
+   模拟器修改屏幕尺寸
 
 .. _GUI加载棱镜模型:
 
@@ -49,14 +65,14 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `parent`: 父对象，新的棱镜模型将附加到此 GUI 组件中。
-- `name`: 作名称，用于标识和管理 3D 对象。
-- `desc_addr`: 描述符地址，包含可视化的解析数据。
-- `x`: 在父组件坐标系中的 X 坐标。
-- `y`: 在父组件坐标系中的 Y 坐标。
-- `w`: 控件的宽度。
-- `h`: 控件的高度。
-- `config`: 指向配置结构体的指针，用于配置面数、旋转等特性。
++ ``parent``: 父对象，新的棱镜模型将附加到此 GUI 组件中。
++ ``name``: 作名称，用于标识和管理 3D 对象。
++ ``desc_addr``: 描述符地址，包含可视化的解析数据。
++ ``x``: 在父组件坐标系中的 X 坐标。
++ ``y``: 在父组件坐标系中的 Y 坐标。
++ ``w``: 控件的宽度。
++ ``h``: 控件的高度。
++ ``config``: 指向配置结构体的指针，用于配置面数、旋转等特性。
 
 **示例:**
 
@@ -75,7 +91,7 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`:已经创建的棱镜模型对象。
++ ``prism_mirror3d``:已经创建的棱镜模型对象。
 
 **示例:**
 
@@ -91,9 +107,8 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`:已经创建的棱镜模型对象，待添加点击事件。
-
-- `callback`:回调函数，用于处理点击事件后的应用切换逻辑。
++ ``prism_mirror3d``：已经创建的棱镜模型对象，待添加点击事件。
++ ``callback``：回调函数，用于处理点击事件后的应用切换逻辑。
 
 **示例:**
 
@@ -103,7 +118,7 @@ GUI加载棱镜模型
         // 处理应用切换逻辑
     }
 
-    gui_prism_mirror3d_click_switch_app_add_event(prism, onSwitchAppCallback);
+    gui_prism_mirror3d_click_switch_app_add_event(prism_demo, onSwitchAppCallback);
 
 设置大小
 ~~~~~~~~
@@ -111,14 +126,14 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`: 棱镜模型对象。
-- `scale`: 缩放因子。
++ ``prism_mirror3d``：棱镜模型对象。
++ ``scale``：缩放因子。
 
 **示例:**
 
 .. code-block:: c
 
-    gui_prism_mirror3d_set_scale(prism, 1.0f);
+    gui_prism_mirror3d_set_scale(prism_demo, 1.0f);
 
 设置位置
 ~~~~~~~~
@@ -126,16 +141,16 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`: 棱镜模型对象。
-- `x`: X 坐标。
-- `y`: Y 坐标。
-- `z`: Z 坐标。
+- ``prism_mirror3d``：棱镜模型对象。
+- ``x``: X 坐标。
+- ``y``: Y 坐标。
+- ``z``: Z 坐标。
 
 **示例:**
 
 .. code-block:: c
 
-    gui_prism_mirror3d_set_position(prism, 0, 50, 0);
+    gui_prism_mirror3d_set_position(prism_demo, 0, 50, 0);
 
 
 设置方位
@@ -144,16 +159,16 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`: 棱镜模型对象。
-- `x`: 围绕 X 轴的旋转角度。
-- `y`: 围绕 Y 轴的旋转角度。
-- `z`: 围绕 Z 轴的旋转角度。
+- ``prism_mirror3d``: 棱镜模型对象。
+- ``x``: 围绕 X 轴的旋转角度。
+- ``y``: 围绕 Y 轴的旋转角度。
+- ``z``: 围绕 Z 轴的旋转角度。
 
 **示例:**
 
 .. code-block:: cpp
 
-    gui_prism_mirror3d_set_rotation_angles(prism, 0, 60, 0);
+    gui_prism_mirror3d_set_rotation_angles(prism_demo, 0, 60, 0);
 
 设置原始状态
 ~~~~~~~~~~~~~~
@@ -162,13 +177,13 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`: 要进行配置的棱镜模型对象。
-- `world_position`: 长度为 3 的浮点数组，指定棱镜在世界坐标系中的 x, y, z 坐标。
-- `camera_position`: 长度为 3 的浮点数组，指定相机相对于棱镜位置的 x, y, z 坐标。
-- `rot_x`: 围绕 X 轴的旋转角度（以度为单位）。
-- `rot_y`: 围绕 Y 轴的旋转角度（以度为单位）。
-- `rot_z`: 围绕 Z 轴的旋转角度（以度为单位）。
-- `scale`: 棱镜的缩放比例。
++ ``prism_mirror3d``：要进行配置的棱镜模型对象。
++ ``world_position``：长度为 3 的浮点数组，指定棱镜在世界坐标系中的 x, y, z 坐标。
++ ``camera_position``：长度为 3 的浮点数组，指定相机相对于棱镜位置的 x, y, z 坐标。
++ ``rot_x``：围绕 X 轴的旋转角度（以度为单位）。
++ ``rot_y``：围绕 Y 轴的旋转角度（以度为单位）。
++ ``rot_z``：围绕 Z 轴的旋转角度（以度为单位）。
++ ``scale``：棱镜的缩放比例。
 
 **示例:**
 
@@ -185,13 +200,13 @@ GUI加载棱镜模型
 
 **参数:**
 
-- `prism_mirror3d`: 要调整的棱镜模型对象。
-- `world_position`: 目标世界坐标系中的 x, y, z 坐标（浮点数组）。
-- `camera_position`: 相机的目标位置坐标数组，指定相对于棱镜的 x, y, z。
-- `rot_x`: 目标围绕 X 轴的旋转角度。
-- `rot_y`: 目标围绕 Y 轴的旋转角度。
-- `rot_z`: 目标围绕 Z 轴的旋转角度。
-- `scale`: 棱镜的目标缩放比例。
++ ``prism_mirror3d``：要调整的棱镜模型对象。
++ ``world_position``：目标世界坐标系中的 x, y, z 坐标（浮点数组）。
++ ``camera_position``：相机的目标位置坐标数组，指定相对于棱镜的 x, y, z。
++ ``rot_x``：目标围绕 X 轴的旋转角度。
++ ``rot_y``：目标围绕 Y 轴的旋转角度。
++ ``rot_z``：目标围绕 Z 轴的旋转角度。
++ ``scale``：棱镜的目标缩放比例。
 
 **示例:**
 
@@ -213,11 +228,11 @@ GUI加载棱镜模型
 
 棱镜控件通过特定的参数来控制其基本属性。以下是应用的设置概述：
 
-- **面数**：定义棱镜的可见面数量。此设置为 `6`，表示棱镜为六边形结构。
++ **面数**：定义棱镜的可见面数量。此设置为 `6`，表示棱镜为六边形结构。
 
-- **自动旋转**：默认情况下，棱镜控件会自动旋转。在此配置中，自动旋转功能是启用的。若需禁用该功能，应在应用代码中通过额外的逻辑来实现，因为此默认设置保持功能激活。
++ **自动旋转**：默认情况下，棱镜控件会自动旋转。在此配置中，自动旋转功能是启用的。若需禁用该功能，应在应用代码中通过额外的逻辑来实现，因为此默认设置保持功能激活。
 
-- **触摸灵敏度**：该参数控制棱镜对触摸输入的响应。灵敏度设置为 `0.05f`，指定了中等水平的响应性，允许用户进行流畅的交互。
++ **触摸灵敏度**：该参数控制棱镜对触摸输入的响应。灵敏度设置为 `0.05f`，指定了中等水平的响应性，允许用户进行流畅的交互。
 
 **配置代码设置：**
 
@@ -230,11 +245,11 @@ GUI加载棱镜模型
 配置解释
 ~~~~~~~~
 
-- **面数量** (`face_nums`)：调整棱镜的几何复杂性，目前支持6棱柱效果。
++ **面数量** (`face_nums`)：调整棱镜的几何复杂性，目前支持6棱柱效果。
 
-- **自动旋转** (`auto_rotation`)：启用或禁用棱镜自动旋转的功能。值为 `true` 表示功能处于激活状态。
++ **自动旋转** (`auto_rotation`)：启用或禁用棱镜自动旋转的功能。值为 `true` 表示功能处于激活状态。
 
-- **灵敏度** (`sensitivity`)：控制棱镜响应触摸手势的程度。将此值默认设置为 `0.05f` 提供了良好的响应性，适合绝大多数用户交互场景的流畅操作。
++ **灵敏度** (`sensitivity`)：控制棱镜响应触摸手势的程度。将此值默认设置为 `0.05f` 提供了良好的响应性，适合绝大多数用户交互场景的流畅操作。
 
 .. _棱镜控件使用注意事项:
 
@@ -251,10 +266,7 @@ GUI加载棱镜模型
       + 文件路径： :file:`HoneyGUI\\realgui\\example\\demo\\3d` ，所需文件： :file:`extract_desc.exe` 和 :file:`png2c.py`。
 
 
-2. 如果使用其他比例的显示屏，为获得更佳的视觉效果，需要重新使用三维软件建模，并导出相应的OBJ文件（参考 :ref:`棱镜控件修改3D模型` ）制作GUI可以加载的描述文件（具体步骤请参考 :ref:`GUI加载棱镜模型` ）。
-3. 三维建模导出的OBJ文件需要配置Y轴为前进轴。
-4. 棱镜默认创建后会自动旋转，关闭这个功能，请在 :file:`gui_prism_mirror.h` 将AUTO_ROTATION参数置0；
-5. 修改棱镜控件的跟手灵敏度，请在 :file:`gui_prism_mirror.h` 调整SENSITIVITY；
+2. 如果使用其他比例的显示屏，为获得更佳的视觉效果，需要重新使用三维软件建模，并导出相应的OBJ文件，(参考 :ref:`棱镜控件修改3D模型` )制作GUI可以加载的描述文件（具体步骤请参考 :ref:`GUI加载棱镜模型` ）。
 
 .. _棱镜控件修改3D模型:
 
@@ -266,7 +278,7 @@ GUI加载棱镜模型
 
 .. figure:: https://foruda.gitee.com/images/1736508668989561574/99180bb7_13406851.jpeg
    :align: center
-   :width: 800px
+   :width: 700px
 
    调整模型视图
 
@@ -274,7 +286,7 @@ GUI加载棱镜模型
 
 .. figure:: https://foruda.gitee.com/images/1736508578410723528/ba011e3a_13406851.jpeg
    :align: center
-   :width: 800px
+   :width: 700px
 
    缩放模型比例
 
@@ -282,7 +294,7 @@ GUI加载棱镜模型
 
 .. figure:: https://foruda.gitee.com/images/1736732505811582125/f24394ef_13406851.jpeg
    :align: center
-   :width: 800px
+   :width: 850px
 
    导出模型obj文件
 

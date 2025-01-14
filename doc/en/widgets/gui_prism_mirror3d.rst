@@ -15,9 +15,23 @@ This control supports loading 3D prism mirror models consisting of OBJ and MTL f
 Running the Prismatic Effect on the Simulator
 ----------------------------------------------
 
-1. In :file:`menu_config.h` ( :file:`HoneyGUI\\win32_sim\\menu_config.h`), enable the macro definition CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D;
+HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the :ref:`Get Started` section.
 
-2. Compile and run the simulator, and the effect in the video at the beginning of the document will appear;
+After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator.In :file:`menu_config.h` ( :file:`your HoneyGUI dir/win32_sim/menu_config.h`), enable the macro definition **CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D** ;
+
+.. figure:: https://foruda.gitee.com/images/1736838781027776182/64086e10_13406851.jpeg
+   :align: center
+   :width: 400px
+
+   Simulator Runs the Prism Effect
+
+1. If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir/realgui/example/demo/`, and modify the values of :c:macro:`DRV_LCD_WIDTH` and :c:macro:`DRV_LCD_HEIGHT` to the desired pixel values.
+
+.. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
+   :align: center
+   :width: 400
+
+   Simulator changes screen size
 
 .. _GUI Load Prism Mirror Model:
 
@@ -48,14 +62,14 @@ Create a prism model using the :cpp:any:`gui_prism_mirror3d_create` function. Th
 
 **Parameters:**
 
-- `parent`: The parent object, the new prism model will be attached to this GUI component.
-- `name`: Used as a name to identify and manage 3D objects.
-- `desc_add`: descriptor address, containing visualized parsing data.
-- `x`: The x coordinate in the parent component coordinate system.
-- `y`: The y coordinate in the parent component coordinate system.
-- `w`: The width of the control.
-- `h`: The height of the control.
-- `config`: A pointer to the configuration structure used to configure features such as face count and rotation.
++ ``parent``: The parent object, the new prism model will be attached to this GUI component.
++ ``name``: Used as a name to identify and manage 3D objects.
++ ``desc_add``: descriptor address, containing visualized parsing data.
++ ``x``: The x coordinate in the parent component coordinate system.
++ ``y``: The y coordinate in the parent component coordinate system.
++ ``w``: The width of the control.
++ ``h``: The height of the control.
++ ``config``: A pointer to the configuration structure used to configure features such as face count and rotation.
 
 **Example:**
 
@@ -74,7 +88,7 @@ Use the function :cpp:any:`gui_prism_mirror3d_enter_animate` to add dynamic effe
 
 **Parameters:**
 
-- `Prism-mirror3d`: A prism model object that has already been created.
++ ``Prism-mirror3d``: A prism model object that has already been created.
 
 **Example:**
 
@@ -90,8 +104,8 @@ Use the function :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` to add
 
 **Parameters:**
 
-- `Prism-mirror3d`: A prism model object that has already been created, waiting to add a click event.
-- `Callback`: A callback function used to handle the application switching logic after a click event.
++ ``Prism-mirror3d``: A prism model object that has already been created, waiting to add a click event.
++ ``Callback``: A callback function used to handle the application switching logic after a click event.
 
 **Example:**
 
@@ -101,7 +115,7 @@ Use the function :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` to add
         //Handling application switching logic
     }
 
-    gui_prism_mirror3d_click_switch_app_add_event(prism, onSwitchAppCallback);
+    gui_prism_mirror3d_click_switch_app_add_event(prism_demo, onSwitchAppCallback);
 
 Set size
 ~~~~~~~~
@@ -109,14 +123,14 @@ Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Ad
 
 **Parameters:**
 
-- `prism_mirror3d`: The prism mirror object.
-- `scale`: The scale factor.
++ ``prism_mirror3d``: The prism mirror object.
++ ``scale``: The scale factor.
 
 **Example:**
 
 .. code-block::  c
 
-   gui_prism_mirror3d_set_scale(prism, 1.0f);
+   gui_prism_mirror3d_set_scale(prism_demo, 1.0f);
 
 Set location
 ~~~~~~~~~~~~~
@@ -124,16 +138,16 @@ Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism m
 
 **Parameters:**
 
-- `prism_mirror3d`: The prism mirror object.
-- `x`: The X coordinate.
-- `y`: The Y coordinate.
-- `z`: The Z coordinate.
++ ``prism_mirror3d``: The prism mirror object.
++ ``x``: The X coordinate.
++ ``y``: The Y coordinate.
++ ``z``: The Z coordinate.
 
 **Example:**
 
 .. code-block::  c   
 
-   gui_prism_mirror3d_set_position(prism, 0, 50, 0);
+   gui_prism_mirror3d_set_position(prism_demo, 0, 50, 0);
 
 Set orientation
 ~~~~~~~~~~~~~~~~
@@ -141,16 +155,16 @@ Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mir
 
 **Parameters:**
 
-- `prism_mirror3d`: The prism mirror object.
-- `x`: The rotation angle around the X axis.
-- `y`: The rotation angle around the Y axis.
-- `z`: The rotation angle around the Z axis.
++ ``prism_mirror3d``: The prism mirror object.
++ ``x``: The rotation angle around the X axis.
++ ``y``: The rotation angle around the Y axis.
++ ``z``: The rotation angle around the Z axis.
 
 **Example:**
 
 .. code-block::  c
 
-   gui_prism_mirror3d_set_rotation_angles(prism, 0, 60, 0);
+   gui_prism_mirror3d_set_rotation_angles(prism_demo, 0, 60, 0);
 
 Set original state
 ~~~~~~~~~~~~~~~~~~~
@@ -158,13 +172,13 @@ Use the cpp: any function to set the original state of the 3D prism model as :cp
 
 **Parameters:**
 
-- `prism-mirror3d`: The prism model object to be configured.
-- `world_position`: A floating-point array of length 3, specifying the x of the prism in the world coordinate system, y. Z coordinate.
-- `camera_position`: A floating-point array of length 3 that specifies the position of the camera relative to the prism, denoted as x, y. Z coordinate.
-- `rot_x`: The rotation angle (in degrees) around the X-axis.
-- `rot_y`: The rotation angle around the Y-axis (in degrees).
-- `rot_z`: The rotation angle (in degrees) around the Z-axis.
-- `scale`: The scaling ratio of a prism.
++ ``prism-mirror3d``: The prism model object to be configured.
++ ``world_position``: A floating-point array of length 3, specifying the x of the prism in the world coordinate system, y. Z coordinate.
++ ``camera_position``: A floating-point array of length 3 that specifies the position of the camera relative to the prism, denoted as x, y. Z coordinate.
++ ``rot_x``: The rotation angle (in degrees) around the X-axis.
++ ``rot_y``: The rotation angle around the Y-axis (in degrees).
++ ``rot_z``: The rotation angle (in degrees) around the Z-axis.
++ ``scale``: The scaling ratio of a prism.
 
 **Example:**
 
@@ -181,13 +195,13 @@ Use the cpp: any function to define the target state that the 3D prism model wil
 
 **Parameters:**
 
-- `prism-mirror3d`: The prism model object to be adjusted.
-- `world_position`: x in the target world coordinate system, y. Z coordinate (floating point array).
-- `camera_position`: an array of target position coordinates for the camera, specifying x relative to the prism, y, z。
-- `rot_x`: The rotation angle of the target around the X-axis.
-- `rot_y`: The rotation angle of the target around the Y-axis.
-- `rot_z`: The rotation angle of the target around the Z-axis.
-- `scale`: The target scaling ratio of a prism.
++ ``prism-mirror3d``: The prism model object to be adjusted.
++ ``world_position``: x in the target world coordinate system, y. Z coordinate (floating point array).
++ ``camera_position``: an array of target position coordinates for the camera, specifying x relative to the prism, y, z。
++ ``rot_x``: The rotation angle of the target around the X-axis.
++ ``rot_y``: The rotation angle of the target around the Y-axis.
++ ``rot_z``: The rotation angle of the target around the Z-axis.
++ ``scale``: The target scaling ratio of a prism.
 
 **Example:**
 
@@ -209,11 +223,11 @@ Automatic Rotation and Sensitivity Settings
 
 The prism mirror is configured with specific parameters to control its basic properties. Here's an overview of the settings applied:
 
-- **Number of Faces**: Defines the number of visible faces of the prism. This is set to `6` to have a hexagonal prism shape.
++ **Number of Faces**: Defines the number of visible faces of the prism. This is set to `6` to have a hexagonal prism shape.
 
-- **Automatic Rotation**: By default, the prism mirror rotates automatically. In this configuration, automatic rotation is enabled. However, if you want to disable it, this should be done through additional logic in the application code if required, as the default setting here keeps it active.
++ **Automatic Rotation**: By default, the prism mirror rotates automatically. In this configuration, automatic rotation is enabled. However, if you want to disable it, this should be done through additional logic in the application code if required, as the default setting here keeps it active.
 
-- **Touch Sensitivity**: This parameter controls how responsive the prism is to touch inputs. The sensitivity is set to `0.05f`, which specifies a medium level of responsiveness, allowing for smooth user interaction.
++ **Touch Sensitivity**: This parameter controls how responsive the prism is to touch inputs. The sensitivity is set to `0.05f`, which specifies a medium level of responsiveness, allowing for smooth user interaction.
 
 **Configuration Code Set:**
 
@@ -226,11 +240,11 @@ The prism mirror is configured with specific parameters to control its basic pro
 Configuration Explanation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **Face Number**: Adjusts the geometric complexity of the prism mirror, currently supports 6-prism effect.
++ **Face Number**: Adjusts the geometric complexity of the prism mirror, currently supports 6-prism effect.
 
-- **Auto Rotation**: Enable or disable the feature where the prism rotates automatically. A value of `1` means the feature is active.
++ **Auto Rotation**: Enable or disable the feature where the prism rotates automatically. A value of `1` means the feature is active.
 
-- **Sensitivity**: Controls how the prism responds to touch gestures. Setting this to `0.05f` provides a well-balanced responsivenes
++ **Sensitivity**: Controls how the prism responds to touch gestures. Setting this to `0.05f` provides a well-balanced responsivenes
 
 .. _Prism Mirror Control Usage Notes:
 
@@ -249,10 +263,7 @@ Prism Mirror Control Usage Notes
 
       + File path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`, required files: :file:`extract_desc.exe` and :file:`png2c.py`.
 
-2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`), and create a description file that can be loaded into the GUI (please refer to :ref:`GUI Load Prism Mirror Model` for specific steps).
-3. The OBJ file exported by 3D modeling needs to configure the Y axis as the forward axis.
-4. The default prism will automatically rotate after creation. To turn off this function, please set the AUTO_ROTATION parameter to 0 in :file:`gui_prism_mirror.h`;
-5. To modify the follower sensitivity of the prism control, please adjust SENSITIVITY in :file:`gui_prism_mirror. h`;
+2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`: Create a description file that can be loaded into the GUI (please refer to: ref: GUI loading prism model for specific steps).
 
 .. _Prism Widget to Modify 3D Model:
 
@@ -264,7 +275,7 @@ This routine uses Blender software as a demonstration.
 
 .. figure:: https://foruda.gitee.com/images/1736508668989561574/99180bb7_13406851.jpeg
    :align: center
-   :width: 800px
+   :width: 700px
 
    Modify Prism Mirror 3D View
 
@@ -272,7 +283,7 @@ This routine uses Blender software as a demonstration.
 
 .. figure:: https://foruda.gitee.com/images/1736508578410723528/ba011e3a_13406851.jpeg
    :align: center
-   :width: 800px
+   :width: 700px
 
    Scale Prism Mirror 3D
 
@@ -280,7 +291,7 @@ This routine uses Blender software as a demonstration.
 
 .. figure:: https://foruda.gitee.com/images/1736732505811582125/f24394ef_13406851.jpeg
    :align: center
-   :width: 800px
+   :width: 850px
 
    Export Prism Mirror 3D Object Document
 
