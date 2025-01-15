@@ -726,6 +726,17 @@ void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type,
  */
 void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement);
 
+/**
+ * @brief Move a widget object to specified coordinates.
+ *
+ * This function moves the specified widget object to a new (x, y) coordinate
+ * position.
+ *
+ * @param obj Pointer to the widget object to be moved.
+ * @param x   The new x-coordinate for the widget object.
+ * @param y   The new y-coordinate for the widget object.
+ */
+void gui_obj_move(gui_obj_t *obj, int x, int y);
 
 #ifdef __cplusplus
 }

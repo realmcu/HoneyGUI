@@ -35,14 +35,19 @@
 #define APP_COMBOBOX
 #define APP_PAGE_LIST
 #define APP_CANVAS_OUTPUT
-GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
+/*Define a app with name APP_HEART_RATE*/
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(heart_rate_startup);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(heart_rate_shutdown);
+GUI_APP_DEFINE_NAME_ANIMATION_FUNC_CUSTOM(APP_HEART_RATE, heart_rate_startup,
+                                          heart_rate_shutdown) // cppcheck-suppress syntaxError
+/*Define a app with name APP_HEART_RATE end*/
 /*Define a app with name APP_STOPWATCH*/
 #define APP_STOPWATCH
 GUI_APP_DEFINE_NAME_ANIMATION(APP_STOPWATCH, GUI_APP_ANIMATION_1, GUI_APP_ANIMATION_5)
 /*Define a app with name APP_STOPWATCH end*/
 /*Define a app with name APP_MENU and entry func app_menu*/
 #define APP_MENU
-GUI_APP_DEFINE(APP_MENU,       app_menu)
+GUI_APP_DEFINE_NAME_ANIMATION(APP_MENU, GUI_APP_ANIMATION_1, GUI_APP_ANIMATION_5)
 /*Define a app with name APP_MENU and entry func app_menu end*/
 GUI_APP_DEFINE_NAME(APP_MAP)
 GUI_APP_DEFINE_NAME(APP_CARDVIEW)
@@ -88,12 +93,11 @@ static void app_win_cb(gui_win_t *win);
 extern gui_app_t *get_app_watch_ui(void);
 #define RETURN_ARRAY_SIZE 17
 extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
-static void app_hr_ui_design(gui_app_t *app)
+GUI_APP_ENTRY(APP_HEART_RATE)
 {
-    gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
+    gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_canvas_rect_create((void *)app_win, HR_BK_RECT_NAME, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
                            255));
-    gui_win_set_animate(app_win, 1000, 0, (gui_animate_callback_t)app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
     gui_page_center_alignment(page, SCREEN_H);
@@ -243,22 +247,7 @@ static void app_hr_ui_design(gui_app_t *app)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
     /*gui_return_create end*/
 }
-static void app_win_cb(gui_win_t *win)
-{
-    GUI_BASE(win)->x = (1.0f - win->animate->progress_percent) * SCREEN_W;
-    gui_canvas_rect_t *img = 0;
-    gui_obj_tree_get_widget_by_name((void *)win, HR_BK_RECT_NAME, (void *)&img);
-    if (img)
-    {
-        gui_canvas_rect_set_opacity(img, (255 - 100)*win->animate->progress_percent + 100);
-    }
 
-    if (win->animate->progress_percent >= 1.0f)
-    {
-        gui_app_shutdown(get_app_watch_ui());
-    }
-
-}
 static void heart_ani_cb(gui_win_t *win)
 {
     static bool odd;
@@ -570,20 +559,10 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
 
 
 }
-/* app swap animation callback of the next app*/
+
 #include "gui_menu_cellular.h"
 #include "math.h"
-static void menu_win_ani_cb(void *args, gui_win_t *win)
-{
-    float pro = gui_win_get_animation_progress_percent(win);
-    gui_win_set_scale_rate(win, sinf(pro * (M_PI / 2 - 0.2f) + 0.2f),
-                           sinf(pro * (M_PI / 2 - 0.2f) + 0.2f));
-    gui_win_set_opacity(win, (pro) * UINT8_MAX);
-    if (gui_win_is_animation_end_frame(win))
-    {
-        gui_win_set_scale_rate(win, 0, 0);//reset scale
-    }
-}
+
 #define APP_WATCH_WIN_NAME "menu win name"
 static void menu_win_ani_cb_return(void *args, gui_win_t *win)
 {
@@ -647,14 +626,13 @@ static void app_menu_cb(void *obj, gui_event_t e, void *param)
     gui_log("%d,%p\n", GUI_TYPE(gui_obj_t, obj)->type, param);
 }
 /*Define APP_MENU's entry func */
-static void app_menu(gui_app_t *app)
+
+GUI_APP_ENTRY(APP_MENU)
 {
     /**
      * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
     */
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, APP_MENU_WIN_NAME, 0, 0, 0, 0);
-    gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, (gui_animate_callback_t)menu_win_ani_cb,
-                        0);//aniamtion start to play at app startup
     /* app swap animation configration of the next app*/
     uint32_t *array[] =
     {
@@ -730,7 +708,7 @@ static void app_menu(gui_app_t *app)
     }
     //status_bar(win, (void *)cell);
     gui_return_create(win, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_menu_win_cb, (void *)cell);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
 }
 /*Define APP_MENU's entry func end*/
 #include "gui_seekbar.h"
@@ -3093,4 +3071,26 @@ GUI_APP_ENTRY(APP_CANVAS_OUTPUT)
             gui_fps_create(GUI_APP_ROOT_SCREEN);
         }
     }
+}
+static float ease_in_out(float t)
+{
+    return t < 0.5f ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(heart_rate_startup)
+{
+    float progress = gui_animation_get_progress(animate);
+    int y = SCREEN_H * (1 - ease_in_out(progress));
+    gui_log("startup%d\n", y);
+    gui_obj_move(this_widget, 0, y);
+    unsigned char opacity_value = (unsigned char)(255 * progress);
+    gui_win_set_opacity(this_widget, opacity_value);
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(heart_rate_shutdown)
+{
+    float progress = gui_animation_get_progress(animate);
+    int y = SCREEN_H * (ease_in_out(progress));
+    gui_log("shutdown%d\n", y);
+    gui_obj_move(this_widget, 0, y);
+    unsigned char opacity_value = (unsigned char)(255 * (1 - progress));
+    gui_win_set_opacity(this_widget, opacity_value);
 }

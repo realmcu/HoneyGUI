@@ -400,35 +400,27 @@ static void page_callback(gui_page_t *page)
 
 
 }
+/*swap to APP_HEART_RATE*/
 static void heart_rate_cb()
 {
-    //GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
-    GUI_APP_STARTUP(APP_HEART_RATE) // cppcheck-suppress unknownMacro
     gui_app_layer_top();
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(),
+                        GUI_APP_HANDLE(APP_HEART_RATE))// cppcheck-suppress unknownMacro
 }
-/* The first app's nimation starts playing on click event*/
+/*swap to APP_HEART_RATE end*/
 static void menu_cb(gui_obj_t *obj)
 {
-    // Retrieve the window object with the name specified by MENU_WIN_NAME from the root of the GUI tree
-    gui_win_t *win = 0;
-    gui_obj_tree_get_widget_by_name(gui_get_root(obj), MENU_WIN_NAME, (void *)&win);
-
-    // If the window object is found, enable its animation by setting the animate flag to 1
-    if (win)
-    {
-        win->animate->animate = 1;
-    }
-    GUI_APP_STARTUP(APP_MENU);  // Start up the menu application(NEXT APP)
-
-    // Bring the next application layer to the top, ensuring it's displayed above the first app layer
     gui_app_layer_top();
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MENU))
 }
-/* In the button click callback, execute the next app startup.*/
+/*swap to APP_STOPWATCH*/
 static void stopwatch_cb()
 {
     gui_app_layer_top();
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
 }
+/*swap to APP_STOPWATCH end*/
+
 static void map_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MAP))

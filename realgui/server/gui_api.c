@@ -1394,3 +1394,16 @@ float *gui_get_json_array(const char *path, const char *parent_key, const char *
     cJSON_Delete(root);
     return array;
 }
+float gui_animation_get_progress(gui_animate_t *animation)
+{
+    GUI_ASSERT(animation)
+    if (animation)
+    {
+        return animation->progress_percent;
+    }
+    else
+    {
+        return 0;
+    }
+}
+

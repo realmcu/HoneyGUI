@@ -25,4 +25,3 @@ The GUI framework diagram is shown in the figure below:
     Use LVGL Design An Application <LVGL/app_lvgl>
     Use ARM-2D Design An Application <ARM-2D/fwk_app_arm2d>
     Use RVD Tool Design An Application <SaaA/index>
-    Application Switching <Switch_APP/index>

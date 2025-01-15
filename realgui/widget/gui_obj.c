@@ -1234,4 +1234,9 @@ void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y)
     obj->x = x;
     obj->y = y;
 }
-
+void gui_obj_move(gui_obj_t *obj, int x, int y)
+{
+    GUI_WIDGET_TRY_EXCEPT(obj) // cppcheck-suppress unknownMacro
+    obj->x = x;
+    obj->y = y;
+}
