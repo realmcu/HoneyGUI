@@ -41,7 +41,7 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_BOX2D'):
     src += ['app_ui_box2d.cpp']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-if GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
+if GetDepend('CONFIG_REALTEK_BUILD_LVGL_V8'):
     src += ['app_ui_lvgl.c']
     group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
