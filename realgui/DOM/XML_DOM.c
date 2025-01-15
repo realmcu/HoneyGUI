@@ -835,6 +835,4231 @@ static void on_click_jump_to_capp_cb(void *obj, gui_event_t e, gui_app_t *handle
         gui_app_switch(gui_current_app(), handle);
     }
 }
+static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = gui_get_screen_width();
+        int16_t h = 50;
+        const char *text = "text";
+#ifdef __WIN32
+        char *font = "app/system/resource/font/tangyuanti.ttf";
+#else
+        char *font =
+            "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
+#endif
+        gui_color_t color = APP_COLOR_WHITE;
+        int fontSize = 32;
+        TEXT_MODE style = (TEXT_MODE)0;
+        uint8_t inputable = false;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                uint32_t w_temp = atoi(p->attr[++i]);
+                if (w_temp)
+                {
+                    w = w_temp;
+                }
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                uint32_t w_temp = atoi(p->attr[++i]);
+                if (w_temp)
+                {
+                    h = w_temp;
+                }
+            }
+            else if (!strcmp(p->attr[i], "text"))
+            {
+                text = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "font"))
+            {
+                font = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "fontSize"))
+            {
+                fontSize = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "color"))
+            {
+                color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "mode"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "truncate"))
+                {
+                    style = (TEXT_MODE)0;
+                }
+                else if (!strcmp(p->attr[i], "verticalscroll"))
+                {
+                    style = SCROLL_Y;
+                }
+                else if (!strcmp(p->attr[i], "left"))
+                {
+                    style = LEFT;
+                }
+                else if (!strcmp(p->attr[i], "center"))
+                {
+                    style = CENTER;
+                }
+                else if (!strcmp(p->attr[i], "right"))
+                {
+                    style = RIGHT;
+                }
+            }
+            else if (!strcmp(p->attr[i], "inputable"))
+            {
+                inputable = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("p->txt2 = %s,\n", ptxt);
+
+        if (text && font)
+        {
+            gui_text_t *t = 0;
+            if (style == 0 || style == CENTER || style == RIGHT || style == LEFT)
+            {
+                t = gui_text_create(parent, ptxt, x, y, w, h);
+                gui_color_t color_temporary;
+                color_temporary = color;
+                gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
+                if (inputable)
+                {
+                    gui_text_input_set(t, inputable);
+                    gui_text_click(t, gui_keyboard_launch_by_widget, t);
+                }
+
+
+                {
+                    FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
+                    char *font_type = font;
+                    if (strstr(font_type, ".bin") != NULL)
+                    {
+                        font_type2 = GUI_FONT_SRC_BMP;
+                        void *addr1 = gui_get_file_address(font_type);
+                        //gui_font_mem_init(addr1);
+                        t->font_height = fontSize;
+                        t->path = 0;
+                        t->font_type = GUI_FONT_SRC_BMP;
+                        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+                        gui_text_mode_set(t, style);
+                        // t->font_height = fontSize;
+                        //t->path = 0;
+                    }
+                    else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
+                    {
+#ifdef __WIN32
+                        font_type2 = GUI_FONT_SRC_TTF;
+                        t->path = gui_get_file_address(font);
+                        t->font_height = fontSize;
+                        t->font_type = GUI_FONT_SRC_TTF;
+#else
+                        font_type =
+                            "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
+                        {
+                            font_type2 = GUI_FONT_SRC_BMP;
+                            char b[100] = {0};
+                            strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                            void *addr1 = gui_get_file_address(b);
+                            memset(b, 0, sizeof(b));
+                            char *a = font_type;
+                            strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                 ".bin;") - a + strlen(".bin;")));
+                            void *addr2 = gui_get_file_address(b);
+                            // gui_set_font_mem_resourse(fontSize, addr1,  addr2);
+                            t->path = 0;
+                            t->font_type = GUI_FONT_SRC_BMP;
+                        }
+#endif
+                    }
+
+                }
+            }
+            else
+            {
+                gui_scroll_text_t *scroll_text = gui_scroll_text_create(parent,  ptxt, x, y,
+                                                                        strlen(text) * (fontSize / 4), h);
+                gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
+                gui_color_t color_temporary;
+                color_temporary = color;
+                gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_TTF, color_temporary,
+                                    strlen(text),
+                                    fontSize);
+                t = (void *)scroll_text;
+            }
+            parent = (void *)t;
+        }
+    }
+    return parent;
+}
+static gui_obj_t *widget_create_window(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        bool hide = false;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hide = true;
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
+        {
+            parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
+            if (hide)
+            {
+                parent->not_show = 1;
+            }
+
+
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        int style = 0; GUI_UNUSED(style);
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "transition"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "normal"))
+                {
+                    style = CLASSIC;
+                }
+                else if (!strcmp(p->attr[i], "fade"))
+                {
+                    style = FADE;
+                }
+                else if (!strcmp(p->attr[i], "scale"))
+                {
+                    style = REDUCTION;
+                }
+                else if (!strcmp(p->attr[i], "fadeScale"))
+                {
+                    style = REDUCTION_FADE;
+                }
+
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
+        gui_tabview_loop_x((void *)parent, true);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
+                                                 T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t cx = 100; GUI_UNUSED(cx);
+        int16_t cy = 100; GUI_UNUSED(cy);
+        int16_t r = 100; GUI_UNUSED(r);
+        int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
+        int cap = 0; GUI_UNUSED(cap);
+        gui_color_t stroke = APP_COLOR_RED;
+        float sd = 0; GUI_UNUSED(sd);
+        float ed = 100; GUI_UNUSED(ed);
+        int dir = NVG_CW;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
+            {
+                cx = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centerY") ||
+                     !strcmp(p->attr[i], "centralY"))
+            {
+                cy = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "r") || !strcmp(p->attr[i], "radius"))
+            {
+                r = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "startDegree") || !strcmp(p->attr[i], "startAngle"))
+            {
+                sd = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "endDegree") || !strcmp(p->attr[i], "endAngle"))
+            {
+                ed = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "strokeWidth") || !strcmp(p->attr[i], "stroke-width"))
+            {
+                stroke_width = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
+                     !strcmp(p->attr[i], "cap"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "butt"))
+                {
+                    cap = NVG_BUTT;
+                }
+                else if (!strcmp(p->attr[i], "round"))
+                {
+                    cap = NVG_ROUND;
+                }
+                else if (!strcmp(p->attr[i], "square"))
+                {
+                    cap = NVG_SQUARE;
+                }
+            }
+            else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
+            {
+                stroke = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "direction") || !strcmp(p->attr[i], "clockwise"))
+            {
+                if (!strcmp(p->attr[++i], "CCW") || !strcmp(p->attr[i], "count clockwise"))
+                {
+                    dir = NVG_CCW;
+                }
+                else if (!strcmp(p->attr[i], "CW") || !strcmp(p->attr[i], "clockwise"))
+                {
+                    dir = NVG_CW;
+                }
+
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //arc animation by user's buffer
+        {
+            int image_h = r * 2 + stroke_width * 2,
+                image_w = image_h,
+                pixel_bytes = 4,
+                buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+            uint8_t *imgdata = gui_lower_malloc(buffer_size);
+            memset(imgdata, 0, buffer_size);
+            int format = GUI_CANVAS_OUTPUT_RGBA;  int image_width = image_w;
+            int image_height = image_h;  uint8_t *target_buffer = imgdata;
+            {
+                int pixel_length = 4;
+                int data_length = 0;
+                uint8_t *buffer = 0;
+                uint8_t *output_data = 0;
+                switch (format)
+                {
+                case GUI_CANVAS_OUTPUT_PNG:
+                case GUI_CANVAS_OUTPUT_JPG:
+                    {
+                        data_length = image_width * image_height * pixel_length;
+                        buffer = gui_lower_malloc(data_length);
+                        memset(buffer, 0, data_length);
+                    }
+                    break;
+                case GUI_CANVAS_OUTPUT_RGBA:
+                    {
+                        output_data = target_buffer;
+                        buffer = output_data + sizeof(gui_rgb_data_head_t);
+                        memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                        gui_rgb_data_head_t *head = (void *)output_data;
+                        head->type = ARGB8888;
+                        head->w = image_width;
+                        head->h = image_height;
+                    }
+                    break;
+                case GUI_CANVAS_OUTPUT_RGB565:
+                    {
+                        pixel_length = 2;
+                        output_data = target_buffer;
+                        memset(output_data, 0, sizeof(gui_rgb_data_head_t));
+                        buffer = output_data + sizeof(gui_rgb_data_head_t);
+                        gui_rgb_data_head_t *head = (void *)output_data;
+                        head->type = RGB565;
+                        head->w = image_width;
+                        head->h = image_height;
+                    }
+                    break;
+                default:
+                    break;
+                }
+
+                {
+                    NVGcontext *vg = 0;
+                    extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                                     uint32_t h,
+                                                     uint32_t stride,
+                                                     enum     NVGtexture format,
+                                                     uint8_t *data);
+                    extern void nvgDeleteAGGE(NVGcontext * ctx);
+                    vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
+                                       (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
+                    nvgBeginFrame(vg, image_width, image_height, 1);
+
+                    nvgResetTransform(vg);
+                    float a0,  a1;
+                    a0 = sd;
+                    a1 = ed;
+                    if (a0 != a1)
+                    {
+                        nvgArc(vg, r + stroke_width, r + stroke_width, r, sd, ed, dir);
+                        nvgStrokeWidth(vg, stroke_width);
+                        nvgStrokeColor(vg, nvgRGBA(stroke.color.rgba.r, stroke.color.rgba.g, stroke.color.rgba.b,
+                                                   stroke.color.rgba.a));
+                        nvgStroke(vg);
+                    }
+
+
+                    nvgEndFrame(vg);
+                    nvgDeleteAGGE(vg);
+                }
+            }
+            gui_img_t *img = gui_img_create_from_mem(parent, ptxt, imgdata, cx - image_w / 2, cy - image_h / 2,
+                                                     0, 0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            parent = (void *)img;
+            parent->obj_cb = gui_canvas_img_cb;
+        }
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_progressbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0; GUI_UNUSED(w);
+        int16_t h = 0; GUI_UNUSED(h);
+        gui_color_t color = APP_COLOR_WHITE_OPACITY;
+        gui_color_t highlightColor = APP_COLOR_WHITE;
+        bool vh = false;
+        bool canvas = false;
+        char *picture = "app/system/resource/Progress bar_full.bin";
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "canvasOrPicture"))
+            {
+                if (!strcmp(p->attr[++i], "canvas"))
+                {
+                    canvas = true;
+                }
+                else
+                {
+                    canvas = false;
+                }
+
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "color"))
+            {
+                color = string_rgb888(p->attr[++i]);
+                //gui_log("color %s,%x\n", p->attr[i], color);
+            }
+            else if (!strcmp(p->attr[i], "highlightColor"))
+            {
+                highlightColor = string_rgb888(p->attr[++i]);
+                //gui_log("color %s,%x\n", p->attr[i], highlightColor);
+            }
+            else if (!strcmp(p->attr[i], "orientation"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "vertical"))
+                {
+                    vh = true;
+                }
+                else if (!strcmp(p->attr[i], "V"))
+                {
+                    vh = true;
+                }
+                else if (!strcmp(p->attr[i], "horizontal"))
+                {
+                    vh = false;
+                }
+                else if (!strcmp(p->attr[i], "H"))
+                {
+                    vh = false;
+                }
+
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        if (canvas == true)
+        {
+#if 0
+            if (vh)
+            {
+                //parent = (void *)gui_progressbar_v_create(parent, ptxt, x, y, w, h);
+            }
+            else
+            {
+                //parent = (void *)gui_progressbar_create(parent, ptxt, x, y, w, h);
+            }
+
+            GUI_TYPE(gui_progressbar_t, parent)->color = color;
+            GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
+#endif
+        }
+        else
+        {
+            if (vh)
+            {
+                parent = (void *)gui_progressbar_img_v_create(parent, (void *)gui_get_image_file_address(picture),
+                                                              x, y);
+            }
+            else
+            {
+                parent = (void *)gui_progressbar_img_h_create(parent, (void *)gui_get_image_file_address(picture),
+                                                              x, y);
+            }
+        }
+        parent->name = ptxt;
+
+
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0; GUI_UNUSED(w);
+        int16_t h = 0; GUI_UNUSED(h);
+        gui_color_t color = APP_COLOR_WHITE_OPACITY;
+        gui_color_t highlightColor = APP_COLOR_WHITE;
+        bool canvas = false;
+        bool arc = false;
+        char *picture = "app/system/resource/Progress bar_full.bin";
+        char *folder = NULL;
+        bool vh = false;
+        int16_t cx = 0;
+        int16_t cy = 0;
+
+        float sd = 0;
+        float ed = 0;
+        // default image blend_mode
+        BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+        uint8_t opacity = 255;
+        bool reverse = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "canvasOrPicture"))
+            {
+                if (!strcmp(p->attr[++i], "canvas"))
+                {
+                    canvas = true;
+                }
+                else
+                {
+                    canvas = false;
+                }
+
+            }
+            else if (!strcmp(p->attr[i], "folder"))
+            {
+                folder = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "color"))
+            {
+                color = string_rgb888(p->attr[++i]);
+                //gui_log("color %s,%x\n", p->attr[i], color);
+            }
+            else if (!strcmp(p->attr[i], "highlightColor"))
+            {
+                highlightColor = string_rgb888(p->attr[++i]);
+                //gui_log("color %s,%x\n", p->attr[i], highlightColor);
+            }
+            else if (!strcmp(p->attr[i], "orientation"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "vertical"))
+                {
+                    vh = true;
+                }
+                else if (!strcmp(p->attr[i], "V"))
+                {
+                    vh = true;
+                }
+                else if (!strcmp(p->attr[i], "horizontal"))
+                {
+                    vh = false;
+                }
+                else if (!strcmp(p->attr[i], "H"))
+                {
+                    vh = false;
+                }
+                else if (!strcmp(p->attr[i], "arc"))
+                {
+                    arc = true;
+                }
+
+            }
+            else if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX"))
+            {
+                cx = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centralY"))
+            {
+                cy = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "startDegree"))
+            {
+                sd = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "endDegree"))
+            {
+                ed = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "reverse"))
+            {
+                reverse = 1;
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+            }
+            else if (!strcmp(p->attr[i], "opacity"))
+            {
+                opacity = atof(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        if (canvas)
+        {
+#if 0
+            /* code */
+
+
+            if (vh)
+            {
+                //parent = (void *)gui_seekbar_create(parent, ptxt, x, y, w, h);
+            }
+            else
+            {
+                //parent = (void *)gui_seekbar_h_create(parent, ptxt, x, y, w, h);
+            }
+
+            GUI_TYPE(gui_progressbar_t, parent)->color = color;
+            GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
+#endif
+        }
+        else if (!folder)
+        {
+
+            if (vh)
+            {
+                parent = (void *)gui_seekbar_create_img_v(parent, (void *)gui_get_image_file_address(picture), x,
+                                                          y);
+            }
+            else
+            {
+                parent = (void *)gui_seekbar_create_img_h(parent, (void *)gui_get_image_file_address(picture), x,
+                                                          y);
+            }
+            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+            gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
+        }
+        else if (folder)
+        {
+            int file_count = 0;
+
+            {
+                gui_fs_dir *dir = 0;
+                struct gui_fs_dirent *entry;
+                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                if ((dir = gui_fs_opendir(path)) == NULL)
+                {
+                    gui_free(path);
+                    return 0;
+                }
+                gui_free(path);
+                while ((entry = gui_fs_readdir(dir)) != NULL)
+                {
+                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    {
+                        file_count++;
+                    }
+
+
+                }
+                gui_fs_closedir(dir);
+            }
+            void **image_array = gui_malloc(file_count * sizeof(void *));
+            {
+                gui_fs_dir *dir = 0;
+                struct gui_fs_dirent *entry;
+                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                if ((dir = gui_fs_opendir(path)) == NULL)
+                {
+                    gui_free(path);
+                    return 0;
+                }
+
+                int count = 0;
+                while ((entry = gui_fs_readdir(dir)) != NULL)
+                {
+                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    {
+                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                        sprintf(path2, "%s/%s", folder, entry->d_name);
+                        image_array[count++] = (void *)gui_get_image_file_address(path2);
+                    }
+
+                }
+                gui_free(path);
+                gui_fs_closedir(dir);
+                if (reverse)
+                {
+                    reverse_array(image_array, count);
+                }
+
+
+            }
+            bool if_widget = 0;
+            if (p->parent)
+            {
+                if (!strcmp(widget[21].name, p->parent->name))
+                {
+                    if_widget = 1;
+                }
+            }
+            if (if_widget)
+            {
+                parent = (void *)gui_seekbar_create_movie_h_double(parent, image_array, file_count, x, y);
+                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
+            }
+            else
+            {
+                if (arc)
+                {
+                    parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
+                                                                  cx, cy, 100, 100, sd, ed);
+                    gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                    gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
+                }
+                else
+                {
+                    if (vh)
+                    {
+                        parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
+                    }
+                    else
+                    {
+                        parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
+                    }
+                    gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                    gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
+                }
+            }
+
+
+
+
+
+        }
+
+        parent->name = ptxt;
+
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_tab(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        int16_t idx = 0;
+        int16_t idy = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "idx"))
+            {
+                idx = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "idy"))
+            {
+                idy = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
+        parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_curtainview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        int style = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "transition"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "normal"))
+                {
+                    style = WIDGET_CLASSIC;
+                }
+                else if (!strcmp(p->attr[i], "fade"))
+                {
+                    style = WIDGET_FADE;
+                }
+                else if (!strcmp(p->attr[i], "scale"))
+                {
+                    style = WIDGET_SCALE;
+                }
+                else if (!strcmp(p->attr[i], "fadeScale"))
+                {
+                    style = WIDGET_SCALE_FADE;
+                }
+
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
+        parent = (void *)gui_curtainview_create(parent, ptxt, x, y, w, h);
+        GUI_TYPE(gui_curtainview_t, parent)->style = style;
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_page(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
+        parent = (void *)gui_page_create(parent, ptxt, x, y, w, h);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_grid(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t rowNumber = 4;
+        int16_t colNumber = 4;
+        int16_t rowGap = 100;
+        int16_t colGap = 100;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rowNumber"))
+            {
+                rowNumber = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "colNumber"))
+            {
+                colNumber = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rowGap"))
+            {
+                rowGap = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "colGap"))
+            {
+                colGap = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
+        parent = (void *)gui_grid_create(parent, x, y, rowNumber, colNumber, colGap, rowGap);
+        parent->name = ptxt;
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_screen(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t w = 0; GUI_UNUSED(w);
+        int16_t h = 0; GUI_UNUSED(h);
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        float scope = 1.0f;
+        T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
+        int style = 0; GUI_UNUSED(style);
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "scope"))
+            {
+                scope = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "orientation"))
+            {
+                const char *o = p->attr[++i];
+                if (!strcmp(o, "middle"))
+                {
+                    orientation = CURTAIN_MIDDLE;
+                }
+                else if (!strcmp(o, "up"))
+                {
+                    orientation = CURTAIN_UP;
+                }
+                else if (!strcmp(o, "down"))
+                {
+                    orientation = CURTAIN_DOWN;
+                }
+                else if (!strcmp(o, "left"))
+                {
+                    orientation = CURTAIN_LEFT;
+                }
+                else if (!strcmp(o, "right"))
+                {
+                    orientation = CURTAIN_RIGHT;
+                }
+            }
+            else if (!strcmp(p->attr[i], "transition"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "normal"))
+                {
+                    style = WIDGET_CLASSIC;
+                }
+                else if (!strcmp(p->attr[i], "fade"))
+                {
+                    style = WIDGET_FADE;
+                }
+                else if (!strcmp(p->attr[i], "scale"))
+                {
+                    style = WIDGET_SCALE;
+                }
+                else if (!strcmp(p->attr[i], "fadeScale"))
+                {
+                    style = WIDGET_SCALE_FADE;
+                }
+
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+        parent = (void *)gui_curtain_create(parent, ptxt, x, y, w, h, orientation, scope);
+        if (orientation == CURTAIN_UP)
+        {
+            parent = (void *)gui_win_create(parent, 0,  0, (1 - scope) * gui_get_screen_height(), w, h * scope);
+        }
+
+        else if (orientation == CURTAIN_LEFT)
+        {
+            parent = (void *)gui_win_create(parent, 0, (1 - scope) * gui_get_screen_width(), 0, w * scope, h);
+        }
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        char *font_type = "app/system/resource/font/tangyuanti.ttf";
+        char *text = NULL;
+        int text_x = 0;
+        int text_y = 0;
+        gui_color_t font_color = APP_COLOR_RED;
+        uint32_t font_size = 32;
+        int picture_x = 0;
+        int picture_y = 0;
+        int transition = 0; GUI_UNUSED(transition);
+        char *picture = NULL;
+        char *hl_picture = NULL;
+        int style = 0;
+        // default image blend_mode
+        BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+        uint8_t opacity = 255;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "font"))
+            {
+                font_type = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "highlightPicture"))
+            {
+                hl_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontSize"))
+            {
+                font_size = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "text"))
+            {
+                text = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "textX"))
+            {
+                text_x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "textY"))
+            {
+                text_y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "pictureX"))
+            {
+                picture_x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "pictureY"))
+            {
+                picture_y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "mode"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "normal"))
+                {
+                    style = WIDGET_CLASSIC;
+                }
+                else if (!strcmp(p->attr[i], "fade"))
+                {
+                    style = WIDGET_FADE;
+                }
+                else if (!strcmp(p->attr[i], "scale"))
+                {
+                    style = WIDGET_SCALE;
+                }
+                else if (!strcmp(p->attr[i], "fadeScale"))
+                {
+                    style = WIDGET_SCALE_FADE;
+                }
+                else if (!strcmp(p->attr[i], "array"))
+                {
+                    style = BUTTON_HIGHLIGHT_ARRAY;
+                }
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+            }
+            else if (!strcmp(p->attr[i], "opacity"))
+            {
+                opacity = atof(p->attr[++i]);
+            }
+            i++;
+        }
+        void *img1;
+        void *img2;
+        {
+            img1 = (void *)gui_get_image_file_address(picture);
+            gui_free(picture);
+            img2 = img1;
+        }
+        if (style != BUTTON_HIGHLIGHT_ARRAY)
+        {
+            img2 = (void *)gui_get_image_file_address(hl_picture);
+            gui_free(hl_picture);
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //font_size = 32;
+        parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, BUTTON_BG_ICON, 0);
+        GUI_TYPE(gui_button_t, parent)->style = style;
+        parent->name = ptxt;
+        gui_button_img_move((void *)parent, picture_x, picture_y);
+        gui_button_text_move((void *)parent, text_x, text_y);
+        gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
+        gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
+        if (text && GUI_TYPE(gui_button_t, parent)->text)
+        {
+            gui_color_t color_temporary;
+            color_temporary = font_color;
+            GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
+        }
+        parent->obj_cb = button_render;
+        parent->has_destroy_cb = true;
+
+        if (style)
+        {
+            if (style == BUTTON_HIGHLIGHT_ARRAY)
+            {
+                int file_count = 0;
+                char *folder = hl_picture;
+                {
+                    gui_fs_dir *dir = 0;
+                    struct gui_fs_dirent *entry;
+                    char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                    sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                    if ((dir = gui_fs_opendir(path)) == NULL)
+                    {
+                        GUI_ASSERT(0);
+                    }
+                    gui_free(path);
+                    while ((entry = gui_fs_readdir(dir)) != NULL)
+                    {
+                        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                        {
+                            file_count++;
+                        }
+
+
+                    }
+                    gui_fs_closedir(dir);
+                }
+                void **image_array = gui_malloc(file_count * sizeof(void *));
+                {
+                    gui_fs_dir *dir = 0;
+                    struct gui_fs_dirent *entry;
+                    char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                    sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                    if ((dir = gui_fs_opendir(path)) == NULL)
+                    {
+                        gui_free(path);
+                        return 0;
+                    }
+
+                    int count = 0;
+                    while ((entry = gui_fs_readdir(dir)) != NULL)
+                    {
+                        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                        {
+                            char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                            sprintf(path2, "%s/%s", folder, entry->d_name);
+                            image_array[count++] = (void *)gui_get_image_file_address(path2);
+                        }
+
+                    }
+                    gui_free(path);
+                    gui_fs_closedir(dir);
+                    GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array,
+                                                   (void *)(uintptr_t)file_count);
+                    GUI_TYPE(gui_button_t, parent)->data = image_array;
+                    GUI_API(gui_button_t).on_release((void *)parent, (gui_event_cb_t)button_press_array, (void *) - 1);
+                }
+            }
+            else
+            {
+                gui_button_press((void *)parent, (gui_event_cb_t)sport_button_press, parent);
+                gui_button_release((void *)parent, (gui_event_cb_t)sport_button_release, parent);
+            }
+
+        }
+        if (text && GUI_TYPE(gui_button_t, parent)->text)
+        {
+            FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
+            if (strstr(font_type, ".bin") != NULL)
+            {
+                font_type2 = GUI_FONT_SRC_BMP;
+                void *addr1 = gui_get_file_address(font_type);
+//gui_font_mem_init(addr1);
+                GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
+                GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1, FONT_SRC_MEMADDR);
+                gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
+// t->font_height = fontSize;
+//t->path = 0;
+            }
+            else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
+            {
+#ifdef __WIN32
+                font_type2 = GUI_FONT_SRC_TTF;
+                GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+                GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
+
+#else
+                font_type =
+                    "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
+                {
+                    font_type2 = GUI_FONT_SRC_BMP;
+                    char b[100] = {0};
+                    strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                    void *addr1 = gui_get_file_address(b);
+                    memset(b, 0, sizeof(b));
+                    char *a = font_type;
+                    strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                         ".bin;") - a + strlen(".bin;")));
+                    void *addr2 = gui_get_file_address(b);
+// gui_set_font_mem_resourse(32, addr1,  addr2);
+                    GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                    GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_BMP;
+                }
+#endif
+            }
+        }
+        {
+            bool if_widget = 0;
+            if (p->parent)
+            {
+                if (!strcmp(widget[21].name, p->parent->name))
+                {
+                    if_widget = 1;
+                }
+            }
+            if (if_widget)
+            {
+                if (open_switch_name && !strcmp(parent->name, open_switch_name))
+                {
+                    gui_free(open_switch_name);
+                    open_switch_name = 0;
+                    GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                   (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+                }
+                else if (close_switch_name && !strcmp(parent->name, close_switch_name))
+                {
+                    gui_free(close_switch_name);
+                    close_switch_name = 0;
+                    GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                   (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+                }
+                else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
+                {
+                    gui_free(pause_switch_name);
+                    pause_switch_name = 0;
+                    GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                   (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
+                }
+            }
+        }
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0; GUI_UNUSED(x);
+        int16_t y = 0; GUI_UNUSED(y);
+        int16_t w = 0; GUI_UNUSED(w);
+        int16_t h = 0; GUI_UNUSED(h);
+        char *font_type = "rtk_font_fs32"; GUI_UNUSED(font_type);
+        char *text = NULL; GUI_UNUSED(text);
+        int text_x = 0; GUI_UNUSED(text_x);
+        int text_y = 0; GUI_UNUSED(text_y);
+        uint32_t font_color = 0Xf0f0; GUI_UNUSED(font_color);
+        uint32_t font_size = 40; GUI_UNUSED(font_size);
+        int picture_x = 0; GUI_UNUSED(picture_x);
+        int picture_y = 0; GUI_UNUSED(picture_y);
+        int transition = 0; GUI_UNUSED(transition);
+        char *picture = NULL; GUI_UNUSED(picture);
+        char *hl_picture = NULL; GUI_UNUSED(hl_picture);
+        int style = 0; GUI_UNUSED(style);
+
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "highlightPicture"))
+            {
+                hl_picture = gui_strdup(p->attr[++i]);
+            }
+
+            i++;
+        }
+        void *img1; GUI_UNUSED(img1);
+        void *img2; GUI_UNUSED(img2);
+        {
+            img1 = (void *)gui_get_image_file_address(picture);
+        }
+        {
+            img2 = (void *)gui_get_image_file_address(hl_picture);;
+        }
+        //parent = (void *)gui_radio_create(parent, x, y, w, h, img1, img2);
+        //parent->name = get_space_string_head(p->txt);
+        //parent = gui_win_create(parent, "1", 0,0,0,0);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        char *picture = NULL;
+        char *hl_picture = NULL;
+        char *pictureHl = NULL;
+        char *hl_pictureHl = NULL;
+        int picture_x = 0;
+        int picture_y = 0;
+        int dur = 1000;
+        // default image blend_mode
+        BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+        uint8_t opacity = 255;
+        int style = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "highlightPicture"))
+            {
+                hl_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "clickedPicture"))
+            {
+                pictureHl = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "clickedHighlightPicture"))
+            {
+                hl_pictureHl = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "pictureX"))
+            {
+                picture_x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "pictureY"))
+            {
+                picture_y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+            }
+            else if (!strcmp(p->attr[i], "opacity"))
+            {
+                opacity = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "mode"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "array"))
+                {
+                    style = SWITCH_HIGHLIGHT_ARRAY;
+                }
+            }
+            else if (!strcmp(p->attr[i], "duration"))
+            {
+                dur = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        void *img1;
+        void *img2;
+        {
+            img1 = gui_get_file_address(picture);
+            img2 = img1;
+        }
+        if (style != SWITCH_HIGHLIGHT_ARRAY)
+        {
+            img2 = gui_get_file_address(hl_picture);
+        }
+        if (!img1)
+        {
+            img1 = img2;
+        }
+        if (!img2)
+        {
+            img2 = img1;
+        }
+        if (!img2 && !img1)
+        {
+            img1 = (void *)gui_get_image_file_address("app/system/resource/switchOff.bin");
+            img2 = (void *)gui_get_image_file_address("app/system/resource/switchOn.bin");
+            int16_t *scale = img1;
+            scale++;
+            w = *scale;
+            scale++;
+            h = *scale;
+        }
+
+
+        parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
+        parent->name = get_space_string_head(p->txt);
+        if (hl_pictureHl)
+        {
+            GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = (void *)gui_get_image_file_address(hl_pictureHl);
+        }
+        if (pictureHl)
+        {
+            GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = (void *)gui_get_image_file_address(pictureHl);
+        }
+        GUI_TYPE(gui_switch_t, parent)->switch_picture->base.x = picture_x;
+        GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
+        gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
+        gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
+        if (style)
+        {
+            if (style == SWITCH_HIGHLIGHT_ARRAY)
+            {
+                GUI_TYPE(gui_switch_t, parent)->style = style;
+                int file_count = 0;
+                char *folder = hl_picture;
+                {
+                    gui_fs_dir *dir = 0;
+                    struct gui_fs_dirent *entry;
+                    char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                    sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                    if ((dir = gui_fs_opendir(path)) == NULL)
+                    {
+                        GUI_ASSERT(0);
+                    }
+                    gui_free(path);
+                    while ((entry = gui_fs_readdir(dir)) != NULL)
+                    {
+                        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                        {
+                            file_count++;
+                        }
+
+
+                    }
+                    gui_fs_closedir(dir);
+                }
+                void **image_array = gui_malloc(file_count * sizeof(void *));
+                {
+                    gui_fs_dir *dir = 0;
+                    struct gui_fs_dirent *entry;
+                    char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                    sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                    if ((dir = gui_fs_opendir(path)) == NULL)
+                    {
+                        gui_free(path);
+                        return 0;
+                    }
+
+                    int count = 0;
+                    while ((entry = gui_fs_readdir(dir)) != NULL)
+                    {
+                        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                        {
+                            char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                            sprintf(path2, "%s/%s", folder, entry->d_name);
+                            image_array[count++] = (void *)gui_get_image_file_address(path2);
+                        }
+
+                    }
+                    gui_free(path);
+                    gui_fs_closedir(dir);
+                    GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array,
+                                                   (void *)(uintptr_t)file_count);
+                    GUI_API(gui_switch_t).animate((void *)parent, dur, 0, switch_press_ani_cb_array, 0);
+                    GUI_TYPE(gui_switch_t, parent)->animate->animate = 0;
+                    GUI_TYPE(gui_switch_t, parent)->data = image_array;
+                    GUI_TYPE(gui_switch_t, parent)->on_pic_addr = image_array[file_count - 1];
+
+                }
+            }
+
+
+        }
+        bool if_widget = 0;
+        if (p->parent)
+        {
+            if (!strcmp(widget[21].name, p->parent->name))
+            {
+                if_widget = 1;
+            }
+        }
+        if (if_widget)
+        {
+            if (open_switch_name && !strcmp(parent->name, open_switch_name))
+            {
+                gui_free(open_switch_name);
+                open_switch_name = 0;
+                GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                 (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+                GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                  (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+            }
+            else if (close_switch_name && !strcmp(parent->name, close_switch_name))
+            {
+                gui_free(close_switch_name);
+                close_switch_name = 0;
+                GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                 (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+                GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                  (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+            }
+            else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
+            {
+                gui_free(pause_switch_name);
+                pause_switch_name = 0;
+                GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                 (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
+                GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                  (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)3);
+            }
+        }
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+
+        gui_gallery_config_t config = {0};
+        char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
+        char *folder = NULL;
+
+        // default image blend_mode
+        uint8_t blendMode = IMG_FILTER_BLACK; GUI_UNUSED(blendMode);
+        uint8_t opacity = 255; GUI_UNUSED(opacity);
+
+        memset(&config, 0, sizeof(config));
+        while (true)
+        {
+            // #define IS_STR(str) (!strcmp(p->attr[i], str))
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "folder"))
+            {
+                folder = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "mainBg"))
+            {
+                config.data_main_bg = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "centerBg"))
+            {
+                config.data_center_bg = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "centerPercent"))
+            {
+                config.center_percent = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "sideScale"))
+            {
+                config.side_scale = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "sidePosPercent"))
+            {
+                config.side_pos_percent = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+            }
+            else if (!strcmp(p->attr[i], "opacity"))
+            {
+                opacity = atof(p->attr[++i]);
+            }
+            i++;
+        }
+
+        char *ptxt = get_space_string_head(p->txt);
+        if (!folder)
+        {
+            gui_log("gallery folder is not found!\n");
+        }
+        else if (folder)
+        {
+            int file_count = 0;
+            gui_fs_dir *dir = 0;
+            struct gui_fs_dirent *entry;
+            char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+            // init image array
+            sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+            if ((dir = gui_fs_opendir(dir_path)) == NULL)
+            {
+                gui_free(dir_path);
+                return 0;
+            }
+            gui_free(dir_path);
+
+            while ((entry = gui_fs_readdir(dir)) != NULL)
+            {
+                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                {
+                    char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                    void *addr = NULL;
+                    void *data = NULL;
+
+                    file_count++;
+                    sprintf(file_path, "%s/%s", folder, entry->d_name);
+                    addr = (void *)gui_get_image_file_address(file_path);
+                    if (!config.img_array)
+                    {
+                        data = gui_malloc(sizeof(uint8_t *));
+                    }
+                    else
+                    {
+                        data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                    }
+                    config.img_array = data;
+                    config.img_array[file_count - 1] = addr;
+
+                    gui_free(file_path);
+                }
+            }
+            gui_fs_closedir(dir);
+
+            config.num_pic = file_count;
+        }
+
+        if (config.data_main_bg)
+        {
+            config.data_main_bg = (void *)gui_get_image_file_address(config.data_main_bg);
+        }
+        if (config.data_center_bg)
+        {
+            config.data_center_bg = (void *)gui_get_image_file_address(config.data_center_bg);
+        }
+
+        gui_gallery_create(parent, ptxt, &config,
+                           x, y, w, h);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        gui_kb_config_t config = {0};
+        char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
+        // char *folder = NULL;
+
+        // default image blend_mode
+        memset(&config, 0, sizeof(config));
+
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "ime"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "pinyin"))
+                {
+                    config.ime = KB_METHOD_PINYIN;
+                }
+            }
+            i++;
+        }
+
+        {
+#define PATH_PRE "app/system/resource/"
+            char *floder_kb = PATH_PRE"keyboard"; GUI_UNUSED(floder_kb);
+            char *floder_letter = PATH_PRE"keyboard/0_letter/";
+            char *floder_letter_upper = PATH_PRE"keyboard/1_letter_upper/";
+            char *floder_num = PATH_PRE"keyboard/2_number/";
+            char *floder_symbol = PATH_PRE"keyboard/3_symbol/";
+            char *floder_func = PATH_PRE"keyboard/4_func/";
+            char *floder_other = PATH_PRE"keyboard/5_other/";
+
+            config.layout = KB_LAYOUT_BASIC;
+            config.mode = KB_MODE_BASIC_ENG_LOWWER;
+
+            uint16_t file_count = 0;
+            gui_fs_dir *dir = NULL;
+            struct gui_fs_dirent *entry;
+            char *folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
+            for (int i = 0; i < sizeof(folder_array) / sizeof(folder_array[0]); i++)
+            {
+                char *folder = folder_array[i];
+                char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                // init image array
+                sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                if ((dir = gui_fs_opendir(dir_path)) == NULL)
+                {
+                    gui_free(dir_path);
+                    continue;
+                    //perror("gui_fs_opendir() failed"); return;
+                }
+                // gui_log("folder: %d %s\n", dir, folder);
+                gui_free(dir_path);
+
+
+                while ((entry = gui_fs_readdir(dir)) != NULL)
+                {
+                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    {
+                        char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                        void *addr = NULL;
+                        void *data = NULL;
+
+                        file_count++;
+                        sprintf(file_path, "%s/%s", folder, entry->d_name);
+                        // gui_log("file_count %d, file: %s\n", file_count, entry->d_name);
+                        addr = (void *)gui_get_image_file_address(file_path);
+                        if (!config.img_array)
+                        {
+                            data = gui_malloc(sizeof(uint8_t *));
+                        }
+                        else
+                        {
+                            data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                        }
+                        config.img_array = data;
+                        config.img_array[file_count - 1] = addr;
+
+                        gui_free(file_path);
+                    }
+
+                }
+                gui_fs_closedir(dir);
+                // gui_log("file_count %d, folder: %s\n", file_count, folder);
+                if (0 == strcmp(folder, floder_symbol))
+                {
+                    config.file_mark[0] = file_count;
+                }
+                else if (0 == strcmp(folder, floder_func))
+                {
+                    config.file_mark[1] = file_count;
+                }
+            }
+            config.num_pic = file_count;
+        }
+
+        gui_keyboard_create(parent, "test", &config,
+                            0, 0, gui_get_screen_width(), gui_get_screen_height());
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_javascript(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+    {
+        if (!strcmp(p->attr[0], "file"))
+        {
+            js = gui_strdup(p->attr[1]);
+        }
+
+    }
+    return parent;
+}
+static gui_obj_t *widget_create_macro_motorized_curtain(ezxml_t p, gui_obj_t *parent,
+                                                        T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            if (!strcmp(p->attr[i], "switchOpen"))
+            {
+                open_switch_name = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "switchClose"))
+            {
+                close_switch_name = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "switchPause"))
+            {
+                pause_switch_name = gui_strdup(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+        parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+    {
+        char *ptxt = get_space_string_head(p->txt);
+        static unsigned char ml_count;
+        //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+        if (ptxt && ptxt[0] == 0)
+        {
+            gui_free(ptxt);
+            ptxt = 0;
+        }
+        if (!ptxt)
+        {
+
+            char buffer[20];
+            sprintf(buffer, "__ml%d_", ml_count++);
+            ptxt = gui_strdup(buffer);
+        }
+
+        parent = (void *)gui_multi_level_create(parent, ptxt, (void(*)(gui_obj_t *))multi_level_ui_design);
+
+    }
+    return parent;
+}
+static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                    }
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                                               (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                                                           gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                           param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                    }
+
+                }
+
+            }
+            else if (!strcmp(type, "control"))
+            {
+                if (!strcmp(to, "light"))
+                {
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                         (gui_event_cb_t)light_switch_on_cb, light);
+                        GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                          (gui_event_cb_t)light_switch_off_cb, light);
+                    }
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            {
+                char **param = gui_malloc(sizeof(char *) * 2);
+                param[0] = gui_strdup(to);
+                param[1] = gui_strdup(id);
+                if (!strcmp(type, "animatePause"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)pause_animation_cb,
+                                                          (param));
+                    }
+
+                }
+                else if (!strcmp(type, "animate"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)start_animation_cb,
+                                                          (param));
+                    }
+
+                }
+            }
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        char *picture = NULL;
+        char *hl_picture = NULL;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "highlightPicture"))
+            {
+                hl_picture = gui_strdup(p->attr[++i]);
+            }
+            i++;
+        }
+        void *img1 = return_image;
+        void *img2 = return_image_hl;
+        if (picture)
+        {
+            img1 = (void *)gui_get_image_file_address(picture);
+            img2 = img1;
+        }
+        if (hl_picture)
+        {
+            img2 = (void *)gui_get_image_file_address(hl_picture);
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //font_size = 32;
+        parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, 0, (T_BUTTON_BG_TYPE)0, 0);
+        parent->name = ptxt;
+        gui_button_t *button = (void *)parent;
+        button->img->blend_mode = IMG_SRC_OVER_MODE;
+        GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
+
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        char *slider_picture = NULL;
+        char *bg_picture = NULL;
+        int16_t minValue = 0;
+        int16_t maxValue = 0;
+        int16_t currentValue = 0;
+        int16_t slider_size = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "bgPicture"))
+            {
+                bg_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "sliderPicture"))
+            {
+                slider_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "minValue"))
+            {
+                minValue = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "maxValue"))
+            {
+                maxValue = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "currentValue"))
+            {
+                currentValue = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "sliderSize"))
+            {
+                slider_size = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        void *bg_buf;
+        void *slider_buf;
+        if (bg_picture)
+        {
+            bg_buf = (void *)gui_get_image_file_address(bg_picture);
+        }
+        if (slider_picture)
+        {
+            slider_buf = (void *)gui_get_image_file_address(slider_picture);
+        }
+
+        parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minValue, maxValue, slider_buf,
+                                           currentValue, slider_size);
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_onchange(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        int id = 0;
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        if (type)
+        {
+
+            if (!strcmp(type, "control"))
+            {
+                light_param_t *light;
+                light = gui_malloc(sizeof(light_param_t));
+                light->id = (id);
+                if (!strcmp(to, "controlLightBT"))
+                {
+                    if (parent->type == SEEKBAR)
+                    {
+                        GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)light_brightness_cb,
+                                                         light);
+                    }
+                }
+                else if (!strcmp(to, "controlLightCT"))
+                {
+                    light->text = gui_malloc(sizeof(gui_text_t));
+                    if (parent->type == SLIDER)
+                    {
+                        gui_slider_t *slider = (gui_slider_t *)parent;
+                        GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)light_colorTemp_cb, light);
+                    }
+
+                }
+            }
+            else if (!strcmp(type, "write"))
+            {
+                if (parent->type == SLIDER)
+                {
+                    gui_slider_t *slider = (gui_slider_t *)parent;
+                    GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)slider_write_text_cb, gui_strdup(to));
+                }
+            }
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = (p->attr[++i]);
+            }
+            i++;
+        }
+        if (type)
+        {
+            char **param = gui_malloc(sizeof(char *) * 2);
+            param[0] = gui_strdup(to);
+            param[1] = gui_strdup(id);
+            if (!strcmp(type, "animatePause"))
+            {
+
+                GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                 (param));
+            }
+            else if (!strcmp(type, "animate"))
+            {
+                GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                 param);
+            }
+        }
+    }
+
+    return parent;
+}
+
+static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = (p->attr[++i]);
+            }
+            i++;
+        }
+        if (type)
+        {
+            char **param = gui_malloc(sizeof(char *) * 2);
+            param[0] = gui_strdup(to);
+            param[1] = gui_strdup(id);
+            if (!strcmp(type, "animatePause"))
+            {
+
+                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                  (gui_event_cb_t)pause_animation_cb,
+                                                  (param));
+            }
+            else if (!strcmp(type, "animate"))
+            {
+                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                  (gui_event_cb_t)start_animation_cb,
+                                                  param);
+            }
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0; GUI_UNUSED(to);
+        char *id = 0;
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = (p->attr[++i]);
+            }
+            i++;
+        }
+        if (type)
+        {
+
+            if (!strcmp(type, "animate"))
+            {
+                ezxml_t f = 0;
+                if (f1 != 0)
+                {
+                    f = f1;
+                }
+                else
+                {
+                    f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
+                }
+                foreach_create_animate(f, parent, gui_strdup(id));
+                //gui_log(" ");
+                if (f1 == 0)
+                {
+                    ezxml_free(f);
+                }
+            }
+
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *parent,
+                                                      T_OBJ_TYPE widget_type)
+{
+
+    {
+        /*<roller
+            id="scrollWheel1"
+            x="50"               <!-- X coordinate -->
+            y="100"              <!-- Y coordinate -->
+            w="200"              <!-- Width -->
+            h="300"              <!-- Height -->
+            items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  <!-- Items displayed in each row of the scroll wheel -->
+            itemCount="11"        <!-- Total number of items -->
+            rowCount="3"         <!-- Number of visible rows in the scroll wheel -->
+            rowSpacing="20"      <!-- Spacing between each row -->
+        ></roller>*/
+
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0; GUI_UNUSED(h);
+        int16_t row_count = 0;
+        int16_t row_spacing = 0;
+        int16_t item_count = 0;
+        const char *items = NULL;
+        int column_offset = 0; GUI_UNUSED(column_offset);
+        const char *font = 0;
+        int16_t font_size = 0;
+        gui_color_t  font_color = {0};
+        gui_color_t  font_color_highlight = {0};
+        gui_color_t  item_color = {0}; GUI_UNUSED(item_color);
+        gui_color_t  item_color_highlight = {0}; GUI_UNUSED(item_color_highlight);
+        bool loop = 1;
+        TEXT_MODE style = LEFT;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+
+            //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rowCount"))
+            {
+                row_count = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rowSpacing"))
+            {
+                row_spacing = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "items"))
+            {
+                items = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "font"))
+            {
+                font = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "fontSize"))
+            {
+                font_size = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColorHighlight"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color_highlight = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                item_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemColorHighlight"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                item_color_highlight = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "loop"))
+            {
+                if (!strcmp(p->attr[++i], "loop"))
+                {
+                    loop = 1;
+                }
+                else if (!strcmp(p->attr[i], "true"))
+                {
+                    loop = 1;
+                }
+                else if (!strcmp(p->attr[i], "false"))
+                {
+                    loop = 0;
+                }
+                else if (!strcmp(p->attr[i], "disable"))
+                {
+                    loop = 0;
+                }
+                else if (!strcmp(p->attr[i], "not loop"))
+                {
+                    loop = 0;
+                }
+            }
+            else if (!strcmp(p->attr[i], "fontMode"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "truncate"))
+                {
+                    style = (TEXT_MODE)0;
+                }
+                else if (!strcmp(p->attr[i], "verticalscroll"))
+                {
+                    style = SCROLL_Y;
+                }
+                else if (!strcmp(p->attr[i], "left"))
+                {
+                    style = LEFT;
+                }
+                else if (!strcmp(p->attr[i], "center"))
+                {
+                    style = CENTER;
+                }
+                else if (!strcmp(p->attr[i], "right"))
+                {
+                    style = RIGHT;
+                }
+            }
+            i++;
+        }
+        {
+            char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+            char *token = strtok(items_copy, ",");
+            int j = 0;
+            while (token != NULL)
+            {
+                j++;
+                token = strtok(NULL, ",");
+            }
+            item_count = j;
+            gui_free(items_copy);
+        }
+        if (item_count == 0)
+        {
+            item_count = 1;
+            items = "NULL";
+        }
+        // Split items into an array of strings
+        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+        const char **string_array = gui_malloc(item_count * sizeof(char *));
+        char *token = strtok(items_copy, ",");
+        int j = 0;
+        while (token != NULL && j < item_count)
+        {
+            string_array[j++] = token;
+            token = strtok(NULL, ",");
+        }
+        //gui_free(items_copy);
+        if (item_count - 2 < row_count)
+        {
+            int item_count_temp = item_count;
+            if (item_count > row_count)
+            {
+                item_count_temp = item_count * 2;
+            }
+            else
+            {
+                item_count_temp = (row_count / item_count + 2) * item_count;
+            }
+            const char **string_array_temp = gui_malloc(item_count_temp * sizeof(char *));
+            for (size_t i = 0; i < item_count_temp; i++)
+            {
+                string_array_temp[i] = string_array[i % item_count];
+            }
+            gui_free(string_array);
+            string_array = string_array_temp;
+            item_count = item_count_temp;
+        }
+
+        // Create the scroll wheel widget
+        gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
+                                                   parent, x, y, w, row_spacing, row_count, string_array, item_count
+                                               );
+        if (scroll_wheel == NULL)
+        {
+            gui_log("Failed to create scroll wheel widget.\n");
+            return 0;;
+        }
+        scroll_wheel->font_color = font_color;
+        scroll_wheel->font_color_highlight = font_color_highlight;
+        extern void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
+                                                           const void *font_file_pointer,
+                                                           int font_size, TEXT_MODE mode);
+        gui_scroll_wheel_new_render_text_alien(scroll_wheel, gui_get_file_address(font), font_size, style);
+        scroll_wheel->loop = loop;
+
+        parent = GUI_BASE(scroll_wheel);
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_calendar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+
+        /*    <calendar
+        x="0"
+        y="360"
+        w="800"
+        h="400"
+        fontColor="#ff000000"
+        fontSize="16"
+        font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
+        </calendar>*/
+
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        gui_color_t color_p = gui_color_css("DarkSlateGray");
+        gui_color_t font_color_highlight = gui_color_css("#FFFFFFFF");;
+        gui_color_t item_color = gui_color_css("#FFFFFF");;
+        gui_color_t item_color_highlight = gui_color_css("rgba(135, 206, 250, 1.0)");;
+        gui_color_t title_color = gui_color_css("rgb(255, 255, 255)");;
+        gui_color_t title_background_color = gui_color_css("hsl(203, 92%, 75%)");;
+        const char *font = 0;
+        int16_t font_size = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+
+            //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                color_p = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColorHighlight"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color_highlight = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                item_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemColorHighlight"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                item_color_highlight = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "titleColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                title_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "titleBackgroundColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                title_background_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "font"))
+            {
+                font = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "fontSize"))
+            {
+                font_size = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_p,
+                            font_color_highlight, item_color, item_color_highlight, title_color, title_background_color);
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_ontime(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0; GUI_UNUSED(to);
+        char *id = 0; GUI_UNUSED(id);
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = (p->attr[++i]);
+            }
+            i++;
+        }
+        switch (parent->type)
+        {
+        case IMAGE_FROM_MEM:
+            {
+                if (type)
+                {
+                    if (id)
+                    {
+                        char *token;
+                        int numbers[2];
+                        int index = 0;
+                        token = strtok(id, ",");
+                        while (token != NULL && index < 2)
+                        {
+                            numbers[index] = atoi(token);
+                            index++;
+                            token = strtok(NULL, ",");
+                        }
+
+                        two_integers *data = (two_integers *)gui_malloc(sizeof(two_integers));
+                        if (data)
+                        {
+
+
+                            data->num1 = numbers[0];
+                            data->num2 = numbers[1];
+
+                            if (!strcmp(type, "hour"))
+                            {
+
+                                gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_hour,
+                                                       (void *)data, "hour");
+                            }
+                            else if (!strcmp(type, "minute"))
+                            {
+                                gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_minute,
+                                                       (void *)data, "minute");
+                            }
+                            else if (!strcmp(type, "second"))
+                            {
+                                gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_second,
+                                                       (void *)data, "second");
+                            }
+                            parent->obj_cb = img_ontime_render;
+                        }
+                    }
+                    else
+                    {
+                        if (!strcmp(type, "hour"))
+                        {
+#define HOUR_ANIMATION 1
+#define MINUTE_ANIMATION 2
+#define SECOND_ANIMATION 3
+                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                   (void *)HOUR_ANIMATION, "hour");
+                        }
+                        else if (!strcmp(type, "minute"))
+                        {
+                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                   (void *)MINUTE_ANIMATION, "minute");
+                        }
+                        else if (!strcmp(type, "second"))
+                        {
+                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
+                                                   (void *)SECOND_ANIMATION, "second");
+                        }
+                    }
+                }
+
+            }
+            break;
+        case TEXTBOX:
+            {
+                if (type)
+                {
+                    gui_text_set_animate(parent, 1000, -1, text_animate_watchface_callback, gui_strdup(type));
+                }
+
+
+            }
+            break;
+        default:
+            break;
+        }
+
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        /*<combo
+            x="450"
+            y="400"
+            w="200"
+            items="Item1,Item2,Item3,Item4,Item5"
+            rowSpacing="32"
+            fontSize="16"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+            fontColor="#000000"
+            picture="app\\box\\resource\\combo\\rect20.bin"
+            highlightPicture="app\\box\\resource\\combo\\rect20hl.bin"
+            blendMode="imgBypassMode">combo1
+        </combo>*/
+
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t row_spacing = 0;
+        int16_t item_count = 0;
+        const char *items = NULL;
+        const char *font = 0;
+        int16_t font_size = 0;
+        gui_color_t  font_color = {0};
+        char *picture = NULL;
+        char *hl_picture = NULL;
+        char *item_selection_picture = NULL;
+        char *selector_picture = NULL;
+        char *selector_picture_collapsed = NULL;
+        char *selector_picture_hl = NULL;
+        char *selector_picture_collapsed_hl = NULL;
+        const char *font_selection = 0;
+        int16_t font_size_selection = 0;
+        gui_color_t  font_color_selection = {0};
+        gui_color_t  font_color_highlight = {0};
+        gui_color_t  background_color = {0};
+        // default image blend_mode
+        BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+
+            //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rowSpacing"))
+            {
+                row_spacing = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "items"))
+            {
+                items = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "font"))
+            {
+                font = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "fontSize"))
+            {
+                font_size = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontSelection"))
+            {
+                font_selection = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "fontSizeSelection"))
+            {
+                font_size_selection = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColorSelection"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color_selection = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColorHighlight"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color_highlight = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "backgroundColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                background_color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemPicture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemPictureHighlight"))
+            {
+                hl_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemPictureSelection"))
+            {
+                item_selection_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "selectionPicture"))
+            {
+                selector_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "selectionPictureCollapsed"))
+            {
+                selector_picture_collapsed = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "selectionPictureHighlight"))
+            {
+                selector_picture_hl = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "selectionPictureCollapsedHighlight"))
+            {
+                selector_picture_collapsed_hl = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+            }
+            i++;
+        }
+        {
+            char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+            char *token = strtok(items_copy, ",");
+            int j = 0;
+            while (token != NULL)
+            {
+                j++;
+                token = strtok(NULL, ",");
+            }
+            item_count = j;
+            gui_free(items_copy);
+        }
+        if (item_count == 0)
+        {
+            item_count = 1;
+            items = "NULL";
+        }
+        // Split items into an array of strings
+        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+        const char **string_array = gui_malloc(item_count * sizeof(char *));
+        char *token = strtok(items_copy, ",");
+        int j = 0;
+        while (token != NULL && j < item_count)
+        {
+            string_array[j++] = token;
+            token = strtok(NULL, ",");
+        }
+        gui_combo_t *combo = gui_combo_create(parent, x, y, w, item_count,
+                                              row_spacing,
+                                              string_array, gui_get_image_file_address(picture),
+                                              gui_get_image_file_address(hl_picture),
+                                              gui_get_image_file_address(item_selection_picture),
+                                              gui_get_image_file_address(selector_picture),
+                                              gui_get_image_file_address(selector_picture_hl),
+                                              gui_get_image_file_address(selector_picture_collapsed),
+                                              gui_get_image_file_address(selector_picture_collapsed_hl),
+                                              background_color,
+                                              font_size,
+                                              font_color,
+                                              gui_get_file_address(font),
+                                              font_size_selection,
+                                              font_color_selection, gui_get_file_address(font_selection), font_color_highlight, blendMode);
+
+
+        // parent = GUI_BASE(combo);
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent,
+                                                    T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0; GUI_UNUSED(to);
+        char *id = 0;
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = (p->attr[++i]);
+            }
+            i++;
+        }
+        switch (parent->type)
+        {
+        case IMAGE_FROM_MEM:
+            {
+                if (type)
+                {
+                    if (!strcmp(type, "activity"))
+                    {
+                        if (!strcmp(id, "exercise"))
+                        {
+                            arc_animation_param_t *param = 0;
+                            ezxml_t pt = p->parent;
+                            if (!strcmp(p->parent->name, "arc"))
+                            {
+                                ezxml_t p = pt;
+                                size_t i = 0;
+                                int16_t cx = 100; GUI_UNUSED(cx);
+                                int16_t cy = 100; GUI_UNUSED(cy);
+                                int16_t r = 100; GUI_UNUSED(r);
+                                int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
+                                int cap = 0; GUI_UNUSED(cap);
+                                gui_color_t stroke = APP_COLOR_RED;
+                                float sd = 0; GUI_UNUSED(sd);
+                                float ed = 100; GUI_UNUSED(ed);
+                                int dir;
+                                while (true)
+                                {
+                                    if (!(p->attr[i]))
+                                    {
+                                        break;
+                                    }
+                                    ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+                                    if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
+                                    {
+                                        cx = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centerY") ||
+                                             !strcmp(p->attr[i], "centralY"))
+                                    {
+                                        cy = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "r") || !strcmp(p->attr[i], "radius"))
+                                    {
+                                        r = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "startDegree") || !strcmp(p->attr[i], "startAngle"))
+                                    {
+                                        sd = atof(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "endDegree") || !strcmp(p->attr[i], "endAngle"))
+                                    {
+                                        ed = atof(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "strokeWidth") || !strcmp(p->attr[i], "stroke-width"))
+                                    {
+                                        stroke_width = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
+                                             !strcmp(p->attr[i], "cap"))
+                                    {
+                                        char *s = p->attr[++i];
+                                        if (!strcmp(p->attr[i], "butt"))
+                                        {
+                                            cap = NVG_BUTT;
+                                        }
+                                        else if (!strcmp(p->attr[i], "round"))
+                                        {
+                                            cap = NVG_ROUND;
+                                        }
+                                        else if (!strcmp(p->attr[i], "square"))
+                                        {
+                                            cap = NVG_SQUARE;
+                                        }
+                                    }
+                                    else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
+                                    {
+                                        stroke = string_rgb888(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "direction") || !strcmp(p->attr[i], "clockwise"))
+                                    {
+                                        if (!strcmp(p->attr[++i], "CCW") || !strcmp(p->attr[i], "count clockwise"))
+                                        {
+                                            dir = NVG_CCW;
+                                        }
+                                        else if (!strcmp(p->attr[i], "CW") || !strcmp(p->attr[i], "clockwise"))
+                                        {
+                                            dir = NVG_CW;
+                                        }
+
+                                    }
+                                    i++;
+                                }
+                                int image_h = r * 2 + stroke_width * 2,
+                                    image_w = image_h,
+                                    pixel_bytes = 4,
+                                    buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                                param = gui_malloc(sizeof(arc_animation_param_t));
+                                memset(param, 0, sizeof(arc_animation_param_t));
+                                param->aniamtion_type = ARC_ACTIVITY_EX_ANIMATION;
+                                param->cap = cap;
+                                param->cx = cx;
+                                param->cy = cy;
+                                param->dir = dir;
+                                param->ed = ed;
+                                param->image_data_length = buffer_size;
+                                param->r = r;
+                                param->sd = sd;
+                                param->stroke = stroke;
+                                param->stroke_width = stroke_width;
+                                param->image_width = image_w;
+                                param->image_height = image_h;
+                                param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
+
+                            }
+                            gui_img_append_animate((void *)parent, 1000, -1, arc_animate_activity_callback, (void *)param, 0);
+                            parent->obj_cb = img_ontime_render;
+                        }
+                    }
+                    else if (!strcmp(type, "heart_rate"))
+                    {
+                        if (!strcmp(id, "array"))
+                        {
+                            chart_animation_param_t *param = 0;
+                            ezxml_t pt = p->parent;
+                            if (!strcmp(p->parent->name, "chart"))
+                            {
+                                ezxml_t p = pt;
+                                size_t i = 0;
+                                int16_t x = 0; GUI_UNUSED(x);
+                                int16_t y = 0; GUI_UNUSED(y);
+                                int16_t w = 0;
+                                int16_t h = 0;
+                                int16_t item_count = 0; GUI_UNUSED(item_count);
+                                const char *items = NULL; GUI_UNUSED(items);
+                                gui_color_t  color = {0};
+                                int16_t max = 0;
+                                int16_t min = 0;
+                                const char *style = "waveform";
+                                int16_t stroke_width = 4;
+                                while (true)
+                                {
+                                    if (!(p->attr[i]))
+                                    {
+                                        break;
+                                    }
+
+                                    //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+                                    if (!strcmp(p->attr[i], "x"))
+                                    {
+                                        x = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "y"))
+                                    {
+                                        y = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "w"))
+                                    {
+                                        w = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "h"))
+                                    {
+                                        h = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "items"))
+                                    {
+                                        items = p->attr[++i];
+                                    }
+                                    else if (!strcmp(p->attr[i], "color"))
+                                    {
+                                        color = string_rgb888(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "max"))
+                                    {
+                                        max = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "min"))
+                                    {
+                                        min = atoi(p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "style"))
+                                    {
+                                        style = (p->attr[++i]);
+                                    }
+                                    else if (!strcmp(p->attr[i], "strokeWidth"))
+                                    {
+                                        stroke_width = atoi(p->attr[++i]);
+                                    }
+                                    i++;
+                                }
+                                int image_h = h,
+                                    image_w = w,
+                                    pixel_bytes = 4,
+                                    buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                                param = gui_malloc(sizeof(chart_animation_param_t));
+                                memset(param, 0, sizeof(chart_animation_param_t));
+                                param->aniamtion_type = CHART_HEART_RATE_DATA_ANIMATION;
+                                param->image_data_length = buffer_size;
+                                param->image_width = image_w;
+                                param->image_height = image_h;
+                                param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
+                                param->color = color;
+                                param->max = max;
+                                param->min = min;
+                                param->stroke_width = stroke_width;
+                                if (!strcmp(style, "waveform"))
+                                {
+                                    param->chart_type = 1;
+                                }
+                                else if (!strcmp(style, "bar"))
+                                {
+                                    param->chart_type = 2;
+                                }
+                                else if (!strcmp(style, "line"))
+                                {
+                                    param->chart_type = 3;
+                                }
+                                else
+                                {
+                                    param->chart_type = 1;
+                                }
+
+                            }
+                            gui_img_append_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback,
+                                                   (void *)param, 0);
+                            parent->obj_cb = img_ontime_render;
+                        }
+                    }
+                }
+            }
+            break;
+        case TEXTBOX:
+            {
+                if (type)
+                {
+                    if (!strcmp(type, "Weather"))
+                    {
+                        if (!strcmp(id, "current"))
+                        {
+                            gui_text_set_animate(parent, 1000, -1, text_animate_weather_callback,
+                                                 (void *)TEXT_WEATHER_CUR_ANIMATION);
+                        }
+                    }
+                    else if (!strcmp(type, "heart_rate"))
+                    {
+                        if (!strcmp(id, "current"))
+                        {
+                            gui_text_set_animate(parent, 1000, -1, text_animation_hr_callback,
+                                                 (void *)TEXT_HEART_RATE_CUR_ANIMATION);
+                        }
+                    }
+                    else if (!strcmp(type, "activity"))
+                    {
+                        if (!strcmp(id, "exercise"))
+                        {
+                            gui_text_set_animate(parent, 1000, -1, text_animate_activity_callback,
+                                                 (void *)TEXT_ACTIVITY_EX_ANIMATION);
+                        }
+                    }
+                    else if (!strcmp(type, "battery"))
+                    {
+                        if (!strcmp(id, "capacity"))
+                        {
+                            gui_text_set_animate(parent, 1000, -1, text_animate_battery_callback,
+                                                 (void *)TEXT_BATTERY_CAPACITY_ANIMATION);
+                        }
+                    }
+                }
+            }
+            break;
+        default:
+            break;
+        }
+
+
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        /*  <chart
+                w="55"
+                h="55"
+                x="342"
+                y="342"
+                color="yellow"
+                items="100,200,0,44,50, 1000, -200,20,-30,88"
+                max="400"
+                min="-300"
+                >chart1
+            </chart>  */
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        int16_t item_count = 0;
+        const char *items = NULL;
+        gui_color_t  color = {0};
+        int16_t max = 0;
+        int16_t min = 0;
+        const char *style = "waveform";
+        int16_t stroke_width = 4;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+
+            //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "items"))
+            {
+                items = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "color"))
+            {
+                color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "max"))
+            {
+                max = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "min"))
+            {
+                min = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "style"))
+            {
+                style = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "strokeWidth"))
+            {
+                stroke_width = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        {
+            char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+            char *token = strtok(items_copy, ",");
+            int j = 0;
+            while (token != NULL)
+            {
+                j++;
+                token = strtok(NULL, ",");
+            }
+            item_count = j;
+            gui_free(items_copy);
+        }
+        if (item_count == 0)
+        {
+            item_count = 1;
+            items = "0";
+        }
+        float numbers[item_count];
+        {
+            const char delim[2] = ",";
+            char *token;
+            int i = 0;
+            char *str_copy = gui_strdup(items);
+            if (str_copy == NULL)
+            {
+                gui_log("strdup failed");
+                return 0;
+            }
+            token = strtok(str_copy, delim);
+            while (token != NULL)
+            {
+                numbers[i++] = atof(token);
+                token = strtok(NULL, delim);
+            }
+            // for (int j = 0; j < i; j++)
+            // {
+            //     gui_log("%d ", numbers[j]);
+            // }
+            // gui_log("\n");
+            gui_free(str_copy);
+        }
+        int
+        pixel_bytes = 4;
+        size_t buffer_size = h * w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        uint8_t *buffer = gui_lower_malloc(buffer_size);
+        memset(buffer, 0, buffer_size);
+        NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
+        if (!strcmp(style, "waveform"))
+        {
+            gui_wave_render(vg, 0, 0, w,
+                            h,
+                            item_count,
+                            numbers,
+                            color,
+                            max,
+                            min);
+        }
+        else if (!strcmp(style, "bar"))
+        {
+            gui_bar_render(vg, 0, 0, w,
+                           h,
+                           item_count,
+                           numbers,
+                           color,
+                           max,
+                           min, stroke_width);
+        }
+        else if (!strcmp(style, "line"))
+        {
+            gui_line_render(vg, 0, 0, w,
+                            h,
+                            item_count,
+                            numbers,
+                            color,
+                            max,
+                            min, stroke_width);
+        }
+        else
+        {
+            gui_wave_render(vg, 0, 0, w,
+                            h,
+                            item_count,
+                            numbers,
+                            color,
+                            max,
+                            min);
+        }
+
+        gui_canvas_output_buffer_blank_close(vg);
+        char *ptxt = get_space_string_head(p->txt);
+        gui_img_t *img = gui_img_create_from_mem(parent, ptxt, buffer, x, y,
+                                                 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+        parent = (void *)img;
+        parent->obj_cb = gui_canvas_img_cb;
+    }
+
+    return parent;
+}
+
+static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0; GUI_UNUSED(w);
+        int16_t h = 0; GUI_UNUSED(h);
+        char *file = NULL;
+        char *folder = NULL;
+        int count = 0;
+        uint32_t duration = 1000;
+        float scalex = 1;
+        float scaley = 1;
+        float angle = 0;
+        // default image blend_mode
+        BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+        uint8_t opacity = 255;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "scaleX"))
+            {
+                scalex = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "scaleY"))
+            {
+                scaley = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rotationAngle"))
+            {
+                angle = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+            }
+            else if (!strcmp(p->attr[i], "opacity"))
+            {
+                opacity = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "file"))
+            {
+                char *filetemp = p->attr[++i];
+                if (strlen(filetemp) == 0)
+                {
+                    file = NULL;
+                }
+                else
+                {
+                    file = gui_strdup(filetemp);
+                }
+            }
+            else if (!strcmp(p->attr[i], "folder"))
+            {
+                folder = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "duration"))
+            {
+                duration = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+
+        //gui_log("x:%d,y:%d,w:%dh:%d,file:%s\n", x, y, w, h, file);
+        if (folder)
+        {
+            int file_count = 0;
+            {
+                gui_fs_dir *dir = NULL;
+                struct gui_fs_dirent *entry;
+                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                if ((dir = gui_fs_opendir(path)) == NULL)
+                {
+                    gui_free(path);
+                    return 0;
+                }
+                gui_free(path);
+                while ((entry = gui_fs_readdir(dir)) != NULL)
+                {
+                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    {
+                        file_count++;
+                    }
+                }
+                gui_fs_closedir(dir);
+            }
+
+            void **image_array = gui_malloc(file_count * sizeof(void *));
+            {
+                gui_fs_dir *dir = NULL;
+                struct gui_fs_dirent *entry;
+                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                if ((dir = gui_fs_opendir(path)) == NULL)
+                {
+                    gui_free(path);
+                    return 0;
+                }
+
+
+                while ((entry = gui_fs_readdir(dir)) != NULL)
+                {
+                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    {
+                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                        sprintf(path2, "%s/%s", folder, entry->d_name);
+                        image_array[count++] = (void *)gui_get_image_file_address(path2);
+                    }
+                }
+                gui_free(path);
+                gui_fs_closedir(dir);
+            }
+            parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, image_array[0], x, y);
+
+            image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
+            params->image_arr = image_array;
+            params->image_count = count;
+            params->img = (gui_img_t *)parent;
+            params->img_name = ptxt;
+
+            gui_img_set_animate((gui_img_t *)parent, duration, -1, image_animate_callback, params);
+            gui_img_set_mode((gui_img_t *)parent, blendMode);
+            gui_img_set_opacity((gui_img_t *)parent, opacity);
+        }
+        else if (file)
+        {
+            void *imgbuf = (void *)gui_get_image_file_address(file);
+            gui_free(file);
+            parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
+            if (scalex != 1 || scaley != 1)
+            {
+                gui_img_scale((void *)parent, scalex, scaley);
+            }
+            if (angle != 0)
+            {
+                gui_img_get_height((void *)parent);
+                gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
+            }
+            gui_img_set_mode((gui_img_t *)parent, blendMode);
+            gui_img_set_opacity((gui_img_t *)parent, opacity);
+            parent->obj_cb = img_render;
+        }
+    }
+
+
+    return parent;
+}
+
+typedef struct xml_widget_create
+{
+    T_OBJ_TYPE widget_type;
+    gui_obj_t *(* widget_create)(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type);
+} xml_widget_create_t;
+static xml_widget_create_t xml_widget_create_array[] =
+{
+    {TEXTBOX, widget_create_textbox},
+    {IMAGE, widget_create_image},
+    {WINDOW, widget_create_window},
+    {PROGRESSBAR, widget_create_progressbar},
+    {SEEKBAR, widget_create_seekbar},
+    {TABVIEW, widget_create_tabview},
+    {TAB, widget_create_tab},
+    {CURTAINVIEW, widget_create_curtainview},
+    {CURTAIN, widget_create_curtain},
+    {ICON, widget_create_icon},
+    {JAVASCRIPT, widget_create_javascript},
+    {CLICKSWITCH, widget_create_clickswitch},
+    {PAGE, widget_create_page},
+    {SCREEN, widget_create_screen},
+    {GRID, widget_create_grid},
+    {GALLERY, widget_create_gallery},
+    {RADIO, widget_create_radio},
+    {MACRO_CANVAS_ARC, widget_create_macro_canvas_arc},
+    {MACRO_MOTORIZED_CURTAIN, widget_create_macro_motorized_curtain},
+    {KEYBOARD, widget_create_keyboard},
+    {MULTI_LEVEL, widget_create_multi_level},
+    {MACRO_ONCLICK, widget_create_macro_onclick},
+    {MACRO_BACKICON, widget_create_macro_backicon},
+    {SLIDER, widget_create_slider},
+    {MACRO_ONCHANGE, widget_create_macro_onchange},
+    {MACRO_ONON, widget_create_macro_onon},
+    {MACRO_ONOFF, widget_create_macro_onoff},
+    {MACRO_ONLOAD, widget_create_macro_onload},
+    {TYPE_SCROLL_WHEEL_NEW, widget_create_type_scroll_wheel_new},
+    {MACRO_CALENDAR, widget_create_macro_calendar},
+    {MACRO_ONTIME, widget_create_macro_ontime},
+    {MACRO_COMBO, widget_create_macro_combo},
+    {MACRO_ON_PERIPHERAL, widget_create_macro_on_peripheral},
+    {MACRO_CHART, widget_create_macro_chart},
+};
+
+static gui_obj_t *widget_create_interface(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+    int array_size = sizeof(xml_widget_create_array) / sizeof(xml_widget_create_array[0]);
+    for (int i = 0; i < array_size; i++)
+    {
+        if (xml_widget_create_array[i].widget_type == widget_type)
+        {
+            // Call the creation function
+            parent = xml_widget_create_array[i].widget_create(p, parent, widget_type);
+            return parent;
+        }
+    }
+    printf("Unknown widget type%d\n", widget_type);
+    return parent;
+}
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
@@ -843,4039 +5068,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
     {
         if (!strcmp(widget[i].name, name))
         {
-            switch (widget[i].type)
-            {
-            case TEXTBOX:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = gui_get_screen_width();
-                    int16_t h = 50;
-                    const char *text = "text";
-#ifdef __WIN32
-                    char *font = "app/system/resource/font/tangyuanti.ttf";
-#else
-                    char *font =
-                        "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
-#endif
-                    gui_color_t color = APP_COLOR_WHITE;
-                    int fontSize = 32;
-                    TEXT_MODE style = (TEXT_MODE)0;
-                    uint8_t inputable = false;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            uint32_t w_temp = atoi(p->attr[++i]);
-                            if (w_temp)
-                            {
-                                w = w_temp;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            uint32_t w_temp = atoi(p->attr[++i]);
-                            if (w_temp)
-                            {
-                                h = w_temp;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "text"))
-                        {
-                            text = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "font"))
-                        {
-                            font = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "fontSize"))
-                        {
-                            fontSize = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "color"))
-                        {
-                            color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "mode"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "truncate"))
-                            {
-                                style = (TEXT_MODE)0;
-                            }
-                            else if (!strcmp(p->attr[i], "verticalscroll"))
-                            {
-                                style = SCROLL_Y;
-                            }
-                            else if (!strcmp(p->attr[i], "left"))
-                            {
-                                style = LEFT;
-                            }
-                            else if (!strcmp(p->attr[i], "center"))
-                            {
-                                style = CENTER;
-                            }
-                            else if (!strcmp(p->attr[i], "right"))
-                            {
-                                style = RIGHT;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "inputable"))
-                        {
-                            inputable = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("p->txt2 = %s,\n", ptxt);
-
-                    if (text && font)
-                    {
-                        gui_text_t *t = 0;
-                        if (style == 0 || style == CENTER || style == RIGHT || style == LEFT)
-                        {
-                            t = gui_text_create(parent, ptxt, x, y, w, h);
-                            gui_color_t color_temporary;
-                            color_temporary = color;
-                            gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
-                            if (inputable)
-                            {
-                                gui_text_input_set(t, inputable);
-                                gui_text_click(t, gui_keyboard_launch_by_widget, t);
-                            }
-
-
-                            {
-                                FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
-                                char *font_type = font;
-                                if (strstr(font_type, ".bin") != NULL)
-                                {
-                                    font_type2 = GUI_FONT_SRC_BMP;
-                                    void *addr1 = gui_get_file_address(font_type);
-                                    //gui_font_mem_init(addr1);
-                                    t->font_height = fontSize;
-                                    t->path = 0;
-                                    t->font_type = GUI_FONT_SRC_BMP;
-                                    gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-                                    gui_text_mode_set(t, style);
-                                    // t->font_height = fontSize;
-                                    //t->path = 0;
-                                }
-                                else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
-                                {
-#ifdef __WIN32
-                                    font_type2 = GUI_FONT_SRC_TTF;
-                                    t->path = gui_get_file_address(font);
-                                    t->font_height = fontSize;
-                                    t->font_type = GUI_FONT_SRC_TTF;
-#else
-                                    font_type =
-                                        "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
-                                    {
-                                        font_type2 = GUI_FONT_SRC_BMP;
-                                        char b[100] = {0};
-                                        strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
-                                        void *addr1 = gui_get_file_address(b);
-                                        memset(b, 0, sizeof(b));
-                                        char *a = font_type;
-                                        strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
-                                                                                                             ".bin;") - a + strlen(".bin;")));
-                                        void *addr2 = gui_get_file_address(b);
-                                        // gui_set_font_mem_resourse(fontSize, addr1,  addr2);
-                                        t->path = 0;
-                                        t->font_type = GUI_FONT_SRC_BMP;
-                                    }
-#endif
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            gui_scroll_text_t *scroll_text = gui_scroll_text_create(parent,  ptxt, x, y,
-                                                                                    strlen(text) * (fontSize / 4), h);
-                            gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
-                            gui_color_t color_temporary;
-                            color_temporary = color;
-                            gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_TTF, color_temporary,
-                                                strlen(text),
-                                                fontSize);
-                            t = (void *)scroll_text;
-                        }
-                        parent = (void *)t;
-                    }
-                }
-                break;
-            case IMAGE:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0; GUI_UNUSED(w);
-                    int16_t h = 0; GUI_UNUSED(h);
-                    char *file = NULL;
-                    char *folder = NULL;
-                    int count = 0;
-                    uint32_t duration = 1000;
-                    float scalex = 1;
-                    float scaley = 1;
-                    float angle = 0;
-                    // default image blend_mode
-                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
-                    uint8_t opacity = 255;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "scaleX"))
-                        {
-                            scalex = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "scaleY"))
-                        {
-                            scaley = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "rotationAngle"))
-                        {
-                            angle = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "blendMode"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "imgBypassMode"))
-                            {
-                                blendMode = IMG_BYPASS_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                            {
-                                blendMode = IMG_FILTER_BLACK;
-                            }
-                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                            {
-                                blendMode = IMG_SRC_OVER_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgCoverMode"))
-                            {
-                                blendMode = IMG_COVER_MODE;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "opacity"))
-                        {
-                            opacity = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "file"))
-                        {
-                            char *filetemp = p->attr[++i];
-                            if (strlen(filetemp) == 0)
-                            {
-                                file = NULL;
-                            }
-                            else
-                            {
-                                file = gui_strdup(filetemp);
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "folder"))
-                        {
-                            folder = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "duration"))
-                        {
-                            duration = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-
-                    //gui_log("x:%d,y:%d,w:%dh:%d,file:%s\n", x, y, w, h, file);
-                    if (folder)
-                    {
-                        int file_count = 0;
-                        {
-                            gui_fs_dir *dir = NULL;
-                            struct gui_fs_dirent *entry;
-                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = gui_fs_opendir(path)) == NULL)
-                            {
-                                gui_free(path);
-                                return 0;
-                            }
-                            gui_free(path);
-                            while ((entry = gui_fs_readdir(dir)) != NULL)
-                            {
-                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                {
-                                    file_count++;
-                                }
-                            }
-                            gui_fs_closedir(dir);
-                        }
-
-                        void **image_array = gui_malloc(file_count * sizeof(void *));
-                        {
-                            gui_fs_dir *dir = NULL;
-                            struct gui_fs_dirent *entry;
-                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = gui_fs_opendir(path)) == NULL)
-                            {
-                                gui_free(path);
-                                return 0;
-                            }
-
-
-                            while ((entry = gui_fs_readdir(dir)) != NULL)
-                            {
-                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                {
-                                    char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-                                    sprintf(path2, "%s/%s", folder, entry->d_name);
-                                    image_array[count++] = (void *)gui_get_image_file_address(path2);
-                                }
-                            }
-                            gui_free(path);
-                            gui_fs_closedir(dir);
-                        }
-                        parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, image_array[0], x, y);
-
-                        image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
-                        params->image_arr = image_array;
-                        params->image_count = count;
-                        params->img = (gui_img_t *)parent;
-                        params->img_name = ptxt;
-
-                        gui_img_set_animate((gui_img_t *)parent, duration, -1, image_animate_callback, params);
-                        gui_img_set_mode((gui_img_t *)parent, blendMode);
-                        gui_img_set_opacity((gui_img_t *)parent, opacity);
-                    }
-                    else if (file)
-                    {
-                        void *imgbuf = (void *)gui_get_image_file_address(file);
-                        gui_free(file);
-                        parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
-                        if (scalex != 1 || scaley != 1)
-                        {
-                            gui_img_scale((void *)parent, scalex, scaley);
-                        }
-                        if (angle != 0)
-                        {
-                            gui_img_get_height((void *)parent);
-                            gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
-                        }
-                        gui_img_set_mode((gui_img_t *)parent, blendMode);
-                        gui_img_set_opacity((gui_img_t *)parent, opacity);
-                        parent->obj_cb = img_render;
-                    }
-                }
-                break;
-            case WINDOW:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    bool hide = false;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "hidden"))
-                        {
-                            hide = true;
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
-                    {
-                        parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
-                        if (hide)
-                        {
-                            parent->not_show = 1;
-                        }
-
-
-                    }
-                }
-                break;
-            case TABVIEW:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    int style = 0; GUI_UNUSED(style);
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "transition"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "normal"))
-                            {
-                                style = CLASSIC;
-                            }
-                            else if (!strcmp(p->attr[i], "fade"))
-                            {
-                                style = FADE;
-                            }
-                            else if (!strcmp(p->attr[i], "scale"))
-                            {
-                                style = REDUCTION;
-                            }
-                            else if (!strcmp(p->attr[i], "fadeScale"))
-                            {
-                                style = REDUCTION_FADE;
-                            }
-
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
-                    gui_tabview_loop_x((void *)parent, true);
-                }
-                break;
-            case MACRO_CANVAS_ARC:
-                {
-                    size_t i = 0;
-                    int16_t cx = 100; GUI_UNUSED(cx);
-                    int16_t cy = 100; GUI_UNUSED(cy);
-                    int16_t r = 100; GUI_UNUSED(r);
-                    int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
-                    int cap = 0; GUI_UNUSED(cap);
-                    gui_color_t stroke = APP_COLOR_RED;
-                    float sd = 0; GUI_UNUSED(sd);
-                    float ed = 100; GUI_UNUSED(ed);
-                    int dir = NVG_CW;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
-                        {
-                            cx = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centerY") ||
-                                 !strcmp(p->attr[i], "centralY"))
-                        {
-                            cy = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "r") || !strcmp(p->attr[i], "radius"))
-                        {
-                            r = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "startDegree") || !strcmp(p->attr[i], "startAngle"))
-                        {
-                            sd = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "endDegree") || !strcmp(p->attr[i], "endAngle"))
-                        {
-                            ed = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "strokeWidth") || !strcmp(p->attr[i], "stroke-width"))
-                        {
-                            stroke_width = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
-                                 !strcmp(p->attr[i], "cap"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "butt"))
-                            {
-                                cap = NVG_BUTT;
-                            }
-                            else if (!strcmp(p->attr[i], "round"))
-                            {
-                                cap = NVG_ROUND;
-                            }
-                            else if (!strcmp(p->attr[i], "square"))
-                            {
-                                cap = NVG_SQUARE;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
-                        {
-                            stroke = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "direction") || !strcmp(p->attr[i], "clockwise"))
-                        {
-                            if (!strcmp(p->attr[++i], "CCW") || !strcmp(p->attr[i], "count clockwise"))
-                            {
-                                dir = NVG_CCW;
-                            }
-                            else if (!strcmp(p->attr[i], "CW") || !strcmp(p->attr[i], "clockwise"))
-                            {
-                                dir = NVG_CW;
-                            }
-
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //arc animation by user's buffer
-                    {
-                        int image_h = r * 2 + stroke_width * 2,
-                            image_w = image_h,
-                            pixel_bytes = 4,
-                            buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-                        uint8_t *imgdata = gui_lower_malloc(buffer_size);
-                        memset(imgdata, 0, buffer_size);
-                        int format = GUI_CANVAS_OUTPUT_RGBA;  int image_width = image_w;
-                        int image_height = image_h;  uint8_t *target_buffer = imgdata;
-                        {
-                            int pixel_length = 4;
-                            int data_length = 0;
-                            uint8_t *buffer = 0;
-                            uint8_t *output_data = 0;
-                            switch (format)
-                            {
-                            case GUI_CANVAS_OUTPUT_PNG:
-                            case GUI_CANVAS_OUTPUT_JPG:
-                                {
-                                    data_length = image_width * image_height * pixel_length;
-                                    buffer = gui_lower_malloc(data_length);
-                                    memset(buffer, 0, data_length);
-                                }
-                                break;
-                            case GUI_CANVAS_OUTPUT_RGBA:
-                                {
-                                    output_data = target_buffer;
-                                    buffer = output_data + sizeof(gui_rgb_data_head_t);
-                                    memset(output_data, 0, sizeof(gui_rgb_data_head_t));
-                                    gui_rgb_data_head_t *head = (void *)output_data;
-                                    head->type = ARGB8888;
-                                    head->w = image_width;
-                                    head->h = image_height;
-                                }
-                                break;
-                            case GUI_CANVAS_OUTPUT_RGB565:
-                                {
-                                    pixel_length = 2;
-                                    output_data = target_buffer;
-                                    memset(output_data, 0, sizeof(gui_rgb_data_head_t));
-                                    buffer = output_data + sizeof(gui_rgb_data_head_t);
-                                    gui_rgb_data_head_t *head = (void *)output_data;
-                                    head->type = RGB565;
-                                    head->w = image_width;
-                                    head->h = image_height;
-                                }
-                                break;
-                            default:
-                                break;
-                            }
-
-                            {
-                                NVGcontext *vg = 0;
-                                extern NVGcontext *nvgCreateAGGE(uint32_t w,
-                                                                 uint32_t h,
-                                                                 uint32_t stride,
-                                                                 enum     NVGtexture format,
-                                                                 uint8_t *data);
-                                extern void nvgDeleteAGGE(NVGcontext * ctx);
-                                vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
-                                                   (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
-                                nvgBeginFrame(vg, image_width, image_height, 1);
-
-                                nvgResetTransform(vg);
-                                float a0,  a1;
-                                a0 = sd;
-                                a1 = ed;
-                                if (a0 != a1)
-                                {
-                                    nvgArc(vg, r + stroke_width, r + stroke_width, r, sd, ed, dir);
-                                    nvgStrokeWidth(vg, stroke_width);
-                                    nvgStrokeColor(vg, nvgRGBA(stroke.color.rgba.r, stroke.color.rgba.g, stroke.color.rgba.b,
-                                                               stroke.color.rgba.a));
-                                    nvgStroke(vg);
-                                }
-
-
-                                nvgEndFrame(vg);
-                                nvgDeleteAGGE(vg);
-                            }
-                        }
-                        gui_img_t *img = gui_img_create_from_mem(parent, ptxt, imgdata, cx - image_w / 2, cy - image_h / 2,
-                                                                 0, 0);
-                        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-                        parent = (void *)img;
-                        parent->obj_cb = gui_canvas_img_cb;
-                    }
-
-
-                }
-                break;
-            case PROGRESSBAR:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0; GUI_UNUSED(w);
-                    int16_t h = 0; GUI_UNUSED(h);
-                    gui_color_t color = APP_COLOR_WHITE_OPACITY;
-                    gui_color_t highlightColor = APP_COLOR_WHITE;
-                    bool vh = false;
-                    bool canvas = false;
-                    char *picture = "app/system/resource/Progress bar_full.bin";
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "canvasOrPicture"))
-                        {
-                            if (!strcmp(p->attr[++i], "canvas"))
-                            {
-                                canvas = true;
-                            }
-                            else
-                            {
-                                canvas = false;
-                            }
-
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "color"))
-                        {
-                            color = string_rgb888(p->attr[++i]);
-                            //gui_log("color %s,%x\n", p->attr[i], color);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightColor"))
-                        {
-                            highlightColor = string_rgb888(p->attr[++i]);
-                            //gui_log("color %s,%x\n", p->attr[i], highlightColor);
-                        }
-                        else if (!strcmp(p->attr[i], "orientation"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "vertical"))
-                            {
-                                vh = true;
-                            }
-                            else if (!strcmp(p->attr[i], "V"))
-                            {
-                                vh = true;
-                            }
-                            else if (!strcmp(p->attr[i], "horizontal"))
-                            {
-                                vh = false;
-                            }
-                            else if (!strcmp(p->attr[i], "H"))
-                            {
-                                vh = false;
-                            }
-
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    if (canvas == true)
-                    {
-#if 0
-                        if (vh)
-                        {
-                            //parent = (void *)gui_progressbar_v_create(parent, ptxt, x, y, w, h);
-                        }
-                        else
-                        {
-                            //parent = (void *)gui_progressbar_create(parent, ptxt, x, y, w, h);
-                        }
-
-                        GUI_TYPE(gui_progressbar_t, parent)->color = color;
-                        GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
-#endif
-                    }
-                    else
-                    {
-                        if (vh)
-                        {
-                            parent = (void *)gui_progressbar_img_v_create(parent, (void *)gui_get_image_file_address(picture),
-                                                                          x, y);
-                        }
-                        else
-                        {
-                            parent = (void *)gui_progressbar_img_h_create(parent, (void *)gui_get_image_file_address(picture),
-                                                                          x, y);
-                        }
-                    }
-                    parent->name = ptxt;
-
-
-
-
-                }
-                break;
-            case SEEKBAR:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0; GUI_UNUSED(w);
-                    int16_t h = 0; GUI_UNUSED(h);
-                    gui_color_t color = APP_COLOR_WHITE_OPACITY;
-                    gui_color_t highlightColor = APP_COLOR_WHITE;
-                    bool canvas = false;
-                    bool arc = false;
-                    char *picture = "app/system/resource/Progress bar_full.bin";
-                    char *folder = NULL;
-                    bool vh = false;
-                    int16_t cx = 0;
-                    int16_t cy = 0;
-
-                    float sd = 0;
-                    float ed = 0;
-                    // default image blend_mode
-                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
-                    uint8_t opacity = 255;
-                    bool reverse = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "canvasOrPicture"))
-                        {
-                            if (!strcmp(p->attr[++i], "canvas"))
-                            {
-                                canvas = true;
-                            }
-                            else
-                            {
-                                canvas = false;
-                            }
-
-                        }
-                        else if (!strcmp(p->attr[i], "folder"))
-                        {
-                            folder = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "color"))
-                        {
-                            color = string_rgb888(p->attr[++i]);
-                            //gui_log("color %s,%x\n", p->attr[i], color);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightColor"))
-                        {
-                            highlightColor = string_rgb888(p->attr[++i]);
-                            //gui_log("color %s,%x\n", p->attr[i], highlightColor);
-                        }
-                        else if (!strcmp(p->attr[i], "orientation"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "vertical"))
-                            {
-                                vh = true;
-                            }
-                            else if (!strcmp(p->attr[i], "V"))
-                            {
-                                vh = true;
-                            }
-                            else if (!strcmp(p->attr[i], "horizontal"))
-                            {
-                                vh = false;
-                            }
-                            else if (!strcmp(p->attr[i], "H"))
-                            {
-                                vh = false;
-                            }
-                            else if (!strcmp(p->attr[i], "arc"))
-                            {
-                                arc = true;
-                            }
-
-                        }
-                        else if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX"))
-                        {
-                            cx = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centralY"))
-                        {
-                            cy = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "startDegree"))
-                        {
-                            sd = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "endDegree"))
-                        {
-                            ed = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "reverse"))
-                        {
-                            reverse = 1;
-                        }
-                        else if (!strcmp(p->attr[i], "blendMode"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "imgBypassMode"))
-                            {
-                                blendMode = IMG_BYPASS_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                            {
-                                blendMode = IMG_FILTER_BLACK;
-                            }
-                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                            {
-                                blendMode = IMG_SRC_OVER_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgCoverMode"))
-                            {
-                                blendMode = IMG_COVER_MODE;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "opacity"))
-                        {
-                            opacity = atof(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    if (canvas)
-                    {
-#if 0
-                        /* code */
-
-
-                        if (vh)
-                        {
-                            //parent = (void *)gui_seekbar_create(parent, ptxt, x, y, w, h);
-                        }
-                        else
-                        {
-                            //parent = (void *)gui_seekbar_h_create(parent, ptxt, x, y, w, h);
-                        }
-
-                        GUI_TYPE(gui_progressbar_t, parent)->color = color;
-                        GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
-#endif
-                    }
-                    else if (!folder)
-                    {
-
-                        if (vh)
-                        {
-                            parent = (void *)gui_seekbar_create_img_v(parent, (void *)gui_get_image_file_address(picture), x,
-                                                                      y);
-                        }
-                        else
-                        {
-                            parent = (void *)gui_seekbar_create_img_h(parent, (void *)gui_get_image_file_address(picture), x,
-                                                                      y);
-                        }
-                        gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
-                        gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
-                    }
-                    else if (folder)
-                    {
-                        int file_count = 0;
-
-                        {
-                            gui_fs_dir *dir = 0;
-                            struct gui_fs_dirent *entry;
-                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = gui_fs_opendir(path)) == NULL)
-                            {
-                                gui_free(path);
-                                return 0;
-                            }
-                            gui_free(path);
-                            while ((entry = gui_fs_readdir(dir)) != NULL)
-                            {
-                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                {
-                                    file_count++;
-                                }
-
-
-                            }
-                            gui_fs_closedir(dir);
-                        }
-                        void **image_array = gui_malloc(file_count * sizeof(void *));
-                        {
-                            gui_fs_dir *dir = 0;
-                            struct gui_fs_dirent *entry;
-                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = gui_fs_opendir(path)) == NULL)
-                            {
-                                gui_free(path);
-                                return 0;
-                            }
-
-                            int count = 0;
-                            while ((entry = gui_fs_readdir(dir)) != NULL)
-                            {
-                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                {
-                                    char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-                                    sprintf(path2, "%s/%s", folder, entry->d_name);
-                                    image_array[count++] = (void *)gui_get_image_file_address(path2);
-                                }
-
-                            }
-                            gui_free(path);
-                            gui_fs_closedir(dir);
-                            if (reverse)
-                            {
-                                reverse_array(image_array, count);
-                            }
-
-
-                        }
-                        bool if_widget = 0;
-                        if (p->parent)
-                        {
-                            if (!strcmp(widget[21].name, p->parent->name))
-                            {
-                                if_widget = 1;
-                            }
-                        }
-                        if (if_widget)
-                        {
-                            parent = (void *)gui_seekbar_create_movie_h_double(parent, image_array, file_count, x, y);
-                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
-                            gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
-                        }
-                        else
-                        {
-                            if (arc)
-                            {
-                                parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
-                                                                              cx, cy, 100, 100, sd, ed);
-                                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
-                                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
-                            }
-                            else
-                            {
-                                if (vh)
-                                {
-                                    parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
-                                }
-                                else
-                                {
-                                    parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
-                                }
-                                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
-                                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
-                            }
-                        }
-
-
-
-
-
-                    }
-
-                    parent->name = ptxt;
-
-
-
-                }
-                break;
-            case TAB:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    int16_t idx = 0;
-                    int16_t idy = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "idx"))
-                        {
-                            idx = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "idy"))
-                        {
-                            idy = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
-                    parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
-                }
-                break;
-            case CURTAINVIEW:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    int style = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "transition"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "normal"))
-                            {
-                                style = WIDGET_CLASSIC;
-                            }
-                            else if (!strcmp(p->attr[i], "fade"))
-                            {
-                                style = WIDGET_FADE;
-                            }
-                            else if (!strcmp(p->attr[i], "scale"))
-                            {
-                                style = WIDGET_SCALE;
-                            }
-                            else if (!strcmp(p->attr[i], "fadeScale"))
-                            {
-                                style = WIDGET_SCALE_FADE;
-                            }
-
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
-                    parent = (void *)gui_curtainview_create(parent, ptxt, x, y, w, h);
-                    GUI_TYPE(gui_curtainview_t, parent)->style = style;
-                }
-                break;
-            case PAGE:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
-                    parent = (void *)gui_page_create(parent, ptxt, x, y, w, h);
-                }
-                break;
-            case GRID:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t rowNumber = 4;
-                    int16_t colNumber = 4;
-                    int16_t rowGap = 100;
-                    int16_t colGap = 100;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "rowNumber"))
-                        {
-                            rowNumber = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "colNumber"))
-                        {
-                            colNumber = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "rowGap"))
-                        {
-                            rowGap = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "colGap"))
-                        {
-                            colGap = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
-                    parent = (void *)gui_grid_create(parent, x, y, rowNumber, colNumber, colGap, rowGap);
-                    parent->name = ptxt;
-                }
-                break;
-            case SCREEN:
-                {
-                    size_t i = 0;
-                    int16_t w = 0; GUI_UNUSED(w);
-                    int16_t h = 0; GUI_UNUSED(h);
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                }
-                break;
-            case CURTAIN:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    float scope = 1.0f;
-                    T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
-                    int style = 0; GUI_UNUSED(style);
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "scope"))
-                        {
-                            scope = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "orientation"))
-                        {
-                            const char *o = p->attr[++i];
-                            if (!strcmp(o, "middle"))
-                            {
-                                orientation = CURTAIN_MIDDLE;
-                            }
-                            else if (!strcmp(o, "up"))
-                            {
-                                orientation = CURTAIN_UP;
-                            }
-                            else if (!strcmp(o, "down"))
-                            {
-                                orientation = CURTAIN_DOWN;
-                            }
-                            else if (!strcmp(o, "left"))
-                            {
-                                orientation = CURTAIN_LEFT;
-                            }
-                            else if (!strcmp(o, "right"))
-                            {
-                                orientation = CURTAIN_RIGHT;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "transition"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "normal"))
-                            {
-                                style = WIDGET_CLASSIC;
-                            }
-                            else if (!strcmp(p->attr[i], "fade"))
-                            {
-                                style = WIDGET_FADE;
-                            }
-                            else if (!strcmp(p->attr[i], "scale"))
-                            {
-                                style = WIDGET_SCALE;
-                            }
-                            else if (!strcmp(p->attr[i], "fadeScale"))
-                            {
-                                style = WIDGET_SCALE_FADE;
-                            }
-
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
-                    parent = (void *)gui_curtain_create(parent, ptxt, x, y, w, h, orientation, scope);
-                    if (orientation == CURTAIN_UP)
-                    {
-                        parent = (void *)gui_win_create(parent, 0,  0, (1 - scope) * gui_get_screen_height(), w, h * scope);
-                    }
-
-                    else if (orientation == CURTAIN_LEFT)
-                    {
-                        parent = (void *)gui_win_create(parent, 0, (1 - scope) * gui_get_screen_width(), 0, w * scope, h);
-                    }
-
-
-                }
-                break;
-            case ICON:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *font_type = "app/system/resource/font/tangyuanti.ttf";
-                    char *text = NULL;
-                    int text_x = 0;
-                    int text_y = 0;
-                    gui_color_t font_color = APP_COLOR_RED;
-                    uint32_t font_size = 32;
-                    int picture_x = 0;
-                    int picture_y = 0;
-                    int transition = 0; GUI_UNUSED(transition);
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    int style = 0;
-                    // default image blend_mode
-                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
-                    uint8_t opacity = 255;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "font"))
-                        {
-                            font_type = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightPicture"))
-                        {
-                            hl_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontSize"))
-                        {
-                            font_size = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "text"))
-                        {
-                            text = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "textX"))
-                        {
-                            text_x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "textY"))
-                        {
-                            text_y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "pictureX"))
-                        {
-                            picture_x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "pictureY"))
-                        {
-                            picture_y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "mode"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "normal"))
-                            {
-                                style = WIDGET_CLASSIC;
-                            }
-                            else if (!strcmp(p->attr[i], "fade"))
-                            {
-                                style = WIDGET_FADE;
-                            }
-                            else if (!strcmp(p->attr[i], "scale"))
-                            {
-                                style = WIDGET_SCALE;
-                            }
-                            else if (!strcmp(p->attr[i], "fadeScale"))
-                            {
-                                style = WIDGET_SCALE_FADE;
-                            }
-                            else if (!strcmp(p->attr[i], "array"))
-                            {
-                                style = BUTTON_HIGHLIGHT_ARRAY;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "blendMode"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "imgBypassMode"))
-                            {
-                                blendMode = IMG_BYPASS_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                            {
-                                blendMode = IMG_FILTER_BLACK;
-                            }
-                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                            {
-                                blendMode = IMG_SRC_OVER_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgCoverMode"))
-                            {
-                                blendMode = IMG_COVER_MODE;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "opacity"))
-                        {
-                            opacity = atof(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    void *img1;
-                    void *img2;
-                    {
-                        img1 = (void *)gui_get_image_file_address(picture);
-                        gui_free(picture);
-                        img2 = img1;
-                    }
-                    if (style != BUTTON_HIGHLIGHT_ARRAY)
-                    {
-                        img2 = (void *)gui_get_image_file_address(hl_picture);
-                        gui_free(hl_picture);
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //font_size = 32;
-                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, BUTTON_BG_ICON, 0);
-                    GUI_TYPE(gui_button_t, parent)->style = style;
-                    parent->name = ptxt;
-                    gui_button_img_move((void *)parent, picture_x, picture_y);
-                    gui_button_text_move((void *)parent, text_x, text_y);
-                    gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
-                    gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
-                    if (text && GUI_TYPE(gui_button_t, parent)->text)
-                    {
-                        gui_color_t color_temporary;
-                        color_temporary = font_color;
-                        GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
-                    }
-                    parent->obj_cb = button_render;
-                    parent->has_destroy_cb = true;
-
-                    if (style)
-                    {
-                        if (style == BUTTON_HIGHLIGHT_ARRAY)
-                        {
-                            int file_count = 0;
-                            char *folder = hl_picture;
-                            {
-                                gui_fs_dir *dir = 0;
-                                struct gui_fs_dirent *entry;
-                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = gui_fs_opendir(path)) == NULL)
-                                {
-                                    GUI_ASSERT(0);
-                                }
-                                gui_free(path);
-                                while ((entry = gui_fs_readdir(dir)) != NULL)
-                                {
-                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                    {
-                                        file_count++;
-                                    }
-
-
-                                }
-                                gui_fs_closedir(dir);
-                            }
-                            void **image_array = gui_malloc(file_count * sizeof(void *));
-                            {
-                                gui_fs_dir *dir = 0;
-                                struct gui_fs_dirent *entry;
-                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = gui_fs_opendir(path)) == NULL)
-                                {
-                                    gui_free(path);
-                                    return 0;
-                                }
-
-                                int count = 0;
-                                while ((entry = gui_fs_readdir(dir)) != NULL)
-                                {
-                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                    {
-                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-                                        sprintf(path2, "%s/%s", folder, entry->d_name);
-                                        image_array[count++] = (void *)gui_get_image_file_address(path2);
-                                    }
-
-                                }
-                                gui_free(path);
-                                gui_fs_closedir(dir);
-                                GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array,
-                                                               (void *)(uintptr_t)file_count);
-                                GUI_TYPE(gui_button_t, parent)->data = image_array;
-                                GUI_API(gui_button_t).on_release((void *)parent, (gui_event_cb_t)button_press_array, (void *) - 1);
-                            }
-                        }
-                        else
-                        {
-                            gui_button_press((void *)parent, (gui_event_cb_t)sport_button_press, parent);
-                            gui_button_release((void *)parent, (gui_event_cb_t)sport_button_release, parent);
-                        }
-
-                    }
-                    if (text && GUI_TYPE(gui_button_t, parent)->text)
-                    {
-                        FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
-                        if (strstr(font_type, ".bin") != NULL)
-                        {
-                            font_type2 = GUI_FONT_SRC_BMP;
-                            void *addr1 = gui_get_file_address(font_type);
-//gui_font_mem_init(addr1);
-                            GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
-                            GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                            gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1, FONT_SRC_MEMADDR);
-                            gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
-// t->font_height = fontSize;
-//t->path = 0;
-                        }
-                        else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
-                        {
-#ifdef __WIN32
-                            font_type2 = GUI_FONT_SRC_TTF;
-                            GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
-                            GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
-
-#else
-                            font_type =
-                                "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
-                            {
-                                font_type2 = GUI_FONT_SRC_BMP;
-                                char b[100] = {0};
-                                strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
-                                void *addr1 = gui_get_file_address(b);
-                                memset(b, 0, sizeof(b));
-                                char *a = font_type;
-                                strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
-                                                                                                     ".bin;") - a + strlen(".bin;")));
-                                void *addr2 = gui_get_file_address(b);
-// gui_set_font_mem_resourse(32, addr1,  addr2);
-                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                                GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_BMP;
-                            }
-#endif
-                        }
-                    }
-                    {
-                        bool if_widget = 0;
-                        if (p->parent)
-                        {
-                            if (!strcmp(widget[21].name, p->parent->name))
-                            {
-                                if_widget = 1;
-                            }
-                        }
-                        if (if_widget)
-                        {
-                            if (open_switch_name && !strcmp(parent->name, open_switch_name))
-                            {
-                                gui_free(open_switch_name);
-                                open_switch_name = 0;
-                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
-                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
-                            }
-                            else if (close_switch_name && !strcmp(parent->name, close_switch_name))
-                            {
-                                gui_free(close_switch_name);
-                                close_switch_name = 0;
-                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
-                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
-                            }
-                            else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
-                            {
-                                gui_free(pause_switch_name);
-                                pause_switch_name = 0;
-                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
-                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
-                            }
-                        }
-                    }
-
-                    break;
-                }
-            case RADIO:
-                {
-                    size_t i = 0;
-                    int16_t x = 0; GUI_UNUSED(x);
-                    int16_t y = 0; GUI_UNUSED(y);
-                    int16_t w = 0; GUI_UNUSED(w);
-                    int16_t h = 0; GUI_UNUSED(h);
-                    char *font_type = "rtk_font_fs32"; GUI_UNUSED(font_type);
-                    char *text = NULL; GUI_UNUSED(text);
-                    int text_x = 0; GUI_UNUSED(text_x);
-                    int text_y = 0; GUI_UNUSED(text_y);
-                    uint32_t font_color = 0Xf0f0; GUI_UNUSED(font_color);
-                    uint32_t font_size = 40; GUI_UNUSED(font_size);
-                    int picture_x = 0; GUI_UNUSED(picture_x);
-                    int picture_y = 0; GUI_UNUSED(picture_y);
-                    int transition = 0; GUI_UNUSED(transition);
-                    char *picture = NULL; GUI_UNUSED(picture);
-                    char *hl_picture = NULL; GUI_UNUSED(hl_picture);
-                    int style = 0; GUI_UNUSED(style);
-
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightPicture"))
-                        {
-                            hl_picture = gui_strdup(p->attr[++i]);
-                        }
-
-                        i++;
-                    }
-                    void *img1; GUI_UNUSED(img1);
-                    void *img2; GUI_UNUSED(img2);
-                    {
-                        img1 = (void *)gui_get_image_file_address(picture);
-                    }
-                    {
-                        img2 = (void *)gui_get_image_file_address(hl_picture);;
-                    }
-                    //parent = (void *)gui_radio_create(parent, x, y, w, h, img1, img2);
-                    //parent->name = get_space_string_head(p->txt);
-                    //parent = gui_win_create(parent, "1", 0,0,0,0);
-                }
-                break;
-            case CLICKSWITCH:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    char *pictureHl = NULL;
-                    char *hl_pictureHl = NULL;
-                    int picture_x = 0;
-                    int picture_y = 0;
-                    int dur = 1000;
-                    // default image blend_mode
-                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
-                    uint8_t opacity = 255;
-                    int style = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightPicture"))
-                        {
-                            hl_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "clickedPicture"))
-                        {
-                            pictureHl = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "clickedHighlightPicture"))
-                        {
-                            hl_pictureHl = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "pictureX"))
-                        {
-                            picture_x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "pictureY"))
-                        {
-                            picture_y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "blendMode"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "imgBypassMode"))
-                            {
-                                blendMode = IMG_BYPASS_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                            {
-                                blendMode = IMG_FILTER_BLACK;
-                            }
-                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                            {
-                                blendMode = IMG_SRC_OVER_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgCoverMode"))
-                            {
-                                blendMode = IMG_COVER_MODE;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "opacity"))
-                        {
-                            opacity = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "mode"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "array"))
-                            {
-                                style = SWITCH_HIGHLIGHT_ARRAY;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "duration"))
-                        {
-                            dur = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    void *img1;
-                    void *img2;
-                    {
-                        img1 = gui_get_file_address(picture);
-                        img2 = img1;
-                    }
-                    if (style != SWITCH_HIGHLIGHT_ARRAY)
-                    {
-                        img2 = gui_get_file_address(hl_picture);
-                    }
-                    if (!img1)
-                    {
-                        img1 = img2;
-                    }
-                    if (!img2)
-                    {
-                        img2 = img1;
-                    }
-                    if (!img2 && !img1)
-                    {
-                        img1 = (void *)gui_get_image_file_address("app/system/resource/switchOff.bin");
-                        img2 = (void *)gui_get_image_file_address("app/system/resource/switchOn.bin");
-                        int16_t *scale = img1;
-                        scale++;
-                        w = *scale;
-                        scale++;
-                        h = *scale;
-                    }
-
-
-                    parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
-                    parent->name = get_space_string_head(p->txt);
-                    if (hl_pictureHl)
-                    {
-                        GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = (void *)gui_get_image_file_address(hl_pictureHl);
-                    }
-                    if (pictureHl)
-                    {
-                        GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = (void *)gui_get_image_file_address(pictureHl);
-                    }
-                    GUI_TYPE(gui_switch_t, parent)->switch_picture->base.x = picture_x;
-                    GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
-                    gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
-                    gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
-                    if (style)
-                    {
-                        if (style == SWITCH_HIGHLIGHT_ARRAY)
-                        {
-                            GUI_TYPE(gui_switch_t, parent)->style = style;
-                            int file_count = 0;
-                            char *folder = hl_picture;
-                            {
-                                gui_fs_dir *dir = 0;
-                                struct gui_fs_dirent *entry;
-                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = gui_fs_opendir(path)) == NULL)
-                                {
-                                    GUI_ASSERT(0);
-                                }
-                                gui_free(path);
-                                while ((entry = gui_fs_readdir(dir)) != NULL)
-                                {
-                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                    {
-                                        file_count++;
-                                    }
-
-
-                                }
-                                gui_fs_closedir(dir);
-                            }
-                            void **image_array = gui_malloc(file_count * sizeof(void *));
-                            {
-                                gui_fs_dir *dir = 0;
-                                struct gui_fs_dirent *entry;
-                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
-                                if ((dir = gui_fs_opendir(path)) == NULL)
-                                {
-                                    gui_free(path);
-                                    return 0;
-                                }
-
-                                int count = 0;
-                                while ((entry = gui_fs_readdir(dir)) != NULL)
-                                {
-                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                    {
-                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-                                        sprintf(path2, "%s/%s", folder, entry->d_name);
-                                        image_array[count++] = (void *)gui_get_image_file_address(path2);
-                                    }
-
-                                }
-                                gui_free(path);
-                                gui_fs_closedir(dir);
-                                GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array,
-                                                               (void *)(uintptr_t)file_count);
-                                GUI_API(gui_switch_t).animate((void *)parent, dur, 0, switch_press_ani_cb_array, 0);
-                                GUI_TYPE(gui_switch_t, parent)->animate->animate = 0;
-                                GUI_TYPE(gui_switch_t, parent)->data = image_array;
-                                GUI_TYPE(gui_switch_t, parent)->on_pic_addr = image_array[file_count - 1];
-
-                            }
-                        }
-
-
-                    }
-                    bool if_widget = 0;
-                    if (p->parent)
-                    {
-                        if (!strcmp(widget[21].name, p->parent->name))
-                        {
-                            if_widget = 1;
-                        }
-                    }
-                    if (if_widget)
-                    {
-                        if (open_switch_name && !strcmp(parent->name, open_switch_name))
-                        {
-                            gui_free(open_switch_name);
-                            open_switch_name = 0;
-                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
-                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
-                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
-                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
-                        }
-                        else if (close_switch_name && !strcmp(parent->name, close_switch_name))
-                        {
-                            gui_free(close_switch_name);
-                            close_switch_name = 0;
-                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
-                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
-                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
-                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
-                        }
-                        else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
-                        {
-                            gui_free(pause_switch_name);
-                            pause_switch_name = 0;
-                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
-                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
-                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
-                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)3);
-                        }
-                    }
-
-                }
-                break;
-            case GALLERY:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-
-                    gui_gallery_config_t config = {0};
-                    char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
-                    char *folder = NULL;
-
-                    // default image blend_mode
-                    uint8_t blendMode = IMG_FILTER_BLACK; GUI_UNUSED(blendMode);
-                    uint8_t opacity = 255; GUI_UNUSED(opacity);
-
-                    memset(&config, 0, sizeof(config));
-                    while (true)
-                    {
-                        // #define IS_STR(str) (!strcmp(p->attr[i], str))
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "folder"))
-                        {
-                            folder = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "mainBg"))
-                        {
-                            config.data_main_bg = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "centerBg"))
-                        {
-                            config.data_center_bg = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "centerPercent"))
-                        {
-                            config.center_percent = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "sideScale"))
-                        {
-                            config.side_scale = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "sidePosPercent"))
-                        {
-                            config.side_pos_percent = atof(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "blendMode"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "imgBypassMode"))
-                            {
-                                blendMode = IMG_BYPASS_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                            {
-                                blendMode = IMG_FILTER_BLACK;
-                            }
-                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                            {
-                                blendMode = IMG_SRC_OVER_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgCoverMode"))
-                            {
-                                blendMode = IMG_COVER_MODE;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "opacity"))
-                        {
-                            opacity = atof(p->attr[++i]);
-                        }
-                        i++;
-                    }
-
-                    char *ptxt = get_space_string_head(p->txt);
-                    if (!folder)
-                    {
-                        gui_log("gallery folder is not found!\n");
-                    }
-                    else if (folder)
-                    {
-                        int file_count = 0;
-                        gui_fs_dir *dir = 0;
-                        struct gui_fs_dirent *entry;
-                        char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-
-                        // init image array
-                        sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
-                        if ((dir = gui_fs_opendir(dir_path)) == NULL)
-                        {
-                            gui_free(dir_path);
-                            return 0;
-                        }
-                        gui_free(dir_path);
-
-                        while ((entry = gui_fs_readdir(dir)) != NULL)
-                        {
-                            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                            {
-                                char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-                                void *addr = NULL;
-                                void *data = NULL;
-
-                                file_count++;
-                                sprintf(file_path, "%s/%s", folder, entry->d_name);
-                                addr = (void *)gui_get_image_file_address(file_path);
-                                if (!config.img_array)
-                                {
-                                    data = gui_malloc(sizeof(uint8_t *));
-                                }
-                                else
-                                {
-                                    data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
-                                }
-                                config.img_array = data;
-                                config.img_array[file_count - 1] = addr;
-
-                                gui_free(file_path);
-                            }
-                        }
-                        gui_fs_closedir(dir);
-
-                        config.num_pic = file_count;
-                    }
-
-                    if (config.data_main_bg)
-                    {
-                        config.data_main_bg = (void *)gui_get_image_file_address(config.data_main_bg);
-                    }
-                    if (config.data_center_bg)
-                    {
-                        config.data_center_bg = (void *)gui_get_image_file_address(config.data_center_bg);
-                    }
-
-                    gui_gallery_create(parent, ptxt, &config,
-                                       x, y, w, h);
-                }
-                break;
-            case KEYBOARD:
-                {
-                    size_t i = 0;
-                    gui_kb_config_t config = {0};
-                    char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
-                    // char *folder = NULL;
-
-                    // default image blend_mode
-                    memset(&config, 0, sizeof(config));
-
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "ime"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "pinyin"))
-                            {
-                                config.ime = KB_METHOD_PINYIN;
-                            }
-                        }
-                        i++;
-                    }
-
-                    {
-#define PATH_PRE "app/system/resource/"
-                        char *floder_kb = PATH_PRE"keyboard"; GUI_UNUSED(floder_kb);
-                        char *floder_letter = PATH_PRE"keyboard/0_letter/";
-                        char *floder_letter_upper = PATH_PRE"keyboard/1_letter_upper/";
-                        char *floder_num = PATH_PRE"keyboard/2_number/";
-                        char *floder_symbol = PATH_PRE"keyboard/3_symbol/";
-                        char *floder_func = PATH_PRE"keyboard/4_func/";
-                        char *floder_other = PATH_PRE"keyboard/5_other/";
-
-                        config.layout = KB_LAYOUT_BASIC;
-                        config.mode = KB_MODE_BASIC_ENG_LOWWER;
-
-                        uint16_t file_count = 0;
-                        gui_fs_dir *dir = NULL;
-                        struct gui_fs_dirent *entry;
-                        char *folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
-                        for (int i = 0; i < sizeof(folder_array) / sizeof(folder_array[0]); i++)
-                        {
-                            char *folder = folder_array[i];
-                            char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-
-                            // init image array
-                            sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
-                            if ((dir = gui_fs_opendir(dir_path)) == NULL)
-                            {
-                                gui_free(dir_path);
-                                continue;
-                                //perror("gui_fs_opendir() failed"); return;
-                            }
-                            // gui_log("folder: %d %s\n", dir, folder);
-                            gui_free(dir_path);
-
-
-                            while ((entry = gui_fs_readdir(dir)) != NULL)
-                            {
-                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-                                {
-                                    char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
-                                    void *addr = NULL;
-                                    void *data = NULL;
-
-                                    file_count++;
-                                    sprintf(file_path, "%s/%s", folder, entry->d_name);
-                                    // gui_log("file_count %d, file: %s\n", file_count, entry->d_name);
-                                    addr = (void *)gui_get_image_file_address(file_path);
-                                    if (!config.img_array)
-                                    {
-                                        data = gui_malloc(sizeof(uint8_t *));
-                                    }
-                                    else
-                                    {
-                                        data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
-                                    }
-                                    config.img_array = data;
-                                    config.img_array[file_count - 1] = addr;
-
-                                    gui_free(file_path);
-                                }
-
-                            }
-                            gui_fs_closedir(dir);
-                            // gui_log("file_count %d, folder: %s\n", file_count, folder);
-                            if (0 == strcmp(folder, floder_symbol))
-                            {
-                                config.file_mark[0] = file_count;
-                            }
-                            else if (0 == strcmp(folder, floder_func))
-                            {
-                                config.file_mark[1] = file_count;
-                            }
-                        }
-                        config.num_pic = file_count;
-                    }
-
-                    gui_keyboard_create(parent, "test", &config,
-                                        0, 0, gui_get_screen_width(), gui_get_screen_height());
-                }
-                break;
-            case JAVASCRIPT:
-                {
-                    if (!strcmp(p->attr[0], "file"))
-                    {
-                        js = gui_strdup(p->attr[1]);
-                    }
-
-                }
-                break;
-            case MACRO_MOTORIZED_CURTAIN:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        if (!strcmp(p->attr[i], "switchOpen"))
-                        {
-                            open_switch_name = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "switchClose"))
-                        {
-                            close_switch_name = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "switchPause"))
-                        {
-                            pause_switch_name = gui_strdup(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
-                    parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
-                }
-                break;
-            case MULTI_LEVEL:
-                {
-                    char *ptxt = get_space_string_head(p->txt);
-                    static unsigned char ml_count;
-                    //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
-                    if (ptxt && ptxt[0] == 0)
-                    {
-                        gui_free(ptxt);
-                        ptxt = 0;
-                    }
-                    if (!ptxt)
-                    {
-
-                        char buffer[20];
-                        sprintf(buffer, "__ml%d_", ml_count++);
-                        ptxt = gui_strdup(buffer);
-                    }
-
-                    parent = (void *)gui_multi_level_create(parent, ptxt, (void(*)(gui_obj_t *))multi_level_ui_design);
-
-                }
-                break;
-            case MACRO_ONCLICK:
-                {
-                    char *type = 0;
-                    char *to = 0;
-                    char *id = 0;
-                    int x = 0;
-                    int y = 0;
-                    size_t i = 0;
-                    while (true)
-                    {
-                        //gui_log("p->attr[i]:%x\n",p->attr[i]);
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id1"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "id2"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    int to_widget = 0; GUI_UNUSED(to_widget);
-                    if (type && to)
-                    {
-                        if (!strcmp(type, "jump"))
-                        {
-                            {
-                                //to
-                                if (!strcmp(to, "multiLevel"))
-                                {
-                                    //GUI_API(gui_multi_level_t).jump(parent, x, y);
-                                    struct on_click_jump_cb_param *param;
-                                    param = gui_malloc(sizeof(struct on_click_jump_cb_param));
-                                    if (id)
-                                    {
-                                        get_2_int_from_string(id, &x, &y);
-                                    }
-
-
-                                    param->id1 = x;
-                                    param->id2 = y;
-                                    if (parent->type == BUTTON)
-                                    {
-                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
-                                    }
-                                    else if (parent->type == WINDOW)
-                                    {
-                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
-                                    }
-                                }
-                                else if (!strcmp(to, "app"))
-                                {
-                                    if (ends_with_xml(id))
-                                    {
-                                        if (parent->type == BUTTON)
-                                        {
-                                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
-                                                                           (void *)gui_get_path_by_relative(id));
-                                        }
-                                        else if (parent->type == WINDOW)
-                                        {
-                                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        gui_log("[SaaA] error app jump format\n");
-                                    }
-
-
-
-                                }
-                                else if (!strcmp(to, "C-APP"))
-                                {
-                                    if (parent->type == BUTTON)
-                                    {
-                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
-                                                                       gui_app_get_by_name(id));
-                                    }
-                                    else if (parent->type == WINDOW)
-                                    {
-                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
-                                    }
-                                }
-                                else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
-                                {
-                                    //GUI_API(gui_multi_level_t).jump(parent, x, y);
-                                    struct on_click_jump_cb_param *param;
-                                    param = gui_malloc(sizeof(struct on_click_jump_cb_param));
-                                    char *tabview_name = 0;
-                                    if (id)
-                                    {
-                                        get_2_int_from_string(id, &x, &y);
-
-                                        {
-                                            // Find the first comma in the string
-                                            const char *first_comma = strchr(id, ',');
-
-                                            if (first_comma != NULL)
-                                            {
-                                                // Find the second comma starting from the character after the first comma
-                                                const char *second_comma = strchr(first_comma + 1, ',');
-
-                                                // If the second comma was found and it's not at the end of the string
-                                                if (second_comma != NULL && *(second_comma + 1) != '\0')
-                                                {
-                                                    tabview_name = gui_strdup(second_comma + 1);
-                                                }
-                                                else
-                                                {
-                                                    // Handle the case where the second comma is not found or is at the end
-                                                    gui_log("The second comma does not exist or is at the end.\n");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                // Handle the case where the first comma is not found
-                                                gui_log("The first comma is not found.\n");
-                                            }
-                                        }
-                                    }
-
-                                    param->id1 = x;
-                                    param->id2 = y;
-                                    param->to_widget_name = tabview_name;
-                                    if (parent->type == BUTTON)
-                                    {
-                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
-                                                                       param);
-                                    }
-                                    else if (parent->type == WINDOW)
-                                    {
-                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
-                                    }
-                                }
-
-                            }
-
-                        }
-                        else if (!strcmp(type, "control"))
-                        {
-                            if (!strcmp(to, "light"))
-                            {
-                                light_param_t *light;
-                                light = gui_malloc(sizeof(light_param_t));
-                                light->id = x;
-                                light->state = (bool)y;
-                                if (parent->type == BUTTON)
-                                {
-                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
-                                }
-                                else if (parent->type == WINDOW)
-                                {
-                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
-                                }
-                                else if (parent->type == CLICKSWITCH)
-                                {
-                                    GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
-                                                                     (gui_event_cb_t)light_switch_on_cb, light);
-                                    GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
-                                                                      (gui_event_cb_t)light_switch_off_cb, light);
-                                }
-                            }
-
-                            //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
-
-                        }
-                        else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
-                        {
-                            char **param = gui_malloc(sizeof(char *) * 2);
-                            param[0] = gui_strdup(to);
-                            param[1] = gui_strdup(id);
-                            if (!strcmp(type, "animatePause"))
-                            {
-                                if (parent->type == BUTTON)
-                                {
-                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
-                                }
-                                else if (parent->type == WINDOW)
-                                {
-                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
-                                }
-                                else if (parent->type == CLICKSWITCH)
-                                {
-                                    GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
-                                                                     (param));
-                                    GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                                      (gui_event_cb_t)pause_animation_cb,
-                                                                      (param));
-                                }
-
-                            }
-                            else if (!strcmp(type, "animate"))
-                            {
-                                if (parent->type == BUTTON)
-                                {
-                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
-                                }
-                                else if (parent->type == WINDOW)
-                                {
-                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
-                                }
-                                else if (parent->type == CLICKSWITCH)
-                                {
-                                    GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
-                                                                     (param));
-                                    GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                                      (gui_event_cb_t)start_animation_cb,
-                                                                      (param));
-                                }
-
-                            }
-                        }
-                    }
-                }
-                break;
-            case MACRO_BACKICON:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightPicture"))
-                        {
-                            hl_picture = gui_strdup(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    void *img1 = return_image;
-                    void *img2 = return_image_hl;
-                    if (picture)
-                    {
-                        img1 = (void *)gui_get_image_file_address(picture);
-                        img2 = img1;
-                    }
-                    if (hl_picture)
-                    {
-                        img2 = (void *)gui_get_image_file_address(hl_picture);
-                    }
-                    char *ptxt = get_space_string_head(p->txt);
-                    //font_size = 32;
-                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, 0, (T_BUTTON_BG_TYPE)0, 0);
-                    parent->name = ptxt;
-                    gui_button_t *button = (void *)parent;
-                    button->img->blend_mode = IMG_SRC_OVER_MODE;
-                    GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
-
-
-                    break;
-                }
-            case SLIDER:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *slider_picture = NULL;
-                    char *bg_picture = NULL;
-                    int16_t minValue = 0;
-                    int16_t maxValue = 0;
-                    int16_t currentValue = 0;
-                    int16_t slider_size = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "bgPicture"))
-                        {
-                            bg_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "sliderPicture"))
-                        {
-                            slider_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "minValue"))
-                        {
-                            minValue = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "maxValue"))
-                        {
-                            maxValue = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "currentValue"))
-                        {
-                            currentValue = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "sliderSize"))
-                        {
-                            slider_size = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    void *bg_buf;
-                    void *slider_buf;
-                    if (bg_picture)
-                    {
-                        bg_buf = (void *)gui_get_image_file_address(bg_picture);
-                    }
-                    if (slider_picture)
-                    {
-                        slider_buf = (void *)gui_get_image_file_address(slider_picture);
-                    }
-
-                    parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minValue, maxValue, slider_buf,
-                                                       currentValue, slider_size);
-                }
-                break;
-            case MACRO_ONCHANGE:
-                {
-                    char *type = 0;
-                    char *to = 0;
-                    int id = 0;
-                    size_t i = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    if (type)
-                    {
-
-                        if (!strcmp(type, "control"))
-                        {
-                            light_param_t *light;
-                            light = gui_malloc(sizeof(light_param_t));
-                            light->id = (id);
-                            if (!strcmp(to, "controlLightBT"))
-                            {
-                                if (parent->type == SEEKBAR)
-                                {
-                                    GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)light_brightness_cb,
-                                                                     light);
-                                }
-                            }
-                            else if (!strcmp(to, "controlLightCT"))
-                            {
-                                light->text = gui_malloc(sizeof(gui_text_t));
-                                if (parent->type == SLIDER)
-                                {
-                                    gui_slider_t *slider = (gui_slider_t *)parent;
-                                    GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)light_colorTemp_cb, light);
-                                }
-
-                            }
-                        }
-                        else if (!strcmp(type, "write"))
-                        {
-                            if (parent->type == SLIDER)
-                            {
-                                gui_slider_t *slider = (gui_slider_t *)parent;
-                                GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)slider_write_text_cb, gui_strdup(to));
-                            }
-                        }
-                    }
-                }
-                break;
-            case MACRO_ONON:
-                {
-                    char *type = 0;
-                    char *to = 0;
-                    char *id = 0;
-                    size_t i = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = (p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    if (type)
-                    {
-                        char **param = gui_malloc(sizeof(char *) * 2);
-                        param[0] = gui_strdup(to);
-                        param[1] = gui_strdup(id);
-                        if (!strcmp(type, "animatePause"))
-                        {
-
-                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
-                                                             (param));
-                        }
-                        else if (!strcmp(type, "animate"))
-                        {
-                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
-                                                             param);
-                        }
-                    }
-                }
-                break;
-            case MACRO_ONOFF:
-                {
-                    char *type = 0;
-                    char *to = 0;
-                    char *id = 0;
-                    size_t i = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = (p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    if (type)
-                    {
-                        char **param = gui_malloc(sizeof(char *) * 2);
-                        param[0] = gui_strdup(to);
-                        param[1] = gui_strdup(id);
-                        if (!strcmp(type, "animatePause"))
-                        {
-
-                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                              (gui_event_cb_t)pause_animation_cb,
-                                                              (param));
-                        }
-                        else if (!strcmp(type, "animate"))
-                        {
-                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                              (gui_event_cb_t)start_animation_cb,
-                                                              param);
-                        }
-                    }
-                }
-                break;
-            case MACRO_ONLOAD:
-                {
-                    char *type = 0;
-                    char *to = 0; GUI_UNUSED(to);
-                    char *id = 0;
-                    size_t i = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = (p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    if (type)
-                    {
-
-                        if (!strcmp(type, "animate"))
-                        {
-                            ezxml_t f = 0;
-                            if (f1 != 0)
-                            {
-                                f = f1;
-                            }
-                            else
-                            {
-                                f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
-                            }
-                            foreach_create_animate(f, parent, gui_strdup(id));
-                            //gui_log(" ");
-                            if (f1 == 0)
-                            {
-                                ezxml_free(f);
-                            }
-                        }
-
-                    }
-                }
-                break;
-            case TYPE_SCROLL_WHEEL_NEW:
-                {
-                    /*<roller
-                        id="scrollWheel1"
-                        x="50"               <!-- X coordinate -->
-                        y="100"              <!-- Y coordinate -->
-                        w="200"              <!-- Width -->
-                        h="300"              <!-- Height -->
-                        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  <!-- Items displayed in each row of the scroll wheel -->
-                        itemCount="11"        <!-- Total number of items -->
-                        rowCount="3"         <!-- Number of visible rows in the scroll wheel -->
-                        rowSpacing="20"      <!-- Spacing between each row -->
-                    ></roller>*/
-
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0; GUI_UNUSED(h);
-                    int16_t row_count = 0;
-                    int16_t row_spacing = 0;
-                    int16_t item_count = 0;
-                    const char *items = NULL;
-                    int column_offset = 0; GUI_UNUSED(column_offset);
-                    const char *font = 0;
-                    int16_t font_size = 0;
-                    gui_color_t  font_color = {0};
-                    gui_color_t  font_color_highlight = {0};
-                    gui_color_t  item_color = {0}; GUI_UNUSED(item_color);
-                    gui_color_t  item_color_highlight = {0}; GUI_UNUSED(item_color_highlight);
-                    bool loop = 1;
-                    TEXT_MODE style = LEFT;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
-
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "rowCount"))
-                        {
-                            row_count = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "rowSpacing"))
-                        {
-                            row_spacing = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "items"))
-                        {
-                            items = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "font"))
-                        {
-                            font = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "fontSize"))
-                        {
-                            font_size = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColorHighlight"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color_highlight = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            item_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemColorHighlight"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            item_color_highlight = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "loop"))
-                        {
-                            if (!strcmp(p->attr[++i], "loop"))
-                            {
-                                loop = 1;
-                            }
-                            else if (!strcmp(p->attr[i], "true"))
-                            {
-                                loop = 1;
-                            }
-                            else if (!strcmp(p->attr[i], "false"))
-                            {
-                                loop = 0;
-                            }
-                            else if (!strcmp(p->attr[i], "disable"))
-                            {
-                                loop = 0;
-                            }
-                            else if (!strcmp(p->attr[i], "not loop"))
-                            {
-                                loop = 0;
-                            }
-                        }
-                        else if (!strcmp(p->attr[i], "fontMode"))
-                        {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "truncate"))
-                            {
-                                style = (TEXT_MODE)0;
-                            }
-                            else if (!strcmp(p->attr[i], "verticalscroll"))
-                            {
-                                style = SCROLL_Y;
-                            }
-                            else if (!strcmp(p->attr[i], "left"))
-                            {
-                                style = LEFT;
-                            }
-                            else if (!strcmp(p->attr[i], "center"))
-                            {
-                                style = CENTER;
-                            }
-                            else if (!strcmp(p->attr[i], "right"))
-                            {
-                                style = RIGHT;
-                            }
-                        }
-                        i++;
-                    }
-                    {
-                        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
-                        char *token = strtok(items_copy, ",");
-                        int j = 0;
-                        while (token != NULL)
-                        {
-                            j++;
-                            token = strtok(NULL, ",");
-                        }
-                        item_count = j;
-                        gui_free(items_copy);
-                    }
-                    if (item_count == 0)
-                    {
-                        item_count = 1;
-                        items = "NULL";
-                    }
-                    // Split items into an array of strings
-                    char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
-                    const char **string_array = gui_malloc(item_count * sizeof(char *));
-                    char *token = strtok(items_copy, ",");
-                    int j = 0;
-                    while (token != NULL && j < item_count)
-                    {
-                        string_array[j++] = token;
-                        token = strtok(NULL, ",");
-                    }
-                    //gui_free(items_copy);
-                    if (item_count - 2 < row_count)
-                    {
-                        int item_count_temp = item_count;
-                        if (item_count > row_count)
-                        {
-                            item_count_temp = item_count * 2;
-                        }
-                        else
-                        {
-                            item_count_temp = (row_count / item_count + 2) * item_count;
-                        }
-                        const char **string_array_temp = gui_malloc(item_count_temp * sizeof(char *));
-                        for (size_t i = 0; i < item_count_temp; i++)
-                        {
-                            string_array_temp[i] = string_array[i % item_count];
-                        }
-                        gui_free(string_array);
-                        string_array = string_array_temp;
-                        item_count = item_count_temp;
-                    }
-
-                    // Create the scroll wheel widget
-                    gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
-                                                               parent, x, y, w, row_spacing, row_count, string_array, item_count
-                                                           );
-                    if (scroll_wheel == NULL)
-                    {
-                        gui_log("Failed to create scroll wheel widget.\n");
-                        continue;;
-                    }
-                    scroll_wheel->font_color = font_color;
-                    scroll_wheel->font_color_highlight = font_color_highlight;
-                    extern void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
-                                                                       const void *font_file_pointer,
-                                                                       int font_size, TEXT_MODE mode);
-                    gui_scroll_wheel_new_render_text_alien(scroll_wheel, gui_get_file_address(font), font_size, style);
-                    scroll_wheel->loop = loop;
-
-                    parent = GUI_BASE(scroll_wheel);
-
-                }
-                break;
-            case MACRO_CALENDAR:
-                {
-
-                    /*    <calendar
-                    x="0"
-                    y="360"
-                    w="800"
-                    h="400"
-                    fontColor="#ff000000"
-                    fontSize="16"
-                    font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
-                    </calendar>*/
-
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    gui_color_t color_p = gui_color_css("DarkSlateGray");
-                    gui_color_t font_color_highlight = gui_color_css("#FFFFFFFF");;
-                    gui_color_t item_color = gui_color_css("#FFFFFF");;
-                    gui_color_t item_color_highlight = gui_color_css("rgba(135, 206, 250, 1.0)");;
-                    gui_color_t title_color = gui_color_css("rgb(255, 255, 255)");;
-                    gui_color_t title_background_color = gui_color_css("hsl(203, 92%, 75%)");;
-                    const char *font = 0;
-                    int16_t font_size = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
-
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            color_p = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColorHighlight"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color_highlight = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            item_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemColorHighlight"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            item_color_highlight = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "titleColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            title_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "titleBackgroundColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            title_background_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "font"))
-                        {
-                            font = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "fontSize"))
-                        {
-                            font_size = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_p,
-                                        font_color_highlight, item_color, item_color_highlight, title_color, title_background_color);
-
-                }
-                break;
-            case MACRO_ONTIME:
-                {
-                    char *type = 0;
-                    char *to = 0; GUI_UNUSED(to);
-                    char *id = 0; GUI_UNUSED(id);
-                    size_t i = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = (p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    switch (parent->type)
-                    {
-                    case IMAGE_FROM_MEM:
-                        {
-                            if (type)
-                            {
-                                if (id)
-                                {
-                                    char *token;
-                                    int numbers[2];
-                                    int index = 0;
-                                    token = strtok(id, ",");
-                                    while (token != NULL && index < 2)
-                                    {
-                                        numbers[index] = atoi(token);
-                                        index++;
-                                        token = strtok(NULL, ",");
-                                    }
-
-                                    two_integers *data = (two_integers *)gui_malloc(sizeof(two_integers));
-                                    if (data)
-                                    {
-
-
-                                        data->num1 = numbers[0];
-                                        data->num2 = numbers[1];
-
-                                        if (!strcmp(type, "hour"))
-                                        {
-
-                                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_hour,
-                                                                   (void *)data, "hour");
-                                        }
-                                        else if (!strcmp(type, "minute"))
-                                        {
-                                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_minute,
-                                                                   (void *)data, "minute");
-                                        }
-                                        else if (!strcmp(type, "second"))
-                                        {
-                                            gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback_second,
-                                                                   (void *)data, "second");
-                                        }
-                                        parent->obj_cb = img_ontime_render;
-                                    }
-                                }
-                                else
-                                {
-                                    if (!strcmp(type, "hour"))
-                                    {
-#define HOUR_ANIMATION 1
-#define MINUTE_ANIMATION 2
-#define SECOND_ANIMATION 3
-                                        gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
-                                                               (void *)HOUR_ANIMATION, "hour");
-                                    }
-                                    else if (!strcmp(type, "minute"))
-                                    {
-                                        gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
-                                                               (void *)MINUTE_ANIMATION, "minute");
-                                    }
-                                    else if (!strcmp(type, "second"))
-                                    {
-                                        gui_img_append_animate((void *)parent, 1000, -1, img_animate_watchface_callback,
-                                                               (void *)SECOND_ANIMATION, "second");
-                                    }
-                                }
-                            }
-
-                        }
-                        break;
-                    case TEXTBOX:
-                        {
-                            if (type)
-                            {
-                                gui_text_set_animate(parent, 1000, -1, text_animate_watchface_callback, gui_strdup(type));
-                            }
-
-
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-
-
-
-                }
-                break;
-            case MACRO_COMBO:
-                {
-                    /*<combo
-                        x="450"
-                        y="400"
-                        w="200"
-                        items="Item1,Item2,Item3,Item4,Item5"
-                        rowSpacing="32"
-                        fontSize="16"
-                        font="app/box/resource/font/arialbd_size16_bits4_font.bin"
-                        fontColor="#000000"
-                        picture="app\\box\\resource\\combo\\rect20.bin"
-                        highlightPicture="app\\box\\resource\\combo\\rect20hl.bin"
-                        blendMode="imgBypassMode">combo1
-                    </combo>*/
-
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t row_spacing = 0;
-                    int16_t item_count = 0;
-                    const char *items = NULL;
-                    const char *font = 0;
-                    int16_t font_size = 0;
-                    gui_color_t  font_color = {0};
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    char *item_selection_picture = NULL;
-                    char *selector_picture = NULL;
-                    char *selector_picture_collapsed = NULL;
-                    char *selector_picture_hl = NULL;
-                    char *selector_picture_collapsed_hl = NULL;
-                    const char *font_selection = 0;
-                    int16_t font_size_selection = 0;
-                    gui_color_t  font_color_selection = {0};
-                    gui_color_t  font_color_highlight = {0};
-                    gui_color_t  background_color = {0};
-                    // default image blend_mode
-                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
-
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "rowSpacing"))
-                        {
-                            row_spacing = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "items"))
-                        {
-                            items = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "font"))
-                        {
-                            font = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "fontSize"))
-                        {
-                            font_size = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontSelection"))
-                        {
-                            font_selection = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "fontSizeSelection"))
-                        {
-                            font_size_selection = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColorSelection"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color_selection = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "fontColorHighlight"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            font_color_highlight = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "backgroundColor"))
-                        {
-                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                            background_color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemPicture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemPictureHighlight"))
-                        {
-                            hl_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "itemPictureSelection"))
-                        {
-                            item_selection_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "selectionPicture"))
-                        {
-                            selector_picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "selectionPictureCollapsed"))
-                        {
-                            selector_picture_collapsed = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "selectionPictureHighlight"))
-                        {
-                            selector_picture_hl = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "selectionPictureCollapsedHighlight"))
-                        {
-                            selector_picture_collapsed_hl = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "blendMode"))
-                        {
-                            i++;
-                            if (!strcmp(p->attr[i], "imgBypassMode"))
-                            {
-                                blendMode = IMG_BYPASS_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                            {
-                                blendMode = IMG_FILTER_BLACK;
-                            }
-                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                            {
-                                blendMode = IMG_SRC_OVER_MODE;
-                            }
-                            else if (!strcmp(p->attr[i], "imgCoverMode"))
-                            {
-                                blendMode = IMG_COVER_MODE;
-                            }
-                        }
-                        i++;
-                    }
-                    {
-                        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
-                        char *token = strtok(items_copy, ",");
-                        int j = 0;
-                        while (token != NULL)
-                        {
-                            j++;
-                            token = strtok(NULL, ",");
-                        }
-                        item_count = j;
-                        gui_free(items_copy);
-                    }
-                    if (item_count == 0)
-                    {
-                        item_count = 1;
-                        items = "NULL";
-                    }
-                    // Split items into an array of strings
-                    char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
-                    const char **string_array = gui_malloc(item_count * sizeof(char *));
-                    char *token = strtok(items_copy, ",");
-                    int j = 0;
-                    while (token != NULL && j < item_count)
-                    {
-                        string_array[j++] = token;
-                        token = strtok(NULL, ",");
-                    }
-                    gui_combo_t *combo = gui_combo_create(parent, x, y, w, item_count,
-                                                          row_spacing,
-                                                          string_array, gui_get_image_file_address(picture),
-                                                          gui_get_image_file_address(hl_picture),
-                                                          gui_get_image_file_address(item_selection_picture),
-                                                          gui_get_image_file_address(selector_picture),
-                                                          gui_get_image_file_address(selector_picture_hl),
-                                                          gui_get_image_file_address(selector_picture_collapsed),
-                                                          gui_get_image_file_address(selector_picture_collapsed_hl),
-                                                          background_color,
-                                                          font_size,
-                                                          font_color,
-                                                          gui_get_file_address(font),
-                                                          font_size_selection,
-                                                          font_color_selection, gui_get_file_address(font_selection), font_color_highlight, blendMode);
-
-
-                    // parent = GUI_BASE(combo);
-
-                }
-                break;
-            case MACRO_ON_PERIPHERAL:
-                {
-                    char *type = 0;
-                    char *to = 0; GUI_UNUSED(to);
-                    char *id = 0;
-                    size_t i = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        if (!strcmp(p->attr[i], "type"))
-                        {
-                            type = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "to"))
-                        {
-                            to = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "id"))
-                        {
-                            id = (p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    switch (parent->type)
-                    {
-                    case IMAGE_FROM_MEM:
-                        {
-                            if (type)
-                            {
-                                if (!strcmp(type, "activity"))
-                                {
-                                    if (!strcmp(id, "exercise"))
-                                    {
-                                        arc_animation_param_t *param = 0;
-                                        ezxml_t pt = p->parent;
-                                        if (!strcmp(p->parent->name, "arc"))
-                                        {
-                                            ezxml_t p = pt;
-                                            size_t i = 0;
-                                            int16_t cx = 100; GUI_UNUSED(cx);
-                                            int16_t cy = 100; GUI_UNUSED(cy);
-                                            int16_t r = 100; GUI_UNUSED(r);
-                                            int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
-                                            int cap = 0; GUI_UNUSED(cap);
-                                            gui_color_t stroke = APP_COLOR_RED;
-                                            float sd = 0; GUI_UNUSED(sd);
-                                            float ed = 100; GUI_UNUSED(ed);
-                                            int dir;
-                                            while (true)
-                                            {
-                                                if (!(p->attr[i]))
-                                                {
-                                                    break;
-                                                }
-                                                ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-                                                if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX") || !strcmp(p->attr[i], "centerX"))
-                                                {
-                                                    cx = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centerY") ||
-                                                         !strcmp(p->attr[i], "centralY"))
-                                                {
-                                                    cy = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "r") || !strcmp(p->attr[i], "radius"))
-                                                {
-                                                    r = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "startDegree") || !strcmp(p->attr[i], "startAngle"))
-                                                {
-                                                    sd = atof(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "endDegree") || !strcmp(p->attr[i], "endAngle"))
-                                                {
-                                                    ed = atof(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "strokeWidth") || !strcmp(p->attr[i], "stroke-width"))
-                                                {
-                                                    stroke_width = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
-                                                         !strcmp(p->attr[i], "cap"))
-                                                {
-                                                    char *s = p->attr[++i];
-                                                    if (!strcmp(p->attr[i], "butt"))
-                                                    {
-                                                        cap = NVG_BUTT;
-                                                    }
-                                                    else if (!strcmp(p->attr[i], "round"))
-                                                    {
-                                                        cap = NVG_ROUND;
-                                                    }
-                                                    else if (!strcmp(p->attr[i], "square"))
-                                                    {
-                                                        cap = NVG_SQUARE;
-                                                    }
-                                                }
-                                                else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
-                                                {
-                                                    stroke = string_rgb888(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "direction") || !strcmp(p->attr[i], "clockwise"))
-                                                {
-                                                    if (!strcmp(p->attr[++i], "CCW") || !strcmp(p->attr[i], "count clockwise"))
-                                                    {
-                                                        dir = NVG_CCW;
-                                                    }
-                                                    else if (!strcmp(p->attr[i], "CW") || !strcmp(p->attr[i], "clockwise"))
-                                                    {
-                                                        dir = NVG_CW;
-                                                    }
-
-                                                }
-                                                i++;
-                                            }
-                                            int image_h = r * 2 + stroke_width * 2,
-                                                image_w = image_h,
-                                                pixel_bytes = 4,
-                                                buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-                                            param = gui_malloc(sizeof(arc_animation_param_t));
-                                            memset(param, 0, sizeof(arc_animation_param_t));
-                                            param->aniamtion_type = ARC_ACTIVITY_EX_ANIMATION;
-                                            param->cap = cap;
-                                            param->cx = cx;
-                                            param->cy = cy;
-                                            param->dir = dir;
-                                            param->ed = ed;
-                                            param->image_data_length = buffer_size;
-                                            param->r = r;
-                                            param->sd = sd;
-                                            param->stroke = stroke;
-                                            param->stroke_width = stroke_width;
-                                            param->image_width = image_w;
-                                            param->image_height = image_h;
-                                            param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
-
-                                        }
-                                        gui_img_append_animate((void *)parent, 1000, -1, arc_animate_activity_callback, (void *)param, 0);
-                                        parent->obj_cb = img_ontime_render;
-                                    }
-                                }
-                                else if (!strcmp(type, "heart_rate"))
-                                {
-                                    if (!strcmp(id, "array"))
-                                    {
-                                        chart_animation_param_t *param = 0;
-                                        ezxml_t pt = p->parent;
-                                        if (!strcmp(p->parent->name, "chart"))
-                                        {
-                                            ezxml_t p = pt;
-                                            size_t i = 0;
-                                            int16_t x = 0; GUI_UNUSED(x);
-                                            int16_t y = 0; GUI_UNUSED(y);
-                                            int16_t w = 0;
-                                            int16_t h = 0;
-                                            int16_t item_count = 0; GUI_UNUSED(item_count);
-                                            const char *items = NULL; GUI_UNUSED(items);
-                                            gui_color_t  color = {0};
-                                            int16_t max = 0;
-                                            int16_t min = 0;
-                                            const char *style = "waveform";
-                                            int16_t stroke_width = 4;
-                                            while (true)
-                                            {
-                                                if (!(p->attr[i]))
-                                                {
-                                                    break;
-                                                }
-
-                                                //gui_log("p->attr[i]:%s\n", p->attr[i]);
-
-                                                if (!strcmp(p->attr[i], "x"))
-                                                {
-                                                    x = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "y"))
-                                                {
-                                                    y = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "w"))
-                                                {
-                                                    w = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "h"))
-                                                {
-                                                    h = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "items"))
-                                                {
-                                                    items = p->attr[++i];
-                                                }
-                                                else if (!strcmp(p->attr[i], "color"))
-                                                {
-                                                    color = string_rgb888(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "max"))
-                                                {
-                                                    max = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "min"))
-                                                {
-                                                    min = atoi(p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "style"))
-                                                {
-                                                    style = (p->attr[++i]);
-                                                }
-                                                else if (!strcmp(p->attr[i], "strokeWidth"))
-                                                {
-                                                    stroke_width = atoi(p->attr[++i]);
-                                                }
-                                                i++;
-                                            }
-                                            int image_h = h,
-                                                image_w = w,
-                                                pixel_bytes = 4,
-                                                buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-                                            param = gui_malloc(sizeof(chart_animation_param_t));
-                                            memset(param, 0, sizeof(chart_animation_param_t));
-                                            param->aniamtion_type = CHART_HEART_RATE_DATA_ANIMATION;
-                                            param->image_data_length = buffer_size;
-                                            param->image_width = image_w;
-                                            param->image_height = image_h;
-                                            param->target_buffer  = (void *)gui_img_get_image_data((void *)parent);
-                                            param->color = color;
-                                            param->max = max;
-                                            param->min = min;
-                                            param->stroke_width = stroke_width;
-                                            if (!strcmp(style, "waveform"))
-                                            {
-                                                param->chart_type = 1;
-                                            }
-                                            else if (!strcmp(style, "bar"))
-                                            {
-                                                param->chart_type = 2;
-                                            }
-                                            else if (!strcmp(style, "line"))
-                                            {
-                                                param->chart_type = 3;
-                                            }
-                                            else
-                                            {
-                                                param->chart_type = 1;
-                                            }
-
-                                        }
-                                        gui_img_append_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback,
-                                                               (void *)param, 0);
-                                        parent->obj_cb = img_ontime_render;
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case TEXTBOX:
-                        {
-                            if (type)
-                            {
-                                if (!strcmp(type, "Weather"))
-                                {
-                                    if (!strcmp(id, "current"))
-                                    {
-                                        gui_text_set_animate(parent, 1000, -1, text_animate_weather_callback,
-                                                             (void *)TEXT_WEATHER_CUR_ANIMATION);
-                                    }
-                                }
-                                else if (!strcmp(type, "heart_rate"))
-                                {
-                                    if (!strcmp(id, "current"))
-                                    {
-                                        gui_text_set_animate(parent, 1000, -1, text_animation_hr_callback,
-                                                             (void *)TEXT_HEART_RATE_CUR_ANIMATION);
-                                    }
-                                }
-                                else if (!strcmp(type, "activity"))
-                                {
-                                    if (!strcmp(id, "exercise"))
-                                    {
-                                        gui_text_set_animate(parent, 1000, -1, text_animate_activity_callback,
-                                                             (void *)TEXT_ACTIVITY_EX_ANIMATION);
-                                    }
-                                }
-                                else if (!strcmp(type, "battery"))
-                                {
-                                    if (!strcmp(id, "capacity"))
-                                    {
-                                        gui_text_set_animate(parent, 1000, -1, text_animate_battery_callback,
-                                                             (void *)TEXT_BATTERY_CAPACITY_ANIMATION);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-
-
-
-                }
-                break;
-            case MACRO_CHART:
-                {
-                    /*  <chart
-                            w="55"
-                            h="55"
-                            x="342"
-                            y="342"
-                            color="yellow"
-                            items="100,200,0,44,50, 1000, -200,20,-30,88"
-                            max="400"
-                            min="-300"
-                            >chart1
-                        </chart>  */
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    int16_t item_count = 0;
-                    const char *items = NULL;
-                    gui_color_t  color = {0};
-                    int16_t max = 0;
-                    int16_t min = 0;
-                    const char *style = "waveform";
-                    int16_t stroke_width = 4;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-
-                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
-
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "items"))
-                        {
-                            items = p->attr[++i];
-                        }
-                        else if (!strcmp(p->attr[i], "color"))
-                        {
-                            color = string_rgb888(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "max"))
-                        {
-                            max = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "min"))
-                        {
-                            min = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "style"))
-                        {
-                            style = (p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "strokeWidth"))
-                        {
-                            stroke_width = atoi(p->attr[++i]);
-                        }
-                        i++;
-                    }
-                    {
-                        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
-                        char *token = strtok(items_copy, ",");
-                        int j = 0;
-                        while (token != NULL)
-                        {
-                            j++;
-                            token = strtok(NULL, ",");
-                        }
-                        item_count = j;
-                        gui_free(items_copy);
-                    }
-                    if (item_count == 0)
-                    {
-                        item_count = 1;
-                        items = "0";
-                    }
-                    float numbers[item_count];
-                    {
-                        const char delim[2] = ",";
-                        char *token;
-                        int i = 0;
-                        char *str_copy = gui_strdup(items);
-                        if (str_copy == NULL)
-                        {
-                            gui_log("strdup failed");
-                            return 0;
-                        }
-                        token = strtok(str_copy, delim);
-                        while (token != NULL)
-                        {
-                            numbers[i++] = atof(token);
-                            token = strtok(NULL, delim);
-                        }
-                        // for (int j = 0; j < i; j++)
-                        // {
-                        //     gui_log("%d ", numbers[j]);
-                        // }
-                        // gui_log("\n");
-                        gui_free(str_copy);
-                    }
-                    int
-                    pixel_bytes = 4;
-                    size_t buffer_size = h * w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-                    uint8_t *buffer = gui_lower_malloc(buffer_size);
-                    memset(buffer, 0, buffer_size);
-                    NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
-                    if (!strcmp(style, "waveform"))
-                    {
-                        gui_wave_render(vg, 0, 0, w,
-                                        h,
-                                        item_count,
-                                        numbers,
-                                        color,
-                                        max,
-                                        min);
-                    }
-                    else if (!strcmp(style, "bar"))
-                    {
-                        gui_bar_render(vg, 0, 0, w,
-                                       h,
-                                       item_count,
-                                       numbers,
-                                       color,
-                                       max,
-                                       min, stroke_width);
-                    }
-                    else if (!strcmp(style, "line"))
-                    {
-                        gui_line_render(vg, 0, 0, w,
-                                        h,
-                                        item_count,
-                                        numbers,
-                                        color,
-                                        max,
-                                        min, stroke_width);
-                    }
-                    else
-                    {
-                        gui_wave_render(vg, 0, 0, w,
-                                        h,
-                                        item_count,
-                                        numbers,
-                                        color,
-                                        max,
-                                        min);
-                    }
-
-                    gui_canvas_output_buffer_blank_close(vg);
-                    char *ptxt = get_space_string_head(p->txt);
-                    gui_img_t *img = gui_img_create_from_mem(parent, ptxt, buffer, x, y,
-                                                             0, 0);
-                    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-
-                    parent = (void *)img;
-                    parent->obj_cb = gui_canvas_img_cb;
-                }
-                break;
-            /*default*/
-            default:
-                break;
-            }
+            parent = widget_create_interface(p, parent, widget[i].type);
         }
     }
     return parent;
