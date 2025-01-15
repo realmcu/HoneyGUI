@@ -122,7 +122,7 @@ static void app_chargebox_ui_design(gui_app_t *app)
                                                0, 0);
     gui_img_set_mode(screen_wallpaper, IMG_BYPASS_MODE);
     gui_img_create_from_mem(win, GIF_LOAD_NAME, ARROW_BIN, 20, 120, 0, 0);
-    gui_win_set_animate(win, 1000, -1, img_loading_animate_callback, win);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)img_loading_animate_callback, win);
     gui_obj_add_event_cb(win, (gui_event_cb_t)screen_unlock_cb, GUI_EVENT_2, NULL);
 
     bat_left = gui_img_create_from_mem(tabview_info, "BAT_L", BAT_L_BIN, 20, 10, 0, 0);
