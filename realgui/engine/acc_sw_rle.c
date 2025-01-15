@@ -245,53 +245,50 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
     head->compress = 0;
     return;
 }
+bool is_identity_matrix(gui_matrix_t *matrix)
+{
+    return (matrix->m[0][0] == 1) && (matrix->m[1][1] == 1) && (matrix->m[2][2] == 1) &&
+           (matrix->m[0][1] == 0) && (matrix->m[1][0] == 0) &&
+           (matrix->m[2][0] == 0) && (matrix->m[2][1] == 0);
+}
 
+void handle_image_blend_mode(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+{
+    switch (image->blend_mode)
+    {
+    case IMG_COVER_MODE:
+        rle_cover_blit_2_rgb565(image, dc, rect);
+        break;
+    case IMG_BYPASS_MODE:
+        rle_bypass_blit_2_rgb565(image, dc, rect);
+        break;
+    case IMG_FILTER_BLACK:
+        rle_filter_blit_2_rgb565(image, dc, rect);
+        break;
+    default:
+        // Handle other cases if necessary
+        do_raster_use_rle(image, dc, rect);
+        break;
+    }
+}
 void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
+    if (!is_identity_matrix(&image->matrix))
+    {
+        do_raster_use_rle(image, dc, rect);
+        return;
+    }
+
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
-    uint8_t opacity = image ->opacity_value;
     char img_type = head->type;
-    gui_matrix_t *matrix = &image->matrix;
-    bool identity = true;
-    if (
-        (matrix->m[0][0] == 1) && \
-        (matrix->m[1][1] == 1) && \
-        (matrix->m[2][2] == 1) && \
-        (matrix->m[0][1] == 0) && \
-        (matrix->m[1][0] == 0) && \
-        (matrix->m[2][0] == 0) && \
-        (matrix->m[2][1] == 0)
-    )
-    {
-        identity = true;
-    }
-    else
-    {
-        identity = false;
-    }
+    uint8_t opacity = image->opacity_value;
 
-    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565) && (opacity == 255) &&
-        (rect == NULL))
+    if ((dc_bytes_per_pixel == 2) && (img_type == RGB565) && (opacity == 255) && (rect == NULL))
     {
-        if (image->blend_mode == IMG_COVER_MODE)
-        {
-            rle_cover_blit_2_rgb565(image, dc, rect);
-            return;
-        }
-        else if (image->blend_mode == IMG_BYPASS_MODE)
-        {
-            rle_bypass_blit_2_rgb565(image, dc, rect);
-            return;
-        }
-        else if (image->blend_mode == IMG_FILTER_BLACK)
-        {
-            rle_filter_blit_2_rgb565(image, dc, rect);
-            return;
-        }
-
+        handle_image_blend_mode(image, dc, rect);
+        return;
     }
 
     do_raster_use_rle(image, dc, rect);
-    return;
 }
