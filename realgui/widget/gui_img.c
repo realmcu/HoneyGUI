@@ -721,7 +721,8 @@ static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
     {
         for (uint16_t y = 0; y < h; y++)
         {
-            memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
+            memcpy(dc->shot_buf + 8 + y * (uint32_t)w * byte, dc->frame_buf + y * dc->fb_width * byte,
+                   (uint32_t)w * byte);
         }
         // gui_log("[GUI warning] please use user method for improve! \n");
     }
@@ -729,13 +730,13 @@ static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
     {
         if (dc->section_count == 0)
         {
-            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            uint8_t *dst = 8 + dc->shot_buf + (uint32_t)w * dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
         }
         else if (dc->section_count == total_section_cnt - 1)
         {
             uint32_t last_height = dc->target_h - dc->section_count * dc->fb_height;
-            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            uint8_t *dst = 8 + dc->shot_buf + (uint32_t)w * dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
             // gui_log("[GUI warning] please use user method for improve! \n");
         }
@@ -745,7 +746,7 @@ static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
         }
         else
         {
-            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            uint8_t *dst = 8 + dc->shot_buf + (uint32_t)w * dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
         }
     }

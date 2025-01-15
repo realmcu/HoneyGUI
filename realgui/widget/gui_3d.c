@@ -90,15 +90,18 @@ gui_point_4d_t calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1, gui
     Q0.x = (1 - u) * P3.x + u * P0.x;
     Q0.y = (1 - u) * P3.y + u * P0.y;
     Q0.z = (1 - u) * P3.z + u * P0.z;
+    Q0.w = (1 - u) * P3.w + u * P0.w;
 
     Q1.x = (1 - u) * P2.x + u * P1.x;
     Q1.y = (1 - u) * P2.y + u * P1.y;
     Q1.z = (1 - u) * P2.z + u * P1.z;
+    Q1.w = (1 - u) * P2.w + u * P1.w;
 
     // Vertical interpolation
     point.x = (1 - v) * Q1.x + v * Q0.x;
     point.y = (1 - v) * Q1.y + v * Q0.y;
     point.z = (1 - v) * Q1.z + v * Q0.z;
+    point.w = (1 - v) * Q1.w + v * Q0.w;
 
     return point;
 
