@@ -402,6 +402,10 @@ static void gui_text_draw(gui_obj_t *obj)
     {
         gui_text_font_load(text, &draw_rect);
     }
+    if (text->font_type == GUI_FONT_SRC_TTF)
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
+    }
 
     if (dc->pfb_type == PFB_X_DIRECTION)
     {

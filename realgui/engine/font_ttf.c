@@ -81,18 +81,6 @@ static const uint8_t lookup_table_4b[16] =
 #endif
 
 /*
-    USE_BIT_BUF can reduce memory consumption and increase rendering speed.
-    Ensure it is always enabled if there are no issues.
-*/
-#define USE_BIT_BUF          1
-
-/*
-    USE_FLOAT_RECT_SIZE uses float to calculate the rendering boundaries, which can increase data precision.
-    If there are no issues, make sure it is always enabled.
-*/
-#define USE_FLOAT_RECT_SIZE  1
-
-/*
     FIX_AUTO_VECTORIZE is used to adapt to auto-vectorization,
     and it only needs to be enabled when the compiler's auto-vectorization feature is turned on.
     It will reduce rendering speed and increase memory overhead.
@@ -110,6 +98,130 @@ static const uint8_t lookup_table_4b[16] =
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+
+static TransformCase determineTransformCase(float a, float b)
+{
+    if (a >= 0 && b >= 0)
+    {
+        return POS_POS;
+    }
+    else if (a >= 0 && b < 0)
+    {
+        return POS_NEG;
+    }
+    else if (a < 0 && b >= 0)
+    {
+        return NEG_POS;
+    }
+    else
+    {
+        return NEG_NEG;
+    }
+}
+
+static void transformPointV2(float x, float y, float m[3][3], float *x_out, float *y_out)
+{
+    float w = m[2][0] * x + m[2][1] * y + m[2][2];
+    *x_out = (m[0][0] * x + m[0][1] * y + m[0][2]) / w;
+    *y_out = (m[1][0] * x + m[1][1] * y + m[1][2]) / w;
+}
+static void transformPoint(float x, float y, float m[3][3], float *x_out, float *y_out)
+{
+    *x_out = m[0][0] * x + m[0][1] * y + m[0][2];
+    *y_out = m[1][0] * x + m[1][1] * y + m[1][2];
+}
+
+void computeBoundingBoxInt(int x0, int y0, int x1, int y1, float m[3][3], TransformCase caseX,
+                           TransformCase caseY, int *xmin, int *xmax, int *ymin, int *ymax)
+{
+    float x_min, x_max, y_min, y_max;
+    float temp_x, temp_y;
+
+    if (caseX == POS_POS || caseX == POS_NEG)
+    {
+        transformPoint(x0, (caseX == POS_POS ? y0 : y1), m, &x_min, &temp_y);
+        transformPoint(x1, (caseX == POS_POS ? y1 : y0), m, &x_max, &temp_y);
+    }
+    else
+    {
+        transformPoint(x1, (caseX == NEG_POS ? y0 : y1), m, &x_min, &temp_y);
+        transformPoint(x0, (caseX == NEG_POS ? y1 : y0), m, &x_max, &temp_y);
+    }
+
+    if (caseY == POS_POS || caseY == POS_NEG)
+    {
+        transformPoint((caseY == POS_POS ? x0 : x1), y0, m, &temp_x, &y_min);
+        transformPoint((caseY == POS_POS ? x1 : x0), y1, m, &temp_x, &y_max);
+    }
+    else
+    {
+        transformPoint((caseY == NEG_POS ? x1 : x0), y0, m, &temp_x, &y_min);
+        transformPoint((caseY == NEG_POS ? x0 : x1), y1, m, &temp_x, &y_max);
+    }
+
+    *xmin = (int)x_min;
+    *xmax = (int)x_max;
+    *ymin = (int)y_min;
+    *ymax = (int)y_max;
+}
+
+void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, float m[3][3],
+                             TransformCase caseX, TransformCase caseY, float *xmin, float *xmax, float *ymin, float *ymax)
+{
+    float temp_x, temp_y;
+
+    if (caseX == POS_POS || caseX == POS_NEG)
+    {
+        transformPoint(x0, (caseX == POS_POS ? y0 : y1), m, xmin, &temp_y);
+        transformPoint(x1, (caseX == POS_POS ? y1 : y0), m, xmax, &temp_y);
+    }
+    else
+    {
+        transformPoint(x1, (caseX == NEG_POS ? y0 : y1), m, xmin, &temp_y);
+        transformPoint(x0, (caseX == NEG_POS ? y1 : y0), m, xmax, &temp_y);
+    }
+
+    if (caseY == POS_POS || caseY == POS_NEG)
+    {
+        transformPoint((caseY == POS_POS ? x0 : x1), y0, m, &temp_x, ymin);
+        transformPoint((caseY == POS_POS ? x1 : x0), y1, m, &temp_x, ymax);
+    }
+    else
+    {
+        transformPoint((caseY == NEG_POS ? x1 : x0), y0, m, &temp_x, ymin);
+        transformPoint((caseY == NEG_POS ? x0 : x1), y1, m, &temp_x, ymax);
+    }
+}
+
+void computeBoundingBoxFloatV2(float x0, float y0, float x1, float y1, float m[3][3], float *xmin,
+                               float *xmax, float *ymin, float *ymax)
+{
+    float tx0, ty0, tx1, ty1, tx2, ty2, tx3, ty3;
+
+    transformPointV2(x0, y0, m, &tx0, &ty0);
+    transformPointV2(x1, y0, m, &tx1, &ty1);
+    transformPointV2(x0, y1, m, &tx2, &ty2);
+    transformPointV2(x1, y1, m, &tx3, &ty3);
+
+    *xmin = fminf(fminf(tx0, tx1), fminf(tx2, tx3));
+    *xmax = fmaxf(fmaxf(tx0, tx1), fmaxf(tx2, tx3));
+    *ymin = fminf(fminf(ty0, ty1), fminf(ty2, ty3));
+    *ymax = fmaxf(fmaxf(ty0, ty1), fmaxf(ty2, ty3));
+}
+
+void computeBoundingBoxIntV2(int x0, int y0, int x1, int y1, float m[3][3], int *xmin, int *xmax,
+                             int *ymin, int *ymax)
+{
+    float fxmin, fxmax, fymin, fymax;
+
+    computeBoundingBoxFloatV2((float)x0, (float)y0, (float)x1, (float)y1, m, &fxmin, &fxmax, &fymin,
+                              &fymax);
+
+    *xmin = (int)fxmin;
+    *xmax = (int)fxmax;
+    *ymin = (int)fymin;
+    *ymax = (int)fymax;
+}
 
 void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
 {
@@ -421,7 +533,6 @@ void adjustImageBufferPrecision(uint8_t *img_out, uint32_t out_size, uint8_t ras
     }
 }
 
-#if USE_BIT_BUF
 void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec, int out_w,
                      int out_h, int render_w, int render_h, uint32_t line_word, uint32_t block_bit)
 {
@@ -594,74 +705,6 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
         }
     }
 }
-#else
-void makeImageBuffer(uint8_t *img_out, const uint8_t *img, uint8_t raster_prec, int out_w,
-                     int out_h, int render_w,  int render_h)
-{
-    if (raster_prec == 4)
-    {
-        for (uint32_t y = 0; y < out_h; y++)
-        {
-            for (uint32_t x = 0; x < out_w; x++)
-            {
-                uint32_t *value = (uint32_t *)&img[(y * raster_prec) * render_w + (x * raster_prec)];
-                img_out[y * out_w + x] = ((value[0] + value[out_w] + value[out_w * 2] + value[out_w * 3]) *
-                                          0x01010101) >> 24;
-            }
-        }
-    }
-    else if (raster_prec == 2)
-    {
-        for (uint32_t y = 0; y < out_h; y++)
-        {
-            for (uint32_t x = 0; x < out_w; x++)
-            {
-                uint16_t *value = (uint16_t *)&img[(y * raster_prec) * render_w + (x * raster_prec)];
-                img_out[y * out_w + x] = ((value[0] + value[out_w]) * 0x0101) >> 8;
-            }
-        }
-    }
-    else if (raster_prec == 1)
-    {
-        memset(img_out, 0, out_w * out_h);
-        uint32_t i = 0;
-#if defined FONT_TTF_USE_MVE && 1
-        //MVE CODE, quicker about 1ms
-        for (; i + 16 <= out_w * out_h; i += 16)
-        {
-            uint8x16_t input = vldrbq_u8(img + i);
-            // uint8x16_t output = vmulq_n_u8(input, 0xff);
-            uint8x16_t output = vqrshlq_n_u8(input, 8);
-            vst1q(img_out + i, output);
-        }
-#endif
-        for (; i < out_w * out_h; i++)
-        {
-            if (img[i])
-            {
-                img_out[i] = 0xff;
-            }
-        }
-    }
-    else if (raster_prec == 8)
-    {
-        memset(img_out, 0, out_w * out_h);
-        for (uint32_t y = 0; y < out_h; y++)
-        {
-            for (uint32_t x = 0; x < out_w; x++)
-            {
-                for (uint32_t i = 0; i < raster_prec; i++)
-                {
-                    for (uint32_t j = 0; j < raster_prec; j++)
-                    {
-                        img_out[y * out_w + x] += img[(y * raster_prec + i) * render_w + (x * raster_prec + j)];
-                    }
-                }
-            }
-        }
-    }
-}
-#endif
 
 /*============================================================================*
  *                           Public Functions
@@ -700,15 +743,8 @@ void gui_font_get_ttf_info(gui_text_t *text)
     uint32_t uni_i = 0;
     uint32_t chr_i = 0;
 
-    float scale = 0;
+    float scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
 //    short advance = 0;
-
-    scale = text->font_height * text->base.matrix->m[0][0] / (ttfbin->ascent - ttfbin->descent);
-    int16_t scale_height = (int16_t)ceil(text->font_height * text->base.matrix->m[0][0]);
-    if (scale_height < 1)
-    {
-        scale_height = 1;
-    }
 
     for (uni_i = 0; uni_i < unicode_len; uni_i++)
     {
@@ -720,7 +756,7 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].x = 0;
             // chr[chr_i].y = 0;
             // chr[chr_i].w = 0;
-            chr[chr_i].h = scale_height;
+            chr[chr_i].h = text->font_height;
             // chr[chr_i].char_y = 0;
             chr[chr_i].char_w = 0;
             chr[chr_i].char_h = 0;
@@ -732,10 +768,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].x = 0;
             // chr[chr_i].y = 0;
             // chr[chr_i].w = 0;
-            chr[chr_i].h = scale_height;
+            chr[chr_i].h = text->font_height;
             // chr[chr_i].char_y = 0;
-            chr[chr_i].char_w = (scale_height + 1) / 2;
-            chr[chr_i].char_h = (scale_height + 1) / 2;
+            chr[chr_i].char_w = (text->font_height + 1) / 2;
+            chr[chr_i].char_h = (text->font_height + 1) / 2;
             // chr[chr_i].dot_addr = 0;
         }
         else
@@ -753,10 +789,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].x = 0;
             // chr[chr_i].y = 0;
             // chr[chr_i].w = 0;
-            chr[chr_i].h = scale_height;
+            chr[chr_i].h = text->font_height;
             // chr[chr_i].char_y = 0;
             chr[chr_i].char_w = glyphData->advance * scale;
-            chr[chr_i].char_h = scale_height;
+            chr[chr_i].char_h = text->font_height;
             chr[chr_i].dot_addr = font_ptr;
         }
 
@@ -770,16 +806,17 @@ void gui_font_get_ttf_info(gui_text_t *text)
     gui_free(unicode_buf);
 }
 
-static void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
+void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
 {
-    float scale_x = text->base.matrix->m[0][0];
-    float scale_y = text->base.matrix->m[1][1];
+    gui_matrix_t *tm = text->base.matrix;
 
-    rect->x2 = (rect->x2 - rect->x1) * scale_x + rect->x1;
-    rect->y2 = (rect->y2 - rect->y1) * scale_y + rect->y1;
-
-    rect->xboundright = (rect->xboundright - rect->xboundleft) * scale_x + rect->xboundleft;
-    rect->yboundbottom = (rect->yboundbottom - rect->yboundtop) * scale_y + rect->yboundtop;
+    int mx1, my1, mx2, my2;
+    computeBoundingBoxIntV2(0, 0, text->base.w - 1, text->base.h - 1,
+                            tm->m, &mx1, &mx2, &my1, &my2);
+    rect->x1 = mx1;
+    rect->y1 = my1;
+    rect->x2 = mx2;
+    rect->y2 = my2;
 }
 
 void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)
@@ -804,7 +841,6 @@ void gui_font_ttf_load(gui_text_t *text, gui_text_rect_t *rect)
     {
         if (text != NULL)
         {
-            gui_font_ttf_adapt_rect(text, rect);
             gui_font_mem_layout(text, rect);
         }
     }
@@ -839,33 +875,56 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
 
     short ascent = 0;
-    short descent = 0;
-//    short lineGap = 0;
-
-//    int line_num = 0;
-
     float scale = 0;
-//    float xpos = 0;
-//    float ypos = 0;
-//    float baseline = 0;
 
     ascent = ttfbin->ascent;
-    descent = ttfbin->descent;
-    scale = text->font_height * text->base.matrix->m[0][0] / (ascent - descent);
+    scale = (float)text->font_height / (ttfbin->ascent - ttfbin->descent);
+
     if (scale <= 0)
     {
         return;
     }
 
-//    baseline = ascent * scale;
-
-    // uint8_t raster_prec = ttfbin->rendor_mode;
     uint8_t raster_prec = 1 << text->rendermode;
 
     gui_dispdev_t *dc = gui_get_dc();
 
+    gui_matrix_t *tm = text->base.matrix;
+    TransformCase caseX = determineTransformCase(tm->m[0][0], tm->m[0][1]);
+    TransformCase caseY = determineTransformCase(tm->m[1][0], tm->m[1][1]);
+
+    FONT_MATRIX_TYPE tm_type;
+    if (tm->m[2][0] != 0 || tm->m[2][1] != 0 || tm->m[2][2] != 1)
+    {
+        tm_type = FONT_HOMOGENEOUS;
+    }
+    else if (tm->m[0][0] != 1 || tm->m[0][1] != 0 || tm->m[1][0] != 0 || tm->m[1][1] != 1)
+    {
+        tm_type = FONT_SCALE;
+    }
+    else if (tm->m[0][2] != 0 || tm->m[1][2] != 0)
+    {
+        tm_type = FONT_TRANSFORM;
+    }
+    else
+    {
+        tm_type = FONT_IDENTITY;
+    }
+
     for (uint16_t index = 0; index < text->active_font_len; index++)
     {
+        if (chr[index].buf)
+        {
+            font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x, chr[index].y, chr[index].w,
+                                         chr[index].h);
+            if (dc->section_count * dc->fb_height >= chr[index].y + chr[index].h)
+            {
+                gui_free(chr[index].buf);
+                chr[index].buf = NULL;
+                chr[index].char_w = 0;
+            }
+            continue;
+        }
         if (chr[index].dot_addr == 0 || chr[index].char_w == 0)
         {
             continue;
@@ -874,140 +933,353 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
         float render_scale = scale * raster_prec;
 
-        int glyph_w = render_scale * (glyphData->x1 - glyphData->x0 + 1) + 2;
-        int glyph_h = render_scale * (glyphData->y1 - glyphData->y0 + 1) + 2;
-#if USE_FLOAT_RECT_SIZE
-        float glyph_x0 = render_scale * glyphData->x0;
-        float glyph_y0 = render_scale * glyphData->y0;
-#else
-        int glyph_x0 = render_scale * glyphData->x0;
-        int glyph_y0 = render_scale * glyphData->y0;
+        float glyph_x0 = 0;
+        float glyph_y0 = 0;
+        float glyph_x1 = 0;
+        float glyph_y1 = 0;
+        float glyph_w = 0;
+        float glyph_h = 0;
 
-        if (glyph_y0 < 0)
-        {
-            glyph_y0 --;
-            glyph_h ++;
-        }
-        if (glyph_x0 < 0)
-        {
-            glyph_x0 --;
-            glyph_w ++;
-        }
-#endif
+        float glyph_x0m = 0;
+        float glyph_y0m = 0;
+        float glyph_x1m = 0;
+        float glyph_y1m = 0;
 
-        int render_w = ALIGN_TO(glyph_w, raster_prec);
-        int render_h = ALIGN_TO(glyph_h, raster_prec);
-        // int render_x0 = glyph_x0;
-        // int render_x1 = render_x0 + render_w;
-        // int render_y0 = ascent * render_scale + glyph_y0;
-        // int render_y1 = render_y0 + render_h;
+        int mx_offset = 0;
+        int my_offset = 0;
 
-        int out_w = render_w / raster_prec;
-        int out_h = render_h / raster_prec;
-#if USE_FLOAT_RECT_SIZE
-        int out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET;
-        int out_y0 = ascent / raster_prec * render_scale + glyph_y0 / raster_prec + ROUNDING_OFFSET;
-#else
-        int out_x0 = glyph_x0 / raster_prec;
-        int out_y0 = ascent / raster_prec * render_scale + glyph_y0 / raster_prec;
-#endif
-        // int out_x1 = out_x0 + out_w;
-        // int out_y1 = out_y0 + out_h;
+        int render_w = 0;
+        int render_h = 0;
 
-#if USE_BIT_BUF
+        int out_x0 = 0;
+        int out_y0 = 0;
+        int out_x1 = 0;
+        int out_y1 = 0;
+        int out_w = 0;
+        int out_h = 0;
+
         uint32_t block_bit = 32;
-        render_w = ALIGN_TO(render_w, block_bit);
-        uint32_t line_word = render_w / block_bit;
-        out_w = render_w / raster_prec;
-#endif
-        if (chr[index].buf)
-        {
-            font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x + out_x0,
-                                         chr[index].y + out_y0, out_w, out_h);
-            continue;;
-        }
+        uint32_t line_word = 0;
 
+        int mx0 = 0;
+        int my0 = 0;
+        int mx1 = 0;
+        int my1 = 0;
+
+        int line_count = 0;
+        ttf_point *windingsfm;
         uint8_t *winding_lengths = chr[index].dot_addr + offsetof(FontGlyphData, winding_lengths);
         FontWindings *windings = (FontWindings *)(winding_lengths + glyphData->winding_count);
-        int line_count = 0;
         for (int i = 0; i < glyphData->winding_count; i++)
         {
             line_count += winding_lengths[i];
         }
         GUI_ASSERT(line_count != 0);
+        ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
+
+        switch (tm_type)
+        {
+        case FONT_HOMOGENEOUS:
+            {
+                glyph_x0 = scale * glyphData->x0;
+                glyph_y0 = scale * (ascent + glyphData->y0);
+                glyph_x1 = scale * (glyphData->x1);
+                glyph_y1 = scale * (ascent + glyphData->y1);
+
+                mx_offset = chr[index].x - text->offset_x;
+                my_offset = chr[index].y - text->offset_y;
+
+                computeBoundingBoxFloatV2(mx_offset + glyph_x0, my_offset + glyph_y0,
+                                          mx_offset + glyph_x1, my_offset + glyph_y1,
+                                          tm->m, &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
+
+                glyph_x0m *= raster_prec;
+                glyph_y0m *= raster_prec;
+                glyph_x1m *= raster_prec;
+                glyph_y1m *= raster_prec;
+
+                glyph_w = glyph_x1m - glyph_x0m + 1;
+                glyph_h = glyph_y1m - glyph_y0m + 1;
+
+                // gui_log("text out glyph_w %d  my0 %d out_w %d out_h %d\n",glyph_w,glyph_h);
+
+                render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
+                render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
+
+                render_w = ALIGN_TO(render_w, block_bit);
+                line_word = render_w / block_bit;
+
+                out_w = render_w / raster_prec;
+                out_h = render_h / raster_prec;
+
+                out_x0 = glyph_x0 + ROUNDING_OFFSET;
+                out_y0 = glyph_y0 + ROUNDING_OFFSET;
+                out_x1 = out_x0 + out_w - 1;
+                out_y1 = out_y0 + out_h - 1;
+
+                computeBoundingBoxIntV2(mx_offset + out_x0, my_offset + out_y0,
+                                        mx_offset + out_x1, my_offset + out_y1,
+                                        tm->m, &mx0, &mx1, &my0, &my1);
 
 #if defined FONT_TTF_USE_MVE && 0
-        //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
-        ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
-        FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
-        memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                /*MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.*/
+                /*todo by luke*/
+                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsd[i].x;
+                    windingsf[i].x = windingsf[i].x * scale;
+                    windingsf[i].x += mx_offset;
 
-        uint32_t li = 0;
-
-        /*MVE Code Start*/
-        const float32x4_t addv = {-glyph_x0, -glyph_y0, -glyph_x0, -glyph_y0};
-        const float32x4_t mulv = {render_scale, -render_scale, render_scale, -render_scale};
-
-        for (; li + 1 < line_count; li += 2)
-        {
-            int32x4_t resulti = vldrhq_s32(&windingsd[li].x);
-            float32x4_t result = vcvtq_f32_s32(resulti);
-
-            result = vmulq_f32(result, mulv);
-            result = vaddq_f32(result, addv);
-            vstrwq_f32(&windingsf[li].x, result);
-        }
-        /*MVE Code End*/
-        for (; li < line_count; li ++)
-        {
-#if USE_FLOAT_RECT_SIZE
-            windingsf[li].x = (windingsd[li].x - glyphData->x0) * render_scale;
-            windingsf[li].y = (- glyphData->y0 - windingsd[li].y) * render_scale;
+                    windingsf[i].y = ascent - windingsd[i].y;
+                    windingsf[i].y = windingsf[i].y * scale;
+                    windingsf[i].y += my_offset;
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    transformPointV2(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
+                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
+                }
+                gui_free(windingsd);
 #else
-            windingsf[li].x = windingsd[li].x * render_scale - glyph_x0;
-            windingsf[li].y = (- windingsd[li].y * render_scale - glyph_y0);
-#endif
-        }
-        gui_free(windingsd);
-#else
-        // for (int i = 0; i < line_count; i++)
-        // {
-        //     gui_log("before windings[%d]: x %d, y %d \n", i, windings[i].x,windings[i].y);
-        // }
-        ttf_point *windingsf = gui_malloc(line_count * sizeof(ttf_point));
 #if FIX_AUTO_VECTORIZE
-        FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
-        memcpy(windingsd, windings, line_count * sizeof(FontWindings));
-        for (int i = 0; i < line_count; i++)
-        {
-#if USE_FLOAT_RECT_SIZE
-            windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale;
-            windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale;
-#else
-            windingsf[i].x = windingsd[i].x * render_scale - glyph_x0;
-            windingsf[i].y = (- windingsd[i].y * render_scale - glyph_y0);
-#endif
-        }
-        gui_free(windingsd);
-#else
-        for (int i = 0; i < line_count; i++)
-        {
-#if USE_FLOAT_RECT_SIZE
-            windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale;
-            windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale;
-#else
-            windingsf[i].x = windings[i].x * render_scale - glyph_x0;
-            windingsf[i].y = (- windings[i].y * render_scale - glyph_y0);
-#endif
-        }
-#endif
-        // for (int i = 0; i < line_count; i++)
-        // {
-        //     gui_log("after windingsf[%d]: x %f, y %f \n", i, windingsf[i].x,windingsf[i].y);
-        // }
-#endif
+                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsd[i].x;
+                    windingsf[i].x = windingsf[i].x * scale;
+                    windingsf[i].x += mx_offset;
 
-        GUI_ASSERT(line_count != 0);
+                    windingsf[i].y = ascent - windingsd[i].y;
+                    windingsf[i].y = windingsf[i].y * scale;
+                    windingsf[i].y += my_offset;
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    transformPointV2(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
+                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
+                }
+                gui_free(windingsd);
+#else
+                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windings[i].x;
+                    windingsf[i].x = windingsf[i].x * scale;
+                    windingsf[i].x += mx_offset;
+
+                    windingsf[i].y = ascent - windings[i].y;
+                    windingsf[i].y = windingsf[i].y * scale;
+                    windingsf[i].y += my_offset;
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    transformPointV2(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
+                    windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
+                }
+                gui_free(windingsfm);
+#endif
+#endif
+            }
+            break;
+        case FONT_SCALE:
+            {
+                glyph_x0 = render_scale * glyphData->x0;
+                glyph_y0 = render_scale * (ascent + glyphData->y0);
+                glyph_x1 = render_scale * glyphData->x1;
+                glyph_y1 = render_scale * (ascent + glyphData->y1);
+
+                computeBoundingBoxFloat(glyph_x0, glyph_y0,
+                                        glyph_x1, glyph_y1,
+                                        tm->m, caseX, caseY,
+                                        &glyph_x0m, &glyph_x1m, &glyph_y0m, &glyph_y1m);
+
+                glyph_w = glyph_x1m - glyph_x0m + 1;
+                glyph_h = glyph_y1m - glyph_y0m + 1;
+
+                render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
+                render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
+
+                render_w = ALIGN_TO(render_w, block_bit);
+                line_word = render_w / block_bit;
+
+                out_w = render_w / raster_prec;
+                out_h = render_h / raster_prec;
+
+                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET;
+                out_y0 = glyph_y0 / raster_prec + ROUNDING_OFFSET;
+                out_x1 = out_x0 + out_w - 1;
+                out_y1 = out_y0 + out_h - 1;
+
+                mx_offset = chr[index].x - text->offset_x;
+                my_offset = chr[index].y - text->offset_y;
+
+                computeBoundingBoxInt(mx_offset + out_x0, my_offset + out_y0,
+                                      mx_offset + out_x1, my_offset + out_y1,
+                                      tm->m, caseX, caseY,
+                                      &mx0, &mx1, &my0, &my1);
+
+#if defined FONT_TTF_USE_MVE && 0
+                //MVE code time is equal to normal code(auto vectorize).If add matrix, should try again.
+                /*todo by luke*/
+                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsd[i].x * render_scale;
+                    windingsf[i].y = (ascent - windingsd[i].y) * render_scale;
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    transformPoint(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsfm[i].x - glyph_x0m;
+                    windingsf[i].y = windingsfm[i].y - glyph_y0m;
+                }
+                gui_free(windingsfm);
+                gui_free(windingsd);
+#else
+#if FIX_AUTO_VECTORIZE
+                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsd[i].x * render_scale;
+                    windingsf[i].y = (ascent - windingsd[i].y) * render_scale;
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    transformPoint(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsfm[i].x - glyph_x0m;
+                    windingsf[i].y = windingsfm[i].y - glyph_y0m;
+                }
+                gui_free(windingsfm);
+                gui_free(windingsd);
+#else
+                windingsfm = gui_malloc(line_count * sizeof(ttf_point));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windings[i].x * render_scale;
+                    windingsf[i].y = (ascent - windings[i].y) * render_scale;
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    transformPoint(windingsf[i].x, windingsf[i].y, tm->m, &windingsfm[i].x, &windingsfm[i].y);
+                }
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = windingsfm[i].x - glyph_x0m;
+                    windingsf[i].y = windingsfm[i].y - glyph_y0m;
+                }
+                gui_free(windingsfm);
+#endif
+#endif
+            }
+            break;
+        case FONT_TRANSFORM:
+        case FONT_IDENTITY:
+            {
+                glyph_x0 = render_scale * glyphData->x0;
+                glyph_y0 = render_scale * glyphData->y0;
+                glyph_x1 = render_scale * glyphData->x1;
+                glyph_y1 = render_scale * glyphData->y1;
+
+                glyph_w = glyph_x1 - glyph_x0 + 1;
+                glyph_h = glyph_y1 - glyph_y0 + 1;
+
+                render_w = ALIGN_TO((int)(glyph_w + 1), raster_prec);
+                render_h = ALIGN_TO((int)(glyph_h + 1), raster_prec);
+
+                render_w = ALIGN_TO(render_w, block_bit);
+                line_word = render_w / block_bit;
+
+                out_w = render_w / raster_prec;
+                out_h = render_h / raster_prec;
+
+                out_x0 = glyph_x0 / raster_prec + ROUNDING_OFFSET;
+                out_y0 = glyph_y0 / raster_prec + ascent * scale + ROUNDING_OFFSET;
+                out_x1 = out_x0 + out_w - 1;
+                out_y1 = out_y0 + out_h - 1;
+
+                mx0 = out_x0 + chr[index].x;
+                mx1 = out_x1 + chr[index].x;
+                my0 = out_y0 + chr[index].y;
+                my1 = out_y1 + chr[index].y;
+
+#if defined FONT_TTF_USE_MVE && 0
+                //MVE code time >= normal code.
+                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+
+                uint32_t li = 0;
+
+                /*MVE Code Start*/
+                const float32x4_t addv = {-glyph_x0, -glyph_y0, -glyph_x0, -glyph_y0};
+                const float32x4_t mulv = {render_scale, -render_scale, render_scale, -render_scale};
+
+                for (; li + 1 < line_count; li += 2)
+                {
+                    int32x4_t resulti = vldrhq_s32(&windingsd[li].x);
+                    float32x4_t result = vcvtq_f32_s32(resulti);
+
+                    result = vmulq_f32(result, mulv);
+                    result = vaddq_f32(result, addv);
+                    vstrwq_f32(&windingsf[li].x, result);
+                }
+                /*MVE Code End*/
+                for (; li < line_count; li ++)
+                {
+                    windingsf[li].x = (windingsd[li].x - glyphData->x0) * render_scale;
+                    windingsf[li].y = (- glyphData->y0 - windingsd[li].y) * render_scale;
+                }
+                gui_free(windingsd);
+#else
+#if FIX_AUTO_VECTORIZE
+                FontWindings *windingsd = gui_malloc(line_count * sizeof(FontWindings));
+                memcpy(windingsd, windings, line_count * sizeof(FontWindings));
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = (windingsd[i].x - glyphData->x0) * render_scale;
+                    windingsf[i].y = (- glyphData->y0 - windingsd[i].y) * render_scale;
+                }
+                gui_free(windingsd);
+#else
+                for (int i = 0; i < line_count; i++)
+                {
+                    windingsf[i].x = (windings[i].x - glyphData->x0) * render_scale;
+                    windingsf[i].y = (- glyphData->y0 - windings[i].y) * render_scale;
+                }
+#endif
+#endif
+            }
+            break;
+        default:
+            break;
+        }
+
         LINE_T *line_list = gui_malloc(line_count * sizeof(LINE_T));
 
         int lint_count_actual = 0;
@@ -1031,7 +1303,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         //     gui_log("line %d : x0 %f , y0 %d , y1 %d , dxy %f\n",
         //             i,line_list[i].x0,line_list[i].y0,line_list[i].y1,line_list[i].dxy);
         // }
-#if USE_BIT_BUF
+
         uint32_t render_size = render_w * render_h / 8;
         uint32_t *img = gui_malloc(render_size);
         memset(img, 0, render_size);
@@ -1044,6 +1316,10 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
             for (int y = line_list[i].y0; y < line_list[i].y1; y++)
             {
                 float xi = line_list[i].x0 + line_list[i].dxy * y;
+                // GUI_ASSERT(xi >= 0)
+                // GUI_ASSERT(xi <= render_w)
+                // GUI_ASSERT(y >= 0)
+                // GUI_ASSERT(y <= render_h)
                 uint32_t xint = (uint32_t)(xi);
                 img[y * line_word + xint / block_bit] ^= masks[xint % block_bit];
                 for (uint32_t li = xint / block_bit + 1; li < line_word; li++)
@@ -1054,34 +1330,8 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h, line_word, block_bit);
 
-#else
-        uint32_t render_size = render_w * render_h;
-        uint8_t *img = gui_malloc(render_size);
-        memset(img, 0, render_size);
-
-        uint32_t out_size = out_w * out_h;
-        uint8_t *img_out = gui_malloc(out_size);
-
-        for (int i = 0; i < lint_count_actual; i++)
-        {
-            for (int y = line_list[i].y0; y < line_list[i].y1; y++)
-            {
-                float xi = line_list[i].x0 + line_list[i].dxy * y;
-                uint32_t xint = (uint32_t)(xi);
-
-                uint8_t *imgoff = &img[y * render_w];
-                for (uint32_t j = xint; j < render_w; j++)
-                {
-                    imgoff[j] ^= 1;
-                }
-            }
-        }
-        makeImageBuffer(img_out, img, raster_prec, out_w, out_h, render_w, render_h);
-#endif
-
         adjustImageBufferPrecision(img_out, out_size, raster_prec);
-        font_ttf_draw_bitmap_classic(text, img_out, rect, chr[index].x + out_x0, chr[index].y + out_y0,
-                                     out_w, out_h);
+        font_ttf_draw_bitmap_classic(text, img_out, rect, mx0, my0, out_w, out_h);
 
         gui_free(windingsf);
         gui_free(line_list);
@@ -1090,6 +1340,12 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         if (dc->type == DC_RAMLESS)
         {
             chr[index].buf = img_out;
+            chr[index].x = mx0;
+            chr[index].y = my0;
+            chr[index].w = out_w;
+            chr[index].h = out_h;
+            chr[index].char_w = mx1 - mx0 + 1;
+            chr[index].char_h = my1 - my0 + 1;
         }
         else
         {

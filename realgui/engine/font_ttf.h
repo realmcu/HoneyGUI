@@ -84,6 +84,23 @@ typedef struct
     float x;
     float y;
 } ttf_point;
+
+typedef enum
+{
+    POS_POS,  // m[0][0] >= 0, m[0][1] >= 0
+    POS_NEG,  // m[0][0] >= 0, m[0][1] <  0
+    NEG_POS,  // m[0][0] <  0, m[0][1] >= 0
+    NEG_NEG   // m[0][0] <  0, m[0][1] <  0
+} TransformCase;
+
+typedef enum
+{
+    FONT_IDENTITY,
+    FONT_TRANSFORM,
+    FONT_SCALE,
+    FONT_HOMOGENEOUS
+} FONT_MATRIX_TYPE;
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/
@@ -126,6 +143,13 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect);
  */
 void gui_font_ttf_unload(gui_text_t *text);
 
+/**
+ * @brief calculate rect
+ *
+ * @param text Widget pointer
+ * @param rect Widget boundary
+ */
+void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect);
 
 #ifdef __cplusplus
 }
