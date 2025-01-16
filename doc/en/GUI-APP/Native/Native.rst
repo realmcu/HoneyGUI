@@ -30,7 +30,7 @@ Define A C-APP
 
 - Define app UI design entry function with ``GUI_APP_ENTRY`` API. 
 
-- The UI design entry function will be executed once when the app is created.
+- The UI design entry function will be executed once when the app startup.
 
 .. literalinclude:: ../../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
