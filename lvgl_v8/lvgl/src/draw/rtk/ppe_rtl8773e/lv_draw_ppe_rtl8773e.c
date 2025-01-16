@@ -10,9 +10,9 @@
 #include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
 #include <math.h>
-#include "lv_draw_rtk_ppe_v2.h"
-#include "lv_draw_rtk_ppe_rect_v2.h"
-#include "lv_draw_rtk_ppe_blend_v2.h"
+#include "lv_draw_ppe_rtl8773e.h"
+#include "lv_draw_ppe_rtl8773e_rect.h"
+#include "lv_draw_ppe_rtl8773e_blend.h"
 #include "trace.h"
 #include "hal_idu.h"
 

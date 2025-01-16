@@ -9,7 +9,7 @@
 
 #include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
-#include "lv_draw_rtk_ppe_utils_v2.h"
+#include "lv_draw_ppe_rtl8773e_utils.h"
 #include "../../../core/lv_refr.h"
 #include "section.h"
 
@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define BUFFER_SIZE     (80 * 1024 - 454 * 40 * 2)
+#define BUFFER_SIZE     (40 * 1024)
 /**********************
  *      TYPEDEFS
  **********************/
@@ -122,7 +122,6 @@ void lv_ppe_get_matrix(ppe_matrix_t *matrix, const lv_area_t *coords, const lv_d
 }
 
 #include "trace.h"
-extern void SCB_InvalidateDCache(void);
 lv_res_t lv_ppe_buffer_copy(void *dest_buf, lv_coord_t dest_stride, const lv_area_t *dest_area,
                             const void *src_buf, lv_coord_t src_stride, const lv_area_t *src_area, uint8_t unit_size)
 {

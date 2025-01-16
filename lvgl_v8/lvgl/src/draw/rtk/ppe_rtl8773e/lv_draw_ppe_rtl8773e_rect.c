@@ -10,7 +10,7 @@
 
 #include "lvgl.h"
 #if LV_USE_GPU_RTK_PPEV2
-#include "lv_draw_rtk_ppe_rect_v2.h"
+#include "lv_draw_ppe_rtl8773e_rect.h"
 #include "rtl_ppe.h"
 #include <math.h>
 #include "trace.h"
@@ -62,6 +62,7 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
     target.win_y_min = coords->y1;
     target.win_y_max = coords->y2;
     target.opacity = dsc->bg_opa;
+    target.stride = target.width;
 
     ppe_rect_t rect = {.x = coords->x1, .w = coords->x2 - coords->x1 + 1, .y = coords->y1, .h = coords->y2 - coords->y1 + 1};
     PPE_err err = PPE_Mask(&target, bg_color.full, &rect);

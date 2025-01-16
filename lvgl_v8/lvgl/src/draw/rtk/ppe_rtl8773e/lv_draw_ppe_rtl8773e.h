@@ -19,7 +19,7 @@ extern "C" {
 
 #if LV_USE_GPU_RTK_PPEV2
 #include "../../sw/lv_draw_sw.h"
-#include "lv_draw_rtk_ppe_utils_v2.h"
+#include "lv_draw_ppe_rtl8773e_utils.h"
 
 /*********************
  *      DEFINES
