@@ -162,8 +162,8 @@ function backToTop() {
 /* ============= Toggle Languages ============= */
 document.addEventListener("DOMContentLoaded", function () {
     let currentUrl = window.location.href;
-    let newEnUrl = currentUrl.replace(/\/cn\//gi, '/en/');
-    let newCnUrl = currentUrl.replace(/\/en\//gi, '/cn/');
+    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
+    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
  
     document.getElementById('toEN').href = newEnUrl;
     document.getElementById('toCN').href = newCnUrl;

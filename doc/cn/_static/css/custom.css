@@ -262,10 +262,6 @@ figcaption, figcaption p{
 .rst-content ol ol ol li {
     list-style-type: lower-roman !important;
 }
-.rst-content ol ol li p,
-.rst-content ol ol ol li p {
-    display: inline !important;
-}
 
 .rst-content section ol,
 .rst-content section ol.arabic,
@@ -294,6 +290,16 @@ html.writer-html5 .rst-content dl.field-list>dt {
 /* ========= Render Code Block Style ========= */
 .rst-content .guilabel {
     line-height: 1.3rem
+}
+.rst-content p>kbd.kbd {   /* 解决在平板微信中不显示kbd指令渲染效果的问题 */
+    color: inherit;
+    font-size: 80%;
+    background-color: #fff;
+    border: 1px solid #a6a6a6;
+    border-radius: 4px;
+    box-shadow: 0 2px grey;
+    padding: 2.4px 6px;
+    margin: auto 0;
 }
 
 /* code copy button style */
