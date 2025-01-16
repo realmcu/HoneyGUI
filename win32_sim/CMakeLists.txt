@@ -23,31 +23,35 @@ add_subdirectory(../ HoneyGUI.out)
 if(CONFIG_LVGL)
 
     add_subdirectory(port//lvgl_port)
-        list(APPEND gui_sources 
+        list(APPEND gui_sources_win32 
 			${lvgl_port_src}
 			)
 
-    list(APPEND gui_headers
+    list(APPEND gui_headers_win32
     ${lvgl_port_inc}
     )
 
 endif()
     add_subdirectory(port//realgui_port)
-    list(APPEND gui_sources 
+    list(APPEND gui_sources_win32 
 			${realgui_port_src}
 			)
 
-    list(APPEND gui_headers
+    list(APPEND gui_headers_win32
     ${realgui_port_inc}
     )
-
-
-
-
-target_sources(gui PRIVATE ${gui_sources})
-
-target_include_directories(gui PUBLIC ${gui_headers})
-
+if(CONFIG_LIB_MODE)
+set_target_properties( PROPERTIES LINK_FLAGS "-Wl,-Map=output.map")
+set_target_properties(gui PROPERTIES
+    LINK_FLAGS "-Wl,--whole-archive ${CMAKE_CURRENT_SOURCE_DIR}/build/HoneyGUI.out/libHoneyGUI.a -Wl,--no-whole-archive,-Map=output.map")
+target_link_libraries(gui PRIVATE HoneyGUI)
+else()
+list(APPEND gui_sources_win32
+			${gui_sources}
+			)
+list(APPEND gui_headers_win32
+    ${gui_headers}
+    )
 
 set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/RTE/SDL2-2.26.0/x86_64-w64-mingw32/lib/")
 
@@ -63,6 +67,14 @@ set_target_properties(LibSecond PROPERTIES IMPORTED_LOCATION "${LIBRARY_PATH}/li
 
 target_link_libraries(gui mingw32 opengl32 LibFirst LibSecond setupapi
 dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi version uuid)
+endif()
+
+
+target_sources(gui PRIVATE ${gui_sources_win32})
+
+target_include_directories(gui PUBLIC ${gui_headers_win32})
+
+
 
 
 

@@ -71,7 +71,57 @@ if(CONFIG_LVGL)
 			
 			)
 endif()
+if(CMAKE_GENERATOR STREQUAL "MinGW Makefiles")
+    message("Using MinGW Makefiles")
+list(APPEND gui_headers
+${CMAKE_CURRENT_SOURCE_DIR}/win32_sim/RTE/SDL2-2.26.0/x86_64-w64-mingw32/include/SDL2/
+${CMAKE_CURRENT_SOURCE_DIR}/win32_sim/RTE/SDL2-2.26.0/x86_64-w64-mingw32/include/
+${CMAKE_CURRENT_SOURCE_DIR}/win32_sim/RTE/SDL2-2.26.0/x86_64-w64-mingw32
+${CMAKE_CURRENT_SOURCE_DIR}/win32_sim/RTE/SDL2-2.26.0/
+${CMAKE_CURRENT_SOURCE_DIR}/win32_sim/RTE/
+    )
+endif()
+
+
+
+
+
 set(gui_headers ${gui_headers} CACHE INTERNAL  "gui headers ")
+
+
+if(CONFIG_LIB_MODE)
+add_library(HoneyGUI STATIC
+    ${gui_sources}
+)
+# Include directories
+target_include_directories(HoneyGUI PUBLIC
+    ${gui_headers}
+)
+if(CMAKE_GENERATOR STREQUAL "MinGW Makefiles")
+set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/win32_sim/RTE/SDL2-2.26.0/x86_64-w64-mingw32/lib/")
+
+
+add_library(LibFirst STATIC IMPORTED)
+add_library(LibSecond STATIC IMPORTED)
+
+
+set_target_properties(LibFirst PROPERTIES IMPORTED_LOCATION "${LIBRARY_PATH}/libSDL2main.a")
+set_target_properties(LibSecond PROPERTIES IMPORTED_LOCATION "${LIBRARY_PATH}/libSDL2.a")
+
+
+
+target_link_libraries(HoneyGUI mingw32 opengl32 LibFirst LibSecond setupapi
+dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi version uuid)
+
+#set(CUSTOM_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/default.ld")
+
+
+#target_link_options(HoneyGUI PRIVATE "-T${CUSTOM_LINKER_SCRIPT}")
+endif()
+
+endif()
+
+
 
 
 

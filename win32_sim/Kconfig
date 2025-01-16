@@ -100,3 +100,8 @@ config LVGL_ARC_2
 endchoice
 
 endmenu
+
+config LIB_MODE
+    bool "Compile as a Library"
+    help
+      Enable this option to compile the project as a library instead of an executable.
