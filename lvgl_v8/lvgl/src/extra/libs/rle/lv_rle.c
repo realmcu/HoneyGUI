@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LV_USE_GPU_RTK_PPE
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
 #include "hal_idu.h"
 #endif
 
@@ -130,7 +130,7 @@ static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *im
 static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height);
 
-#ifdef LV_USE_GPU_RTK_PPE
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
 static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_t width,
                                   uint16_t height);
 #endif
@@ -145,7 +145,7 @@ void lv_rtk_idu_init(void)
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 
-#ifdef LV_USE_GPU_RTK_PPE
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
     uint8_t channel1 = 1, channel2 = 3;
     hal_dma_channel_init(&channel1, &channel2);
 #endif
@@ -213,7 +213,7 @@ static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_
             }
             else if (input_type == ARGB8888)
             {
-                header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+                header->cf = LV_IMG_CF_TRUE_COLOR;
             }
             LV_LOG_INFO("decoder_info RLE %d %d %d", header->w, header->h, header->cf);
             return LV_RES_OK;
@@ -297,7 +297,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
             idu_file_t *file = (idu_file_t *)(rle_data + 8);
             lv_res_t ret;
 
-#ifdef LV_USE_GPU_RTK_PPE
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
             ret = hw_acc_idu_decode(rle_data, img_data, width, height);
 
             if (ret == LV_RES_OK)
@@ -379,7 +379,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
         lv_res_t ret;
 
-#ifdef LV_USE_GPU_RTK_PPE
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
         ret = hw_acc_idu_decode(data, img_data, width, height);
 
         if (ret == LV_RES_OK)
@@ -432,7 +432,11 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 {
     LV_UNUSED(decoder);
-    dsc->img_data = NULL;
+    if (dsc->img_data != NULL)
+    {
+        lv_mem_free(dsc->img_data);
+        dsc->img_data = NULL;
+    }
     if (dsc->user_data)
     {
         lv_mem_free(dsc->user_data);
@@ -475,6 +479,8 @@ static lv_res_t decompress_rle_rgb565_data(const idu_file_t *file, uint8_t *img_
     LV_ASSERT(file != NULL && img_data != NULL);
     LV_ASSERT(width > 0 && height > 0);
 
+#if LV_COLOR_DEPTH == 16
+    // For 16-bit color depth (RGB565), directly use the RGB565 data
     uint16_t *linebuf = (uint16_t *)img_data;
     for (uint32_t y = 0; y < height; y++)
     {
@@ -488,15 +494,75 @@ static lv_res_t decompress_rle_rgb565_data(const idu_file_t *file, uint8_t *img_
             linebuf += node->len;
         }
     }
+#elif LV_COLOR_DEPTH == 24
+    // For 24-bit color depth, convert RGB565 to RGB888
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t y = 0; y < height; y++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[y];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[y + 1];
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_rgb565_node_t *node = (idu_rgb565_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                uint16_t rgb565 = node->pixel16;
+                uint8_t r = (rgb565 >> 11) & 0x1F;
+                uint8_t g = (rgb565 >> 5) & 0x3F;
+                uint8_t b = rgb565 & 0x1F;
+
+                // Convert to RGB888
+                linebuf[i * 3 + 0] = (r << 3) | (r >> 2); // Red
+                linebuf[i * 3 + 1] = (g << 2) | (g >> 4); // Green
+                linebuf[i * 3 + 2] = (b << 3) | (b >> 2); // Blue
+            }
+            addr += sizeof(idu_rgb565_node_t);
+            linebuf += node->len * 3;
+        }
+    }
+#elif LV_COLOR_DEPTH == 32
+    // For 32-bit color depth, convert RGB565 to RGB888 and add a fully opaque alpha channel
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t y = 0; y < height; y++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[y];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[y + 1];
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_rgb565_node_t *node = (idu_rgb565_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                uint16_t rgb565 = node->pixel16;
+                uint8_t r = (rgb565 >> 11) & 0x1F;
+                uint8_t g = (rgb565 >> 5) & 0x3F;
+                uint8_t b = rgb565 & 0x1F;
+
+                // Convert to RGB888 with full opacity in alpha channel
+                linebuf[i * 4 + 0] = (r << 3) | (r >> 2); // Red
+                linebuf[i * 4 + 1] = (g << 2) | (g >> 4); // Green
+                linebuf[i * 4 + 2] = (b << 3) | (b >> 2); // Blue
+                linebuf[i * 4 + 3] = 255;                // Alpha (fully opaque)
+            }
+            addr += sizeof(idu_rgb565_node_t);
+            linebuf += node->len * 4;
+        }
+    }
+#else
+    LV_LOG_ERROR("Unsupported LV_COLOR_DEPTH");
+#endif
 
     return LV_RES_OK;
 }
+
+
 static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height)
 {
     LV_ASSERT(file != NULL && img_data != NULL);
     LV_ASSERT(width > 0 && height > 0);
 
+#if LV_COLOR_DEPTH == 16
+    // For 16-bit color depth (RGB565), directly use the RGB565 part and ignore alpha
     uint8_t *linebuf = (uint8_t *)img_data;
     for (uint32_t line = 0; line < height; line++)
     {
@@ -515,6 +581,62 @@ static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *im
             linebuf += node->len * 3;
         }
     }
+#elif LV_COLOR_DEPTH == 24
+    // For 24-bit color depth, convert RGB565 to RGB888 without alpha
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t line = 0; line < height; line++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_argb8565_node_t *node = (idu_argb8565_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                uint16_t rgb565 = node->pixel;
+                uint8_t r = (rgb565 >> 11) & 0x1F;
+                uint8_t g = (rgb565 >> 5) & 0x3F;
+                uint8_t b = rgb565 & 0x1F;
+
+                // Convert to RGB888
+                linebuf[i * 3 + 0] = (r << 3) | (r >> 2); // Red
+                linebuf[i * 3 + 1] = (g << 2) | (g >> 4); // Green
+                linebuf[i * 3 + 2] = (b << 3) | (b >> 2); // Blue
+            }
+            addr += sizeof(idu_argb8565_node_t);
+            linebuf += node->len * 3;
+        }
+    }
+#elif LV_COLOR_DEPTH == 32
+    // For 32-bit color depth, convert RGB565 to RGB888 and handle alpha channel
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t line = 0; line < height; line++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_argb8565_node_t *node = (idu_argb8565_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                uint16_t rgb565 = node->pixel;
+                uint8_t r = (rgb565 >> 11) & 0x1F;
+                uint8_t g = (rgb565 >> 5) & 0x3F;
+                uint8_t b = rgb565 & 0x1F;
+
+                // Convert to RGB888 and include alpha
+                linebuf[i * 4 + 0] = (r << 3) | (r >> 2); // Red
+                linebuf[i * 4 + 1] = (g << 2) | (g >> 4); // Green
+                linebuf[i * 4 + 2] = (b << 3) | (b >> 2); // Blue
+                linebuf[i * 4 + 3] = node->alpha;         // Alpha
+            }
+            addr += sizeof(idu_argb8565_node_t);
+            linebuf += node->len * 4;
+        }
+    }
+#else
+    LV_LOG_ERROR("Unsupported LV_COLOR_DEPTH");
+#endif
 
     return LV_RES_OK;
 }
@@ -526,26 +648,78 @@ static lv_res_t decompress_rle_rgb888_data(const idu_file_t *file, uint8_t *img_
     LV_ASSERT(file != NULL && img_data != NULL);
     LV_ASSERT(width > 0 && height > 0);
 
-    uint8_t *linebuf = (uint8_t *)img_data;
+#if LV_COLOR_DEPTH == 16
+    // For 16-bit color depth, convert RGB888 to RGB565
+    uint16_t *linebuf = (uint16_t *)img_data;
     for (uint32_t line = 0; line < height; line++)
     {
         uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
         uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
-
 
         for (uint32_t addr = start; addr < end;)
         {
             idu_rgb888_node_t *node = (idu_rgb888_node_t *)(uintptr_t)addr;
             for (uint32_t i = 0; i < node->len; i++)
             {
-                linebuf[i * 3]     = node->pixel_b;
-                linebuf[i * 3 + 1] = node->pixel_g;
-                linebuf[i * 3 + 2] = node->pixel_r;
+                uint8_t r = node->pixel_r;
+                uint8_t g = node->pixel_g;
+                uint8_t b = node->pixel_b;
+
+                // Convert RGB888 to RGB565
+                uint16_t rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+                linebuf[i] = rgb565;
             }
             addr += sizeof(idu_rgb888_node_t);
-            linebuf += node->len * 3;
+            linebuf += node->len;
         }
     }
+#elif LV_COLOR_DEPTH == 24
+    // For 24-bit color depth, directly copy RGB888 data
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t line = 0; line < height; line++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
+
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_rgb888_node_t *node = (idu_rgb888_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                linebuf[0] = node->pixel_r;
+                linebuf[1] = node->pixel_g;
+                linebuf[2] = node->pixel_b;
+                linebuf += 3;
+            }
+            addr += sizeof(idu_rgb888_node_t);
+        }
+    }
+#elif LV_COLOR_DEPTH == 32
+    // For 32-bit color depth, copy RGB888 data and set alpha to fully opaque
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t line = 0; line < height; line++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
+
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_rgb888_node_t *node = (idu_rgb888_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                linebuf[0] = node->pixel_r;
+                linebuf[1] = node->pixel_g;
+                linebuf[2] = node->pixel_b;
+                linebuf[3] = 0xFF; // Alpha channel set to fully opaque
+                linebuf += 4;
+            }
+            addr += sizeof(idu_rgb888_node_t);
+        }
+    }
+#else
+    LV_LOG_ERROR("Unsupported LV_COLOR_DEPTH");
+#endif
+
     return LV_RES_OK;
 }
 
@@ -555,6 +729,8 @@ static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *im
     LV_ASSERT(file != NULL && img_data != NULL);
     LV_ASSERT(width > 0 && height > 0);
 
+#if LV_COLOR_DEPTH == 32
+    // For 32-bit depth, directly copy ARGB8888 data as it's a perfect match
     uint32_t *linebuf = (uint32_t *)img_data;
     for (uint32_t line = 0; line < height; line++)
     {
@@ -570,6 +746,58 @@ static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *im
             linebuf += node->len;
         }
     }
+#elif LV_COLOR_DEPTH == 24
+    // For 24-bit depth, convert ARGB8888 to RGB888, ignoring the alpha channel
+    uint8_t *linebuf = (uint8_t *)img_data;
+    for (uint32_t line = 0; line < height; line++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
+
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_argb8888_node_t *node = (idu_argb8888_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                // Extract RGB components from ARGB8888
+                linebuf[0] = (node->pixel32 >> 16) & 0xFF; // Red
+                linebuf[1] = (node->pixel32 >> 8) & 0xFF;  // Green
+                linebuf[2] = node->pixel32 & 0xFF;         // Blue
+                linebuf += 3;
+            }
+            addr += sizeof(idu_argb8888_node_t);
+        }
+    }
+#elif LV_COLOR_DEPTH == 16
+    // For 16-bit depth, convert ARGB8888 to RGB565, ignoring the alpha channel
+    uint16_t *linebuf = (uint16_t *)img_data;
+    for (uint32_t line = 0; line < height; line++)
+    {
+        uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+        uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
+
+        for (uint32_t addr = start; addr < end;)
+        {
+            idu_argb8888_node_t *node = (idu_argb8888_node_t *)(uintptr_t)addr;
+            for (uint32_t i = 0; i < node->len; i++)
+            {
+                // Extract RGB components from ARGB8888
+                uint8_t r = (node->pixel32 >> 16) & 0xFF;
+                uint8_t g = (node->pixel32 >> 8) & 0xFF;
+                uint8_t b = node->pixel32 & 0xFF;
+
+                // Convert ARGB8888 to RGB565, discarding the alpha channel
+                uint16_t rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+                linebuf[i] = rgb565;
+            }
+            addr += sizeof(idu_argb8888_node_t);
+            linebuf += node->len;
+        }
+    }
+#else
+    LV_LOG_ERROR("Unsupported LV_COLOR_DEPTH");
+#endif
+
     return LV_RES_OK;
 }
 
