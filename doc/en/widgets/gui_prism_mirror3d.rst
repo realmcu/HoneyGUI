@@ -117,7 +117,7 @@ Use the function :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` to add
 
     gui_prism_mirror3d_click_switch_app_add_event(prism_demo, onSwitchAppCallback);
 
-Set size
+Set Size
 ~~~~~~~~
 Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Adjust the scaling factor to suit the requirements of the scene.
 
@@ -132,7 +132,7 @@ Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Ad
 
    gui_prism_mirror3d_set_scale(prism_demo, 1.0f);
 
-Set location
+Set Location
 ~~~~~~~~~~~~~
 Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism model. This function requires x, y. The z-coordinate is used to define the position of the model in 3D space.
 
@@ -149,7 +149,7 @@ Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism m
 
    gui_prism_mirror3d_set_position(prism_demo, 0, 50, 0);
 
-Set orientation
+Set Orientation
 ~~~~~~~~~~~~~~~~
 Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mirror3d_set_rotation_angles`. This feature helps adjust the orientation of the model in the 3D environment.
 
@@ -166,7 +166,7 @@ Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mir
 
    gui_prism_mirror3d_set_rotation_angles(prism_demo, 0, 60, 0);
 
-Set original state
+Set Original State
 ~~~~~~~~~~~~~~~~~~~
 Use the cpp: any function to set the original state of the 3D prism model as :cpp:any:`gui_prism_mirror3d_det_raw_date`. This function sets the initial position, camera position, rotation angle, and scaling ratio of the prism in the 3D world. Usually called immediately after the control is initialized to define the initial display state.
 
@@ -188,7 +188,7 @@ Use the cpp: any function to set the original state of the 3D prism model as :cp
    float raw_camera_position[3] = {0, 5, 60};
    gui_prism_mirror3d_set_raw_state(prism_demo, raw_world_position, raw_camera_position, 0, 0, 0, 13);
 
-Set target status
+Set Target Status
 ~~~~~~~~~~~~~~~~~~
 
 Use the cpp: any function to define the target state that the 3D prism model will achieve in animation or interaction. This feature is particularly suitable for creating smooth transition effects, such as changing from one position to another.
