@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
 #include "hal_idu.h"
 #endif
 
@@ -130,7 +130,7 @@ static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *im
 static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height);
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
 static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_t width,
                                   uint16_t height);
 #endif
@@ -145,7 +145,7 @@ void lv_rtk_idu_init(void)
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
     uint8_t channel1 = 1, channel2 = 3;
     hal_dma_channel_init(&channel1, &channel2);
 #endif
@@ -297,7 +297,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
             idu_file_t *file = (idu_file_t *)(rle_data + 8);
             lv_res_t ret;
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
             ret = hw_acc_idu_decode(rle_data, img_data, width, height);
 
             if (ret == LV_RES_OK)
@@ -379,7 +379,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
         lv_res_t ret;
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_RTK_PPEV2 == 1)
+#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
         ret = hw_acc_idu_decode(data, img_data, width, height);
 
         if (ret == LV_RES_OK)

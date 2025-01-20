@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_GPU_RTK_PPEV2
+#if LV_USE_GPU_PPE_RTL8773E
 #include "../../lv_draw_rect.h"
 #include "../../sw/lv_draw_sw.h"
 #include "lv_draw_ppe_rtl8773e.h"
@@ -38,7 +38,7 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_RTK_PPEV2*/
+#endif /*LV_USE_GPU_PPE_RTL8773E*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

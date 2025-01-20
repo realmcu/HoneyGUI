@@ -28,8 +28,8 @@
 #if LV_USE_GPU_RTK_PPE
 #include "../draw/rtk/ppe/lv_draw_rtk_ppe.h"
 #endif
-#if LV_USE_GPU_RTK_PPEV2
-#include "../draw/rtk/ppev2/lv_draw_rtk_ppe_v2.h"
+#if LV_USE_GPU_PPE_RTL8773E
+#include "../draw/rtk/ppe_rtl8773e/lv_draw_ppe_rtl8773e.h"
 #endif
 
 #if LV_USE_THEME_DEFAULT
@@ -132,7 +132,7 @@ void lv_disp_drv_init(lv_disp_drv_t *driver)
     driver->draw_ctx_init = lv_draw_arm2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_arm2d_ctx_init;
     driver->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
-#elif (LV_USE_GPU_RTK_PPEV2 || LV_USE_GPU_RTK_PPE)
+#elif (0) //(LV_USE_GPU_PPE_RTL8773E || LV_USE_GPU_RTK_PPE)
     driver->draw_ctx_init = lv_draw_ppe_ctx_init;
     driver->draw_ctx_deinit = lv_draw_ppe_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_sw_ctx_t);

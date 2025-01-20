@@ -8,7 +8,7 @@
  *********************/
 
 #include "lvgl.h"
-#if LV_USE_GPU_RTK_PPEV2
+#if LV_USE_GPU_PPE_RTL8773E
 #include "lv_draw_ppe_rtl8773e_utils.h"
 #include "../../../core/lv_refr.h"
 #include "section.h"
@@ -162,4 +162,4 @@ lv_color32_t lv_ppe_toABGR8888(lv_color_t color)
     return ABGR8888_color;
 }
 
-#endif /*LV_USE_GPU_RTK_PPEV2*/
+#endif /*LV_USE_GPU_PPE_RTL8773E*/
