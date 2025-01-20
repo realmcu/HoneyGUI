@@ -2,7 +2,7 @@
 Page
 =====
 
-The page widget is a container widget that allow developers to create a page containing other widgets along the y-axis. After creating a page, various other widgets can be added to it, such as button, image, and more. The page widget can extend beyond the screen display boundaries, and users can access additional controls added to the page by swiping up or down. 
+The page widget is a container widget that allow developers to create a page containing other widgets along the y-axis. After creating a page, various other widgets can be added to it, such as button, image, and more. The page widget can extend beyond the screen display boundaries, and users can access additional widgets added to the page by swiping up or down. 
 
 Usage
 -----

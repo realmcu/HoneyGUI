@@ -9,8 +9,8 @@ In collaboration with LiteGFX, various cool widgets and smart watch faces have b
 Usage
 -----
 
-HoneyGUI has already encapsulated the LiteGFX effect control layer, so there's no need to create and configure
-controls separately. Simply call the effect creation API.
+HoneyGUI has already encapsulated the LiteGFX effect widget layer, so there's no need to create and configure
+widgets separately. Simply call the effect creation API.
 
 To run the LiteGFX effects on the simulator, comment out the macro ``CONFIG_REALTEK_BUILD_GUI_454_454_DEMO``
 in ``menu_config.h`` to disable the default example. Enable the macro ``CONFIG_REALTEK_BUILD_LITE_GFX`` to

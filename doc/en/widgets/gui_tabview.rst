@@ -35,16 +35,19 @@ Developers can use :cpp:any:`gui_tabview_set_style` to set the desired style of 
 
 Set Tabview Loop
 ~~~~~~~~~~~~~~~~~
-The tabview loop function is a clever feature that allows users to easily navigate through all the tabs that have been created. By enabling the reverse loop display function using :cpp:any:`gui_tabview_loop_x` for the x-axis and :cpp:any:`gui_tabview_loop_y` for the y-axis, as shown in Figure-a, you will see a blue outer box indicating the visible area of the screen for the tab control. The direction of the arrow represents the direction of tab switching. When swiping left, once all tabs have moved to the left side of the visible area, another left swipe will cycle back to the leftmost tab that was created. Conversely, as shown in Figure-b, when swiping right again, the display will cycle from the rightmost tab.
+The tabview loop function is a clever feature that allows users to easily navigate through all the tabs that have been created. By enabling the reverse loop display function using :cpp:any:`gui_tabview_loop_x` for the x-axis and :cpp:any:`gui_tabview_loop_y` for the y-axis, as shown in Figure-a, you will see a blue outer box indicating the visible area of the screen for the tab widget. The direction of the arrow represents the direction of tab switching. When swiping left, once all tabs have moved to the left side of the visible area, another left swipe will cycle back to the leftmost tab that was created. Conversely, as shown in Figure-b, when swiping right again, the display will cycle from the rightmost tab.
 
 
-.. figure:: https://foruda.gitee.com/images/1707118586546869079/2d4816ec_10641540.png
+.. figure:: https://foruda.gitee.com/images/1737357436952016270/569e58cc_13408154.png
    :align: center
+   :width: 400px
 
    Figure-a
 
-.. figure:: https://foruda.gitee.com/images/1707118609354334424/c6a664b2_10641540.png
+
+.. figure:: https://foruda.gitee.com/images/1737357500617800758/e845c1e5_13408154.png
    :align: center
+   :width: 400px
 
    Figure-b
 

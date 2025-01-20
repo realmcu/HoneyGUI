@@ -593,11 +593,11 @@ Start with Demo
 
 It is recommended for developers to read and understand the `LVGL Overview <https://docs.lvgl.io/8.3/overview/index.html>`_ and `LVGL Widgets - Base object <https://docs.lvgl.io/8.3/widgets/obj.html>`_ sections before starting development. This will help them grasp the design concepts and logic of LVGL.
 
-LVGL provides a rich set of demos and examples to help developers understand and familiarize themselves with the usage of various controls and features.
+LVGL provides a rich set of demos and examples to help developers understand and familiarize themselves with the usage of various widgets and features.
 
 - The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/demo`. Developers can directly invoke the corresponding :func:`lv_demo_xxx()` function to explore and understand them.
 
-- The online documentation `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ demonstrates the running effects of various examples, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/example`. Developers can directly call the corresponding :func:`lv_example_xxx()` function to familiarize themselves with controls and understand their features.
+- The online documentation `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ demonstrates the running effects of various examples, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/example`. Developers can directly call the corresponding :func:`lv_example_xxx()` function to familiarize themselves with widgets and understand their features.
 
 Resource Converter
 ==========================
@@ -798,7 +798,7 @@ To decode RLE compressed image resources in LVGL, you need to enable the RLE dec
 
 
 .. note::
-- When using the RLE decoder along with ROMFS, the decoder will directly obtain images from the file system, i.e., FLASH, without additional caching.
+   When using the RLE decoder along with ROMFS, the decoder will directly obtain images from the file system, i.e., FLASH, without additional caching.
 
 Font Converter
 ---------------------
@@ -816,7 +816,7 @@ Please refer to the following steps for usage in `LVGL Overview Font - Add a new
 5. Select the font file (TTF/WOFF).
 6. Set the Unicode range of characters to convert, or directly list the characters that need to be converted.
 
-The `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, :func:`lv_example_label_3()` demonstrates how to configure a specific font for a label control. To automatically build font resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
+The `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, :func:`lv_example_label_3()` demonstrates how to configure a specific font for a label widget. To automatically build font resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
 
 LVGL provides built-in fonts, which are saved as arrays in the directory :file:`your HoneyGUI dir/lvgl/src/font/`. Each font file specifies the included characters at the beginning of the file. The built-in fonts include a Chinese font, :file:`lv_font_simsun_16_cjk.c`, which is a CJK (Chinese, Japanese, and Korean) 16px font, but it is a single font size with a limited character set.
 

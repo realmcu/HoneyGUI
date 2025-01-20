@@ -4,7 +4,7 @@
 Card
 ======
 
-Users can create various controls on the card. Before creating the card widget, select create cardview widget.
+Users can create various widgets on the card. Before creating the card widget, select create cardview widget.
 
 Usage
 -----
