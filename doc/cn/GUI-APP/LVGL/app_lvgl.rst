@@ -561,7 +561,7 @@ HoneyGUI 提供 `ROMFS` 文件系统镜像的打包支持：
 
 
 
-LVGL 基准测试
+LVGL Benchmark 测试
 ==========================
 .. <!-- - benchmark 介绍
 .. - 参考指标，意义
@@ -572,7 +572,7 @@ LVGL 基准测试
 LVGL 的 Benchmark 是一个性能测试工具，用于评估 LVGL 库在各种硬件和软件环境下的图形显示性能。通过运行 Benchmark，用户可以获取帧率、渲染速度和内存使用情况等数据，从而帮助优化显示配置和调试性能问题。Benchmark 包括多种测试场景，如图形绘制、动画和文本渲染，每个场景模拟实际应用中的常见操作。用户可以通过这些测试来比较不同配置和平台的性能表现，从而做出针对性的优化调整。
 LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/benchmark/README.md`。
 
-LVGL benchmark 测试
+参考 Benchmark 
 -----------------------------
 
 
