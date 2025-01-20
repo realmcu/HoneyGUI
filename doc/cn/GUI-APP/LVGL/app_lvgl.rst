@@ -651,7 +651,7 @@ LVGL 在线转换工具
    
    颜色格式的说明请参考 `LVGL Overview Images - color format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_
 4. 选择输出图片的类型 (C array/binary file)
-5. 点击转换获取输出文件
+5. 点击 :guilabel:`Convert` 获取输出文件
 
 在文档 `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 

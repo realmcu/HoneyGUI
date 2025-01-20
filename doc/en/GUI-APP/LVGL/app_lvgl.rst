@@ -2,7 +2,7 @@
 Use LVGL Design An Application
 ===============================
 
-Overview
+LVGL introduction
 ==========================
 - `LVGL Website <https://lvgl.io/>`_
 - `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
@@ -529,7 +529,7 @@ HoneyGUI provides support for packaging `ROMFS` file system images:
 
 1. The working directory is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/`. The packaging process requires Python environment support. The external file resources used in the project need to be packaged as a file system image and downloaded as :guilabel:`User Data`.
 
-2. Open the working directory and place the files to be packaged in the :file:`root/` folder. Double-click the :file:`mkromfs_0x4600000.bat` script to generate the file system image :file:`root(0x4600000).bin` and the resource mapping address :file:`resource.h`. The default base address of the files is `0x4600000`. :file:`resource.h` records the mapping address of the packaged files. Since `ROMFS` supports direct access using physical addresses, developers can access the resource files directly through the mapping address.
+2. Open the working directory and place the files to be packaged in the :file:`root/` folder. Double-click the :file:`mkromfs_0x4600000.bat` script to generate the file system image :file:`root(0x4600000).bin` and the resource mapping address :file:`resource.h`. The default :guilabel:`base address` of the files is `0x4600000`. :file:`resource.h` records the mapping address of the packaged files. Since `ROMFS` supports direct access using physical addresses, developers can access the resource files directly through the mapping address.
 
 3. Use the :guilabel:`User Data` feature of the MP Tool to download and burn the file system image to flash. The burn address should match the :guilabel:`base address`. If you need to modify the :guilabel:`base address`, you can modify the **addr** parameter in the :file:`mkromfs_0x4600000.bat` script. For example, the following example changes the :guilabel:`base address` from `0x4600000` to `0x4000000`.
 
@@ -549,7 +549,7 @@ HoneyGUI provides support for packaging `ROMFS` file system images:
 
 
 
-Benchmark
+LVGL Benchmark
 ==========================
 
 LVGL Benchmark is a performance testing tool designed to evaluate the graphical display performance of the LVGL library in various hardware and software environments. By running the Benchmark, users can obtain data on frame rate, rendering speed, and memory usage, helping to optimize display configurations and debug performance issues. The Benchmark includes various test scenarios such as graphical drawing, animations, and text rendering, each simulating common operations in real applications. Users can use these tests to compare the performance of different configurations and platforms, enabling targeted optimization adjustments.
@@ -667,8 +667,8 @@ Compressing Images
 Users can utilize the HoneyGUI Image Convert Tool to convert image resources into RLE-compressed binary file format. For detailed usage steps, please refer to  `HoneyGUI Image Converter - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_:
 
 1. Select the image file to be compressed (supports PNG, JPEG, etc.)
-2. Configure the image conversion parameters: enable :guilabel:`Compress`, choose :guilabel:`Compress Mode` as `RLE`, enable :guilabel:`Color Head`, and select :guilabel:`Color Space` as needed
-3. Click to convert and generate a compressed binary file
+2. Configure the image conversion parameters: enable :guilabel:`Compress`, choose :guilabel:`Compress Mode` as :guilabel:`RLE`, enable :guilabel:`Color Head`, and select :guilabel:`Color Space` as needed
+3. Click to :guilabel:`Convert` and generate a compressed binary file
 
 Importing into LVGL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -797,7 +797,7 @@ To decode RLE compressed image resources in LVGL, you need to enable the RLE dec
     #endif
 
 
-Note:
+.. note::
 - When using the RLE decoder along with ROMFS, the decoder will directly obtain images from the file system, i.e., FLASH, without additional caching.
 
 Font Converter
