@@ -53,6 +53,7 @@ typedef struct
     T_SLIDE_STYLE style;
     gui_vertex_t normal;
     gui_obj_t *shot_obj; // shot
+    gui_obj_t *shot_pave_obj; // shot for TAB_ROTATE_BOOK style
     gui_obj_t *rte_obj; //run time envriment
 } gui_tab_t;
 
@@ -172,6 +173,7 @@ void gui_tab_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
  */
 void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
+void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 #ifdef __cplusplus
 }

@@ -529,7 +529,7 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (this->style == TAB_CUBE)
+    if (this->style == TAB_CUBE || this->style == TAB_ROTATE_BOOK)
     {
         this->enable_pre_load = enable;
     }

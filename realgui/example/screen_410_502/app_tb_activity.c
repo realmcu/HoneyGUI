@@ -44,8 +44,8 @@ static void win_cb(gui_obj_t *obj)
 
 void page_tb_activity(void *parent)
 {
-    // tv = (gui_tabview_t *)(GUI_BASE(parent)->parent->parent);
-
     gui_win_t *win = gui_win_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)win_cb, GUI_BASE(win));
+    extern void activity_app(gui_obj_t *obj);
+    activity_app((gui_obj_t *)win);
 }
