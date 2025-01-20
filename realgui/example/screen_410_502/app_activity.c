@@ -24,6 +24,15 @@ static bool draw_flag = 0;
 static char move_content[30], ex_content[30], stand_content[30];
 
 static gui_text_t *move_text, *ex_text, *stand_text;
+static gui_img_t *img;
+
+void clear_activity(void)
+{
+    move_text = NULL;
+    ex_text = NULL;
+    stand_text = NULL;
+    img = NULL;
+}
 
 static void arc_activity_cb(NVGcontext *vg)
 {
@@ -130,7 +139,7 @@ static void arc_activity_cb(NVGcontext *vg)
     nvgStrokeColor(vg, nvgRGB(117, 230, 229));
     nvgStroke(vg);
     gui_fb_change();
-    gui_log("progress: %f\n", progress);
+    // gui_log("progress: %f\n", progress);
 }
 // cppcheck-suppress syntaxError
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
@@ -147,13 +156,6 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 200, 200, arc_activity_cb, img_data);
         gui_img_set_image_data(this_widget, img_data);
     }
-}
-
-void clear_activity_app(void)
-{
-    move_text = NULL;
-    ex_text = NULL;
-    stand_text = NULL;
 }
 
 void activity_app(gui_obj_t *obj)
@@ -182,7 +184,6 @@ void activity_app(gui_obj_t *obj)
         gui_text_mode_set(stand_text, LEFT);
         // gui_text_convert_to_img(stand_text, RGB565);
     }
-
     {
         int image_h = 200,
             image_w = 200,
@@ -195,8 +196,12 @@ void activity_app(gui_obj_t *obj)
         }
         memset(img_data, 0, buffer_size);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
-        gui_img_t *img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
-                                                 50, 0, 0);
+        if (img)
+        {
+            gui_obj_tree_free(img);
+        }
+        img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
+                                      50, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
     }

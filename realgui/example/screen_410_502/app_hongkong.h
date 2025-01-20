@@ -11,10 +11,8 @@ extern void *get_app_hongkong(void);
 extern void page_tb_clock(void *parent);
 extern void page_tb_activity(void *parent);
 extern void page_tb_heart(void *parent);
-extern void page_tb_blood(void *parent);
 extern void page_tb_weather(void *parent);
 extern void page_tb_music(void *parent);
-extern void page_tb_cube(void *parent);
 
 #ifdef __cplusplus
 }

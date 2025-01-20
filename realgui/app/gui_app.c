@@ -13,6 +13,7 @@
 gui_app_t *current_app;
 gui_app_t *next_app;
 static bool app_layer;
+static void app_shutdown(gui_app_t *app);
 void gui_app_layer_top()
 {
     app_layer = true;
@@ -43,7 +44,7 @@ static void dtor(void *this)
 {
     GUI_ASSERT(this != NULL);
 }
-#define GUI_APP_MAX UINT8_MAX
+#define GUI_APP_MAX 32
 static gui_app_t *app_array[GUI_APP_MAX];
 static int app_array_count;
 void gui_app_append(gui_app_t *app)
@@ -96,8 +97,16 @@ void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry)
 #define APP_TRANSITION_DURATION_MS 1000
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_transition_animation_function);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function_custom);
 void gui_app_startup(gui_app_t *app)
 {
+    app->close_sync = 0;
+    if (current_app == app)
+    {
+        app_shutdown(current_app);
+        current_app = 0;
+    }
+
     gui_list_init(&app->screen.child_list);
     gui_list_init(&app->screen.brother_list);
     app->screen.opacity_value = UINT8_MAX;
@@ -122,6 +131,16 @@ void gui_app_startup(gui_app_t *app)
             gui_win_set_animate(win, APP_TRANSITION_DURATION_MS, 0,  app_transition_animation_function, app);
         }
     }
+    else if (app->startup_animation || app->shutdown_animation)
+    {
+        gui_win_t *win = gui_win_create(&(app->screen), APP_WINDOW_NAME, 0, 0, 0, 0);
+        app->window = win;
+        if (app->startup_animation)
+        {
+            gui_win_set_animate(win, APP_TRANSITION_DURATION_MS, 0,  app->startup_animation, app);
+        }
+    }
+
 
 
     app->ui_design(app);
@@ -150,6 +169,7 @@ static void app_shutdown(gui_app_t *app)
     if (app->next)
     {
         app->close = true;
+        app->next = false;
         gui_log("app_shutdown async\n");
     }
     else
@@ -176,6 +196,7 @@ static void app_shutdown(gui_app_t *app)
 }
 void gui_app_shutdown(gui_app_t *app)
 {
+    app->close_sync = 0;
     if (app->shutdown_animation_flag != GUI_APP_ANIMATION_NULL)
     {
         if (app->window != GUI_TYPE(gui_win_t, &(app->screen)))
@@ -190,7 +211,22 @@ void gui_app_shutdown(gui_app_t *app)
         }
 
     }
+    else if (app->shutdown_animation)
+    {
+        if (app->window != GUI_TYPE(gui_win_t, &(app->screen)))
+        {
+            gui_win_append_animate(app->window, APP_TRANSITION_DURATION_MS, 0,
+                                   app->shutdown_animation, app, "customShutdowm");
+            gui_win_append_animate(app->window, APP_TRANSITION_DURATION_MS, 0,
+                                   app_shutdowm_transition_animation_function_custom, app, "customShutdowm");
+            return;
+        }
+        else
+        {
+            gui_log("[APP ANIMATION]Please use GUI_APP_DEFINE_NAME_ANIMATION_FUNC_CUSTOM to make a APP");
+        }
 
+    }
     app_shutdown(app);
 
 }
@@ -206,12 +242,16 @@ gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_e
     return app;
 }
 
-void gui_switch_app(gui_app_t *from, gui_app_t *to)
+void gui_app_switch(gui_app_t *from, gui_app_t *to)
 {
+    if (from == NULL)
+    {
+        from = current_app;
+    }
     gui_app_shutdown(from);
 
     gui_app_startup(to);
-    gui_log("gui_switch_app from %s to %s\n", from->screen.name, to->screen.name);
+    gui_log("gui_app_switch from %s to %s\n", from->screen.name, to->screen.name);
 }
 
 void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms)
@@ -494,7 +534,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_transition_animation_function)
     gui_app_t *app = p;
     gui_app_animation_t flag = app->startup_animation_flag;
     gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
-    float pro = gui_win_get_animation_progress_percent(win); gui_log("%f\n", pro);
+    float pro = gui_win_get_animation_progress_percent(win); gui_log("startup%f\n", pro);
     gui_error_t e = animation_case(flag, app, win, pro);
     if (e == GUI_SUCCESS)
     {
@@ -515,7 +555,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_
     gui_app_t *app = p;
     gui_app_animation_t flag = app->shutdown_animation_flag;
     gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
-    float pro = gui_win_get_animation_progress_percent(win); gui_log("%f\n", pro);
+    float pro = gui_win_get_animation_progress_percent(win); gui_log("shutdowm%f\n", pro);
     gui_error_t e = animation_case(flag, app, win, pro);
     if (e == GUI_SUCCESS)
     {
@@ -530,5 +570,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_
     else
     {
         return;
+    }
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(app_shutdowm_transition_animation_function_custom)
+{
+    gui_app_t *app = p;
+    if (animate->end_frame)
+    {
+        app_shutdown(app);
     }
 }

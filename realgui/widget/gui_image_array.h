@@ -106,8 +106,23 @@ gui_image_array_t *gui_image_array_create(void *parent,
                                           void **image_data_array,
                                           int array_lenght,
                                           const char *widget_name);
-
-
+/**
+ * @brief image array create (ftl address mode)
+ *
+ * @param parent parent widget
+ * @param x left
+ * @param y top
+ * @param image_data_array  image_data_array (ftl address mode)
+ * @param array_lenght  array_lenght
+ * @param name  widget name
+ * @return gui_image_array_t* widget pointer
+ */
+gui_image_array_t *gui_image_array_create_ftl(void *parent,
+                                              int16_t x,
+                                              int16_t y,
+                                              void **image_data_array,
+                                              int array_lenght,
+                                              const char *widget_name);
 
 #ifdef __cplusplus
 }

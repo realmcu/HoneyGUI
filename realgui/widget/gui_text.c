@@ -20,6 +20,7 @@
 #include "gui_text.h"
 #include "gui_matrix.h"
 #include "font_mem.h"
+#include "font_ttf.h"
 #include "font_stb.h"
 #include "font_mem_img.h"
 #include "font_mem_matrix.h"
@@ -107,6 +108,11 @@ static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 #endif
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_ttf_load(text, rect);
+        }
+        break;
 
     default:
         break;
@@ -155,6 +161,11 @@ static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 #endif
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_ttf_draw(text, rect);
+        }
+        break;
 
     default:
         break;
@@ -196,6 +207,11 @@ static void gui_text_font_unload(gui_text_t *text)
         }
         break;
 #endif
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_ttf_unload(text);
+        }
+        break;
 
     default:
         break;
@@ -236,6 +252,12 @@ static void gui_text_font_destory(gui_text_t *text)
         break;
 
     case GUI_FONT_SRC_FT:
+        {
+
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
         {
 
         }
@@ -306,9 +328,7 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         return;
     }
-    /*Temp fix text missing bug, when parent's opacity_value<255*/
-    this->color.color.rgba.a =  this->base.parent->opacity_value;
-    //this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
+
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
@@ -381,6 +401,10 @@ static void gui_text_draw(gui_obj_t *obj)
     if (dc->section_count == 0)
     {
         gui_text_font_load(text, &draw_rect);
+    }
+    if (text->font_type == GUI_FONT_SRC_TTF)
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
     }
 
     if (dc->pfb_type == PFB_X_DIRECTION)
@@ -479,6 +503,7 @@ void gui_text_ctor(gui_text_t *this,
     this->font_mode = FONT_SRC_MEMADDR;
     this->content_refresh = false;
     this->layout_refresh = false;
+    this->rendermode = 2;
 }
 
 /*============================================================================*
@@ -536,6 +561,28 @@ void gui_text_input_set(gui_text_t *this, bool inputable)
 void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)
 {
     this->wordwrap = wordwrap;
+}
+
+void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)
+{
+    switch (rendermode)
+    {
+    case 1:
+        this->rendermode = 0;
+        break;
+    case 2:
+        this->rendermode = 1;
+        break;
+    case 4:
+        this->rendermode = 2;
+        break;
+    case 8:
+        this->rendermode = 3;
+        break;
+
+    default:
+        break;
+    };
 }
 
 void gui_text_set_min_scale(gui_text_t *this, float min_scale)

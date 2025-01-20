@@ -19,7 +19,7 @@ extern "C" {
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
 #else
-#include "lvgl_v9/lvgl.h"
+#include "lvgl.h"
 #endif
 
 /*********************

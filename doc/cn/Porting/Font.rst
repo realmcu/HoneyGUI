@@ -1,8 +1,8 @@
 .. _Font_Porting_CN:
 
-=======
+========
 字库移植
-=======
+========
 
 本章节会解析字库部分代码，并介绍如何使用开发者的字库替换替换HoneyGUI的原生字库，或者加入定制化功能。
 
@@ -15,7 +15,8 @@
 文本编码转换
 ^^^^^^^^^^^^
 
-在文件 ``font_mem.c`` ，函数 ``gui_font_get_dot_info`` 中，``process_content_by_charset`` 会解析文本控件的文本内容，并保存为unicode(UTF-32)储存到 ``unicode_buf`` ，Unicode数量作为返回值输入 ``unicode_len`` 。
+在文件 ``font_mem.c`` ，函数 :cpp:any:`gui_font_get_dot_info` 中，:cpp:any:`process_content_by_charset` 会解析文本控件的文本内容，
+并保存为unicode(UTF-32)储存到 ``unicode_buf`` ，Unicode数量作为返回值输入 ``unicode_len`` 。
 
 .. code-block:: c
 
@@ -29,7 +30,7 @@
         return;
     }
 
-``process_content_by_charset`` 的具体实现请查阅 ``draw_font.c`` 。
+:cpp:any:`process_content_by_charset` 的具体实现请查阅 ``draw_font.c`` 。
 
 .. note::
 
@@ -46,7 +47,7 @@
 字库索引
 ^^^^^^^^
 
-在文件 ``font_mem.c`` ，函数 ``gui_font_get_dot_info`` 中，解析得到 Unicode 之后，会使用 Unicode 去文本控件指定的字库中索引字形信息。
+在文件 ``font_mem.c`` ，函数 :cpp:any:`gui_font_get_dot_info` 中，解析得到 Unicode 之后，会使用 Unicode 去文本控件指定的字库中索引字形信息。
 
 由于字库工具具有 ``crop`` 属性，以及两种索引模式，因此在使用unicode在字库文件中寻找文本数据以及点阵数据时，使用了不同的解析代码。
 
@@ -90,9 +91,9 @@
 排版
 ~~~~
 
-文本控件支持多种不同的排版模式。 详见 `文本模式 <#Text_Widget_Mode_CN>`_ 。
+文本控件支持多种不同的排版模式。
 
-具体的排版功能在文件 ``font_mem.c`` 的函数 ``gui_font_mem_layout`` 中，每种排版模式具有不同的排版逻辑，但是都依赖于字形信息 ``chr`` 和文本控件提供的边框信息 ``rect`` 。
+具体的排版功能在文件 ``font_mem.c`` 的函数 :cpp:any:`gui_font_mem_layout` 中，每种排版模式具有不同的排版逻辑，但是都依赖于字形信息 ``chr`` 和文本控件提供的边框信息 ``rect`` 。
 
 ``rect`` 结构体数组结构如下：
 
@@ -102,22 +103,32 @@
    :end-before: /** @brief  text rect struct end */
 
 ``rect`` 为控件层传入的控件显示范围，其中 ``x1`` 和 ``x2`` 分别代表左边框和右边框的X坐标， ``y1`` 和 ``y2`` 分别代表上边框和下边框的Y坐标，其数值是内部控件计算生成，依赖控件创建时的位置和大小。
+
 通过 ``rect`` 的四个坐标计算出 ``rect_w`` 和 ``rect_h`` 。
+
 四组 ``bound`` 值是滚动文本控件 ``scroll_text`` 用来处理显示边界的，文本控件 ``text`` 暂时没有使用。
 
 开发者可以根据需求，添加新的排版模式。
 
-通过 ``gui_text_wordwrap_set`` 使能了英文单词换行功能（``wordwrap``）后，多行排版会增加英文单词的换行规则，防止英文单词的截断。
+通过 :cpp:any:`gui_text_wordwrap_set` 使能了英文单词换行功能（``wordwrap``）后，多行排版会增加英文单词的换行规则，防止英文单词的截断。
 
 字符绘制
 ~~~~~~~~~
 
-点阵字符的绘制代码位于 ``font_mem.c`` 中的 ``rtk_draw_unicode`` 中。
-可以指定文本控件开启矩阵运算功能以适配文本缩放效果，这部分字符的绘制代码位于 ``font_mem_matrix.c`` 中的 ``rtk_draw_unicode_matrix`` 中。
-可以指定文本控件开启转图片功能，将文本转化成图片，可以实现复杂特效，这部分字符的绘制代码位于 ``font_mem_img.c`` 中的 ``gui_font_bmp2img_one_char`` 中。
+点阵字符的绘制代码位于 ``font_mem.c`` 中的 :cpp:any:`rtk_draw_unicode` 中。
+
+可以指定文本控件开启矩阵运算功能以适配文本缩放效果，这部分字符的绘制代码位于 ``font_mem_matrix.c`` 中的 :cpp:any:`rtk_draw_unicode_matrix` 中。
+
+可以指定文本控件开启转图片功能，将文本转化成图片，可以实现复杂特效，这部分字符的绘制代码位于 ``font_mem_img.c`` 中的 :cpp:any:`gui_font_bmp2img_one_char` 中。
 
 字符绘制阶段不涉及任何排版信息，只会读取字形信息，并绘制到屏幕缓存中。
 
 每个字的绘制都会使用控件边框、屏幕的边框以及当前字符的边框三重限制绘制区域。
 
 如果开发者想要使用特殊的字库进行绘制，需要修改点阵数据解析代码，并将像素绘制到屏幕缓存中。
+
+API
+---
+
+.. doxygenfile:: font_mem.h
+.. doxygenfile:: draw_font.h

@@ -22,7 +22,7 @@ typedef struct
     unsigned int *texture_sizes;
     unsigned char **textures;
 
-} gui_3d_description_t;
+} gui_description_t;
 
 
 void loadFile(void *ctx, const char *filename, const int is_mtl, const char *obj_filename,
@@ -176,7 +176,7 @@ void write_string(FILE *file, const char *string)
     }
 }
 
-void save_desc_to_binary_file(gui_3d_description_t *desc, const char *filename)
+void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
 {
     FILE *file = fopen(filename, "wb");
     if (!file)
@@ -321,7 +321,7 @@ int main(int argc, char **argv)
     }
 
     const char *obj_filename = argv[1];
-    gui_3d_description_t *desc = malloc(sizeof(gui_3d_description_t));
+    gui_description_t *desc = malloc(sizeof(gui_description_t));
 
     tinyobj_parse_obj(&desc->attrib, &desc->shapes, &desc->num_shapes, &desc->materials,
                       &desc->num_materials, obj_filename, loadFile, NULL, 0);

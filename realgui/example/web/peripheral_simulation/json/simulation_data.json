@@ -1,9 +1,11 @@
 {
     "weather": [
         {
+            "range_min": 18,
+            "range_max": 37,
             "low": 18,
-            "high": 28,
-            "cur": 24,
+            "high": 29,
+            "current": 25,
             "condition_1": "Cloudy",
             "condition_2": "Cloudy",
             "condition_3": "Cloudy",
@@ -13,22 +15,30 @@
     ],
     "compass": [
         {
-            "degree": 121
+            "degree": 90
         }
     ],
     "activity": [
         {
-            "move": 8677,
-            "ex": 10,
-            "stand": 19
+            "move_max": 20000,
+            "exercise_max": 60,
+            "stand_max": 30,
+            "move": 10000,
+            "exercise": 30,
+            "stand": 12
         }
     ],
     "heart_rate": [
         {
-            "AM12": 91,
-            "AM6": 86,
+            "range_min": 40,
+            "range_max": 160,
+            "AM12": 70,
+            "AM6": 70,
             "PM12": 70,
-            "PM6": 70
+            "PM6": 70,
+            "array": [
+                0
+            ]
         }
     ]
 }

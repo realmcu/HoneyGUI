@@ -9,7 +9,7 @@ Usage
 
 Create Widget
 ~~~~~~~~~~~~~~
-To reate a new watchface gradient widget, you can call the function :cpp:any:`gui_watchface_gradient_create` to achieve it.
+To create a new watchface gradient widget, you can call the function :cpp:any:`gui_watchface_gradient_create` to achieve it.
 
 Example
 --------

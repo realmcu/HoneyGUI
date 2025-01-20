@@ -401,7 +401,7 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
                 }
                 {
                     const char *text = ":";
-                    gui_text_t *t = gui_text_create(timer, TIMER_TEXT_NAME4, 330, Y_OFFSET, width, TEXT_SZIE);
+                    gui_text_t *t = gui_text_create(timer, TIMER_TEXT_NAME5, 330, Y_OFFSET, width, TEXT_SZIE);
                     gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), FONT_SIZE);
                     const void *addr1 = FONT;
                     gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);

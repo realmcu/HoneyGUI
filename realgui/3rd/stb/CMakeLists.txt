@@ -1,4 +1,3 @@
-
 set(sources_name gui_3rd_common_sources)
 set(headers_name gui_3rd_common_headers)
 
@@ -20,4 +19,3 @@ foreach(ITEM ${${sources_name}})
    message(${ITEM})
 endforeach()
 endif()
-

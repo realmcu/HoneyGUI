@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "gui_server.h"
 #include "gui_win.h"
 #include "gui_tab.h"
 #include "def_event.h"

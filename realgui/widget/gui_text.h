@@ -39,7 +39,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  text mode enum start */
+/* TEXT_MODE start */
 typedef enum
 {
     /* TOP */
@@ -62,17 +62,17 @@ typedef enum
     VERTICAL_LEFT      = 0x40,
     VERTICAL_RIGHT     = 0x41,
 } TEXT_MODE;
-/** @brief  text mode enum end */
+/* TEXT_MODE end */
 
 /** @brief  font type enum */
 typedef enum
 {
     GUI_FONT_SRC_BMP = 0,
     GUI_FONT_SRC_STB = 1,
-    GUI_FONT_SRC_TTF = 1,
     GUI_FONT_SRC_IMG = 2,
     GUI_FONT_SRC_MAT = 3,
     GUI_FONT_SRC_FT  = 4,
+    GUI_FONT_SRC_TTF = 5,
 } FONT_SRC_TYPE;
 
 typedef enum
@@ -125,6 +125,7 @@ typedef struct gui_text
     uint8_t ispasswd      : 1;
     uint8_t wordwrap      : 1;
     uint8_t scope         : 1;
+    uint8_t rendermode    : 2;
 } gui_text_t;
 
 /** @brief  text line structure */
@@ -221,12 +222,20 @@ void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 void gui_text_input_set(gui_text_t *this_widget, bool inputable);
 
 /**
- * @brief By setting wordwrap to enable English word wrapping..
+ * @brief By setting wordwrap to enable English word wrapping.
  *
  * @param this_widget the text box widget pointer.
  * @param wordwrap wordwrap.
  */
 void gui_text_wordwrap_set(gui_text_t *this_widget, bool wordwrap);
+
+/**
+ * @brief Set ttf raster render mode.
+ *
+ * @param this_widget the text box widget pointer.
+ * @param rendermode rendermode.1/2/4/8
+ */
+void gui_text_rendermode_set(gui_text_t *this_widget, uint8_t rendermode);
 
 /**
  * @brief set text min scale.

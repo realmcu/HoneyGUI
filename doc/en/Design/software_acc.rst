@@ -106,10 +106,11 @@ The following flow describes the cover mode process for No RLE compressed image.
 
 .. figure:: https://foruda.gitee.com/images/1726135750546602965/e70749d0_13671125.png
        :align: center
-       :withd: 800px
+       :width: 800px
        :name: Cover_mode_path
         
        Cover Mode Path
+
 - If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
 - The dc_bytes_per_pixel is pixel bytes of  display device, calculated as dc->bit_depth >> 3, where bit_depth is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
 
@@ -423,6 +424,7 @@ The following flowchart describes the process of writing compressed images to a 
 - If the opacity_value is 0, the image is not displayed and the process is break.
 - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
 - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+
 RLE Filter Matrix
 ~~~~~~~~~~~~~~~~~~
 
@@ -507,7 +509,7 @@ Support Input Type and Output Type
 .. csv-table:: 
   :header: Input type, Output type
   :stub-columns: 1
-  :align: left
+  :align: center
   :name: Image source input/output type
 
   RGB565, RGB565

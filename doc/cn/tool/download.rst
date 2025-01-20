@@ -11,7 +11,7 @@ MP Tool支持调试模式和批量生产模式，集成了打包和flash map生�
 ------------
 在MP Tool启动界面选择芯片类型和语言，以RTL8762G为例。
 
-.. figure:: https://foruda.gitee.com/images/1727331633078866623/859a389b_13408154.png
+.. figure:: https://foruda.gitee.com/images/1735624989517380575/77a119ab_13408154.png
    :width: 800px
    :align: center
 

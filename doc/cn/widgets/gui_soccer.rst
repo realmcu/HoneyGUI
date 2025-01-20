@@ -38,13 +38,73 @@
 
    #include "gui_app.h"
    #include "gui_soccer.h"
-   #include "green_hexagon.txt"
+   #include "ui_resource.h"
 
-   static void app_dialing_ui_design(gui_app_t *app)
+   uint32_t *gui_soccer_array[] =
    {
-       gui_soccer_t *soccer = gui_soccer_create(&(app->screen), "soccer", (void *)_acgreen_hexagon, 0, 0);
-       // gui_soccer_set_size(soccer, 80);
-       gui_soccer_set_center(soccer, 240, 240);
+      SOCCER_P0001_CALL_BIN,
+      SOCCER_P0002_SPORTS_BIN,
+      SOCCER_P0003_HEARTRATE_BIN,
+      SOCCER_P0004_SLEEP_BIN,
+      SOCCER_P0005_WEATHER_BIN,
+      SOCCER_P0006_ACTIVITIES_BIN,
+      SOCCER_P0007_STRESS_BIN,
+      SOCCER_P0008_SPO2_BIN,
+      SOCCER_P0009_MUSIC_BIN,
+      SOCCER_P0010_VOICE_BIN,
+      SOCCER_P0011_NOTIFICATION_BIN,
+      SOCCER_P0012_SETTINGS_BIN,
+      SOCCER_P0013_SPORT_CORECD_BIN,
+      SOCCER_P0014_MEASURE_BIN,
+      SOCCER_P0015_MOOD_BIN,
+      SOCCER_P0016_BREATHE_BIN,
+      SOCCER_P0017_ALARM_BIN,
+      SOCCER_P0018_PERIOD_BIN,
+      SOCCER_P0019_HOME_BIN,
+      SOCCER_P0020_MORE_BIN,
+   };
+   static void app_call_ui_design(gui_app_t *app);
+   static gui_app_t app_call =
+   {
+      .screen =
+      {
+         .name = "app_call",
+         .x    = 0,
+         .y    = 0,
+      },
+      .ui_design = app_call_ui_design,
+      .active_ms = 1000 * 5,
+   };
+
+   gui_app_t *get_call_app(void)
+   {
+      return &app_call;
+   }
+   static void app_call_ui_design(gui_app_t *app)
+   {
+      gui_img_create_from_mem(&(app->screen), "call", SOCCER_P0001_CALL_BIN, 100, 100, 100, 100);
+   }
+   static void app_soccer_cb(void *obj, gui_event_t e, void *param)
+   {
+      gui_soccer_t *soccer = (gui_soccer_t *)obj;
+      int index = soccer->press_face;
+      switch (soccer->press_face)
+      {
+      case 0:
+         gui_switch_app(gui_current_app(), get_call_app());
+         break;
+      default:
+         break;
+      }
+   }
+   GUI_APP_ENTRY(APP_SOCCER)
+   {
+      gui_soccer_t *soccer = gui_soccer_create(&(app->screen), "soccer", gui_soccer_array, 0, 0);
+      gui_soccer_set_center(soccer, 227, 227);
+      gui_soccer_on_click(soccer, app_soccer_cb, NULL);
+
+      gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                        sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
    }
 
 

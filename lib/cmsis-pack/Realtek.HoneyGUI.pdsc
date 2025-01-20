@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package schemaVersion="1.7.37" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
+
+  <!-- Package Information -->
+  <vendor>Realtek</vendor>
+  <name>HoneyGUI</name>
+  <description>A simple example CMSIS package for HoneyGUI.</description>
+  <url>https://docs.realmcu.com/gui/en/latest/index.html/</url>
+  <license>LICENSE</license>
+  
+  <!-- Keywords -->
+  <keywords>
+    <keyword>CMSIS</keyword>
+    <keyword>GUI</keyword>
+    <keyword>HoneyGUI</keyword>
+  </keywords>
+
+  <!-- Releases -->
+  <releases>
+	<release date="2024-12-08" version="2.0.2" tag="v2.0.2" url="https://docs.realmcu.com/gui/en/latest/index.html">
+      - Something About HoneyGUI
+    </release>
+  </releases>
+
+  <!-- Components -->
+  <components>
+    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="core" Csub="test" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+	    <description>HoneyGUI core code, must.</description>
+      <files>
+		    <file category="header"         name="test.h"/>
+        <file category="sourceC"         name="test.c"/>
+      </files>
+    </component>
+    <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="demo" Csub="test" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">
+	    <description>HoneyGUI example code, optional.</description>
+      <files>
+		    <file category="header"         name="test.h"/>
+        <file category="sourceC"         name="test.c"/>
+      </files>
+    </component>
+  </components>
+
+  <!-- Conditions -->
+  <!-- Verify and reposition or restructure as required by the specification -->
+  <conditions>
+    <condition id="SomeConditionId"/>
+  </conditions>
+
+</package>

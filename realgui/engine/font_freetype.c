@@ -205,9 +205,6 @@ void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
-    uint32_t width = bitmap.width;
-    uint32_t rows = bitmap.rows;
-    uint8_t *buffer = bitmap.buffer;
     int x_start = slot->bitmap_left;
     int y_start = text->font_height - slot->bitmap_top;
 
@@ -226,7 +223,6 @@ void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
         GUI_ASSERT(error == 0)                          /* error handling omitted */
 
         x_start = slot->bitmap_left + rect->x1;
-        x_start += bitmap.width;
         y_start = text->font_height - slot->bitmap_top + rect->y1;
 
         font_ft_draw_bitmap(text, &slot->bitmap, rect, x_start, y_start);

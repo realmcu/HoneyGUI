@@ -14,7 +14,6 @@ SrcRemove(src,'app_dashboard_480_272.c')
 SrcRemove(src,'app_dashboard_800_400.c')
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_800_480']
-print(CPPPATH)
 
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_800_480_DEMO']

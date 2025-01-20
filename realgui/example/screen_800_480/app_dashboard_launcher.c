@@ -80,9 +80,9 @@ void app_dashboard_launcher_update_thread(void *this)
 #ifdef CONFIG_REALTEK_BUILD_LVGL_GUI
 static void kb_button_cb(void *obj, gui_event_t e)
 {
-    gui_log("gui_switch_app_to lvgl line = %d \n", __LINE__);
+    gui_log("gui_app_switch_to lvgl line = %d \n", __LINE__);
     extern gui_app_t *get_app_lvgl(void);
-    gui_switch_app(gui_current_app(), get_app_lvgl());
+    gui_app_switch(gui_current_app(), get_app_lvgl());
 }
 #endif
 void app_dashboard_launcher_ui_design(gui_app_t *app)

@@ -28,18 +28,20 @@ ci_check_config = {
     "ignore_file_encoding":[
         r"win32_sim/RTE/",
         r"realgui/3rd/",
-        r"lvgl/",
+        r"lvgl_v8/",
         r"lvgl_v9/",
         r"realgui/example/screen_454_454",
         r"realgui/example/screen_320_385",
         r"doc/cn",
         r"doc/en/_templates/",
-        r"menu_config_win.py"
+        r"menu_config_win.py",
+        r"README.md",
+        r"README_zh.md"
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",
         r"realgui/3rd/",
-        r"lvgl/",
+        r"lvgl_v8/",
         r"lvgl_v9/",
     ],
     "commit_version_check": {

@@ -28,7 +28,6 @@ CPPPATH += [cwd + '\\gui_contacts']
 CPPPATH += [cwd + '\\gui_player']
 CPPPATH += [cwd + '\\gui_record']
 CPPPATH += [cwd + '\\gui_watchface']
-print(CPPPATH)
 
 
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'):

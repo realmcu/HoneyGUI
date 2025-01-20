@@ -556,7 +556,7 @@ extern char *defaultPath;
 #define GUI_SUCCESS (gui_error_t)0
 typedef int gui_error_t;
 #define GUI_MAGIC_NUMBER 0x0b
-#define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT((obj&&GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
+#define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT(obj != NULL);GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
 /**
  * @brief Macro to retrieve a GUI widget pointer by its name.
  *

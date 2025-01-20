@@ -56,46 +56,38 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
-    uint8_t opacity = image ->opacity_value;
-    char img_type = head->type;
-    gui_matrix_t *matrix = &image->matrix;
-    bool identity = false;
-    if (
-        (matrix->m[0][0] == 1) && \
-        (matrix->m[1][1] == 1) && \
-        (matrix->m[2][2] == 1) && \
-        (matrix->m[0][1] == 0) && \
-        (matrix->m[1][0] == 0) && \
-        (matrix->m[2][0] == 0) && \
-        (matrix->m[2][1] == 0)
-    )
-    {
-        identity = true;
-    }
+    uint8_t opacity = image->opacity_value;
 
-    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565) && (opacity == 255) &&
-        (rect == NULL))
+    bool identity = (image->matrix.m[0][0] == 1) &&
+                    (image->matrix.m[1][1] == 1) &&
+                    (image->matrix.m[2][2] == 1) &&
+                    (image->matrix.m[0][1] == 0) &&
+                    (image->matrix.m[1][0] == 0) &&
+                    (image->matrix.m[2][0] == 0) &&
+                    (image->matrix.m[2][1] == 0);
+
+    if ((dc_bytes_per_pixel == 2) && identity && (head->type == RGB565) &&
+        (opacity == 255) && (rect == NULL))
     {
-        if (image->blend_mode == IMG_COVER_MODE)
+        switch (image->blend_mode)
         {
+        case IMG_COVER_MODE:
             cover_blit_2_rgb565(image, dc, rect);
             return;
-        }
-        else if (image->blend_mode == IMG_BYPASS_MODE)
-        {
+        case IMG_BYPASS_MODE:
             bypass_blit_2_rgb565(image, dc, rect);
             return;
-        }
-        else if (image->blend_mode == IMG_FILTER_BLACK)
-        {
+        case IMG_FILTER_BLACK:
             filter_blit_2_rgb565(image, dc, rect);
             return;
+        default:
+            break;
         }
     }
 
     do_raster_no_rle(image, dc, rect);
-    return;
 }
+
 
 
 

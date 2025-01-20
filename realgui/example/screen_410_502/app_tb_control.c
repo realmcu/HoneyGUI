@@ -8,13 +8,26 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include <gui_app.h>
+#include "kb_algo.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 
+typedef struct switch_state
+{
+    uint8_t sw_1 : 1;
+    uint8_t sw_2 : 1;
+    uint8_t sw_3 : 1;
+    uint8_t sw_4 : 1;
+    uint8_t sw_5 : 1;
+} switch_state_t;
+
+static switch_state_t sw_state = {0};
 static gui_img_t *img_phone, *img_nobother, *img_mute;
 static gui_win_t *win_control_enter, *win_control;
 static bool enter_flag = 0;
+static gui_switch_t *sw_lte, *sw_wifi, *sw_phone, *sw_mute, *sw_nobother;
+
 
 static void callback_phone_on(void *obj, gui_event_t e, void *param)
 {
@@ -48,7 +61,7 @@ static void win_cb()
     // enter animation
     if (!enter_flag)
     {
-        if (obj->x > 80)
+        if (obj->x > 100)
         {
             obj->x = (1 - progress) * SCREEN_WIDTH;
         }
@@ -58,6 +71,11 @@ static void win_cb()
             enter_flag = 1;
         }
     }
+    sw_state.sw_1 = sw_lte->ifon;
+    sw_state.sw_2 = sw_wifi->ifon;
+    sw_state.sw_3 = sw_phone->ifon;
+    sw_state.sw_4 = sw_mute->ifon;
+    sw_state.sw_5 = sw_nobother->ifon;
 }
 
 static void page_tb_control(gui_obj_t *parent)
@@ -68,6 +86,27 @@ static void page_tb_control(gui_obj_t *parent)
     // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(win_control), NULL, 0, 0,
                                                             SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+
+    //switch
+    sw_lte = gui_switch_create(win_control, 20, 100, 182, 121, CONTROL_LTE_OFF_BIN,
+                               CONTROL_LTE_ON_BIN);
+    sw_wifi = gui_switch_create(win_control, 207, 100, 182, 121, CONTROL_WIFI_OFF_BIN,
+                                CONTROL_WIFI_ON_BIN);
+    sw_phone = gui_switch_create(win_control, 20, 100 + 125 * 1, 182, 121,
+                                 CONTROL_PHONE_OFF_BIN,
+                                 CONTROL_PHONE_ON_BIN);
+    sw_mute = gui_switch_create(win_control, 20, 100 + 125 * 2, 182, 121,
+                                CONTROL_MUTE_OFF_BIN,
+                                CONTROL_MUTE_ON_BIN);
+    sw_nobother = gui_switch_create(win_control, 207, 100 + 125 * 2, 182, 121,
+                                    CONTROL_NOBOTHER_OFF_BIN,
+                                    CONTROL_NOBOTHER_ON_BIN);
+    gui_switch_change_state(sw_lte, sw_state.sw_1);
+    gui_switch_change_state(sw_wifi, sw_state.sw_2);
+    gui_switch_change_state(sw_phone, sw_state.sw_3);
+    gui_switch_change_state(sw_mute, sw_state.sw_4);
+    gui_switch_change_state(sw_nobother, sw_state.sw_5);
+
     // capsule
     gui_canvas_round_rect_t *capsule = gui_canvas_round_rect_create(GUI_BASE(win_control), NULL,
                                                                     136, 20, 138, 47, 20, gui_rgb(196, 196, 196));
@@ -79,21 +118,20 @@ static void page_tb_control(gui_obj_t *parent)
     img_mute = gui_img_create_from_mem(capsule, "capsule_mute", MUTE_OFF_ICON_BIN, 98, 9, 0, 0);
     gui_img_set_mode(img_mute, IMG_SRC_OVER_MODE);
 
-    //switch
-    gui_switch_t *sw_lte = gui_switch_create(win_control, 20, 100, 182, 121, CONTROL_LTE_OFF_BIN,
-                                             CONTROL_LTE_ON_BIN);
-    gui_switch_t *sw_wifi = gui_switch_create(win_control, 207, 100, 182, 121, CONTROL_WIFI_OFF_BIN,
-                                              CONTROL_WIFI_ON_BIN);
-    gui_switch_t *sw_phone = gui_switch_create(win_control, 20, 100 + 125 * 1, 182, 121,
-                                               CONTROL_PHONE_OFF_BIN,
-                                               CONTROL_PHONE_ON_BIN);
-    gui_switch_t *sw_mute = gui_switch_create(win_control, 20, 100 + 125 * 2, 182, 121,
-                                              CONTROL_MUTE_OFF_BIN,
-                                              CONTROL_MUTE_ON_BIN);
-    gui_switch_t *sw_nobother = gui_switch_create(win_control, 207, 100 + 125 * 2, 182, 121,
-                                                  CONTROL_NOBOTHER_OFF_BIN,
-                                                  CONTROL_NOBOTHER_ON_BIN);
+    if (sw_state.sw_3)
+    {
+        img_phone->data = PHONE_ON_ICON_BIN;
+    }
+    if (sw_state.sw_4)
+    {
+        img_mute->data = MUTE_ON_ICON_BIN;
+    }
+    if (sw_state.sw_5)
+    {
+        img_nobother->data = NOBOTHER_ON_ICON_BIN;
+    }
 
+    //add switch callback func
     gui_obj_add_event_cb(sw_phone, (gui_event_cb_t)callback_phone_on, GUI_EVENT_1, NULL);
     gui_obj_add_event_cb(sw_phone, (gui_event_cb_t)callback_phone_off, GUI_EVENT_2, NULL);
     gui_obj_add_event_cb(sw_nobother, (gui_event_cb_t)callback_nobother_on, GUI_EVENT_1, NULL);
@@ -116,9 +154,11 @@ static void page_tb_control(gui_obj_t *parent)
 
 void win_control_enter_cb()
 {
-    kb_info_t *kb = kb_get_info();
+    extern gui_kb_port_data_t *port_kb_get_data(void);
+    gui_kb_port_data_t *kb = port_kb_get_data();
     static bool kb_hold = 0;
     static bool win_control_release = 0;
+    static uint32_t time_press = 0;
     if (enter_flag)
     {
         {
@@ -185,22 +225,23 @@ void win_control_enter_cb()
                 // gui_log(" %s-->%s \n", obj->name, obj->parent->name);
             }
         }
-
         if (kb_hold)
         {
-            if (kb->released)
+            if (kb->event == GUI_KB_EVENT_UP)
             {
-                gui_log("kb_hold %d\n", kb->released);
-                gui_obj_event_set(GUI_BASE(win_control_enter), GUI_EVENT_8);
+                kb_hold = 0;
+                uint32_t time = kb->timestamp_ms_release - time_press;
+                if (time > 1000)
+                {
+                    gui_log("pressing time = %d\n", time);
+                    gui_obj_event_set(GUI_BASE(win_control_enter), GUI_EVENT_8);
+                }
             }
         }
-        if (kb->pressed)
+        if (kb->event == GUI_KB_EVENT_DOWN && !kb_hold)
         {
+            time_press = kb->timestamp_ms_press;
             kb_hold = 1;
-        }
-        else
-        {
-            kb_hold = 0;
         }
     }
 }

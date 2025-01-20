@@ -22,8 +22,6 @@
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
-#define SCREEN_X_OFF 21
-#define SCREEN_Y_OFF 18
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
@@ -36,10 +34,9 @@ gui_win_t *win_watch;
 static gui_text_t *date_text;
 static char date_text_content[10];
 static char weekday_content[30];
-static struct tm watch_time;
-struct tm *timeinfo;
+extern struct tm *timeinfo;
 
-bool return_to_watchface_flag; //true: return to watchface; flases: return to app_menu
+bool return_to_watchface_flag; //true: return to watchface; false: return to app_menu
 
 uint8_t canvas_update_flag = 0;
 static gui_text_t *temperature_cur, *temperature_low, *temperature_high;
@@ -57,8 +54,8 @@ static char degree_content[5] = "0°", orien_content[3] = "N";
 
 static gui_img_t *img_heart_rate;
 
-static uint8_t *img_data_temperature,
-       *img_data_activity;
+static uint8_t *img_data_temperature;
+uint8_t *img_data_activity;
 
 char *cjson_content = NULL;
 
@@ -186,39 +183,36 @@ void json_refreash()
     sprintf(cjson_content, "%s", temp);
     gui_free(temp);
     cJSON_Delete(root);
-    canvas_update_flag = 0b1101;
+    canvas_update_flag = 0b1111;
     // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
-    gui_log("cjson_content: %s\n", cjson_content);
+//    gui_log("cjson_content: %s\n", cjson_content);
 }
 #endif
 
 extern char *day[];
 static void refreash_time()
 {
-    // GUI_WIDGET_POINTER_BY_NAME(img_hour_decimal, "watch_hour_decimal");
+    if (!timeinfo)
+    {
+        return;
+    }
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
-                          text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
-    // GUI_WIDGET_POINTER_BY_NAME(img_hour_single, "watch_hour_single");
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
-                          text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
+    gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
 
-    // GUI_WIDGET_POINTER_BY_NAME(img_minute_decimal, "watch_minute_decimal");
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", win_watch);
+    gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10]);
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
-                          text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
-    // GUI_WIDGET_POINTER_BY_NAME(img_minute_single, "watch_minute_single");
+    gui_img_set_image_data((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10]);
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", win_watch);
-    gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
-                          text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
+    gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
 
     sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set(date_text, date_text_content, strlen(date_text_content));
-    gui_text_convert_to_img(date_text, RGB565);
+    // gui_text_convert_to_img(date_text, RGB565);
 
     // refreash weather date
-    // GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
     GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "weather_text", win_watch)
     uint8_t index = timeinfo->tm_wday;
 
@@ -235,9 +229,9 @@ static void win_clock_cb(gui_win_t *win)
     if (win->animate->Beginning_frame)
     {
 #if defined __WIN32
-        time_t rawtime;
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
+        // time_t rawtime;
+        // time(&rawtime);
+        // timeinfo = localtime(&rawtime);
         char *temp = cjson_content;
         cjson_content = read_file(filename);
         if (!cjson_content)
@@ -252,13 +246,13 @@ static void win_clock_cb(gui_win_t *win)
         canvas_update_flag = 0b1111;
         // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
-        extern struct tm watch_clock_get(void);
-        watch_time = watch_clock_get();
-        timeinfo = &watch_time;
-        gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
-        gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
+        // extern struct tm watch_clock_get(void);
+        // watch_time = watch_clock_get();
+        // timeinfo = &watch_time;
+        // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
+        // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
         // json_refreash();
-        // tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
+//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
         refreash_time();
     }
@@ -285,61 +279,6 @@ static void win_clock_cb(gui_win_t *win)
         }
     }
     // gui_log("curtain_index = %d", curtain_index);
-
-    touch_info_t *tp = tp_get_info();
-    static bool hold;
-    if (tp->pressed)
-    {
-        hold = 1;
-    }
-    if (tp->released)
-    {
-        hold = 0;
-    }
-    if (hold)
-    {
-        // enable slide card in ct_clock
-        if (slide_card_enable && tp->x > 50 && tp->x < 300 && tp->y > 220 && tp->y < 330)
-        {
-            gui_tabview_t *tv = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "clock_tv", (void *)&tv);
-            if (tv)
-            {
-                GUI_BASE(tv)->gesture = 0;
-            }
-            gui_tabview_t *clock = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "hongkong_tabview",
-                                            (void *)&clock); //  can find "hongkong_tabview" in "app_hongkong.c"
-            if (clock)
-            {
-                GUI_BASE(clock)->gesture = 1;
-            }
-            if (cv)
-            {
-                GUI_BASE(cv)->gesture = 1;
-            }
-        }
-        else
-        {
-            gui_tabview_t *tv = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "clock_tv", (void *)&tv);
-            if (tv)
-            {
-                GUI_BASE(tv)->gesture = 1;
-            }
-            gui_tabview_t *clock = 0;
-            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "hongkong_tabview",
-                                            (void *)&clock); //  can find "hongkong_tabview" in "app_hongkong.c"
-            if (clock)
-            {
-                GUI_BASE(clock)->gesture = 0;
-            }
-            if (cv)
-            {
-                GUI_BASE(cv)->gesture = 0;
-            }
-        }
-    }
 }
 static void arc_activity_cb(NVGcontext *vg)
 {
@@ -377,7 +316,6 @@ static void arc_activity_cb(NVGcontext *vg)
     }
     else
     {
-
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -583,7 +521,6 @@ static void arc_temperature_cb(NVGcontext *vg)
     }
     else
     {
-
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -680,7 +617,7 @@ static void arc_temperature_cb(NVGcontext *vg)
             {
                 sprintf(tempera_cur_content, "%d", cur_val);
                 gui_text_content_set(temperature_cur, tempera_cur_content, strlen(tempera_cur_content));
-                gui_text_convert_to_img(temperature_cur, RGB565);
+                // gui_text_convert_to_img(temperature_cur, RGB565);
                 sprintf(tempera_low_content, "%d", low_val);
                 gui_text_content_set(temperature_low, tempera_low_content, strlen(tempera_low_content));
                 sprintf(tempera_high_content, "%d", high_val);
@@ -739,7 +676,6 @@ static void compass_cb(void)
     }
     else
     {
-
         root = cJSON_Parse(cjson_content);
         if (!root)
         {
@@ -790,46 +726,27 @@ static void compass_cb(void)
     cJSON_Delete(root);
 }
 
-static bool canvas_temperature_update()
-{
-    if ((canvas_update_flag & 0x02) && curtain_index)
-    {
-        canvas_update_flag &= 0b1101;
-        return true;
-    }
-    return false;
-}
-
-static bool canvas_activity_update()
-{
-    if ((canvas_update_flag & 0x04) && curtain_index)
-    {
-        canvas_update_flag &= 0b1011;
-        // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
-        return true;
-    }
-    return false;
-}
-
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 {
-    if (canvas_activity_update())
+    if ((canvas_update_flag & 0x04) && curtain_index)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
         gui_img_set_image_data(this_widget, img_data);
+        canvas_update_flag &= 0b1011;
     }
 }
 
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_temperature_animation)
 {
-    if (canvas_temperature_update())
+    if ((canvas_update_flag & 0x02) && curtain_index)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
         gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb, img_data);
         gui_img_set_image_data(this_widget, img_data);
+        canvas_update_flag &= 0b1101;
     }
 }
 
@@ -848,22 +765,6 @@ void page_ct_clock(void *parent)
     gui_canvas_create(parent, NULL, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); //fb_change
     win_watch = gui_win_create(parent, "win_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     return_to_watchface_flag = true;
-    // card
-    gui_tabview_t *tv = gui_tabview_create(win_watch, "clock_tv", 20 + SCREEN_X_OFF, 160 + SCREEN_Y_OFF,
-                                           328, 150);
-    gui_tab_t *tb_0 = gui_tab_create(tv, "tb_0", 0, 0, 0, 0, 0, 0);
-    gui_tab_t *tb_1 = gui_tab_create(tv, "tb_1", 0, 0, 0, 0, 1, 0);
-    gui_tab_t *tb_2 = gui_tab_create(tv, "tb_2", 0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_3 = gui_tab_create(tv, "tb_3", 0, 0, 0, 0, 3, 0);
-    gui_tab_t *tb_4 = gui_tab_create(tv, "tb_4", 0, 0, 0, 0, 4, 0);
-
-    gui_img_t *img_weather = gui_img_create_from_mem(tb_0, "CLOCK_CARD_WEATHER",
-                                                     UI_CLOCK_CARD_WEATHER_BIN, 0, 0, 0, 0);
-    // gui_obj_add_event_cb(img_weather, (gui_event_cb_t)switch_app_menu, GUI_EVENT_1, NULL);
-    gui_img_create_from_mem(tb_1, "CLOCK_CARD_COMPASS", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_2, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_MUSIC_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_3, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_ALARM_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_4, "CLOCK_CARD_WORKOUT", UI_CLOCK_CARD_WORKOUT_BIN, 0, 0, 0, 0);
 
     // temperature
     {
@@ -871,11 +772,14 @@ void page_ct_clock(void *parent)
             image_w = 100,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        img_data_temperature = gui_lower_malloc(buffer_size);
+        if (!img_data_temperature)
+        {
+            img_data_temperature = gui_lower_malloc(buffer_size);
+        }
         memset(img_data_temperature, 0, buffer_size);
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_temperature,
-                                                 16 + SCREEN_X_OFF,
-                                                 330 + SCREEN_Y_OFF, 100, 100);
+                                                 37,
+                                                 348, 100, 100);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_animate(img, 2000, -1, canvas_temperature_animation, (void *)buffer_size);
         //text
@@ -886,8 +790,8 @@ void page_ct_clock(void *parent)
                      48);
         gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(temperature_cur, LEFT);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
-                                 img_data_temperature);
+        // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
+        //                          img_data_temperature);
         sprintf(tempera_low_content, "18");
         temperature_low = gui_text_create(img, "temperature_low",  19, 70, 0, 0);
         gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
@@ -909,6 +813,8 @@ void page_ct_clock(void *parent)
 
     // weather condition
     {
+        gui_img_t *img_weather = gui_img_create_from_mem(win_watch, "CLOCK_CARD_WEATHER",
+                                                         UI_CLOCK_CARD_WEATHER_BIN, 41, 178, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_2", UI_WEATHER_RAIN_L_BIN, 89, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_M_BIN, 150, 73, 0, 0);
@@ -945,37 +851,38 @@ void page_ct_clock(void *parent)
                      32);
         gui_text_type_set(weather_range, font_size_32_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(weather_range, LEFT);
+        gui_img_set_animate(img_weather, 3000, -1, weather_cb, img_weather);
     }
-    gui_img_set_animate(img_weather, 3000, -1, weather_cb, img_weather);
 // #endif
 
     // date & time text
     sprintf(date_text_content, "SUN 0");
-    date_text = gui_text_create(win_watch, "date_text",  -35, 15 + SCREEN_Y_OFF, 0, 0);
+    date_text = gui_text_create(win_watch, "date_text",  -35, 33, 0, 0);
     gui_text_set(date_text, (void *)date_text_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_text_content),
                  48);
     gui_text_type_set(date_text, font_size_48_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, RIGHT);
-    gui_text_convert_to_img(date_text, RGB565);
+    // gui_text_convert_to_img(date_text, RGB565);
     {
         int text_w = 35;
         gui_img_t *img = gui_img_create_from_mem(win_watch, "watch_hour_decimal", text_num_array[0],
-                                                 190 + SCREEN_X_OFF, 70 + SCREEN_Y_OFF, 0, 0);
+                                                 211, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win_watch, "watch_hour_single", text_num_array[0],
-                                      190 + SCREEN_X_OFF + text_w, 70 + SCREEN_Y_OFF, 0, 0);
+                                      211 + text_w, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win_watch, "colon", text_num_array[10],
-                                      190 + SCREEN_X_OFF + text_w * 2 + 5, 70 + SCREEN_Y_OFF + 5, 0, 0);
+                                      211 + text_w * 2 + 5, 88 + 5, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win_watch, "watch_minute_decimal", text_num_array[0],
-                                      190 + SCREEN_X_OFF + text_w * 2 + 17, 70 + SCREEN_Y_OFF, 0, 0);
+                                      211 + text_w * 2 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win_watch, "watch_minute_single", text_num_array[0],
-                                      190 + SCREEN_X_OFF + text_w * 3 + 17, 70 + SCREEN_Y_OFF, 0, 0);
+                                      211 + text_w * 3 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
+    refreash_time();
 
     // activity icon
     {
@@ -983,17 +890,20 @@ void page_ct_clock(void *parent)
             image_w = 100,
             pixel_bytes = 4;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        img_data_activity = gui_lower_malloc(buffer_size);
+        if (!img_data_activity)
+        {
+            img_data_activity = gui_lower_malloc(buffer_size);
+        }
         memset(img_data_activity, 0, buffer_size);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data_activity);
-        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 16 + SCREEN_X_OFF,
-                                                 50 + SCREEN_Y_OFF, 0, 0);
+        // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data_activity);
+        gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 37,
+                                                 68, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_animate(img, 1000, -1, canvas_activity_animation, (void *)buffer_size);
     }
     // compass icon
     gui_img_t *img = gui_img_create_from_mem(win_watch, "CLOCK_COMPASS_DIAL",
-                                             UI_CLOCK_COMPASS_DIAL_ICON_BIN, 134 + SCREEN_X_OFF, 330 + SCREEN_Y_OFF, 0, 0);
+                                             UI_CLOCK_COMPASS_DIAL_ICON_BIN, 155, 348, 0, 0);
     compass_pointer = gui_img_create_from_mem(img, "CLOCK_COMPASS_POINTER",
                                               UI_CLOCK_COMPASS_POINTER_ICON_BIN, 42, 10, 0, 0);
     compass_degree = gui_text_create(img, "compass_degree",  5, 23, 0, 0);
@@ -1012,10 +922,9 @@ void page_ct_clock(void *parent)
     gui_img_set_animate(img, 1000, -1, compass_cb, NULL);
 
     img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",
-                                             UI_CLOCK_HEARTRATE_ICON_BIN, 251 + SCREEN_X_OFF, 330 + SCREEN_Y_OFF, 0,
+                                             UI_CLOCK_HEARTRATE_ICON_BIN, 272, 348, 0,
                                              0);
     extern void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param);
     gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_APP_HEART_RATE, GUI_EVENT_1, NULL);
-
     gui_win_set_animate(win_watch, 2000, -1, (gui_animate_callback_t)win_clock_cb, win_watch);
 }

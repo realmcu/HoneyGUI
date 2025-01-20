@@ -1,3 +1,4 @@
+/* 3d butterfly demo start*/
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_tabview.h"
@@ -11,15 +12,11 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-
-
-#include "tiger_blue.txt"
 #include "def_3d.h"
 #include "gui_3d.h"
 
 #include "butterfly/desc.txt"
 #include "math.h"
-
 
 static int frame_counter = 0;
 static float wing_angle = 0.0f;
@@ -45,7 +42,7 @@ void update_animation()
 }
 
 static void cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
-               gui_3d_camera_t *camera)
+               gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_3d_matrix_t face_matrix;
@@ -54,33 +51,34 @@ static void cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world
     gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 50), gui_point_4d(0, 0, 0), 1, 32767, 90,
                                  dc->screen_width, dc->screen_height);
 
-    gui_3d_world_inititalize(&object_matrix, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
+    gui_3d_world_inititalize(&object_matrix, butterfly_x, butterfly_y, butterfly_z, 0, 0,
+                             butterfly_rz + 90,
                              5);
 
 
     if (face == 0)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(1, 0, 0),
+        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
     else if (face == 1)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(1, 0, 0),
+        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  -wing_angle, 1);
     }
     else if (face == 2)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(1, 0, 0),
+        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
     else if (face == 3)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(1, 0, 0),
+        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  -wing_angle, 1);
     }
     else
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(1, 0, 0), 0,
+        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0), 0,
                                  1);
     }
 
@@ -103,7 +101,7 @@ static void app_ui_design(gui_app_t *app)
     return;
 
 }
-
+/* 3d butterfly demo end*/
 
 static gui_app_t rtk_gui_demo =
 {

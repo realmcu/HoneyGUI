@@ -19,7 +19,10 @@ static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
 static struct gui_ftl *ftl = NULL;
 static struct acc_engine *acc = NULL;
-char *defaultPath = "realgui\\example\\screen_480_480\\root\\";
+#ifndef _GUI_FS_ROOT_DIR
+#define _GUI_FS_ROOT_DIR "realgui\\example\\screen_480_480\\root\\"
+#endif
+char *defaultPath = _GUI_FS_ROOT_DIR;
 
 void gui_change_default_path(int argc, char **argv)
 {
@@ -29,6 +32,9 @@ void gui_change_default_path(int argc, char **argv)
         {
             char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
             sprintf(path, "%s%s", argv[count + 1], "\\");
+            static char *buffer;
+            buffer = defaultPath;
+            GUI_UNUSED(buffer);
             defaultPath = path;
         }
     }
@@ -106,7 +112,6 @@ void gui_os_api_register(gui_os_api_t *info)
     {
         lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
     }
-
     os_api = info;
 }
 
@@ -793,10 +798,17 @@ void *gui_get_file_address(const char *file)
             used += size;
             //gui_log(">malloc: %d -- used: %d\n", size, used);
         }
+        if (size == 0)
+        {
+            gui_fs_close(fd);
+            return 0;
+        }
+
         void *imgbuf = gui_malloc(size);
         memset(imgbuf, 0, size);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, imgbuf, size);
+        gui_fs_close(fd);
         file_node->mem_addr = imgbuf;
         return imgbuf;
     }
@@ -1382,3 +1394,16 @@ float *gui_get_json_array(const char *path, const char *parent_key, const char *
     cJSON_Delete(root);
     return array;
 }
+float gui_animation_get_progress(gui_animate_t *animation)
+{
+    GUI_ASSERT(animation)
+    if (animation)
+    {
+        return animation->progress_percent;
+    }
+    else
+    {
+        return 0;
+    }
+}
+

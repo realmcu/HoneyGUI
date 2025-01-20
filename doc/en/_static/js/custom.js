@@ -1,22 +1,15 @@
 /* API collapsing */
 document.addEventListener('DOMContentLoaded', (event) => {
     document.querySelectorAll("dl.cpp,dl.c").forEach(cppListing => {
-        const curHash = location.hash.substring(1);
+        cppListing.classList.add("expanded");
         const dt = cppListing.querySelector("dt");
-        const span = cppListing.querySelector(`[id="${curHash}" ]`);
-        let shouldBeExpanded = false;
-
-        if(dt.id.toLocaleLowerCase() == curHash.toLocaleLowerCase() || span != null) {
-            shouldBeExpanded = true;
-        }    
-        cppListing.classList.add(shouldBeExpanded ? "expanded" : "unexpanded");
         const button = document.createElement("span");
         button.classList.add("rtk-api-expansion-button");
         button.addEventListener("click", () => {
             cppListing.classList.toggle("unexpanded");
             cppListing.classList.toggle("expanded");
         });
-        
+       
         dt.insertBefore(button, dt.firstChild);
     });
 })
@@ -167,16 +160,11 @@ function backToTop() {
 }
 
 /* ============= Toggle Languages ============= */
-function change_language(lang)
-{
-    var url = window.location.pathname;
-    var newUrl = "";
-    if(lang.toLowerCase() == 'en')
-    {
-        newUrl = url.replace(/\/en\//gi, '/cn/');
-    }
-    else {
-        newUrl = url.replace(/\/cn\//gi, '/en/');
-    }  
-    window.location.href = newUrl;
-}
+document.addEventListener("DOMContentLoaded", function () {
+    let currentUrl = window.location.href;
+    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
+    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
+ 
+    document.getElementById('toEN').href = newEnUrl;
+    document.getElementById('toCN').href = newCnUrl;
+})

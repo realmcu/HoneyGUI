@@ -38,19 +38,19 @@ def add_download_link(download_tool_list, language_path):
   if len(download_tool_list) != 3:
     sys.exit("Invalid tool list: {}".format(download_tool_list))
   print("Start add download link")
-  index_file = os.path.join(language_path, "tool/index.md")
+  index_file = os.path.join(language_path, "tool/index.rst")
   if not os.path.exists(index_file):
     sys.exit("Cannot find index file: {}".format(index_file))
   with open(index_file, mode='r', newline='', errors='surrogateescape') as fd:
     stream = fd.read()
     download_link = '''
-```eval_rst
+
 Image Convert Tool: :download:`Image Convert Tool <../{}>`
 
 Font Convert Tool: :download:`Font Convert Tool <../{}>`
 
 RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
-```
+
 '''.format(download_tool_list[0], download_tool_list[1], download_tool_list[2])
     stream = re.sub(r'(<!-- Add tool downlod link here -->\n)', lambda objs: objs.group(1) + download_link, stream, count=0, flags=re.M)
   with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:

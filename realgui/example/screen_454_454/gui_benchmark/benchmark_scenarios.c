@@ -529,7 +529,7 @@ void app_benchmark_start(void)
     /*free all tabs before switch gui app*/
     app_gui_main_free();
     //to do
-    gui_switch_app(get_app_watch_ui(), get_app_benchmark());
+    gui_app_switch(get_app_watch_ui(), get_app_benchmark());
 }
 
 void app_benchmark_finish(void)
@@ -540,6 +540,6 @@ void app_benchmark_finish(void)
     /*show cost ms on lcd*/
     //design_benchmark_show(get_app_benchmark());
     //to do
-    gui_switch_app(get_app_benchmark(), get_app_watch_ui());
+    gui_app_switch(get_app_benchmark(), get_app_watch_ui());
 }
 

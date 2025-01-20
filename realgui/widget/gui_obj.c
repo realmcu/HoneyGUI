@@ -534,10 +534,8 @@ bool gui_obj_in_rect(gui_obj_t *obj,
 
     gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
 
-    if ((m_x >= x)
-        && ((m_x + m_w) <= (x + w))
-        && (m_y >= y)
-        && ((m_y + m_h) <= (y + h)))
+    if ((m_x < x + w) && (m_x + m_w > x) &&
+        (m_y < y + h) && (m_y + m_h > y))
     {
         return true;
     }
@@ -1236,4 +1234,9 @@ void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y)
     obj->x = x;
     obj->y = y;
 }
-
+void gui_obj_move(gui_obj_t *obj, int x, int y)
+{
+    GUI_WIDGET_TRY_EXCEPT(obj) // cppcheck-suppress unknownMacro
+    obj->x = x;
+    obj->y = y;
+}

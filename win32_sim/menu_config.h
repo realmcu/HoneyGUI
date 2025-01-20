@@ -23,11 +23,19 @@
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
-//  #define CONFIG_REALTEK_BUILD_REAL_BASE
+// #define CONFIG_REALTEK_BUILD_REAL_BASE
+// </c>
+
+// <c> RTK GUI Base Demo
+// #define CONFIG_REALTEK_BUILD_MULTI_APP
 // </c>
 
 // <c> RTK GUI 3D Demo
 // #define CONFIG_REALTEK_BUILD_REAL_3D
+// </c>
+
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D
 // </c>
 
 // <c> RTK GUI Paint Engine Demo
@@ -58,6 +66,11 @@
 // #define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
 // </c>
 
+// <c> RTK GUI Demo 410 502 Lvgl
+// #define CONFIG_REALTEK_BUILD_GUI_410_502_LVGL_DEMO
+// </c>
+
+
 // <c> RTK GUI TEST
 // #define CONFIG_REALTEK_BUILD_TEST
 // </c>
@@ -76,10 +89,6 @@
 
 // <c> RTK GUI Demo 240 320
 // #define CONFIG_REALTEK_BUILD_GUI_240_320_DEMO
-// </c>
-
-// <c> RTK GUI Demo 368 448 FileSystem
-// #define CONFIG_REALTEK_BUILD_GUI_448_368_FILESYSTEM_DEMO
 // </c>
 
 // <c> RTK GUI Demo 320 384
@@ -179,10 +188,10 @@
 // </e>
 
 // <e> HoneyGUI Enable LVGL
-#define CONFIG_REALTEK_BUILD_LVGL_GUI     0
+#define CONFIG_REALTEK_BUILD_LVGL_V8     0
 #define CONFIG_REALTEK_BUILD_LVGL_V9      0
 
-#if (CONFIG_REALTEK_BUILD_LVGL_GUI == 1)
+#if (CONFIG_REALTEK_BUILD_LVGL_V8 == 1) || (CONFIG_REALTEK_BUILD_LVGL_V9 == 1)
 
 // <c> HoneyGUI Enalbe LVGL APP
 #define CONFIG_REALTEK_BUILD_LVGL_DEMO_APP
@@ -194,23 +203,6 @@
 
 // <c> HoneyGUI Enable LVGL RLOTTIE
 #define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
-// </c>
-
-#endif
-
-
-#if (CONFIG_REALTEK_BUILD_LVGL_V9 == 1)
-
-// <c> HoneyGUI Enalbe LVGL V9 APP
-#define CONFIG_REALTEK_BUILD_LVGLV9_DEMO_APP
-// </c>
-
-// <c> HoneyGUI Enable LVGL V9 EXAMPLES
-#define CONFIG_REALTEK_BUILD_LVGLV9_EXAMPLES
-// </c>
-
-// <c> HoneyGUI Enable LVGL V9 RLOTTIE
-#define CONFIG_REALTEK_BUILD_LVGLV9_RLOTTIE
 // </c>
 
 #endif
@@ -238,6 +230,15 @@
 
 // </e>
 
+
+// <e> h.264 decoder
+#define CONFIG_REALTEK_H264_DECODER     0
+#if (CONFIG_REALTEK_H264_DECODER == 1)
+
+#define CONFIG_REALTEK_H264BSD
+
+#endif
+// </e>
 
 // </h>
 

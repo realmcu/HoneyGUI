@@ -370,7 +370,25 @@ static void gui_fb_draw(gui_obj_t *root)
             dc->lcd_draw_sync();
         }
         dc->lcd_update(dc);
+    }
+    else if (dc->type == DC_DOUBLE)
+    {
+        if (dc->frame_buf == dc->disp_buf_1)
+        {
+            dc->frame_buf = dc->disp_buf_2;
+        }
+        else
+        {
+            dc->frame_buf = dc->disp_buf_1;
+        }
+        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
 
+        obj_draw_scan(root);
+        if (dc->lcd_draw_sync != NULL)
+        {
+            dc->lcd_draw_sync();
+        }
+        dc->lcd_update(dc);
     }
 }
 

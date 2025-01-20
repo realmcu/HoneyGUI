@@ -174,6 +174,11 @@
  * GPU
  *-----------*/
 
+/*Use Realtek GPU */
+
+#define LV_USE_GPU_RTK_PPE 0   // Set to 1 to use the original PPE version
+#define LV_USE_GPU_RTK_PPEV2 0 // Set to 1 to use the PPEV2 version
+
 /*Use Arm's 2D acceleration library Arm-2D */
 #define LV_USE_GPU_ARM2D 0
 
@@ -666,7 +671,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 
 /*Rlottie library*/
-#define LV_USE_RLOTTIE 1
+#define LV_USE_RLOTTIE 0
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/

@@ -133,7 +133,7 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
         gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
     }
 
-    if (GET_BASE(this->c)->type == IMAGE_SCOPE)
+    if (this->image_type == IMAGE_SCOPE)
     {
         if (this->color == 1)
         {
@@ -144,11 +144,13 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
             GUI_TYPE(gui_img_scope_t, this->c)->scope_y1 = (1.0f - percentage) * this->max;
         }
     }
-    else if (GET_BASE(this->c)->type == IMAGE_ARRAY)
+    else if (this->image_type == IMAGE_ARRAY)
     {
         size_t p = percentage * (this->max - 1);
 
         GUI_TYPE(gui_img_t, this->c)->data = ((void **)(uintptr_t)(this->color_hl))[p];
+        GET_BASE(this->c)->w = gui_img_get_width((void *)(this->c)) + 1;
+        GET_BASE(this->c)->h = gui_img_get_height((void *)(this->c));
     }
 }
 

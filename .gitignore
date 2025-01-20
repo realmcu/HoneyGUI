@@ -87,3 +87,4 @@ gui_engine/example/screen_640_360/Export/root/
 gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Export/root/
 gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Simulate/
 gui_engine/example/web/tree/diagram.mmd
+win32_sim/build/

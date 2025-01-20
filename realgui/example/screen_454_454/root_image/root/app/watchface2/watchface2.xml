@@ -122,7 +122,7 @@ file="app/watchface2/wf2preview.bin">
             x="100"
             y="380">btn_music
             <onClick
-                    to="app"
+                    to="C-APP"
                     type="jump" 
                     id="APP_MUSIC">
             </onClick>

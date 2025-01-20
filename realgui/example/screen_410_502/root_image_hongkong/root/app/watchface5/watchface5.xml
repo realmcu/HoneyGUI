@@ -79,7 +79,7 @@ file="app/watchface5/wf5preview.bin">
             h="49"
             text="88"
             fontSize="24"
-            font="app/watchface5/MichromaRegularSize24Bits4Font.bin"
+            font="app/watchface5/w5MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_ex
            <onPeripheral 
                 type="activity" 
@@ -104,7 +104,7 @@ file="app/watchface5/wf5preview.bin">
             h="49"
             text="88"
             fontSize="24"
-            font="app/watchface5/MichromaRegularSize24Bits4Font.bin"
+            font="app/watchface5/w5MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_bat
             <onPeripheral 
                 type="battery" 
@@ -135,7 +135,7 @@ file="app/watchface5/wf5preview.bin">
             h="49"
             text="90"
             fontSize="24"
-            font="app/watchface5/MichromaRegularSize24Bits4Font.bin"
+            font="app/watchface5/w5MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_HR
            <onPeripheral 
                 type="heart_rate" 
@@ -153,7 +153,7 @@ file="app/watchface5/wf5preview.bin">
             h="24"
             text="SATURDAY"
             fontSize="24"
-            font="app/watchface5/MichromaRegularSize24Bits4Font.bin"
+            font="app/watchface5/w5MichromaRegularSize24Bits4Font.bin"
             mode="center">txt_week
             <onTime
                 type="MONDAY"
@@ -169,7 +169,7 @@ file="app/watchface5/wf5preview.bin">
             h="24"
             text="12/MARCH"
             fontSize="16"
-            font="app/watchface5/MichromaRegularSize16Bits4Font.bin"
+            font="app/watchface5/w5MichromaRegularSize16Bits4Font.bin"
             mode="center">txt_date
             <onTime
                 type="1/JANUARY"

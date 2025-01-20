@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app iconPicture = "app/watchface/resource/icon.bin">WATCHFACE
+    <script
+    file="app/watchface/script.js">
+    </script>
+    
+    <screen
+    w="800"
+    h="800"
+    x="0"
+    y="0">screen0
+    <tabview transition="fadeScale">tv1
+			<tab >t1
+				<img file="app/watchface/resource/watchface/wf1preview.bin">img1 </img>
+			</tab>
+			<tab idx="1">t2
+				<img file="app/watchface/resource/watchface/wf2preview.bin" >img1</img>
+			</tab>
+			<tab idx="2">t2
+				<img file="app/watchface/resource/watchface/wf3preview.bin" >img1</img>
+			</tab>
+			<tab idx="3">t2
+				<img file="app/watchface/resource/watchface/wf5preview.bin" >img1</img>
+			</tab>
+		</tabview>		
+
+<img
+            x="0"
+            y="753"
+            opacity="255"
+            file="app/watchface/resource/tab/tabs_group.bin"
+            blendMode="imgSrcOverMode"
+            >tabs_group
+
+    
+    <icon
+            picture="app/watchface/resource/tab/Tab1.bin"
+            highlightPicture="app/watchface/resource/tab/Tab1hl.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="32"
+            h="47"
+            x="0"
+            y="0">tab1
+            <onClick
+                    to="tabview"
+                    type="jump" 
+                    id="1,0,tv1">
+            </onClick>
+    </icon>
+    <icon
+            picture="app/watchface/resource/tab/Tab2.bin"
+            highlightPicture="app/watchface/resource/tab/Tab2hl.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="32"
+            h="47"
+            x="63"
+            y="0">tab1
+            <onClick
+                    to="tabview"
+                    type="jump" 
+                    id="2,0,tv1">
+            </onClick>
+    </icon>
+    <icon
+            picture="app/watchface/resource/tab/Tab3.bin"
+            highlightPicture="app/watchface/resource/tab/Tab3hl.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="32"
+            h="47"
+            x="126"
+            y="0">tab1
+            <onClick
+                    to="tabview"
+                    type="jump" 
+                    id="0,0,tv1">
+            </onClick>
+    </icon>
+
+</img>   
+    <icon
+            picture="app/watchface/resource/launcher.bin"
+            highlightPicture="app/watchface/resource/launcher.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="70"
+            h="70"
+            x="550"
+            y="700">JumpToLauncher
+            <onClick
+                    to="C-APP"
+                    type="jump" 
+                    id="app_launcher_frontend">
+            </onClick>
+    </icon> 
+</screen></app>

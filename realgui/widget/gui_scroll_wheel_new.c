@@ -98,6 +98,12 @@ static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **
     gui_obj_t *object = obj;
     GUI_UNUSED(object);
     int count = 0;
+    T_OBJ_TYPE type = TEXTBOX;
+    if (this->render_mode == GUI_SCROLL_WHEEL_NEW_RENDER_IMAGE_ARRAY)
+    {
+        type = IMAGE_FROM_MEM;
+    }
+
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -108,7 +114,7 @@ static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **
 
         if (obj && obj->type == WINDOW)
         {
-            GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, obj)
+            GUI_WIDGET_POINTER_BY_TYPE(text, type, obj)
             text_widget_array[count] = text;
             count++;
         }
@@ -212,7 +218,7 @@ static void override(gui_obj_t *win)
         int ax, ay;
         gui_obj_absolute_xy(GUI_BASE(this), &ax, &ay);
         if (touch->pressed &&
-            touch->x > ax - this->col_offset &&
+            touch->x > ax  &&
             touch->x < ax + win->w &&
             touch->y > ay &&
             touch->y < ay + this->gap * this->count)
@@ -222,7 +228,7 @@ static void override(gui_obj_t *win)
             memset(this->recode, 0, sizeof(this->recode));
         }
         if (touch->pressing &&
-            touch->x > ax - this->col_offset &&
+            touch->x > ax  &&
             touch->x < ax + win->w &&
             touch->y > ay &&
             touch->y < ay + this->gap * this->count)
@@ -627,6 +633,36 @@ void gui_scroll_wheel_new_render_image_array(gui_scroll_wheel_new_t *widget,
         }
     }
 }
+void gui_scroll_wheel_new_render_image_array_ftl(gui_scroll_wheel_new_t *widget,
+                                                 const struct gui_text_image_map *map, int map_length)
+{
+    widget->text_image_map = map;
+    widget->text_image_map_length = map_length;
+    widget->render_mode = GUI_SCROLL_WHEEL_NEW_RENDER_IMAGE_ARRAY;
+    for (size_t i = 0; i < widget->count + 2; i++)
+    {
+        gui_win_t *win = gui_win_create(widget->win, 0, 0, widget->gap * i, GUI_BASE(widget)->w,
+                                        widget->gap);
+        {
+            const char *text = widget->string_array[i];
+            const char *input = text;
+            size_t num_pointers;
+            void **image_pointers = get_image_pointers(input, &num_pointers, widget->text_image_map_length,
+                                                       widget->text_image_map);
+
+            // Print results
+            gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
+            for (size_t i = 0; i < num_pointers; ++i)
+            {
+                gui_log("Image pointer %zu: %p\n", i + 1, image_pointers[i]);
+            }
+            gui_image_array_create_ftl(win, 0, 0, image_pointers, num_pointers,
+                                       "num");
+            // Free allocated memory
+            gui_free(image_pointers);
+        }
+    }
+}
 void gui_scroll_wheel_new_set_col_offset(gui_scroll_wheel_new_t *widget, int offset)
 {
     if (offset >= GUI_BASE(widget)->w)
@@ -636,7 +672,7 @@ void gui_scroll_wheel_new_set_col_offset(gui_scroll_wheel_new_t *widget, int off
 
     widget->col_offset = offset;
     GUI_BASE(widget->win)->x = offset;
-    GUI_BASE(widget->win)->w -= offset;
+    //GUI_BASE(widget->win)->w -= offset;
 
 }
 gui_scroll_wheel_new_t *gui_scroll_wheel_new_create(void    *parent,

@@ -402,14 +402,14 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     memcpy(img_buf, &head, sizeof(head));
 
     mem_char_t *chr = text->data;
-    GUI_FONT_HEAD *font;
+    GUI_FONT_HEAD_BMP *font;
     if (text->font_mode == FONT_SRC_FTL)
     {
-        font = (GUI_FONT_HEAD *)font_lib_tab[get_fontlib_by_name(text->path)].data;
+        font = (GUI_FONT_HEAD_BMP *)font_lib_tab[get_fontlib_by_name(text->path)].data;
     }
     else
     {
-        font = (GUI_FONT_HEAD *)text->path;
+        font = (GUI_FONT_HEAD_BMP *)text->path;
     }
     uint8_t rendor_mode = font->rendor_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
@@ -418,7 +418,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
-                                  font_img_pixel_bytes, font->font_mode_detail.detail.crop);
+                                  font_img_pixel_bytes, font->crop);
     }
     gui_font_mem_unload(text);
     return img_buf;

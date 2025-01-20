@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<app iconPicture = "app/box/resource/lamp/circle.bin">box640x360
+<app iconPicture = "app/box/resource/icon.bin">TEST
     <script
     file="app/box/box640x360.js">
     </script>
@@ -71,6 +71,8 @@
     h="800"
     x="0"
     y="0">screen0
+    
+    
     <slider
         x="202"
         y="180"
@@ -144,6 +146,7 @@
         font="app/box/resource/font/arialbd_size16_bits4_font.bin"
         mode="truncate">txt_brightness
     </textbox>
+
     <!-- Animation test -->
     <img
         x="0"
@@ -388,7 +391,7 @@
         radius="27"
         strokeWidth="4"
         strokeColor="yellow"
-        startAngle="-1.6"
+        startAngle="0.5"
         endAngle="3.14"
         clockwise="CW"
         cap="round">arc1
@@ -398,22 +401,71 @@
             id="exercise">
         </onPeripheral>
 </arc>   
-<chart
-        w="400"
-        h="300"
-        x="10"
-        y="10"
-        color="yellow"
-        items="100,200,300,400,-100,-200,0,50,333,-333,499"
-        max="400"
-        min="-300"  
-        >chart1
-        <onPeripheral 
-                type="heart_rate" 
-                to="chart1" 
-                id="array">
+
+<multiLevel>
+    <multiLevel>ml10
+        <chart
+            w="400"
+            h="300"
+            x="10"
+            y="10"
+            color="yellow"
+            items="100,200,300,400,-100,-200,0,50,333,-333,499"
+            max="400"
+            min="-300"  
+            style="waveform"
+            >chart1
+            <onPeripheral 
+                    type="heart_rate" 
+                    to="chart1" 
+                    id="array">
+                </onPeripheral>
+        </chart>  
+    </multiLevel>
+    <multiLevel>ml11
+        <chart
+                w="400"
+                h="200"
+                x="10"
+                y="10"
+                color="red"
+                items="100,200,300,400,-100,-200,0,50,333,-333,499"
+                max="400"
+                min="-300"  
+                strokeWidth="20"
+                style="bar"
+                >chart2
+                <onPeripheral 
+                        type="heart_rate" 
+                        to="chart2" 
+                        id="array">
+                    </onPeripheral>
+        </chart> 
+                <chart
+            w="400"
+            h="100"
+            x="10"
+            y="210"
+            color="blue"
+            items="100,200,300,400,-100,-200,0,50,333,-333,499"
+            max="400"
+            min="-300"  
+            strokeWidth="4"
+            style="line"
+            >chart3
+            <onPeripheral 
+                    type="heart_rate" 
+                    to="chart3" 
+                    id="array">
             </onPeripheral>
-</chart>  
+        </chart> 
+    </multiLevel>
+</multiLevel>
+
+
+
+
+
 <textbox
             x="0"
             y="130"
@@ -607,40 +659,152 @@
             </onTime>
     </textbox>
      <img
-            x="393"
-            y="319"
+            x="293"
+            y="213"
             opacity="255"
             file="app/box/resource/time/Union2.bin"
             blendMode="imgSrcOverMode"
             >hour_hand
             <onTime
                 type="hour"
-                to="hour_hand">
+                to="hour_hand"
+                id="7,87">
             </onTime>
     </img>
     <img
-            x="394"
-            y="239"
+            x="293"
+            y="133"
             opacity="255"
             file="app/box/resource/time/Union.bin"
             blendMode="imgSrcOverMode"
             >minute_hand
             <onTime
                 type="minute"
-                to="minute_hand">
+                to="minute_hand"
+                id="7,167">
             </onTime>
     </img>
     <img
-            x="399"
-            y="253"
+            x="299"
+            y="173"
             opacity="255"
             file="app/box/resource/time/Vector7.bin"
             blendMode="imgSrcOverMode"
             >second_hand
             <onTime
                 type="second"
-                to="second_hand">
+                to="second_hand"
+                id="1,127">
             </onTime>
     </img>
+    <img
+            x="297"
+            y="297"
+            opacity="255"
+            file="app/box/resource/time/Ellipse5.bin"
+            blendMode="imgSrcOverMode"
+            >watchfacemask
 
+    </img>
+
+<img
+            x="0"
+            y="753"
+            opacity="255"
+            file="app/box/resource/tab/tabs_group.bin"
+            blendMode="imgSrcOverMode"
+            >tabs_group
+
+    
+    <icon
+            picture="app/box/resource/tab/Tab1.bin"
+            highlightPicture="app/box/resource/tab/Tab1hl.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="32"
+            h="47"
+            x="0"
+            y="0">tab1
+            <onClick
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,0">
+            </onClick>
+    </icon>
+    <icon
+            picture="app/box/resource/tab/Tab2.bin"
+            highlightPicture="app/box/resource/tab/Tab2hl.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="32"
+            h="47"
+            x="63"
+            y="0">tab1
+            <onClick
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,1">
+            </onClick>
+    </icon>
+    <icon
+            picture="app/box/resource/tab/Tab3.bin"
+            highlightPicture="app/box/resource/tab/Tab3hl.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="32"
+            h="47"
+            x="126"
+            y="0">tab1
+            <onClick
+                    to="multiLevel"
+                    type="jump" 
+                    id="0,0">
+            </onClick>
+    </icon>
+</img>
+    <icon
+            picture="app/box/resource/time/watchicon.bin"
+            highlightPicture="app/box/resource/time/watchicon.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="100"
+            h="100"
+            x="650"
+            y="700">jumpToWatchface
+            <onClick
+                    to="app"
+                    type="jump" 
+                    id="app/watchface/index.xml">
+            </onClick>
+    </icon>
+        <icon
+            picture="app/box/resource/time/launcher.bin"
+            highlightPicture="app/box/resource/time/launcher.bin"
+            blendMode="imgSrcOverMode"
+            opacity="255"
+            pictureX="0"
+            pictureY="0"
+            rotationAngle="0"
+            w="100"
+            h="100"
+            x="550"
+            y="700">JumpToLauncher
+            <onClick
+                    to="C-APP"
+                    type="jump" 
+                    id="app_launcher_frontend">
+            </onClick>
+    </icon>
 </screen></app>

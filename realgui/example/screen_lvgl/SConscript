@@ -16,6 +16,6 @@ CPPDEFINES = []
 
 
 
-group = DefineGroup('lvgl_assets', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('lvgl_assets', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_V8'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

@@ -1,0 +1,36 @@
+# for module compiling
+
+import os
+from building import *
+import menu_config
+
+# get current directory
+cwd  = GetCurrentDir()
+objs = []
+list = os.listdir(cwd)
+parent_dir = os.path.dirname(cwd)
+
+src = Split("""
+""")
+
+include_path = []
+libs = ['']
+libpath = ['']
+
+
+if GetDepend(['CONFIG_REALTEK_H264BSD']) :
+    src += Glob(cwd + '/src/*.c')
+
+include_path += [cwd,
+        cwd + '/inc',]
+
+
+
+group = DefineGroup('h264bsd', src, depend = ['CONFIG_REALTEK_H264BSD'], CPPPATH = include_path,LIBS = libs, DEFINE = ['H264_BSD_ENABLE'])
+
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        group = group + SConscript(os.path.join(d, 'SConscript'))
+
+Return('group')

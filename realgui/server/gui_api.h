@@ -398,6 +398,18 @@ char *gui_dom_get_preview_image_file(const char *xml);
  * @param parent_widget The parent widget to which the tree structure is to be associated.
  */
 void gui_dom_create_tree_nest(const char *xml, gui_obj_t *parent_widget);
+/**
+ * @brief Retrieve the progress of an animation.
+ *
+ * This function returns the current progress of the specified animation.
+ * The progress is represented as a floating-point value between 0.0 and 1.0,
+ *
+ * @param animation Pointer to the animation structure.
+ * @return The current progress of the animation, ranging from 0.0 to 1.0.
+ */
+float gui_animation_get_progress(gui_animate_t *animation);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -15,12 +15,15 @@
 #include "guidef.h"
 #include "wheel_algo.h"
 #include "kb_algo.h"
+#include <time.h>
+#include "gui_fps.h"
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
-static gui_tabview_t *tv;
+gui_tabview_t *tv;
 static gui_win_t *win_hk; //, *win_control;
 bool control_flag = 0;
+static bool enter_menu_flag = 0;
 
 static gui_app_t app_hongkong =
 {
@@ -33,8 +36,8 @@ static gui_app_t app_hongkong =
     },
     .ui_design = app_hongkong_ui_design,
     .active_ms = 1000000,
-    .shutdown_animation_flag = GUI_APP_ANIMATION_10,
-    .startup_animation_flag = GUI_APP_ANIMATION_9,
+    // .shutdown_animation_flag = GUI_APP_ANIMATION_10,
+    // .startup_animation_flag = GUI_APP_ANIMATION_9,
 };
 
 void *get_app_hongkong(void)
@@ -44,95 +47,103 @@ void *get_app_hongkong(void)
 
 static void kb_button_cb()
 {
-#ifdef _WIN32
-    touch_info_t *wheel = wheel_get_info();
-    // kb_info_t *kb = kb_get_info();
-    static bool hold = 0;
-    // static bool kb_hold = 0;
+    app_hongkong.startup_animation_flag = GUI_APP_ANIMATION_9;
+    app_hongkong.shutdown_animation_flag = GUI_APP_ANIMATION_10;
+
+    extern gui_kb_port_data_t *kb_get_data(void);
+    gui_kb_port_data_t *kb = kb_get_data();
+    static uint32_t time_press = 0;
+    static uint8_t hold = 0;
+    static bool press_his = 0;
+    static uint32_t release_his = 0;
     if (hold)
     {
-        if (wheel->button_up)
+        if (kb->event == GUI_KB_EVENT_UP)
         {
-            gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
+            hold = 0;
+            uint32_t time = kb->timestamp_ms_release - time_press;
+            if (time <= 300)
+            {
+                // gui_log("pressing time = %d\n", time);
+                if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
+                {
+                    gui_log("change menu style\n");
+                    extern uint8_t menu_style;
+                    menu_style++;
+                    menu_style %= 3;
+                }
+                press_his = !press_his;
+                release_his = kb->timestamp_ms_release;
+                return;
+            }
+            if (time <= 1000)
+            {
+                gui_log("pressing time = %d\n", time);
+                press_his = 0;
+                gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
+            }
         }
     }
-    if (wheel->button_hold)
+    if (kb->event == GUI_KB_EVENT_DOWN && !hold)
     {
+        time_press = kb->timestamp_ms_press;
         hold = 1;
     }
-    else
-    {
-        hold = 0;
-    }
-#else
-#include "kb_algo.h"
-    extern gui_kb_port_data_t *port_kb_get_data(void);
-    gui_kb_port_data_t *kb = port_kb_get_data();
-    // static uint8_t hold = 0;
-    // if (hold)
-    // {
-    //     if (kb->event == GUI_KB_EVENT_UP)
-    //     {
-
-    //     }
-    // }
-    if (kb->event == GUI_KB_EVENT_DOWN)
-    {
-        // hold = 1;
-        gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
-    }
-    // else
-    // {
-    //     hold = 0;
-    // }
-#endif
 }
 
 static void switch_app_menu()
 {
-    gui_log("enter menu\n");
-    extern void *get_app_menu();
-    gui_switch_app(gui_current_app(), get_app_menu());
+    if (!enter_menu_flag)
+    {
+        enter_menu_flag = 1;
+        gui_log("enter menu\n");
+        extern void close_box2d_ring(void);
+        close_box2d_ring();
+        extern void clear_activity(void);
+        clear_activity();
+
+        extern gui_app_t *get_app_menu();
+        gui_app_switch(gui_current_app(), get_app_menu());
+    }
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
     // extern gui_app_t *_get_app_APP_MUSIC_handle(void);
-    // gui_switch_app(gui_current_app(), _get_app_APP_MUSIC_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
     // extern gui_app_t *get_app_menu();
-    // gui_switch_app(gui_current_app(), get_app_menu());
+    // gui_app_switch(gui_current_app(), get_app_menu());
     // extern gui_app_t *_get_app_APP_BOX2D_RING_handle();
-    // gui_switch_app(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
     // extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
-    // gui_switch_app(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+    // gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
     // return;
-
     tv = gui_tabview_create(app->window, "hongkong_tabview", 0, 0, 0, 0);
     win_hk = gui_win_create(app->window, "window_hongkong", 0, 0, 0, 0);
     gui_win_set_animate(win_hk, 1000, -1, kb_button_cb, NULL);
     gui_obj_add_event_cb(win_hk, (gui_event_cb_t)switch_app_menu, GUI_EVENT_8,
-                         app->window); //GUI_EVENT_8
+                         app->window);
+    enter_menu_flag = 0;
     gui_tabview_set_style(tv, TAB_CUBE);
     gui_tabview_enable_pre_load(tv, true);
+
     extern void page_tb_control_enter(void *parent);
     page_tb_control_enter(app->window);
 
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",           0, 0, 0, 0, 3, 0);
-    gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
-    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
-    // page_tb_clock(win);
-    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
-    // page_tb_control(gui_tab_get_rte_obj(tb_activity));
-    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
-    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
-    page_tb_cube(gui_tab_get_rte_obj(tb_cube));
-    page_tb_weather(gui_tab_get_rte_obj(tb_weather));
+    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 3, 0);
+
     page_tb_music(gui_tab_get_rte_obj(tb_music));
+    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
+    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
+    // page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+
+    gui_tab_update_preload(GUI_BASE(tb_clock));
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
 // static void data_generate_task_entry()
@@ -144,6 +155,57 @@ static void app_hongkong_ui_design(gui_app_t *app)
 //         gui_thread_mdelay(2000);
 //     }
 // }
+
+typedef enum
+{
+    MESSAGE = 0,
+    OS,
+} app_name;
+
+typedef struct information
+{
+    const char *informer;
+    const char *content;
+    const char *time;
+    app_name app;
+} information_t;
+static char *content = NULL;
+static void inform_generate_task_entry()
+{
+    while (true)
+    {
+        gui_thread_mdelay(2000);
+
+        if (!content)
+        {
+            content = gui_malloc(60);
+            sprintf(content, "Watch will attempt to install this update later tonight.");
+        }
+        extern struct tm *timeinfo;
+        char time[10];
+        if (timeinfo)
+        {
+            sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        }
+
+        information_t payload =
+        {
+            "watchOS 10.3.1",
+            content,
+            time,
+            OS
+        };
+        extern void pagelist_create(information_t *payload);
+        gui_msg_t msg =
+        {
+            .event = GUI_EVENT_USER_DEFINE,
+            .payload = &payload,
+            .cb = (gui_msg_cb)pagelist_create,
+        };
+
+        gui_send_msg_to_server(&msg);
+    }
+}
 
 uint8_t resource_root[1024 * 1024 * 20];
 static int app_init(void)
@@ -169,10 +231,10 @@ static int app_init(void)
     }
 #endif
     gui_server_init();
-    // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
     gui_app_startup(get_app_hongkong());
+    // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
+    gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     return 0;
 }
 
 GUI_INIT_APP_EXPORT(app_init);
-

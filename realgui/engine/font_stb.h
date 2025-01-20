@@ -33,12 +33,10 @@ extern "C" {
 #include <draw_font.h>
 #include "gui_text.h"
 
-
 /*============================================================================*
  *                         Types
  *============================================================================*/
 
-/** @brief  text mode enum start */
 typedef struct font_stb_screen
 {
     int width;
