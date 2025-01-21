@@ -131,8 +131,8 @@ static void transformPoint(float x, float y, float m[3][3], float *x_out, float 
     *y_out = m[1][0] * x + m[1][1] * y + m[1][2];
 }
 
-void computeBoundingBoxInt(int x0, int y0, int x1, int y1, float m[3][3], TransformCase caseX,
-                           TransformCase caseY, int *xmin, int *xmax, int *ymin, int *ymax)
+static void computeBoundingBoxInt(int x0, int y0, int x1, int y1, float m[3][3],
+                                  TransformCase caseX, TransformCase caseY, int *xmin, int *xmax, int *ymin, int *ymax)
 {
     float x_min, x_max, y_min, y_max;
     float temp_x, temp_y;
@@ -165,8 +165,8 @@ void computeBoundingBoxInt(int x0, int y0, int x1, int y1, float m[3][3], Transf
     *ymax = (int)y_max;
 }
 
-void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, float m[3][3],
-                             TransformCase caseX, TransformCase caseY, float *xmin, float *xmax, float *ymin, float *ymax)
+static void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, float m[3][3],
+                                    TransformCase caseX, TransformCase caseY, float *xmin, float *xmax, float *ymin, float *ymax)
 {
     float temp_x, temp_y;
 
@@ -193,8 +193,8 @@ void computeBoundingBoxFloat(float x0, float y0, float x1, float y1, float m[3][
     }
 }
 
-void computeBoundingBoxFloatV2(float x0, float y0, float x1, float y1, float m[3][3], float *xmin,
-                               float *xmax, float *ymin, float *ymax)
+static void computeBoundingBoxFloatV2(float x0, float y0, float x1, float y1, float m[3][3],
+                                      float *xmin, float *xmax, float *ymin, float *ymax)
 {
     float tx0, ty0, tx1, ty1, tx2, ty2, tx3, ty3;
 
@@ -209,8 +209,8 @@ void computeBoundingBoxFloatV2(float x0, float y0, float x1, float y1, float m[3
     *ymax = fmaxf(fmaxf(ty0, ty1), fmaxf(ty2, ty3));
 }
 
-void computeBoundingBoxIntV2(int x0, int y0, int x1, int y1, float m[3][3], int *xmin, int *xmax,
-                             int *ymin, int *ymax)
+static void computeBoundingBoxIntV2(int x0, int y0, int x1, int y1, float m[3][3], int *xmin,
+                                    int *xmax, int *ymin, int *ymax)
 {
     float fxmin, fxmax, fymin, fymax;
 
@@ -240,6 +240,7 @@ void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
         line->x0 = p2.x - line->dxy * line->y0;
     }
 }
+
 gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
 {
     uint32_t mix;

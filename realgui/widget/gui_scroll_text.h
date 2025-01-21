@@ -41,8 +41,8 @@ extern "C" {
 typedef struct gui_scroll_text
 {
     gui_text_t base;
-    uint8_t start_value;
-    uint8_t end_value;
+    uint32_t start_value;
+    uint32_t end_value;
     uint32_t cnt_value;
     uint32_t init_time_ms;
     uint32_t duration_time_ms;
@@ -104,8 +104,8 @@ gui_scroll_text_t *gui_scroll_text_create(void       *parent,
  */
 void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
                                 TEXT_MODE          mode,
-                                uint8_t            start_value,
-                                uint8_t            end_value,
+                                uint32_t           start_value,
+                                uint32_t           end_value,
                                 uint32_t           interval_time_ms,
                                 uint32_t           duration_time_ms);
 

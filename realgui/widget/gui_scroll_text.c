@@ -342,6 +342,14 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         gui_scroll_text_font_load(&text->base, &draw_rect);
     }
+    if (text->base.font_type == GUI_FONT_SRC_TTF)
+    {
+        gui_font_ttf_adapt_rect((gui_text_t *)text, &draw_rect);
+        draw_rect.xboundleft = draw_rect.x1;
+        draw_rect.xboundright = draw_rect.x2;
+        draw_rect.yboundtop = draw_rect.y1;
+        draw_rect.yboundbottom = draw_rect.y2;
+    }
 
     gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
 
@@ -482,8 +490,8 @@ void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
 
 void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
                                 TEXT_MODE          mode,
-                                uint8_t            start_value,
-                                uint8_t            end_value,
+                                uint32_t           start_value,
+                                uint32_t           end_value,
                                 uint32_t           interval_time_ms,
                                 uint32_t           duration_time_ms)
 {

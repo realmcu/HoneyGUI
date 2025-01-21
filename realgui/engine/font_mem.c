@@ -686,9 +686,15 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case SCROLL_Y:
         {
             uint32_t line = 0;
+            int last_space_index = 0;
+
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
+                if (chr[i].unicode == 0x20)
+                {
+                    last_space_index = i;
+                }
                 if (i == 0)
                 {
                     chr[i].x = rect->x1;
@@ -697,7 +703,22 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 {
                     chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
                 }
-                if ((chr[i].x + chr[i].char_w - 1) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
+                {
+                    if (chr[i].unicode == 0x20)
+                    {
+                        chr[i].y = rect->y1 + line * chr[i].h;
+                        chr[i].char_w = rect->x2 + 1 - chr[i].x;
+                        continue;
+                    }
+                    if (text->wordwrap && i != text->font_len - 1)
+                    {
+                        i = last_space_index + 1;
+                    }
+                    line++;
+                    chr[i].x = rect->x1;
+                }
+                else if (chr[i - 1].unicode == 0x0A)
                 {
                     line++;
                     chr[i].x = rect->x1;

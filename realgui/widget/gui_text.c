@@ -224,6 +224,10 @@ static void gui_text_font_destory(gui_text_t *text)
     {
         gui_free(text->animate);
     }
+    if (text->matrix)
+    {
+        gui_free(text->matrix);
+    }
 
     switch (text->font_type)
     {
@@ -300,10 +304,20 @@ static void gui_text_input_prepare(gui_obj_t *obj)
 }
 static void gui_text_prepare(gui_obj_t *obj)
 {
+    if (obj->not_show)
+    {
+        return;
+    }
+
     gui_text_t *this = (void *)obj;
     touch_info_t *tp = tp_get_info();
     gui_point3f_t point = {0, 0, 1};
     uint8_t last;
+
+    if (this->font_type == GUI_FONT_SRC_IMG)
+    {
+        return;
+    }
 
 #if 0 // font mat scale min scale function
     if (this->base.matrix->m[0][0] < this->min_scale)
@@ -320,15 +334,10 @@ static void gui_text_prepare(gui_obj_t *obj)
     //         this->base.matrix->m[0][0],this->base.matrix->m[1][1],
     //         this->scale_img->base.matrix->m[0][0],this->scale_img->base.matrix->m[1][1]);
 #endif
-    if (this->font_type == GUI_FONT_SRC_IMG)
+    if (this->matrix)
     {
-        return;
+        matrix_multiply(obj->matrix, this->matrix);
     }
-    if (this->base.not_show)
-    {
-        return;
-    }
-
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
@@ -361,14 +370,7 @@ static void gui_text_prepare(gui_obj_t *obj)
         break;
     }
 
-    if (obj->not_show)
-    {
-        this->layout_refresh = false;
-        this->content_refresh = false;
-    }
-
     last = this->checksum;
-    this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
 
     if (last != this->checksum || this->content_refresh)
@@ -628,6 +630,15 @@ void gui_text_emoji_set(gui_text_t *this, uint8_t *path, uint8_t size)
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
 {
     this->charset = charset;
+}
+
+void gui_text_set_matrix(gui_text_t *this, gui_matrix_t *matrix)
+{
+    if (this->matrix == NULL)
+    {
+        this->matrix = gui_malloc(sizeof(struct gui_matrix));
+    }
+    memcpy(this->matrix, matrix, sizeof(gui_matrix_t));
 }
 
 void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
