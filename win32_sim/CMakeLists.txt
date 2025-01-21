@@ -12,14 +12,16 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_EXTENSIONS ON)
 include(${CMAKE_SOURCE_DIR}/config.cmake)
 
+
 project(HoneyGUI)
+add_executable(gui main.c)
 add_subdirectory(../ HoneyGUI.out)
 
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")
     message(STATUS "Target processor is ARM.")
 else()
-add_executable(gui main.c)
+
 
 
 set_target_properties(gui PROPERTIES
