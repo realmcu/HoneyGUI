@@ -26,7 +26,7 @@ Rounded Rectangle
 
 A simple example of drawing three rounded rectangles of different colors.
 
-* three color refer to `Colors' RGB Data <https://www.rapidtables.com/web/color/RGB_Color.html>`_.
+* Three color refer to `Colors' RGB Data <https://www.rapidtables.com/web/color/RGB_Color.html>`_.
 * ``firebrick``
 * ``olive drab``
 * ``dodger blue`` with 100 value opacity

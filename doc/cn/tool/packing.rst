@@ -10,7 +10,7 @@ RTL87x2G 是一系列IC类型的缩写。
 
 RTL87x2G和RTL8762D的打包流程一样，以下以RTL8762G为例进行说明。
 
-在开始之前，请在SDK目录下的（``\subsys\gui\realgui\example\screen_800_480\root_image_800_480``）选择一个合适的示例，或者基于示例创建一个新的打包目录。
+在开始之前，请在SDK目录下的（ ``\subsys\gui\realgui\example\screen_800_480\root_image_800_480`` ）选择一个合适的示例，或者基于示例创建一个新的打包目录。
 然后，将bat和py脚本复制到该目录中，确保root文件夹以及bat和py脚本都处于该目录下。
 
 用户数据生成流程如下：
@@ -54,7 +54,7 @@ RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用�
 
 1. 将生成的图像 ``bin`` 文件复制到 ``\src\app\watch\gui_application\root_image\root\8773e_watch`` 目录，并将生成的字体 ``bin`` 文件复制到 ``\src\app\watch\gui_application\root_image\root\font`` 目录。
 2. 修改构建地址（``build address``）：开发者需要通过修改 ``mkromfs_0x4400000.bat`` 文件（:kbd:`python_bin_mkromfs_0x4400000.py --binary --addr 0x238b400 root root(0x4400000).bin`）。这里的 ``--addr`` 参数对应于闪存映射中的 userdata 地址加上 0x400（图像头部大小）。
-3. 在 ``\src\app\watch\gui_application\root_image``目录中双击 ``mkromfs_0x4400000.bat`` 文件来执行脚本，并生成root文件夹的镜像。一个新的 ``bin`` 文件 ``root(0x4400000).bin`` 和头文件 ``ui_resource.h`` 将出现在目录中。
+3. 在 ``\src\app\watch\gui_application\root_image`` 目录中双击 ``mkromfs_0x4400000.bat`` 文件来执行脚本，并生成root文件夹的镜像。一个新的 ``bin`` 文件 ``root(0x4400000).bin`` 和头文件 ``ui_resource.h`` 将出现在目录中。
 4. 在这两个文件中，``.bin`` 文件是包含root目录内容的镜像文件，而 ``.h`` 文件则包含了文件系统中每个文件的地址偏移量，这些偏移量允许开发者在不使用文件系统的情况下直接访问这些文件。
 
 .. figure:: https://foruda.gitee.com/images/1726730908892819237/3349d8fb_13671125.png

@@ -27,8 +27,8 @@ Function ``void app_music_ui_design(gui_obj_t *obj)`` is located in file ``realg
 
 Widgets Tree Design
 ~~~~~~~~~~~~~~~~~~~
-.. figure:: https://foruda.gitee.com/images/1733109387176750266/2d2ebb9b_10088396.png
-   :width: 400px
+.. figure:: https://foruda.gitee.com/images/1737429147962828506/953bab9f_13408154.png
+   :width: 600px
    :align: center
    :name: Widgets Tree Design
    

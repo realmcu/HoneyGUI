@@ -11,7 +11,7 @@ RTL87x2G is the abbreviation of a series IC type.
 
 The packaging process for the RTL87x2G and RTL8762D is the same. Take RTL8762G as an example as follows.
 
-Before starting, select the appropriate demo under the sdk directory (``\subsys\gui\realgui\example\screen_800_480\root_image_800_480``), or create a new packaging directory based on the example. 
+Before starting, select the appropriate demo under the sdk directory ( ``\subsys\gui\realgui\example\screen_800_480\root_image_800_480`` ), or create a new packaging directory based on the example. 
 Then copy the ``bat and py scripts`` to that directory, ensuring that the ``root folder`` and the ``bat and py scripts`` exist under the directory.
 
 .. figure:: https://foruda.gitee.com/images/1726730622033771482/882af9c3_13671125.png
@@ -28,7 +28,7 @@ RTL8763E and RTL8773DO
 ----------------------
 RTL8763E is the name of a series IC type, including RTL8763EWE-VP/RTL8763EW-VC. The packaging process for RTL877DO is similar to that of RTL8763E.
 
-Before starting, navigate to the SDK directory (``\tool\Gadgets\gui_package_tool``) and choose the appropriate IC directory. Select the ``8763E`` directory for ``RTL8763EW`` and the ``87x3D`` directory for ``RTL8773DO``.
+Before starting, navigate to the SDK directory ( ``\tool\Gadgets\gui_package_tool`` ) and choose the appropriate IC directory. Select the ``8763E`` directory for ``RTL8763EW`` and the ``87x3D`` directory for ``RTL8773DO``.
 
 The process for generating user data is as follows:
 
