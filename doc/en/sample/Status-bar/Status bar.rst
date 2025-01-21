@@ -11,7 +11,7 @@ Status Bar
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Status-bar/status_bar.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1737443754966055427/08a3861e_10088396.gif" width= "400" /></div>
    <br>
    
 Implementation
