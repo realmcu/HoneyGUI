@@ -29,17 +29,28 @@ DEFAULT_ARGS=()
 # An empty list defaults to all folders next to this script.
 # Default: empty (all folders)
 #
-# PACK_DIRS="
-#   <list directories here>
-# "
+PACK_DIRS="
+  ../../realgui/app
+  ../../realgui/core
+  ../../realgui/dc
+  ../../realgui/DOM
+  ../../realgui/example
+  ../../realgui/engine
+  ../../realgui/input
+  ../../realgui/misc
+  ../../realgui/SaaA
+  ../../realgui/server
+  ../../realgui/widget
+"
 
 # Specify file names to be added to pack base directory
 # Default: empty
 #
 PACK_BASE_FILES="
   LICENSE
-  test.h
-  test.c
+  gen_pack.sh
+  generate_pdsc.py
+  Realtek.HoneyGUI.pdsc
 "
 
 # Specify file names to be deleted from pack build directory
