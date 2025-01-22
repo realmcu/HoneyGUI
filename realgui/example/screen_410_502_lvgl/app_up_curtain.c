@@ -1,6 +1,33 @@
 #include "lvgl.h"
 #include "app_main.h"
 
+static bool is_at_bottom  = false;
+
+static void page_scroll_event_cb(lv_event_t *e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_SCROLL_END)
+    {
+        lv_obj_t *obj = lv_event_get_target(e);
+        lv_coord_t scrollable = lv_obj_get_scroll_bottom(obj);
+        // lv_log("scrollable=%d\n", scrollable);
+        if (scrollable < -50)
+        {
+            is_at_bottom = true;
+        }
+        else
+        {
+            is_at_bottom = false;
+        }
+    }
+    if (is_at_bottom)
+    {
+        is_at_bottom = false;
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_TOP, 500, 0, &lv_watchface_init);
+    }
+}
+
 void scr_up_curtain_cb(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -13,7 +40,8 @@ void scr_up_curtain_cb(lv_event_t *e)
         // opa_on_Animation(ui_date_group, 500);
         // opa_on_Animation(ui_weather_title_group_1, 400);
     }
-    if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP)
+    if (event_code == LV_EVENT_GESTURE &&
+        lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP)
     {
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_TOP, 500, 0, &lv_watchface_init);
@@ -23,22 +51,60 @@ void scr_up_curtain_cb(lv_event_t *e)
 void lv_up_curtain_init(void)
 {
     scr_up_curtain = lv_obj_create(NULL);
-
-    // lv_obj_set_style_bg_color(scr_up_curtain, lv_color_make(0, 0, 0), 0);
-    // lv_obj_set_style_bg_opa(scr_up_curtain, LV_OPA_COVER, 0);
-
-    // extern const lv_image_dsc_t ui_text_0;
-    // lv_obj_t *img1 = lv_image_create(scr_up_curtain);
-    // lv_image_set_src(img1, &ui_text_0);
-    // lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-
-    lv_obj_t *label1 = lv_label_create(scr_up_curtain);
-    lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
-    lv_label_set_text(label1, "scr_up_curtain.");
-    lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
-    lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
-
     lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)scr_up_curtain_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_t *page = lv_obj_create(scr_up_curtain);
+    lv_obj_set_size(page, 410, 502);
+    lv_obj_set_pos(page, 0, 0);
+    lv_obj_set_style_bg_color(page, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(page, 76, 0);
+    lv_obj_add_flag(page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollbar_mode(page, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_style_border_width(page, 0, 0);
+    lv_obj_add_event_cb(page, (lv_event_cb_t)page_scroll_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_t *label = lv_label_create(page);
+    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_label_set_text(label, "This is a multiline\n"
+                      "scrollable text content.\n"
+                      "Add enough lines or reduce\n"
+                      "the size of the page.\n"
+                      "\n"
+                      "\n"
+                      "This text must be longer\n"
+                      "than the page height to\n"
+                      "enable scrolling.\n"
+                      "\n"
+                      "Keep adding lines...\n"
+                      "The more lines, the better.\n"
+                      "\n"
+                      "\n"
+                      "\n"
+                      "Keep adding...\n"
+                      "\n"
+                      "Almost there...\n"
+                      "\n"
+                      "Scrolling should now work!"
+                      "This is a multiline\n"
+                      "scrollable text content.\n"
+                      "Add enough lines or reduce\n"
+                      "the size of the page.\n"
+                      "\n"
+                      "\n"
+                      "This text must be longer\n"
+                      "than the page height to\n"
+                      "enable scrolling.\n"
+                      "\n"
+                      "Keep adding lines...\n"
+                      "The more lines, the better.\n"
+                      "\n"
+                      "\n"
+                      "\n"
+                      "Keep adding...\n"
+                      "\n"
+                      "Almost there...\n"
+                      "\n"
+                      "Scrolling should now work!"
+                     );
 }
 
