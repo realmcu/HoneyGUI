@@ -402,34 +402,6 @@ static void gui_tabview_prepare(gui_obj_t *obj)
             break;
         }
     }
-    if (tp->pressing == false)
-    {
-        if (this->release_x >= GUI_FRAME_STEP)
-        {
-            this->release_x -= GUI_FRAME_STEP;
-        }
-        else if (this->release_x <= -GUI_FRAME_STEP)
-        {
-            this->release_x += GUI_FRAME_STEP;
-        }
-        else
-        {
-            this->release_x = 0;
-        }
-
-        if (this->release_y >= GUI_FRAME_STEP)
-        {
-            this->release_y -= GUI_FRAME_STEP;
-        }
-        else if (this->release_y <= -GUI_FRAME_STEP)
-        {
-            this->release_y += GUI_FRAME_STEP;
-        }
-        else
-        {
-            this->release_y = 0;
-        }
-    }
 
 
     this->checksum = 0;
@@ -458,6 +430,34 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     else
     {
         this->tab_need_pre_load = false;
+    }
+    if (tp->pressing == false)
+    {
+        if (this->release_x >= GUI_FRAME_STEP)
+        {
+            this->release_x -= GUI_FRAME_STEP;
+        }
+        else if (this->release_x <= -GUI_FRAME_STEP)
+        {
+            this->release_x += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_x = 0;
+        }
+
+        if (this->release_y >= GUI_FRAME_STEP)
+        {
+            this->release_y -= GUI_FRAME_STEP;
+        }
+        else if (this->release_y <= -GUI_FRAME_STEP)
+        {
+            this->release_y += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_y = 0;
+        }
     }
 }
 
