@@ -23,7 +23,7 @@ static struct acc_engine *acc = NULL;
 #define _GUI_FS_ROOT_DIR "realgui\\example\\screen_480_480\\root\\"
 #endif
 char *defaultPath = _GUI_FS_ROOT_DIR;
-
+static char *buffer;
 void gui_change_default_path(int argc, char **argv)
 {
     for (int count = 1; count < argc; count++)
@@ -32,7 +32,6 @@ void gui_change_default_path(int argc, char **argv)
         {
             char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
             sprintf(path, "%s%s", argv[count + 1], "\\");
-            static char *buffer;
             buffer = defaultPath;
             GUI_UNUSED(buffer);
             defaultPath = path;

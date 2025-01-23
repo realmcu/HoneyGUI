@@ -368,9 +368,10 @@ static char *read_file(const char *path)
     //if (content)
     {
         size_t size = fread(content, 1, length, file);
+        GUI_UNUSED(size);
         if (size != length)
         {
-            gui_log("%d\n", size);
+            //gui_log("%d\n", size);
             gui_free(content);
             fclose(file);
             return 0;
@@ -1100,27 +1101,27 @@ static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 h = atoi(p->attr[++i]);
             }
-            else if (!strcmp(p->attr[i], "transition"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "normal"))
-                {
-                    style = CLASSIC;
-                }
-                else if (!strcmp(p->attr[i], "fade"))
-                {
-                    style = FADE;
-                }
-                else if (!strcmp(p->attr[i], "scale"))
-                {
-                    style = REDUCTION;
-                }
-                else if (!strcmp(p->attr[i], "fadeScale"))
-                {
-                    style = REDUCTION_FADE;
-                }
+            // else if (!strcmp(p->attr[i], "transition"))
+            // {
+            //     char *s = p->attr[++i];
+            //     if (!strcmp(p->attr[i], "normal"))
+            //     {
+            //         style = CLASSIC;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fade"))
+            //     {
+            //         style = FADE;
+            //     }
+            //     else if (!strcmp(p->attr[i], "scale"))
+            //     {
+            //         style = REDUCTION;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fadeScale"))
+            //     {
+            //         style = REDUCTION_FADE;
+            //     }
 
-            }
+            // }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -1177,23 +1178,23 @@ static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
             {
                 stroke_width = atoi(p->attr[++i]);
             }
-            else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
-                     !strcmp(p->attr[i], "cap"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "butt"))
-                {
-                    cap = NVG_BUTT;
-                }
-                else if (!strcmp(p->attr[i], "round"))
-                {
-                    cap = NVG_ROUND;
-                }
-                else if (!strcmp(p->attr[i], "square"))
-                {
-                    cap = NVG_SQUARE;
-                }
-            }
+            // else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
+            //          !strcmp(p->attr[i], "cap"))
+            // {
+            //     char *s = p->attr[++i];
+            //     if (!strcmp(p->attr[i], "butt"))
+            //     {
+            //         cap = NVG_BUTT;
+            //     }
+            //     else if (!strcmp(p->attr[i], "round"))
+            //     {
+            //         cap = NVG_ROUND;
+            //     }
+            //     else if (!strcmp(p->attr[i], "square"))
+            //     {
+            //         cap = NVG_SQUARE;
+            //     }
+            // }
             else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
             {
                 stroke = string_rgb888(p->attr[++i]);
@@ -1574,6 +1575,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -1830,7 +1832,7 @@ static gui_obj_t *widget_create_curtainview(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     style = WIDGET_SCALE_FADE;
                 }
-
+                GUI_UNUSED(style);
             }
             i++;
         }
@@ -1974,7 +1976,7 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t h = 0;
         float scope = 1.0f;
         T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
-        int style = 0; GUI_UNUSED(style);
+        // int style = 0; GUI_UNUSED(style);
         while (true)
         {
             if (!(p->attr[i]))
@@ -2026,27 +2028,27 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                     orientation = CURTAIN_RIGHT;
                 }
             }
-            else if (!strcmp(p->attr[i], "transition"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "normal"))
-                {
-                    style = WIDGET_CLASSIC;
-                }
-                else if (!strcmp(p->attr[i], "fade"))
-                {
-                    style = WIDGET_FADE;
-                }
-                else if (!strcmp(p->attr[i], "scale"))
-                {
-                    style = WIDGET_SCALE;
-                }
-                else if (!strcmp(p->attr[i], "fadeScale"))
-                {
-                    style = WIDGET_SCALE_FADE;
-                }
+            // else if (!strcmp(p->attr[i], "transition"))
+            // {
+            //     char *s = p->attr[++i];
+            //     if (!strcmp(p->attr[i], "normal"))
+            //     {
+            //         style = WIDGET_CLASSIC;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fade"))
+            //     {
+            //         style = WIDGET_FADE;
+            //     }
+            //     else if (!strcmp(p->attr[i], "scale"))
+            //     {
+            //         style = WIDGET_SCALE;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fadeScale"))
+            //     {
+            //         style = WIDGET_SCALE_FADE;
+            //     }
 
-            }
+            // }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -2178,6 +2180,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
                 {
                     style = BUTTON_HIGHLIGHT_ARRAY;
                 }
+                GUI_UNUSED(style);
             }
             else if (!strcmp(p->attr[i], "blendMode"))
             {
@@ -2198,6 +2201,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -2539,6 +2543,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -2724,8 +2729,7 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
         char *folder = NULL;
 
-        // default image blend_mode
-        uint8_t blendMode = IMG_FILTER_BLACK; GUI_UNUSED(blendMode);
+
         uint8_t opacity = 255; GUI_UNUSED(opacity);
 
         memset(&config, 0, sizeof(config));
@@ -2775,26 +2779,6 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             else if (!strcmp(p->attr[i], "sidePosPercent"))
             {
                 config.side_pos_percent = atof(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "blendMode"))
-            {
-                i++;
-                if (!strcmp(p->attr[i], "imgBypassMode"))
-                {
-                    blendMode = IMG_BYPASS_MODE;
-                }
-                else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                {
-                    blendMode = IMG_FILTER_BLACK;
-                }
-                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                {
-                    blendMode = IMG_SRC_OVER_MODE;
-                }
-                else if (!strcmp(p->attr[i], "imgCoverMode"))
-                {
-                    blendMode = IMG_COVER_MODE;
-                }
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -3258,7 +3242,10 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             {
                 char **param = gui_malloc(sizeof(char *) * 2);
                 param[0] = gui_strdup(to);
-                param[1] = gui_strdup(id);
+                if (id)
+                {
+                    param[1] = gui_strdup(id);
+                }
                 if (!strcmp(type, "animatePause"))
                 {
                     if (parent->type == BUTTON)
@@ -3438,8 +3425,8 @@ static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
             }
             i++;
         }
-        void *bg_buf;
-        void *slider_buf;
+        void *bg_buf = 0;
+        void *slider_buf = 0;
         if (bg_picture)
         {
             bg_buf = (void *)gui_get_image_file_address(bg_picture);
@@ -3460,7 +3447,7 @@ static gui_obj_t *widget_create_macro_onchange(ezxml_t p, gui_obj_t *parent, T_O
 
     {
         char *type = 0;
-        char *to = 0;
+        char *to = "null";
         int id = 0;
         size_t i = 0;
         while (true)
@@ -3528,8 +3515,8 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
 
     {
         char *type = 0;
-        char *to = 0;
-        char *id = 0;
+        char *to = "null";
+        char *id = "null";
         size_t i = 0;
         while (true)
         {
@@ -3578,8 +3565,8 @@ static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
     {
         char *type = 0;
-        char *to = 0;
-        char *id = 0;
+        char *to = "null";
+        char *id = "null";
         size_t i = 0;
         while (true)
         {
@@ -3605,7 +3592,10 @@ static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_
         {
             char **param = gui_malloc(sizeof(char *) * 2);
             param[0] = gui_strdup(to);
-            param[1] = gui_strdup(id);
+            if (id)
+            {
+                param[1] = gui_strdup(id);
+            }
             if (!strcmp(type, "animatePause"))
             {
 
@@ -3704,7 +3694,7 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
         int16_t row_count = 0;
         int16_t row_spacing = 0;
         int16_t item_count = 0;
-        const char *items = NULL;
+        const char *items = "NULL";
         int column_offset = 0; GUI_UNUSED(column_offset);
         const char *font = 0;
         int16_t font_size = 0;
@@ -4143,7 +4133,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
         int16_t w = 0;
         int16_t row_spacing = 0;
         int16_t item_count = 0;
-        const char *items = NULL;
+        const char *items = "null,null";
         const char *font = 0;
         int16_t font_size = 0;
         gui_color_t  font_color = {0};
@@ -4273,6 +4263,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             i++;
         }
@@ -4379,7 +4370,7 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                                 gui_color_t stroke = APP_COLOR_RED;
                                 float sd = 0; GUI_UNUSED(sd);
                                 float ed = 100; GUI_UNUSED(ed);
-                                int dir;
+                                int dir = 0;
                                 while (true)
                                 {
                                     if (!(p->attr[i]))
@@ -4428,6 +4419,7 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                                         {
                                             cap = NVG_SQUARE;
                                         }
+                                        GUI_UNUSED(cap);
                                     }
                                     else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
                                     {
@@ -4656,7 +4648,7 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         int16_t w = 0;
         int16_t h = 0;
         int16_t item_count = 0;
-        const char *items = NULL;
+        const char *items = "NULL";
         gui_color_t  color = {0};
         int16_t max = 0;
         int16_t min = 0;
@@ -4887,6 +4879,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
