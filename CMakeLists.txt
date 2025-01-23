@@ -1,9 +1,60 @@
 include(cmake/gui_build.cmake)
 set(gui_debug_enable OFF)
 if(CONFIG_LIB_MODE)
+message(STATUS "LIB MODE.")
 add_library(HoneyGUI STATIC
     ${gui_sources}
 )
+
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")
+
+
+# Check if a specific toolchain is specified
+if(NOT CMAKE_TOOLCHAIN_FILE)
+    message(FATAL_ERROR "Please specify a toolchain file with -DCMAKE_TOOLCHAIN_FILE=<path/to/toolchain>")
+endif()
+
+# Log the current compiler
+if(CMAKE_C_COMPILER MATCHES ".*arm-none-eabi-gcc.*")
+    set(COMPILER_NAME "arm-none-eabi-gcc")
+elseif(CMAKE_C_COMPILER MATCHES ".*armcc.*")
+    set(COMPILER_NAME "armcc")
+elseif(CMAKE_C_COMPILER MATCHES ".*armclang.*")
+    set(COMPILER_NAME "armclang")
+else()
+    set(COMPILER_NAME "Unknown Compiler")
+endif()
+
+message(STATUS "Using Compiler: ${COMPILER_NAME}")
+
+set(LIB_DESTINATION ${CMAKE_CURRENT_LIST_DIR}/lib/${COMPILER_NAME}/)
+
+
+get_target_property(LIB_OUTPUT_NAME HoneyGUI OUTPUT_NAME)
+if(NOT LIB_OUTPUT_NAME)
+    set(LIB_OUTPUT_NAME HoneyGUI)
+endif()
+set(LIB_FILE $<TARGET_FILE:HoneyGUI>)
+
+
+
+
+# Source directory path
+set(SOURCE_DIR  "${CMAKE_CURRENT_LIST_DIR}/realgui")
+
+# Destination directory path
+set(DEST_DIR  "${CMAKE_CURRENT_LIST_DIR}/lib/${COMPILER_NAME}/include")
+
+
+add_custom_command(TARGET HoneyGUI POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${LIB_FILE} ${LIB_DESTINATION}/${LIB_OUTPUT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+    COMMENT "Copying ${LIB_OUTPUT_NAME} to ${LIB_DESTINATION}"
+    COMMAND ${CMAKE_COMMAND} -D SOURCE_DIR=${SOURCE_DIR} -D DEST_DIR=${DEST_DIR} -P ${CMAKE_CURRENT_LIST_DIR}/lib/lib.cmake
+)
+
+endif()
+
+
 endif()
 if(CONFIG_LVGL)
 set(LVGL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/lvgl_v8/lvgl)

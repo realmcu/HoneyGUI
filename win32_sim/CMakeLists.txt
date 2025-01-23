@@ -14,15 +14,20 @@ include(${CMAKE_SOURCE_DIR}/config.cmake)
 
 
 project(HoneyGUI)
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")
+ message(STATUS "Target processor is ARM.")   
+ message(STATUS "${CMAKE_TOOLCHAIN_FILE}")   
+else()
+ 
 add_executable(gui main.c)
+endif()
 add_subdirectory(../ HoneyGUI.out)
 
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")
     message(STATUS "Target processor is ARM.")
 else()
-
-
+ message(STATUS "Target processor is X86.")  
 
 set_target_properties(gui PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../)
@@ -63,9 +68,10 @@ add_library(LibSecond STATIC IMPORTED)
 set_target_properties(LibFirst PROPERTIES IMPORTED_LOCATION "${LIBRARY_PATH}/libSDL2main.a")
 set_target_properties(LibSecond PROPERTIES IMPORTED_LOCATION "${LIBRARY_PATH}/libSDL2.a")   
 if(CONFIG_LIB_MODE)
+message(STATUS "LIB MODE.")
 set_target_properties( PROPERTIES LINK_FLAGS "-Wl,-Map=output.map")
 set_target_properties(gui PROPERTIES
-    LINK_FLAGS "-Wl,--whole-archive ${CMAKE_CURRENT_SOURCE_DIR}/build/HoneyGUI.out/libHoneyGUI.a -Wl,--no-whole-archive,-Map=output.map")
+    LINK_FLAGS "-Wl,--whole-archive ${CMAKE_BINARY_DIR}/HoneyGUI.out/libHoneyGUI.a -Wl,--no-whole-archive,-Map=output.map")
 target_link_libraries(gui mingw32 opengl32 LibFirst LibSecond setupapi
 dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi version uuid HoneyGUI)
 else()
@@ -116,8 +122,8 @@ add_custom_target(menuconfig
     COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_BINARY_DIR}/CMakeCache.txt"
     COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_BINARY_DIR}/Makefile"
     COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_BINARY_DIR}/cmake_install.cmake"
-    COMMAND ${CMAKE_COMMAND} -E echo "Reconfiguring project with CMake"
-    COMMAND ${CMAKE_COMMAND} -G "MinGW Makefiles" -S "${CMAKE_SOURCE_DIR}" -B "${CMAKE_BINARY_DIR}"
+    #COMMAND ${CMAKE_COMMAND} -E echo "Reconfiguring project with CMake"
+    #COMMAND ${CMAKE_COMMAND} -G "MinGW Makefiles" -S "${CMAKE_SOURCE_DIR}" -B "${CMAKE_BINARY_DIR}"
     VERBATIM
 )
 
