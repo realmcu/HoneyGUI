@@ -633,8 +633,9 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
             }
 
             position = body_bomb->GetPosition();
-            position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB), img_bomb,
-                             body_bomb);
+            if (position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB),
+                                 img_bomb,
+                                 body_bomb) == 1) {;}
 
             // Refresh half-cut fruits pos
             if (fruit_cut_flag[0])

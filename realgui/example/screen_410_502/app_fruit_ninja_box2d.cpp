@@ -460,12 +460,12 @@ static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_i
 static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 {
     gui_win_t *win = static_cast<gui_win_t *>(p);
-    if (win->animate->end_frame)
+    if (win->animate->end_frame == 1)
     {
         game_time--;
     }
 
-    if (get_init_flag())
+    if (get_init_flag() == 1)
     {
         // Create a Box2D world with gravity
         void *mem = gui_malloc(sizeof(b2World));
@@ -576,7 +576,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 
         init_flag = false;
     }
-    if (world)
+    if (world != NULL)
     {
         sprintf((char *)time_counter_content, "TIME: %d", game_time);
         gui_text_content_set(time_counter, time_counter_content, strlen((char *)time_counter_content));
@@ -593,7 +593,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         {
             b2Vec2 position = body_st->GetPosition();
             if (position_refresh((int)(position.x * M2P - RADIUS_ST), (int)(position.y * M2P - RADIUS_ST),
-                                 img_strawberry, body_st))
+                                 img_strawberry, body_st) == 1)
             {
                 gui_img_set_attribute(img_strawberry, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
                                       img_strawberry->base.x, img_strawberry->base.y);
@@ -604,7 +604,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 
             position = body_ba->GetPosition();
             if (position_refresh((int)(position.x * M2P - RADIUS_BA), (int)(position.y * M2P - RADIUS_BA),
-                                 img_banana, body_ba))
+                                 img_banana, body_ba) == 1)
             {
                 gui_img_set_attribute(img_banana, "img_banana", FRUIT_NINJA_BANANA_BIN, img_banana->base.x,
                                       img_banana->base.y);
@@ -614,7 +614,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 
             position = body_pe->GetPosition();
             if (position_refresh((int)(position.x * M2P - RADIUS_PE), (int)(position.y * M2P - RADIUS_PE),
-                                 img_peach, body_pe))
+                                 img_peach, body_pe) == 1)
             {
                 gui_img_set_attribute(img_peach, "img_peach", FRUIT_NINJA_PEACH_BIN, img_peach->base.x,
                                       img_peach->base.y);
@@ -633,8 +633,9 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
             }
 
             position = body_bomb->GetPosition();
-            position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB), img_bomb,
-                             body_bomb);
+            if (position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB),
+                                 img_bomb,
+                                 body_bomb) == 1) {;}
 
             // Refresh half-cut fruits pos
             if (fruit_cut_flag[0])
