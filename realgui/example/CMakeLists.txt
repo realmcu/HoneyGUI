@@ -19,5 +19,8 @@ elseif(CONFIG_SMART_HOME_RESOLUTION_480x320)
 elseif(CONFIG_LVGL)
     message(STATUS "*****LVGL*****")
     add_subdirectory(demo)
+elseif(CONFIG_RVD)
+    message(STATUS "*****RVD*****")
+    target_compile_definitions(gui PRIVATE  _GUI_FS_ROOT_DIR="realgui/example/screen_640_360/box/root/")
 endif()
 
