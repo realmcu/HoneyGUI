@@ -179,6 +179,7 @@ static bool ends_with_xml(const char *str);
 static ezxml_t f1;
 static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
@@ -3620,7 +3621,7 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
     {
         char *type = 0;
         char *to = 0; GUI_UNUSED(to);
-        char *id = 0;
+        char *id = "null";
         size_t i = 0;
         while (true)
         {
@@ -3656,7 +3657,10 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
                 {
                     f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                 }
-                foreach_create_animate(f, parent, gui_strdup(id));
+                if (id)
+                {
+                    foreach_create_animate(f, parent, gui_strdup(id));
+                }
                 //gui_log(" ");
                 if (f1 == 0)
                 {
@@ -4346,6 +4350,10 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
             }
             i++;
         }
+        if (!id)
+        {
+            return parent;
+        }
         switch (parent->type)
         {
         case IMAGE_FROM_MEM:
@@ -4572,7 +4580,7 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                             }
                             gui_img_append_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback,
                                                    (void *)param, 0);
-                            parent->obj_cb = img_ontime_render;
+                            parent->obj_cb = img_ontime_canvas_buffer_render;
                         }
                     }
                 }
@@ -6850,6 +6858,59 @@ static void img_ontime_destory(gui_obj_t *obj)
     }
     gui_img_destory(obj);
 }
+static void img_ontime_canvas_buffer_destory(gui_obj_t *obj)
+{
+    gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+    for (size_t i = 0; i < img->animate_array_length; i++)
+    {
+        gui_animate_t *animate = ((gui_animate_t **)(img->animate))[i];
+        gui_free(animate->p);
+    }
+    gui_img_destory(obj);
+    gui_free(GUI_TYPE(gui_img_t, obj)->data);
+}
+static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
+        case OBJ_PREPARE:
+            {
+                gui_img_prepare(obj);
+            }
+            break;
+
+        case OBJ_DRAW:
+            {
+                gui_img_draw_cb(obj);
+            }
+            break;
+
+        case OBJ_END:
+            {
+                gui_img_end(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                img_ontime_canvas_buffer_destory(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
 
