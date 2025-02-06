@@ -6775,6 +6775,7 @@ static void app_xml_ui_design(gui_app_t *app)
 {
     extern void create_tree(gui_app_t *app);
     create_tree(app);
+    gui_fb_change();
 }
 static gui_app_t app_xml =
 {
