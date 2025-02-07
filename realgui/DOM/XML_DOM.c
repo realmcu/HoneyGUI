@@ -3241,8 +3241,9 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             }
             else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
             {
-                char **param = gui_malloc(sizeof(char *) * 2);
+                char **param = gui_malloc(sizeof(char *) * 3);
                 param[0] = gui_strdup(to);
+                param[2] = (void *)parent;
                 if (id)
                 {
                     param[1] = gui_strdup(id);
@@ -5393,8 +5394,10 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     char *ptxt = get_space_string_head(p->txt);
                     if (strcmp(aniamte_name, ptxt))
                     {
+                        gui_free(ptxt);
                         continue;
                     }
+                    gui_free(ptxt);
                     //gui_log("animate_create_handle:%s: %s", name, p->txt);
                     char *type = 0;
                     char *from = 0;
@@ -5618,7 +5621,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->image_arr = image_array;
                         params->image_count = count;
                         gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
-                                               gui_strdup(aniamte_name));
+                                               (aniamte_name));
 
 
                     }
@@ -6151,6 +6154,35 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             {
                 gui_img_t *img = GUI_TYPE(gui_img_t, to);
                 bool create = 1;
+                bool new_trigger = 0;
+                for (size_t i = 0; i < img->animate_array_length; i++)
+                {
+                    if (!(((gui_animate_t **)(img->animate))[i]->trigger_name == to_name[2]))
+                    {
+                        new_trigger = 1;
+                    }
+                }
+                if (new_trigger)
+                {
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+
+                        for (size_t i = 0; i < img->animate_array_length; i++)
+                        {
+                            image_animate_params_t *params = ((((gui_animate_t **)(img->animate))[i])->p);
+                            gui_free(params->animate_type);
+                            gui_free((((gui_animate_t **)(img->animate))[i])->p);
+                            gui_free(((gui_animate_t **)(img->animate))[i]);
+                            ((gui_animate_t **)(img->animate))[i] = NULL;
+                        }
+                        gui_free(img->animate);
+                        img->animate = 0;
+                        img->animate_array_length = 0;
+
+
+                    }
+                }
+
                 {
                     for (size_t i = 0; i < img->animate_array_length; i++)
                     {
@@ -6172,6 +6204,11 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                     }
                     foreach_create_animate(f, to, to_name[1]);
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+                        (((gui_animate_t **)(img->animate))[i]->trigger_name = to_name[2]);
+
+                    }
                     //gui_log(" ");
                     if (f1 == 0)
                     {

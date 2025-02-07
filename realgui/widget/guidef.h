@@ -394,6 +394,7 @@ typedef struct gui_animate
     void (* callback)(void *p, void *this_widget, struct gui_animate *animate);
     void *p;
     const char *name;
+    void *trigger_name;
     bool animate;
     bool init;
     bool Beginning_frame;
