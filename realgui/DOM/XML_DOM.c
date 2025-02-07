@@ -4979,6 +4979,12 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             gui_img_set_animate((gui_img_t *)parent, duration, -1, image_animate_callback, params);
             gui_img_set_mode((gui_img_t *)parent, blendMode);
             gui_img_set_opacity((gui_img_t *)parent, opacity);
+            if (angle != 0)
+            {
+                gui_img_get_height((void *)parent);
+                gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
+            }
+            parent->obj_cb = img_render;
         }
         else if (file)
         {
