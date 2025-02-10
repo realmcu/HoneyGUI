@@ -465,11 +465,11 @@ static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_
 
     if (!ret)
     {
-        return LV_RES_OK;
+        return LV_RES_INV;
     }
     else
     {
-        return LV_RES_INV;
+        return LV_RES_OK;
     }
 }
 #endif

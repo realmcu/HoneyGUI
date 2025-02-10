@@ -177,7 +177,7 @@
 /*Use Realtek GPU */
 
 #define LV_USE_GPU_RTK_PPE 0   // Set to 1 to use the original PPE version
-#define LV_USE_GPU_RTK_PPEV2 0 // Set to 1 to use the PPEV2 version
+#define LV_USE_GPU_PPE_RTL8773E 0 // Set to 1 to use the PPEV2 version
 
 /*Use Arm's 2D acceleration library Arm-2D */
 #define LV_USE_GPU_ARM2D 0
