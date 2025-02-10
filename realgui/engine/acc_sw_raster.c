@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "draw_img.h"
-#include "acc_sw_rle.h"
 
 typedef struct
 {

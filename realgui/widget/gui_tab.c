@@ -24,7 +24,6 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include "gui_tab.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
 
 

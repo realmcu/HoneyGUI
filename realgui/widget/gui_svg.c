@@ -78,7 +78,8 @@ static NVGcolor gui_svg_color4(unsigned int c, float opacity)
 
 static NVGpaint gui_svg_create_linear_gradient(NVGcontext *vg, NSVGgradient *gradient, float alpha)
 {
-    float inverse[6], sx, sy, ex, ey;
+    float inverse[9];
+    float sx, sy, ex, ey;
 
     nvgTransformInverse(inverse, gradient->xform);
     nvgTransformPoint(&sx, &sy, inverse, 0, 0);
@@ -91,7 +92,7 @@ static NVGpaint gui_svg_create_linear_gradient(NVGcontext *vg, NSVGgradient *gra
 
 static NVGpaint gui_svg_create_radial_gradient(NVGcontext *vg, NSVGgradient *gradient, float alpha)
 {
-    float inverse[6], cx, cy, r1, r2, inr, outr;
+    float inverse[9], cx, cy, r1, r2, inr, outr;
 
     nvgTransformInverse(inverse, gradient->xform);
     nvgTransformPoint(&cx, &cy, inverse, 0, 0);
