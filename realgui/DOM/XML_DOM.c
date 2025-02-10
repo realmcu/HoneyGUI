@@ -365,12 +365,12 @@ static char *read_file(const char *path)
         fclose(file);
         return 0;
     }
-    char *content = (char *)malloc(length + 1);
+    char *content = (char *)gui_malloc(length + 1);
     //if (content)
     {
         size_t size = fread(content, 1, length, file);
         GUI_UNUSED(size);
-        if (size != length)
+        if (size == 0)
         {
             //gui_log("%d\n", size);
             gui_free(content);
@@ -444,7 +444,7 @@ static void update_light_config(int index, const char *attribute, int value)
     if (json_str)
     {
         parse_json(json_str);
-        free(json_str);
+        gui_free(json_str);
     }
 
     for (int i = 0; i < LIGHTS_NUM; i++)
