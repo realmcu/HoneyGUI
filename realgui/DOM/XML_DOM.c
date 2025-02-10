@@ -4763,13 +4763,13 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
         if (!strcmp(style, "waveform"))
         {
-            gui_wave_render(vg, 0, 0, w,
-                            h,
-                            item_count,
-                            numbers,
-                            color,
-                            max,
-                            min);
+            gui_wave_width_render(vg, 0, 0, w,
+                                  h,
+                                  item_count,
+                                  numbers,
+                                  color,
+                                  max,
+                                  min, stroke_width);
         }
         else if (!strcmp(style, "bar"))
         {
@@ -4793,13 +4793,13 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         }
         else
         {
-            gui_wave_render(vg, 0, 0, w,
-                            h,
-                            item_count,
-                            numbers,
-                            color,
-                            max,
-                            min);
+            gui_wave_width_render(vg, 0, 0, w,
+                                  h,
+                                  item_count,
+                                  numbers,
+                                  color,
+                                  max,
+                                  min, stroke_width);
         }
 
         gui_canvas_output_buffer_blank_close(vg);
@@ -6727,13 +6727,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
             NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
             if (param->chart_type == 1)
             {
-                gui_wave_render(vg, 0, 0, w,
-                                h,
-                                array_length,
-                                array,
-                                param->color,
-                                param->max,
-                                param->min);
+                gui_wave_width_render(vg, 0, 0, w,
+                                      h,
+                                      array_length,
+                                      array,
+                                      param->color,
+                                      param->max,
+                                      param->min, param->stroke_width);
             }
             else if (param->chart_type == 2)
             {
@@ -6757,13 +6757,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
             }
             else
             {
-                gui_wave_render(vg, 0, 0, w,
-                                h,
-                                array_length,
-                                array,
-                                param->color,
-                                param->max,
-                                param->min);
+                gui_wave_width_render(vg, 0, 0, w,
+                                      h,
+                                      array_length,
+                                      array,
+                                      param->color,
+                                      param->max,
+                                      param->min, param->stroke_width);
             }
             gui_free(array);
             gui_canvas_output_buffer_blank_close(vg);
