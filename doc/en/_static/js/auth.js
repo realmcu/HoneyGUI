@@ -17,7 +17,15 @@ $.ajax({
         if(data.cls == "0") {
             if(data.code == "401"){
                 // console.log("Please Login ... ");
-                window.location.href = `https://www.realmcu.com/en/Account/Login?ReturnUrl=${ReturnUrl}`;
+                if (ReturnUrl.toString().includes("/en/"))
+                {
+                    window.location.href = `https://www.realmcu.com/en/Account/Login?ReturnUrl=${ReturnUrl}`;
+                }
+                else
+                {
+                    window.location.href = `https://www.realmcu.com/zh/Account/Login?ReturnUrl=${ReturnUrl}`;
+                }
+                
             }
             else if(data.code == "405") {
                 // console.log("Sorry, You don't have permission to view documents.");
