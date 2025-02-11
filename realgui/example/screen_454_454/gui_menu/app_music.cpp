@@ -755,16 +755,22 @@ private:
         char dummy = ':';
         std::istringstream timeStream(timePart);
         timeStream >> minutes >> dummy >> seconds;
-        int rst = 0;
-        if (minutes * 60 + seconds > INT_MAX)
+
+
+
+        long long totalSeconds = (minutes) * 60 + seconds; // Use long long to handle large numbers
+
+        // Check for overflow
+        if (totalSeconds > INT_MAX)
         {
-            rst = INT_MAX;
+            return INT_MAX;
         }
-        else
+        if (totalSeconds < INT_MIN)
         {
-            rst = minutes * 60 + seconds;
+            return INT_MIN;
         }
-        return rst;
+
+        return (int)(totalSeconds);
     }
 
 // Function to get metadata

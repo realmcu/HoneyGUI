@@ -15,7 +15,7 @@ if (TARGET_FOUND)
     target_compile_definitions(gui PRIVATE ENABLE_RTK_GUI_410_502_DEMO DRV_LCD_WIDTH=410 DRV_LCD_HIGHT=502 DRV_PIXEL_BITS=32)
 
 else()
-    message(WARNING "Target 'gui' not found. Definitions not applied.")
+    
 endif()
 # Define macros for the specific target
 

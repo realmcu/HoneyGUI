@@ -33,7 +33,7 @@
 - Big-endian : 输入图像是否采用大端模式。
 - Compress : 启用图像压缩。
 - MixAlphaChannel Flag : 在将RGBA转换为RGB或RGB565时，是否将alpha通道混合到RGB中。
-- scanMode : 选择扫描方向是水平还是垂直，BeeGUI仅需要水平方向。
+- Scan Mode : 选择扫描方向是水平还是垂直，BeeGUI仅需要水平方向。
 - Color Space : 选择颜色空间（RGB565、RGBA、BINARY...等）。
 
 颜色空间

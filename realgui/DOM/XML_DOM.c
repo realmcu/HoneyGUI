@@ -179,6 +179,7 @@ static bool ends_with_xml(const char *str);
 static ezxml_t f1;
 static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
@@ -364,13 +365,14 @@ static char *read_file(const char *path)
         fclose(file);
         return 0;
     }
-    char *content = (char *)malloc(length + 1);
+    char *content = (char *)gui_malloc(length + 1);
     //if (content)
     {
         size_t size = fread(content, 1, length, file);
-        if (size != length)
+        GUI_UNUSED(size);
+        if (size == 0)
         {
-            gui_log("%d\n", size);
+            //gui_log("%d\n", size);
             gui_free(content);
             fclose(file);
             return 0;
@@ -442,7 +444,7 @@ static void update_light_config(int index, const char *attribute, int value)
     if (json_str)
     {
         parse_json(json_str);
-        free(json_str);
+        gui_free(json_str);
     }
 
     for (int i = 0; i < LIGHTS_NUM; i++)
@@ -1100,27 +1102,27 @@ static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 h = atoi(p->attr[++i]);
             }
-            else if (!strcmp(p->attr[i], "transition"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "normal"))
-                {
-                    style = CLASSIC;
-                }
-                else if (!strcmp(p->attr[i], "fade"))
-                {
-                    style = FADE;
-                }
-                else if (!strcmp(p->attr[i], "scale"))
-                {
-                    style = REDUCTION;
-                }
-                else if (!strcmp(p->attr[i], "fadeScale"))
-                {
-                    style = REDUCTION_FADE;
-                }
+            // else if (!strcmp(p->attr[i], "transition"))
+            // {
+            //     char *s = p->attr[++i];
+            //     if (!strcmp(p->attr[i], "normal"))
+            //     {
+            //         style = CLASSIC;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fade"))
+            //     {
+            //         style = FADE;
+            //     }
+            //     else if (!strcmp(p->attr[i], "scale"))
+            //     {
+            //         style = REDUCTION;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fadeScale"))
+            //     {
+            //         style = REDUCTION_FADE;
+            //     }
 
-            }
+            // }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -1177,23 +1179,23 @@ static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
             {
                 stroke_width = atoi(p->attr[++i]);
             }
-            else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
-                     !strcmp(p->attr[i], "cap"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "butt"))
-                {
-                    cap = NVG_BUTT;
-                }
-                else if (!strcmp(p->attr[i], "round"))
-                {
-                    cap = NVG_ROUND;
-                }
-                else if (!strcmp(p->attr[i], "square"))
-                {
-                    cap = NVG_SQUARE;
-                }
-            }
+            // else if (!strcmp(p->attr[i], "stroke-linecap") || !strcmp(p->attr[i], "capMode") ||
+            //          !strcmp(p->attr[i], "cap"))
+            // {
+            //     char *s = p->attr[++i];
+            //     if (!strcmp(p->attr[i], "butt"))
+            //     {
+            //         cap = NVG_BUTT;
+            //     }
+            //     else if (!strcmp(p->attr[i], "round"))
+            //     {
+            //         cap = NVG_ROUND;
+            //     }
+            //     else if (!strcmp(p->attr[i], "square"))
+            //     {
+            //         cap = NVG_SQUARE;
+            //     }
+            // }
             else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
             {
                 stroke = string_rgb888(p->attr[++i]);
@@ -1574,6 +1576,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -1830,7 +1833,7 @@ static gui_obj_t *widget_create_curtainview(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     style = WIDGET_SCALE_FADE;
                 }
-
+                GUI_UNUSED(style);
             }
             i++;
         }
@@ -1974,7 +1977,7 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t h = 0;
         float scope = 1.0f;
         T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
-        int style = 0; GUI_UNUSED(style);
+        // int style = 0; GUI_UNUSED(style);
         while (true)
         {
             if (!(p->attr[i]))
@@ -2026,27 +2029,27 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                     orientation = CURTAIN_RIGHT;
                 }
             }
-            else if (!strcmp(p->attr[i], "transition"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "normal"))
-                {
-                    style = WIDGET_CLASSIC;
-                }
-                else if (!strcmp(p->attr[i], "fade"))
-                {
-                    style = WIDGET_FADE;
-                }
-                else if (!strcmp(p->attr[i], "scale"))
-                {
-                    style = WIDGET_SCALE;
-                }
-                else if (!strcmp(p->attr[i], "fadeScale"))
-                {
-                    style = WIDGET_SCALE_FADE;
-                }
+            // else if (!strcmp(p->attr[i], "transition"))
+            // {
+            //     char *s = p->attr[++i];
+            //     if (!strcmp(p->attr[i], "normal"))
+            //     {
+            //         style = WIDGET_CLASSIC;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fade"))
+            //     {
+            //         style = WIDGET_FADE;
+            //     }
+            //     else if (!strcmp(p->attr[i], "scale"))
+            //     {
+            //         style = WIDGET_SCALE;
+            //     }
+            //     else if (!strcmp(p->attr[i], "fadeScale"))
+            //     {
+            //         style = WIDGET_SCALE_FADE;
+            //     }
 
-            }
+            // }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -2178,6 +2181,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
                 {
                     style = BUTTON_HIGHLIGHT_ARRAY;
                 }
+                GUI_UNUSED(style);
             }
             else if (!strcmp(p->attr[i], "blendMode"))
             {
@@ -2198,6 +2202,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -2539,6 +2544,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -2724,8 +2730,7 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
         char *folder = NULL;
 
-        // default image blend_mode
-        uint8_t blendMode = IMG_FILTER_BLACK; GUI_UNUSED(blendMode);
+
         uint8_t opacity = 255; GUI_UNUSED(opacity);
 
         memset(&config, 0, sizeof(config));
@@ -2775,26 +2780,6 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             else if (!strcmp(p->attr[i], "sidePosPercent"))
             {
                 config.side_pos_percent = atof(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "blendMode"))
-            {
-                i++;
-                if (!strcmp(p->attr[i], "imgBypassMode"))
-                {
-                    blendMode = IMG_BYPASS_MODE;
-                }
-                else if (!strcmp(p->attr[i], "imgFilterBlack"))
-                {
-                    blendMode = IMG_FILTER_BLACK;
-                }
-                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
-                {
-                    blendMode = IMG_SRC_OVER_MODE;
-                }
-                else if (!strcmp(p->attr[i], "imgCoverMode"))
-                {
-                    blendMode = IMG_COVER_MODE;
-                }
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -3256,9 +3241,13 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             }
             else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
             {
-                char **param = gui_malloc(sizeof(char *) * 2);
+                char **param = gui_malloc(sizeof(char *) * 3);
                 param[0] = gui_strdup(to);
-                param[1] = gui_strdup(id);
+                param[2] = (void *)parent;
+                if (id)
+                {
+                    param[1] = gui_strdup(id);
+                }
                 if (!strcmp(type, "animatePause"))
                 {
                     if (parent->type == BUTTON)
@@ -3438,8 +3427,8 @@ static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
             }
             i++;
         }
-        void *bg_buf;
-        void *slider_buf;
+        void *bg_buf = 0;
+        void *slider_buf = 0;
         if (bg_picture)
         {
             bg_buf = (void *)gui_get_image_file_address(bg_picture);
@@ -3460,7 +3449,7 @@ static gui_obj_t *widget_create_macro_onchange(ezxml_t p, gui_obj_t *parent, T_O
 
     {
         char *type = 0;
-        char *to = 0;
+        char *to = "null";
         int id = 0;
         size_t i = 0;
         while (true)
@@ -3528,8 +3517,8 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
 
     {
         char *type = 0;
-        char *to = 0;
-        char *id = 0;
+        char *to = "null";
+        char *id = "null";
         size_t i = 0;
         while (true)
         {
@@ -3578,8 +3567,8 @@ static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
     {
         char *type = 0;
-        char *to = 0;
-        char *id = 0;
+        char *to = "null";
+        char *id = "null";
         size_t i = 0;
         while (true)
         {
@@ -3605,7 +3594,10 @@ static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_
         {
             char **param = gui_malloc(sizeof(char *) * 2);
             param[0] = gui_strdup(to);
-            param[1] = gui_strdup(id);
+            if (id)
+            {
+                param[1] = gui_strdup(id);
+            }
             if (!strcmp(type, "animatePause"))
             {
 
@@ -3630,7 +3622,7 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
     {
         char *type = 0;
         char *to = 0; GUI_UNUSED(to);
-        char *id = 0;
+        char *id = "null";
         size_t i = 0;
         while (true)
         {
@@ -3666,7 +3658,10 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
                 {
                     f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                 }
-                foreach_create_animate(f, parent, gui_strdup(id));
+                if (id)
+                {
+                    foreach_create_animate(f, parent, gui_strdup(id));
+                }
                 //gui_log(" ");
                 if (f1 == 0)
                 {
@@ -3704,7 +3699,7 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
         int16_t row_count = 0;
         int16_t row_spacing = 0;
         int16_t item_count = 0;
-        const char *items = NULL;
+        const char *items = "NULL";
         int column_offset = 0; GUI_UNUSED(column_offset);
         const char *font = 0;
         int16_t font_size = 0;
@@ -4143,7 +4138,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
         int16_t w = 0;
         int16_t row_spacing = 0;
         int16_t item_count = 0;
-        const char *items = NULL;
+        const char *items = "null,null";
         const char *font = 0;
         int16_t font_size = 0;
         gui_color_t  font_color = {0};
@@ -4273,6 +4268,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             i++;
         }
@@ -4355,6 +4351,10 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
             }
             i++;
         }
+        if (!id)
+        {
+            return parent;
+        }
         switch (parent->type)
         {
         case IMAGE_FROM_MEM:
@@ -4379,7 +4379,7 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                                 gui_color_t stroke = APP_COLOR_RED;
                                 float sd = 0; GUI_UNUSED(sd);
                                 float ed = 100; GUI_UNUSED(ed);
-                                int dir;
+                                int dir = 0;
                                 while (true)
                                 {
                                     if (!(p->attr[i]))
@@ -4428,6 +4428,7 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                                         {
                                             cap = NVG_SQUARE;
                                         }
+                                        GUI_UNUSED(cap);
                                     }
                                     else if (!strcmp(p->attr[i], "strokeColor") || !strcmp(p->attr[i], "color"))
                                     {
@@ -4580,7 +4581,7 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                             }
                             gui_img_append_animate((void *)parent, 1000, -1, chart_animate_heartrate_data_callback,
                                                    (void *)param, 0);
-                            parent->obj_cb = img_ontime_render;
+                            parent->obj_cb = img_ontime_canvas_buffer_render;
                         }
                     }
                 }
@@ -4656,7 +4657,7 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         int16_t w = 0;
         int16_t h = 0;
         int16_t item_count = 0;
-        const char *items = NULL;
+        const char *items = "NULL";
         gui_color_t  color = {0};
         int16_t max = 0;
         int16_t min = 0;
@@ -4762,13 +4763,13 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
         if (!strcmp(style, "waveform"))
         {
-            gui_wave_render(vg, 0, 0, w,
-                            h,
-                            item_count,
-                            numbers,
-                            color,
-                            max,
-                            min);
+            gui_wave_width_render(vg, 0, 0, w,
+                                  h,
+                                  item_count,
+                                  numbers,
+                                  color,
+                                  max,
+                                  min, stroke_width);
         }
         else if (!strcmp(style, "bar"))
         {
@@ -4792,13 +4793,13 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         }
         else
         {
-            gui_wave_render(vg, 0, 0, w,
-                            h,
-                            item_count,
-                            numbers,
-                            color,
-                            max,
-                            min);
+            gui_wave_width_render(vg, 0, 0, w,
+                                  h,
+                                  item_count,
+                                  numbers,
+                                  color,
+                                  max,
+                                  min, stroke_width);
         }
 
         gui_canvas_output_buffer_blank_close(vg);
@@ -4887,6 +4888,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                 {
                     blendMode = IMG_COVER_MODE;
                 }
+                GUI_UNUSED(blendMode);
             }
             else if (!strcmp(p->attr[i], "opacity"))
             {
@@ -4977,6 +4979,12 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             gui_img_set_animate((gui_img_t *)parent, duration, -1, image_animate_callback, params);
             gui_img_set_mode((gui_img_t *)parent, blendMode);
             gui_img_set_opacity((gui_img_t *)parent, opacity);
+            if (angle != 0)
+            {
+                gui_img_get_height((void *)parent);
+                gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
+            }
+            parent->obj_cb = img_render;
         }
         else if (file)
         {
@@ -5392,8 +5400,10 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     char *ptxt = get_space_string_head(p->txt);
                     if (strcmp(aniamte_name, ptxt))
                     {
+                        gui_free(ptxt);
                         continue;
                     }
+                    gui_free(ptxt);
                     //gui_log("animate_create_handle:%s: %s", name, p->txt);
                     char *type = 0;
                     char *from = 0;
@@ -5617,7 +5627,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->image_arr = image_array;
                         params->image_count = count;
                         gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
-                                               gui_strdup(aniamte_name));
+                                               (aniamte_name));
 
 
                     }
@@ -6150,6 +6160,35 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             {
                 gui_img_t *img = GUI_TYPE(gui_img_t, to);
                 bool create = 1;
+                bool new_trigger = 0;
+                for (size_t i = 0; i < img->animate_array_length; i++)
+                {
+                    if (!(((gui_animate_t **)(img->animate))[i]->trigger_name == to_name[2]))
+                    {
+                        new_trigger = 1;
+                    }
+                }
+                if (new_trigger)
+                {
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+
+                        for (size_t i = 0; i < img->animate_array_length; i++)
+                        {
+                            image_animate_params_t *params = ((((gui_animate_t **)(img->animate))[i])->p);
+                            gui_free(params->animate_type);
+                            gui_free((((gui_animate_t **)(img->animate))[i])->p);
+                            gui_free(((gui_animate_t **)(img->animate))[i]);
+                            ((gui_animate_t **)(img->animate))[i] = NULL;
+                        }
+                        gui_free(img->animate);
+                        img->animate = 0;
+                        img->animate_array_length = 0;
+
+
+                    }
+                }
+
                 {
                     for (size_t i = 0; i < img->animate_array_length; i++)
                     {
@@ -6171,6 +6210,11 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
                     }
                     foreach_create_animate(f, to, to_name[1]);
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+                        (((gui_animate_t **)(img->animate))[i]->trigger_name = to_name[2]);
+
+                    }
                     //gui_log(" ");
                     if (f1 == 0)
                     {
@@ -6683,13 +6727,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
             NVGcontext *vg = gui_canvas_output_buffer_blank(GUI_CANVAS_OUTPUT_RGBA, 0, w, h, buffer);
             if (param->chart_type == 1)
             {
-                gui_wave_render(vg, 0, 0, w,
-                                h,
-                                array_length,
-                                array,
-                                param->color,
-                                param->max,
-                                param->min);
+                gui_wave_width_render(vg, 0, 0, w,
+                                      h,
+                                      array_length,
+                                      array,
+                                      param->color,
+                                      param->max,
+                                      param->min, param->stroke_width);
             }
             else if (param->chart_type == 2)
             {
@@ -6713,13 +6757,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(chart_animate_heartrate_data_callb
             }
             else
             {
-                gui_wave_render(vg, 0, 0, w,
-                                h,
-                                array_length,
-                                array,
-                                param->color,
-                                param->max,
-                                param->min);
+                gui_wave_width_render(vg, 0, 0, w,
+                                      h,
+                                      array_length,
+                                      array,
+                                      param->color,
+                                      param->max,
+                                      param->min, param->stroke_width);
             }
             gui_free(array);
             gui_canvas_output_buffer_blank_close(vg);
@@ -6774,6 +6818,7 @@ static void app_xml_ui_design(gui_app_t *app)
 {
     extern void create_tree(gui_app_t *app);
     create_tree(app);
+    gui_fb_change();
 }
 static gui_app_t app_xml =
 {
@@ -6857,6 +6902,59 @@ static void img_ontime_destory(gui_obj_t *obj)
     }
     gui_img_destory(obj);
 }
+static void img_ontime_canvas_buffer_destory(gui_obj_t *obj)
+{
+    gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+    for (size_t i = 0; i < img->animate_array_length; i++)
+    {
+        gui_animate_t *animate = ((gui_animate_t **)(img->animate))[i];
+        gui_free(animate->p);
+    }
+    gui_img_destory(obj);
+    gui_free(GUI_TYPE(gui_img_t, obj)->data);
+}
+static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
+        case OBJ_PREPARE:
+            {
+                gui_img_prepare(obj);
+            }
+            break;
+
+        case OBJ_DRAW:
+            {
+                gui_img_draw_cb(obj);
+            }
+            break;
+
+        case OBJ_END:
+            {
+                gui_img_end(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                img_ontime_canvas_buffer_destory(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
 

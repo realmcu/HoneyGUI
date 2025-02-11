@@ -11,7 +11,7 @@ Usage
 
 Create Grid Widget
 ~~~~~~~~~~~~~~~~~~~
-Use :cpp:any:`gui_grid_create` to create a grid widget. Populate the grid with controls in the order they were created.
+Use :cpp:any:`gui_grid_create` to create a grid widget. Populate the grid with widgets in the order they were created.
 
 Set Grid Style
 ~~~~~~~~~~~~~~~

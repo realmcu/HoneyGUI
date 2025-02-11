@@ -63,6 +63,7 @@ typedef enum t_slide_style
     TAB_ROTATE       = 0x0005,
     TAB_CUBE         = 0x0006,
     TAB_PAGE         = 0x0007,
+    TAB_ROTATE_BOOK  = 0x0008,
 } T_SLIDE_STYLE;
 /* T_SLIDE_STYLE enum end*/
 /** @brief  tabview structure */

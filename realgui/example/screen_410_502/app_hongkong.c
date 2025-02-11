@@ -125,7 +125,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_obj_add_event_cb(win_hk, (gui_event_cb_t)switch_app_menu, GUI_EVENT_8,
                          app->window);
     enter_menu_flag = 0;
-    gui_tabview_set_style(tv, TAB_CUBE);
+    gui_tabview_set_style(tv, TAB_ROTATE_BOOK);
     gui_tabview_enable_pre_load(tv, true);
 
     extern void page_tb_control_enter(void *parent);
@@ -140,9 +140,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_heart(gui_tab_get_rte_obj(tb_heart));
     page_tb_clock(gui_tab_get_rte_obj(tb_clock));
     page_tb_activity(gui_tab_get_rte_obj(tb_activity));
-    // page_tb_heart(gui_tab_get_rte_obj(tb_heart));
-
     gui_tab_update_preload(GUI_BASE(tb_clock));
+    gui_tab_update_preload(GUI_BASE(tb_activity));
     gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 

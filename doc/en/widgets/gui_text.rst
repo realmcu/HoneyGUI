@@ -74,7 +74,7 @@ This interface can be used to set the content that needs to be displayed by the 
 
 Text Encoding
 ^^^^^^^^^^^^^^
-The text control supports input formats in UTF-8, UTF-16, and UTF-32 encodings simultaneously. Developers can use :cpp:any:`gui_text_encoding_set` to change the encoding format.
+The text widget supports input formats in UTF-8, UTF-16, and UTF-32 encodings simultaneously. Developers can use :cpp:any:`gui_text_encoding_set` to change the encoding format.
 
 Convert to Img
 ^^^^^^^^^^^^^^^

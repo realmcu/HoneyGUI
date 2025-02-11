@@ -29,7 +29,7 @@ Configuration
 - Big-endian : Whether the input image is big-endian.
 - Compress : Enable image compression.
 - MixAlphaChannel Flag : Whether to mix alpha channel to rgb when converting rgba to rgb or rgb565.
-- scanMode : Select whether the scan direction is horizontal or vertical, BeeGUI only wants horizontal.
+- Scan Mode : Select whether the scan direction is horizontal or vertical, BeeGUI only wants horizontal.
 - Color Space : Select colorSpace (RGB565, RGBA, BINARY...), BeeGUI can display all of them.
 
 Color Space

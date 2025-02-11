@@ -3,8 +3,8 @@
 *:realgui\3rd\*
 *:realgui\example\screen_454_454\*
 *:realgui\example\screen_320_385\*
-*:lvgl\*
 *:lvgl_v9\*
+*:lvgl_v8\*
 *:Arm2D\*
 
 

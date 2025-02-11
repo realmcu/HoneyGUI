@@ -8,7 +8,7 @@
  *********************/
 
 #include "lvgl.h"
-#if LV_USE_GPU_RTK_PPEV2
+#if LV_USE_GPU_PPE_RTL8773E
 #include <math.h>
 #include "lv_draw_ppe_rtl8773e.h"
 #include "lv_draw_ppe_rtl8773e_rect.h"
@@ -431,4 +431,4 @@ static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_d
     }
 }
 
-#endif /*LV_USE_GPU_RTK_PPEV2*/
+#endif /*LV_USE_GPU_PPE_RTL8773E*/

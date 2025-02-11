@@ -24,7 +24,7 @@ message(STATUS "*****ARC 2*****")
 target_compile_definitions(gui PRIVATE LVGL_ARC_2_ENABLED=1)
 endif()
 else()
-    message(WARNING "Target 'gui' not found. Definitions not applied.")
+    
 endif()
 
 

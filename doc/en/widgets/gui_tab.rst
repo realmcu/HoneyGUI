@@ -91,7 +91,7 @@ The tab switching style can be customized, and developers can set the tab switch
 
 Tabview Rotate
 ^^^^^^^^^^^^^^
-Unlike individual tab style changes, the tabview control allows you to set a uniform switching style for all tabs using the function :cpp:any:`gui_tabview_set_style`. For example, you can set all tabs to styles such as ``REDUCTION``, ``CLASSIC``, ``FADE``, ``REDUCTION_FADE``, ``TAB_ROTATE``, ``TAB_CUBE``, or ``TAB_PAGE``. The following example demonstrates how to switch to the ``TAB_ROTATE`` style, with ``CLASSIC`` being the default style.
+Unlike individual tab style changes, the tabview widget allows you to set a uniform switching style for all tabs using the function :cpp:any:`gui_tabview_set_style`. For example, you can set all tabs to styles such as ``REDUCTION``, ``CLASSIC``, ``FADE``, ``REDUCTION_FADE``, ``TAB_ROTATE``, ``TAB_CUBE``, or ``TAB_PAGE``. The following example demonstrates how to switch to the ``TAB_ROTATE`` style, with ``CLASSIC`` being the default style.
 
 
 .. code-block:: c

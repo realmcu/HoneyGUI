@@ -561,7 +561,7 @@ HoneyGUI 提供 `ROMFS` 文件系统镜像的打包支持：
 
 
 
-LVGL 基准测试
+LVGL Benchmark 测试
 ==========================
 .. <!-- - benchmark 介绍
 .. - 参考指标，意义
@@ -572,7 +572,7 @@ LVGL 基准测试
 LVGL 的 Benchmark 是一个性能测试工具，用于评估 LVGL 库在各种硬件和软件环境下的图形显示性能。通过运行 Benchmark，用户可以获取帧率、渲染速度和内存使用情况等数据，从而帮助优化显示配置和调试性能问题。Benchmark 包括多种测试场景，如图形绘制、动画和文本渲染，每个场景模拟实际应用中的常见操作。用户可以通过这些测试来比较不同配置和平台的性能表现，从而做出针对性的优化调整。
 LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/benchmark/README.md`。
 
-LVGL benchmark 测试
+参考 Benchmark 
 -----------------------------
 
 
@@ -781,7 +781,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
    **注意：图像描述符中的色彩格式设置为 cf = LV_IMG_CF_RAW**
  
-  - b. 图片资源访问，控件创建：
+ - b. 图片资源访问，控件创建：
    
    .. code-block:: c
     
@@ -825,7 +825,7 @@ LVGL 启用 RLE 解码器
 
 
 .. note::
-    - 使用 RLE 解码器 + ROMFS 时，解码器将会直接从文件系统即 FLASH 上获取图片，不做额外缓存；
+   使用 RLE 解码器 + ROMFS 时，解码器将会直接从文件系统即 FLASH 上获取图片，不做额外缓存；
 
 
 

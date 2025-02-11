@@ -16,7 +16,7 @@ Text Encoding Conversion
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 In the file ``font_mem.c``, within the function :cpp:any:`gui_font_get_dot_info`,
-:cpp:any:`process_content_by_charset` parses the text content of the text control and saves it as Unicode (UTF-32) in ``unicode_buf``.
+:cpp:any:`process_content_by_charset` parses the text content of the text widget and saves it as Unicode (UTF-32) in ``unicode_buf``.
 The number of Unicode characters is returned in ``unicode_len``.
 
 .. code-block:: c
@@ -109,7 +109,7 @@ The ``rect`` struct array is structured as follows:
    :start-after: /** @brief  text rect struct start */
    :end-before: /** @brief  text rect struct end */
 
-The ``rect`` is the display range of the widget passed from the control layer. In this structure,
+The ``rect`` is the display range of the widget passed from the widget layer. In this structure,
 ``x1`` and ``x2`` represent the X-coordinates of the left and right borders, respectively,
 while ``y1`` and ``y2`` represent the Y-coordinates of the top and bottom borders, respectively.
 

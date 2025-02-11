@@ -115,26 +115,63 @@ static void gui_get_target_color(uint8_t *target_red, uint8_t *target_green, uin
     }
 }
 
+static void blend_colors(uint8_t *target_channel, uint8_t source_channel, uint8_t source_alpha)
+{
+    *target_channel = ((255 - source_alpha) * *target_channel + source_alpha * source_channel) / 255;
+}
+
 static void gui_apply_blend_mode(uint8_t *target_red, uint8_t *target_green, uint8_t *target_blue,
                                  uint8_t *target_alpha,
                                  uint8_t source_red, uint8_t source_green, uint8_t source_blue, uint8_t source_alpha,
                                  uint8_t opacity_value, uint32_t blend_mode)
 {
-    if (blend_mode == IMG_COVER_MODE)
+
+    switch (blend_mode)
     {
-        *target_alpha = source_alpha;
-        *target_red   = source_red;
-        *target_green = source_green;
-        *target_blue  = source_blue;
-        return;
+    case IMG_COVER_MODE:
+        {
+            *target_alpha = source_alpha;
+            *target_red = source_red;
+            *target_green = source_green;
+            *target_blue = source_blue;
+            break;
+        }
+    case IMG_BYPASS_MODE:
+        {
+            uint8_t blend_opacity = opacity_value;
+            blend_colors(target_alpha, source_alpha, blend_opacity);
+            blend_colors(target_red, source_red, blend_opacity);
+            blend_colors(target_green, source_green, blend_opacity);
+            blend_colors(target_blue, source_blue, blend_opacity);
+            break;
+        }
+    case IMG_FILTER_BLACK:
+        {
+            if (source_red == 0 && source_green == 0 && source_blue == 0)
+            {
+                return; // If source is black, do nothing
+            }
+            source_alpha = (source_alpha * opacity_value) / 255;
+            blend_colors(target_alpha, source_alpha, source_alpha);
+            blend_colors(target_red, source_red, source_alpha);
+            blend_colors(target_green, source_green, source_alpha);
+            blend_colors(target_blue, source_blue, source_alpha);
+            break;
+        }
+    case IMG_SRC_OVER_MODE:
+    case IMG_RECT:
+        {
+            source_alpha = (source_alpha * opacity_value) / 255;
+            blend_colors(target_alpha, source_alpha, source_alpha);
+            blend_colors(target_red, source_red, source_alpha);
+            blend_colors(target_green, source_green, source_alpha);
+            blend_colors(target_blue, source_blue, source_alpha);
+            break;
+        }
+    default:
+        GUI_ASSERT(NULL != NULL); // Ensure an error is noticed
+        break;
     }
-
-    source_alpha = source_alpha * opacity_value / 255;
-
-    *target_alpha = ((255 - source_alpha) * *target_alpha + source_alpha * source_alpha) / 255;
-    *target_red   = ((255 - source_alpha) * *target_red + source_alpha * source_red) / 255;
-    *target_green = ((255 - source_alpha) * *target_green + source_alpha * source_green) / 255;
-    *target_blue  = ((255 - source_alpha) * *target_blue + source_alpha * source_blue) / 255;
 }
 
 static void gui_set_pixel_color(uint8_t *writebuf, int write_off, uint8_t dc_bytes_per_pixel,
@@ -274,9 +311,9 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
                 line = line + sizeof(imdc_rgb888_node_t);
             }
             while (location < (x + 1));
-            pixel[0] = node->pixel_r;
+            pixel[2] = node->pixel_r;
             pixel[1] = node->pixel_g;
-            pixel[2] = node->pixel_b;
+            pixel[0] = node->pixel_b;
             break;
         }
     case ARGB8888:

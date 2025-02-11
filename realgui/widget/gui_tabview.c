@@ -402,34 +402,6 @@ static void gui_tabview_prepare(gui_obj_t *obj)
             break;
         }
     }
-    if (tp->pressing == false)
-    {
-        if (this->release_x >= GUI_FRAME_STEP)
-        {
-            this->release_x -= GUI_FRAME_STEP;
-        }
-        else if (this->release_x <= -GUI_FRAME_STEP)
-        {
-            this->release_x += GUI_FRAME_STEP;
-        }
-        else
-        {
-            this->release_x = 0;
-        }
-
-        if (this->release_y >= GUI_FRAME_STEP)
-        {
-            this->release_y -= GUI_FRAME_STEP;
-        }
-        else if (this->release_y <= -GUI_FRAME_STEP)
-        {
-            this->release_y += GUI_FRAME_STEP;
-        }
-        else
-        {
-            this->release_y = 0;
-        }
-    }
 
 
     this->checksum = 0;
@@ -458,6 +430,34 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     else
     {
         this->tab_need_pre_load = false;
+    }
+    if (tp->pressing == false)
+    {
+        if (this->release_x >= GUI_FRAME_STEP)
+        {
+            this->release_x -= GUI_FRAME_STEP;
+        }
+        else if (this->release_x <= -GUI_FRAME_STEP)
+        {
+            this->release_x += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_x = 0;
+        }
+
+        if (this->release_y >= GUI_FRAME_STEP)
+        {
+            this->release_y -= GUI_FRAME_STEP;
+        }
+        else if (this->release_y <= -GUI_FRAME_STEP)
+        {
+            this->release_y += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_y = 0;
+        }
     }
 }
 
@@ -529,7 +529,7 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (this->style == TAB_CUBE)
+    if (this->style == TAB_CUBE || this->style == TAB_ROTATE_BOOK)
     {
         this->enable_pre_load = enable;
     }

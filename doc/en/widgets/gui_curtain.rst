@@ -11,7 +11,7 @@ Usage
 Create Curtain Widget
 ~~~~~~~~~~~~~~~~~~~~~~
 If you want to create a curtain widget with a defined direction, you may opt to utilize the :cpp:any:`gui_curtain_create` function.
-``orientation`` represents direction and can create curtain controls in five different directions: up, down, left, right, and center.
+``orientation`` represents direction and can create curtain widgets in five different directions: up, down, left, right, and center.
 ``Scope`` refers to the curtain range that can be extended, which falls between 0 and 1.
 
 .. _T_GUI_CURTAIN_ENUM1:

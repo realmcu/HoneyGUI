@@ -404,7 +404,110 @@ void gui_wave_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
 
     nvgStrokeWidth(vg, 1.0f);
 }
+void gui_wave_width_render(NVGcontext *vg,
+                           int16_t x,
+                           int16_t y,
+                           int16_t w,
+                           int16_t h,
+                           int16_t item_count,
+                           float *samples,
+                           gui_color_t color,
+                           int16_t max,
+                           int16_t min,
+                           int16_t width)
+{
+    if (!samples)
+    {
+        return;
+    }
+    if (!item_count)
+    {
+        return;
+    }
+    NVGpaint bg;
+    float sx[item_count], sy[item_count];
+    float dx = w;
+    if (item_count != 1)
+    {
+        dx = w / (item_count - 1);
+    }
 
+    int i;
+    for (i = 0; i < item_count; i++)
+    {
+        sx[i] =  i * dx;
+        sy[i] =  h - h * ((samples[i] - min) / (max - min));
+    }
+
+    // Graph background
+    bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(color.color.rgba.r, color.color.rgba.g,
+                                                       color.color.rgba.b, 50), nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b, 240));
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    for (i = 1; i < item_count; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+    }
+
+    nvgLineTo(vg, x + w, y + h);
+    nvgLineTo(vg, x, y + h);
+    nvgFillPaint(vg, bg);
+    nvgFill(vg);
+
+    // Graph line
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0] + 2);
+    for (i = 1; i < item_count; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1] + 2, sx[i] - dx * 0.5f, sy[i] + 2, sx[i],
+                    sy[i] + 2);
+    }
+    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
+    nvgStrokeWidth(vg, 3);
+    nvgStroke(vg);
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    for (i = 1; i < item_count; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+    }
+
+    nvgStrokeColor(vg, nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b,
+                               color.color.rgba.a));
+    nvgStrokeWidth(vg, width);
+    nvgStroke(vg);
+
+    // Graph sample pos
+    for (i = 0; i < item_count; i++)
+    {
+        bg = nvgRadialGradient(vg, sx[i], sy[i] + 2, 3.0f, 8.0f, nvgRGBA(0, 0, 0, 32), nvgRGBA(0, 0, 0, 0));
+        nvgBeginPath(vg);
+        nvgRect(vg, sx[i] - 10, sy[i] - 10 + 2, 20, 20);
+        nvgFillPaint(vg, bg);
+        nvgFill(vg);
+    }
+
+    nvgBeginPath(vg);
+    for (i = 0; i < item_count; i++)
+    {
+        nvgCircle(vg, sx[i], sy[i], 4.0f);
+    }
+
+    nvgFillColor(vg, nvgRGBA(color.color.rgba.r, color.color.rgba.g, color.color.rgba.b,
+                             color.color.rgba.a));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    for (i = 0; i < item_count; i++)
+    {
+        nvgCircle(vg, sx[i], sy[i], 2.0f);
+    }
+
+    nvgFillColor(vg, nvgRGBA(220, 220, 220, 255));
+    nvgFill(vg);
+
+    nvgStrokeWidth(vg, 1.0f);
+}
 void gui_bar_render(NVGcontext *vg, int16_t x, int16_t y, int16_t w,
                     int16_t h,
                     int16_t item_count,
