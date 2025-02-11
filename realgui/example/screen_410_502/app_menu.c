@@ -301,7 +301,7 @@ static void app_menu_design(gui_app_t *app)
         };
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, array,
                                                              sizeof(array) / sizeof(uint32_t *));
-        gui_menu_cellular_offset((void *)menu, -200, -200);
+        // gui_menu_cellular_offset((void *)menu, -200, -200);
         {
             struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
             {

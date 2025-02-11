@@ -258,7 +258,9 @@ static void obj_draw_scan(gui_obj_t *obj)
 static void obj_draw_end(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *temp;
+    gui_list_for_each_safe(node, temp, &obj->child_list)
+    // gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         obj_count++;

@@ -7,7 +7,7 @@ extern "C" {
 #include <gui_app.h>
 
 
-extern void *get_app_hongkong(void);
+extern gui_app_t *get_app_hongkong(void);
 extern void page_tb_clock(void *parent);
 extern void page_tb_activity(void *parent);
 extern void page_tb_heart(void *parent);

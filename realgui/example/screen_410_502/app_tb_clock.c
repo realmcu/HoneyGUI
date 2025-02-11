@@ -76,8 +76,8 @@ static void callback_touch_long(void *obj, gui_event_t e)
     {
     case 0:
         {
-            extern void *get_app_hongkong(void);
-            gui_app_t *app_hongkong = (gui_app_t *)get_app_hongkong();
+            extern gui_app_t *get_app_hongkong(void);
+            gui_app_t *app_hongkong = get_app_hongkong();
             app_hongkong->startup_animation_flag = GUI_APP_ANIMATION_NULL;
             app_hongkong->shutdown_animation_flag = GUI_APP_ANIMATION_NULL;
 
@@ -159,7 +159,7 @@ void page_tb_clock(void *parent)
         }
         break;
     default:
-        // page_ct_clock(ct_clock);
+        page_ct_clock(ct_clock);
         break;
     }
     page_ct_sidebar(ct_left);

@@ -82,3 +82,4 @@
     2.5D足球 (2.5D Soccer) <gui_soccer>
     3D模型 (3D Model) <gui_3D>
     棱镜模型 (Prism Mirror 3D Model) <gui_prism_mirror3d>
+    视图 (View) <gui_view>
