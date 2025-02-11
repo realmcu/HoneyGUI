@@ -2,7 +2,7 @@ Music Player
 ============
 
 - UI design: `Figma - Music Mobile App UI <https://www.figma.com/community/file/1180142936953078905/music-mobile-app-ui>`_
-- Intuitive Three-Layer Design: Navigate effortlessly between three distinct interfaces. The central interface features a sleek display of the current track’s album cover along with essential playback controls.
+- Intuitive Three-Layer Design: Navigate effortlessly between three distinct interfaces. The central interface features a sleek display of the current track’s album cover along with essential playback widgets.
 
 - Swipe Navigation: With a simple swipe, transition to the top interface to access your song list.
 - Lyric Display: Swipe down to reveal the lyrics interface, which is a full-screen display of lyrics, synchronized with the music.
@@ -27,8 +27,8 @@ Function ``void app_music_ui_design(gui_obj_t *obj)`` is located in file ``realg
 
 Widgets Tree Design
 ~~~~~~~~~~~~~~~~~~~
-.. figure:: https://foruda.gitee.com/images/1733109387176750266/2d2ebb9b_10088396.png
-   :width: 400px
+.. figure:: https://foruda.gitee.com/images/1737429147962828506/953bab9f_13408154.png
+   :width: 600px
    :align: center
    :name: Widgets Tree Design
    

@@ -44,7 +44,7 @@ RVisualDesigner
 Javascript
 ==========================
 
-- Non-default effects and logic for controls currently need to be implemented by developers using JavaScript in the current version. For example, control interactions include switch widgets switching images on click, tab widgets sliding , etc. Please refer to `JavaScript syntax` to learn more about the JavaScript-based UI development approach.
+- Non-default effects and logic for widgets currently need to be implemented by developers using JavaScript in the current version. For example, control interactions include switch widgets switching images on click, tab widgets sliding , etc. Please refer to `JavaScript syntax` to learn more about the JavaScript-based UI development approach.
 
 
 
@@ -60,7 +60,7 @@ Light Control Switch
    :width: 400
 
 
-- The callback functions for opening and closing the switch control named "kitchen_switch" are registered sequentially. When the switch control "kitchen_switch" is opened, its callback function :func:`led1OnFunc` will be triggered and called.
+- The callback functions for opening and closing the switch widget named "kitchen_switch" are registered sequentially. When the switch widget "kitchen_switch" is opened, its callback function :func:`led1OnFunc` will be triggered and called.
 - The control of the lights in this example is abstracted as a `Gpio` object. Each light corresponds to a `Gpio` object, and its value is assigned using the :func:`writeSync` function, which is defined in the underlying layer to accommodate different smart home communication control protocols and control methods.
 
 .. code-block:: javascript

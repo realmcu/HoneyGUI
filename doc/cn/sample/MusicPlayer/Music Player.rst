@@ -23,12 +23,12 @@
 
 代码
 ~~~~
-函数 ``void app_music_ui_design(gui_obj_t *obj)`` 位于文件 ``realgui/example/screen_454_454/gui_menu/app_music.cpp``.
+函数 ``void app_music_ui_design(gui_obj_t *obj)`` 位于文件 ``realgui/example/screen_454_454/gui_menu/app_music.cpp``。
 
 控件树设计
 ~~~~~~~~~~~~~~~~~~~
-.. figure:: https://foruda.gitee.com/images/1733109387176750266/2d2ebb9b_10088396.png
-   :width: 400px
+.. figure:: https://foruda.gitee.com/images/1737429147962828506/953bab9f_13408154.png
+   :width: 600px
    :align: center
    :name: 控件树设计
    

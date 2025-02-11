@@ -16,11 +16,11 @@
 #include "os_sync.h"
 #include "hal_idu.h"
 
-
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
-#define PPE_ACC_MIN_OPA       3
-#define PPE_TESS_LENGTH       92
+#define PPE_BARE_COPY_ACCURATE      1
+#define PPE_ACC_MIN_OPA             3
+#define PPE_TESS_LENGTH             92
 
 #include "section.h"
 #define CACHE_BUF_SIZE           (42 * 1024)
@@ -389,6 +389,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     source.height = image->img_h;
                     source.stride = image->img_w;
                     bool ret = ppe_get_area(&src_rect, &dst_rect, &inv_matrix, &source);
+#if !PPE_BARE_COPY_ACCURATE
                     if (src_rect.w % 2)
                     {
                         src_rect.w -= 1;
@@ -397,30 +398,56 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                             return;
                         }
                     }
+#endif
                     if (!ret)
                     {
                         //DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
                         return;
+                    }
+                    if (rect != NULL)
+                    {
+                        int16_t x0 = src_rect.x;
+                        int16_t y0 = src_rect.y;
+                        if (!acc_get_src_rect_area(&src_rect, rect))
+                        {
+                            return;
+                        }
+                        dst_rect.x += (src_rect.x - x0);
+                        dst_rect.y += (src_rect.y - y0);
+                        dst_rect.w = src_rect.w;
+                        dst_rect.h = src_rect.h;
                     }
                 }
                 dst_rect.x -= dc->section.x1;
                 dst_rect.y -= dc->section.y1;
                 if (image->blend_mode == IMG_BYPASS_MODE || image->blend_mode == IMG_COVER_MODE)
                 {
-                    if (head->compress)
+#if PPE_BARE_COPY_ACCURATE
+                    if (src_rect.w % 2 == 0)
+#endif
                     {
-                        uint32_t s;
-                        s = os_lock();
-                        bare_blit_by_idu(&target, &source, &src_rect, &dst_rect);
-                        os_unlock(s);
+                        if (head->compress)
+                        {
+                            uint32_t s;
+                            s = os_lock();
+                            bare_blit_by_idu(&target, &source, &src_rect, &dst_rect);
+                            os_unlock(s);
+                        }
+                        else
+                        {
+                            uint32_t s;
+                            s = os_lock();
+                            bare_blit_by_dma(&target, &source, &src_rect, &dst_rect);
+                            os_unlock(s);
+                        }
+                        return;
                     }
+#if PPE_BARE_COPY_ACCURATE
                     else
                     {
-                        uint32_t s;
-                        s = os_lock();
-                        bare_blit_by_dma(&target, &source, &src_rect, &dst_rect);
-                        os_unlock(s);
+                        mode = PPE_BYPASS_MODE;
                     }
+#endif
                 }
                 else if (image->blend_mode == IMG_RECT)
                 {
@@ -433,8 +460,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     color.color.rgba.b = color.color.rgba.r;
                     color.color.rgba.r = tmp;
                     PPE_Mask(&target, color.color.argb_full, &dst_rect);
+                    return;
                 }
-                return;
             }
             else
             {
@@ -777,7 +804,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
         if (err != PPE_SUCCESS)
         {
-            DBG_DIRECT("PPE err %d", err);
+//            DBG_DIRECT("PPE err %d", err);
 //                sw_acc_blit(image, dc, rect);
         }
     }

@@ -2,7 +2,7 @@
 Obj
 ===
 
-The Object implements the basic properties of widgets on a screen. The screen widget is the root node of a control tree. The screen coordinate system is set as follows. The origin of the polar coordinates is the negative direction of the Y axis, and the positive direction of the polar coordinates is clockwise:
+The Object implements the basic properties of widgets on a screen. The screen widget is the root node of a widget tree. The screen coordinate system is set as follows. The origin of the polar coordinates is the negative direction of the Y axis, and the positive direction of the polar coordinates is clockwise:
 
 .. raw:: html
 

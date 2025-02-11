@@ -116,6 +116,12 @@ static bool gui_tab_loop_prepare(gui_tabview_t *parent, int16_t *tab_gap)
     return true;
 }
 
+void obj_pave_shot_cb(void *p, void *this_widget, gui_animate_t *animate)
+{
+    gui_img_t *pave_shot = (gui_img_t *)this_widget;
+    matrix_identity(GUI_BASE(pave_shot)->matrix);
+}
+
 static void gui_tab_input_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
@@ -173,6 +179,22 @@ static void gui_tab_prepare(gui_obj_t *obj)
                 {
                     gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->center_shot, 0, 0);
                 }
+                if (this->style == TAB_ROTATE_BOOK)
+                {
+                    if (this->shot_pave_obj == NULL)
+                    {
+                        this->shot_pave_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot_1",
+                                                                                   (void *)parent->center_shot, 0,
+                                                                                   0, 0, 0);
+                        gui_img_set_mode((gui_img_t *)(this->shot_pave_obj), IMG_BYPASS_MODE);
+                        gui_img_set_mode((gui_img_t *)(this->shot_obj), IMG_BYPASS_MODE);
+                        gui_img_set_animate((gui_img_t *)(this->shot_pave_obj), 1000, -1, obj_pave_shot_cb, (void *)obj);
+                    }
+                    else
+                    {
+                        gui_img_set_attribute((gui_img_t *)(this->shot_pave_obj), NULL, parent->center_shot, 0, 0);
+                    }
+                }
             }
             else if (tab_x_gap == 1)
             {
@@ -186,6 +208,22 @@ static void gui_tab_prepare(gui_obj_t *obj)
                 else
                 {
                     gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->right_shot, 0, 0);
+                }
+                if (this->style == TAB_ROTATE_BOOK)
+                {
+                    if (this->shot_pave_obj == NULL)
+                    {
+                        this->shot_pave_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot_1",
+                                                                                   (void *)parent->right_shot, 0,
+                                                                                   0, 0, 0);
+                        gui_img_set_mode((gui_img_t *)(this->shot_pave_obj), IMG_BYPASS_MODE);
+                        gui_img_set_mode((gui_img_t *)(this->shot_obj), IMG_BYPASS_MODE);
+                        gui_img_set_animate((gui_img_t *)(this->shot_pave_obj), 1000, -1, obj_pave_shot_cb, (void *)obj);
+                    }
+                    else
+                    {
+                        gui_img_set_attribute((gui_img_t *)(this->shot_pave_obj), NULL, parent->right_shot, 0, 0);
+                    }
                 }
             }
             else if (tab_x_gap == -1)
@@ -201,6 +239,22 @@ static void gui_tab_prepare(gui_obj_t *obj)
                 {
                     gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->left_shot, 0, 0);
                 }
+                if (this->style == TAB_ROTATE_BOOK)
+                {
+                    if (this->shot_pave_obj == NULL)
+                    {
+                        this->shot_pave_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot_1",
+                                                                                   (void *)parent->left_shot, 0,
+                                                                                   0, 0, 0);
+                        gui_img_set_mode((gui_img_t *)(this->shot_pave_obj), IMG_BYPASS_MODE);
+                        gui_img_set_mode((gui_img_t *)(this->shot_obj), IMG_BYPASS_MODE);
+                        gui_img_set_animate((gui_img_t *)(this->shot_pave_obj), 1000, -1, obj_pave_shot_cb, (void *)obj);
+                    }
+                    else
+                    {
+                        gui_img_set_attribute((gui_img_t *)(this->shot_pave_obj), NULL, parent->left_shot, 0, 0);
+                    }
+                }
             }
         }
 
@@ -209,6 +263,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
             if ((tab_x_gap == 0) || (tab_x_gap == -1) || (tab_x_gap == 1))
             {
                 gui_obj_show(this->shot_obj, true);
+                gui_obj_show(this->shot_pave_obj, true);
                 gui_obj_show(this->rte_obj, false);
             }
         }
@@ -217,6 +272,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
             if ((tab_x_gap == 0) || (tab_x_gap == -1) || (tab_x_gap == 1))
             {
                 gui_obj_show(this->shot_obj, false);
+                gui_obj_show(this->shot_pave_obj, false);
                 gui_obj_show(this->rte_obj, true);
             }
         }
@@ -235,6 +291,10 @@ static void gui_tab_prepare(gui_obj_t *obj)
     else if (this->style == TAB_ROTATE)
     {
         gui_tab_rotate(obj, tab_x_gap, tab_y_gap);
+    }
+    else if (this->style == TAB_ROTATE_BOOK)
+    {
+        gui_tab_rotate_book(obj, tab_x_gap, tab_y_gap);
     }
     else if (this->style == REDUCTION)
     {

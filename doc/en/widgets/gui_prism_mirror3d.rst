@@ -2,7 +2,7 @@
 Prism Mirror 3D Model
 ========================
 
-This control supports loading 3D prism mirror models consisting of OBJ and MTL files and supports adding animation effects, which can be displayed on app interfaces. Please read before use: :ref:`Prism Mirror Control Usage Notes`.
+This widget supports loading 3D prism mirror models consisting of OBJ and MTL files and supports adding animation effects, which can be displayed on app interfaces. Please read before use: :ref:`Prism Mirror Widget Usage Notes`.
 
 .. raw:: html
 
@@ -54,7 +54,7 @@ GUI Load Prism Mirror Model
 
    Place the :file:`desc.txt` file containing obj parsed data, mtl parsed data, and image data into the project directory, and load it in :cpp:any:`gui_prism_mirror3d_create`.
 
-Prism Mirror Control Usage
+Prism Mirror Widget Usage
 ---------------------------
 Create Widget
 ~~~~~~~~~~~~~~
@@ -67,8 +67,8 @@ Create a prism model using the :cpp:any:`gui_prism_mirror3d_create` function. Th
 + ``desc_add``: descriptor address, containing visualized parsing data.
 + ``x``: The x coordinate in the parent component coordinate system.
 + ``y``: The y coordinate in the parent component coordinate system.
-+ ``w``: The width of the control.
-+ ``h``: The height of the control.
++ ``w``: The width of the widget.
++ ``h``: The height of the widget.
 + ``config``: A pointer to the configuration structure used to configure features such as face count and rotation.
 
 **Example:**
@@ -117,7 +117,7 @@ Use the function :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` to add
 
     gui_prism_mirror3d_click_switch_app_add_event(prism_demo, onSwitchAppCallback);
 
-Set size
+Set Size
 ~~~~~~~~
 Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Adjust the scaling factor to suit the requirements of the scene.
 
@@ -132,7 +132,7 @@ Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Ad
 
    gui_prism_mirror3d_set_scale(prism_demo, 1.0f);
 
-Set location
+Set Location
 ~~~~~~~~~~~~~
 Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism model. This function requires x, y. The z-coordinate is used to define the position of the model in 3D space.
 
@@ -149,7 +149,7 @@ Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism m
 
    gui_prism_mirror3d_set_position(prism_demo, 0, 50, 0);
 
-Set orientation
+Set Orientation
 ~~~~~~~~~~~~~~~~
 Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mirror3d_set_rotation_angles`. This feature helps adjust the orientation of the model in the 3D environment.
 
@@ -166,9 +166,9 @@ Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mir
 
    gui_prism_mirror3d_set_rotation_angles(prism_demo, 0, 60, 0);
 
-Set original state
+Set Original State
 ~~~~~~~~~~~~~~~~~~~
-Use the cpp: any function to set the original state of the 3D prism model as :cpp:any:`gui_prism_mirror3d_det_raw_date`. This function sets the initial position, camera position, rotation angle, and scaling ratio of the prism in the 3D world. Usually called immediately after the control is initialized to define the initial display state.
+Use the cpp: any function to set the original state of the 3D prism model as :cpp:any:`gui_prism_mirror3d_det_raw_date`. This function sets the initial position, camera position, rotation angle, and scaling ratio of the prism in the 3D world. Usually called immediately after the widget is initialized to define the initial display state.
 
 **Parameters:**
 
@@ -188,7 +188,7 @@ Use the cpp: any function to set the original state of the 3D prism model as :cp
    float raw_camera_position[3] = {0, 5, 60};
    gui_prism_mirror3d_set_raw_state(prism_demo, raw_world_position, raw_camera_position, 0, 0, 0, 13);
 
-Set target status
+Set Target Status
 ~~~~~~~~~~~~~~~~~~
 
 Use the cpp: any function to define the target state that the 3D prism model will achieve in animation or interaction. This feature is particularly suitable for creating smooth transition effects, such as changing from one position to another.
@@ -246,9 +246,9 @@ Configuration Explanation
 
 + **Sensitivity**: Controls how the prism responds to touch gestures. Setting this to `0.05f` provides a well-balanced responsivenes
 
-.. _Prism Mirror Control Usage Notes:
+.. _Prism Mirror Widget Usage Notes:
 
-Prism Mirror Control Usage Notes
+Prism Mirror Widget Usage Notes
 ---------------------------------
 
 1. If you use the current default 3D modeling effect, The default demo effect is a 480 by 480 square display design:

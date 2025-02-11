@@ -10,6 +10,8 @@ extern "C" {
 #include "lv_img_dsc_list.h"
 #include "lv_image_dsc.h"
 
+#define M_PI    ((float)3.14159265358979323846)
+
 extern lv_obj_t *scr_watchface;
 extern lv_obj_t *scr_up_curtain;
 extern lv_obj_t *scr_down_curtain;
@@ -26,6 +28,7 @@ void lv_right_curtain_init(void);
 
 
 // FONTS
+LV_FONT_DECLARE(SourceHanSansSC_size12_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size24_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size32_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size48_bits1_font);

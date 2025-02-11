@@ -394,6 +394,7 @@ typedef struct gui_animate
     void (* callback)(void *p, void *this_widget, struct gui_animate *animate);
     void *p;
     const char *name;
+    void *trigger_name;
     bool animate;
     bool init;
     bool Beginning_frame;
@@ -651,6 +652,10 @@ typedef int gui_error_t;
     \
     memset((animate), 0, sizeof(gui_animate_t));\
     animate->animate = true;\
+    if (dur == 0)\
+    {\
+        dur = 1000;\
+    }\
     animate->dur = dur;\
     animate->callback = (gui_animate_callback_t)callback;\
     animate->repeat_count = repeat_count;\

@@ -222,7 +222,7 @@ Switch
 Listen to 2 Gestures
 --------------------
 
-* The switch control has two events, namely, being triggered by being turned on and being triggered by being turned off.
+* The switch widget has two events, namely, being triggered by being turned on and being triggered by being turned off.
 * This function ``sw.onOn`` is used to register the turned on event.
 * This function ``sw.onOff`` is used to register the turned off event.
 

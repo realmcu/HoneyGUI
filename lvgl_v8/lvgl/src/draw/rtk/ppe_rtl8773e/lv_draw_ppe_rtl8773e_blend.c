@@ -8,7 +8,7 @@
  *********************/
 
 #include "lvgl.h"
-#if LV_USE_GPU_RTK_PPEV2
+#if LV_USE_GPU_PPE_RTL8773E
 #include "lv_draw_ppe_rtl8773e_blend.h"
 #include "lv_draw_ppe_rtl8773e_utils.h"
 #include "rtl_ppe.h"

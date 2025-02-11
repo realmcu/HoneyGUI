@@ -17,6 +17,8 @@ static void *context_alloc(size_t size, void *cb_data_p)
     return malloc(size);
 #elif defined RTL87x2G
     js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
+#elif defined CONFIG_SOC_SERIES_RTL8773E
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
 #elif defined RTL8762D
     js_buffer = (void *)(0x6900000);
 
@@ -40,6 +42,9 @@ static void *script_malloc(void)
     scipt_buff =  malloc(JS_SCRIPT_BUFF_SIZE);
 #elif defined RTL87x2G
     scipt_buff = gui_lower_malloc(JS_SCRIPT_BUFF_SIZE);
+
+#elif defined CONFIG_SOC_SERIES_RTL8773E
+    scipt_buff = gui_lower_malloc(JS_SCRIPT_BUFF_SIZE);
 #elif defined RTL8762D
     scipt_buff = (void *)(0x6900000 + PKG_JMEM_HEAP_SIZE * 1024);
 #else
@@ -57,6 +62,8 @@ static void script_free(void *scipt_buff)
     free(scipt_buff);
 #elif defined RTL87x2G
     // static
+    gui_lower_free(scipt_buff);
+#elif defined CONFIG_SOC_SERIES_RTL8773E
     gui_lower_free(scipt_buff);
 #elif defined RTL8762D
     // static

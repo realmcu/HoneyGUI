@@ -18,7 +18,7 @@ Due to the different hardware configurations of various types of :term:`IC`, the
 
 Flash File System
 ~~~~~~~~~~~~~~~~~~
-The original image is converted into a file in a special format and then downloaded into flash. Flash is configured with a pseudo-file system that provides image index information to the control layer.After the simple migration of the file system is complete, the standard file system can be used.
+The original image is converted into a file in a special format and then downloaded into flash. Flash is configured with a pseudo-file system that provides image index information to the widget layer.After the simple migration of the file system is complete, the standard file system can be used.
 
 Please read the :ref:`Image Convert Tool` section for more information about image conversion.
 
@@ -36,7 +36,7 @@ The function of the acceleration layer is to accelerate the UI image drawing pro
 
 Buffer
 ~~~~~~~
-In most embedded systems where :term:`RAM` is limited, RealUI uses a chunked rendering mechanism that requires a display buffer. The display buffer stores the image drawing results of the accelerator and the drawing results of other non-accelerating controls, and the data are transferred to the frame buffer through :term:`DMA`.
+In most embedded systems where :term:`RAM` is limited, RealUI uses a chunked rendering mechanism that requires a display buffer. The display buffer stores the image drawing results of the accelerator and the drawing results of other non-accelerating widgets, and the data are transferred to the frame buffer through :term:`DMA`.
 
 Single frame draw mode can be used when the available RAM can accommodate a full frame, in which case a full frame buffer is used instead of a display buffer.
 

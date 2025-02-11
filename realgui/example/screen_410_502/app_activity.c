@@ -44,6 +44,7 @@ static void arc_activity_cb(NVGcontext *vg)
     if (!draw_flag)
     {
         draw_flag = 1;
+        progress = 1.0f;
         if (!cjson_content)
         {
             return;
@@ -195,7 +196,7 @@ void activity_app(gui_obj_t *obj)
             gui_log("enter gui_lower_malloc\n");
         }
         memset(img_data, 0, buffer_size);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
+        // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
         if (img)
         {
             gui_obj_tree_free(img);

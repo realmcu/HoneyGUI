@@ -2,7 +2,7 @@
 Switch
 ======
 
-Switch is a custom switch button control, often used to enable or disable certain features or options, allowing the developer to control the behavior of an application by toggling the state of the button.
+Switch is a custom switch button widget, often used to enable or disable certain features or options, allowing the developer to control the behavior of an application by toggling the state of the button.
 
 Usage
 -----

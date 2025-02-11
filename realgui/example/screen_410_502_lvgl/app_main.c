@@ -209,6 +209,8 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     lv_timer_t *timer = lv_timer_create(read_json_cb, 3000, NULL);
     lv_timer_set_repeat_count(timer, -1);
+    lv_timer_ready(timer);
+
     lv_disp_load_scr(scr_watchface);
 }
 

@@ -101,6 +101,7 @@ typedef struct gui_text
     void *content;
     void *data;
     void *path;
+    gui_matrix_t *matrix;
 
     uint16_t len;
     uint16_t font_len;
@@ -118,9 +119,9 @@ typedef struct gui_text
     uint8_t font_height;
     uint8_t emoji_size;
     uint8_t checksum;
-    bool layout_refresh;
-    bool content_refresh;
 
+    bool layout_refresh   : 1;
+    bool content_refresh  : 1;
     uint8_t inputable     : 1;
     uint8_t ispasswd      : 1;
     uint8_t wordwrap      : 1;
@@ -299,6 +300,14 @@ void gui_text_emoji_set(gui_text_t *this_widget, uint8_t *path, uint8_t size);
  * @param encoding_type encoding_type.
  */
 void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
+
+/**
+ * @brief set text matrix
+ * @note
+ * @param this_widget the text widget pointer.
+ * @param encoding_type encoding_type.
+ */
+void gui_text_set_matrix(gui_text_t *this_widget, gui_matrix_t *matrix);
 
 /**
  * @brief set text content.
