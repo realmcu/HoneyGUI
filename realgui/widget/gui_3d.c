@@ -32,7 +32,6 @@
 #include "tinyobj_loader_c.h"
 
 
-
 float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, float point_z)
 {
     gui_point_4d_t lightToPoint =
@@ -106,6 +105,7 @@ gui_point_4d_t calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1, gui
     return point;
 
 }
+
 static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
                         gui_3d_world_t *world, gui_3d_light_t *light)
 {
@@ -161,11 +161,10 @@ static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*fac
 
 }
 
+
 static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
                            gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-
     gui_3d_scene(this->face + i, world, camera);
 
     int material_id = this->desc->attrib.material_ids[i];
@@ -240,9 +239,213 @@ static void gui_3d_update_att(gui_obj_t *obj)
     }
 }
 
+#ifdef GUI3D_TRIANGLE_MESH
+static void generate_triangle_img(gui_3d_t *this, int width, int height, gui_3d_light_t *light)
+{
+    this->img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
+    memset(this->img->data, 0x00, width * height * 2 + sizeof(gui_rgb_data_head_t));
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img->data;
+    head->w = width;
+    head->h = height;
+    head->type = RGB565;
+    uint8_t *pixelData = (uint8_t *)this->img->data + sizeof(gui_rgb_data_head_t);
+    float *depthBuffer = gui_malloc(width * height * sizeof(float));
+    memset(depthBuffer, 0x00, width * height * sizeof(float));
+
+    for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
+    {
+        float x0 = this->face[i].transform_vertex[0].position.x;
+        float y0 = this->face[i].transform_vertex[0].position.y;
+        float z0 = this->face[i].transform_vertex[0].position.z;
+        float x1 = this->face[i].transform_vertex[1].position.x;
+        float y1 = this->face[i].transform_vertex[1].position.y;
+        float z1 = this->face[i].transform_vertex[1].position.z;
+        float x2 = this->face[i].transform_vertex[2].position.x;
+        float y2 = this->face[i].transform_vertex[2].position.y;
+        float z2 = this->face[i].transform_vertex[2].position.z;
+
+        float nz = this->face[i].transform_vertex[0].normal.z;
+
+        float z_factor = fmaxf(0.0f, fminf(1.0f, nz));
+        uint8_t color_intensity = (uint8_t)(255 * z_factor);
+
+        int min_x = floor(fminf(fminf(x0, x1), x2));
+        int max_x = ceil(fmaxf(fmaxf(x0, x1), x2));
+        int min_y = floor(fminf(fminf(y0, y1), y2));
+        int max_y = ceil(fmaxf(fmaxf(y0, y1), y2));
+
+        gui_color_t default_color = APP_COLOR_WHITE;
+
+        if (!(this->face[i].state & GUI_3D_FACESTATE_BACKFACE))
+        {
+            for (int y = min_y; y <= max_y; y++)
+            {
+                for (int x = min_x; x <= max_x; x++)
+                {
+                    float area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+                    float w0 = ((x - x0) * (y2 - y0) - (y - y0) * (x2 - x0)) / area;
+                    float w1 = ((x - x0) * (y1 - y0) - (y - y0) * (x1 - x0)) / (-area);
+                    float w2 = 1.0f - w0 - w1;
+
+                    if ((w0 >= 0 && w1 >= 0 && w2 >= 0))
+                    {
+                        float z = w0 * z0 + w1 * z1 + w2 * z2;
+                        int index = x + y * width;
+
+                        if (depthBuffer[index] != 0 && z < depthBuffer[index])
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            depthBuffer[index] = z;
+                            int pixelIndex = index * 2;
+                            uint16_t color = ((color_intensity & 0xF8) << 8) | ((color_intensity & 0xFC) << 3) | ((
+                                                 color_intensity & 0xF8) >> 3);
+                            pixelData[pixelIndex] = color & 0xFF;
+                            pixelData[pixelIndex + 1] = (color >> 8) & 0xFF;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    gui_free(depthBuffer);
+
+    this->img->img_w = width;
+    this->img->img_h = height;
+    this->img->opacity_value = UINT8_MAX;
+    this->img->blend_mode = IMG_FILTER_BLACK;
+    this->img->high_quality = true;
+
+    gui_obj_t *obj = (gui_obj_t *)this;
+    memcpy(&this->img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(&this->img->inverse, &this->img->matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&this->img->inverse);
+    draw_img_new_area(this->img, NULL);
+}
+
 static void gui_3d_prepare(gui_3d_t *this)
 {
     touch_info_t *tp = tp_get_info();
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_3d_update_att(obj);
+
+    // this->flags = TINYOBJ_FLAG_TRIANGULATE;
+    this->flags = 0;
+
+    this->face = gui_malloc(sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
+    memset(this->face, 0x00, sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
+
+    this->img = gui_malloc(sizeof(draw_img_t));
+    memset(this->img, 0x00, sizeof(draw_img_t));
+
+    gui_3d_world_t world;
+    gui_3d_camera_t camera;
+    gui_3d_light_t light;
+    light.initialized = false;
+    for (size_t i = 0; i < this->desc->num_shapes; i++)
+    {
+        GUI_ASSERT(this->shape_transform_cb != NULL);
+
+        for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
+        {
+            this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
+            // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->desc->shapes[i].name, this->desc->shapes[i].length, this->desc->shapes[i].face_offset + j);
+            convert_to_face(this, this->desc->shapes[i].face_offset + j);
+
+            // face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
+            gui_3d_scene(this->face + (this->desc->shapes[i].face_offset + j), &world, &camera);
+
+        }
+    }
+
+    generate_triangle_img(this, 350, 350, &light);
+
+
+    if (tp->type == TOUCH_SHORT)
+    {
+        // Cache the num_face_num_verts
+        const int num_face_vertices = this->desc->attrib.num_face_num_verts;
+
+        for (int i = 0; i < num_face_vertices; ++i)
+        {
+            // Cache the img_target and face attributes
+            const int target_x = this->img[i].img_target_x;
+            const int target_y = this->img[i].img_target_y;
+            const int target_w = this->img[i].img_target_w;
+            const int target_h = this->img[i].img_target_h;
+
+            if (tp->x >= target_x &&
+                tp->x <= (target_x + target_w) &&
+                tp->y >= target_y &&
+                tp->y <= (target_y + target_h))
+            {
+                gui_obj_event_set(obj, GUI_EVENT_1);
+                break;
+            }
+        }
+    }
+
+    gui_fb_change();
+
+    GUI_UNUSED(this);
+    GUI_UNUSED(obj);
+    GUI_UNUSED(tp);
+}
+
+static void gui_3d_draw(gui_3d_t *this)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    GUI_UNUSED(this);
+    GUI_UNUSED(obj);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
+
+    draw_img_cache(this->img, IMG_SRC_MEMADDR);
+    gui_acc_blit_to_dc(this->img, dc, NULL);
+    draw_img_free(this->img, IMG_SRC_MEMADDR);
+
+}
+
+static void gui_3d_end(gui_3d_t *this)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    GUI_UNUSED(this);
+    GUI_UNUSED(obj);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
+
+    if (this->img != NULL)
+    {
+        gui_free(this->img->data);
+        this->img->data = NULL;
+        if (draw_img_acc_end_cb != NULL)
+        {
+            draw_img_acc_end_cb(this->img);
+        }
+        gui_free(this->img);
+        this->img = NULL;
+    }
+
+    gui_free(this->face);
+    this->face = NULL;
+}
+
+#else
+static void gui_3d_prepare(gui_3d_t *this)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_3d_update_att(obj);
 
@@ -258,12 +461,12 @@ static void gui_3d_prepare(gui_3d_t *this)
     this->mask_img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->mask_img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
 
+    gui_3d_world_t world;
     gui_3d_camera_t camera;
     gui_3d_light_t light;
     light.initialized = false;
     for (size_t i = 0; i < this->desc->num_shapes; i++)
     {
-        gui_3d_world_t world;
         GUI_ASSERT(this->shape_transform_cb != NULL);
 
         for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
@@ -278,6 +481,7 @@ static void gui_3d_prepare(gui_3d_t *this)
             {
                 light_apply(this, i, this->desc->shapes[i].face_offset + j, &world, &light);
             }
+
         }
     }
 
@@ -322,7 +526,6 @@ static void gui_3d_draw(gui_3d_t *this)
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
-
 
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
@@ -407,6 +610,7 @@ static void gui_3d_end(gui_3d_t *this)
     gui_free(this->face);
     this->face = NULL;
 }
+#endif
 
 static void gui_3d_destory(gui_3d_t *this)
 {
@@ -517,9 +721,9 @@ static gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
     desc->attrib.face_num_verts = (int *)TINYOBJ_MALLOC(desc->attrib.num_face_num_verts * sizeof(int));
     memcpy(desc->attrib.face_num_verts, ptr, desc->attrib.num_face_num_verts * sizeof(int));
     ptr += desc->attrib.num_face_num_verts * sizeof(int);
-    desc->attrib.material_ids = (int *)TINYOBJ_MALLOC(desc->attrib.num_faces * sizeof(int));
-    memcpy(desc->attrib.material_ids, ptr, desc->attrib.num_faces * sizeof(int));
-    ptr += desc->attrib.num_faces * sizeof(int);
+    desc->attrib.material_ids = (int *)TINYOBJ_MALLOC(desc->attrib.num_face_num_verts * sizeof(int));
+    memcpy(desc->attrib.material_ids, ptr, desc->attrib.num_face_num_verts * sizeof(int));
+    ptr += desc->attrib.num_face_num_verts * sizeof(int);
 
     //shape
     memcpy(&desc->num_shapes, ptr, sizeof(unsigned int));
@@ -538,50 +742,53 @@ static gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
     //material
     memcpy(&desc->num_materials, ptr, sizeof(unsigned int));
     ptr += sizeof(unsigned int);
-    desc->materials = (tinyobj_material_t *)TINYOBJ_MALLOC(desc->num_materials * sizeof(
-                                                               tinyobj_material_t));
-    for (size_t i = 0; i < desc->num_materials; i++)
-    {
-        tinyobj_material_t *mat = &desc->materials[i];
-        mat->name = read_string_from_ptr(&ptr);
-        memcpy(mat->ambient, ptr, 3 * sizeof(float));
-        ptr += 3 * sizeof(float);
-        memcpy(mat->diffuse, ptr, 3 * sizeof(float));
-        ptr += 3 * sizeof(float);
-        memcpy(mat->specular, ptr, 3 * sizeof(float));
-        ptr += 3 * sizeof(float);
-        memcpy(mat->transmittance, ptr, 3 * sizeof(float));
-        ptr += 3 * sizeof(float);
-        memcpy(mat->emission, ptr, 3 * sizeof(float));
-        ptr += 3 * sizeof(float);
-        memcpy(&mat->shininess, ptr, sizeof(float));
-        ptr += sizeof(float);
-        memcpy(&mat->ior, ptr, sizeof(float));
-        ptr += sizeof(float);
-        memcpy(&mat->dissolve, ptr, sizeof(float));
-        ptr += sizeof(float);
-        memcpy(&mat->illum, ptr, sizeof(int));
-        ptr += sizeof(int);
 
-        mat->ambient_texname = read_string_from_ptr(&ptr);
-        mat->diffuse_texname = read_string_from_ptr(&ptr);
-        mat->specular_texname = read_string_from_ptr(&ptr);
-        mat->specular_highlight_texname = read_string_from_ptr(&ptr);
-        mat->bump_texname = read_string_from_ptr(&ptr);
-        mat->displacement_texname = read_string_from_ptr(&ptr);
-        mat->alpha_texname = read_string_from_ptr(&ptr);
-    }
-
-    //textures
-    desc->textures = (unsigned char **)gui_malloc(desc->num_materials * sizeof(unsigned char *));
-    desc->texture_sizes = (unsigned int *)gui_malloc(desc->num_materials * sizeof(unsigned int));
-    for (size_t i = 0; i < desc->num_materials; i++)
+    if (desc->num_materials > 0)
     {
-        memcpy(&desc->texture_sizes[i], ptr, sizeof(unsigned int));
-        ptr += sizeof(unsigned int);
-        desc->textures[i] = (unsigned char *)gui_malloc(desc->texture_sizes[i] * sizeof(unsigned char));
-        memcpy(desc->textures[i], ptr, desc->texture_sizes[i] * sizeof(unsigned char));
-        ptr += desc->texture_sizes[i] * sizeof(unsigned char);
+        desc->materials = (tinyobj_material_t *)TINYOBJ_MALLOC(desc->num_materials * sizeof(
+                                                                   tinyobj_material_t));
+        for (size_t i = 0; i < desc->num_materials; i++)
+        {
+            tinyobj_material_t *mat = &desc->materials[i];
+            mat->name = read_string_from_ptr(&ptr);
+            memcpy(mat->ambient, ptr, 3 * sizeof(float));
+            ptr += 3 * sizeof(float);
+            memcpy(mat->diffuse, ptr, 3 * sizeof(float));
+            ptr += 3 * sizeof(float);
+            memcpy(mat->specular, ptr, 3 * sizeof(float));
+            ptr += 3 * sizeof(float);
+            memcpy(mat->transmittance, ptr, 3 * sizeof(float));
+            ptr += 3 * sizeof(float);
+            memcpy(mat->emission, ptr, 3 * sizeof(float));
+            ptr += 3 * sizeof(float);
+            memcpy(&mat->shininess, ptr, sizeof(float));
+            ptr += sizeof(float);
+            memcpy(&mat->ior, ptr, sizeof(float));
+            ptr += sizeof(float);
+            memcpy(&mat->dissolve, ptr, sizeof(float));
+            ptr += sizeof(float);
+            memcpy(&mat->illum, ptr, sizeof(int));
+            ptr += sizeof(int);
+
+            mat->ambient_texname = read_string_from_ptr(&ptr);
+            mat->diffuse_texname = read_string_from_ptr(&ptr);
+            mat->specular_texname = read_string_from_ptr(&ptr);
+            mat->specular_highlight_texname = read_string_from_ptr(&ptr);
+            mat->bump_texname = read_string_from_ptr(&ptr);
+            mat->displacement_texname = read_string_from_ptr(&ptr);
+            mat->alpha_texname = read_string_from_ptr(&ptr);
+        }
+
+        //textures
+        desc->textures = (unsigned char **)gui_malloc(desc->num_materials * sizeof(unsigned char *));
+        desc->texture_sizes = (unsigned int *)gui_malloc(desc->num_materials * sizeof(unsigned int));
+        for (size_t i = 0; i < desc->num_materials; i++)
+        {
+            memcpy(&desc->texture_sizes[i], ptr, sizeof(unsigned int));
+            ptr += sizeof(unsigned int);
+            desc->textures[i] = (unsigned char *)ptr;
+            ptr += desc->texture_sizes[i] * sizeof(unsigned char);
+        }
     }
 
     return desc;

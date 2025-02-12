@@ -309,6 +309,49 @@ void *gui_malloc(size_t n)
     return ptr;
 }
 
+void *gui_calloc(size_t num, size_t size)
+{
+    void *ptr = NULL;
+    size_t total_size = num * size;
+
+    if (size != 0 && total_size / size != num)
+    {
+        return NULL;
+    }
+
+    if ((total_size > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
+    {
+        ptr = gui_lower_malloc(total_size);
+        if (ptr != NULL)
+        {
+            memset(ptr, 0, total_size);
+        }
+        return ptr;
+    }
+
+    if (tlsf != NULL)
+    {
+        ptr = tlsf_malloc(tlsf, total_size);
+    }
+    else
+    {
+        GUI_ASSERT(os_api->f_malloc != NULL);
+        ptr = os_api->f_malloc(total_size);
+    }
+
+    if (ptr == NULL)
+    {
+        ptr = gui_lower_malloc(total_size);
+    }
+
+    if (ptr != NULL)
+    {
+        memset(ptr, 0, total_size);
+    }
+
+    return ptr;
+}
+
 void *gui_realloc(void *ptr_old, size_t n)
 {
     void *ptr = NULL;

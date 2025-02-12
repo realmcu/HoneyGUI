@@ -171,6 +171,7 @@ bool gui_mq_send_urgent(void *handle, void *buffer, uint32_t size, uint32_t time
 bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
 void *gui_malloc(size_t n);
+void *gui_calloc(size_t num, size_t size);
 void *gui_realloc(void *ptr_old, size_t n);
 void gui_free(void *rmem);
 void gui_mem_debug(void);

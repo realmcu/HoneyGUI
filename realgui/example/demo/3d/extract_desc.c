@@ -39,11 +39,11 @@ void loadFile(void *ctx, const char *filename, const int is_mtl, const char *obj
         *buffer = (char *)malloc(sizeof(char) * (string_size + 1));
         read_size = fread(*buffer, sizeof(char), (size_t) string_size, handler);
         (*buffer)[string_size] = '\0';
-        if (string_size != read_size)
-        {
-            free(*buffer);
-            *buffer = NULL;
-        }
+        // if (string_size != read_size)
+        // {
+        //     free(*buffer);
+        //     *buffer = NULL;
+        // }
         fclose(handler);
     }
 
@@ -184,7 +184,6 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
         perror("Failed to open file for writing");
         return;
     }
-
     fwrite(&desc->attrib.num_vertices, sizeof(unsigned int), 1, file);
     fwrite(&desc->attrib.num_normals, sizeof(unsigned int), 1, file);
     fwrite(&desc->attrib.num_texcoords, sizeof(unsigned int), 1, file);
@@ -197,7 +196,7 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
     fwrite(desc->attrib.texcoords, sizeof(float), desc->attrib.num_texcoords * 2, file);
     fwrite(desc->attrib.faces, sizeof(tinyobj_vertex_index_t), desc->attrib.num_faces, file);
     fwrite(desc->attrib.face_num_verts, sizeof(int), desc->attrib.num_face_num_verts, file);
-    fwrite(desc->attrib.material_ids, sizeof(int), desc->attrib.num_faces, file);
+    fwrite(desc->attrib.material_ids, sizeof(int), desc->attrib.num_face_num_verts, file);
 
     // Save shapes information
     fwrite(&desc->num_shapes, sizeof(unsigned int), 1, file);
@@ -331,32 +330,36 @@ int main(int argc, char **argv)
     for (uint32_t i = 0; i < desc->attrib.num_face_num_verts; i++)
     {
         int material_id = desc->attrib.material_ids[i];
-        printf("desc->materials[%d].diffuse_texname: %s\n", material_id,
-               desc->materials[material_id].diffuse_texname);
-
-        char *txt_file = get_img_file(desc->materials[material_id].diffuse_texname);
-        if (txt_file == NULL)
+        if (material_id != -1)
         {
-            fprintf(stderr, "Failed to convert filename for material %d\n", material_id);
-            continue;
-        }
+            printf("desc->materials[%d].diffuse_texname: %s\n", material_id,
+                   desc->materials[material_id].diffuse_texname);
 
-        int length;
-        unsigned char *array = read_array_from_file(txt_file, &length);
-        if (array != NULL)
-        {
-            desc->textures[material_id] = malloc(length);
-            desc->texture_sizes[material_id] = length;
-            memcpy(desc->textures[material_id], array, length);
-            free(array);
-        }
-        else
-        {
-            printf("Failed to read array from file.\n");
-        }
+            char *txt_file = get_img_file(desc->materials[material_id].diffuse_texname);
+            if (txt_file == NULL)
+            {
+                fprintf(stderr, "Failed to convert filename for material %d\n", material_id);
+                continue;
+            }
 
-        free(txt_file);
+            int length;
+            unsigned char *array = read_array_from_file(txt_file, &length);
+            if (array != NULL)
+            {
+                desc->textures[material_id] = malloc(length);
+                desc->texture_sizes[material_id] = length;
+                memcpy(desc->textures[material_id], array, length);
+                free(array);
+            }
+            else
+            {
+                printf("Failed to read array from file.\n");
+            }
+
+            free(txt_file);
+        }
     }
+
 
     save_desc_to_binary_file(desc, "desc.bin");
     binary_to_txt_array("desc.bin", "desc.txt");
