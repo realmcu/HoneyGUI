@@ -51,7 +51,7 @@ typedef struct gui_scroll_wheel_new
     int16_t string_array_size;
     int16_t gap;
     int16_t count;
-    int16_t touch_y, speed, text_image_map_length, col_offset, index_offset;
+    int16_t touch_y, touch_y_old, speed, text_image_map_length, col_offset, index_offset;
     gui_win_t *win;
     gui_win_t *win2;
     int16_t recode[5];
@@ -59,6 +59,7 @@ typedef struct gui_scroll_wheel_new
     bool wheel_take_over;
     bool loop;
     char time_array_offset;
+    char blank_count;
     int history_y;
     gui_color_t font_color;
     gui_color_t font_color_highlight;
