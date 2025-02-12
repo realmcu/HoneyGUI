@@ -31,13 +31,23 @@ void gui_change_default_path(int argc, char **argv)
         if (!strcmp(argv[count], "-p") && count + 1 < argc)
         {
             char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
+            if (path == NULL)
+            {
+                gui_log("Memory allocation failed\n");
+                return;
+            }
             sprintf(path, "%s%s", argv[count + 1], "\\");
-            buffer = defaultPath;
-            GUI_UNUSED(buffer);
+
+            if (defaultPath != NULL)
+            {
+                free(defaultPath);
+            }
             defaultPath = path;
         }
     }
+    GUI_UNUSED(buffer);
 }
+
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {

@@ -22,7 +22,6 @@
 #include "gui_server.h"
 #include "gui_obj.h"
 #include "gui_view.h"
-#include "gui_img.h"
 
 /*============================================================================*
  *                           Types

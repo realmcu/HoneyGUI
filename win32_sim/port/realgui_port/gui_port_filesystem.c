@@ -137,9 +137,14 @@ static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
 void port_fstat(int fildes, gui_fs_stat_t *buf)
 {
     struct stat st;
-    int fd = fildes;
-    fstat(fd, &st);
-    buf->st_size = st.st_size;
+
+    if (fstat(fildes, &st) != 0)
+    {
+        buf->st_size = (uint32_t) - 1;
+        return;
+    }
+
+    buf->st_size = (uint32_t)st.st_size;
 }
 static int port_open(const char *file, int flags, ...)
 {

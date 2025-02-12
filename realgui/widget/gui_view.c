@@ -25,7 +25,6 @@
 #include "gui_view.h"
 #include "kb_algo.h"
 #include "gui_img.h"
-#include "gui_tab.h"
 
 /*============================================================================*
  *                           Types
