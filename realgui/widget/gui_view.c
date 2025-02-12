@@ -171,7 +171,7 @@ static void gui_view_prepare(gui_obj_t *obj)
         }
     }
 
-    if (this->style == VIEW_ROTATE_BOOK)
+    if (style == VIEW_ROTATE_BOOK)
     {
         if (this->shot_pave_obj == NULL)
         {
@@ -189,6 +189,10 @@ static void gui_view_prepare(gui_obj_t *obj)
         {
             gui_obj_show(this->shot_pave_obj, false);
         }
+    }
+    else if (this->shot_pave_obj)
+    {
+        gui_obj_show(this->shot_pave_obj, false);
     }
 
     if (this->release_x != 0)
@@ -277,6 +281,12 @@ static void pre_load_view(gui_view_t *this)
     }
 }
 
+static void gui_view_free(void *obj, gui_event_t e, void *param)
+{
+    gui_obj_tree_free(obj);
+    gui_log("[VIEW]free view done!\n");
+}
+
 void gui_view_destory(gui_obj_t *obj)
 {
     gui_view_t *this = (gui_view_t *)obj;
@@ -293,28 +303,46 @@ static void gui_view_end(gui_obj_t *obj)
 
     if ((this->release_x == 0) && (this->release_y == 0))
     {
-        // if (this->view_change_ready)
-        // {
-        //     if (this->cur_id.x || this->cur_id.y)
-        //     {
-        //         gui_obj_tree_free(obj);
-        //     }
-        // }
-        // else
-        if (!this->view_change_ready)
+
+        if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
-            if (this->cur_id.x == 0 && this->cur_id.y == 0)
+            if (!this->initial)
             {
-                gui_obj_t *view_first = gui_list_entry((&(obj->parent->child_list))->next, gui_obj_t, brother_list);
-                gui_obj_tree_free(view_first);
-                this->view_change_ready = true;
-                gui_log("[VIEW]change view done \n");
-            }
-            else
-            {
-                gui_obj_tree_free(obj);
+                gui_obj_event_set(obj, GUI_EVENT_8);
+                obj->active = 1;
             }
         }
+        else
+        {
+            this->view_change_ready = true;
+        }
+        // if (!this->view_change_ready)
+        // {
+
+        // if (this->cur_id.x == 0 && this->cur_id.y == 0)
+        // {
+        //     gui_obj_t *view_first = gui_list_entry((&(obj->parent->child_list))->next, gui_obj_t, brother_list);
+        //     gui_obj_tree_free(view_first);
+        //     this->view_change_ready = true;
+        //     gui_log("[VIEW]change view done \n");
+        // }
+        // else
+        // {
+        //     gui_obj_tree_free(obj);
+        // }
+        // }
+        // else
+        // {
+        // if (this->cur_id.x == 0 && this->cur_id.y == 0)
+        // {
+        //     gui_list_t list = GUI_BASE(obj)->parent->child_list;
+        //     if (list.prev != list.next)
+        //     {
+        //         gui_obj_t *view_second = gui_list_entry((&list)->prev, gui_obj_t, brother_list);
+        //         gui_obj_tree_free(view_second);
+        //     }
+        // }
+        // }
     }
 }
 
@@ -425,7 +453,7 @@ gui_view_t *gui_view_create(void       *parent,
     this->cur_id.y = idy;
     gui_view_enable_pre_load(this);
     gui_list_init(&(GET_BASE(this)->child_list));
-
+    gui_obj_add_event_cb(GET_BASE(this), gui_view_free, GUI_EVENT_8, NULL);
     if ((GET_BASE(this)->parent) != NULL)
     {
         gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));

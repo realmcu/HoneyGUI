@@ -142,6 +142,7 @@ static void create_view_0(void *obj, gui_event_t e, void *param)
         break;
     }
     view_0 = gui_view_create(win_view, "view_0", 0, 0, 0, 0, idx, idy);
+    gui_view_set_style(view_0, VIEW_ROTATE_BOOK);
     gui_img_t *img = gui_img_create_from_mem(view_0->rte_obj, "img", UI_CLOCK_FACE_MAIN_BIN, 0, 0, 0,
                                              0);
     gui_view_add_change_event(view_0, view_1, create_view_1, VIEW_EVENT_MOVE_RIGHT);
@@ -213,6 +214,7 @@ static void create_view_2(void *obj, gui_event_t e, void *param)
     gui_img_scale(img, 2, 2);
     gui_view_add_change_event(view_2, view_0, create_view_0, VIEW_EVENT_MOVE_RIGHT);
 }
+
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     win_view = gui_win_create(app->window, "win_view", 0, 0, 0, 0);
@@ -220,9 +222,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_img_create_from_mem(view_0->rte_obj, "img", UI_CLOCK_FACE_MAIN_BIN, 0, 0, 0, 0);
     gui_view_add_change_event(view_0, view_1, create_view_1, VIEW_EVENT_MOVE_RIGHT);
     gui_view_add_change_event(view_0, view_2, create_view_2, VIEW_EVENT_MOVE_LEFT);
-    gui_view_set_style(view_0, VIEW_CLASSIC);
-    // gui_win_t *win = gui_win_create(app->window, "win_fps", 0, 0, 0, 0);
-    // gui_fps_create(win);
+    gui_view_set_style(view_0, VIEW_ROTATE_BOOK);
+    gui_fps_create(app->window);
 }
 
 
