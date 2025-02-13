@@ -18,6 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include <stdio.h>
+#include <math.h>
 #include <stdint.h>
 #include "draw_img.h"
 
@@ -224,45 +225,6 @@ static void do_raster_pixel(const gui_raster_params_t *params)
                         target_red, target_green, target_blue, target_alpha);
 }
 
-
-void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
-{
-    int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
-    if (!draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
-
-    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
-    gui_rgb_data_head_t *head = image->data;
-    char input_type = head->type;
-    int16_t source_w = image->img_w, source_h = image->img_h;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3, opacity_value = image->opacity_value;
-    uint8_t *writebuf = dc->frame_buf;
-    uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = &image->inverse;
-
-    gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
-
-    for (uint32_t i = y_start; i <= y_end; i++)
-    {
-        for (uint32_t j = x_start; j <= x_end; j++)
-        {
-            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = X / Z, y = Y / Z;
-
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
-            if (rect && ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))) { continue; }
-
-            int read_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
-            params.image_off = read_off;
-            params.write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j -
-                               dc->section.x1;
-
-            do_raster_pixel(&params);
-        }
-    }
-}
-
 static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 {
     gui_img_file_t *file = (gui_img_file_t *)image->data;
@@ -336,6 +298,47 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     }
 }
 
+
+void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+{
+    int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
+    if (!draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
+
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    gui_rgb_data_head_t *head = image->data;
+    char input_type = head->type;
+    int16_t source_w = image->img_w, source_h = image->img_h;
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3, opacity_value = image->opacity_value;
+    uint8_t *writebuf = dc->frame_buf;
+    uint32_t blend_mode = image->blend_mode;
+    gui_matrix_t *inverse = &image->inverse;
+
+    gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
+
+    for (uint32_t i = y_start; i <= y_end; i++)
+    {
+        for (uint32_t j = x_start; j <= x_end; j++)
+        {
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = round(X / Z);
+            int y = round(Y / Z);
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
+            if (rect && ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))) { continue; }
+
+            int read_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
+            params.image_off = read_off;
+            params.write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j -
+                               dc->section.x1;
+
+            do_raster_pixel(&params);
+        }
+    }
+}
+
+
 void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
@@ -359,7 +362,8 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
             float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
             float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
             float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = X / Z, y = Y / Z;
+            int x = round(X / Z);
+            int y = round(Y / Z);
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
             if (rect && ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))) { continue; }
