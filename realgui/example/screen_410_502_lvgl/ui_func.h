@@ -35,8 +35,9 @@ void _ui_roller_set_property(lv_obj_t *target, int id, int val);
 #define _UI_SLIDER_PROPERTY_VALUE_WITH_ANIM 1
 void _ui_slider_set_property(lv_obj_t *target, int id, int val);
 
-void _ui_screen_change(lv_obj_t **target, lv_scr_load_anim_t fademode, int spd, int delay,
-                       void (*target_init)(void));
+void _ui_screen_change(lv_obj_t **target, lv_obj_t **source, lv_scr_load_anim_t fademode, int spd,
+                       int delay,
+                       void (*target_init)(void), bool delete);
 
 void _ui_screen_delete(lv_obj_t **target);
 
