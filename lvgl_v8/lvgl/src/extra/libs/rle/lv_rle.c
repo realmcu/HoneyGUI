@@ -6,6 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#ifdef __arm__
+#include "trace.h"
+#endif
+
 #if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
 #include "hal_idu.h"
 #endif
@@ -14,10 +19,24 @@
  * GLOBAL VARIABLES
  **********************/
 
-static uint8_t *decompress_flag = NULL;
-static uint8_t *psram_img_cache = NULL;  // PSRAM image decode data
-static uint32_t psram_img_cache_size = 0;  // cache size
-static bool psram_img_cache_valid = false;  // cache flag
+typedef struct
+{
+    union
+    {
+        const uint8_t *src_addr;
+        const char src_file[256];
+    };
+    uint8_t *rgb_data;
+    lv_img_src_t src_type;
+    // bool valid;
+} rle_cache_t;
+static rle_cache_t rle_cache;
+
+
+// static uint8_t *decompress_flag = NULL;
+// static uint8_t *psram_img_cache = NULL;  // PSRAM image decode data
+// static uint32_t psram_img_cache_size = 0;  // cache size
+// static bool psram_img_cache_valid = false;  // cache flag
 
 /**********************
  * TYPEDEFS
@@ -259,55 +278,141 @@ static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_
 
 static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 {
+    // search cache
+    LV_LOG_INFO("rgb_data 0x%x.", rle_cache.rgb_data);
+    if (rle_cache.rgb_data)
+    {
+        if (dsc->src_type == rle_cache.src_type)
+        {
+            if (((rle_cache.src_type == LV_IMG_SRC_VARIABLE) && (dsc->src == rle_cache.src_addr)) ||
+                ((rle_cache.src_type == LV_IMG_SRC_FILE) && strcmp(dsc->src, rle_cache.src_file) == 0)
+               )
+            {
+                dsc->img_data = rle_cache.rgb_data;
+                LV_LOG_INFO("Get img from cache.");
+                return LV_RES_OK;
+            }
+        }
+        // clear cache immediately, if no enough memory for two decoded images
+        LV_LOG_INFO("Clear img cache.");
+        if (rle_cache.rgb_data)
+        {
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+            lv_mem_free((void *)rle_cache.rgb_data);
+#endif
+        }
+        memset((void *)&rle_cache, 0, sizeof(rle_cache));
+    }
+
     if (dsc->src_type == LV_IMG_SRC_FILE)
     {
+        void *file_data = NULL;
+        bool file_ioctl = true;
         const char *fn = dsc->src;
         if (strcmp(lv_fs_get_ext(fn), "rle") == 0)               /*Check the extension*/
         {
-
-            uint8_t *rle_data;
+            //DBG_DIRECT(" %s %d\n", __FUNCTION__, __LINE__);
             lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-            if (res != LV_FS_RES_OK) { return LV_RES_INV; }
             uint8_t headers[20];
+            lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
+            if (res != LV_FS_RES_OK)
+            {
+                //DBG_DIRECT(" %s %d\n", __FUNCTION__, __LINE__);
+                return LV_RES_INV;
+            }
 
-            lv_fs_ioctl(&f, (void **)&rle_data, 0);
-            memcpy(headers, rle_data, 20);
+            res = lv_fs_ioctl(&f, (void **)&file_data, 0);
+            if (res == LV_FS_RES_NOT_IMP)
+            {
+                file_ioctl = false;
+                do
+                {
+                    LV_LOG_INFO("load img into ram! %s\n", fn);
+                    uint32_t f_sz = 0;
+                    uint32_t rd_sz = 0;
+                    res = lv_fs_seek(&f, 0, LV_FS_SEEK_END);
+                    if (res != LV_FS_RES_OK) {break;}
+                    res = lv_fs_tell(&f, &f_sz);
+                    if (res != LV_FS_RES_OK) {break;}
+
+                    file_data = lv_mem_alloc(f_sz);
+                    LV_ASSERT_MALLOC(file_data);
+                    res = lv_fs_seek(&f, 0, LV_FS_SEEK_SET);
+                    if (res != LV_FS_RES_OK)
+                    {
+                        lv_mem_free((void *)file_data);
+                        file_data = NULL;
+                        break;
+                    }
+                    res = lv_fs_read(&f, file_data, f_sz, &rd_sz);
+                    if (res != LV_FS_RES_OK || f_sz != rd_sz)
+                    {
+                        lv_mem_free((void *)file_data);
+                        file_data = NULL;
+                        break;
+                    }
+                }
+                while (0);
+            }
+            lv_fs_close(&f);
+            if (res != LV_FS_RES_OK || !file_data)
+            {
+                //DBG_DIRECT(" %s %d\n", __FUNCTION__, __LINE__);
+                return LV_RES_INV;
+            }
+
+            memcpy(headers, file_data, 20);
             uint8_t idu_type = headers[8] & 0x03;// Lowest 2 bits
             uint16_t width = headers[2] | (headers[3] << 8);
             uint16_t height = headers[4] | (headers[5] << 8);
             uint8_t raw_bytes_per_pixel = headers[8] >> 6;
             uint8_t bytes_per_pixel = get_bytes_per_pixel(raw_bytes_per_pixel);
 
-            lv_fs_close(&f);
             dsc->header.w = width;
             dsc->header.h = height;
             LV_ASSERT(idu_type == 0); //source RLE
 
-            if (decompress_flag == (uint8_t *)rle_data)
-            {
-                dsc->img_data = psram_img_cache;
-                return LV_RES_OK;
-            }
             uint32_t img_size = width * height * bytes_per_pixel;
+#if (LV_IDU_MEM_CUSTOM == 1)
+            uint8_t *img_data = (uint8_t *)LV_IDU_MEM_ADR;
+#else
             uint8_t *img_data = lv_mem_alloc(img_size);
+#endif
 
-            psram_img_cache = (uint8_t *)img_data;
-
-            idu_file_t *file = (idu_file_t *)(rle_data + 8);
+            idu_file_t *file = (idu_file_t *)((uint8_t *)file_data + 8);
             lv_res_t ret;
 
 #if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
-            ret = hw_acc_idu_decode(rle_data, img_data, width, height);
+            ret = hw_acc_idu_decode(file_data, img_data, width, height);
 
             if (ret == LV_RES_OK)
             {
-                decompress_flag = (uint8_t *)rle_data;
                 dsc->img_data = (uint8_t *)img_data;
+                if (false == file_ioctl && file_data)
+                {
+                    lv_mem_free((void *)file_data);
+                }
                 LV_LOG_INFO("Hardware decode succeeded.");
+
+                // update rle cache
+                LV_LOG_INFO("Update cache.");
+                rle_cache.src_type = dsc->src_type;
+                memset((void *)rle_cache.src_file, 0, sizeof(rle_cache.src_file));
+                strncpy((char *)rle_cache.src_file, dsc->src, strlen(dsc->src));
+                LV_LOG_INFO("rgb_data 0x%x img_data 0x%x.", rle_cache.rgb_data, img_data);
+                if (rle_cache.rgb_data)
+                {
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+                    lv_mem_free((void *)rle_cache.rgb_data);
+#endif
+                }
+                rle_cache.rgb_data = img_data;
                 return LV_RES_OK;
             }
 #endif
+            //DBG_DIRECT(" %s %d\n", __FUNCTION__, __LINE__);
             char input_type = headers[1];
             switch (input_type)
             {
@@ -328,18 +433,40 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
                 return LV_RES_INV;
             }
 
+            if (false == file_ioctl && file_data)
+            {
+                lv_mem_free((void *)file_data);
+            }
             if (ret != LV_RES_OK)
             {
                 LV_LOG_ERROR("Software decode failed.");
-                lv_mem_free(img_data);
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+                lv_mem_free((void *)img_data);
+#endif
+                img_data = NULL;
                 return ret;
             }
             else
             {
                 LV_LOG_INFO("Software decode succeeded.");
             }
-            decompress_flag = (uint8_t *)rle_data;
             dsc->img_data = (uint8_t *)img_data;
+
+            // update rle cache
+            LV_LOG_INFO("Update cache.");
+            rle_cache.src_type = dsc->src_type;
+            memset((void *)rle_cache.src_file, 0, sizeof(rle_cache.src_file));
+            strncpy((char *)rle_cache.src_file, dsc->src, strlen(dsc->src));
+            LV_LOG_INFO("rgb_data 0x%x img_data 0x%x.", rle_cache.rgb_data, img_data);
+            if (rle_cache.rgb_data)
+            {
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+                lv_mem_free((void *)rle_cache.rgb_data);
+#endif
+            }
+            rle_cache.rgb_data = img_data;
 
             return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
         }
@@ -367,15 +494,14 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
         dsc->header.w = width;
         dsc->header.h = height;
 
+        LV_LOG_INFO("0x%x,  w %d, h %d idu %d", data, width, height, idu_type);
         LV_ASSERT(idu_type == 0); //source RLE
 
-        if (decompress_flag == (uint8_t *)src_dsc->data)
-        {
-            dsc->img_data = psram_img_cache;
-            return LV_RES_OK;
-        }
-        uint8_t *img_data = lv_mem_alloc(img_size); //(uint8_t *)lv_psram_decoder_rle_addr;
-        psram_img_cache = (uint8_t *)img_data;
+#if (LV_IDU_MEM_CUSTOM == 1)
+        uint8_t *img_data = (uint8_t *)LV_IDU_MEM_ADR;
+#else
+        uint8_t *img_data = lv_mem_alloc(img_size);
+#endif
 
         lv_res_t ret;
 
@@ -384,9 +510,21 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
         if (ret == LV_RES_OK)
         {
-            decompress_flag = (uint8_t *)data;
             dsc->img_data = (uint8_t *)img_data;
             LV_LOG_INFO("Hardware decode succeeded.");
+
+            // update rle cache
+            LV_LOG_INFO("Update cache.");
+            rle_cache.src_type = dsc->src_type;
+            rle_cache.src_addr = dsc->src;
+            if (rle_cache.rgb_data)
+            {
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+                lv_mem_free((void *)rle_cache.rgb_data);
+#endif
+            }
+            rle_cache.rgb_data = img_data;
             return LV_RES_OK;
         }
 #endif
@@ -411,8 +549,12 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
         if (ret != LV_RES_OK)
         {
-            lv_mem_free(img_data);
             LV_LOG_ERROR("Software decode failed.");
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+            lv_mem_free((void *)img_data);
+#endif
+            img_data = NULL;
             return ret;
         }
         else
@@ -420,9 +562,20 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
             LV_LOG_INFO("Software decode succeeded.");
         }
 
-        decompress_flag = (uint8_t *)src_dsc->data;
         dsc->img_data = (uint8_t *)img_data;
 
+        // update rle cache
+        LV_LOG_INFO("Update cache.");
+        rle_cache.src_type = dsc->src_type;
+        rle_cache.src_addr = dsc->src;
+        if (rle_cache.rgb_data)
+        {
+#if (LV_IDU_MEM_CUSTOM == 1)
+#else
+            lv_mem_free((void *)rle_cache.rgb_data);
+#endif
+        }
+        rle_cache.rgb_data = img_data;
         return LV_RES_OK;
     }
     return LV_RES_INV;    /*If not returned earlier then it failed*/
@@ -432,17 +585,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 {
     LV_UNUSED(decoder);
-    if (dsc->img_data != NULL)
-    {
-        lv_mem_free(dsc->img_data);
-        dsc->img_data = NULL;
-    }
-    if (dsc->user_data)
-    {
-        lv_mem_free(dsc->user_data);
-        dsc->user_data = NULL;
-    }
-    LV_LOG_INFO("Closed RLE image");
+    LV_LOG_INFO("Close RLE decoder");
 }
 #if LV_USE_GPU_RTK_PPE
 static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_t width,
