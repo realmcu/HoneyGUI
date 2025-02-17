@@ -188,6 +188,8 @@ Once the developers have completed the debugging of the display device driver, a
 
 The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function :func:`void lv_port_disp_init(void)`, such as screen size and frame buffer configuration. The display refresh function is defined as :func:`void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)`.
 
+The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure :c:macro:`DISPLAY_FLUSH_TYPE` to switch modes, where :c:macro:`RAMLESS_XXX` is suitable for display ICs without RAM, :c:macro:`RAM_XXX` is suitable for display ICs with RAM, :c:macro:`XXX_FULL_SCREEN_XXX` indicates pushing the entire screen each time, and :c:macro:`XXX_TWO_SEC` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by :c:macro:`SECTION_HEIGHT`.
+
 For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display IC without RAM:
 
 - When using a display IC without RAM, a frame buffer that covers the entire screen size needs to be allocated. Therefore, two frame buffers with a size equal to the screen size are allocated on the PSRAM for display. The macro definitions for display parameters are defined in the file :file:`lv_conf.h`.
@@ -195,8 +197,27 @@ For detailed display device porting methods and considerations, please refer to 
 
 .. code-block:: c
 
-    // flush func select: 1 (IC without RAM), 0 (IC with RAM) 
+    // flush func 1
+    #define RAMLESS_TWO_FULL_SCREEN         0  // double buffer, full refresh
+
+    // flush func 2
+    #define RAM_TWO_FULL_SCREEN_NO_SEC      1  // double buffer, full refresh
+    #define RAM_ONE_FULL_SCREEN_TWO_SEC     2  // two buffer
+    #define RAM_DIRECT_TWO_SEC              3  // two buffer
+
+
+    // two buffer: section height
+    #define SECTION_HEIGHT                  40
+
+
+    #define DISPLAY_FLUSH_TYPE              RAMLESS_TWO_FULL_SCREEN
+
+    #if (DISPLAY_FLUSH_TYPE == RAMLESS_TWO_FULL_SCREEN)
     #define LVGL_USE_EDPI       1
+    #else
+    #define LVGL_USE_EDPI       0
+    #endif
+
 
     // frame buffer config 
     #define LV_PORT_BUF1        (uint32_t)0x08000000   // address in PSRAM
@@ -249,6 +270,7 @@ For detailed display device porting methods and considerations, please refer to 
         *      This way LVGL will always provide the whole rendered screen in `flush_cb`
         *      and you only need to change the frame buffer's address.
         */
+    #if (DISPLAY_FLUSH_TYPE == RAMLESS_TWO_FULL_SCREEN || DISPLAY_FLUSH_TYPE == RAM_TWO_FULL_SCREEN_NO_SEC)
         static lv_disp_draw_buf_t draw_buf_dsc_3;
         lv_color_t *buf_3_1 = (lv_color_t *)LV_PORT_BUF1;           /*A screen sized buffer*/
         lv_color_t *buf_3_2 = (lv_color_t *)LV_PORT_BUF2;           /*Another screen sized buffer*/
@@ -261,10 +283,37 @@ For detailed display device porting methods and considerations, please refer to 
         /*Required for Example 3)*/
         disp_drv.full_refresh = 1;
 
-        /* Fill a memory array with a color if you have GPU.
-        * Note that, in lv_conf.h you can enable GPUs that has built-in support in LVGL.
-        * But if you have a different GPU you can use with this callback.*/
-        //disp_drv.gpu_fill_cb = gpu_fill;
+    #elif (DISPLAY_FLUSH_TYPE == RAM_DIRECT_TWO_SEC || DISPLAY_FLUSH_TYPE == RAM_ONE_FULL_SCREEN_TWO_SEC)
+    #if 1
+        static uint8_t __attribute__((aligned(4))) disp_buff1[MY_DISP_HOR_RES * SECTION_HEIGHT *
+                                                                            LV_COLOR_DEPTH / 8];
+        static uint8_t __attribute__((aligned(4))) disp_buff2[MY_DISP_HOR_RES * SECTION_HEIGHT *
+                                                                            LV_COLOR_DEPTH / 8];
+    #else
+        uint8_t *disp_buff1 = lv_mem_alloc(MY_DISP_HOR_RES * SECTION_HEIGHT * LV_COLOR_DEPTH / 8);
+        uint8_t *disp_buff2 = lv_mem_alloc(MY_DISP_HOR_RES * SECTION_HEIGHT * LV_COLOR_DEPTH / 8);
+    #endif
+        static lv_disp_draw_buf_t draw_buf_dsc_2;
+        lv_color_t *buf_2_1 = (lv_color_t *)disp_buff1;
+        lv_color_t *buf_2_2 = (lv_color_t *)disp_buff2;
+
+        if (!buf_2_1 || !buf_2_2)
+        {
+            DBG_DIRECT("LVGL frame buffer is NULL");
+            while (1);
+        }
+        lv_disp_draw_buf_init(&draw_buf_dsc_2, buf_2_1, buf_2_2,
+                            MY_DISP_HOR_RES * SECTION_HEIGHT);   /*Initialize the display buffer*/
+
+        /*Set a display buffer*/
+        disp_drv.draw_buf = &draw_buf_dsc_2;
+
+        /*Required for Example 2)*/
+        disp_drv.full_refresh = 0;
+
+        // disp_drv.rounder_cb = rounder_cb;
+
+    #endif
 
         /*Finally register the driver*/
         lv_disp_drv_register(&disp_drv);
@@ -531,7 +580,7 @@ HoneyGUI provides support for packaging `ROMFS` file system images:
 
 2. Open the working directory and place the files to be packaged in the :file:`root/` folder. Double-click the :file:`mkromfs_0x4600000.bat` script to generate the file system image :file:`root(0x4600000).bin` and the resource mapping address :file:`resource.h`. The default :guilabel:`base address` of the files is `0x4600000`. :file:`resource.h` records the mapping address of the packaged files. Since `ROMFS` supports direct access using physical addresses, developers can access the resource files directly through the mapping address.
 
-3. Use the :guilabel:`User Data` feature of the MP Tool to download and burn the file system image to flash. The burn address should match the :guilabel:`base address`. If you need to modify the :guilabel:`base address`, you can modify the **addr** parameter in the :file:`mkromfs_0x4600000.bat` script. For example, the following example changes the :guilabel:`base address` from `0x4600000` to `0x4000000`.
+3. Use the :guilabel:`User Data` feature of the MP Tool to download and burn the file system image to flash. The burn address should match the :guilabel:`base address`. If you need to modify the :guilabel:`base address`, you can modify the **"--addr <number>"** parameter in the :file:`mkromfs_0x4600000.bat` script. For example, the following example changes the :guilabel:`base address` from `0x4600000` to `0x4000000`.
 
 .. code-block:: console
 
@@ -549,11 +598,55 @@ HoneyGUI provides support for packaging `ROMFS` file system images:
 
 
 
+LittleFS File System Image
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The LittleFS file system supports read and write operations and features power-loss protection. HoneyGUI provides packaging support for LittleFS file system images:
+
+1. The working directory is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`. External file resources used by the project will be packaged into a file system image and ultimately downloaded as :guilabel:`User Data`.
+2. Open the working directory and place the files you need to package under the :file:`root/` folder. Double-click the script :file:`mklittlefs_img.bat` to generate the file system image :file:`root.bin`.
+3. Use the :guilabel:`User Data` function in MP Tool to download and write the file system image to flash. To change the size of the file system, modify the **"-s <number>"** parameter in the script :file:`mklittlefs_img.bat`. When using interfaces from :file:`rtk_fs.c` for file operations, ensure that :c:macro:`RTK_FS_MNT_ADDR` matches the write address, and :c:macro:`MAX_LFS_SIZE` matches the file system size.
+4. If you need to unpack a file system image, double-click the script :file:`unpack_littlefs_img.bat` to unpack :file:`root.bin` into the :file:`root_up/` folder.
+
+
+.. code-block:: console
+
+    # pack image:
+    # -c <pack_dir>,  --create <pack_dir>
+    # create littlefs image from a directory
+    #
+    # -b <number>,  --block <number>
+    # fs block size, in bytes
+    #
+    # -p <number>,  --page <number>
+    # fs page size, in bytes
+    # 
+    # -s <number>,  --size <number>
+    # fs image size, in bytes
+
+    mklittlefs.exe -c root/  root.bin  -b 4096  -s 512000 -p 16
+
+
+    # unpack image:
+    # -l,  --list
+    # list files in littlefs image
+    #
+    # -u <dest_dir>,  --unpack <dest_dir>
+    # unpack littlefs image to a directory
+
+    mklittlefs.exe root.bin  -l
+    mklittlefs.exe root.bin  -u root_up/
+
+.. note::
+    1. This packaging tool is only applicable for creating filesystem images of LittleFS.
+
+
+
 LVGL Benchmark
 ==========================
 
 LVGL Benchmark is a performance testing tool designed to evaluate the graphical display performance of the LVGL library in various hardware and software environments. By running the Benchmark, users can obtain data on frame rate, rendering speed, and memory usage, helping to optimize display configurations and debug performance issues. The Benchmark includes various test scenarios such as graphical drawing, animations, and text rendering, each simulating common operations in real applications. Users can use these tests to compare the performance of different configurations and platforms, enabling targeted optimization adjustments.
-The official documentation for the LVGL benchmark test is located at :file:`\lvgl\demos\benchmark\README.md`.
+The official documentation for the LVGL benchmark test is located at :file:`your HoneyGUI dir/lvgl/demos/benchmark/README.md`.
 
 Benchmark for Reference
 -----------------------------

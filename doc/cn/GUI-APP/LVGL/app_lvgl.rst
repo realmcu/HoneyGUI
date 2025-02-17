@@ -202,6 +202,8 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 :func:`void lv_port_disp_init(void)` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 :func:`void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)`。
 
+文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 :c:macro:`DISPLAY_FLUSH_TYPE` 以切换模式，其中 :c:macro:`RAMLESS_XXX` 适用于不带有 RAM 的 display IC， :c:macro:`RAM_XXX` 适用于带有 RAM 的 display IC，:c:macro:`XXX_FULL_SCREEN_XXX` 表示为每次整屏推出，:c:macro:`XXX_TWO_SEC` 表示为只绘制变化的显示内容，单位为两个 buffer 大小，buffer 的像素高度由 :c:macro:`SECTION_HEIGHT` 定义。
+
 
 详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 RAM 的 display IC：
 
@@ -211,8 +213,27 @@ LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在
 
 .. code-block:: c
 
-    // flush func select: 1 (IC without RAM), 0 (IC with RAM) 
+    // flush func 1
+    #define RAMLESS_TWO_FULL_SCREEN         0  // double buffer, full refresh
+
+    // flush func 2
+    #define RAM_TWO_FULL_SCREEN_NO_SEC      1  // double buffer, full refresh
+    #define RAM_ONE_FULL_SCREEN_TWO_SEC     2  // two buffer
+    #define RAM_DIRECT_TWO_SEC              3  // two buffer
+
+
+    // two buffer: section height
+    #define SECTION_HEIGHT                  40
+
+
+    #define DISPLAY_FLUSH_TYPE              RAMLESS_TWO_FULL_SCREEN
+
+    #if (DISPLAY_FLUSH_TYPE == RAMLESS_TWO_FULL_SCREEN)
     #define LVGL_USE_EDPI       1
+    #else
+    #define LVGL_USE_EDPI       0
+    #endif
+
 
     // frame buffer config 
     #define LV_PORT_BUF1        (uint32_t)0x08000000   // address in PSRAM
@@ -265,6 +286,7 @@ LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在
         *      This way LVGL will always provide the whole rendered screen in `flush_cb`
         *      and you only need to change the frame buffer's address.
         */
+    #if (DISPLAY_FLUSH_TYPE == RAMLESS_TWO_FULL_SCREEN || DISPLAY_FLUSH_TYPE == RAM_TWO_FULL_SCREEN_NO_SEC)
         static lv_disp_draw_buf_t draw_buf_dsc_3;
         lv_color_t *buf_3_1 = (lv_color_t *)LV_PORT_BUF1;           /*A screen sized buffer*/
         lv_color_t *buf_3_2 = (lv_color_t *)LV_PORT_BUF2;           /*Another screen sized buffer*/
@@ -277,11 +299,37 @@ LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在
         /*Required for Example 3)*/
         disp_drv.full_refresh = 1;
 
-        /* Fill a memory array with a color if you have GPU.
-        * Note that, in lv_conf.h you can enable GPUs that has built-in support in LVGL.
-        * But if you have a different GPU you can use with this callback.*/
-        //disp_drv.gpu_fill_cb = gpu_fill;
+    #elif (DISPLAY_FLUSH_TYPE == RAM_DIRECT_TWO_SEC || DISPLAY_FLUSH_TYPE == RAM_ONE_FULL_SCREEN_TWO_SEC)
+    #if 1
+        static uint8_t __attribute__((aligned(4))) disp_buff1[MY_DISP_HOR_RES * SECTION_HEIGHT *
+                                                                            LV_COLOR_DEPTH / 8];
+        static uint8_t __attribute__((aligned(4))) disp_buff2[MY_DISP_HOR_RES * SECTION_HEIGHT *
+                                                                            LV_COLOR_DEPTH / 8];
+    #else
+        uint8_t *disp_buff1 = lv_mem_alloc(MY_DISP_HOR_RES * SECTION_HEIGHT * LV_COLOR_DEPTH / 8);
+        uint8_t *disp_buff2 = lv_mem_alloc(MY_DISP_HOR_RES * SECTION_HEIGHT * LV_COLOR_DEPTH / 8);
+    #endif
+        static lv_disp_draw_buf_t draw_buf_dsc_2;
+        lv_color_t *buf_2_1 = (lv_color_t *)disp_buff1;
+        lv_color_t *buf_2_2 = (lv_color_t *)disp_buff2;
 
+        if (!buf_2_1 || !buf_2_2)
+        {
+            DBG_DIRECT("LVGL frame buffer is NULL");
+            while (1);
+        }
+        lv_disp_draw_buf_init(&draw_buf_dsc_2, buf_2_1, buf_2_2,
+                            MY_DISP_HOR_RES * SECTION_HEIGHT);   /*Initialize the display buffer*/
+
+        /*Set a display buffer*/
+        disp_drv.draw_buf = &draw_buf_dsc_2;
+
+        /*Required for Example 2)*/
+        disp_drv.full_refresh = 0;
+
+        // disp_drv.rounder_cb = rounder_cb;
+
+    #endif
         /*Finally register the driver*/
         lv_disp_drv_register(&disp_drv);
     }
@@ -541,9 +589,9 @@ ROMFS 文件系统镜像
 
 HoneyGUI 提供 `ROMFS` 文件系统镜像的打包支持：
 
-1. 工作路径为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/`，执行打包过程需要有 python 环境支持，工程用到的外部文件资源需要打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
+1. 工作路径为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/`，执行打包过程需要有 python 环境支持，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
 2. 打开工作路径，将需要打包的文件放置于 :file:`root/` 文件夹下，双击脚本 :file:`mkromfs_0x4600000.bat` 生成文件系统镜像 :file:`root(0x4600000).bin` 和资源映射地址 :file:`resource.h`。文件的默认 :guilabel:`base address` 为 `0x4600000`，:file:`resource.h` 中记录了打包文件的映射地址，由于 `ROMFS` 支持物理地址直接访问，开发者可通过映射地址直接访问资源文件。
-3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash，烧录地址需与 :guilabel:`base address` 保持一致。若需要修改 :guilabel:`base address`, 修改脚本 :file:`mkromfs_0x4600000.bat` 中的 **addr** 参数即可，如下示例为修改 :guilabel:`base address` 从 `0x4600000` 改为 `0x4000000`。
+3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash，烧录地址需与 :guilabel:`base address` 保持一致。若需要修改 :guilabel:`base address`, 修改脚本 :file:`mkromfs_0x4600000.bat` 中的 **"--addr <number>"** 参数即可，如下示例为修改 :guilabel:`base address` 从 `0x4600000` 改为 `0x4000000`。
 
 .. code-block:: console
 
@@ -558,6 +606,52 @@ HoneyGUI 提供 `ROMFS` 文件系统镜像的打包支持：
 .. note::
   1. 该打包工具仅适用于 ROMFS 的文件系统镜像打包。
   2. 打包过程并非简单的文件拼接，同时也记录了文件系统的目录信息和文件的信息。
+
+
+
+
+LittleFS 文件系统镜像
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+LittleFS 文件系统支持读写操作，且具有掉电保护的特点，HoneyGUI 提供 `LittleFS` 文件系统镜像的打包支持：
+
+1. 工作路径为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
+2. 打开工作路径，将需要打包的文件放置于 :file:`root/` 文件夹下，双击脚本 :file:`mklittlefs_img.bat` 生成文件系统镜像 :file:`root.bin`。
+3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash。若需要修改文件系统的大小, 修改脚本 :file:`mklittlefs_img.bat` 中的 **"-s <number>"** 参数即可。当使用 :file:`rtk_fs.c` 中的接口进行文件操作时，其中的 :c:macro:`RTK_FS_MNT_ADDR` 需与烧录地址一致，:c:macro:`MAX_LFS_SIZE` 需与文件系统大小一致。
+4. 如需解包文件系统镜像，双击脚本 :file:`unpack_littlefs_img.bat` 将 :file:`root.bin` 解包到 :file:`root_up/` 文件夹下。
+
+.. code-block:: console
+
+    # pack image:
+    # -c <pack_dir>,  --create <pack_dir>
+    # create littlefs image from a directory
+    #
+    # -b <number>,  --block <number>
+    # fs block size, in bytes
+    #
+    # -p <number>,  --page <number>
+    # fs page size, in bytes
+    # 
+    # -s <number>,  --size <number>
+    # fs image size, in bytes
+
+    mklittlefs.exe -c root/  root.bin  -b 4096  -s 512000 -p 16
+
+
+    # unpack image:
+    # -l,  --list
+    # list files in littlefs image
+    #
+    # -u <dest_dir>,  --unpack <dest_dir>
+    # unpack littlefs image to a directory
+
+    mklittlefs.exe root.bin  -l
+    mklittlefs.exe root.bin  -u root_up/
+
+
+.. note::
+  1. 该打包工具仅适用于 LittleFS 的文件系统镜像打包。
+
 
 
 
