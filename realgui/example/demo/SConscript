@@ -27,7 +27,11 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_3D'):
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D'):
     src += ['app_ui_realgui_3d_prism_mirror.c']
-    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)   
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_VIEW'):
+    src += ['app_ui_realgui_view.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PAINTENGINE'):
     src += ['app_ui_paintengine.c']
@@ -41,9 +45,18 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_BOX2D'):
     src += ['app_ui_box2d.cpp']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-if GetDepend('CONFIG_REALTEK_BUILD_LVGL_V8'):
-    src += ['app_ui_lvgl.c']
-    group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+if GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
+    # src += ['app_ui_lvgl.c']
+    # group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    
+    src_new = Glob('squareline_lvgl/*.c')
+    src_new += Glob('squareline_lvgl/components/*.c')
+    src_new += Glob('squareline_lvgl/fonts/*.c')
+    src_new += Glob('squareline_lvgl/images/*.c')
+    src_new += Glob('squareline_lvgl/screens/*.c')
+    src_new += ['app_ui_lvgl_test.c']
+    CPPPATH += ['squareline_lvgl']
+    group = DefineGroup('realgui/demo', src_new, depend = ['CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('CONFIG_REALTEK_BUILD_LVGL_V9'):
     src += ['app_ui_lvglv9.c']

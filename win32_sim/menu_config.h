@@ -38,6 +38,10 @@
 // #define CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D
 // </c>
 
+// <c> RTK GUI View Demo
+// #define CONFIG_REALTEK_BUILD_REAL_VIEW
+// </c>
+
 // <c> RTK GUI Paint Engine Demo
 // #define CONFIG_REALTEK_BUILD_REAL_PAINTENGINE
 // </c>

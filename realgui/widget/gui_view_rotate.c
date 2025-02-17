@@ -47,16 +47,18 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
+void gui_view_rotate(gui_obj_t *obj)
 {
     gui_view_t *this = (gui_view_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     gui_matrix_t rotate_3D;
     gui_matrix_t temp;
-    int16_t release_x;
+    int16_t idx = this->cur_id.x;
+    int16_t idy = this->cur_id.y;
     float w = this->base.w;
     float h = this->base.h;
-    float rotate_degree;
+    float rotate_degree_x = 0;
+    float rotate_degree_y = 0;
 
     gui_vertex_t v0 = {-w, -h, 0};
     gui_vertex_t v1 = {w,  -h, 0};
@@ -66,23 +68,34 @@ void gui_view_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     gui_vertex_t tv0, tv1, tv2, tv3;
     gui_vertex_t rv0, rv1, rv2, rv3;
 
-    release_x = this->release_x;
-
+    int16_t release_x = this->release_x;
+    int16_t release_y = this->release_y;
     if (release_x > this->base.w / 2)
     {
-        tab_x_gap++;
+        idx++;
         release_x = release_x - this->base.w;
     }
-
     if (release_x < -this->base.w / 2)
     {
-        tab_x_gap--;
+        idx--;
         release_x = release_x + this->base.w;
     }
 
-    rotate_degree = 90 * release_x / (this->base.w / 2);
+    if (release_y > this->base.h / 2)
+    {
+        idy++;
+        release_y = release_y - this->base.h;
+    }
+    if (release_y < -this->base.h / 2)
+    {
+        idy--;
+        release_y = release_y + this->base.h;
+    }
 
-    matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
+    rotate_degree_x = 90 * release_y / (this->base.h / 2);
+    rotate_degree_y = 90 * release_x / (this->base.w / 2);
+
+    matrix_compute_rotate(-rotate_degree_x, rotate_degree_y, 0, &rotate_3D);
 
     matrix_transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
     matrix_transfrom_rotate(&rotate_3D, &v1, &tv1, 0, 0, 0);
@@ -104,8 +117,8 @@ void gui_view_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);
 
-    matrix_translate((tab_x_gap) * 2 * (int)this->base.w, \
-                     (tab_y_gap) * 2 * (int)this->base.h, \
+    matrix_translate((idx) * 2 * (int)this->base.w, \
+                     (idy) * 2 * (int)this->base.h, \
                      obj->matrix); //todo multi 2 for bug fix
 
     matrix_multiply(obj->matrix, &temp);

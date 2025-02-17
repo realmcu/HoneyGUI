@@ -48,17 +48,19 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
+void gui_view_cube(gui_obj_t *obj)
 {
     gui_view_t *this = (gui_view_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     gui_matrix_t temp;
     gui_matrix_t rotate_3D;
-    int16_t release_x = this->release_x;
+    int16_t idx = this->cur_id.x;
+    int16_t idy = this->cur_id.y;
     float w = this->base.w;
     float h = this->base.h;
     float d = (w + h) / 2;
-    float rotate_degree;
+    float rotate_degree_x = 0;
+    float rotate_degree_y = 0;
     float xoff;
     float yoff;
     float zoff;
@@ -71,9 +73,10 @@ void gui_view_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     gui_vertex_t tv0, tv1, tv2, tv3;
     gui_vertex_t rv0, rv1, rv2, rv3;
 
-    rotate_degree = 90 * release_x / (this->base.w) + 90.0 * (tab_x_gap);
+    rotate_degree_x = 90 * this->release_y / (this->base.h) + 90.0 * (idy);
+    rotate_degree_y = 90 * this->release_x / (this->base.w) + 90.0 * (idx);
 
-    matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
+    matrix_compute_rotate(-rotate_degree_x, rotate_degree_y, 0, &rotate_3D);
 
     matrix_multiply_normal(&rotate_3D, &this->normal);
 
@@ -97,7 +100,7 @@ void gui_view_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);
 
-    if (rv0.x > rv1.x)
+    if (rv0.x > rv1.x || rv0.y > rv2.y)
     {
         obj->not_show = true;
     }
@@ -106,19 +109,19 @@ void gui_view_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
         obj->not_show = false;
     }
 
-    if (rotate_degree > 90)
-    {
-        matrix_translate((tab_x_gap) * (int)this->base.w, \
-                         (tab_y_gap) * (int)this->base.h, \
-                         obj->matrix);
-    }
+    // if (rotate_degree > 90 || rotate_degree < -90)
+    // {
+    //     matrix_translate((idx) * (int)this->base.w, \
+    //                      (idy) * (int)this->base.h, \
+    //                      obj->matrix);
+    // }
 
-    if (rotate_degree < -90)
-    {
-        matrix_translate((tab_x_gap) * (int)this->base.w, \
-                         (tab_y_gap) * (int)this->base.h, \
-                         obj->matrix);
-    }
+    // if (rotate_degree < -90)
+    // {
+    //     matrix_translate((idx) * (int)this->base.w, \
+    //                      (idy) * (int)this->base.h, \
+    //                      obj->matrix);
+    // }
 
     matrix_multiply(obj->matrix, &temp);
 }

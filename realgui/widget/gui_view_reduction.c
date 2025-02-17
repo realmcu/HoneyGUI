@@ -47,19 +47,30 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_reduction(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
+void gui_view_reduction(gui_obj_t *obj)
 {
     gui_view_t *this = (gui_view_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
-    int sx = abs((tab_x_gap) * (int)this->base.w + this->release_x);
+    int16_t idx = this->cur_id.x;
+    int16_t idy = this->cur_id.y;
+    int sx = abs((idx) * (int)this->base.w + this->release_x);
+    int sy = abs((idy) * (int)this->base.h + this->release_y);
     float s;
 
-    matrix_translate((tab_x_gap) * (int)this->base.w + this->release_x, \
-                     (tab_y_gap) * (int)this->base.h + this->release_y, \
+    matrix_translate((idx) * (int)this->base.w + this->release_x, \
+                     (idy) * (int)this->base.h + this->release_y, \
                      obj->matrix);
 
     sx = sx % this->base.w;
-    s = 1.0f - (float)sx / this->base.w;
+    sy = sy % this->base.h;
+    if (sx)
+    {
+        s = 1.0f - (float)sx / this->base.w;
+    }
+    else
+    {
+        s = 1.0f - (float)sy / this->base.h;
+    }
 
     if (s < 0.2f)
     {
