@@ -36,7 +36,6 @@ static bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
 static b2World *world = nullptr; // Box2D world
 static b2Body *body_st, *body_ba, *body_pe, *body_wm,
        *body_bomb; // entities that simulate motion trajectories
-std::vector<b2Body *> temporaryBodies;
 
 static gui_img_t *img_strawberry, *img_banana,
        *img_peach, *img_watermelon,
@@ -61,16 +60,11 @@ void clear_world()
 {
     if (world)
     {
-        for (b2Body *body : temporaryBodies)
-        {
-            world->DestroyBody(body);
-        }
-        temporaryBodies.clear();
+        world->~b2World();
         gui_free(world);
         world = nullptr;
         gui_log("close world done\n");
     }
-
 }
 /* rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)
@@ -509,12 +503,6 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
         body_wm->CreateFixture(&FixtureDef);
 
         body_bomb->CreateFixture(&FixtureDef);
-
-        temporaryBodies.push_back(body_st);
-        temporaryBodies.push_back(body_ba);
-        temporaryBodies.push_back(body_pe);
-        temporaryBodies.push_back(body_wm);
-        temporaryBodies.push_back(body_bomb);
 
         // Create bg and whole fruits for displaying on the window
         img_bg = gui_img_create_from_mem(win, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,

@@ -48,6 +48,7 @@ float OUTER_RING_RADIUS; // Outer ring radius
 float INNER_RING_RADIUS; // Inner ring radius
 int SCREEN_WIDTH; // Screen width
 int SCREEN_HEIGHT; // Screen height
+static const uint8_t *img_array[BALL_COUNT] = {NULL};
 
 struct Ball
 {
@@ -185,14 +186,13 @@ void close()
 {
     if (world)
     {
-        for (Ball body : balls)
+        for (uint8_t ball_cnt = 0; ball_cnt < BALL_COUNT; ++ball_cnt)
         {
-            world->DestroyBody(body.body);
-            // gui_free(body.img);
+            gui_free((void *)img_array[ball_cnt++]);
         }
         balls.clear();
         win_release_callback();
-        deallocate(world);
+        world->~b2World();
         world = nullptr;
         gui_log("close world done\n");
     }
@@ -307,20 +307,20 @@ void render()
         // gui_canvas_rect_create(parent, 0, 0,0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(BACKGROUND_COLOR.r*255, BACKGROUND_COLOR.g*255, BACKGROUND_COLOR.b*255, BACKGROUND_COLOR.a*255));
     }
 
-
+    uint8_t ball_cnt = 0;
     // Draw balls
     for (Ball &ball : balls)
     {
         float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
         float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
 
-
-        const uint8_t *img_data =  gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
-                                                     BALL_RADIUS * 2, canvas_callback);
+        const uint8_t *img_data = gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
+                                                    BALL_RADIUS * 2, canvas_callback);
         gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)img_data, ballX - BALL_RADIUS,
                                                  ballY - BALL_RADIUS, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         ball.img = img;
+        img_array[ball_cnt++] = img_data;
     }
 }
 
@@ -343,8 +343,9 @@ int ui_design(gui_obj_t *obj)
     //     win_release_callback();
     //     deallocate(world);
     // }
-    void *mem = allocate(sizeof(b2World));
-    world = new (mem) b2World(gravity);
+    // void *world_mem = allocate(sizeof(b2World));
+    // world = new (world_mem) b2World(gravity);
+    world = new b2World(gravity);
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
