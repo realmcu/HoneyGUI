@@ -5,11 +5,15 @@ cmake_minimum_required(VERSION 3.10)
 
 
 # Define a variable for the library name
-if(CONFIG_REALTEK_BUILD_LETTER_SHELL) #set to 1 to enable or variable to for depnedency
+if(1) #set to 1 to enable or variable to for depnedency
 
-	add_definitions(-DENABLE_RTK_GUI_CONSOLE)
-    file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
+	set(SOURCES
+		"${CMAKE_CURRENT_SOURCE_DIR}/port.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/jerry_util.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/jerry_console.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/jerry_utf8.c"
+	)
 
 
     # Determine if we should create a library

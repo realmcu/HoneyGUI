@@ -5,9 +5,8 @@ cmake_minimum_required(VERSION 3.10)
 
 
 # Define a variable for the library name
-if(CONFIG_REALTEK_BUILD_LETTER_SHELL) #set to 1 to enable or variable to for depnedency
+if(CONFIG_REALTEK_H264BSD) #set to 1 to enable or variable to for depnedency
 
-	add_definitions(-DENABLE_RTK_GUI_CONSOLE)
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 

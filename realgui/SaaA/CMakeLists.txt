@@ -1,11 +1,45 @@
-file(GLOB gui_SaaA_sources *.c js_ui/*.c)
-set(gui_SaaA_sources ${gui_SaaA_sources} CACHE INTERNAL  "gui server sources ")
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
-HEADER_DIRECTORIES(gui_SaaA_headers ./)
-set(gui_SaaA_headers ${gui_SaaA_headers} CACHE INTERNAL  "gui server headers ")
+cmake_minimum_required(VERSION 3.10)
 
-target_compile_definitions(gui PRIVATE ENABLE_RTK_GUI_SCRIPT_AS_A_APP)
-if(CONFIG_LIB_MODE)
-target_compile_definitions(HoneyGUI PRIVATE ENABLE_RTK_GUI_SCRIPT_AS_A_APP)
-endif() 
 
+# Define a variable for the library name
+if(1) #set to 1 to enable or variable to for depnedency
+
+    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB HEADERS "*.h" "*.hpp")
+
+
+    # Determine if we should create a library
+    if((NOT HEADERS) AND (NOT SOURCES))
+        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
+		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(HEADERS AND (NOT SOURCES))
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(SOURCES AND (NOT HEADERS))
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+    endif()
+
+    if(SOURCES AND HEADERS)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    # Process subdirectories regardless
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            else()
+                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
+            endif()
+        endif()
+    endforeach()
+endif()

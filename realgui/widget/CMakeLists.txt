@@ -1,17 +1,54 @@
-file(GLOB gui_widget_sources *.c 3d/*.c)
-file(GLOB_RECURSE gui_widget_remove_sources gui_px.c gui_u8g2.c)
-list(REMOVE_ITEM gui_widget_sources ${gui_widget_remove_sources})
-set(gui_widget_sources ${gui_widget_sources} CACHE INTERNAL  "gui widget sources ")
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
-HEADER_DIRECTORIES(gui_widget_headers ./ ./3d)
-set(gui_widget_headers ${gui_widget_headers}  CACHE INTERNAL  "gui widget headers ")
+cmake_minimum_required(VERSION 3.10)
 
-if(gui_debug_enable)  
-	foreach(ITEM ${gui_widget_sources})
-		message([gui][widget srcs]${ITEM})
-	endforeach()
+
+# Define a variable for the library name
+if(1) #set to 1 to enable or variable to for depnedency
+
+    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB HEADERS "*.h" "*.hpp")
 	
-	foreach(ITEM ${gui_widget_headers})
-		message([gui][widget headers]${ITEM})
-	endforeach()
+	# Specify the file to exclude
+	set(EXCLUDE_FILE 
+		"${CMAKE_CURRENT_SOURCE_DIR}/gui_scroll_wheel.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/gui_bitmap.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/gui_px.c"
+	)
+	# Remove the specified file from the list of sources
+	list(REMOVE_ITEM SOURCES ${EXCLUDE_FILE})
+
+
+    # Determine if we should create a library
+    if((NOT HEADERS) AND (NOT SOURCES))
+        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
+		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(HEADERS AND (NOT SOURCES))
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(SOURCES AND (NOT HEADERS))
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+    endif()
+
+    if(SOURCES AND HEADERS)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    # Process subdirectories regardless
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            else()
+                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
+            endif()
+        endif()
+    endforeach()
 endif()
