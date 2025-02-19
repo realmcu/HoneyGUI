@@ -31,13 +31,23 @@ void gui_change_default_path(int argc, char **argv)
         if (!strcmp(argv[count], "-p") && count + 1 < argc)
         {
             char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
+            if (path == NULL)
+            {
+                gui_log("Memory allocation failed\n");
+                return;
+            }
             sprintf(path, "%s%s", argv[count + 1], "\\");
-            buffer = defaultPath;
-            GUI_UNUSED(buffer);
+
+            if (defaultPath != NULL)
+            {
+                free(defaultPath);
+            }
             defaultPath = path;
         }
     }
+    GUI_UNUSED(buffer);
 }
+
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {
@@ -296,6 +306,49 @@ void *gui_malloc(size_t n)
     // {
     //     GUI_ASSERT(NULL != NULL);
     // }
+    return ptr;
+}
+
+void *gui_calloc(size_t num, size_t size)
+{
+    void *ptr = NULL;
+    size_t total_size = num * size;
+
+    if (size != 0 && total_size / size != num)
+    {
+        return NULL;
+    }
+
+    if ((total_size > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
+    {
+        ptr = gui_lower_malloc(total_size);
+        if (ptr != NULL)
+        {
+            memset(ptr, 0, total_size);
+        }
+        return ptr;
+    }
+
+    if (tlsf != NULL)
+    {
+        ptr = tlsf_malloc(tlsf, total_size);
+    }
+    else
+    {
+        GUI_ASSERT(os_api->f_malloc != NULL);
+        ptr = os_api->f_malloc(total_size);
+    }
+
+    if (ptr == NULL)
+    {
+        ptr = gui_lower_malloc(total_size);
+    }
+
+    if (ptr != NULL)
+    {
+        memset(ptr, 0, total_size);
+    }
+
     return ptr;
 }
 

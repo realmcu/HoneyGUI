@@ -61,16 +61,11 @@ void clear_world()
 {
     if (world)
     {
-        for (b2Body *body : temporaryBodies)
-        {
-            world->DestroyBody(body);
-        }
-        temporaryBodies.clear();
+        world->~b2World();
         gui_free(world);
         world = nullptr;
         gui_log("close world done\n");
     }
-
 }
 /* rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)

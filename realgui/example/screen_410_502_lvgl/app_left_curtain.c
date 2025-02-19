@@ -8,7 +8,8 @@ void scr_left_curtain_cb(lv_event_t *e)
     if (event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT)
     {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_LEFT, 500, 0, &lv_watchface_init);
+        _ui_screen_change(&scr_watchface, &scr_left_curtain, LV_SCR_LOAD_ANIM_OUT_LEFT, 500, 0,
+                          &lv_watchface_init, 1);
     }
     if (event_code == LV_EVENT_SCREEN_LOAD_START)
     {
@@ -22,7 +23,7 @@ void scr_left_curtain_cb(lv_event_t *e)
 
 void lv_left_curtain_init(void)
 {
-    scr_left_curtain = lv_obj_create(NULL);
+    // scr_left_curtain = lv_obj_create(NULL);
 
     // lv_obj_set_style_bg_color(scr_left_curtain, lv_color_make(0, 0, 0), 0);
     // lv_obj_set_style_bg_opa(scr_left_curtain, LV_OPA_COVER, 0);
@@ -41,6 +42,6 @@ void lv_left_curtain_init(void)
     lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
 
-    lv_obj_add_event_cb(scr_left_curtain, (lv_event_cb_t)scr_left_curtain_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(scr_left_curtain, (lv_event_cb_t)scr_left_curtain_cb, LV_EVENT_ALL, NULL);
 }
 

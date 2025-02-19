@@ -21,7 +21,7 @@
 #include "gui_text.h"
 #include "gui_page.h"
 #include "gui_image_array.h"
-
+#include "math.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -88,6 +88,12 @@ static void ctor(struct gui_scroll_wheel_new *this,
     this->font_color = APP_COLOR_WHITE;
     this->font_color_highlight = APP_COLOR_GRAY;
     this->loop = 1;
+    //
+
+
+    //this->touch_y = touch_y[row_count-1];
+    this->touch_y = ceil((row_count + 1) / 2.0) * row_gap;
+    this->touch_y_old = this->touch_y;
 }
 static void text_widget_array_foreach(gui_scroll_wheel_new_t *this, gui_obj_t **text_widget_array,
                                       int array_count)
@@ -249,14 +255,21 @@ static void override(gui_obj_t *win)
         }
         if (!this->loop)
         {
-            if (this->touch_y > this->gap * 2)
+
+
+
+
+
+            if (this->touch_y > this->touch_y_old)
             {
-                this->touch_y = this->gap * 2;
+                this->touch_y = this->touch_y_old;
             }
-            if (this->touch_y < -this->gap * (time_array_size) + GUI_BASE(this)->h)
+            if (this->touch_y < this->touch_y_old - this->gap * (time_array_size - this->blank_count - 1))
             {
-                this->touch_y = -this->gap * (time_array_size) + GUI_BASE(this)->h;
+                this->touch_y = this->touch_y_old - this->gap * (time_array_size - this->blank_count - 1);
             }
+            //gui_log("this->touch_y:%d\n",this->touch_y);
+
         }
 
         if (this->render)
@@ -357,8 +370,6 @@ static void override(gui_obj_t *win)
                     {
                         GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color;
                     }
-
-
 
                     render(text, (void *)text_widget_array[i], this->render_mode, this->text_image_map_length,
                            this->text_image_map);
@@ -583,7 +594,17 @@ void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
             color = widget->font_color_highlight;
         }
         {
-            const char *text = widget->string_array[i];
+            int time_array_offset = -((widget->count + 2) / 2 % widget->string_array_size);
+            int index = time_array_offset + i;
+            if (index >= widget->string_array_size)
+            {
+                index -= widget->string_array_size;
+            }
+            if (index < 0)
+            {
+                index += widget->string_array_size;
+            }
+            const char *text = widget->string_array[index];
 
             {
                 gui_text_t *t = gui_text_create(win, text, 0, 0, GUI_BASE(widget)->w,

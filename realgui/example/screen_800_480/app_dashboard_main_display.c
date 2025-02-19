@@ -341,17 +341,12 @@ void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_info
         tel_box_right_button->base.not_show = false;
         short_tel_number->base.not_show = false;
     }
-//    if ((app_call_information->phone_status == T_PHONE_STATUS_ACCEPT) ||
-//        (app_call_information->phone_status == T_PHONE_STATUS_ONGOING))
-//    {
-//            tel_reject_end->base.not_show = false;
-//        gui_log("tel reject or end");
-//    }
+
     if (app_call_information->phone_status == T_PHONE_STATUS_ACCEPT)
     {
         tel_accept->base.not_show = false;
         short_tel_accept->base.not_show = false;
-        gui_log("tel accept");
+//        gui_log("tel accept");
     }
 
     memcpy(&show_tel_number[0], &app_call_information->current_phone_number[0],

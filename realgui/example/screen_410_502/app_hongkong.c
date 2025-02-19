@@ -40,7 +40,7 @@ static gui_app_t app_hongkong =
     // .startup_animation_flag = GUI_APP_ANIMATION_9,
 };
 
-void *get_app_hongkong(void)
+gui_app_t *get_app_hongkong(void)
 {
     return &app_hongkong;
 }
@@ -106,6 +106,13 @@ static void switch_app_menu()
         gui_app_switch(gui_current_app(), get_app_menu());
     }
 }
+#include "gui_view.h"
+gui_view_t *view_0 = NULL;
+gui_view_t *view_1 = NULL;
+gui_view_t *view_2 = NULL;
+gui_win_t *win_view = NULL;
+
+
 
 static void app_hongkong_ui_design(gui_app_t *app)
 {
@@ -141,7 +148,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_clock(gui_tab_get_rte_obj(tb_clock));
     page_tb_activity(gui_tab_get_rte_obj(tb_activity));
     gui_tab_update_preload(GUI_BASE(tb_clock));
-    gui_tab_update_preload(GUI_BASE(tb_activity));
+    // gui_tab_update_preload(GUI_BASE(tb_activity));
     gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 

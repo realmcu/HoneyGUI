@@ -64,6 +64,7 @@ static void hw_ppe_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
     target.memory = (void *)dc->frame_buf;
     target.address = (uint32_t)dc->frame_buf;
     target.width  = dc->fb_width;
+    target.stride = dc->fb_width;
     target.height = dc->fb_height;
 
     switch (head->type)
@@ -84,6 +85,7 @@ static void hw_ppe_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
         return;
     }
     source.width = image->img_w;
+    source.stride = image->img_w;
     source.height = image->img_h;
     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
     source.memory = (void *)source.address;
@@ -113,122 +115,122 @@ static void hw_ppe_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
             mode = PPE_BYPASS_MODE;
         }
     }
-    if (1)
+    if ((image->matrix.m[0][0] != 1 || image->matrix.m[1][1] != 1) && \
+        (image->img_w != image->img_target_w && image->img_h != image->img_target_h))
     {
-        if ((image->matrix.m[0][0] != 1 || image->matrix.m[1][1] != 1) && \
-            (image->img_w != image->img_target_w && image->img_h != image->img_target_h))
+        float scale_x = image->matrix.m[0][0], scale_y = image->matrix.m[1][1];
+        ppe_buffer_t scaled_img;
+        ppe_translate_t trans;
+        ppe_rect_t range;
+        ppe_rect_t scale_rect;
+        memset(&scaled_img, 0, sizeof(ppe_buffer_t));
+        if (image->blend_mode == IMG_FILTER_BLACK)
         {
-            float scale_x = image->matrix.m[0][0], scale_y = image->matrix.m[1][1];
-            ppe_buffer_t scaled_img;
-            ppe_translate_t trans;
-            ppe_rect_t range;
-            ppe_rect_t scale_rect;
-            memset(&scaled_img, 0, sizeof(ppe_buffer_t));
-            if (image->blend_mode == IMG_FILTER_BLACK)
+            scaled_img.color_key_en = true;
+            scaled_img.color_key_value = 0x00000000;
+            mode = PPE_SRC_OVER_MODE;
+        }
+        trans.x = constraint_area.x1 - buf_area.x1;
+        trans.y = constraint_area.y1 - buf_area.y1;
+        scale_rect.top = (constraint_area.y1 - draw_area.y1) / scale_y;
+        scale_rect.bottom = ceil((constraint_area.y2 - draw_area.y1) / scale_y) + ceil(
+                                1 / scale_y);
+        if (scale_rect.bottom >= image->img_h)
+        {
+            scale_rect.bottom = image->img_h - 1;
+        }
+        scale_rect.left = (constraint_area.x1 - draw_area.x1) / scale_x;
+        scale_rect.right = ceil((constraint_area.x2 - draw_area.x1) / scale_x) + ceil(
+                               1 / scale_x);
+        if (scale_rect.right >= image->img_w)
+        {
+            scale_rect.right = image->img_w - 1;
+        }
+        scaled_img.width = (uint32_t)((scale_rect.right - scale_rect.left + 1) * scale_x);
+        scaled_img.height = (uint32_t)((scale_rect.bottom - scale_rect.top + 1) * scale_y);
+        scaled_img.stride = scaled_img.width;
+        if (scaled_img.height < 1)
+        {
+            return;
+        }
+        scaled_img.global_alpha_en = true;
+        scaled_img.global_alpha = image->opacity_value;
+        if (head->compress)
+        {
+            source.height = scale_rect.bottom - scale_rect.top + 1;
+            source.width = scale_rect.right - scale_rect.left + 1;
+            source.stride = source.width;
+            const IDU_file_header *header = (IDU_file_header *)((uint32_t)image->data + sizeof(
+                                                                    struct gui_rgb_data_head));
+            hal_idu_decompress_info info;
+            info.start_column = scale_rect.left;
+            info.end_column = scale_rect.right;
+            info.start_line = scale_rect.top;
+            info.end_line = scale_rect.bottom;
+            scale_rect.left = 0;
+            scale_rect.right = info.end_column - info.start_column;
+            scale_rect.top = 0;
+            scale_rect.bottom = info.end_line - info.start_line;
+            info.raw_data_address = (uint32_t)header;
+            source.memory = gui_malloc(source.height * source.width *
+                                       ppe_get_format_data_len(source.format));
+            source.address = (uint32_t)source.memory;
+            bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
+            if (!ret)
             {
-                scaled_img.color_key_en = true;
-                scaled_img.color_key_value = 0x00000000;
-                mode = PPE_SRC_OVER_MODE;
-            }
-            trans.x = constraint_area.x1 - buf_area.x1;
-            trans.y = constraint_area.y1 - buf_area.y1;
-            scale_rect.top = (constraint_area.y1 - draw_area.y1) / scale_y;
-            scale_rect.bottom = ceil((constraint_area.y2 - draw_area.y1) / scale_y) + ceil(
-                                    1 / scale_y);
-            if (scale_rect.bottom >= image->img_h)
-            {
-                scale_rect.bottom = image->img_h - 1;
-            }
-            scale_rect.left = (constraint_area.x1 - draw_area.x1) / scale_x;
-            scale_rect.right = ceil((constraint_area.x2 - draw_area.x1) / scale_x) + ceil(
-                                   1 / scale_x);
-            if (scale_rect.right >= image->img_w)
-            {
-                scale_rect.right = image->img_w - 1;
-            }
-            scaled_img.width = (uint32_t)((scale_rect.right - scale_rect.left + 1) * scale_x);
-            scaled_img.height = (uint32_t)((scale_rect.bottom - scale_rect.top + 1) * scale_y);
-            if (scaled_img.height < 1)
-            {
+                gui_free(source.memory);
                 return;
             }
-            scaled_img.global_alpha_en = true;
-            scaled_img.global_alpha = image->opacity_value;
-            if (head->compress)
-            {
-                source.height = scale_rect.bottom - scale_rect.top + 1;
-                source.width = scale_rect.right - scale_rect.left + 1;
-                const IDU_file_header *header = (IDU_file_header *)((uint32_t)image->data + sizeof(
-                                                                        struct gui_rgb_data_head));
-                hal_idu_decompress_info info;
-                info.start_column = scale_rect.left;
-                info.end_column = scale_rect.right;
-                info.start_line = scale_rect.top;
-                info.end_line = scale_rect.bottom;
-                scale_rect.left = 0;
-                scale_rect.right = info.end_column - info.start_column;
-                scale_rect.top = 0;
-                scale_rect.bottom = info.end_line - info.start_line;
-                info.raw_data_address = (uint32_t)header;
-                source.memory = gui_malloc(source.height * source.width *
-                                           ppe_get_format_data_len(source.format));
-                source.address = (uint32_t)source.memory;
-                bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
-                if (!ret)
-                {
-                    gui_free(source.memory);
-                    return;
-                }
-            }
-            scaled_img.format = source.format;
-            scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * ppe_get_format_data_len(
-                                               source.format));
-            PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
-            if (err == PPE_SUCCESS)
-            {
-                err = PPE_blend(&scaled_img, &target, &trans, mode);
-            }
-            if (head->compress)
-            {
-                gui_free(source.memory);
-            }
-            gui_free(scaled_img.memory);
         }
-        else
+        scaled_img.format = source.format;
+        scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * ppe_get_format_data_len(
+                                           source.format));
+        PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
+        if (err == PPE_SUCCESS)
         {
-            ppe_translate_t trans = {.x = draw_area.x1 - dc->section.x1, .y = draw_area.y1 - dc->section.y1};
-            if (head->compress)
-            {
-                RCC_PeriphClockCmd(APBPeriph_IDU, APBPeriph_IDU_CLOCK, ENABLE);
+            err = PPE_blend(&scaled_img, &target, &trans, mode);
+        }
+        if (head->compress)
+        {
+            gui_free(source.memory);
+        }
+        gui_free(scaled_img.memory);
+    }
+    else
+    {
+        ppe_translate_t trans = {.x = draw_area.x1 - dc->section.x1, .y = draw_area.y1 - dc->section.y1};
+        if (head->compress)
+        {
+            RCC_PeriphClockCmd(APBPeriph_IDU, APBPeriph_IDU_CLOCK, ENABLE);
 
-                const IDU_file_header *header = (IDU_file_header *)((uint32_t)image->data + sizeof(
-                                                                        struct gui_rgb_data_head));
-                hal_idu_decompress_info info;
-                info.start_column = constraint_area.x1 - draw_area.x1;
-                info.end_column = constraint_area.x2 - draw_area.x1;
-                info.start_line = constraint_area.y1 - draw_area.y1;
-                info.end_line = constraint_area.y2 - draw_area.y1;
-                info.raw_data_address = (uint32_t)header;
-                source.memory = gui_malloc((info.end_line - info.start_line + 1) * (info.end_column -
-                                                                                    info.start_column + 1)
-                                           * ppe_get_format_data_len(source.format));
-                source.address = (uint32_t)source.memory;
-                source.width = info.end_column - info.start_column + 1;
-                source.height = info.end_line - info.start_line + 1;
-                trans.x = constraint_area.x1 - dc->section.x1;
-                trans.y = constraint_area.y1 - dc->section.y1;
-                bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
-                if (!ret)
-                {
-                    gui_free(source.memory);
-                    return;
-                }
-            }
-            PPE_ERR err = PPE_blend(&source, &target, &trans, PPE_SRC_OVER_MODE);
-            if (head->compress)
+            const IDU_file_header *header = (IDU_file_header *)((uint32_t)image->data + sizeof(
+                                                                    struct gui_rgb_data_head));
+            hal_idu_decompress_info info;
+            info.start_column = constraint_area.x1 - draw_area.x1;
+            info.end_column = constraint_area.x2 - draw_area.x1;
+            info.start_line = constraint_area.y1 - draw_area.y1;
+            info.end_line = constraint_area.y2 - draw_area.y1;
+            info.raw_data_address = (uint32_t)header;
+            source.memory = gui_malloc((info.end_line - info.start_line + 1) * (info.end_column -
+                                                                                info.start_column + 1)
+                                       * ppe_get_format_data_len(source.format));
+            source.address = (uint32_t)source.memory;
+            source.width = info.end_column - info.start_column + 1;
+            source.height = info.end_line - info.start_line + 1;
+            source.stride = source.width;
+            trans.x = constraint_area.x1 - dc->section.x1;
+            trans.y = constraint_area.y1 - dc->section.y1;
+            bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
+            if (!ret)
             {
                 gui_free(source.memory);
+                return;
             }
+        }
+        PPE_ERR err = PPE_blend(&source, &target, &trans, PPE_SRC_OVER_MODE);
+        if (head->compress)
+        {
+            gui_free(source.memory);
         }
     }
 }
@@ -283,6 +285,7 @@ static void hw_bare_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *
     target.address = (uint32_t)dc->frame_buf;
     target.width  = dc->fb_width;
     target.height = dc->fb_height;
+    target.stride = dc->fb_width;
 
     switch (head->type)
     {
@@ -303,6 +306,7 @@ static void hw_bare_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *
     }
     source.width = image->img_w;
     source.height = image->img_h;
+    source.stride = image->img_w;
     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
@@ -335,6 +339,7 @@ static void hw_bare_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *
         }
         scaled_img.width = (uint32_t)((scale_rect.right - scale_rect.left + 1) * scale_x);
         scaled_img.height = (uint32_t)((scale_rect.bottom - scale_rect.top + 1) * scale_y);
+        scaled_img.stride = scaled_img.width;
         if (scaled_img.height < 1)
         {
             return;
@@ -345,6 +350,7 @@ static void hw_bare_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *
         {
             source.height = scale_rect.bottom - scale_rect.top + 1;
             source.width = scale_rect.right - scale_rect.left + 1;
+            source.stride = source.width;
             const IDU_file_header *header = (IDU_file_header *)((uint32_t)image->data + sizeof(
                                                                     struct gui_rgb_data_head));
             hal_idu_decompress_info info;
@@ -370,6 +376,7 @@ static void hw_bare_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *
         scaled_img.format = source.format;
         scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * ppe_get_format_data_len(
                                            source.format));
+
         PPE_ERR err = PPE_Scale_Rect_Cover(&source, &target, &trans, scale_x, scale_y, &scale_rect);
         if (head->compress)
         {

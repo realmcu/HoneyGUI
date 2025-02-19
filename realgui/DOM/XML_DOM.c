@@ -3851,26 +3851,57 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
             token = strtok(NULL, ",");
         }
         //gui_free(items_copy);
-        if (item_count - 2 < row_count)
+        int blank_count = 0;
+        if (loop)
         {
-            int item_count_temp = item_count;
-            if (item_count > row_count)
+            if (item_count - 2 < row_count)
             {
-                item_count_temp = item_count * 2;
+                int item_count_temp = item_count;
+                if (item_count > row_count)
+                {
+                    item_count_temp = item_count * 2;
+                }
+                else
+                {
+                    item_count_temp = (row_count / item_count + 2) * item_count;
+                }
+                const char **string_array_temp = gui_malloc(item_count_temp * sizeof(char *));
+                for (size_t i = 0; i < item_count_temp; i++)
+                {
+                    string_array_temp[i] = string_array[i % item_count];
+                }
+                gui_free(string_array);
+                string_array = string_array_temp;
+                item_count = item_count_temp;
             }
-            else
-            {
-                item_count_temp = (row_count / item_count + 2) * item_count;
-            }
-            const char **string_array_temp = gui_malloc(item_count_temp * sizeof(char *));
-            for (size_t i = 0; i < item_count_temp; i++)
-            {
-                string_array_temp[i] = string_array[i % item_count];
-            }
-            gui_free(string_array);
-            string_array = string_array_temp;
-            item_count = item_count_temp;
         }
+        else
+        {
+
+            {
+                int item_count_temp = _UI_MAX(row_count + 2 + row_count / 2, item_count + 2 + item_count / 2) ;
+                const char **string_array_temp = gui_malloc(item_count_temp * sizeof(char *));
+                for (size_t i = 0; i < item_count_temp; i++)
+                {
+                    if (i < item_count)
+                    {
+                        string_array_temp[i] = string_array[i];
+                    }
+                    else
+                    {
+                        string_array_temp[i] = " ";
+                    }
+
+
+                }
+                blank_count = item_count_temp - item_count;
+                gui_free(string_array);
+                string_array = string_array_temp;
+                item_count = item_count_temp;
+            }
+        }
+
+
 
         // Create the scroll wheel widget
         gui_scroll_wheel_new_t *scroll_wheel = gui_scroll_wheel_new_create(
@@ -3888,7 +3919,7 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
                                                            int font_size, TEXT_MODE mode);
         gui_scroll_wheel_new_render_text_alien(scroll_wheel, gui_get_file_address(font), font_size, style);
         scroll_wheel->loop = loop;
-
+        scroll_wheel->blank_count = blank_count;
         parent = GUI_BASE(scroll_wheel);
 
     }

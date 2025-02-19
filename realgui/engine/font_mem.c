@@ -47,6 +47,10 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint8_t font_index;
     uint32_t table_offset;
     uint32_t dot_offset;
+    if (text == NULL)
+    {
+        return;
+    }
     if (text->path == NULL)
     {
         font_index = get_fontlib_by_size(text->font_height);
@@ -65,8 +69,11 @@ void gui_font_get_dot_info(gui_text_t *text)
     if (text->font_mode == FONT_SRC_MEMADDR)
     {
         font = (GUI_FONT_HEAD_BMP *)text->path;
-        table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
-        dot_offset = table_offset + font->index_area_size;
+        if (font != NULL)
+        {
+            table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
+            dot_offset = table_offset + font->index_area_size;
+        }
     }
     else if (text->font_mode == FONT_SRC_FTL)
     {

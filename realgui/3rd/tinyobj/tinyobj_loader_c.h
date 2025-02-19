@@ -162,6 +162,11 @@ extern void tinyobj_materials_free(tinyobj_material_t *materials,
 #include <string.h>
 #include <errno.h>
 
+#define TINYOBJ_MALLOC gui_malloc
+#define TINYOBJ_REALLOC gui_realloc
+#define TINYOBJ_CALLOC gui_calloc
+#define TINYOBJ_FREE gui_free
+
 #if defined(TINYOBJ_MALLOC) && defined(TINYOBJ_CALLOC) && defined(TINYOBJ_FREE) && (defined(TINYOBJ_REALLOC) || defined(TINYOBJ_REALLOC_SIZED))
 /* ok */
 #elif !defined(TINYOBJ_MALLOC) && !defined(TINYOBJ_CALLOC) && !defined(TINYOBJ_FREE) && !defined(TINYOBJ_REALLOC) && !defined(TINYOBJ_REALLOC_SIZED)
