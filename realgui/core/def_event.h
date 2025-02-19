@@ -42,24 +42,28 @@ typedef enum
     GUI_EVENT_TOUCH_RELEASED          = 0x0005,
     GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE = 0x0006,
     GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE  = 0x0007,
+    GUI_EVENT_TOUCH_MOVE_LEFT         = 0x0008,
+    GUI_EVENT_TOUCH_MOVE_RIGHT        = 0x0009,
+    GUI_EVENT_TOUCH_MOVE_UP           = 0x000A,
+    GUI_EVENT_TOUCH_MOVE_DOWN         = 0x000B,
 
-    GUI_EVENT_KB_UP_PRESSED           = 0x0008,
-    GUI_EVENT_KB_UP_RELEASED          = 0x0009,
-    GUI_EVENT_KB_DOWN_PRESSED         = 0x000A,
-    GUI_EVENT_KB_DOWN_RELEASED        = 0x000B,
+    GUI_EVENT_KB_UP_PRESSED           = 0x000C,
+    GUI_EVENT_KB_UP_RELEASED          = 0x000D,
+    GUI_EVENT_KB_DOWN_PRESSED         = 0x000E,
+    GUI_EVENT_KB_DOWN_RELEASED        = 0x000F,
 
-    GUI_EVENT_KB_SHORT_CLICKED        = 0x000C,
-    GUI_EVENT_KB_LONG_CLICKED         = 0x000D,
+    GUI_EVENT_KB_SHORT_CLICKED        = 0x0010,
+    GUI_EVENT_KB_LONG_CLICKED         = 0x0011,
     /** Special events*/
     /** Other events*/
-    GUI_EVENT_1                       = 0x000E,
-    GUI_EVENT_2                       = 0x000F,
-    GUI_EVENT_3                       = 0x0010,
-    GUI_EVENT_4                       = 0x0011,
-    GUI_EVENT_5                       = 0x0012,
-    GUI_EVENT_6                       = 0x0013,
-    GUI_EVENT_7                       = 0x0014,
-    GUI_EVENT_8                       = 0x0015,
+    GUI_EVENT_1                       = 0x0012,
+    GUI_EVENT_2                       = 0x0013,
+    GUI_EVENT_3                       = 0x0014,
+    GUI_EVENT_4                       = 0x0015,
+    GUI_EVENT_5                       = 0x0016,
+    GUI_EVENT_6                       = 0x0017,
+    GUI_EVENT_7                       = 0x0018,
+    GUI_EVENT_8                       = 0x0019,
 
 
 } gui_event_t;

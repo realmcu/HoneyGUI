@@ -3,10 +3,10 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_view.c
-  * @brief Extended in the cross direction
-  * @details switch the currently displayed screen by sliding
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/24
+  * @brief the view widget is a kind of container that makes switching more convenient and effectively reduces memory consumption.
+  * @details switch the currently view by sliding or clicking
+  * @author shel_deng@realsil.com.cn
+  * @date 2025/02/18
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -95,12 +95,12 @@ static void gui_view_prepare(gui_obj_t *obj)
                 if (event_flag) { break; }
                 if (this->view_change_ready && this->release_x < 0)
                 {
-                    gui_obj_event_set(obj, (gui_event_t)VIEW_EVENT_MOVE_LEFT);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
                     event_flag = 1;
                 }
                 else if ((this->view_change_ready && this->release_x > 0))
                 {
-                    gui_obj_event_set(obj, (gui_event_t)VIEW_EVENT_MOVE_RIGHT);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
                     event_flag = 1;
                 }
             }
@@ -112,12 +112,12 @@ static void gui_view_prepare(gui_obj_t *obj)
                 if (event_flag) { break; }
                 if (this->view_change_ready && this->release_y < 0)
                 {
-                    gui_obj_event_set(obj, (gui_event_t)VIEW_EVENT_MOVE_UP);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_UP);
                     event_flag = 1;
                 }
                 else if (this->view_change_ready && this->release_y > 0)
                 {
-                    gui_obj_event_set(obj, (gui_event_t)VIEW_EVENT_MOVE_DOWN);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
                     event_flag = 1;
                 }
             }
@@ -174,9 +174,9 @@ static void gui_view_prepare(gui_obj_t *obj)
                 if (this->view_click && this->view_change_ready)
                 {
                     gui_log("[VIEW]TOUCH_CLICK\n");
-                    gui_obj_event_set(obj, (gui_event_t)VIEW_EVENT_CLICK);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     event_flag = 1;
-                    style = VIEW_ANIMATION_NULL;
+                    style = VIEW_ANIMATION_NULL; // keep event_flag 1
                 }
             }
             break;
@@ -281,7 +281,7 @@ static void gui_view_prepare(gui_obj_t *obj)
     {
         return; // skip slide animation
     }
-    if (style == VIEW_CLASSIC)
+    if (style == VIEW_TRANSPLATION)
     {
         matrix_translate(this->cur_id.x * (int)this->base.w + this->release_x, \
                          this->cur_id.y * (int)this->base.h + this->release_y, \
@@ -354,8 +354,9 @@ static void gui_view_end(gui_obj_t *obj)
 {
     gui_view_t *this = (gui_view_t *)obj;
     VIEW_CHANGE_STYLE style = this->style;
+
     if ((this->release_x == 0) && (this->release_y == 0) &&
-        style <= VIEW_PAGE) // distinguish click event
+        style < VIEW_ANIMATION_NULL) // distinguish click event
     {
         if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
@@ -460,19 +461,19 @@ static void gui_view_update_view(void *obj, gui_event_t e, void *param)
     int16_t idy = 0;
     switch (e)
     {
-    case VIEW_EVENT_MOVE_LEFT:
+    case GUI_EVENT_TOUCH_MOVE_LEFT:
         idx = 1;
         break;
-    case VIEW_EVENT_MOVE_RIGHT:
+    case GUI_EVENT_TOUCH_MOVE_RIGHT:
         idx = -1;
         break;
-    case VIEW_EVENT_MOVE_UP:
+    case GUI_EVENT_TOUCH_MOVE_UP:
         idy = 1;
         break;
-    case VIEW_EVENT_MOVE_DOWN:
+    case GUI_EVENT_TOUCH_MOVE_DOWN:
         idy = -1;
         break;
-    case VIEW_EVENT_CLICK:
+    case GUI_EVENT_TOUCH_CLICKED:
         {
             gui_view_set_animate(view_old, VIEW_TRANSITION_DURATION_MS, 0, view_transition_animation_function,
                                  NULL);
@@ -764,7 +765,7 @@ gui_view_t *gui_view_create(void       *parent,
     GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = VIEW;
     GET_BASE(this)->create_done = true;
-    this->style = VIEW_CLASSIC;
+    this->style = VIEW_TRANSPLATION;
     // this->cur_id.x = 0;
     // this->cur_id.y = 0;
     // this->view_dsc_cnt = 0;
@@ -793,7 +794,7 @@ gui_view_t *gui_view_create(void       *parent,
 
 void gui_view_add_change_event(gui_view_t *this, void **obj_pointer, VIEW_CHANGE_STYLE style_out,
                                VIEW_CHANGE_STYLE style_in,
-                               void (* cb)(void *parent), T_GUI_VIEW_EVENT event)
+                               void (* cb)(void *parent), gui_event_t event)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_view_dsc_t *dsc = gui_malloc(sizeof(gui_view_dsc_t));
@@ -810,7 +811,7 @@ void gui_view_add_change_event(gui_view_t *this, void **obj_pointer, VIEW_CHANGE
     for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
     {
         gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-        if (event_dsc->filter == (gui_event_t)event)
+        if (event_dsc->filter == event)
         {
             event_dsc_old = event_dsc;
             break;
@@ -823,32 +824,32 @@ void gui_view_add_change_event(gui_view_t *this, void **obj_pointer, VIEW_CHANGE
     }
     else
     {
-        gui_obj_add_event_cb(this, (gui_event_cb_t)gui_view_update_view, (gui_event_t)event,
+        gui_obj_add_event_cb(this, (gui_event_cb_t)gui_view_update_view, event,
                              dsc);
     }
     switch (event)
     {
-    case VIEW_EVENT_MOVE_LEFT:
+    case GUI_EVENT_TOUCH_MOVE_LEFT:
         {
             this->view_left = 1;
         }
         break;
-    case VIEW_EVENT_MOVE_RIGHT:
+    case GUI_EVENT_TOUCH_MOVE_RIGHT:
         {
             this->view_right = 1;
         }
         break;
-    case VIEW_EVENT_MOVE_UP:
+    case GUI_EVENT_TOUCH_MOVE_UP:
         {
             this->view_up = 1;
         }
         break;
-    case VIEW_EVENT_MOVE_DOWN:
+    case GUI_EVENT_TOUCH_MOVE_DOWN:
         {
             this->view_down = 1;
         }
         break;
-    case VIEW_EVENT_CLICK:
+    case GUI_EVENT_TOUCH_CLICKED:
         {
             this->view_click = 1;
         }

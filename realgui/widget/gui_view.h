@@ -3,11 +3,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_view.h
-  * @brief Extended in the cross direction
-  * @details switch the currently displayed screen by sliding
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/24
+  * @file gui_view.c
+  * @brief the view widget is a kind of container that makes switching more convenient and effectively reduces memory consumption.
+  * @details switch the currently view by sliding or clicking
+  * @author shel_deng@realsil.com.cn
+  * @date 2025/02/18
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -45,21 +45,21 @@ typedef struct
 /* VIEW_CHANGE_STYLE enum start*/
 typedef enum
 {
-    VIEW_CLASSIC          = 0x0000,
-    VIEW_REDUCTION        = 0x0001,
-    VIEW_ROTATE           = 0x0002,
-    VIEW_CUBE             = 0x0003,
-    VIEW_ROTATE_BOOK      = 0x0004,
-    VIEW_PAGE             = 0x0005,
+    VIEW_TRANSPLATION     = 0x0000, ///< Transplate from the slide direction
+    VIEW_REDUCTION        = 0x0001, ///< Zoom in from the slide direction
+    VIEW_ROTATE           = 0x0002, ///< Rotate in from the slide direction
+    VIEW_CUBE             = 0x0003, ///< Rotate in from the slide direction like cube
+    VIEW_ROTATE_BOOK      = 0x0004, ///< Rotate in from the slide direction like flip-book
+    VIEW_STILL            = 0x0005, ///< Overlay effect with new view transplate in
     VIEW_ANIMATION_NULL   = 0x0006,
-    VIEW_ANIMATION_1,              ///< Recommended for startup
-    VIEW_ANIMATION_2,              ///< Recommended for startup
-    VIEW_ANIMATION_3,              ///< Recommended for startup
-    VIEW_ANIMATION_4,              ///< Recommended for startup
-    VIEW_ANIMATION_5,              ///< Recommended for startup
-    VIEW_ANIMATION_6,              ///< Recommended for shutdown
-    VIEW_ANIMATION_7,              ///< Recommended for shutdown
-    VIEW_ANIMATION_8,              ///< Recommended for shutdown
+    VIEW_ANIMATION_1,               ///< Recommended for startup
+    VIEW_ANIMATION_2,               ///< Recommended for startup
+    VIEW_ANIMATION_3,               ///< Recommended for startup
+    VIEW_ANIMATION_4,               ///< Recommended for startup
+    VIEW_ANIMATION_5,               ///< Recommended for startup
+    VIEW_ANIMATION_6,               ///< Recommended for shutdown
+    VIEW_ANIMATION_7,               ///< Recommended for shutdown
+    VIEW_ANIMATION_8,               ///< Recommended for shutdown
 } VIEW_CHANGE_STYLE;
 /* VIEW_CHANGE_STYLE enum end*/
 
@@ -106,15 +106,6 @@ typedef struct gui_view
 
     uint8_t checksum;
 } gui_view_t;
-
-typedef enum
-{
-    VIEW_EVENT_MOVE_LEFT = GUI_EVENT_4,
-    VIEW_EVENT_MOVE_RIGHT = GUI_EVENT_5,
-    VIEW_EVENT_MOVE_UP = GUI_EVENT_6,
-    VIEW_EVENT_MOVE_DOWN = GUI_EVENT_7,
-    VIEW_EVENT_CLICK = GUI_EVENT_TOUCH_CLICKED,
-} T_GUI_VIEW_EVENT;
 
 
 
@@ -166,7 +157,7 @@ gui_view_t *gui_view_create(void       *parent,
  */
 void gui_view_add_change_event(gui_view_t *this, void **obj_pointer, VIEW_CHANGE_STYLE style_out,
                                VIEW_CHANGE_STYLE style_in,
-                               void (* cb)(void *parent), T_GUI_VIEW_EVENT event);
+                               void (* cb)(void *parent), gui_event_t event);
 
 /**
  * @brief enable view widget caching.
