@@ -173,30 +173,69 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
     lv_img_src_t src_type = lv_img_src_get_type(src);
     lv_img_dsc_t img_dsc;
     lv_img_dsc_t *dsc = &img_dsc;
+    void *file_data = NULL;
+    bool file_ioctl = true;
     if (src_type == LV_IMG_SRC_FILE)
     {
-        uint8_t *rle_data;
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
         if (res != LV_FS_RES_OK) { return LV_RES_INV; }
-        lv_fs_ioctl(&f, (void **)&rle_data, 0);
+        res = lv_fs_ioctl(&f, (void **)&file_data, 0);
+        if (res == LV_FS_RES_NOT_IMP)
+        {
+            file_ioctl = false;
+            LV_LOG_INFO("load img into ram! %s\n", src);
+            do
+            {
+                uint32_t f_sz = 0;
+                uint32_t rd_sz = 0;
+                res = lv_fs_seek(&f, 0, LV_FS_SEEK_END);
+                if (res != LV_FS_RES_OK) {break;}
+                res = lv_fs_tell(&f, &f_sz);
+                if (res != LV_FS_RES_OK) {break;}
+
+                file_data = lv_mem_alloc(f_sz);
+                LV_ASSERT_MALLOC(file_data);
+                res = lv_fs_seek(&f, 0, LV_FS_SEEK_SET);
+                if (res != LV_FS_RES_OK)
+                {
+                    lv_mem_free(file_data);
+                    file_data = NULL;
+                    break;
+                }
+                res = lv_fs_read(&f, file_data, f_sz, &rd_sz);
+                if (res != LV_FS_RES_OK || f_sz != rd_sz)
+                {
+                    lv_mem_free(file_data);
+                    file_data = NULL;
+                    break;
+                }
+                LV_LOG_INFO("load DONE\n");
+            }
+            while (0);
+        }
         lv_fs_close(&f);
+        if (res != LV_FS_RES_OK || !file_data)
+        {
+            return LV_RES_INV;
+        }
 
         if (strcmp(lv_fs_get_ext(src), "rle") == 0)
         {
             uint8_t headers[20];
-            memcpy(headers, rle_data, 20);
+            memcpy(headers, file_data, 20);
             uint16_t width = headers[2] | (headers[3] << 8);
             uint16_t height = headers[4] | (headers[5] << 8);
             img_dsc.header.w = width;
             img_dsc.header.h = height;
-            img_dsc.data = rle_data;
+            img_dsc.data = file_data;
             img_dsc.header.cf = LV_IMG_CF_RAW;
+            LV_LOG_INFO("W %d  h %d data 0x%x\n", img_dsc.header.w, img_dsc.header.h, img_dsc.data);
         }
         else
         {
-            memcpy(&(img_dsc.header), rle_data, sizeof(lv_img_header_t));
-            img_dsc.data = rle_data + sizeof(lv_img_header_t);
+            memcpy(&(img_dsc.header), file_data, sizeof(lv_img_header_t));
+            img_dsc.data = (uint8_t *)file_data + sizeof(lv_img_header_t);
         }
     }
     else if (src_type == LV_IMG_SRC_VARIABLE)
@@ -269,6 +308,11 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if (_lv_area_intersect(&clip_com, draw_ctx->clip_area, &map_area_rot) == false)
         {
+            /* release image file cache before return */
+            if (false == file_ioctl && file_data)
+            {
+                lv_mem_free(file_data);
+            }
             return LV_RES_OK;
         }
         const lv_area_t *clip_area_ori = draw_ctx->clip_area;
@@ -290,6 +334,11 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
         done = false;
     }
 
+    /* release image file cache before return */
+    if (false == file_ioctl && file_data)
+    {
+        lv_mem_free(file_data);
+    }
     if (done)
     {
         return LV_RES_OK;

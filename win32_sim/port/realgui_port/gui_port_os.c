@@ -8,7 +8,6 @@
 #include <time.h>
 #include "gui_queue.h"
 #include <unistd.h>
-#include <dirent.h>
 
 static volatile uint32_t gui_tick;
 

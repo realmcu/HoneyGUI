@@ -2,9 +2,7 @@
 #include "guidef.h"
 #include "gui_api.h"
 #include "gui_port.h"
-#include <pthread.h>
 #include <stdio.h>
-#include <dirent.h>
 
 
 int port_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)

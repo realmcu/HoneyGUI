@@ -199,6 +199,20 @@ static void app_dialing_ui_design(gui_app_t *app)
     // lv_port_fs_init();
 
     LV_LOG("LVGL start \n");
+    lv_timer_t *timer = lv_timer_create(read_json_cb, 3000, NULL);
+    lv_timer_set_repeat_count(timer, -1);
+    lv_timer_ready(timer);
+
+    // lv_disp_load_scr(scr_watchface);
+
+    lv_obj_t *tv = lv_tileview_create(lv_scr_act());
+    lv_obj_set_scrollbar_mode(tv, LV_SCROLLBAR_MODE_OFF); // hide scroll bar
+
+    scr_watchface = lv_tileview_add_tile(tv, 1, 1, LV_DIR_ALL); // create center tile
+    scr_up_curtain = lv_tileview_add_tile(tv, 1, 0, LV_DIR_BOTTOM); // create up tile
+    scr_down_curtain = lv_tileview_add_tile(tv, 1, 2, LV_DIR_TOP); // create down tile
+    scr_left_curtain = lv_tileview_add_tile(tv, 0, 1, LV_DIR_RIGHT); // create left tile
+    scr_right_curtain = lv_tileview_add_tile(tv, 2, 1, LV_DIR_LEFT); // create right tile
 
     //initialize curtains
     lv_watchface_init();
@@ -206,12 +220,7 @@ static void app_dialing_ui_design(gui_app_t *app)
     lv_down_curtain_init();
     lv_left_curtain_init();
     lv_right_curtain_init();
-
-    lv_timer_t *timer = lv_timer_create(read_json_cb, 3000, NULL);
-    lv_timer_set_repeat_count(timer, -1);
-    lv_timer_ready(timer);
-
-    lv_disp_load_scr(scr_watchface);
+    lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_OFF); // start with center tile, no animation
 }
 
 static gui_app_t app_lvgl =

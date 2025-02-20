@@ -14,17 +14,14 @@ static void page_scroll_event_cb(lv_event_t *e)
         if (scrollable < -50)
         {
             is_at_bottom = true;
+            lv_indev_wait_release(lv_indev_get_act());
+            _ui_screen_change(&scr_watchface, &scr_up_curtain, LV_SCR_LOAD_ANIM_OUT_TOP, 500, 0,
+                              &lv_watchface_init, 1);
         }
         else
         {
             is_at_bottom = false;
         }
-    }
-    if (is_at_bottom)
-    {
-        is_at_bottom = false;
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_TOP, 500, 0, &lv_watchface_init);
     }
 }
 
@@ -44,14 +41,15 @@ void scr_up_curtain_cb(lv_event_t *e)
         lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP)
     {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_watchface, LV_SCR_LOAD_ANIM_OUT_TOP, 500, 0, &lv_watchface_init);
+        _ui_screen_change(&scr_watchface, &scr_up_curtain, LV_SCR_LOAD_ANIM_OUT_TOP, 500, 0,
+                          &lv_watchface_init, 1);
     }
 }
 
 void lv_up_curtain_init(void)
 {
-    scr_up_curtain = lv_obj_create(NULL);
-    lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)scr_up_curtain_cb, LV_EVENT_ALL, NULL);
+    // scr_up_curtain = lv_obj_create(NULL);
+    // lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)scr_up_curtain_cb, LV_EVENT_ALL, NULL);
 
     lv_obj_t *page = lv_obj_create(scr_up_curtain);
     lv_obj_set_size(page, 410, 502);
@@ -61,7 +59,7 @@ void lv_up_curtain_init(void)
     lv_obj_add_flag(page, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_scrollbar_mode(page, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_border_width(page, 0, 0);
-    lv_obj_add_event_cb(page, (lv_event_cb_t)page_scroll_event_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(page, (lv_event_cb_t)page_scroll_event_cb, LV_EVENT_ALL, NULL);
 
     lv_obj_t *label = lv_label_create(page);
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);

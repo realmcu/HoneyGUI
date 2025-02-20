@@ -8,10 +8,17 @@
 #include <math.h>
 
 extern char *cjson_content;
+static cJSON *root;
 
 static lv_obj_t *date_label;
+static lv_obj_t *time_img_container;
+static lv_obj_t *activity_arc;
+static lv_obj_t *weather_card;
+static lv_obj_t *temperature_container;
+static lv_obj_t *compass_dial;
 static lv_obj_t *weather_current, *weather_range;
-static bool weather_syn_flag = 0;
+
+static lv_timer_t *timer;
 
 lv_image_dsc_t const *text_num_array[] =
 {
@@ -39,13 +46,13 @@ char *day[7] =
     "SAT"
 };
 
-void time_update_cb(lv_timer_t *timer)
+void time_update_cb(void)
 {
     time_t rawtime;
     time(&rawtime);
     struct tm *timeinfo = localtime(&rawtime);
 
-    lv_obj_t *parent = (lv_obj_t *)lv_timer_get_user_data(timer);
+    lv_obj_t *parent = time_img_container;
 
     lv_obj_t *hour_decimal = lv_obj_get_child(parent, 0);
     lv_image_set_src(hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
@@ -93,25 +100,9 @@ static void weather_icon_set(char *condition, lv_obj_t *obj)
     }
 }
 
-static void weather_update_cb(lv_timer_t *timer)
+static void weather_update_cb(void)
 {
-    lv_obj_t *parent = (lv_obj_t *)lv_timer_get_user_data(timer);
-
-    cJSON *root;
-    if (!cjson_content)
-    {
-        return;
-    }
-    else
-    {
-        root = cJSON_Parse(cjson_content);
-        if (!root)
-        {
-            LV_LOG("Error parsing JSON!\r\n");
-            return;
-        }
-    }
-    weather_syn_flag = true;
+    lv_obj_t *parent = weather_card;
     // parse weather array
     cJSON *weather_array = cJSON_GetObjectItemCaseSensitive(root, "weather");
     if (cJSON_IsArray(weather_array))
@@ -142,7 +133,6 @@ static void weather_update_cb(lv_timer_t *timer)
             }
         }
     }
-    cJSON_Delete(root);
 
     // date
     time_t rawtime;
@@ -158,22 +148,8 @@ static void weather_update_cb(lv_timer_t *timer)
     }
 }
 
-void arc_activity_cb(lv_timer_t *timer)
+void arc_activity_cb(void)
 {
-    cJSON *root;
-    if (!cjson_content)
-    {
-        return;
-    }
-    else
-    {
-        root = cJSON_Parse(cjson_content);
-        if (!root)
-        {
-            LV_LOG("Error parsing JSON!\r\n");
-            return;
-        }
-    }
     // parse activity array
     cJSON *activity_array = cJSON_GetObjectItemCaseSensitive(root, "activity");
     if (cJSON_IsArray(activity_array))
@@ -189,7 +165,7 @@ void arc_activity_cb(lv_timer_t *timer)
             cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "exercise");
             cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
 
-            lv_obj_t *arc_move = (lv_obj_t *)lv_timer_get_user_data(timer);
+            lv_obj_t *arc_move = activity_arc;
             lv_obj_t *arc_ex = lv_obj_get_sibling(arc_move, 1);
             lv_obj_t *arc_stand = lv_obj_get_sibling(arc_ex, 1);
             uint16_t start_angel = 270;
@@ -200,32 +176,11 @@ void arc_activity_cb(lv_timer_t *timer)
                                  start_angel + (uint16_t)(360 * stand->valueint / 30)); // cap 30 times
         }
     }
-    // clear
-    cJSON_Delete(root);
 }
 
-static void temperature_update_cb(lv_timer_t *timer)
+static void temperature_update_cb()
 {
-    cJSON *root;
-    lv_obj_t *parent = (lv_obj_t *)lv_timer_get_user_data(timer);
-    if (!weather_syn_flag)
-    {
-        return;
-    }
-    weather_syn_flag = 0;
-    if (!cjson_content)
-    {
-        return;
-    }
-    else
-    {
-        root = cJSON_Parse(cjson_content);
-        if (!root)
-        {
-            LV_LOG("Error parsing JSON!\r\n");
-            return;
-        }
-    }
+    lv_obj_t *parent = temperature_container;
     // parse temperature array
     cJSON *weather_array = cJSON_GetObjectItemCaseSensitive(root, "weather");
     if (cJSON_IsArray(weather_array))
@@ -269,27 +224,11 @@ static void temperature_update_cb(lv_timer_t *timer)
             lv_obj_set_pos(knob, ax - r_circle, ay - r_circle);
         }
     }
-    // clear
-    cJSON_Delete(root);
 }
 
-static void compass_update_cb(lv_timer_t *timer)
+static void compass_update_cb()
 {
-    cJSON *root;
-    lv_obj_t *parent = (lv_obj_t *)lv_timer_get_user_data(timer);
-    if (!cjson_content)
-    {
-        return;
-    }
-    else
-    {
-        root = cJSON_Parse(cjson_content);
-        if (!root)
-        {
-            LV_LOG("Error parsing JSON!\r\n");
-            return;
-        }
-    }
+    lv_obj_t *parent = compass_dial;
     // parse compass array
     cJSON *compass_array = cJSON_GetObjectItemCaseSensitive(root, "compass");
     if (cJSON_IsArray(compass_array))
@@ -335,24 +274,12 @@ static void compass_update_cb(lv_timer_t *timer)
             lv_label_set_text(compass_orien, orien_content);
         }
     }
-    // clear
-    cJSON_Delete(root);
 }
 
 static void scr_watchface_cb(lv_event_t *event)
 {
     lv_event_code_t event_code = lv_event_get_code(event);
-    // LV_LOG("event_code %d\n", event_code);
-    if (event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT)
-    {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_right_curtain, LV_SCR_LOAD_ANIM_OVER_LEFT, 500, 0, &lv_right_curtain_init);
-    }
-    if (event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT)
-    {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_left_curtain, LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0, &lv_left_curtain_init);
-    }
+
     if (event_code == LV_EVENT_SCREEN_LOAD_START)
     {
         // left_Animation(ui_hour_group, 0);
@@ -361,16 +288,45 @@ static void scr_watchface_cb(lv_event_t *event)
         // opa_on_Animation(ui_date_group, 500);
         // opa_on_Animation(&ui_weather_title_group_1, 400);
     }
-    if (event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP)
+    if (event_code == LV_EVENT_GESTURE)
     {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_down_curtain, LV_SCR_LOAD_ANIM_OVER_TOP, 500, 0, &lv_down_curtain_init);
-    }
-    if (event_code == LV_EVENT_GESTURE &&
-        lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM)
-    {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_up_curtain, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0, &lv_up_curtain_init);
+        switch (lv_indev_get_gesture_dir(lv_indev_get_act()))
+        {
+        case LV_DIR_LEFT:
+            {
+                lv_indev_wait_release(lv_indev_get_act());
+                _ui_screen_change(&scr_right_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_LEFT, 500, 0,
+                                  &lv_right_curtain_init, 1);
+                lv_timer_del(timer);
+                break;
+            }
+        case LV_DIR_RIGHT:
+            {
+                lv_indev_wait_release(lv_indev_get_act());
+                _ui_screen_change(&scr_left_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0,
+                                  &lv_left_curtain_init, 1);
+                lv_timer_del(timer);
+                break;
+            }
+        case LV_DIR_TOP:
+            {
+                lv_indev_wait_release(lv_indev_get_act());
+                _ui_screen_change(&scr_down_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_TOP, 500, 0,
+                                  &lv_down_curtain_init, 1);
+                lv_timer_del(timer);
+                break;
+            }
+        case LV_DIR_BOTTOM:
+            {
+                lv_indev_wait_release(lv_indev_get_act());
+                _ui_screen_change(&scr_up_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0,
+                                  &lv_up_curtain_init, 1);
+                lv_timer_del(timer);
+                break;
+            }
+        default:
+            break;
+        }
     }
 }
 
@@ -378,18 +334,40 @@ static void heartrate_cb(lv_event_t *event)
 {
     LV_LOG("change to heartrate screen\n");
     return;
-    lv_event_code_t event_code = lv_event_get_code(event);
-    if (event_code == LV_EVENT_CLICKED)
+}
+
+static void timer_cb(lv_timer_t *timer)
+{
+    if (!scr_watchface)
     {
-        // lv_scr_load();// change to heartrate screen
-        LV_LOG("change to heartrate screen\n");
+        return;
     }
+    time_update_cb();
+
+    if (!cjson_content)
+    {
+        return;
+    }
+    else
+    {
+        root = cJSON_Parse(cjson_content);
+        if (!root)
+        {
+            LV_LOG("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    arc_activity_cb();
+    weather_update_cb();
+    temperature_update_cb();
+    compass_update_cb();
+    // clear
+    cJSON_Delete(root);
 }
 
 void lv_watchface_init(void)
 {
-    scr_watchface = lv_obj_create(NULL);
-
+    // scr_watchface = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(scr_watchface, lv_color_make(0, 0, 0), 0);
     lv_obj_set_style_bg_opa(scr_watchface, LV_OPA_COVER, 0);
     lv_obj_clear_flag(scr_watchface, LV_OBJ_FLAG_SCROLLABLE);
@@ -409,7 +387,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_text_font(date_label, &SourceHanSansSC_size32_bits1_font,
                                    LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        lv_obj_t *time_img_container = lv_obj_create(scr_watchface);
+        time_img_container = lv_obj_create(scr_watchface);
         lv_obj_set_pos(time_img_container, 211, 88);
         lv_obj_set_size(time_img_container, 200, 200);
         lv_obj_clear_flag(time_img_container, LV_OBJ_FLAG_SCROLLABLE);
@@ -432,14 +410,12 @@ void lv_watchface_init(void)
         lv_obj_t *colon = lv_image_create(time_img_container);
         lv_image_set_src(colon, text_num_array[10]);
         lv_obj_set_pos(colon, 75, 5);
-
-        lv_timer_t *timer = lv_timer_create(time_update_cb, 3000, time_img_container);
-        lv_timer_set_repeat_count(timer, -1);
     }
 
     // activity icon
     {
         lv_obj_t *arc_1 = lv_arc_create(scr_watchface);
+        activity_arc = arc_1;
         uint8_t radius = 50;
         lv_obj_set_pos(arc_1, 87 - radius, 128 - radius);
         lv_obj_set_size(arc_1, radius * 2, radius * 2);
@@ -477,14 +453,11 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_3, lv_color_make(22, 50, 47), LV_PART_MAIN);
         lv_obj_remove_style(arc_3, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_3, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
-
-        lv_timer_t *timer = lv_timer_create(arc_activity_cb, 2000, arc_1);
-        lv_timer_set_repeat_count(timer, -1);
     }
 
     // weather condition
     {
-        lv_obj_t *weather_card = lv_image_create(scr_watchface);
+        weather_card = lv_image_create(scr_watchface);
         lv_image_set_src(weather_card, &ui_clock_card_weather);
         lv_obj_set_pos(weather_card, 37, 185);
         lv_obj_clear_flag(weather_card, LV_OBJ_FLAG_SCROLLABLE);
@@ -557,14 +530,12 @@ void lv_watchface_init(void)
         lv_obj_set_style_text_opa(weather_range, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(weather_range, &SourceHanSansSC_size24_bits1_font,
                                    LV_PART_MAIN | LV_STATE_DEFAULT);
-
-        lv_timer_t *timer = lv_timer_create(weather_update_cb, 3000, weather_card);
-        lv_timer_set_repeat_count(timer, -1);
     }
 
     // temperature icon
     {
         lv_obj_t *container = lv_obj_create(scr_watchface);
+        temperature_container = container;
         lv_obj_set_pos(container, 15, 335);
         lv_obj_set_size(container, 120, 120);
         lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
@@ -622,13 +593,11 @@ void lv_watchface_init(void)
             lv_obj_set_style_radius(knob, 6, 0);
             lv_obj_set_style_bg_color(knob, lv_color_make(255, 0, 0), 0);
         }
-        lv_timer_t *timer = lv_timer_create(temperature_update_cb, 3000, container);
-        lv_timer_set_repeat_count(timer, -1);
     }
 
     // compass icon
     {
-        lv_obj_t *compass_dial = lv_image_create(scr_watchface);
+        compass_dial = lv_image_create(scr_watchface);
         lv_image_set_src(compass_dial, &ui_clock_compass_dial_icon);
         lv_obj_set_pos(compass_dial, 154, 348);
         lv_obj_set_size(compass_dial, 100, 100);
@@ -655,9 +624,6 @@ void lv_watchface_init(void)
         lv_obj_set_style_text_opa(compass_orien, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(compass_orien, &SourceHanSansSC_size24_bits1_font,
                                    LV_PART_MAIN | LV_STATE_DEFAULT);
-
-        lv_timer_t *timer = lv_timer_create(compass_update_cb, 3000, compass_dial);
-        lv_timer_set_repeat_count(timer, -1);
     }
 
     // heartrate icon
@@ -672,6 +638,8 @@ void lv_watchface_init(void)
         lv_obj_set_style_bg_opa(heartrate, LV_OPA_TRANSP, 0);
         lv_obj_add_event_cb(heartrate, (lv_event_cb_t)heartrate_cb, LV_EVENT_CLICKED, NULL);
     }
-    lv_obj_add_event_cb(scr_watchface, (lv_event_cb_t)scr_watchface_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(scr_watchface, (lv_event_cb_t)scr_watchface_cb, LV_EVENT_ALL, NULL);
+    timer = lv_timer_create(timer_cb, 2000, scr_watchface);
+    lv_timer_set_repeat_count(timer, -1);
 }
 

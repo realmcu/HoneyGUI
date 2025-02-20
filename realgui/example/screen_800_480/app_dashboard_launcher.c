@@ -57,7 +57,7 @@ gui_app_t app_dashboard_launcher =
     },
     .thread_entry = app_dashboard_launcher_update_thread,
     .ui_design = app_dashboard_launcher_ui_design,
-    .active_ms = 30000,
+    .active_ms = 30 * 1000,
 
 };
 
@@ -77,22 +77,12 @@ void app_dashboard_launcher_update_thread(void *this)
         gui_thread_mdelay(25);
     }
 }
-#ifdef CONFIG_REALTEK_BUILD_LVGL_GUI
-static void kb_button_cb(void *obj, gui_event_t e)
-{
-    gui_log("gui_app_switch_to lvgl line = %d \n", __LINE__);
-    extern gui_app_t *get_app_lvgl(void);
-    gui_app_switch(gui_current_app(), get_app_lvgl());
-}
-#endif
+
 void app_dashboard_launcher_ui_design(gui_app_t *app)
 {
     win_connected_display = gui_win_create(&(app->screen), "win_connected_display", 0, 0, 800, 480);
     win_main_display = gui_win_create(&(app->screen), "win_main_display", 0, 0, 800, 480);
-#ifdef CONFIG_REALTEK_BUILD_LVGL_GUI
-    gui_obj_add_event_cb(win_main_display, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_DOWN_PRESSED,
-                         NULL);//switch app
-#endif
+
     gui_font_mem_init(HARMONYOS_SIZE28_BITS1_FONT_BIN);
     gui_font_mem_init(HARMONYOS_SIZE32_BITS1_FONT_BIN);
     gui_font_mem_init(HARMONYOS_SIZE56_BITS1_FONT_BIN);

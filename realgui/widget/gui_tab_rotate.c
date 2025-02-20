@@ -22,7 +22,6 @@
 #include "gui_server.h"
 #include "gui_obj.h"
 #include "gui_tab.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_cube.h"
 

@@ -319,7 +319,7 @@
                         y="150"             
                         w="50"           
                         h="60"             
-                        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11 "  
+                        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11"  
                         itemCount="11"       
                         rowCount="3"         
                         rowSpacing="20"      
@@ -414,6 +414,7 @@
             max="400"
             min="-300"  
             style="waveform"
+            strokeWidth="20"
             >chart1
             <onPeripheral 
                     type="heart_rate" 

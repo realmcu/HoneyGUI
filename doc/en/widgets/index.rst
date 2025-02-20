@@ -81,3 +81,4 @@ Widgets
     2.5D Soccer <gui_soccer>
     3D Model <gui_3D>
     Prism Mirror 3D Model <gui_prism_mirror3d>
+    View <gui_view>
