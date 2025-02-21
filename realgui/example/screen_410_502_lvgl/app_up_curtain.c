@@ -25,7 +25,8 @@ typedef struct information
 } information_t;
 
 static lv_obj_t *tv_array[TV_ARRAY_NUM] = {0};
-lv_obj_t *page;
+static lv_obj_t *page;
+static lv_obj_t *screen_array[TV_ARRAY_NUM] = {0};
 
 static bool close_flag = 0;
 
@@ -99,10 +100,174 @@ static void tileview_event_cb(lv_event_t *e)
     add_flag_recursive(page, LV_OBJ_FLAG_SCROLLABLE);
 }
 
+static void cancel_cb(lv_event_t *e)
+{
+    // Load the previous screen with a slide-out-to-left animation
+    lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_MOVE_LEFT, 300, 0, false);
+}
+
+static void view_more_click_tab_1_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t *obj = lv_event_get_target(e);
+    if (code == LV_EVENT_PRESSED)
+    {
+        lv_obj_set_style_bg_color(obj, lv_color_hex(0xFFFFFF), 0);
+        LV_LOG("Click tab 1!\n");
+    }
+    else if (code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST)
+    {
+        lv_obj_set_style_bg_color(obj, lv_color_make(39, 43, 44), 0);
+    }
+}
+static void view_more_click_tab_2_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t *obj = lv_event_get_target(e);
+    if (code == LV_EVENT_PRESSED)
+    {
+        lv_obj_set_style_bg_color(obj, lv_color_hex(0xFFFFFF), 0);
+        LV_LOG("Click tab 2!\n");
+    }
+    else if (code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST)
+    {
+        lv_obj_set_style_bg_color(obj, lv_color_make(39, 43, 44), 0);
+    }
+}
+static void view_more_click_tab_3_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t *obj = lv_event_get_target(e);
+    if (code == LV_EVENT_PRESSED)
+    {
+        lv_obj_set_style_bg_color(obj, lv_color_hex(0xFFFFFF), 0);
+        LV_LOG("Click tab 3!\n");
+    }
+    else if (code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST)
+    {
+        lv_obj_set_style_bg_color(obj, lv_color_make(39, 43, 44), 0);
+    }
+}
+
+// Initialize the view_more screen
+static void init_view_more(lv_obj_t *parent, information_t *payload)
+{
+    const char *informer = payload->informer;
+    const char *content = payload->content;
+    const char *time = payload->time;
+    app_name app = payload->app;
+
+    lv_obj_set_style_bg_color(parent, lv_color_hex(0x0), LV_PART_MAIN);
+
+    // Create a Cancel label
+    lv_obj_t *cancel_label = lv_label_create(parent);
+    lv_label_set_text(cancel_label, "Cancel");
+    lv_obj_align(cancel_label, LV_ALIGN_TOP_LEFT, 20, 15);
+    lv_obj_set_style_text_color(cancel_label, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_text_opa(cancel_label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(cancel_label, &SourceHanSansSC_size24_bits1_font,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(cancel_label, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(cancel_label, cancel_cb, LV_EVENT_CLICKED, NULL);
+
+    // Time text in the top right corner
+    lv_obj_t *time_label = lv_label_create(parent);
+    lv_label_set_text(time_label, time);
+    lv_obj_align(time_label, LV_ALIGN_TOP_RIGHT, -60, 15); // Align to top right
+    lv_obj_set_style_text_color(time_label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(time_label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(time_label, &SourceHanSansSC_size24_bits1_font,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    char source[40];
+    lv_obj_t *label = lv_label_create(parent);
+    lv_label_set_text(label, source);
+    lv_obj_set_pos(label, 37, 70);
+    lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(label, &SourceHanSansSC_size24_bits1_font,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_t *icon = lv_image_create(parent);
+    lv_obj_set_pos(icon, 360, 20);
+    switch (app)
+    {
+    case MESSAGE:
+        {
+            sprintf(source, "\"message\" dialog\n%s", informer);
+            lv_label_set_text(label, source);
+            lv_image_set_src(icon, &ui_person_icon);
+        }
+        break;
+    case OS:
+        {
+            sprintf(source, "\"OS\" dialog");
+            lv_label_set_text(label, source);
+            lv_image_set_src(icon, &ui_iwatch_icon);
+        }
+        break;
+    default:
+        break;
+    }
+
+    // Create option labels
+    {
+        lv_obj_t *rect = lv_obj_create(parent);
+        lv_obj_set_style_bg_color(rect, lv_color_make(39, 43, 44), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_radius(rect, 15, LV_PART_MAIN);
+        lv_obj_set_style_border_width(rect, 0, LV_PART_MAIN); // No border
+        lv_obj_set_size(rect, 350, 80);
+        lv_obj_set_pos(rect, 30, 160);
+        lv_obj_add_event_cb(rect, view_more_click_tab_1_cb, LV_EVENT_ALL, NULL);
+
+        lv_obj_t *label = lv_label_create(rect);
+        lv_label_set_text(label, "Don't remind for an hour");
+        lv_obj_center(label);
+        lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(label, &SourceHanSansSC_size24_bits1_font,
+                                   LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    {
+        lv_obj_t *rect = lv_obj_create(parent);
+        lv_obj_set_style_bg_color(rect, lv_color_make(39, 43, 44), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_radius(rect, 15, LV_PART_MAIN);
+        lv_obj_set_style_border_width(rect, 0, LV_PART_MAIN); // No border
+        lv_obj_set_size(rect, 350, 80);
+        lv_obj_set_pos(rect, 30, 250);
+        lv_obj_add_event_cb(rect, view_more_click_tab_2_cb, LV_EVENT_ALL, NULL);
+
+        lv_obj_t *label = lv_label_create(rect);
+        lv_label_set_text(label, "Don't remind today");
+        lv_obj_center(label);
+        lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(label, &SourceHanSansSC_size24_bits1_font,
+                                   LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    {
+        lv_obj_t *rect = lv_obj_create(parent);
+        lv_obj_set_style_bg_color(rect, lv_color_make(39, 43, 44), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_radius(rect, 15, LV_PART_MAIN);
+        lv_obj_set_style_border_width(rect, 0, LV_PART_MAIN); // No border
+        lv_obj_set_size(rect, 350, 80);
+        lv_obj_set_pos(rect, 30, 340);
+        lv_obj_add_event_cb(rect, view_more_click_tab_3_cb, LV_EVENT_ALL, NULL);
+
+        lv_obj_t *label = lv_label_create(rect);
+        lv_label_set_text(label, "Add this to Summary");
+        lv_obj_center(label);
+        lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(label, &SourceHanSansSC_size24_bits1_font,
+                                   LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+}
 
 static void view_more_cb(lv_event_t *e)
 {
-    LV_LOG("Clicked view_more\n");
+    lv_obj_t *screen = lv_event_get_user_data(e);
+    // Load the new screen with a slide-in-from-right and fade-in animation
+    lv_scr_load_anim(screen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 300, 0, false);
 }
 
 // Animation callback for sliding the tabview to the left
@@ -137,6 +302,8 @@ static void move_left_anim_done_cb(lv_anim_t *a)
     }
     lv_obj_delete(tabview);
     tv_array[index] = NULL;
+    lv_obj_delete(screen_array[index]);
+    screen_array[index] = NULL;
     if (index == TV_ARRAY_NUM - 1 || !tv_array[index + 1])
     {
         close_flag = 0;
@@ -157,6 +324,7 @@ static void move_left_anim_done_cb(lv_anim_t *a)
         lv_anim_set_ready_cb(&anim, clear_anim_finished_cb); // Delete when animation finishes
         lv_anim_start(&anim);
         tv_array[index - 1] = tv_array[index];
+        screen_array[index - 1] = screen_array[index];
         index++;
         // gui_log("y = %d\r\n", tv_os->y);
         if (index == TV_ARRAY_NUM)
@@ -173,6 +341,7 @@ static void clear_all_anim_finished_cb(lv_anim_t *a)
     while (index < TV_ARRAY_NUM && tv_array[index])
     {
         lv_obj_delete(tv_array[index]);
+        lv_obj_delete(screen_array[index]);
         tv_array[index] = NULL;
         index++;
     }
@@ -266,6 +435,7 @@ void pagelist_create(gui_msg_t *msg)
             uint32_t y = TV_START + index * (TV_HEIGHT + TV_INTERVAL);
             lv_obj_align(tv_array[index - 1], LV_ALIGN_TOP_MID, 0, y);
             tv_array[index] = tv_array[index - 1];
+            screen_array[index] = screen_array[index - 1];
             if ((index - 1) == 0)
             {
                 break;
@@ -379,8 +549,11 @@ void pagelist_create(gui_msg_t *msg)
     lv_obj_set_style_text_font(right_label, &SourceHanSansSC_size32_bits1_font,
                                LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_t *view_more = lv_obj_create(NULL);
+    screen_array[0] = view_more;
+    init_view_more(view_more, payload);
     // Click events
-    lv_obj_add_event_cb(left_part, view_more_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(left_part, view_more_cb, LV_EVENT_CLICKED, view_more);
     lv_obj_add_event_cb(right_part, clear_tv_cb, LV_EVENT_CLICKED, NULL);
 }
 

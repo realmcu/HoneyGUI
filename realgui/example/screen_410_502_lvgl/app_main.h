@@ -12,6 +12,7 @@ extern "C" {
 
 #define M_PI    ((float)3.14159265358979323846)
 
+extern lv_obj_t *tileview;
 extern lv_obj_t *scr_watchface;
 extern lv_obj_t *scr_up_curtain;
 extern lv_obj_t *scr_down_curtain;
