@@ -24,8 +24,9 @@ typedef struct information
     app_name app;
 } information_t;
 
-static lv_obj_t *tv_array[TV_ARRAY_NUM] = {0};
+
 static lv_obj_t *page;
+static lv_obj_t *tv_array[TV_ARRAY_NUM] = {0};
 static lv_obj_t *screen_array[TV_ARRAY_NUM] = {0};
 
 static bool close_flag = 0;
@@ -76,11 +77,11 @@ static bool close_flag = 0;
 static bool is_bottom_start(lv_point_t *point)
 {
     lv_coord_t height = lv_disp_get_ver_res(NULL); // Get screen height
-    lv_coord_t threshold = height * 4 / 5; // Define bottom area as the lower 1/5
+    lv_coord_t threshold = height * 5 / 6; // Define bottom area as the lower 1/5
     return (point->y > threshold);
 }
 
-static void tileview_event_cb(lv_event_t *e)
+static void page_event_cb(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *obj = lv_event_get_target(e);
@@ -562,15 +563,14 @@ void lv_up_curtain_init(void)
     // scr_up_curtain = lv_obj_create(NULL);
     // lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)scr_up_curtain_cb, LV_EVENT_ALL, NULL);
     lv_obj_set_style_bg_color(scr_up_curtain, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(scr_up_curtain, LV_OPA_0, 76);
+    lv_obj_set_style_bg_opa(scr_up_curtain, 76, 0);
     page = lv_obj_create(scr_up_curtain);
     lv_obj_set_size(page, SCREEN_WIDTH, SCREEN_HEIGHT);
     lv_obj_set_pos(page, 0, 0);
     lv_obj_add_flag(page, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_scrollbar_mode(page, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_border_width(page, 0, 0);
-    // lv_obj_add_event_cb(page, (lv_event_cb_t)page_scroll_event_cb, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(page, tileview_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(page, page_event_cb, LV_EVENT_ALL, NULL);
     for (uint8_t index = 0; index < TV_ARRAY_NUM; index++)
     {
         tv_array[index] = NULL;
@@ -578,24 +578,29 @@ void lv_up_curtain_init(void)
 
     pagelist_clear(page);
 
-    // time_t rawtime;
-    // time(&rawtime);
-    // struct tm *timeinfo = localtime(&rawtime);
-    // char time[10];
-    // if (timeinfo)
-    // {
-    //     sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-    // }
-    // char *content =
-    //     "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.";
+    time_t rawtime;
+    time(&rawtime);
+    struct tm *timeinfo = localtime(&rawtime);
+    char time[10];
+    if (timeinfo)
+    {
+        sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    }
+    char *content =
+        "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.";
 
-    // information_t payload =
-    // {
-    //     "watchOS 10.3.1",
-    //     content,
-    //     time,
-    //     MESSAGE
-    // };
-    // pagelist_create(&payload);
-    // pagelist_create(&payload);
+    information_t payload =
+    {
+        "watchOS 10.3.1",
+        content,
+        time,
+        MESSAGE
+    };
+    gui_msg_t msg =
+    {
+        .event = 0,
+        .payload = &payload,
+        .cb = (gui_msg_cb)pagelist_create,
+    };
+    pagelist_create(&msg);
 }
