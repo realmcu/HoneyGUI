@@ -1,22 +1,65 @@
-file(GLOB gui_engine_sources *.c)
-file(GLOB_RECURSE gui_engine_remove_sources  acc_sw_ppe_sim.c font_freetype.c acc_rtk_ppe.c acc_vg_lite.c acc_arm_2d.c)
-list(REMOVE_ITEM gui_engine_sources ${gui_engine_remove_sources})
-set(gui_engine_sources ${gui_engine_sources} CACHE INTERNAL  "gui engine sources ")
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
-HEADER_DIRECTORIES(gui_engine_headers ./)
-set(gui_engine_headers ${gui_engine_headers} CACHE INTERNAL  "gui engine headers ")
+cmake_minimum_required(VERSION 3.10)
 
-if(CONFIG_RTL87X3EP)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hw_acc/rtl8773e)
+
+# Define a variable for the library name
+if(1) #set to 1 to enable or variable to for depnedency
+
+    file(GLOB HEADERS "*.h" "*.hpp")
+	set(SOURCES
+			"${CMAKE_CURRENT_SOURCE_DIR}/draw_img.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/gui_matrix.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/draw_font.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_img.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_matrix.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_stb.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_ttf.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_raster.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_init.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_blend.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_cover.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_bypass.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_filter.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_bypass.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_cover.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_filter.c"
+	)
+
+
+    # Determine if we should create a library
+    if((NOT HEADERS) AND (NOT SOURCES))
+        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
+		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(HEADERS AND (NOT SOURCES))
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(SOURCES AND (NOT HEADERS))
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+    endif()
+
+    if(SOURCES AND HEADERS)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    # Process subdirectories regardless
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            else()
+                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
+            endif()
+        endif()
+    endforeach()
 endif()
-
-if(gui_debug_enable)  
-    foreach(ITEM ${gui_engine_sources} )
-		message(STATUS [GUI][engine_srcs]${ITEM})
-	endforeach()
-	
-	foreach(ITEM ${gui_engine_headers} )
-		message(STATUS [GUI][engine_srcs]${ITEM})
-	endforeach()
-endif()
-

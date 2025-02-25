@@ -123,10 +123,6 @@ The directories and files related to LVGL in HoneyGUI are as follows:
     |  |__ tests
     |
     |-- lvgl_v9                               // LVGL v9
-    |-- user                                  // user ui code directory
-    |   |-- realgui                           
-    |   |-- lvgl_v8                           
-    |   |__ lvgl_v9                           
     :
     :
     |__ win32_sim
@@ -166,9 +162,6 @@ The directories and files related to LVGL in HoneyGUI are as follows:
 2. When running LVGL with the HoneyGUI simulator, the LVGL UI will start running from the file :file:`app_ui_lvgl.c` under the directory :file:`your HoneyGUI dir/realgui/example/demo`.
 
 3. When running LVGL with the HoneyGUI simulator, the root directory pointed to by the LVGL file system interface is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root/`.
-
-4. Developer UI design code can be placed in :file:`your HoneyGUI dir/user/lvgl_vx`, and it will be automatically built into the project's group named "user".
-
 
 
 Porting

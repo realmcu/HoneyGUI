@@ -1,57 +1,45 @@
-# Copyright JS Foundation and other contributors, http://js.foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required (VERSION 2.8.12)
-set(JERRY_EXT_NAME jerry-ext)
-project (${JERRY_EXT_NAME} C)
+cmake_minimum_required(VERSION 3.10)
 
-# Optional features
-set(FEATURE_INIT_FINI OFF CACHE BOOL "Enable init/fini arrays?")
 
-# Status messages
-message(STATUS "FEATURE_INIT_FINI           " ${FEATURE_INIT_FINI})
+# Define a variable for the library name
+if(1) #set to 1 to enable or variable to for depnedency
 
-# Include directories
-set(INCLUDE_EXT_PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(INCLUDE_EXT_PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common")
+    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB HEADERS "*.h" "*.hpp")
 
-set(INCLUDE_EXT_PUBLIC ${INCLUDE_EXT_PUBLIC} PARENT_SCOPE) # for jerry-port
 
-if(FEATURE_INIT_FINI)
-  set(DEFINES_EXT ${DEFINES_EXT} ENABLE_INIT_FINI)
+    # Determine if we should create a library
+    if((NOT HEADERS) AND (NOT SOURCES))
+        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
+		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(HEADERS AND (NOT SOURCES))
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(SOURCES AND (NOT HEADERS))
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+    endif()
+
+    if(SOURCES AND HEADERS)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    # Process subdirectories regardless
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            else()
+                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
+            endif()
+        endif()
+    endforeach()
 endif()
-
-# Source directories
-file(GLOB SOURCE_EXT_ARG        arg/*.c)
-file(GLOB SOURCE_EXT_COMMON     common/*.c)
-file(GLOB SOURCE_EXT_DEBUGGER   debugger/*.c)
-file(GLOB SOURCE_EXT_HANDLER    handler/*.c)
-file(GLOB SOURCE_EXT_MODULE     module/*.c)
-
-set(SOURCE_EXT
-    ${SOURCE_EXT_ARG}
-    ${SOURCE_EXT_COMMON}
-    ${SOURCE_EXT_DEBUGGER}
-    ${SOURCE_EXT_HANDLER}
-    ${SOURCE_EXT_MODULE})
-
-add_library(${JERRY_EXT_NAME} ${SOURCE_EXT})
-
-target_include_directories(${JERRY_EXT_NAME} PUBLIC ${INCLUDE_EXT_PUBLIC})
-target_include_directories(${JERRY_EXT_NAME} PRIVATE ${INCLUDE_EXT_PRIVATE})
-target_compile_definitions(${JERRY_EXT_NAME} PUBLIC ${DEFINES_EXT})
-target_link_libraries(${JERRY_EXT_NAME} jerry-core)
-
-install(TARGETS ${JERRY_EXT_NAME} DESTINATION lib)
-install(DIRECTORY ${INCLUDE_EXT_PUBLIC}/ DESTINATION include)

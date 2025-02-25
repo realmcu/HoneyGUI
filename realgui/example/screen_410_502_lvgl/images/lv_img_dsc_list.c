@@ -44,6 +44,36 @@ const lv_image_dsc_t control_mute_on =
     .data = CONTROL_MUTE_ON_BIN + 8
 };
 
+const lv_image_dsc_t control_nobother_off =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 182,
+    .header.h = 121,
+    .data_size = 88088,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = CONTROL_NOBOTHER_OFF_BIN + 8
+};
+
+const lv_image_dsc_t control_nobother_on =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 182,
+    .header.h = 121,
+    .data_size = 88088,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = CONTROL_NOBOTHER_ON_BIN + 8
+};
+
+const lv_image_dsc_t control_pad =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 182,
+    .header.h = 121,
+    .data_size = 88088,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = CONTROL_PAD_BIN + 8
+};
+
 const lv_image_dsc_t control_phone_off =
 {
     .header.magic = LV_IMAGE_HEADER_MAGIC,
@@ -62,6 +92,26 @@ const lv_image_dsc_t control_phone_on =
     .data_size = 88088,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = CONTROL_PHONE_ON_BIN + 8
+};
+
+const lv_image_dsc_t control_wifi_off =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 182,
+    .header.h = 121,
+    .data_size = 88088,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = CONTROL_WIFI_OFF_BIN + 8
+};
+
+const lv_image_dsc_t control_wifi_on =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 182,
+    .header.h = 121,
+    .data_size = 88088,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = CONTROL_WIFI_ON_BIN + 8
 };
 
 const lv_image_dsc_t fruit_ninja_banana =
@@ -202,6 +252,66 @@ const lv_image_dsc_t fruit_ninja_watermelon_half_2 =
     .data_size = 33320,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = FRUIT_NINJA_WATERMELON_HALF_2_BIN + 8
+};
+
+const lv_image_dsc_t mute_off_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 22,
+    .header.h = 28,
+    .data_size = 2464,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = MUTE_OFF_ICON_BIN + 8
+};
+
+const lv_image_dsc_t mute_on_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 22,
+    .header.h = 28,
+    .data_size = 2464,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = MUTE_ON_ICON_BIN + 8
+};
+
+const lv_image_dsc_t nobother_off_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 32,
+    .header.h = 32,
+    .data_size = 4096,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = NOBOTHER_OFF_ICON_BIN + 8
+};
+
+const lv_image_dsc_t nobother_on_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 32,
+    .header.h = 32,
+    .data_size = 4096,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = NOBOTHER_ON_ICON_BIN + 8
+};
+
+const lv_image_dsc_t phone_off_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 32,
+    .header.h = 32,
+    .data_size = 4096,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PHONE_OFF_ICON_BIN + 8
+};
+
+const lv_image_dsc_t phone_on_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 32,
+    .header.h = 32,
+    .data_size = 4096,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PHONE_ON_ICON_BIN + 8
 };
 
 const lv_image_dsc_t ui_arrow_down =

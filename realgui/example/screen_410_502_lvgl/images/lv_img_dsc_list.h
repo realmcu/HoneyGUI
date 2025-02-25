@@ -1,18 +1,17 @@
 #ifndef LV_IMG_DSC_LIST_H
 #define LV_IMG_DSC_LIST_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "lvgl.h"
-
 extern const lv_image_dsc_t control_lte_off;
 extern const lv_image_dsc_t control_lte_on;
 extern const lv_image_dsc_t control_mute_off;
 extern const lv_image_dsc_t control_mute_on;
+extern const lv_image_dsc_t control_nobother_off;
+extern const lv_image_dsc_t control_nobother_on;
+extern const lv_image_dsc_t control_pad;
 extern const lv_image_dsc_t control_phone_off;
 extern const lv_image_dsc_t control_phone_on;
+extern const lv_image_dsc_t control_wifi_off;
+extern const lv_image_dsc_t control_wifi_on;
 extern const lv_image_dsc_t fruit_ninja_banana;
 extern const lv_image_dsc_t fruit_ninja_banana_half_1;
 extern const lv_image_dsc_t fruit_ninja_banana_half_2;
@@ -27,6 +26,12 @@ extern const lv_image_dsc_t fruit_ninja_strawberry_half_2;
 extern const lv_image_dsc_t fruit_ninja_watermelon;
 extern const lv_image_dsc_t fruit_ninja_watermelon_half_1;
 extern const lv_image_dsc_t fruit_ninja_watermelon_half_2;
+extern const lv_image_dsc_t mute_off_icon;
+extern const lv_image_dsc_t mute_on_icon;
+extern const lv_image_dsc_t nobother_off_icon;
+extern const lv_image_dsc_t nobother_on_icon;
+extern const lv_image_dsc_t phone_off_icon;
+extern const lv_image_dsc_t phone_on_icon;
 extern const lv_image_dsc_t ui_arrow_down;
 extern const lv_image_dsc_t ui_arrow_up;
 extern const lv_image_dsc_t ui_bg_icon;
@@ -81,9 +86,5 @@ extern const lv_image_dsc_t watch_hour_hand;
 extern const lv_image_dsc_t watch_mask;
 extern const lv_image_dsc_t watch_minute_hand;
 extern const lv_image_dsc_t watch_second_hand;
-
-#ifdef __cplusplus
-} /*extern "C"*/
-#endif
 
 #endif // LV_IMG_DSC_LIST_H

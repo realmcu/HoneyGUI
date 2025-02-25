@@ -1,5 +1,34 @@
 #include "ui_func.h"
 
+void clear_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag)
+{
+    lv_obj_clear_flag(obj, flag);
+    // iterate over all child widgets
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for (uint32_t i = 0; i < child_cnt; i++)
+    {
+        lv_obj_t *child = lv_obj_get_child(obj, i);
+        if (child != NULL)
+        {
+            clear_flag_recursive(child, flag);
+        }
+    }
+}
+void add_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag)
+{
+    lv_obj_add_flag(obj, flag);
+    // iterate over all child widgets
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for (uint32_t i = 0; i < child_cnt; i++)
+    {
+        lv_obj_t *child = lv_obj_get_child(obj, i);
+        if (child != NULL)
+        {
+            add_flag_recursive(child, flag);
+        }
+    }
+}
+
 void _ui_bar_set_property(lv_obj_t *target, int id, int val)
 {
     if (id == _UI_BAR_PROPERTY_VALUE_WITH_ANIM) { lv_bar_set_value(target, val, LV_ANIM_ON); }

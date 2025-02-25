@@ -37,6 +37,7 @@ static void lv_tick(void)
     lv_tick_inc(10);
 }
 
+lv_obj_t *tileview;
 lv_obj_t *scr_watchface;
 lv_obj_t *scr_up_curtain;
 lv_obj_t *scr_down_curtain;
@@ -164,6 +165,60 @@ void read_json_cb(lv_timer_t *timer)
     }
 }
 
+typedef enum
+{
+    MESSAGE = 0,
+    OS,
+} app_name;
+
+typedef struct information
+{
+    const char *informer;
+    const char *content;
+    const char *time;
+    app_name app;
+} information_t;
+static char *content = NULL;
+static void inform_generate_task_entry()
+{
+    while (true)
+    {
+        gui_thread_mdelay(2000);
+
+        if (!content)
+        {
+            content = gui_malloc(200);
+            sprintf(content,
+                    "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.");
+        }
+        time_t rawtime;
+        time(&rawtime);
+        struct tm *timeinfo = localtime(&rawtime);
+        char time[10];
+        if (timeinfo)
+        {
+            sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        }
+
+        information_t payload =
+        {
+            "101010",
+            content,
+            time,
+            MESSAGE
+        };
+        extern void pagelist_create(information_t *payload);
+        gui_msg_t msg =
+        {
+            .event = GUI_EVENT_USER_DEFINE,
+            .payload = &payload,
+            .cb = (gui_msg_cb)pagelist_create,
+        };
+
+        gui_send_msg_to_server(&msg);
+    }
+}
+
 uint8_t resource_root[1024 * 1024 * 20];
 static void app_dialing_ui_design(gui_app_t *app)
 {
@@ -205,14 +260,14 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     // lv_disp_load_scr(scr_watchface);
 
-    lv_obj_t *tv = lv_tileview_create(lv_scr_act());
-    lv_obj_set_scrollbar_mode(tv, LV_SCROLLBAR_MODE_OFF); // hide scroll bar
+    tileview = lv_tileview_create(NULL);
+    lv_obj_set_scrollbar_mode(tileview, LV_SCROLLBAR_MODE_OFF); // hide scroll bar
 
-    scr_watchface = lv_tileview_add_tile(tv, 1, 1, LV_DIR_ALL); // create center tile
-    scr_up_curtain = lv_tileview_add_tile(tv, 1, 0, LV_DIR_BOTTOM); // create up tile
-    scr_down_curtain = lv_tileview_add_tile(tv, 1, 2, LV_DIR_TOP); // create down tile
-    scr_left_curtain = lv_tileview_add_tile(tv, 0, 1, LV_DIR_RIGHT); // create left tile
-    scr_right_curtain = lv_tileview_add_tile(tv, 2, 1, LV_DIR_LEFT); // create right tile
+    scr_watchface = lv_tileview_add_tile(tileview, 1, 1, LV_DIR_ALL); // create center tile
+    scr_up_curtain = lv_tileview_add_tile(tileview, 1, 0, LV_DIR_BOTTOM); // create up tile
+    scr_down_curtain = lv_tileview_add_tile(tileview, 1, 2, LV_DIR_TOP); // create down tile
+    scr_left_curtain = lv_tileview_add_tile(tileview, 0, 1, LV_DIR_RIGHT); // create left tile
+    scr_right_curtain = lv_tileview_add_tile(tileview, 2, 1, LV_DIR_LEFT); // create right tile
 
     //initialize curtains
     lv_watchface_init();
@@ -220,7 +275,8 @@ static void app_dialing_ui_design(gui_app_t *app)
     lv_down_curtain_init();
     lv_left_curtain_init();
     lv_right_curtain_init();
-    lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_OFF); // start with center tile, no animation
+    lv_tileview_set_tile_by_index(tileview, 1, 1, LV_ANIM_OFF); // start with center tile, no animation
+    lv_scr_load(tileview);
 }
 
 static gui_app_t app_lvgl =
@@ -242,6 +298,7 @@ static int app_init(void)
 {
     gui_server_init();
     gui_app_startup(&app_lvgl);
+    gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     return 0;
 }
 

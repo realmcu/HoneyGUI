@@ -134,10 +134,6 @@ HoneyGUI LVGL
     |  |__ tests
     |
     |-- lvgl_v9                               // LVGL v9
-    |-- user                                  // user ui code 目录
-    |   |-- realgui                           
-    |   |-- lvgl_v8                           
-    |   |__ lvgl_v9                           
     |
     :
     :
@@ -177,8 +173,6 @@ HoneyGUI LVGL
 2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 :file:`your HoneyGUI dir/realgui/example/demo` 下的 :file:`app_ui_lvgl.c` 开始运行。
 
 3. 使用 HoneyGUI 模拟器运行 LVGL 时，调用的 LVGL 文件系统接口所指向的根目录为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root/`。
-
-4. 开发者的 UI 设计代码文件可放置于 :file:`your HoneyGUI dir/user/lvgl_vx` 下，将被自动构建到工程中名为 "user" 的 group 中。
 
 
 

@@ -139,6 +139,9 @@ void _ui_spinbox_step(lv_obj_t *target, int val)
 void _ui_switch_theme(int val)
 ;
 
+void clear_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag);
+void add_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag);
+
 
 
 #ifdef __cplusplus

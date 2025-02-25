@@ -1,54 +1,45 @@
-add_subdirectory(nanovg)
-add_subdirectory(ezXML)
-add_subdirectory(nanosvg)
-add_subdirectory(painter-engine)
-add_subdirectory(stb)
-add_subdirectory(cJSON)
-add_subdirectory(box2d/src)
-add_subdirectory(minimp3)
-add_subdirectory(letter_shell)
-add_subdirectory(tinyobj)
-if(CONFIG_JAVASCRIPT_PARSER_SaaA)
-add_subdirectory(js)
-endif()
-list(APPEND gui_3rd_sources 
-			${gui_3rd_common_sources} 
-			${gui_3rd_ezxml_sources}
-			${gui_3rd_js_sources} 
-			${gui_3rd_nanosvg_sources}
-			${gui_3rd_nanovg_sources} 
-			${gui_3rd_px_sources} 
-			${gui_3rd_stb_sources}
-			${gui_widget_cJSIN_sources}
-			${BOX2D_SOURCE_FILES}
-			${gui_minimp3_sources}
-			${gui_3rd_letter_sources}
-			${gui_tinyobj_sources}
-			)
-set(gui_3rd_sources ${gui_3rd_sources} CACHE INTERNAL  "gui engine 3rd ")
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
-list(APPEND gui_3rd_headers
-			${gui_3rd_common_headers} 
-			${gui_3rd_ezxml_headers}
-			${gui_3rd_js_headers} 
-			${gui_3rd_nanosvg_headers}
-			${gui_3rd_nanovg_headers} 
-			${gui_3rd_px_headers} 
-			${gui_3rd_stb_headers}
-			${gui_widget_cJSIN_headers}
-			${BOX2D_HEADER_FILES}
-			${gui_minimp3_headers}
-			${gui_3rd_letter_headers}
-			${gui_tinyobj_headers}
-			)
-set(gui_3rd_headers ${gui_3rd_headers} CACHE INTERNAL  "gui 3rd headers ")
+cmake_minimum_required(VERSION 3.10)
 
-if(gui_debug_enable)  
-	foreach(ITEM ${gui_3rd_sources})
-		message([GUI][3rd srcs] ${ITEM})
-	endforeach()
-	
-	foreach(ITEM ${gui_3rd_headers})
-		message([GUI][3rd srcs] ${ITEM})
-	endforeach()
+
+# Define a variable for the library name
+if(1) #set to 1 to enable or variable to for depnedency
+
+    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB HEADERS "*.h" "*.hpp")
+
+
+    # Determine if we should create a library
+    if((NOT HEADERS) AND (NOT SOURCES))
+        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
+		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(HEADERS AND (NOT SOURCES))
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(SOURCES AND (NOT HEADERS))
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+    endif()
+
+    if(SOURCES AND HEADERS)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    # Process subdirectories regardless
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            else()
+                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
+            endif()
+        endif()
+    endforeach()
 endif()

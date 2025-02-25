@@ -1,17 +1,45 @@
-file(GLOB gui_input_sources *.c )
-set(gui_input_sources ${gui_input_sources} CACHE INTERNAL  "gui input sources ")
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 
-HEADER_DIRECTORIES(gui_input_headers ./)
-set(gui_input_headers ${gui_input_headers} CACHE INTERNAL  "gui input headers ")
+cmake_minimum_required(VERSION 3.10)
 
-if(gui_debug_enable)  
-	foreach(ITEM ${gui_input_sources})
-		message([gui][input srcs]${ITEM})
-	endforeach()
-	
-	foreach(ITEM ${gui_input_headers})
-		message([gui][input headers]${ITEM})
-	endforeach()
+
+# Define a variable for the library name
+if(1) #set to 1 to enable or variable to for depnedency
+
+    file(GLOB SOURCES "*.c" "*.cpp")
+    file(GLOB HEADERS "*.h" "*.hpp")
+
+
+    # Determine if we should create a library
+    if((NOT HEADERS) AND (NOT SOURCES))
+        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
+		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(HEADERS AND (NOT SOURCES))
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if(SOURCES AND (NOT HEADERS))
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+    endif()
+
+    if(SOURCES AND HEADERS)
+        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    # Process subdirectories regardless
+    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+    foreach(subdir ${SUBDIRS})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
+            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
+                add_subdirectory(${subdir})
+            else()
+                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
+            endif()
+        endif()
+    endforeach()
 endif()
-
-
