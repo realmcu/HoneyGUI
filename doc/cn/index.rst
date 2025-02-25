@@ -22,6 +22,7 @@ HoneyGUI
    常见问题 <FAQ/index>
    获取PDF <get-pdf/index>
    专业术语 <Glossary>
+   版本说明 <release_notes/index>
 
 
 

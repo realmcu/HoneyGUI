@@ -18,6 +18,7 @@ HoneyGUI
   FAQ <FAQ/index>
   Get PDF <get-pdf/index>
   Glossary <Glossary>
+  Release Notes <release_notes/index>
 
 
 
