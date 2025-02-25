@@ -12,15 +12,18 @@ if(1) #set to 1 to enable or variable to for depnedency
 	
 	# Specify the file to exclude
 	set(EXCLUDE_FILE 
-		"${CMAKE_CURRENT_SOURCE_DIR}/gui_scroll_wheel.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/gui_bitmap.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/gui_px.c"
-	)
-    if(NOT CONFIG_REALTEK_BUILD_U8G2)
-    set(EXCLUDE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/gui_u8g2.c")
+        "${CMAKE_CURRENT_SOURCE_DIR}/gui_scroll_wheel.c"
+    )
+    
+    if(NOT CONFIG_REALTEK_BUILD_PAINTER_ENGINE)
+        list(APPEND EXCLUDE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/gui_px.c.c")
     endif()
-	# Remove the specified file from the list of sources
-	list(REMOVE_ITEM SOURCES ${EXCLUDE_FILE})
+    
+    if(NOT CONFIG_REALTEK_BUILD_U8G2)
+        list(APPEND EXCLUDE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/gui_u8g2.c")
+    endif()
+    # Remove the specified file from the list of sources
+    list(REMOVE_ITEM SOURCES ${EXCLUDE_FILE})
 
 
     # Determine if we should create a library
