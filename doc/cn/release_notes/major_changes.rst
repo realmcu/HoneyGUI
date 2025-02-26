@@ -2,22 +2,20 @@
 Major Changes
 =======================
 
-.. start-majorchanges_v1066
+.. start-majorchanges_v1.0.6.6
 
-v1.0.6.6 25 February 2025
---------------------------
+v1.0.6.6
+---------
 
-Major Features
-^^^^^^^^^^^^^^^^
+- **Major Features**
 
-* Add view widget. (21a61e0d)
-* Add 3d face. (d2862e5e)
-* Add littlefs packing tool. (7bd59f3d)
+  * Add view widget. (21a61e0d)
+  * Add 3d face. (d2862e5e)
+  * Add littlefs packing tool. (7bd59f3d)
 
-Major Bug Fixes
-^^^^^^^^^^^^^^^^
+- **Major Bug Fixes**
 
-* Fix roller loop off. (6045a92d)
-* Fix lv_rle, add fs load for rle, fix cache. (821b890e)
+  * Fix roller loop off. (6045a92d)
+  * Fix lv_rle, add fs load for rle, fix cache. (821b890e)
 
-.. end-majorchanges_v1066
+.. end-majorchanges_v1.0.6.6
