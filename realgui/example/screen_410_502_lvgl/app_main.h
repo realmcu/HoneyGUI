@@ -12,6 +12,32 @@ extern "C" {
 
 #define M_PI    ((float)3.14159265358979323846)
 
+#define WATCH_DEMO_USE_TILESLIDE    0
+
+#if WATCH_DEMO_USE_TILESLIDE
+#define WATCH_DEMO_USE_SNAPSHOT     1
+#if WATCH_DEMO_USE_SNAPSHOT
+#if !LV_USE_DRAW_PPE_RTL8773E && \
+            !LV_USE_DRAW_PPE_RTL872xG && \
+            LV_MEM_SIZE < 3 * 1024 * 1024
+#warning "It's recommended to have at least 3MB RAM for the snapshot tileview watch demo on SW"
+#endif
+#else
+#if !LV_USE_DRAW_PPE_RTL8773E && \
+            !LV_USE_DRAW_PPE_RTL872xG && \
+            LV_MEM_SIZE < 1024 * 1024
+#warning "It's recommended to have at least 1MB RAM for the tileview watch demo on SW"
+#endif
+#endif
+#endif
+
+#ifndef WATCH_DEMO_USE_SNAPSHOT
+#define WATCH_DEMO_USE_SNAPSHOT     0
+#endif
+
+uint32_t event_snapshot_creat;
+uint32_t event_snapshot_delete;
+
 extern lv_obj_t *tileview;
 extern lv_obj_t *scr_watchface;
 extern lv_obj_t *scr_up_curtain;
