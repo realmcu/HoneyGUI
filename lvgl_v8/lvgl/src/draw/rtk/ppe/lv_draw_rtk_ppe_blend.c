@@ -50,6 +50,7 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
+    target.stride = target.width;
     lv_color32_t bg_color = lv_ppe_toABGR8888(dsc->color);
     if (dsc->opa != 0xFF)
     {
@@ -78,11 +79,13 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
+    target.stride = target.width;
 
     source.address = (uint32_t)img->data;
     source.memory = (uint32_t *)source.address;
     source.width = coords->x2 - coords->x1 + 1;
     source.height = coords->y2 - coords->y1 + 1;
+    source.stride = source.width;
     source.format = PPE_A8;
 
     ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
@@ -109,6 +112,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     target.memory = (uint32_t *)target.address;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
+    target.stride = target.width;
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
 
     source.address = (uint32_t)map_p;
@@ -117,6 +121,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     uint32_t source_height = coords->y2 - coords->y1 + 1;
     source.width = source_width;
     source.height = source_height;
+    source.stride = source.width;
     const uint8_t *img_data = (uint8_t *)map_p;
     source.format = img_data[1];
     PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
@@ -271,6 +276,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 info.raw_data_address = (uint32_t)(map_p + 8);
                 source.width = info.end_column - info.start_column + 1;
                 source.height = info.end_line - info.start_line + 1;
+                source.stride = source.width;
                 source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
                 source.address = (uint32_t)source.memory;
                 bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
@@ -333,6 +339,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 ppe_rect_t scale_rect = {.left = start_column, .top = start_line, .bottom = end_line, .right = end_column};
                 zoom.width = (uint32_t)((end_column - start_column + 1) * zoom_ratio);
                 zoom.height = (uint32_t)((end_line - start_line + 1) * zoom_ratio);
+                zoom.stride = zoom.width;
                 if (zoom.width == 0 || zoom.height == 0)
                 {
                     break;
@@ -347,6 +354,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                     info.raw_data_address = (uint32_t)(map_p + 8);
                     source.width = info.end_column - info.start_column + 1;
                     source.height = info.end_line - info.start_line + 1;
+                    source.stride = source.width;
                     source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
                     source.address = (uint32_t)source.memory;
                     bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
@@ -413,6 +421,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             info.raw_data_address = (uint32_t)(map_p + 8);
             source.width = info.end_column - info.start_column + 1;
             source.height = info.end_line - info.start_line + 1;
+            source.stride = source.width;
             source.memory = (uint32_t *)lv_mem_alloc(source.width * source.height * pixel_byte);
             bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
             trans.x = blend_rect.x1;
@@ -447,12 +456,14 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     target.memory = (uint32_t *)target.address;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
+    target.stride = target.width;
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ABGR8888;
 
     source.address = (uint32_t)map_p;
     source.memory = (uint32_t *)source.address;
     source.width = coords->x2 - coords->x1 + 1;
     source.height = coords->y2 - coords->y1 + 1;
+    source.stride = source.width;
     if (LV_COLOR_DEPTH == 16)
     {
         source.format = PPE_RGB565;
@@ -476,6 +487,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     recolor.format = source.format;
     recolor.width = source.width;
     recolor.height = source.height;
+    recolor.stride = recolor.width;
     lv_color32_t recolor_value = lv_ppe_toABGR8888(dsc->recolor);
     recolor_value.ch.alpha = dsc->recolor_opa;
 
@@ -559,12 +571,14 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     target.memory = (uint32_t *)target.address;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
+    target.stride = target.width;
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
 
     source.address = (uint32_t)dsc->mask_buf;
     source.memory = (uint32_t *)source.address;
     source.width = dsc->mask_area->x2 - dsc->mask_area->x1 + 1;
     source.height = dsc->mask_area->y2 - dsc->mask_area->y1 + 1;
+    source.stride = source.width;
     source.format = PPE_A8;
 
     ppe_translate_t trans = {.x = dsc->mask_area->x1, .y = dsc->mask_area->y1};
@@ -591,12 +605,14 @@ lv_res_t lv_ppe_map(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
     target.memory = (uint32_t *)target.address;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
+    target.stride = target.width;
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
 
     source.address = (uint32_t)dsc->src_buf;
     source.memory = (uint32_t *)source.address;
     source.width = dsc->blend_area->x2 - dsc->blend_area->x1 + 1;
     source.height = dsc->blend_area->y2 - dsc->blend_area->y1 + 1;
+    source.stride = source.width;
     source.format = target.format;
     if (dsc->opa < LV_OPA_MIN)
     {
