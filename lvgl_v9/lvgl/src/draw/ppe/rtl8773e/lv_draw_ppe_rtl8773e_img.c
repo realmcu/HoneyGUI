@@ -42,6 +42,11 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
                                const lv_area_t *coords);
 static void lv_draw_ppe_tile(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
                              const lv_area_t *coords);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+static void lv_draw_ppe_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
+                               const lv_area_t *coords, lv_matrix_t *matrix);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -54,6 +59,37 @@ static void lv_draw_ppe_tile(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+void lv_draw_ppe_image_use_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
+                                  const lv_area_t *coords, lv_matrix_t *matrix)
+{
+    if (draw_dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+    {
+        return;
+    }
+
+    lv_draw_ppe_matrix(draw_unit, draw_dsc, coords, matrix);
+}
+
+void lv_draw_ppe_layer_use_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
+                                  const lv_area_t *coords, lv_matrix_t *matrix)
+{
+    if (draw_dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+    {
+        return;
+    }
+    lv_layer_t *layer_to_draw = (lv_layer_t *)draw_dsc->src;
+
+    /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
+     *In this case just return. */
+    if (layer_to_draw->draw_buf == NULL) { return; }
+
+    lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
+    new_draw_dsc.src = layer_to_draw->draw_buf;
+    lv_draw_ppe_matrix(draw_unit, &new_draw_dsc, coords, matrix);
+}
+
+
 void lv_draw_ppe_image(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
                        const lv_area_t *coords)
 {
@@ -446,4 +482,175 @@ static void lv_draw_ppe_tile(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_
     }
     PPE_Finish();
 }
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+static void lv_draw_ppe_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
+                               const lv_area_t *coords, lv_matrix_t *matrix)
+{
+    lv_layer_t *layer = draw_unit->target_layer;
+    const lv_image_dsc_t *img_dsc = draw_dsc->src;
+    lv_area_t area_rot;
+    lv_area_t constraint_area;
+
+    ppe_rect_t src_rect = {.x = 0, .y = 0, .w = img_dsc->header.w, .h = img_dsc->header.h};
+    ppe_rect_t target_rect = {0};
+    lv_display_t *disp = lv_display_get_default();
+    ppe_buffer_t target, source;
+    target.width = disp->hor_res;
+    target.height = disp->ver_res;
+    ppe_matrix_t ppe_mat, pre_trans;
+    memcpy(&ppe_mat, matrix, sizeof(ppe_matrix_t));
+    if (coords->x1 != 0 || coords->y1 != 0)
+    {
+        ppe_get_identity(&pre_trans);
+        pre_trans.m[0][2] = coords->x1;
+        pre_trans.m[1][2] = coords->y1;
+        ppe_mat_multiply(&ppe_mat, &pre_trans);
+    }
+    ppe_get_area(&target_rect, &src_rect, &ppe_mat, &target);
+    area_rot.x1 = target_rect.x;
+    area_rot.y1 = target_rect.y;
+    area_rot.x2 = target_rect.x + target_rect.w - 1;
+    area_rot.y2 = target_rect.y + target_rect.h - 1;
+    bool compressed = false;
+    ppe_rect_t draw_rect;
+    if (!lv_area_intersect(&constraint_area, &draw_unit->target_layer->buf_area, &area_rot))
+    {
+        return;
+    }
+    else
+    {
+        draw_rect.x = constraint_area.x1;
+        draw_rect.y = constraint_area.y1;
+        draw_rect.w = lv_area_get_width(&constraint_area);
+        draw_rect.h = lv_area_get_height(&constraint_area);
+    }
+    memset(&target, 0, sizeof(ppe_buffer_t));
+    memset(&source, 0, sizeof(ppe_buffer_t));
+    if (img_dsc->header.cf == LV_COLOR_FORMAT_RAW)
+    {
+        compressed = true;
+    }
+    target.format = PPE_ABGR8888;
+    switch (draw_unit->target_layer->color_format)
+    {
+    case LV_COLOR_FORMAT_RGB565:
+        target.format = PPE_RGB565;
+        break;
+    case LV_COLOR_FORMAT_ARGB8888:
+        target.format = PPE_ARGB8888;
+        break;
+    case LV_COLOR_FORMAT_RGB888:
+        target.format = PPE_RGB888;
+        break;
+    case LV_COLOR_FORMAT_XRGB8888:
+        target.format = PPE_XRGB8888;
+        break;
+    default:
+        return;
+    }
+    target.address = (uint32_t)draw_unit->target_layer->draw_buf->data;
+    target.width = lv_area_get_width(&draw_unit->target_layer->buf_area);
+    target.height = lv_area_get_height(&draw_unit->target_layer->buf_area);
+    target.stride = target.width;
+    target.win_x_min = 0;
+    target.win_x_max = target.width - 1;
+    target.win_y_min = 0;
+    target.win_y_max = target.height - 1;
+
+    PPE_BLEND_MODE mode = PPE_SRC_OVER_MODE;
+
+    source.format = lv_ppe_get_format(img_dsc->header.cf, img_dsc->data);
+    uint8_t pixel_byte = PPE_Get_Pixel_Size(source.format);
+
+    source.address = (uint32_t)img_dsc->data;
+    source.width = img_dsc->header.w;
+    source.height = img_dsc->header.h;
+    source.stride = img_dsc->header.stride / pixel_byte;
+    source.opacity = draw_dsc->opa;
+    source.win_x_min = target.win_x_min;
+    source.win_x_max = target.win_x_max;
+    source.win_y_min = target.win_y_min;
+    source.win_y_max = target.win_y_max;
+
+    bool no_transform = lv_matrix_is_identity_or_translation(matrix);
+
+    if ((source.format == PPE_RGB565 || source.format == PPE_RGB888) && \
+        no_transform)
+    {
+        mode = PPE_BYPASS_MODE;
+    }
+
+    ppe_matrix_t inverse;
+
+    ppe_rect_t image_area;
+    memcpy(&inverse, &ppe_mat, sizeof(ppe_matrix_t));
+    ppe_matrix_inverse(&inverse);
+    if (!ppe_get_area(&image_area, &draw_rect, &inverse, &source))
+    {
+        return;
+    }
+
+    uint8_t *pic_buffer = lv_ppe_get_buffer(0);
+    if (image_area.w * image_area.h * pixel_byte <= LV_PPE_MAX_BUFFER_SIZE)
+    {
+        if (!compressed)
+        {
+            hal_idu_dma_info copy_info;
+            copy_info.length = image_area.w * pixel_byte;
+            copy_info.height = image_area.h;
+            copy_info.src_stride = img_dsc->header.stride;
+            copy_info.dst_stride = copy_info.length;
+            uint32_t src_addr = source.address + (source.stride * image_area.y + image_area.x) * pixel_byte;
+            hal_dma_copy(&copy_info, (uint8_t *)src_addr, pic_buffer);
+        }
+        else
+        {
+            hal_idu_decompress_info decode_info;
+            decode_info.raw_data_address = (uint32_t)img_dsc->data + 8;
+            decode_info.start_column = image_area.x;
+            decode_info.end_column = image_area.x + image_area.w - 1;
+            decode_info.start_line = image_area.y;
+            decode_info.end_line = image_area.y + image_area.h - 1;
+            hal_idu_decompress(&decode_info, pic_buffer);
+        }
+        source.width = image_area.w;
+        source.height = image_area.h;
+        source.stride = image_area.w;
+        source.address = (uint32_t)pic_buffer;
+        if (draw_dsc->recolor_opa >= LV_OPA_MIN)
+        {
+            uint32_t recolor_value = lv_ppe_get_color(draw_dsc->recolor, draw_dsc->recolor_opa);
+            ppe_rect_t recolor_rect = {.x = 0, .y = 0, .w = source.width, .h = source.height};
+            PPE_Mask(&source, recolor_value, &recolor_rect);
+        }
+        ppe_get_identity(&pre_trans);
+        pre_trans.m[0][2] = image_area.x * -1.0f;
+        pre_trans.m[1][2] = image_area.y * -1.0f;
+        ppe_mat_multiply(&pre_trans, &inverse);
+        ppe_translate(draw_unit->target_layer->buf_area.x1, draw_unit->target_layer->buf_area.y1,
+                      &pre_trans);
+        memcpy(&inverse, &pre_trans, sizeof(float) * 9);
+    }
+    else
+    {
+        ppe_translate(draw_unit->target_layer->buf_area.x1, draw_unit->target_layer->buf_area.y1, &inverse);
+    }
+    lv_area_move(&constraint_area, -draw_unit->target_layer->buf_area.x1,
+                 -draw_unit->target_layer->buf_area.y1);
+    draw_rect.x = constraint_area.x1;
+    draw_rect.y = constraint_area.y1;
+    if (draw_dsc->antialias)
+    {
+        source.high_quality = true;
+    }
+    PPE_err err = PPE_Blit_Inverse(&target, &source, &inverse, &draw_rect, mode);
+    PPE_Finish();
+    if (err == PPE_SUCCESS)
+    {
+        return;
+    }
+    return;
+}
+#endif
 #endif /*LV_USE_PPE*/
