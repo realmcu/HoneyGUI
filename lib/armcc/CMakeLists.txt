@@ -1,9 +1,11 @@
 cmake_minimum_required (VERSION 3.10)
-cmake_policy(SET CMP0123 NEW)
 
 set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_C_COMPILER armclang)
-set(CMAKE_CXX_COMPILER armclang)
+
+set(ARMCLANG_PATH "C:/Keil_v5/ARM/ARMCC/bin")
+
+set(CMAKE_C_COMPILER "${ARMCLANG_PATH}/armcc.exe")
+set(CMAKE_CXX_COMPILER "${ARMCLANG_PATH}/armcc.exe")
 
 
 set(CMAKE_CXX_STANDARD 11)
@@ -11,15 +13,17 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_EXTENSIONS ON)
 
-set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 
 # For ARM Cortex-M4
-set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb")
+set(C_FLAGS "--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork ")
+
+set(CPP_FLAGS "-c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork ")
 
 # Apply the flags to C and C++ compiler settings
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CPU_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPU_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPP_FLAGS}")
 
 
 
