@@ -83,14 +83,11 @@ static void lv_draw_ppe_rect(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_t *
 
     /* Draw the background */
     ppe_dsc.bg_opa = dsc->bg_opa;
-    if (lv_draw_ppe_bg(draw_ctx, &ppe_dsc, coords) != LV_RES_OK)
+    if (lv_draw_ppe_bg(draw_ctx, &ppe_dsc, coords) == LV_RES_OK)
     {
-        if (dsc->bg_opa > LV_OPA_MIN)
-        {
-            lv_draw_sw_rect(draw_ctx, &ppe_dsc, coords);
-        }
+        ppe_dsc.bg_opa = 0;
     }
-    ppe_dsc.bg_opa = 0;
+    
     ppe_dsc.bg_img_opa = dsc->bg_img_opa;
     ppe_dsc.border_opa = dsc->border_opa;
     ppe_dsc.outline_opa = dsc->outline_opa;
@@ -314,6 +311,11 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
                 lv_mem_free(file_data);
             }
             return LV_RES_OK;
+        }
+        bool has_mask = lv_draw_mask_is_any(&clip_com);
+        if(has_mask)
+        {
+            return LV_RES_INV;
         }
         const lv_area_t *clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
