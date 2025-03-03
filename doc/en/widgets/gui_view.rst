@@ -15,33 +15,66 @@ The view widget is a kind of container that makes switching more convenient. Any
 
 Usage
 -------
+Register Descriptor of View
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_descriptor_register` function can be used to register descriptor of view in the descriptor list for other view to read and use as a parameter to create the view, via passing in the descriptor's address. The ``gui_view_descriptor`` structure is defined as follows:
+
+.. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h
+   :language: c
+   :start-after: /* gui_view_descriptor start*/
+   :end-before: /* gui_view_descriptor end*/
+
+
+Get Descriptor of View by Name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_descriptor_get` function can be used to get the view descriptor with the corresponding ``name``  by passing in the string.
+
+
 Create View Widget
 ~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_view_create` function can be used to establish a view widget.
 
-Add Change Event
-~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_view_add_change_event` function can be used to add a event for this view widget to change to another view. Specific events include ``GUI_EVENT_TOUCH_CLICKED`` 、 ``GUI_EVENT_TOUCH_MOVE_LEFT``、 ``GUI_EVENT_TOUCH_MOVE_LEFT`` and so on. The available switching styles include the following:
 
-.. literalinclude:: ../../../realgui/widget/gui_view.h
+Set Switch View Event
+~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_switch_on_event` function can be used to set switch view event. Repeatable settings for a particular event will use the latest descriptor. Specific events include ``GUI_EVENT_TOUCH_CLICKED`` 、 ``GUI_EVENT_KB_SHORT_CLICKED`` 、 ``GUI_EVENT_TOUCH_MOVE_LEFT``、 ``GUI_EVENT_TOUCH_MOVE_RIGHT`` and so on. The available switching styles include the following:
+
+.. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h
    :language: c
-   :start-after: /* VIEW_CHANGE_STYLE enum start*/
-   :end-before: /* VIEW_CHANGE_STYLE enum end*/
+   :start-after: /* VIEW_SWITCH_STYLE enum start*/
+   :end-before: /* VIEW_SWITCH_STYLE enum end*/
 
-Enable View Caching
-~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_view_enable_pre_load` function can be used to enable view widget caching。
+
+Switch View Directly
+~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_switch_direct` function can be used to switch view directly, which can be used in conjunction with events or animations of the child widgets based on view. Note that the switching style is limited to the animation style and cannot be set to the sliding style.
+
+Get Current View Pointer
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_get_current_view` function can be used to get current view pointer, and can be used with :cpp:any:`gui_view_switch_direct` to switch the current view.
 
 Example
 ---------
 View
 ~~~~~~~~~~
-You can set a different switching style for each view widget.
+Below are three separate C files, each containing a descriptor for the view and the design function.
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_view.c
+.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_blue.c
    :language: c
-   :start-after: /* view demo start*/
-   :end-before: /* view demo end*/
+   :start-after: /* view blue start*/
+   :end-before: /* view blue end*/
+
+
+.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_white.c
+   :language: c
+   :start-after: /* view white start*/
+   :end-before: /* view white end*/
+
+
+.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_yellow.c
+   :language: c
+   :start-after: /* view yellow start*/
+   :end-before: /* view yellow end*/
 
 
 .. raw:: html

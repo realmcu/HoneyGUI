@@ -94,7 +94,7 @@ static int auto_test_app_init(void)
     gui_app_startup(get_launcher_app());
     return 0;
 }
-GUI_INIT_ENV_EXPORT(auto_test_app_init);
+GUI_INIT_APP_EXPORT(auto_test_app_init);
 
 
 

@@ -35,7 +35,7 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_FACE_3D'):
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)   
     
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_VIEW'):
-    src += ['app_ui_realgui_view.c']
+    src += Glob('view_demo/*.c')
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PAINTENGINE'):

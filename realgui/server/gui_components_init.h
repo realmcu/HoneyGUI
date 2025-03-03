@@ -61,9 +61,9 @@ typedef int (*gui_init_fn_t)(void);
 /* device initialization */
 #define GUI_INIT_DEVICE_EXPORT(fn)          GUI_APP_INIT_EXPORT(fn, "3")
 /* components initialization (dfs, lwip, ...) */
-#define GUI_INIT_COMPONENT_EXPORT(fn)       GUI_APP_INIT_EXPORT(fn, "4")
+#define GUI_INIT_VIEW_DESCRIPTOR_REGISTER(fn)         GUI_APP_INIT_EXPORT(fn, "4")
 /* environment initialization (mount disk, ...) */
-#define GUI_INIT_ENV_EXPORT(fn)             GUI_APP_INIT_EXPORT(fn, "5")
+#define GUI_INIT_VIEW_DESCRIPTOR_GET(fn)            GUI_APP_INIT_EXPORT(fn, "5")
 /* appliation initialization (rtgui application etc ...) */
 #define GUI_INIT_APP_EXPORT(fn)             GUI_APP_INIT_EXPORT(fn, "6")
 

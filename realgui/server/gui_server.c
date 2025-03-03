@@ -19,6 +19,7 @@
 #include <string.h>
 #include <gui_app.h>
 #include "gui_win.h"
+#include "gui_components_init.h"
 
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "js_extern_io.h"
@@ -240,6 +241,12 @@ static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool 
  */
 int gui_server_init(void)
 {
+    static bool inited = false;
+    if (inited)
+    {
+        return 0;
+    }
+    inited = true;
     extern void gui_port_dc_init(void);
     extern void gui_port_indev_init(void);
     extern void gui_port_os_init(void);
@@ -261,3 +268,5 @@ int gui_server_init(void)
                       15);
     return 0;
 }
+
+GUI_INIT_PREV_EXPORT(gui_server_init);
