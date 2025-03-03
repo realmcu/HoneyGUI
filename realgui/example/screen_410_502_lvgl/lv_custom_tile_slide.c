@@ -94,10 +94,17 @@ void tileview_custom_cb(lv_event_t *e)
             scale =  1 - scale / 2;
             int32_t scaleint  = LV_CLAMP(128, scale * 256, 256);
 
+#if TILE_SLIDE_USE_SNAPSHORT
+            lv_obj_set_style_transform_pivot_x(lv_obj_get_child(tile_obj, 1), LV_PCT(50), 0);
+            lv_obj_set_style_transform_pivot_y(lv_obj_get_child(tile_obj, 1), LV_PCT(50), 0);
+            lv_obj_set_style_transform_scale(lv_obj_get_child(tile_obj, 1), scaleint, 0);
+            lv_obj_set_style_opa(lv_obj_get_child(tile_obj, 1), scaleint, 0);
+#else
             lv_obj_set_style_transform_pivot_x(tile_obj, LV_PCT(50), 0);
             lv_obj_set_style_transform_pivot_y(tile_obj, LV_PCT(50), 0);
             lv_obj_set_style_transform_scale(tile_obj, scaleint, 0);
             lv_obj_set_style_opa(tile_obj, scaleint, 0);
+#endif
         }
         // LV_LOG("tileview_custom_cb LV_EVENT_SCROLL \n");
     }
@@ -110,12 +117,15 @@ void tileview_custom_cb(lv_event_t *e)
             for (int i = 0; i < lv_obj_get_child_count(obj); i++)
             {
                 lv_obj_t *tile_obj = lv_obj_get_child(obj, i);
-                lv_obj_set_style_transform_scale(tile_obj, 256, 0);
-                lv_obj_set_style_opa(tile_obj, 255, 0);
 #if TILE_SLIDE_USE_SNAPSHORT
+                lv_obj_set_style_transform_scale(lv_obj_get_child(tile_obj, 1), 256, 0);
+                lv_obj_set_style_opa(lv_obj_get_child(tile_obj, 1), 255, 0);
                 lv_obj_add_flag(lv_obj_get_child(tile_obj, 1), LV_OBJ_FLAG_HIDDEN);
                 lv_obj_clear_flag(lv_obj_get_child(tile_obj, 0), LV_OBJ_FLAG_HIDDEN);
                 lv_obj_send_event(lv_obj_get_child(tile_obj, 1), event_snapshot_delete, NULL);
+#else
+                lv_obj_set_style_transform_scale(tile_obj, 256, 0);
+                lv_obj_set_style_opa(tile_obj, 255, 0);
 #endif
             }
             LV_LOG_INFO("REAL LV_EVENT_SCROLL_END \n");

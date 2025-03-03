@@ -281,27 +281,22 @@ static void app_dialing_ui_design(gui_app_t *app)
     scr_watchface = lv_obj_create(tile_center);
     lv_obj_remove_style_all(scr_watchface);
     lv_obj_set_size(scr_watchface, LV_PCT(100), LV_PCT(100));
-    lv_obj_set_style_bg_opa(scr_watchface, LV_OPA_TRANSP, 0);
 
     scr_up_curtain = lv_obj_create(tile_up);
     lv_obj_remove_style_all(scr_up_curtain);
     lv_obj_set_size(scr_up_curtain, LV_PCT(100), LV_PCT(100));
-    lv_obj_set_style_bg_opa(scr_up_curtain, LV_OPA_TRANSP, 0);
 
     scr_down_curtain = lv_obj_create(tile_down);
     lv_obj_remove_style_all(scr_down_curtain);
     lv_obj_set_size(scr_down_curtain, LV_PCT(100), LV_PCT(100));
-    lv_obj_set_style_bg_opa(scr_down_curtain, LV_OPA_TRANSP, 0);
 
     scr_left_curtain = lv_obj_create(tile_left);
     lv_obj_remove_style_all(scr_left_curtain);
     lv_obj_set_size(scr_left_curtain, LV_PCT(100), LV_PCT(100));
-    lv_obj_set_style_bg_opa(scr_left_curtain, LV_OPA_TRANSP, 0);
 
     scr_right_curtain = lv_obj_create(tile_right);
     lv_obj_remove_style_all(scr_right_curtain);
     lv_obj_set_size(scr_right_curtain, LV_PCT(100), LV_PCT(100));
-    lv_obj_set_style_bg_opa(scr_right_curtain, LV_OPA_TRANSP, 0);
 
     //initialize curtains
     lv_watchface_init();

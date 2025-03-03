@@ -24,8 +24,8 @@ void update_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot)
 
 void creat_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot)
 {
-    lv_obj_set_style_bg_opa(img_snapshot, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(img_snapshot, lv_color_hex(0x000000), 0);
+    // lv_obj_set_style_bg_opa(img_snapshot, LV_OPA_100, 0);
+    // lv_obj_set_style_bg_color(img_snapshot, lv_color_hex(0x000000), 0);
     update_snapshot(widget, img_snapshot);
 }
 
