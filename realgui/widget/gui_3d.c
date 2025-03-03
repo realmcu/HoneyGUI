@@ -28,11 +28,10 @@
 #include "acc_init.h"
 #include "gui_fb.h"
 #include <guidef.h>
-#define TINYOBJ_LOADER_C_IMPLEMENTATION
-#include "tinyobj_loader_c.h"
 
 
-float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, float point_z)
+static float gui_3d_calculate_light_to_point(gui_3d_light_t *light, float point_x, float point_y,
+                                             float point_z)
 {
     gui_point_4d_t lightToPoint =
     {
@@ -79,8 +78,9 @@ float calculateLight2Point(gui_3d_light_t *light, float point_x, float point_y, 
     return 0;
 }
 
-gui_point_4d_t calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1, gui_point_4d_t P2,
-                                       gui_point_4d_t P3, float u, float v)
+static gui_point_4d_t gui_3d_calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1,
+                                                     gui_point_4d_t P2,
+                                                     gui_point_4d_t P3, float u, float v)
 {
     gui_point_4d_t point;
 
@@ -106,8 +106,8 @@ gui_point_4d_t calculate_point_in_quad(gui_point_4d_t P0, gui_point_4d_t P1, gui
 
 }
 
-static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
-                        gui_3d_world_t *world, gui_3d_light_t *light)
+static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/,
+                               gui_3d_world_t *world, gui_3d_light_t *light)
 {
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
     float width = head->w;
@@ -135,12 +135,13 @@ static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*fac
                 v = 1.0f - v;
             }
 
-            gui_point_4d_t point = calculate_point_in_quad(this->face[i].transform_world_vertex[0].position,
-                                                           this->face[i].transform_world_vertex[1].position,
-                                                           this->face[i].transform_world_vertex[2].position,
-                                                           this->face[i].transform_world_vertex[3].position, u, v);
+            gui_point_4d_t point = gui_3d_calculate_point_in_quad(
+                                       this->face[i].transform_world_vertex[0].position,
+                                       this->face[i].transform_world_vertex[1].position,
+                                       this->face[i].transform_world_vertex[2].position,
+                                       this->face[i].transform_world_vertex[3].position, u, v);
 
-            float intensity = calculateLight2Point(light, point.x, point.y, point.z);
+            float intensity = gui_3d_calculate_light_to_point(light, point.x, point.y, point.z);
 
             if (intensity != 0)
             {
@@ -162,8 +163,9 @@ static void light_apply(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*fac
 }
 
 
-static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*face_offset*/,
-                           gui_3d_world_t *world, gui_3d_camera_t *camera)
+static void gui_3d_face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/,
+                                  size_t i /*face_offset*/,
+                                  gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
     gui_3d_scene(this->face + i, world, camera);
 
@@ -198,7 +200,7 @@ static void face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/, size_t i /*
     draw_img_new_area(this->img + i, NULL);
 }
 
-static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
+static void gui_3d_convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
 {
     size_t index_offset = 0;
     for (size_t s = 0; s < i; s++)
@@ -208,23 +210,23 @@ static void convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
 
     for (size_t j = 0; j < this->desc->attrib.face_num_verts[i]; j++)
     {
-        tinyobj_vertex_index_t idx = this->desc->attrib.faces[index_offset + j];
+        gui_obj_vertex_index_t idx = this->desc->attrib.faces[index_offset + j];
 
-        float *v = &this->desc->attrib.vertices[3 * idx.v_idx];
-        float *vt = &this->desc->attrib.texcoords[2 * idx.vt_idx];
-        float *vn = &this->desc->attrib.normals[3 * idx.vn_idx];
+        gui_obj_vertex_coordinate_t *v = &this->desc->attrib.vertices[idx.v_idx];
+        gui_obj_texcoord_coordinate_t *vt = &this->desc->attrib.texcoords[idx.vt_idx];
+        gui_obj_vertex_coordinate_t *vn = &this->desc->attrib.normals[idx.vn_idx];
 
-        this->face[i].vertex[j].position.x = v[0];
-        this->face[i].vertex[j].position.y = v[1];
-        this->face[i].vertex[j].position.z = v[2];
+        this->face[i].vertex[j].position.x = v->x;
+        this->face[i].vertex[j].position.y = v->y;
+        this->face[i].vertex[j].position.z = v->z;
         this->face[i].vertex[j].position.w = 1;
 
-        this->face[i].vertex[j].u = vt[0];
-        this->face[i].vertex[j].v = vt[1];
+        this->face[i].vertex[j].u = vt->u;
+        this->face[i].vertex[j].v = vt->v;
 
-        this->face[i].vertex[j].normal.x = vn[0];
-        this->face[i].vertex[j].normal.y = vn[1];
-        this->face[i].vertex[j].normal.z = vn[2];
+        this->face[i].vertex[j].normal.x = vn->x;
+        this->face[i].vertex[j].normal.y = vn->y;
+        this->face[i].vertex[j].normal.z = vn->z;
         this->face[i].vertex[j].normal.w = 1;
 
     }
@@ -240,7 +242,8 @@ static void gui_3d_update_att(gui_obj_t *obj)
 }
 
 #ifdef GUI3D_TRIANGLE_MESH
-static void generate_triangle_img(gui_3d_t *this, int width, int height, gui_3d_light_t *light)
+static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height,
+                                         gui_3d_light_t *light)
 {
     this->img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
     memset(this->img->data, 0x00, width * height * 2 + sizeof(gui_rgb_data_head_t));
@@ -274,36 +277,32 @@ static void generate_triangle_img(gui_3d_t *this, int width, int height, gui_3d_
         int min_y = floor(fminf(fminf(y0, y1), y2));
         int max_y = ceil(fmaxf(fmaxf(y0, y1), y2));
 
-        gui_color_t default_color = APP_COLOR_WHITE;
-
+        // Non-backfaces
         if (!(this->face[i].state & GUI_3D_FACESTATE_BACKFACE))
         {
+            float area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+
             for (int y = min_y; y <= max_y; y++)
             {
                 for (int x = min_x; x <= max_x; x++)
                 {
-                    float area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
                     float w0 = ((x - x0) * (y2 - y0) - (y - y0) * (x2 - x0)) / area;
                     float w1 = ((x - x0) * (y1 - y0) - (y - y0) * (x1 - x0)) / (-area);
                     float w2 = 1.0f - w0 - w1;
 
+                    // Inside the triangle
                     if ((w0 >= 0 && w1 >= 0 && w2 >= 0))
                     {
                         float z = w0 * z0 + w1 * z1 + w2 * z2;
                         int index = x + y * width;
 
-                        if (depthBuffer[index] != 0 && z < depthBuffer[index])
-                        {
-                            continue;
-                        }
-                        else
+                        // Foreground
+                        if (depthBuffer[index] == 0 || z > depthBuffer[index])
                         {
                             depthBuffer[index] = z;
-                            int pixelIndex = index * 2;
-                            uint16_t color = ((color_intensity & 0xF8) << 8) | ((color_intensity & 0xFC) << 3) | ((
-                                                 color_intensity & 0xF8) >> 3);
-                            pixelData[pixelIndex] = color & 0xFF;
-                            pixelData[pixelIndex + 1] = (color >> 8) & 0xFF;
+                            ((uint16_t *)pixelData)[index] = ((color_intensity & 0xF8) << 8) | ((color_intensity & 0xFC) << 3)
+                                                             | ((
+                                                                    color_intensity & 0xF8) >> 3);
                         }
                     }
                 }
@@ -353,17 +352,15 @@ static void gui_3d_prepare(gui_3d_t *this)
 
         for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
         {
-            this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
-            // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->desc->shapes[i].name, this->desc->shapes[i].length, this->desc->shapes[i].face_offset + j);
-            convert_to_face(this, this->desc->shapes[i].face_offset + j);
+            size_t face_offset = this->desc->shapes[i].face_offset + j;
 
-            // face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
-            gui_3d_scene(this->face + (this->desc->shapes[i].face_offset + j), &world, &camera);
-
+            this->shape_transform_cb(this, face_offset, &world, &camera, &light);
+            gui_3d_convert_to_face(this, face_offset);
+            gui_3d_scene(this->face + face_offset, &world, &camera);
         }
     }
 
-    generate_triangle_img(this, 350, 350, &light);
+    gui_3d_generate_triangle_img(this, 350, 350, &light);
 
 
     if (tp->type == TOUCH_SHORT)
@@ -473,13 +470,13 @@ static void gui_3d_prepare(gui_3d_t *this)
         {
             this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
             // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->desc->shapes[i].name, this->desc->shapes[i].length, this->desc->shapes[i].face_offset + j);
-            convert_to_face(this, this->desc->shapes[i].face_offset + j);
+            gui_3d_convert_to_face(this, this->desc->shapes[i].face_offset + j);
 
-            face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
+            gui_3d_face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
 
             if (light.initialized)
             {
-                light_apply(this, i, this->desc->shapes[i].face_offset + j, &world, &light);
+                gui_3d_light_apply(this, this->desc->shapes[i].face_offset + j, &world, &light);
             }
 
         }
@@ -623,17 +620,6 @@ static void gui_3d_destory(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    for (int i = 0; i < this->desc->num_materials; i++)
-    {
-        gui_free(this->desc->textures[i]);
-        this->desc->textures[i] = NULL;
-    }
-
-    tinyobj_attrib_free(&this->desc->attrib);
-    tinyobj_shapes_free(this->desc->shapes, this->desc->num_shapes);
-    tinyobj_materials_free(this->desc->materials, this->desc->num_materials);
-
-    gui_free(this->desc->texture_sizes);
     gui_free(this->desc->textures);
     gui_free(this->desc);
 }
@@ -666,129 +652,64 @@ static void gui_3d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static char *read_string_from_ptr(unsigned char **ptr)
-{
-    if (*ptr == NULL)
-    {
-        return NULL;
-    }
-    unsigned int length;
-    memcpy(&length, *ptr, sizeof(unsigned int));
-    *ptr += sizeof(unsigned int);
-    if (length == 0)
-    {
-        return NULL;
-    }
-    char *string = (char *)TINYOBJ_MALLOC(length * sizeof(char));
-    memcpy(string, *ptr, length);
-    *ptr += length;
-
-    return string;
-}
 
 static gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
 {
-    gui_3d_description_t *desc = (gui_3d_description_t *)gui_malloc(sizeof(gui_3d_description_t));
     unsigned char *ptr = (unsigned char *)desc_addr;
+    gui_3d_description_t *desc = (gui_3d_description_t *)gui_malloc(sizeof(gui_3d_description_t));
 
-    //attrib
-    memcpy(&desc->attrib.num_vertices, ptr, sizeof(unsigned int));
+    // attrib
+    desc->attrib.num_vertices = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-    memcpy(&desc->attrib.num_normals, ptr, sizeof(unsigned int));
+    desc->attrib.num_normals = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-    memcpy(&desc->attrib.num_texcoords, ptr, sizeof(unsigned int));
+    desc->attrib.num_texcoords = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-    memcpy(&desc->attrib.num_faces, ptr, sizeof(unsigned int));
+    desc->attrib.num_faces = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-    memcpy(&desc->attrib.num_face_num_verts, ptr, sizeof(unsigned int));
+    desc->attrib.num_face_num_verts = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-    memcpy(&desc->attrib.pad0, ptr, sizeof(int));
+    desc->attrib.pad0 = *((int *)ptr);
     ptr += sizeof(int);
 
-    desc->attrib.vertices = (float *)TINYOBJ_MALLOC(desc->attrib.num_vertices * 3 * sizeof(float));
-    memcpy(desc->attrib.vertices, ptr, desc->attrib.num_vertices * 3 * sizeof(float));
-    ptr += desc->attrib.num_vertices * 3 * sizeof(float);
-    desc->attrib.normals = (float *)TINYOBJ_MALLOC(desc->attrib.num_normals * 3 * sizeof(float));
-    memcpy(desc->attrib.normals, ptr, desc->attrib.num_normals * 3 * sizeof(float));
-    ptr += desc->attrib.num_normals * 3 * sizeof(float);
-    desc->attrib.texcoords = (float *)TINYOBJ_MALLOC(desc->attrib.num_texcoords * 2 * sizeof(float));
-    memcpy(desc->attrib.texcoords, ptr, desc->attrib.num_texcoords * 2 * sizeof(float));
-    ptr += desc->attrib.num_texcoords * 2 * sizeof(float);
-    desc->attrib.faces = (tinyobj_vertex_index_t *)TINYOBJ_MALLOC(desc->attrib.num_faces * sizeof(
-                                                                      tinyobj_vertex_index_t));
-    memcpy(desc->attrib.faces, ptr, desc->attrib.num_faces * sizeof(tinyobj_vertex_index_t));
-    ptr += desc->attrib.num_faces * sizeof(tinyobj_vertex_index_t);
-    desc->attrib.face_num_verts = (int *)TINYOBJ_MALLOC(desc->attrib.num_face_num_verts * sizeof(int));
-    memcpy(desc->attrib.face_num_verts, ptr, desc->attrib.num_face_num_verts * sizeof(int));
+    desc->attrib.vertices = (gui_obj_vertex_coordinate_t *)ptr;
+    ptr += desc->attrib.num_vertices * sizeof(gui_obj_vertex_coordinate_t);
+    desc->attrib.normals = (gui_obj_vertex_coordinate_t *)ptr;
+    ptr += desc->attrib.num_normals * sizeof(gui_obj_vertex_coordinate_t);
+    desc->attrib.texcoords = (gui_obj_texcoord_coordinate_t *)ptr;
+    ptr += desc->attrib.num_texcoords * sizeof(gui_obj_texcoord_coordinate_t);
+    desc->attrib.faces = (gui_obj_vertex_index_t *)ptr;
+    ptr += desc->attrib.num_faces * sizeof(gui_obj_vertex_index_t);
+    desc->attrib.face_num_verts = (int *)ptr;
     ptr += desc->attrib.num_face_num_verts * sizeof(int);
-    desc->attrib.material_ids = (int *)TINYOBJ_MALLOC(desc->attrib.num_face_num_verts * sizeof(int));
-    memcpy(desc->attrib.material_ids, ptr, desc->attrib.num_face_num_verts * sizeof(int));
+    desc->attrib.material_ids = (int *)ptr;
     ptr += desc->attrib.num_face_num_verts * sizeof(int);
 
-    //shape
-    memcpy(&desc->num_shapes, ptr, sizeof(unsigned int));
+    // shape
+    desc->num_shapes = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-    desc->shapes = (tinyobj_shape_t *)TINYOBJ_MALLOC(desc->num_shapes * sizeof(tinyobj_shape_t));
-    for (size_t i = 0; i < desc->num_shapes; i++)
-    {
-        desc->shapes[i].name = read_string_from_ptr(&ptr);
+    desc->shapes = (gui_obj_shape_t *)ptr;
+    ptr += desc->num_shapes * sizeof(gui_obj_shape_t);
 
-        memcpy(&desc->shapes[i].face_offset, ptr, sizeof(unsigned int));
-        ptr += sizeof(unsigned int);
-        memcpy(&desc->shapes[i].length, ptr, sizeof(unsigned int));
-        ptr += sizeof(unsigned int);
-    }
-
-    //material
-    memcpy(&desc->num_materials, ptr, sizeof(unsigned int));
+    // material
+    desc->num_materials = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
-
     if (desc->num_materials > 0)
     {
-        desc->materials = (tinyobj_material_t *)TINYOBJ_MALLOC(desc->num_materials * sizeof(
-                                                                   tinyobj_material_t));
-        for (size_t i = 0; i < desc->num_materials; i++)
-        {
-            tinyobj_material_t *mat = &desc->materials[i];
-            mat->name = read_string_from_ptr(&ptr);
-            memcpy(mat->ambient, ptr, 3 * sizeof(float));
-            ptr += 3 * sizeof(float);
-            memcpy(mat->diffuse, ptr, 3 * sizeof(float));
-            ptr += 3 * sizeof(float);
-            memcpy(mat->specular, ptr, 3 * sizeof(float));
-            ptr += 3 * sizeof(float);
-            memcpy(mat->transmittance, ptr, 3 * sizeof(float));
-            ptr += 3 * sizeof(float);
-            memcpy(mat->emission, ptr, 3 * sizeof(float));
-            ptr += 3 * sizeof(float);
-            memcpy(&mat->shininess, ptr, sizeof(float));
-            ptr += sizeof(float);
-            memcpy(&mat->ior, ptr, sizeof(float));
-            ptr += sizeof(float);
-            memcpy(&mat->dissolve, ptr, sizeof(float));
-            ptr += sizeof(float);
-            memcpy(&mat->illum, ptr, sizeof(int));
-            ptr += sizeof(int);
+        desc->materials = (gui_obj_material_t *)ptr;
+        ptr += desc->num_materials * sizeof(gui_obj_material_t);
 
-            mat->ambient_texname = read_string_from_ptr(&ptr);
-            mat->diffuse_texname = read_string_from_ptr(&ptr);
-            mat->specular_texname = read_string_from_ptr(&ptr);
-            mat->specular_highlight_texname = read_string_from_ptr(&ptr);
-            mat->bump_texname = read_string_from_ptr(&ptr);
-            mat->displacement_texname = read_string_from_ptr(&ptr);
-            mat->alpha_texname = read_string_from_ptr(&ptr);
-        }
-
-        //textures
+        // textures size
+        desc->texture_sizes = (unsigned int *)ptr;
+        ptr += desc->num_materials * sizeof(unsigned int);
         desc->textures = (unsigned char **)gui_malloc(desc->num_materials * sizeof(unsigned char *));
-        desc->texture_sizes = (unsigned int *)gui_malloc(desc->num_materials * sizeof(unsigned int));
-        for (size_t i = 0; i < desc->num_materials; i++)
+        // texture content
+        for (uint32_t i = 0; i < desc->num_materials; i++)
         {
-            memcpy(&desc->texture_sizes[i], ptr, sizeof(unsigned int));
-            ptr += sizeof(unsigned int);
             desc->textures[i] = (unsigned char *)ptr;
-            ptr += desc->texture_sizes[i] * sizeof(unsigned char);
+            ptr += desc->texture_sizes[i];
         }
+
     }
 
     return desc;
