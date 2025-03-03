@@ -518,7 +518,7 @@ static void ctor(gui_image_array_t *this, void *parent,
     base->has_prepare_cb = true;
     base->has_draw_cb = true;
     base->has_end_cb = true;
-    base->has_destroy_cb = true;
+    base->has_destory_cb = true;
     base->w = ((gui_rgb_data_head_t *)image_data_array[0])->w * array_lenght;
     base->h = ((gui_rgb_data_head_t *)image_data_array[0])->h;
     this->image_data = gui_malloc(array_lenght * sizeof(void *));
@@ -561,7 +561,7 @@ static void ctor_ftl(gui_image_array_t *this, void *parent,
     base->has_prepare_cb = true;
     base->has_draw_cb = true;
     base->has_end_cb = true;
-    base->has_destroy_cb = true;
+    base->has_destory_cb = true;
 
     int w, h;
     img_get_width(IMG_SRC_FTL, image_data_array[0], &w, &h);

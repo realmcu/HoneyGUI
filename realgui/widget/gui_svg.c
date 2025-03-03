@@ -416,7 +416,7 @@ gui_svg_t *gui_svg_create_from_mem(void       *parent,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for self
     this->addr = addr;
@@ -471,7 +471,7 @@ gui_svg_t *gui_svg_create_from_file(void       *parent,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for self
     this->filename = filename;

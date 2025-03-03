@@ -580,7 +580,7 @@ gui_tabview_t *gui_tabview_create(void       *parent,
     GET_BASE(this)->obj_cb = gui_tabview_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
     GET_BASE(this)->type = TABVIEW;
     this->initial = true;
     gui_list_init(&(GET_BASE(this)->child_list));

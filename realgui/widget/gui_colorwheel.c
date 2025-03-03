@@ -259,7 +259,7 @@ static void gui_colorwheel_ctor(gui_colorwheel_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 }
 
 /*============================================================================*

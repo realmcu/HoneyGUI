@@ -245,7 +245,7 @@ static void gui_wave_ctor(gui_wave_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 }
 
 /*============================================================================*

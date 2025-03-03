@@ -471,7 +471,7 @@ static void gui_gallery_ctor(gui_gallery_t         *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     this->img_array = config->img_array;
     this->num_pic = config->num_pic;

@@ -231,7 +231,7 @@ static void widget_nanovg_img_ctor(gui_canvas_img_t *this, gui_obj_t *parent, co
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     ulSize = w * h * (dc->bit_depth >> 3) + sizeof(struct gui_rgb_data_head);
     this->bpImageBuff = gui_malloc(ulSize);

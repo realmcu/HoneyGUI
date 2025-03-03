@@ -735,7 +735,7 @@ void gui_3d_ctor(gui_3d_t               *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destroy_cb = true;
+    obj->has_destory_cb = true;
 
     // for self
     this->desc = gui_get_3d_desc(desc_addr);

@@ -479,7 +479,7 @@ static void gui_img_live_ctor(gui_img_live_t  *this,
     root->obj_cb = gui_img_live_cb;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for self
     this->fps = IMG_LIVE_FPS;

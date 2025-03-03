@@ -582,7 +582,7 @@ static void gui_img_ctor(gui_img_t            *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destroy_cb = true;
+    obj->has_destory_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
     if (src_mode == IMG_SRC_FILESYS)

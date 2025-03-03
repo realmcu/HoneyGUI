@@ -347,7 +347,7 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     array = (void **)img_file->img_path;
 

@@ -148,7 +148,7 @@ static void gui_arm2d_ctor(gui_arm2d_t *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destroy_cb = true;
+    obj->has_destory_cb = true;
 }
 
 /*============================================================================*

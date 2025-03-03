@@ -1646,7 +1646,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)

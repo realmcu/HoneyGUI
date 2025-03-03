@@ -808,7 +808,7 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destroy_cb = true;
+    obj->has_destory_cb = true;
 
 
     gui_list_init(&(GET_BASE(this)->child_list));
@@ -871,7 +871,7 @@ gui_canvas_arc_t *gui_canvas_arc_create_ftl(void       *parent,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destroy_cb = true;
+    obj->has_destory_cb = true;
 
 
     gui_list_init(&(GET_BASE(this)->child_list));

@@ -1769,7 +1769,7 @@ void gui_page_ctor(gui_page_t *this,
     GET_BASE(this)->obj_cb = gui_page_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;
@@ -1803,14 +1803,14 @@ void gui_page_rebound(gui_page_t *this, bool rebound)
         GET_BASE(this)->obj_cb = gui_page_rebound_cb;
         GET_BASE(this)->has_input_prepare_cb = true;
         GET_BASE(this)->has_prepare_cb = true;
-        GET_BASE(this)->has_destroy_cb = true;
+        GET_BASE(this)->has_destory_cb = true;
     }
     else
     {
         GET_BASE(this)->obj_cb = gui_page_cb;
         GET_BASE(this)->has_input_prepare_cb = true;
         GET_BASE(this)->has_prepare_cb = true;
-        GET_BASE(this)->has_destroy_cb = true;
+        GET_BASE(this)->has_destory_cb = true;
     }
 }
 void gui_page_rebound_horizontal(gui_page_t *this, bool rebound)
@@ -1820,14 +1820,14 @@ void gui_page_rebound_horizontal(gui_page_t *this, bool rebound)
         GET_BASE(this)->obj_cb = gui_page_rebound_cb_x;
         GET_BASE(this)->has_input_prepare_cb = true;
         GET_BASE(this)->has_prepare_cb = true;
-        GET_BASE(this)->has_destroy_cb = true;
+        GET_BASE(this)->has_destory_cb = true;
     }
     else
     {
         GET_BASE(this)->obj_cb = gui_page_cb_x;
         GET_BASE(this)->has_input_prepare_cb = true;
         GET_BASE(this)->has_prepare_cb = true;
-        GET_BASE(this)->has_destroy_cb = true;
+        GET_BASE(this)->has_destory_cb = true;
     }
 }
 void gui_page_loop(gui_page_t *this)
@@ -1835,7 +1835,7 @@ void gui_page_loop(gui_page_t *this)
     GET_BASE(this)->obj_cb = gui_page_loop_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
 }
 void gui_page_center_alignment(gui_page_t *this, int align_hight)
 {

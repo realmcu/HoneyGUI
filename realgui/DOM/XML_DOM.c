@@ -2238,7 +2238,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
         }
         parent->obj_cb = button_render;
-        parent->has_destroy_cb = true;
+        parent->has_destory_cb = true;
 
         if (style)
         {

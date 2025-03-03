@@ -301,7 +301,7 @@ void gui_qbcode_ctor(gui_qbcode_t *this, gui_obj_t *parent, const char *name, in
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for qrcodeself
     if (this->type == QRCODE_DISPLAY_IMAGE)

@@ -631,7 +631,7 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
     GET_BASE(canvas_round_rect)->has_prepare_cb = true;
     GET_BASE(canvas_round_rect)->has_draw_cb = true;
     GET_BASE(canvas_round_rect)->has_end_cb = true;
-    GET_BASE(canvas_round_rect)->has_destroy_cb = true;
+    GET_BASE(canvas_round_rect)->has_destory_cb = true;
     gui_list_init(&(GET_BASE(canvas_round_rect)->child_list));
     if ((GET_BASE(canvas_round_rect)->parent) != NULL)
     {
@@ -661,7 +661,7 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create_ftl(gui_obj_t   *parent,
     GET_BASE(canvas_round_rect)->has_prepare_cb = true;
     GET_BASE(canvas_round_rect)->has_draw_cb = true;
     GET_BASE(canvas_round_rect)->has_end_cb = true;
-    GET_BASE(canvas_round_rect)->has_destroy_cb = true;
+    GET_BASE(canvas_round_rect)->has_destory_cb = true;
     gui_list_init(&(GET_BASE(canvas_round_rect)->child_list));
     if ((GET_BASE(canvas_round_rect)->parent) != NULL)
     {

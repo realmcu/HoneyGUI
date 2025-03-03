@@ -331,7 +331,7 @@ void gui_img_scope_ctor(gui_img_t  *this,
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_draw_cb = true;
     GET_BASE(this)->has_end_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
     //for self
 
     this->blend_mode = IMG_FILTER_BLACK;

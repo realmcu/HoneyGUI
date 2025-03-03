@@ -521,7 +521,7 @@ static void gui_turn_table_ctor(gui_turn_table_t *this,
     GET_BASE(this)->obj_cb = gui_turn_table_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
     GET_BASE(this)->skip_tp_up_hold = true;
     GET_BASE(this)->skip_tp_down_hold = true;
     GET_BASE(this)->skip_tp_left_hold = true;

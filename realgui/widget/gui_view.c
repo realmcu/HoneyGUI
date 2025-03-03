@@ -762,7 +762,7 @@ gui_view_t *gui_view_create(void       *parent,
     // GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_end_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
     GET_BASE(this)->type = VIEW;
     GET_BASE(this)->create_done = true;
     this->style = VIEW_TRANSPLATION;

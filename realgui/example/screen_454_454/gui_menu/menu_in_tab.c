@@ -120,7 +120,7 @@ void design_tab_menu(void *parent)
     GET_BASE(page)->obj_cb = gui_page_cb;
     GET_BASE(page)->has_input_prepare_cb = true;
     GET_BASE(page)->has_prepare_cb = true;
-    GET_BASE(page)->has_destroy_cb = true;
+    GET_BASE(page)->has_destory_cb = true;
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);

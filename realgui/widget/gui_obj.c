@@ -56,7 +56,7 @@ static void gui_obj_destory_cb(gui_obj_t *obj)
         gui_free(obj->matrix);
     }
 
-    if (obj->has_destroy_cb)
+    if (obj->has_destory_cb)
     {
         obj->obj_cb(obj, OBJ_DESTORY);
     }

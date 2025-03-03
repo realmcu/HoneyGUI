@@ -447,7 +447,7 @@ static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 }
 
 static void gui_watchface_gradient_ctor(gui_watchface_gradient_t *this,

@@ -523,7 +523,7 @@ gui_cardview_t *gui_cardview_create(void       *parent,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     this->style = REDUCTION;
     this->bottom_space_count = 1;

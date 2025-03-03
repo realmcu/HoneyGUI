@@ -320,7 +320,7 @@ static void gui_watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 }
 
 

@@ -140,7 +140,7 @@ static void gui_widget_template_ctor(gui_widget_template_t *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destroy_cb = true;
+    obj->has_destory_cb = true;
 }
 
 /*============================================================================*

@@ -161,7 +161,7 @@ static void widget_litegfx_ctor(gui_widget_litegfx_t *this, gui_obj_t *parent, c
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for self
     this->handler = 0;

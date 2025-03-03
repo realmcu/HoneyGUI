@@ -180,7 +180,7 @@ static void gui_u8g2_widget_ctor(gui_u8g2_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 }
 
 

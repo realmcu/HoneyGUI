@@ -243,7 +243,7 @@ void gui_win_ctor(gui_win_t  *this,
     GET_BASE(this)->obj_cb = gui_win_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    GET_BASE(this)->has_destory_cb = true;
     GET_BASE(this)->type = WINDOW;
 }
 

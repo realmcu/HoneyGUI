@@ -76,7 +76,7 @@ static void tree_child_free(gui_obj_t *object)
                 gui_free(obj->matrix);
             }
 
-            if (obj->has_destroy_cb)
+            if (obj->has_destory_cb)
             {
                 obj->obj_cb(obj, OBJ_DESTORY);
             }

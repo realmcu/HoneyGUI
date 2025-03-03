@@ -518,7 +518,7 @@ static void gui_cube_ctor(gui_cube_t         *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for self
     char *img_path[6];

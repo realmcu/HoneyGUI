@@ -286,7 +286,7 @@ static void gui_pagelist_ctor(gui_pagelist_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destroy_cb = true;
+    root->has_destory_cb = true;
 
     //for self
     this->base.type = PAGELIST;
