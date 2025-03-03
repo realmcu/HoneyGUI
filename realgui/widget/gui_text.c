@@ -218,7 +218,7 @@ static void gui_text_font_unload(gui_text_t *text)
     }
 }
 
-static void gui_text_font_destory(gui_text_t *text)
+static void gui_text_font_destroy(gui_text_t *text)
 {
     if (text->animate)
     {
@@ -245,7 +245,7 @@ static void gui_text_font_destory(gui_text_t *text)
 
     case GUI_FONT_SRC_IMG:
         {
-            gui_font_scale_destory(text);
+            gui_font_scale_destroy(text);
         }
         break;
 
@@ -441,11 +441,11 @@ static void gui_text_end(gui_obj_t *obj)
 
 }
 
-static void gui_text_destory(gui_obj_t *obj)
+static void gui_text_destroy(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
 
-    gui_text_font_destory(text);
+    gui_text_font_destroy(text);
 }
 
 static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -469,8 +469,8 @@ static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_text_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_text_destory(obj);
+        case OBJ_DESTROY:
+            gui_text_destroy(obj);
             break;
 
         default:
@@ -498,7 +498,7 @@ void gui_text_ctor(gui_text_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
     //for self
     this->mode = LEFT;
     this->inputable = false;
@@ -661,7 +661,7 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
     gui_img_t *text_img;
     int16_t img_x = 0, img_y = 0;
 
-    gui_font_scale_destory(this);
+    gui_font_scale_destroy(this);
     img = gui_text_bmp2img(this, font_img_type, &img_x, &img_y);
 
     if (this->scale_img == NULL)

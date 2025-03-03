@@ -452,7 +452,7 @@ static void turn_table_prepare(gui_obj_t *obj)
         gui_fb_change();
     }
 }
-static void turn_table_destory(gui_obj_t *obj)
+static void turn_table_destroy(gui_obj_t *obj)
 {
     gui_turn_table_t *this = (void *)obj;
     gui_free(this->static_list);
@@ -474,8 +474,8 @@ static void gui_turn_table_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             turn_table_prepare(obj);
             break;
 
-        case OBJ_DESTORY:
-            turn_table_destory(obj);
+        case OBJ_DESTROY:
+            turn_table_destroy(obj);
             break;
 
         default:
@@ -521,7 +521,7 @@ static void gui_turn_table_ctor(gui_turn_table_t *this,
     GET_BASE(this)->obj_cb = gui_turn_table_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destory_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->skip_tp_up_hold = true;
     GET_BASE(this)->skip_tp_down_hold = true;
     GET_BASE(this)->skip_tp_left_hold = true;

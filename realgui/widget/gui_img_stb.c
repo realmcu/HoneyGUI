@@ -204,7 +204,7 @@ static void gui_img_stb_modify_img_static(gui_obj_t *obj)
 
     img->src_changed = false;
 }
-static void gui_img_stb_image_destory(gui_obj_t *obj)
+static void gui_img_stb_image_destroy(gui_obj_t *obj)
 {
     gui_stb_img_t *img = (gui_stb_img_t *)obj;
 
@@ -348,8 +348,8 @@ static void gui_stb_image_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_img_tjpgd_image_draw(obj);
             break;
 #endif
-        case OBJ_DESTORY:
-            gui_img_stb_image_destory(obj);
+        case OBJ_DESTROY:
+            gui_img_stb_image_destroy(obj);
             break;
 
         default:
@@ -377,7 +377,7 @@ static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
 #endif
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->src_changed = true;

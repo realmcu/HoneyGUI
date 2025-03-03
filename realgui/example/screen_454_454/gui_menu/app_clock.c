@@ -205,7 +205,7 @@ static void stop_watch_ml1_0(gui_obj_t *parent)
     GUI_API(gui_switch_t).on_turn_on(sw, (gui_event_cb_t)stopwatch_switch_on_cb, stop);
     GUI_API(gui_switch_t).on_turn_off(sw, (gui_event_cb_t)stopwatch_switch_off_cb, stop);
 }
-static void hour_destory_overwrite(gui_obj_t *obj)
+static void hour_destroy_overwrite(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
     if (this->animate)
@@ -215,7 +215,7 @@ static void hour_destory_overwrite(gui_obj_t *obj)
     }
     hour_index = GUI_API(gui_scroll_wheel_new_t).get_index(GUI_TYPE(gui_scroll_wheel_new_t, obj));
 }
-static void minute_destory_overwrite(gui_obj_t *obj)
+static void minute_destroy_overwrite(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
     if (this->animate)
@@ -225,7 +225,7 @@ static void minute_destory_overwrite(gui_obj_t *obj)
     }
     minute_index = GUI_API(gui_scroll_wheel_new_t).get_index(GUI_TYPE(gui_scroll_wheel_new_t, obj));
 }
-static void second_destory_overwrite(gui_obj_t *obj)
+static void second_destroy_overwrite(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
     if (this->animate)
@@ -245,8 +245,8 @@ static void hour_overwrite(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_win_prepare(obj);
             break;
 
-        case OBJ_DESTORY:
-            hour_destory_overwrite(obj);
+        case OBJ_DESTROY:
+            hour_destroy_overwrite(obj);
             break;
 
         default:
@@ -264,8 +264,8 @@ static void minute_overwrite(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_win_prepare(obj);
             break;
 
-        case OBJ_DESTORY:
-            minute_destory_overwrite(obj);
+        case OBJ_DESTROY:
+            minute_destroy_overwrite(obj);
             break;
 
         default:
@@ -283,8 +283,8 @@ static void second_overwrite(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_win_prepare(obj);
             break;
 
-        case OBJ_DESTORY:
-            second_destory_overwrite(obj);
+        case OBJ_DESTROY:
+            second_destroy_overwrite(obj);
             break;
 
         default:

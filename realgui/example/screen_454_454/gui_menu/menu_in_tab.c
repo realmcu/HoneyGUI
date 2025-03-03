@@ -72,7 +72,7 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             page_dtor(obj);
             break;
 
@@ -120,7 +120,7 @@ void design_tab_menu(void *parent)
     GET_BASE(page)->obj_cb = gui_page_cb;
     GET_BASE(page)->has_input_prepare_cb = true;
     GET_BASE(page)->has_prepare_cb = true;
-    GET_BASE(page)->has_destory_cb = true;
+    GET_BASE(page)->has_destroy_cb = true;
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);
@@ -459,8 +459,8 @@ static void block_cb()
 }
 static void page_dtor(gui_obj_t *obj)
 {
-    extern void gui_page_destory(gui_obj_t *obj);
-    gui_page_destory(obj);
+    extern void gui_page_destroy(gui_obj_t *obj);
+    gui_page_destroy(obj);
     page_y_recode = obj->y;
 }
 static void fruit_ninja_cb()

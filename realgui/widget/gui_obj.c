@@ -47,18 +47,18 @@
  *                           Private Functions
  *============================================================================*/
 
-static void gui_obj_destory_cb(gui_obj_t *obj)
+static void gui_obj_destroy_cb(gui_obj_t *obj)
 {
-    //gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
+    //gui_log("do obj %s free(destroy), line = %d\n", obj->name, __LINE__);
 
     if (obj->matrix != NULL)
     {
         gui_free(obj->matrix);
     }
 
-    if (obj->has_destory_cb)
+    if (obj->has_destroy_cb)
     {
-        obj->obj_cb(obj, OBJ_DESTORY);
+        obj->obj_cb(obj, OBJ_DESTROY);
     }
 }
 
@@ -78,7 +78,7 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
         }
 
         gui_obj_tree_child_free(obj);
-        gui_obj_destory_cb(obj);
+        gui_obj_destroy_cb(obj);
 
         if (obj->event_dsc != NULL)
         {
@@ -394,7 +394,7 @@ void gui_obj_tree_free(void *obj)
     if (object->parent)
     {
         gui_list_remove(&object->brother_list);
-        gui_obj_destory_cb(obj);
+        gui_obj_destroy_cb(obj);
 
         if (object->event_dsc != NULL)
         {

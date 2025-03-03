@@ -158,7 +158,7 @@ static void wheel_list_prepare(gui_obj_t *obj)
         }
     }
 }
-static void wheel_list_destory(gui_obj_t *obj)
+static void wheel_list_destroy(gui_obj_t *obj)
 {
     gui_wheel_list_t *this = (void *)obj;
     gui_free(this->rotation);
@@ -183,8 +183,8 @@ static void gui_wheel_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             wheel_list_prepare(obj);
             break;
 
-        case OBJ_DESTORY:
-            wheel_list_destory(obj);
+        case OBJ_DESTROY:
+            wheel_list_destroy(obj);
             break;
 
         default:
@@ -207,7 +207,7 @@ static void gui_wheel_list_ctor(gui_wheel_list_t *this,
     GET_BASE(this)->obj_cb = gui_wheel_list_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destory_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
 
     this->layer = layer;
     this->distence = distence;

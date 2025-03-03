@@ -83,7 +83,7 @@ static void gui_widget_template_end(gui_widget_template_t *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_widget_template_destory(gui_widget_template_t *this)
+static void gui_widget_template_destroy(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -113,8 +113,8 @@ static void gui_widget_template_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_widget_template_end((gui_widget_template_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_widget_template_destory((gui_widget_template_t *)obj);
+        case OBJ_DESTROY:
+            gui_widget_template_destroy((gui_widget_template_t *)obj);
             break;
 
         default:
@@ -140,7 +140,7 @@ static void gui_widget_template_ctor(gui_widget_template_t *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destory_cb = true;
+    obj->has_destroy_cb = true;
 }
 
 /*============================================================================*

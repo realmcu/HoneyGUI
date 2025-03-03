@@ -313,7 +313,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
     }
 }
 
-void gui_font_scale_destory(gui_text_t *text)
+void gui_font_scale_destroy(gui_text_t *text)
 {
     if (text->scale_img != NULL)
     {

@@ -187,7 +187,7 @@ static void prepare(gui_obj_t *obj)
 
 }
 
-static void gui_win_destory(gui_obj_t *obj)
+static void gui_win_destroy(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
     if (this->animate)
@@ -221,8 +221,8 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_win_prepare(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_win_destory(obj);
+        case OBJ_DESTROY:
+            gui_win_destroy(obj);
             break;
 
         default:
@@ -243,7 +243,7 @@ void gui_win_ctor(gui_win_t  *this,
     GET_BASE(this)->obj_cb = gui_win_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destory_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = WINDOW;
 }
 

@@ -440,7 +440,7 @@ void gui_img_end(gui_obj_t *obj)
     }
 }
 
-static void destory(gui_obj_t *obj)
+static void destroy(gui_obj_t *obj)
 {
     gui_img_t *this = (gui_img_t *)obj;
 
@@ -487,9 +487,9 @@ static void destory(gui_obj_t *obj)
  *       object is no longer valid and should not be used. This function
  *       should be called when the image is no longer needed.
  */
-void gui_img_destory(gui_obj_t *obj)
+void gui_img_destroy(gui_obj_t *obj)
 {
-    destory(obj);
+    destroy(obj);
 }
 static gui_rgb_data_head_t gui_img_get_header(gui_img_t *this)
 {
@@ -549,9 +549,9 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_img_destory(obj);
+                gui_img_destroy(obj);
             }
             break;
 
@@ -582,7 +582,7 @@ static void gui_img_ctor(gui_img_t            *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destory_cb = true;
+    obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
     if (src_mode == IMG_SRC_FILESYS)

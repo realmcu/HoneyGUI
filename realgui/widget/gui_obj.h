@@ -114,7 +114,7 @@ typedef enum
     OBJ_PREPARE,
     OBJ_DRAW,
     OBJ_END,
-    OBJ_DESTORY,
+    OBJ_DESTROY,
 } T_OBJ_CB_TYPE;
 
 typedef struct _gui_obj_t
@@ -153,7 +153,7 @@ typedef struct _gui_obj_t
     uint32_t has_prepare_cb       : 1;
     uint32_t has_draw_cb          : 1;
     uint32_t has_end_cb           : 1;
-    uint32_t has_destory_cb       : 1;
+    uint32_t has_destroy_cb       : 1;
     uint32_t magic                : 4;
     gui_event_dsc_t *event_dsc;
 

@@ -451,7 +451,7 @@ static void gui_cube_end(gui_obj_t *obj)
     }
 }
 
-static void gui_cube_destory(gui_obj_t *obj)
+static void gui_cube_destroy(gui_obj_t *obj)
 {
     gui_cube_t *this = (gui_cube_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
@@ -487,8 +487,8 @@ static void gui_cube_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_cube_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_cube_destory(obj);
+        case OBJ_DESTROY:
+            gui_cube_destroy(obj);
             break;
 
         default:
@@ -518,7 +518,7 @@ static void gui_cube_ctor(gui_cube_t         *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     char *img_path[6];

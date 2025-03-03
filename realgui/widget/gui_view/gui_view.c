@@ -72,7 +72,7 @@ static void gui_view_prepare(gui_obj_t *obj)
     }
 }
 
-static void gui_view_destory(gui_obj_t *obj)
+static void gui_view_destroy(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_view_t *this = (gui_view_t *)obj;
@@ -161,9 +161,9 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_view_destory(obj);
+                gui_view_destroy(obj);
             }
             break;
 
@@ -208,7 +208,7 @@ gui_view_t *gui_view_create(void       *parent,
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_end_cb = true;
-    GET_BASE(this)->has_destory_cb  = true;
+    GET_BASE(this)->has_destroy_cb  = true;
     GET_BASE(this)->type = VIEW;
     GET_BASE(this)->create_done = true;
     gui_list_init(&(GET_BASE(this)->child_list));

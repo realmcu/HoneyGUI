@@ -310,7 +310,7 @@ static void gui_svg_end(gui_obj_t *obj)
 
 }
 
-static void gui_svg_destory(gui_obj_t *obj)
+static void gui_svg_destroy(gui_obj_t *obj)
 {
 
 }
@@ -369,9 +369,9 @@ static void gui_svg_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_svg_destory(obj);
+                gui_svg_destroy(obj);
             }
             break;
 
@@ -416,7 +416,7 @@ gui_svg_t *gui_svg_create_from_mem(void       *parent,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->addr = addr;
@@ -471,7 +471,7 @@ gui_svg_t *gui_svg_create_from_file(void       *parent,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->filename = filename;

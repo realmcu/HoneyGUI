@@ -414,7 +414,7 @@ static void gui_cardview_end(gui_obj_t *obj)
 
 }
 
-static void gui_cardview_destory(gui_obj_t *obj)
+static void gui_cardview_destroy(gui_obj_t *obj)
 {
     gui_cardview_t *this = (void *)obj;
     if (this->animate)
@@ -446,8 +446,8 @@ static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_cardview_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_cardview_destory(obj);
+        case OBJ_DESTROY:
+            gui_cardview_destroy(obj);
             break;
 
         default:
@@ -523,7 +523,7 @@ gui_cardview_t *gui_cardview_create(void       *parent,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     this->style = REDUCTION;
     this->bottom_space_count = 1;

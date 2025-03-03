@@ -507,7 +507,7 @@ static void gui_soccer_end(gui_obj_t *obj)
     }
 }
 
-static void gui_soccer_destory(gui_obj_t *obj)
+static void gui_soccer_destroy(gui_obj_t *obj)
 {
     return;
 }
@@ -530,8 +530,8 @@ static void gui_soccer_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_soccer_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_soccer_destory(obj);
+        case OBJ_DESTROY:
+            gui_soccer_destroy(obj);
             break;
 
         default:
@@ -557,8 +557,8 @@ static void gui_soccer_cb_ftl(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_soccer_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_soccer_destory(obj);
+        case OBJ_DESTROY:
+            gui_soccer_destroy(obj);
             break;
 
         default:
@@ -587,7 +587,7 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
 
@@ -630,7 +630,7 @@ static void gui_soccer_ctor_ftl(gui_soccer_t       *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
 

@@ -2238,7 +2238,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
         }
         parent->obj_cb = button_render;
-        parent->has_destory_cb = true;
+        parent->has_destroy_cb = true;
 
         if (style)
         {
@@ -6871,14 +6871,14 @@ void *get_app_xml(void)
 {
     return &app_xml;
 }
-extern void gui_img_destory(gui_obj_t *obj);
+extern void gui_img_destroy(gui_obj_t *obj);
 extern void gui_img_input_prepare(gui_obj_t *obj);
 extern void gui_img_prepare(gui_obj_t *obj);
 extern void gui_img_draw_cb(gui_obj_t *obj);
 extern void gui_img_end(gui_obj_t *obj);
-static void canvas_img_destory(gui_obj_t *obj)
+static void canvas_img_destroy(gui_obj_t *obj)
 {
-    gui_img_destory(obj);
+    gui_img_destroy(obj);
     gui_free(GUI_TYPE(gui_img_t, obj)->data);
 }
 
@@ -6912,9 +6912,9 @@ static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                canvas_img_destory(obj);
+                canvas_img_destroy(obj);
             }
             break;
 
@@ -6923,7 +6923,7 @@ static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
-static void img_ontime_destory(gui_obj_t *obj)
+static void img_ontime_destroy(gui_obj_t *obj)
 {
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     for (size_t i = 0; i < img->animate_array_length; i++)
@@ -6931,9 +6931,9 @@ static void img_ontime_destory(gui_obj_t *obj)
         gui_animate_t *animate = ((gui_animate_t **)(img->animate))[i];
         gui_free(animate->p);
     }
-    gui_img_destory(obj);
+    gui_img_destroy(obj);
 }
-static void img_ontime_canvas_buffer_destory(gui_obj_t *obj)
+static void img_ontime_canvas_buffer_destroy(gui_obj_t *obj)
 {
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     for (size_t i = 0; i < img->animate_array_length; i++)
@@ -6941,7 +6941,7 @@ static void img_ontime_canvas_buffer_destory(gui_obj_t *obj)
         gui_animate_t *animate = ((gui_animate_t **)(img->animate))[i];
         gui_free(animate->p);
     }
-    gui_img_destory(obj);
+    gui_img_destroy(obj);
     gui_free(GUI_TYPE(gui_img_t, obj)->data);
 }
 static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -6974,9 +6974,9 @@ static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_typ
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                img_ontime_canvas_buffer_destory(obj);
+                img_ontime_canvas_buffer_destroy(obj);
             }
             break;
 
@@ -7016,9 +7016,9 @@ static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                img_ontime_destory(obj);
+                img_ontime_destroy(obj);
             }
             break;
 
@@ -7028,10 +7028,10 @@ static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void img_destory(gui_obj_t *obj)
+static void img_destroy(gui_obj_t *obj)
 {
     gui_free((void *)obj->name);
-    gui_img_destory(obj);
+    gui_img_destroy(obj);
 }
 static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
@@ -7063,9 +7063,9 @@ static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                img_destory(obj);
+                img_destroy(obj);
             }
             break;
 
@@ -7074,7 +7074,7 @@ static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
-static void gui_button_destory(gui_obj_t *obj)
+static void gui_button_destroy(gui_obj_t *obj)
 {
     gui_button_t *button = GUI_TYPE(gui_button_t, obj);
     if (button && button->text && button->text->content)
@@ -7103,9 +7103,9 @@ static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         case OBJ_PREPARE:
             gui_button_prepare(obj);
             break;
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_button_destory(obj);
+                gui_button_destroy(obj);
             }
             break;
         default:

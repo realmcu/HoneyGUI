@@ -198,7 +198,7 @@ static void gui_simple_img_end(gui_obj_t *obj)
     }
 }
 
-static void gui_simple_img_destory(gui_obj_t *obj)
+static void gui_simple_img_destroy(gui_obj_t *obj)
 {
     gui_simple_img_t *this = (gui_simple_img_t *)obj;
 
@@ -236,9 +236,9 @@ static void gui_simple_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_simple_img_destory(obj);
+                gui_simple_img_destroy(obj);
             }
             break;
 
@@ -270,7 +270,7 @@ static void gui_simple_img_ctor(gui_simple_img_t     *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destory_cb = true;
+    obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
     if (this->src_mode == IMG_SRC_FILESYS)

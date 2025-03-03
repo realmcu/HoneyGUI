@@ -67,7 +67,7 @@ static void  gui_pagelistview_end(gui_pagelistview_t *this)
 
 }
 
-static void  gui_pagelistview_destory(gui_pagelistview_t *this)
+static void  gui_pagelistview_destroy(gui_pagelistview_t *this)
 {
 
 }
@@ -94,8 +94,8 @@ static void gui_pagelistview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_pagelistview_end((gui_pagelistview_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_pagelistview_destory((gui_pagelistview_t *)obj);
+        case OBJ_DESTROY:
+            gui_pagelistview_destroy((gui_pagelistview_t *)obj);
             break;
 
         default:
@@ -121,7 +121,7 @@ static void gui_pagelistview_ctor(gui_pagelistview_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->base.type = PAGELISTVIEW;

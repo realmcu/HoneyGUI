@@ -170,7 +170,7 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
         }
     }
 }
-static void destory(gui_obj_t *obj)
+static void destroy(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
     if (this->animate)
@@ -200,8 +200,8 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_win_prepare_globle(obj);
             break;
 
-        case OBJ_DESTORY:
-            destory(obj);
+        case OBJ_DESTROY:
+            destroy(obj);
             break;
 
         default:

@@ -268,7 +268,7 @@ static void gui_img_scope_img_end(gui_obj_t *obj)
     }
 }
 
-static void gui_img_scope_img_destory(gui_obj_t *obj)
+static void gui_img_scope_img_destroy(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
     gui_img_t *this = (gui_img_t *)obj;
@@ -302,8 +302,8 @@ static void gui_img_scope_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_img_scope_img_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_img_scope_img_destory(obj);
+        case OBJ_DESTROY:
+            gui_img_scope_img_destroy(obj);
             break;
 
         default:
@@ -331,7 +331,7 @@ void gui_img_scope_ctor(gui_img_t  *this,
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_draw_cb = true;
     GET_BASE(this)->has_end_cb = true;
-    GET_BASE(this)->has_destory_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     //for self
 
     this->blend_mode = IMG_FILTER_BLACK;

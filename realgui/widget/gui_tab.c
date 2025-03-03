@@ -376,7 +376,7 @@ static void gui_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
                 gui_tab_destroy(obj);
             }
@@ -404,7 +404,7 @@ static void gui_tab_ctor(gui_tab_t  *this,
     GET_BASE(this)->obj_cb = gui_tab_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destory_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;

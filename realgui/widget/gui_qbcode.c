@@ -275,7 +275,7 @@ static void gui_qbcode_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
                 gui_qbcode_destroy(obj);
             }
@@ -301,7 +301,7 @@ void gui_qbcode_ctor(gui_qbcode_t *this, gui_obj_t *parent, const char *name, in
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for qrcodeself
     if (this->type == QRCODE_DISPLAY_IMAGE)

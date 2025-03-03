@@ -57,7 +57,7 @@ int QueueSize(Queue *q)
     }
     return count;
 }
-void QueueDestory(Queue *q)
+void QueueDestroy(Queue *q)
 {
     if (q->_front == NULL)
     {

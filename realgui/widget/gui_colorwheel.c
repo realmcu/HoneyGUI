@@ -209,7 +209,7 @@ static void gui_colorwheel_end(gui_obj_t *obj)
 
 }
 
-static void gui_colorwheel_destory(gui_obj_t *obj)
+static void gui_colorwheel_destroy(gui_obj_t *obj)
 {
 
 }
@@ -232,8 +232,8 @@ static void gui_colorwheel_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_colorwheel_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_colorwheel_destory(obj);
+        case OBJ_DESTROY:
+            gui_colorwheel_destroy(obj);
             break;
 
         default:
@@ -259,7 +259,7 @@ static void gui_colorwheel_ctor(gui_colorwheel_t *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 }
 
 /*============================================================================*

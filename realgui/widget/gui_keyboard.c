@@ -312,7 +312,7 @@ static void gui_kb_draw_cb(gui_obj_t *obj)
 {}
 static void gui_kb_end(gui_obj_t *obj)
 {}
-static void gui_kb_destory(gui_obj_t *obj)
+static void gui_kb_destroy(gui_obj_t *obj)
 {}
 
 static void gui_kb_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -333,8 +333,8 @@ static void gui_kb_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_kb_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_kb_destory(obj);
+        case OBJ_DESTROY:
+            gui_kb_destroy(obj);
             break;
 
         default:
@@ -1646,7 +1646,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)

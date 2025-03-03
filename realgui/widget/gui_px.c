@@ -135,7 +135,7 @@ static void gui_px_end(gui_px_t *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_px_destory(gui_px_t *this)
+static void gui_px_destroy(gui_px_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -196,8 +196,8 @@ static void gui_px_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_px_end((gui_px_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_px_destory((gui_px_t *)obj);
+        case OBJ_DESTROY:
+            gui_px_destroy((gui_px_t *)obj);
             break;
 
         default:
@@ -225,7 +225,7 @@ static void gui_px_ctor(gui_px_t   *this,
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
-    root->has_destory_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     dc = gui_get_dc();

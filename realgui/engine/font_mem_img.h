@@ -18,7 +18,7 @@ extern "C" {
  *
  * @param text Widget pointer
  */
-void gui_font_scale_destory(gui_text_t *text);
+void gui_font_scale_destroy(gui_text_t *text);
 
 /**
  * @brief transform bmp text to img

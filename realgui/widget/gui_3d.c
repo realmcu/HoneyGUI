@@ -609,7 +609,7 @@ static void gui_3d_end(gui_3d_t *this)
 }
 #endif
 
-static void gui_3d_destory(gui_3d_t *this)
+static void gui_3d_destroy(gui_3d_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -642,8 +642,8 @@ static void gui_3d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_3d_end((gui_3d_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_3d_destory((gui_3d_t *)obj);
+        case OBJ_DESTROY:
+            gui_3d_destroy((gui_3d_t *)obj);
             break;
 
         default:
@@ -735,7 +735,7 @@ void gui_3d_ctor(gui_3d_t               *this,
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
-    obj->has_destory_cb = true;
+    obj->has_destroy_cb = true;
 
     // for self
     this->desc = gui_get_3d_desc(desc_addr);
