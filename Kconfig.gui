@@ -6,9 +6,6 @@ menu "HoneyGUI Framework Config"
         default n
 
         if REALTEK_BUILD_GUI
-            config REALTEK_BUILD_GUI_OS_HEAP
-            bool "Enable OS Heap"
-            default n
 
             config REALTEK_BUILD_GUI_FONT_STB
             bool "Enable STB FONT"

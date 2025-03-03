@@ -115,9 +115,7 @@
 
 
 // <h> HoneyGUI Config Function
-// <c> RTK GUI Use OS Heap
-// #define CONFIG_REALTEK_BUILD_GUI_OS_HEAP
-// </c>
+
 
 // <c> RTK GUI Font Enable STB
 #define CONFIG_REALTEK_BUILD_GUI_FONT_STB
