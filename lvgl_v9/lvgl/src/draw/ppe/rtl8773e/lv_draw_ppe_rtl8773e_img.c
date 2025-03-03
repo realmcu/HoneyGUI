@@ -88,7 +88,7 @@ void lv_draw_ppe_layer_use_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image
     new_draw_dsc.src = layer_to_draw->draw_buf;
     lv_draw_ppe_matrix(draw_unit, &new_draw_dsc, coords, matrix);
 }
-
+#endif
 
 void lv_draw_ppe_image(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_t *draw_dsc,
                        const lv_area_t *coords)
