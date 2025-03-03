@@ -20,6 +20,7 @@
 #include <gui_app.h>
 #include "gui_win.h"
 #include "gui_components_init.h"
+#include "gui_version.h"
 
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "js_extern_io.h"
@@ -261,6 +262,11 @@ int gui_server_init(void)
     gui_port_acc_init();
 
     gui_fb_change();
+
+    gui_log("GUI branch Version: %s\n", VERSION_BRANCH);
+    gui_log("GUI commit Version: %s\n", VERSION_COMMIT);
+    gui_log("GUI build Date: %s\n", VERSION_BUILD_DATE);
+    gui_log("GUI repo Status: %s\n", VERSION_REPO_STATUS);
 
     gui_thread_create(GUI_SERVER_THREAD_NAME,
                       gui_server_entry, NULL,

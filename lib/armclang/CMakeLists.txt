@@ -41,13 +41,20 @@ else()
     message(FATAL_ERROR "SOC file ${SOC_FILE} does not exist.")
 endif()
 
-
-find_program(menuconfig_EXECUTABLE menuconfig NO_CMAKE_FIND_ROOTO_PATH)
-set(menuconfig_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/../../Kconfig.gui")
-execute_process( COMMAND 
-				 ${menuconfig_EXECUTABLE} 
-				 ${menuconfig_ARGS} 
+execute_process( 
+				COMMAND 
+				python 
+				${CMAKE_CURRENT_SOURCE_DIR}/../../tool/git_generate_version.py 
+				${CMAKE_CURRENT_SOURCE_DIR}/../../realgui/
+				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 				)
+
+#find_program(menuconfig_EXECUTABLE menuconfig NO_CMAKE_FIND_ROOTO_PATH)
+#set(menuconfig_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/../../Kconfig.gui")
+#execute_process( COMMAND 
+#				 ${menuconfig_EXECUTABLE} 
+#				 ${menuconfig_ARGS} 
+#				)
 
 execute_process( 
 				COMMAND 
@@ -65,6 +72,8 @@ project(HoneyGUI)
 set(GUI_TARGET_NAME gui)
 
 add_library(${GUI_TARGET_NAME} STATIC)
+set_target_properties(${GUI_TARGET_NAME} PROPERTIES PREFIX "" OUTPUT_NAME ${GUI_TARGET_NAME} SUFFIX ".lib")
+
 add_subdirectory(../../realgui build/realgui)
 
 install(TARGETS ${GUI_TARGET_NAME}
