@@ -215,4 +215,3 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
     gui_fb_change();
 }
 
-GUI_INIT_APP_EXPORT(gui_server_init);
