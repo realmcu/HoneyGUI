@@ -85,9 +85,27 @@ file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/core/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/app/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/dc/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/input/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/engine/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/3rd/nanovg/base/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/3rd/cJSON/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 
 install(FILES ${HEADER_FILES} DESTINATION include)
 
+install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")
+
+file(GLOB SRC_FILES "../../realgui/engine/hw_acc/${HW_ACC_PATH}/*.c")
+install(FILES ${SRC_FILES} DESTINATION src)
 
 
 

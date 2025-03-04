@@ -18,6 +18,7 @@
 #include <time.h>
 #include "gui_fps.h"
 #include "gui_view.h"
+#include "cJSON.h"
 
 #define CURRENT_VIEW_NAME "watchface_view"
 

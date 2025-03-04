@@ -1,9 +1,11 @@
 # Apply the flags to C and C++ compiler settings
+set(CONFIG_SOC_SERIES_RTL8773E y)
+set(HW_ACC_PATH "rtl8773e")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -xc \
 	-std=c11 \
     --target=arm-arm-none-eabi \
-    -march=armv8.1-m.main+dsp+mve.fp+fp \
+	-march=armv8m.main -mfpu=fpv5-sp-d16 \
     -mfloat-abi=hard \
     -fno-rtti \
     -flto \
@@ -29,9 +31,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wno-implicit-function-declaration ")
 	
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-	-std=c++98 \
+	-std=c++11 \
     --target=arm-arm-none-eabi \
-    -march=armv8.1-m.main+dsp+mve.fp+fp \
+    -march=armv8m.main -mfpu=fpv5-sp-d16 \
     -mfloat-abi=hard \
     -flto \
     -funsigned-char \

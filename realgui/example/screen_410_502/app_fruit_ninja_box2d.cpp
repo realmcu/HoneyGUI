@@ -4,7 +4,7 @@
 #include "root_image_hongkong/ui_resource.h"
 #include "box2d/box2d.h"
 #include "gui_text.h"
-#include "../input/tp_algo.h"
+#include "tp_algo.h"
 #include "guidef.h"
 #include <iostream>
 #include <stdio.h>
