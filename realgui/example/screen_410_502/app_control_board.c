@@ -8,10 +8,41 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include <gui_app.h>
-#include "kb_algo.h"
+#include "app_hongkong.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
+
+#define CURRENT_VIEW_NAME "app_control_view"
+
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
+static void page_tb_control(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .design_cb = page_tb_control,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 typedef struct switch_state
 {
@@ -58,19 +89,6 @@ static void win_cb()
 {
     float progress = win_control->animate->progress_percent;
     gui_obj_t *obj = GUI_BASE(win_control);
-    // enter animation
-    if (!enter_flag)
-    {
-        if (obj->x > 100)
-        {
-            obj->x = (1 - progress) * SCREEN_WIDTH;
-        }
-        else
-        {
-            obj->x = 0;
-            enter_flag = 1;
-        }
-    }
     sw_state.sw_1 = sw_lte->ifon;
     sw_state.sw_2 = sw_wifi->ifon;
     sw_state.sw_3 = sw_phone->ifon;
@@ -78,9 +96,13 @@ static void win_cb()
     sw_state.sw_5 = sw_nobother->ifon;
 }
 
-static void page_tb_control(gui_obj_t *parent)
+static void page_tb_control(gui_view_t *view)
 {
-    win_control = gui_win_create(parent, NULL, SCREEN_WIDTH, 0, 0, 0);
+    clear_mem();
+
+    gui_view_switch_on_event(view, watchface_view, VIEW_TRANSPLATION, VIEW_STILL,
+                             GUI_EVENT_TOUCH_MOVE_LEFT);
+    win_control = gui_win_create(view, NULL, 0, 0, 0, 0);
     gui_win_set_animate(win_control, 500, -1, (gui_animate_callback_t)win_cb, NULL);
 
     // draw background
@@ -150,112 +172,4 @@ static void page_tb_control(gui_obj_t *parent)
     img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_PERCENT_BIN, 95, 40, 0, 0);
     gui_img_scale(img_num, 0.8, 0.8);
     gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
-}
-
-void win_control_enter_cb()
-{
-    extern gui_kb_port_data_t *port_kb_get_data(void);
-    gui_kb_port_data_t *kb = port_kb_get_data();
-    static bool kb_hold = 0;
-    static bool win_control_release = 0;
-    static uint32_t time_press = 0;
-    if (enter_flag)
-    {
-        {
-            gui_list_t *node = NULL;
-            gui_list_t *tmp = NULL;
-            gui_obj_t *obj = GUI_BASE(win_control_enter)->parent;
-            gui_list_for_each_safe(node, tmp, &obj->child_list)
-            {
-                gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-                if (obj->magic != GUI_MAGIC_NUMBER)
-                {
-                    return;
-                }
-                obj->gesture = 1;
-                obj->active = 0;
-                obj->not_show = 1;
-                // gui_log(" %s-->%s \n", obj->name, obj->parent->name);
-            }
-            GUI_BASE(win_control_enter)->gesture = 0;
-            GUI_BASE(win_control_enter)->active = 1;
-            GUI_BASE(win_control_enter)->not_show = 0;
-        }
-        gui_obj_t *obj = GUI_BASE(win_control);
-        touch_info_t *tp = tp_get_info();
-        static int16_t deltaX = 0;
-        if (tp->deltaX == deltaX)
-        {
-            obj->x = 0;
-            return;
-        }
-        if (tp->deltaX < 205 && tp->deltaX >= 0)
-        {
-            obj->x = tp->deltaX * 2;
-            deltaX = tp->deltaX;
-        }
-        else if (tp->deltaX > 205)
-        {
-            // gui_log("tp->deltaX = %d\n", tp->deltaX);
-            obj->x = SCREEN_WIDTH;
-            enter_flag = 0;
-            deltaX = 0;
-            gui_obj_tree_free(win_control);
-            win_control_release = 1;
-        }
-    }
-    else
-    {
-        if (win_control_release)
-        {
-            win_control_release = 0;
-            gui_list_t *node = NULL;
-            gui_list_t *tmp = NULL;
-            gui_obj_t *obj = GUI_BASE(win_control_enter)->parent;
-            gui_list_for_each_safe(node, tmp, &obj->child_list)
-            {
-                gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-                if (obj->magic != GUI_MAGIC_NUMBER)
-                {
-                    return;
-                }
-                obj->gesture = 0;
-                obj->active = 1;
-                obj->not_show = 0;
-                // gui_log(" %s-->%s \n", obj->name, obj->parent->name);
-            }
-        }
-        if (kb_hold)
-        {
-            if (kb->event == GUI_KB_EVENT_UP)
-            {
-                kb_hold = 0;
-                uint32_t time = kb->timestamp_ms_release - time_press;
-                if (time > 1000)
-                {
-                    gui_log("pressing time = %d\n", time);
-                    gui_obj_event_set(GUI_BASE(win_control_enter), GUI_EVENT_8);
-                }
-            }
-        }
-        if (kb->event == GUI_KB_EVENT_DOWN && !kb_hold)
-        {
-            time_press = kb->timestamp_ms_press;
-            kb_hold = 1;
-        }
-    }
-}
-
-static void switch_control_board(void *obj, gui_event_t e, void *param)
-{
-    gui_log("switch_control_board\n");
-    page_tb_control((gui_obj_t *)param);
-}
-
-void page_tb_control_enter(void *parent)
-{
-    win_control_enter = gui_win_create(parent, NULL, 0, 0, 0, 0);
-    gui_obj_add_event_cb(win_control_enter, (gui_event_cb_t)switch_control_board, GUI_EVENT_8,
-                         win_control_enter);
-    gui_win_set_animate(win_control_enter, 1000, -1, win_control_enter_cb, NULL);
 }

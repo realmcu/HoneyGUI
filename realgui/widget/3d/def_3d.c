@@ -753,7 +753,8 @@ void gui_3d_face_transform_perspective(gui_3d_face_t *face, gui_3d_camera_t *cam
     }
 }
 
-bool are_all_vertices_outside(gui_3d_face_t *face, char axis, float threshold, bool greater_than)
+static bool gui_3d_all_vertices_outside(gui_3d_face_t *face, char axis, float threshold,
+                                        bool greater_than)
 {
     for (int i = 0; i < VERTEX_COUNT; i++)
     {
@@ -773,22 +774,22 @@ void gui_3d_face_cull_out_side(gui_3d_face_t *face, gui_3d_camera_t *camera)
 
     bool outside = false;
 
-    if (are_all_vertices_outside(face, 'y', camera->viewplane_height / 2, true))
+    if (gui_3d_all_vertices_outside(face, 'y', camera->viewplane_height / 2, true))
     {
         //up
         outside = true;
     }
-    else if (are_all_vertices_outside(face, 'y', -camera->viewplane_height / 2, false))
+    else if (gui_3d_all_vertices_outside(face, 'y', -camera->viewplane_height / 2, false))
     {
         //down
         outside = true;
     }
-    else if (are_all_vertices_outside(face, 'x', -camera->viewplane_width / 2, false))
+    else if (gui_3d_all_vertices_outside(face, 'x', -camera->viewplane_width / 2, false))
     {
         //left
         outside = true;
     }
-    else if (are_all_vertices_outside(face, 'x', camera->viewplane_width / 2, true))
+    else if (gui_3d_all_vertices_outside(face, 'x', camera->viewplane_width / 2, true))
     {
         //right
         outside = true;

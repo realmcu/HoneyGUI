@@ -19,6 +19,8 @@
 #include <string.h>
 #include <gui_app.h>
 #include "gui_win.h"
+#include "gui_components_init.h"
+#include "gui_version.h"
 
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "js_extern_io.h"
@@ -240,6 +242,12 @@ static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool 
  */
 int gui_server_init(void)
 {
+    static bool inited = false;
+    if (inited)
+    {
+        return 0;
+    }
+    inited = true;
     extern void gui_port_dc_init(void);
     extern void gui_port_indev_init(void);
     extern void gui_port_os_init(void);
@@ -255,9 +263,16 @@ int gui_server_init(void)
 
     gui_fb_change();
 
+    gui_log("GUI branch Version: %s\n", VERSION_BRANCH);
+    gui_log("GUI commit Version: %s\n", VERSION_COMMIT);
+    gui_log("GUI build Date: %s\n", VERSION_BUILD_DATE);
+    gui_log("GUI repo Status: %s\n", VERSION_REPO_STATUS);
+
     gui_thread_create(GUI_SERVER_THREAD_NAME,
                       gui_server_entry, NULL,
                       1024 * 10,
                       15);
     return 0;
 }
+
+GUI_INIT_PREV_EXPORT(gui_server_init);

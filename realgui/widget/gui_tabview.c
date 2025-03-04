@@ -461,7 +461,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     }
 }
 
-void gui_tabview_destory(gui_obj_t *obj)
+void gui_tabview_destroy(gui_obj_t *obj)
 {
     gui_tabview_t *this = (gui_tabview_t *)obj;
 
@@ -505,9 +505,9 @@ static void gui_tabview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_tabview_destory(obj);
+                gui_tabview_destroy(obj);
             }
             break;
 

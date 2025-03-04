@@ -15,36 +15,68 @@
 
 用法
 -----
+注册视图控件描述子
+~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_descriptor_register` 函数传入视图控件描述子地址将其注册在描述子列表中供其它视图控件读取使用，作为创建视图控件的参数，其中 ``gui_view_descriptor`` 结构体定义如下：
+
+.. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h
+   :language: c
+   :start-after: /* gui_view_descriptor start*/
+   :end-before: /* gui_view_descriptor end*/
+
+
+获得视图控件描述子
+~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_descriptor_get` 函数通过传入字符串获取对应 ``name`` 的视图控件描述子。
+
+
 创建视图控件
 ~~~~~~~~~~~~~~
-使用 :cpp:any:`gui_view_create` 函数可以创建一个视图控件。
+使用 :cpp:any:`gui_view_create` 函数可以根据描述子创建一个视图控件。
 
 
 设置视图切换事件
 ~~~~~~~~~~~~~~~~~~
-开发者可以使用 :cpp:any:`gui_view_add_change_event` 来设置视图切换事件。具体的事件类型包括 ``GUI_EVENT_TOUCH_CLICKED`` 、 ``GUI_EVENT_TOUCH_MOVE_LEFT``、 ``GUI_EVENT_TOUCH_MOVE_LEFT`` 等。具体的切换风格请参考下列枚举：
+使用 :cpp:any:`gui_view_switch_on_event` 设置视图切换事件，对某一个事件可以重复设置，会使用最新的描述子。具体的事件类型包括 ``GUI_EVENT_TOUCH_CLICKED`` 、 ``GUI_EVENT_KB_SHORT_CLICKED`` 、 ``GUI_EVENT_TOUCH_MOVE_LEFT``、 ``GUI_EVENT_TOUCH_MOVE_RIGHT`` 等。具体的切换风格请参考下列枚举：
 
-.. literalinclude:: ../../../realgui/widget/gui_view.h
+
+.. literalinclude:: ../../../realgui/widget/gui_view/gui_view.h
    :language: c
-   :start-after: /* VIEW_CHANGE_STYLE enum start*/
-   :end-before: /* VIEW_CHANGE_STYLE enum end*/
+   :start-after: /* VIEW_SWITCH_STYLE enum start*/
+   :end-before: /* VIEW_SWITCH_STYLE enum end*/
 
 
-使能视图缓存功能
-~~~~~~~~~~~~~~~~~
-使用 :cpp:any:`gui_view_enable_pre_load` 函数使能视图缓存功能。
+立即切换视图
+~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_switch_direct` 立即切换视图，可以配合视图控件中子控件的事件或动画使用，注意切换风格仅限于动画风格，不可设置滑动风格。
+
+获取当前显示的视图控件指针
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_get_current_view` 函数可以获取当前显示的视图控件指针，可以搭配 :cpp:any:`gui_view_switch_direct` 使用，将当前view切换。
+
 
 示例
 -----
 视图控件
 ~~~~~~~~~~
-可以对每一个视图控件设置多种切换事件。
+以下是三个单独的C文件，每个C文件中包含view控件的描述子以及design函数。
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_view.c
+.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_blue.c
    :language: c
-   :start-after: /* view demo start*/
-   :end-before: /* view demo end*/
+   :start-after: /* view blue start*/
+   :end-before: /* view blue end*/
 
+
+.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_white.c
+   :language: c
+   :start-after: /* view white start*/
+   :end-before: /* view white end*/
+
+
+.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_yellow.c
+   :language: c
+   :start-after: /* view yellow start*/
+   :end-before: /* view yellow end*/
 
 
 .. raw:: html

@@ -25,11 +25,21 @@
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
+
+const static gui_view_descriptor_t *heartrate_view = NULL;
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    heartrate_view = gui_view_descriptor_get("heartrate_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
 static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
 
-static uint8_t curtain_index = CURTAIN_MIDDLE;
 gui_win_t *win_watch;
 static gui_text_t *date_text;
 static char date_text_content[10];
@@ -38,7 +48,7 @@ extern struct tm *timeinfo;
 
 bool return_to_watchface_flag; //true: return to watchface; false: return to app_menu
 
-uint8_t canvas_update_flag = 0;
+extern uint8_t canvas_update_flag;
 static gui_text_t *temperature_cur, *temperature_low, *temperature_high;
 static gui_text_t *weather_cur, *weather_range;
 static bool weather_syn_flag = false;
@@ -55,9 +65,9 @@ static char degree_content[5] = "0°", orien_content[3] = "N";
 static gui_img_t *img_heart_rate;
 
 static uint8_t *img_data_temperature;
-uint8_t *img_data_activity;
+static uint8_t *img_data_activity;
 
-char *cjson_content = NULL;
+extern char *cjson_content;
 
 /*Define watch_text_num_array*/
 void *text_num_array[] =
@@ -74,121 +84,6 @@ void *text_num_array[] =
     UI_TEXT_9_BIN,
     UI_TEXT_COLON_BIN,
 };
-
-static uint16_t seed = 12345;
-uint16_t xorshift16()
-{
-    seed ^= seed << 6;
-    seed ^= seed >> 9;
-    seed ^= seed << 2;
-    return seed;
-}
-
-#if defined __WIN32
-const char *filename =
-    "./realgui/example/web/peripheral_simulation/json/simulation_data.json";
-/* read CJSON to string */
-char *read_file(const char *file_path)
-{
-    const char *path = NULL;
-    if (!file_path)
-    {
-        path = filename;
-    }
-    else
-    {
-        path = file_path;
-    }
-    FILE *file = fopen(path, "r");
-    if (!file)
-    {
-        perror("fopen");
-        return NULL;
-    }
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    char *content = (char *)malloc(length + 1);
-    if (content)
-    {
-        fread(content, 1, length, file);
-        content[length] = '\0';
-    }
-    fclose(file);
-    return content;
-}
-#else
-// #include "tuya_ble_feature_weather.h"
-// #include "watch_clock.h"
-
-void json_refreash()
-{
-    uint16_t degree = xorshift16() % 359;
-    uint16_t move = xorshift16() % 20000;
-    uint16_t ex = xorshift16() % 60;
-    uint16_t stand = xorshift16() % 30;
-    move = move < 1 ? 1 : move;
-    ex = ex < 1 ? 1 : ex;
-    stand = stand < 1 ? 1 : stand;
-    uint16_t AM12 = xorshift16() % 120;
-    uint16_t AM6 = xorshift16() % 120;
-    uint16_t PM12 = xorshift16() % 120;
-    uint16_t PM6 = xorshift16() % 120;
-    // gui_log("!cjson_content: %x %x %x %x %x\n", cjson_content[0], cjson_content[1], cjson_content[2], cjson_content[3], cjson_content[4]);
-
-    cJSON *root = cJSON_Parse(cjson_content);
-    if (!root)
-    {
-        gui_log("json_refreash Error parsing JSON!\r\n");
-        return;
-    }
-    cJSON *compass_array = cJSON_GetObjectItem(root, "compass");
-    if (compass_array != NULL && cJSON_GetArraySize(compass_array) > 0)
-    {
-        cJSON *compass_item = cJSON_GetArrayItem(compass_array, 0);
-        cJSON_ReplaceItemInObject(compass_item, "degree", cJSON_CreateNumber(degree));
-    }
-
-    cJSON *activity_array = cJSON_GetObjectItem(root, "activity");
-    if (activity_array != NULL && cJSON_GetArraySize(activity_array) > 0)
-    {
-        cJSON *activity_item = cJSON_GetArrayItem(activity_array, 0);
-        cJSON_ReplaceItemInObject(activity_item, "move", cJSON_CreateNumber(move));
-        cJSON_ReplaceItemInObject(activity_item, "exercise", cJSON_CreateNumber(ex));
-        cJSON_ReplaceItemInObject(activity_item, "stand", cJSON_CreateNumber(stand));
-    }
-
-    cJSON *heart_rate_array = cJSON_GetObjectItem(root, "heart_rate");
-    if (heart_rate_array != NULL && cJSON_GetArraySize(heart_rate_array) > 0)
-    {
-        cJSON *heart_rate_item = cJSON_GetArrayItem(heart_rate_array, 0);
-        {
-            AM12 = AM12 > 60 ? AM12 : 68;
-            cJSON_ReplaceItemInObject(heart_rate_item, "AM12", cJSON_CreateNumber(AM12));
-        }
-        {
-            AM6 = AM6 > 60 ? AM6 : 73;
-            cJSON_ReplaceItemInObject(heart_rate_item, "AM6", cJSON_CreateNumber(AM6));
-        }
-        {
-            PM12 = PM12 > 60 ? PM12 : 82;
-            cJSON_ReplaceItemInObject(heart_rate_item, "PM12", cJSON_CreateNumber(PM12));
-        }
-        {
-            PM6 = PM6 > 60 ? PM6 : 94;
-            cJSON_ReplaceItemInObject(heart_rate_item, "PM6", cJSON_CreateNumber(PM6));
-        }
-    }
-    char *temp = cJSON_PrintUnformatted(root);
-    sprintf(cjson_content, "%s", temp);
-    gui_free(temp);
-    cJSON_Delete(root);
-    canvas_update_flag = 0b1111;
-    // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
-//    gui_log("cjson_content: %s\n", cjson_content);
-}
-#endif
-
 extern char *day[];
 static void refreash_time()
 {
@@ -225,61 +120,27 @@ static void refreash_time()
 
 static void win_clock_cb(gui_win_t *win)
 {
-    bool slide_card_enable;
+    // bool slide_card_enable;
     if (win->animate->Beginning_frame)
     {
-#if defined __WIN32
-        // time_t rawtime;
-        // time(&rawtime);
-        // timeinfo = localtime(&rawtime);
-        char *temp = cjson_content;
-        cjson_content = read_file(filename);
-        if (!cjson_content)
-        {
-            cjson_content = temp;
-            perror("fopen");
-        }
-        else
-        {
-            free(temp);
-        }
-        canvas_update_flag = 0b1111;
-        // gui_log("canvas_update_flag %x\n", canvas_update_flag);
-#else
-        // extern struct tm watch_clock_get(void);
-        // watch_time = watch_clock_get();
-        // timeinfo = &watch_time;
-        // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
-        // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
-        // json_refreash();
-//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
-#endif
         refreash_time();
     }
-
-    // blur this curtain
-    gui_curtainview_t *cv = 0;
-    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "ct_clock",
-                                    (void *)&cv); //  can find "ct_clock" in "app_tb_clock.c"
-    if (cv)
-    {
-        if (cv->cur_curtain == CURTAIN_MIDDLE)
-        {
-            // GUI_BASE(win_watch)->opacity_value = 255;
-            GUI_BASE(img_heart_rate)->event_dsc_cnt = 1;
-            slide_card_enable = true;
-            curtain_index = CURTAIN_MIDDLE;
-        }
-        else
-        {
-            // GUI_BASE(win_watch)->opacity_value = 50;
-            GUI_BASE(img_heart_rate)->event_dsc_cnt = 0; //block img_heart_rate cb func
-            slide_card_enable = false;
-            curtain_index = 0U;
-        }
-    }
-    // gui_log("curtain_index = %d", curtain_index);
 }
+
+void clear_clock(void)
+{
+    if (img_data_temperature)
+    {
+        gui_lower_free(img_data_temperature);
+        img_data_temperature = NULL;
+    }
+    if (img_data_activity)
+    {
+        gui_lower_free(img_data_activity);
+        img_data_activity = NULL;
+    }
+}
+
 static void arc_activity_cb(NVGcontext *vg)
 {
     cJSON *root;
@@ -633,7 +494,7 @@ static void arc_temperature_cb(NVGcontext *vg)
 
 static void compass_cb(void)
 {
-    if (!(canvas_update_flag & 0x08) || !curtain_index)
+    if (!(canvas_update_flag & 0x08))
     {
         return;
     }
@@ -728,7 +589,7 @@ static void compass_cb(void)
 
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 {
-    if ((canvas_update_flag & 0x04) && curtain_index)
+    if (canvas_update_flag & 0x04)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
@@ -740,7 +601,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
 
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_temperature_animation)
 {
-    if ((canvas_update_flag & 0x02) && curtain_index)
+    if (canvas_update_flag & 0x02)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
         memset(img_data, 0, (size_t)p);
@@ -750,18 +611,18 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_temperature_animation)
     }
 }
 
-void page_ct_clock(void *parent)
+void switch_heartrate()
 {
-#if defined __WIN32
-    cjson_content = read_file(filename);
-    if (!cjson_content)
-    {
-        perror("fopen");
-    }
-#else
-    cjson_content = gui_malloc(700);
-    memcpy(cjson_content, TUYA_CJSON_BIN, 700);
-#endif
+    gui_view_switch_direct(gui_view_get_current_view(), heartrate_view, VIEW_ANIMATION_7,
+                           VIEW_ANIMATION_1);
+}
+
+void page_ct_clock(gui_view_t *view)
+{
+    clear_mem();
+
+    gui_obj_t *parent = GUI_BASE(view);
+
     gui_canvas_create(parent, NULL, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); //fb_change
     win_watch = gui_win_create(parent, "win_clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     return_to_watchface_flag = true;
@@ -924,7 +785,7 @@ void page_ct_clock(void *parent)
     img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",
                                              UI_CLOCK_HEARTRATE_ICON_BIN, 272, 348, 0,
                                              0);
-    extern void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param);
-    gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_APP_HEART_RATE, GUI_EVENT_1, NULL);
+
+    gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_heartrate, GUI_EVENT_1, NULL);
     gui_win_set_animate(win_watch, 2000, -1, (gui_animate_callback_t)win_clock_cb, win_watch);
 }

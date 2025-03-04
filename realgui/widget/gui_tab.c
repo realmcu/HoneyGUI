@@ -376,7 +376,7 @@ static void gui_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
                 gui_tab_destroy(obj);
             }

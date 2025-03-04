@@ -1629,7 +1629,7 @@ void gui_page_prepare_rebound(gui_obj_t *obj)
 
 
 }
-void gui_page_destory(gui_obj_t *obj)
+void gui_page_destroy(gui_obj_t *obj)
 {
     gui_page_t *this = (gui_page_t *)obj;
     if (this->animate)
@@ -1653,8 +1653,8 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_page_update(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_page_destory(obj);
+        case OBJ_DESTROY:
+            gui_page_destroy(obj);
             break;
 
         default:
@@ -1676,8 +1676,8 @@ static void gui_page_cb_x(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_page_update_x(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_page_destory(obj);
+        case OBJ_DESTROY:
+            gui_page_destroy(obj);
             break;
 
         default:
@@ -1699,8 +1699,8 @@ static void gui_page_loop_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_page_loop_update(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_page_destory(obj);
+        case OBJ_DESTROY:
+            gui_page_destroy(obj);
             break;
 
         default:
@@ -1723,8 +1723,8 @@ static void gui_page_rebound_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_page_update_rebound(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_page_destory(obj);
+        case OBJ_DESTROY:
+            gui_page_destroy(obj);
             break;
 
         default:
@@ -1747,8 +1747,8 @@ static void gui_page_rebound_cb_x(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_page_update_rebound_x(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_page_destory(obj);
+        case OBJ_DESTROY:
+            gui_page_destroy(obj);
             break;
 
         default:

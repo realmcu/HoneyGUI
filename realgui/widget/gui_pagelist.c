@@ -233,7 +233,7 @@ static void gui_pagelist_end(gui_pagelist_t *this)
 {
 
 }
-static void gui_pagelist_destory(gui_pagelist_t *this)
+static void gui_pagelist_destroy(gui_pagelist_t *this)
 {
 
 }
@@ -259,8 +259,8 @@ static void gui_pagelist_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_pagelist_end((gui_pagelist_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_pagelist_destory((gui_pagelist_t *)obj);
+        case OBJ_DESTROY:
+            gui_pagelist_destroy((gui_pagelist_t *)obj);
             break;
 
         default:

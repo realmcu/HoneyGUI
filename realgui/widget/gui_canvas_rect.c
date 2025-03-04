@@ -163,7 +163,7 @@ static void gui_canvas_rect_end(gui_canvas_rect_t *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_canvas_rect_destory(gui_canvas_rect_t *this)
+static void gui_canvas_rect_destroy(gui_canvas_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -196,8 +196,8 @@ static void gui_canvas_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_canvas_rect_end((gui_canvas_rect_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_canvas_rect_destory((gui_canvas_rect_t *)obj);
+        case OBJ_DESTROY:
+            gui_canvas_rect_destroy((gui_canvas_rect_t *)obj);
             break;
 
         default:

@@ -55,15 +55,16 @@ typedef enum
     GUI_EVENT_KB_SHORT_CLICKED        = 0x0010,
     GUI_EVENT_KB_LONG_CLICKED         = 0x0011,
     /** Special events*/
+    GUI_EVENT_VIEW_SWITCH_DIRECT      = 0x0012,
     /** Other events*/
-    GUI_EVENT_1                       = 0x0012,
-    GUI_EVENT_2                       = 0x0013,
-    GUI_EVENT_3                       = 0x0014,
-    GUI_EVENT_4                       = 0x0015,
-    GUI_EVENT_5                       = 0x0016,
-    GUI_EVENT_6                       = 0x0017,
-    GUI_EVENT_7                       = 0x0018,
-    GUI_EVENT_8                       = 0x0019,
+    GUI_EVENT_1                       = 0x0013,
+    GUI_EVENT_2                       = 0x0014,
+    GUI_EVENT_3                       = 0x0015,
+    GUI_EVENT_4                       = 0x0016,
+    GUI_EVENT_5                       = 0x0017,
+    GUI_EVENT_6                       = 0x0018,
+    GUI_EVENT_7                       = 0x0019,
+    GUI_EVENT_8                       = 0x001A,
 
 
 } gui_event_t;

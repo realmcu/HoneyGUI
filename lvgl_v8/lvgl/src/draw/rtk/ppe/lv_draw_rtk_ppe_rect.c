@@ -58,6 +58,7 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
     target.memory = draw_ctx->buf;
     target.width = lv_area_get_width(draw_ctx->buf_area);
     target.height = lv_area_get_height(draw_ctx->buf_area);
+    target.stride = target.width;
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     lv_color32_t bg_color = lv_ppe_toABGR8888(dsc->bg_color);
 

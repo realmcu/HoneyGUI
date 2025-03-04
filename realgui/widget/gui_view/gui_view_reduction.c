@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_tab_rotate.c
-  * @brief tab widget
-  * @details tab widget
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/25
+  * @file gui_view_reduction.c
+  * @brief view widget
+  * @details view widget
+  * @author shel_deng@realsil.com.cn
+  * @date 2025/2/18
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -47,9 +47,9 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_reduction(gui_obj_t *obj)
+void gui_view_reduction(gui_view_t *this)
 {
-    gui_view_t *this = (gui_view_t *)obj;
+    gui_obj_t *obj = GUI_BASE(this);
     gui_dispdev_t *dc = gui_get_dc();
     int16_t idx = this->cur_id.x;
     int16_t idy = this->cur_id.y;

@@ -427,7 +427,7 @@ static void end(gui_obj_t *obj)
 
 }
 
-static void destory(gui_obj_t *obj)
+static void destroy(gui_obj_t *obj)
 {
     gui_image_array_t *this = (gui_image_array_t *)obj;
     if (this->image_data)
@@ -465,8 +465,8 @@ static void cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             end(obj);
             break;
 
-        case OBJ_DESTORY:
-            destory(obj);
+        case OBJ_DESTROY:
+            destroy(obj);
             break;
 
         default:
@@ -492,8 +492,8 @@ static void cb_ftl(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             end(obj);
             break;
 
-        case OBJ_DESTORY:
-            destory(obj);
+        case OBJ_DESTROY:
+            destroy(obj);
             break;
 
         default:

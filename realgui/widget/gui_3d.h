@@ -32,7 +32,6 @@ extern "C" {
 #include "gui_api.h"
 #include "gui_obj.h"
 #include "def_3d.h"
-#include "tinyobj_loader_c.h"
 
 
 /*============================================================================*
@@ -42,13 +41,81 @@ extern "C" {
 /** @brief  ... */
 typedef struct
 {
-    tinyobj_attrib_t attrib;
+    int v_idx, vt_idx, vn_idx;
+} gui_obj_vertex_index_t;
+
+typedef struct
+{
+    float x, y, z;
+} gui_obj_vertex_coordinate_t;
+
+typedef struct
+{
+    float u, v;
+} gui_obj_texcoord_coordinate_t;
+
+
+typedef struct
+{
+    unsigned int num_vertices;
+    unsigned int num_normals;
+    unsigned int num_texcoords;
+    unsigned int num_faces;
+    unsigned int num_face_num_verts;
+
+    int pad0;
+
+    gui_obj_vertex_coordinate_t *vertices;
+    gui_obj_vertex_coordinate_t *normals;
+    gui_obj_texcoord_coordinate_t *texcoords;
+    gui_obj_vertex_index_t *faces;
+    int *face_num_verts;
+    int *material_ids;
+} gui_obj_attrib_t;
+
+typedef struct
+{
+    // char *name; /* group name or object name. */
+    unsigned int face_offset;
+    unsigned int length;
+} gui_obj_shape_t;
+
+typedef struct
+{
+    // char *name;
+
+    float ambient[3];
+    float diffuse[3];
+    float specular[3];
+    float transmittance[3];
+    float emission[3];
+    float shininess;
+    float ior;      /* index of refraction */
+    float dissolve; /* 1 == opaque; 0 == fully transparent */
+    /* illumination model (see http://www.fileformat.info/format/material/) */
+    int illum;
+
+    // int pad0;
+
+    // char *ambient_texname;            /* map_Ka */
+    // char *diffuse_texname;            /* map_Kd */
+    // char *specular_texname;           /* map_Ks */
+    // char *specular_highlight_texname; /* map_Ns */
+    // char *bump_texname;               /* map_bump, bump */
+    // char *displacement_texname;       /* disp */
+    // char *alpha_texname;              /* map_d */
+} gui_obj_material_t;
+
+
+typedef struct
+{
+    gui_obj_attrib_t attrib;
 
     unsigned int num_shapes;
-    tinyobj_shape_t *shapes;
+    gui_obj_shape_t *shapes;
 
     unsigned int num_materials;
-    tinyobj_material_t *materials;
+    gui_obj_material_t *materials;
 
     unsigned int *texture_sizes;
     unsigned char **textures;

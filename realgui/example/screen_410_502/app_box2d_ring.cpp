@@ -12,19 +12,43 @@
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
 #include "gui_canvas_rect.h"
+#include "app_hongkong.h"
+#include "gui_return.h"
 
-static void *allocate(size_t size)
-{
-    return gui_lower_malloc(size);
-}
+#define CURRENT_VIEW_NAME "box2d_ring_view"
+extern "C" {
+    static gui_view_t *current_view = NULL;
+    const static gui_view_descriptor_t *menu_view = NULL;
+    void app_box2d_ring_ui_design(gui_view_t *view);
 
-static void deallocate(void *ptr) noexcept
-{
-    gui_lower_free(ptr);
+    static gui_view_descriptor_t const descriptor =
+    {
+        /* change Here for current view */
+        .name = (const char *)CURRENT_VIEW_NAME,
+        .pView = &current_view,
+        .design_cb = app_box2d_ring_ui_design,
+    };
+
+    static int gui_view_descriptor_register_init(void)
+    {
+        gui_view_descriptor_register(&descriptor);
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+    static int gui_view_get_other_view_descriptor_init(void)
+    {
+        /* you can get other view descriptor point here */
+        menu_view = gui_view_descriptor_get("menu_view");
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
 namespace app_box2d_ring
 {
-
+void *world_mem = NULL;
 const float TIMESTEP = 1.0f / 60.0f; // Timestep
 const int VELOCITY_ITERATIONS = 8; // Velocity iterations
 const int POSITION_ITERATIONS = 3; // Position iterations
@@ -193,6 +217,7 @@ void close()
         balls.clear();
         win_release_callback();
         world->~b2World();
+        gui_free(world_mem);
         world = nullptr;
         gui_log("close world done\n");
     }
@@ -333,19 +358,9 @@ int ui_design(gui_obj_t *obj)
 
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
 
-    // if (world != nullptr)
-    // {
-    //     for (Ball body : balls)
-    //     {
-    //         world->DestroyBody(body.body);
-    //     }
-    //     balls.clear();
-    //     win_release_callback();
-    //     deallocate(world);
-    // }
-    // void *world_mem = allocate(sizeof(b2World));
-    // world = new (world_mem) b2World(gravity);
-    world = new b2World(gravity);
+    world_mem = gui_malloc(sizeof(b2World));
+    world = new (world_mem) b2World(gravity);
+    // world = new b2World(gravity);
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
@@ -364,8 +379,26 @@ int ui_design(gui_obj_t *obj)
 
 // C interface
 extern "C" {
-    void app_box2d_ring_ui_design(gui_obj_t *obj)
+    static void return_cb()
     {
+        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    }
+
+    void app_box2d_ring_ui_design(gui_view_t *view)
+    {
+        clear_mem();
+
+        gui_obj_t *obj = GUI_BASE(view);
+        app_box2d_ring::ui_design(obj);
+
+        extern const uint32_t *gui_app_return_array[17];
+
+        gui_return_create(view, gui_app_return_array,
+                          sizeof(gui_app_return_array) / sizeof(uint32_t *), (void *)return_cb, 0);
+    }
+    void app_box2d_ring_watchface(gui_obj_t *obj)
+    {
+        app_box2d_ring::close();
         app_box2d_ring::ui_design(obj);
     }
     void close_box2d_ring(void)

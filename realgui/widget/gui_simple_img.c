@@ -198,7 +198,7 @@ static void gui_simple_img_end(gui_obj_t *obj)
     }
 }
 
-static void gui_simple_img_destory(gui_obj_t *obj)
+static void gui_simple_img_destroy(gui_obj_t *obj)
 {
     gui_simple_img_t *this = (gui_simple_img_t *)obj;
 
@@ -236,9 +236,9 @@ static void gui_simple_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
-                gui_simple_img_destory(obj);
+                gui_simple_img_destroy(obj);
             }
             break;
 

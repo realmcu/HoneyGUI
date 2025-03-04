@@ -17,12 +17,44 @@
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
 #include "cJSON.h"
+#include "app_hongkong.h"
 
 #define __WIN_NAME "win_timecard"
 #define __IMG_NAME    "timecard"
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 #define CARD_HEIGHT 157 + 10
+
+#define CURRENT_VIEW_NAME "app_down_view"
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
+void curtain_down_design(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .design_cb = curtain_down_design,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
 
 char *month[12] =
 {
@@ -61,9 +93,23 @@ static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
 
 static gui_cardview_t *cv;
 
-extern uint8_t *img_data_activity;
+static uint8_t *img_data_activity;
 static char *move_content, *ex_content, *stand_content;
-uint8_t *img_data_bg = NULL;
+static uint8_t *img_data_bg = NULL;
+
+void clear_down_view(void)
+{
+    if (img_data_bg)
+    {
+        gui_lower_free(img_data_bg);
+        img_data_bg = NULL;
+    }
+    if (img_data_activity)
+    {
+        gui_lower_free(img_data_activity);
+        img_data_activity = NULL;
+    }
+}
 
 static void display_time()
 {
@@ -187,31 +233,31 @@ static void activity_cb()
     cJSON_Delete(root);
 }
 
-static void cv_cb(gui_cardview_t *cv)
+static void cv_cb(void *p, void *this_widget, gui_animate_t *animate)
 {
-    if (cv->animate->Beginning_frame)
+    gui_cardview_t *cv = (gui_cardview_t *)this_widget;
+    if (animate->Beginning_frame)
     {
         display_time();
+        activity_cb();
+    }
+    int offset = cv->hold_y;
+    if (current_view->view_switch_ready)
+    {
+        cv->gesture_flag = 0;
+        GUI_BASE(cv)->has_input_prepare_cb = 1;
+    }
+    else
+    {
+        cv->gesture_flag = 1;
+        GUI_BASE(cv)->has_input_prepare_cb = 0;
     }
 
     extern gui_app_t *get_app_hongkong(void);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(win, __WIN_NAME, &(get_app_hongkong()->screen));
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img, __IMG_NAME, &(get_app_hongkong()->screen));
 
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(ct, "ct_clock", &(get_app_hongkong()->screen));
-    if (((gui_curtainview_t *)ct)->cur_curtain == CURTAIN_DOWN)
-    {
-        GUI_BASE(cv)->not_show = 0;
-        if (cv->animate->Beginning_frame)
-        {
-            activity_cb();
-        }
-    }
-    else
-    {
-        GUI_BASE(cv)->not_show = 1;
-    }
-    int offset = cv->hold_y;
+    GUI_BASE(cv)->not_show = 0;
     if (offset + CARD_HEIGHT + 50 < 0)
     {
         GUI_BASE(win)->not_show = 0;
@@ -234,36 +280,36 @@ static void cv_cb(gui_cardview_t *cv)
     }
 }
 
-static void switch_app_cb(void *obj, gui_event_t e, void *param)
-{
-    gui_log("enter switch_app_cb\n");
-    extern void close_box2d_ring(void);
-    close_box2d_ring();
-    extern void clear_activity(void);
-    clear_activity();
+// static void switch_app_cb(void *obj, gui_event_t e, void *param)
+// {
+//     gui_log("enter switch_app_cb\n");
+//     extern void close_box2d_ring(void);
+//     close_box2d_ring();
+//     extern void clear_activity(void);
+//     clear_activity();
 
-    const char *obj_name = ((gui_obj_t *)obj)->name;
-    if (strcmp(obj_name, "music") == 0)
-    {
-        extern gui_app_t *_get_app_APP_MUSIC_handle(void);
-        gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
-    }
-    else if (strcmp(obj_name, "FJ") == 0)
-    {
-        extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
-        gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
-    }
-    else if (strcmp(obj_name, "HR") == 0)
-    {
-        extern gui_app_t *_get_app_APP_HEART_RATE_handle();
-        gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
-    }
-    else if (strcmp(obj_name, "appview") == 0)
-    {
-        extern gui_app_t *get_app_menu();
-        gui_app_switch(gui_current_app(), get_app_menu());
-    }
-}
+//     const char *obj_name = ((gui_obj_t *)obj)->name;
+//     if (strcmp(obj_name, "music") == 0)
+//     {
+//         extern gui_app_t *_get_app_APP_MUSIC_handle(void);
+//         gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
+//     }
+//     else if (strcmp(obj_name, "FJ") == 0)
+//     {
+//         extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
+//         gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+//     }
+//     else if (strcmp(obj_name, "HR") == 0)
+//     {
+//         extern gui_app_t *_get_app_APP_HEART_RATE_handle();
+//         gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+//     }
+//     else if (strcmp(obj_name, "appview") == 0)
+//     {
+//         extern gui_app_t *get_app_menu();
+//         gui_app_switch(gui_current_app(), get_app_menu());
+//     }
+// }
 
 static void img_bg_cb(NVGcontext *vg)
 {
@@ -272,8 +318,98 @@ static void img_bg_cb(NVGcontext *vg)
     nvgFill(vg);
 }
 
-void curtain_down_design(void *parent_widget)
+static void arc_activity_cb(NVGcontext *vg)
 {
+    cJSON *root;
+    extern char *cjson_content;
+    if (!cjson_content)
+    {
+        return;
+    }
+    else
+    {
+        root = cJSON_Parse(cjson_content);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    // parse activity array
+    cJSON *activity_array = cJSON_GetObjectItemCaseSensitive(root, "activity");
+    if (cJSON_IsArray(activity_array))
+    {
+        cJSON *act = cJSON_GetArrayItem(activity_array, 0);
+        if (!act)
+        {
+            gui_log("get activity_array unsuccessful\n");
+        }
+        else
+        {
+            cJSON *move = cJSON_GetObjectItemCaseSensitive(act, "move");
+            cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "exercise");
+            cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
+
+            nvgBeginPath(vg);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
+                   M_PI * 3.5f, NVG_CW);
+            nvgStrokeWidth(vg, 8);
+            nvgStrokeColor(vg, nvgRGB(58, 23, 29));
+            nvgStroke(vg);
+            nvgBeginPath(vg);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
+                   M_PI * (1.5f + 2.0f * move->valueint / 20000.0f), NVG_CW);  // cap 20000 steps
+            nvgStrokeWidth(vg, 8);
+            nvgStrokeColor(vg, nvgRGB(230, 67, 79));
+            nvgStroke(vg);
+
+            nvgBeginPath(vg);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
+                   M_PI * 3.5f, NVG_CW);
+            nvgStrokeWidth(vg, 8);
+            nvgStrokeColor(vg, nvgRGB(30, 55, 25));
+            nvgStroke(vg);
+            nvgBeginPath(vg);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
+                   M_PI * (1.5f + 2.0f * ex->valueint / 60.0f), NVG_CW);  // cap 60 min.
+            nvgStrokeWidth(vg, 8);
+            nvgStrokeColor(vg, nvgRGB(186, 253, 79));
+            nvgStroke(vg);
+
+            nvgBeginPath(vg);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
+                   M_PI * 3.5f, NVG_CW);
+            nvgStrokeWidth(vg, 8);
+            nvgStrokeColor(vg, nvgRGB(22, 50, 47));
+            nvgStroke(vg);
+            nvgBeginPath(vg);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
+                   M_PI * (1.5f + 2.0f * stand->valueint / 30.0f), NVG_CW); // cap 30 times
+            nvgStrokeWidth(vg, 8);
+            nvgStrokeColor(vg, nvgRGB(117, 230, 229));
+            nvgStroke(vg);
+        }
+    }
+    // clear
+    cJSON_Delete(root);
+}
+
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
+{
+    uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
+    memset(img_data, 0, (size_t)p);
+    gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
+    gui_img_set_image_data(this_widget, img_data);
+}
+
+void curtain_down_design(gui_view_t *view)
+{
+    clear_mem();
+
+    gui_view_switch_on_event(view, watchface_view, VIEW_TRANSPLATION, VIEW_STILL,
+                             GUI_EVENT_TOUCH_MOVE_DOWN);
+
+    gui_obj_t *parent_widget = GUI_BASE(view);
     // draw background
     gui_canvas_rect_create(parent_widget, "background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0,
                            0));
@@ -316,14 +452,15 @@ void curtain_down_design(void *parent_widget)
     cv = gui_cardview_create(parent_widget, "cardview", 21, 0,
                              SCREEN_WIDTH - 21, SCREEN_HEIGHT);
     gui_cardview_set_style(cv, REDUCTION);
+    GUI_BASE(cv)->has_input_prepare_cb = 0;
     // change timecard img and canvas
-    gui_cardview_set_animate(cv, 2000, -1, cv_cb, cv);
+    gui_cardview_set_animate(cv, 2000, -1, cv_cb, NULL);
 
     draw_timecard(parent_widget);
 
     gui_card_t *cv_no_dispaly = gui_card_create(cv, "cv_no_dispaly", 0, 0, 0,
                                                 250); // adjust card position
-    gui_card_t *cv_calendar = gui_card_create(cv, "cv_valendar",   0, 0, 0, CARD_HEIGHT);
+    gui_card_t *cv_calendar = gui_card_create(cv, "cv_calendar",   0, 0, 0, CARD_HEIGHT);
     gui_card_t *cv_weather = gui_card_create(cv, "cv_weather",     0, 0, 0, CARD_HEIGHT);
     gui_card_t *cv_activity = gui_card_create(cv, "cv_activity",   0, 0, 0, CARD_HEIGHT);
     gui_card_t *cv_app = gui_card_create(cv, "cv_app",             0, 0, 0, CARD_HEIGHT);
@@ -357,8 +494,23 @@ void curtain_down_design(void *parent_widget)
         img = gui_img_create_from_mem(canvas, "ac_bg", UI_BG_ICON_BIN, 22, 33, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_scale(img, 0.9f, 0.9f);
-        img = gui_img_create_from_mem(canvas, "activity", img_data_activity, 17, 28, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+        // activity icon
+        {
+            int image_h = 100,
+                image_w = 100,
+                pixel_bytes = 4;
+            size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+            if (!img_data_activity)
+            {
+                img_data_activity = gui_lower_malloc(buffer_size);
+            }
+            memset(img_data_activity, 0, buffer_size);
+            // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data_activity);
+            img = gui_img_create_from_mem(canvas, "activity", img_data_activity, 17, 28, 0, 0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_img_set_animate(img, 1000, -1, canvas_activity_animation, (void *)buffer_size);
+        }
 
         move_content = (char *)gui_lower_malloc(30);
         sprintf(move_content, "Move: 0/20000 steps");
@@ -394,17 +546,17 @@ void curtain_down_design(void *parent_widget)
                                                         0, 0, 0);
         img = gui_img_create_from_mem(canvas_app, "music", UI_CLOCK_MUSIC_ICON_BIN, 17, 28, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
+        // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
         img = gui_img_create_from_mem(canvas_app, "FJ", UI_CLOCK_FRUIT_NINJA_ICON_BIN, 17 + 109, 28, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
+        // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
         img = gui_img_create_from_mem(canvas_app, "HR", UI_CLOCK_HEARTRATE_ICON_BIN, 17 + 109 * 2, 28, 0,
                                       0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
+        // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
     }
 
     img = gui_img_create_from_mem(cv_appview, "appview", UI_CARD_APPVIEW_BIN, 38, 81, 0, 0);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
-    gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
+    // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_1, NULL);
 }

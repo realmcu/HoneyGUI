@@ -388,7 +388,7 @@ static void gui_gallery_end(gui_obj_t *obj)
 
 }
 
-static void gui_gallery_destory(gui_obj_t *obj)
+static void gui_gallery_destroy(gui_obj_t *obj)
 {
 
 }
@@ -411,8 +411,8 @@ static void gui_gallery_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_gallery_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_gallery_destory(obj);
+        case OBJ_DESTROY:
+            gui_gallery_destroy(obj);
             break;
 
         default:

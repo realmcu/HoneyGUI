@@ -114,7 +114,7 @@ typedef enum
     OBJ_PREPARE,
     OBJ_DRAW,
     OBJ_END,
-    OBJ_DESTORY,
+    OBJ_DESTROY,
 } T_OBJ_CB_TYPE;
 
 typedef struct _gui_obj_t

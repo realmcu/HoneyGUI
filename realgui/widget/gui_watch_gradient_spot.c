@@ -268,7 +268,7 @@ static void gui_watch_gradient_spot_end(gui_obj_t *obj)
 
 }
 
-static void gui_watch_gradient_spot_destory(gui_obj_t *obj)
+static void gui_watch_gradient_spot_destroy(gui_obj_t *obj)
 {
 
 }
@@ -291,8 +291,8 @@ static void gui_watch_gradient_spot_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_watch_gradient_spot_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_watch_gradient_spot_destory(obj);
+        case OBJ_DESTROY:
+            gui_watch_gradient_spot_destroy(obj);
             break;
 
         default:

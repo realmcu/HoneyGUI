@@ -62,7 +62,7 @@ char *get_img_file(const char *filename)
 
 
 // png
-unsigned char *read_array_from_file(const char *filename, size_t *length)
+unsigned char *read_array_from_file(const char *filename, uint32_t *length)
 {
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -184,6 +184,7 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
         perror("Failed to open file for writing");
         return;
     }
+
     fwrite(&desc->attrib.num_vertices, sizeof(unsigned int), 1, file);
     fwrite(&desc->attrib.num_normals, sizeof(unsigned int), 1, file);
     fwrite(&desc->attrib.num_texcoords, sizeof(unsigned int), 1, file);
@@ -203,7 +204,7 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
     for (int i = 0; i < desc->num_shapes; i++)
     {
         printf("desc->shapes[%d].name: %s\n", i, desc->shapes[i].name);
-        write_string(file, desc->shapes[i].name);
+        // write_string(file, desc->shapes[i].name);
         fwrite(&desc->shapes[i].face_offset, sizeof(unsigned int), 1, file);
         fwrite(&desc->shapes[i].length, sizeof(unsigned int), 1, file);
     }
@@ -213,7 +214,7 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
     for (int i = 0; i < desc->num_materials; i++)
     {
         const tinyobj_material_t *mat = &desc->materials[i];
-        write_string(file, mat->name);
+        // write_string(file, mat->name);
         fwrite(mat->ambient, sizeof(float), 3, file);
         fwrite(mat->diffuse, sizeof(float), 3, file);
         fwrite(mat->specular, sizeof(float), 3, file);
@@ -223,13 +224,13 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
         fwrite(&mat->ior, sizeof(float), 1, file);
         fwrite(&mat->dissolve, sizeof(float), 1, file);
         fwrite(&mat->illum, sizeof(int), 1, file);
-        write_string(file, mat->ambient_texname);
-        write_string(file, mat->diffuse_texname);
-        write_string(file, mat->specular_texname);
-        write_string(file, mat->specular_highlight_texname);
-        write_string(file, mat->bump_texname);
-        write_string(file, mat->displacement_texname);
-        write_string(file, mat->alpha_texname);
+        // write_string(file, mat->ambient_texname);
+        // write_string(file, mat->diffuse_texname);
+        // write_string(file, mat->specular_texname);
+        // write_string(file, mat->specular_highlight_texname);
+        // write_string(file, mat->bump_texname);
+        // write_string(file, mat->displacement_texname);
+        // write_string(file, mat->alpha_texname);
     }
 
     // Save textures
@@ -237,8 +238,12 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
     {
         unsigned int texture_size = desc->texture_sizes[i];
         fwrite(&texture_size, sizeof(unsigned int), 1, file);
-        fwrite(desc->textures[i], sizeof(unsigned char), texture_size, file);
     }
+    for (int i = 0; i < desc->num_materials; i++)
+    {
+        fwrite(desc->textures[i], sizeof(unsigned char), desc->texture_sizes[i], file);
+    }
+
 
     fclose(file);
     printf("Write description to bin file successfully!\n");
@@ -342,7 +347,7 @@ int main(int argc, char **argv)
                 continue;
             }
 
-            int length;
+            uint32_t length;
             unsigned char *array = read_array_from_file(txt_file, &length);
             if (array != NULL)
             {

@@ -687,7 +687,7 @@ static void gui_canvas_arc_end(gui_canvas_arc_t *this)
     if (this->circle_img_02 != NULL) {gui_free(this->circle_img_02); this->circle_img_02 = NULL;}
 }
 
-static void gui_canvas_arc_destory(gui_canvas_arc_t *this)
+static void gui_canvas_arc_destroy(gui_canvas_arc_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -718,8 +718,8 @@ static void gui_canvas_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_canvas_arc_end((gui_canvas_arc_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_canvas_arc_destory((gui_canvas_arc_t *)obj);
+        case OBJ_DESTROY:
+            gui_canvas_arc_destroy((gui_canvas_arc_t *)obj);
             break;
 
         default:
@@ -746,8 +746,8 @@ static void gui_canvas_arc_cb_ftl(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_canvas_arc_end((gui_canvas_arc_t *)obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_canvas_arc_destory((gui_canvas_arc_t *)obj);
+        case OBJ_DESTROY:
+            gui_canvas_arc_destroy((gui_canvas_arc_t *)obj);
             break;
 
         default:

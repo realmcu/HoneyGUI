@@ -172,7 +172,7 @@ static void widget_nanovg_canvas_img_end(gui_obj_t *obj)
     GUI_UNUSED(obj);
 
 }
-static void widget_nanovg_canvas_img_destory(gui_obj_t *obj)
+static void widget_nanovg_canvas_img_destroy(gui_obj_t *obj)
 {
     gui_canvas_img_t *this = (gui_canvas_img_t *)obj;
     if (this->bpImageBuff)
@@ -202,8 +202,8 @@ static void gui_canvas_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             widget_nanovg_canvas_img_end(obj);
             break;
 
-        case OBJ_DESTORY:
-            widget_nanovg_canvas_img_destory(obj);
+        case OBJ_DESTROY:
+            widget_nanovg_canvas_img_destroy(obj);
             break;
 
         default:

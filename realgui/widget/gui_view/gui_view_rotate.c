@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_tab_rotate.c
-  * @brief tab widget
-  * @details tab widget
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/25
+  * @file gui_view_rotate.c
+  * @brief view widget
+  * @details view widget
+  * @author shel_deng@realsil.com.cn
+  * @date 2025/2/18
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -21,9 +21,7 @@
 #include "guidef.h"
 #include "gui_server.h"
 #include "gui_obj.h"
-#include "gui_img.h"
 #include "gui_view.h"
-#include "tp_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -44,15 +42,15 @@
  *                            Variables
  *============================================================================*/
 
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_rotate_book(gui_obj_t *obj)
+void gui_view_rotate(gui_view_t *this)
 {
-    gui_view_t *this = (gui_view_t *)obj;
+    gui_obj_t *obj = GUI_BASE(this);
     gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *parent = obj->parent;
     gui_matrix_t rotate_3D;
     gui_matrix_t temp;
     int16_t idx = this->cur_id.x;
@@ -61,7 +59,6 @@ void gui_view_rotate_book(gui_obj_t *obj)
     float h = this->base.h;
     float rotate_degree_x = 0;
     float rotate_degree_y = 0;
-    bool rotate_90 = 0;
 
     gui_vertex_t v0 = {-w, -h, 0};
     gui_vertex_t v1 = {w,  -h, 0};
@@ -77,26 +74,22 @@ void gui_view_rotate_book(gui_obj_t *obj)
     {
         idx++;
         release_x = release_x - this->base.w;
-        rotate_90 = 1;
     }
     if (release_x < -this->base.w / 2)
     {
         idx--;
         release_x = release_x + this->base.w;
-        rotate_90 = 1;
     }
 
     if (release_y > this->base.h / 2)
     {
         idy++;
         release_y = release_y - this->base.h;
-        rotate_90 = 1;
     }
     if (release_y < -this->base.h / 2)
     {
         idy--;
         release_y = release_y + this->base.h;
-        rotate_90 = 1;
     }
 
     rotate_degree_x = 90 * release_y / (this->base.h / 2);
@@ -124,68 +117,10 @@ void gui_view_rotate_book(gui_obj_t *obj)
     matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);
 
-    static bool list_change = 1; //0: list change; 1: list restore
-    static bool list_restore = 0;
-    touch_info_t *tp = tp_get_info();
-    if (release_x || release_y)
-    {
-        // set scope
-        uint8_t scope_x = release_x > 0 ? 1 : 0;
-        uint8_t scope_y = release_y > 0 ? 1 : 0;
-        GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_flag = 1;
-        GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x1 = (scope_x + idx) * dc->screen_width / 2;
-        GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x2 = (scope_x + idx + 1) * dc->screen_width / 2;
-        GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_y1 = (scope_y + idy) * dc->screen_height / 2;
-        GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_y2 = (scope_y + idy + 1) * dc->screen_height / 2;
-        if (release_x)
-        {
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_y1 = 0;
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_y2 = dc->screen_height;
-        }
-        else
-        {
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x1 = 0;
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x2 = dc->screen_width;
-        }
+    matrix_translate((idx) * 2 * (int)this->base.w, \
+                     (idy) * 2 * (int)this->base.h, \
+                     obj->matrix); //todo multi 2 for bug fix
 
-        // change obj list
-        if (tp->type >= TOUCH_LEFT_SLIDE && tp->type <= TOUCH_DOWN_SLIDE)
-        {
-            list_restore = 1;
-        }
-        if (rotate_90 && !list_change) // slide over 90, restore list
-        {
-            list_change = 1;
-            GUI_BASE(parent)->child_list.prev = &obj->brother_list;
-            gui_list_t *next_tab = obj->brother_list.next;
-            obj->brother_list.next = obj->brother_list.next->next;
-            next_tab->next = &obj->brother_list;
-            GUI_BASE(parent)->child_list.next = next_tab;
-        }
-        if (!rotate_90 && list_change && !list_restore)
-        {
-            list_change = 0;
-            gui_list_t *next_tab = obj->brother_list.next;
-            obj->brother_list.next = obj->brother_list.next->next;
-            next_tab->next = &obj->brother_list;
-            GUI_BASE(parent)->child_list.next = next_tab;
-            GUI_BASE(parent)->child_list.prev = next_tab->next;
-        }
-    }
-    else
-    {
-        if (!list_change)
-        {
-            list_change = 1;
-            GUI_BASE(parent)->child_list.prev = &obj->brother_list;
-            gui_list_t *next_tab = obj->brother_list.next;
-            obj->brother_list.next = obj->brother_list.next->next;
-            next_tab->next = &obj->brother_list;
-            GUI_BASE(parent)->child_list.next = next_tab;
-            obj->not_show = 1;
-        }
-        list_restore = 0;
-    }
     matrix_multiply(obj->matrix, &temp);
 }
 

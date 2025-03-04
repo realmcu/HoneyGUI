@@ -275,7 +275,7 @@ static void gui_qbcode_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             }
             break;
 
-        case OBJ_DESTORY:
+        case OBJ_DESTROY:
             {
                 gui_qbcode_destroy(obj);
             }

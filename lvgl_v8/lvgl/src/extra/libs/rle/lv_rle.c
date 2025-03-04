@@ -199,7 +199,7 @@ static lv_res_t decoder_info(lv_img_decoder_t *decoder, const void *src, lv_img_
     if (src_type == LV_IMG_SRC_FILE)
     {
         const char *fn = src;
-        LV_ASSERT(strcmp(lv_fs_get_ext(fn), "rle") == 0);
+        // LV_ASSERT(strcmp(lv_fs_get_ext(fn), "rle") == 0);
         if (strcmp(lv_fs_get_ext(fn), "rle") == 0)               /*Check the extension*/
         {
             /*Save the data in the header*/

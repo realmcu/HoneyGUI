@@ -104,12 +104,12 @@ typedef enum
 void gui_page_update(gui_obj_t *obj);
 
 /**
- * @brief destory the page widget.
+ * @brief destroy the page widget.
  *
  * @param obj widget pointer.
  *
  */
-void gui_page_destory(gui_obj_t *obj);
+void gui_page_destroy(gui_obj_t *obj);
 
 /**
  * @brief construct a page widget.

@@ -16,26 +16,24 @@
 #include "root_image_hongkong/ui_resource.h"
 
 #include "gui_prism_mirror3d.h"
-#include <tp_algo.h>
+#include "tp_algo.h"
+#include "app_hongkong.h"
 
-static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *);
-static gui_app_t _app_APP_WATCHFACE_PRISM3D =
-{
-    .screen =
-    {
-        .name = "APP_WATCHFACE_PRISM3D",
-        .magic = 0x0b,
-    },
-    .ui_design = _APP_WATCHFACE_PRISM3D_ui_design,
-    .active_ms = 1000000,
-};
-gui_app_t *_get_app_APP_WATCHFACE_PRISM3D_handle(void) { return &_app_APP_WATCHFACE_PRISM3D; }
-
+const static gui_view_descriptor_t *watchface_view = NULL;
 extern uint8_t watchface_index;
-static void app_cb(void *p);
-static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *app)
+static int gui_view_get_other_view_descriptor_init(void)
 {
-    gui_prism_mirror3d_t *prism_watchface = gui_prism_mirror3d_create(&(app->screen), "prism_3d",
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+static void app_cb(void *obj);
+void _APP_WATCHFACE_PRISM3D_ui_design(gui_view_t *view)
+{
+    gui_prism_mirror3d_t *prism_watchface = gui_prism_mirror3d_create(GUI_BASE(view), "prism_3d",
                                                                       DESC_PRISM3D_BIN, 0, 0,
                                                                       410,
                                                                       502, NULL);
@@ -59,7 +57,7 @@ static void _APP_WATCHFACE_PRISM3D_ui_design(gui_app_t *app)
     gui_prism_mirror3d_enter_animate(prism_watchface);
 }
 
-static void app_cb(void *p)
+static void app_cb(void *obj)
 {
     extern char *defaultPath;
     extern char watchface_path[];
@@ -89,7 +87,7 @@ static void app_cb(void *p)
     default:
         break;
     }
-    extern void *get_app_hongkong(void);
-    gui_app_switch(gui_current_app(), (gui_app_t *)get_app_hongkong());
+    gui_view_switch_direct(gui_view_get_current_view(), watchface_view, VIEW_ANIMATION_NULL,
+                           VIEW_ANIMATION_5);
 }
 

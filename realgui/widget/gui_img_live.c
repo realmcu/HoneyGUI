@@ -338,7 +338,7 @@ static void gui_img_live_draw(gui_obj_t *obj)
     this->img->draw_img->data = data;
 }
 
-static void gui_img_live_destory(gui_obj_t *obj)
+static void gui_img_live_destroy(gui_obj_t *obj)
 {
     gui_img_live_t *this = (gui_img_live_t *)obj;
 
@@ -450,8 +450,8 @@ static void gui_img_live_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
             gui_img_live_draw(obj);
             break;
 
-        case OBJ_DESTORY:
-            gui_img_live_destory(obj);
+        case OBJ_DESTROY:
+            gui_img_live_destroy(obj);
             break;
 
         default:

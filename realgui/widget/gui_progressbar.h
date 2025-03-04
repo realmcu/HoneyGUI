@@ -48,7 +48,7 @@ typedef struct gui_progressbar
     uint32_t color_hl;
     size_t max;
     float per, per_history;
-    void (*ctor)(struct gui_progressbar *this, gui_obj_t *parent, const char *name, int16_t x,
+    void (*ctor)(struct gui_progressbar *_this, gui_obj_t *parent, const char *name, int16_t x,
                  int16_t y,
                  int16_t w, int16_t h);
     IMG_SOURCE_MODE_TYPE src_mode;   // scroll_bar
@@ -165,42 +165,42 @@ gui_progressbar_t *gui_progressbar_movie_create_from_fs(void      *parent,
 /**
  * @brief set progress.
  *
- * @param this widget object pointer.
+ * @param _this widget object pointer.
  * @param progress the progress of widget.
  */
-void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress);
+void gui_progressbar_set_progress(gui_progressbar_t *_this, size_t progress);
 
 /**
  * @brief get_progress.
  *
- * @param this widget object pointer.
+ * @param _this widget object pointer.
  * @return size_t
  */
-size_t gui_progressbar_get_progress(gui_progressbar_t *this);
+size_t gui_progressbar_get_progress(gui_progressbar_t *_this);
 
 /**
  * @brief set_percentage.
  *
- * @param this widget object pointer.
+ * @param _this widget object pointer.
  * @param percentage the percentage of widget.
  */
-void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage);
+void gui_progressbar_set_percentage(gui_progressbar_t *_this, float percentage);
 
 /**
  * @brief get_percentage.
  *
- * @param this widget object pointer.
+ * @param _this widget object pointer.
  * @return float.
  */
-float gui_progressbar_get_percentage(gui_progressbar_t *this);
+float gui_progressbar_get_percentage(gui_progressbar_t *_this);
 
 /**
  * @brief get_max.
  *
- * @param this widget object pointer.
+ * @param _this widget object pointer.
  * @return size_t.
  */
-size_t gui_progressbar_get_max(gui_progressbar_t *this);
+size_t gui_progressbar_get_max(gui_progressbar_t *_this);
 
 
 

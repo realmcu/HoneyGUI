@@ -24,68 +24,82 @@
 #define MENU_GAP 125
 #define APP_NUM 10
 
-#define APP_MUSIC
-#define APP_FRUIT_NINJA
-#define APP_BOX2D_RING
-#define APP_HEART_RATE
-#define APP_ACTIVITY
+#define CURRENT_VIEW_NAME "menu_view"
 
-//cppcheck-suppress syntaxError
-GUI_APP_DEFINE_NAME_ANIMATION(APP_BOX2D_RING, GUI_APP_ANIMATION_9,
-                              GUI_APP_ANIMATION_10)
-GUI_APP_DEFINE_NAME_ANIMATION(APP_FRUIT_NINJA, GUI_APP_ANIMATION_2, GUI_APP_ANIMATION_5)
-GUI_APP_DEFINE_NAME_ANIMATION(APP_MUSIC, GUI_APP_ANIMATION_3, GUI_APP_ANIMATION_7)
-GUI_APP_DEFINE_NAME_ANIMATION(APP_HEART_RATE, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_5)
-GUI_APP_DEFINE_NAME_ANIMATION(APP_ACTIVITY, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_5)
-// GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
-// GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
-// GUI_APP_DEFINE_NAME(APP_MUSIC)
-// GUI_APP_DEFINE_NAME(APP_HEART_RATE)
-// GUI_APP_DEFINE_NAME(APP_ACTIVITY)
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
+const static gui_view_descriptor_t *activity_view = NULL;
+const static gui_view_descriptor_t *box2d_ring_view = NULL;
+const static gui_view_descriptor_t *fruit_ninja_view = NULL;
+const static gui_view_descriptor_t *heartrate_view = NULL;
+const static gui_view_descriptor_t *music_view = NULL;
+void app_menu_design(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .design_cb = app_menu_design,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    activity_view = gui_view_descriptor_get("activity_view");
+    box2d_ring_view = gui_view_descriptor_get("box2d_ring_view");
+    fruit_ninja_view = gui_view_descriptor_get("fruit_ninja_view");
+    heartrate_view = gui_view_descriptor_get("heartrate_view");
+    music_view = gui_view_descriptor_get("music_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 uint8_t menu_style = 0;
 static gui_win_t *win_array[APP_NUM];
 static int16_t page_menu_y_his = 0;
+bool sidebar_flag = 0;
 
 extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
 
 void switch_APP_BOX2D_RING(void *obj, gui_event_t e, void *param)
 {
-    extern void close_box2d_ring(void);
-    close_box2d_ring();
-
-    gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+    gui_view_switch_direct(current_view, box2d_ring_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
 }
 
 void switch_APP_FRUIT_NINJA(void *obj, gui_event_t e, void *param)
 {
-    gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+    gui_view_switch_direct(current_view, fruit_ninja_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2);
 }
 
 void switch_APP_MUSIC(void *obj, gui_event_t e, void *param)
 {
-    gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
+    gui_view_switch_direct(current_view, music_view, VIEW_ANIMATION_7, VIEW_ANIMATION_3);
 }
 
 void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
 {
-    extern void clear_activity(void);
-    clear_activity();
-    gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+    gui_view_switch_direct(current_view, heartrate_view, VIEW_ANIMATION_7, VIEW_ANIMATION_1);
 }
 
 void switch_APP_ACTIVITY(void *obj, gui_event_t e, void *param)
 {
-    gui_app_switch(gui_current_app(), _get_app_APP_ACTIVITY_handle());
+
+    gui_view_switch_direct(current_view, activity_view, VIEW_ANIMATION_7, VIEW_ANIMATION_4);
 }
 
-// static void switch_APP_CALCULATOR()
-// {
-//     gui_app_switch(gui_current_app(), _get_app_APP_CALCULATOR_handle());
-// }
-
 /*Define gui_app_return_array*/
-static const uint32_t *gui_app_return_array[] =
+const uint32_t *gui_app_return_array[] =
 {
     PATH04_BIN,
     PATH05_BIN,
@@ -106,96 +120,9 @@ static const uint32_t *gui_app_return_array[] =
     PATH25_BIN,
 };
 
-static void app_menu_design(gui_app_t *app);
-static gui_app_t app_menu =
-{
-    .screen =
-    {
-        .name = "app_menu",
-        .x    = 0,
-        .y    = 0,
-        .magic = GUI_MAGIC_NUMBER,
-        .parent = NULL,
-    },
-    .ui_design = app_menu_design,
-    .thread_entry = NULL,
-    .active_ms = 1000000,
-};
-
-gui_app_t *get_app_menu()
-{
-    return &app_menu;
-}
-
-static void menu_win_ani_cb(void *args, gui_win_t *win)
-{
-    float pro = gui_win_get_animation_progress_percent(win);
-    gui_win_set_scale_rate(win, sinf(pro * (M_PI / 2 - 0.2f) + 0.2f),
-                           sinf(pro * (M_PI / 2 - 0.2f) + 0.2f));
-    gui_win_set_opacity(win, (pro) * UINT8_MAX);
-    if (gui_win_is_animation_end_frame(win))
-    {
-        gui_win_set_scale_rate(win, 0, 0);//reset scale
-    }
-}
-
-static void app_menu_cb(void *obj, gui_event_t e, void *param)
-{
-    gui_log("%d,%p\n", GUI_TYPE(gui_obj_t, obj)->type, param);
-}
-
 static void app_back2watchface_cb(void)
 {
-    gui_app_switch(gui_current_app(), get_app_hongkong());
-}
-
-static void app_back2prescreen_cb(void)
-{
-    extern bool sidebar_flag;
-    extern bool return_to_watchface_flag;
-
-    if (return_to_watchface_flag || sidebar_flag)
-    {
-        gui_app_switch(gui_current_app(), get_app_hongkong());
-    }
-    else
-    {
-        gui_app_switch(gui_current_app(), get_app_menu());
-    }
-}
-
-static void app_AT_back2prescreen_cb(void)
-{
-    extern bool sidebar_flag;
-    extern bool return_to_watchface_flag;
-
-    extern void clear_activity(void);
-    clear_activity();
-    app_back2prescreen_cb();
-}
-
-static void app_HR_back2prescreen_cb(void)
-{
-    // extern void clear_heart_rate_app(void);
-
-    app_back2prescreen_cb();
-    // clear_heart_rate_app();
-}
-
-static void app_FN_back2prescreen_cb(void)
-{
-    extern void close_FN_APP();
-    close_FN_APP();
-
-    app_back2prescreen_cb();
-}
-
-static void app_BOX2D_RING_return_cb(void)
-{
-    extern void close_box2d_ring(void);
-    close_box2d_ring();
-
-    app_back2prescreen_cb();
+    gui_view_switch_direct(current_view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
 }
 
 static void app_soccer_cb(void *obj, gui_event_t e, void *param)
@@ -204,19 +131,19 @@ static void app_soccer_cb(void *obj, gui_event_t e, void *param)
     switch (soccer->press_face % 5)
     {
     case 0:
-        gui_app_switch(gui_current_app(), _get_app_APP_HEART_RATE_handle());
+        gui_view_switch_direct(current_view, heartrate_view, VIEW_ANIMATION_7, VIEW_ANIMATION_1);
         break;
     case 1:
-        gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
+        gui_view_switch_direct(current_view, music_view, VIEW_ANIMATION_7, VIEW_ANIMATION_3);
         break;
     case 2:
-        gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
+        gui_view_switch_direct(current_view, fruit_ninja_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2);
         break;
     case 3:
-        gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
+        gui_view_switch_direct(current_view, box2d_ring_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
         break;
     case 4:
-        gui_app_switch(gui_current_app(), _get_app_APP_ACTIVITY_handle());
+        gui_view_switch_direct(current_view, activity_view, VIEW_ANIMATION_7, VIEW_ANIMATION_4);
         break;
     default:
         break;
@@ -238,14 +165,12 @@ void page_callback(gui_page_t *page)
 }
 
 
-static void app_menu_design(gui_app_t *app)
+void app_menu_design(gui_view_t *view)
 {
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(&app->screen);
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "win_app_menu", 0, 0, SCREEN_WIDTH,
+    clear_mem();
+
+    gui_win_t *win = gui_win_create(view, "win_app_menu", 0, 0, SCREEN_WIDTH,
                                     SCREEN_HEIGHT);
-    gui_win_set_animate(win, 1000, 0, (gui_animate_callback_t)menu_win_ani_cb,
-                        0);//aniamtion start to play at app startup
 
     extern bool return_to_watchface_flag;
     return_to_watchface_flag = false;
@@ -417,64 +342,4 @@ static void app_menu_design(gui_app_t *app)
     }
     gui_return_create(win, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2watchface_cb, NULL);
-}
-
-GUI_APP_ENTRY(APP_BOX2D_RING)
-{
-    sidebar_app_array_fill(UI_CLOCK_BOX2D_RING_ICON_BIN, switch_APP_BOX2D_RING);
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(&app->screen);
-
-    extern void app_box2d_ring_ui_design(gui_obj_t *obj);
-    app_box2d_ring_ui_design(GUI_APP_ROOT_SCREEN);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_BOX2D_RING_return_cb, (void *)0);
-}
-
-GUI_APP_ENTRY(APP_MUSIC)
-{
-    sidebar_app_array_fill(UI_CLOCK_MUSIC_ICON_BIN, switch_APP_MUSIC);
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(&app->screen);
-
-    extern void app_music_ui_design(gui_obj_t *obj);
-    app_music_ui_design(GUI_APP_ROOT_SCREEN);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_back2prescreen_cb, (void *)0);
-}
-
-GUI_APP_ENTRY(APP_FRUIT_NINJA)
-{
-    sidebar_app_array_fill(UI_CLOCK_FRUIT_NINJA_ICON_BIN, switch_APP_FRUIT_NINJA);
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(&app->screen);
-
-    extern void app_fruit_ninja_design(gui_obj_t *obj);
-    app_fruit_ninja_design(GUI_APP_ROOT_SCREEN);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_FN_back2prescreen_cb, (void *)0);
-}
-
-GUI_APP_ENTRY(APP_HEART_RATE)
-{
-    sidebar_app_array_fill(UI_CLOCK_HEARTRATE_ICON_BIN, switch_APP_HEART_RATE);
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(&app->screen);
-
-    extern void heart_rate_app(gui_obj_t *obj);
-    heart_rate_app(GUI_APP_ROOT_SCREEN);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_HR_back2prescreen_cb, (void *)0);
-}
-
-GUI_APP_ENTRY(APP_ACTIVITY)
-{
-    sidebar_app_array_fill(UI_CLOCK_ACTIVITY_ICON_BIN, switch_APP_ACTIVITY);
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(&app->screen);
-
-    extern void activity_app(gui_obj_t *obj);
-    activity_app(GUI_APP_ROOT_SCREEN);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_AT_back2prescreen_cb, (void *)0);
 }
