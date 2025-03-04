@@ -12,6 +12,43 @@
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
+#include "app_hongkong.h"
+#include "gui_return.h"
+
+#define CURRENT_VIEW_NAME "music_view"
+
+extern "C" {
+    static gui_view_t *current_view = NULL;
+    const static gui_view_descriptor_t *menu_view = NULL;
+    const static gui_view_descriptor_t *heartrate_view = NULL;
+    void app_music_ui_design(gui_view_t *view);
+
+    static gui_view_descriptor_t const descriptor =
+    {
+        /* change Here for current view */
+        .name = (const char *)CURRENT_VIEW_NAME,
+        .pView = &current_view,
+        .design_cb = app_music_ui_design,
+    };
+
+    static int gui_view_descriptor_register_init(void)
+    {
+        gui_view_descriptor_register(&descriptor);
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+    static int gui_view_get_other_view_descriptor_init(void)
+    {
+        /* you can get other view descriptor point here */
+        menu_view = gui_view_descriptor_get("menu_view");
+        heartrate_view = gui_view_descriptor_get("heartrate_view");
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+}
 
 extern "C" {
 
@@ -1022,8 +1059,29 @@ void appMusicUIDesign(gui_obj_t *parent)
 
 
 extern "C" {
-    void app_music_ui_design(gui_obj_t *parent)
+    static void return_cb()
     {
+        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    }
+
+    void app_music_ui_design(gui_view_t *view)
+    {
+        clear_mem();
+
+        gui_obj_t *parent = GUI_BASE(view);
         gui_music_app::appMusicUIDesign(parent);
+
+        const char *name = GUI_BASE(gui_view_get_current_view())->name;
+        if (strcmp(name, "heartrate_view") == 0)
+        {
+            gui_view_switch_on_event(view, heartrate_view, VIEW_CUBE, VIEW_CUBE,
+                                     GUI_EVENT_TOUCH_MOVE_RIGHT);
+        }
+        else
+        {
+            extern const uint32_t *gui_app_return_array[17];
+            gui_return_create(view, gui_app_return_array,
+                              sizeof(gui_app_return_array) / sizeof(uint32_t *), (void *)return_cb, 0);
+        }
     }
 }

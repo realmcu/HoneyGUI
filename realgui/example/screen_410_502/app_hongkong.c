@@ -17,13 +17,55 @@
 #include "kb_algo.h"
 #include <time.h>
 #include "gui_fps.h"
+#include "gui_view.h"
+
+#define CURRENT_VIEW_NAME "watchface_view"
+
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+const static gui_view_descriptor_t *app_control_view = NULL;
+const static gui_view_descriptor_t *app_down_view = NULL;
+const static gui_view_descriptor_t *app_up_view = NULL;
+const static gui_view_descriptor_t *activity_view = NULL;
+const static gui_view_descriptor_t *watchface_select_view = NULL;
+
+static void watchface_design(gui_view_t *view);
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .design_cb = watchface_design,
+};
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    app_control_view = gui_view_descriptor_get("app_control_view");
+    app_down_view = gui_view_descriptor_get("app_down_view");
+    app_up_view = gui_view_descriptor_get("app_up_view");
+    activity_view = gui_view_descriptor_get("activity_view");
+    watchface_select_view  = gui_view_descriptor_get("watchface_select_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
-gui_tabview_t *tv;
-static gui_win_t *win_hk; //, *win_control;
 bool control_flag = 0;
 static bool enter_menu_flag = 0;
+
+char watchface_path[100];
+uint8_t watchface_index = 1;
 
 static gui_app_t app_hongkong =
 {
@@ -47,9 +89,6 @@ gui_app_t *get_app_hongkong(void)
 
 static void kb_button_cb()
 {
-    app_hongkong.startup_animation_flag = GUI_APP_ANIMATION_9;
-    app_hongkong.shutdown_animation_flag = GUI_APP_ANIMATION_10;
-
     extern gui_kb_port_data_t *kb_get_data(void);
     gui_kb_port_data_t *kb = kb_get_data();
     static uint32_t time_press = 0;
@@ -76,11 +115,11 @@ static void kb_button_cb()
                 release_his = kb->timestamp_ms_release;
                 return;
             }
-            if (time <= 1000)
+            else
             {
                 gui_log("pressing time = %d\n", time);
                 press_his = 0;
-                gui_obj_event_set(GUI_BASE(win_hk), GUI_EVENT_8);
+                gui_view_switch_direct(gui_view_get_current_view(), menu_view, VIEW_ANIMATION_6, VIEW_ANIMATION_1);
             }
         }
     }
@@ -91,65 +130,280 @@ static void kb_button_cb()
     }
 }
 
-static void switch_app_menu()
+
+char *cjson_content = NULL;
+uint8_t canvas_update_flag = 0;
+struct tm *timeinfo;
+static struct tm watch_time;
+
+static uint16_t seed = 12345;
+uint16_t xorshift16()
 {
-    if (!enter_menu_flag)
-    {
-        enter_menu_flag = 1;
-        gui_log("enter menu\n");
-        extern void close_box2d_ring(void);
-        close_box2d_ring();
-        extern void clear_activity(void);
-        clear_activity();
-
-        extern gui_app_t *get_app_menu();
-        gui_app_switch(gui_current_app(), get_app_menu());
-    }
+    seed ^= seed << 6;
+    seed ^= seed >> 9;
+    seed ^= seed << 2;
+    return seed;
 }
-#include "gui_view.h"
-gui_view_t *view_0 = NULL;
-gui_view_t *view_1 = NULL;
-gui_view_t *view_2 = NULL;
-gui_win_t *win_view = NULL;
 
+#if defined __WIN32
+const char *filename =
+    "./realgui/example/web/peripheral_simulation/json/simulation_data.json";
+/* read CJSON to string */
+char *read_file(const char *file_path)
+{
+    const char *path = NULL;
+    if (!file_path)
+    {
+        path = filename;
+    }
+    else
+    {
+        path = file_path;
+    }
+    FILE *file = fopen(path, "r");
+    if (!file)
+    {
+        perror("fopen");
+        return NULL;
+    }
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *content = (char *)malloc(length + 1);
+    if (content)
+    {
+        fread(content, 1, length, file);
+        content[length] = '\0';
+    }
+    fclose(file);
+    return content;
+}
+#else
+// #include "tuya_ble_feature_weather.h"
+// #include "watch_clock.h"
 
+void json_refreash()
+{
+    uint16_t degree = xorshift16() % 359;
+    uint16_t move = xorshift16() % 20000;
+    uint16_t ex = xorshift16() % 60;
+    uint16_t stand = xorshift16() % 30;
+    move = move < 1 ? 1 : move;
+    ex = ex < 1 ? 1 : ex;
+    stand = stand < 1 ? 1 : stand;
+    uint16_t AM12 = xorshift16() % 120;
+    uint16_t AM6 = xorshift16() % 120;
+    uint16_t PM12 = xorshift16() % 120;
+    uint16_t PM6 = xorshift16() % 120;
+    // gui_log("!cjson_content: %x %x %x %x %x\n", cjson_content[0], cjson_content[1], cjson_content[2], cjson_content[3], cjson_content[4]);
+
+    cJSON *root = cJSON_Parse(cjson_content);
+    if (!root)
+    {
+        gui_log("json_refreash Error parsing JSON!\r\n");
+        return;
+    }
+    cJSON *compass_array = cJSON_GetObjectItem(root, "compass");
+    if (compass_array != NULL && cJSON_GetArraySize(compass_array) > 0)
+    {
+        cJSON *compass_item = cJSON_GetArrayItem(compass_array, 0);
+        cJSON_ReplaceItemInObject(compass_item, "degree", cJSON_CreateNumber(degree));
+    }
+
+    cJSON *activity_array = cJSON_GetObjectItem(root, "activity");
+    if (activity_array != NULL && cJSON_GetArraySize(activity_array) > 0)
+    {
+        cJSON *activity_item = cJSON_GetArrayItem(activity_array, 0);
+        cJSON_ReplaceItemInObject(activity_item, "move", cJSON_CreateNumber(move));
+        cJSON_ReplaceItemInObject(activity_item, "exercise", cJSON_CreateNumber(ex));
+        cJSON_ReplaceItemInObject(activity_item, "stand", cJSON_CreateNumber(stand));
+    }
+
+    cJSON *heart_rate_array = cJSON_GetObjectItem(root, "heart_rate");
+    if (heart_rate_array != NULL && cJSON_GetArraySize(heart_rate_array) > 0)
+    {
+        cJSON *heart_rate_item = cJSON_GetArrayItem(heart_rate_array, 0);
+        {
+            AM12 = AM12 > 60 ? AM12 : 68;
+            cJSON_ReplaceItemInObject(heart_rate_item, "AM12", cJSON_CreateNumber(AM12));
+        }
+        {
+            AM6 = AM6 > 60 ? AM6 : 73;
+            cJSON_ReplaceItemInObject(heart_rate_item, "AM6", cJSON_CreateNumber(AM6));
+        }
+        {
+            PM12 = PM12 > 60 ? PM12 : 82;
+            cJSON_ReplaceItemInObject(heart_rate_item, "PM12", cJSON_CreateNumber(PM12));
+        }
+        {
+            PM6 = PM6 > 60 ? PM6 : 94;
+            cJSON_ReplaceItemInObject(heart_rate_item, "PM6", cJSON_CreateNumber(PM6));
+        }
+    }
+    char *temp = cJSON_PrintUnformatted(root);
+    sprintf(cjson_content, "%s", temp);
+    gui_free(temp);
+    cJSON_Delete(root);
+    canvas_update_flag = 0b1111;
+    // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
+//    gui_log("cjson_content: %s\n", cjson_content);
+}
+#endif
+
+void win_cb(void *p, void *this_widget, gui_animate_t *animate)
+{
+    if (animate->Beginning_frame)
+    {
+#if defined __WIN32
+        time_t rawtime;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        char *temp = cjson_content;
+        cjson_content = read_file(filename);
+        if (!cjson_content)
+        {
+            cjson_content = temp;
+            perror("fopen");
+        }
+        else
+        {
+            free(temp);
+        }
+        canvas_update_flag = 0b1111;
+        // gui_log("canvas_update_flag %x\n", canvas_update_flag);
+#else
+        // extern struct tm watch_clock_get(void);
+        // watch_time = watch_clock_get();
+        timeinfo = &watch_time;
+        // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
+        // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
+        // json_refreash();
+//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
+#endif
+    }
+    kb_button_cb();
+}
 
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
-    // extern gui_app_t *_get_app_APP_MUSIC_handle(void);
-    // gui_app_switch(gui_current_app(), _get_app_APP_MUSIC_handle());
-    // extern gui_app_t *get_app_menu();
-    // gui_app_switch(gui_current_app(), get_app_menu());
-    // extern gui_app_t *_get_app_APP_BOX2D_RING_handle();
-    // gui_app_switch(gui_current_app(), _get_app_APP_BOX2D_RING_handle());
-    // extern gui_app_t *_get_app_APP_FRUIT_NINJA_handle();
-    // gui_app_switch(gui_current_app(), _get_app_APP_FRUIT_NINJA_handle());
-    // return;
-    tv = gui_tabview_create(app->window, "hongkong_tabview", 0, 0, 0, 0);
-    win_hk = gui_win_create(app->window, "window_hongkong", 0, 0, 0, 0);
-    gui_win_set_animate(win_hk, 1000, -1, kb_button_cb, NULL);
-    gui_obj_add_event_cb(win_hk, (gui_event_cb_t)switch_app_menu, GUI_EVENT_8,
-                         app->window);
+
     enter_menu_flag = 0;
-    gui_tabview_set_style(tv, TAB_ROTATE_BOOK);
-    gui_tabview_enable_pre_load(tv, true);
 
-    extern void page_tb_control_enter(void *parent);
-    page_tb_control_enter(app->window);
+#if defined __WIN32
+    cjson_content = read_file(filename);
+    if (!cjson_content)
+    {
+        perror("fopen");
+    }
+#else
+    cjson_content = gui_malloc(700);
+    memcpy(cjson_content, TUYA_CJSON_BIN, 700);
+#endif
 
-    gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
-    gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
-    gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 3, 0);
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "view_win", 0, 0, 0, 0);
+    gui_view_t *view = gui_view_create(win, &descriptor, 0, 0, 0, 0);
 
-    page_tb_music(gui_tab_get_rte_obj(tb_music));
-    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
-    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
-    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
-    gui_tab_update_preload(GUI_BASE(tb_clock));
-    // gui_tab_update_preload(GUI_BASE(tb_activity));
+    gui_win_set_animate(win, 2000, -1, win_cb, NULL);
     gui_fps_create(GUI_APP_ROOT_SCREEN);
+}
+
+void clear_mem(void)
+{
+    gui_view_t *view = gui_view_get_current_view();
+    if (!view)
+    {
+        return;
+    }
+    const char *name = GUI_BASE(view)->name;
+
+    if (strcmp(name, "heartrate_view"))
+    {
+        extern void clear_heart_rate_cache(void);
+        clear_heart_rate_cache();
+    }
+    if (strcmp(name, "box2d_ring_view"))
+    {
+        extern void close_box2d_ring(void);
+        close_box2d_ring();
+    }
+    if (strcmp(name, "fruit_ninja_view"))
+    {
+        extern void close_FN(void);
+        close_FN();
+    }
+    if (strcmp(name, "activity_view"))
+    {
+        extern void clear_activity(void);
+        clear_activity();
+    }
+    if (strcmp(name, "watchface_view"))
+    {
+        extern void clear_clock(void);
+        clear_clock();
+    }
+    if (strcmp(name, "app_down_view"))
+    {
+        extern void clear_down_view(void);
+        clear_down_view();
+    }
+}
+
+static void watchface_design(gui_view_t *view)
+{
+    clear_mem();
+
+    gui_view_switch_on_event(view, app_down_view, VIEW_STILL, VIEW_TRANSPLATION,
+                             GUI_EVENT_TOUCH_MOVE_UP);
+    gui_view_switch_on_event(view, app_up_view, VIEW_STILL, VIEW_TRANSPLATION,
+                             GUI_EVENT_TOUCH_MOVE_DOWN);
+    gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
+                             GUI_EVENT_TOUCH_MOVE_LEFT);
+    gui_view_switch_on_event(view, app_control_view, VIEW_STILL, VIEW_TRANSPLATION,
+                             GUI_EVENT_TOUCH_MOVE_RIGHT);
+    gui_view_switch_on_event(view, watchface_select_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5,
+                             GUI_EVENT_TOUCH_LONG);
+
+    extern void page_ct_clock(gui_view_t *view);
+    extern void create_tree_nest(const char *xml, void *obj);
+    extern void create_watchface_bf(gui_view_t *view);
+    extern void create_watchface_ring(gui_view_t *view);
+    switch (watchface_index)
+    {
+    case 0:
+        {
+            create_tree_nest((void *)watchface_path, view);
+        }
+        break;
+    case 1:
+        {
+            page_ct_clock(view);
+        }
+        break;
+    case 2:
+        {
+            create_watchface_bf(view);
+        }
+        break;
+    case 3:
+        {
+            create_watchface_ring(view);
+        }
+        break;
+    case 4:
+        {
+            create_tree_nest((void *)watchface_path, view);
+        }
+        break;
+    case 5:
+        {
+            create_tree_nest((void *)watchface_path, view);
+        }
+        break;
+    default:
+        page_ct_clock(view);
+        break;
+    }
 }
 
 // static void data_generate_task_entry()

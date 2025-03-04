@@ -1,6 +1,6 @@
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_img.h>
-#include "gui_curtainview.h"
+#include "gui_view.h"
 #include "gui_tabview.h"
 #include "gui_tab.h"
 #include "gui_canvas.h"
@@ -14,6 +14,7 @@
 #include "gui_canvas_round_rect.h"
 #include "guidef.h"
 #include "def_list.h"
+#include "app_hongkong.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -21,6 +22,36 @@
 #define TAB_INTERVAL 20
 #define TAB_START 140
 #define TAB_ARRAY_NUM 4
+
+#define CURRENT_VIEW_NAME "app_up_view"
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
+void tabview_up_design(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .design_cb = tabview_up_design,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 typedef enum
 {
@@ -41,7 +72,6 @@ static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
 static gui_page_t *pg = NULL;
 static gui_win_t *win_animate, *win_design;
 static gui_obj_t *tv_array[TAB_ARRAY_NUM] = {0};
-static gui_curtain_t *ct_parent;
 static gui_img_t *arrow;
 static bool close_flag = 0;
 
@@ -63,7 +93,7 @@ static void win_clear_all_cb(void)
                 gui_list_t *node = NULL;
                 gui_list_t *tmp = NULL;
                 // clear "win_view_more"
-                gui_list_for_each_safe(node, tmp, &(GUI_BASE(ct_parent)->child_list))
+                gui_list_for_each_safe(node, tmp, &(GUI_BASE(current_view)->child_list))
                 {
                     gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
                     if (obj->magic != GUI_MAGIC_NUMBER)
@@ -218,6 +248,7 @@ static void cancel_cb(gui_obj_t *win)
     if (percent >= 1)
     {
         gui_win_start_animation(win_design);
+        gui_obj_show(win, false);
         GUI_BASE(pg)->gesture = 0;
         // gui_obj_tree_free(win);
     }
@@ -226,6 +257,7 @@ static void cancel_cb(gui_obj_t *win)
 static void view_more_cb(gui_obj_t *win)
 {
     // enter animation
+    gui_obj_show(win, true);
     if (win->x < -100)
     {
         win->x = (win_animate->animate->progress_percent - 1) * SCREEN_WIDTH;
@@ -307,7 +339,8 @@ static void view_more_enter(void *obj, gui_event_t e, void *param)
 
 void pagelist_create(gui_msg_t *msg)
 {
-    if (strcmp(gui_current_app()->screen.name, "app_hongkong") != 0 || !pg)
+    gui_view_t *view = gui_view_get_current_view();
+    if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) || !pg)
     {
         // gui_log("Current APP can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
         return;
@@ -431,8 +464,9 @@ void pagelist_create(gui_msg_t *msg)
     // view more
     gui_win_t *win;
     {
-        win = gui_win_create(ct_parent, "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
+        win = gui_win_create(current_view, "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
                              SCREEN_HEIGHT);
+        gui_obj_show(win, false);
         gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), "0", 0, 0,
                                                               SCREEN_WIDTH,
                                                               SCREEN_HEIGHT, gui_rgb(0, 0, 0));
@@ -540,7 +574,7 @@ static void win_design_cb(void)
     bool flag = false;
     int16_t y;
     int16_t h;
-    static bool curtain_change = 0;
+    static bool view_change = 0;
     uint8_t index = 0;
 
     while (1)
@@ -559,9 +593,9 @@ static void win_design_cb(void)
     }
 
     touch_info_t *tp = tp_get_info();
-    if (!GUI_BASE(ct_parent)->gesture && tp->deltaY < -(SCREEN_HEIGHT / 2))
+    if (!GUI_BASE(current_view)->gesture && tp->deltaY < -(SCREEN_HEIGHT / 2))
     {
-        curtain_change = 1;
+        view_change = 1;
     }
 
     static bool hold;
@@ -573,7 +607,7 @@ static void win_design_cb(void)
     {
         hold = 0;
         gui_img_set_image_data(arrow, UI_LINE_STILL_BIN);
-        if (!curtain_change) //still curtain_up, show all pages
+        if (!view_change) //still view_up, show all pages
         {
             GUI_BASE(pg)->gesture = 0;
         }
@@ -638,13 +672,13 @@ static void win_design_cb(void)
         if (flag || tp->y > SCREEN_HEIGHT - 50)
         {
             GUI_BASE(pg)->gesture = 1;
-            GUI_BASE(ct_parent)->gesture = 0;
-            // gui_log("curtain down\n");
+            GUI_BASE(current_view)->gesture = 0;
+            // gui_log("view down\n");
         }
         else
         {
             GUI_BASE(pg)->gesture = 0;
-            GUI_BASE(ct_parent)->gesture = 1;
+            GUI_BASE(current_view)->gesture = 1;
             // gui_log("page down\n");
         }
 
@@ -658,8 +692,7 @@ static void win_design_cb(void)
         }
     }
     // not show pages out of screen
-    gui_curtainview_t *curtainview = (gui_curtainview_t *)(GUI_BASE(ct_parent)->parent);
-    if (curtainview->cur_curtain == CURTAIN_UP)
+    if (current_view->view_switch_ready)
     {
         for (uint8_t i = 0; i < index; i++)
         {
@@ -675,7 +708,7 @@ static void win_design_cb(void)
             }
         }
     }
-    // enter curtain_up, show all pages
+    // enter view_up, show all pages
     else
     {
         for (uint8_t i = 0; i < index; i++)
@@ -692,17 +725,22 @@ static void win_design_cb(void)
             }
         }
         GUI_BASE(pg)->gesture = 0;
-        curtain_change = 0;
+        view_change = 0;
     }
 }
 
-void tabview_up_design(void *parent_widget)
+void tabview_up_design(gui_view_t *view)
 {
-    ct_parent = (gui_curtain_t *)parent_widget;
+    clear_mem();
+
+    gui_view_switch_on_event(view, watchface_view, VIEW_TRANSPLATION, VIEW_STILL,
+                             GUI_EVENT_TOUCH_MOVE_UP);
+
+    gui_obj_t *parent_widget = GUI_BASE(view);
     win_design = gui_win_create(parent_widget, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(win_design), "background", 0, 0,
-                                                            SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(255, 255, 255, 76));
+                                                            SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
 
     pg = gui_page_create(canvas_rect, "ct_up_page", 0, 0, 0, 0);
     // draw table content

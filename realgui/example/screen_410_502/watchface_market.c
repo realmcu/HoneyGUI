@@ -4,15 +4,44 @@
 #include "gui_api.h"
 #include "root_image_hongkong/ui_resource.h"
 #include "guidef.h"
+#include "app_hongkong.h"
 
+// #define CURRENT_VIEW_NAME "watchface_market_view"
 
-#define APP_WATCHFACE_MARKET
-// cppcheck-suppress syntaxError
-GUI_APP_DEFINE_NAME_ANIMATION(APP_WATCHFACE_MARKET, GUI_APP_ANIMATION_4, GUI_APP_ANIMATION_7)
-// GUI_APP_DEFINE_NAME(APP_WATCHFACE_MARKET)
+// static gui_view_t *current_view = NULL;
+
+const static gui_view_descriptor_t *watchface_view = NULL;
+// void watchface_mask_design(gui_view_t* view);
+
+// static gui_view_descriptor_t const descriptor =
+// {
+//     /* change Here for current view */
+//     .name = (const char *)CURRENT_VIEW_NAME,
+//     .pView = &current_view,
+//     .design_cb = watchface_mask_design,
+// };
+
+// static int gui_view_descriptor_register_init(void)
+// {
+//     gui_view_descriptor_register(&descriptor);
+//     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+//     return 0;
+// }
+// static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
 #define APP_WATCHFACE_MARKET_MAX_COUNT 10
 
 static char **xml_file_array = NULL;
+extern char watchface_path[];
 
 static char **find_all_xml_files(const char *dirPath, int *xml_file_counts)
 {
@@ -88,6 +117,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_release_cb)
     gui_win_set_animate(win, 400, 0, win_release_animation_cb, NULL);
 }
 gui_win_t *win;
+gui_view_t *view_parent = NULL;
 // gui_win_t *win2;
 static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
 {
@@ -98,14 +128,17 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
         if (strcmp(GUI_BASE(obj)->name, "wf_UI") == 0)
         {
             watchface_index = 1;
+            // gui_view_switch_direct(view_parent, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
         }
         else if (strcmp(GUI_BASE(obj)->name, "wf_ring") == 0)
         {
             watchface_index = 3;
+            // gui_view_switch_direct(view_parent, watchface_ring_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
         }
         else if (strcmp(GUI_BASE(obj)->name, "wf_butterfly") == 0)
         {
             watchface_index = 2;
+            // gui_view_switch_direct(view_parent, watchface_butterfly_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
         }
     }
     else
@@ -130,13 +163,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
             watchface_index = 0;
         }
     }
-    extern gui_app_t *get_app_hongkong(void);
-    gui_app_layer_buttom();
-    GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_hongkong());
-    // GUI_WIDGET_POINTER_BY_NAME_ROOT(watchface_window, "_watchface_main_window_",
-    //                                 &(get_app_hongkong()->screen))  // cppcheck-suppress syntaxError
-    // gui_obj_child_free(wathcface_window);
-    // create_tree_nest((void *)path, watchface_window);
+    gui_view_switch_direct(view_parent, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
     int count = 0;
     while (1)
     {
@@ -155,11 +182,10 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
 }
 
 // if use this APP on EVB, need to add romfs.c, romfs.h and update gui_port_filesystem.c
-GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
+void WATCHFACE_MARKET_list(gui_view_t *view)
 {
-    // win2 = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, gui_get_screen_width(),
-    //                       gui_get_screen_height());
-    win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, gui_get_screen_width(),
+    view_parent = view;
+    win = gui_win_create(view, 0, 0, 0, gui_get_screen_width(),
                          gui_get_screen_height());
 
     gui_page_t *page = gui_page_create(win, 0, 0, 0, gui_get_screen_width(), 0);
@@ -225,3 +251,18 @@ GUI_APP_ENTRY(APP_WATCHFACE_MARKET)
         }
     }
 }
+
+// void watchface_mask_design(gui_view_t* view)
+// {
+//     gui_view_switch_on_event(view, app_down_view, VIEW_STILL, VIEW_TRANSPLATION,
+//                               GUI_EVENT_TOUCH_MOVE_UP);
+//     gui_view_switch_on_event(view, app_up_view, VIEW_STILL, VIEW_TRANSPLATION,
+//                               GUI_EVENT_TOUCH_MOVE_DOWN);
+//     gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
+//                               GUI_EVENT_TOUCH_MOVE_LEFT);
+//     gui_view_switch_on_event(view, watchface_select_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5,
+//                               GUI_EVENT_TOUCH_LONG);
+
+//     extern void create_tree_nest(const char *xml, void *obj);
+//     create_tree_nest((void *)watchface_path, view);
+// }

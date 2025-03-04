@@ -13,12 +13,49 @@
 #include <stdint.h>
 #include "gui_api.h"
 #include <vector>
+#include "app_hongkong.h"
+#include "gui_return.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 #define HEIGHT_OFFSET 100
+
+#define CURRENT_VIEW_NAME "fruit_ninja_view"
+
+extern "C" {
+    static gui_view_t *current_view = NULL;
+    const static gui_view_descriptor_t *menu_view = NULL;
+    void app_fruit_ninja_design(gui_view_t *view);
+
+    static gui_view_descriptor_t const descriptor =
+    {
+        /* change Here for current view */
+        .name = (const char *)CURRENT_VIEW_NAME,
+        .pView = &current_view,
+        .design_cb = app_fruit_ninja_design,
+    };
+
+    static int gui_view_descriptor_register_init(void)
+    {
+        gui_view_descriptor_register(&descriptor);
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+    static int gui_view_get_other_view_descriptor_init(void)
+    {
+        /* you can get other view descriptor point here */
+        menu_view = gui_view_descriptor_get("menu_view");
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+}
+
 namespace app_fruit_ninja
 {
+static void *mem = NULL;
 static const float M2P =
     20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
 static const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
@@ -61,7 +98,7 @@ void clear_world()
     if (world)
     {
         world->~b2World();
-        gui_free(world);
+        gui_free(mem);
         world = nullptr;
         gui_log("close world done\n");
     }
@@ -462,7 +499,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
     if (get_init_flag() == 1)
     {
         // Create a Box2D world with gravity
-        void *mem = gui_malloc(sizeof(b2World));
+        mem = gui_malloc(sizeof(b2World));
         b2Vec2 gravity(0.0f, 9.8f);
         world = new (mem) b2World(gravity);
 
@@ -703,11 +740,23 @@ static void fruit_ninja_design(gui_obj_t *obj)
 }
 
 extern "C" {
-    void app_fruit_ninja_design(gui_obj_t *obj)
+    static void return_cb()
     {
-        app_fruit_ninja::fruit_ninja_design(obj);
+        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
     }
-    void close_FN_APP()
+    void app_fruit_ninja_design(gui_view_t *view)
+    {
+        clear_mem();
+
+        gui_obj_t *obj = GUI_BASE(view);
+        app_fruit_ninja::fruit_ninja_design(obj);
+
+        extern const uint32_t *gui_app_return_array[17];
+        extern void app_FN_back2prescreen_cb(void);
+        gui_return_create(view, gui_app_return_array,
+                          sizeof(gui_app_return_array) / sizeof(uint32_t *), (void *)return_cb, 0);
+    }
+    void close_FN(void)
     {
         app_fruit_ninja::clear_world();
     }

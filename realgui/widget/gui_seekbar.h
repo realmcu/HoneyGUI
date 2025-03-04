@@ -59,9 +59,9 @@ typedef struct gui_seekbar
 
 _GUI_API_DEFINE(gui_seekbar_t)
 void (*animate)(gui_seekbar_t *o, uint32_t dur, int repeat_count, void *callback, void *p);
-float (*get_progress)(gui_seekbar_t *this);
-void (*set_progress)(gui_seekbar_t *this, float progress);
-void (*on_change)(gui_seekbar_t *this, gui_event_cb_t function, void *param);
+float (*get_progress)(gui_seekbar_t *_this);
+void (*set_progress)(gui_seekbar_t *_this, float progress);
+void (*on_change)(gui_seekbar_t *_this, gui_event_cb_t function, void *param);
 _GUI_API_DECLARE(gui_seekbar_t)
 
 /*============================================================================*
@@ -86,7 +86,7 @@ _GUI_API_DECLARE(gui_seekbar_t)
 /**
   * @brief  create a vertical based on picture seekbar
   * @param  parent the father widget it nested in
-  * @param  filename this seekbar widget's name
+  * @param  filename _this seekbar widget's name
   * @param  x   the X-axis coordinate relative to parent widget
   * @param  y   the y-axis coordinate relative to parent widget
   * @return return the widget object pointer
@@ -107,7 +107,7 @@ gui_seekbar_t *gui_seekbar_create_img_v(void       *parent,
 /**
   * @brief  create a horizontal based on picture seekbar
   * @param  parent the father widget it nested in
-  * @param  filename this seekbar widget's name
+  * @param  filename _this seekbar widget's name
   * @param  x   the X-axis coordinate relative to parent widget
   * @param  y   the y-axis coordinate relative to parent widget
   * @return return the widget object pointer

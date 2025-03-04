@@ -16,12 +16,54 @@
 #include "gui_canvas_img.h"
 #include "gui_curtain.h"
 #include "gui_canvas_rect.h"
+#include "app_hongkong.h"
+#include "gui_return.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
+
+#define CURRENT_VIEW_NAME "heartrate_view"
+
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *music_view = NULL;
+const static gui_view_descriptor_t *activity_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
+void heart_rate_app(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .design_cb = heart_rate_app,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    activity_view = gui_view_descriptor_get("activity_view");
+    music_view = gui_view_descriptor_get("music_view");
+    menu_view = gui_view_descriptor_get("menu_view");
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+
+
 static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
@@ -239,17 +281,32 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(hr_animation)
         gui_img_set_image_data(this_widget, img_data);
     }
 }
-void clear_heart_rate_app(void)
+void clear_heart_rate_cache(void)
 {
-    // if (img_data)
-    // {
-    //     gui_lower_free(img_data);
-    //     img_data = NULL;
-    // }
+    if (img_data)
+    {
+        gui_lower_free(img_data);
+        img_data = NULL;
+    }
 }
-
-void heart_rate_app(gui_obj_t *obj)
+static void return_cb()
 {
+    const char *name = GUI_BASE(gui_view_get_current_view())->name;
+    if (strcmp(name, "menu_view") == 0)
+    {
+        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    }
+    else
+    {
+        gui_view_switch_direct(current_view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    }
+}
+void heart_rate_app(gui_view_t *view)
+{
+    clear_mem();
+
+    gui_obj_t *obj = GUI_BASE(view);
+
     gui_log("current app:%s\n", gui_current_app()->screen.name);
 
     win_hb = gui_win_create(obj, "hb_win", 0, 0, SCREEN_WIDTH,
@@ -368,5 +425,19 @@ void heart_rate_app(gui_obj_t *obj)
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
         gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+    }
+    const char *name = GUI_BASE(gui_view_get_current_view())->name;
+    if (strcmp(name, "music_view") == 0 || strcmp(name, "activity_view") == 0)
+    {
+        gui_view_switch_on_event(view, music_view, VIEW_CUBE, VIEW_CUBE,
+                                 GUI_EVENT_TOUCH_MOVE_LEFT);
+        gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
+                                 GUI_EVENT_TOUCH_MOVE_RIGHT);
+    }
+    else
+    {
+        extern const uint32_t *gui_app_return_array[17];
+        gui_return_create(view, gui_app_return_array,
+                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_cb, 0);
     }
 }

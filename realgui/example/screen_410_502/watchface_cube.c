@@ -11,27 +11,25 @@
 #include "math.h"
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_cube.h"
+#include "app_hongkong.h"
 
-static void _APP_WATCHFACE_CUBE_ui_design(gui_app_t *app);
-static gui_app_t _app_APP_WATCHFACE_CUBE =
+const static gui_view_descriptor_t *watchface_view = NULL;
+
+static int gui_view_get_other_view_descriptor_init(void)
 {
-    .screen =
-    {
-        .name = "APP_WATCHFACE_CUBE",
-        .magic = 0x0b,
-    },
-    .ui_design = _APP_WATCHFACE_CUBE_ui_design,
-    .active_ms = 1000000,
-    .shutdown_animation_flag = GUI_APP_ANIMATION_7,
-    // .startup_animation_flag = GUI_APP_ANIMATION_4,
-};
-gui_app_t *_get_app_APP_WATCHFACE_CUBE_handle(void) { return &_app_APP_WATCHFACE_CUBE; }
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void app_cb(void *obj, gui_event_t e, void *param)
 {
     extern uint8_t watchface_index;
     extern char *defaultPath;
     extern char watchface_path[];
+    gui_view_t *view = (gui_view_t *)GUI_BASE(obj)->parent;
     switch (e)
     {
     case GUI_EVENT_1:
@@ -50,6 +48,7 @@ static void app_cb(void *obj, gui_event_t e, void *param)
         break;
     case GUI_EVENT_5:
         watchface_index = 3;
+
         break;
     case GUI_EVENT_6:
         watchface_index = 4;
@@ -58,11 +57,10 @@ static void app_cb(void *obj, gui_event_t e, void *param)
     default:
         break;
     }
-    extern void *get_app_hongkong(void);
-    gui_app_switch(gui_current_app(), (gui_app_t *)get_app_hongkong());
+    gui_view_switch_direct(view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
 }
 
-void _APP_WATCHFACE_CUBE_ui_design(gui_app_t *app)
+void WATCHFACE_CUBE_ui_design(gui_view_t *view)
 {
     gui_cube_imgfile_t imgfile =
     {
@@ -75,7 +73,7 @@ void _APP_WATCHFACE_CUBE_ui_design(gui_app_t *app)
         .data_addr.data_addr_left = WATCHFACE_RING_BIN,
         .data_addr.data_addr_right = WF3PREVIEW_BIN
     };
-    gui_cube_t *cube = gui_cube_create(app->window, "cube", &imgfile, 0, 0);
+    gui_cube_t *cube = gui_cube_create(view, "cube", &imgfile, 0, 0);
     gui_cube_auto_rotation_by_y(cube, 100, 3.0f);
     gui_cube_set_mode(cube, CUBE_SIDE_DOWN, IMG_SRC_OVER_MODE);
     gui_cube_set_size(cube, 120);

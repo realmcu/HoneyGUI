@@ -19,6 +19,7 @@
 #define HEIGHT_OFFSET 100
 namespace app_fruit_ninja
 {
+static void *mem = NULL;
 static const float M2P =
     20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
 static const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
@@ -62,7 +63,7 @@ void clear_world()
     if (world)
     {
         world->~b2World();
-        gui_free(world);
+        gui_free(mem);
         world = nullptr;
         gui_log("close world done\n");
     }
@@ -463,7 +464,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
     if (get_init_flag())
     {
         // Create a Box2D world with gravity
-        void *mem = gui_malloc(sizeof(b2World));
+        mem = gui_malloc(sizeof(b2World));
         b2Vec2 gravity(0.0f, 9.8f);
         world = new (mem) b2World(gravity);
 

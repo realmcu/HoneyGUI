@@ -46,11 +46,11 @@ typedef struct
 /* VIEW_SWITCH_STYLE enum start*/
 typedef enum
 {
-    VIEW_TRANSPLATION     = 0x0000, ///< Transplate from the slide direction
-    VIEW_REDUCTION        = 0x0001, ///< Zoom in from the slide direction
-    VIEW_ROTATE           = 0x0002, ///< Rotate in from the slide direction
-    VIEW_CUBE             = 0x0003, ///< Rotate in from the slide direction like cube
-    VIEW_STILL            = 0x0004, ///< Overlay effect with new view transplate in
+    VIEW_STILL            = 0x0000, ///< Overlay effect with new view transplate in
+    VIEW_TRANSPLATION     = 0x0001, ///< Transplate from the slide direction
+    VIEW_REDUCTION        = 0x0002, ///< Zoom in from the slide direction
+    VIEW_ROTATE           = 0x0003, ///< Rotate in from the slide direction
+    VIEW_CUBE             = 0x0004, ///< Rotate in from the slide direction like cube
     VIEW_ANIMATION_NULL   = 0x0005,
     VIEW_ANIMATION_1,               ///< Recommended for startup
     VIEW_ANIMATION_2,               ///< Recommended for startup

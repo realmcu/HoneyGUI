@@ -325,7 +325,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(view_transition_animation_function
             GUI_BASE(this)->y = 0;
             this->view_switch_ready = true;
             this->event = 0;
-            this->style = VIEW_TRANSPLATION;
+            this->style = VIEW_STILL;
         }
     }
 }

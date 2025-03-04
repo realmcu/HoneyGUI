@@ -6,9 +6,47 @@
 #include "guidef.h"
 #include "gui_img.h"
 #include <time.h>
+#include "app_hongkong.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
+
+// #define CURRENT_VIEW_NAME "watchface_ring_view"
+
+// static gui_view_t *current_view = NULL;
+// const static gui_view_descriptor_t *app_down_view = NULL;
+// const static gui_view_descriptor_t *app_up_view = NULL;
+// const static gui_view_descriptor_t *activity_view = NULL;
+// const static gui_view_descriptor_t *watchface_select_view = NULL;
+// void create_watchface_ring(gui_view_t *view);
+
+// static gui_view_descriptor_t const descriptor =
+// {
+//     /* change Here for current view */
+//     .name = (const char *)CURRENT_VIEW_NAME,
+//     .pView = &current_view,
+//     .design_cb = create_watchface_ring,
+// };
+
+// static int gui_view_descriptor_register_init(void)
+// {
+//     gui_view_descriptor_register(&descriptor);
+//     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+//     return 0;
+// }
+// static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+// static int gui_view_get_other_view_descriptor_init(void)
+// {
+//     /* you can get other view descriptor point here */
+//     app_down_view = gui_view_descriptor_get("app_down_view");
+//     app_up_view = gui_view_descriptor_get("app_up_view");
+//     activity_view = gui_view_descriptor_get("activity_view");
+//     watchface_select_view  = gui_view_descriptor_get("watchface_select_view");
+//     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+//     return 0;
+// }
+// static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static gui_img_t *h_hand, *m_hand, *s_hand;
 
@@ -67,12 +105,21 @@ static void win_cb()
     }
 }
 
-void create_watchface_ring(void *parent)
+void create_watchface_ring(gui_view_t *view)
 {
-    gui_obj_t *obj = GUI_BASE(parent);
+    // gui_view_switch_on_event(view, app_down_view, VIEW_STILL, VIEW_TRANSPLATION,
+    //                           GUI_EVENT_TOUCH_MOVE_UP);
+    // gui_view_switch_on_event(view, app_up_view, VIEW_STILL, VIEW_TRANSPLATION,
+    //                           GUI_EVENT_TOUCH_MOVE_DOWN);
+    // gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
+    //                           GUI_EVENT_TOUCH_MOVE_LEFT);
+    // gui_view_switch_on_event(view, watchface_select_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5,
+    //                           GUI_EVENT_TOUCH_LONG);
+
+    gui_obj_t *obj = GUI_BASE(view);
     gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    extern void app_box2d_ring_ui_design(gui_obj_t *obj);
-    app_box2d_ring_ui_design((gui_obj_t *)win);
+    extern void app_box2d_ring_watchface(gui_obj_t *obj);
+    app_box2d_ring_watchface((gui_obj_t *)win);
 
     gui_img_create_from_mem(win, "mask", WATCH_MASK_BIN, 200, 242, 0, 0);
     h_hand = gui_img_create_from_mem(win, "h_hand", WATCH_HOUR_HAND_BIN, 200, 163, 0, 0);
