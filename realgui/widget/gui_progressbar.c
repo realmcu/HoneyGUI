@@ -93,7 +93,7 @@ void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
     if (this->per != this->per_history)
     {
         this->per_history = this->per;
-        gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
+        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
     }
 
     if (this->image_type == IMAGE_SCOPE)
@@ -130,7 +130,7 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
     if (this->per != this->per_history)
     {
         this->per_history = this->per;
-        gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
+        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
     }
 
     if (this->image_type == IMAGE_SCOPE)

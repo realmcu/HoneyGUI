@@ -89,7 +89,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
 
     if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
     {
-        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
     if (tabview->jump.jump_flag)
     {
@@ -194,7 +194,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
                         break;
                     }
 
-                    gui_obj_event_set(obj, GUI_EVENT_8);
+                    gui_obj_enable_event(obj, GUI_EVENT_8);
                     this->release_y = tp->deltaY;
 
                     if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_down == 0))
@@ -238,7 +238,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
                     }
                 }
 
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
                 //when current tab is the end,come back to current tab if sliding.
                 if ((tabview->cur_id.x == tabview->tab_cnt_right))
                 {
@@ -279,7 +279,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
                         break;
                     }
                 }
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
                 //when current tab is the end,come back to current tab if sliding.
                 if (tabview->cur_id.x == tabview->tab_cnt_left)
                 {
@@ -420,7 +420,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     if (((this->tab_change_ready == true) && (this->release_x == 0) && (this->release_y == 0)) ||
         (dc->frame_count == 1) || this->initial)
     {
-        gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+        gui_obj_enable_event(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
         this->tab_change_ready = false;
         this->initial = false;
         this->tab_need_pre_load = true;

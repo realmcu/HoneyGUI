@@ -362,7 +362,7 @@ static void gui_text_prepare(gui_obj_t *obj)
             }
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                gui_obj_event_set(obj, (gui_event_t)TXT_EVENT_CLICK);
+                gui_obj_enable_event(obj, (gui_event_t)TXT_EVENT_CLICK);
             }
         }
         break;

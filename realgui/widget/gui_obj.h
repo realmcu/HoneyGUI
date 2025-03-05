@@ -253,12 +253,12 @@ void gui_obj_add_event_cb(void           *obj,
   * \code{.c}
   * static void app_main_task(gui_obj_t *obj)
   * {
-  *    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+  *    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
   *
   * }
   * \endcode
   */
-void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code);
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code);
 
 /**
   * @brief free the widget tree recursively,from the root to the leaves.Preorder traversal.

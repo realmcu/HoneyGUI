@@ -76,44 +76,44 @@ static void prepare(gui_obj_t *obj)
 
     if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0) && !(obj->event_dsc->event_code))
     {
-        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
 
     if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         if (tp->pressing)
         {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSING);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
         }
         switch (tp->type)
         {
         case TOUCH_SHORT:
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
             }
             break;
 
         case TOUCH_UP_SLIDE:
             {
-                gui_obj_event_set(obj, GUI_EVENT_3);
+                gui_obj_enable_event(obj, GUI_EVENT_3);
             }
             break;
 
         case TOUCH_DOWN_SLIDE:
             {
-                gui_obj_event_set(obj, GUI_EVENT_4);
+                gui_obj_enable_event(obj, GUI_EVENT_4);
             }
             break;
 
         case TOUCH_LEFT_SLIDE:
             {
-                gui_obj_event_set(obj, GUI_EVENT_1);
+                gui_obj_enable_event(obj, GUI_EVENT_1);
             }
             break;
 
         case TOUCH_RIGHT_SLIDE:
             {
-                gui_obj_event_set(obj, GUI_EVENT_2);
+                gui_obj_enable_event(obj, GUI_EVENT_2);
             }
             break;
 
@@ -122,7 +122,7 @@ static void prepare(gui_obj_t *obj)
                 if (this->long_flag == false)
                 {
                     this->long_flag = true;
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
                 }
             }
             break;
@@ -133,7 +133,7 @@ static void prepare(gui_obj_t *obj)
 
         if (tp->pressed)
         {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
             this->long_flag = false;
             this->press_flag = true;
         }
@@ -145,7 +145,7 @@ static void prepare(gui_obj_t *obj)
         this->release_flag = false;
         if (obj->event_dsc_cnt && obj->event_dsc->event_code == GUI_EVENT_INVALIDE)
         {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
         }
         this->long_flag = false;
     }
@@ -181,7 +181,7 @@ static void prepare(gui_obj_t *obj)
     }
     if (this->event5_flag)
     {
-        gui_obj_event_set(obj, GUI_EVENT_5);
+        gui_obj_enable_event(obj, GUI_EVENT_5);
     }
 
 

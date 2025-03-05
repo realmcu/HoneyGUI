@@ -150,7 +150,7 @@ UI系统可以接收设备中其他外设的输入，典型的输入设备有触
         kb_info_t *kb = kb_get_info();  
         if (kb->pressed == true)  
         {  
-            gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);  
+            gui_obj_enable_event(obj, GUI_EVENT_KB_DOWN_PRESSED);  
         }  
     ......
     }  

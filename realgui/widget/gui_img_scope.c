@@ -115,7 +115,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
                 b->press_flag = true;
             }
         }
@@ -124,7 +124,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         {
             b->press_flag = false;
             b->release_flag = false;
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
         }
 
         if (tp->released && b->press_flag)
@@ -214,7 +214,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         if ((tp->type == TOUCH_SHORT)
             && (obj->event_dsc_cnt > 0))
         {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
         }
     }
 

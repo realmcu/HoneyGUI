@@ -624,7 +624,7 @@ static void win_design_cb(void)
                 {
                     if (tp->x > 52 && tp->x < 357)
                     {
-                        gui_obj_event_set(canvas, GUI_EVENT_1);
+                        gui_obj_enable_event(canvas, GUI_EVENT_1);
 
                         gui_log("click clear\r\n");
                         return;
@@ -649,12 +649,12 @@ static void win_design_cb(void)
                         {
                             if (tp->x > 30 && tp->x < 200)
                             {
-                                gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_2);
+                                gui_obj_enable_event(GUI_BASE(tv), GUI_EVENT_2);
                                 // gui_log("click left\r\n");
                             }
                             else if (tp->x > 210 && tp->x < 380)
                             {
-                                gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_1);
+                                gui_obj_enable_event(GUI_BASE(tv), GUI_EVENT_1);
                                 // gui_log("click right\r\n");
                             }
                             break;

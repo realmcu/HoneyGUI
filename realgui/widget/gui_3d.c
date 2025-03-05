@@ -381,7 +381,7 @@ static void gui_3d_prepare(gui_3d_t *this)
                 tp->y >= target_y &&
                 tp->y <= (target_y + target_h))
             {
-                gui_obj_event_set(obj, GUI_EVENT_1);
+                gui_obj_enable_event(obj, GUI_EVENT_1);
                 break;
             }
         }
@@ -500,7 +500,7 @@ static void gui_3d_prepare(gui_3d_t *this)
                 tp->y >= target_y &&
                 tp->y <= (target_y + target_h))
             {
-                gui_obj_event_set(obj, GUI_EVENT_1);
+                gui_obj_enable_event(obj, GUI_EVENT_1);
                 break;
             }
         }

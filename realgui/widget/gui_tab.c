@@ -310,7 +310,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
 
     if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
     {
-        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
 }
 

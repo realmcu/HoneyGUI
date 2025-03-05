@@ -222,7 +222,7 @@ static void gui_perspective_prepare(gui_obj_t *obj)
             {
             case TOUCH_SHORT:
                 {
-                    gui_obj_event_set(obj, (gui_event_t)(GUI_EVENT_1 + i));
+                    gui_obj_enable_event(obj, (gui_event_t)(GUI_EVENT_1 + i));
                 }
                 break;
             default:

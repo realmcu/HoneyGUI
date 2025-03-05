@@ -205,7 +205,7 @@ void gui_obj_add_event_cb(void           *obj,
     event_dsc->event_code = GUI_EVENT_INVALIDE;
 }
 
-void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code)
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code)
 {
     if (!obj->gesture)
     {

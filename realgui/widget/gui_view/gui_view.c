@@ -110,7 +110,7 @@ static void gui_view_end(gui_obj_t *obj)
     {
         if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
-            gui_obj_event_set(obj, VIEW_FREE_EVENT);
+            gui_obj_enable_event(obj, VIEW_FREE_EVENT);
             obj->active = 1;
         }
         else
@@ -127,7 +127,7 @@ static void gui_view_end(gui_obj_t *obj)
         }
         else
         {
-            gui_obj_event_set(obj, VIEW_FREE_EVENT);
+            gui_obj_enable_event(obj, VIEW_FREE_EVENT);
             obj->active = 1;
         }
     }
@@ -404,7 +404,7 @@ void gui_view_switch_direct(gui_view_t *this, const gui_view_descriptor_t *descr
     {
         gui_view_switch_on_event(this, descriptor, switch_out_style, switch_in_style,
                                  GUI_EVENT_VIEW_SWITCH_DIRECT);
-        gui_obj_event_set(GUI_BASE(this), GUI_EVENT_VIEW_SWITCH_DIRECT);
+        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_VIEW_SWITCH_DIRECT);
         this->event = 1;
     }
 }

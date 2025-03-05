@@ -116,7 +116,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_button_release(button, (gui_event_cb_t)button_release_cb, button);
 
 #ifdef ENABLE_APP_AUTOSTART
-                    gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);
+                    gui_obj_enable_event((void *)button, GUI_EVENT_TOUCH_RELEASED);
                     button->flag = 1;
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
 #endif

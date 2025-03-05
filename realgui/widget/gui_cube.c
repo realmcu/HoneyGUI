@@ -411,7 +411,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         cube_event.size > 0 &&
         cube_event.event != GUI_EVENT_INVALIDE)
     {
-        gui_obj_event_set(obj, cube_event.event);
+        gui_obj_enable_event(obj, cube_event.event);
     }
 }
 

@@ -196,7 +196,7 @@ static void gui_page_hold_y(gui_obj_t *obj)
                                               this->bottom_space_count - (int)gui_get_screen_height()))
              && this->hold_y != 0)/*@BOTTOM*/
     {
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
         this->hold_y = this->start_y - (this->height + this->card_height * this->bottom_space_count -
                                         (int)gui_get_screen_height());
     }
@@ -216,13 +216,13 @@ static void gui_page_update_inertial(gui_obj_t *obj)
     if (this->speed > 3)
     {
         this->hold_y += this->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed -= 1;
     }
     else if (this->speed < -3)
     {
         this->hold_y += this->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed += 1;
     }
 }
@@ -234,7 +234,7 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     if (this->hold_y > this->start_y)/*@TOP*/
     {
         this->hold_y = this->start_y;
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
         this->release = false;
     }
     else if (this->hold_y < (this->start_y - (this->height + this->card_height *
@@ -244,7 +244,7 @@ static void gui_page_update_boundary(gui_obj_t *obj)
         this->release = false;
         this->hold_y = this->start_y - (this->height + this->card_height * this->bottom_space_count -
                                         (int)gui_get_screen_height());
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
     }
 }
 
@@ -359,7 +359,7 @@ static void gui_cardview_prepare(gui_obj_t *obj)
                     this->release = false;
                     this->speed = 0;
                     memset(this->recode, 0, 10);
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
 
                 if (tp->type != TOUCH_HOLD_Y)
@@ -382,11 +382,11 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     {
         if (tp->deltaY <= -10)
         {
-            gui_obj_event_set(obj, GUI_EVENT_1);
+            gui_obj_enable_event(obj, GUI_EVENT_1);
         }
         else if (tp->deltaY > 10)
         {
-            gui_obj_event_set(obj, GUI_EVENT_2);
+            gui_obj_enable_event(obj, GUI_EVENT_2);
         }
     }
 

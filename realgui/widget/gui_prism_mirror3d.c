@@ -173,7 +173,7 @@ static void prism_mirror3d_render_animate_cb(void *param)
         }
         else
         {
-            gui_obj_event_set(GUI_BASE(prism_mirror3d), GUI_EVENT_2);//fack click switch
+            gui_obj_enable_event(GUI_BASE(prism_mirror3d), GUI_EVENT_2);//fack click switch
             enter_face_flags = prism_mirror3d->face_flags_rotation;
             enter_flag = true;
         }

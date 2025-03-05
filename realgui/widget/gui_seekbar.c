@@ -128,7 +128,7 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
 
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
             break;
@@ -148,19 +148,19 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
-                //gui_obj_event_set(obj, GUI_EVENT_1);
+                //gui_obj_enable_event(obj, GUI_EVENT_1);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            //gui_obj_event_set(obj, GUI_EVENT_2);
+            //gui_obj_enable_event(obj, GUI_EVENT_2);
         }
 
         if (b->press_flag)
         {
-            //gui_obj_event_set(obj, GUI_EVENT_3);
+            //gui_obj_enable_event(obj, GUI_EVENT_3);
         }
     }
 }
@@ -278,7 +278,7 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
 
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
             break;
@@ -299,19 +299,19 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
             {
                 b->press_flag = true;
 
-                gui_obj_event_set(obj, GUI_EVENT_1);
+                gui_obj_enable_event(obj, GUI_EVENT_1);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            gui_obj_event_set(obj, GUI_EVENT_2);
+            gui_obj_enable_event(obj, GUI_EVENT_2);
         }
 
         if (b->press_flag)
         {
-            gui_obj_event_set(obj, GUI_EVENT_3);
+            gui_obj_enable_event(obj, GUI_EVENT_3);
         }
     }
 }
@@ -370,7 +370,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
 
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    //gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    //gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
             break;
@@ -390,18 +390,18 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
-                //gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+                //gui_obj_enable_event(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            //gui_obj_event_set(obj, GUI_EVENT_2);
+            //gui_obj_enable_event(obj, GUI_EVENT_2);
         }
         if (b->press_flag)
         {
-            //gui_obj_event_set(obj, GUI_EVENT_3);
+            //gui_obj_enable_event(obj, GUI_EVENT_3);
         }
     }
 }
@@ -474,7 +474,7 @@ static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
 
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
             break;
@@ -494,18 +494,18 @@ static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
-                gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+                gui_obj_enable_event(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            gui_obj_event_set(obj, GUI_EVENT_2);
+            gui_obj_enable_event(obj, GUI_EVENT_2);
         }
         if (b->press_flag)
         {
-            gui_obj_event_set(obj, GUI_EVENT_3);
+            gui_obj_enable_event(obj, GUI_EVENT_3);
         }
     }
 }
