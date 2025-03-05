@@ -83,6 +83,7 @@ typedef struct gui_view
     uint32_t view_switch_ready       : 1; // 1: target view switch done
     uint32_t event                   : 1; // 1: stop setting event
     uint32_t moveback                : 1; // 1: move to the opposite direction
+    uint32_t view_tp                 : 1; // 1: enable to update release
     uint32_t view_left               : 1;
     uint32_t view_right              : 1;
     uint32_t view_up                 : 1;

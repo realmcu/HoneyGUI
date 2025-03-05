@@ -108,6 +108,7 @@ static void gui_view_end(gui_obj_t *obj)
     if (!tp->pressing && (this->release_x == 0) && (this->release_y == 0) &&
         this->style < VIEW_ANIMATION_NULL) // distinguish click event
     {
+        this->view_tp = 1;
         if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
             gui_obj_enable_event(obj, VIEW_FREE_EVENT);
@@ -115,6 +116,7 @@ static void gui_view_end(gui_obj_t *obj)
         }
         else
         {
+            this->event = 0;
             this->view_switch_ready = true;
         }
     }
@@ -123,7 +125,10 @@ static void gui_view_end(gui_obj_t *obj)
         this->moveback = 0;
         if (this->view_switch_ready)
         {
-            this->event = 0;
+            if (tp->pressing)
+            {
+                this->event = 0;
+            }
         }
         else
         {
@@ -225,6 +230,7 @@ gui_view_t *gui_view_create(void       *parent,
     {
         this->view_switch_ready = false;
     }
+    this->view_tp = 1;
 
     *descriptor->pView = this;
     descriptor->design_cb(this);
@@ -237,13 +243,6 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
 {
     gui_view_t *this = (gui_view_t *)obj;
     gui_view_on_event_t *on_event = (gui_view_on_event_t *)param;
-    // for (uint32_t i = 0; i < this->on_event_num; i++)
-    // {
-    //     if (this->on_event[i]->event == e)
-    //     {
-    //         gui_view_create(GUI_BASE(this)->parent, this->on_event[i]->descriptor, 0, 0, 0, 0);
-    //     }
-    // }
     this->style = on_event->switch_out_style;
     gui_view_t *target_view = gui_view_create(GUI_BASE(this)->parent, on_event->descriptor, 0, 0, 0, 0);
     target_view->style = on_event->switch_in_style;

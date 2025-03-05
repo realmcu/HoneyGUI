@@ -54,7 +54,7 @@ static void prepare_touch_process(gui_view_t *this)
         case TOUCH_HOLD_X:
             {
                 if (((obj->skip_tp_left_hold && tp->deltaX < 0) ||
-                     (obj->skip_tp_right_hold && tp->deltaX > 0)))
+                     (obj->skip_tp_right_hold && tp->deltaX > 0)) || !this->view_tp)
                 {
                     break;
                 }
@@ -95,7 +95,7 @@ static void prepare_touch_process(gui_view_t *this)
         case TOUCH_HOLD_Y:
             {
                 if (((obj->skip_tp_up_hold && tp->deltaY < 0) ||
-                     (obj->skip_tp_down_hold && tp->deltaY > 0)))
+                     (obj->skip_tp_down_hold && tp->deltaY > 0))  || !this->view_tp)
                 {
                     break;
                 }
@@ -135,6 +135,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_x < 0 && (this->view_left || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_LEFT_SLIDE\n");
+                    this->view_tp = 0;
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
                     this->cur_id.x -= 1;
                     this->release_x = this->release_x + this->base.w;
@@ -147,6 +148,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_x > 0 && (this->view_right || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_RIGHT_SLIDE\n");
+                    this->view_tp = 0;
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
                     this->cur_id.x += 1;
                     this->release_x = this->release_x - this->base.w;
@@ -159,6 +161,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_y > 0 && (this->view_down || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_DOWN_SLIDE\n");
+                    this->view_tp = 0;
                     this->cur_id.y += 1;
                     this->release_y = this->release_y - this->base.h;
                 }
@@ -170,6 +173,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_y < 0 && (this->view_up || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_UP_SLIDE\n");
+                    this->view_tp = 0;
                     this->cur_id.y -= 1;
                     this->release_y = this->release_y + this->base.h;
                 }
@@ -205,12 +209,8 @@ static void prepare_touch_process(gui_view_t *this)
     }
 
     // restore view offset
-    if (tp->pressing == false)
+    if (tp->pressing == false || !this->view_tp)
     {
-        if (style < VIEW_ANIMATION_NULL)
-        {
-            this->event = 0;
-        }
         if (this->release_x >= GUI_FRAME_STEP)
         {
             this->release_x -= GUI_FRAME_STEP;
