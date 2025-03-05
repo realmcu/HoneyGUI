@@ -1,5 +1,7 @@
-/*
- * File      : gui_server.c
+/**
+ * @file gui_api.c
+ * @brief GUI API implementation
+ * @version 1.0
  */
 
 #include <stdarg.h>

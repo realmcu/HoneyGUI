@@ -42,7 +42,7 @@ extern "C" {
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
-struct gui_img_transform
+typedef struct gui_img_transform
 {
 
     float degrees;                      //!< float gui_img_get_transform_degrees(gui_img_t *img);
@@ -54,13 +54,13 @@ struct gui_img_transform
     float t_y;                          //!< translate of screen y;  float gui_img_get_transform_t_y(gui_img_t *img);
     float t_x_old;
     float t_y_old;
-};
+} gui_img_transform_t;
 
 typedef struct gui_img
 {
     gui_obj_t base;
     draw_img_t *draw_img;
-    struct gui_img_transform *transform;
+    gui_img_transform_t *transform;
     void *data;                         // this means address or filesystem path
     union
     {

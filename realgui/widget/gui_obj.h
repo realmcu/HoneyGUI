@@ -554,6 +554,17 @@ void gui_obj_get_area(gui_obj_t *obj,
 bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
 
 /**
+ * @brief judge the point if in range of this_widget obj circle.
+ *
+ * @param obj widget object pointer.
+ * @param x the X-axis coordinate.
+ * @param y the Y-axis coordinate.
+ * @return true.
+ * @return false.
+ */
+bool gui_obj_point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
+
+/**
  * @brief do crc check.
  *
  * @param seed the initial value to start the checksum calculation.

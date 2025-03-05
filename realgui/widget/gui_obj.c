@@ -559,6 +559,29 @@ bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y)
 
     return false;
 }
+
+bool gui_obj_point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y)
+{
+    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
+
+    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
+    int circle_w = (float)m_w / 1.41421356f;
+    int circle_h = (float)m_h / 1.41421356f;
+    //gui_log("%d,%d,%d,%d\n",m_x, m_y, m_w, circle_w);
+    m_x += (m_w - circle_w) / 2;
+    m_y += (m_h - circle_h) / 2;
+    m_w = circle_w;
+    m_h = circle_h;
+    if ((m_x < x)
+        && ((m_x + m_w) > x)
+        && (m_y < y)
+        && ((m_y + m_h) > y))
+    {
+        return true;
+    }
+
+    return false;
+}
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y)
 {
     GUI_WIDGET_TRY_EXCEPT(obj)

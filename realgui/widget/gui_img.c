@@ -48,11 +48,6 @@
  *                           Private Functions
  *============================================================================*/
 
-static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
-#if 0 //comment for dead code, AC5 compile warning
-static float gui_img_get_transform_t_y_old(gui_img_t *this);
-static float gui_img_get_transform_t_x_old(gui_img_t *this);
-#endif
 static void gui_img_reset_translate(gui_img_t *this);
 void gui_img_set_animate(gui_img_t *this,
                          uint32_t   dur,
@@ -332,7 +327,7 @@ void gui_img_prepare(gui_obj_t *obj)
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
         }
     }
-    if (point_in_obj_circle(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
     {
         if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
         {
@@ -351,28 +346,7 @@ void gui_img_prepare(gui_obj_t *obj)
         gui_fb_change();
     }
 }
-static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y)
-{
-    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
 
-    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
-    int circle_w = (float)m_w / 1.41421356f;
-    int circle_h = (float)m_h / 1.41421356f;
-    //gui_log("%d,%d,%d,%d\n",m_x, m_y, m_w, circle_w);
-    m_x += (m_w - circle_w) / 2;
-    m_y += (m_h - circle_h) / 2;
-    m_w = circle_w;
-    m_h = circle_h;
-    if ((m_x < x)
-        && ((m_x + m_w) > x)
-        && (m_y < y)
-        && ((m_y + m_h) > y))
-    {
-        return true;
-    }
-
-    return false;
-}
 /**
  * @brief Callback function for drawing the GUI image.
  *
@@ -1099,26 +1073,7 @@ float gui_img_get_transform_t_y(gui_img_t *this)
     }
     return DEFAULT_TRANSFORM_T_Y;
 }
-#if 0 //comment for dead code, AC5 compile warning
-static float gui_img_get_transform_t_y_old(gui_img_t *this)
-{
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
-    if (this->transform)
-    {
-        return this->transform->t_y_old;
-    }
-    return DEFAULT_TRANSFORM_T_Y;
-}
-static float gui_img_get_transform_t_x_old(gui_img_t *this)
-{
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
-    if (this->transform)
-    {
-        return this->transform->t_x_old;
-    }
-    return DEFAULT_TRANSFORM_T_X;
-}
-#endif
+
 void gui_img_skew_x(gui_img_t *this, float degrees)
 {
 
