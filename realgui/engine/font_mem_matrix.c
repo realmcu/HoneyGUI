@@ -650,6 +650,23 @@ void gui_font_mat_unload(gui_text_t *text)
 {
     if (text->data)
     {
+        mem_char_t *chr = text->data;
+        for (int i = 0; i < text->active_font_len; i++)
+        {
+            if (chr[i].buf != NULL)
+            {
+                gui_free(chr[i].buf);
+                chr[i].buf = NULL;
+            }
+        }
+    }
+    return;
+}
+
+void gui_font_mat_destroy(gui_text_t *text)
+{
+    if (text->data)
+    {
         if (text->font_mode == FONT_SRC_FTL)
         {
             mem_char_t *chr = text->data;
@@ -752,16 +769,28 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
             {
                 continue;
             }
+            if (chr[i].buf == NULL)
+            {
+                gui_matrix_t *font_matrix = gui_malloc(sizeof(gui_matrix_t) * 2);
+
+                memcpy(&draw_img.matrix, text->base.matrix, sizeof(gui_matrix_t));
+                matrix_translate(draw_img.img_target_x - text->offset_x, draw_img.img_target_y - text->offset_y,
+                                 &draw_img.matrix);
+
+                memcpy(&draw_img.inverse, &draw_img.matrix, sizeof(gui_matrix_t));
+                matrix_inverse(&draw_img.inverse);
+
+                memcpy(&font_matrix[0], &draw_img.matrix, sizeof(gui_matrix_t) * 2);
+
+                chr[i].buf = (uint8_t *)font_matrix;
+            }
+            else
+            {
+                memcpy(&draw_img.matrix, chr[i].buf, sizeof(gui_matrix_t) * 2);
+            }
 
             draw_img.img_h = head->h;
             draw_img.img_w = head->w;
-
-            memcpy(&draw_img.matrix, text->base.matrix, sizeof(struct gui_matrix));
-            matrix_translate(draw_img.img_target_x - text->offset_x, draw_img.img_target_y - text->offset_y,
-                             &draw_img.matrix);
-
-            memcpy(&draw_img.inverse, &draw_img.matrix, sizeof(struct gui_matrix));
-            matrix_inverse(&draw_img.inverse);
 
             draw_img_new_area(&draw_img, NULL);
 

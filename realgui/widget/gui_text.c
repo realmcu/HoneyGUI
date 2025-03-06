@@ -206,7 +206,7 @@ static void gui_text_font_unload(gui_text_t *text)
 
     case GUI_FONT_SRC_MAT:
         {
-            // gui_font_mat_unload(text);
+            gui_font_mat_unload(text);
         }
         break;
 
@@ -261,7 +261,7 @@ static void gui_text_font_destroy(gui_text_t *text)
 
     case GUI_FONT_SRC_MAT:
         {
-            gui_font_mat_unload(text);
+            gui_font_mat_destroy(text);
         }
         break;
 
