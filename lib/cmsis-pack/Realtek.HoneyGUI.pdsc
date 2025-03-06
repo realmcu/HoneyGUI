@@ -37,7 +37,7 @@
         <file category="header" name="core/def_file.h"/>
         <file category="header" name="core/def_image.h"/>
         <file category="header" name="core/def_list.h"/>
-        <file category="header" name="core/def_matrix.h"/>
+        <file category="header" name="core/def_type.h"/>
         <file category="header" name="core/def_vg.h"/>
       </files>
     </component>

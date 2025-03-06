@@ -161,6 +161,29 @@ typedef struct _gui_obj_t
 
 } gui_obj_t;
 
+typedef struct gui_animate
+{
+    uint32_t dur;
+    int repeat_count;
+    uint32_t init_time_ms;
+    uint32_t cur_time_ms;
+    uint32_t current_repeat_count;
+    uint32_t current_frame;
+    uint32_t last_round;
+    float progress_percent;
+    float last_per;
+    void (* callback)(void *p, void *this_widget, struct gui_animate *animate);
+    void *p;
+    const char *name;
+    void *trigger_name;
+    bool animate;
+    bool init;
+    bool Beginning_frame;
+    bool end_frame;
+} gui_animate_t;
+
+typedef void (* gui_animate_callback_t)(void *p, void *this_widget, gui_animate_t *animate);
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/

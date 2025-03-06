@@ -26,6 +26,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "def_color.h"
 /*============================================================================*
  *                         Types
  *============================================================================*/
@@ -43,6 +45,12 @@ typedef struct gui_rgb_data_head
     char version;
     char rsvd2;
 } gui_rgb_data_head_t;
+
+typedef struct _gui_rect_file_head
+{
+    struct gui_rgb_data_head head;
+    gui_color_t color;
+} gui_rect_file_head_t;
 
 typedef enum
 {
@@ -113,6 +121,7 @@ typedef struct imdc_argb8888_node
     uint32_t pixel32;    //argb8888
 } imdc_argb8888_node_t;
 #pragma pack()
+
 
 
 #ifdef __cplusplus
