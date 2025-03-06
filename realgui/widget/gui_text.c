@@ -57,7 +57,17 @@ static bool gui_text_matrix_is_identity(gui_matrix_t *matrix)
     {
         return false;
     }
-    if (matrix->m[0][0] == 1.0f && matrix->m[1][1] == 1.0f)
+    if (
+        matrix->m[0][0] == 1.0f && \
+        matrix->m[0][1] == 0.0f && \
+        // matrix->m[0][2] == 0.0f &&
+        matrix->m[1][0] == 0.0f && \
+        matrix->m[1][1] == 1.0f && \
+        // matrix->m[1][2] == 0.0f &&
+        matrix->m[2][0] == 0.0f && \
+        matrix->m[2][1] == 0.0f && \
+        matrix->m[2][2] == 1.0f
+    )
     {
         return true;
     }
@@ -408,6 +418,10 @@ static void gui_text_draw(gui_obj_t *obj)
     {
         gui_font_ttf_adapt_rect(text, &draw_rect);
     }
+    if (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit)
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
+    }
 
     if (dc->pfb_type == PFB_X_DIRECTION)
     {
@@ -506,6 +520,7 @@ void gui_text_ctor(gui_text_t *this,
     this->content_refresh = false;
     this->layout_refresh = false;
     this->rendermode = 2;
+    this->use_img_blit = true;
 }
 
 /*============================================================================*
@@ -563,6 +578,11 @@ void gui_text_input_set(gui_text_t *this, bool inputable)
 void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)
 {
     this->wordwrap = wordwrap;
+}
+
+void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)
+{
+    this->use_img_blit = use_img_blit;
 }
 
 void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)
