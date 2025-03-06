@@ -35,7 +35,9 @@ extern "C" {
 #include "def_color.h"
 #include "def_matrix.h"
 #include "def_vg.h"
+#include "def_input.h"
 #include "def_file.h"
+#include "def_fs.h"
 
 
 
@@ -56,41 +58,6 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-
-typedef struct touch_info
-{
-    int16_t deltaX;
-    int16_t deltaY;
-    int16_t x;
-    int16_t y;
-    int16_t history_x;
-    int16_t history_y;
-    uint32_t type;
-    uint8_t pressed  : 1;
-    uint8_t released : 1;
-    uint8_t pressing : 1;
-    uint8_t button_down  : 1;
-    uint8_t button_up  : 1;
-    uint8_t button_hold  : 1;
-} touch_info_t;
-
-
-typedef struct kb_info
-{
-    uint32_t type;
-    char *string[20];
-    uint8_t pressed  : 1;
-    uint8_t released : 1;
-    uint8_t pressing : 1;
-} kb_info_t;
-
-
-
-typedef struct wheel_info
-{
-    uint32_t type;
-    int16_t delta;
-} wheel_info_t;
 
 typedef struct gui_rect
 {
@@ -125,38 +92,8 @@ typedef struct _gui_frame_monitor_t
     uint32_t end;
     void (*end_cb)(void);
 } gui_frame_monitor_t;
-typedef struct gui_touch_port_data
-{
-    uint8_t  event;                 /* The touch event of the data */
-    uint8_t  track_id;              /* Track id of point */
-    uint16_t width;                 /* Point of width */
-    uint16_t x_coordinate;          /* Point of x coordinate */
-    uint16_t y_coordinate;          /* Point of y coordinate */
-    uint32_t timestamp_ms;          /* The timestamp when pressing, update periodically*/
-    uint16_t x_coordinate_start;    /* Point of x when pressed, update once, for tp algo v2*/
-    uint16_t y_coordinate_start;    /* Point of y when pressed, update once, for tp algo v2*/
-    uint32_t timestamp_ms_start;    /* The timestamp when pressed, update once, for tp algo v2*/
-    void *data;
-} gui_touch_port_data_t;
 
-typedef struct gui_kb_port_data
-{
-    uint8_t  event;
-    uint8_t  name[10];
-    uint32_t timestamp_ms_press;            /* The timestamp when pressed, update once */
-    uint32_t timestamp_ms_release;          /* The timestamp when when release, update once*/
-    uint32_t timestamp_ms_pressing;         /* The timestamp when pressing, update periodically*/
-} gui_kb_port_data_t;
-#define GUI_WHEEL_NO_EVENT 0
-#define GUI_WHEEL_BUTTON_DOWN 1
-#define GUI_WHEEL_BUTTON_UP 2
-#define GUI_WHEEL_SCROLL 3
-typedef struct gui_wheel_port_data
-{
-    uint8_t  event;//0:no event//1:button down//2:button up//3:scroll
-    int16_t  delta;//positive away from the user and negative toward the user
-    uint32_t timestamp_ms;             /* The timestamp when the data was received */
-} gui_wheel_port_data_t;
+
 typedef struct gui_dispdev
 {
     /* width and height */
@@ -221,73 +158,7 @@ typedef struct draw_img
 } draw_img_t;
 
 
-struct gui_fs_dirent
-{
-    uint8_t d_type;           /* The type of the file */
-    uint8_t d_namlen;         /* The length of the not including the terminating null file name */
-    uint16_t d_reclen;        /* length of this record */
-    char *d_name;         /* The null-terminated file name */
-    void *dirent;
-};
-typedef struct
-{
-    void *dir;
-    struct gui_fs_dirent *dirent;
-} gui_fs_dir;
 
-
-typedef struct gui_fs_stat
-{
-    void *information;//by howie
-    uint32_t  st_size;
-} gui_fs_stat_t;
-/* gui_fs struct define start */
-struct gui_fs
-{
-    int (*open)(const char *file, int flags, ...);
-    int (*close)(int d);
-    int (*read)(int fd, void *buf, size_t len);
-    int (*write)(int fd, const void *buf, size_t len);
-    int (*lseek)(int fd, int offset, int whence);
-    /* directory api*/
-    gui_fs_dir *(*opendir)(const char *name);
-    struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
-    int (*closedir)(gui_fs_dir *d);
-    int (*ioctl)(int fildes, int cmd, ...);
-    void (*fstat)(int fildes, gui_fs_stat_t *buf);
-};
-/* gui_fs struct define end */
-
-/* gui_ftl struct define start */
-struct gui_ftl
-{
-    int (*read)(uint32_t addr, uint8_t *buf, uint32_t len);
-    int (*write)(uint32_t addr, const uint8_t *buf, uint32_t len);
-    int (*erase)(uint32_t addr, uint32_t len);
-};
-/* gui_ftl struct define end */
-
-/* gui_indev struct define start */
-struct gui_indev
-{
-    uint16_t tp_witdh;
-    uint16_t tp_height;
-    uint32_t touch_timeout_ms;
-    uint16_t long_button_time_ms;
-    uint16_t short_button_time_ms;
-    uint16_t kb_long_button_time_ms;
-    uint16_t kb_short_button_time_ms;
-    uint16_t quick_slide_time_ms;
-
-    void (*ext_button_indicate)(void (*callback)(void));
-
-    gui_touch_port_data_t *(*tp_get_data)(void);
-
-    gui_kb_port_data_t *(*kb_get_port_data)(void);
-
-    gui_wheel_port_data_t *(*wheel_get_port_data)(void);
-};
-/* gui_indev struct define end */
 
 typedef void (* log_func_t)(const char *fmt, ...);
 
@@ -336,37 +207,6 @@ typedef struct draw_circle
 } draw_circle_t;
 
 
-/* T_GUI_INPUT_TYPE enum start*/
-typedef enum
-{
-    TOUCH_INIT                  = 0x100,
-    TOUCH_HOLD_X                = 0x101,
-    TOUCH_HOLD_Y                = 0x102,
-    TOUCH_SHORT                 = 0x103,
-    TOUCH_LONG                  = 0x104,
-    TOUCH_ORIGIN_FROM_X         = 0x105,
-    TOUCH_ORIGIN_FROM_Y         = 0x106,
-    TOUCH_LEFT_SLIDE            = 0x107,
-    TOUCH_RIGHT_SLIDE           = 0x108,
-    TOUCH_UP_SLIDE              = 0x109,
-    TOUCH_DOWN_SLIDE            = 0x10A,
-    TOUCH_SHORT_BUTTON          = 0x10B,
-    TOUCH_LONG_BUTTON           = 0x10C,
-    TOUCH_UP_SLIDE_TWO_PAGE     = 0x10D,
-    TOUCH_DOWN_SLIDE_TWO_PAGE   = 0x10E,
-    TOUCH_INVALIDE              = 0x10F,
-
-    KB_INIT                     = 0x200,
-    KB_SHORT                    = 0x201,
-    KB_LONG                     = 0x202,
-    KB_INVALIDE                 = 0x203,
-
-    WHEEL_INIT                  = 0x300,
-    WHEEL_ING                   = 0x301,
-    WHEEL_FINISHED              = 0x302,
-    WHEEL_INVALIDE              = 0x303,
-} T_GUI_INPUT_TYPE;
-/* T_GUI_INPUT_TYPE enum end*/
 
 
 
@@ -466,21 +306,7 @@ typedef struct acc_engine
  *                         Macros
  *============================================================================*/
 
-/** @brief
-  * @{
-  * The color used in the GUI:
-  *
-  *         bit        bit
-  * RGB565  15 R,G,B   0
-  * BGR565  15 B,G,R   0
-  * RGB888  23 R,G,B   0
-  * ARGB888 31 A,R,G,B 0
-  * RGBA888 31 R,G,B,A 0
-  * ABGR888 31 A,B,G,R 0
-  *
-  * The gui_color is defined as ARGB888.
-  *        bit31 A,R,G,B bit0
-  */
+
 
 
 #define GUI_SWAP16(x)          ((uint16_t)(                         \
@@ -505,15 +331,7 @@ typedef struct acc_engine
 #define GUI_UNUSED(x) (void)(x)             /* macro to get rid of 'unused parameter' warning */
 #define GUI_TYPE(type, obj) ((type *)obj)
 
-#if defined __WIN32
 
-
-//#define GUI_ROOT_FOLDER "realgui\\example\\screen_480_480\\root\\"
-extern char *defaultPath;
-#define GUI_ROOT_FOLDER defaultPath
-#else
-#define GUI_ROOT_FOLDER "/"
-#endif
 #define GUI_NEW(type, constructor_cb, param) type *this = gui_malloc(sizeof(type));\
     memset(this, 0, sizeof(type));\
     constructor_cb(param);\

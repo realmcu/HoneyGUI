@@ -584,7 +584,8 @@ bool gui_obj_point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y)
 }
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y)
 {
-    GUI_WIDGET_TRY_EXCEPT(obj)
+    GUI_ASSERT(obj != NULL);
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
     GUI_ASSERT(absolute_x) // cppcheck-suppress unknownMacro
     GUI_ASSERT(absolute_y)
     gui_obj_t *o = obj;

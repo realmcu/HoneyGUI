@@ -929,13 +929,13 @@ void gui_img_set_attribute(gui_img_t  *this,
 }
 void gui_img_set_image_data(gui_img_t  *this, const uint8_t *file_pointer)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(file_pointer != NULL);
     this->data = (void *)file_pointer;
 }
 const uint8_t *gui_img_get_image_data(gui_img_t  *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     return this->data;
 }
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
@@ -957,7 +957,7 @@ void gui_img_set_tp_block(gui_img_t *this, bool block)
 #define DEFAULT_TRANSFORM_T_Y 0
 static struct gui_img_transform *get_transform(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform == 0)
     {
         this->transform = gui_malloc(sizeof(*this->transform));
@@ -981,20 +981,20 @@ void gui_img_rotation(gui_img_t *this,
                       float      c_x,
                       float      c_y)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     get_transform(this)->degrees = degrees;
     get_transform(this)->c_x = c_x;
     get_transform(this)->c_y = c_y;
 }
 static void gui_img_reset_translate(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     get_transform(this)->t_x_old = 0;
     get_transform(this)->t_y_old = 0;
 }
 void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if ((scale_x > 0) && (scale_y > 0))
     {
         get_transform(this)->scale_x = scale_x;
@@ -1004,7 +1004,7 @@ void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 
 void gui_img_translate(gui_img_t *this, float t_x, float t_y)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     get_transform(this)->t_x = t_x + get_transform(this)->t_x_old;
     get_transform(this)->t_y = t_y + get_transform(this)->t_y_old;
     get_transform(this)->t_x_old += t_x;
@@ -1012,7 +1012,7 @@ void gui_img_translate(gui_img_t *this, float t_x, float t_y)
 }
 float gui_img_get_transform_scale_x(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->scale_x;
@@ -1021,7 +1021,7 @@ float gui_img_get_transform_scale_x(gui_img_t *this)
 }
 float gui_img_get_transform_scale_y(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->scale_y;
@@ -1030,7 +1030,7 @@ float gui_img_get_transform_scale_y(gui_img_t *this)
 }
 float gui_img_get_transform_degrees(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->degrees;
@@ -1039,7 +1039,7 @@ float gui_img_get_transform_degrees(gui_img_t *this)
 }
 float gui_img_get_transform_c_x(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->c_x;
@@ -1048,7 +1048,7 @@ float gui_img_get_transform_c_x(gui_img_t *this)
 }
 float gui_img_get_transform_c_y(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->c_y;
@@ -1057,7 +1057,7 @@ float gui_img_get_transform_c_y(gui_img_t *this)
 }
 float gui_img_get_transform_t_x(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->t_x;
@@ -1066,7 +1066,7 @@ float gui_img_get_transform_t_x(gui_img_t *this)
 }
 float gui_img_get_transform_t_y(gui_img_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     if (this->transform)
     {
         return this->transform->t_y;

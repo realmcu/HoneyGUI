@@ -21,6 +21,23 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
+
+/** @brief
+  * @{
+  * The color used in the GUI:
+  *
+  *         bit        bit
+  * RGB565  15 R,G,B   0
+  * BGR565  15 B,G,R   0
+  * RGB888  23 R,G,B   0
+  * ARGB888 31 A,R,G,B 0
+  * RGBA888 31 R,G,B,A 0
+  * ABGR888 31 A,B,G,R 0
+  *
+  * The gui_color is defined as ARGB888.
+  *        bit31 A,R,G,B bit0
+  */
+
 #pragma pack(1)
 typedef struct _color_rgb888
 {
