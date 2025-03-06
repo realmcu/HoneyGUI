@@ -38,40 +38,6 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  ... */
-typedef struct
-{
-    int v_idx, vt_idx, vn_idx;
-} gui_obj_vertex_index_t;
-
-typedef struct
-{
-    float x, y, z;
-} gui_obj_vertex_coordinate_t;
-
-typedef struct
-{
-    float u, v;
-} gui_obj_texcoord_coordinate_t;
-
-
-typedef struct
-{
-    unsigned int num_vertices;
-    unsigned int num_normals;
-    unsigned int num_texcoords;
-    unsigned int num_faces;
-    unsigned int num_face_num_verts;
-
-    int pad0;
-
-    gui_obj_vertex_coordinate_t *vertices;
-    gui_obj_vertex_coordinate_t *normals;
-    gui_obj_texcoord_coordinate_t *texcoords;
-    gui_obj_vertex_index_t *faces;
-    int *face_num_verts;
-    int *material_ids;
-} gui_obj_attrib_t;
 
 typedef struct
 {
@@ -135,8 +101,11 @@ typedef struct gui_3d
     draw_img_t *mask_img;
     gui_animate_t *animate;
 
-    void (*shape_transform_cb)(struct gui_3d *this, size_t s/*shape_offset*/, gui_3d_world_t *world,
-                               gui_3d_camera_t *camera, gui_3d_light_t *light);
+    void (*global_shape_transform_cb)(struct gui_3d *this, gui_3d_world_t *world,
+                                      gui_3d_camera_t *camera, gui_3d_light_t *light);
+    void (*local_shape_transform_cb)(struct gui_3d *this, size_t s/*shape_offset*/,
+                                     gui_3d_world_t *world,
+                                     gui_3d_camera_t *camera, gui_3d_light_t *light);
 
 } gui_3d_t;
 
@@ -179,16 +148,26 @@ gui_3d_t *gui_3d_create(void       *parent,
                         int16_t     h);
 
 /**
- * @brief set shape transform callback
+ * @brief set global shape transform callback
+ *
+ * @param this the 3d widget pointer
+ * @param cb Set callback functions for the world coordinate system, camera coordinate system,
+ *           and light source for all faces
+ */
+void gui_3d_set_global_shape_transform_cb(gui_3d_t *this,
+                                          void (*cb)(gui_3d_t *this, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                                     gui_3d_light_t *light));
+/**
+ * @brief set local shape transform callback
  *
  * @param this the 3d widget pointer
  * @param face face offset
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
  *           and light source for the specified face
  */
-void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t face,
-                                   void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
-                                              gui_3d_light_t *light));
+void gui_3d_set_local_shape_transform_cb(gui_3d_t *this, size_t face,
+                                         void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                                    gui_3d_light_t *light));
 
 /**
  * @brief set 3D animation effects

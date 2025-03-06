@@ -9,6 +9,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+
 #define GUI_3D_FACESTATE_ACTIVE 1
 #define GUI_3D_FACESTATE_CLIPPED 2
 #define GUI_3D_FACESTATE_BACKFACE 4
@@ -94,11 +95,55 @@ typedef struct
 
 typedef struct
 {
+    int v_idx, vt_idx, vn_idx;
+} gui_obj_vertex_index_t;
+
+typedef struct
+{
+    float x, y, z;
+} gui_obj_vertex_coordinate_t;
+
+typedef struct
+{
+    float u, v;
+} gui_obj_texcoord_coordinate_t;
+
+typedef struct
+{
+    unsigned int num_vertices;
+    unsigned int num_normals;
+    unsigned int num_texcoords;
+    unsigned int num_faces;
+    unsigned int num_face_num_verts;
+
+    int pad0;
+
+    gui_obj_vertex_coordinate_t *vertices;
+    gui_obj_vertex_coordinate_t *normals;
+    gui_obj_texcoord_coordinate_t *texcoords;
+    gui_obj_vertex_index_t *faces;
+    int *face_num_verts;
+    int *material_ids;
+} gui_obj_attrib_t;
+
+#ifdef GUI3D_TRIANGLE_MESH
+#define VERTEX_COUNT  3
+typedef struct
+{
+    uint32_t            state;
+    gui_3d_vertex_t     vertex[3];
+    gui_3d_vertex_t     transform_vertex[3];
+} gui_3d_face_t;
+#else
+#define VERTEX_COUNT  4
+typedef struct
+{
     uint32_t            state;
     gui_3d_vertex_t     vertex[4];
     gui_3d_vertex_t     transform_vertex[4];
     gui_3d_vertex_t     transform_world_vertex[4];
 } gui_3d_face_t;
+#endif
 
 typedef gui_3d_matrix_t gui_3d_world_t;
 
@@ -163,6 +208,9 @@ void gui_3d_light_inititalize(gui_3d_light_t *light, gui_point_4d_t lightPositio
 
 void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera);
 
+void gui_3d_face_transform_local_to_global(gui_3d_face_t *face, gui_3d_world_t *world);
+void gui_3d_face_transform_local_to_global_tria(gui_3d_face_t *face, size_t face_index,
+                                                gui_obj_attrib_t *attrib, gui_3d_world_t *world);
 void gui_3d_face_transform_local_to_local(gui_3d_face_t *face, gui_3d_matrix_t *m);
 
 bool gui_3d_generate_2d_matrix(gui_3d_point_2d_t *src, gui_3d_point_2d_t *dst, float *ret);

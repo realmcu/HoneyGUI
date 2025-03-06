@@ -106,132 +106,6 @@ static gui_point_4d_t gui_3d_calculate_point_in_quad(gui_point_4d_t P0, gui_poin
 
 }
 
-static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/,
-                               gui_3d_world_t *world, gui_3d_light_t *light)
-{
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
-    float width = head->w;
-    float height = head->h;
-    int data_size = sizeof(gui_rgb_data_head_t) + width * height * 4;
-
-    memcpy(this->mask_img + i, this->img + i, sizeof(draw_img_t));
-    this->mask_img[i].data = (unsigned char *)gui_malloc(data_size);
-    memcpy(this->mask_img[i].data, this->img[i].data, data_size);
-
-
-    unsigned char mask_color[4] = {light->color.r, light->color.g, light->color.b, light->color.a};
-    float alpha = mask_color[3] / 255.0f;
-
-    for (int p_y = 0; p_y < height; p_y++)
-    {
-        for (int p_x = 0; p_x < width; p_x++)
-        {
-            float u = (float)p_x / (width - 1);
-
-            float v = (float)p_y / (height - 1);
-
-            if (this->face[i].vertex[0].v == 1)
-            {
-                v = 1.0f - v;
-            }
-
-            gui_point_4d_t point = gui_3d_calculate_point_in_quad(
-                                       this->face[i].transform_world_vertex[0].position,
-                                       this->face[i].transform_world_vertex[1].position,
-                                       this->face[i].transform_world_vertex[2].position,
-                                       this->face[i].transform_world_vertex[3].position, u, v);
-
-            float intensity = gui_3d_calculate_light_to_point(light, point.x, point.y, point.z);
-
-            if (intensity != 0)
-            {
-                unsigned char *origin_pixel = (unsigned char *)this->img[i].data + sizeof(gui_rgb_data_head_t) +
-                                              (p_y * head->w + p_x) * 4;
-                unsigned char *pixel = (unsigned char *)this->mask_img[i].data + sizeof(gui_rgb_data_head_t)  +
-                                       (p_y * head->w + p_x) * 4;
-
-                for (int c = 0; c < 3; ++c)
-                {
-                    pixel[c] = (unsigned char)(mask_color[c] * alpha * intensity + origin_pixel[c] *
-                                               (1 - alpha * intensity));
-                }
-            }
-
-        }
-    }
-
-}
-
-
-static void gui_3d_face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/,
-                                  size_t i /*face_offset*/,
-                                  gui_3d_world_t *world, gui_3d_camera_t *camera)
-{
-    gui_3d_scene(this->face + i, world, camera);
-
-    int material_id = this->desc->attrib.material_ids[i];
-    this->img[i].data = (void *)this->desc->textures[material_id];
-
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
-    float width = head->w;
-    float height = head->h;
-
-    gui_3d_point_2d_t src[4];
-    gui_3d_point_2d_t dst[4];
-    for (size_t j = 0; j < 4; ++j)
-    {
-        src[j].x = this->face[i].vertex[j].u * width;
-        src[j].y = (1.0f - this->face[i].vertex[j].v) * height;
-
-        dst[j].x = this->face[i].transform_vertex[j].position.x;
-        dst[j].y = this->face[i].transform_vertex[j].position.y;
-    }
-
-    gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
-    memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
-    matrix_inverse(&this->img[i].inverse);
-
-    this->img[i].img_w = width;
-    this->img[i].img_h = height;
-    this->img[i].blend_mode = IMG_SRC_OVER_MODE;
-    this->img[i].high_quality = true;
-    this->img[i].opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
-
-    draw_img_new_area(this->img + i, NULL);
-}
-
-static void gui_3d_convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
-{
-    size_t index_offset = 0;
-    for (size_t s = 0; s < i; s++)
-    {
-        index_offset += this->desc->attrib.face_num_verts[i];
-    }
-
-    for (size_t j = 0; j < this->desc->attrib.face_num_verts[i]; j++)
-    {
-        gui_obj_vertex_index_t idx = this->desc->attrib.faces[index_offset + j];
-
-        gui_obj_vertex_coordinate_t *v = &this->desc->attrib.vertices[idx.v_idx];
-        gui_obj_texcoord_coordinate_t *vt = &this->desc->attrib.texcoords[idx.vt_idx];
-        gui_obj_vertex_coordinate_t *vn = &this->desc->attrib.normals[idx.vn_idx];
-
-        this->face[i].vertex[j].position.x = v->x;
-        this->face[i].vertex[j].position.y = v->y;
-        this->face[i].vertex[j].position.z = v->z;
-        this->face[i].vertex[j].position.w = 1;
-
-        this->face[i].vertex[j].u = vt->u;
-        this->face[i].vertex[j].v = vt->v;
-
-        this->face[i].vertex[j].normal.x = vn->x;
-        this->face[i].vertex[j].normal.y = vn->y;
-        this->face[i].vertex[j].normal.z = vn->z;
-        this->face[i].vertex[j].normal.w = 1;
-
-    }
-}
-
 static void gui_3d_update_att(gui_obj_t *obj)
 {
     gui_3d_t *this = (void *)obj;
@@ -242,8 +116,7 @@ static void gui_3d_update_att(gui_obj_t *obj)
 }
 
 #ifdef GUI3D_TRIANGLE_MESH
-static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height,
-                                         gui_3d_light_t *light)
+static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
 {
     this->img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
     memset(this->img->data, 0x00, width * height * 2 + sizeof(gui_rgb_data_head_t));
@@ -251,26 +124,21 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height,
     head->w = width;
     head->h = height;
     head->type = RGB565;
+
     uint8_t *pixelData = (uint8_t *)this->img->data + sizeof(gui_rgb_data_head_t);
     float *depthBuffer = gui_malloc(width * height * sizeof(float));
     memset(depthBuffer, 0x00, width * height * sizeof(float));
 
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        float x0 = this->face[i].transform_vertex[0].position.x;
-        float y0 = this->face[i].transform_vertex[0].position.y;
-        float z0 = this->face[i].transform_vertex[0].position.z;
-        float x1 = this->face[i].transform_vertex[1].position.x;
-        float y1 = this->face[i].transform_vertex[1].position.y;
-        float z1 = this->face[i].transform_vertex[1].position.z;
-        float x2 = this->face[i].transform_vertex[2].position.x;
-        float y2 = this->face[i].transform_vertex[2].position.y;
-        float z2 = this->face[i].transform_vertex[2].position.z;
+        // Cache vertex positions
+        gui_3d_vertex_t *vertices = this->face[i].transform_vertex;
+        float x0 = vertices[0].position.x, y0 = vertices[0].position.y, z0 = vertices[0].position.z;
+        float x1 = vertices[1].position.x, y1 = vertices[1].position.y, z1 = vertices[1].position.z;
+        float x2 = vertices[2].position.x, y2 = vertices[2].position.y, z2 = vertices[2].position.z;
 
-        float nz = this->face[i].transform_vertex[0].normal.z;
-
-        float z_factor = fmaxf(0.0f, fminf(1.0f, nz));
-        uint8_t color_intensity = (uint8_t)(255 * z_factor);
+        float nz = vertices[0].normal.z;
+        uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
 
         int min_x = floor(fminf(fminf(x0, x1), x2));
         int max_x = ceil(fmaxf(fmaxf(x0, x1), x2));
@@ -282,6 +150,7 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height,
         {
             float area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
 
+            // Iterate over the bounding box
             for (int y = min_y; y <= max_y; y++)
             {
                 for (int x = min_x; x <= max_x; x++)
@@ -300,9 +169,9 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height,
                         if (depthBuffer[index] == 0 || z > depthBuffer[index])
                         {
                             depthBuffer[index] = z;
-                            ((uint16_t *)pixelData)[index] = ((color_intensity & 0xF8) << 8) | ((color_intensity & 0xFC) << 3)
-                                                             | ((
-                                                                    color_intensity & 0xF8) >> 3);
+                            ((uint16_t *)pixelData)[index] = ((color_intensity & 0xF8) << 8) |
+                                                             ((color_intensity & 0xFC) << 3) |
+                                                             ((color_intensity & 0xF8) >> 3);
                         }
                     }
                 }
@@ -333,7 +202,6 @@ static void gui_3d_prepare(gui_3d_t *this)
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_3d_update_att(obj);
 
-    // this->flags = TINYOBJ_FLAG_TRIANGULATE;
     this->flags = 0;
 
     this->face = gui_malloc(sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
@@ -346,22 +214,32 @@ static void gui_3d_prepare(gui_3d_t *this)
     gui_3d_camera_t camera;
     gui_3d_light_t light;
     light.initialized = false;
+
+    // global transform
+    if (this->global_shape_transform_cb != NULL)
+    {
+        this->global_shape_transform_cb(this, &world, &camera, &light);
+    }
+
     for (size_t i = 0; i < this->desc->num_shapes; i++)
     {
-        GUI_ASSERT(this->shape_transform_cb != NULL);
-
         for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
         {
             size_t face_offset = this->desc->shapes[i].face_offset + j;
 
-            this->shape_transform_cb(this, face_offset, &world, &camera, &light);
-            gui_3d_convert_to_face(this, face_offset);
+            // local transform
+            if (this->local_shape_transform_cb != NULL)
+            {
+                this->local_shape_transform_cb(this, face_offset, &world, &camera, &light);
+            }
+            gui_3d_face_transform_local_to_global_tria(this->face + face_offset, face_offset,
+                                                       &this->desc->attrib, &world);
             gui_3d_scene(this->face + face_offset, &world, &camera);
+
         }
     }
 
-    gui_3d_generate_triangle_img(this, 350, 350, &light);
-
+    gui_3d_generate_triangle_img(this, 350, 350);
 
     if (tp->type == TOUCH_SHORT)
     {
@@ -439,6 +317,132 @@ static void gui_3d_end(gui_3d_t *this)
 }
 
 #else
+static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/,
+                               gui_3d_world_t *world, gui_3d_light_t *light)
+{
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
+    float width = head->w;
+    float height = head->h;
+    int data_size = sizeof(gui_rgb_data_head_t) + width * height * 4;
+
+    memcpy(this->mask_img + i, this->img + i, sizeof(draw_img_t));
+    this->mask_img[i].data = (unsigned char *)gui_malloc(data_size);
+    memcpy(this->mask_img[i].data, this->img[i].data, data_size);
+
+
+    unsigned char mask_color[4] = {light->color.r, light->color.g, light->color.b, light->color.a};
+    float alpha = mask_color[3] / 255.0f;
+
+    for (int p_y = 0; p_y < height; p_y++)
+    {
+        for (int p_x = 0; p_x < width; p_x++)
+        {
+            float u = (float)p_x / (width - 1);
+
+            float v = (float)p_y / (height - 1);
+
+            if (this->face[i].vertex[0].v == 1)
+            {
+                v = 1.0f - v;
+            }
+
+            gui_point_4d_t point = gui_3d_calculate_point_in_quad(
+                                       this->face[i].transform_world_vertex[0].position,
+                                       this->face[i].transform_world_vertex[1].position,
+                                       this->face[i].transform_world_vertex[2].position,
+                                       this->face[i].transform_world_vertex[3].position, u, v);
+
+            float intensity = gui_3d_calculate_light_to_point(light, point.x, point.y, point.z);
+
+            if (intensity != 0)
+            {
+                unsigned char *origin_pixel = (unsigned char *)this->img[i].data + sizeof(gui_rgb_data_head_t) +
+                                              (p_y * head->w + p_x) * 4;
+                unsigned char *pixel = (unsigned char *)this->mask_img[i].data + sizeof(gui_rgb_data_head_t)  +
+                                       (p_y * head->w + p_x) * 4;
+
+                for (int c = 0; c < 3; ++c)
+                {
+                    pixel[c] = (unsigned char)(mask_color[c] * alpha * intensity + origin_pixel[c] *
+                                               (1 - alpha * intensity));
+                }
+            }
+
+        }
+    }
+
+}
+
+static void gui_3d_face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/,
+                                  size_t i /*face_offset*/,
+                                  gui_3d_world_t *world, gui_3d_camera_t *camera)
+{
+    gui_3d_face_transform_local_to_global(this->face + i, world);
+    gui_3d_scene(this->face + i, world, camera);
+
+    int material_id = this->desc->attrib.material_ids[i];
+    this->img[i].data = (void *)this->desc->textures[material_id];
+
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
+    float width = head->w;
+    float height = head->h;
+
+    gui_3d_point_2d_t src[4];
+    gui_3d_point_2d_t dst[4];
+    for (size_t j = 0; j < 4; ++j)
+    {
+        src[j].x = this->face[i].vertex[j].u * width;
+        src[j].y = (1.0f - this->face[i].vertex[j].v) * height;
+
+        dst[j].x = this->face[i].transform_vertex[j].position.x;
+        dst[j].y = this->face[i].transform_vertex[j].position.y;
+    }
+
+    gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
+    memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&this->img[i].inverse);
+
+    this->img[i].img_w = width;
+    this->img[i].img_h = height;
+    this->img[i].blend_mode = IMG_SRC_OVER_MODE;
+    this->img[i].high_quality = true;
+    this->img[i].opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
+
+    draw_img_new_area(this->img + i, NULL);
+}
+
+static void gui_3d_convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
+{
+    size_t index_offset = 0;
+    for (size_t s = 0; s < i; s++)
+    {
+        index_offset += this->desc->attrib.face_num_verts[i];
+    }
+
+    for (size_t j = 0; j < this->desc->attrib.face_num_verts[i]; j++)
+    {
+        gui_obj_vertex_index_t idx = this->desc->attrib.faces[index_offset + j];
+
+        gui_obj_vertex_coordinate_t *v = &this->desc->attrib.vertices[idx.v_idx];
+        gui_obj_texcoord_coordinate_t *vt = &this->desc->attrib.texcoords[idx.vt_idx];
+        gui_obj_vertex_coordinate_t *vn = &this->desc->attrib.normals[idx.vn_idx];
+
+        this->face[i].vertex[j].position.x = v->x;
+        this->face[i].vertex[j].position.y = v->y;
+        this->face[i].vertex[j].position.z = v->z;
+        this->face[i].vertex[j].position.w = 1;
+
+        this->face[i].vertex[j].u = vt->u;
+        this->face[i].vertex[j].v = vt->v;
+
+        this->face[i].vertex[j].normal.x = vn->x;
+        this->face[i].vertex[j].normal.y = vn->y;
+        this->face[i].vertex[j].normal.z = vn->z;
+        this->face[i].vertex[j].normal.w = 1;
+
+    }
+}
+
 static void gui_3d_prepare(gui_3d_t *this)
 {
     touch_info_t *tp = tp_get_info();
@@ -462,21 +466,31 @@ static void gui_3d_prepare(gui_3d_t *this)
     gui_3d_camera_t camera;
     gui_3d_light_t light;
     light.initialized = false;
+
+    // global transform
+    if (this->global_shape_transform_cb != NULL)
+    {
+        this->global_shape_transform_cb(this, &world, &camera, &light);
+    }
+
     for (size_t i = 0; i < this->desc->num_shapes; i++)
     {
-        GUI_ASSERT(this->shape_transform_cb != NULL);
-
         for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
         {
-            this->shape_transform_cb(this, this->desc->shapes[i].face_offset + j, &world, &camera, &light);
-            // gui_log("Shape[%d][%s] has [%d] faces, and offset is %d\n", i, this->desc->shapes[i].name, this->desc->shapes[i].length, this->desc->shapes[i].face_offset + j);
-            gui_3d_convert_to_face(this, this->desc->shapes[i].face_offset + j);
+            size_t face_offset = this->desc->shapes[i].face_offset + j;
 
-            gui_3d_face_transfrom(this, i, this->desc->shapes[i].face_offset + j, &world, &camera);
+            // local transform
+            if (this->local_shape_transform_cb != NULL)
+            {
+                this->local_shape_transform_cb(this, face_offset, &world, &camera, &light);
+            }
+            gui_3d_convert_to_face(this, face_offset);
+
+            gui_3d_face_transfrom(this, i, face_offset, &world, &camera);
 
             if (light.initialized)
             {
-                gui_3d_light_apply(this, this->desc->shapes[i].face_offset + j, &world, &light);
+                gui_3d_light_apply(this, face_offset, &world, &light);
             }
 
         }
@@ -744,12 +758,18 @@ void gui_3d_ctor(gui_3d_t               *this,
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-
-void gui_3d_set_shape_transform_cb(gui_3d_t *this, size_t face/*face_offset*/,
-                                   void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
-                                              gui_3d_light_t *light))
+void gui_3d_set_global_shape_transform_cb(gui_3d_t *this,
+                                          void (*cb)(gui_3d_t *this, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                                     gui_3d_light_t *light))
 {
-    this->shape_transform_cb = cb;
+    this->global_shape_transform_cb = cb;
+}
+
+void gui_3d_set_local_shape_transform_cb(gui_3d_t *this, size_t face/*face_offset*/,
+                                         void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                                    gui_3d_light_t *light))
+{
+    this->local_shape_transform_cb = cb;
 }
 
 void gui_3d_set_animate(gui_3d_t     *this,

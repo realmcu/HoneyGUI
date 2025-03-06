@@ -25,11 +25,12 @@ void update_face_animation()
 
     if (tp->pressed || tp->pressing)
     {
-        rot_angle += tp->deltaX / 10.0f;
+        rot_angle += tp->deltaX / 5.0f;
     }
 }
 
-static void face_cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
+
+static void face_cb(gui_3d_t *this, gui_3d_world_t *world,
                     gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -58,7 +59,7 @@ static void app_ui_design(gui_app_t *app)
     extern void gui_fps_create(void *parent);
     gui_fps_create(&(app->screen));
 
-    gui_3d_set_shape_transform_cb(test_3d, 0, face_cb);
+    gui_3d_set_global_shape_transform_cb(test_3d, face_cb);
 
     gui_3d_set_animate(test_3d, 10000, -1, update_face_animation, NULL);
 

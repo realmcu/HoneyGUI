@@ -105,62 +105,6 @@ typedef struct
  *============================================================================*/
 
 /**
- * @brief Callback for rendering a 3D prism mirror.
- *
- * @param parent The parent 3D object.
- * @param face The face index to render.
- * @param world The world coordinate system.
- * @param camera The camera observing the object.
- * @param light The light affecting the object.
- */
-static void prism_mirror3d_render_callback(gui_3d_t *parent, size_t face, gui_3d_world_t *world,
-                                           gui_3d_camera_t *camera, gui_3d_light_t *light);
-
-/**
- * @brief Updates the angle of the prism mirror. Called on a timer or event.
- *
- * @param param The user-provided parameter.
- */
-static void prism_mirror3d_update_angle_cb(void *param);
-
-/**
- * @brief Animation callback for rendering.
- *
- * @param param The user-provided parameter.
- */
-static void prism_mirror3d_render_animate_cb(void *param);
-
-/**
- * @brief Callback for when a prism face is clicked.
- *
- * @param obj The object being clicked.
- * @param e The event type.
- * @param param The user-provided parameter.
- */
-static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param);
-
-/**
- * @brief Swaps the current and target states of the prism.
- *
- * @param prism The prism mirror object.
- */
-static void gui_prism_mirror3d_swap_states(gui_prism_mirror3d_t *prism);
-
-/**
- * @brief Interpolates and animates the rendering of a prism.
- *
- * @param render_object The object being rendered.
- */
-static void gui_prism_render_interpolated_animate(gui_prism_mirror3d_t *render_object);
-
-/**
- * @brief Updates the face flags for a prism mirror based on its current state.
- *
- * @param prism_mirror3d The prism mirror object.
- */
-static void gui_prism_mirror3d_update_face_flags(gui_prism_mirror3d_t *prism_mirror3d);
-
-/**
  * @brief Enters an animation for the prism mirror.
  *
  * @param parent The parent prism mirror object.

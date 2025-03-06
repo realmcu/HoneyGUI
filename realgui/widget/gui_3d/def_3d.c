@@ -2,9 +2,9 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_img.c
-  * @brief image widget
-  * @details image widget is used to show image on the screen
+  * @file def_3d.c
+  * @brief 3d calculation for 3d widget
+  * @details 3d calculation for 3d widget
   * @author howie_wang@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0
@@ -48,11 +48,6 @@ static void gui_3d_swap(float *a, float *b)
     *a = *b;
     *b = c;
 }
-#ifdef GUI3D_TRIANGLE_MESH
-#define VERTEX_COUNT  3
-#else
-#define VERTEX_COUNT  4
-#endif
 
 
 static bool gui_3d_gauss(float A[][9], int equ, int var,
@@ -570,7 +565,10 @@ void gui_3d_face_transform(gui_3d_face_t *face, gui_3d_matrix_t mat, GUI_3D_FACE
             {
                 face->transform_vertex[i] = face->vertex[i];
                 face->transform_vertex[i].position = gui_3d_point4D_mul_matrix(face->vertex[i].position, mat);
+
+#ifndef GUI3D_TRIANGLE_MESH
                 face->transform_world_vertex[i].position = face->transform_vertex[i].position;
+#endif
             }
             break;
         }
@@ -593,6 +591,36 @@ void gui_3d_face_transform(gui_3d_face_t *face, gui_3d_matrix_t mat, GUI_3D_FACE
 void gui_3d_face_transform_local_to_global(gui_3d_face_t *face, gui_3d_world_t *world)
 {
     gui_3d_face_transform(face, *world, GUI_3D_FACE_TRANSFORM_LOACL_TO_GLOBAL);
+}
+
+void gui_3d_face_transform_local_to_global_tria(gui_3d_face_t *face, size_t face_index,
+                                                gui_obj_attrib_t *attrib, gui_3d_world_t *world)
+{
+    size_t index_offset = 0;
+    for (size_t s = 0; s < face_index; s++)
+    {
+        index_offset += attrib->face_num_verts[face_index];
+    }
+
+    for (size_t j = 0; j < attrib->face_num_verts[face_index]; j++)
+    {
+        gui_obj_vertex_index_t idx = attrib->faces[index_offset + j];
+
+        gui_obj_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
+        gui_obj_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
+        gui_obj_vertex_coordinate_t *vn = &attrib->normals[idx.vn_idx];
+
+        gui_point_4d_t local_position = {v->x, v->y, v->z, 1.0f};
+        face->transform_vertex[j].position = gui_3d_point4D_mul_matrix(local_position, *world);
+
+        face->transform_vertex[j].u = vt->u;
+        face->transform_vertex[j].v = vt->v;
+        face->transform_vertex[j].normal.x = vn->x;
+        face->transform_vertex[j].normal.y = vn->y;
+        face->transform_vertex[j].normal.z = vn->z;
+        face->transform_vertex[j].normal.w = 1;
+
+    }
 }
 
 void gui_3d_face_transform_local_to_local(gui_3d_face_t *face, gui_3d_matrix_t *m)
@@ -753,49 +781,35 @@ void gui_3d_face_transform_perspective(gui_3d_face_t *face, gui_3d_camera_t *cam
     }
 }
 
-static bool gui_3d_all_vertices_outside(gui_3d_face_t *face, char axis, float threshold,
-                                        bool greater_than)
+static bool gui_3d_all_vertices_outside(const gui_3d_face_t *face, const char *axes,
+                                        const float *thresholds, const bool *greater_than)
 {
     for (int i = 0; i < VERTEX_COUNT; i++)
     {
-        float value = (axis == 'y') ? face->transform_vertex[i].position.y :
-                      face->transform_vertex[i].position.x;
-
-        if ((greater_than && value <= threshold) || (!greater_than && value >= threshold))
+        for (int j = 0; j < 2; j++)
         {
-            return false;
+            float value = (axes[j] == 'y') ? face->transform_vertex[i].position.y :
+                          face->transform_vertex[i].position.x;
+
+            if ((greater_than[j] && value <= thresholds[j]) || (!greater_than[j] && value >= thresholds[j]))
+            {
+                return false;
+            }
         }
     }
     return true;
 }
 
-void gui_3d_face_cull_out_side(gui_3d_face_t *face, gui_3d_camera_t *camera)
+void gui_3d_face_cull_out_side(gui_3d_face_t *face, const gui_3d_camera_t *camera)
 {
+    char axes[2] = {'y', 'x'};
+    float thresholds[4] = {camera->viewplane_height / 2, -camera->viewplane_height / 2,
+                           -camera->viewplane_width / 2, camera->viewplane_width / 2
+                          };
+    bool greater_than[4] = {true, false, false, true};
 
-    bool outside = false;
-
-    if (gui_3d_all_vertices_outside(face, 'y', camera->viewplane_height / 2, true))
-    {
-        //up
-        outside = true;
-    }
-    else if (gui_3d_all_vertices_outside(face, 'y', -camera->viewplane_height / 2, false))
-    {
-        //down
-        outside = true;
-    }
-    else if (gui_3d_all_vertices_outside(face, 'x', -camera->viewplane_width / 2, false))
-    {
-        //left
-        outside = true;
-    }
-    else if (gui_3d_all_vertices_outside(face, 'x', camera->viewplane_width / 2, true))
-    {
-        //right
-        outside = true;
-    }
-
-    if (outside)
+    if (gui_3d_all_vertices_outside(face, &axes[0], &thresholds[0], &greater_than[0]) ||
+        gui_3d_all_vertices_outside(face, &axes[1], &thresholds[2], &greater_than[2]))
     {
         face->state |= GUI_3D_FACESTATE_CLIPPED;
     }
@@ -803,31 +817,28 @@ void gui_3d_face_cull_out_side(gui_3d_face_t *face, gui_3d_camera_t *camera)
     {
         face->state &= ~GUI_3D_FACESTATE_CLIPPED;
     }
-
 }
 
 void gui_3d_face_transform_screen(gui_3d_face_t *face, gui_3d_camera_t *camera)
 {
-
-    float alpha = (0.5f * camera->viewport_width - 0.5f);
-    float beta = (0.5f * camera->viewport_height - 0.5f);
+    float alpha = 0.5f * (camera->viewport_width - 1);
+    float beta = 0.5f * (camera->viewport_height - 1);
 
     for (int i = 0; i < VERTEX_COUNT; i++)
     {
-        // face=GUI_VECTOR_AT(gui_3d_face_t,&list->facestream,i);
-        face->transform_vertex[i].position.x = alpha + alpha * face->transform_vertex[i].position.x;
-        face->transform_vertex[i].position.y = beta + beta * face->transform_vertex[i].position.y;
+        float x = face->transform_vertex[i].position.x;
+        float y = face->transform_vertex[i].position.y;
 
-        //inv y
-        face->transform_vertex[i].position.y = -face->transform_vertex[i].position.y +
-                                               camera->viewport_height;
+        face->transform_vertex[i].position.x = alpha * (1 + x);
+
+        // transform and inv y
+        face->transform_vertex[i].position.y = camera->viewport_height - beta * (1 + y) ;
     }
 
 }
 
 void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
-    gui_3d_face_transform_local_to_global(face, world);
     gui_3d_camera_build_UVN_matrix(camera);
     gui_3d_face_transform_camera(face, camera);
     gui_3d_face_cull_region(face, camera);

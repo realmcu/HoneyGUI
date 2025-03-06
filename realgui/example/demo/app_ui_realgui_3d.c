@@ -93,7 +93,7 @@ static void app_ui_design(gui_app_t *app)
 
     gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-    gui_3d_set_shape_transform_cb(test_3d, 0, cb);
+    gui_3d_set_local_shape_transform_cb(test_3d, 0, cb);
 
     gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
 
