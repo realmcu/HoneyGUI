@@ -39,7 +39,7 @@
 
 #define IMAGE_ARRAY 1
 #define IMAGE_SCOPE 2
-
+#define IMAGE_THUMB 3
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -93,7 +93,7 @@ void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
     if (this->per != this->per_history)
     {
         this->per_history = this->per;
-        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
+        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_5);
     }
 
     if (this->image_type == IMAGE_SCOPE)
@@ -116,7 +116,14 @@ void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
         GET_BASE(this->c)->h = gui_img_get_height((void *)(this->c));
 
     }
+    else if (this->image_type == IMAGE_THUMB)
+    {
+        size_t p = progress;
 
+
+        GET_BASE(this->c)->x = p;
+
+    }
 }
 
 size_t gui_progressbar_get_progress(gui_progressbar_t *this)
@@ -130,7 +137,7 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
     if (this->per != this->per_history)
     {
         this->per_history = this->per;
-        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
+        gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_5);
     }
 
     if (this->image_type == IMAGE_SCOPE)
@@ -151,6 +158,14 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
         GUI_TYPE(gui_img_t, this->c)->data = ((void **)(uintptr_t)(this->color_hl))[p];
         GET_BASE(this->c)->w = gui_img_get_width((void *)(this->c)) + 1;
         GET_BASE(this->c)->h = gui_img_get_height((void *)(this->c));
+    }
+    else if (this->image_type == IMAGE_THUMB)
+    {
+        size_t p = percentage * (this->max);
+
+
+        GET_BASE(this->c)->x = p;
+
     }
 }
 
@@ -216,7 +231,34 @@ void gui_progressbar_h_img_ctor(gui_progressbar_t *this,
     GUI_TYPE(gui_img_scope_t, this->c)->scope_x2 = this->max * this->per;
     GUI_TYPE(gui_img_scope_t, this->c)->scope_y2 = GET_BASE(this)->h;
 }
+void gui_progressbar_h_thumb_ctor(gui_progressbar_t *this,
+                                  gui_obj_t         *parent,
+                                  void              *picture,
+                                  int16_t            x,
+                                  int16_t            y,
+                                  uint16_t bar_width
+                                 )
+{
 
+    gui_obj_ctor(&(this->base), parent, "h_thumb_pro", x, y, 0, 0);
+    this->per = 0.3f;
+    this->base.type = PROGRESSBAR;
+
+    this->color = 1;
+    this->image_type = IMAGE_THUMB;
+    gui_list_init(&(((gui_obj_t *)this)->child_list));
+    if ((((gui_obj_t *)this)->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
+                               &(((gui_obj_t *)this)->brother_list));
+    }
+    this->c = (void *)gui_img_create_from_mem(this, "_thumb", picture, 0, 0, 0, 0);
+    int w = gui_img_get_width((void *)this->c);
+    this->max = bar_width - w;
+    GET_BASE(this)->w = bar_width;
+    this->thumb_width = w;
+    GET_BASE(this)->h = gui_img_get_height((void *)this->c);
+}
 void gui_progressbar_h_img_ctor_from_ftl(gui_progressbar_t *this,
                                          gui_obj_t         *parent,
                                          void              *picture,
@@ -415,6 +457,19 @@ gui_progressbar_t *gui_progressbar_movie_create_from_fs(void      *parent,
     gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
     memset(this, 0, sizeof(gui_progressbar_t));
     gui_progressbar_movie_ctor_core(this, parent, picture_array, array_length, x, y, IMG_SRC_FILESYS);
+    ((gui_obj_t *)this)->create_done = 1;
+
+    return this;
+}
+gui_progressbar_t *gui_progressbar_thumb_h_create(void    *parent,
+                                                  void    *picture_pointer,
+                                                  int16_t  x,
+                                                  int16_t  y,
+                                                  uint16_t bar_width)
+{
+    gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
+    memset(this, 0, sizeof(gui_progressbar_t));
+    gui_progressbar_h_thumb_ctor(this, parent, picture_pointer, x, y, bar_width);
     ((gui_obj_t *)this)->create_done = 1;
 
     return this;

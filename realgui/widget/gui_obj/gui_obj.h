@@ -107,6 +107,9 @@ typedef enum t_obj_type
     GUI_VENDOR_TYPE,
     MACRO_CHART,
     VIEW,
+    MACRO_ONCOMPLETE,
+    MACRO_KEY,
+    MACRO_ONSELECT,
 } T_OBJ_TYPE;
 typedef enum
 {
@@ -772,7 +775,23 @@ void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displa
  * @param y   The new y-coordinate for the widget object.
  */
 void gui_obj_move(gui_obj_t *obj, int x, int y);
-
+/**
+ * @brief Get an array of widget objects from the GUI object tree by type.
+ *
+ * This function searches the GUI object tree starting from the root and
+ * retrieves an array of widget objects of the specified type.
+ *
+ * @param root Pointer to the root of the GUI object tree.
+ * @param type The type of the object to find.
+ * @param output_array Pointer to an array where the found objects should be stored.
+ * @param length Pointer to an integer where the length of the array should be stored.
+ *
+ * @return 0 if successful, -1 if not successful.
+ */
+int gui_obj_tree_get_widget_array_by_type(gui_obj_t *root,
+                                          T_OBJ_TYPE type,
+                                          gui_obj_t ***output_array,
+                                          int *length);
 #ifdef __cplusplus
 }
 #endif

@@ -42,7 +42,7 @@ void gui_change_default_path(int argc, char **argv)
 
             if (defaultPath != NULL)
             {
-                free(defaultPath);
+                //free(defaultPath);
             }
             defaultPath = path;
         }

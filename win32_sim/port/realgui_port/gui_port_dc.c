@@ -7,7 +7,7 @@
 #include "unistd.h"
 #include "tp_algo.h"
 #include "kb_algo.h"
-
+#include "gui_message.h"
 #ifndef DRV_LCD_WIDTH
 #define DRV_LCD_WIDTH   480
 #endif
@@ -165,7 +165,17 @@ static void *sdl_flush(void *arg)
         SDL_DestroyTexture(texture);
     }
 }
+#ifdef REALTEK_BUILD_GUI_XML_DOM
+static void key_gui_msg_cb(void *p)
+{
 
+    extern gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
+    gui_msg_t *msg = p;
+
+    gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
+
+}
+#endif
 void *rtk_gui_sdl(void *arg)
 {
     int quit = 0;
@@ -289,6 +299,16 @@ void *rtk_gui_sdl(void *arg)
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
                 strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
                 kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
+#ifdef REALTEK_BUILD_GUI_XML_DOM
+                gui_msg_t msg =
+                {
+                    .event = GUI_EVENT_USER_DEFINE,
+                    .payload = (void *)(size_t)event.key.keysym.sym,
+                    .cb = (gui_msg_cb)key_gui_msg_cb,
+                };
+                extern bool gui_send_msg_to_server(gui_msg_t *msg);
+                gui_send_msg_to_server(&msg);
+#endif
             }
             break;
         case SDL_QUIT:

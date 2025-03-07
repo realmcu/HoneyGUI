@@ -53,7 +53,12 @@ extern void gui_progressbar_h_img_ctor(gui_progressbar_t *this, gui_obj_t *paren
                                        int16_t x, int16_t y);
 extern void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent,
                                        void **picture_array, uint16_t array_number, int16_t x, int16_t y);
-
+extern void gui_progressbar_h_thumb_ctor(gui_progressbar_t *this,
+                                         gui_obj_t         *parent,
+                                         void              *picture,
+                                         int16_t            x,
+                                         int16_t            y,
+                                         uint16_t bar_width);
 
 /*============================================================================*
  *                           Private Functions
@@ -212,7 +217,17 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                float pro = gui_seekbar_get_gegree_to_center(circle->arcx + 0, circle->arcy + 0, tp->x + tp->deltaX,
+                //         gui_obj_t *o = obj;
+                //         o = obj;
+                //         int ax = obj->x, ay = obj->y;
+                // while (o->parent != NULL)
+                // {
+                //     o = o->parent;
+                //     ax += o->x;
+                //     ay += o->y;
+                // }
+                float pro = gui_seekbar_get_gegree_to_center(circle->arcx + obj->matrix->m[0][2],
+                                                             circle->arcy + obj->matrix->m[1][2], tp->x + tp->deltaX,
                                                              tp->y + tp->deltaY);
                 float progress = 0;
                 GUI_UNUSED(progress);
@@ -311,8 +326,13 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
 
         if (b->press_flag)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_3);
+            //gui_obj_enable_event(obj, GUI_EVENT_3);
         }
+    }
+    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+        gui_log("%d\n", event_dsc->event_code);
     }
 }
 
@@ -324,7 +344,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
     gui_seekbar_update_att(obj);
     tp = tp_get_info();
     circle = (gui_seekbar_t *)obj;
-
+    static bool event_4;
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
         if ((tp->type == TOUCH_HOLD_X)
@@ -333,15 +353,40 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                int pro = tp->x + tp->deltaX - obj->x;
-                if (pro <= 0) { pro = 1; }
-                if (pro >= obj->w) { pro = obj->w; }
+                int pro = circle->last_pro + tp->deltaX;
+                if (pro <= 0) { pro = 0; }
+                if (pro >= (obj->w - circle->base.thumb_width)) { pro = (obj->w - circle->base.thumb_width); }
                 if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
                 {
-                    pro = pro * circle->base.max / obj->w;
+                    pro = pro * circle->base.max / (obj->w - circle->base.thumb_width);
                     gui_log("pro:%d\n", pro);
                 }
-                gui_progressbar_set_progress((void *)circle, pro);
+                gui_progressbar_set_progress((void *)circle, pro);//gui_log("per:%f\n", circle->base.per);
+                if (circle->base.per == 1.0f)
+                {
+                    if (circle->thumb_picture_highlight)
+                    {
+                        GUI_TYPE(gui_img_t, circle->base.c)->data = (void *)circle->thumb_picture_highlight;
+                    }
+
+
+                    if (!event_4)
+                    {
+                        gui_obj_enable_event(obj, GUI_EVENT_4); gui_log("GUI_EVENT_4:\n");
+                        event_4 = 1;
+                    }
+
+                }
+                else
+                {
+                    if (circle->thumb_picture)
+                    {
+                        GUI_TYPE(gui_img_t, circle->base.c)->data = (void *)circle->thumb_picture;
+                    }
+
+                }
+
+
             }
         }
     }
@@ -391,6 +436,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
             {
                 b->press_flag = true;
                 //gui_obj_enable_event(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+                event_4 = 0;
             }
         }
 
@@ -398,12 +444,15 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
         {
             b->press_flag = false;
             //gui_obj_enable_event(obj, GUI_EVENT_2);
+            b->last_pro = gui_progressbar_get_progress((void *)b);
         }
         if (b->press_flag)
         {
             //gui_obj_enable_event(obj, GUI_EVENT_3);
         }
     }
+
+
 }
 static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
 {
@@ -505,7 +554,7 @@ static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
         }
         if (b->press_flag)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_3);
+            //gui_obj_enable_event(obj, GUI_EVENT_3);
         }
     }
 }
@@ -596,8 +645,25 @@ void gui_seekbar_ctor_img_h(gui_seekbar_t *this,
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
     GET_BASE(this)->has_prepare_cb = true;
+    this->last_pro = this->base.per * this->base.max;
 }
+void gui_seekbar_ctor_thumb_h(gui_seekbar_t *this,
+                              gui_obj_t     *parent,
+                              void          *picture,
+                              void          *picture_hl,
+                              int16_t        x,
+                              int16_t        y,
+                              uint16_t bar_width)
+{
+    gui_progressbar_h_thumb_ctor(&(this->base), parent, picture, x, y, bar_width);
 
+    this->base.base.type = SEEKBAR;
+    GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
+    GET_BASE(this)->has_prepare_cb = true;
+    this->thumb_picture = picture;
+    this->thumb_picture_highlight = picture_hl;
+    //this->last_pro = this->base.per*this->base.max;
+}
 void gui_seekbar_ctor_movie_h(gui_seekbar_t  *this,
                               gui_obj_t      *parent,
                               void          **picture_array,
@@ -720,13 +786,15 @@ static void gui_seekbar_set_animate(gui_seekbar_t *this, uint32_t dur, int repea
 }
 static void on_change(gui_seekbar_t *this, gui_event_cb_t function, void *param)
 {
-    gui_obj_add_event_cb(this, function, GUI_EVENT_1, param);
+    gui_obj_add_event_cb(this, function, GUI_EVENT_5, param);
 }
-_GUI_API_ASSIGN(gui_seekbar_t)
-.animate = gui_seekbar_set_animate,
- .get_progress = (float(*)(gui_seekbar_t *))gui_progressbar_get_percentage,
-  .set_progress = (void (*)(gui_seekbar_t *, float))gui_progressbar_set_percentage,
-   .on_change = on_change,
+//_GUI_API_ASSIGN(gui_seekbar_t)
+_gui_api_gui_seekbar_t _gui_api_for_gui_seekbar_t =
+{
+    .animate = gui_seekbar_set_animate,
+    .get_progress = (float(*)(gui_seekbar_t *))gui_progressbar_get_percentage,
+    .set_progress = (void (*)(gui_seekbar_t *, float))gui_progressbar_set_percentage,
+    .on_change = on_change,
 };
 /*============================================================================*
  *                           Public Functions
@@ -817,3 +885,34 @@ gui_seekbar_t *gui_seekbar_create_movie_arc(void      *parent,
 
     return this;
 }
+gui_seekbar_t *gui_seekbar_create_thumb_h(void    *parent,
+                                          void    *picture_pointer,
+                                          void    *picture_highlight_pointer,
+                                          int16_t  x,
+                                          int16_t  y,
+                                          uint16_t bar_width)
+{
+    gui_seekbar_t *this = gui_malloc(sizeof(gui_seekbar_t));
+    memset(this, 0, sizeof(gui_seekbar_t));
+    gui_seekbar_ctor_thumb_h(this, parent, picture_pointer, picture_highlight_pointer, x, y, bar_width);
+    ((gui_obj_t *)this)->create_done = 1;
+
+    return this;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

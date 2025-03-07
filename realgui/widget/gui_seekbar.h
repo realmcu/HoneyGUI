@@ -52,18 +52,23 @@ typedef struct gui_seekbar
     uint16_t arcy;
     uint16_t arc_r;
     uint16_t arc_w;
+    uint16_t last_pro;
     float arc_start;
     float arc_end;
     gui_animate_t *animate;
+    const uint8_t *thumb_picture_highlight;
+    const uint8_t *thumb_picture;
 } gui_seekbar_t;
 
-_GUI_API_DEFINE(gui_seekbar_t)
-void (*animate)(gui_seekbar_t *o, uint32_t dur, int repeat_count, void *callback, void *p);
-float (*get_progress)(gui_seekbar_t *_this);
-void (*set_progress)(gui_seekbar_t *_this, float progress);
-void (*on_change)(gui_seekbar_t *_this, gui_event_cb_t function, void *param);
-_GUI_API_DECLARE(gui_seekbar_t)
-
+//_GUI_API_DEFINE(gui_seekbar_t)
+typedef struct __gui_api_gui_seekbar_t
+{
+    void (*animate)(gui_seekbar_t *o, uint32_t dur, int repeat_count, void *callback, void *p);
+    float (*get_progress)(gui_seekbar_t *_this);
+    void (*set_progress)(gui_seekbar_t *_this, float progress);
+    void (*on_change)(gui_seekbar_t *_this, gui_event_cb_t function, void *param);
+//_GUI_API_DECLARE(gui_seekbar_t)
+} _gui_api_gui_seekbar_t; extern _gui_api_gui_seekbar_t _gui_api_for_gui_seekbar_t;
 /*============================================================================*
  *                         Constants
  *============================================================================*/
@@ -198,6 +203,25 @@ gui_seekbar_t *gui_seekbar_create_movie_h_double(void      *parent,
                                                  uint16_t   array_length,
                                                  int16_t    x,
                                                  int16_t    y);
+/**
+  * @brief  create a horizontal seekbar with thumb image
+  * @param  parent the father widget it nested in
+  * @param  picture_pointer thumb image pointer
+  * @param  picture_highlight_pointer thumb image highlight pointer
+  * @param  x the X-axis coordinate relative to parent widget
+  * @param  y the y-axis coordinate relative to parent widget
+  * @param  bar_width seekbar width
+  * @return return the widget object pointer
+  * <b>Example usage</b>
+  *
+  * \endcode
+  */
+gui_seekbar_t *gui_seekbar_create_thumb_h(void    *parent,
+                                          void    *picture_pointer,
+                                          void    *picture_highlight_pointer,
+                                          int16_t  x,
+                                          int16_t  y,
+                                          uint16_t bar_width);
 
 
 

@@ -36,6 +36,7 @@
 #include "gui_wave.h"
 #include "gui_api.h"
 #include "gui_multi_level.h"
+#include "gui_pagelist_new.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
 struct widget_create
 {
@@ -86,6 +87,10 @@ static struct widget_create widget[] =
     {"combo", MACRO_COMBO},
     {"onPeripheral", MACRO_ON_PERIPHERAL},
     {"chart", MACRO_CHART},
+    {"list", MACRO_PAGE_LIST_NEW},
+    {"onComplete", MACRO_ONCOMPLETE},
+    {"key", MACRO_KEY},
+    {"onSelect", MACRO_ONSELECT},
 };
 
 typedef struct
@@ -100,6 +105,8 @@ typedef struct
     int rotate_y;
     int rotate_from;
     int rotate_to;
+    float textContent_from;
+    float textContent_to;
     float scale_x;
     float scale_y;
     float scale_x_from;
@@ -114,6 +121,17 @@ typedef struct
     char *animate_type;
     gui_img_t *img;
 } image_animate_params_t;
+typedef struct
+{
+    float values[10];
+    float values_2[10];
+    float key_times[10];
+    int length;
+    char *img_name;
+    char *animate_type;
+    gui_img_t *img;
+    uint8_t calc_mode;
+} image_animate_key_times_params_t;
 typedef struct arc_animation_param
 {
     gui_color_t stroke;
@@ -130,6 +148,7 @@ typedef struct arc_animation_param
     uint8_t cap;
     uint8_t aniamtion_type;
     uint8_t dir;
+    uint8_t calc_mode;
 
 } arc_animation_param_t;
 typedef struct chart_animation_param
@@ -151,12 +170,22 @@ typedef struct
     int num1;
     int num2;
 } two_integers;
+struct on_click_jump_cb_param
+{
+    const char *to_widget_name;
+    int id1;
+    int id2;
+};
 #define TEXT_WEATHER_CUR_ANIMATION 1
 #define ARC_ACTIVITY_EX_ANIMATION 2
 #define CHART_HEART_RATE_DATA_ANIMATION 3
 #define TEXT_HEART_RATE_CUR_ANIMATION 4
 #define TEXT_ACTIVITY_EX_ANIMATION 5
 #define TEXT_BATTERY_CAPACITY_ANIMATION 6
+#define ANIMATION_CALC_MODE_DISCRETE 0
+#define ANIMATION_CALC_MODE_LINEAR 1
+#define ANIMATION_CALC_MODE_PACED 3
+#define ANIMATION_CALC_MODE_SPLINE 4
 static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
@@ -182,6 +211,17 @@ static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+static void parse_id_string(const char *id, struct on_click_jump_cb_param *param);
+/**
+ * @brief Writes a key value in a array at the specified ID.
+ *
+ * @param id The ID of the key array to write.
+ * @param up Whether the key is up or down.
+ * @param down Whether the key is down or up.
+ *
+ * @return A gui_error_t indicating the result of the operation.
+ */
+gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
 {
@@ -227,6 +267,29 @@ static void img_scale_cb(image_animate_params_t *animate_params, void *null, gui
                      animate_params->scale_y_center);
 }
 
+
+static void text_content_cb(image_animate_params_t *animate_params, void *null,
+                            gui_animate_t *animate)
+{
+    uint8_t opacity = animate_params->textContent_from - animate->progress_percent *
+                      (animate_params->textContent_from - animate_params->textContent_to);
+    //gui_log("img_opacity_cb%d\n", opacity);
+    int num = opacity;
+    static  char str[20];
+
+
+    sprintf(str, "%d", num);
+
+    gui_text_content_set((void *)animate_params->img, str, strlen(str));
+
+}
+static void progress_content_cb(image_animate_params_t *animate_params, void *null,
+                                gui_animate_t *animate)
+{
+    float opacity = animate_params->textContent_from - animate->progress_percent *
+                    (animate_params->textContent_from - animate_params->textContent_to);
+    gui_progressbar_set_percentage((void *)animate_params->img, opacity);
+}
 static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
                            gui_animate_t *animate)
 {
@@ -234,6 +297,138 @@ static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
                       (animate_params->opacity_from - animate_params->opacity);
     //gui_log("img_opacity_cb%d\n", opacity);
     gui_img_set_opacity(animate_params->img, opacity);
+}
+static void img_opacity_key_times_cb(image_animate_key_times_params_t *animate_params, void *null,
+                                     gui_animate_t *animate)
+{
+    float per = animate->progress_percent;
+    int opacity = 255; // Default opacity if no interpolation is possible
+
+    switch (animate_params->calc_mode)
+    {
+    case ANIMATION_CALC_MODE_DISCRETE:
+        {
+            // Find the position in the key_times array
+            for (int i = 0; i < animate_params->length - 1; i++)
+            {
+                if (per >= animate_params->key_times[i] && per < animate_params->key_times[i + 1])
+                {
+                    // Linear interpolation between key times
+                    //float segment_progress = (per - animate_params->key_times[i]) / (animate_params->key_times[i + 1] - animate_params->key_times[i]);
+                    opacity = animate_params->values[i] /*+ segment_progress * (animate_params->values[i + 1] - animate_params->values[i])*/;
+                    break;
+                }
+            }
+
+        }
+        break;
+    case ANIMATION_CALC_MODE_LINEAR:
+    case ANIMATION_CALC_MODE_PACED:
+    case ANIMATION_CALC_MODE_SPLINE:
+        {
+            // Find the position in the key_times array
+            for (int i = 0; i < animate_params->length - 1; i++)
+            {
+                if (per >= animate_params->key_times[i] && per < animate_params->key_times[i + 1])
+                {
+                    // Linear interpolation between key times
+                    float segment_progress = (per - animate_params->key_times[i]) / (animate_params->key_times[i + 1] -
+                                                                                     animate_params->key_times[i]);
+                    opacity = animate_params->values[i] + segment_progress * (animate_params->values[i + 1] -
+                                                                              animate_params->values[i]);
+                    break;
+                }
+            }
+
+        }
+        break;
+    default:
+        break;
+    }
+
+
+    // If 'per' is exactly at the last key time, use the last value
+    if (per >= animate_params->key_times[animate_params->length - 1] || animate->end_frame)
+    {
+        opacity = animate_params->values[animate_params->length - 1];
+    }
+
+    // Set the image opacity
+    gui_img_set_opacity(animate_params->img,
+                        (int)(opacity)); // Assuming gui_img_set_opacity expects an integer between 0 and 255
+
+    // Optional: debug logging
+    // gui_log("img_opacity_cb: opacity set to %d\n", (int)(opacity * 255));
+}
+static void img_translate_key_times_cb(image_animate_key_times_params_t *animate_params, void *null,
+                                       gui_animate_t *animate)
+{
+    float per = animate->progress_percent;
+
+    float t_x = 0;
+
+
+    float t_y = 0;
+
+
+    switch (animate_params->calc_mode)
+    {
+    case ANIMATION_CALC_MODE_DISCRETE:
+        {
+// Find the position in the key_times array
+            for (int i = 0; i < animate_params->length - 1; i++)
+            {
+                if (per >= animate_params->key_times[i] && per < animate_params->key_times[i + 1])
+                {
+                    // Linear interpolation between key times
+                    //float segment_progress = (per - animate_params->key_times[i]) / (animate_params->key_times[i + 1] - animate_params->key_times[i]);
+                    t_x = animate_params->values[i] /*+ segment_progress * (animate_params->values[i + 1] - animate_params->values[i])*/;
+                    t_y = animate_params->values_2[i];
+                    break;
+                }
+            }
+        }
+        break;
+    case ANIMATION_CALC_MODE_LINEAR:
+    case ANIMATION_CALC_MODE_PACED:
+    case ANIMATION_CALC_MODE_SPLINE:
+        {
+// Find the position in the key_times array
+            for (int i = 0; i < animate_params->length - 1; i++)
+            {
+                if (per >= animate_params->key_times[i] && per < animate_params->key_times[i + 1])
+                {
+                    // Linear interpolation between key times
+                    float segment_progress = (per - animate_params->key_times[i]) / (animate_params->key_times[i + 1] -
+                                                                                     animate_params->key_times[i]);
+                    t_x = animate_params->values[i] + segment_progress * (animate_params->values[i + 1] -
+                                                                          animate_params->values[i]);
+                    t_y = animate_params->values_2[i] + segment_progress * (animate_params->values_2[i + 1] -
+                                                                            animate_params->values_2[i]);
+
+                    break;
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+
+    // If 'per' is exactly at the last key time, use the last value
+    if (per >= animate_params->key_times[animate_params->length - 1] || animate->end_frame)
+    {
+        t_x = animate_params->values[animate_params->length - 1];
+        t_y = animate_params->values_2[animate_params->length - 1];
+
+    }
+
+
+
+    gui_img_translate(animate_params->img, t_x, t_y);
+    // Optional: debug logging
+//gui_log("img_opacity_cb: opacity set to %d\n", (int)(opacity * 255));
 }
 static void image_animate_callback(void *params, void *null, gui_animate_t *animate);
 static void multi_animate_callback(void *params, void *null, gui_animate_t *animate)
@@ -255,6 +450,14 @@ static void multi_animate_callback(void *params, void *null, gui_animate_t *anim
     else if (!strcmp(animate_params->animate_type, "opacity"))
     {
         img_opacity_cb(params, null, animate);
+    }
+    else if (!strcmp(animate_params->animate_type, "textContent"))
+    {
+        text_content_cb(params, null, animate);
+    }
+    else if (!strcmp(animate_params->animate_type, "progress"))
+    {
+        progress_content_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_translate"))
     {
@@ -316,7 +519,31 @@ static void multi_animate_callback(void *params, void *null, gui_animate_t *anim
         image_animate_callback(params, null, animate);
     }
 }
-
+static void multi_animate_key_times_callback(void *params, void *null, gui_animate_t *animate)
+{
+    image_animate_key_times_params_t *animate_params = (image_animate_key_times_params_t *)params;
+    //gui_log("multi_animate_callback:%x,%s\n", animate_params, animate_params->animate_type);
+    if (!strcmp(animate_params->animate_type, "rotate"))
+    {
+        //img_rotate_cb(params, null, animate);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate"))
+    {
+        img_translate_key_times_cb(params, null, animate);
+    }
+    else if (!strcmp(animate_params->animate_type, "scale"))
+    {
+        //img_scale_cb(params, null, animate);
+    }
+    else if (!strcmp(animate_params->animate_type, "opacity"))
+    {
+        img_opacity_key_times_cb(params, null, animate);
+    }
+    else if (!strcmp(animate_params->animate_type, "image frame"))
+    {
+        //image_animate_callback(params, null, animate);
+    }
+}
 static void image_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
     int current_image_index = 0;
@@ -540,6 +767,24 @@ static void slider_write_text_cb(void *obj, gui_event_t e, char *text_name)
     snprintf(light_value_text, sizeof(light_value_text), "%d",
              GUI_API(gui_slider_t).get_currentValue(this));
     gui_text_content_set(text, light_value_text, strlen(light_value_text));
+}
+static void seekbar_write_text_cb(void *obj, gui_event_t e, char *text_name)
+{
+    gui_seekbar_t *this = (gui_seekbar_t *)obj;
+    gui_text_t *text = 0;
+    gui_obj_tree_get_widget_by_name((gui_obj_t *)gui_current_app(), text_name, (gui_obj_t **)&text);
+    if (!text)
+    {
+        return;
+    }
+
+    gui_free(text->content);
+    text->content = gui_malloc(5);
+    memset(text->content, 0, 5);
+    snprintf(text->content, 5, "%d",
+             (int)(GUI_API(gui_seekbar_t).get_progress(this) * 100 + 0.5f));
+    gui_text_content_set(text, text->content, strlen(text->content));
+    gui_log("text->content:%s\n", text->content);
 }
 static char *open_switch_name;
 static char *pause_switch_name;
@@ -783,27 +1028,36 @@ static void multi_level_ui_design(gui_multi_level_t *obj)
 {
     create_tree_in_multi_level(gui_current_app(), obj);
 }
-struct on_click_jump_cb_param
-{
-    const char *to_widget_name;
-    int id1;
-    int id2;
-};
+
 
 static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
 {
-    GUI_WIDGET_POINTER_BY_TYPE(ml, MULTI_LEVEL, &(gui_current_app()->screen))
-    if (param->id1 < 0)
+    if (param->to_widget_name)
     {
-        setting_return_cb(obj, e, (void *)param);
+        GUI_WIDGET_POINTER_BY_NAME(ml, param->to_widget_name);
+        if (param->id1 < 0)
+        {
+            setting_return_cb(obj, e, (void *)param);
+        }
+        else
+        {
+            GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
+        }
     }
     else
     {
-        GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
+        GUI_WIDGET_POINTER_BY_TYPE(ml, MULTI_LEVEL, &(gui_current_app()->screen));
+        if (param->id1 < 0)
+        {
+            setting_return_cb(obj, e, (void *)param);
+        }
+        else
+        {
+            GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
+        }
     }
-
-
 }
+
 static void on_click_jump_cb_tabview(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
 {
     if (param->to_widget_name)
@@ -1079,6 +1333,7 @@ static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t w = 0;
         int16_t h = 0;
         int style = 0; GUI_UNUSED(style);
+        bool gestures = true;
         while (true)
         {
             if (!(p->attr[i]))
@@ -1123,11 +1378,25 @@ static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             //     }
 
             // }
+            else if (!strcmp(p->attr[i], "gestures"))
+            {
+                ++i;
+                if (!strcmp(p->attr[i], "true"))
+                {
+                    gestures = true;
+                }
+                else if (!strcmp(p->attr[i], "false"))
+                {
+                    gestures = false;
+                }
+
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
         parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
         gui_tabview_loop_x((void *)parent, true);
+        GUI_TYPE(gui_tabview_t, parent)->tp_disable = !gestures;
     }
 
     return parent;
@@ -1309,6 +1578,23 @@ static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
 
     return parent;
 }
+/**
+ * @brief Create a progress bar widget.
+ *
+ * The created widget can be a canvas type or image type.
+ *
+ * For canvas type, the color of the progress bar can be set.
+ * For image type, the image of the progress bar can be set.
+ *
+ * The orientation of the progress bar can be set to vertical or horizontal.
+ *
+ * The created widget can be used as a parent of other widgets.
+ *
+ * @param p the XML node of the widget.
+ * @param parent the parent widget of the created widget.
+ * @param widget_type the type of the created widget.
+ * @return the created widget.
+ */
 static gui_obj_t *widget_create_progressbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
 
@@ -1449,6 +1735,8 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         bool arc = false;
         char *picture = "app/system/resource/Progress bar_full.bin";
         char *folder = NULL;
+        char *picture_thumb = 0;
+        char *picture_thumb_hl = 0;
         bool vh = false;
         int16_t cx = 0;
         int16_t cy = 0;
@@ -1500,7 +1788,15 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             }
             else if (!strcmp(p->attr[i], "picture"))
             {
-                picture = gui_strdup(p->attr[++i]);
+                picture = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "pictureThumb"))
+            {
+                picture_thumb = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "pictureThumbHighlight"))
+            {
+                picture_thumb_hl = (p->attr[++i]);
             }
             else if (!strcmp(p->attr[i], "color"))
             {
@@ -1606,16 +1902,34 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         }
         else if (!folder)
         {
-
-            if (vh)
+            if (picture_thumb)
             {
-                parent = (void *)gui_seekbar_create_img_v(parent, (void *)gui_get_image_file_address(picture), x,
-                                                          y);
+                if (!picture_thumb_hl)
+                {
+                    picture_thumb_hl = picture_thumb;
+                }
+
+
+                parent = (void *)gui_seekbar_create_thumb_h(parent,
+                                                            (void *)gui_get_image_file_address(picture_thumb),
+                                                            (void *)gui_get_image_file_address(picture_thumb_hl), x,
+                                                            y, w);
             }
             else
             {
-                parent = (void *)gui_seekbar_create_img_h(parent, (void *)gui_get_image_file_address(picture), x,
-                                                          y);
+                /* code */
+
+
+                if (vh)
+                {
+                    parent = (void *)gui_seekbar_create_img_v(parent, (void *)gui_get_image_file_address(picture), x,
+                                                              y);
+                }
+                else
+                {
+                    parent = (void *)gui_seekbar_create_img_h(parent, (void *)gui_get_image_file_address(picture), x,
+                                                              y);
+                }
             }
             gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
             gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
@@ -1741,6 +2055,7 @@ static gui_obj_t *widget_create_tab(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wid
         int16_t h = 0;
         int16_t idx = 0;
         int16_t idy = 0;
+
         while (true)
         {
             if (!(p->attr[i]))
@@ -1772,6 +2087,7 @@ static gui_obj_t *widget_create_tab(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wid
             {
                 idy = atoi(p->attr[++i]);
             }
+
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -2387,74 +2703,385 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
 
     return parent;
 }
+typedef struct radio
+{
+    const uint8_t *pic;
+    const uint8_t *pic_hl;
+    char *radio_name;
+    bool check;
+    gui_img_t *img;
+} radio_t;
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_cb)
+{
+    radio_t *param = p;
+    if (param->check)
+    {
+        gui_obj_enable_event(this_widget, GUI_EVENT_6);
+        param->check = 0;
+    }
+
+}
+
+static void radio_win_update_att(gui_obj_t *obj)
+{
+    gui_win_t *this = (void *)obj;
+    animate_frame_update(this->animate, obj);
+    {
+        for (size_t i = 0; i < this->animate_array_length; i++)
+        {
+            animate_frame_update(this->animate_array[i], obj);
+        }
+
+    }
+
+}
+static void radio_win_input_prepare(gui_obj_t *obj)
+{
+}
+#include "kb_algo.h"
+static void radio_win_prepare(gui_obj_t *obj)
+{
+    extern touch_info_t *tp_get_info(void);
+    touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
+
+    gui_win_t *this = (void *)obj;
+
+    radio_win_update_att(obj);
+    gui_event_t event_code = GUI_EVENT_INVALIDE;
+    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+        event_code = event_dsc->event_code;
+        gui_log("code%s   %d.   %d\n", obj->name, event_dsc->event_code, i);
+    }
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0) && !(obj->event_dsc->event_code))
+    {
+        if (event_code != GUI_EVENT_6)
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
+        }
+    }
+
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    {
+        if (tp->pressing)
+        {
+            if (event_code != GUI_EVENT_6)
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
+            }
+        }
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
+            {
+                if (event_code != GUI_EVENT_6)
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+                }
+            }
+            break;
+
+        case TOUCH_UP_SLIDE:
+            {
+                if (event_code != GUI_EVENT_6)
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_3);
+                }
+            }
+            break;
+
+        case TOUCH_DOWN_SLIDE:
+            {
+                if (event_code != GUI_EVENT_6)
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_4);
+                }
+            }
+            break;
+
+        case TOUCH_LEFT_SLIDE:
+            {
+                if (event_code != GUI_EVENT_6)
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_1);
+                }
+            }
+            break;
+
+        case TOUCH_RIGHT_SLIDE:
+            {
+                if (event_code != GUI_EVENT_6)
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_2);
+                }
+            }
+            break;
+
+        case TOUCH_LONG:
+            {
+                if (this->long_flag == false)
+                {
+                    this->long_flag = true;
+                    if (event_code != GUI_EVENT_6)
+                    {
+                        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
+                    }
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        if (tp->pressed)
+        {
+            if (event_code != GUI_EVENT_6)
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+            }
+            this->long_flag = false;
+            this->press_flag = true;
+        }
+    }
+
+    if (this->release_flag)
+    {
+        this->press_flag = false;
+        this->release_flag = false;
+        if (event_code != GUI_EVENT_6)
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+        }
+        this->long_flag = false;
+    }
+
+    if (tp->released && this->press_flag)
+    {
+        this->release_flag = true;
+    }
+
+    if (this->scale != 0 || this->scale_y != 0)
+    {
+        matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
+        if (this->scale == 0)
+        {
+            matrix_scale(1, this->scale_y, GET_BASE(obj)->matrix);
+        }
+        else if (this->scale_y == 0)
+        {
+            matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
+        }
+        else
+        {
+            matrix_scale(this->scale, this->scale_y, GET_BASE(obj)->matrix);
+        }
+        matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
+    }
+    if (this->hold_tp)
+    {
+        gui_obj_skip_other_up_hold(obj);
+        gui_obj_skip_other_down_hold(obj);
+        gui_obj_skip_other_left_hold(obj);
+        gui_obj_skip_other_right_hold(obj);
+    }
+    if (this->event5_flag)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_5);
+
+    }
+    // gui_obj_enable_event(obj, GUI_EVENT_6);
+    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+
+        gui_log("code%s   %d.   %d\n", obj->name, event_dsc->event_code, i);
+    }
+
+}
+
+static void radio_win_destory(gui_obj_t *obj)
+{
+    gui_win_t *this = (void *)obj;
+    if (this->animate)
+    {
+        gui_free(this->animate);
+        this->animate = NULL;
+    }
+    if (this->animate_array)
+    {
+        for (size_t i = 0; i < this->animate_array_length; i++)
+        {
+            gui_free(this->animate_array[i]);
+            this->animate_array[i] = NULL;
+        }
+        gui_free(this->animate_array);
+        this->animate_array = 0;
+        this->animate_array_length = 0;
+    }
+}
+
+static void radio_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            radio_win_input_prepare(obj);
+            break;
+        case OBJ_PREPARE:
+            radio_win_prepare(obj);
+            break;
+
+        case OBJ_DESTROY:
+            radio_win_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+
+
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_press)
+{
+    gui_obj_t **widgets = NULL;
+    int count = 0;
+
+
+    gui_obj_tree_get_widget_array_by_type(
+        (gui_obj_t *)gui_current_app(), RADIO, &widgets, &count);
+
+    for (int i = 0; i < count; i++)
+    {
+
+        gui_win_t *win = GUI_TYPE(gui_win_t, widgets[i]);
+        radio_t *param = win->animate->p;
+        param->img->data = (void *)param->pic;
+        param->check = 0;
+    }
+    gui_free(widgets);
+    {
+        gui_win_t *win = GUI_TYPE(gui_win_t, obj);
+        radio_t *param = win->animate->p;
+        param->img->data = (void *)param->pic_hl;
+        param->check = 1;
+    }
+
+}
 static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
+    size_t i = 0;
+    int16_t x = 0;
+    int16_t y = 0;
+    int16_t w = 0;
+    int16_t h = 0;
 
+    int picture_x = 0; GUI_UNUSED(picture_x);
+    int picture_y = 0; GUI_UNUSED(picture_y);
+    char *picture = NULL;
+    char *hl_picture = NULL;
+    char *radio_name = NULL;
+    // default image blend_mode
+    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+    uint8_t opacity = 255; GUI_UNUSED(opacity);
+    while (true)
     {
-        size_t i = 0;
-        int16_t x = 0; GUI_UNUSED(x);
-        int16_t y = 0; GUI_UNUSED(y);
-        int16_t w = 0; GUI_UNUSED(w);
-        int16_t h = 0; GUI_UNUSED(h);
-        char *font_type = "rtk_font_fs32"; GUI_UNUSED(font_type);
-        char *text = NULL; GUI_UNUSED(text);
-        int text_x = 0; GUI_UNUSED(text_x);
-        int text_y = 0; GUI_UNUSED(text_y);
-        uint32_t font_color = 0Xf0f0; GUI_UNUSED(font_color);
-        uint32_t font_size = 40; GUI_UNUSED(font_size);
-        int picture_x = 0; GUI_UNUSED(picture_x);
-        int picture_y = 0; GUI_UNUSED(picture_y);
-        int transition = 0; GUI_UNUSED(transition);
-        char *picture = NULL; GUI_UNUSED(picture);
-        char *hl_picture = NULL; GUI_UNUSED(hl_picture);
-        int style = 0; GUI_UNUSED(style);
-
-        while (true)
+        if (!(p->attr[i]))
         {
-            if (!(p->attr[i]))
-            {
-                break;
-            }
-            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-            if (!strcmp(p->attr[i], "x"))
-            {
-                x = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "y"))
-            {
-                y = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "w"))
-            {
-                w = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "h"))
-            {
-                h = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "picture"))
-            {
-                picture = gui_strdup(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "highlightPicture"))
-            {
-                hl_picture = gui_strdup(p->attr[++i]);
-            }
+            break;
+        }
+        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+        if (!strcmp(p->attr[i], "x"))
+        {
+            x = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "y"))
+        {
+            y = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "w"))
+        {
+            w = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "h"))
+        {
+            h = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "name"))
+        {
+            radio_name = gui_strdup(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "picture"))
+        {
+            picture = gui_strdup(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "highlightPicture"))
+        {
+            hl_picture = gui_strdup(p->attr[++i]);
+        }
 
+        else if (!strcmp(p->attr[i], "pictureX"))
+        {
+            picture_x = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "pictureY"))
+        {
+            picture_y = atoi(p->attr[++i]);
+        }
+
+        else if (!strcmp(p->attr[i], "blendMode"))
+        {
             i++;
+            if (!strcmp(p->attr[i], "imgBypassMode"))
+            {
+                blendMode = IMG_BYPASS_MODE;
+            }
+            else if (!strcmp(p->attr[i], "imgFilterBlack"))
+            {
+                blendMode = IMG_FILTER_BLACK;
+            }
+            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+            {
+                blendMode = IMG_SRC_OVER_MODE;
+            }
+            else if (!strcmp(p->attr[i], "imgCoverMode"))
+            {
+                blendMode = IMG_COVER_MODE;
+            }
+            GUI_UNUSED(blendMode);
         }
-        void *img1; GUI_UNUSED(img1);
-        void *img2; GUI_UNUSED(img2);
+        else if (!strcmp(p->attr[i], "opacity"))
         {
-            img1 = (void *)gui_get_image_file_address(picture);
+            opacity = atof(p->attr[++i]);
         }
-        {
-            img2 = (void *)gui_get_image_file_address(hl_picture);;
-        }
-        //parent = (void *)gui_radio_create(parent, x, y, w, h, img1, img2);
-        //parent->name = get_space_string_head(p->txt);
-        //parent = gui_win_create(parent, "1", 0,0,0,0);
+        i++;
     }
+    char *ptxt = get_space_string_head(p->txt);
+    //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
+    radio_t *param = gui_malloc(sizeof(radio_t));
+    memset(param, 0, sizeof(radio_t));
+    parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
+    parent->obj_cb = radio_win_cb;
+    GUI_TYPE(gui_obj_t, parent)->type = RADIO;
+    gui_win_press((void *)parent, win_radio_press, param);
+
+    gui_win_set_animate((void *)parent, 10000, -1, win_radio_cb, param);
+    gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)gui_get_image_file_address(picture), 0,
+                                             0, 0, 0);
+    param->img = img;
+    param->pic_hl = gui_get_image_file_address(hl_picture);
+    param->pic = gui_get_image_file_address(picture);
+    param->radio_name = radio_name;
+
+
+
+
 
     return parent;
 }
@@ -3053,6 +3680,78 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
     }
     return parent;
 }
+/**
+ * Extract the substring after the second comma, trimming leading and trailing spaces
+ * @param id Input string (e.g., "1,0,    ml0 ")
+ * @param param Structure containing to_widget_name to store the result
+ */
+static void parse_id_string(const char *id, struct on_click_jump_cb_param *param)
+{
+    if (id == NULL || param == NULL)
+    {
+        gui_log("Invalid input: id or param is NULL\n");
+        return;
+    }
+
+    // Find the first comma in the string
+    const char *first_comma = strchr(id, ',');
+    if (first_comma == NULL)
+    {
+        gui_log("The first comma is not found in '%s'\n", id);
+        param->to_widget_name = 0;
+        return;
+    }
+
+    // Find the second comma starting from the character after the first comma
+    const char *second_comma = strchr(first_comma + 1, ',');
+    if (second_comma == NULL || *(second_comma + 1) == '\0')
+    {
+        gui_log("The second comma does not exist or is at the end in '%s'\n", id);
+        param->to_widget_name = 0;
+        return;
+    }
+
+    // Start after the second comma
+    const char *value_start = second_comma + 1;
+
+    // Skip leading spaces
+    while (isspace((unsigned char)*value_start))
+    {
+        value_start++;
+    }
+    if (*value_start == '\0')
+    {
+        gui_log("No non-space content after second comma in '%s'\n", id);
+        param->to_widget_name = 0;
+        return;
+    }
+
+    // Find the end of the value (string end)
+    const char *value_end = value_start + strlen(value_start);
+
+    // Trim trailing spaces
+    while (value_end > value_start && isspace((unsigned char) * (value_end - 1)))
+    {
+        value_end--;
+    }
+
+    // Calculate length of the trimmed string
+    size_t value_length = value_end - value_start;
+    if (value_length == 0)
+    {
+        gui_log("Empty value after trimming in '%s'\n", id);
+        param->to_widget_name = 0;
+        return;
+    }
+
+    // Duplicate the trimmed string
+    char trimmed_value[value_length + 1] ; // Assume gui_strdup allocates new memory
+
+    strncpy(trimmed_value, value_start, value_length);
+    trimmed_value[value_length] = '\0';
+
+    param->to_widget_name = gui_strdup(trimmed_value);
+}
 static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
 
@@ -3099,6 +3798,8 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             if (!strcmp(type, "jump"))
             {
                 {
+
+
                     //to
                     if (!strcmp(to, "multiLevel"))
                     {
@@ -3109,7 +3810,7 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         {
                             get_2_int_from_string(id, &x, &y);
                         }
-
+                        parse_id_string(id, param);
 
                         param->id1 = x;
                         param->id2 = y;
@@ -3120,6 +3821,10 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         else if (parent->type == WINDOW)
                         {
                             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
                         }
                     }
                     else if (!strcmp(to, "app"))
@@ -3134,6 +3839,10 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                             else if (parent->type == WINDOW)
                             {
                                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_KEY)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
                             }
                         }
                         else
@@ -3154,6 +3863,11 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         else if (parent->type == WINDOW)
                         {
                             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
+                                                 gui_app_get_by_name(id));
                         }
                     }
                     else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
@@ -3205,6 +3919,10 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         else if (parent->type == WINDOW)
                         {
                             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
                         }
                     }
 
@@ -3294,6 +4012,528 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
 
     return parent;
 }
+static gui_obj_t *widget_create_macro_on_select(ezxml_t p, gui_obj_t *parent,
+                                                T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+
+                        parse_id_string(id, param);
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            //GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == SEEKBAR)
+                        {
+                            //gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_4, param);
+                        }
+                        else if (parent->type == RADIO)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
+                        }
+                    }
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                // GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                //                                (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                            else if (parent->type == SEEKBAR)
+                            {
+                                //gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_4, gui_strdup(id));
+                            }
+                            else if (parent->type == RADIO)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            // GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                            //                                gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                        else if (parent->type == SEEKBAR)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_4,
+                                                 gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == RADIO)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
+                                                 gui_app_get_by_name(id));
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            // GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                            //                                param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                        else if (parent->type == SEEKBAR)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_4, param);
+                        }
+                        else if (parent->type == RADIO)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
+                        }
+                    }
+
+                }
+
+            }
+            //     else if (!strcmp(type, "control"))
+            //     {
+            //         if (!strcmp(to, "light"))
+            //         {
+            //             light_param_t *light;
+            //             light = gui_malloc(sizeof(light_param_t));
+            //             light->id = x;
+            //             light->state = (bool)y;
+            //             if (parent->type == BUTTON)
+            //             {
+            //                 GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+            //             }
+            //             else if (parent->type == WINDOW)
+            //             {
+            //                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+            //             }
+            //             else if (parent->type == CLICKSWITCH)
+            //             {
+            //                 GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+            //                                                  (gui_event_cb_t)light_switch_on_cb, light);
+            //                 GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+            //                                                   (gui_event_cb_t)light_switch_off_cb, light);
+            //             }
+            //         }
+
+            //         //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            //     }
+            //     else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            //     {
+            //         char **param = gui_malloc(sizeof(char *) * 3);
+            //         param[0] = gui_strdup(to);
+            //         param[2] = (void *)parent;
+            //         if (id)
+            //         {
+            //             param[1] = gui_strdup(id);
+            //         }
+            //         if (!strcmp(type, "animatePause"))
+            //         {
+            //             if (parent->type == BUTTON)
+            //             {
+            //                 GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //             }
+            //             else if (parent->type == WINDOW)
+            //             {
+            //                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //             }
+            //             else if (parent->type == CLICKSWITCH)
+            //             {
+            //                 GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+            //                                                  (param));
+            //                 GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                                   (gui_event_cb_t)pause_animation_cb,
+            //                                                   (param));
+            //             }
+
+            //         }
+            //         else if (!strcmp(type, "animate"))
+            //         {
+            //             if (parent->type == BUTTON)
+            //             {
+            //                 GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //             }
+            //             else if (parent->type == WINDOW)
+            //             {
+            //                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //             }
+            //             else if (parent->type == CLICKSWITCH)
+            //             {
+            //                 GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+            //                                                  (param));
+            //                 GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                                   (gui_event_cb_t)start_animation_cb,
+            //                                                   (param));
+            //             }
+
+            //         }
+            //     }
+            //
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_oncomplete(ezxml_t p, gui_obj_t *parent,
+                                                 T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+
+                        parse_id_string(id, param);
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            //GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == SEEKBAR)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_4, param);
+                        }
+
+                    }
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                // GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                //                                (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                            else if (parent->type == SEEKBAR)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_4, gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            // GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                            //                                gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                        else if (parent->type == SEEKBAR)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_4,
+                                                 gui_app_get_by_name(id));
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            // GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                            //                                param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            //gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                        else if (parent->type == SEEKBAR)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_4, param);
+                        }
+                    }
+
+                }
+
+            }
+            //     else if (!strcmp(type, "control"))
+            //     {
+            //         if (!strcmp(to, "light"))
+            //         {
+            //             light_param_t *light;
+            //             light = gui_malloc(sizeof(light_param_t));
+            //             light->id = x;
+            //             light->state = (bool)y;
+            //             if (parent->type == BUTTON)
+            //             {
+            //                 GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+            //             }
+            //             else if (parent->type == WINDOW)
+            //             {
+            //                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+            //             }
+            //             else if (parent->type == CLICKSWITCH)
+            //             {
+            //                 GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+            //                                                  (gui_event_cb_t)light_switch_on_cb, light);
+            //                 GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+            //                                                   (gui_event_cb_t)light_switch_off_cb, light);
+            //             }
+            //         }
+
+            //         //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            //     }
+            //     else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            //     {
+            //         char **param = gui_malloc(sizeof(char *) * 3);
+            //         param[0] = gui_strdup(to);
+            //         param[2] = (void *)parent;
+            //         if (id)
+            //         {
+            //             param[1] = gui_strdup(id);
+            //         }
+            //         if (!strcmp(type, "animatePause"))
+            //         {
+            //             if (parent->type == BUTTON)
+            //             {
+            //                 GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //             }
+            //             else if (parent->type == WINDOW)
+            //             {
+            //                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //             }
+            //             else if (parent->type == CLICKSWITCH)
+            //             {
+            //                 GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+            //                                                  (param));
+            //                 GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                                   (gui_event_cb_t)pause_animation_cb,
+            //                                                   (param));
+            //             }
+
+            //         }
+            //         else if (!strcmp(type, "animate"))
+            //         {
+            //             if (parent->type == BUTTON)
+            //             {
+            //                 GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //             }
+            //             else if (parent->type == WINDOW)
+            //             {
+            //                 gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //             }
+            //             else if (parent->type == CLICKSWITCH)
+            //             {
+            //                 GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+            //                                                  (param));
+            //                 GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                                   (gui_event_cb_t)start_animation_cb,
+            //                                                   (param));
+            //             }
+
+            //         }
+            //     }
+            //
+        }
+    }
+
+    return parent;
+}
 static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
 
@@ -3357,6 +4597,88 @@ static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_O
         button->img->blend_mode = IMG_SRC_OVER_MODE;
         GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
 
+
+
+    }
+
+    return parent;
+}
+
+#define BOARD_SDL2
+//#include "board_xml.h"
+typedef struct xml_dom_key
+{
+    bool down;
+    bool up;
+} xml_dom_key_t;
+static xml_dom_key_t xml_dom_key_array[UINT8_MAX + 1];
+gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down)
+{
+    if (id >= 0 && id <= UINT8_MAX)
+    {
+        xml_dom_key_array[id].up = up;
+        xml_dom_key_array[id].down = down;
+        return GUI_SUCCESS;
+    }
+    return GUI_ERROR_NULL;
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_key_ani)
+{
+    intptr_t id = (size_t)p;
+    if (id >= 0 && id <= UINT8_MAX)
+    {
+        if (xml_dom_key_array[id].up)
+        {
+            gui_obj_enable_event(this_widget, GUI_EVENT_6);
+            xml_dom_key_array[id].up = 0;
+        }
+    }
+
+
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_key_cb)
+{
+//gui_log("win_key_cb%d\n",param);
+    GUI_UNUSED(win_key_cb);
+}
+static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int id = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "id"))
+            {
+                id = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "name"))
+            {
+
+            }
+            i++;
+        }
+        if (id >= 0 && id < sizeof(xml_dom_key_array) / sizeof(xml_dom_key_t))
+        {
+
+
+            char *ptxt = get_space_string_head(p->txt);
+            gui_win_t *win = gui_win_create(parent, ptxt, 0,  0, 0, 0);
+            gui_win_set_animate(win, 10000, -1, win_key_ani, (void *)(size_t)id);
+
+            GUI_BASE(win)->type = MACRO_KEY;
+            parent = (void *)win;
+        }
+        else
+        {
+            gui_log("Key id >=256, create failed\n");
+        }
 
 
     }
@@ -3505,6 +4827,11 @@ static gui_obj_t *widget_create_macro_onchange(ezxml_t p, gui_obj_t *parent, T_O
                 {
                     gui_slider_t *slider = (gui_slider_t *)parent;
                     GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)slider_write_text_cb, gui_strdup(to));
+                }
+                else if (parent->type == SEEKBAR)
+                {
+                    GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)seekbar_write_text_cb,
+                                                     gui_strdup(to));
                 }
             }
         }
@@ -3921,6 +5248,218 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
         scroll_wheel->loop = loop;
         scroll_wheel->blank_count = blank_count;
         parent = GUI_BASE(scroll_wheel);
+
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent,
+                                                    T_OBJ_TYPE widget_type)
+{
+
+    {
+
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0; GUI_UNUSED(h);
+        int16_t row_spacing = 0;
+        int16_t item_count = 0;
+        const char *items = "NULL";
+        const char *font = 0;
+        int16_t font_size = 0;
+        gui_color_t  font_color = {0};
+        bool horizontal = 1;
+        TEXT_MODE style = CENTER;
+        BLEND_MODE_TYPE blendMode = IMG_BYPASS_MODE;
+        char *picture = NULL;
+        char *hl_picture = NULL;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+
+            //gui_log("p->attr[i]:%s\n", p->attr[i]);
+
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rowSpacing"))
+            {
+                row_spacing = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "items"))
+            {
+                items = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "font"))
+            {
+                font = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "fontSize"))
+            {
+                font_size = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontColor"))
+            {
+                //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                font_color = string_rgb888(p->attr[++i]);
+            }
+
+            else if (!strcmp(p->attr[i], "horizontal"))
+            {
+                if (!strcmp(p->attr[++i], "horizontal"))
+                {
+                    horizontal = 1;
+                }
+                else if (!strcmp(p->attr[i], "true"))
+                {
+                    horizontal = 1;
+                }
+                else if (!strcmp(p->attr[i], "false"))
+                {
+                    horizontal = 0;
+                }
+                else if (!strcmp(p->attr[i], "vertical"))
+                {
+                    horizontal = 0;
+                }
+                else if (!strcmp(p->attr[i], "not horizontal"))
+                {
+                    horizontal = 0;
+                }
+            }
+            else if (!strcmp(p->attr[i], "fontMode"))
+            {
+                char *s = p->attr[++i];
+                if (!strcmp(p->attr[i], "truncate"))
+                {
+                    style = (TEXT_MODE)0;
+                }
+                else if (!strcmp(p->attr[i], "verticalscroll"))
+                {
+                    style = SCROLL_Y;
+                }
+                else if (!strcmp(p->attr[i], "left"))
+                {
+                    style = LEFT;
+                }
+                else if (!strcmp(p->attr[i], "center"))
+                {
+                    style = CENTER;
+                }
+                else if (!strcmp(p->attr[i], "right"))
+                {
+                    style = RIGHT;
+                }
+            }
+            else if (!strcmp(p->attr[i], "picture"))
+            {
+                picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "highlightPicture"))
+            {
+                hl_picture = gui_strdup(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "blendMode"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "imgBypassMode"))
+                {
+                    blendMode = IMG_BYPASS_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                {
+                    blendMode = IMG_FILTER_BLACK;
+                }
+                else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                {
+                    blendMode = IMG_SRC_OVER_MODE;
+                }
+                else if (!strcmp(p->attr[i], "imgCoverMode"))
+                {
+                    blendMode = IMG_COVER_MODE;
+                }
+                GUI_UNUSED(blendMode);
+            }
+            i++;
+        }
+        {
+            char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+            char *token = strtok(items_copy, ",");
+            int j = 0;
+            while (token != NULL)
+            {
+                j++;
+                token = strtok(NULL, ",");
+            }
+            item_count = j;
+            gui_free(items_copy);
+        }
+        if (item_count == 0)
+        {
+            item_count = 1;
+            items = "NULL";
+        }
+        // Split items into an array of strings
+        char *items_copy = gui_strdup(items); // Make a copy of items to use with strtok
+        const char **string_array = gui_malloc(item_count * sizeof(char *));
+        char *token = strtok(items_copy, ",");
+        int j = 0;
+        while (token != NULL && j < item_count)
+        {
+            string_array[j++] = token;
+            token = strtok(NULL, ",");
+        }
+        if (!horizontal)
+        {
+            parent = (void *)gui_pagelist_new_create(parent,
+                                                     x,
+                                                     y,
+                                                     w,
+                                                     row_spacing,
+                                                     gui_get_file_address(picture),
+                                                     gui_get_file_address(hl_picture),
+                                                     blendMode,
+                                                     gui_get_file_address(font),
+                                                     font_size,
+                                                     font_color);
+        }
+        else
+        {
+            parent = (void *)gui_pagelist_new_create_horizontal(parent,
+                                                                x,
+                                                                y,
+                                                                w,
+                                                                row_spacing,
+                                                                gui_get_file_address(picture),
+                                                                gui_get_file_address(hl_picture),
+                                                                blendMode,
+                                                                gui_get_file_address(font),
+                                                                font_size,
+                                                                font_color);
+        }
+
+        GUI_TYPE(gui_pagelist_new_t, parent)->text_mode = style;
+        gui_page_list_new_render((void *)parent, item_count, 0, string_array);
+
+
 
     }
 
@@ -5082,6 +6621,10 @@ static xml_widget_create_t xml_widget_create_array[] =
     {MACRO_COMBO, widget_create_macro_combo},
     {MACRO_ON_PERIPHERAL, widget_create_macro_on_peripheral},
     {MACRO_CHART, widget_create_macro_chart},
+    {MACRO_PAGE_LIST_NEW, widget_create_macro_page_list_new},
+    {MACRO_ONCOMPLETE, widget_create_macro_oncomplete},
+    {MACRO_KEY, widget_create_macro_key},
+    {MACRO_ONSELECT, widget_create_macro_on_select},
 };
 
 static gui_obj_t *widget_create_interface(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -5446,6 +6989,9 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     float scale_y = 1; GUI_UNUSED(scale_y);
                     uint8_t opacity = 255; GUI_UNUSED(opacity);
                     size_t i = 0;
+                    char *values = 0;
+                    char *key_times = 0;
+                    uint8_t calc_mode = ANIMATION_CALC_MODE_LINEAR;
                     while (true)
                     {
                         //gui_log("p->attr[i]:%x\n",p->attr[i]);
@@ -5478,18 +7024,50 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         {
                             pause = (p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "values"))
+                        {
+                            values = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "keyTimes"))
+                        {
+                            key_times = (p->attr[++i]);
+                        }
+
+                        else if (!strcmp(p->attr[i], "calcMode"))
+                        {
+                            ++i;
+                            if (!strcmp(p->attr[i], "discrete"))
+                            {
+                                calc_mode = ANIMATION_CALC_MODE_DISCRETE;
+                            }
+                            else if (!strcmp(p->attr[i], "linear"))
+                            {
+                                calc_mode = ANIMATION_CALC_MODE_LINEAR;
+                            }
+                            else if (!strcmp(p->attr[i], "paced"))
+                            {
+                                calc_mode = ANIMATION_CALC_MODE_PACED;
+                            }
+                            else if (!strcmp(p->attr[i], "spline"))
+                            {
+                                calc_mode = ANIMATION_CALC_MODE_SPLINE;
+                            }
+
+
+                        }
                         i++;
                     }
-                    float from_num_f[4];
-                    float to_num_f[4];
-                    memset(from_num_f, 0, sizeof(from_num_f));
-                    memset(to_num_f, 0, sizeof(to_num_f));
-                    void **image_array = 0;
-                    int count = 0;
+
                     if (type && from && to && dur && repeatCount)
                     {
+                        float from_num_f[4];
+                        float to_num_f[4];
+                        memset(from_num_f, 0, sizeof(from_num_f));
+                        memset(to_num_f, 0, sizeof(to_num_f));
+                        void **image_array = 0;
+                        int count = 0;
                         if (!strcmp(type, "rotate") || !strcmp(type, "scale") || !strcmp(type, "opacity") ||
-                            !strcmp(type, "translate"))
+                            !strcmp(type, "translate") || !strcmp(type, "textContent") || !strcmp(type, "progress"))
                         {
                             int dur_num = 0; GUI_UNUSED(dur_num);
                             int repeat_num = 0; GUI_UNUSED(repeat_num);
@@ -5631,6 +7209,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                             //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
 
+
                         image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
                         params->img = (gui_img_t *)parent;
                         params->animate_type = gui_strdup(type);
@@ -5657,7 +7236,278 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->translate_to_y = to_num_f[1];
                         params->image_arr = image_array;
                         params->image_count = count;
-                        gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
+                        params->textContent_from = from_num_f[0];
+                        params->textContent_to = to_num_f[0];
+                        if (!strcmp(type, "textContent"))
+                        {
+                            gui_text_set_animate((gui_text_t *)parent, dur_num, repeat_num, multi_animate_callback, params
+                                                );
+                        }
+                        else if (!strcmp(type, "progress"))
+                        {
+                            GUI_API(gui_seekbar_t).animate((void *)parent, dur_num, repeat_num, multi_animate_callback, params);
+                        }
+
+                        else
+                        {
+                            gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
+                                                   (aniamte_name));
+                        }
+
+
+                    }
+                    else if (type && key_times && values && dur && repeatCount)
+                    {
+                        float values_num_f[10];
+                        float values2_num_f[10];
+                        float key_times_num_f[10];
+                        memset(values_num_f, 0, sizeof(values_num_f));
+                        memset(values2_num_f, 0, sizeof(values2_num_f));
+                        memset(key_times_num_f, 0, sizeof(key_times_num_f));
+                        void **image_array = 0;
+                        int count = 0;
+                        int values_length = 0;
+                        if (!strcmp(type, "rotate") || !strcmp(type, "scale") || !strcmp(type, "opacity"))
+                        {
+                            int dur_num = 0; GUI_UNUSED(dur_num);
+                            int repeat_num = 0; GUI_UNUSED(repeat_num);
+                            {
+                                //values
+                                int from_length = strlen(values);
+                                int index[10 + 1];
+                                index[0] = -1;
+                                int idcount = 1;
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (values[i] == ';' || values[i] == '\0')
+                                    {
+                                        index[idcount] = i;
+                                        int num_length = index[idcount] - index[idcount - 1] ;
+                                        char num_char[num_length + 1];
+                                        num_char[num_length] = '\0';
+                                        memcpy(num_char, values + index[idcount - 1] + 1, num_length);
+                                        values_num_f[idcount - 1] = (float)atof(num_char);
+                                        idcount++;
+                                    }
+                                }
+
+                                values_length = idcount - 1; // Adjust for the fact that we count one extra for '\0'
+                                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            }
+                            {
+                                //key_times
+                                int from_length = strlen(key_times);
+                                int index[10 + 1];
+                                index[0] = -1;
+
+                                int idcount = 1;
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (key_times[i] == ';' || key_times[i] == '\0')
+                                    {
+                                        index[idcount] = i;
+                                        int num_length = index[idcount] - index[idcount - 1] ;
+                                        char num_char[num_length + 1];
+                                        num_char[num_length] = '\0';
+                                        memcpy(num_char, key_times + index[idcount - 1] + 1, num_length);
+                                        key_times_num_f[idcount - 1] = (float)atof(num_char);
+                                        idcount++;
+                                    }
+                                }
+                                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            }
+                        }
+                        else if (
+                            !strcmp(type, "translate"))
+                        {
+                            int dur_num = 0; GUI_UNUSED(dur_num);
+                            int repeat_num = 0; GUI_UNUSED(repeat_num);
+                            {
+                                //values
+                                int from_length = strlen(values);
+                                int index[10 + 1];
+                                index[0] = -1;
+                                int idcount = 1;
+
+// Count the number of segments
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (values[i] == ';' || values[i] == '\0')
+                                    {
+                                        index[idcount] = i;
+                                        idcount++;
+                                    }
+                                }
+                                values_length = idcount - 1; // Adjust for the fact that we count one extra for '\0'
+
+
+// Parse each segment
+                                for (int i = 0; i < values_length; i++)
+                                {
+                                    char segment[20]; // Assuming no segment will be longer than 19 characters
+                                    int segment_length;
+
+                                    if (i == values_length - 1) // Last segment
+                                    {
+                                        segment_length = from_length - index[i] - 1;
+                                    }
+                                    else
+                                    {
+                                        segment_length = index[i + 1] - index[i] - 1;
+                                    }
+
+                                    // Copy segment to a temporary buffer
+                                    strncpy(segment, values + index[i] + 1, segment_length);
+                                    segment[segment_length] = '\0';
+
+                                    // Parse x and y from the segment
+                                    char *token = strtok(segment, ",");
+                                    if (token != NULL)
+                                    {
+                                        values_num_f[i] = atof(token); // Store x value
+                                        token = strtok(NULL, ",");
+                                        if (token != NULL)
+                                        {
+                                            values2_num_f[i] = atof(token);    // Store y value
+                                        }
+                                    }
+                                }
+
+// Debug print to verify parsing
+                                for (int i = 0; i < values_length; i++)
+                                {
+                                    printf("Point %d: (%f, %f)\n", i, values_num_f[i], values2_num_f[i]);
+                                }
+                                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            }
+                            {
+                                //key_times
+                                int from_length = strlen(key_times);
+                                int index[10 + 1];
+                                index[0] = -1;
+
+                                int idcount = 1;
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (key_times[i] == ';' || key_times[i] == '\0')
+                                    {
+                                        index[idcount] = i;
+                                        int num_length = index[idcount] - index[idcount - 1] ;
+                                        char num_char[num_length + 1];
+                                        num_char[num_length] = '\0';
+                                        memcpy(num_char, key_times + index[idcount - 1] + 1, num_length);
+                                        key_times_num_f[idcount - 1] = (float)atof(num_char);
+                                        idcount++;
+                                    }
+                                }
+                                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            }
+                        }
+                        if (!strcmp(type, "image frame") && values)
+                        {
+                            int file_count = 0;
+                            {
+                                gui_fs_dir *dir = NULL;
+                                struct gui_fs_dirent *entry;
+                                char *path = gui_malloc(strlen(values) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, values);
+                                if ((dir = gui_fs_opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    return 0;
+                                }
+                                gui_free(path);
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        file_count++;
+                                    }
+                                }
+                                gui_fs_closedir(dir);
+                            }
+
+                            image_array = gui_malloc(file_count * sizeof(void *));
+                            {
+                                gui_fs_dir *dir = NULL;
+                                struct gui_fs_dirent *entry;
+                                char *path = gui_malloc(strlen(values) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, values);
+                                if ((dir = gui_fs_opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    return 0;
+                                }
+
+
+                                while ((entry = gui_fs_readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(values) + 2);
+                                        sprintf(path2, "%s/%s", values, entry->d_name);
+                                        image_array[count++] = (void *)gui_get_image_file_address(path2);
+                                    }
+                                }
+                                gui_free(path);
+                                gui_fs_closedir(dir);
+                            }
+                        }
+
+
+                        int dur_num = 0;
+
+                        int repeat_num = 0;
+
+
+                        {
+                            //dur
+                            int from_length = strlen(dur);
+                            int ms = 0;
+                            for (size_t i = 0; i < from_length + 1; i++)
+                            {
+                                if (dur[i] == 'm')
+                                {
+                                    ms = 1;
+                                    break;
+                                }
+
+                            }
+                            dur_num = atoi(dur);
+                            if (!ms)
+                            {
+                                dur_num = dur_num * 1000;
+                            }
+
+                            //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                        }
+                        {
+                            //repeatCount
+                            int repeatCount_num = 0;
+                            if (!strcmp(repeatCount, "indefinite"))
+                            {
+                                repeatCount_num = -1;
+                            }
+                            else
+                            {
+                                repeatCount_num = atoi(repeatCount);
+                            }
+                            repeat_num = repeatCount_num;
+
+                            //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                        }
+
+
+                        image_animate_key_times_params_t *params = gui_malloc(sizeof(image_animate_key_times_params_t));
+                        params->img = (gui_img_t *)parent;
+                        params->animate_type = gui_strdup(type);
+                        memcpy(params->key_times, key_times_num_f, sizeof(key_times_num_f));
+                        memcpy(params->values, values_num_f, sizeof(values_num_f));
+                        memcpy(params->values_2, values2_num_f, sizeof(values2_num_f));
+                        params->length = values_length;
+                        params->calc_mode = calc_mode;
+                        gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_key_times_callback,
+                                               params,
                                                (aniamte_name));
 
 

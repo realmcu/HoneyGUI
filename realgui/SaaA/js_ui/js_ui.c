@@ -1066,7 +1066,7 @@ DECLARE_HANDLER(onpressing_seekbar)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_obj_add_event_cb(obj, (gui_event_cb_t)js_cb_with_args, GUI_EVENT_3, cb_arg);
+        gui_obj_add_event_cb(obj, (gui_event_cb_t)js_cb_with_args, GUI_EVENT_5, cb_arg);
     }
 
     return jerry_create_undefined();

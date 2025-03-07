@@ -220,7 +220,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_scope_t));
 
     if (last != this->checksum)
     {

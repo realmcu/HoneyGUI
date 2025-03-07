@@ -402,7 +402,7 @@
         </onPeripheral>
 </arc>   
 
-<multiLevel>
+<multiLevel>ml0
     <multiLevel>ml10
         <chart
             w="400"
@@ -808,4 +808,21 @@
                     id="app_launcher_frontend">
             </onClick>
     </icon>
+    <list
+        w="100"
+        h="100"
+        x="700"
+        y="0"
+        horizontal="vertical"
+        rowSpacing="43"      
+        fontSize="16"
+        font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+        fontColor="gray"
+        fontMode="middle"
+        picture="app\\box\\resource\\combo\\itembk.bin"
+        highlightPicture="app\\box\\resource\\combo\\itemhighlight.bin"
+        blendMode="imgSrcOverMode"
+        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11,Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11" 
+        >pagelist1
+    </list>
 </screen></app>
