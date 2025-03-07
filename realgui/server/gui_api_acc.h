@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_fb.h
-  * @brief Framebuffer update
-  * @details The entire update process
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/19
+  * @file gui_api_acc.h
+  * @brief Application Programming Interface for UI
+  * @details Acc Engine
+  * @author sienna_shen@realsil.com.cn
+  * @date 2025/3/5
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -17,9 +17,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_FB_H__
-#define __GUI_FB_H__
-
+#ifndef __GUI_API_ACC_H__
+#define __GUI_API_ACC_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,69 +27,26 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 #include <guidef.h>
-#include <gui_api.h>
-#include <gui_obj.h>
-
-
-/*============================================================================*
- *                         Types
- *============================================================================*/
-
-
-/*============================================================================*
- *                         Constants
- *============================================================================*/
-
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
 
 
-/*============================================================================*
- *                         Variables
- *============================================================================*/
-
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
 
-/**
- * @brief entire update process
- *
- * @param parent the widget tree
- */
-void gui_fb_disp(gui_obj_t *root, bool enable_event);
+void gui_acc_info_register(struct acc_engine *info);
 
-
-/**
- * @brief this means framebuffer have change, need update framebuffer
- *
- */
-void gui_fb_change(void);
-
-/**
- * @brief Get fps.
- *
- * @return fps
- */
-uint32_t gui_fps(void);
-
+struct acc_engine *gui_get_acc(void);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif
-
-
-
-
-
-
-
-
-
-

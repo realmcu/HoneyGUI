@@ -35,6 +35,7 @@
 #include "gui_combo.h"
 #include "gui_wave.h"
 #include "gui_api.h"
+#include "cJSON.h"
 #include "gui_multi_level.h"
 #include "gui_pagelist_new.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
@@ -7922,7 +7923,6 @@ void album_ctor(void *this)
 {
     gui_app_ctor_base(this, "album", app_init, album_startup, album_close);
 }*/
-#include <gui_api.h>
 
 char *get_app_name(const char *xml)
 {
@@ -8239,6 +8239,162 @@ static const uint8_t *gui_get_image_file_address(const char *image_file_path)
 const uint8_t *gui_dom_get_image_file_address(const char *image_file_path)
 {
     return gui_get_image_file_address(image_file_path);
+}
+void gui_get_json_value(const char *path, const char *parent_key, const char *key, void *value)
+{
+    cJSON *root;
+    if (!path)
+    {
+        gui_log("path can't be NULL!\r\n");
+        return;
+    }
+    else
+    {
+        if (!parent_key || !key)
+        {
+            gui_log("parent_key and key can't be NULL!\r\n");
+            return;
+        }
+        root = cJSON_Parse(path);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    // parse array
+    cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
+    if (!cJSON_IsArray(json_array))
+    {
+        gui_log("get %s_Array unsuccessful\n", parent_key);
+        cJSON_Delete(root);
+        return;
+    }
+    else
+    {
+        cJSON *obj = cJSON_GetArrayItem(json_array, 0);
+        if (!obj)
+        {
+            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            cJSON_Delete(root);
+            return;
+        }
+        else
+        {
+            cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
+            if (!json_key)
+            {
+                gui_log("get %s_Key unsuccessful\n", key);
+                cJSON_Delete(root);
+                return;
+            }
+            else
+            {
+                if (strcmp(key, "array") == 0)
+                {
+                    int array_size = cJSON_GetArraySize(json_key);
+                    for (int i = 0; i < array_size; i++)
+                    {
+                        cJSON *array_item = cJSON_GetArrayItem(json_key, i);
+                        if (cJSON_IsNumber(array_item))
+                        {
+                            ((int *)value)[i] = array_item->valueint;
+                            //printf("array[%d] = %d\n", i, array_item->valueint);
+                        }
+                    }
+                }
+                else if (strstr(key, "condition") != NULL)
+                {
+                    sprintf((char *)value, "%s", json_key->valuestring);
+                }
+                else
+                {
+                    *((int *)value) = json_key->valueint;
+                }
+            }
+        }
+    }
+    // clear
+    cJSON_Delete(root);
+}
+float *gui_get_json_array(const char *path, const char *parent_key, const char *key,
+                          int *array_length)
+{
+    cJSON *root;
+    float *array = 0;
+    *array_length = 0;
+    if (!path)
+    {
+        gui_log("path can't be NULL!\r\n");
+        return 0;
+    }
+    else
+    {
+        if (!parent_key || !key)
+        {
+            gui_log("parent_key and key can't be NULL!\r\n");
+            return 0;
+        }
+        root = cJSON_Parse(path);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return 0;
+        }
+    }
+    // parse array
+    cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
+    if (!cJSON_IsArray(json_array))
+    {
+        gui_log("get %s_Array unsuccessful\n", parent_key);
+        cJSON_Delete(root);
+        return 0;
+    }
+    else
+    {
+        cJSON *obj = cJSON_GetArrayItem(json_array, 0);
+        if (!obj)
+        {
+            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            cJSON_Delete(root);
+            return 0;
+        }
+        else
+        {
+            cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
+            if (!json_key)
+            {
+                gui_log("get %s_Key unsuccessful\n", key);
+                cJSON_Delete(root);
+                return 0;
+            }
+            else
+            {
+                if (strcmp(key, "array") == 0)
+                {
+                    int array_size = cJSON_GetArraySize(json_key);
+                    array = gui_malloc((array_size) * sizeof(float));
+                    memset(array, 0, (array_size)*sizeof(float));
+                    for (int i = 0; i < array_size; i++)
+                    {
+                        cJSON *array_item = cJSON_GetArrayItem(json_key, i);
+                        if (cJSON_IsNumber(array_item))
+                        {
+                            array[i] = array_item->valuedouble;
+                            //printf("array[%d] = %d,%f\n", i, array_item->valueint, array_item->valuedouble);
+                        }
+                    }
+                    *array_length = array_size;
+
+
+                }
+
+            }
+        }
+    }
+    // clear
+    cJSON_Delete(root);
+    return array;
 }
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_weather_callback)
 {

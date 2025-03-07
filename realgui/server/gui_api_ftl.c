@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_fb.h
-  * @brief Framebuffer update
-  * @details The entire update process
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/19
+  * @file gui_api_ftl.c
+  * @brief Application Programming Interface for UI
+  * @details Flash Translation Layer
+  * @author sienna_shen@realsil.com.cn
+  * @date 2025/3/5
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -14,83 +14,70 @@
   ***************************************************************************************
   */
 
-/*============================================================================*
- *               Define to prevent recursive inclusion
- *============================================================================*/
-#ifndef __GUI_FB_H__
-#define __GUI_FB_H__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_obj.h>
+
+#include "guidef.h"
+#include "gui_api_ftl.h"
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+
 
 
 /*============================================================================*
- *                         Types
+ *                            Variables
+ *============================================================================*/
+
+static struct gui_ftl *ftl = NULL;
+
+/*============================================================================*
+ *                           Private Functions
  *============================================================================*/
 
 
 /*============================================================================*
- *                         Constants
+ *                           Public Functions
  *============================================================================*/
 
 
-/*============================================================================*
- *                         Macros
- *============================================================================*/
-
-
-/*============================================================================*
- *                         Variables
- *============================================================================*/
-
-
-/*============================================================================*
- *                         Functions
- *============================================================================*/
-
-/**
- * @brief entire update process
- *
- * @param parent the widget tree
- */
-void gui_fb_disp(gui_obj_t *root, bool enable_event);
-
-
-/**
- * @brief this means framebuffer have change, need update framebuffer
- *
- */
-void gui_fb_change(void);
-
-/**
- * @brief Get fps.
- *
- * @return fps
- */
-uint32_t gui_fps(void);
-
-
-#ifdef __cplusplus
+void gui_ftl_info_register(struct gui_ftl *info)
+{
+    ftl = info;
 }
-#endif
 
-#endif
-
-
-
-
-
-
-
-
-
-
+int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
+{
+    if (ftl->read)
+    {
+        ftl->read(addr, buf, len);
+        return len;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len)
+{
+    if (ftl->write)
+    {
+        ftl->write(addr, buf, len);
+        return len;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int gui_ftl_erase(uint32_t addr, uint32_t len)
+{
+    if (ftl->erase)
+    {
+        ftl->erase(addr, len);
+    }
+    return 0;
+}

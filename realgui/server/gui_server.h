@@ -24,6 +24,7 @@ void gui_server_msg_init(void);
 bool gui_send_msg_to_server(gui_msg_t *msg);
 void gui_recv_msg_to_server(void);
 void gui_server_exec_cb(gui_msg_cb cb);
+void gui_task_ext_execution_sethook(void (*hook)(void));
 
 #ifdef __cplusplus
 }

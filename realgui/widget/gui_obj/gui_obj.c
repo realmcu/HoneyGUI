@@ -1111,6 +1111,18 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
     animate->p = p;
     return animate;
 }
+float gui_animation_get_progress(gui_animate_t *animation)
+{
+    GUI_ASSERT(animation)
+    if (animation)
+    {
+        return animation->progress_percent;
+    }
+    else
+    {
+        return 0;
+    }
+}
 void gui_obj_tree_print_bfs(gui_obj_t *root)
 {
     if (root == NULL)

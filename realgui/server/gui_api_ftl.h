@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_fb.h
-  * @brief Framebuffer update
-  * @details The entire update process
-  * @author howie_wang@realsil.com.cn
-  * @date 2023/10/19
+  * @file gui_api_ftl.h
+  * @brief Application Programming Interface for UI
+  * @details Flash Translation Layer
+  * @author sienna_shen@realsil.com.cn
+  * @date 2025/3/5
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -17,9 +17,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_FB_H__
-#define __GUI_FB_H__
-
+#ifndef __GUI_API_FTL_H__
+#define __GUI_API_FTL_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,29 +27,15 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 #include <guidef.h>
-#include <gui_api.h>
-#include <gui_obj.h>
-
-
-/*============================================================================*
- *                         Types
- *============================================================================*/
-
-
-/*============================================================================*
- *                         Constants
- *============================================================================*/
-
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
 
-
-/*============================================================================*
- *                         Variables
- *============================================================================*/
 
 
 /*============================================================================*
@@ -58,39 +43,35 @@ extern "C" {
  *============================================================================*/
 
 /**
- * @brief entire update process
+ * @brief Read from flash translation layer
  *
- * @param parent the widget tree
+ * @param addr The starting address to read from.
+ * @param buf Buffer to store the read data.
+ * @param len Number of bytes to read.
+ * @return int
  */
-void gui_fb_disp(gui_obj_t *root, bool enable_event);
-
+int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len);
 
 /**
- * @brief this means framebuffer have change, need update framebuffer
+ * @brief Write to the flash translation layer
  *
+ * @param addr The starting address to write to.
+ * @param buf The buffer containing the data to write.
+ * @param len The number of bytes to write.
+ * @return int
  */
-void gui_fb_change(void);
+int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len);
 
 /**
- * @brief Get fps.
+ * @brief Erase a section of the flash translation layer
  *
- * @return fps
+ * @param addr The starting address of the section to erase.
+ * @param len The number of bytes to erase.
+ * @return int
  */
-uint32_t gui_fps(void);
-
+int gui_ftl_erase(uint32_t addr, uint32_t len);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif
-
-
-
-
-
-
-
-
-
-

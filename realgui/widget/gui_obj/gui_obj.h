@@ -643,6 +643,17 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
                                    void         *p);
 
 /**
+ * @brief Retrieve the progress of an animation.
+ *
+ * This function returns the current progress of the specified animation.
+ * The progress is represented as a floating-point value between 0.0 and 1.0,
+ *
+ * @param animation Pointer to the animation structure.
+ * @return The current progress of the animation, ranging from 0.0 to 1.0.
+ */
+float gui_animation_get_progress(gui_animate_t *animation);
+
+/**
  * @brief print name by bfs order.
  *
  * @param root tree.
@@ -751,6 +762,27 @@ void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y);
  */
 void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
                                                int index);
+
+/**
+ * @brief API to create a widget tree structure from an XML file and associate it with a parent widget.
+ *
+ * @param xml The path to the XML file to be parsed.
+ * @param parent_widget The parent widget to which the tree structure is to be associated.
+ */
+void gui_dom_create_tree_nest(const char *xml, gui_obj_t *parent_widget);
+
+/**
+ * @brief Extracts the preview image file path from an XML file.
+ *
+ * This function parses the given XML file and attempts to find the preview
+ * image file path by looking for specific tags within the XML.
+ *
+ * @param xml_file The path to the XML file to be parsed.
+ * @return A string containing the path to the preview image file. If the XML
+ *         file cannot be loaded or the preview image file path cannot be found,
+ *         returns NULL.
+ */
+char *gui_dom_get_preview_image_file(const char *xml);
 
 /**
  * @brief Update the speed based on displacement.
