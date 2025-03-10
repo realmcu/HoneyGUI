@@ -55,9 +55,12 @@ Mkfile.old
 dkms.conf
 *.pyc
 .gitignore
-keil_sim/RTE/*
-keil_sim/build/*
-keil_sim/gui_engine.uvguix.*
+keil_sim/ac5/RTE/*
+keil_sim/ac5/build/*
+keil_sim/ac5/HoneyGUI.uvguix.*
+keil_sim/ac6/RTE/*
+keil_sim/ac6/build/*
+keil_sim/ac6/HoneyGUI.uvguix.*
 lib/RTE/*
 lib/build/*
 lib/gui_engine.uvguix.*

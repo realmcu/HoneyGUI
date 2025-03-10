@@ -339,7 +339,7 @@
               <MiscControls>--diag_suppress=1</MiscControls>
               <Define>DRV_LCD_WIDTH=480 DRV_LCD_HIGHT=480 DRV_PIXEL_BITS=16 ENABLE_HONEYGUI GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\app;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\DOM;..\..\realgui\engine;..\..\realgui\example\demo;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\3d</IncludePath>
+              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\app;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\DOM;..\..\realgui\engine;..\..\realgui\example\demo;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_tabview;..\..\realgui\widget\gui_view</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -511,85 +511,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/dom</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
-          <Files>
-            <File>
-              <FileName>XML_DOM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\DOM\XML_DOM.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>realgui/engine</GroupName>
           <Files>
             <File>
@@ -738,9 +659,39 @@
           <GroupName>realgui/server</GroupName>
           <Files>
             <File>
-              <FileName>gui_api.c</FileName>
+              <FileName>gui_api_acc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\server\gui_api.c</FilePath>
+              <FilePath>..\..\realgui\server\gui_api_acc.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_color.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_color.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_dc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_dc.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_fs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_fs.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_ftl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_ftl.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_indev.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_indev.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_api_os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\server\gui_api_os.c</FilePath>
             </File>
             <File>
               <FileName>gui_components_init.c</FileName>
@@ -767,11 +718,6 @@
         <Group>
           <GroupName>realgui/widget</GroupName>
           <Files>
-            <File>
-              <FileName>gui_3d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d.c</FilePath>
-            </File>
             <File>
               <FileName>gui_barcode_gen.c</FileName>
               <FileType>1</FileType>
@@ -878,11 +824,6 @@
               <FilePath>..\..\realgui\widget\gui_image_array.c</FilePath>
             </File>
             <File>
-              <FileName>gui_img.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_img.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_img_live.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_img_live.c</FilePath>
@@ -916,11 +857,6 @@
               <FileName>gui_multi_level.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_multi_level.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_obj.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_obj.c</FilePath>
             </File>
             <File>
               <FileName>gui_page.c</FileName>
@@ -1018,46 +954,6 @@
               <FilePath>..\..\realgui\widget\gui_switch.c</FilePath>
             </File>
             <File>
-              <FileName>gui_tab.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_cube.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab_cube.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_fade.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab_fade.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_reduction.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab_reduction.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_reduction_fade.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab_reduction_fade.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_rotate.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab_rotate.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_rotate_book.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tab_rotate_book.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tabview.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_tabview.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_text.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_text.c</FilePath>
@@ -1066,31 +962,6 @@
               <FileName>gui_turn_table.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_turn_table.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_view.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_view.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_view_cube.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_view_cube.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_view_reduction.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_view_reduction.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_view_rotate.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_view_rotate.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_view_rotate_book.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_view_rotate_book.c</FilePath>
             </File>
             <File>
               <FileName>gui_watch_gradient_spot.c</FileName>
@@ -1125,7 +996,117 @@
             <File>
               <FileName>def_3d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\3d\def_3d.c</FilePath>
+              <FilePath>..\..\realgui\widget\gui_3d\def_3d.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_3d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_3d\gui_3d.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_img.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_img\gui_img.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_obj.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_obj\gui_obj.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_obj_animate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_obj\gui_obj_animate.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_obj_event.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_obj\gui_obj_event.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_obj_suppress.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_obj\gui_obj_suppress.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_obj_tree.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_obj\gui_obj_tree.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_cube.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab_cube.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_fade.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab_fade.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_reduction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab_reduction.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_reduction_fade.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab_reduction_fade.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_rotate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab_rotate.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_rotate_book.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tab_rotate_book.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tabview.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_tabview\gui_tabview.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view_animate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view_animate.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view_cube.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view_cube.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view_descriptor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view_descriptor.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view_prepare_internal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view_prepare_internal.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view_reduction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view_reduction.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_view_rotate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_view\gui_view_rotate.c</FilePath>
             </File>
           </Files>
         </Group>
