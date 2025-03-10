@@ -29,6 +29,7 @@ if(NOT DEFINED SOC)
     message(WARNING "SOC variable not specified. Using default SOC: ${DEFAULT_SOC}.")
     set(SOC "${DEFAULT_SOC}")
 endif()
+message("build soc = ${SOC}")
 
 # Set the SOC file path
 set(SOC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${SOC}.cmake")
@@ -39,21 +40,6 @@ if(EXISTS "${SOC_FILE}")
 else()
     message(FATAL_ERROR "SOC file ${SOC_FILE} does not exist.")
 endif()
-
-execute_process( 
-				COMMAND 
-				python 
-				${CMAKE_CURRENT_SOURCE_DIR}/../../tool/git_generate_version.py 
-				${CMAKE_CURRENT_SOURCE_DIR}/../../realgui/
-				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-				)
-
-#find_program(menuconfig_EXECUTABLE menuconfig NO_CMAKE_FIND_ROOTO_PATH)
-#set(menuconfig_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/../../Kconfig.gui")
-#execute_process( COMMAND 
-#				 ${menuconfig_EXECUTABLE} 
-#				 ${menuconfig_ARGS} 
-#				)
 
 execute_process( 
 				COMMAND 
@@ -101,7 +87,9 @@ list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 
 install(FILES ${HEADER_FILES} DESTINATION include)
 if(CONFIG_REALTEK_BUILD_GUI_BOX2D)
-install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")
+	install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")
 endif()
-file(GLOB SRC_FILES "../../realgui/engine/hw_acc/${HW_ACC_PATH}/*.c")
+if(NOT CONFIG_SOC_SERIES_RTL8763D)
+	file(GLOB SRC_FILES "../../realgui/engine/hw_acc/${HW_ACC_PATH}/*.c")
+endif()
 install(FILES ${SRC_FILES} DESTINATION src)

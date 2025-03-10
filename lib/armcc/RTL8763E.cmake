@@ -1,6 +1,6 @@
 # Apply the flags to C and C++ compiler settings armcc
-set(CONFIG_SOC_SERIES_RTL8762G y)
-set(HW_ACC_PATH "rtl8762g")
+set(CONFIG_SOC_SERIES_RTL8763E y)
+set(HW_ACC_PATH "rtl8763e")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     --c99 \
     -c	\
@@ -9,7 +9,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -g \
     -O2 \
     --apcs=interwork \
-    --fpu=FPv5-SP \
     --bss_threshold=0 \
     --diag_suppress=177 ")
 	
@@ -20,6 +19,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -g \
     -O2 \
     --apcs=interwork \
-    --fpu=FPv5-SP \
     --bss_threshold=0 \
     --diag_suppress=177")
