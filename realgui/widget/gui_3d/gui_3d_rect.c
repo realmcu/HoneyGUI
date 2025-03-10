@@ -21,9 +21,9 @@
 #include <math.h>
 #include "guidef.h"
 #include "gui_obj.h"
-#include "gui_3d.h"
+#include "gui_3d_rect.h"
 #include "tp_algo.h"
-#include "def_3d.h"
+#include "def_3d_rect.h"
 #include "draw_img.h"
 #include "acc_init.h"
 #include "gui_fb.h"
@@ -106,218 +106,16 @@ static gui_point_4d_t gui_3d_calculate_point_in_quad(gui_point_4d_t P0, gui_poin
 
 }
 
-static void gui_3d_update_att(gui_obj_t *obj)
+static void gui_3d_rect_update_att(gui_obj_t *obj)
 {
-    gui_3d_t *this = (void *)obj;
+    gui_3d_rect_t *this = (void *)obj;
     if (this->animate)
     {
         animate_frame_update(this->animate, obj);
     }
 }
 
-#ifdef GUI3D_TRIANGLE_MESH
-static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
-{
-    this->img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
-    memset(this->img->data, 0x00, width * height * 2 + sizeof(gui_rgb_data_head_t));
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img->data;
-    head->w = width;
-    head->h = height;
-    head->type = RGB565;
-
-    uint8_t *pixelData = (uint8_t *)this->img->data + sizeof(gui_rgb_data_head_t);
-    float *depthBuffer = gui_malloc(width * height * sizeof(float));
-    memset(depthBuffer, 0x00, width * height * sizeof(float));
-
-    for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
-    {
-        // Cache vertex positions
-        gui_3d_vertex_t *vertices = this->face[i].transform_vertex;
-        float x0 = vertices[0].position.x, y0 = vertices[0].position.y, z0 = vertices[0].position.z;
-        float x1 = vertices[1].position.x, y1 = vertices[1].position.y, z1 = vertices[1].position.z;
-        float x2 = vertices[2].position.x, y2 = vertices[2].position.y, z2 = vertices[2].position.z;
-
-        float nz = vertices[0].normal.z;
-        uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
-
-        int min_x = floor(fminf(fminf(x0, x1), x2));
-        int max_x = ceil(fmaxf(fmaxf(x0, x1), x2));
-        int min_y = floor(fminf(fminf(y0, y1), y2));
-        int max_y = ceil(fmaxf(fmaxf(y0, y1), y2));
-
-        // Non-backfaces
-        if (!(this->face[i].state & GUI_3D_FACESTATE_BACKFACE))
-        {
-            float area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
-
-            // Iterate over the bounding box
-            for (int y = min_y; y <= max_y; y++)
-            {
-                for (int x = min_x; x <= max_x; x++)
-                {
-                    float w0 = ((x - x0) * (y2 - y0) - (y - y0) * (x2 - x0)) / area;
-                    float w1 = ((x - x0) * (y1 - y0) - (y - y0) * (x1 - x0)) / (-area);
-                    float w2 = 1.0f - w0 - w1;
-
-                    // Inside the triangle
-                    if ((w0 >= 0 && w1 >= 0 && w2 >= 0))
-                    {
-                        float z = w0 * z0 + w1 * z1 + w2 * z2;
-                        int index = x + y * width;
-
-                        // Foreground
-                        if (depthBuffer[index] == 0 || z > depthBuffer[index])
-                        {
-                            depthBuffer[index] = z;
-                            ((uint16_t *)pixelData)[index] = ((color_intensity & 0xF8) << 8) |
-                                                             ((color_intensity & 0xFC) << 3) |
-                                                             ((color_intensity & 0xF8) >> 3);
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    gui_free(depthBuffer);
-
-    this->img->img_w = width;
-    this->img->img_h = height;
-    this->img->opacity_value = UINT8_MAX;
-    this->img->blend_mode = IMG_FILTER_BLACK;
-    this->img->high_quality = true;
-
-    gui_obj_t *obj = (gui_obj_t *)this;
-    memcpy(&this->img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    memcpy(&this->img->inverse, &this->img->matrix, sizeof(gui_matrix_t));
-    matrix_inverse(&this->img->inverse);
-    draw_img_new_area(this->img, NULL);
-}
-
-static void gui_3d_prepare(gui_3d_t *this)
-{
-    touch_info_t *tp = tp_get_info();
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *obj = (gui_obj_t *)this;
-    gui_3d_update_att(obj);
-
-    this->flags = 0;
-
-    this->face = gui_malloc(sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
-    memset(this->face, 0x00, sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
-
-    this->img = gui_malloc(sizeof(draw_img_t));
-    memset(this->img, 0x00, sizeof(draw_img_t));
-
-    gui_3d_world_t world;
-    gui_3d_camera_t camera;
-    gui_3d_light_t light;
-    light.initialized = false;
-
-    // global transform
-    if (this->global_shape_transform_cb != NULL)
-    {
-        this->global_shape_transform_cb(this, &world, &camera, &light);
-    }
-
-    for (size_t i = 0; i < this->desc->num_shapes; i++)
-    {
-        for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
-        {
-            size_t face_offset = this->desc->shapes[i].face_offset + j;
-
-            // local transform
-            if (this->local_shape_transform_cb != NULL)
-            {
-                this->local_shape_transform_cb(this, face_offset, &world, &camera, &light);
-            }
-            gui_3d_face_transform_local_to_global_tria(this->face + face_offset, face_offset,
-                                                       &this->desc->attrib, &world);
-            gui_3d_scene(this->face + face_offset, &world, &camera);
-
-        }
-    }
-
-    gui_3d_generate_triangle_img(this, 350, 350);
-
-    if (tp->type == TOUCH_SHORT)
-    {
-        // Cache the num_face_num_verts
-        const int num_face_vertices = this->desc->attrib.num_face_num_verts;
-
-        for (int i = 0; i < num_face_vertices; ++i)
-        {
-            // Cache the img_target and face attributes
-            const int target_x = this->img[i].img_target_x;
-            const int target_y = this->img[i].img_target_y;
-            const int target_w = this->img[i].img_target_w;
-            const int target_h = this->img[i].img_target_h;
-
-            if (tp->x >= target_x &&
-                tp->x <= (target_x + target_w) &&
-                tp->y >= target_y &&
-                tp->y <= (target_y + target_h))
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_1);
-                break;
-            }
-        }
-    }
-
-    gui_fb_change();
-
-    GUI_UNUSED(this);
-    GUI_UNUSED(obj);
-    GUI_UNUSED(tp);
-}
-
-static void gui_3d_draw(gui_3d_t *this)
-{
-    touch_info_t *tp = tp_get_info();
-    gui_obj_t *obj = (gui_obj_t *)this;
-    gui_dispdev_t *dc = gui_get_dc();
-
-    GUI_UNUSED(this);
-    GUI_UNUSED(obj);
-    GUI_UNUSED(tp);
-    GUI_UNUSED(dc);
-
-    draw_img_cache(this->img, IMG_SRC_MEMADDR);
-    gui_acc_blit_to_dc(this->img, dc, NULL);
-    draw_img_free(this->img, IMG_SRC_MEMADDR);
-
-}
-
-static void gui_3d_end(gui_3d_t *this)
-{
-    touch_info_t *tp = tp_get_info();
-    gui_obj_t *obj = (gui_obj_t *)this;
-    gui_dispdev_t *dc = gui_get_dc();
-
-    GUI_UNUSED(this);
-    GUI_UNUSED(obj);
-    GUI_UNUSED(tp);
-    GUI_UNUSED(dc);
-
-    if (this->img != NULL)
-    {
-        gui_free(this->img->data);
-        this->img->data = NULL;
-        if (draw_img_acc_end_cb != NULL)
-        {
-            draw_img_acc_end_cb(this->img);
-        }
-        gui_free(this->img);
-        this->img = NULL;
-    }
-
-    gui_free(this->face);
-    this->face = NULL;
-}
-
-#else
-static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/,
+static void gui_3d_light_apply(gui_3d_rect_t *this, size_t i /*face_offset*/,
                                gui_3d_world_t *world, gui_3d_light_t *light)
 {
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
@@ -373,12 +171,11 @@ static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/,
 
 }
 
-static void gui_3d_face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/,
-                                  size_t i /*face_offset*/,
-                                  gui_3d_world_t *world, gui_3d_camera_t *camera)
+static void gui_3d_rect_face_transfrom(gui_3d_rect_t *this, size_t s/*shape_offset*/,
+                                       size_t i /*face_offset*/,
+                                       gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
-    gui_3d_face_transform_local_to_global(this->face + i, world);
-    gui_3d_scene(this->face + i, world, camera);
+    gui_3d_rect_scene(this->face + i, world, camera);
 
     int material_id = this->desc->attrib.material_ids[i];
     this->img[i].data = (void *)this->desc->textures[material_id];
@@ -411,7 +208,7 @@ static void gui_3d_face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/,
     draw_img_new_area(this->img + i, NULL);
 }
 
-static void gui_3d_convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
+static void gui_3d_rect_convert_to_face(gui_3d_rect_t *this, size_t i /*face_offset*/)
 {
     size_t index_offset = 0;
     for (size_t s = 0; s < i; s++)
@@ -443,18 +240,15 @@ static void gui_3d_convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
     }
 }
 
-static void gui_3d_prepare(gui_3d_t *this)
+static void gui_3d_rect_prepare(gui_3d_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
-    gui_3d_update_att(obj);
+    gui_3d_rect_update_att(obj);
 
-    // this->flags = TINYOBJ_FLAG_TRIANGULATE;
-    this->flags = 0;
-
-    this->face = gui_malloc(sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
-    memset(this->face, 0x00, sizeof(gui_3d_face_t) * this->desc->attrib.num_face_num_verts);
+    this->face = gui_malloc(sizeof(gui_3d_rect_face_t) * this->desc->attrib.num_face_num_verts);
+    memset(this->face, 0x00, sizeof(gui_3d_rect_face_t) * this->desc->attrib.num_face_num_verts);
 
     this->img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
@@ -484,9 +278,9 @@ static void gui_3d_prepare(gui_3d_t *this)
             {
                 this->local_shape_transform_cb(this, face_offset, &world, &camera, &light);
             }
-            gui_3d_convert_to_face(this, face_offset);
+            gui_3d_rect_convert_to_face(this, face_offset);
 
-            gui_3d_face_transfrom(this, i, face_offset, &world, &camera);
+            gui_3d_rect_face_transfrom(this, i, face_offset, &world, &camera);
 
             if (light.initialized)
             {
@@ -527,7 +321,7 @@ static void gui_3d_prepare(gui_3d_t *this)
     GUI_UNUSED(tp);
 }
 
-static void gui_3d_draw(gui_3d_t *this)
+static void gui_3d_rect_draw(gui_3d_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -580,7 +374,7 @@ static void gui_3d_draw(gui_3d_t *this)
 
 }
 
-static void gui_3d_end(gui_3d_t *this)
+static void gui_3d_rect_end(gui_3d_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -621,9 +415,8 @@ static void gui_3d_end(gui_3d_t *this)
     gui_free(this->face);
     this->face = NULL;
 }
-#endif
 
-static void gui_3d_destroy(gui_3d_t *this)
+static void gui_3d_rect_destroy(gui_3d_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -638,26 +431,26 @@ static void gui_3d_destroy(gui_3d_t *this)
     gui_free(this->desc);
 }
 
-static void gui_3d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+static void gui_3d_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
         switch (cb_type)
         {
         case OBJ_PREPARE:
-            gui_3d_prepare((gui_3d_t *)obj);
+            gui_3d_rect_prepare((gui_3d_rect_t *)obj);
             break;
 
         case OBJ_DRAW:
-            gui_3d_draw((gui_3d_t *)obj);
+            gui_3d_rect_draw((gui_3d_rect_t *)obj);
             break;
 
         case OBJ_END:
-            gui_3d_end((gui_3d_t *)obj);
+            gui_3d_rect_end((gui_3d_rect_t *)obj);
             break;
 
         case OBJ_DESTROY:
-            gui_3d_destroy((gui_3d_t *)obj);
+            gui_3d_rect_destroy((gui_3d_rect_t *)obj);
             break;
 
         default:
@@ -667,85 +460,24 @@ static void gui_3d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 }
 
 
-static gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
-{
-    unsigned char *ptr = (unsigned char *)desc_addr;
-    gui_3d_description_t *desc = (gui_3d_description_t *)gui_malloc(sizeof(gui_3d_description_t));
-
-    // attrib
-    desc->attrib.num_vertices = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    desc->attrib.num_normals = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    desc->attrib.num_texcoords = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    desc->attrib.num_faces = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    desc->attrib.num_face_num_verts = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    desc->attrib.pad0 = *((int *)ptr);
-    ptr += sizeof(int);
-
-    desc->attrib.vertices = (gui_obj_vertex_coordinate_t *)ptr;
-    ptr += desc->attrib.num_vertices * sizeof(gui_obj_vertex_coordinate_t);
-    desc->attrib.normals = (gui_obj_vertex_coordinate_t *)ptr;
-    ptr += desc->attrib.num_normals * sizeof(gui_obj_vertex_coordinate_t);
-    desc->attrib.texcoords = (gui_obj_texcoord_coordinate_t *)ptr;
-    ptr += desc->attrib.num_texcoords * sizeof(gui_obj_texcoord_coordinate_t);
-    desc->attrib.faces = (gui_obj_vertex_index_t *)ptr;
-    ptr += desc->attrib.num_faces * sizeof(gui_obj_vertex_index_t);
-    desc->attrib.face_num_verts = (int *)ptr;
-    ptr += desc->attrib.num_face_num_verts * sizeof(int);
-    desc->attrib.material_ids = (int *)ptr;
-    ptr += desc->attrib.num_face_num_verts * sizeof(int);
-
-    // shape
-    desc->num_shapes = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    desc->shapes = (gui_obj_shape_t *)ptr;
-    ptr += desc->num_shapes * sizeof(gui_obj_shape_t);
-
-    // material
-    desc->num_materials = *((unsigned int *)ptr);
-    ptr += sizeof(unsigned int);
-    if (desc->num_materials > 0)
-    {
-        desc->materials = (gui_obj_material_t *)ptr;
-        ptr += desc->num_materials * sizeof(gui_obj_material_t);
-
-        // textures size
-        desc->texture_sizes = (unsigned int *)ptr;
-        ptr += desc->num_materials * sizeof(unsigned int);
-        desc->textures = (unsigned char **)gui_malloc(desc->num_materials * sizeof(unsigned char *));
-        // texture content
-        for (uint32_t i = 0; i < desc->num_materials; i++)
-        {
-            desc->textures[i] = (unsigned char *)ptr;
-            ptr += desc->texture_sizes[i];
-        }
-
-    }
-
-    return desc;
-
-}
 
 
 
-void gui_3d_ctor(gui_3d_t               *this,
-                 gui_obj_t              *parent,
-                 const char             *name,
-                 void                   *desc_addr,
-                 int16_t                 x,
-                 int16_t                 y,
-                 int16_t                 w,
-                 int16_t                 h)
+
+void gui_3d_rect_ctor(gui_3d_rect_t               *this,
+                      gui_obj_t              *parent,
+                      const char             *name,
+                      void                   *desc_addr,
+                      int16_t                 x,
+                      int16_t                 y,
+                      int16_t                 w,
+                      int16_t                 h)
 {
     //for obj class
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
-    obj->obj_cb = gui_3d_cb;
+    obj->obj_cb = gui_3d_rect_cb;
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
@@ -758,37 +490,38 @@ void gui_3d_ctor(gui_3d_t               *this,
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_3d_set_global_shape_transform_cb(gui_3d_t *this,
-                                          void (*cb)(gui_3d_t *this, gui_3d_world_t *world, gui_3d_camera_t *camera,
-                                                     gui_3d_light_t *light))
+
+void gui_3d_rect_set_global_shape_transform_cb(gui_3d_rect_t *this,
+                                               void (*cb)(gui_3d_rect_t *this, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                                          gui_3d_light_t *light))
 {
     this->global_shape_transform_cb = cb;
 }
 
-void gui_3d_set_local_shape_transform_cb(gui_3d_t *this, size_t face/*face_offset*/,
-                                         void (*cb)(gui_3d_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
-                                                    gui_3d_light_t *light))
+void gui_3d_rect_set_local_shape_transform_cb(gui_3d_rect_t *this, size_t face/*face_offset*/,
+                                              void (*cb)(gui_3d_rect_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
+                                                         gui_3d_light_t *light))
 {
     this->local_shape_transform_cb = cb;
 }
 
-void gui_3d_set_animate(gui_3d_t     *this,
-                        uint32_t      dur,
-                        int           repeat_count,
-                        void         *callback,
-                        void         *p)
+void gui_3d_rect_set_animate(gui_3d_rect_t     *this,
+                             uint32_t      dur,
+                             int           repeat_count,
+                             void         *callback,
+                             void         *p)
 {
     GUI_SET_ANIMATE_HELPER
 }
 
 
-gui_3d_t *gui_3d_create(void       *parent,
-                        const char *name,
-                        void       *desc_addr,
-                        int16_t     x,
-                        int16_t     y,
-                        int16_t     w,
-                        int16_t     h)
+gui_3d_rect_t *gui_3d_rect_create(void       *parent,
+                                  const char *name,
+                                  void       *desc_addr,
+                                  int16_t     x,
+                                  int16_t     y,
+                                  int16_t     w,
+                                  int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
@@ -797,11 +530,11 @@ gui_3d_t *gui_3d_create(void       *parent,
         name = "WIDGET_3D";
     }
 
-    gui_3d_t *this = gui_malloc(sizeof(gui_3d_t));
+    gui_3d_rect_t *this = gui_malloc(sizeof(gui_3d_rect_t));
     GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(gui_3d_t));
+    memset(this, 0x00, sizeof(gui_3d_rect_t));
 
-    gui_3d_ctor(this, (gui_obj_t *)parent, name, desc_addr, x, y, w, h);
+    gui_3d_rect_ctor(this, (gui_obj_t *)parent, name, desc_addr, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -813,7 +546,7 @@ gui_3d_t *gui_3d_create(void       *parent,
     GET_BASE(this)->create_done = true;
     return this;
 }
-void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter)
+void gui_3d_rect_on_click(gui_3d_rect_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
 }

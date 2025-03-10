@@ -1,5 +1,5 @@
-#ifndef DEF_3D_H
-#define DEF_3D_H
+#ifndef DEF_3D_COMMON_H
+#define DEF_3D_COMMON_H
 
 
 #ifdef __cplusplus
@@ -126,24 +126,43 @@ typedef struct
     int *material_ids;
 } gui_obj_attrib_t;
 
-#ifdef GUI3D_TRIANGLE_MESH
-#define VERTEX_COUNT  3
 typedef struct
 {
-    uint32_t            state;
-    gui_3d_vertex_t     vertex[3];
-    gui_3d_vertex_t     transform_vertex[3];
-} gui_3d_face_t;
-#else
-#define VERTEX_COUNT  4
+    unsigned int face_offset;
+    unsigned int length;
+} gui_obj_shape_t;
+
 typedef struct
 {
-    uint32_t            state;
-    gui_3d_vertex_t     vertex[4];
-    gui_3d_vertex_t     transform_vertex[4];
-    gui_3d_vertex_t     transform_world_vertex[4];
-} gui_3d_face_t;
-#endif
+    float ambient[3];
+    float diffuse[3];
+    float specular[3];
+    float transmittance[3];
+    float emission[3];
+    float shininess;
+    float ior;      /* index of refraction */
+    float dissolve; /* 1 == opaque; 0 == fully transparent */
+    /* illumination model (see http://www.fileformat.info/format/material/) */
+    int illum;
+
+} gui_obj_material_t;
+
+
+typedef struct
+{
+    gui_obj_attrib_t attrib;
+
+    unsigned int num_shapes;
+    gui_obj_shape_t *shapes;
+
+    unsigned int num_materials;
+    gui_obj_material_t *materials;
+
+    unsigned int *texture_sizes;
+    unsigned char **textures;
+
+} gui_3d_description_t;
+
 
 typedef gui_3d_matrix_t gui_3d_world_t;
 
@@ -175,21 +194,29 @@ typedef struct
     uint8_t a; ///< Alpha channel for transparency, at the highest address
 } gui_3d_RGBAcolor_t;
 
-typedef struct
-{
-    bool initialized;
-    float included_angle;
-    float blend_ratio;
-    gui_point_4d_t position;
-    gui_point_4d_t targetDirection;
-    gui_3d_RGBAcolor_t color;
-} gui_3d_light_t;
+
+bool gui_3d_generate_2d_matrix(gui_3d_point_2d_t *src, gui_3d_point_2d_t *dst, float *ret);
 
 gui_point_4d_t gui_point_4d(float x, float y, float z);
-
 float gui_point4D_dot(gui_point_4d_t p1, gui_point_4d_t p2);
-
 gui_point_4d_t gui_point_4d_unit(gui_point_4d_t p);
+gui_point_4d_t gui_point_4d_cross(gui_point_4d_t p1, gui_point_4d_t p2);
+gui_point_4d_t gui_point_4d_sub(gui_point_4d_t p1, gui_point_4d_t p2);
+
+void gui_3d_matrix_identity(gui_3d_matrix_t *m);
+void gui_3d_matrix_zero(gui_3d_matrix_t *Mat);
+void gui_3d_matrix_translate(gui_3d_matrix_t *m, float t_x, float t_y, float t_z);
+void gui_3d_matrix_rotateY(gui_3d_matrix_t *m, float rotY);
+void gui_3d_matrix_rotateX(gui_3d_matrix_t *m, float rotX);
+void gui_3d_matrix_rotateZ(gui_3d_matrix_t *m, float rotZ);
+void gui_3d_matrix_scale(gui_3d_matrix_t *m, float scale_x, float scale_y, float scale_z);
+
+gui_3d_matrix_t gui_3d_matrix_multiply(gui_3d_matrix_t Mat1, gui_3d_matrix_t Mat2);
+gui_point_4d_t gui_3d_point4D_mul_matrix(gui_point_4d_t p, gui_3d_matrix_t mat);
+
+gui_vector_4d_t gui_3d_vector(float ux, float uy, float uz);
+gui_point_4d_t gui_3d_point(float x, float y, float z);
+
 
 void gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z, float rotX,
                               float rotY, float rotZ, float scale);
@@ -202,31 +229,11 @@ void gui_3d_calculator_matrix(gui_3d_matrix_t *world, \
 bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t cameraPosition,
                                   gui_point_4d_t cameraTarget, float near, float far, float fov, float viewPortWidth,
                                   float viewPortHeight);
-
-void gui_3d_light_inititalize(gui_3d_light_t *light, gui_point_4d_t lightPosition,
-                              gui_point_4d_t lightTarget, float included_angle, float blend_ratio, gui_3d_RGBAcolor_t color);
-
-void gui_3d_scene(gui_3d_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera);
-
-void gui_3d_face_transform_local_to_global(gui_3d_face_t *face, gui_3d_world_t *world);
-void gui_3d_face_transform_local_to_global_tria(gui_3d_face_t *face, size_t face_index,
-                                                gui_obj_attrib_t *attrib, gui_3d_world_t *world);
-void gui_3d_face_transform_local_to_local(gui_3d_face_t *face, gui_3d_matrix_t *m);
-
-bool gui_3d_generate_2d_matrix(gui_3d_point_2d_t *src, gui_3d_point_2d_t *dst, float *ret);
-
-gui_vector_4d_t gui_3d_vector(float ux, float uy, float uz);
-gui_point_4d_t gui_3d_point(float x, float y, float z);
-
-gui_3d_matrix_t gui_3d_matrix_multiply(gui_3d_matrix_t Mat1, gui_3d_matrix_t Mat2);
+void gui_3d_camera_build_UVN_matrix(gui_3d_camera_t *camera);
 
 
-void gui_3d_matrix_identity(gui_3d_matrix_t *m);
-void gui_3d_matrix_translate(gui_3d_matrix_t *m, float t_x, float t_y, float t_z);
-void gui_3d_matrix_rotateY(gui_3d_matrix_t *m, float rotY);
-void gui_3d_matrix_rotateX(gui_3d_matrix_t *m, float rotX);
-void gui_3d_matrix_rotateZ(gui_3d_matrix_t *m, float rotZ);
-void gui_3d_matrix_scale(gui_3d_matrix_t *m, float scale_x, float scale_y, float scale_z);
+gui_3d_description_t *gui_get_3d_desc(void *desc_addr);
+
 #ifdef __cplusplus
 }
 #endif

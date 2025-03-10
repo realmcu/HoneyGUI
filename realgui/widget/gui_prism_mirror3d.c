@@ -44,7 +44,7 @@ static int16_t enter_face_flags = 1;
  *                           Private Functions
  *============================================================================*/
 
-static void prism_mirror3d_render_callback(gui_3d_t *parent, gui_3d_world_t *world,
+static void prism_mirror3d_render_callback(gui_3d_rect_t *parent, gui_3d_world_t *world,
                                            gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     // Cube specific render logic
@@ -188,8 +188,8 @@ static void prism_mirror3d_render_animate_cb(void *param)
                                                           prism_mirror3d->render_object.animate->progress_percent;
 
 
-    gui_3d_set_global_shape_transform_cb((gui_3d_t *)prism_mirror3d,
-                                         prism_mirror3d_render_callback); // Set to the final callback
+    gui_3d_rect_set_global_shape_transform_cb((gui_3d_rect_t *)prism_mirror3d,
+                                              prism_mirror3d_render_callback); // Set to the final callback
 
     if (prism_mirror3d->render_object.animate->progress_percent == 1)
     {
@@ -214,8 +214,8 @@ static void prism_mirror3d_render_animate_cb(void *param)
 static void gui_prism_render_interpolated_animate(gui_prism_mirror3d_t *render_object)
 {
     GUI_ASSERT(render_object != NULL);
-    gui_3d_set_animate((gui_3d_t *)render_object, 800, 0, prism_mirror3d_render_animate_cb,
-                       render_object);
+    gui_3d_rect_set_animate((gui_3d_rect_t *)render_object, 800, 0, prism_mirror3d_render_animate_cb,
+                            render_object);
 }
 
 static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param)
@@ -265,8 +265,8 @@ static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *para
 void gui_prism_mirror3d_set_animate(gui_prism_mirror3d_t *prism_mirror3d)
 {
     GUI_ASSERT(prism_mirror3d != NULL);
-    gui_3d_set_animate((gui_3d_t *)prism_mirror3d, 10000, -1, prism_mirror3d_update_angle_cb,
-                       prism_mirror3d);
+    gui_3d_rect_set_animate((gui_3d_rect_t *)prism_mirror3d, 10000, -1, prism_mirror3d_update_angle_cb,
+                            prism_mirror3d);
 }
 void gui_prism_mirror3d_set_scale(gui_prism_mirror3d_t *prism_mirror3d, float scale)
 {
@@ -369,7 +369,7 @@ gui_prism_mirror3d_t *gui_prism_mirror3d_create(gui_obj_t *parent, const char *n
     GUI_ASSERT(prism_mirror3d != NULL);
 
     memset(prism_mirror3d, 0x00, sizeof(gui_prism_mirror3d_t));
-    gui_3d_ctor((void *)prism_mirror3d, (gui_obj_t *)parent, name, desc_addr, x, y, w, h);
+    gui_3d_rect_ctor((void *)prism_mirror3d, (gui_obj_t *)parent, name, desc_addr, x, y, w, h);
     gui_list_init(&(GET_BASE(prism_mirror3d)->child_list));
 
     if ((GET_BASE(prism_mirror3d)->parent) != NULL)
@@ -396,8 +396,9 @@ gui_prism_mirror3d_t *gui_prism_mirror3d_create(gui_obj_t *parent, const char *n
     prism_mirror3d->interpolated_state = (gui_prism_transform_state_t) {.worldPosition = {0, 0, 0}, .cameraPosition = {0, 0, 0}, .rot_x = 0, .rot_y = 0, .scale = 0};
 
     prism_mirror3d->face_flags_rotation = enter_face_flags;
-    gui_3d_set_global_shape_transform_cb((gui_3d_t *)prism_mirror3d, prism_mirror3d_render_callback);
-    gui_3d_on_click((gui_3d_t *)prism_mirror3d, prism_mirror3d_on_face_click_cb, NULL);
+    gui_3d_rect_set_global_shape_transform_cb((gui_3d_rect_t *)prism_mirror3d,
+                                              prism_mirror3d_render_callback);
+    gui_3d_rect_on_click((gui_3d_rect_t *)prism_mirror3d, prism_mirror3d_on_face_click_cb, NULL);
 
     return prism_mirror3d;
 }

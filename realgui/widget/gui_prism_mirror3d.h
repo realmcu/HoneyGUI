@@ -41,8 +41,8 @@ extern "C" {
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "def_3d.h"
-#include "gui_3d.h"
+#include "def_3d_rect.h"
+#include "gui_3d_rect.h"
 
 /*============================================================================*
  *                         Types
@@ -82,7 +82,7 @@ typedef struct
  */
 typedef struct
 {
-    gui_3d_t render_object;               /**< The 3D render object */
+    gui_3d_rect_t render_object;               /**< The 3D render object */
     int16_t face_flags_rotation;                   /**< Flags defining the visibility of faces */
     prism_mirror3d_config_t conf;
     gui_prism_transform_state_t raw_state; /**< The raw transform state */
