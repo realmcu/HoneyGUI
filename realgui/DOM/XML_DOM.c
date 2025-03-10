@@ -1101,14 +1101,11 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t w = gui_get_screen_width();
         int16_t h = 50;
         const char *text = "text";
-#ifdef __WIN32
-        char *font = "app/system/resource/font/tangyuanti.ttf";
-#else
-        char *font =
-            "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
-#endif
+
+        char *font = 0;
+
         gui_color_t color = APP_COLOR_WHITE;
-        int fontSize = 32;
+        int fontSize = 0;
         TEXT_MODE style = (TEXT_MODE)0;
         uint8_t inputable = false;
         while (true)
@@ -1192,9 +1189,18 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("p->txt2 = %s,\n", ptxt);
 
-        if (text && font)
+        if (text)
         {
             gui_text_t *t = 0;
+            if (font == 0 ||
+                fontSize == 0 ||
+                gui_get_file_address(font) == 0)
+            {
+                text = "Font Export failed! Try again.";
+                fontSize = 16;
+                w = gui_get_screen_width();
+                font = "app/system/resource/font/arialbd_size16_bits4_font.bin";
+            }
             if (style == 0 || style == CENTER || style == RIGHT || style == LEFT)
             {
                 t = gui_text_create(parent, ptxt, x, y, w, h);
@@ -2396,12 +2402,14 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         int16_t y = 0;
         int16_t w = 0;
         int16_t h = 0;
-        char *font_type = "app/system/resource/font/tangyuanti.ttf";
+
+
+        char *font_type = 0;
         char *text = NULL;
         int text_x = 0;
         int text_y = 0;
         gui_color_t font_color = APP_COLOR_RED;
-        uint32_t font_size = 32;
+        uint32_t font_size = 0;
         int picture_x = 0;
         int picture_y = 0;
         int transition = 0; GUI_UNUSED(transition);
@@ -2540,6 +2548,20 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             gui_free(hl_picture);
         }
         char *ptxt = get_space_string_head(p->txt);
+        if (text)
+        {
+            if (font_type == 0 ||
+                font_size == 0 ||
+                gui_get_file_address(font_type) == 0)
+            {
+                text = "Font Export failed! Try again.";
+                font_size = 16;
+                w = gui_get_screen_width();
+                font_type = "app/system/resource/font/arialbd_size16_bits4_font.bin";
+            }
+        }
+
+
         //font_size = 32;
         parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, BUTTON_BG_ICON, 0);
         GUI_TYPE(gui_button_t, parent)->style = style;
@@ -2720,6 +2742,11 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_cb)
         gui_obj_enable_event(this_widget, GUI_EVENT_6);
         param->check = 0;
     }
+    else
+    {
+        gui_obj_enable_event(this_widget, GUI_EVENT_INVALIDE);
+    }
+
 
 }
 
@@ -2893,13 +2920,7 @@ static void radio_win_prepare(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_5);
 
     }
-    // gui_obj_enable_event(obj, GUI_EVENT_6);
-    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
-    {
-        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
 
-        gui_log("code%s   %d.   %d\n", obj->name, event_dsc->event_code, i);
-    }
 
 }
 
