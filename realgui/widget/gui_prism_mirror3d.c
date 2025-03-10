@@ -359,7 +359,7 @@ void gui_prism_mirror3d_set_target_state(gui_prism_mirror3d_t *prism_mirror3d,
     prism_mirror3d->target_state.scale = scale;
 }
 gui_prism_mirror3d_t *gui_prism_mirror3d_create(gui_obj_t *parent, const char *name,
-                                                void *desc_addr, uint16_t x, uint16_t y,
+                                                gui_3d_description_t *desc, uint16_t x, uint16_t y,
                                                 uint16_t w, uint16_t h,
                                                 prism_mirror3d_config_t *config)
 {
@@ -369,7 +369,7 @@ gui_prism_mirror3d_t *gui_prism_mirror3d_create(gui_obj_t *parent, const char *n
     GUI_ASSERT(prism_mirror3d != NULL);
 
     memset(prism_mirror3d, 0x00, sizeof(gui_prism_mirror3d_t));
-    gui_3d_rect_ctor((void *)prism_mirror3d, (gui_obj_t *)parent, name, desc_addr, x, y, w, h);
+    gui_3d_rect_ctor((void *)prism_mirror3d, (gui_obj_t *)parent, name, desc, x, y, w, h);
     gui_list_init(&(GET_BASE(prism_mirror3d)->child_list));
 
     if ((GET_BASE(prism_mirror3d)->parent) != NULL)

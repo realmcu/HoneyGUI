@@ -41,7 +41,6 @@ extern "C" {
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "def_3d_rect.h"
 #include "gui_3d_rect.h"
 
 /*============================================================================*
@@ -224,8 +223,8 @@ void gui_prism_mirror3d_set_target_state(
  *               The created prism object will be a child of this parent, inheriting context and layout.
  * @param name The name identifier for the prism object.
  *             This string is used to uniquely identify the object within the GUI environment.
- * @param desc_addr Pointer to the description data for the prism.
- *                  This can include detailed geometric or material properties for rendering.
+ * @param desc Pointer to the description data for the prism.
+ *             This can include detailed geometric or material properties for rendering.
  * @param x The X coordinate for the position of the prism within the parent object.
  * @param y The Y coordinate for the position of the prism within the parent object.
  * @param w The width of the prism object.
@@ -238,7 +237,7 @@ void gui_prism_mirror3d_set_target_state(
  *         Returns NULL if the creation fails due to memory allocation issues or invalid parameters.
  */
 gui_prism_mirror3d_t *gui_prism_mirror3d_create(gui_obj_t *parent, const char *name,
-                                                void *desc_addr,
+                                                gui_3d_description_t *desc,
                                                 uint16_t x, uint16_t y, uint16_t w, uint16_t h,
                                                 prism_mirror3d_config_t *config);
 

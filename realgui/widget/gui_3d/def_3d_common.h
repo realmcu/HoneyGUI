@@ -147,9 +147,16 @@ typedef struct
 
 } gui_obj_material_t;
 
+typedef enum
+{
+    GUI_3D_FACE_RECTANGLE,
+    GUI_3D_FACE_TRIANGLE,
+    GUI_3D_FACE_RECTANGLE_TRIANGLE,
+} GUI_3D_FACE_TYPE;
 
 typedef struct
 {
+    GUI_3D_FACE_TYPE face_type;
     gui_obj_attrib_t attrib;
 
     unsigned int num_shapes;

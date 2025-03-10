@@ -79,20 +79,20 @@ typedef struct gui_3d_tria
  *
  * @param parent parent widget
  * @param name widget name
- * @param desc_addr description file data
+ * @param desc description file data
  * @param x the X-axis coordinate relative to parent widget
  * @param y the Y-axis coordinate relative to parent widget
  * @param w width
  * @param h height
  * @return the widget object pointer
  */
-gui_3d_tria_t *gui_3d_tria_create(void       *parent,
-                                  const char *name,
-                                  void       *desc_addr,
-                                  int16_t     x,
-                                  int16_t     y,
-                                  int16_t     w,
-                                  int16_t     h);
+gui_3d_tria_t *gui_3d_tria_create(void                  *parent,
+                                  const char            *name,
+                                  gui_3d_description_t  *desc,
+                                  int16_t                x,
+                                  int16_t                y,
+                                  int16_t                w,
+                                  int16_t                h);
 
 /**
  * @brief set global shape transform callback
@@ -123,32 +123,12 @@ void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face,
  * @param callback every frame callback
  * @param p callback's parameter
  */
-void gui_3d_tria_set_animate(gui_3d_tria_t     *this,
-                             uint32_t      dur,
-                             int           repeat_count,
-                             void         *callback,
-                             void         *p);
+void gui_3d_tria_set_animate(gui_3d_tria_t *this,
+                             uint32_t       dur,
+                             int            repeat_count,
+                             void          *callback,
+                             void          *p);
 
-/**
- * @brief Constructor for a 3D widget, initializing its attributes.
- *
- * @param this Pointer to the 3D widget.
- * @param parent Pointer to the parent GUI object.
- * @param name Name of the widget.
- * @param desc_addr Pointer to description data.
- * @param x X-axis coordinate.
- * @param y Y-axis coordinate.
- * @param w Width of the widget.
- * @param h Height of the widget.
- */
-void gui_3d_tria_ctor(gui_3d_tria_t               *this,
-                      gui_obj_t              *parent,
-                      const char             *name,
-                      void                   *desc_addr,
-                      int16_t                 x,
-                      int16_t                 y,
-                      int16_t                 w,
-                      int16_t                 h);
 
 
 #ifdef __cplusplus

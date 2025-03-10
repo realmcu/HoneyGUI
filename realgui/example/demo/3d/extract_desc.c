@@ -184,7 +184,36 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
         perror("Failed to open file for writing");
         return;
     }
+    // Save face type
+    bool allRectangle = true;
+    bool allTriangle = true;
+    int defalutValue = 0;
+    for (int i = 0; i < desc->attrib.num_face_num_verts; i++)
+    {
+        if (desc->attrib.face_num_verts[i] != 4)
+        {
+            allRectangle = false;
+        }
+        if (desc->attrib.face_num_verts[i] != 3)
+        {
+            allTriangle = false;
+        }
+    }
+    if (allRectangle)
+    {
+        defalutValue = 0;
+    }
+    else if (allTriangle)
+    {
+        defalutValue = 1;
+    }
+    else
+    {
+        defalutValue = 2;
+    }
+    fwrite(&defalutValue, sizeof(int), 1, file);
 
+    // Save attribute
     fwrite(&desc->attrib.num_vertices, sizeof(unsigned int), 1, file);
     fwrite(&desc->attrib.num_normals, sizeof(unsigned int), 1, file);
     fwrite(&desc->attrib.num_texcoords, sizeof(unsigned int), 1, file);

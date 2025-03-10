@@ -11,7 +11,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "gui_3d_rect.h"
+#include "gui_3d.h"
 #include "math.h"
 
 #include "gui_prism_mirror3d.h"
@@ -34,8 +34,9 @@ static void app_ui_design(gui_app_t *app)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
+    gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
     gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(&(app->screen), "prism_3d",
-                                                                 (void *)_acdesc, 0, 0,
+                                                                 desc, 0, 0,
                                                                  dc->screen_width,
                                                                  dc->screen_height, NULL);
     float raw_world_position[3] = {0, 10, 100};

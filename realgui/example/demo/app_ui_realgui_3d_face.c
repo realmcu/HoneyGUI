@@ -11,8 +11,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 
-#include "def_3d_tria.h"
-#include "gui_3d_tria.h"
+#include "gui_3d.h"
 #include "tp_algo.h"
 #include "face3d/desc_1454.txt"
 #include "face3d/desc_5822.txt"
@@ -30,7 +29,7 @@ void update_face_animation()
 }
 
 
-static void face_cb(gui_3d_tria_t *this, gui_3d_world_t *world,
+static void face_cb(void *this, gui_3d_world_t *world,
                     gui_3d_camera_t *camera)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -51,18 +50,17 @@ static void face_cb(gui_3d_tria_t *this, gui_3d_world_t *world,
 }
 
 
+
 static void app_ui_design(gui_app_t *app)
 {
-    gui_3d_tria_t *test_3d = gui_3d_tria_create(&(app->screen), "3d-widget", (void *)_acdesc_1454, 0, 0,
-                                                480,
-                                                480);
+    gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc_1454);
+
+    void *test_3d = gui_3d_create(&(app->screen), "3d-widget", desc, 0, 0, 480, 480);
+    gui_3d_set_global_shape_transform_cb(test_3d, (gui_3d_shape_transform_cb)face_cb);
+    gui_3d_set_animate(test_3d, 10000, -1, update_face_animation, NULL);
 
     extern void gui_fps_create(void *parent);
     gui_fps_create(&(app->screen));
-
-    gui_3d_tria_set_global_shape_transform_cb(test_3d, face_cb);
-
-    gui_3d_tria_set_animate(test_3d, 10000, -1, update_face_animation, NULL);
 
     return;
 

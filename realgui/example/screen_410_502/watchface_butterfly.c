@@ -12,7 +12,7 @@
 #include "gui_components_init.h"
 #include "gui_canvas.h"
 
-#include "gui_3d_rect.h"
+#include "gui_3d.h"
 #include "math.h"
 
 #include <time.h>
@@ -156,7 +156,7 @@ static void update_animation()
     butterfly_rz = theta * (180.0f / M_PI);
 }
 
-static void cb(gui_3d_rect_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
+static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
                gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -216,12 +216,12 @@ void create_watchface_bf(gui_view_t *view)
     gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)win_cb, win);
 
-    gui_3d_rect_t *test_3d = gui_3d_rect_create(obj, "3d-widget", (void *)DESC_BUTTERFLY_BIN, 0, 0, 410,
-                                                502);
+    gui_3d_description_t *desc = gui_get_3d_desc((void *)DESC_BUTTERFLY_BIN);
+    void *test_3d = gui_3d_create(obj, "3d-widget", desc, 0, 0, 410, 502);
 
-    gui_3d_rect_set_local_shape_transform_cb(test_3d, 0, cb);
+    gui_3d_set_local_shape_transform_cb(test_3d, 0, cb);
 
-    gui_3d_rect_set_animate(test_3d, 10000, -1, update_animation, NULL);
+    gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
 
     gui_img_t *img = gui_img_create_from_mem(win, "mask", W1ELLIPSE5_BIN, 204, 246, 0, 0);
     h_hand = gui_img_create_from_mem(win, "h_hand", W1UNION2_BIN, 199, 170, 0, 0);

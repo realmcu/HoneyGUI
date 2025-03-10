@@ -269,11 +269,10 @@ static void gui_3d_tria_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 
 
-
-void gui_3d_tria_ctor(gui_3d_tria_t               *this,
+void gui_3d_tria_ctor(gui_3d_tria_t          *this,
                       gui_obj_t              *parent,
                       const char             *name,
-                      void                   *desc_addr,
+                      gui_3d_description_t   *desc,
                       int16_t                 x,
                       int16_t                 y,
                       int16_t                 w,
@@ -290,7 +289,7 @@ void gui_3d_tria_ctor(gui_3d_tria_t               *this,
     obj->has_destroy_cb = true;
 
     // for self
-    this->desc = gui_get_3d_desc(desc_addr);
+    this->desc = desc;
 }
 
 /*============================================================================*
@@ -308,23 +307,23 @@ void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face/*
     this->local_shape_transform_cb = cb;
 }
 
-void gui_3d_tria_set_animate(gui_3d_tria_t     *this,
-                             uint32_t      dur,
-                             int           repeat_count,
-                             void         *callback,
-                             void         *p)
+void gui_3d_tria_set_animate(gui_3d_tria_t *this,
+                             uint32_t       dur,
+                             int            repeat_count,
+                             void          *callback,
+                             void          *p)
 {
     GUI_SET_ANIMATE_HELPER
 }
 
 
-gui_3d_tria_t *gui_3d_tria_create(void       *parent,
-                                  const char *name,
-                                  void       *desc_addr,
-                                  int16_t     x,
-                                  int16_t     y,
-                                  int16_t     w,
-                                  int16_t     h)
+gui_3d_tria_t *gui_3d_tria_create(void                  *parent,
+                                  const char            *name,
+                                  gui_3d_description_t  *desc,
+                                  int16_t                x,
+                                  int16_t                y,
+                                  int16_t                w,
+                                  int16_t                h)
 {
     GUI_ASSERT(parent != NULL);
 
@@ -337,7 +336,7 @@ gui_3d_tria_t *gui_3d_tria_create(void       *parent,
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_3d_tria_t));
 
-    gui_3d_tria_ctor(this, (gui_obj_t *)parent, name, desc_addr, x, y, w, h);
+    gui_3d_tria_ctor(this, (gui_obj_t *)parent, name, desc, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)

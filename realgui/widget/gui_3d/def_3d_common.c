@@ -579,6 +579,10 @@ gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
     unsigned char *ptr = (unsigned char *)desc_addr;
     gui_3d_description_t *desc = (gui_3d_description_t *)gui_malloc(sizeof(gui_3d_description_t));
 
+    // face type
+    desc->face_type = (GUI_3D_FACE_TYPE) * ((int *)ptr);
+    ptr += sizeof(int);
+
     // attrib
     desc->attrib.num_vertices = *((unsigned int *)ptr);
     ptr += sizeof(unsigned int);
