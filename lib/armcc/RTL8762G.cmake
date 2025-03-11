@@ -1,6 +1,5 @@
 # Apply the flags to C and C++ compiler settings armcc
 set(CONFIG_SOC_SERIES_RTL8762G y)
-set(HW_ACC_PATH "rtl8762g")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     --c99 \
     -c	\

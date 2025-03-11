@@ -65,7 +65,9 @@ install(TARGETS ${GUI_TARGET_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
-
+		
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/gui_version.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
@@ -89,7 +91,5 @@ install(FILES ${HEADER_FILES} DESTINATION include)
 if(CONFIG_REALTEK_BUILD_GUI_BOX2D)
 	install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")
 endif()
-if(NOT CONFIG_SOC_SERIES_RTL8763D)
-	file(GLOB SRC_FILES "../../realgui/engine/hw_acc/${HW_ACC_PATH}/*.c")
-endif()
+
 install(FILES ${SRC_FILES} DESTINATION src)

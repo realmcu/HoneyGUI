@@ -159,14 +159,13 @@ This example demonstrates porting to RTL8773GWP dashboard project.
 2. Project Configuration:
 
    - Add header file path in Keil MDK
-   - Configure library file path
    - Link gui.lib in project settings
 
-.. figure:: https://foruda.gitee.com/images/1741658280986603709/e02496b7_13406851.jpeg
+.. figure:: https://foruda.gitee.com/images/1741674292411402494/07c72a64_13406851.jpeg
    :align: center
    :width: 800px
 
-   Copy header and library files to project directory
+   Copy header files to project directory
 
 .. figure:: https://foruda.gitee.com/images/1741657914099825115/216c4d69_13406851.jpeg
    :align: center

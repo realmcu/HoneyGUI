@@ -160,14 +160,13 @@ Armclang 编译
 2. 工程配置：
 
    - 在 Keil MDK 中添加头文件路径
-   - 配置库文件路径
    - 在工程设置中链接 gui.lib 库
 
-.. figure:: https://foruda.gitee.com/images/1741658280986603709/e02496b7_13406851.jpeg
+.. figure:: https://foruda.gitee.com/images/1741674292411402494/07c72a64_13406851.jpeg
    :align: center
    :width: 800px
 
-   复制头文件和库文件到工程目录
+   链接头文件路径到工程目录
 
 .. figure:: https://foruda.gitee.com/images/1741657914099825115/216c4d69_13406851.jpeg
    :align: center
