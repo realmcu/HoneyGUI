@@ -1,7 +1,7 @@
 #include "lvgl.h"
 #include "app_main.h"
-#include "guidef.h"
 #include <time.h>
+#include <stdio.h>
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -29,7 +29,7 @@ static lv_obj_t *page;
 static lv_obj_t *tv_array[TV_ARRAY_NUM] = {0};
 static lv_obj_t *screen_array[TV_ARRAY_NUM] = {0};
 
-static bool close_flag = 0;
+static bool close_flag = 1;
 
 // static bool is_at_bottom = false;
 // static void page_scroll_event_cb(lv_event_t *e)
@@ -406,7 +406,7 @@ static void pagelist_clear(lv_obj_t *parent)
     lv_obj_add_event_cb(rect, clear_all_cb, LV_EVENT_CLICKED, NULL);
 }
 
-void pagelist_create(gui_msg_t *msg)
+void pagelist_create(information_t *payload)
 {
     if (close_flag)
     {
@@ -444,7 +444,6 @@ void pagelist_create(gui_msg_t *msg)
             index--;
         }
     }
-    information_t *payload = (information_t *)msg->payload;
     const char *informer = payload->informer;
     const char *content = payload->content;
     const char *time = payload->time;
@@ -577,30 +576,31 @@ void lv_up_curtain_init(void)
     }
 
     pagelist_clear(page);
+    close_flag = 0;
 
-    time_t rawtime;
-    time(&rawtime);
-    struct tm *timeinfo = localtime(&rawtime);
-    char time[10];
-    if (timeinfo)
-    {
-        sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-    }
-    char *content =
-        "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.";
+    // time_t rawtime;
+    // time(&rawtime);
+    // struct tm *timeinfo = localtime(&rawtime);
+    // char time[10];
+    // if (timeinfo)
+    // {
+    //     sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    // }
+    // char *content =
+    //     "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.";
 
-    information_t payload =
-    {
-        "watchOS 10.3.1",
-        content,
-        time,
-        MESSAGE
-    };
-    gui_msg_t msg =
-    {
-        .event = 0,
-        .payload = &payload,
-        .cb = (gui_msg_cb)pagelist_create,
-    };
-    pagelist_create(&msg);
+    // information_t payload =
+    // {
+    //     "watchOS 10.3.1",
+    //     content,
+    //     time,
+    //     MESSAGE
+    // };
+    // gui_msg_t msg =
+    // {
+    //     .event = 0,
+    //     .payload = &payload,
+    //     .cb = (gui_msg_cb)pagelist_create,
+    // };
+    // pagelist_create(&msg);
 }

@@ -7,9 +7,10 @@
 #include <string.h>
 #include <math.h>
 
+#if LVGL_USE_CJSON
 extern char *cjson_content;
 static cJSON *root;
-
+#endif
 static lv_obj_t *date_label;
 static lv_obj_t *time_img_container;
 static lv_obj_t *activity_arc;
@@ -18,7 +19,7 @@ static lv_obj_t *temperature_container;
 static lv_obj_t *compass_dial;
 static lv_obj_t *weather_current, *weather_range;
 
-static lv_timer_t *timer;
+static lv_timer_t *timer = NULL;
 
 lv_image_dsc_t const *text_num_array[] =
 {
@@ -67,7 +68,7 @@ void time_update_cb(void)
     sprintf(date_text_content, "%s %d", day[timeinfo->tm_wday], timeinfo->tm_mday);
     lv_label_set_text(date_label, date_text_content);
 }
-
+#if LVGL_USE_CJSON
 static void weather_icon_set(char *condition, lv_obj_t *obj)
 {
     if (strcmp(condition, "Sunny") == 0)
@@ -248,7 +249,6 @@ static void compass_update_cb()
             // moving triangle
             float a0 = M_PI * degree_val / 360 * 2; // 0 ~ 2pi CW
             float ax, ay;
-            uint8_t offset = 5;
             ax = x + cosf(a0 + M_PI * 3 / 2) * r - 5;
             ay = y + sinf(a0 + M_PI * 3 / 2) * r - 5;
 
@@ -275,7 +275,36 @@ static void compass_update_cb()
         }
     }
 }
-
+#endif
+static void timer_cb(lv_timer_t *timer)
+{
+    if (!scr_watchface)
+    {
+        return;
+    }
+    time_update_cb();
+#if LVGL_USE_CJSON
+    if (!cjson_content)
+    {
+        return;
+    }
+    else
+    {
+        root = cJSON_Parse(cjson_content);
+        if (!root)
+        {
+            LV_LOG("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    arc_activity_cb();
+    weather_update_cb();
+    temperature_update_cb();
+    compass_update_cb();
+    // clear
+    cJSON_Delete(root);
+#endif
+}
 static void scr_watchface_cb(lv_event_t *event)
 {
     lv_event_code_t event_code = lv_event_get_code(event);
@@ -336,35 +365,6 @@ static void heartrate_cb(lv_event_t *event)
     return;
 }
 
-static void timer_cb(lv_timer_t *timer)
-{
-    if (!scr_watchface)
-    {
-        return;
-    }
-    time_update_cb();
-
-    if (!cjson_content)
-    {
-        return;
-    }
-    else
-    {
-        root = cJSON_Parse(cjson_content);
-        if (!root)
-        {
-            LV_LOG("Error parsing JSON!\r\n");
-            return;
-        }
-    }
-    arc_activity_cb();
-    weather_update_cb();
-    temperature_update_cb();
-    compass_update_cb();
-    // clear
-    cJSON_Delete(root);
-}
-
 void lv_watchface_init(void)
 {
     // scr_watchface = lv_obj_create(NULL);
@@ -414,6 +414,8 @@ void lv_watchface_init(void)
 
     // activity icon
     {
+        uint16_t start_angel = 270;
+
         lv_obj_t *arc_1 = lv_arc_create(scr_watchface);
         activity_arc = arc_1;
         uint8_t radius = 50;
@@ -427,6 +429,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_1, lv_color_make(58, 23, 29), LV_PART_MAIN);
         lv_obj_remove_style(arc_1, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_1, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+        lv_arc_set_end_angle(arc_1, start_angel + (uint16_t)(360 * 10000 / 20000)); // cap 20000 steps
 
         lv_obj_t *arc_2 = lv_arc_create(scr_watchface);
         radius = 38;
@@ -440,6 +443,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_2, lv_color_make(30, 55, 25), LV_PART_MAIN);
         lv_obj_remove_style(arc_2, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_2, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+        lv_arc_set_end_angle(arc_2, start_angel + (uint16_t)(360 * 30 / 60)); // cap 60 min
 
         lv_obj_t *arc_3 = lv_arc_create(scr_watchface);
         radius = 26;
@@ -453,6 +457,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_3, lv_color_make(22, 50, 47), LV_PART_MAIN);
         lv_obj_remove_style(arc_3, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_3, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+        lv_arc_set_end_angle(arc_3, start_angel + (uint16_t)(360 * 15 / 30)); // cap 30 times
     }
 
     // weather condition
@@ -605,12 +610,22 @@ void lv_watchface_init(void)
         lv_obj_set_style_border_width(compass_dial, 0, 0);
         lv_obj_set_style_bg_opa(compass_dial, LV_OPA_TRANSP, 0);
 
+        uint16_t degree_val = 90;
+        float x = 100 / 2;
+        float y = 100 / 2;
+        float r = 36; // radius
+        // move triangle
+        float a0 = M_PI * degree_val / 360 * 2; // 0 ~ 2pi CW
+        float ax, ay;
+        ax = x + cosf(a0 + M_PI * 3 / 2) * r - 5;
+        ay = y + sinf(a0 + M_PI * 3 / 2) * r - 5;
         lv_obj_t *compass_pointer = lv_image_create(compass_dial);
         lv_image_set_src(compass_pointer, &ui_clock_compass_pointer_icon);
-        lv_obj_set_pos(compass_pointer, 42, 10);
+        lv_obj_set_pos(compass_pointer, (int32_t)ax, (int32_t)ay);
+        lv_image_set_rotation(compass_pointer, degree_val * 10);
 
         lv_obj_t *compass_degree = lv_label_create(compass_dial);
-        lv_label_set_text(compass_degree, "0°");
+        lv_label_set_text(compass_degree, "90°");
         lv_obj_align(compass_degree, LV_ALIGN_TOP_MID, 0, 23);
         lv_obj_set_style_text_color(compass_dial, lv_color_make(254, 106, 26),
                                     LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -618,7 +633,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_text_font(compass_dial, &SourceHanSansSC_size24_bits1_font,
                                    LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_t *compass_orien = lv_label_create(compass_dial);
-        lv_label_set_text(compass_orien, "N");
+        lv_label_set_text(compass_orien, "E");
         lv_obj_align(compass_orien, LV_ALIGN_TOP_MID, 0, 50);
         lv_obj_set_style_text_color(compass_orien, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(compass_orien, 255, LV_PART_MAIN | LV_STATE_DEFAULT);

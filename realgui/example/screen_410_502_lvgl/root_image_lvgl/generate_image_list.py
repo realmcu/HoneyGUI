@@ -57,7 +57,10 @@ def parse_bin_file(file_path):
 def generate_c_file(bin_file_data, output_c_file, output_h_file):
     # Generate the .c file
     with open(output_c_file, 'w') as f_c:
-        f_c.write('#include "lvgl.h"\n\n')
+        f_c.write('#include "lvgl.h"\n')
+        f_c.write('#include "lv_image_dsc.h"\n')
+        f_c.write('#include "lv_color.h"\n')
+        f_c.write('#include "root_image_lvgl/ui_resource.h"\n\n')
         for data in bin_file_data:
             # Write the structure
             f_c.write(f"const lv_image_dsc_t {data['struct_name']} = {{\n")

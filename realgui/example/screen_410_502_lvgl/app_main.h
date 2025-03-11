@@ -12,6 +12,8 @@ extern "C" {
 
 #define M_PI    ((float)3.14159265358979323846)
 
+#define LVGL_USE_CJSON 0
+
 #define WATCH_DEMO_USE_TILESLIDE    0
 
 #if WATCH_DEMO_USE_TILESLIDE
@@ -44,6 +46,7 @@ extern lv_obj_t *scr_up_curtain;
 extern lv_obj_t *scr_down_curtain;
 extern lv_obj_t *scr_left_curtain;
 extern lv_obj_t *scr_right_curtain;
+extern lv_obj_t *scr_app_menu;
 
 
 
@@ -52,6 +55,7 @@ void lv_up_curtain_init(void);
 void lv_down_curtain_init(void);
 void lv_left_curtain_init(void);
 void lv_right_curtain_init(void);
+void lv_app_menu_init(void);
 
 
 // FONTS
