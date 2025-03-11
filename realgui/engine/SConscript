@@ -30,10 +30,6 @@ src += ['acc_sw_rle_filter.c']
 if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
     src += ['acc_vg_lite.c']
 
-if GetDepend(['CONFIG_REALTEK_BUILD_PPE']):
-    Import('RTK_IC_TYPE')
-    src += ['./hw_acc/' + RTK_IC_TYPE + '/acc_rtk_ppe.c']
-
 if GetDepend(['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE']):
     src += ['font_freetype.c']
 

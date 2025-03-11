@@ -14,7 +14,6 @@
 #include "lv_draw_rtk_ppe_utils.h"
 #include "rtl_ppe.h"
 #include "rtl_gdma.h"
-#include "hal_idu.h"
 #include "rtl_idu.h"
 /*********************
  *      DEFINES
@@ -189,11 +188,11 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     case LV_IMG_CF_RAW:
         {
             IDU_file_header *header = (IDU_file_header *)(map_p + 8);
-            if (header->algorithm_type.pixel_bytes == IDU_PIXEL_16BIT)
+            if (header->algorithm_type.pixel_bytes == 0)
             {
                 source.format = PPE_RGB565;
             }
-            else if (header->algorithm_type.pixel_bytes == IDU_PIXEL_24BIT)
+            else if (header->algorithm_type.pixel_bytes == 1)
             {
                 if (source.format == 1) //ARGB8565
                 {
@@ -208,6 +207,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             else
             {
                 source.format = PPE_ARGB8888;
+                mode = PPE_SRC_OVER_MODE;
             }
             compressed = true;
         }
@@ -268,18 +268,22 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 ppe_rect_t scale_rect = {.x1 = 0, .x2 = source.width - 1, \
                                          .y1 = 0, .y2 = source.height - 1
                                         };
-                hal_idu_decompress_info info;
+                IDU_decode_range info;
                 info.start_column = scale_rect.left;
                 info.end_column = scale_rect.right;
                 info.start_line = scale_rect.top;
                 info.end_line = scale_rect.bottom;
-                info.raw_data_address = (uint32_t)(map_p + 8);
                 source.width = info.end_column - info.start_column + 1;
                 source.height = info.end_line - info.start_line + 1;
                 source.stride = source.width;
                 source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
                 source.address = (uint32_t)source.memory;
-                bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
+                info.target_stride = source.width * ppe_get_format_data_len(source.format);
+                IDU_DMA_config dma_cfg;
+                dma_cfg.output_buf = source.memory;
+                dma_cfg.RX_DMA_channel_num = lv_ppe_get_high_speed_dma();
+                dma_cfg.TX_DMA_channel_num = lv_ppe_get_low_speed_dma();
+                IDU_ERROR ret = IDU_Decode((uint8_t *)(map_p + 8), &info, &dma_cfg);
                 scale_rect.top = 0;
                 scale_rect.left = 0;
                 scale_rect.right = source.width - 1;
@@ -346,18 +350,22 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 }
                 if (compressed)
                 {
-                    hal_idu_decompress_info info;
+                    IDU_decode_range info;
                     info.start_column = scale_rect.left;
                     info.end_column = scale_rect.right;
                     info.start_line = scale_rect.top;
                     info.end_line = scale_rect.bottom;
-                    info.raw_data_address = (uint32_t)(map_p + 8);
                     source.width = info.end_column - info.start_column + 1;
                     source.height = info.end_line - info.start_line + 1;
                     source.stride = source.width;
                     source.memory = lv_mem_alloc(source.width * source.height * pixel_byte);
                     source.address = (uint32_t)source.memory;
-                    bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
+                    info.target_stride = source.width * ppe_get_format_data_len(source.format);
+                    IDU_DMA_config dma_cfg;
+                    dma_cfg.output_buf = source.memory;
+                    dma_cfg.RX_DMA_channel_num = lv_ppe_get_high_speed_dma();
+                    dma_cfg.TX_DMA_channel_num = lv_ppe_get_low_speed_dma();
+                    IDU_ERROR ret = IDU_Decode((uint8_t *)(map_p + 8), &info, &dma_cfg);
                     scale_rect.top = 0;
                     scale_rect.left = 0;
                     scale_rect.right = source.width - 1;
@@ -413,17 +421,21 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         }
         if (compressed)
         {
-            hal_idu_decompress_info info;
+            IDU_decode_range info;
             info.start_column = constraint_area.x1 - base->x;
             info.end_column = constraint_area.x2 - base->x;
             info.start_line = constraint_area.y1 - base->y;
             info.end_line = constraint_area.y2 - base->y;
-            info.raw_data_address = (uint32_t)(map_p + 8);
             source.width = info.end_column - info.start_column + 1;
             source.height = info.end_line - info.start_line + 1;
             source.stride = source.width;
             source.memory = (uint32_t *)lv_mem_alloc(source.width * source.height * pixel_byte);
-            bool ret = hal_idu_decompress(&info, (uint8_t *)source.memory);
+            info.target_stride = source.width * ppe_get_format_data_len(source.format);
+            IDU_DMA_config dma_cfg;
+            dma_cfg.output_buf = source.memory;
+            dma_cfg.RX_DMA_channel_num = lv_ppe_get_high_speed_dma();
+            dma_cfg.TX_DMA_channel_num = lv_ppe_get_low_speed_dma();
+            IDU_ERROR ret = IDU_Decode((uint8_t *)(map_p + 8), &info, &dma_cfg);
             trans.x = blend_rect.x1;
             trans.y = blend_rect.y1;
         }
@@ -513,7 +525,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     if (image_size <= buffer_size)
     {
         ppe_rect_t rect = {.left = 0, .right = source.width - 1, .top = 0, .bottom = source.height - 1};
-        PPE_ERR err = lv_ppe_recolor(&source, &recolor, &rect, recolor_value.full);
+        PPE_ERR err = PPE_Mask(&source, &recolor, &rect, recolor_value.full);
         if (err != PPE_SUCCESS)
         {
             return LV_RES_INV;
@@ -541,7 +553,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
                 rect.bottom = source.height - 1;
             }
             recolor.height = (rect.bottom - rect.top + 1);
-            PPE_ERR err = lv_ppe_recolor(&source, &recolor, &rect, recolor_value.full);
+            PPE_ERR err = PPE_Mask(&source, &recolor, &rect, recolor_value.full);
 
             if (err != PPE_SUCCESS)
             {
