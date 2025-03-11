@@ -96,12 +96,25 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         tabview->cur_id.y = tabview->jump.jump_id.y;
         tabview->cur_id.x = tabview->jump.jump_id.x;
         tabview->jump.jump_flag = false;
+        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
+
+        if (last != this->checksum)
+        {
+            gui_fb_change();
+        }
 
         return;
     }
 
     if (tabview->tp_disable)
     {
+        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
+
+        if (last != this->checksum)
+        {
+            gui_fb_change();
+        }
+
         return;
     }
 
