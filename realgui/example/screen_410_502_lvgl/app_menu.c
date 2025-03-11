@@ -1,6 +1,6 @@
+#include <math.h>
 #include "lvgl.h"
 #include "app_main.h"
-#include <math.h>
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -62,7 +62,7 @@ static void update_button_pos(lv_obj_t *page, lv_coord_t scroll_y)
 
         // Set the new position of the button
         uint8_t offX_range = 20;
-        lv_coord_t new_x = (uint8_t)(offX_range * abs(center_offset) / (SCREEN_HEIGHT / 2));
+        lv_coord_t new_x = (uint8_t)(offX_range * LV_ABS(center_offset) / (SCREEN_HEIGHT / 2));
         lv_obj_set_x(btn, new_x);
     }
 }

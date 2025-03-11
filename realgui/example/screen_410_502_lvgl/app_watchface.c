@@ -2,7 +2,6 @@
 #include "app_main.h"
 #include "lv_img_dsc_list.h"
 #include <time.h>
-#include "cJSON.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -10,6 +9,7 @@
 #if LVGL_USE_CJSON
 extern char *cjson_content;
 static cJSON *root;
+#include "cJSON.h"
 #endif
 static lv_obj_t *date_label;
 static lv_obj_t *time_img_container;
@@ -654,7 +654,9 @@ void lv_watchface_init(void)
         lv_obj_add_event_cb(heartrate, (lv_event_cb_t)heartrate_cb, LV_EVENT_CLICKED, NULL);
     }
     // lv_obj_add_event_cb(scr_watchface, (lv_event_cb_t)scr_watchface_cb, LV_EVENT_ALL, NULL);
+#if defined __WIN32
     timer = lv_timer_create(timer_cb, 2000, scr_watchface);
     lv_timer_set_repeat_count(timer, -1);
+#endif
 }
 

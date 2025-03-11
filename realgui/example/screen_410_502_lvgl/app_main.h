@@ -37,8 +37,8 @@ extern "C" {
 #define WATCH_DEMO_USE_SNAPSHOT     0
 #endif
 
-uint32_t event_snapshot_creat;
-uint32_t event_snapshot_delete;
+extern uint32_t event_snapshot_creat;
+extern uint32_t event_snapshot_delete;
 
 extern lv_obj_t *tileview;
 extern lv_obj_t *scr_watchface;
@@ -63,6 +63,8 @@ LV_FONT_DECLARE(SourceHanSansSC_size12_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size24_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size32_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size48_bits1_font);
+
+void watch_demo_init(void);
 
 
 #ifdef __cplusplus

@@ -1,45 +1,16 @@
-#include "guidef.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "lvgl.h"
-#include <sys/types.h>
-#include <pthread.h>
+#include <time.h>
+
 #include "lv_port_disp.h"
 #include "lv_port_indev.h"
 #include "lv_port_fs.h"
 
-#include <stdio.h>
-#include <time.h>
 #include "app_main.h"
 #include "lv_custom_tile_slide.h"
 #include "lv_custom_tile_snapshot.h"
-
-#include "kb_algo.h"
-#ifdef __WIN32
-#include <gui_app.h>
-#include "gui_server.h"
-#include "gui_components_init.h"
-#endif
-
-static void lvgl_loop(void *tihs)
-{
-    while ((1))
-    {
-        pthread_testcancel();
-        lv_timer_handler();                 //! run lv task at the max speed
-    }
-}
-
-static void port_log(lv_log_level_t level, const char *buf)
-{
-    gui_log("[LVGL]%s", buf);
-}
-
-static void lv_tick(void)
-{
-    lv_tick_inc(10);
-}
 
 lv_obj_t *tileview;
 bool tileview_scrolling = false;
@@ -55,6 +26,9 @@ lv_obj_t *scr_down_curtain;
 lv_obj_t *scr_left_curtain;
 lv_obj_t *scr_right_curtain;
 lv_obj_t *scr_app_menu;
+
+uint32_t event_snapshot_creat;
+uint32_t event_snapshot_delete;
 
 #if LVGL_USE_CJSON
 char *cjson_content = NULL;
@@ -194,7 +168,7 @@ static void inform_generate_task_entry()
 {
     if (!content)
     {
-        content = gui_malloc(200);
+        content = lv_malloc(200);
         sprintf(content,
                 "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.");
     }
@@ -218,52 +192,19 @@ static void inform_generate_task_entry()
     pagelist_create(&payload);
 }
 
-static void enter_menu_cb(lv_event_t *event)
-{
-    kb_info_t *kb = kb_get_info();
-    if (kb->pressed)
-    {
-        _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0,
-                          lv_app_menu_init, 0);
-    }
-}
-#ifdef __WIN32
-uint8_t resource_root[1024 * 1024 * 20];
-#endif
-static void app_dialing_ui_design(gui_app_t *app)
-{
-#if defined _WIN32
-    extern int open(const char *file, int flags, ...);
-    extern int read(int fd, void *buf, size_t len);
-    extern int close(int fd);
-    defaultPath = "realgui\\example\\screen_410_502_lvgl\\root_image_lvgl\\root\\";
-    int fd;
-    fd = open("./realgui/example/screen_410_502_lvgl/root_image_lvgl/root(0x253E400).bin", 0);
-    if (fd > 0)
-    {
-        printf("open root(0x4400000).bin Successful!\n");
-        read(fd, resource_root, 1024 * 1024 * 20);
-    }
-    else
-    {
-        printf("open root(0x4400000).bin Fail!\n");
-        printf("open root(0x4400000).bin Fail!\n");
-        printf("open root(0x4400000).bin Fail!\n");
-    }
-#endif
+/*need fix by shel*/
+// static void enter_menu_cb(lv_event_t *event)
+// {
+//     kb_info_t *kb = kb_get_info();
+//     if (kb->pressed)
+//     {
+//         _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0,
+//                           lv_app_menu_init, 0);
+//     }
+// }
 
-    if (lv_is_initialized() == true)
-    {
-        return;
-    }
-    gui_set_tick_hook(lv_tick);
-    lv_init();
-    lv_log_register_print_cb((lv_log_print_g_cb_t)port_log);
-    lv_port_disp_init();
-    lv_port_indev_init();
-    // lv_port_fs_init();
-
-    LV_LOG("LVGL start \n");
+void watch_demo_init(void)
+{
 #if LVGL_USE_CJSON
     {
         lv_timer_t *timer = lv_timer_create(read_json_cb, 3000, NULL);
@@ -271,18 +212,19 @@ static void app_dialing_ui_design(gui_app_t *app)
         lv_timer_ready(timer);
     }
 #endif
+#if defined __WIN32
     {
         lv_timer_t *timer = lv_timer_create(inform_generate_task_entry, 3000, NULL);
         lv_timer_set_repeat_count(timer, -1);
         lv_timer_ready(timer);
     }
-
+#endif
     // lv_disp_load_scr(scr_watchface);
 
     tileview = lv_tileview_create(NULL);
     lv_obj_set_style_bg_color(tileview, lv_color_hex(0x000000), 0);
     lv_obj_set_scrollbar_mode(tileview, LV_SCROLLBAR_MODE_OFF); // hide scroll bar
-    lv_obj_add_event_cb(tileview, (lv_event_cb_t)enter_menu_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(tileview, (lv_event_cb_t)enter_menu_cb, LV_EVENT_ALL, NULL);
 
     tile_center = lv_tileview_add_tile(tileview, 1, 1, LV_DIR_ALL); // create center tile
     tile_up = lv_tileview_add_tile(tileview, 1, 0, LV_DIR_BOTTOM); // create up tile
@@ -359,28 +301,4 @@ static void app_dialing_ui_design(gui_app_t *app)
 #endif
     lv_scr_load(tileview);
 }
-
-static gui_app_t app_lvgl =
-{
-    .screen =
-    {
-        .name = "app_ui_lvgl",
-        .x    = 0,
-        .y    = 0,
-        .parent = NULL,
-    },
-    .ui_design = app_dialing_ui_design,
-    .thread_entry = lvgl_loop,
-    .active_ms = 1000000,
-    .lvgl = true,
-};
-
-static int app_init(void)
-{
-    gui_server_init();
-    gui_app_startup(&app_lvgl);
-    return 0;
-}
-
-GUI_INIT_APP_EXPORT(app_init);
 

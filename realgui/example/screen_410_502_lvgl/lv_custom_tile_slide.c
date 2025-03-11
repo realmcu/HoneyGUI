@@ -134,9 +134,12 @@ void tileview_custom_cb(lv_event_t *e)
     }
 }
 
+extern bool tileview_scrolling;
+
 void create_cross_tileview(void)
 {
-    lv_obj_t *tv = lv_tileview_create(lv_scr_act());
+    lv_obj_t *tv = lv_tileview_create(lv_screen_active());
+    lv_obj_set_style_bg_color(tv, lv_color_black(), 0);
     lv_obj_set_scrollbar_mode(tv, LV_SCROLLBAR_MODE_OFF);
 
     //center
@@ -148,11 +151,6 @@ void create_cross_tileview(void)
     lv_obj_t *label = lv_label_create(center_tile);
     lv_label_set_text(label, "Center");
     lv_obj_center(label);
-
-    LV_IMAGE_DECLARE(control_mute_on);
-    lv_obj_t *muteon = lv_image_create(center_tile);
-    lv_image_set_src(muteon, &control_mute_on);
-    lv_obj_align(muteon, LV_ALIGN_TOP_MID, 0, 0);
 
     //top
     lv_obj_t *top_tile = lv_tileview_add_tile(tv, 1, 0, LV_DIR_BOTTOM);
@@ -195,5 +193,5 @@ void create_cross_tileview(void)
     lv_obj_center(label);
 
     lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_OFF);
-    lv_obj_add_event_cb(tv, tileview_custom_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(tv, tileview_custom_cb, LV_EVENT_ALL, &tileview_scrolling);
 }
