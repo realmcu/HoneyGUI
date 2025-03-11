@@ -10,8 +10,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "def_3d.h"
-#include "gui_3d.h"
+#include "gui_3d_rect.h"
 #include "math.h"
 #include "root_image_hongkong/ui_resource.h"
 

@@ -23,6 +23,7 @@ typedef enum
     GUI_EVENT_USER_DEFINE             = 0x0100,
 } gui_msg_event_t;
 
+
 #ifdef __cplusplus
 }
 #endif

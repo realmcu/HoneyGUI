@@ -1,5 +1,4 @@
 #include "lvgl.h"
-#include "lv_img_dsc_list.h"
 #include "lv_image_dsc.h"
 #include "lv_color.h"
 #include "root_image_lvgl/ui_resource.h"
@@ -292,6 +291,176 @@ const lv_image_dsc_t nobother_on_icon =
     .data_size = 4096,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = NOBOTHER_ON_ICON_BIN + 8
+};
+
+const lv_image_dsc_t path02 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 2,
+    .header.h = 100,
+    .data_size = 800,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH02_BIN + 8
+};
+
+const lv_image_dsc_t path03 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 3,
+    .header.h = 100,
+    .data_size = 1200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH03_BIN + 8
+};
+
+const lv_image_dsc_t path04 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 4,
+    .header.h = 100,
+    .data_size = 1600,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH04_BIN + 8
+};
+
+const lv_image_dsc_t path05 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 5,
+    .header.h = 100,
+    .data_size = 2000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH05_BIN + 8
+};
+
+const lv_image_dsc_t path06 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 6,
+    .header.h = 100,
+    .data_size = 2400,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH06_BIN + 8
+};
+
+const lv_image_dsc_t path07 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 7,
+    .header.h = 100,
+    .data_size = 2800,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH07_BIN + 8
+};
+
+const lv_image_dsc_t path08 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 8,
+    .header.h = 100,
+    .data_size = 3200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH08_BIN + 8
+};
+
+const lv_image_dsc_t path09 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 9,
+    .header.h = 100,
+    .data_size = 3600,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH09_BIN + 8
+};
+
+const lv_image_dsc_t path10 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 10,
+    .header.h = 100,
+    .data_size = 4000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH10_BIN + 8
+};
+
+const lv_image_dsc_t path11 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 11,
+    .header.h = 100,
+    .data_size = 4400,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH11_BIN + 8
+};
+
+const lv_image_dsc_t path12 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 12,
+    .header.h = 100,
+    .data_size = 4800,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH12_BIN + 8
+};
+
+const lv_image_dsc_t path13 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 13,
+    .header.h = 100,
+    .data_size = 5200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH13_BIN + 8
+};
+
+const lv_image_dsc_t path14 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 14,
+    .header.h = 100,
+    .data_size = 5600,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH14_BIN + 8
+};
+
+const lv_image_dsc_t path15 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 15,
+    .header.h = 100,
+    .data_size = 6000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH15_BIN + 8
+};
+
+const lv_image_dsc_t path16 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 16,
+    .header.h = 100,
+    .data_size = 6400,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH16_BIN + 8
+};
+
+const lv_image_dsc_t path17 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 17,
+    .header.h = 100,
+    .data_size = 6800,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH17_BIN + 8
+};
+
+const lv_image_dsc_t path18 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 18,
+    .header.h = 100,
+    .data_size = 7200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = PATH18_BIN + 8
 };
 
 const lv_image_dsc_t phone_off_icon =

@@ -6,7 +6,7 @@ extern "C" {
 #endif
 #include "stdint.h"
 #include "stdbool.h"
-#include "def_matrix.h"
+#include "def_type.h"
 
 typedef enum
 {

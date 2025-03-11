@@ -31,7 +31,6 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D'):
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_FACE_3D'):
     src += ['app_ui_realgui_3d_face.c']
-    CPPDEFINES += ['GUI3D_TRIANGLE_MESH']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)   
     
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_VIEW'):

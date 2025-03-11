@@ -32,7 +32,7 @@ extern "C" {
 #include "gui_api.h"
 #include "gui_img.h"
 #include "gui_win.h"
-
+#include "gui_text.h"
 /*============================================================================*
  *                         Types
  *============================================================================*/
@@ -76,6 +76,7 @@ typedef struct gui_pagelist_new
     bool horizontal;
     bool append;
     BLEND_MODE_TYPE blending;
+    TEXT_MODE text_mode;
 } gui_pagelist_new_t;
 
 

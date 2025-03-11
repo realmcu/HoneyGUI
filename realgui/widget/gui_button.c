@@ -107,7 +107,7 @@ void gui_button_prepare(gui_obj_t *obj)
 
     if (this->flag == true)
     {
-        gui_obj_event_set(obj, GUI_EVENT_5);
+        gui_obj_enable_event(obj, GUI_EVENT_5);
     }
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
@@ -126,7 +126,7 @@ void gui_button_prepare(gui_obj_t *obj)
                 }
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
             break;
@@ -142,7 +142,7 @@ void gui_button_prepare(gui_obj_t *obj)
                     if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                     {
                         this->long_flag = true;
-                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
                     }
                 }
             }
@@ -166,7 +166,7 @@ void gui_button_prepare(gui_obj_t *obj)
                                       this->img->base.y);
             }
 
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
 
             this->long_flag = false;
             this->press_flag = true;
@@ -184,7 +184,7 @@ void gui_button_prepare(gui_obj_t *obj)
                                   this->img->base.y);
         }
 
-        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
 
         this->long_flag = false;
     }

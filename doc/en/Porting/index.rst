@@ -12,3 +12,4 @@ The display scheme extension currently supports font library porting.
 
     Platform Porting <Platform>
     Font Porting <Font>
+    HoneyGUI Porting <Library>

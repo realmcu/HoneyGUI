@@ -21,6 +21,7 @@
 #include "gui_win.h"
 #include "gui_components_init.h"
 #include "gui_version.h"
+#include "gui_server.h"
 
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "js_extern_io.h"

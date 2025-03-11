@@ -59,7 +59,7 @@ void lv_draw_ppe_ctx_init(lv_disp_drv_t *drv, lv_draw_ctx_t *draw_ctx)
 //    draw_ctx->draw_img_decoded = lv_draw_ppe_img_decoded;
     draw_sw_ctx->blend = lv_draw_ppe_blend;
     uint8_t channel1 = 1, channel2 = 3;
-    hal_dma_channel_init(&channel1, &channel2);
+    lv_ppe_register_dma_channel(channel1, channel2);
 }
 
 void lv_draw_ppe_ctx_deinit(lv_disp_drv_t *drv, lv_draw_ctx_t *draw_ctx)
@@ -87,7 +87,7 @@ static void lv_draw_ppe_rect(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_t *
     {
         ppe_dsc.bg_opa = 0;
     }
-    
+
     ppe_dsc.bg_img_opa = dsc->bg_img_opa;
     ppe_dsc.border_opa = dsc->border_opa;
     ppe_dsc.outline_opa = dsc->outline_opa;
@@ -313,7 +313,7 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
             return LV_RES_OK;
         }
         bool has_mask = lv_draw_mask_is_any(&clip_com);
-        if(has_mask)
+        if (has_mask)
         {
             return LV_RES_INV;
         }

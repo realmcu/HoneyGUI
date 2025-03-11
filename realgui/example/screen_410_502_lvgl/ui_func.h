@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "lvgl.h"
+#include "app_main.h"
 
 #define _UI_TEMPORARY_STRING_BUFFER_SIZE 32
 #define _UI_BAR_PROPERTY_VALUE 0
@@ -141,7 +142,7 @@ void _ui_switch_theme(int val)
 
 void clear_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag);
 void add_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag);
-
+void return_create(lv_obj_t *parent, void (*cb)(void));
 
 
 #ifdef __cplusplus

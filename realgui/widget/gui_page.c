@@ -384,17 +384,17 @@ static void gui_page_hold_y(gui_obj_t *obj)
     gui_page_t *this = (gui_page_t *)obj;
 
     obj->y = tp->deltaY + this->yold;
-    gui_obj_event_set(obj, GUI_EVENT_8);
+    gui_obj_enable_event(obj, GUI_EVENT_8);
 
     if (obj->y > this->start_y)/*@TOP*/
     {
         obj->y = this->start_y;
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
     }
     else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height()))
              && obj->y != 0)/*@BOTTOM*/
     {
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
         obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
     }
 
@@ -407,17 +407,17 @@ static void gui_page_hold_x(gui_obj_t *obj)
     gui_page_t *this = (gui_page_t *)obj;
 
     obj->x = tp->deltaX + this->yold;
-    gui_obj_event_set(obj, GUI_EVENT_8);
+    gui_obj_enable_event(obj, GUI_EVENT_8);
 
     if (obj->x > this->start_x)/*@TOP*/
     {
         obj->x = this->start_x;
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
     }
     else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width()))
              && obj->x != 0)/*@BOTTOM*/
     {
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
         obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
     }
 
@@ -435,13 +435,13 @@ static void gui_page_update_inertial(gui_obj_t *obj)
     if (this->speed > 3)
     {
         obj->y += this->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed -= 1;
     }
     else if (this->speed < -3)
     {
         obj->y += this->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed += 1;
     }
 }
@@ -458,13 +458,13 @@ static void gui_page_update_inertial_x(gui_obj_t *obj)
     if (this->speed > 3)
     {
         obj->x += this->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed -= 1;
     }
     else if (this->speed < -3)
     {
         obj->x += this->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed += 1;
     } gui_log("this->speed:%d\n", this->speed);
 }
@@ -475,7 +475,7 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     if (obj->y > this->start_y)/*@TOP*/
     {
         obj->y = this->start_y;
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
         this->release = false;
     }
     else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height()))
@@ -483,7 +483,7 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     {
         this->release = false;
         obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
     }
 }
 static void  gui_page_update_boundary_x(gui_obj_t *obj)
@@ -493,7 +493,7 @@ static void  gui_page_update_boundary_x(gui_obj_t *obj)
     if (obj->x > this->start_x)/*@TOP*/
     {
         obj->x = this->start_x;
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
         this->release = false;
     }
     else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width()))
@@ -501,7 +501,7 @@ static void  gui_page_update_boundary_x(gui_obj_t *obj)
     {
         this->release = false;
         obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
-        gui_obj_event_set(obj, GUI_EVENT_7);
+        gui_obj_enable_event(obj, GUI_EVENT_7);
     }
 }
 
@@ -519,21 +519,21 @@ static void gui_page_update_alien(gui_obj_t *obj)
                 this->speed = 0;
                 this->release = false;
                 obj->y = this->target;
-                gui_obj_event_set(obj, GUI_EVENT_7);
+                gui_obj_enable_event(obj, GUI_EVENT_7);
             }
 
             obj->y += this->speed;
 
             if (this->speed != 0)
             {
-                gui_obj_event_set(obj, GUI_EVENT_8);
+                gui_obj_enable_event(obj, GUI_EVENT_8);
             }
         }
         else
         {
             this->speed = 0;
             this->release = false;
-            gui_obj_event_set(obj, GUI_EVENT_7);
+            gui_obj_enable_event(obj, GUI_EVENT_7);
         }
     }
 }
@@ -551,21 +551,21 @@ static void gui_page_update_alien_x(gui_obj_t *obj)
                 this->speed = 0;
                 this->release = false;
                 obj->x = this->target;
-                gui_obj_event_set(obj, GUI_EVENT_7);
+                gui_obj_enable_event(obj, GUI_EVENT_7);
             }
 
             obj->x += this->speed;
 
             if (this->speed != 0)
             {
-                gui_obj_event_set(obj, GUI_EVENT_8);
+                gui_obj_enable_event(obj, GUI_EVENT_8);
             }
         }
         else
         {
             this->speed = 0;
             this->release = false;
-            gui_obj_event_set(obj, GUI_EVENT_7);
+            gui_obj_enable_event(obj, GUI_EVENT_7);
         }
     } gui_log("this->target:%d, obj->x :%d\n", this->target, obj->x);
 }
@@ -662,7 +662,7 @@ void gui_page_update(gui_obj_t *obj)
                     if (this->speed != 0)
                     {
                         this->release = true;
-                        gui_obj_event_set(obj, GUI_EVENT_8);
+                        gui_obj_enable_event(obj, GUI_EVENT_8);
                     }
                     else
 
@@ -681,7 +681,7 @@ void gui_page_update(gui_obj_t *obj)
                             }
                         }
 
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
 
                 }
                 else if (tp->pressed)
@@ -689,7 +689,7 @@ void gui_page_update(gui_obj_t *obj)
                     this->release = false;
                     this->speed = 0;
                     memset(this->recode, 0, 10);
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
 
 
@@ -771,7 +771,7 @@ void gui_page_update_x(gui_obj_t *obj)
                     if (this->speed != 0)
                     {
                         this->release = true;
-                        gui_obj_event_set(obj, GUI_EVENT_8);
+                        gui_obj_enable_event(obj, GUI_EVENT_8);
                     }
                     else
 
@@ -790,7 +790,7 @@ void gui_page_update_x(gui_obj_t *obj)
                             }
                         }
 
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
 
                 }
                 else if (tp->pressed)
@@ -798,7 +798,7 @@ void gui_page_update_x(gui_obj_t *obj)
                     this->release = false;
                     this->speed = 0;
                     memset(this->recode, 0, 10);
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
 
 
@@ -879,7 +879,7 @@ void gui_page_loop_update(gui_obj_t *obj)
                     if (this->speed != 0)
                     {
                         this->release = true;
-                        gui_obj_event_set(obj, GUI_EVENT_8);
+                        gui_obj_enable_event(obj, GUI_EVENT_8);
                     }
                     else
 
@@ -898,7 +898,7 @@ void gui_page_loop_update(gui_obj_t *obj)
                             }
                         }
 
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
 
                 }
                 else if (tp->pressed)
@@ -906,7 +906,7 @@ void gui_page_loop_update(gui_obj_t *obj)
                     this->release = false;
                     this->speed = 0;
                     memset(this->recode, 0, 10);
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
 
                 if (tp->type != TOUCH_HOLD_Y)
@@ -963,7 +963,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
             }
 
             obj->y = tp->deltaY + this->yold;
-            gui_obj_event_set(obj, GUI_EVENT_8);
+            gui_obj_enable_event(obj, GUI_EVENT_8);
 
             if (obj->y > this->start_y)
             {
@@ -1012,7 +1012,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
             if (this->speed != 0)
             {
                 this->release = true;
-                gui_obj_event_set(obj, GUI_EVENT_8);
+                gui_obj_enable_event(obj, GUI_EVENT_8);
             }
             else
             {
@@ -1030,7 +1030,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
                         this->speed = -GUI_PAGE_MIN_SPEED;
                     }
                 }
-                gui_obj_event_set(obj, GUI_EVENT_7);
+                gui_obj_enable_event(obj, GUI_EVENT_7);
             }
         }
         else if (tp->pressed)
@@ -1039,7 +1039,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
             this->speed = 0;
             this->status = 0;
             memset(this->recode, 0, 10);
-            gui_obj_event_set(obj, GUI_EVENT_7);
+            gui_obj_enable_event(obj, GUI_EVENT_7);
         }
     }
     if (tp->type != TOUCH_HOLD_Y)
@@ -1058,14 +1058,14 @@ void gui_page_update_rebound(gui_obj_t *obj)
                 {
                     obj->y = this->start_y;
                     this->release = false;
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
                 else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
                          obj->y != 0)/*@BOTTOM*/
                 {
                     this->release = false;
                     obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
             }
             break;
@@ -1082,14 +1082,14 @@ void gui_page_update_rebound(gui_obj_t *obj)
                 {
                     obj->x = this->start_x;
                     this->release = false;
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
                 else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
                          obj->y != 0)/*@BOTTOM*/
                 {
                     this->release = false;
                     obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
             }
             break;
@@ -1106,14 +1106,14 @@ void gui_page_update_rebound(gui_obj_t *obj)
                 {
                     obj->y = this->start_y;
                     this->release = false;
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
                 else if (obj->y > (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
                          obj->y != 0)/*@BOTTOM*/
                 {
                     this->release = false;
                     obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
 
                 }
             }
@@ -1162,7 +1162,7 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
             }
 
             obj->x = tp->deltaX + this->yold;
-            gui_obj_event_set(obj, GUI_EVENT_8);
+            gui_obj_enable_event(obj, GUI_EVENT_8);
 
             if (obj->x > this->start_x)
             {
@@ -1211,7 +1211,7 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
             if (this->speed != 0)
             {
                 this->release = true;
-                gui_obj_event_set(obj, GUI_EVENT_8);
+                gui_obj_enable_event(obj, GUI_EVENT_8);
             }
             else
             {
@@ -1229,7 +1229,7 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
                         this->speed = -GUI_PAGE_MIN_SPEED;
                     }
                 }
-                gui_obj_event_set(obj, GUI_EVENT_7);
+                gui_obj_enable_event(obj, GUI_EVENT_7);
             }
         }
         else if (tp->pressed)
@@ -1238,7 +1238,7 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
             this->speed = 0;
             this->status = 0;
             memset(this->recode, 0, 10);
-            gui_obj_event_set(obj, GUI_EVENT_7);
+            gui_obj_enable_event(obj, GUI_EVENT_7);
         }
     }
     if (tp->type != TOUCH_HOLD_X)
@@ -1257,14 +1257,14 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
                 {
                     obj->x = this->start_x;
                     this->release = false;
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
                 else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
                          obj->x != 0)/*@BOTTOM*/
                 {
                     this->release = false;
                     obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
             }
             break;
@@ -1281,14 +1281,14 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
                 {
                     obj->x = this->start_x;
                     this->release = false;
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
                 else if (obj->x < (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
                          obj->x != 0)/*@BOTTOM*/
                 {
                     this->release = false;
                     obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
             }
             break;
@@ -1305,14 +1305,14 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
                 {
                     obj->x = this->start_x;
                     this->release = false;
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
                 }
                 else if (obj->x > (this->start_x - (obj->w - (int)gui_get_screen_width())) &&
                          obj->x != 0)/*@BOTTOM*/
                 {
                     this->release = false;
                     obj->x = this->start_x - (obj->w - (int)gui_get_screen_width());
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    gui_obj_enable_event(obj, GUI_EVENT_7);
 
                 }
             }
@@ -1359,7 +1359,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
             }
 
             obj->y = tp->deltaY + this->yold;
-            gui_obj_event_set(obj, GUI_EVENT_8);
+            gui_obj_enable_event(obj, GUI_EVENT_8);
 
             if (obj->y > this->start_y)
             {
@@ -1408,7 +1408,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
             if (this->speed != 0)
             {
                 this->release = true;
-                gui_obj_event_set(obj, GUI_EVENT_8);
+                gui_obj_enable_event(obj, GUI_EVENT_8);
             }
             else
             {
@@ -1426,7 +1426,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                         this->speed = -GUI_PAGE_MIN_SPEED;
                     }
                 }
-                gui_obj_event_set(obj, GUI_EVENT_7);
+                gui_obj_enable_event(obj, GUI_EVENT_7);
             }
         }
         else if (tp->pressed)
@@ -1435,7 +1435,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
             this->speed = 0;
             this->status = 0;
             memset(this->recode, 0, 10);
-            gui_obj_event_set(obj, GUI_EVENT_7);
+            gui_obj_enable_event(obj, GUI_EVENT_7);
         }
 
         if (tp->type != TOUCH_HOLD_Y)
@@ -1459,7 +1459,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                     {
                         obj->y = this->start_y;
                         this->release = false;
-                        gui_obj_event_set(obj, GUI_EVENT_7);
+                        gui_obj_enable_event(obj, GUI_EVENT_7);
                         *take_over = 0;
                     }
                     else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
@@ -1467,7 +1467,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                     {
                         this->release = false;
                         obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-                        gui_obj_event_set(obj, GUI_EVENT_7);
+                        gui_obj_enable_event(obj, GUI_EVENT_7);
                         *take_over = 0;
                     }
                 }
@@ -1489,7 +1489,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                     {
                         obj->y = this->start_y;
                         this->release = false;
-                        gui_obj_event_set(obj, GUI_EVENT_7);
+                        gui_obj_enable_event(obj, GUI_EVENT_7);
                         *take_over = 0;
                     }
                     else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
@@ -1497,7 +1497,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                     {
                         this->release = false;
                         obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-                        gui_obj_event_set(obj, GUI_EVENT_7);
+                        gui_obj_enable_event(obj, GUI_EVENT_7);
                         *take_over = 0;
                     }
                 }
@@ -1519,7 +1519,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                     {
                         obj->y = this->start_y;
                         this->release = false;
-                        gui_obj_event_set(obj, GUI_EVENT_7);
+                        gui_obj_enable_event(obj, GUI_EVENT_7);
                         *take_over = 0;
                     }
                     else if (obj->y > (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
@@ -1527,7 +1527,7 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
                     {
                         this->release = false;
                         obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
-                        gui_obj_event_set(obj, GUI_EVENT_7);
+                        gui_obj_enable_event(obj, GUI_EVENT_7);
                         *take_over = 0;
 
                     }
@@ -1568,7 +1568,7 @@ static void prepare_rebound_wheel(gui_obj_t *obj, touch_info_t *tp)
     {
 
         obj->y = tp->history_y;
-        gui_obj_event_set(obj, GUI_EVENT_8);
+        gui_obj_enable_event(obj, GUI_EVENT_8);
         if (obj->y > this->start_y)
         {
             this->status = 1;

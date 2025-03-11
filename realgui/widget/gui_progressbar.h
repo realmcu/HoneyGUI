@@ -53,6 +53,7 @@ typedef struct gui_progressbar
                  int16_t w, int16_t h);
     IMG_SOURCE_MODE_TYPE src_mode;   // scroll_bar
     uint8_t image_type;
+    uint16_t thumb_width;
 } gui_progressbar_t;
 /* gui_progressbar_t end*/
 
@@ -202,6 +203,21 @@ float gui_progressbar_get_percentage(gui_progressbar_t *_this);
  */
 size_t gui_progressbar_get_max(gui_progressbar_t *_this);
 
+/**
+ * @brief create a horizontal progressbar based on picture with thumb.
+ *
+ * @param parent parent widget.
+ * @param picture_pointer the picture background.
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param bar_width the bar width.
+ * @return gui_progressbar_t*.
+ */
+gui_progressbar_t *gui_progressbar_thumb_h_create(void    *parent,
+                                                  void    *picture_pointer,
+                                                  int16_t  x,
+                                                  int16_t  y,
+                                                  uint16_t bar_width);
 
 
 #ifdef __cplusplus

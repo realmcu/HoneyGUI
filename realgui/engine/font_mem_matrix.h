@@ -35,6 +35,13 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect);
  */
 void gui_font_mat_unload(gui_text_t *text);
 
+/**
+ * @brief Destroy font matrix resources
+ *
+ * @param text Text widget pointer
+ */
+void gui_font_mat_destroy(gui_text_t *text);
+
 #ifdef __cplusplus
 }
 #endif

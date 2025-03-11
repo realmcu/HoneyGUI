@@ -477,17 +477,17 @@ static int app_init(void)
     extern int close(int fd);
     defaultPath = "realgui\\example\\screen_410_502\\root_image_hongkong\\root\\";
     int fd;
-    fd = open("./realgui/example/screen_410_502/root_image_hongkong/root(0x4400000).bin", 0);
+    fd = open("./realgui/example/screen_410_502/root_image_hongkong/root(0x253E400).bin", 0);
     if (fd > 0)
     {
-        printf("open root(0x4400000).bin Successful!\n");
+        printf("open root(0x253E400).bin Successful!\n");
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
-        printf("open root(0x4400000).bin Fail!\n");
-        printf("open root(0x4400000).bin Fail!\n");
-        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x253E400).bin Fail!\n");
+        printf("open root(0x253E400).bin Fail!\n");
+        printf("open root(0x253E400).bin Fail!\n");
         return 0;
     }
 #endif

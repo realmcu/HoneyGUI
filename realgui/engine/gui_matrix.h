@@ -5,7 +5,7 @@
 #define __GUI_MATRIX_H__
 
 #include <guidef.h>
-#include "def_matrix.h"
+#include "def_type.h"
 
 #ifdef __cplusplus
 extern "C" {

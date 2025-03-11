@@ -70,5 +70,4 @@ const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
         }
     }
     return NULL;
-
 }

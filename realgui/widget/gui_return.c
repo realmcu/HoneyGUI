@@ -90,7 +90,7 @@ static void gui_return_prepare(gui_obj_t *obj)
             if (return_flag)
             {
                 return_flag = 0;
-                gui_obj_event_set(obj, GUI_EVENT_8);
+                gui_obj_enable_event(obj, GUI_EVENT_8);
             }
         }
 

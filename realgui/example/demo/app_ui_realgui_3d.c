@@ -12,7 +12,6 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "def_3d.h"
 #include "gui_3d.h"
 
 #include "butterfly/desc.txt"
@@ -41,7 +40,7 @@ void update_animation()
     butterfly_rz = theta * (180.0f / M_PI);
 }
 
-static void cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
+static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
                gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -90,10 +89,11 @@ static void cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world
 
 static void app_ui_design(gui_app_t *app)
 {
+    gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
 
-    gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+    void *test_3d = gui_3d_create(&(app->screen), "3d-widget", desc, 0, 0, 480, 480);
 
-    gui_3d_set_shape_transform_cb(test_3d, 0, cb);
+    gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
 
     gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
 

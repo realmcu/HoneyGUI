@@ -122,6 +122,7 @@ typedef struct gui_text
 
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
+    bool use_img_blit     : 1;
     uint8_t inputable     : 1;
     uint8_t ispasswd      : 1;
     uint8_t wordwrap      : 1;
@@ -229,6 +230,14 @@ void gui_text_input_set(gui_text_t *this_widget, bool inputable);
  * @param wordwrap wordwrap.
  */
 void gui_text_wordwrap_set(gui_text_t *this_widget, bool wordwrap);
+
+/**
+ * @brief Enable/disable matrix-based image rendering for text
+ * @param this Pointer to the text widget
+ * @param use_img_blit true = use image matrix blitting (for complex transformations),
+ *                     false = use standard rendering
+ */
+void gui_text_use_matrix_by_img(gui_text_t *this_widget, bool use_img_blit);
 
 /**
  * @brief Set ttf raster render mode.

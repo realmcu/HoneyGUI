@@ -347,17 +347,3 @@ gui_app_t *gui_app_get_by_name(const char *name);
 #endif
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-

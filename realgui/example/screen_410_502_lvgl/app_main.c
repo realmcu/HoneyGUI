@@ -1,12 +1,8 @@
 #include "guidef.h"
-#include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "lvgl.h"
-#include "gui_server.h"
-#include "gui_components_init.h"
 #include <sys/types.h>
 #include <pthread.h>
 #include "lv_port_disp.h"
@@ -18,6 +14,13 @@
 #include "app_main.h"
 #include "lv_custom_tile_slide.h"
 #include "lv_custom_tile_snapshot.h"
+
+#include "kb_algo.h"
+#ifdef __WIN32
+#include <gui_app.h>
+#include "gui_server.h"
+#include "gui_components_init.h"
+#endif
 
 static void lvgl_loop(void *tihs)
 {
@@ -51,8 +54,9 @@ lv_obj_t *scr_up_curtain;
 lv_obj_t *scr_down_curtain;
 lv_obj_t *scr_left_curtain;
 lv_obj_t *scr_right_curtain;
+lv_obj_t *scr_app_menu;
 
-
+#if LVGL_USE_CJSON
 char *cjson_content = NULL;
 
 #if defined __WIN32
@@ -157,7 +161,6 @@ void json_refreash()
 //    gui_log("cjson_content: %s\n", cjson_content);
 }
 #endif
-
 void read_json_cb(lv_timer_t *timer)
 {
     char *temp = cjson_content;
@@ -172,7 +175,7 @@ void read_json_cb(lv_timer_t *timer)
         free(temp);
     }
 }
-
+#endif
 typedef enum
 {
     MESSAGE = 0,
@@ -189,45 +192,44 @@ typedef struct information
 static char *content = NULL;
 static void inform_generate_task_entry()
 {
-    while (true)
+    if (!content)
     {
-        gui_thread_mdelay(2000);
-
-        if (!content)
-        {
-            content = gui_malloc(200);
-            sprintf(content,
-                    "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.");
-        }
-        time_t rawtime;
-        time(&rawtime);
-        struct tm *timeinfo = localtime(&rawtime);
-        char time[10];
-        if (timeinfo)
-        {
-            sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-        }
-
-        information_t payload =
-        {
-            "101010",
-            content,
-            time,
-            MESSAGE
-        };
-        extern void pagelist_create(information_t *payload);
-        gui_msg_t msg =
-        {
-            .event = GUI_EVENT_USER_DEFINE,
-            .payload = &payload,
-            .cb = (gui_msg_cb)pagelist_create,
-        };
-
-        gui_send_msg_to_server(&msg);
+        content = gui_malloc(200);
+        sprintf(content,
+                "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.");
     }
+    time_t rawtime;
+    time(&rawtime);
+    struct tm *timeinfo = localtime(&rawtime);
+    char time[10];
+    if (timeinfo)
+    {
+        sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    }
+
+    information_t payload =
+    {
+        "101010",
+        content,
+        time,
+        MESSAGE
+    };
+    extern void pagelist_create(information_t *payload);
+    pagelist_create(&payload);
 }
 
+static void enter_menu_cb(lv_event_t *event)
+{
+    kb_info_t *kb = kb_get_info();
+    if (kb->pressed)
+    {
+        _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0,
+                          lv_app_menu_init, 0);
+    }
+}
+#ifdef __WIN32
 uint8_t resource_root[1024 * 1024 * 20];
+#endif
 static void app_dialing_ui_design(gui_app_t *app)
 {
 #if defined _WIN32
@@ -236,7 +238,7 @@ static void app_dialing_ui_design(gui_app_t *app)
     extern int close(int fd);
     defaultPath = "realgui\\example\\screen_410_502_lvgl\\root_image_lvgl\\root\\";
     int fd;
-    fd = open("./realgui/example/screen_410_502_lvgl/root_image_lvgl/root(0x4400000).bin", 0);
+    fd = open("./realgui/example/screen_410_502_lvgl/root_image_lvgl/root(0x253E400).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
@@ -262,15 +264,25 @@ static void app_dialing_ui_design(gui_app_t *app)
     // lv_port_fs_init();
 
     LV_LOG("LVGL start \n");
-    lv_timer_t *timer = lv_timer_create(read_json_cb, 3000, NULL);
-    lv_timer_set_repeat_count(timer, -1);
-    lv_timer_ready(timer);
+#if LVGL_USE_CJSON
+    {
+        lv_timer_t *timer = lv_timer_create(read_json_cb, 3000, NULL);
+        lv_timer_set_repeat_count(timer, -1);
+        lv_timer_ready(timer);
+    }
+#endif
+    {
+        lv_timer_t *timer = lv_timer_create(inform_generate_task_entry, 3000, NULL);
+        lv_timer_set_repeat_count(timer, -1);
+        lv_timer_ready(timer);
+    }
 
     // lv_disp_load_scr(scr_watchface);
 
     tileview = lv_tileview_create(NULL);
     lv_obj_set_style_bg_color(tileview, lv_color_hex(0x000000), 0);
     lv_obj_set_scrollbar_mode(tileview, LV_SCROLLBAR_MODE_OFF); // hide scroll bar
+    lv_obj_add_event_cb(tileview, (lv_event_cb_t)enter_menu_cb, LV_EVENT_ALL, NULL);
 
     tile_center = lv_tileview_add_tile(tileview, 1, 1, LV_DIR_ALL); // create center tile
     tile_up = lv_tileview_add_tile(tileview, 1, 0, LV_DIR_BOTTOM); // create up tile
@@ -367,7 +379,6 @@ static int app_init(void)
 {
     gui_server_init();
     gui_app_startup(&app_lvgl);
-    gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     return 0;
 }
 

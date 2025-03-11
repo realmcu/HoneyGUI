@@ -745,7 +745,7 @@ static void gui_basic_func_proc(uint32_t key_val)
                     str[len] = '\0';
                     gui_text_content_set(txt, (void *)str, len);
 
-                    gui_obj_event_set((gui_obj_t *)txt, (gui_event_t)TXT_EVENT_PSWD_DONE);
+                    gui_obj_enable_event((gui_obj_t *)txt, (gui_event_t)TXT_EVENT_PSWD_DONE);
                 }
                 else
                 {

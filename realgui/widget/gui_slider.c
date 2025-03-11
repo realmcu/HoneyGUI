@@ -91,7 +91,7 @@ static void gui_slider_prepare(gui_obj_t *obj)
 
         if (this->preValue != this->currentValue)
         {
-            gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
+            gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
         }
         this->preValue = this->currentValue;
     }

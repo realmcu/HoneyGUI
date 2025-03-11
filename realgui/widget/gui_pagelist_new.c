@@ -50,7 +50,30 @@
 
 static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
 {
-    GUI_WIDGET_POINTER_BY_TYPE(t, TEXTBOX, obj)
+    //GUI_WIDGET_POINTER_BY_TYPE(t, TEXTBOX, obj)
+    {
+        if (!(obj != ((void *)0)))
+        {
+            gui_assert_handler("obj != NULL", __FUNCTION__, 53);
+        };
+        if (!((((gui_obj_t *)obj)->magic == 0x0b)))
+        {
+            gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 53);
+        }
+    }
+    gui_obj_t *t = 0;
+    extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE, gui_obj_t **);
+    gui_obj_tree_get_widget_by_type(obj, TEXTBOX, &t);
+    {
+        if (!(t != ((void *)0)))
+        {
+            gui_assert_handler("t != NULL", __FUNCTION__, 53);
+        };
+        if (!((((gui_obj_t *)t)->magic == 0x0b)))
+        {
+            gui_assert_handler("(GUI_BASE(t)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 53);
+        }
+    }
     gui_text_content_set((void *)t, (void *)pl->item_text_array[index],
                          strlen(pl->item_text_array[index]));
     //change obj callback
@@ -65,9 +88,63 @@ static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
 }
 static void win_press(void *obj, gui_event_t e, void *param)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
-                               MACRO_PAGE_LIST_NEW)
-    GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
+    // GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
+    //                            MACRO_PAGE_LIST_NEW)
+    {
+        {
+            if (!(((gui_pagelist_new_t *)
+                   ((gui_obj_t *)obj)->parent->parent->parent) != ((void *)0)))
+            {
+                gui_assert_handler("((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != NULL",
+                                   __FUNCTION__, 80);
+            };
+            if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic ==
+                   0x0b)))
+            {
+                gui_assert_handler("(GUI_BASE(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic == GUI_MAGIC_NUMBER)",
+                                   __FUNCTION__, 80);
+            }
+        }
+        if ((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type !=
+             MACRO_PAGE_LIST_NEW))
+        {
+            extern void gui_log(const char *format, ...);
+            gui_log("GUI_WIDGET_TYPE_TRY_EXCEPT: type is %d ;",
+                    ((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type);
+        }
+        {
+            if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type ==
+                   MACRO_PAGE_LIST_NEW)))
+            {
+                gui_assert_handler("(GUI_BASE(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type == MACRO_PAGE_LIST_NEW)",
+                                   __FUNCTION__, 80);
+            }
+        }
+    }
+    //GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
+    {
+        if (!(obj != ((void *)0)))
+        {
+            gui_assert_handler("obj != NULL", __FUNCTION__, 82);
+        };
+        if (!((((gui_obj_t *)obj)->magic == 0x0b)))
+        {
+            gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 82);
+        }
+    }
+    gui_obj_t *img = 0;
+    extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE, gui_obj_t **);
+    gui_obj_tree_get_widget_by_type(obj, IMAGE_FROM_MEM, &img);
+    {
+        if (!(img != ((void *)0)))
+        {
+            gui_assert_handler("img != NULL", __FUNCTION__, 82);
+        };
+        if (!((((gui_obj_t *)img)->magic == 0x0b)))
+        {
+            gui_assert_handler("(GUI_BASE(img)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 82);
+        }
+    }
     GUI_TYPE(gui_img_t, img)->data = (void *)GUI_TYPE(gui_pagelist_new_t,
                                                       GUI_BASE(obj)->parent->parent->parent)->item_image_hl;
     GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent)->current_item_index = (size_t)(
@@ -76,9 +153,62 @@ static void win_press(void *obj, gui_event_t e, void *param)
 }
 static void win_release(void *obj, gui_event_t e, void *param)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
-                               MACRO_PAGE_LIST_NEW)
-    GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
+    // GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
+    //                            MACRO_PAGE_LIST_NEW)
+    {
+        {
+            if (!(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != ((void *)0)))
+            {
+                gui_assert_handler("((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != NULL",
+                                   __FUNCTION__, 93);
+            };
+            if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic ==
+                   0x0b)))
+            {
+                gui_assert_handler("(GUI_BASE(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic == GUI_MAGIC_NUMBER)",
+                                   __FUNCTION__, 93);
+            }
+        }
+        if ((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type !=
+             MACRO_PAGE_LIST_NEW))
+        {
+            extern void gui_log(const char *format, ...);
+            gui_log("GUI_WIDGET_TYPE_TRY_EXCEPT: type is %d ;",
+                    ((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type);
+        }
+        {
+            if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type ==
+                   MACRO_PAGE_LIST_NEW)))
+            {
+                gui_assert_handler("(GUI_BASE(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->type == MACRO_PAGE_LIST_NEW)",
+                                   __FUNCTION__, 93);
+            }
+        }
+    }
+    //GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
+    {
+        if (!(obj != ((void *)0)))
+        {
+            gui_assert_handler("obj != NULL", __FUNCTION__, 95);
+        };
+        if (!((((gui_obj_t *)obj)->magic == 0x0b)))
+        {
+            gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 95);
+        }
+    }
+    gui_obj_t *img = 0;
+    extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE, gui_obj_t **);
+    gui_obj_tree_get_widget_by_type(obj, IMAGE_FROM_MEM, &img);
+    {
+        if (!(img != ((void *)0)))
+        {
+            gui_assert_handler("img != NULL", __FUNCTION__, 95);
+        };
+        if (!((((gui_obj_t *)img)->magic == 0x0b)))
+        {
+            gui_assert_handler("(GUI_BASE(img)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 95);
+        }
+    }
     GUI_TYPE(gui_img_t, img)->data = (void *)GUI_TYPE(gui_pagelist_new_t,
                                                       GUI_BASE(obj)->parent->parent->parent)->item_image;
     GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent)->current_item_index = (size_t)(
@@ -874,7 +1004,7 @@ static void ctor(gui_pagelist_new_t *this, void       *parent,
         GUI_BASE(this)->w = row_space * (gui_get_screen_height() / row_space + 1);
         GUI_BASE(this)->h = w;
     }
-
+    this->text_mode = MID_CENTER;
 }
 
 
@@ -962,12 +1092,13 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
             gui_win_t *win = gui_win_create(timer1, 0, i * pagelist_new->row_space, 0, pagelist_new->row_space,
                                             GUI_BASE(pagelist_new)->h);
             gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)pagelist_new->item_image, 0, 0, 0, 0);
+            gui_img_set_mode(img, pagelist_new->blending);
             const char *text = pagelist_new->item_text_array[i];
             gui_text_t *t = gui_text_create(win, 0, 0, 0, pagelist_new->row_space, GUI_BASE(win)->h);
-            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text),
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
                          pagelist_new->font_size);
             gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
-            gui_text_mode_set(t, MID_CENTER);
+            gui_text_mode_set(t, pagelist_new->text_mode);
             if (item_click_function_array && pagelist_new->click_function_array[i])
             {
                 gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i], (gui_event_cb_t)i);
@@ -985,12 +1116,13 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
             gui_win_t *win = gui_win_create(timer1, 0, 0, i * pagelist_new->row_space,
                                             GUI_BASE(pagelist_new)->w, pagelist_new->row_space);
             gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)pagelist_new->item_image, 0, 0, 0, 0);
+            gui_img_set_mode(img, pagelist_new->blending);
             const char *text = pagelist_new->item_text_array[i];
             gui_text_t *t = gui_text_create(win, 0, 0, 0, GUI_BASE(win)->w, pagelist_new->row_space);
-            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text),
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
                          pagelist_new->font_size);
             gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
-            gui_text_mode_set(t, MID_CENTER);
+            gui_text_mode_set(t, pagelist_new->text_mode);
 
             if (item_click_function_array && pagelist_new->click_function_array[i])
             {

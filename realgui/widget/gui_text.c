@@ -57,7 +57,17 @@ static bool gui_text_matrix_is_identity(gui_matrix_t *matrix)
     {
         return false;
     }
-    if (matrix->m[0][0] == 1.0f && matrix->m[1][1] == 1.0f)
+    if (
+        matrix->m[0][0] == 1.0f && \
+        matrix->m[0][1] == 0.0f && \
+        // matrix->m[0][2] == 0.0f &&
+        matrix->m[1][0] == 0.0f && \
+        matrix->m[1][1] == 1.0f && \
+        // matrix->m[1][2] == 0.0f &&
+        matrix->m[2][0] == 0.0f && \
+        matrix->m[2][1] == 0.0f && \
+        matrix->m[2][2] == 1.0f
+    )
     {
         return true;
     }
@@ -196,7 +206,7 @@ static void gui_text_font_unload(gui_text_t *text)
 
     case GUI_FONT_SRC_MAT:
         {
-            // gui_font_mat_unload(text);
+            gui_font_mat_unload(text);
         }
         break;
 
@@ -251,7 +261,7 @@ static void gui_text_font_destroy(gui_text_t *text)
 
     case GUI_FONT_SRC_MAT:
         {
-            gui_font_mat_unload(text);
+            gui_font_mat_destroy(text);
         }
         break;
 
@@ -362,7 +372,7 @@ static void gui_text_prepare(gui_obj_t *obj)
             }
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                gui_obj_event_set(obj, (gui_event_t)TXT_EVENT_CLICK);
+                gui_obj_enable_event(obj, (gui_event_t)TXT_EVENT_CLICK);
             }
         }
         break;
@@ -405,6 +415,10 @@ static void gui_text_draw(gui_obj_t *obj)
         gui_text_font_load(text, &draw_rect);
     }
     if (text->font_type == GUI_FONT_SRC_TTF)
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
+    }
+    if (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit)
     {
         gui_font_ttf_adapt_rect(text, &draw_rect);
     }
@@ -506,6 +520,7 @@ void gui_text_ctor(gui_text_t *this,
     this->content_refresh = false;
     this->layout_refresh = false;
     this->rendermode = 2;
+    this->use_img_blit = true;
 }
 
 /*============================================================================*
@@ -563,6 +578,11 @@ void gui_text_input_set(gui_text_t *this, bool inputable)
 void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)
 {
     this->wordwrap = wordwrap;
+}
+
+void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)
+{
+    this->use_img_blit = use_img_blit;
 }
 
 void gui_text_rendermode_set(gui_text_t *this, uint8_t rendermode)

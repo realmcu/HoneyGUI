@@ -54,7 +54,7 @@ static void prepare_touch_process(gui_view_t *this)
         case TOUCH_HOLD_X:
             {
                 if (((obj->skip_tp_left_hold && tp->deltaX < 0) ||
-                     (obj->skip_tp_right_hold && tp->deltaX > 0)))
+                     (obj->skip_tp_right_hold && tp->deltaX > 0)) || !this->view_tp)
                 {
                     break;
                 }
@@ -81,12 +81,12 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->event) { break; }
                 if (this->view_switch_ready && this->release_x < 0)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
                     this->event = 1;
                 }
                 else if ((this->view_switch_ready && this->release_x > 0))
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
                     this->event = 1;
                 }
             }
@@ -95,7 +95,7 @@ static void prepare_touch_process(gui_view_t *this)
         case TOUCH_HOLD_Y:
             {
                 if (((obj->skip_tp_up_hold && tp->deltaY < 0) ||
-                     (obj->skip_tp_down_hold && tp->deltaY > 0)))
+                     (obj->skip_tp_down_hold && tp->deltaY > 0))  || !this->view_tp)
                 {
                     break;
                 }
@@ -119,12 +119,12 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->event) { break; }
                 if (this->view_switch_ready && this->release_y < 0)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_UP);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP);
                     this->event = 1;
                 }
                 else if (this->view_switch_ready && this->release_y > 0)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
                     this->event = 1;
                 }
             }
@@ -135,7 +135,8 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_x < 0 && (this->view_left || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_LEFT_SLIDE\n");
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
+                    this->view_tp = 0;
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
                     this->cur_id.x -= 1;
                     this->release_x = this->release_x + this->base.w;
                 }
@@ -147,7 +148,8 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_x > 0 && (this->view_right || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_RIGHT_SLIDE\n");
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
+                    this->view_tp = 0;
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
                     this->cur_id.x += 1;
                     this->release_x = this->release_x - this->base.w;
                 }
@@ -159,6 +161,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_y > 0 && (this->view_down || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_DOWN_SLIDE\n");
+                    this->view_tp = 0;
                     this->cur_id.y += 1;
                     this->release_y = this->release_y - this->base.h;
                 }
@@ -170,6 +173,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->release_y < 0 && (this->view_up || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_UP_SLIDE\n");
+                    this->view_tp = 0;
                     this->cur_id.y -= 1;
                     this->release_y = this->release_y + this->base.h;
                 }
@@ -181,7 +185,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->view_click && this->view_switch_ready)
                 {
                     gui_log("[VIEW]TOUCH_CLICK\n");
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                     this->event = 1;
                     style = VIEW_ANIMATION_NULL; // keep this->event 1
                 }
@@ -193,7 +197,7 @@ static void prepare_touch_process(gui_view_t *this)
                 if (this->view_touch_long && this->view_switch_ready)
                 {
                     gui_log("[VIEW]TOUCH_LONG\n");
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
                     this->event = 1;
                     style = VIEW_ANIMATION_NULL; // keep this->event 1
                 }
@@ -205,12 +209,8 @@ static void prepare_touch_process(gui_view_t *this)
     }
 
     // restore view offset
-    if (tp->pressing == false)
+    if (tp->pressing == false || !this->view_tp)
     {
-        if (style < VIEW_ANIMATION_NULL)
-        {
-            this->event = 0;
-        }
         if (this->release_x >= GUI_FRAME_STEP)
         {
             this->release_x -= GUI_FRAME_STEP;
@@ -287,14 +287,14 @@ void gui_view_prepare_internal(gui_view_t *this)
         this->view_button && this->view_switch_ready)
     {
         this->event = 1;
-        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
         return;
     }
     if (!this->event && (kb->type == KB_LONG) &&
         this->view_button_long && this->view_switch_ready)
     {
         this->event = 1;
-        gui_obj_event_set(obj, GUI_EVENT_KB_LONG_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_CLICKED);
         return;
     }
 

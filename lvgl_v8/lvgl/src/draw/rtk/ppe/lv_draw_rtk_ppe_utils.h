@@ -34,11 +34,15 @@ extern "C" {
  **********************/
 lv_color32_t lv_ppe_toABGR8888(lv_color_t color);
 
-PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, ppe_rect_t *rect, uint32_t color);
-
 void lv_ppe_get_transformed_area(lv_area_t *res, lv_coord_t w, lv_coord_t h, int16_t angle,
                                  uint16_t zoom,
                                  const lv_point_t *pivot);
+
+uint8_t lv_ppe_get_high_speed_dma(void);
+
+uint8_t lv_ppe_get_low_speed_dma(void);
+
+void lv_ppe_register_dma_channel(uint8_t high_speed, uint8_t low_speed);
 /**********************
  *      MACROS
  **********************/

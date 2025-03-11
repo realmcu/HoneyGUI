@@ -29,7 +29,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wno-implicit-function-declaration ")
 	
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-	-std=c++98 \
+	-std=c++11 \
     --target=arm-arm-none-eabi \
     -march=armv8.1-m.main+dsp+mve.fp+fp \
     -mfloat-abi=hard \

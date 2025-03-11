@@ -41,8 +41,7 @@ extern "C" {
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
-#include "def_3d.h"
-#include "gui_3d.h"
+#include "gui_3d_rect.h"
 
 /*============================================================================*
  *                         Types
@@ -82,7 +81,7 @@ typedef struct
  */
 typedef struct
 {
-    gui_3d_t render_object;               /**< The 3D render object */
+    gui_3d_rect_t render_object;               /**< The 3D render object */
     int16_t face_flags_rotation;                   /**< Flags defining the visibility of faces */
     prism_mirror3d_config_t conf;
     gui_prism_transform_state_t raw_state; /**< The raw transform state */
@@ -103,62 +102,6 @@ typedef struct
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-
-/**
- * @brief Callback for rendering a 3D prism mirror.
- *
- * @param parent The parent 3D object.
- * @param face The face index to render.
- * @param world The world coordinate system.
- * @param camera The camera observing the object.
- * @param light The light affecting the object.
- */
-static void prism_mirror3d_render_callback(gui_3d_t *parent, size_t face, gui_3d_world_t *world,
-                                           gui_3d_camera_t *camera, gui_3d_light_t *light);
-
-/**
- * @brief Updates the angle of the prism mirror. Called on a timer or event.
- *
- * @param param The user-provided parameter.
- */
-static void prism_mirror3d_update_angle_cb(void *param);
-
-/**
- * @brief Animation callback for rendering.
- *
- * @param param The user-provided parameter.
- */
-static void prism_mirror3d_render_animate_cb(void *param);
-
-/**
- * @brief Callback for when a prism face is clicked.
- *
- * @param obj The object being clicked.
- * @param e The event type.
- * @param param The user-provided parameter.
- */
-static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param);
-
-/**
- * @brief Swaps the current and target states of the prism.
- *
- * @param prism The prism mirror object.
- */
-static void gui_prism_mirror3d_swap_states(gui_prism_mirror3d_t *prism);
-
-/**
- * @brief Interpolates and animates the rendering of a prism.
- *
- * @param render_object The object being rendered.
- */
-static void gui_prism_render_interpolated_animate(gui_prism_mirror3d_t *render_object);
-
-/**
- * @brief Updates the face flags for a prism mirror based on its current state.
- *
- * @param prism_mirror3d The prism mirror object.
- */
-static void gui_prism_mirror3d_update_face_flags(gui_prism_mirror3d_t *prism_mirror3d);
 
 /**
  * @brief Enters an animation for the prism mirror.
@@ -280,8 +223,8 @@ void gui_prism_mirror3d_set_target_state(
  *               The created prism object will be a child of this parent, inheriting context and layout.
  * @param name The name identifier for the prism object.
  *             This string is used to uniquely identify the object within the GUI environment.
- * @param desc_addr Pointer to the description data for the prism.
- *                  This can include detailed geometric or material properties for rendering.
+ * @param desc Pointer to the description data for the prism.
+ *             This can include detailed geometric or material properties for rendering.
  * @param x The X coordinate for the position of the prism within the parent object.
  * @param y The Y coordinate for the position of the prism within the parent object.
  * @param w The width of the prism object.
@@ -294,7 +237,7 @@ void gui_prism_mirror3d_set_target_state(
  *         Returns NULL if the creation fails due to memory allocation issues or invalid parameters.
  */
 gui_prism_mirror3d_t *gui_prism_mirror3d_create(gui_obj_t *parent, const char *name,
-                                                void *desc_addr,
+                                                gui_3d_description_t *desc,
                                                 uint16_t x, uint16_t y, uint16_t w, uint16_t h,
                                                 prism_mirror3d_config_t *config);
 

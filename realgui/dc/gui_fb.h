@@ -71,7 +71,12 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event);
  */
 void gui_fb_change(void);
 
-
+/**
+ * @brief Get fps.
+ *
+ * @return fps
+ */
+uint32_t gui_fps(void);
 
 
 #ifdef __cplusplus

@@ -73,18 +73,20 @@ typedef struct gui_button
     uint8_t flag   : 1;
     uint8_t enable : 1;                 //!< enable function
 } gui_button_t;
-_GUI_API_DEFINE(gui_button_t)
-void (*on_click)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
-void (*on_press)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
-void (*on_long_press)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
-void (*on_release)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
-void (*animate)(gui_button_t *,
-                uint32_t      dur,
-                int           repeat_count,
-                void         *callback,
-                void         *p);
-_GUI_API_DECLARE(gui_button_t)
-
+//_GUI_API_DEFINE(gui_button_t)
+typedef struct __gui_api_gui_button_t
+{
+    void (*on_click)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+    void (*on_press)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+    void (*on_long_press)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+    void (*on_release)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+    void (*animate)(gui_button_t *,
+                    uint32_t      dur,
+                    int           repeat_count,
+                    void         *callback,
+                    void         *p);
+//_GUI_API_DECLARE(gui_button_t)
+} _gui_api_gui_button_t; extern _gui_api_gui_button_t _gui_api_for_gui_button_t;
 /*============================================================================*
  *                         Constants
  *============================================================================*/

@@ -151,7 +151,7 @@ The first way is as follow.
         kb_info_t *kb = kb_get_info();  
         if (kb->pressed == true)  
         {  
-            gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);  
+            gui_obj_enable_event(obj, GUI_EVENT_KB_DOWN_PRESSED);  
         }  
     ......
     }  

@@ -1,4 +1,108 @@
 #include "ui_func.h"
+#include <math.h>
+
+#define DRAG_THRESHOLD 30  // Drag distance threshold
+#define LEFT_EDGE_THRESHOLD 30  // Left edge detection range
+
+// Custom data structure for gesture handling
+typedef struct
+{
+    lv_obj_t *img;
+    void (*cb)(void);
+} custom_data_t;
+
+// Drag indicator image sequence
+static const lv_image_dsc_t *drag_indicator_imgs[] =
+{
+    &path02,
+    &path03,
+    &path04,
+    &path05,
+    &path06,
+    &path07,
+    &path08,
+    &path09,
+    &path10,
+    &path11,
+    &path12,
+    &path13,
+    &path14,
+    &path15,
+    &path16,
+    &path17,
+    &path18,
+};
+#define DRAG_IMG_COUNT (sizeof(drag_indicator_imgs) / sizeof(drag_indicator_imgs[0]))
+
+// Gesture detection callback
+static void return_gesture_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    custom_data_t *param = (custom_data_t *)lv_event_get_user_data(e);
+    lv_obj_t *img = param->img;
+    lv_obj_t *obj = lv_event_get_target(e);
+    lv_indev_t *indev = lv_indev_get_act();
+    lv_point_t point;
+    static bool release_flag = 1; // 1: release
+    static lv_coord_t pressed_x = 0;
+    lv_indev_get_point(indev, &point);
+
+    if (code == LV_EVENT_PRESSING)
+    {
+        if (point.x < LEFT_EDGE_THRESHOLD)
+        {
+            // Start from the left edge
+            if (release_flag)
+            {
+                // Start dragging, record starting point and show image
+                pressed_x = point.x;
+                release_flag = 0;
+                lv_obj_clear_flag(img, LV_OBJ_FLAG_HIDDEN);
+                lv_obj_set_pos(img, 0, point.y - 50);
+            }
+            // Disable scrolling of the parent object
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+            // Update image position and sequence
+            lv_coord_t drag_x = point.x - pressed_x;
+            if (drag_x >= 0 && drag_x <= DRAG_THRESHOLD)
+            {
+                // Select image based on drag distance
+                uint8_t img_index = floor((DRAG_IMG_COUNT - 1) * drag_x / DRAG_THRESHOLD);
+                lv_img_set_src(img, drag_indicator_imgs[img_index]);
+            }
+        }
+    }
+    else if (code == LV_EVENT_RELEASED)
+    {
+        // Re-enable scrolling of the parent object
+        lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+        if (!release_flag)
+        {
+            lv_coord_t drag_x = point.x - pressed_x;
+            if (drag_x > DRAG_THRESHOLD)
+            {
+                param->cb(); // Exit
+            }
+            lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);
+            release_flag = 1;
+            pressed_x = 0;
+        }
+    }
+}
+
+static custom_data_t param = {0};
+
+// Create return gesture indicator
+void return_create(lv_obj_t *parent, void (*cb)(void))
+{
+    lv_obj_t *img = lv_img_create(parent);
+    lv_img_set_src(img, drag_indicator_imgs[0]);
+    lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN); // Hide initially
+    lv_obj_set_pos(img, 0, 0);
+    param.img = img;
+    param.cb = cb;
+    lv_obj_add_event_cb(parent, return_gesture_cb, LV_EVENT_ALL, (void *)&param);
+}
 
 void clear_flag_recursive(lv_obj_t *obj, lv_obj_flag_t flag)
 {
