@@ -9,17 +9,13 @@
  *
  */
 #include <string.h>
-#include <guidef.h>
-#include <gui_matrix.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_matrix.h"
+#include "gui_fb.h"
+#include "gui_obj.h"
 #include "gui_server.h"
 
-#define MAX_EVENT_CNT   10
-static gui_event_cb_t event_cb[MAX_EVENT_CNT];
-static gui_event_t event_code[MAX_EVENT_CNT];
-static void *event_cb_param[MAX_EVENT_CNT];
-static void *event_obj[MAX_EVENT_CNT];
-static uint8_t event_cnt = 0;
+
 static bool fb_change = false;
 static uint32_t gui_obj_count;
 static uint32_t obj_count;
@@ -268,19 +264,7 @@ static void obj_draw_end(gui_obj_t *obj)
         }
         if (obj->active)
         {
-            for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
-            {
-                gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-                if (event_dsc->filter == event_dsc->event_code)
-                {
-                    event_cb[event_cnt] = event_dsc->event_cb;
-                    event_code[event_cnt] = event_dsc->event_code;
-                    event_cb_param[event_cnt] = event_dsc->user_data;
-                    event_obj[event_cnt] = obj;
-                    event_dsc->event_code = GUI_EVENT_INVALIDE;
-                    event_cnt++;
-                }
-            }
+            gui_obj_event_handle(obj);
         }
 
         matrix_identity(obj->matrix);
@@ -465,14 +449,8 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     obj_draw_end(root);
     gui_obj_count = obj_count;
     obj_count = 0;
-    if (enable_event == true)
-    {
-        for (uint8_t i = 0; i < event_cnt; i++)
-        {
-            event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
-        }
-    }
-    event_cnt = 0;
+
+    gui_obj_event_dispatch(enable_event);
     dc->frame_count++;
 
     if (dc->lcd_frame_monitor)
