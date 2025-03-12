@@ -10,7 +10,8 @@ extern "C" {
 #include "lv_img_dsc_list.h"
 #include "lv_image_dsc.h"
 
-#define M_PI    ((float)3.14159265358979323846)
+#include <math.h>
+
 
 #define LVGL_USE_CJSON 0
 

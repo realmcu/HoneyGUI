@@ -58,7 +58,7 @@ static void return_gesture_cb(lv_event_t *e)
                 pressed_x = point.x;
                 release_flag = 0;
                 lv_obj_clear_flag(img, LV_OBJ_FLAG_HIDDEN);
-                lv_obj_set_pos(img, 0, point.y - 50);
+                lv_obj_set_pos(img, 0, point.y - lv_obj_get_height(img) / 2);
             }
             // Disable scrolling of the parent object
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
@@ -95,7 +95,16 @@ static custom_data_t param = {0};
 // Create return gesture indicator
 void return_create(lv_obj_t *parent, void (*cb)(void))
 {
-    lv_obj_t *img = lv_img_create(parent);
+    lv_obj_t *img;
+    lv_obj_t *obj = lv_obj_get_parent(parent);
+    if (obj != NULL)
+    {
+        img = lv_img_create(obj);
+    }
+    else
+    {
+        img = lv_img_create(parent);
+    }
     lv_img_set_src(img, drag_indicator_imgs[0]);
     lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN); // Hide initially
     lv_obj_set_pos(img, 0, 0);

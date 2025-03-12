@@ -37,6 +37,8 @@ def parse_bin_file(file_path):
         # Read the 5th and 6th bytes to determine the height H, note that the low byte comes first
         height = struct.unpack('<H', data[4:6])[0]
 
+        stride = width * size
+
         data_size = width * height * size
 
         # Extract the file name and its different formats
@@ -49,6 +51,7 @@ def parse_bin_file(file_path):
             'struct_name': struct_name,
             'width': width,
             'height': height,
+            'stride': stride,
             'data_size': data_size,
             'color_space': color_space,
             'data_name': data_name
@@ -67,6 +70,7 @@ def generate_c_file(bin_file_data, output_c_file, output_h_file):
             f_c.write(f"    .header.magic = LV_IMAGE_HEADER_MAGIC,\n")
             f_c.write(f"    .header.w = {data['width']},\n")
             f_c.write(f"    .header.h = {data['height']},\n")
+            f_c.write(f"    .header.stride = {data['stride']},\n")
             f_c.write(f"    .data_size = {data['data_size']},\n")
             f_c.write(f"    .header.cf = {data['color_space']},\n")
             f_c.write(f"    .data = {data['data_name']} + 8\n")
@@ -84,8 +88,8 @@ def generate_c_file(bin_file_data, output_c_file, output_h_file):
 if __name__ == '__main__':
     # Replace with your directory path
     directory = "./root"
-    output_c_file = "lv_img_dsc_list.c"  # Generated C file
-    output_h_file = "lv_img_dsc_list.h"  # Generated H file
+    output_c_file = "../images/lv_img_dsc_list.c"  # Generated C file
+    output_h_file = "../images/lv_img_dsc_list.h"  # Generated H file
 
     bin_files = read_bin_files(directory)
     bin_file_data = []
