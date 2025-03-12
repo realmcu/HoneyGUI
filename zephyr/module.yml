@@ -2,10 +2,10 @@ build:
   # Path to the Kconfig file that will be sourced into Zephyr Kconfig tree under
   # Zephyr > Modules > example-application. Path is relative from root of this
   # repository.
-  #kconfig: Kconfig.gui
+  kconfig: Kconfig.gui
   # Path to the folder that contains the CMakeLists.txt file to be included by
   # Zephyr build system. The `.` is the root of this repository.
-  #cmake: .
+  cmake: .
   settings:
     # Additional roots for boards and DTS files. Zephyr will use the
     # `<board_root>/boards` for additional boards. The `.` is the root of this
