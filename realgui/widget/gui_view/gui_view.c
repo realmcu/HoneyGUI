@@ -246,6 +246,7 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
     this->style = on_event->switch_out_style;
     gui_view_t *target_view = gui_view_create(GUI_BASE(this)->parent, on_event->descriptor, 0, 0, 0, 0);
     target_view->style = on_event->switch_in_style;
+    target_view->event = 1;
     // change list for transplation cover
     if (target_view->style == VIEW_STILL)
     {
@@ -258,6 +259,11 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
         next_tab->prev = object->brother_list.next;
         GUI_BASE(parent)->child_list.next = next_tab;
         GUI_BASE(parent)->child_list.prev = next_tab->next;
+    }
+    if (target_view->style < VIEW_ANIMATION_NULL)
+    {
+        target_view->release_x = this->release_x;
+        target_view->release_y = this->release_y;
     }
     int16_t idx = 0;
     int16_t idy = 0;

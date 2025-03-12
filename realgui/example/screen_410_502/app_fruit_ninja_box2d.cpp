@@ -52,6 +52,54 @@ extern "C" {
     }
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
+#ifndef __WIN32
+void *lx_platform_malloc(size_t size)
+{
+    void *ptr = NULL;
+    if (size != 0)
+    {
+        ptr = gui_malloc(size);
+
+        if (ptr != NULL)
+        {
+            memset(ptr, 0, size);
+        }
+        else
+        {
+            gui_log("lx_platform_malloc failed!!!, size:%d", size);
+        }
+    }
+
+    return (void *)ptr;
+}
+
+void lx_platform_free(void *ptr)
+{
+    gui_free(ptr);
+}
+
+void *operator new (size_t size)
+{
+    void *ptr = lx_platform_malloc(size);
+    return ptr;
+}
+
+void *operator new[](size_t size)
+{
+    void *ptr = lx_platform_malloc(size);
+    return ptr;
+}
+
+void operator delete (void *ptr) noexcept
+{
+    lx_platform_free(ptr);
+}
+
+void operator delete[](void *ptr) noexcept
+{
+    lx_platform_free(ptr);
+}
+#endif
 
 namespace app_fruit_ninja
 {

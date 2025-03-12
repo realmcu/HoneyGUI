@@ -340,7 +340,7 @@ static void view_more_enter(void *obj, gui_event_t e, void *param)
 void pagelist_create(gui_msg_t *msg)
 {
     gui_view_t *view = gui_view_get_current_view();
-    if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) || !pg)
+    if (!view || strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) || !pg)
     {
         // gui_log("Current APP can't add tab!!! %s, %d\n", __FUNCTION__, __LINE__);
         return;

@@ -77,14 +77,13 @@ static void prepare_touch_process(gui_view_t *this)
                         this->release_x = -obj->w;
                     }
                 }
-
-                if (this->event) { break; }
-                if (this->view_switch_ready && this->release_x < 0)
+                if (this->event) {break;}
+                if (this->view_switch_ready && this->view_left && this->release_x < 0)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
                     this->event = 1;
                 }
-                else if ((this->view_switch_ready && this->release_x > 0))
+                else if (this->view_switch_ready && this->view_right && this->release_x > 0)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
                     this->event = 1;
@@ -116,13 +115,13 @@ static void prepare_touch_process(gui_view_t *this)
                 {
                     this->moveback = 1;
                 }
-                if (this->event) { break; }
-                if (this->view_switch_ready && this->release_y < 0)
+                if (this->event) {break;}
+                if (this->view_switch_ready && this->view_up && this->release_y < 0)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP);
                     this->event = 1;
                 }
-                else if (this->view_switch_ready && this->release_y > 0)
+                else if (this->view_switch_ready && this->view_down && this->release_y > 0)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
                     this->event = 1;
@@ -132,11 +131,11 @@ static void prepare_touch_process(gui_view_t *this)
 
         case TOUCH_LEFT_SLIDE:
             {
-                if (this->release_x < 0 && (this->view_left || !this->view_switch_ready))
+                if (this->event && this->release_x < 0 && (this->view_left || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_LEFT_SLIDE\n");
                     this->view_tp = 0;
-                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
+                    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE);
                     this->cur_id.x -= 1;
                     this->release_x = this->release_x + this->base.w;
                 }
@@ -145,11 +144,11 @@ static void prepare_touch_process(gui_view_t *this)
 
         case TOUCH_RIGHT_SLIDE:
             {
-                if (this->release_x > 0 && (this->view_right || !this->view_switch_ready))
+                if (this->event && this->release_x > 0 && (this->view_right || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_RIGHT_SLIDE\n");
                     this->view_tp = 0;
-                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
+                    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE);
                     this->cur_id.x += 1;
                     this->release_x = this->release_x - this->base.w;
                 }
@@ -158,7 +157,7 @@ static void prepare_touch_process(gui_view_t *this)
 
         case TOUCH_DOWN_SLIDE:
             {
-                if (this->release_y > 0 && (this->view_down || !this->view_switch_ready))
+                if (this->event && this->release_y > 0 && (this->view_down || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_DOWN_SLIDE\n");
                     this->view_tp = 0;
@@ -170,7 +169,7 @@ static void prepare_touch_process(gui_view_t *this)
 
         case TOUCH_UP_SLIDE:
             {
-                if (this->release_y < 0 && (this->view_up || !this->view_switch_ready))
+                if (this->event && this->release_y < 0 && (this->view_up || !this->view_switch_ready))
                 {
                     gui_log("[VIEW]TOUCH_UP_SLIDE\n");
                     this->view_tp = 0;
@@ -181,8 +180,7 @@ static void prepare_touch_process(gui_view_t *this)
             break;
         case TOUCH_SHORT:
             {
-                if (this->event) { break; }
-                if (this->view_click && this->view_switch_ready)
+                if (!this->event && this->view_click && this->view_switch_ready)
                 {
                     gui_log("[VIEW]TOUCH_CLICK\n");
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
@@ -193,8 +191,7 @@ static void prepare_touch_process(gui_view_t *this)
             break;
         case TOUCH_LONG:
             {
-                if (this->event) { break; }
-                if (this->view_touch_long && this->view_switch_ready)
+                if (!this->event && this->view_touch_long && this->view_switch_ready)
                 {
                     gui_log("[VIEW]TOUCH_LONG\n");
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);

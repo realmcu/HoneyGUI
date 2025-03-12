@@ -219,7 +219,7 @@ void create_watchface_bf(gui_view_t *view)
     gui_3d_description_t *desc = gui_get_3d_desc((void *)DESC_BUTTERFLY_BIN);
     void *test_3d = gui_3d_create(obj, "3d-widget", desc, 0, 0, 410, 502);
 
-    gui_3d_set_local_shape_transform_cb(test_3d, 0, cb);
+    gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
 
     gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
 
