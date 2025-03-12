@@ -8,31 +8,45 @@ HoneyGUI 是一个轻量级的嵌入式 GUI 系统，专为 Realtek 系列芯片
 
 注意事项
 --------
-- 确保已正确安装 Keil MDK 和 CMake
-- 编译前请确保相关依赖库已安装
-- 如遇编译错误，请检查芯片型号是否正确指定
-- 检查编译器路径设置：
-    - Armcc 编译器默认路径：C:/Keil_v5/ARM/ARMCC/bin
-    - Armclang 编译器默认路径：C:/Keil_v5/ARM/ArmCompilerforEmbedded6.22/bin
-    - 若安装路径不同，请在 CMake 配置中相应修改编译器路径
 
-.. figure:: https://foruda.gitee.com/images/1741658954829556595/7a3ac221_13406851.jpeg
-   :align: center
-   :width: 800px
+环境配置
+~~~~~~~~
 
-   armcc默认路径
+- 请确保已正确安装 Keil MDK 开发环境。
+- 确认 CMake（3.15或以上版本）已安装并添加到系统环境变量。
+- 编译前请验证所有依赖库已正确安装。
 
-.. figure:: https://foruda.gitee.com/images/1741658971923798243/db601575_13406851.jpeg
-   :align: center
-   :width: 800px
+编译器选择
+~~~~~~~~~
 
-   armclang默认路径
+- Keil AC5 工程：必须使用 armcc 编译器构建库文件。
+- Keil AC6 工程：必须使用 armclang 编译器构建库文件。
+- 确保编译器版本与工程设置完全匹配。
+
+路径配置
+~~~~~~~
+
+- Armcc 编译器路径检查：
+    - 默认位置：``C:/Keil_v5/ARM/ARMCC/bin``。
+    - 如安装位置不同，需在 CMake 中更新路径设置。
+- Armclang 编译器路径检查：
+    - 默认位置：``C:/Keil_v5/ARM/ArmCompilerforEmbedded6.22/bin``。
+    - 如安装位置不同，需在 CMake 中更新路径设置。
+
+常见问题处理
+~~~~~~~~~~~
+
+- 编译错误时，首先检查：
+    - 芯片型号是否正确指定。
+    - 编译器路径是否正确配置。
+    - 编译器版本是否与工程匹配。
+- 确保所有必要的环境变量已正确设置。
 
 编译环境要求
 ------------
-- CMake 3.15 或以上版本
-- Keil MDK 5 或以上版本
-- Windows 操作系统
+- CMake 3.15 或以上版本。
+- Keil MDK 5 或以上版本。
+- Windows 操作系统。
 
 Armcc 编译
 ----------
@@ -91,8 +105,8 @@ Armcc 编译
     ...
 
 4. 编译生成的资源文件位置：
-    - 头文件： E:/HoneyGUI/lib/armcc/install/include
-    - 库文件： E:/HoneyGUI/lib/armcc/install/lib/gui.lib
+    - 头文件： ``<your HoneyGUI dir>/lib/armcc/install/include``。
+    - 库文件： ``<your HoneyGUI dir>/lib/armcc/install/lib/gui.lib``。
 
 Armclang 编译
 ------------
@@ -144,8 +158,8 @@ Armclang 编译
     ...
 
 4. 编译生成的资源文件位置：
-    - 头文件： E:/HoneyGUI/lib/armclang/install/include
-    - 库文件： E:/HoneyGUI/lib/armclang/install/lib/gui.lib
+    - 头文件： ``<your HoneyGUI dir>/lib/armclang/install/include``。
+    - 库文件： ``<your HoneyGUI dir>/lib/armclang/install/lib/gui.lib``。
 
 工程移植示例
 ------------
@@ -154,13 +168,13 @@ Armclang 编译
 
 1. 将编译生成的资源文件复制到工程目录：
 
-   - 复制头文件（.h）到工程的资源目录
-   - 复制库文件（gui.lib）到工程的资源目录
+   - 复制头文件（.h）到工程的资源目录。
+   - 复制库文件（gui.lib）到工程的资源目录。
    
 2. 工程配置：
 
-   - 在 Keil MDK 中添加头文件路径
-   - 在工程设置中链接 gui.lib 库
+   - 在 Keil MDK 中添加头文件路径。
+   - 在工程设置中链接 gui.lib 库。
 
 .. figure:: https://foruda.gitee.com/images/1741674292411402494/07c72a64_13406851.jpeg
    :align: center
@@ -173,4 +187,3 @@ Armclang 编译
    :width: 800px
 
    链接库文件到工程目录   
-    

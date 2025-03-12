@@ -1,5 +1,4 @@
 # Apply the flags to C and C++ compiler settings
-set(HW_ACC_PATH "rtl87x2g")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -xc \
 	-std=c11 \
