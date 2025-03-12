@@ -2,14 +2,14 @@
 3D Model
 =========
 
-The widget supports loading 3D models composed of obj and mtl files, and supports adding animation effects.
+The widget supports loading 3D models composed of :file:`.obj` and :file:`.mtl` files, and supports adding animation effects.
 
-GUI Loading 3D Models
+GUI Load 3D Model
 ----------------------
-1. Components of a 3D Model
+1. Components of a 3D model
 
-   + OBJ file: Stores the geometric data of the 3D model, including vertices, normals, texture coordinates, faces, etc.
-   + MTL file: Describes the material properties of the 3D model, including color, glossiness, transparency, and texture mapping.
+   + :file:`.obj` file: Stores the geometric data of the 3D model, including vertices, normals, texture coordinates, faces, etc.
+   + :file:`.mtl` file: Describes the material properties of the 3D model, including color, glossiness, transparency, and texture mapping.
    + Image files: Textures used in the model.
 
    .. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
@@ -18,9 +18,9 @@ GUI Loading 3D Models
 
       Example of 3D Model Components
 
-2. Parsing the 3D Model and Generating a 3D Information Descriptor
+2. Parsing the 3D model and generating a 3D information descriptor
 
-   + Invoke a script to process the obj file.
+   + Invoke a script to process the :file:`.obj` file.
 
    .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
       :width: 800px
@@ -28,7 +28,7 @@ GUI Loading 3D Models
 
       Script Processing
    
-   + Generate binary arrays for image and 3D information descriptors.
+   + Generate a 3D information descriptor, which includes parsed OBJ data, parsed MTL data, and texture maps.
 
    .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
       :width: 800px
@@ -36,42 +36,62 @@ GUI Loading 3D Models
 
       Generating Binary Arrays
 
-3. GUI Loading Descriptor
+3. GUI load descriptor
 
-   Place the desc file containing parsed obj data, mtl data, and image data into the project directory, and load it using :cpp:any:`gui_3d_create`.
+   Place the desc file into the project directory, and call the ``gui_get_3d_desc()`` function to load it into the ``gui_3d_description_t`` structure.
 
+   **Example:**
+
+   .. code-block:: c
+
+      gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
+
+   The ``gui_3d_description_t`` structure is defined as follows:
+
+   .. literalinclude:: ../../../realgui/widget/gui_3d/def_3d_common.h
+      :language: c
+      :start-after: /* gui_3d_description_t start*/
+      :end-before: /* gui_3d_description_t end*/
+   
+   In this context, ``GUI_3D_FACE_TYPE`` represents the face type of a 3D object. Currently, it supports 3D models composed of ``GUI_3D_FACE_RECTANGLE`` (rectangle) or ``GUI_3D_FACE_TRIANGLE`` (triangle).
 
 3D Widget Usage
 ----------------
 Create Widget
 ~~~~~~~~~~~~~~
-Use :cpp:any:`gui_3d_create` to create the 3D model. The imported ``desc_addr`` file is the parsed data extracted by the script.
+Use :cpp:any:`gui_3d_create` to create the 3D model. The imported ``desc`` is the parsed data extracted by the script.
 
-Shape Transformation
-~~~~~~~~~~~~~~~~~~~~~~
-Use :cpp:any:`gui_3d_set_shape_transform_cb` to transform the 3D model, where ``cb`` can set different shape transformations for each face of the object. In this function, ``world``, ``camera`` and ``light`` 
-represent the global transformation of the 3D object, camera view projection, and lighting information, respectively.
+Global Shape Transformation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Use :cpp:any:`gui_3d_set_global_shape_transform_cb` to apply a global transformation to the 3D model, where ``cb`` sets the same shape transformation for all faces of the object. In this function, ``world`` and ``camera`` represent the world coordinate transformation of the 3D object and the camera view projection, respectively. 
+Additionally, rectangular faces support the setting of ``light`` information.
+
+
+Local Shape Transformation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Use :cpp:any:`gui_3d_set_local_shape_transform_cb` to apply a local transformation to the 3D model, where ``cb`` allows setting different shape transformations for each face of the object, and ``face`` specifies the face to be transformed. In this function, ``world`` and ``camera`` represent the world coordinate transformation of the 3D object and the camera view projection, respectively. 
+Additionally, rectangular faces support the setting of ``light`` information.
 
 World Transformation
 ^^^^^^^^^^^^^^^^^^^^^^
 
 The initialization function is ``gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z, float rotX, float rotY, float rotZ, float scale)``.
 
-+ ``world``: A pointer to the world transformation matrix, it transforms the 3D object from model coordinates to world coordinates;
++ ``world``: A pointer to the world transformation matrix, it transforms the 3D object from model coordinates to world coordinates.
 
-+ ``x``: The distance of translation along the X-axis, used to determine the object's position in the X direction within the world coordinate system;
++ ``x``: The distance of translation along the X-axis, used to determine the object's position in the X direction within the world coordinate system.
 
-+ ``y``: The distance of translation along the Y-axis, used to determine the object's position in the Y direction within the world coordinate system;
++ ``y``: The distance of translation along the Y-axis, used to determine the object's position in the Y direction within the world coordinate system.
 
-+ ``z``: The distance of translation along the Z-axis, used to determine the object's position in the Z direction within the world coordinate system;
++ ``z``: The distance of translation along the Z-axis, used to determine the object's position in the Z direction within the world coordinate system.
 
-+ ``rotX``: The angle of rotation around the X-axis (in degrees);
++ ``rotX``: The angle of rotation around the X-axis (in degrees).
 
-+ ``rotY``: The angle of rotation around the Y-axis (in degrees);
++ ``rotY``: The angle of rotation around the Y-axis (in degrees).
 
-+ ``rotZ``: The angle of rotation around the Z-axis (in degrees);
++ ``rotZ``: The angle of rotation around the Z-axis (in degrees).
 
-+ ``scale``: A uniform scaling factor used to proportionally scale the object in all directions;
++ ``scale``: A uniform scaling factor used to proportionally scale the object in all directions.
 
 
 Purpose:
@@ -86,21 +106,21 @@ Camera Transformation
 
 The initialization function is ``gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t cameraPosition, gui_point_4d_t cameraTarget, float near, float far, float fov, float viewPortWidth, float viewPortHeight)``.
 
-+ ``camera``: A pointer to the camera structure, used to initialize camera properties;
++ ``camera``: A pointer to the camera structure, used to initialize camera properties.
 
-+ ``cameraPosition``: The position of the camera in world coordinates;
++ ``cameraPosition``: The position of the camera in world coordinates.
 
-+ ``cameraTarget``: The target point the camera is directed at, i.e., the focal point of the camera's line of sight;
++ ``cameraTarget``: The target point the camera is directed at, i.e., the focal point of the camera's line of sight.
 
-+ ``near``: The near clipping plane distance, defining the distance from the camera to the near plane of the camera's view frustum. Objects closer than this distance will be clipped;
++ ``near``: The near clipping plane distance, defining the distance from the camera to the near plane of the camera's view frustum. Objects closer than this distance will be clipped.
 
-+ ``far``: The far clipping plane distance, defining the distance from the camera to the far plane of the view frustum. Objects farther than this distance will be clipped;
++ ``far``: The far clipping plane distance, defining the distance from the camera to the far plane of the view frustum. Objects farther than this distance will be clipped.
 
-+ ``fov``: The field of view, usually expressed as a vertical angle (in degrees), defining the openness of the camera, i.e., the opening angle of the camera's view frustum;
++ ``fov``: The field of view, usually expressed as a vertical angle (in degrees), defining the openness of the camera, i.e., the opening angle of the camera's view frustum.
 
-+ ``viewPortWidth``: The width of the viewport, defining the horizontal size of the rendering target or window;
++ ``viewPortWidth``: The width of the viewport, defining the horizontal size of the rendering target or window.
 
-+ ``viewPortHeight``: The height of the viewport, defining the vertical size of the rendering target or window;
++ ``viewPortHeight``: The height of the viewport, defining the vertical size of the rendering target or window.
 
 
 Purpose:
@@ -114,13 +134,13 @@ Lighting Information
 
 The initialization function is ``gui_3d_light_inititalize(gui_3d_light_t *light, gui_point_4d_t lightPosition, gui_point_4d_t lightTarget, float included_angle, float blend_ratio, gui_3d_RGBAcolor_t color)``.
 
-+ ``light``: A pointer to the light source structure, used to initialize the properties of the light source;
++ ``light``: A pointer to the light source structure, used to initialize the properties of the light source.
 
-+ ``lightPosition``: The position of the light source in world coordinates;
++ ``lightPosition``: The position of the light source in world coordinates.
 
-+ ``lightTarget``: The target position of the light source, defining the direction of illumination;
++ ``lightTarget``: The target position of the light source, defining the direction of illumination.
 
-+ ``included_angle``: The cone angle of the light (in degrees),  represented as angle :math:`\alpha` in the diagram. It determines the illumination range of the spotlight, which corresponds to the outer circle of the spotlight in the diagram;
++ ``included_angle``: The cone angle of the light (in degrees),  represented as angle :math:`\alpha` in the diagram. It determines the illumination range of the spotlight, which corresponds to the outer circle of the spotlight in the diagram.
 
 + ``blend_ratio``: The ratio of the light blending region, defining the softness of the spotlight's edge. It ranges from 0 to 1 and determines angle :math:`\beta` in the diagram. The value is calculated using the following formula:
 
@@ -128,9 +148,9 @@ The initialization function is ``gui_3d_light_inititalize(gui_3d_light_t *light,
    
       β = α (1 - ratio)
 
-   The blending region extends from the inner circle to the outer circle of the spotlight. Within the inner circle, the light intensity is constant, while it gradually diminishes from the inner to the outer circle;
+   The blending region extends from the inner circle to the outer circle of the spotlight. Within the inner circle, the light intensity is constant, while it gradually diminishes from the inner to the outer circle.
 
-+ ``color``: The color of the light source and its transparency;
++ ``color``: The color of the light source and its transparency.
 
 .. figure:: https://foruda.gitee.com/images/1735889400996762341/a4f7e0c8_13408154.png
    :width: 400px
@@ -155,6 +175,8 @@ Example
 3D Butterfly
 ~~~~~~~~~~~~~
 
+The model is composed entirely of rectangular faces. By calling :cpp:any:`gui_3d_set_local_shape_transform_cb()`, you can set local transformations for different faces to create animation effects.
+
 .. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d.c
    :language: c
    :start-after: /* 3d butterfly demo start*/
@@ -170,6 +192,9 @@ Example
 
 3D Prism
 ~~~~~~~~
+
+The model is composed entirely of rectangular faces. By calling ``gui_3d_light_inititalize()``, you can add lighting effects.
+
 .. code-block:: c
 
    #include "math.h"
@@ -220,6 +245,24 @@ Example
    <br>
    <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube3d.gif" width= "400" /></div>
    <br>
+
+
+3D Face
+~~~~~~~~
+
+The model is composed of 1,454 triangular faces.
+
+.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d_face.c
+   :language: c
+   :start-after: /* 3d face demo start*/
+   :end-before: /* 3d face demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/face.gif" width= "400" /></div>
+   <br>
+
 
 API
 ---

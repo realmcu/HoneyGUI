@@ -125,6 +125,7 @@ typedef struct gui_wheel_port_data
     uint32_t timestamp_ms;             /* The timestamp when the data was received */
 } gui_wheel_port_data_t;
 
+/* gui_indev struct define start */
 typedef struct gui_indev
 {
     uint16_t tp_witdh;
@@ -144,7 +145,7 @@ typedef struct gui_indev
 
     gui_wheel_port_data_t *(*wheel_get_port_data)(void);
 } gui_indev_t;
-
+/* gui_indev struct define end */
 
 
 #ifdef __cplusplus

@@ -1,3 +1,4 @@
+/* 3d face demo start*/
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_tabview.h"
@@ -59,14 +60,14 @@ static void app_ui_design(gui_app_t *app)
     gui_3d_set_global_shape_transform_cb(test_3d, (gui_3d_shape_transform_cb)face_cb);
     gui_3d_set_animate(test_3d, 10000, -1, update_face_animation, NULL);
 
-    extern void gui_fps_create(void *parent);
-    gui_fps_create(&(app->screen));
+//    extern void gui_fps_create(void *parent);
+//    gui_fps_create(&(app->screen));
 
     return;
 
 }
 
-
+/* 3d face demo end*/
 
 static gui_app_t rtk_gui_demo =
 {

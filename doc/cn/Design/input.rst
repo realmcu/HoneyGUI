@@ -58,7 +58,7 @@ UI系统可以接收设备中其他外设的输入，典型的输入设备有触
 触摸板算法处理的代码实现在 ``tp_algo_process`` 函数中。通过判断X轴和Y轴坐标数据的变化以及触摸时间，进行手势识别。经过算法处理后得到的输入类型如下：
 
 
-.. literalinclude:: ../../../realgui/widget/guidef.h
+.. literalinclude:: ../../../realgui/core/def_input.h
    :language: c
    :start-after: /* T_GUI_INPUT_TYPE enum start*/
    :end-before: /* T_GUI_INPUT_TYPE enum end*/

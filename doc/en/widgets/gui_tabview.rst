@@ -27,7 +27,7 @@ Set Tabview Style
 Developers can use :cpp:any:`gui_tabview_set_style` to set the desired style of tabview. By default, the classic style is ``CLASSIC``. The available switching effects include the following:
 
 
-.. literalinclude:: ../../../realgui/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

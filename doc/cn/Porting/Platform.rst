@@ -223,7 +223,7 @@
 - 不使用文件系统时可以填入空指针。
 - 结构体定义如下：
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_fs.h
      :language: c
      :start-after: /* gui_fs struct define start */
      :end-before: /* gui_fs struct define end */
@@ -236,7 +236,7 @@
 - 不使用闪存转换层时可以填入空指针。
 - 结构体定义如下:
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_fs.h
      :language: c
      :start-after: /* gui_ftl struct define start */
      :end-before: /* gui_ftl struct define end */
@@ -247,7 +247,7 @@
 - 参考 ``guidef.h`` 和 ``gui_port_indev.c``
 - 输入设备包括触摸板、键盘和滚轮，输入信息的结构体如下：
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_input.h
      :language: c
      :start-after: /* gui_indev struct define start */
      :end-before: /* gui_indev struct define end */
@@ -315,7 +315,7 @@
 - 参考 ``guidef.h`` 和 ``gui_port_os.c``
 - 需要定义线程、定时器、消息队列和内存管理的接口，结构体定义如下：
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_os.h
      :language: c
      :start-after: /* gui_os_api struct define start */
      :end-before: /* gui_os_api struct define end */

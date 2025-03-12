@@ -3,9 +3,9 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_3d_rect.h
-  * @brief 3D widget for objects composed of rectangle mesh
-  * @details 3D widget for objects composed of rectangle mesh
+  * @file gui_3d.h
+  * @brief 3D widget
+  * @details 3D widget
   * @author sienna_shen@realsil.com.cn
   * @date 2025/3/7
   * @version 1.0
@@ -69,7 +69,7 @@ typedef struct
  *
  * @param parent parent widget
  * @param name widget name
- * @param desc_addr description file data
+ * @param desc description file data
  * @param x the X-axis coordinate relative to parent widget
  * @param y the Y-axis coordinate relative to parent widget
  * @param w width

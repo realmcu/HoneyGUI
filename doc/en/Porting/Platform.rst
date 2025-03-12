@@ -134,7 +134,7 @@ Filesystem
 - If not using a filesystem, you can fill in null pointers.
 - The structure definition is as follows:
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_fs.h
      :language: c
      :start-after: /* gui_fs struct define start */
      :end-before: /* gui_fs struct define end */
@@ -147,7 +147,7 @@ Flash Translation Layer
 - If not using a Flash Translation Layer, you can fill in null pointers.
 - The structure definition is as follows:
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_fs.h
      :language: c
      :start-after: /* gui_ftl struct define start */
      :end-before: /* gui_ftl struct define end */
@@ -158,7 +158,7 @@ Input Device
 - Refer to ``guidef.h`` and ``gui_port_indev.c``
 - Input devices include touchpads, keyboards, and wheels. The structure for input information is as follows:
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_input.h
      :language: c
      :start-after: /* gui_indev struct define start */
      :end-before: /* gui_indev struct define end */
@@ -193,7 +193,7 @@ Operating System
 - Refer to ``guidef.h`` and ``gui_port_os.c``
 - Define the interfaces for thread, timer, message queue, and memory management. The structure definition is as follows:
 
-  .. literalinclude:: ../../../realgui/widget/guidef.h
+  .. literalinclude:: ../../../realgui/core/def_os.h
      :language: c
      :start-after: /* gui_os_api struct define start */
      :end-before: /* gui_os_api struct define end */
