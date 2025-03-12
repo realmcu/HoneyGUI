@@ -202,7 +202,8 @@ static void prism_mirror3d_render_animate_cb(void *param)
         }
         else
         {
-            gui_obj_enable_event(GUI_BASE(prism_mirror3d), GUI_EVENT_2);//fack click switch
+            //gui_obj_enable_event(GUI_BASE(prism_mirror3d), GUI_EVENT_2);//fack click switch
+            GUI_ASSERT(0);
             enter_face_flags = prism_mirror3d->face_flags_rotation;
             enter_flag = true;
         }
@@ -305,8 +306,8 @@ void gui_prism_mirror3d_set_rotation_angles(gui_prism_mirror3d_t *prism_mirror3d
 void gui_prism_mirror3d_click_switch_app_add_event(gui_prism_mirror3d_t *prism_mirror3d,
                                                    gui_event_cb_t callback)
 {
-    gui_obj_add_event_cb((gui_obj_t *)prism_mirror3d, callback, GUI_EVENT_2,
-                         (gui_prism_mirror3d_t *)prism_mirror3d);
+    //gui_obj_add_event_cb((gui_obj_t *)prism_mirror3d, callback, GUI_EVENT_2, (gui_prism_mirror3d_t *)prism_mirror3d);
+    GUI_ASSERT(0);
 }
 void gui_prism_mirror3d_enter_animate(gui_prism_mirror3d_t *prism_mirror3d)
 {

@@ -22,7 +22,7 @@
 #include "gui_obj.h"
 #include "acc_init.h"
 #include "tp_algo.h"
-#include "gui_win.h"
+#include "gui_fb.h"
 
 /*============================================================================*
  *                           Types
@@ -109,28 +109,6 @@ void gui_img_input_prepare(gui_obj_t *obj)
         return;
     }
 
-    if (this->tp_block)
-    {
-
-        if (tp->pressed)
-        {
-            gui_obj_skip_other_parent_pressed(obj);
-        }
-
-        switch (tp->type)
-        {
-        case TOUCH_SHORT:
-            {
-                gui_obj_skip_other_parent_short(obj);
-            }
-            break;
-        case TOUCH_LONG:
-            {
-                gui_obj_skip_other_parent_long(obj);
-            }
-            break;
-        }
-    }
 }
 /**
  * @brief Prepares the GUI image associated with the specified object.
@@ -148,6 +126,7 @@ void gui_img_prepare(gui_obj_t *obj)
     uint8_t last;
     gui_img_t *this;
     touch_info_t *tp;
+    GUI_UNUSED(tp);
 
     GUI_ASSERT(obj != NULL);
 
@@ -159,34 +138,9 @@ void gui_img_prepare(gui_obj_t *obj)
     matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
     matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
 
-    float m00 = obj->matrix->m[0][0];
-    float m01 = obj->matrix->m[0][1];
-    float m02 = obj->matrix->m[0][2];
-    float m10 = obj->matrix->m[1][0];
-    float m11 = obj->matrix->m[1][1];
-    float m12 = obj->matrix->m[1][2];
-    float m20 = obj->matrix->m[2][0];
-    float m21 = obj->matrix->m[2][1];
-    float m22 = obj->matrix->m[2][2];
-
-    if ((m01 == 0)
-        && (m10 == 0)
-        && (m20 == 0)
-        && (m21 == 0)
-        && (m22 == 1)) //scale and translate, no rotate
+    if (gui_obj_out_screen(obj))
     {
-        float x_min = m02;
-        float x_max = m02 + m00 * obj->w;
-        float y_min = m12;
-        float y_max = m12 + m11 * obj->h;
-
-        if ((x_min > (int)gui_get_screen_width())
-            || (x_max < 0)
-            || (y_min > (int)gui_get_screen_height())
-            || (y_max < 0))
-        {
-            return;
-        }
+        return;
     }
 
     this->draw_img = gui_malloc(sizeof(draw_img_t));
@@ -199,31 +153,10 @@ void gui_img_prepare(gui_obj_t *obj)
 
     gui_img_update_att(obj);
 
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
-    {
-        gui_img_t *b = (void *)obj;
-
-        if (tp->pressed)
-        {
-            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-                b->press_flag = true;
-            }
-        }
-
-        if (b->release_flag)
-        {
-            b->press_flag = false;
-            b->release_flag = false;
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-        }
-
-        if (tp->released && b->press_flag)
-        {
-            b->release_flag = true;
-        }
-    }
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED);
 
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
@@ -231,109 +164,10 @@ void gui_img_prepare(gui_obj_t *obj)
     matrix_inverse(&this->draw_img->inverse);
     draw_img_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 
-    {
-        this->scope = 0;
-        gui_obj_t *o = obj;
-        while (o->parent != NULL)
-        {
-            o = o->parent;
-            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope && !this->scope_flag)
-            {
-                this->scope = 1;
-                break;
-            }
-        }
-    }
-    if (this->scope)
-    {
-        gui_obj_t *o = obj;
-        gui_win_t *win_scope = 0;
-        GUI_TYPE(gui_img_t, obj)->ax = obj->x;
-        GUI_TYPE(gui_img_t, obj)->ay = obj->y;
-        while (o->parent != NULL)
-        {
-            o = o->parent;
-            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
-            {
-                win_scope = (void *)o;
-                break;
-            }
-        }
-        o = obj;
-        while (o->parent != NULL)
-        {
-            o = o->parent;
-            GUI_TYPE(gui_img_t, obj)->ax += o->x;
-            GUI_TYPE(gui_img_t, obj)->ay += o->y;
-        }
-        if (win_scope)
-        {
-            int ax = win_scope->base.x ;
-            int ay = win_scope->base.y;
-            o = GUI_BASE(win_scope);
-            while (o->parent != NULL)
-            {
-                o = o->parent;
-                ax += o->x;
-                ay += o->y;
-            }
-            int w_w = win_scope->base.w;
-            int w_h = win_scope->base.h;
-            int img_x = GUI_TYPE(gui_img_t, obj)->ax;
-            int img_y = GUI_TYPE(gui_img_t, obj)->ay;
-            int img_w = this->draw_img->img_w;
-            int img_h = this->draw_img->img_h;
-            //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
-            GUI_TYPE(gui_img_t, obj)->scope_x1 = 0;
-            GUI_TYPE(gui_img_t, obj)->scope_x2 = img_w;
-            GUI_TYPE(gui_img_t, obj)->scope_y1 = 0;
-            GUI_TYPE(gui_img_t, obj)->scope_y2 = img_h;
-            obj->not_show = 0;
-            if (ax > img_x)
-            {
-                GUI_TYPE(gui_img_t, obj)->scope_x1 = ax - img_x;
-            }
-            if (ay > img_y)
-            {
-                GUI_TYPE(gui_img_t, obj)->scope_y1 = ay - img_y;
-            }
-            if (ax + w_w < img_x + img_w)
-            {
-                GUI_TYPE(gui_img_t, obj)->scope_x2 = -(img_x - (ax + w_w));
-            }
-            if (ay + w_h < img_y + img_h)
-            {
-                GUI_TYPE(gui_img_t, obj)->scope_y2 = -(img_y - (ay + w_h));
-            }
-            if (ay + w_h < img_y)
-            {
-                //obj->not_show = 1;
-                GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
-            }
-            if (ay > img_y + img_h * gui_img_get_transform_scale_y(this))
-            {
-                //obj->not_show = 1;
-                GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
-            }
-        }
-    }
 
     draw_img_new_area(this->draw_img, NULL);
 
-    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-    {
-        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-        }
-    }
-    if (gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
-    {
-        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_1);
-        }
-    }
+
     last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
@@ -368,21 +202,20 @@ void gui_img_draw_cb(gui_obj_t *obj)
 
     draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 
-    if (this->scope || this->scope_flag)
+    if (this->need_clip)
     {
-        gui_rect_t rect =
-        {
-            .x1 = this->scope_x1,
-            .x2 = this->scope_x2,
-            .y1 = this->scope_y1,
-            .y2 = this->scope_y2,
-        };
+        gui_rect_t rect = {0};
+        gui_obj_get_clip_rect(obj, &rect);
         gui_acc_blit_to_dc(this->draw_img, dc, &rect);
     }
     else
     {
-        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+        gui_rect_t rect = {0};
+        gui_obj_get_clip_rect(obj, &rect);
+        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+        // gui_acc_blit_to_dc(this->draw_img, dc, NULL);
     }
+
 
     // release img if cached
     draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
@@ -605,126 +438,10 @@ static void gui_img_ctor(gui_img_t            *this,
         gui_img_scale(this, 10.0f / 8.0f, 10.0f / 8.0f);
         gui_log("resize image!! \n");
     }
-    this->scope_x1 = 0;
-    this->scope_y1 = 0;
-    this->scope_x2 = gui_img_get_width(this);
-    this->scope_y2 = gui_img_get_height(this);
+
 }
 
-static void gui_img_rect_copy(uint8_t       *target,
-                              uint8_t       *source,
-                              uint16_t       x,
-                              uint16_t       y,
-                              uint16_t       w,
-                              uint16_t       h,
-                              gui_dispdev_t *dc)
-{
-    uint16_t byte = dc->bit_depth / 8;
 
-    for (uint16_t i = 0; i < h; i++)
-    {
-        // Use size_t type for intermediate multiplications to avoid sign extension issues
-        size_t target_offset = (size_t)i * (size_t)w * (size_t)byte;
-        size_t source_offset = (size_t)i * (size_t)dc->fb_width * (size_t)byte;
-
-        memcpy(target + target_offset, source + source_offset, (size_t)w * (size_t)byte);
-    }
-}
-
-static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
-{
-    if (dc->virtual_lcd_update != NULL)
-    {
-        dc->virtual_lcd_update(dc);
-        return;
-    }
-
-    float scale = 1;
-    uint16_t w = (uint16_t)(dc->fb_width * scale);
-    uint16_t h = (uint16_t)(dc->fb_height * scale);
-    uint16_t byte = dc->bit_depth / 8;
-
-    uint32_t total_section_cnt = (uint32_t)(dc->screen_height / dc->fb_height);
-    if (dc->screen_height % dc->fb_height != 0)
-    {
-        total_section_cnt += 1;
-    }
-
-    if (dc->type == DC_SINGLE)
-    {
-        for (uint16_t y = 0; y < h; y++)
-        {
-            size_t target_offset = 8 + (size_t)y * (size_t)w * (size_t)byte;
-            size_t source_offset = (size_t)y * (size_t)dc->fb_width * (size_t)byte;
-
-            memcpy(dc->shot_buf + target_offset, dc->frame_buf + source_offset, (size_t)w * (size_t)byte);
-        }
-        // gui_log("[GUI warning] please use user method for improve! \n");
-    }
-    else if (dc->type == DC_RAMLESS)
-    {
-        uint8_t *dst = dc->shot_buf + 8 + (size_t)w * (size_t)dc->fb_height * (size_t)dc->section_count *
-                       (size_t)byte;
-        if (dc->section_count == 0)
-        {
-            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
-        }
-        else if (dc->section_count == total_section_cnt - 1)
-        {
-            uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
-            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
-            // gui_log("[GUI warning] please use user method for improve! \n");
-        }
-        else
-        {
-            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
-        }
-    }
-}
-
-static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
-{
-    float scale = 1;
-    uint16_t w = dc->target_w * scale;
-    uint16_t h = dc->target_h * scale;
-    uint16_t byte = dc->bit_depth / 8;
-    uint32_t total_section_cnt = (dc->target_h / dc->fb_height + ((
-                                                                      dc->target_h % dc->fb_height) ? 1 : 0));
-
-    if (dc->type == DC_SINGLE)
-    {
-        for (uint16_t y = 0; y < h; y++)
-        {
-            memcpy(dc->shot_buf + 8 + y * (uint32_t)w * byte, dc->frame_buf + y * dc->fb_width * byte,
-                   (uint32_t)w * byte);
-        }
-        // gui_log("[GUI warning] please use user method for improve! \n");
-    }
-    else if (dc->type == DC_RAMLESS)
-    {
-        if (dc->section_count == 0)
-        {
-            uint8_t *dst = 8 + dc->shot_buf + (uint32_t)w * dc->fb_height * dc->section_count * byte;
-            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
-        }
-        else if (dc->section_count == total_section_cnt - 1)
-        {
-            uint32_t last_height = dc->target_h - dc->section_count * dc->fb_height;
-            uint8_t *dst = 8 + dc->shot_buf + (uint32_t)w * dc->fb_height * dc->section_count * byte;
-            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
-            // gui_log("[GUI warning] please use user method for improve! \n");
-        }
-        else if (dc->section_count > total_section_cnt - 1)
-        {
-
-        }
-        else
-        {
-            uint8_t *dst = 8 + dc->shot_buf + (uint32_t)w * dc->fb_height * dc->section_count * byte;
-            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
-        }
-    }
-}
 
 /*============================================================================*
  *                           Public Functions
@@ -943,10 +660,7 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
     this->opacity_value = opacity_value;
 }
 
-void gui_img_set_tp_block(gui_img_t *this, bool block)
-{
-    this->tp_block = block;
-}
+
 
 #define DEFAULT_TRANSFORM_SCALE_X 1.0F
 #define DEFAULT_TRANSFORM_SCALE_Y 1.0F
@@ -1084,75 +798,7 @@ void gui_img_skew_y(gui_img_t *this, float degrees)
 
 }
 
-void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_dispdev_t *dc_bak = gui_malloc(sizeof(gui_dispdev_t));
-    gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
-    memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
-    memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
-    matrix_scale(1.0f, 1.0f, obj->matrix);
 
-    dc->bit_depth = 16;
-
-    dc->lcd_update = gui_img_virtual_dc_update;
-    dc->shot_buf = shot_buf;
-
-    gui_fb_change();
-    gui_fb_disp(obj, false);
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
-
-    head->scan = 0;
-    head->align = 0;
-    head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
-    head->compress = 0;
-    head->rsvd = 0;
-    head->type = 0;
-    head->version = 0;
-    head->rsvd2 = 0;
-    head->w = obj->w * 1.0f;
-    head->h = obj->h * 1.0f;
-
-    memcpy(dc, dc_bak, sizeof(gui_dispdev_t));
-    memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
-    gui_free(dc_bak);
-    gui_free(matrix_bak);
-}
-void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_dispdev_t *dc_bak = gui_malloc(sizeof(gui_dispdev_t));
-    gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
-    memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
-    memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
-    //matrix_scale(0.7f, 0.7f, obj->matrix);
-
-    dc->bit_depth = 16;
-
-    dc->lcd_update = gui_img_virtual_dc_update_root_size;
-    dc->shot_buf = shot_buf;
-    dc->target_h = obj->h;
-    dc->target_w = obj->w;
-    gui_fb_change();
-    gui_fb_disp(obj, false);
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
-
-    head->scan = 0;
-    head->align = 0;
-    head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
-    head->compress = 0;
-    head->rsvd = 0;
-    head->type = 0;
-    head->version = 0;
-    head->rsvd2 = 0;
-    head->w = obj->w ;
-    head->h = obj->h ;
-
-    memcpy(dc, dc_bak, sizeof(gui_dispdev_t));
-    memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
-    gui_free(dc_bak);
-    gui_free(matrix_bak);
-}
 void gui_img_append_animate(gui_img_t              *_this,
                             uint32_t                dur,
                             int                     repeat_count,

@@ -72,7 +72,7 @@
 截屏
 ~~~~
 
-开发者可以使用 :cpp:any:`gui_img_tree_convert_to_img` 来保存全屏截图。另外，可以使用 :cpp:any:`gui_img_tree_convert_to_img_root_size` 来保存当前控件大小的截图。保存的图像会是RGB格式。
+开发者可以使用 :cpp:any:`gui_img_tree_convert_to_img` 来保存全屏截图。保存的图像会是RGB格式。
 
 示例
 ----

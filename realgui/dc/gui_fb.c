@@ -41,34 +41,11 @@ static void obj_reset_active(gui_obj_t *obj)
 static bool obj_is_active(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    float m00 = obj->matrix->m[0][0];
-    float m01 = obj->matrix->m[0][1];
-    float m02 = obj->matrix->m[0][2];
-    float m10 = obj->matrix->m[1][0];
-    float m11 = obj->matrix->m[1][1];
-    float m12 = obj->matrix->m[1][2];
-    float m20 = obj->matrix->m[2][0];
-    float m21 = obj->matrix->m[2][1];
-    float m22 = obj->matrix->m[2][2];
 
-    if ((m01 == 0) && \
-        (m10 == 0) && \
-        (m20 == 0) && \
-        (m21 == 0) && \
-        (m22 == 1)) //scale and translate, no rotate
+    if (gui_obj_out_screen(obj))
     {
-        float x_min = m02;
-        float x_max = m02 + m00 * obj->w;
-        float y_min = m12;
-        float y_max = m12 + m11 * obj->h;
-        if ((x_min > (int)gui_get_screen_width()) || \
-            (x_max < 0) || \
-            (y_min > (int)gui_get_screen_height()) || \
-            (y_max < 0))
-        {
-            obj->active = false;
-            return false;
-        }
+        obj->active = false;
+        return false;
     }
 
     gui_point3f_t p[4] =
@@ -195,10 +172,7 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         if (obj->has_prepare_cb)
         {
-            if (!obj->gesture)
-            {
-                obj->obj_cb(obj, OBJ_PREPARE);
-            }
+            obj->obj_cb(obj, OBJ_PREPARE);
         }
         if (obj->not_show)
         {
@@ -262,18 +236,10 @@ static void obj_draw_end(gui_obj_t *obj)
         {
             obj->obj_cb(obj, OBJ_END);
         }
-        if (obj->active)
-        {
-            gui_obj_event_handle(obj);
-        }
 
         matrix_identity(obj->matrix);
         obj->active = false;
 
-        obj->skip_tp_left_hold = true;
-        obj->skip_tp_right_hold = true;
-        obj->skip_tp_up_hold = true;
-        obj->skip_tp_down_hold = true;
         obj_draw_end(obj);
     }
 }

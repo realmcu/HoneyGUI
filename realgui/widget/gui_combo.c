@@ -114,7 +114,7 @@ static void item_button_cb(void *obj, gui_event_t e, void *param)
 
             GUI_TYPE(gui_button_t, button)->off_pic_addr = (void *)combo->item_background_selection_image;
             GUI_TYPE(gui_button_t, button)->img->data = GUI_TYPE(gui_button_t, button)->off_pic_addr;
-            GUI_API(gui_switch_t).turn_off(combo->button_selector);
+            _gui_api_for_gui_switch_t.turn_off(combo->button_selector);
             {
                 gui_text_t *last_text = 0;
                 gui_obj_tree_get_widget_by_type_and_index((void *)combo, TEXTBOX, (void *)&last_text,
@@ -235,7 +235,9 @@ gui_combo_t *gui_combo_create(gui_obj_t *parent,
 
     return this;
 }
-_GUI_API_ASSIGN(gui_combo_t)
-.on_change = on_change,
- .get_current_item = current_item,
+
+_gui_api_gui_combo_t _gui_api_for_gui_combo_t =
+{
+    .on_change = on_change,
+    .get_current_item = current_item,
 };

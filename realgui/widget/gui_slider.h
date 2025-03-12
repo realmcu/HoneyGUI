@@ -64,10 +64,17 @@ typedef struct gui_slider
     void *slider_image_addr;
 } gui_slider_t;
 
-_GUI_API_DEFINE(gui_slider_t)
-void (*on_change)(gui_slider_t *this, gui_event_cb_t event_cb, void *parameter);
-uint16_t (*get_currentValue)(gui_slider_t *this);
-_GUI_API_DECLARE(gui_slider_t)
+
+
+typedef struct __gui_api_gui_slider_t
+{
+
+    void (*on_change)(gui_slider_t *this, gui_event_cb_t event_cb, void *parameter);
+    uint16_t (*get_currentValue)(gui_slider_t *this);
+//_GUI_API_DECLARE(gui_slider_t)
+} _gui_api_gui_slider_t;
+
+extern _gui_api_gui_slider_t _gui_api_for_gui_slider_t;
 
 /*============================================================================*
  *                         Constants

@@ -112,13 +112,13 @@ void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
 
     if (release_x > 0)
     {
-        if (tab_x_gap == 0 || tab_x_gap == -1)
-        {
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x1 = (1 + tab_x_gap) * dc->screen_width / 2;
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x2 = (2 + tab_x_gap) * dc->screen_width / 2;
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_flag = 1;
-        }
-        else
+//        if (tab_x_gap == 0 || tab_x_gap == -1)
+//        {
+//            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x1 = (1 + tab_x_gap) * dc->screen_width / 2;
+//            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x2 = (2 + tab_x_gap) * dc->screen_width / 2;
+//            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_flag = 1;
+//        }
+//        else
         {
             matrix_translate((tab_x_gap) * 2 * (int)this->base.w, \
                              (tab_y_gap) * 2 * (int)this->base.h, \
@@ -138,13 +138,13 @@ void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     }
     else if (release_x < 0)
     {
-        if (tab_x_gap == 0 || tab_x_gap == 1)
-        {
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x1 = tab_x_gap * dc->screen_width / 2;
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x2 = (1 + tab_x_gap) * dc->screen_width / 2;
-            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_flag = 1;
-        }
-        else
+//        if (tab_x_gap == 0 || tab_x_gap == 1)
+//        {
+//            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x1 = tab_x_gap * dc->screen_width / 2;
+//            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_x2 = (1 + tab_x_gap) * dc->screen_width / 2;
+//            GUI_TYPE(gui_img_t, this->shot_pave_obj)->scope_flag = 1;
+//        }
+//        else
         {
             matrix_translate((tab_x_gap) * 2 * (int)this->base.w, \
                              (tab_y_gap) * 2 * (int)this->base.h, \

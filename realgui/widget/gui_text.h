@@ -82,12 +82,6 @@ typedef enum
     FONT_SRC_FTL     = 2,
 } FONT_SRC_MODE;
 
-typedef enum
-{
-    TXT_EVENT_CLICK         = GUI_EVENT_1,
-    TXT_EVENT_PSWD_DONE     = GUI_EVENT_2,
-
-} T_GUI_TEXT_EVENT;
 
 /** @brief  text widget structure */
 typedef struct gui_text

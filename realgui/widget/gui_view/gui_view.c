@@ -29,7 +29,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define VIEW_FREE_EVENT GUI_EVENT_8
+//#define VIEW_FREE_EVENT GUI_EVENT_8
 
 /*============================================================================*
  *                            Variables
@@ -45,11 +45,6 @@ static void gui_view_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     GUI_UNUSED(tp);
-
-    obj->skip_tp_up_hold = 0;
-    obj->skip_tp_down_hold = 0;
-    obj->skip_tp_left_hold = 0;
-    obj->skip_tp_right_hold = 0;
 }
 
 static void gui_view_prepare(gui_obj_t *obj)
@@ -111,7 +106,8 @@ static void gui_view_end(gui_obj_t *obj)
         this->view_tp = 1;
         if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
-            gui_obj_enable_event(obj, VIEW_FREE_EVENT);
+            //gui_obj_enable_event(obj, VIEW_FREE_EVENT);
+            GUI_ASSERT(0);//SEND MESSAGE TO SERVER
             obj->active = 1;
         }
         else
@@ -132,7 +128,8 @@ static void gui_view_end(gui_obj_t *obj)
         }
         else
         {
-            gui_obj_enable_event(obj, VIEW_FREE_EVENT);
+            //gui_obj_enable_event(obj, VIEW_FREE_EVENT);
+            GUI_ASSERT(0);//SEND MESSAGE TO SERVER
             obj->active = 1;
         }
     }
@@ -178,11 +175,11 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void gui_view_free(void *obj, gui_event_t e, void *param)
-{
-    gui_obj_tree_free(obj);
-    // gui_log("[VIEW]free view done!\n");
-}
+//static void gui_view_free(void *obj, gui_event_t e, void *param)
+//{
+//    gui_obj_tree_free(obj);
+//    // gui_log("[VIEW]free view done!\n");
+//}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -234,7 +231,8 @@ gui_view_t *gui_view_create(void       *parent,
 
     *descriptor->pView = this;
     descriptor->design_cb(this);
-    gui_obj_add_event_cb(GET_BASE(this), gui_view_free, VIEW_FREE_EVENT, NULL);
+    //gui_obj_add_event_cb(GET_BASE(this), gui_view_free, VIEW_FREE_EVENT, NULL);
+    GUI_ASSERT(0);//SEND MESSAGE TO SERVER
     return this;
 }
 

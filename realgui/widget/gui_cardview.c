@@ -65,21 +65,8 @@ static void gui_cardview_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_cardview_t *this = (gui_cardview_t *)obj;
     GUI_UNUSED(tp);
+    GUI_UNUSED(this);
 
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
-    {
-        return;
-    }
-
-    if (this->hold_y == 0)
-    {
-        gui_obj_skip_other_up_hold(obj);
-    }
-    else
-    {
-        gui_obj_skip_other_up_hold(obj);
-        gui_obj_skip_other_down_hold(obj);
-    }
 }
 #define GUI_MAX_SPEED 60
 #define GUI_MIN_SPEED 7
@@ -196,7 +183,9 @@ static void gui_page_hold_y(gui_obj_t *obj)
                                               this->bottom_space_count - (int)gui_get_screen_height()))
              && this->hold_y != 0)/*@BOTTOM*/
     {
-        gui_obj_enable_event(obj, GUI_EVENT_7);
+        //gui_obj_enable_event(obj, GUI_EVENT_7);
+        GUI_ASSERT(NULL != NULL);
+
         this->hold_y = this->start_y - (this->height + this->card_height * this->bottom_space_count -
                                         (int)gui_get_screen_height());
     }
@@ -216,13 +205,15 @@ static void gui_page_update_inertial(gui_obj_t *obj)
     if (this->speed > 3)
     {
         this->hold_y += this->speed;
-        gui_obj_enable_event(obj, GUI_EVENT_8);
+        //gui_obj_enable_event(obj, GUI_EVENT_8);
+        GUI_ASSERT(NULL != NULL);
         this->speed -= 1;
     }
     else if (this->speed < -3)
     {
         this->hold_y += this->speed;
-        gui_obj_enable_event(obj, GUI_EVENT_8);
+        //gui_obj_enable_event(obj, GUI_EVENT_8);
+        GUI_ASSERT(NULL != NULL);
         this->speed += 1;
     }
 }
@@ -234,7 +225,8 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     if (this->hold_y > this->start_y)/*@TOP*/
     {
         this->hold_y = this->start_y;
-        gui_obj_enable_event(obj, GUI_EVENT_7);
+        //gui_obj_enable_event(obj, GUI_EVENT_7);
+        GUI_ASSERT(NULL != NULL);
         this->release = false;
     }
     else if (this->hold_y < (this->start_y - (this->height + this->card_height *
@@ -244,7 +236,8 @@ static void gui_page_update_boundary(gui_obj_t *obj)
         this->release = false;
         this->hold_y = this->start_y - (this->height + this->card_height * this->bottom_space_count -
                                         (int)gui_get_screen_height());
-        gui_obj_enable_event(obj, GUI_EVENT_7);
+        //gui_obj_enable_event(obj, GUI_EVENT_7);
+        GUI_ASSERT(NULL != NULL);
     }
 }
 
@@ -291,14 +284,7 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     {
         return;
     }
-    if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
-    {
-        return;
-    }
-    if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
-    {
-        return;
-    }
+
 
     if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
@@ -359,7 +345,8 @@ static void gui_cardview_prepare(gui_obj_t *obj)
                     this->release = false;
                     this->speed = 0;
                     memset(this->recode, 0, 10);
-                    gui_obj_enable_event(obj, GUI_EVENT_7);
+                    //gui_obj_enable_event(obj, GUI_EVENT_7);
+                    GUI_ASSERT(NULL != NULL);
                 }
 
                 if (tp->type != TOUCH_HOLD_Y)
@@ -382,11 +369,13 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     {
         if (tp->deltaY <= -10)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_1);
+            //gui_obj_enable_event(obj, GUI_EVENT_1);
+            GUI_ASSERT(NULL != NULL);
         }
         else if (tp->deltaY > 10)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_2);
+            //gui_obj_enable_event(obj, GUI_EVENT_2);
+            GUI_ASSERT(NULL != NULL);
         }
     }
 
@@ -485,12 +474,14 @@ void gui_cardview_set_bottom_space(gui_cardview_t *this, uint8_t bottom_space)
 
 void gui_cardview_up(gui_cardview_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    GUI_ASSERT(NULL != NULL);
 }
 
 void gui_cardview_down(gui_cardview_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+    GUI_ASSERT(NULL != NULL);
 }
 
 gui_cardview_t *gui_cardview_create(void       *parent,

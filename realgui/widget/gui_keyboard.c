@@ -745,7 +745,8 @@ static void gui_basic_func_proc(uint32_t key_val)
                     str[len] = '\0';
                     gui_text_content_set(txt, (void *)str, len);
 
-                    gui_obj_enable_event((gui_obj_t *)txt, (gui_event_t)TXT_EVENT_PSWD_DONE);
+                    //gui_obj_enable_event((gui_obj_t *)txt, (gui_event_t)TXT_EVENT_PSWD_DONE);
+                    GUI_ASSERT(0);//by wanghao , use send message
                 }
                 else
                 {
@@ -1673,7 +1674,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
                                            0, 0, w, h);
     gui_img_set_mode(this->img_bg, IMG_BYPASS_MODE);
     gui_img_scale(this->img_bg, this->scale, gui_get_screen_height() / 320.f);
-    gui_img_set_tp_block(this->img_bg, true);
+    // gui_img_set_tp_block(this->img_bg, true);
 
     //
     if (this->layout == KB_LAYOUT_BASIC)

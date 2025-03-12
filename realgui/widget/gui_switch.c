@@ -73,11 +73,13 @@ void gui_switch_turn_on(gui_switch_t *this)
 
     if (this->ifon)
     {
-        gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_ON);
+        //gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_ON);
+        GUI_ASSERT(0);
     }
     else if (!this->ifon)
     {
-        gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_OFF);
+        //gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_OFF);
+        GUI_ASSERT(0);
     }
 }
 
@@ -87,11 +89,13 @@ void gui_switch_turn_off(gui_switch_t *this)
 
     if (this->ifon)
     {
-        gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_ON);
+        //gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_ON);
+        GUI_ASSERT(0);
     }
     else if (!this->ifon)
     {
-        gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_OFF);
+        //gui_obj_enable_event((void *)this, (gui_event_t)SWITCH_EVENT_TURN_OFF);
+        GUI_ASSERT(0);
     }
 }
 
@@ -107,77 +111,81 @@ void gui_switch_is_off(gui_switch_t *this)
 
 static void gui_switch_on(gui_switch_t *b, gui_event_cb_t callback, void *parameter)
 {
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_ON, parameter);
+    //gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_ON, parameter);
+    GUI_ASSERT(0);
 }
 
 static void gui_switch_off(gui_switch_t *b, gui_event_cb_t callback, void *parameter)
 {
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_OFF, parameter);
+    //gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_OFF, parameter);
+    GUI_ASSERT(0);
 }
 static void on_press(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, (gui_event_t)SWITCH_EVENT_PRESSED, parameter);
+    //gui_obj_add_event_cb(this, event_cb, (gui_event_t)SWITCH_EVENT_PRESSED, parameter);
+    GUI_ASSERT(0);
 }
 static void on_release(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, (gui_event_t)SWITCH_EVENT_RELEASED, parameter);
+    //gui_obj_add_event_cb(this, event_cb, (gui_event_t)SWITCH_EVENT_RELEASED, parameter);
+    GUI_ASSERT(0);
 }
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-static void gui_switch_hl(gui_switch_t *sw)
-{
-    if (sw->ifon)
-    {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_hl_pic_addr,
-                              sw->switch_picture->base.x, sw->switch_picture->base.y);
-    }
-    else
-    {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_hl_pic_addr,
-                              sw->switch_picture->base.x, sw->switch_picture->base.y);
-    }
-}
+//static void gui_switch_hl(gui_switch_t *sw)
+//{
+//    if (sw->ifon)
+//    {
+//        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_hl_pic_addr,
+//                              sw->switch_picture->base.x, sw->switch_picture->base.y);
+//    }
+//    else
+//    {
+//        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_hl_pic_addr,
+//                              sw->switch_picture->base.x, sw->switch_picture->base.y);
+//    }
+//}
 
-static void gui_switch_hl_back(gui_switch_t *sw)
-{
-    if (sw->ifon)
-    {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr,
-                              sw->switch_picture->base.x, sw->switch_picture->base.y);
-    }
-    else
-    {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr,
-                              sw->switch_picture->base.x, sw->switch_picture->base.y);
-    }
-}
+//static void gui_switch_hl_back(gui_switch_t *sw)
+//{
+//    if (sw->ifon)
+//    {
+//        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr,
+//                              sw->switch_picture->base.x, sw->switch_picture->base.y);
+//    }
+//    else
+//    {
+//        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr,
+//                              sw->switch_picture->base.x, sw->switch_picture->base.y);
+//    }
+//}
 
-static void gui_switch_long_touch(gui_switch_t *sw)
-{
-    gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
-                          sw->long_touch_state_pic_addr, 0, 0);
-}
+//static void gui_switch_long_touch(gui_switch_t *sw)
+//{
+//    gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
+//                          sw->long_touch_state_pic_addr, 0, 0);
+//}
 
-static void gui_switch_long_touch_back(gui_switch_t *sw)
-{
-    if (sw->ifon)
-    {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr,
-                              sw->switch_picture->base.x, sw->switch_picture->base.y);
-    }
-    else
-    {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr,
-                              sw->switch_picture->base.x, sw->switch_picture->base.y);
-    }
-}
+//static void gui_switch_long_touch_back(gui_switch_t *sw)
+//{
+//    if (sw->ifon)
+//    {
+//        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr,
+//                              sw->switch_picture->base.x, sw->switch_picture->base.y);
+//    }
+//    else
+//    {
+//        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr,
+//                              sw->switch_picture->base.x, sw->switch_picture->base.y);
+//    }
+//}
 
-static void gui_switch_hl_long_touch(gui_switch_t *sw)
-{
-    gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
-                          sw->long_touch_state_hl_pic_addr, sw->switch_picture->base.x, sw->switch_picture->base.y);
-}
+//static void gui_switch_hl_long_touch(gui_switch_t *sw)
+//{
+//    gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
+//                          sw->long_touch_state_hl_pic_addr, sw->switch_picture->base.x, sw->switch_picture->base.y);
+//}
 
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
 {
@@ -212,22 +220,6 @@ static void gui_switch_input_prepare(gui_obj_t *obj)
     GUI_UNUSED(tp);
     GUI_UNUSED(this);
 
-    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false)
-    {
-        return;
-    }
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
-    {
-        if (tp->type == TOUCH_SHORT)
-        {
-            gui_obj_skip_other_short(obj);
-        }
-        if (tp->pressed)
-        {
-            gui_obj_skip_other_pressed(obj);
-        }
-    }
-
 }
 static void gui_switch_prepare(gui_obj_t *obj)
 {
@@ -249,138 +241,11 @@ static void gui_switch_prepare(gui_obj_t *obj)
         return;
     }
     animate_frame_update(this->animate, GUI_BASE(this));
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
-    {
-        if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-        {
-            switch (tp->type)
-            {
-            case TOUCH_SHORT:
-                {
-                    if ((obj->skip_tp_short))
-                    {
-                        break;
-                    }
-                    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                    {
-                        this->ifon = !(this->ifon);
-                        gui_switch_change_state(this, this->ifon);
-                        if (this->ifon)
-                        {
-                            gui_obj_enable_event(obj, (gui_event_t)SWITCH_EVENT_TURN_ON);
-                        }
-                        else if (!this->ifon)
-                        {
-                            gui_obj_enable_event(obj, (gui_event_t)SWITCH_EVENT_TURN_OFF);
-                        }
-                        gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
-                        this->press_flag = false;
-                    }
-                }
-                break;
-            case TOUCH_UP_SLIDE:
-                {
-                }
-                break;
-            case TOUCH_DOWN_SLIDE:
-                {
-                }
-                break;
-            case TOUCH_LEFT_SLIDE:
-                {
-                }
-                break;
-            case TOUCH_RIGHT_SLIDE:
-                {
-                }
-                break;
-            case TOUCH_LONG:
-                {
-                    if (this->long_flag == false)
-                    {
-                        if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                        {
-                            this->long_flag = true;
-                            if (this->long_touch_enable)
-                            {
-                                gui_log("TOUCH_LONG b->long_touch_state = %d\n", this->long_touch_state);
+    //gui_obj_enable_event(obj, (gui_event_t)SWITCH_EVENT_TURN_ON);
+    //gui_obj_enable_event(obj, (gui_event_t)SWITCH_EVENT_TURN_OFF);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
 
-                                this->long_touch_state = !this->long_touch_state;
-                                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-                                gui_switch_hl_back(this);
-
-                                if (this->long_touch_state)
-                                {
-                                    gui_switch_long_touch(this);
-                                }
-                                else
-                                {
-                                    gui_switch_long_touch_back(this);
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                break;
-            }
-            if (tp->pressed)
-            {
-                if (!obj->skip_tp_pressed)
-                {
-                    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                    {
-                        //gui_log("pressed type 0x%x\n", tp->type);
-                        gui_obj_enable_event(obj, (gui_event_t)SWITCH_EVENT_PRESSED);
-
-                        this->long_flag = false;
-                        this->press_flag = true;
-
-                        if (!this->long_touch_state)
-                        {
-                            gui_switch_hl(this);
-                        }
-                        else
-                        {
-                            gui_switch_hl_long_touch(this);
-                        }
-                    }
-                }
-            }
-            //pic can change back if slide happens on pic
-            if (tp->pressing)
-            {
-                if (tp->deltaX != 0 || tp->deltaY != 0 || tp->type == TOUCH_HOLD_X ||
-                    tp->type == TOUCH_HOLD_Y)
-                {
-                    gui_switch_hl_back(this);
-                }
-            }
-            if (this->release_flag)
-            {
-                if ((tp->type != TOUCH_HOLD_Y) && (tp->type != TOUCH_ORIGIN_FROM_Y))
-                {
-                    if (this->long_touch_state)
-                    {
-                        gui_switch_long_touch(this);
-                    }
-                }
-                this->press_flag = false;
-                this->release_flag = false;
-                this->long_flag = false;
-            }
-            if (tp->released && this->press_flag)
-            {
-                this->release_flag = true;
-                gui_obj_enable_event(obj, (gui_event_t)SWITCH_EVENT_RELEASED);
-            }
-            if (this->touch_disable)
-            {
-                gui_obj_enable_event(obj, (gui_event_t)0);
-            }
-        }
-    }
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_switch_t));
     if (last != this->checksum)
@@ -503,15 +368,17 @@ gui_switch_t *gui_switch_create_from_ftl(void    *parent,
 {
     return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_FTL);
 }
-_GUI_API_ASSIGN(gui_switch_t)
-.ctor = gui_switch_ctor,
- .on_turn_off = gui_switch_off,
-  .on_turn_on = gui_switch_on,
-   .turn_off = gui_switch_turn_off,
+
+_gui_api_gui_switch_t _gui_api_for_gui_switch_t =
+{
+    .ctor = gui_switch_ctor,
+    .on_turn_off = gui_switch_off,
+    .on_turn_on = gui_switch_on,
+    .turn_off = gui_switch_turn_off,
     .turn_on = gui_switch_turn_on,
-     .on_press = on_press,
-      .animate = animate,
-       .on_release = on_release,
-        .turn_off_no_event = gui_switch_is_off,
-         .turn_on_no_event = gui_switch_is_on,
+    .on_press = on_press,
+    .animate = animate,
+    .on_release = on_release,
+    .turn_off_no_event = gui_switch_is_off,
+    .turn_on_no_event = gui_switch_is_on,
 };

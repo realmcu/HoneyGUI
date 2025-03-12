@@ -52,22 +52,7 @@ static void turn_table_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_turn_table_t *this = (void *)obj;
     GUI_UNUSED(tp);
-    if (this->skip_up_tp)
-    {
-        gui_obj_skip_other_up_hold(obj);
-    }
-    if (this->skip_down_tp)
-    {
-        gui_obj_skip_other_down_hold(obj);
-    }
-    if (this->skip_left_tp)
-    {
-        gui_obj_skip_other_left_hold(obj);
-    }
-    if (this->skip_right_tp)
-    {
-        gui_obj_skip_other_right_hold(obj);
-    }
+    GUI_UNUSED(this);
 }
 static void gui_turn_table_update_resetting_angle(gui_turn_table_t *this)
 {
@@ -233,13 +218,11 @@ static void gui_turn_table_icon_img_set(gui_img_t *this, int x, int y, bool acti
     if (active)
     {
         gui_img_set_location(this, x, y);
-        this->base.gesture = 0;
         gui_obj_show(this, true);
     }
     else
     {
         gui_img_set_location(this, x, y);
-        this->base.gesture = 1;
         gui_obj_show(this, false);
     }
 }
@@ -522,10 +505,6 @@ static void gui_turn_table_ctor(gui_turn_table_t *this,
     GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_destroy_cb = true;
-    GET_BASE(this)->skip_tp_up_hold = true;
-    GET_BASE(this)->skip_tp_down_hold = true;
-    GET_BASE(this)->skip_tp_left_hold = true;
-    GET_BASE(this)->skip_tp_right_hold = true;
 
     this->icon_quantity = icon_quantity;
     this->icon_radius = icon_radius;

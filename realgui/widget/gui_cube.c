@@ -207,9 +207,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *root = (gui_obj_t *)obj;
     touch_info_t *tp = tp_get_info();
-    gui_cube_img_event_t cube_event;
-    cube_event.size = 0;
-    cube_event.event = GUI_EVENT_INVALIDE;
+
     GUI_UNUSED(root);
 
     // Scale the cube to proper size
@@ -293,13 +291,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&front->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&front->inverse);
         draw_img_new_area(front, NULL);
-        if (gui_cube_point_in_rect(front, tp->x, tp->y) == true)
+        if ((gui_cube_point_in_rect(front, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            if (this->nz[CUBE_NZ_0321] > cube_event.size)
-            {
-                cube_event.size = this->nz[CUBE_NZ_0321];
-                cube_event.event = GUI_EVENT_1;
-            }
+            GUI_ASSERT(0);
+            //SEND MESSAGE HERE
         }
     }
 
@@ -314,13 +309,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&back->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&back->inverse);
         draw_img_new_area(back, NULL);
-        if (gui_cube_point_in_rect(back, tp->x, tp->y) == true)
+        if ((gui_cube_point_in_rect(back, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            if (this->nz[CUBE_NZ_4567] > cube_event.size)
-            {
-                cube_event.size = this->nz[CUBE_NZ_4567];
-                cube_event.event = GUI_EVENT_2;
-            }
+            GUI_ASSERT(0);
+            //SEND MESSAGE HERE
         }
     }
 
@@ -335,13 +327,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&up->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&up->inverse);
         draw_img_new_area(up, NULL);
-        if (gui_cube_point_in_rect(up, tp->x, tp->y) == true)
+        if ((gui_cube_point_in_rect(up, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            if (this->nz[CUBE_NZ_5126] > cube_event.size)
-            {
-                cube_event.size = this->nz[CUBE_NZ_5126];
-                cube_event.event = GUI_EVENT_3;
-            }
+            GUI_ASSERT(0);
+            //SEND MESSAGE HERE
         }
     }
 
@@ -356,13 +345,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&down->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&down->inverse);
         draw_img_new_area(down, NULL);
-        if (gui_cube_point_in_rect(down, tp->x, tp->y) == true)
+        if ((gui_cube_point_in_rect(down, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            if (this->nz[CUBE_NZ_0473] > cube_event.size)
-            {
-                cube_event.size = this->nz[CUBE_NZ_0473];
-                cube_event.event = GUI_EVENT_4;
-            }
+            GUI_ASSERT(0);
+            //SEND MESSAGE HERE
         }
     }
 
@@ -377,13 +363,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&left->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&left->inverse);
         draw_img_new_area(left, NULL);
-        if (gui_cube_point_in_rect(left, tp->x, tp->y) == true)
+        if ((gui_cube_point_in_rect(left, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            if (this->nz[CUBE_NZ_7623] > cube_event.size)
-            {
-                cube_event.size = this->nz[CUBE_NZ_7623];
-                cube_event.event = GUI_EVENT_5;
-            }
+            GUI_ASSERT(0);
+            //SEND MESSAGE HERE
         }
     }
 
@@ -398,21 +381,15 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&right->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&right->inverse);
         draw_img_new_area(right, NULL);
-        if (gui_cube_point_in_rect(right, tp->x, tp->y) == true)
+        if ((gui_cube_point_in_rect(right, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            if (this->nz[CUBE_NZ_0154] > cube_event.size)
-            {
-                cube_event.size = this->nz[CUBE_NZ_0154];
-                cube_event.event = GUI_EVENT_6;
-            }
+            GUI_ASSERT(0);
+            //SEND MESSAGE HERE
+
         }
+
     }
-    if (tp->type == TOUCH_SHORT &&
-        cube_event.size > 0 &&
-        cube_event.event != GUI_EVENT_INVALIDE)
-    {
-        gui_obj_enable_event(obj, cube_event.event);
-    }
+
 }
 
 static void gui_cube_draw_cb(gui_obj_t *obj)
@@ -635,12 +612,13 @@ uint8_t gui_cube_get_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side)
 
 void gui_cube_add_click_cb(gui_cube_t *this, gui_cube_cb_t cb_list)
 {
-    gui_obj_add_event_cb(this, cb_list.click_cb_front, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(this, cb_list.click_cb_back, GUI_EVENT_2, NULL);
-    gui_obj_add_event_cb(this, cb_list.click_cb_up, GUI_EVENT_3, NULL);
-    gui_obj_add_event_cb(this, cb_list.click_cb_down, GUI_EVENT_4, NULL);
-    gui_obj_add_event_cb(this, cb_list.click_cb_left, GUI_EVENT_5, NULL);
-    gui_obj_add_event_cb(this, cb_list.click_cb_right, GUI_EVENT_6, NULL);
+    // gui_obj_add_event_cb(this, cb_list.click_cb_front, GUI_EVENT_1, NULL);
+    // gui_obj_add_event_cb(this, cb_list.click_cb_back, GUI_EVENT_2, NULL);
+    // gui_obj_add_event_cb(this, cb_list.click_cb_up, GUI_EVENT_3, NULL);
+    // gui_obj_add_event_cb(this, cb_list.click_cb_down, GUI_EVENT_4, NULL);
+    // gui_obj_add_event_cb(this, cb_list.click_cb_left, GUI_EVENT_5, NULL);
+    // gui_obj_add_event_cb(this, cb_list.click_cb_right, GUI_EVENT_6, NULL);
+    GUI_ASSERT(NULL != NULL);
 }
 
 void gui_cube_set_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side, uint8_t opacity)

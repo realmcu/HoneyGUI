@@ -314,14 +314,16 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
             {
                 b->press_flag = true;
 
-                gui_obj_enable_event(obj, GUI_EVENT_1);
+                //gui_obj_enable_event(obj, GUI_EVENT_1);
+                GUI_ASSERT(0);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            gui_obj_enable_event(obj, GUI_EVENT_2);
+            //gui_obj_enable_event(obj, GUI_EVENT_2);
+            GUI_ASSERT(0);
         }
 
         if (b->press_flag)
@@ -332,7 +334,7 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
     for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
     {
         gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-        gui_log("%d\n", event_dsc->event_code);
+        GUI_UNUSED(event_dsc);
     }
 }
 
@@ -372,7 +374,9 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
 
                     if (!event_4)
                     {
-                        gui_obj_enable_event(obj, GUI_EVENT_4); gui_log("GUI_EVENT_4:\n");
+                        //gui_obj_enable_event(obj, GUI_EVENT_4);
+                        GUI_ASSERT(0);
+                        gui_log("GUI_EVENT_4:\n");
                         event_4 = 1;
                     }
 
@@ -543,14 +547,16 @@ static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
-                gui_obj_enable_event(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+                //gui_obj_enable_event(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+                GUI_ASSERT(0);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            gui_obj_enable_event(obj, GUI_EVENT_2);
+            //gui_obj_enable_event(obj, GUI_EVENT_2);
+            GUI_ASSERT(0);
         }
         if (b->press_flag)
         {
@@ -786,7 +792,8 @@ static void gui_seekbar_set_animate(gui_seekbar_t *this, uint32_t dur, int repea
 }
 static void on_change(gui_seekbar_t *this, gui_event_cb_t function, void *param)
 {
-    gui_obj_add_event_cb(this, function, GUI_EVENT_5, param);
+    //gui_obj_add_event_cb(this, function, GUI_EVENT_5, param);
+    GUI_ASSERT(0);// send message
 }
 //_GUI_API_ASSIGN(gui_seekbar_t)
 _gui_api_gui_seekbar_t _gui_api_for_gui_seekbar_t =

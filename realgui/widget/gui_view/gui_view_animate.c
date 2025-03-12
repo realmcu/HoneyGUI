@@ -316,7 +316,8 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(view_transition_animation_function
     {
         if (this->view_switch_ready)
         {
-            gui_obj_enable_event(GUI_BASE(this), VIEW_FREE_EVENT);
+            //gui_obj_enable_event(GUI_BASE(this), VIEW_FREE_EVENT);
+            GUI_ASSERT(0);//SEND MESSAGE TO SERVER
         }
         else
         {

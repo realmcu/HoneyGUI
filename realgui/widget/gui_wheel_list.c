@@ -50,10 +50,6 @@ static void wheel_list_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     GUI_UNUSED(tp);
-    gui_obj_skip_other_right_hold(obj);
-    gui_obj_skip_other_left_hold(obj);
-    gui_obj_skip_other_down_hold(obj);
-    gui_obj_skip_other_up_hold(obj);
 }
 
 static void adjust_radian(float *radian)

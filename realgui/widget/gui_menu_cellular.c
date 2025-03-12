@@ -512,8 +512,8 @@ void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
         {
             if (para_array && para_array[index].callback_function)
             {
-                gui_obj_add_event_cb(obj, para_array[index].callback_function, GUI_EVENT_1,
-                                     para_array[index].parameter);
+                //gui_obj_add_event_cb(obj, para_array[index].callback_function, GUI_EVENT_1, para_array[index].parameter);
+                GUI_ASSERT(0);//todo comment by howie
             }
         }
         index++;

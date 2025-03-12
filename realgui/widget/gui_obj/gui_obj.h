@@ -128,6 +128,19 @@ void gui_obj_show(void *obj, bool enable);
 
 
 /**
+ * @brief judge the obj if out of screen.
+ */
+bool gui_obj_out_screen(gui_obj_t *obj);
+
+/**
+ * @brief Calculate the clipping rectangle of a GUI object relative to its top-level ancestor.
+ *
+ * @param obj The GUI object for which the clipping rectangle is calculated.
+ * @param rect The output rectangle that will contain the calculated clipping area.
+ */
+void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect);
+
+/**
  * @brief judge the obj if in range of this_widget rect.
  *
  * @param obj pointer to the GUI object.

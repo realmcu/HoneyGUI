@@ -71,25 +71,6 @@ void gui_button_input_prepare(gui_obj_t *obj)
         return;
     }
 
-    if (tp->pressed)
-    {
-        gui_obj_skip_other_pressed(obj);
-    }
-
-    switch (tp->type)
-    {
-    case TOUCH_SHORT:
-        {
-            gui_obj_skip_other_short(obj);
-        }
-        break;
-    case TOUCH_LONG:
-        {
-            gui_obj_skip_other_long(obj);
-        }
-        break;
-    }
-
 
 }
 /**
@@ -102,97 +83,15 @@ void gui_button_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_button_t *this = (void *)obj;
+    GUI_UNUSED(this);
 
     gui_button_update_att(obj);
 
-    if (this->flag == true)
-    {
-        gui_obj_enable_event(obj, GUI_EVENT_5);
-    }
-
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
-    {
-        return;
-    }
-
-    if (TOUCH_INVALIDE != tp->type)
-        switch (tp->type)
-        {
-        case TOUCH_SHORT:
-            {
-                if (obj->skip_tp_short || !this->enable)
-                {
-                    break;
-                }
-                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                {
-                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-                }
-            }
-            break;
-
-        case TOUCH_LONG:
-            {
-                if (obj->skip_tp_long || !this->enable)
-                {
-                    break;
-                }
-                if (this->long_flag == false)
-                {
-                    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                    {
-                        this->long_flag = true;
-                        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-                    }
-                }
-            }
-            break;
-
-        default:
-            break;
-        }
-
-    if (tp->pressed)
-    {
-        if (obj->skip_tp_pressed || !this->enable)
-        {
-            return;
-        }
-        if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-        {
-            if (this->on_pic_addr && this->style == 0)
-            {
-                gui_img_set_attribute(this->img, this->img->base.name, this->on_pic_addr, this->img->base.x,
-                                      this->img->base.y);
-            }
-
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-
-            this->long_flag = false;
-            this->press_flag = true;
-        }
-    }
-
-    if (this->release_flag)
-    {
-        this->press_flag = false;
-        this->release_flag = false;
-
-        if (this->off_pic_addr && this->style == 0)
-        {
-            gui_img_set_attribute(this->img, this->img->base.name, this->off_pic_addr, this->img->base.x,
-                                  this->img->base.y);
-        }
-
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-
-        this->long_flag = false;
-    }
-
-    if (tp->released && this->press_flag)
-    {
-        this->release_flag = true;
-    }
+    //gui_obj_enable_event(obj, GUI_EVENT_5);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
 }
 
 static void gui_button_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -459,11 +358,12 @@ gui_button_t *gui_button_create_ftl(void             *parent,
                                   count, IMG_SRC_FTL);
 }
 
-_GUI_API_ASSIGN(gui_button_t)
-.on_click = gui_button_click,
- .on_long_press = gui_button_long,
-  .on_press = gui_button_press,
-   .on_release = gui_button_release,
+
+_gui_api_gui_button_t _gui_api_for_gui_button_t =
+{
+    .on_click = gui_button_click,
+    .on_long_press = gui_button_long,
+    .on_press = gui_button_press,
+    .on_release = gui_button_release,
     .animate = gui_button_set_animate,
 };
-

@@ -71,116 +71,19 @@ static void prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
     gui_win_t *this = (void *)obj;
+    GUI_UNUSED(this);
 
     gui_win_update_att(obj);
 
-    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0) && !(obj->event_dsc->event_code))
-    {
-        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
-    }
-
-    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-    {
-        if (tp->pressing)
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
-        }
-        switch (tp->type)
-        {
-        case TOUCH_SHORT:
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-            }
-            break;
-
-        case TOUCH_UP_SLIDE:
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_3);
-            }
-            break;
-
-        case TOUCH_DOWN_SLIDE:
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_4);
-            }
-            break;
-
-        case TOUCH_LEFT_SLIDE:
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_1);
-            }
-            break;
-
-        case TOUCH_RIGHT_SLIDE:
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_2);
-            }
-            break;
-
-        case TOUCH_LONG:
-            {
-                if (this->long_flag == false)
-                {
-                    this->long_flag = true;
-                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-                }
-            }
-            break;
-
-        default:
-            break;
-        }
-
-        if (tp->pressed)
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-            this->long_flag = false;
-            this->press_flag = true;
-        }
-    }
-
-    if (this->release_flag)
-    {
-        this->press_flag = false;
-        this->release_flag = false;
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-        this->long_flag = false;
-    }
-
-    if (tp->released && this->press_flag)
-    {
-        this->release_flag = true;
-    }
-
-    if (this->scale != 0 || this->scale_y != 0)
-    {
-        matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
-        if (this->scale == 0)
-        {
-            matrix_scale(1, this->scale_y, GET_BASE(obj)->matrix);
-        }
-        else if (this->scale_y == 0)
-        {
-            matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
-        }
-        else
-        {
-            matrix_scale(this->scale, this->scale_y, GET_BASE(obj)->matrix);
-        }
-        matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
-    }
-    if (this->hold_tp)
-    {
-        gui_obj_skip_other_up_hold(obj);
-        gui_obj_skip_other_down_hold(obj);
-        gui_obj_skip_other_left_hold(obj);
-        gui_obj_skip_other_right_hold(obj);
-    }
-    if (this->event5_flag)
-    {
-        gui_obj_enable_event(obj, GUI_EVENT_5);
-    }
-
+    gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    //gui_obj_enable_event(obj, GUI_EVENT_1);
+    //gui_obj_enable_event(obj, GUI_EVENT_2);
+    //gui_obj_enable_event(obj, GUI_EVENT_3);
+    //gui_obj_enable_event(obj, GUI_EVENT_4);
+    //gui_obj_enable_event(obj, GUI_EVENT_5);
 
 }
 
@@ -287,22 +190,26 @@ void gui_win_append_animate(gui_win_t  *win,
 }
 void gui_win_left(gui_win_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    GUI_ASSERT(0);
 }
 
 void gui_win_right(gui_win_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+    GUI_ASSERT(0);
 }
 
 void gui_win_up(gui_win_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
+    GUI_ASSERT(0);
 }
 
 void gui_win_down(gui_win_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
+    GUI_ASSERT(0);
 }
 
 void gui_win_press(gui_win_t *this, gui_event_cb_t callback, void *parameter)

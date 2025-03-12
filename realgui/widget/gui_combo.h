@@ -58,58 +58,63 @@ typedef struct gui_combo
     const uint8_t *item_background_selection_image;
     gui_switch_t *button_selector;
 } gui_combo_t;
-_GUI_API_DEFINE(gui_combo_t)
-/**
- * @brief Sets the on-change event callback for the combo box.
- *
- * This function sets a callback function that will be called whenever the selected
- * item of the combo box changes.
- * The callback function will receive the combo box
- * object, the event type, and an additional user parameter.
- *
- * @param combo Pointer to the combo box object.
- * @param on_change_function The callback function to be set, which will be called
- *                           when the selected item changes.
- * @param parameter An additional parameter that will be passed to the callback function.
- *
- * @note Example:
- * @code
- * #include "gui_combo.h"
- *
- * // Define an on-change event callback function
- * static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(on_change_func)
- * {
- *     int c;
- *     const char *s;
- *     // Get the current selected item's index and text
- *     GUI_API(gui_combo_t).get_current_item((gui_combo_t*)obj, &c, &s);
- *     // Log a message
- *     gui_log("Selected item index: %d, text: %s\n", c, s);
- * }
- *
- * // Function to set up the on-change callback for the combo box
- * void setup_combo_on_change_callback(gui_combo_t *combo, void *param)
- * {
- *     GUI_API(gui_combo_t).on_change(combo, on_change_func, param);
- * }
- * @endcode
- */
-void (*on_change)(gui_combo_t *combo, gui_event_cb_t on_change_function, void *parameter);
+typedef struct __gui_api_gui_slider_t
+{
+    /**
+     * @brief Sets the on-change event callback for the combo box.
+     *
+     * This function sets a callback function that will be called whenever the selected
+     * item of the combo box changes.
+     * The callback function will receive the combo box
+     * object, the event type, and an additional user parameter.
+     *
+     * @param combo Pointer to the combo box object.
+     * @param on_change_function The callback function to be set, which will be called
+     *                           when the selected item changes.
+     * @param parameter An additional parameter that will be passed to the callback function.
+     *
+     * @note Example:
+     * @code
+     * #include "gui_combo.h"
+     *
+     * // Define an on-change event callback function
+     * static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(on_change_func)
+     * {
+     *     int c;
+     *     const char *s;
+     *     // Get the current selected item's index and text
+     *     GUI_API(gui_combo_t).get_current_item((gui_combo_t*)obj, &c, &s);
+     *     // Log a message
+     *     gui_log("Selected item index: %d, text: %s\n", c, s);
+     * }
+     *
+     * // Function to set up the on-change callback for the combo box
+     * void setup_combo_on_change_callback(gui_combo_t *combo, void *param)
+     * {
+     *     GUI_API(gui_combo_t).on_change(combo, on_change_func, param);
+     * }
+     * @endcode
+     */
+    void (*on_change)(gui_combo_t *combo, gui_event_cb_t on_change_function, void *parameter);
 
 
-/**
- * @brief Gets the currently selected item in the combo box.
- *
- * This function retrieves the index and text of the currently selected item in the combo box.
- *
- * @param combo Pointer to the combo box object.
- * @param item_index Pointer to an integer where the index of the current item will be stored.
- * @param item_text Pointer to a string where the text of the current item will be stored.
- */
-void (*get_current_item)(gui_combo_t *combo, int *item_index, const char **item_text);
+    /**
+     * @brief Gets the currently selected item in the combo box.
+     *
+     * This function retrieves the index and text of the currently selected item in the combo box.
+     *
+     * @param combo Pointer to the combo box object.
+     * @param item_index Pointer to an integer where the index of the current item will be stored.
+     * @param item_text Pointer to a string where the text of the current item will be stored.
+     */
+    void (*get_current_item)(gui_combo_t *combo, int *item_index, const char **item_text);
 
 
-_GUI_API_DECLARE(gui_combo_t)
+
+} _gui_api_gui_combo_t;
+
+
+extern _gui_api_gui_combo_t _gui_api_for_gui_combo_t;
 /*============================================================================*
  *                         Constants
  *============================================================================*/

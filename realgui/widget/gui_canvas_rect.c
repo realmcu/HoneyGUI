@@ -57,34 +57,6 @@ static void gui_canvas_rect_input_prepare(gui_obj_t *obj)
     GUI_UNUSED(tp);
     GUI_UNUSED(this);
 
-    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
-        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
-    {
-        return;
-    }
-
-    if (this->tp_block)
-    {
-
-        if (tp->pressed)
-        {
-            gui_obj_skip_other_parent_pressed(obj);
-        }
-
-        switch (tp->type)
-        {
-        case TOUCH_SHORT:
-            {
-                gui_obj_skip_other_parent_short(obj);
-            }
-            break;
-        case TOUCH_LONG:
-            {
-                gui_obj_skip_other_parent_long(obj);
-            }
-            break;
-        }
-    }
 }
 
 static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)

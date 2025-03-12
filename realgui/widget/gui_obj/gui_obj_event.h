@@ -87,12 +87,6 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code);
 
 /**
  * @brief this_widget API only for Widget, not for Application.
- * @param obj Pointer to the GUI object.
- */
-void gui_obj_event_handle(gui_obj_t *obj);
-
-/**
- * @brief this_widget API only for Widget, not for Application.
  */
 void gui_obj_event_dispatch(bool enable_event);
 

@@ -64,30 +64,32 @@ struct gui_switch
 };
 /* gui_switch_t end*/
 
-_GUI_API_DEFINE(gui_switch_t)
-void (*turn_off)(gui_switch_t *sw);
+//_GUI_API_DEFINE(gui_switch_t)
+typedef struct __gui_api_gui_switch_t
+{
+    void (*turn_off)(gui_switch_t *sw);
 
-void (*turn_on)(gui_switch_t *sw);
-void (*on_turn_on)(gui_switch_t *, gui_event_cb_t cb, void *p);
-void (*on_turn_off)(gui_switch_t *, gui_event_cb_t cb, void *p);
-void (*on_press)(gui_switch_t *, gui_event_cb_t event_cb, void *parameter);
-void (*on_release)(gui_switch_t *, gui_event_cb_t event_cb, void *parameter);
-void (*ctor)(gui_switch_t *, gui_obj_t *parent, int16_t x,
-             int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
-void (*animate)(gui_switch_t *,
-                uint32_t      dur,
-                int           repeat_count,
-                void         *callback,
-                void         *p);
-void (*turn_off_no_event)(gui_switch_t *sw);
-void (*turn_on_no_event)(gui_switch_t *sw);
-_GUI_API_DECLARE(gui_switch_t)
+    void (*turn_on)(gui_switch_t *sw);
+    void (*on_turn_on)(gui_switch_t *, gui_event_cb_t cb, void *p);
+    void (*on_turn_off)(gui_switch_t *, gui_event_cb_t cb, void *p);
+    void (*on_press)(gui_switch_t *, gui_event_cb_t event_cb, void *parameter);
+    void (*on_release)(gui_switch_t *, gui_event_cb_t event_cb, void *parameter);
+    void (*ctor)(gui_switch_t *, gui_obj_t *parent, int16_t x,
+                 int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
+    void (*animate)(gui_switch_t *,
+                    uint32_t      dur,
+                    int           repeat_count,
+                    void         *callback,
+                    void         *p);
+    void (*turn_off_no_event)(gui_switch_t *sw);
+    void (*turn_on_no_event)(gui_switch_t *sw);
+} _gui_api_gui_switch_t;
+extern _gui_api_gui_switch_t _gui_api_for_gui_switch_t;
+//_GUI_API_DECLARE(gui_switch_t)
 
 
 typedef enum
 {
-    SWITCH_EVENT_TURN_ON     = GUI_EVENT_1,
-    SWITCH_EVENT_TURN_OFF    = GUI_EVENT_2,
     SWITCH_EVENT_PRESSED     = GUI_EVENT_TOUCH_PRESSED,
     SWITCH_EVENT_RELEASED     = GUI_EVENT_TOUCH_RELEASED,
 

@@ -64,7 +64,10 @@ static void gui_return_prepare(gui_obj_t *obj)
 
             if (GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget)
             {
-                GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 1;
+                //GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 1;
+                //because no gesture
+                //comment for compile
+                GUI_ASSERT(0);
             }
 
             GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
@@ -82,7 +85,10 @@ static void gui_return_prepare(gui_obj_t *obj)
 
             if (GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget)
             {
-                GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 0;
+                //GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 0;
+                //because no gesture
+                //comment for compile
+                GUI_ASSERT(0);
             }
 
             gui_progressbar_set_progress((void *)circle, pro);
@@ -90,7 +96,8 @@ static void gui_return_prepare(gui_obj_t *obj)
             if (return_flag)
             {
                 return_flag = 0;
-                gui_obj_enable_event(obj, GUI_EVENT_8);
+                //gui_obj_enable_event(obj, GUI_EVENT_8);
+                GUI_ASSERT(0);
             }
         }
 
@@ -166,7 +173,8 @@ static void gui_return_ctor(gui_return_t   *this,
     this->ignore_gesture_widget = ignore_gesture_widget;
     GET_BASE(this)->obj_cb = gui_return_cb;
     GET_BASE(this)->has_prepare_cb = true;
-    gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_8, this);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_8, this);
+    GUI_ASSERT(0);
 
     GET_BASE(this)->w = RETURN_HEIGHT;
     GET_BASE(this)->h = (int)gui_get_screen_height() * 2 / 3;

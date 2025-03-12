@@ -221,7 +221,119 @@ void gui_obj_show(void *obj, bool enable)
     }
 }
 
+bool gui_obj_out_screen(gui_obj_t *obj)
+{
+    float m00 = obj->matrix->m[0][0];
+    float m01 = obj->matrix->m[0][1];
+    float m02 = obj->matrix->m[0][2];
+    float m10 = obj->matrix->m[1][0];
+    float m11 = obj->matrix->m[1][1];
+    float m12 = obj->matrix->m[1][2];
+    float m20 = obj->matrix->m[2][0];
+    float m21 = obj->matrix->m[2][1];
+    float m22 = obj->matrix->m[2][2];
 
+    if ((m01 == 0)
+        && (m10 == 0)
+        && (m20 == 0)
+        && (m21 == 0)
+        && (m22 == 1)) //scale and translate, no rotate
+    {
+        float x_min = m02;
+        float x_max = m02 + m00 * obj->w;
+        float y_min = m12;
+        float y_max = m12 + m11 * obj->h;
+
+        if ((x_min > (int)gui_get_screen_width())
+            || (x_max < 0)
+            || (y_min > (int)gui_get_screen_height())
+            || (y_max < 0))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief Calculate the clipping rectangle of a GUI object relative to its top-level ancestor.
+ *
+ * @param obj The GUI object for which the clipping rectangle is calculated.
+ * @param rect The output rectangle that will contain the calculated clipping area.
+ */
+void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect)
+{
+#define MAX_OBJ_LIST 20
+    gui_obj_t *obj_list[MAX_OBJ_LIST];
+    gui_rect_t absolute_rect_list[MAX_OBJ_LIST];
+    gui_rect_t relative_rect_list[MAX_OBJ_LIST];
+    uint32_t i = 0;
+    uint32_t j = 0;
+    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
+    {
+        obj_list[i++] = o;
+    }
+    for (j = 0; j < i; j++)
+    {
+        relative_rect_list[j].x1 = obj_list[i - 1 - j]->x;
+        relative_rect_list[j].y1 = obj_list[i - 1 - j]->y;
+        relative_rect_list[j].x2 = obj_list[i - 1 - j]->x + obj_list[j]->w - 1;
+        relative_rect_list[j].y2 = obj_list[i - 1 - j]->y + obj_list[j]->h - 1;
+    }
+    int16_t x1_max = 0;
+    int16_t y1_max = 0;
+    int16_t x2_min = 0;
+    int16_t y2_min = 0;
+    for (j = 0; j < i; j++)
+    {
+
+        if (j == 0)
+        {
+            absolute_rect_list[j].x1 = relative_rect_list[j].x1;
+            absolute_rect_list[j].y1 = relative_rect_list[j].y1;
+            absolute_rect_list[j].x2 = absolute_rect_list[j].x1 + relative_rect_list[j].x2 -
+                                       relative_rect_list[j].x1;
+            absolute_rect_list[j].y2 = absolute_rect_list[j].y1 + relative_rect_list[j].y2 -
+                                       relative_rect_list[j].y1;
+            x1_max = absolute_rect_list[j].x1;
+            y1_max = absolute_rect_list[j].y1;
+            x2_min = absolute_rect_list[j].x2;
+            y2_min = absolute_rect_list[j].y2;
+        }
+        else
+        {
+            absolute_rect_list[j].x1 = absolute_rect_list[j - 1].x1 + relative_rect_list[j].x1;
+            absolute_rect_list[j].y1 = absolute_rect_list[j - 1].y1 + relative_rect_list[j].y1;
+            absolute_rect_list[j].x2 = absolute_rect_list[j].x1 + relative_rect_list[j].x2 -
+                                       relative_rect_list[j].x1;
+            absolute_rect_list[j].y2 = absolute_rect_list[j].y1 + relative_rect_list[j].y2 -
+                                       relative_rect_list[j].y1;
+            if (absolute_rect_list[j].x1 > x1_max)
+            {
+                x1_max = absolute_rect_list[j].x1;
+            }
+            if (absolute_rect_list[j].y1 > y1_max)
+            {
+                y1_max = absolute_rect_list[j].y1;
+            }
+            if (absolute_rect_list[j].x2 < x2_min)
+            {
+                x2_min = absolute_rect_list[j].x2;
+            }
+            if (absolute_rect_list[j].y2 < y2_min)
+            {
+                y2_min = absolute_rect_list[j].y2;
+            }
+        }
+
+    }
+
+
+    rect->x1 = x1_max - absolute_rect_list[0].x1;
+    rect->y1 = y1_max - absolute_rect_list[0].y1;
+    rect->x2 = x2_min - absolute_rect_list[0].x1;
+    rect->y2 = y2_min - absolute_rect_list[0].y1;
+}
 
 void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *x,

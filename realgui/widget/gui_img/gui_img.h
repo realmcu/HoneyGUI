@@ -44,7 +44,6 @@ extern "C" {
 #endif
 typedef struct gui_img_transform
 {
-
     float degrees;                      //!< float gui_img_get_transform_degrees(gui_img_t *img);
     float c_x;                          //!< center of image x; float gui_img_get_transform_c_x(gui_img_t *img);
     float c_y;                          //!< center of image y;  float gui_img_get_transform_c_y(gui_img_t *img);
@@ -68,20 +67,14 @@ typedef struct gui_img
         void *ftl;
     };
     gui_animate_t *animate;
-    uint16_t scope_x1;
-    uint16_t scope_x2;
-    uint16_t scope_y1;
-    uint16_t scope_y2;
-    int16_t ax, ay;
+
     uint32_t opacity_value : 8;
     uint32_t blend_mode    : 3;
     uint32_t src_mode      : 3;
     uint32_t high_quality  : 1;
     uint32_t press_flag    : 1;         //!< press to change picture to the highlighted
     uint32_t release_flag  : 1;
-    uint32_t scope         : 1;
-    uint32_t scope_flag    : 1;
-    uint32_t tp_block      : 1;
+    uint32_t need_clip     : 1;
     uint8_t checksum;
     uint8_t animate_array_length;
 } gui_img_t;
@@ -218,14 +211,6 @@ void gui_img_skew_y(gui_img_t *_this, float degrees);
 void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value);
 
 /**
- * @brief set image as tp blocker, tp will not be recived by widget under image.
- *
- * @param _this the image widget pointer.
- * @param block block or not.
- */
-void gui_img_set_tp_block(gui_img_t *_this, bool block);
-
-/**
  * @brief creat an image widget from memory address.
  * @note creat an image widget and set attribute.
  * @param parent the father widget it nested in.
@@ -316,15 +301,6 @@ void gui_img_set_quality(gui_img_t *_this, bool high_quality);
  * @param matrix null if no need to transform.
  */
 void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
-
-/**
- * @brief convert a tree to a image data in root widget's size (RGB format).
- *
- * @param obj tree root.
- * @param matrix null if no need to transform.
- * @param shot_buf image data buffer.
- */
-void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
 
 /**
  * @brief get the transform scale in the X direction for a GUI image.

@@ -93,10 +93,7 @@ typedef struct gui_tabview
     uint8_t checksum;
 } gui_tabview_t;
 
-typedef enum
-{
-    TABVIEW_EVENT_TAB_CHANGE = GUI_EVENT_3,
-} T_GUI_TABVIEW_EVENT;
+
 
 /*============================================================================*
  *                         Constants

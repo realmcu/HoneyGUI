@@ -54,92 +54,11 @@ static void gui_curtainview_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_curtainview_t *this = (gui_curtainview_t *)obj;
     GUI_UNUSED(tp);
+    GUI_UNUSED(this);
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
     {
         return;
-    }
-
-    switch (this->cur_curtain)
-    {
-    case CURTAIN_MIDDLE:
-        {
-            if (this->has_up_curtain == true)
-            {
-                if (this->cur_curtain_flag || this->middle_flag_up)
-                {
-                    gui_obj_skip_other_up_hold(obj);
-                    gui_obj_skip_other_left_hold(obj);
-                    gui_obj_skip_other_right_hold(obj);
-                }
-
-                gui_obj_skip_other_down_hold(obj);
-
-                obj->skip_tp_down_hold = false;
-            }
-
-            if (this->has_down_curtain == true)
-            {
-                if (this->cur_curtain_flag || this->middle_flag)
-                {
-                    gui_obj_skip_other_down_hold(obj);
-                    gui_obj_skip_other_left_hold(obj);
-                    gui_obj_skip_other_right_hold(obj);
-                }
-
-                gui_obj_skip_other_up_hold(obj);
-
-                obj->skip_tp_up_hold = false;
-            }
-
-            if (this->has_left_curtain == true)
-            {
-                if (this->cur_curtain_flag || this->middle_flag_left || this->left_flag)
-                {
-                    gui_obj_skip_other_left_hold(obj);
-                }
-
-                gui_obj_skip_other_right_hold(obj);
-            }
-
-            if (this->has_right_curtain == true)
-            {
-                gui_obj_skip_other_left_hold(obj);
-            }
-        }
-        break;
-
-    case CURTAIN_UP:
-        {
-            gui_obj_skip_other_down_hold(obj);
-            gui_obj_skip_other_up_hold(obj);
-            gui_obj_skip_other_right_hold(obj);
-            gui_obj_skip_other_left_hold(obj);
-        }
-        break;
-
-    case CURTAIN_DOWN:
-        {
-            gui_obj_skip_other_down_hold(obj);
-            gui_obj_skip_other_up_hold(obj);
-            gui_obj_skip_other_right_hold(obj);
-            gui_obj_skip_other_left_hold(obj);
-        }
-        break;
-
-    case CURTAIN_LEFT:
-        {
-            gui_obj_skip_other_left_hold(obj);
-            gui_obj_skip_other_right_hold(obj);
-        }
-        break;
-    case CURTAIN_RIGHT:
-        {
-        }
-        break;
-
-    default:
-        break;
     }
 }
 
@@ -234,15 +153,7 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
     {
     case TOUCH_HOLD_X:
         {
-            if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
-            {
-                break;
-            }
 
-            if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
-            {
-                break;
-            }
 
             if (this->middle_flag || this->middle_flag_up || this->down_flag ||
                 this->cur_curtain == CURTAIN_DOWN || this->up_flag || this->cur_curtain == CURTAIN_UP)
@@ -319,15 +230,6 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
 
     case TOUCH_HOLD_Y:
         {
-            if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
-            {
-                break;
-            }
-
-            if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
-            {
-                break;
-            }
 
             if (this->middle_flag_left || this->left_flag)
             {

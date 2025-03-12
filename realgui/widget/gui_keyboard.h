@@ -159,7 +159,7 @@ typedef enum
 
 
 // event
-    KB_EVENT_PSWD_DONE     = GUI_EVENT_1,
+    KB_EVENT_PSWD_DONE,
 
 
 } KEYBOARD_CONST;

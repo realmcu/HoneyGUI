@@ -409,7 +409,8 @@ static void gui_soccer_prepare(gui_obj_t *obj)
                 tp->y >= this->draw_img[i].img_target_y &&
                 tp->y <= (this->draw_img[i].img_target_y + this->draw_img[i].img_target_h) && this->normal[i].z > 0)
             {
-                gui_obj_enable_event(obj, GUI_EVENT_1);
+                //gui_obj_enable_event(obj, GUI_EVENT_1);
+                GUI_ASSERT(0);
                 this->press_face = i;
                 gui_log("this->press_face: %d\n", this->press_face);
                 break;
@@ -772,5 +773,6 @@ void gui_soccer_set_slide_range(gui_soccer_t *this, float range)
 
 void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    GUI_ASSERT(0);
 }

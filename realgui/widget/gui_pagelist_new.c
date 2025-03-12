@@ -617,10 +617,7 @@ static void override(void *p, void *this_widget, gui_animate_t *animate)
 {
     gui_win_t *win = this_widget;
     gui_pagelist_new_t *pl = p;
-    if (GUI_BASE(pl)->gesture)
-    {
-        return;
-    }
+
     if (pl->item_count < pl->row_count - 1)
     {
         return;
@@ -679,10 +676,7 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
 {
     gui_win_t *win = this_widget;
     gui_pagelist_new_t *pl = p;
-    if (GUI_BASE(pl)->gesture)
-    {
-        return;
-    }
+
 
     if (pl->item_count < pl->row_count - 1)
     {

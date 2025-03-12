@@ -24,6 +24,7 @@
 #include "gui_obj.h"
 #include "gui_obj_event.h"
 #include "gui_api.h"
+#include "tp_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -54,12 +55,34 @@ static uint8_t event_cnt = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-
+static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event)
+{
+    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+        if (event_dsc->filter == event)
+        {
+            event_cb[event_cnt] = event_dsc->event_cb;
+            event_code[event_cnt] = event;
+            event_cb_param[event_cnt] = event_dsc->user_data;
+            event_obj[event_cnt] = obj;
+            event_cnt++;
+        }
+    }
+}
 
 /*============================================================================*
 *                           Public Functions
 *============================================================================*/
 
+/**
+ * @brief Adds an event callback to a GUI object.
+ *
+ * This function registers a callback function to be called when a specific event occurs on the GUI object.
+ *
+ * @param obj Pointer to the GUI object to which the event callback will be added.
+ * @param event_cb The callback function to be registered for the event.
+ */
 void gui_obj_add_event_cb(void           *obj,
                           gui_event_cb_t  event_cb,
                           gui_event_t     filter,
@@ -74,36 +97,57 @@ void gui_obj_add_event_cb(void           *obj,
     event_dsc->event_cb = event_cb;
     event_dsc->filter = filter;
     event_dsc->user_data = user_data;
-    event_dsc->event_code = GUI_EVENT_INVALIDE;
+
+    gui_obj_suppress_set(object, filter);
+
 }
 
-void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code)
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
 {
-    if (!obj->gesture)
+    touch_info_t *tp = tp_get_info();
+    switch (event)
     {
-        for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    case GUI_EVENT_TOUCH_CLICKED:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
-            gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-            event_dsc->event_code = event_code;
+            gui_obj_store_event(obj, event);
         }
+        break;
+    case GUI_EVENT_TOUCH_LONG:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_LONG))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        break;
+    case GUI_EVENT_TOUCH_DOUBLE_CLICKED:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_DOUBLE))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        GUI_ASSERT(NULL != NULL);
+        break;
+    case GUI_EVENT_TOUCH_PRESSED:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressed == true))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        break;
+    case GUI_EVENT_TOUCH_RELEASED:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->released == true))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        break;
+    case GUI_EVENT_TOUCH_PRESSING:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressing == true))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        break;
+    default:
+        break;
     }
-}
 
-void gui_obj_event_handle(gui_obj_t *obj)
-{
-    for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
-    {
-        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-        if (event_dsc->filter == event_dsc->event_code)
-        {
-            event_cb[event_cnt] = event_dsc->event_cb;
-            event_code[event_cnt] = event_dsc->event_code;
-            event_cb_param[event_cnt] = event_dsc->user_data;
-            event_obj[event_cnt] = obj;
-            event_dsc->event_code = GUI_EVENT_INVALIDE;
-            event_cnt++;
-        }
-    }
 }
 
 void gui_obj_event_dispatch(bool enable_event)

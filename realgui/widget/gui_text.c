@@ -294,23 +294,6 @@ static void gui_text_input_prepare(gui_obj_t *obj)
     GUI_UNUSED(tp);
     GUI_UNUSED(this);
 
-    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
-        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
-    {
-        return;
-    }
-
-    switch (tp->type)
-    {
-    case TOUCH_SHORT:
-        {
-            if (this->inputable)
-            {
-                gui_obj_skip_other_short(obj);
-            }
-        }
-        break;
-    }
 }
 static void gui_text_prepare(gui_obj_t *obj)
 {
@@ -360,25 +343,9 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         this->base.h = this->font_height;
     }
+    //gui_obj_enable_event(obj, (gui_event_t)TXT_EVENT_CLICK);
+    GUI_ASSERT(0);
 
-    switch (tp->type)
-    {
-    case TOUCH_SHORT:
-        {
-            if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) ||
-                (obj->skip_tp_short))
-            {
-                break;
-            }
-            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-            {
-                gui_obj_enable_event(obj, (gui_event_t)TXT_EVENT_CLICK);
-            }
-        }
-        break;
-    default:
-        break;
-    }
 
     last = this->checksum;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
@@ -529,11 +496,13 @@ void gui_text_ctor(gui_text_t *this,
 
 void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
+    //gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
+    GUI_ASSERT(0);
 }
 void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
+    //gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
+    GUI_ASSERT(0);
 }
 
 void gui_text_set(gui_text_t    *this,

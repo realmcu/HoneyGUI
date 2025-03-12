@@ -23,7 +23,7 @@
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_REAL_BASE
+#define CONFIG_REALTEK_BUILD_REAL_BASE
 // </c>
 
 // <c> RTK GUI Base Demo
@@ -67,7 +67,7 @@
 // </c>
 
 // <c> RTK GUI Demo 454 454
-#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
 
 // <c> RTK GUI Demo 410 502
@@ -180,10 +180,10 @@
 // </c>
 
 // <c> RTK GUI BOX2D
-#define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// #define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 // <c> RTK GUI XML_DOM
-#define CONFIG_REALTEK_BUILD_GUI_XML_DOM
+// #define CONFIG_REALTEK_BUILD_GUI_XML_DOM
 // </c>
 
 // <c> RTK GUI Enable SasA

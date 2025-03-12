@@ -91,7 +91,8 @@ static void gui_slider_prepare(gui_obj_t *obj)
 
         if (this->preValue != this->currentValue)
         {
-            gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
+            //gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_1);
+            GUI_ASSERT(0);
         }
         this->preValue = this->currentValue;
     }
@@ -199,7 +200,8 @@ gui_slider_t *gui_slider_create(void          *parent,
 
 void gui_slider_value_change(gui_slider_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_1, parameter);
+    //gui_obj_add_event_cb(this, event_cb, GUI_EVENT_1, parameter);
+    GUI_ASSERT(0);
 }
 
 uint16_t gui_slider_get_currentValue(gui_slider_t *this)
@@ -207,9 +209,10 @@ uint16_t gui_slider_get_currentValue(gui_slider_t *this)
     return this->currentValue;
 }
 
-_GUI_API_ASSIGN(gui_slider_t)
-.on_change = gui_slider_value_change,
- .get_currentValue = gui_slider_get_currentValue,
+_gui_api_gui_slider_t _gui_api_for_gui_slider_t =
+{
+    .on_change = gui_slider_value_change,
+    .get_currentValue = gui_slider_get_currentValue,
 };
 
 
