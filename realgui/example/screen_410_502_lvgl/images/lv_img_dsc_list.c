@@ -3,6 +3,17 @@
 #include "lv_color.h"
 #include "root_image_lvgl/ui_resource.h"
 
+const lv_image_dsc_t clear_bg =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 305,
+    .header.h = 80,
+    .header.stride = 1220,
+    .data_size = 97600,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = CLEAR_BG_BIN + 8
+};
+
 const lv_image_dsc_t control_lte_off =
 {
     .header.magic = LV_IMAGE_HEADER_MAGIC,
@@ -278,6 +289,28 @@ const lv_image_dsc_t fruit_ninja_watermelon_half_2 =
     .data = FRUIT_NINJA_WATERMELON_HALF_2_BIN + 8
 };
 
+const lv_image_dsc_t menu_bar_bg =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 418,
+    .header.h = 128,
+    .header.stride = 1672,
+    .data_size = 214016,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = MENU_BAR_BG_BIN + 8
+};
+
+const lv_image_dsc_t msg_tab_bg =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 350,
+    .header.h = 220,
+    .header.stride = 1400,
+    .data_size = 308000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = MSG_TAB_BG_BIN + 8
+};
+
 const lv_image_dsc_t mute_off_icon =
 {
     .header.magic = LV_IMAGE_HEADER_MAGIC,
@@ -320,6 +353,39 @@ const lv_image_dsc_t nobother_on_icon =
     .data_size = 4096,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = NOBOTHER_ON_ICON_BIN + 8
+};
+
+const lv_image_dsc_t option_bar_bg =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 350,
+    .header.h = 80,
+    .header.stride = 1400,
+    .data_size = 112000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = OPTION_BAR_BG_BIN + 8
+};
+
+const lv_image_dsc_t option_bar_white_bg =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 350,
+    .header.h = 80,
+    .header.stride = 1400,
+    .data_size = 112000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = OPTION_BAR_WHITE_BG_BIN + 8
+};
+
+const lv_image_dsc_t option_tab_bg =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 170,
+    .header.h = 220,
+    .header.stride = 680,
+    .data_size = 149600,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = OPTION_TAB_BG_BIN + 8
 };
 
 const lv_image_dsc_t path02 =

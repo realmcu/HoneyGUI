@@ -370,8 +370,8 @@ static void heartrate_cb(lv_event_t *event)
 void lv_watchface_init(void)
 {
     // scr_watchface = lv_obj_create(NULL);
-    lv_obj_set_style_bg_color(scr_watchface, lv_color_make(0, 0, 0), 0);
-    lv_obj_set_style_bg_opa(scr_watchface, LV_OPA_COVER, 0);
+    // lv_obj_set_style_bg_color(scr_watchface, lv_color_make(0, 0, 0), 0);
+    // lv_obj_set_style_bg_opa(scr_watchface, LV_OPA_COVER, 0);
     lv_obj_clear_flag(scr_watchface, LV_OBJ_FLAG_SCROLLABLE);
 
     // extern const lv_image_dsc_t ui_clock_face_main;

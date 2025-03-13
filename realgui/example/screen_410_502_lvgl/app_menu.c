@@ -116,24 +116,18 @@ void lv_app_menu_init(void)
     // Add all APP items
     for (uint32_t i = 0; i < APP_COUNT; i++)
     {
-        // Create button as a container
-        lv_obj_t *btn = lv_btn_create(page);
-        lv_obj_set_style_bg_color(btn, lv_color_hex(0x333333), 0);
-        lv_obj_set_style_shadow_width(btn, 20, 0); // Remove shadow
-        lv_obj_set_style_border_width(btn, 0, LV_PART_MAIN); // No border
-        lv_obj_set_style_pad_all(btn, 0, 0);
-        lv_obj_set_style_radius(btn, 10, 0);
-        lv_obj_set_pos(btn, 0, (ITEM_HEIGHT + ITEM_INTERVAL) * i);
-        lv_obj_set_width(btn, SCREEN_WIDTH);
-        lv_obj_set_height(btn, ITEM_HEIGHT);
-        lv_obj_clear_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_t *bg = lv_image_create(page);
+        lv_image_set_src(bg, &menu_bar_bg);
+        lv_obj_set_pos(bg, 0, 0);
+        lv_obj_set_pos(bg, 0, (ITEM_HEIGHT + ITEM_INTERVAL) * i);
+        lv_obj_clear_flag(bg, LV_OBJ_FLAG_SCROLLABLE);
 
         // Add icon
-        lv_obj_t *img = lv_img_create(btn);
+        lv_obj_t *img = lv_img_create(bg);
         lv_img_set_src(img, app_list[i].icon);
         lv_obj_align(img, LV_ALIGN_LEFT_MID, 20, 0);
         // Add text
-        lv_obj_t *label = lv_label_create(btn);
+        lv_obj_t *label = lv_label_create(bg);
         lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
         lv_label_set_text(label, app_list[i].name);
         lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);

@@ -1,6 +1,7 @@
 #ifndef LV_IMG_DSC_LIST_H
 #define LV_IMG_DSC_LIST_H
 
+extern const lv_image_dsc_t clear_bg;
 extern const lv_image_dsc_t control_lte_off;
 extern const lv_image_dsc_t control_lte_on;
 extern const lv_image_dsc_t control_mute_off;
@@ -26,10 +27,15 @@ extern const lv_image_dsc_t fruit_ninja_strawberry_half_2;
 extern const lv_image_dsc_t fruit_ninja_watermelon;
 extern const lv_image_dsc_t fruit_ninja_watermelon_half_1;
 extern const lv_image_dsc_t fruit_ninja_watermelon_half_2;
+extern const lv_image_dsc_t menu_bar_bg;
+extern const lv_image_dsc_t msg_tab_bg;
 extern const lv_image_dsc_t mute_off_icon;
 extern const lv_image_dsc_t mute_on_icon;
 extern const lv_image_dsc_t nobother_off_icon;
 extern const lv_image_dsc_t nobother_on_icon;
+extern const lv_image_dsc_t option_bar_bg;
+extern const lv_image_dsc_t option_bar_white_bg;
+extern const lv_image_dsc_t option_tab_bg;
 extern const lv_image_dsc_t path02;
 extern const lv_image_dsc_t path03;
 extern const lv_image_dsc_t path04;
