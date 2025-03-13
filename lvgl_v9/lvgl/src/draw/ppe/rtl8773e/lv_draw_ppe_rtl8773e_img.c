@@ -215,7 +215,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         draw_rect.h = lv_area_get_height(&constraint_area);
     }
     if (!transform && draw_dsc->opa >= LV_OPA_MAX && draw_dsc->recolor_opa == 0 &&
-        target.format == source.format)
+        target.format == source.format && (target.format == PPE_RGB565 || target.format == PPE_RGB888))
     {
         int16_t target_x = constraint_area.x1 - draw_unit->target_layer->buf_area.x1;
         int16_t target_y = constraint_area.y1 - draw_unit->target_layer->buf_area.y1;
