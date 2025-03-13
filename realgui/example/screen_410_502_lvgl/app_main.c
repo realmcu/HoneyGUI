@@ -175,17 +175,17 @@ static void inform_generate_task_entry()
     time_t rawtime;
     time(&rawtime);
     struct tm *timeinfo = localtime(&rawtime);
-    char time[10];
+    char time_str[10];
     if (timeinfo)
     {
-        sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        sprintf(time_str, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
     }
 
     information_t payload =
     {
         "101010",
         content,
-        time,
+        time_str,
         MESSAGE
     };
     extern void pagelist_create(information_t *payload);
