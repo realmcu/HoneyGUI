@@ -2550,9 +2550,13 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         char *ptxt = get_space_string_head(p->txt);
         if (text)
         {
-            if (font_type == 0 ||
-                font_size == 0 ||
-                gui_get_file_address(font_type) == 0)
+            if (strlen(text) == 0)
+            {
+                text = 0;
+            }
+            else if (font_type == 0 ||
+                     font_size == 0 ||
+                     gui_get_file_address(font_type) == 0)
             {
                 text = "Font Export failed! Try again.";
                 font_size = 16;
