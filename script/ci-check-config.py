@@ -103,6 +103,18 @@ ci_check_config = {
                 "gerrit-label": True,
                 "ignore-if-set": True # if this label is already set, then ignore this step, only take effect when funciton is None
             },
+            "Reviewer-Check": {
+                "function": None,
+                "label-value": '+1',
+                "fail-fast": True,
+                "gerrit-label": True
+            },
+            "SDK-API-Review": {
+                "function": None,
+                "label-value": '+2',
+                "fail-fast": True,
+                "gerrit-label": True
+            },
             #"repo-custom-check": {
             #    "function": None,
             #    "fail-fast": True

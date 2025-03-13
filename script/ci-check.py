@@ -16,6 +16,7 @@ sys.path.append(honeyRepo_uitl_dir)
 sys.path.append(os.path.join(os.environ[honeyRepo_env], "build", "jenkins"))
 
 from ci_check import *
+from jenkins_base import JenkinsCheckBase
 
 class CICheck(CICheckBase):
     pass
@@ -24,3 +25,4 @@ class CICheck(CICheckBase):
 if __name__ == '__main__':
     ci_check = CICheck()
     ci_check.do_ci_check()
+
