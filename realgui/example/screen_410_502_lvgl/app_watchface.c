@@ -361,7 +361,9 @@ static void scr_watchface_cb(lv_event_t *event)
 
 static void heartrate_cb(lv_event_t *event)
 {
-    LV_LOG("change to heartrate screen\n");
+    _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0,
+                      lv_app_menu_init, 0);
+    LV_LOG("click heartrate icon\n");
     return;
 }
 

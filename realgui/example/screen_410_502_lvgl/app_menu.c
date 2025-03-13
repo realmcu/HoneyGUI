@@ -40,8 +40,6 @@ static void exit_menu(void)
     lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
 }
 
-
-
 // Update button positions based on scroll
 static void update_button_pos(lv_obj_t *page, lv_coord_t scroll_y)
 {
