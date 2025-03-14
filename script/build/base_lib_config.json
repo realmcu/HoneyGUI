@@ -1,5 +1,5 @@
 {
-    "guiEngine-master": {
+    "guiEngine-rvd-dev": {
         "mandatory": [],
         "temporary": [
             ["keil_sim/ac5/HoneyGUI.uvprojx", "", "sdk"],

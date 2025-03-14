@@ -96,7 +96,7 @@ ci_check_config = {
                 "fail-fast": True,
                 "gerrit-label": True
             },
-            "Test-Request": {
+            "Test-Requested": {
                 "function": None,
                 "label-value": True,
                 "fail-fast": True,
