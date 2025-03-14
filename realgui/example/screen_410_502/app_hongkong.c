@@ -290,7 +290,7 @@ void win_cb(void *p, void *this_widget, gui_animate_t *animate)
 //        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
     }
-    // kb_button_cb();
+    kb_button_cb();
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)

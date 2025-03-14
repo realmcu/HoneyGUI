@@ -17,14 +17,10 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <string.h>
-#include "guidef.h"
-#include "gui_server.h"
+#include "gui_view.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-#include "gui_view.h"
 #include "kb_algo.h"
-#include "gui_img.h"
 
 
 /*============================================================================*
@@ -271,8 +267,6 @@ static void prepare_touch_process(gui_view_t *this)
  *============================================================================*/
 void gui_view_prepare_internal(gui_view_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
     gui_obj_t *obj = (gui_obj_t *)this;
 

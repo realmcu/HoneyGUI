@@ -17,14 +17,9 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <string.h>
-#include "guidef.h"
-#include "gui_server.h"
+#include "gui_view.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-#include "gui_view.h"
-#include "kb_algo.h"
-#include "gui_img.h"
 
 /*============================================================================*
  *                            Macros
@@ -56,7 +51,6 @@ static void gui_view_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
     gui_view_t *this = (gui_view_t *)obj;
     uint8_t last = this->checksum;
 

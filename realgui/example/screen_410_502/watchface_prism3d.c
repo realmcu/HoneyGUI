@@ -32,8 +32,10 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void app_cb(void *obj);
 void _APP_WATCHFACE_PRISM3D_ui_design(gui_view_t *view)
 {
+    gui_3d_description_t *desc = gui_get_3d_desc((void *)
+                                                 DESC_PRISM3D_BIN); //add triangel or rectangle head
     gui_prism_mirror3d_t *prism_watchface = gui_prism_mirror3d_create(GUI_BASE(view), "prism_3d",
-                                                                      DESC_PRISM3D_BIN, 0, 0,
+                                                                      desc, 0, 0,
                                                                       410,
                                                                       502, NULL);
     float raw_world_position[3] = {0, 10, 100};
