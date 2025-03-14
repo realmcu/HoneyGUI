@@ -760,7 +760,7 @@ private:
 
         long long totalSeconds = (minutes) * 60 + seconds; // Use long long to handle large numbers
 
-        // Check for overflow
+// Check for overflow (limit to INT_MAX and INT_MIN)
         if (totalSeconds > INT_MAX)
         {
             return INT_MAX;
@@ -770,7 +770,9 @@ private:
             return INT_MIN;
         }
 
-        return (int)(totalSeconds);
+        // Convert result to int since it's within range
+        return static_cast<int>(totalSeconds);
+
     }
 
 // Function to get metadata

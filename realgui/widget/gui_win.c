@@ -391,8 +391,8 @@ void gui_win_move(gui_win_t *win, int x, int y)
         {
             if (!(win != ((void *)0)))
             {
-                gui_assert_handler("win != NULL", __FUNCTION__, 389);
-            };
+                return;
+            }
             if (!((((gui_obj_t *)win)->magic == 0x0b)))
             {
                 gui_assert_handler("(GUI_BASE(win)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 389);
