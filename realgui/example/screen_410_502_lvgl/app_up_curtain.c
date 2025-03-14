@@ -8,7 +8,7 @@
 #define TV_HEIGHT 220
 #define TV_INTERVAL 30
 #define TV_START 130
-#define TV_ARRAY_NUM 4
+#define TV_ARRAY_NUM 2
 
 typedef enum
 {
@@ -511,9 +511,10 @@ void lv_up_curtain_init(void)
     // scr_up_curtain = lv_obj_create(NULL);
     // lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)scr_up_curtain_cb, LV_EVENT_ALL, NULL);
     page = lv_obj_create(scr_up_curtain);
+    lv_obj_remove_style_all(page);
     lv_obj_set_scroll_dir(page, LV_DIR_VER);
-    // lv_obj_set_style_bg_color(page, lv_color_make(76, 76, 76), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(page, 0, 0);
+    lv_obj_set_style_bg_color(page, lv_color_make(76, 76, 76), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(page, LV_OPA_COVER, 0);
     lv_obj_set_size(page, SCREEN_WIDTH, SCREEN_HEIGHT);
     lv_obj_set_pos(page, 0, 0);
     lv_obj_add_flag(page, LV_OBJ_FLAG_SCROLLABLE);

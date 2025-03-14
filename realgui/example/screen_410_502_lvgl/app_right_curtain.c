@@ -1,5 +1,6 @@
 #include "lvgl.h"
 #include "app_main.h"
+#include "app_music.h"
 
 void scr_right_curtain_cb(lv_event_t *e)
 {
@@ -27,20 +28,20 @@ void lv_right_curtain_init(void)
 
     // lv_obj_set_style_bg_color(scr_right_curtain, lv_color_make(0, 0, 0), 0);
     // lv_obj_set_style_bg_opa(scr_right_curtain, LV_OPA_COVER, 0);
+    app_music(scr_right_curtain);
+    // extern const lv_image_dsc_t watchface_butterfly;
+    // lv_obj_t *img1 = lv_image_create(scr_right_curtain);
+    // lv_image_set_src(img1, &watchface_butterfly);
+    // lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+    // lv_image_set_scale(img1, 512);
+    // lv_obj_clear_flag(img1, LV_OBJ_FLAG_SCROLLABLE);
 
-    extern const lv_image_dsc_t watchface_butterfly;
-    lv_obj_t *img1 = lv_image_create(scr_right_curtain);
-    lv_image_set_src(img1, &watchface_butterfly);
-    lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-    lv_image_set_scale(img1, 512);
-    lv_obj_clear_flag(img1, LV_OBJ_FLAG_SCROLLABLE);
-
-    lv_obj_t *label1 = lv_label_create(scr_right_curtain);
-    lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
-    lv_label_set_text(label1, "scr_right_curtain.");
-    lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
-    lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
+    // lv_obj_t *label1 = lv_label_create(scr_right_curtain);
+    // lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
+    // lv_label_set_text(label1, "scr_right_curtain.");
+    // lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
+    // lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
+    // lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
 
     // lv_obj_add_event_cb(scr_right_curtain, (lv_event_cb_t)scr_right_curtain_cb, LV_EVENT_ALL, NULL);
 }

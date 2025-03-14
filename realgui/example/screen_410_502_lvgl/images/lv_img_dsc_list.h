@@ -1,6 +1,27 @@
 #ifndef LV_IMG_DSC_LIST_H
 #define LV_IMG_DSC_LIST_H
 
+extern const lv_image_dsc_t app_music_btn_list_pause;
+extern const lv_image_dsc_t app_music_btn_list_play;
+extern const lv_image_dsc_t app_music_btn_loop;
+extern const lv_image_dsc_t app_music_btn_next;
+extern const lv_image_dsc_t app_music_btn_pause;
+extern const lv_image_dsc_t app_music_btn_play;
+extern const lv_image_dsc_t app_music_btn_prev;
+extern const lv_image_dsc_t app_music_btn_rnd;
+extern const lv_image_dsc_t app_music_corner_left;
+extern const lv_image_dsc_t app_music_corner_right;
+extern const lv_image_dsc_t app_music_cover_1;
+extern const lv_image_dsc_t app_music_cover_2;
+extern const lv_image_dsc_t app_music_cover_3;
+extern const lv_image_dsc_t app_music_icn_chart;
+extern const lv_image_dsc_t app_music_icn_chat;
+extern const lv_image_dsc_t app_music_icn_download;
+extern const lv_image_dsc_t app_music_icn_heart;
+extern const lv_image_dsc_t app_music_icn_slider;
+extern const lv_image_dsc_t app_music_list_border;
+extern const lv_image_dsc_t app_music_wave_bottom;
+extern const lv_image_dsc_t app_music_wave_top;
 extern const lv_image_dsc_t clear_bg;
 extern const lv_image_dsc_t control_lte_off;
 extern const lv_image_dsc_t control_lte_on;

@@ -3,6 +3,237 @@
 #include "lv_color.h"
 #include "root_image_lvgl/ui_resource.h"
 
+const lv_image_dsc_t app_music_btn_list_pause =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 58,
+    .header.h = 60,
+    .header.stride = 232,
+    .data_size = 13920,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_LIST_PAUSE_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_list_play =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 58,
+    .header.h = 60,
+    .header.stride = 232,
+    .data_size = 13920,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_LIST_PLAY_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_loop =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 24,
+    .header.h = 24,
+    .header.stride = 96,
+    .data_size = 2304,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_LOOP_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_next =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 62,
+    .header.h = 62,
+    .header.stride = 248,
+    .data_size = 15376,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_NEXT_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_pause =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 79,
+    .header.h = 77,
+    .header.stride = 316,
+    .data_size = 24332,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_PAUSE_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_play =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 79,
+    .header.h = 77,
+    .header.stride = 316,
+    .data_size = 24332,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_PLAY_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_prev =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 62,
+    .header.h = 62,
+    .header.stride = 248,
+    .data_size = 15376,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_PREV_BIN + 8
+};
+
+const lv_image_dsc_t app_music_btn_rnd =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 24,
+    .header.h = 24,
+    .header.stride = 96,
+    .data_size = 2304,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_BTN_RND_BIN + 8
+};
+
+const lv_image_dsc_t app_music_corner_left =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 18,
+    .header.h = 18,
+    .header.stride = 72,
+    .data_size = 1296,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_CORNER_LEFT_BIN + 8
+};
+
+const lv_image_dsc_t app_music_corner_right =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 18,
+    .header.h = 18,
+    .header.stride = 72,
+    .data_size = 1296,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_CORNER_RIGHT_BIN + 8
+};
+
+const lv_image_dsc_t app_music_cover_1 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 176,
+    .header.h = 175,
+    .header.stride = 704,
+    .data_size = 123200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_COVER_1_BIN + 8
+};
+
+const lv_image_dsc_t app_music_cover_2 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 176,
+    .header.h = 175,
+    .header.stride = 704,
+    .data_size = 123200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_COVER_2_BIN + 8
+};
+
+const lv_image_dsc_t app_music_cover_3 =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 176,
+    .header.h = 175,
+    .header.stride = 704,
+    .data_size = 123200,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_COVER_3_BIN + 8
+};
+
+const lv_image_dsc_t app_music_icn_chart =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 24,
+    .header.h = 24,
+    .header.stride = 96,
+    .data_size = 2304,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_ICN_CHART_BIN + 8
+};
+
+const lv_image_dsc_t app_music_icn_chat =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 24,
+    .header.h = 24,
+    .header.stride = 96,
+    .data_size = 2304,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_ICN_CHAT_BIN + 8
+};
+
+const lv_image_dsc_t app_music_icn_download =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 24,
+    .header.h = 24,
+    .header.stride = 96,
+    .data_size = 2304,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_ICN_DOWNLOAD_BIN + 8
+};
+
+const lv_image_dsc_t app_music_icn_heart =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 24,
+    .header.h = 24,
+    .header.stride = 96,
+    .data_size = 2304,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_ICN_HEART_BIN + 8
+};
+
+const lv_image_dsc_t app_music_icn_slider =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 36,
+    .header.h = 38,
+    .header.stride = 144,
+    .data_size = 5472,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_ICN_SLIDER_BIN + 8
+};
+
+const lv_image_dsc_t app_music_list_border =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 272,
+    .header.h = 4,
+    .header.stride = 1088,
+    .data_size = 4352,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_LIST_BORDER_BIN + 8
+};
+
+const lv_image_dsc_t app_music_wave_bottom =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 272,
+    .header.h = 42,
+    .header.stride = 1088,
+    .data_size = 45696,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_WAVE_BOTTOM_BIN + 8
+};
+
+const lv_image_dsc_t app_music_wave_top =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 272,
+    .header.h = 42,
+    .header.stride = 1088,
+    .data_size = 45696,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = APP_MUSIC_WAVE_TOP_BIN + 8
+};
+
 const lv_image_dsc_t clear_bg =
 {
     .header.magic = LV_IMAGE_HEADER_MAGIC,
