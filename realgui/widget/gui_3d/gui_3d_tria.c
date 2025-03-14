@@ -144,8 +144,8 @@ static void gui_3d_tria_prepare(gui_3d_tria_t *this)
     this->img = gui_malloc(sizeof(draw_img_t));
     memset(this->img, 0x00, sizeof(draw_img_t));
 
-    gui_3d_world_t world;
-    gui_3d_camera_t camera;
+    gui_3d_world_t world = {0};
+    gui_3d_camera_t camera = {0};
 
     // global transform
     if (this->global_shape_transform_cb != NULL)

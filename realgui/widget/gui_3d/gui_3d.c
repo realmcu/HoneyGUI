@@ -21,10 +21,7 @@
 #include <math.h>
 #include "guidef.h"
 #include "gui_obj.h"
-#include "tp_algo.h"
 #include "draw_img.h"
-#include "acc_init.h"
-#include "gui_fb.h"
 #include <guidef.h>
 #include "gui_3d.h"
 #include "gui_3d_rect.h"

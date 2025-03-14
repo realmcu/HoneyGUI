@@ -256,9 +256,9 @@ static void gui_3d_rect_prepare(gui_3d_rect_t *this)
     this->mask_img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->mask_img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
 
-    gui_3d_world_t world;
-    gui_3d_camera_t camera;
-    gui_3d_light_t light;
+    gui_3d_world_t world = {0};
+    gui_3d_camera_t camera = {0};
+    gui_3d_light_t light = {0};
     light.initialized = false;
 
     // global transform
