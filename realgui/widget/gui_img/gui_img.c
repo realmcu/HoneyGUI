@@ -798,35 +798,3 @@ void gui_img_skew_y(gui_img_t *this, float degrees)
 
 }
 
-
-void gui_img_append_animate(gui_img_t              *_this,
-                            uint32_t                dur,
-                            int                     repeat_count,
-                            gui_animate_callback_t  callback,
-                            void                   *p,
-                            const char             *name)
-{
-    if (_this->animate_array_length == 0 && _this->animate)
-    {
-        memset(_this->animate, 0, sizeof(*_this->animate));
-        gui_free(_this->animate);
-        _this->animate = 0;
-    }
-    _this->animate_array_length++;
-    _this->animate = gui_realloc(_this->animate, sizeof(gui_animate_t) * _this->animate_array_length);
-    ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1] = gui_malloc(sizeof(
-                                                                                gui_animate_t));
-    gui_animate_t *animate = ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1];
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    if (dur == 0)
-    {
-        animate->dur = 1000;
-    }
-    animate->callback = callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    animate->name = name;
-}

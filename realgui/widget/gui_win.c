@@ -252,8 +252,7 @@ gui_win_t *gui_win_create(void       *parent,
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     {
-        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
-                               &(((gui_obj_t *)this)->brother_list));
+        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));
     }
 
     ((gui_obj_t *)this)->create_done = true;

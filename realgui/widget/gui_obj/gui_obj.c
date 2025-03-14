@@ -41,7 +41,19 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-
+static gui_obj_t root =
+{
+    .name = "screen",
+    .parent = NULL,
+    .x = 0,
+    .y = 0,
+    .opacity_value = UINT8_MAX,
+    .magic = GUI_MAGIC_NUMBER,
+    .child_list = {&(root.child_list), &(root.child_list)},
+    .brother_list = {&(root.brother_list), &(root.brother_list)},
+    .create_done = true,
+    .matrix = NULL,
+};
 
 /*============================================================================*
  *                           Private Functions
@@ -137,6 +149,12 @@ static bool is_string(const char *str, size_t max_len)
 /*============================================================================*
 *                           Public Functions
 *============================================================================*/
+
+gui_obj_t *gui_obj_get_root(void)
+{
+    return &root;
+}
+
 void gui_obj_ctor(gui_obj_t  *this,
                   gui_obj_t  *parent,
                   const char *name,

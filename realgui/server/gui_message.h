@@ -6,7 +6,6 @@
 
 
 #include <guidef.h>
-#include <gui_app.h>
 #include <gui_obj.h>
 #ifdef __cplusplus
 extern "C" {

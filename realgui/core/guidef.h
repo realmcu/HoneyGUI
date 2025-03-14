@@ -50,30 +50,6 @@ extern "C" {
  *============================================================================*/
 
 
-/**
- * @brief Macro that defines the parameters for an animation callback function.
- *
- * This macro specifies the parameters that an animation callback function must take.
- * These parameters typically include a generic pointer `p`, a pointer to the widget
- * being animated `this_widget`, and a pointer to an `animate` structure.
- *
- * @param p            A generic pointer parameter that can be used to pass custom data.
- * @param this_widget  A pointer to the widget that is being animated.
- * @param animate      A pointer to the structure containing animation details.
- */
-#define GUI_ANIMATION_CALLBACK_PARAMETER void *p, void *this_widget, struct gui_animate *animate
-
-/**
- * @brief Macro to define an animation callback function.
- *
- * This macro is used to define the signature of an animation callback function.
- * The `function_name` parameter specifies the name of the function. The function
- * will take the parameters defined by `GUI_ANIMATION_CALLBACK_PARAMETER`.
- *
- * @param function_name  The name of the animation callback function to define.
- */
-#define GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(function_name) void function_name(GUI_ANIMATION_CALLBACK_PARAMETER)
-
 
 /*============================================================================*
  *                         Macros
@@ -82,8 +58,10 @@ extern "C" {
 
 
 
-#define GUI_UNUSED(x) (void)(x)             /* macro to get rid of 'unused parameter' warning */
-#define GUI_TYPE(type, obj) ((type *)obj)
+#define GUI_UNUSED(x)           (void)(x)             /* macro to get rid of 'unused parameter' warning */
+#define GUI_TYPE(type, obj)     ((type *)obj)
+#define GET_BASE(_p)            ((gui_obj_t *)_p)
+#define GUI_BASE(_p)            ((gui_obj_t *)_p)
 
 
 #define GUI_NEW(type, constructor_cb, param) type *this = gui_malloc(sizeof(type));\
@@ -98,6 +76,7 @@ extern "C" {
     GET_BASE(this)->create_done = true;\
     /*todo exit critical section*/\
     return this;
+
 #define GUI_CREATE_HELPER(type, constructor_cb, param) type *this = gui_malloc(sizeof(type));\
     memset(this, 0, sizeof(type));\
     constructor_cb(param);\
@@ -108,12 +87,9 @@ extern "C" {
         gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));\
     }\
     GET_BASE(this)->create_done = true;
-#define GET_BASE(_p) ((gui_obj_t *)_p)
-#define GUI_BASE(_p) ((gui_obj_t *)_p)
-#define _GUI_API_DEFINE(type) typedef struct __gui_api_##type{
-#define _GUI_API_DECLARE(type) } _gui_api_##type;extern _gui_api_##type _gui_api_for_##type;
-#define _GUI_API_ASSIGN(type) _gui_api_##type _gui_api_for_##type ={
-#define GUI_API(type)  _gui_api_for_##type
+
+
+
 
 #if defined _WIN32
 #define GUI_FRAME_STEP 50

@@ -366,23 +366,6 @@ float gui_img_get_transform_t_x(gui_img_t *img);
 float gui_img_get_transform_t_y(gui_img_t *img);
 
 /**
- * @brief append an animation to a GUI image.
- *
- * @param _this pointer to the GUI image object.
- * @param dur duration of the animation in milliseconds.
- * @param repeat_count number of times the animation should repeat.
- * @param callback (void *p, void *this_widget, gui_animate_t *animate)Function to be called at each the animation frame.
- * @param p user data to be passed to the callback function.
- * @param name aniamte name.
- */
-void gui_img_append_animate(gui_img_t              *_this,
-                            uint32_t                dur,
-                            int                     repeat_count,
-                            gui_animate_callback_t  callback,
-                            void                   *p,
-                            const char              *name);
-
-/**
  * @brief Sets the image data for a specified image widget.
  *
  * This function assigns the given image data to the specified image widget.

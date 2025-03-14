@@ -64,6 +64,15 @@ extern "C" {
  *============================================================================*/
 
 /**
+ * @brief Get the root GUI object.
+ *
+ * This function returns a pointer to the root GUI object in the widget tree.
+ *
+ * @return A pointer to the root GUI object.
+ */
+gui_obj_t *gui_obj_get_root(void);
+
+/**
   * @param this_widget pointer to the GUI image object.
   * @param parent the father widget it nested in.
   * @param filename the obj widget name.
@@ -345,6 +354,20 @@ void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displa
  * @param y   The new y-coordinate for the widget object.
  */
 void gui_obj_move(gui_obj_t *obj, int x, int y);
+
+/**
+ * @brief Set a timer for a GUI object.
+ *
+ * This function sets a timer for the specified GUI object with a given interval.
+ * The timer can be configured to reload automatically or run only once.
+ * When the timer expires, the provided callback function is called.
+ *
+ * @param obj Pointer to the GUI object to set the timer for.
+ * @param interval The interval in milliseconds for the timer.
+ * @param reload Boolean flag indicating whether the timer should reload automatically (true) or run only once (false).
+ * @param callback Pointer to the callback function to be called when the timer expires.
+ */
+void gui_obj_set_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*callback)(void *));
 
 #ifdef __cplusplus
 }

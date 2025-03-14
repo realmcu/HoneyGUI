@@ -120,6 +120,13 @@ typedef enum
     OBJ_DESTROY,
 } T_OBJ_CB_TYPE;
 
+typedef struct gui_obj_timer
+{
+    uint32_t interval_ms;
+    bool reload;
+    void (*p_timer_callback)(void *);
+} gui_obj_timer_t;
+
 typedef struct _gui_obj_t
 {
     const char *name;
@@ -154,6 +161,7 @@ typedef struct _gui_obj_t
     struct _gui_obj_t **suppress_conflict_obj_list;
 
     gui_matrix_t *matrix;
+    gui_obj_timer_t *timer;
 
 } gui_obj_t;
 

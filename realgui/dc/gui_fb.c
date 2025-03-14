@@ -182,6 +182,10 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
+        if ((obj->timer) && (obj->timer->p_timer_callback))
+        {
+            obj->timer->p_timer_callback(obj);
+        }
 
         obj_draw_prepare(obj);
     }

@@ -14,7 +14,6 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <string.h>
-#include <gui_app.h>
 
 
 

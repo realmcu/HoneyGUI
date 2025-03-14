@@ -32,7 +32,6 @@ int main(int argc, char **argv)
            PROJECT_NAME, \
            COMPILE_TIME);
 
-    gui_change_default_path(argc, argv);
     gui_components_init();
 
     while (1)

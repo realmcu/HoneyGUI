@@ -6,19 +6,9 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-src = Glob('*.c')
-src += Glob('*.cpp')
-SrcRemove(src,'gui_scroll_wheel.c')
-SrcRemove(src,'gui_bitmap.c')
+# src += Glob('*.cpp')
+src += ['gui_win.c']
 
-if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
-    SrcRemove(src,'gui_lvgl.c')
-
-if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
-    SrcRemove(src,'gui_px.c')
-
-if not GetDepend(['CONFIG_REALTEK_BUILD_U8G2']):
-    SrcRemove(src,'gui_u8g2.c')
 
 CPPPATH = [cwd]
 
