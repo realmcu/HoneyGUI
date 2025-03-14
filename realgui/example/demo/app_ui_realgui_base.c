@@ -25,7 +25,8 @@
 
 void test_cb(void *arg)
 {
-    gui_log("test_cb\n");
+    gui_img_t *img = (gui_img_t *)arg;
+    gui_log("obj name = %s\n", img->base.name);
 }
 
 

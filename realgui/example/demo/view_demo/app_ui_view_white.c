@@ -5,7 +5,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "tiger_blue.txt"
 #include "tiger_grey.txt"
 #include "tiger_laven.txt"
@@ -64,7 +63,7 @@ static void app_ui_view_white_design(gui_view_t *view)
                                              0);
     gui_img_scale(img, 1.875f, 2.034f);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
-    gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_1, NULL);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_view_switch_on_event(view, blue_view, VIEW_REDUCTION, VIEW_REDUCTION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

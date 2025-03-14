@@ -5,7 +5,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "tiger_blue.txt"
 #include "tiger_grey.txt"
 #include "tiger_laven.txt"

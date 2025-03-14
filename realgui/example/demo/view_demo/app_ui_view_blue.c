@@ -5,7 +5,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "tiger_blue.txt"
 #include "tiger_white.txt"
 #include "tiger_yellow.txt"
@@ -52,34 +51,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void app_ui_design(gui_app_t *app)
-{
-    gui_win_t *win_view = gui_win_create(app->window, "win_view", 0, 0, 0, 0);
-    current_view = gui_view_create(win_view, &descriptor, 0, 0, 0, 0);
-    gui_fps_create(app->window);
-}
 /* view demo end*/
 
-static gui_app_t rtk_gui_demo =
-{
-    .screen =
-    {
-        .name = "rtk_gui_demo",
-        .x    = 0,
-        .y    = 0,
-    },
-    .ui_design = app_ui_design,
-    .active_ms = 1000 * 60 * 60,
-};
 
-
-static int app_init(void)
-{
-    gui_app_startup(&rtk_gui_demo);
-    return 0;
-}
-
-GUI_INIT_APP_EXPORT(app_init);
 
 static void app_ui_view_blue_design(gui_view_t *view)
 {
@@ -104,4 +78,15 @@ static void app_ui_view_blue_design(gui_view_t *view)
     gui_view_switch_on_event(view, yellow_view, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
                              GUI_EVENT_KB_SHORT_CLICKED);
 }
+
+static int app_init(void)
+{
+    gui_win_t *win_view = gui_win_create(gui_obj_get_root(), "win_view", 0, 0, 0, 0);
+    current_view = gui_view_create(win_view, &descriptor, 0, 0, 0, 0);
+    // gui_fps_create(app->window);
+    return 0;
+}
+
+GUI_INIT_APP_EXPORT(app_init);
+
 /* view blue end*/

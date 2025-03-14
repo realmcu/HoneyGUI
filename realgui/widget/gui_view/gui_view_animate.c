@@ -305,7 +305,8 @@ static void animation_case(gui_view_t *this, float pro)
     }
 }
 
-static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(view_transition_animation_function)
+static void view_transition_animation_function(void *p, void *this_widget,
+                                               struct gui_animate *animate)
 {
     gui_view_t *this = this_widget;
     this->event = 1;
