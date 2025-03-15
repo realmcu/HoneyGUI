@@ -1,3 +1,8 @@
+/**
+ * @file app_main.h
+ *
+ */
+
 #ifndef _APP_MAIN_H
 #define _APP_MAIN_H
 
@@ -5,6 +10,9 @@
 extern "C" {
 #endif
 
+/*********************
+ *      INCLUDES
+ *********************/
 #include "lvgl.h"
 #include "ui_func.h"
 #include "lv_img_dsc_list.h"
@@ -12,10 +20,12 @@ extern "C" {
 
 #include <math.h>
 
-
+/*********************
+ *      DEFINES
+ *********************/
 #define LVGL_USE_CJSON 0
 
-#define WATCH_DEMO_USE_TILESLIDE    0
+#define WATCH_DEMO_USE_TILESLIDE    1
 
 #if WATCH_DEMO_USE_TILESLIDE
 #define WATCH_DEMO_USE_SNAPSHOT     1
@@ -38,6 +48,13 @@ extern "C" {
 #define WATCH_DEMO_USE_SNAPSHOT     0
 #endif
 
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
 extern uint32_t event_snapshot_creat;
 extern uint32_t event_snapshot_delete;
 
@@ -66,6 +83,11 @@ LV_FONT_DECLARE(SourceHanSansSC_size32_bits1_font);
 LV_FONT_DECLARE(SourceHanSansSC_size48_bits1_font);
 
 void watch_demo_init(void);
+
+/**********************
+ *      MACROS
+ **********************/
+
 
 
 #ifdef __cplusplus

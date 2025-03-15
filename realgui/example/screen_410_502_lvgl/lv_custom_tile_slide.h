@@ -22,10 +22,32 @@ extern "C" {
 #include "lv_tileview_private.h"
 #include "lv_area_private.h"
 
+#if LV_USE_MATRIX
+#include "lv_matrix.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
 
+/**********************
+ *      TYPEDEFS
+ **********************/
+typedef enum
+{
+    CLASSIC,        /**< Default slide animation */
+    FADE,           /**< Cross-fade opacity transition */
+    SCALE,          /**< Zoom animation effect */
+    SCALE_FADE,     /**< Combined zoom & fade effect */
+
+    /*need matrix*/
+    CUBE_ROTATION,  /**< 3D cube rotation transition */
+    SPIRAL_NOTEBOOK,/**< Spiral notebook flip effect */
+} SLIDE_EFFECT;
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
 /**
  * @brief Custom tileview scroll event handler
  *
@@ -54,19 +76,8 @@ void tileview_custom_cb(lv_event_t *e);
 void create_cross_tileview(void);
 
 /**********************
- *      TYPEDEFS
- **********************/
-
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
-
-
-/**********************
  *      MACROS
  **********************/
-
 
 
 #ifdef __cplusplus

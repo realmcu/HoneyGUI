@@ -21,6 +21,10 @@ static lv_obj_t *weather_current, *weather_range;
 
 static lv_timer_t *timer = NULL;
 
+#ifndef M_PI
+#define M_PI    ((float)3.14159265358979323846)
+#endif
+
 lv_image_dsc_t const *text_num_array[] =
 {
     &ui_text_0,

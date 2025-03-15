@@ -256,7 +256,7 @@ static void auto_step_cb(lv_timer_t *t)
 /**********************
  *      DEFINES
  **********************/
-#define TRACK_COUNT 14  /* The number of tracks in the list */
+#define TRACK_COUNT 10  /* The number of tracks in the list */
 
 /**********************
  *  STATIC PROTOTYPES

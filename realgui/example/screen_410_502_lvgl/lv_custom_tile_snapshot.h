@@ -65,8 +65,19 @@ void snapshot_custom_cb_delete(lv_event_t *e);
  * @param e LVGL event object
  * @note Gets widget reference from event user data
  */
-void snapshot_custom_cb_creat(lv_event_t *e);
+void snapshot_custom_cb_create(lv_event_t *e);
 
+/**
+ * @brief Create a snapshot object with event bindings
+ *
+ * @param parent Parent container for the snapshot image
+ * @param target Target widget to capture snapshot from
+ * @param create_enent_id Event ID for snapshot creation trigger
+ * @param delete_enent_id Event ID for snapshot deletion trigger
+ * @return lv_obj_t* Pointer to the created snapshot image object
+ */
+lv_obj_t *create_snapshot_obj_with_enent(lv_obj_t *parent, lv_obj_t *target,
+                                         uint32_t create_enent_id, uint32_t delete_enent_id);
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
