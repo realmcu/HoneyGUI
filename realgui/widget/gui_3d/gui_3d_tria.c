@@ -121,8 +121,8 @@ static void gui_3d_generate_triangle_img(gui_3d_tria_t *this, int width, int hei
     this->img->img_w = width;
     this->img->img_h = height;
     this->img->opacity_value = UINT8_MAX;
-    this->img->blend_mode = IMG_FILTER_BLACK;
-    this->img->high_quality = true;
+    this->img->blend_mode = IMG_BYPASS_MODE;
+    // this->img->high_quality = true;
 
     gui_obj_t *obj = (gui_obj_t *)this;
     memcpy(&this->img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -139,7 +139,7 @@ static void gui_3d_tria_prepare(gui_3d_tria_t *this)
     gui_3d_tria_update_att(obj);
 
     this->face = gui_malloc(sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
-    memset(this->face, 0x00, sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
+    memset(this->face, 0x1, sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
 
     this->img = gui_malloc(sizeof(draw_img_t));
     memset(this->img, 0x00, sizeof(draw_img_t));
@@ -152,6 +152,8 @@ static void gui_3d_tria_prepare(gui_3d_tria_t *this)
     {
         this->global_shape_transform_cb(this, &world, &camera);
     }
+
+    gui_3d_camera_build_UVN_matrix(&camera);
 
     for (size_t i = 0; i < this->desc->num_shapes; i++)
     {

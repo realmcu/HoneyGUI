@@ -23,29 +23,25 @@
 void gui_3d_tria_face_transform_local_to_global(gui_3d_tria_face_t *face, size_t face_index,
                                                 gui_obj_attrib_t *attrib, gui_3d_world_t *world)
 {
-    size_t index_offset = 0;
-    for (size_t s = 0; s < face_index; s++)
-    {
-        index_offset += attrib->face_num_verts[face_index];
-    }
+    size_t index_offset = face_index * 3;
 
-    for (size_t j = 0; j < attrib->face_num_verts[face_index]; j++)
+    for (size_t j = 0; j < 3; j++)
     {
         gui_obj_vertex_index_t idx = attrib->faces[index_offset + j];
 
         gui_obj_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
-        gui_obj_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
+        // gui_obj_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
         gui_obj_vertex_coordinate_t *vn = &attrib->normals[idx.vn_idx];
 
         gui_point_4d_t local_position = {v->x, v->y, v->z, 1.0f};
         face->transform_vertex[j].position = gui_3d_point4D_mul_matrix(local_position, *world);
 
-        face->transform_vertex[j].u = vt->u;
-        face->transform_vertex[j].v = vt->v;
+        // face->transform_vertex[j].u = vt->u;
+        // face->transform_vertex[j].v = vt->v;
         face->transform_vertex[j].normal.x = vn->x;
         face->transform_vertex[j].normal.y = vn->y;
         face->transform_vertex[j].normal.z = vn->z;
-        face->transform_vertex[j].normal.w = 1;
+        // face->transform_vertex[j].normal.w = 1;
 
     }
 }
@@ -227,14 +223,18 @@ void gui_3d_tria_scene(gui_3d_tria_face_t *face, size_t face_index, gui_obj_attr
                        gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
     gui_3d_tria_face_transform_local_to_global(face, face_index, attrib, world);
-    gui_3d_camera_build_UVN_matrix(camera);
+    // gui_3d_camera_build_UVN_matrix(camera);
     gui_3d_tria_face_transform_camera(face, camera);
-    gui_3d_tria_face_cull_region(face, camera);
     gui_3d_tria_face_calculate_normal(face);
     gui_3d_tria_face_update_back_face(face, GUI_3D_CULLMODE_CCW);
-    gui_3d_tria_face_transform_perspective(face, camera);
-    gui_3d_tria_face_cull_out_side(face, camera);
-    gui_3d_tria_face_transform_screen(face, camera);
+
+    if (!(face->state & GUI_3D_FACESTATE_BACKFACE))
+    {
+        gui_3d_tria_face_cull_region(face, camera);
+        gui_3d_tria_face_transform_perspective(face, camera);
+        gui_3d_tria_face_cull_out_side(face, camera);
+        gui_3d_tria_face_transform_screen(face, camera);
+    }
 }
 
 
