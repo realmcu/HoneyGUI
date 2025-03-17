@@ -175,11 +175,12 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-//static void gui_view_free(void *obj, gui_event_t e, void *param)
-//{
-//    gui_obj_tree_free(obj);
-//    // gui_log("[VIEW]free view done!\n");
-//}
+static void gui_view_free(void *obj, gui_event_t e, void *userdate)
+{
+    gui_obj_tree_free(obj);
+    // gui_log("[VIEW]free view done!\n");
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -231,8 +232,7 @@ gui_view_t *gui_view_create(void       *parent,
 
     *descriptor->pView = this;
     descriptor->design_cb(this);
-    //gui_obj_add_event_cb(GET_BASE(this), gui_view_free, VIEW_FREE_EVENT, NULL);
-    GUI_ASSERT(0);//SEND MESSAGE TO SERVER
+    gui_obj_add_event_cb(GET_BASE(this), gui_view_free, GUI_EVENT_SYSTEM_FREE, NULL);
     return this;
 }
 

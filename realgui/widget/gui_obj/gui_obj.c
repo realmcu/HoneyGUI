@@ -504,14 +504,14 @@ gui_obj_t *gui_get_root(gui_obj_t *object)
 
 void gui_obj_hidden(gui_obj_t *obj, bool hidden)
 {
-    GUI_WIDGET_TRY_EXCEPT(obj)
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
     obj->not_show = hidden;
 }
 
 #define MAX_WIDGET_NAME_LENGTH 128
 const char *gui_widget_name(gui_obj_t *widget, const char *name)
 {
-    GUI_WIDGET_TRY_EXCEPT(widget)
+    GUI_ASSERT((GUI_BASE(widget)->magic == GUI_MAGIC_NUMBER));
     if (is_string(name, MAX_WIDGET_NAME_LENGTH + 1))
     {
         widget->name = name;
@@ -519,85 +519,16 @@ const char *gui_widget_name(gui_obj_t *widget, const char *name)
     return widget->name;
 
 }
-void gui_update_speed(int *speed, int speed_recode[])
-{
-    IMPORT_GUI_TOUCHPAD
-    int recode_num = 4;
-    for (size_t i = 0; i < recode_num; i++)
-    {
-        speed_recode[i] = speed_recode[i + 1];
-    }
-    speed_recode[recode_num] = touch->deltaY;
-    *speed = speed_recode[recode_num] - speed_recode[0];
-    int max_speed = GUI_SPEED_MAX;
-    int min_speed = GUI_SPEED_MIN;
-    if (*speed > max_speed)
-    {
-        *speed = max_speed;
-    }
-    else if (*speed < -max_speed)
-    {
-        *speed = -max_speed;
-    }
-    if ((*speed > 0) && (*speed < min_speed))
-    {
-        *speed = min_speed;
-    }
-    else if ((*speed < 0) && (*speed > -min_speed))
-    {
-        *speed = -min_speed;
-    }
-}
-void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement)
-{
-    int recode_num = 4;
-    for (size_t i = 0; i < recode_num; i++)
-    {
-        speed_recode[i] = speed_recode[i + 1];
-    }
-    speed_recode[recode_num] = displacement;
-    *speed = speed_recode[recode_num] - speed_recode[0];
-    int max_speed = GUI_SPEED_MAX;
-    int min_speed = GUI_SPEED_MIN;
-    if (*speed > max_speed)
-    {
-        *speed = max_speed;
-    }
-    else if (*speed < -max_speed)
-    {
-        *speed = -max_speed;
-    }
-    if ((*speed > 0) && (*speed < min_speed))
-    {
-        *speed = min_speed;
-    }
-    else if ((*speed < 0) && (*speed > -min_speed))
-    {
-        *speed = -min_speed;
-    }
-}
-void gui_inertial(int *speed, int end_speed, int *offset)
-{
-    if (*speed > end_speed)
-    {
-        *offset += *speed;
-        *speed -= 1;
-    }
-    else if (*speed < -end_speed)
-    {
-        *offset += *speed;
-        *speed += 1;
-    }
-}
+
 void gui_set_location(gui_obj_t *obj, uint16_t x, uint16_t y)
 {
-    GUI_WIDGET_TRY_EXCEPT(obj)
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
     obj->x = x;
     obj->y = y;
 }
 void gui_obj_move(gui_obj_t *obj, int x, int y)
 {
-    GUI_WIDGET_TRY_EXCEPT(obj) // cppcheck-suppress unknownMacro
+    GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
     obj->x = x;
     obj->y = y;
 }

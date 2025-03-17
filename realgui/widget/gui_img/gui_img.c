@@ -49,18 +49,6 @@
  *============================================================================*/
 
 static void gui_img_reset_translate(gui_img_t *this);
-void gui_img_set_animate(gui_img_t *this,
-                         uint32_t   dur,
-                         int        repeat_count,
-                         void      *callback,
-                         void      *p)
-{
-    if (this->animate_array_length != 0)
-    {
-        return;
-    }
-    GUI_SET_ANIMATE_HELPER
-}
 
 static void gui_img_update_att(gui_obj_t *o)
 {

@@ -125,6 +125,7 @@ typedef struct gui_obj_timer
     uint32_t interval_ms;
     bool reload;
     void (*p_timer_callback)(void *);
+    uint32_t expire_time;
 } gui_obj_timer_t;
 
 typedef struct _gui_obj_t

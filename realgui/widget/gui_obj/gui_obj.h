@@ -367,7 +367,13 @@ void gui_obj_move(gui_obj_t *obj, int x, int y);
  * @param reload Boolean flag indicating whether the timer should reload automatically (true) or run only once (false).
  * @param callback Pointer to the callback function to be called when the timer expires.
  */
-void gui_obj_set_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*callback)(void *));
+void gui_obj_create_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*callback)(void *));
+
+void gui_obj_delete_timer(gui_obj_t *obj);
+
+void gui_obj_start_timer(gui_obj_t *obj);
+
+void gui_obj_stop_timer(gui_obj_t *obj);
 
 #ifdef __cplusplus
 }

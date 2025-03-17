@@ -305,8 +305,8 @@ static void animation_case(gui_view_t *this, float pro)
     }
 }
 
-static void view_transition_animation_function(void *p, void *this_widget,
-                                               struct gui_animate *animate)
+void view_transition_animation_function(void *p, void *this_widget,
+                                        struct gui_animate *animate)
 {
     gui_view_t *this = this_widget;
     this->event = 1;
@@ -337,9 +337,5 @@ static void view_transition_animation_function(void *p, void *this_widget,
  *============================================================================*/
 void gui_view_set_animate(gui_view_t *this)
 {
-    uint32_t dur = VIEW_TRANSITION_DURATION_MS;
-    int repeat_count = 0;
-    gui_animate_callback_t callback = view_transition_animation_function;
-    void *p = NULL;
-    GUI_SET_ANIMATE_HELPER
+    GUI_ASSERT(0);
 }

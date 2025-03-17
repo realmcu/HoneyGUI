@@ -39,7 +39,8 @@ static int app_init(void)
     gui_img_t *img = gui_img_create_from_mem(win,  "img_1_test", (void *)_actiger_blue_compressed, 0, 0,
                                              0, 0);
 
-    gui_obj_set_timer(&(img->base), 1000, true, test_cb);
+    gui_obj_create_timer(&(img->base), 1000, true, test_cb);
+    gui_obj_start_timer(&(img->base));
 
     return 0;
 }

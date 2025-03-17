@@ -53,7 +53,7 @@
 *                           Public Functions
 *============================================================================*/
 
-void gui_obj_set_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*callback)(void *))
+void gui_obj_create_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*callback)(void *))
 {
     if (obj->timer == NULL)
     {
@@ -65,5 +65,57 @@ void gui_obj_set_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*ca
     obj->timer->interval_ms = interval;
     obj->timer->reload = reload;
     obj->timer->p_timer_callback = callback;
+
+}
+
+void gui_obj_delete_timer(gui_obj_t *obj)
+{
+    if (obj->timer != NULL)
+    {
+        gui_free(obj->timer);
+        obj->timer = NULL;
+    }
+}
+
+void gui_obj_start_timer(gui_obj_t *obj)
+{
+
+    GUI_ASSERT(obj->timer != NULL);
+
+    obj->timer->expire_time = gui_ms_get() + obj->timer->interval_ms;
+}
+
+void gui_obj_stop_timer(gui_obj_t *obj)
+{
+
+    GUI_ASSERT(obj->timer != NULL);
+
+    obj->timer->expire_time = 0;
+}
+
+void gui_obj_timer_handler(gui_obj_t *obj)
+{
+    if (obj->timer == NULL)
+    {
+        return;
+    }
+
+    if (obj->timer->p_timer_callback == NULL)
+    {
+        return;
+    }
+
+    if (obj->timer->expire_time < gui_ms_get())
+    {
+        obj->timer->p_timer_callback(obj);
+        if (obj->timer->reload)
+        {
+            obj->timer->expire_time = gui_ms_get() + obj->timer->interval_ms;
+        }
+        else
+        {
+            obj->timer = NULL;
+        }
+    }
 
 }

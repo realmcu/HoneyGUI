@@ -18,8 +18,8 @@
 
 
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *yellow_view = NULL;
-const static gui_view_descriptor_t *white_view = NULL;
+const static gui_view_descriptor_t *yellow_view_descriptor = NULL;
+const static gui_view_descriptor_t *white_view_descriptor = NULL;
 static void app_ui_view_blue_design(gui_view_t *view);
 
 
@@ -43,8 +43,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    yellow_view = gui_view_descriptor_get("yellow_view");
-    white_view = gui_view_descriptor_get("white_view");
+    yellow_view_descriptor = gui_view_descriptor_get("yellow_view");
+    white_view_descriptor = gui_view_descriptor_get("white_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -62,27 +62,28 @@ static void app_ui_view_blue_design(gui_view_t *view)
     gui_img_scale(img, 1.875f, 2.034f);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
 
-    gui_view_switch_on_event(view, yellow_view, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_CUBE, VIEW_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, white_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_LEFT);
+    gui_view_switch_on_event(view, white_view_descriptor, VIEW_CUBE, VIEW_CUBE,
+                             GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, white_view, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, white_view_descriptor, VIEW_CUBE, VIEW_CUBE,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, yellow_view, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_CUBE, VIEW_CUBE,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, white_view, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
+    gui_view_switch_on_event(view, white_view_descriptor, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
                              GUI_EVENT_TOUCH_CLICKED);
-    gui_view_switch_on_event(view, yellow_view, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
+    gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
                              GUI_EVENT_KB_SHORT_CLICKED);
 }
 
 static int app_init(void)
 {
-    gui_win_t *win_view = gui_win_create(gui_obj_get_root(), "win_view", 0, 0, 0, 0);
-    current_view = gui_view_create(win_view, &descriptor, 0, 0, 0, 0);
+    // gui_win_t *win_view = gui_win_create(gui_obj_get_root(), "win_view", 0, 0, 0, 0);
+    current_view = gui_view_create(gui_obj_get_root(), &descriptor, 0, 0, 0, 0);
     // gui_fps_create(app->window);
     return 0;
 }

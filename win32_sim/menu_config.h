@@ -23,7 +23,7 @@
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_REAL_BASE
+#define CONFIG_REALTEK_BUILD_REAL_BASE
 // </c>
 
 // <c> RTK GUI Base Demo
@@ -43,7 +43,7 @@
 // </c>
 
 // <c> RTK GUI View Demo
-#define CONFIG_REALTEK_BUILD_REAL_VIEW
+// #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>
 
 // <c> RTK GUI Paint Engine Demo
@@ -195,48 +195,6 @@
 
 // </e>
 
-// <e> HoneyGUI Enable LVGL
-#define CONFIG_REALTEK_BUILD_LVGL_V8     0
-#define CONFIG_REALTEK_BUILD_LVGL_V9      0
-
-#if (CONFIG_REALTEK_BUILD_LVGL_V8 == 1) || (CONFIG_REALTEK_BUILD_LVGL_V9 == 1)
-
-// <c> HoneyGUI Enalbe LVGL APP
-#define CONFIG_REALTEK_BUILD_LVGL_DEMO_APP
-// </c>
-
-// <c> HoneyGUI Enable LVGL EXAMPLES
-#define CONFIG_REALTEK_BUILD_LVGL_EXAMPLES
-// </c>
-
-// <c> HoneyGUI Enable LVGL RLOTTIE
-#define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
-// </c>
-
-#endif
-
-// </e>
-
-// <e> HoneyGUI Enable Arm-2D
-#define CONFIG_REALTEK_BUILD_ARM_2D     0
-
-#if (CONFIG_REALTEK_BUILD_ARM_2D == 1)
-
-// <c> HoneyGUI Enalbe ARM2D APP
-#define CONFIG_REALTEK_BUILD_ARM2D_DEMO_APP
-// </c>
-
-#endif
-
-// </e>
-
-// <e> HoneyGUI Enable Legacy RTK GUI
-#define CONFIG_REALTEK_BUILD_LEGACY_RTK_GUI     0
-
-#if (CONFIG_REALTEK_BUILD_LEGACY_RTK_GUI == 1)
-#endif
-
-// </e>
 
 
 // <e> h.264 decoder

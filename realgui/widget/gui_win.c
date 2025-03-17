@@ -151,43 +151,6 @@ void gui_win_ctor(gui_win_t  *this,
  *                           Public Functions
  *============================================================================*/
 
-void gui_win_set_animate(gui_win_t *this,
-                         uint32_t   dur,
-                         int        repeat_count,
-                         gui_animate_callback_t callback,
-                         void      *p)
-{
-    if (this->animate_array_length != 0)
-    {
-        return;
-    }
-    GUI_SET_ANIMATE_HELPER
-}
-void gui_win_append_animate(gui_win_t  *win,
-                            uint32_t    dur,
-                            int         repeat_count,
-                            void       *callback,
-                            void       *p,
-                            const char *name)
-{
-    win->animate_array_length++;
-    win->animate_array = gui_realloc(win->animate_array,
-                                     sizeof(*(win->animate_array)) * win->animate_array_length);
-    win->animate_array[win->animate_array_length - 1] = gui_malloc(sizeof(gui_animate_t));
-    gui_animate_t *animate = win->animate_array[win->animate_array_length - 1];
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    if (dur == 0)
-    {
-        animate->dur = 1000;
-    }
-    animate->callback = (gui_animate_callback_t)callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    animate->name = name;
-}
 void gui_win_left(gui_win_t *this, void *callback, void *parameter)
 {
     //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
@@ -319,12 +282,12 @@ void gui_win_move(gui_win_t *win, int x, int y)
 }
 int gui_win_get_x(gui_win_t *win)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(win, WINDOW)
+    GUI_ASSERT(GUI_BASE(win)->type == WINDOW);
     return GUI_BASE(win)->x;
 }
 int gui_win_get_y(gui_win_t *win)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(win, WINDOW)
+    GUI_ASSERT(GUI_BASE(win)->type == WINDOW);
     return GUI_BASE(win)->y;
 }
 void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)

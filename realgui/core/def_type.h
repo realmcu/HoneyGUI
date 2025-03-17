@@ -22,6 +22,16 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
+
+/**
+ * @brief gui error code definition
+ */
+typedef int gui_error_t;
+#define GUI_ERROR (gui_error_t)1
+#define GUI_ERROR_NULL (gui_error_t)2
+#define GUI_ERROR_FORMAT (gui_error_t)3
+#define GUI_SUCCESS (gui_error_t)0
+
 /**
  * @brief Swap the bytes of a 16-bit value
  */

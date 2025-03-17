@@ -48,6 +48,77 @@
  *                           Private Functions
  *============================================================================*/
 
+void gui_update_speed(int *speed, int speed_recode[])
+{
+    IMPORT_GUI_TOUCHPAD
+    int recode_num = 4;
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        speed_recode[i] = speed_recode[i + 1];
+    }
+    speed_recode[recode_num] = tp->deltaY;
+    *speed = speed_recode[recode_num] - speed_recode[0];
+    int max_speed = GUI_SPEED_MAX;
+    int min_speed = GUI_SPEED_MIN;
+    if (*speed > max_speed)
+    {
+        *speed = max_speed;
+    }
+    else if (*speed < -max_speed)
+    {
+        *speed = -max_speed;
+    }
+    if ((*speed > 0) && (*speed < min_speed))
+    {
+        *speed = min_speed;
+    }
+    else if ((*speed < 0) && (*speed > -min_speed))
+    {
+        *speed = -min_speed;
+    }
+}
+void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displacement)
+{
+    int recode_num = 4;
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        speed_recode[i] = speed_recode[i + 1];
+    }
+    speed_recode[recode_num] = displacement;
+    *speed = speed_recode[recode_num] - speed_recode[0];
+    int max_speed = GUI_SPEED_MAX;
+    int min_speed = GUI_SPEED_MIN;
+    if (*speed > max_speed)
+    {
+        *speed = max_speed;
+    }
+    else if (*speed < -max_speed)
+    {
+        *speed = -max_speed;
+    }
+    if ((*speed > 0) && (*speed < min_speed))
+    {
+        *speed = min_speed;
+    }
+    else if ((*speed < 0) && (*speed > -min_speed))
+    {
+        *speed = -min_speed;
+    }
+}
+void gui_inertial(int *speed, int end_speed, int *offset)
+{
+    if (*speed > end_speed)
+    {
+        *offset += *speed;
+        *speed -= 1;
+    }
+    else if (*speed < -end_speed)
+    {
+        *offset += *speed;
+        *speed += 1;
+    }
+}
+
 static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
 {
     //GUI_WIDGET_POINTER_BY_TYPE(t, TEXTBOX, obj)
@@ -706,14 +777,14 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
     {
         int ax, ay;
         gui_obj_absolute_xy(GUI_BASE(win), &ax, &ay);
-        if (touch->pressed && touch->y > ay && touch->y < ay + GUI_BASE(win)->h)
+        if (tp->pressed && tp->y > ay && tp->y < ay + GUI_BASE(win)->h)
         {
             (pl->history_y) = pl->touch_y;
             (pl->speed) = 0;
             memset(speed_recode, 0, sizeof(speed_recode));
             (pl->event5_flag) = 0;
         }
-        if (touch->released && (pl->time_array_offset) < 0)
+        if (tp->released && (pl->time_array_offset) < 0)
         {
             GUI_BASE(timer1)->x = 0;
             (pl->time_array_offset) = 0;
@@ -721,7 +792,7 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
             (pl->history_y) = 0;
             pl->touch_y = 0;
         }
-        if (touch->pressing && (touch->deltaY != 0 || touch->deltaX != 0))
+        if (tp->pressing && (tp->deltaY != 0 || tp->deltaX != 0))
         {
             gui_img_t *img = 0;
             gui_obj_tree_get_widget_by_type_and_index((void *)pl->timer, IMAGE_FROM_MEM, (void *)&img,
@@ -729,14 +800,14 @@ static void override_horizontal(void *p, void *this_widget, gui_animate_t *anima
             GUI_TYPE(gui_img_t, img)->data = (void *)pl->item_image;
         }
 
-        if (touch->pressing && touch->y > ay && touch->y < ay + GUI_BASE(win)->h)
+        if (tp->pressing && tp->y > ay && tp->y < ay + GUI_BASE(win)->h)
         {
-            pl->touch_y = (pl->history_y) + touch->deltaX;
+            pl->touch_y = (pl->history_y) + tp->deltaX;
             /**
              * Index = offset / gap % array length
                WidgetOffset = offset % gap
             */
-            gui_update_speed_by_displacement(&(pl->speed), speed_recode, touch->deltaX);
+            gui_update_speed_by_displacement(&(pl->speed), speed_recode, tp->deltaX);
             pl->render_flag = 1;
 
 

@@ -418,7 +418,7 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_ob
         if ((strlen(name) == strlen(obj->name)) && (strcmp(name, obj->name) == 0))
         {
             *output = obj;
-            GUI_WIDGET_TRY_EXCEPT(obj)
+            GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER));
             return;
         }
 
