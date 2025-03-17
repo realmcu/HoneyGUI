@@ -1,119 +1,136 @@
 document.addEventListener("DOMContentLoaded", function () {
     var imgModal = document.getElementById("imgModal");
     var imgInModal= document.getElementById("imgInModal");
-    var closeImgModal = document.getElementsByClassName("img-modal-close")[0];
-    var currentScale = 1;
-
-    // 初始化图片大小，使其适应容器
-    function initModalImageSize() {
-        const imgNaturalWidth = imgInModal.naturalWidth;
-        const imgNaturalHeight = imgInModal.naturalHeight;
-        const imgRatio = imgNaturalWidth / imgNaturalHeight;
-
-        const innerWidth = window.innerWidth;
-        const innerHeight = window.innerHeight;
-        const winRatio = innerWidth / innerHeight;
-
-        var imgRenderWidth = imgNaturalWidth;
-        var imgRenderHeight = imgNaturalHeight;
-        if(imgRatio >= winRatio) {
-            imgRenderWidth = Math.min(imgNaturalWidth, innerWidth);
-            imgRenderHeight = imgRenderWidth / imgRatio;
+    var imgModalCloseButton = document.getElementsByClassName("img-modal-close")[0];
+    var curImgScale = 1;
+ 
+    function addImgClickListener() {
+        const initModalImgSize = function() {
+            const innerWidth = window.innerWidth;
+            const innerHeight = window.innerHeight;
+        
+            imgInModal.style.maxWidth = `${innerWidth}px`;
+            imgInModal.style.maxHeight = `${innerHeight}px`;
+            
+            imgInModal.style.transformOrigin = "center center";
+            imgInModal.style.transform = 'scale(1)'; // Reset scale and translation on each open
+            curImgScale = 1; // Reset scale value
         }
-        else {
-            imgRenderHeight = Math.min(imgNaturalHeight, innerHeight);
-            imgRenderWidth = imgRenderHeight * imgRatio;
-        }
-
-        imgInModal.style.width = `${imgRenderWidth}px`;
-        imgInModal.style.height = `${imgRenderHeight}px`;
-
-        imgInModal.style.transformOrigin = "center center";
-        imgInModal.style.transform = 'scale(1)'; // Reset scale and translation on each open
-        currentScale = 1; // Reset scale value
-    }
-
-    function handleImageClick(event) {
-        imgModal.style.display = "flex";
-        imgModal.style.justifyContent = 'center';
-        imgModal.style.alignItems = 'center';
-
-        imgInModal.src = this.src;
-        initModalImageSize();
-        document.documentElement.style.overflow = "hidden"; // Disable scrolling
-    }
-
-    document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
-        var validImageRegex = /\.(jpe?g|png|gif|bmp|webp)$/i;
-        var parentElement = imgItem.parentElement;
-        var parentHref = parentElement.getAttribute('href');
-        // 父标签有 href 属性
-        if (parentHref) {
-            if(validImageRegex.test(parentHref.toLowerCase())) { // 父标签 href 属性为图片地址
-                // 阻止父a标签的点击事件
-                parentElement.addEventListener('click', function(aEvent) {
-                    aEvent.preventDefault();
-                });
-                parentElement.classList.add('no-cursor-link');
-                imgItem.addEventListener('click', handleImageClick);
-            }
-        }
-        else { // 父标签没有 href 属性
-            imgItem.addEventListener('click', handleImageClick);
-        }
-    });
-
-    closeImgModal.onclick = function() {
-        imgModal.style.display = "none";
-        document.documentElement.style.overflow = "auto"; // Enable scrolling
-    }
-
-    window.onclick = function(event) {
-        if (event.target === imgModal) {
-            imgModal.style.display = "none";
-            document.documentElement.style.overflow = "auto"; // Enable scrolling
-        }
-    }
-
-    function listenImgModalcroll() {
-        const hasHorScrollBar = (imgInModal.clientWidth * currentScale) > imgModal.clientWidth;
-        const hasVerScrollBar = (imgInModal.clientHeight * currentScale) > imgModal.clientHeight;
-
-        if (hasHorScrollBar) {
-            imgModal.style.justifyContent = 'start';
-            if (hasVerScrollBar) {
-                imgModal.style.alignItems = 'start';
-                imgInModal.style.transformOrigin = 'left top';
-            } else {
-                imgModal.style.alignItems = 'center';
-                imgInModal.style.transformOrigin = 'left center';
-            }
-        }
-        else {
+ 
+        const handleImgClick = function() { // 改为普通的函数表达式
+            imgModal.style.display = "flex";
             imgModal.style.justifyContent = 'center';
-            if (hasVerScrollBar) {
-                imgModal.style.alignItems = 'start';
-                imgInModal.style.transformOrigin = 'center top';
-            } else {
-                imgModal.style.alignItems = 'center';
-                imgInModal.style.transformOrigin = 'center center';
+            imgModal.style.alignItems = 'center';
+    
+            imgInModal.src = this.src; // 这里 this 的引用会指向被点击的 img 元素
+            initModalImgSize();
+            document.documentElement.style.overflow = "hidden"; // 禁用滚动
+        };
+ 
+        document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
+            var validImgRegex = /\.(jpe?g|png|gif|bmp|webp)$/i;
+            var parentElement = imgItem.parentElement;
+            var parentHref = parentElement.getAttribute('href');
+            // 父标签有 href 属性
+            if (parentHref) {
+                if(validImgRegex.test(parentHref.toLowerCase())) { // 父标签 href 属性为图片地址
+                    // 阻止父a标签的点击事件
+                    parentElement.addEventListener('click', function(aEvent) {
+                        aEvent.preventDefault();
+                    });
+                    parentElement.classList.add('no-cursor-link');
+                }
             }
-        }
+            imgItem.addEventListener('click', handleImgClick);
+        });
     }
-
-    // Zoom in/out
-    imgInModal.addEventListener("wheel", function(event) {
-        event.preventDefault();
-
-        if (event.deltaY < 0) {
-            // Scroll up (zoom in)
-            currentScale = Math.min(3, currentScale + 0.06); // Avoid scaling below the original size
-        } else {
-            // Scroll down (zoom out)
-            currentScale = Math.max(0.7, currentScale - 0.06); // Avoid scaling below the original size
+    
+    function addImgModalCloseHandler() {
+        imgModal.addEventListener('click', function(event) {
+            // 确保点击的仅是 imgModal 或者 imgModalCloseButton，而非内部其他子元素
+            if (event.target === imgModal || event.target === imgModalCloseButton) {
+                imgModal.style.display = "none";
+                document.documentElement.style.overflow = "auto"; // 启用页面滚动
+            }
+        });
+    }
+ 
+    function addImgZoomHandler() {
+        const updateImgModalPositionStyle = function() {
+            const hasHorScrollBar = (imgInModal.clientWidth * curImgScale) > imgModal.clientWidth;
+            const hasVerScrollBar = (imgInModal.clientHeight * curImgScale) > imgModal.clientHeight;
+    
+            // set the horizontal alignment
+            imgModal.style.justifyContent = hasHorScrollBar ? 'start' : 'center';
+            // set the vertical alignment
+            imgModal.style.alignItems = hasVerScrollBar ? 'start' : 'center';
+            // set transform origin attribute: start position
+            const horTransformOrigin = hasHorScrollBar ? 'left' : 'center';
+            const verTransformOrigin = hasVerScrollBar ? 'top' : 'center';
+            imgInModal.style.transformOrigin = `${horTransformOrigin} ${verTransformOrigin}`;
         }
-
-        imgInModal.style.transform = `scale(${currentScale})`;
-        listenImgModalcroll();
-    });
+ 
+        // image zoom in/out
+        imgInModal.addEventListener("wheel", function(event) {
+            event.preventDefault();
+            if (event.deltaY < 0) {
+                // Scroll up (zoom in)
+                curImgScale = Math.min(3, curImgScale + 0.06); // Avoid scaling below the original size
+            } else {
+                // Scroll down (zoom out)
+                curImgScale = Math.max(0.7, curImgScale - 0.06); // Avoid scaling below the original size
+            }
+ 
+            imgInModal.style.transform = `scale(${curImgScale})`;
+            updateImgModalPositionStyle();
+        });
+    }
+ 
+    function addImgTouchEventHandler() {
+        let initialDistance = 0;
+    
+        const getDistance = (point1, point2) => {
+            return Math.hypot(point2.x - point1.x, point2.y - point1.y);
+        };
+    
+        imgInModal.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 2) {
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                initialDistance = getDistance(
+                    { x: touch1.pageX, y: touch1.pageY }, 
+                    { x: touch2.pageX, y: touch2.pageY }
+                );
+            }
+        });
+    
+        imgInModal.addEventListener('touchmove', (event) => {
+            if (event.touches.length === 2) {
+                event.preventDefault();
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                const newDistance = getDistance(
+                    { x: touch1.pageX, y: touch1.pageY }, 
+                    { x: touch2.pageX, y: touch2.pageY }
+                );
+                const scaleChange = newDistance / initialDistance;
+    
+                // Calculate new scale and constrain it between 0.7 and 3
+                curImgScale *= scaleChange;
+                curImgScale = Math.max(0.7, Math.min(curImgScale, 3));
+    
+                // Apply new scale
+                imgInModal.style.transform = `scale(${curImgScale})`;
+                updateImgModalPositionStyle();
+    
+                // Update initial distance for the next move event
+                initialDistance = newDistance;
+            }
+        }, { passive: false });
+    }
+ 
+    addImgClickListener();
+    addImgModalCloseHandler();
+    addImgZoomHandler();
+    addImgTouchEventHandler();
 });
