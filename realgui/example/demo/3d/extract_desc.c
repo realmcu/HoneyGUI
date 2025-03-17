@@ -270,7 +270,10 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
     }
     for (int i = 0; i < desc->num_materials; i++)
     {
-        fwrite(desc->textures[i], sizeof(unsigned char), desc->texture_sizes[i], file);
+        if (desc->texture_sizes[i] > 0)
+        {
+            fwrite(desc->textures[i], sizeof(unsigned char), desc->texture_sizes[i], file);
+        }
     }
 
 
@@ -360,11 +363,12 @@ int main(int argc, char **argv)
                       &desc->num_materials, obj_filename, loadFile, NULL, 0);
     desc->textures = (unsigned char **)malloc(desc->num_materials * sizeof(unsigned char *));
     desc->texture_sizes = (unsigned int *)malloc(desc->num_materials * sizeof(unsigned int));
+    memset(desc->texture_sizes, 0x00, desc->num_materials * sizeof(unsigned int));
 
     for (uint32_t i = 0; i < desc->attrib.num_face_num_verts; i++)
     {
         int material_id = desc->attrib.material_ids[i];
-        if (material_id != -1)
+        if (material_id != -1  && desc->materials[material_id].diffuse_texname != NULL)
         {
             printf("desc->materials[%d].diffuse_texname: %s\n", material_id,
                    desc->materials[material_id].diffuse_texname);
