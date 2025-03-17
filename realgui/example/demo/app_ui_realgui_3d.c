@@ -1,14 +1,10 @@
 /* 3d butterfly demo start*/
 #include "guidef.h"
 #include "gui_img.h"
-#include "gui_tabview.h"
-#include "gui_tab.h"
-#include "gui_img.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_canvas.h"
@@ -87,41 +83,22 @@ static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
 
 
 
-static void app_ui_design(gui_app_t *app)
+static int app_init(void)
 {
     gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
 
-    void *test_3d = gui_3d_create(&(app->screen), "3d-widget", desc, 0, 0, 480, 480);
+    void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", desc, 0, 0, 480, 480);
 
     gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
 
     gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
 
+    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, NULL);
 
-    return;
+    return 0;
 
 }
 /* 3d butterfly demo end*/
-
-static gui_app_t rtk_gui_demo =
-{
-    .screen =
-    {
-        .name = "rtk_gui_demo",
-        .x    = 0,
-        .y    = 0,
-    },
-    .ui_design = app_ui_design,
-    .active_ms = 1000 * 60 * 60,
-};
-
-
-static int app_init(void)
-{
-    gui_server_init();
-    gui_app_startup(&rtk_gui_demo);
-    return 0;
-}
 
 GUI_INIT_APP_EXPORT(app_init);
 

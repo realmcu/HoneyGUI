@@ -308,8 +308,7 @@ static void gui_3d_rect_prepare(gui_3d_rect_t *this)
                 tp->y >= target_y &&
                 tp->y <= (target_y + target_h))
             {
-                //gui_obj_enable_event(obj, GUI_EVENT_1);
-                GUI_ASSERT(0);
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
                 break;
             }
         }
@@ -549,7 +548,6 @@ gui_3d_rect_t *gui_3d_rect_create(void                  *parent,
 }
 void gui_3d_rect_on_click(gui_3d_rect_t *this, void *callback, void *parameter)
 {
-    //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
-    GUI_ASSERT(0);
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 
