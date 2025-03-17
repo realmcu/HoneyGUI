@@ -43,6 +43,8 @@ PPE_PIXEL_FORMAT lv_ppe_get_format(lv_color_format_t cf, const uint8_t *content)
 
 lv_area_t lv_ppe_get_matrix_area(ppe_matrix_t *matrix, const lv_area_t *coords,
                                  const lv_draw_image_dsc_t *draw_dsc);
+
+bool lv_ppe_get_area(ppe_rect_t *result_rect, ppe_rect_t *source_rect, ppe_matrix_t *matrix);
 /**********************
  *      MACROS
  **********************/

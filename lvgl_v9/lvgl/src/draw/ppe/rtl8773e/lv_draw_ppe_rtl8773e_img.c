@@ -507,7 +507,7 @@ static void lv_draw_ppe_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         pre_trans.m[1][2] = coords->y1;
         ppe_mat_multiply(&ppe_mat, &pre_trans);
     }
-    ppe_get_area(&target_rect, &src_rect, &ppe_mat, &target);
+    lv_ppe_get_area(&target_rect, &src_rect, &ppe_mat);
     area_rot.x1 = target_rect.x;
     area_rot.y1 = target_rect.y;
     area_rot.x2 = target_rect.x + target_rect.w - 1;

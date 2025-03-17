@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_PPE_RTL8773E
 #include "lv_ppe_rtl8773e_utils.h"
 #include "section.h"
+#include "math.h"
 
 SHM_DATA_SECTION uint8_t cache_buffer[40 * 1024];
 /*********************
@@ -144,4 +145,133 @@ uint8_t *lv_ppe_get_buffer(uint32_t size)
 {
     return cache_buffer;
 }
+
+typedef struct
+{
+    float p[3];
+} pox_t;
+
+static void pos_transfer(ppe_matrix_t *matrix, pox_t *pox)
+{
+    float m_row0, m_row1, m_row2;
+
+    float a = pox->p[0];
+    float b = pox->p[1];
+    float c = pox->p[2];
+
+    /* Process all rows. */
+    m_row0 = matrix->m[0][0];
+    m_row1 = matrix->m[0][1];
+    m_row2 = matrix->m[0][2];
+    pox->p[0] = (m_row0 * a) + (m_row1 * b) + (m_row2 * c);
+
+    m_row0 = matrix->m[1][0];
+    m_row1 = matrix->m[1][1];
+    m_row2 = matrix->m[1][2];
+    pox->p[1] = (m_row0 * a) + (m_row1 * b) + (m_row2 * c);
+
+    m_row0 = matrix->m[2][0];
+    m_row1 = matrix->m[2][1];
+    m_row2 = matrix->m[2][2];
+    pox->p[2] = (m_row0 * a) + (m_row1 * b) + (m_row2 * c);
+
+    pox->p[0] = pox->p[0] / pox->p[2];
+    pox->p[1] = pox->p[1] / pox->p[2];
+    pox->p[2] = 1;
+}
+
+
+bool lv_ppe_get_area(ppe_rect_t *result_rect, ppe_rect_t *source_rect, ppe_matrix_t *matrix)
+{
+    ppe_pox_t pox = {0.0f};
+    float x_min = 0.0f;
+    float x_max = 0.0f;
+    float y_min = 0.0f;
+    float y_max = 0.0f;
+
+    pox.p[0] = source_rect->x * 1.0f;
+    pox.p[1] = source_rect->y * 1.0f;
+    pox.p[2] = 1.0f;
+    pos_transfer(matrix, &pox);
+    x_min = pox.p[0];
+    x_max = pox.p[0];
+    y_min = pox.p[1];
+    y_max = pox.p[1];
+
+    pox.p[0] = (source_rect->x + source_rect->w - 1) * 1.0f;
+    pox.p[1] = source_rect->y * 1.0f;
+    pox.p[2] = 1.0f;
+    pos_transfer(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = source_rect->x * 1.0f;
+    pox.p[1] = (source_rect->y + source_rect->h - 1) * 1.0f;
+    pox.p[2] = 1.0f;
+    pos_transfer(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = (source_rect->x + source_rect->w - 1) * 1.0f;
+    pox.p[1] = (source_rect->y + source_rect->h - 1) * 1.0f;
+    pox.p[2] = 1.0f;
+    pos_transfer(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    result_rect->x = (int16_t)x_min;
+    result_rect->y = (int16_t)y_min;
+    result_rect->w = ceil(x_max) - result_rect->x + 1;
+    result_rect->h = ceil(y_max) - result_rect->y + 1;
+
+    if (isnan(y_min) || isnan(y_max) || isnan(x_min) || isnan(x_max) || result_rect->h == 0 ||
+        result_rect->w == 0)
+    {
+        return false;
+    }
+    return true;
+}
+
 #endif /*LV_USE_PPE*/
