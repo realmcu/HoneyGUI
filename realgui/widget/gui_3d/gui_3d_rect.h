@@ -46,7 +46,6 @@ typedef struct gui_3d_rect
     gui_3d_rect_face_t *face;
     draw_img_t *img;
     draw_img_t *mask_img;
-    gui_animate_t *animate;
 
     void (*global_shape_transform_cb)(struct gui_3d_rect *this, gui_3d_world_t *world,
                                       gui_3d_camera_t *camera, gui_3d_light_t *light);

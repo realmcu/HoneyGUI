@@ -85,15 +85,11 @@ static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
 
 static int app_init(void)
 {
-    gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
-
-    void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", desc, 0, 0, 480, 480);
+    void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
     gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
 
-    gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
-
-    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, NULL);
+    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, update_animation);
 
     return 0;
 

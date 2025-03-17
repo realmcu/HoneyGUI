@@ -106,14 +106,6 @@ static gui_point_4d_t gui_3d_calculate_point_in_quad(gui_point_4d_t P0, gui_poin
 
 }
 
-static void gui_3d_rect_update_att(gui_obj_t *obj)
-{
-    gui_3d_rect_t *this = (void *)obj;
-    if (this->animate)
-    {
-        animate_frame_update(this->animate, obj);
-    }
-}
 
 static void gui_3d_light_apply(gui_3d_rect_t *this, size_t i /*face_offset*/,
                                gui_3d_world_t *world, gui_3d_light_t *light)
@@ -245,7 +237,7 @@ static void gui_3d_rect_prepare(gui_3d_rect_t *this)
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
-    gui_3d_rect_update_att(obj);
+
 
     this->face = gui_malloc(sizeof(gui_3d_rect_face_t) * this->desc->attrib.num_face_num_verts);
     memset(this->face, 0x00, sizeof(gui_3d_rect_face_t) * this->desc->attrib.num_face_num_verts);
@@ -505,14 +497,6 @@ void gui_3d_rect_set_local_shape_transform_cb(gui_3d_rect_t *this, size_t face/*
     this->local_shape_transform_cb = cb;
 }
 
-void gui_3d_rect_set_animate(gui_3d_rect_t *this,
-                             uint32_t       dur,
-                             int            repeat_count,
-                             void          *callback,
-                             void          *p)
-{
-    GUI_SET_ANIMATE_HELPER
-}
 
 
 gui_3d_rect_t *gui_3d_rect_create(void                  *parent,

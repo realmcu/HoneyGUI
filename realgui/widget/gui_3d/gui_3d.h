@@ -69,7 +69,7 @@ typedef struct
  *
  * @param parent parent widget
  * @param name widget name
- * @param desc description file data
+ * @param desc_addr description file data
  * @param x the X-axis coordinate relative to parent widget
  * @param y the Y-axis coordinate relative to parent widget
  * @param w width
@@ -78,7 +78,7 @@ typedef struct
  */
 void *gui_3d_create(void                 *parent,
                     const char           *name,
-                    gui_3d_description_t *desc,
+                    void                 *desc_addr,
                     int16_t               x,
                     int16_t               y,
                     int16_t               w,
@@ -102,21 +102,6 @@ void gui_3d_set_global_shape_transform_cb(void *this, gui_3d_shape_transform_cb 
  *           and light source for the specified face
  */
 void gui_3d_set_local_shape_transform_cb(void *this, size_t face, gui_3d_shape_transform_cb cb);
-
-/**
- * @brief set 3D animation effects
- *
- * @param this the 3d widget pointer
- * @param dur animation time cost in ms
- * @param repeat_count rounds to repeat
- * @param callback every frame callback
- * @param p callback's parameter
- */
-void gui_3d_set_animate(void       *this,
-                        uint32_t    dur,
-                        int         repeat_count,
-                        void       *callback,
-                        void       *p);
 
 /**
  * @brief Set a callback function for when the 3D widget is clicked.

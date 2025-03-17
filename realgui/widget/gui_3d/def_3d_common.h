@@ -240,7 +240,7 @@ bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t camera
 void gui_3d_camera_build_UVN_matrix(gui_3d_camera_t *camera);
 
 
-gui_3d_description_t *gui_get_3d_desc(void *desc_addr);
+gui_3d_description_t *gui_load_3d_description(void *desc_addr);
 
 #ifdef __cplusplus
 }

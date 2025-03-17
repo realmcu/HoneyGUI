@@ -574,7 +574,7 @@ void gui_3d_camera_build_UVN_matrix(gui_3d_camera_t *camera)
     camera->mat_cam = gui_3d_matrix_multiply(mt_inv, mt_uvn);
 }
 
-gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
+gui_3d_description_t *gui_load_3d_description(void *desc_addr)
 {
     unsigned char *ptr = (unsigned char *)desc_addr;
     gui_3d_description_t *desc = (gui_3d_description_t *)gui_malloc(sizeof(gui_3d_description_t));

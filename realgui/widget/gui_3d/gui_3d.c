@@ -37,12 +37,13 @@
 
 void *gui_3d_create(void                 *parent,
                     const char           *name,
-                    gui_3d_description_t *desc,
+                    void                 *desc_addr,
                     int16_t               x,
                     int16_t               y,
                     int16_t               w,
                     int16_t               h)
 {
+    gui_3d_description_t *desc = gui_load_3d_description((void *)desc_addr);
 
     switch (desc->face_type)
     {
@@ -99,27 +100,6 @@ void gui_3d_set_local_shape_transform_cb(void *this, size_t face, gui_3d_shape_t
     }
 }
 
-void gui_3d_set_animate(void       *this,
-                        uint32_t    dur,
-                        int         repeat_count,
-                        void       *callback,
-                        void       *p)
-{
-    gui_3d_base_t *base = (gui_3d_base_t *)this;
-    switch (base->desc->face_type)
-    {
-    case GUI_3D_FACE_RECTANGLE:
-        gui_3d_rect_set_animate((gui_3d_rect_t *)this, dur, repeat_count, callback, p);
-        break;
-
-    case GUI_3D_FACE_TRIANGLE:
-        gui_3d_tria_set_animate((gui_3d_tria_t *)this, dur, repeat_count, callback, p);
-        break;
-
-    default:
-        break;
-    }
-}
 
 void gui_3d_on_click(void *this, void *callback, void *parameter)
 {

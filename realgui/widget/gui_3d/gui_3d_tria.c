@@ -29,15 +29,6 @@
 #include <guidef.h>
 
 
-static void gui_3d_tria_update_att(gui_obj_t *obj)
-{
-    gui_3d_tria_t *this = (void *)obj;
-    if (this->animate)
-    {
-        animate_frame_update(this->animate, obj);
-    }
-}
-
 static void gui_3d_generate_triangle_img(gui_3d_tria_t *this, int width, int height)
 {
     this->img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
@@ -136,7 +127,6 @@ static void gui_3d_tria_prepare(gui_3d_tria_t *this)
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
-    gui_3d_tria_update_att(obj);
 
     this->face = gui_malloc(sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
     memset(this->face, 0x00, sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
@@ -305,15 +295,6 @@ void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face/*
                                               void (*cb)(gui_3d_tria_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera))
 {
     this->local_shape_transform_cb = cb;
-}
-
-void gui_3d_tria_set_animate(gui_3d_tria_t *this,
-                             uint32_t       dur,
-                             int            repeat_count,
-                             void          *callback,
-                             void          *p)
-{
-    GUI_SET_ANIMATE_HELPER
 }
 
 

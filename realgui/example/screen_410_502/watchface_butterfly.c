@@ -216,12 +216,11 @@ void create_watchface_bf(gui_view_t *view)
     gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)win_cb, win);
 
-    gui_3d_description_t *desc = gui_get_3d_desc((void *)DESC_BUTTERFLY_BIN);
-    void *test_3d = gui_3d_create(obj, "3d-widget", desc, 0, 0, 410, 502);
+    void *test_3d = gui_3d_create(obj, "3d-widget", DESC_BUTTERFLY_BIN, 0, 0, 410, 502);
 
     gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
 
-    gui_3d_set_animate(test_3d, 10000, -1, update_animation, NULL);
+    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, update_animation);
 
     gui_img_t *img = gui_img_create_from_mem(win, "mask", W1ELLIPSE5_BIN, 204, 246, 0, 0);
     h_hand = gui_img_create_from_mem(win, "h_hand", W1UNION2_BIN, 199, 170, 0, 0);
