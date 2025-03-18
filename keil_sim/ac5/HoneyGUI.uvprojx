@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>DRV_LCD_HIGHT=480 DRV_PIXEL_BITS=16 ENABLE_HONEYGUI DRV_LCD_WIDTH=480 GUI_KEIL_SIM</Define>
+              <Define>DRV_PIXEL_BITS=16 DRV_LCD_WIDTH=480 ENABLE_HONEYGUI DRV_LCD_HIGHT=480 GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\example\demo;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_card;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_view</IncludePath>
+              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_card;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_view;..\..\example\demo</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -601,16 +601,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/demo</GroupName>
-          <Files>
-            <File>
-              <FileName>app_ui_realgui_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\example\demo\app_ui_realgui_base.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>realgui/input</GroupName>
           <Files>
             <File>
@@ -852,6 +842,16 @@
               <FileName>gui_view_rotate.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_view\gui_view_rotate.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/demo</GroupName>
+          <Files>
+            <File>
+              <FileName>app_ui_realgui_base.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\example\demo\app_ui_realgui_base.c</FilePath>
             </File>
           </Files>
         </Group>

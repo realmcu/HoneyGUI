@@ -38,16 +38,14 @@ env.Append(LIBS = ['opengl32'])
 
 
 RTK_GUI_ENGINE = os.path.abspath('./../realgui/')
-LVGL_ROOT = os.path.abspath('./../lvgl_v8/lvgl/')
-LVGLV9_ROOT = os.path.abspath('./../lvgl_v9/lvgl/')
+GUI_EXAMPLE = os.path.abspath('./../example/')
+
 PLATFORM = menu_config.PLATFORM
 
 Export('PLATFORM')
 Export('TOOL_ROOT')
 Export('RTK_GUI_ENGINE')
-Export('LVGL_ROOT')
-Export('LVGLV9_ROOT')
-LEGACY_UI = os.path.abspath('./../rtkv0/')
+
 
 
 print("CC: ", env['CC'])
@@ -95,6 +93,7 @@ if platform.system() == 'Windows':
 
 # include app
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
+objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
 
 
 # bsp_vdir = 'build'

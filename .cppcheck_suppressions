@@ -1,11 +1,11 @@
 
 *:win32_sim\RTE\*
 *:realgui\3rd\*
-*:realgui\example\screen_454_454\*
-*:realgui\example\screen_320_385\*
-*:lvgl_v9\*
-*:lvgl_v8\*
-*:Arm2D\*
+*:example\screen_454_454\*
+*:example\screen_320_385\*
+*:example\gui_menu\*
+
+
 
 
 
