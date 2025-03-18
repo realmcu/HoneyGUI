@@ -101,3 +101,26 @@ void gui_obj_suppress_set(gui_obj_t *object, gui_event_t filter)
     gui_obj_suppress_child_event(object, filter);
 }
 
+
+bool gui_obj_event_is_suppressed(gui_obj_t *object, gui_event_t event, touch_info_t *tp)
+{
+    for (uint8_t i = 0; i < object->suppress_conflict_obj_cnt; i++)
+    {
+        gui_obj_t *o = object->suppress_conflict_obj_list[i];
+        for (uint8_t j = 0; j < o->event_dsc_cnt; j++)
+        {
+            gui_event_dsc_t *event_dsc = o->event_dsc + j;
+            if (event_dsc->filter == event)
+            {
+                if (gui_obj_point_in_obj_rect(o, tp->x, tp->y) == true)
+                {
+                    return true;
+                }
+
+            }
+        }
+    }
+    return false;
+}
+
+

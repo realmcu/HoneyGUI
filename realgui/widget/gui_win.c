@@ -79,11 +79,7 @@ static void prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-    //gui_obj_enable_event(obj, GUI_EVENT_1);
-    //gui_obj_enable_event(obj, GUI_EVENT_2);
-    //gui_obj_enable_event(obj, GUI_EVENT_3);
-    //gui_obj_enable_event(obj, GUI_EVENT_4);
-    //gui_obj_enable_event(obj, GUI_EVENT_5);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
 }
 

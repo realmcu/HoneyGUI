@@ -49,6 +49,7 @@ extern "C" {
  *============================================================================*/
 
 void gui_obj_suppress_set(gui_obj_t *object, gui_event_t filter);
+bool gui_obj_event_is_suppressed(gui_obj_t *object, gui_event_t event, touch_info_t *tp);
 
 
 #ifdef __cplusplus
