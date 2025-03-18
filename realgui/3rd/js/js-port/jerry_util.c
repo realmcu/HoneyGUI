@@ -240,81 +240,43 @@ static void _js_value_dump(jerry_value_t value)
         printf("what?");
     }
 }
+#include "gui_api.h"
 
 void js_value_dump(jerry_value_t value)
 {
     _js_value_dump(value);
-    printf("\n");
+    gui_log("\n");
 }
-#ifdef __arm__
-#include "romfs.h"
-#else
-#include <sys/stat.h>
-#include <fcntl.h>
-#endif
+
 int js_read_file(const char *filename, char **script)
 {
-#ifdef __WIN32
-    FILE *fp;
+
+
     int length = 0;
-    struct stat statbuf;
+
 
     if (!filename || !script) { return 0; }
 
-    stat(filename, &statbuf);
-    length = statbuf.st_size;
 
-    if (!length) { return 0; }
-
-    if (!(*script)) { return 0; }
-
-    (*script)[length] = '\0';
-
-    fp = fopen(filename, "rb");
-    if (!fp)
-    {
-        printf("open %s failed!\n", filename);
-        return 0;
-    }
-
-    if (fread(*script, length, 1, fp) != 1)
-    {
-        length = 0;
-        printf("read %s failed!\n", filename);
-    }
-    fclose(fp);
-
-    return length;
-#else
-    //FILE *fp;
-    int length = 0;
-    //struct stat statbuf;
-
-    if (!filename || !script) { return 0; }
-
-    //stat(filename, &statbuf);
-    //length = statbuf.st_size;
-
-    //if(!length) return 0;
     int fd = 0;
-    fd = open(filename, 0);
-    length = gui_fs_lseek(fd, 0, SEEK_END) - lseek(fd, 0, SEEK_SET);
+    fd = gui_fs_open(filename, 0);
+    length = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
 
     if (!(*script)) { return 0; }
     (*script)[length] = '\0';
 
-    read(fd, *script, length);
+    gui_fs_read(fd, *script, length);
 
-    //rt_kprintf("length:%d",length);
+
     if (fd <= 0)
     {
-        printf("open %s failed!\n", filename);
+        gui_log("open %s failed!\n", filename);
         return 0;
     }
-    close(fd);
+    gui_fs_close(fd);
 
     return length;
-#endif
+
 }
 
 int js_util_init(void)
