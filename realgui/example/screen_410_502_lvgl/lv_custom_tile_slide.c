@@ -39,6 +39,8 @@ static void reset_scale_fade_effect(lv_obj_t *obj);
 #if LV_DRAW_TRANSFORM_USE_MATRIX
 static void apply_cube_effect(lv_obj_t *obj);
 static void reset_cube_effect(lv_obj_t *obj);
+static void apply_box_effect(lv_obj_t *obj);
+static void reset_box_effect(lv_obj_t *obj);
 static void apply_spiral_notebook_effect(lv_obj_t *obj);
 static void reset_spiral_notebook_effect(lv_obj_t *obj);
 #endif
@@ -239,15 +241,30 @@ static void apply_scale_fade_effect(lv_obj_t *obj)
     float scale = 1 - LV_MAX(scale_x, scale_y) / 2;
     int32_t scaleint  = LV_CLAMP(128, scale * 256, 256);
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_matrix_translate(&matrix, screen_center.x, screen_center.y);
+    lv_matrix_scale(&matrix, scale, scale);
+    lv_matrix_translate(&matrix, -screen_center.x, -screen_center.y);
+    lv_obj_set_transform(obj, &matrix);
+#else
     lv_obj_set_style_transform_pivot_x(obj, LV_PCT(50), 0);
     lv_obj_set_style_transform_pivot_y(obj, LV_PCT(50), 0);
     lv_obj_set_style_transform_scale(obj, scaleint, 0);
+#endif
     lv_obj_set_style_opa(obj, scaleint, 0);
 }
 
 static void reset_scale_fade_effect(lv_obj_t *obj)
 {
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_obj_set_transform(obj, &matrix);
+#else
     lv_obj_set_style_transform_scale(obj, 256, 0);
+#endif
     lv_obj_set_style_opa(obj, 255, 0);
 }
 
@@ -271,16 +288,31 @@ static void apply_scale_effect(lv_obj_t *obj)
     float scale_y = (float)(LV_ABS(obj_center.y - screen_center.y)) / screen_center.y;
 
     float scale = 1 - LV_MAX(scale_x, scale_y) / 2;
-    int32_t scaleint  = LV_CLAMP(128, scale * 256, 256);
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_matrix_translate(&matrix, screen_center.x, screen_center.y);
+    lv_matrix_scale(&matrix, scale, scale);
+    lv_matrix_translate(&matrix, -screen_center.x, -screen_center.y);
+    lv_obj_set_transform(obj, &matrix);
+#else
+    int32_t scaleint  = LV_CLAMP(128, scale * 256, 256);
     lv_obj_set_style_transform_pivot_x(obj, LV_PCT(50), 0);
     lv_obj_set_style_transform_pivot_y(obj, LV_PCT(50), 0);
     lv_obj_set_style_transform_scale(obj, scaleint, 0);
+#endif
 }
 
 static void reset_scale_effect(lv_obj_t *obj)
 {
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_obj_set_transform(obj, &matrix);
+#else
     lv_obj_set_style_transform_scale(obj, 256, 0);
+#endif
 }
 
 static void apply_fade_effect(lv_obj_t *obj)
@@ -330,30 +362,144 @@ static void apply_cube_effect(lv_obj_t *obj)
         .y = (obj_coords.y1 + obj_coords.y2) / 2
     };
 
-    float scale_x = (float)(LV_ABS(obj_center.x - screen_center.x)) / screen_center.x;
-    float scale_y = (float)(LV_ABS(obj_center.y - screen_center.y)) / screen_center.y;
+    /*cube 3d matrix*/
+    float w = obj_coords.x2 - obj_coords.x1;
+    float h = obj_coords.y2 - obj_coords.y1;
+    float d = (w + h) / 2;
+    float xoff = (float)lv_display_get_horizontal_resolution(NULL) / 2;
+    float yoff = (float)lv_display_get_vertical_resolution(NULL) / 2 ;
+    float zoff = -(xoff + yoff) * 2;
 
-    float scale = 1 - LV_MAX(scale_x, scale_y) / 2;
-    int32_t scaleint  = LV_CLAMP(128, scale * 256, 256);
+    lv_vertex_t v0 = {-w, -h, d};
+    lv_vertex_t v1 = {w,  -h, d};
+    lv_vertex_t v2 = {w,  h,  d};
+    lv_vertex_t v3 = {-w, h,  d};
 
-    float rotate_degree = 90 * (scaleint / 256.0f - 1.0f);
+    lv_vertex_t tv0, tv1, tv2, tv3;
+    lv_vertex_t rv0, rv1, rv2, rv3;
 
-    lv_matrix_t matrix;
-    lv_matrix_identity(&matrix);
+    lv_matrix_t temp;
+    lv_matrix_t rotate_3D;
+    lv_matrix_identity(&temp);
+    lv_matrix_identity(&rotate_3D);
 
-    lv_matrix_rotate(&matrix, rotate_degree);
+    float release_x = (obj_center.x - screen_center.x) / 2;
+    float release_y = (obj_center.y - screen_center.y) / 2;
+    float rotate_degree;
 
-    lv_obj_get_style_transform_rotation(obj, rotate_degree);
-    lv_obj_set_style_transform_pivot_x(obj, LV_PCT(50), 0);
-    lv_obj_set_style_transform_pivot_y(obj, LV_PCT(50), 0);
-    lv_obj_set_transform(obj, &matrix);
+    if (LV_ABS(release_x) > LV_ABS(release_y))
+    {
+        rotate_degree = 90.0 * (release_x) / screen_center.x;
+        lv_matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
+    }
+    else
+    {
+        rotate_degree = -90.0 * (release_y) / screen_center.y;
+        lv_matrix_compute_rotate(rotate_degree, 0, 0, &rotate_3D);
+    }
+
+    lv_matrix_transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
+    lv_matrix_transfrom_rotate(&rotate_3D, &v1, &tv1, 0, 0, 0);
+    lv_matrix_transfrom_rotate(&rotate_3D, &v2, &tv2, 0, 0, 0);
+    lv_matrix_transfrom_rotate(&rotate_3D, &v3, &tv3, 0, 0, 0);
+
+    lv_matrix_compute_rotate(0, 0, 0, &rotate_3D);
+
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv0, &rv0, xoff, yoff, zoff);
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv1, &rv1, xoff, yoff, zoff);
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
+
+    lv_vertex_t p = {screen_center.x, screen_center.y, screen_center.x + screen_center.y};
+
+    lv_matrix_transfrom_blit(w, h, &p, &rv0, &rv1, &rv2, &rv3, &temp);
+    lv_matrix_translate(&temp, - release_x, - release_y);
+
+    lv_obj_set_transform(obj, &temp);
 }
 
 static void reset_cube_effect(lv_obj_t *obj)
 {
-    lv_matrix_t identity;
-    lv_matrix_identity(&identity);
-    lv_obj_set_transform(obj, &identity);
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_obj_set_transform(obj, &matrix);
+}
+static void apply_box_effect(lv_obj_t *obj)
+{
+    lv_point_t screen_center =
+    {
+        .x = lv_display_get_horizontal_resolution(NULL) / 2,
+        .y = lv_display_get_vertical_resolution(NULL) / 2
+    };
+
+    lv_area_t obj_coords;
+    lv_obj_get_coords(obj, &obj_coords);
+    lv_point_t obj_center =
+    {
+        .x = (obj_coords.x1 + obj_coords.x2) / 2,
+        .y = (obj_coords.y1 + obj_coords.y2) / 2
+    };
+
+    /*box 3d matrix*/
+    float w = obj_coords.x2 - obj_coords.x1;
+    float h = obj_coords.y2 - obj_coords.y1;
+    float d = (w + h) / 2;
+    float xoff = (float)lv_display_get_horizontal_resolution(NULL) / 2;
+    float yoff = (float)lv_display_get_vertical_resolution(NULL) / 2 ;
+    float zoff = -(xoff + yoff) * 2;
+
+    lv_vertex_t v0 = {-w, -h, d};
+    lv_vertex_t v1 = {w,  -h, d};
+    lv_vertex_t v2 = {w,  h,  d};
+    lv_vertex_t v3 = {-w, h,  d};
+
+    lv_vertex_t tv0, tv1, tv2, tv3;
+    lv_vertex_t rv0, rv1, rv2, rv3;
+
+    lv_matrix_t temp;
+    lv_matrix_t rotate_3D;
+    lv_matrix_identity(&temp);
+    lv_matrix_identity(&rotate_3D);
+
+    float release_x = (obj_center.x - screen_center.x) / 2;
+    float release_y = (obj_center.y - screen_center.y) / 2;
+    float rotate_degree;
+
+    if (LV_ABS(release_x) > LV_ABS(release_y))
+    {
+        rotate_degree = -90.0 * (release_x) / screen_center.x;
+        lv_matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
+    }
+    else
+    {
+        rotate_degree = 90.0 * (release_y) / screen_center.y;
+        lv_matrix_compute_rotate(rotate_degree, 0, 0, &rotate_3D);
+    }
+
+    lv_matrix_transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
+    lv_matrix_transfrom_rotate(&rotate_3D, &v1, &tv1, 0, 0, 0);
+    lv_matrix_transfrom_rotate(&rotate_3D, &v2, &tv2, 0, 0, 0);
+    lv_matrix_transfrom_rotate(&rotate_3D, &v3, &tv3, 0, 0, 0);
+
+    lv_matrix_compute_rotate(0, 0, 0, &rotate_3D);
+
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv0, &rv0, xoff, yoff, zoff);
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv1, &rv1, xoff, yoff, zoff);
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
+    lv_matrix_transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
+
+    lv_vertex_t p = {screen_center.x, screen_center.y, screen_center.x + screen_center.y};
+
+    lv_matrix_transfrom_blit(w, h, &p, &rv0, &rv1, &rv2, &rv3, &temp);
+    lv_matrix_translate(&temp, - release_x, - release_y);
+    lv_obj_set_transform(obj, &temp);
+}
+
+static void reset_box_effect(lv_obj_t *obj)
+{
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_obj_set_transform(obj, &matrix);
 }
 
 static void apply_spiral_notebook_effect(lv_obj_t *obj)
@@ -391,9 +537,9 @@ static void apply_spiral_notebook_effect(lv_obj_t *obj)
 
 static void reset_spiral_notebook_effect(lv_obj_t *obj)
 {
-    lv_matrix_t identity;
-    lv_matrix_identity(&identity);
-    lv_obj_set_transform(obj, &identity);
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_obj_set_transform(obj, &matrix);
 }
 #endif
 static void apply_slide_effect(lv_obj_t *obj, SLIDE_EFFECT effect)
@@ -412,6 +558,9 @@ static void apply_slide_effect(lv_obj_t *obj, SLIDE_EFFECT effect)
         apply_scale_fade_effect(obj);
         break;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
+    case BOX:
+        apply_box_effect(obj);
+        break;
     case CUBE_ROTATION:
         apply_cube_effect(obj);
         break;
@@ -440,6 +589,9 @@ static void reset_slide_effect(lv_obj_t *obj, SLIDE_EFFECT effect)
         reset_scale_fade_effect(obj);
         break;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
+    case BOX:
+        reset_box_effect(obj);
+        break;
     case CUBE_ROTATION:
         reset_cube_effect(obj);
         break;

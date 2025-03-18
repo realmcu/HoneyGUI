@@ -3,7 +3,7 @@
 #include "lv_custom_tile_slide.h"
 
 
-#define EFFECT_NUM 6
+#define EFFECT_NUM 7
 static lv_style_t style_effect;
 static lv_style_t style_effect_chk;
 static lv_style_t style_font;
@@ -14,6 +14,7 @@ static const char *effet_name_list[EFFECT_NUM] =
     "FADE",
     "SCALE",
     "SCALE_FADE",
+    "BOX",
     "CUBE_ROTATION",
     "SPIRAL_NOTEBOOK",
 };
@@ -24,6 +25,7 @@ static SLIDE_EFFECT effect_list[EFFECT_NUM] =
     FADE,
     SCALE,
     SCALE_FADE,
+    BOX,
     CUBE_ROTATION,
     SPIRAL_NOTEBOOK
 };
@@ -77,7 +79,7 @@ void create_slide_effect_checkbox(lv_obj_t *parent)
         lv_obj_add_style(obj, &style_effect_chk, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &style_font, LV_PART_MAIN | LV_STATE_DEFAULT);
 #if !LV_DRAW_TRANSFORM_USE_MATRIX
-        if (effect_list[i] >= CUBE_ROTATION)
+        if (effect_list[i] >= BOX)
         {
             lv_obj_add_state(obj, LV_STATE_DISABLED);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE);

@@ -51,7 +51,7 @@ void update_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot);
  * @param img_snapshot Image object for displaying snapshot
  * @note Initializes black background and updates snapshot immediately
  */
-void creat_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot);
+void create_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot);
 
 /**
  * @brief Delete snapshot event callback
@@ -66,6 +66,8 @@ void snapshot_custom_cb_delete(lv_event_t *e);
  * @note Gets widget reference from event user data
  */
 void snapshot_custom_cb_create(lv_event_t *e);
+
+lv_obj_t *create_snapshot_obj_directly(lv_obj_t *parent, lv_obj_t *target);
 
 /**
  * @brief Create a snapshot object with event bindings

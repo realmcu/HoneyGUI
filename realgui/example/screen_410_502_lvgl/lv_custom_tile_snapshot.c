@@ -22,7 +22,7 @@ void update_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot)
     lv_image_set_src(img_snapshot, snapshot);
 }
 
-void creat_snapshot_img(lv_obj_t *widget, lv_obj_t *img_snapshot)
+void create_snapshot(lv_obj_t *widget, lv_obj_t *img_snapshot)
 {
     update_snapshot(widget, img_snapshot);
 }
@@ -39,14 +39,14 @@ void snapshot_custom_cb_create(lv_event_t *e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *img_snapshot = lv_event_get_current_target(e);
     lv_obj_t *widget = lv_event_get_user_data(e);
-    creat_snapshot_img(widget, img_snapshot);
+    create_snapshot(widget, img_snapshot);
 }
 
 lv_obj_t *create_snapshot_obj_directly(lv_obj_t *parent, lv_obj_t *target)
 {
     lv_obj_t *snapshot = lv_image_create(parent);
     lv_obj_set_size(snapshot, lv_obj_get_width(target), lv_obj_get_height(target));
-    creat_snapshot_img(target, snapshot);
+    create_snapshot(target, snapshot);
     lv_obj_add_flag(target, LV_OBJ_FLAG_HIDDEN);
     return snapshot;
 }

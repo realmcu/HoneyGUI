@@ -25,7 +25,9 @@ extern "C" {
 #if LV_USE_MATRIX
 #include "lv_matrix.h"
 #endif
-
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+#include "lv_custom_matrix.h"
+#endif
 /*********************
  *      DEFINES
  *********************/
@@ -41,8 +43,11 @@ typedef enum
     SCALE_FADE,     /**< Combined zoom & fade effect */
 
     /*need matrix*/
+    BOX,            /**< 3D box rotation effect */
     CUBE_ROTATION,  /**< 3D cube rotation transition */
     SPIRAL_NOTEBOOK,/**< Spiral notebook flip effect */
+
+    EFFECT_COUNT,   /**< Total number of effects */
 } SLIDE_EFFECT;
 
 /**********************
