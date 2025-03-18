@@ -59,12 +59,14 @@ lv_obj_t *tile_up;
 lv_obj_t *tile_down;
 lv_obj_t *tile_left;
 lv_obj_t *tile_right;
+lv_obj_t *tile_right_2;
 
 lv_obj_t *scr_watchface;
 lv_obj_t *scr_up_curtain;
 lv_obj_t *scr_down_curtain;
 lv_obj_t *scr_left_curtain;
 lv_obj_t *scr_right_curtain;
+lv_obj_t *scr_right_curtain_2;
 lv_obj_t *scr_app_menu;
 
 uint32_t event_snapshot_creat;
@@ -86,13 +88,11 @@ void watch_demo_init(void)
         lv_timer_ready(timer);
     }
 #endif
-#if defined __WIN32
     {
         lv_timer_t *timer = lv_timer_create(inform_generate_task_entry, 3000, NULL);
         lv_timer_set_repeat_count(timer, -1);
         lv_timer_ready(timer);
     }
-#endif
 
     tileview = lv_tileview_create(NULL);
     lv_obj_set_style_bg_color(tileview, lv_color_make(0, 0, 0), 0);
@@ -103,7 +103,8 @@ void watch_demo_init(void)
     tile_up = lv_tileview_add_tile(tileview, 1, 0, LV_DIR_BOTTOM); // create up tile
     tile_down = lv_tileview_add_tile(tileview, 1, 2, LV_DIR_TOP); // create down tile
     tile_left = lv_tileview_add_tile(tileview, 0, 1, LV_DIR_RIGHT); // create left tile
-    tile_right = lv_tileview_add_tile(tileview, 2, 1, LV_DIR_LEFT); // create right tile
+    tile_right = lv_tileview_add_tile(tileview, 2, 1, LV_DIR_HOR); // create right tile
+    tile_right_2 = lv_tileview_add_tile(tileview, 3, 1, LV_DIR_LEFT); // create right 2 tile
 
     scr_watchface = lv_obj_create(tile_center);
     lv_obj_remove_style_all(scr_watchface);
@@ -125,12 +126,17 @@ void watch_demo_init(void)
     lv_obj_remove_style_all(scr_right_curtain);
     lv_obj_set_size(scr_right_curtain, LV_PCT(100), LV_PCT(100));
 
+    scr_right_curtain_2 = lv_obj_create(tile_right_2);
+    lv_obj_remove_style_all(scr_right_curtain_2);
+    lv_obj_set_size(scr_right_curtain_2, LV_PCT(100), LV_PCT(100));
+
     //initialize curtains
     lv_watchface_init();
     lv_up_curtain_init();
     lv_down_curtain_init();
     lv_left_curtain_init();
     lv_right_curtain_init();
+    lv_right_curtain_2_init();
 
     lv_tileview_set_tile_by_index(tileview, 1, 1, LV_ANIM_OFF); // start with center tile, no animation
 
@@ -146,6 +152,8 @@ void watch_demo_init(void)
     create_snapshot_obj_with_enent(tile_down, tile_down, event_snapshot_creat, event_snapshot_delete);
     create_snapshot_obj_with_enent(tile_left, tile_left, event_snapshot_creat, event_snapshot_delete);
     create_snapshot_obj_with_enent(tile_right, tile_right, event_snapshot_creat, event_snapshot_delete);
+    create_snapshot_obj_with_enent(tile_right_2, tile_right_2, event_snapshot_creat,
+                                   event_snapshot_delete);
 #endif
 #endif
     lv_screen_load(tileview);
@@ -283,9 +291,13 @@ static void inform_generate_task_entry()
         sprintf(content,
                 "Never gonna give you up. Never gonna let you down. Never gonna run around and desert you. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.");
     }
+    struct tm watch_time = {0};
+    struct tm *timeinfo = &watch_time;
+#ifdef __WIN32
     time_t rawtime;
     time(&rawtime);
-    struct tm *timeinfo = localtime(&rawtime);
+    timeinfo = localtime(&rawtime);
+#endif
     char time_str[10];
     if (timeinfo)
     {
@@ -318,5 +330,4 @@ static void enter_menu_cb(lv_event_t *event)
         indev = lv_indev_get_next(indev);
     }
 }
-
 

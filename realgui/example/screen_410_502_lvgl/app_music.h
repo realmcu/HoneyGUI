@@ -26,9 +26,9 @@ extern "C" {
 #define APP_MUSIC_ROUND     0
 #define APP_MUSIC_LARGE     0
 #define APP_MUSIC_AUTO_PLAY 0
-#  define APP_MUSIC_HANDLE_SIZE  40
+#define APP_MUSIC_HANDLE_SIZE  60
 #else
-#  define APP_MUSIC_HANDLE_SIZE  20
+#define APP_MUSIC_HANDLE_SIZE  20
 #endif
 
 /**********************

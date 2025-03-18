@@ -2,25 +2,6 @@
 #include "app_main.h"
 #include "lv_custom_tile_slide.h"
 
-void scr_left_curtain_cb(lv_event_t *e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-    if (event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT)
-    {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&scr_watchface, &scr_left_curtain, LV_SCR_LOAD_ANIM_OUT_LEFT, 500, 0,
-                          &lv_watchface_init, 1);
-    }
-    if (event_code == LV_EVENT_SCREEN_LOAD_START)
-    {
-        // left_Animation(ui_hour_group, 0);
-        // right_Animation(ui_label_min, 0);
-        // opa_on_Animation(ui_weather_group_1, 300);
-        // opa_on_Animation(ui_date_group, 500);
-        // opa_on_Animation(ui_weather_title_group_1, 400);
-    }
-}
 
 #define EFFECT_NUM 6
 static lv_style_t style_effect;
@@ -127,6 +108,6 @@ void lv_left_curtain_init(void)
 
     create_slide_effect_checkbox(scr_left_curtain);
 
-    // lv_obj_add_event_cb(scr_left_curtain, (lv_event_cb_t)scr_left_curtain_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(scr_left_curtain, (lv_event_cb_t)tile_left_cb, LV_EVENT_ALL, NULL);
 }
 

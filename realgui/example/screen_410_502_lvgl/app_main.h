@@ -19,13 +19,14 @@ extern "C" {
 #include "lv_image_dsc.h"
 
 #include <math.h>
+#include <stdio.h>
 
 /*********************
  *      DEFINES
  *********************/
 #define LVGL_USE_CJSON 0
 
-#define WATCH_DEMO_USE_TILESLIDE    1
+#define WATCH_DEMO_USE_TILESLIDE    0
 
 #if WATCH_DEMO_USE_TILESLIDE
 #define WATCH_DEMO_USE_SNAPSHOT     1
@@ -59,13 +60,20 @@ extern uint32_t event_snapshot_creat;
 extern uint32_t event_snapshot_delete;
 
 extern lv_obj_t *tileview;
+extern lv_obj_t *tile_center;
+extern lv_obj_t *tile_up;
+extern lv_obj_t *tile_down;
+extern lv_obj_t *tile_left;
+extern lv_obj_t *tile_right;
+extern lv_obj_t *tile_right_2;
+
 extern lv_obj_t *scr_watchface;
 extern lv_obj_t *scr_up_curtain;
 extern lv_obj_t *scr_down_curtain;
 extern lv_obj_t *scr_left_curtain;
 extern lv_obj_t *scr_right_curtain;
+extern lv_obj_t *scr_right_curtain_2;
 extern lv_obj_t *scr_app_menu;
-
 
 
 void lv_watchface_init(void);
@@ -73,6 +81,7 @@ void lv_up_curtain_init(void);
 void lv_down_curtain_init(void);
 void lv_left_curtain_init(void);
 void lv_right_curtain_init(void);
+void lv_right_curtain_2_init(void);
 void lv_app_menu_init(void);
 
 

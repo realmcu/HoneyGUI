@@ -53,7 +53,7 @@ static bool close_flag = 1;
 //         }
 //     }
 // }
-// void scr_up_curtain_cb(lv_event_t *e)
+// void tile_up_cb(lv_event_t *e)
 // {
 //     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -282,7 +282,7 @@ static void init_view_more(lv_obj_t *parent, information_t *payload)
     // Create a Cancel label
     lv_obj_t *cancel_label = lv_label_create(parent);
     lv_label_set_text(cancel_label, "Cancel");
-    lv_obj_align(cancel_label, LV_ALIGN_TOP_LEFT, 20, 15);
+    lv_obj_align(cancel_label, LV_ALIGN_TOP_LEFT, 25, 30);
     lv_obj_set_style_text_color(cancel_label, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_opa(cancel_label, 255, 0);
     lv_obj_set_style_text_font(cancel_label, &SourceHanSansSC_size24_bits1_font,
@@ -293,7 +293,7 @@ static void init_view_more(lv_obj_t *parent, information_t *payload)
     // Time text in the top right corner
     lv_obj_t *time_label = lv_label_create(parent);
     lv_label_set_text(time_label, time);
-    lv_obj_align(time_label, LV_ALIGN_TOP_RIGHT, -60, 15); // Align to top right
+    lv_obj_align(time_label, LV_ALIGN_TOP_RIGHT, -60, 30); // Align to top right
     lv_obj_set_style_text_color(time_label, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_opa(time_label, 255, 0);
     lv_obj_set_style_text_font(time_label, &SourceHanSansSC_size24_bits1_font,
@@ -301,13 +301,13 @@ static void init_view_more(lv_obj_t *parent, information_t *payload)
 
     char source[40];
     lv_obj_t *label = lv_label_create(parent);
-    lv_obj_set_pos(label, 37, 70);
+    lv_obj_set_pos(label, 37, 90);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_opa(label, 255, 0);
     lv_obj_set_style_text_font(label, &SourceHanSansSC_size24_bits1_font,
                                0);
     lv_obj_t *icon = lv_image_create(parent);
-    lv_obj_set_pos(icon, 360, 20);
+    lv_obj_set_pos(icon, 360, 35);
     switch (app)
     {
     case MESSAGE:
@@ -338,7 +338,7 @@ static void init_view_more(lv_obj_t *parent, information_t *payload)
     {
         lv_obj_t *bg = lv_image_create(parent);
         lv_image_set_src(bg, &option_bar_bg);
-        lv_obj_set_pos(bg, 30, 160 + i * 90);
+        lv_obj_set_pos(bg, 30, 180 + i * 90);
         lv_obj_add_flag(bg, LV_OBJ_FLAG_CLICKABLE);
 
         lv_obj_t *opt_label = lv_label_create(bg);
@@ -509,7 +509,7 @@ void pagelist_create(information_t *payload)
 void lv_up_curtain_init(void)
 {
     // scr_up_curtain = lv_obj_create(NULL);
-    // lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)scr_up_curtain_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(scr_up_curtain, (lv_event_cb_t)tile_up_cb, LV_EVENT_ALL, NULL);
     page = lv_obj_create(scr_up_curtain);
     lv_obj_remove_style_all(page);
     lv_obj_set_scroll_dir(page, LV_DIR_VER);

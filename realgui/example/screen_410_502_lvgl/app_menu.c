@@ -36,8 +36,25 @@ static int16_t page_menu_y_his = 0;
 // Exit menu function
 static void exit_menu(void)
 {
-    LV_LOG("enter exit_menu func\n");
+    // LV_LOG("enter exit_menu func\n");
     lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
+}
+
+static void enter_app_cb(lv_event_t *e)
+{
+    lv_obj_t *obj = lv_event_get_target(e);
+    uint8_t index = lv_obj_get_index(obj);
+    index %= (APP_COUNT / 2);
+    if (index == 1)
+    {
+        lv_tileview_set_tile_by_index(tileview, 2, 1, LV_ANIM_OFF);
+        lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
+    }
+    else if (index == 4)
+    {
+        lv_tileview_set_tile_by_index(tileview, 3, 1, LV_ANIM_OFF);
+        lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
+    }
 }
 
 // Update button positions based on scroll
@@ -121,6 +138,8 @@ void lv_app_menu_init(void)
         lv_obj_set_pos(bg, 0, 0);
         lv_obj_set_pos(bg, 0, (ITEM_HEIGHT + ITEM_INTERVAL) * i);
         lv_obj_clear_flag(bg, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_add_flag(bg, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(bg, (lv_event_cb_t)enter_app_cb, LV_EVENT_CLICKED, NULL);
 
         // Add icon
         lv_obj_t *img = lv_img_create(bg);

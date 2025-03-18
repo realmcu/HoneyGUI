@@ -15,7 +15,7 @@ typedef struct switch_state
 
 static switch_state_t sw_state = {0};
 static lv_obj_t *img_phone, *img_nobother, *img_mute;
-// void scr_down_curtain_cb(lv_event_t *e)
+// void tile_down_cb(lv_event_t *e)
 // {
 //     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -74,12 +74,12 @@ void button_phone_event_cb(lv_event_t *e)
     if (sw_state.sw_3)
     {
         lv_image_set_src(img, &control_phone_on);
-        lv_image_set_src(img_phone, &phone_on_icon);
+        lv_image_set_src(img_phone, &capsule_phone_on);
     }
     else
     {
         lv_image_set_src(img, &control_phone_off);
-        lv_image_set_src(img_phone, &phone_off_icon);
+        lv_image_set_src(img_phone, &capsule_phone_off);
     }
 }
 
@@ -91,12 +91,12 @@ void button_mute_event_cb(lv_event_t *e)
     if (sw_state.sw_4)
     {
         lv_image_set_src(img, &control_mute_on);
-        lv_image_set_src(img_mute, &mute_on_icon);
+        lv_image_set_src(img_mute, &capsule_mute_on);
     }
     else
     {
         lv_image_set_src(img, &control_mute_off);
-        lv_image_set_src(img_mute, &mute_off_icon);
+        lv_image_set_src(img_mute, &capsule_mute_off);
     }
 }
 
@@ -108,42 +108,35 @@ void button_nobother_event_cb(lv_event_t *e)
     if (sw_state.sw_5)
     {
         lv_image_set_src(img, &control_nobother_on);
-        lv_image_set_src(img_nobother, &nobother_on_icon);
+        lv_image_set_src(img_nobother, &capsule_nobother_on);
     }
     else
     {
         lv_image_set_src(img, &control_nobother_off);
-        lv_image_set_src(img_nobother, &nobother_off_icon);
+        lv_image_set_src(img_nobother, &capsule_nobother_off);
     }
 }
 
 void lv_down_curtain_init(void)
 {
     // scr_down_curtain = lv_obj_create(NULL);
-    // lv_obj_add_event_cb(scr_down_curtain, (lv_event_cb_t)scr_down_curtain_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(scr_down_curtain, (lv_event_cb_t)tile_down_cb, LV_EVENT_ALL, NULL);
 
-    lv_obj_set_style_bg_color(scr_down_curtain, lv_color_make(0, 0, 0), 0);
-    lv_obj_set_style_bg_opa(scr_down_curtain, LV_OPA_COVER, 0);
     lv_obj_set_scrollbar_mode(scr_down_curtain, LV_SCROLLBAR_MODE_OFF);
 
     // capsule on top
-    lv_obj_t *capsule = lv_obj_create(scr_down_curtain);
-    lv_obj_set_style_bg_color(capsule, lv_color_make(196, 196, 196), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(capsule, 20, LV_PART_MAIN);
-    lv_obj_set_size(capsule, 138, 47);
+    lv_obj_t *capsule = lv_image_create(scr_down_curtain);
+    lv_image_set_src(capsule, &control_capsule);
     lv_obj_set_pos(capsule, 136, 20);
-    lv_obj_clear_flag(capsule, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_border_width(capsule, 0, LV_PART_MAIN); // No border
-    lv_obj_set_style_pad_all(capsule, 0, 0); // Clear all padding
 
     img_phone = lv_image_create(capsule);
-    lv_image_set_src(img_phone, &phone_off_icon);
+    lv_image_set_src(img_phone, &capsule_phone_off);
     lv_obj_set_pos(img_phone, 15, 9);
     img_nobother = lv_image_create(capsule);
-    lv_image_set_src(img_nobother, &nobother_off_icon);
+    lv_image_set_src(img_nobother, &capsule_nobother_off);
     lv_obj_set_pos(img_nobother, 56, 9);
     img_mute = lv_image_create(capsule);
-    lv_image_set_src(img_mute, &mute_off_icon);
+    lv_image_set_src(img_mute, &capsule_mute_off);
     lv_obj_set_pos(img_mute, 98, 9);
 
     // button

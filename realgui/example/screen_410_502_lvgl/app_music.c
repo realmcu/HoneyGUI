@@ -118,8 +118,6 @@ static void app_music_album_next(bool next);
 
 void app_music(lv_obj_t *parent)
 {
-    // lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x343247), 0);
-
     list = app_music_list_create(parent);
     ctrl = app_music_main_create(parent);
 
@@ -272,7 +270,6 @@ static lv_obj_t *list;
 static const lv_font_t *font_small;
 static const lv_font_t *font_medium;
 static const lv_font_t *font_large;
-static lv_style_t style_scrollbar;
 static lv_style_t style_btn;
 static lv_style_t style_button_pr;
 static lv_style_t style_button_chk;
@@ -291,13 +288,6 @@ static lv_obj_t *app_music_list_create(lv_obj_t *parent)
     font_small = &SourceHanSansSC_size12_bits1_font;
     font_medium = &SourceHanSansSC_size24_bits1_font;
     font_large = &SourceHanSansSC_size32_bits1_font;
-
-    lv_style_init(&style_scrollbar);
-    lv_style_set_width(&style_scrollbar, 4);
-//    lv_style_set_bg_opa(&style_scrollbar, LV_OPA_COVER);
-    lv_style_set_bg_color(&style_scrollbar, lv_color_hex3(0xeee));
-    lv_style_set_radius(&style_scrollbar, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_right(&style_scrollbar, 4);
 
     static const int32_t grid_cols[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 #if APP_MUSIC_LARGE
@@ -346,7 +336,9 @@ static lv_obj_t *app_music_list_create(lv_obj_t *parent)
     lv_obj_remove_style_all(list);
     lv_obj_set_size(list, LV_HOR_RES, LV_VER_RES - APP_MUSIC_HANDLE_SIZE);
     lv_obj_set_y(list, APP_MUSIC_HANDLE_SIZE);
-    lv_obj_add_style(list, &style_scrollbar, LV_PART_SCROLLBAR);
+    lv_obj_set_style_width(list, 4, LV_PART_SCROLLBAR);
+    lv_obj_set_style_bg_opa(list, LV_OPA_0, 0);
+    lv_obj_set_scrollbar_mode(list, LV_SCROLLBAR_MODE_OFF); // Hide scroll bar
     lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
 
     uint32_t track_id;
@@ -450,7 +442,6 @@ static void list_delete_event_cb(lv_event_t *e)
 
     if (code == LV_EVENT_DELETE)
     {
-        lv_style_reset(&style_scrollbar);
         lv_style_reset(&style_btn);
         lv_style_reset(&style_button_pr);
         lv_style_reset(&style_button_chk);
@@ -554,7 +545,7 @@ static lv_obj_t *app_music_main_create(lv_obj_t *parent)
     static const int32_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     static int32_t grid_rows[] = {APP_MUSIC_HANDLE_SIZE, 0, LV_GRID_CONTENT, LV_GRID_FR(3), LV_GRID_CONTENT, LV_GRID_FR(3), LV_GRID_CONTENT, LV_GRID_FR(3), LV_GRID_CONTENT, APP_MUSIC_HANDLE_SIZE, LV_GRID_TEMPLATE_LAST};
     grid_rows[1] = LV_VER_RES;
-    lv_obj_set_grid_dsc_array(cont, grid_cols, grid_rows); //  personally to grid_rows
+    lv_obj_set_grid_dsc_array(cont, grid_cols, grid_rows);
     lv_obj_set_style_grid_row_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, 0);
     lv_obj_set_grid_cell(spectrum_obj, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
     lv_obj_set_grid_cell(title_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 2, 1);
@@ -589,49 +580,27 @@ static lv_obj_t *app_music_main_create(lv_obj_t *parent)
     sec_counter_timer = lv_timer_create(timer_cb, 1000, NULL);
     lv_timer_pause(sec_counter_timer);
 
-    lv_anim_t a;
-    lv_anim_init(&a);
+    // Enter animation
+    // lv_anim_t a;
+    // lv_anim_init(&a);
 
-    lv_obj_fade_in(title_box, 1000, INTRO_TIME + 1000);
-    lv_obj_fade_in(icon_box, 1000, INTRO_TIME + 1000);
-    lv_obj_fade_in(ctrl_box, 1000, INTRO_TIME + 1000);
-    lv_obj_fade_in(handle_box, 1000, INTRO_TIME + 1000);
-    lv_obj_fade_in(album_image_obj, 800, INTRO_TIME + 1000);
-    lv_obj_fade_in(spectrum_obj, 0, INTRO_TIME);
+    // lv_obj_fade_in(title_box, 1000, INTRO_TIME + 1000);
+    // lv_obj_fade_in(icon_box, 1000, INTRO_TIME + 1000);
+    // lv_obj_fade_in(ctrl_box, 1000, INTRO_TIME + 1000);
+    // lv_obj_fade_in(handle_box, 1000, INTRO_TIME + 1000);
+    // lv_obj_fade_in(album_image_obj, 800, INTRO_TIME + 1000);
+    // lv_obj_fade_in(spectrum_obj, 0, INTRO_TIME);
 
-    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
-    lv_anim_set_var(&a, album_image_obj);
-    lv_anim_set_duration(&a, 1000);
-    lv_anim_set_delay(&a, INTRO_TIME + 1000);
-    lv_anim_set_values(&a, 1, LV_SCALE_NONE);
-    lv_anim_set_exec_cb(&a, _image_set_scale_anim_cb);
-    lv_anim_set_completed_cb(&a, NULL);
-    lv_anim_start(&a);
+    // lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+    // lv_anim_set_var(&a, album_image_obj);
+    // lv_anim_set_duration(&a, 1000);
+    // lv_anim_set_delay(&a, INTRO_TIME + 1000);
+    // lv_anim_set_values(&a, 1, LV_SCALE_NONE);
+    // lv_anim_set_exec_cb(&a, _image_set_scale_anim_cb);
+    // lv_anim_set_completed_cb(&a, NULL);
+    // lv_anim_start(&a);
 
-    lv_obj_t *logo = lv_image_create(lv_screen_active());
-    lv_image_set_src(logo, &logo);
-    lv_obj_move_foreground(logo);
-    lv_obj_align_to(logo, spectrum_obj, LV_ALIGN_CENTER, 0, 0);
-
-#if APP_MUSIC_SQUARE == 0 && APP_MUSIC_ROUND == 0
-    lv_obj_t *title = lv_label_create(lv_screen_active());
-    lv_label_set_text(title, "LVGL Demo\nMusic player");
-    lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_font(title, font_large, 0);
-    lv_obj_set_style_text_line_space(title, 8, 0);
-    lv_obj_fade_out(title, 500, INTRO_TIME);
-    lv_obj_align_to(title, logo, LV_ALIGN_OUT_LEFT_MID, -20, 0);
-#endif
-
-    lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
-    lv_anim_set_var(&a, logo);
-    lv_anim_set_duration(&a, 400);
-    lv_anim_set_delay(&a, INTRO_TIME + 800);
-    lv_anim_set_values(&a, LV_SCALE_NONE, 10);
-    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
-    lv_anim_start(&a);
-
-    lv_obj_update_layout(main_cont);
+    // lv_obj_update_layout(main_cont);
 
     return main_cont;
 }
@@ -799,6 +768,7 @@ static lv_obj_t *create_title_box(lv_obj_t *parent)
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     title_label = lv_label_create(cont);
+    lv_obj_set_style_pad_top(title_label, 10, 0);
     lv_obj_set_style_text_font(title_label, font_large, 0);
     lv_obj_set_style_text_color(title_label, lv_color_hex(0x504d6d), 0);
     lv_label_set_text(title_label, app_music_get_title(track_id));
