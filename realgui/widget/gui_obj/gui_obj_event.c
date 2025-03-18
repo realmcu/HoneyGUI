@@ -106,7 +106,7 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
 {
     touch_info_t *tp = tp_get_info();
 
-    if (gui_obj_event_is_suppressed(obj, event, tp) == true)
+    if (gui_obj_event_is_suppressed(obj, event) == true)
     {
         return;
     }

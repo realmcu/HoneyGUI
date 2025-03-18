@@ -54,7 +54,7 @@ static void gui_card_input_prepare(gui_obj_t *obj)
     matrix_translate(0, this->id * obj->h, obj->matrix);
 }
 
-#if 1
+
 static void gui_card_prepare_reduction(gui_obj_t *obj)
 {
     gui_card_t *this = (gui_card_t *)obj;
@@ -99,50 +99,7 @@ static void gui_card_prepare_reduction(gui_obj_t *obj)
     }
 
 }
-#else
-static void gui_card_prepare_reduction(gui_obj_t *obj)
-{
-    gui_card_t *this = (gui_card_t *)obj;
-    gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
-    int32_t location = this->ay + parent->hold_y + parent->offset_y;
-    float h = gui_get_screen_height();
-    float t;
-    float scale;
 
-    if (location < h / 2)
-    {
-        matrix_translate(0, location, obj->matrix);
-    }
-    else if (location < (h / 2 + obj->h))
-    {
-        t = (location - h / 2) / (h / 2);
-        scale = (1.0f - t) * 0.2f + 0.8f;
-
-        matrix_translate(0, location, obj->matrix);
-        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-        matrix_scale(scale, scale, obj->matrix);
-        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
-    }
-    else if (location < (h / 2 + obj->h + obj->h))
-    {
-        t = (location - h / 2) / (h / 2);
-        scale = (1.0f - t) * 0.2f + 0.8f;
-
-        matrix_translate(0,  h / 2 + obj->h, obj->matrix);
-        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-        matrix_scale(scale, scale, obj->matrix);
-        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
-    }
-    else
-    {
-        //out of rang
-        matrix_translate(0, location, obj->matrix);
-        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-        matrix_scale(0.7, 0.7, obj->matrix);
-        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
-    }
-}
-#endif
 
 static void gui_card_prepare_classic(gui_obj_t *obj)
 {

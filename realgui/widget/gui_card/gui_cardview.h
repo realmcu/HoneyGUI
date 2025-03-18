@@ -31,12 +31,19 @@ extern "C" {
  *============================================================================*/
 #include "guidef.h"
 #include "gui_api.h"
-#include "gui_tabview.h"
 
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+
+typedef enum t_cardview_style
+{
+    CLASSIC          = 0x0000,
+    REDUCTION        = 0x0001,
+
+} T_CARDVIEW_STYLE;
+
 
 /** @brief  cardview structure */
 typedef struct gui_cardview
@@ -46,7 +53,7 @@ typedef struct gui_cardview
     uint16_t card_height;
     uint16_t total_cnt;
     uint16_t cur_id;
-    T_SLIDE_STYLE style;
+    T_CARDVIEW_STYLE style;
     int16_t hold_y;
     int16_t target_y; //means stop at this location
     int16_t offset_y; //means stop at this location
@@ -107,20 +114,6 @@ gui_cardview_t *gui_cardview_create(void       *parent,
                                     int16_t     w,
                                     int16_t     h);
 
-/**
- * @brief set animate to cardview widget.
- *
- * @param o widget object pointer.
- * @param dur Animation duration.
- * @param repeat_count Repeat play times, -1 means play on repeat forever.
- * @param callback animate frame callback.
- * @param p parameter.
- */
-void gui_cardview_set_animate(gui_cardview_t *_this,
-                              uint32_t        dur,
-                              int             repeat_count,
-                              void           *callback,
-                              void           *p);
 
 /**
  * @brief set cardview style.
@@ -128,7 +121,7 @@ void gui_cardview_set_animate(gui_cardview_t *_this,
  * @param this widget pointer.
  * @param style refer to T_SLIDE_STYLE.
  */
-void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style);
+void gui_cardview_set_style(gui_cardview_t *this, T_CARDVIEW_STYLE style);
 
 /**
  * @brief listen to cardview's event.

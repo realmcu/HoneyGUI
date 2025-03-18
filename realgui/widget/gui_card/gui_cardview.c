@@ -23,6 +23,7 @@
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include "gui_cardview.h"
+#include "gui_fb.h"
 
 
 /*============================================================================*
@@ -40,6 +41,8 @@
  *============================================================================*/
 
 #define CARDVIEW_SLIDE_SPEED 20
+#define GUI_MAX_SPEED 60
+#define GUI_MIN_SPEED 7
 
 
 /*============================================================================*
@@ -68,8 +71,7 @@ static void gui_cardview_input_prepare(gui_obj_t *obj)
     GUI_UNUSED(this);
 
 }
-#define GUI_MAX_SPEED 60
-#define GUI_MIN_SPEED 7
+
 static void gui_page_update_speed(gui_obj_t *obj)
 {
     gui_cardview_t *this = (gui_cardview_t *)obj;
@@ -448,21 +450,13 @@ static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_cardview_set_animate(gui_cardview_t *this,
-                              uint32_t        dur,
-                              int             repeat_count,
-                              void           *callback,
-                              void           *p)
-{
-    GUI_SET_ANIMATE_HELPER
-}
 
 void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this))
 {
     this->status_cb = cb;
 }
 
-void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style)
+void gui_cardview_set_style(gui_cardview_t *this, T_CARDVIEW_STYLE style)
 {
     this->style = style;
 }
