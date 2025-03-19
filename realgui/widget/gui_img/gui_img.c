@@ -50,24 +50,7 @@
 
 static void gui_img_reset_translate(gui_img_t *this);
 
-static void gui_img_update_att(gui_obj_t *o)
-{
-    gui_img_t *this = (void *)o;
-    if (this->animate_array_length == 0)
-    {
-        if (this->animate)
-        {
-            animate_frame_update(this->animate, o);
-        }
-    }
-    else
-    {
-        for (size_t i = 0; i < this->animate_array_length; i++)
-        {
-            animate_frame_update(((gui_animate_t **)(this->animate))[i], o);
-        }
-    }
-}
+
 /**
  * @brief Prepares the GUI image input for processing.
  *
@@ -139,11 +122,12 @@ void gui_img_prepare(gui_obj_t *obj)
     this->draw_img->high_quality = this->high_quality;
     this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
-    gui_img_update_att(obj);
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
     // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED);
 
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));

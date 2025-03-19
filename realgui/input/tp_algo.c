@@ -45,15 +45,26 @@ typedef enum _TOUCH_DIR
 static TOUCH_DIR touch_direct = TOUCH_NONE;
 
 static touch_info_t tp;
-//static touch_info_t invalide_tp;
+
 static uint32_t up_cnt = 0;
 static uint32_t down_cnt = 0;
 static bool long_button_flag = false;
 
 
+static bool tp_left_moved_flag = false;
+static bool tp_right_moved_flag = false;
+static bool tp_up_moved_flag = false;
+static bool tp_down_moved_flag = false;
+
 static void tp_do_reset(void)
 {
     down_cnt = 0;
+    memset(&tp, 0, sizeof(tp));
+    tp.type = TOUCH_INVALIDE;
+    tp_left_moved_flag = false;
+    tp_right_moved_flag = false;
+    tp_up_moved_flag = false;
+    tp_down_moved_flag = false;
 }
 
 static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
@@ -81,11 +92,8 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         {
             tp.type = TOUCH_INVALIDE;
         }
-#if RTL8762G_86BOX
-        if ((up_cnt == 4) && (down_cnt > 0))
-#else
+
         if ((up_cnt == 1) && (down_cnt > 0))
-#endif
         {
             tp_local_event = GUI_TOUCH_EVENT_UP;
             down_cnt = 0;
@@ -407,6 +415,50 @@ static bool tp_judge_short_click(struct gui_touch_port_data *raw_data)
     return false;
 }
 
+static void tp_judge_move_state(void)
+{
+    if (tp_judge_same_point() == true)
+    {
+        return;
+    }
+    if ((tp_left_moved_flag == false) && (tp.deltaX < 0))
+    {
+        tp_left_moved_flag = true;
+        tp.left_moved = true;
+    }
+    else
+    {
+        tp.left_moved = false;
+    }
+    if ((tp_right_moved_flag == false) && (tp.deltaX > 0))
+    {
+        tp_right_moved_flag = true;
+        tp.right_moved = true;
+    }
+    else
+    {
+        tp.right_moved = false;
+    }
+    if ((tp_up_moved_flag == false) && (tp.deltaY < 0))
+    {
+        tp_up_moved_flag = true;
+        tp.up_moved = true;
+    }
+    else
+    {
+        tp.up_moved = false;
+    }
+    if ((tp_down_moved_flag == false) && (tp.deltaY > 0))
+    {
+        tp_down_moved_flag = true;
+        tp.down_moved = true;
+    }
+    else
+    {
+        tp.down_moved = false;
+    }
+
+}
 
 
 struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
@@ -418,6 +470,9 @@ struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
 
     if (flag == GUI_TOUCH_EVENT_DOWN)
     {
+        tp_judge_move_state();
+
+
         if (tp_judge_hold_x(raw_data) == true)
         {
 

@@ -159,34 +159,6 @@ bool gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
             ret = true;
         }
         break;
-    case GUI_EVENT_TOUCH_MOVE_LEFT:
-        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaX < 0))
-        {
-            gui_obj_store_event(obj, event);
-            ret = true;
-        }
-        break;
-    case GUI_EVENT_TOUCH_MOVE_RIGHT:
-        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaX > 0))
-        {
-            gui_obj_store_event(obj, event);
-            ret = true;
-        }
-        break;
-    case GUI_EVENT_TOUCH_MOVE_UP:
-        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaY < 0))
-        {
-            gui_obj_store_event(obj, event);
-            ret = true;
-        }
-        break;
-    case GUI_EVENT_TOUCH_MOVE_DOWN:
-        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaY > 0))
-        {
-            gui_obj_store_event(obj, event);
-            ret = true;
-        }
-        break;
     case GUI_EVENT_KB_SHORT_CLICKED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (kb->type == KB_SHORT))
         {
@@ -201,7 +173,36 @@ bool gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
             ret = true;
         }
         break;
+    case GUI_EVENT_TOUCH_MOVE_LEFT:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->left_moved == true))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_RIGHT:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->right_moved == true))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_UP:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->up_moved == true))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_DOWN:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->down_moved == true))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
     default:
+        GUI_ASSERT(0);
         break;
     }
     return ret;

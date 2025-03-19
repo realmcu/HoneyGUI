@@ -75,6 +75,10 @@ typedef struct touch_info
     uint8_t pressed  : 1;
     uint8_t released : 1;
     uint8_t pressing : 1;
+    uint8_t left_moved : 1;
+    uint8_t right_moved : 1;
+    uint8_t up_moved : 1;
+    uint8_t down_moved : 1;
     uint8_t button_down  : 1;
     uint8_t button_up  : 1;
     uint8_t button_hold  : 1;
