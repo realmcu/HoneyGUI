@@ -234,12 +234,11 @@ static void animation_case(gui_view_t *this, float pro)
     VIEW_SWITCH_STYLE style = this->style;
     float scale_x = 0;
     float scale_y = 0;
-
     switch (style)
     {
     case VIEW_ANIMATION_NULL:
         {
-            GUI_BASE(this)->not_show = 1;
+            // GUI_BASE(this)->not_show = 1;
         }
         break;
     case VIEW_ANIMATION_1:
@@ -317,8 +316,14 @@ void view_transition_animation_function(void *p, void *this_widget,
     {
         if (this->view_switch_ready)
         {
-            //gui_obj_enable_event(GUI_BASE(this), VIEW_FREE_EVENT);
-            GUI_ASSERT(0);//SEND MESSAGE TO SERVER
+            extern void gui_view_free(void *msg);
+            gui_msg_t msg =
+            {
+                .event = GUI_EVENT_USER_DEFINE,
+                .cb = gui_view_free,
+                .payload = this,
+            };
+            gui_send_msg_to_server(&msg);
         }
         else
         {
@@ -327,6 +332,7 @@ void view_transition_animation_function(void *p, void *this_widget,
             GUI_BASE(this)->y = 0;
             this->view_switch_ready = true;
             this->event = 0;
+            this->view_tp = 1;
             this->style = VIEW_STILL;
         }
     }
@@ -337,5 +343,20 @@ void view_transition_animation_function(void *p, void *this_widget,
  *============================================================================*/
 void gui_view_set_animate(gui_view_t *this)
 {
-    GUI_ASSERT(0);
+    gui_animate_t *animate = this->animate;
+    if (!animate)
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+        if (!animate)
+        {
+            gui_log("[VIEW] animate malloc failed!\n");
+            return;
+        }
+    }
+    memset(animate, 0, sizeof(gui_animate_t));
+    animate->animate = 1;
+    animate->dur = VIEW_TRANSITION_DURATION_MS;
+    animate->callback = (gui_animate_callback_t)view_transition_animation_function;
+    animate->repeat_count = 0;
+    this->animate = animate;
 }

@@ -25,6 +25,7 @@
 #include "gui_obj_event.h"
 #include "gui_api.h"
 #include "tp_algo.h"
+#include "kb_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -102,13 +103,15 @@ void gui_obj_add_event_cb(void           *obj,
 
 }
 
-void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
+bool gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
 {
     touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
+    bool ret = false;
 
     if (gui_obj_event_is_suppressed(obj, event) == true)
     {
-        return;
+        return ret;
     }
 
     switch (event)
@@ -117,18 +120,21 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_SHORT))
         {
             gui_obj_store_event(obj, event);
+            ret = true;
         }
         break;
     case GUI_EVENT_TOUCH_LONG:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_LONG))
         {
             gui_obj_store_event(obj, event);
+            ret = true;
         }
         break;
     case GUI_EVENT_TOUCH_DOUBLE_CLICKED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_DOUBLE))
         {
             gui_obj_store_event(obj, event);
+            ret = true;
         }
         GUI_ASSERT(NULL != NULL);
         break;
@@ -136,24 +142,69 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressed == true))
         {
             gui_obj_store_event(obj, event);
+            ret = true;
         }
         break;
     case GUI_EVENT_TOUCH_RELEASED:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->released == true))
         {
             gui_obj_store_event(obj, event);
+            ret = true;
         }
         break;
     case GUI_EVENT_TOUCH_PRESSING:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->pressing == true))
         {
             gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_LEFT:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaX < 0))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_RIGHT:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaX > 0))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_UP:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaY < 0))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_TOUCH_MOVE_DOWN:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->deltaY > 0))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_KB_SHORT_CLICKED:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (kb->type == KB_SHORT))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
+        }
+        break;
+    case GUI_EVENT_KB_LONG_CLICKED:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (kb->type == KB_LONG))
+        {
+            gui_obj_store_event(obj, event);
+            ret = true;
         }
         break;
     default:
         break;
     }
-
+    return ret;
 }
 
 void gui_obj_event_dispatch(bool enable_event)
