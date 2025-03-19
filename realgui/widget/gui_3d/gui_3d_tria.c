@@ -53,12 +53,6 @@ static void gui_3d_generate_triangle_img(gui_3d_tria_t *this, int width, int hei
             float x1 = vertices[1].position.x, y1 = vertices[1].position.y, z1 = vertices[1].position.z;
             float x2 = vertices[2].position.x, y2 = vertices[2].position.y, z2 = vertices[2].position.z;
 
-            float nz = vertices[0].normal.z;
-            uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
-            uint16_t color_value = ((color_intensity & 0xF8) << 8) |
-                                   ((color_intensity & 0xFC) << 3) |
-                                   ((color_intensity & 0xF8) >> 3);
-
             int min_x = floor(fminf(fminf(x0, x1), x2));
             int max_x = ceil(fmaxf(fmaxf(x0, x1), x2));
             int min_y = floor(fminf(fminf(y0, y1), y2));
@@ -73,6 +67,27 @@ static void gui_3d_generate_triangle_img(gui_3d_tria_t *this, int width, int hei
 
             float initial_w0_x_comp = dy2 * inv_area;
             float initial_w1_x_comp = dy1 * inv_area;
+
+            uint16_t color_value = 0;
+            int material_id = this->desc->attrib.material_ids[i];
+            if (material_id >= 0)
+            {
+                float *color_diffuse = this->desc->materials[material_id].diffuse;
+                int color_r = (int)(*color_diffuse * 255);
+                int color_g = (int)(*(color_diffuse + 1) * 255);
+                int color_b = (int)(*(color_diffuse + 2) * 255);
+                color_value = ((color_r & 0xF8) << 8) |
+                              ((color_g & 0xFC) << 3) |
+                              ((color_b & 0xF8) >> 3);
+            }
+            else
+            {
+                float nz = vertices[0].normal.z;
+                uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
+                color_value = ((color_intensity & 0xF8) << 8) |
+                              ((color_intensity & 0xFC) << 3) |
+                              ((color_intensity & 0xF8) >> 3);
+            }
 
             // Iterate over the bounding box
             for (int y = min_y; y <= max_y; y++)
@@ -112,8 +127,8 @@ static void gui_3d_generate_triangle_img(gui_3d_tria_t *this, int width, int hei
     this->img->img_w = width;
     this->img->img_h = height;
     this->img->opacity_value = UINT8_MAX;
-    this->img->blend_mode = IMG_FILTER_BLACK;
-    this->img->high_quality = true;
+    this->img->blend_mode = IMG_BYPASS_MODE;
+    // this->img->high_quality = true;
 
     gui_obj_t *obj = (gui_obj_t *)this;
     memcpy(&this->img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -129,19 +144,21 @@ static void gui_3d_tria_prepare(gui_3d_tria_t *this)
     gui_obj_t *obj = (gui_obj_t *)this;
 
     this->face = gui_malloc(sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
-    memset(this->face, 0x00, sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
+    memset(this->face, 0x1, sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
 
     this->img = gui_malloc(sizeof(draw_img_t));
     memset(this->img, 0x00, sizeof(draw_img_t));
 
-    gui_3d_world_t world;
-    gui_3d_camera_t camera;
+    gui_3d_world_t world = {0};
+    gui_3d_camera_t camera = {0};
 
     // global transform
     if (this->global_shape_transform_cb != NULL)
     {
         this->global_shape_transform_cb(this, &world, &camera);
     }
+
+    gui_3d_camera_build_UVN_matrix(&camera);
 
     for (size_t i = 0; i < this->desc->num_shapes; i++)
     {
@@ -160,7 +177,7 @@ static void gui_3d_tria_prepare(gui_3d_tria_t *this)
         }
     }
 
-    gui_3d_generate_triangle_img(this, 350, 350);
+    gui_3d_generate_triangle_img(this, 380, 380);
 
     gui_fb_change();
 

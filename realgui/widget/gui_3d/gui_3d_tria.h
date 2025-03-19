@@ -113,21 +113,6 @@ void gui_3d_tria_set_global_shape_transform_cb(gui_3d_tria_t *this,
 void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face,
                                               void (*cb)(gui_3d_tria_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera));
 
-/**
- * @brief set 3D animation effects
- *
- * @param this the 3d widget pointer
- * @param dur animation time cost in ms
- * @param repeat_count rounds to repeat
- * @param callback every frame callback
- * @param p callback's parameter
- */
-void gui_3d_tria_set_animate(gui_3d_tria_t *this,
-                             uint32_t       dur,
-                             int            repeat_count,
-                             void          *callback,
-                             void          *p);
-
 
 
 #ifdef __cplusplus

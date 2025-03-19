@@ -36,14 +36,16 @@ static void face_cb(void *this, gui_3d_world_t *world,
     gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767, 90,
                                  dc->screen_width, dc->screen_height);
 
-    gui_3d_world_inititalize(&object_matrix, 0, 25, 120, 0, 0, 0,
-                             5);
+    // gui_3d_world_inititalize(&object_matrix, 0, 25, 120, 0, 0, 0,
+    //                          5);
 
-    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
-                             rot_angle,
-                             1);
+    // gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+    //                          rot_angle,
+    //                          1);
 
-    *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+    // *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+
+    gui_3d_world_inititalize(world, 0, 25, 120, 0, rot_angle, 0, 5);
 }
 
 
@@ -57,7 +59,8 @@ static int app_init(void)
 //    extern void gui_fps_create(void *parent);
 //    gui_fps_create(&(app->screen));
 
-    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, update_face_animation);
+    gui_obj_create_timer(&(((gui_3d_base_t *)test_3d)->base), 17, true, update_face_animation);
+    gui_obj_start_timer(&(((gui_3d_base_t *)test_3d)->base));
 
     return 0;
 

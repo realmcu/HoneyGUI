@@ -12,6 +12,7 @@
 
 #include "butterfly/desc.txt"
 #include "math.h"
+#include "tp_algo.h"
 
 static int frame_counter = 0;
 static float wing_angle = 0.0f;
@@ -20,20 +21,73 @@ static float butterfly_y = 0.0f;
 static float butterfly_z = 0.0f;
 static float butterfly_rz = 0.0f;
 
+bool is_moving_to_target = false;
+static float target_dx = 0.0f;
+static float target_dy = 0.0f;
+static float source_dx = 0.0f;
+static float source_dy = 0.0f;
+static float move_speed = 0.02f;
+static float wing_time = 0.0f;
 void update_animation()
 {
-    frame_counter++;
-    wing_angle = 50.0f * sinf(frame_counter * 0.1f);
+    touch_info_t *tp = tp_get_info();
+    gui_dispdev_t *dc = gui_get_dc();
 
-    float radius = 20.0f;
-    float theta = frame_counter * 0.01f;
+    if (tp->pressed)
+    {
+        target_dx = (tp->x - dc->screen_width / 2) / 2.5f;
+        target_dy = (tp->y - dc->screen_height / 2) / 2.5f;
+        is_moving_to_target = true;
+    }
 
-    butterfly_x = radius * cosf(theta);
-    butterfly_y = radius * sinf(theta);
+    if (is_moving_to_target)
+    {
+        float dx = target_dx - source_dx;
+        float dy = target_dy - source_dy;
 
-    butterfly_z = 10.0f * sinf(frame_counter * 0.05f);
+        float distance = sqrtf(dx * dx + dy * dy);
 
-    butterfly_rz = theta * (180.0f / M_PI);
+        if (distance > 10.0f)
+        {
+            // Acceleration and deceleration
+            float speed_factor = fminf(distance / 40.0f, 1.0f);
+            source_dx += dx * move_speed * speed_factor;
+            source_dy += dy * move_speed * speed_factor;
+
+            // Caculate new rotate angle
+            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI) + 90;
+            float angle_difference = desired_angle - butterfly_rz;
+
+            if (angle_difference > 180.0f)
+            {
+                angle_difference -= 360.0f;
+            }
+            if (angle_difference < -180.0f)
+            {
+                angle_difference += 360.0f;
+            }
+            butterfly_rz += angle_difference * 0.1f;
+
+            // Adjust wing flapping frequency based on speed
+            wing_time += 0.2f + speed_factor * 0.2f;
+            wing_angle = 60.0f * sinf(wing_time);
+
+            butterfly_x = -source_dx;
+            butterfly_y = -source_dy;
+        }
+        else
+        {
+            is_moving_to_target = false;
+        }
+    }
+    else
+    {
+        frame_counter++;
+        wing_time += 0.1f;
+        wing_angle = 50.0f * sinf(wing_time);
+        butterfly_z = 5.0f * sinf(frame_counter * 0.05f);
+    }
+
 }
 
 static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
@@ -43,11 +97,11 @@ static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
     gui_3d_matrix_t face_matrix;
     gui_3d_matrix_t object_matrix;
 
-    gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 50), gui_point_4d(0, 0, 0), 1, 32767, 90,
+    gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767, 90,
                                  dc->screen_width, dc->screen_height);
 
     gui_3d_world_inititalize(&object_matrix, butterfly_x, butterfly_y, butterfly_z, 0, 0,
-                             butterfly_rz + 90,
+                             butterfly_rz,
                              5);
 
 
@@ -89,7 +143,8 @@ static int app_init(void)
 
     gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
 
-    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, update_animation);
+    gui_obj_create_timer(&(((gui_3d_base_t *)test_3d)->base), 17, true, update_animation);
+    gui_obj_start_timer(&(((gui_3d_base_t *)test_3d)->base));
 
     return 0;
 
