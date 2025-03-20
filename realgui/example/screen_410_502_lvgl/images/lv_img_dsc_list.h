@@ -90,6 +90,7 @@ extern const lv_image_dsc_t ui_card_clockcircle;
 extern const lv_image_dsc_t ui_card_weather;
 extern const lv_image_dsc_t ui_clock_activity_icon;
 extern const lv_image_dsc_t ui_clock_box2d_ring_icon;
+extern const lv_image_dsc_t ui_clock_calendar_icon;
 extern const lv_image_dsc_t ui_clock_card_alarm;
 extern const lv_image_dsc_t ui_clock_card_compass;
 extern const lv_image_dsc_t ui_clock_card_music;

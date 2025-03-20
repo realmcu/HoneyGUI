@@ -74,6 +74,7 @@ extern lv_obj_t *scr_left_curtain;
 extern lv_obj_t *scr_right_curtain;
 extern lv_obj_t *scr_right_curtain_2;
 extern lv_obj_t *scr_app_menu;
+extern lv_obj_t *scr_app_calendar;
 
 
 void lv_watchface_init(void);
@@ -83,6 +84,7 @@ void lv_left_curtain_init(void);
 void lv_right_curtain_init(void);
 void lv_right_curtain_2_init(void);
 void lv_app_menu_init(void);
+void lv_app_calendar_init(void);
 
 
 // FONTS

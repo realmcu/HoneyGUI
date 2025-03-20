@@ -982,6 +982,17 @@ const lv_image_dsc_t ui_clock_box2d_ring_icon =
     .data = UI_CLOCK_BOX2D_RING_ICON_BIN + 8
 };
 
+const lv_image_dsc_t ui_clock_calendar_icon =
+{
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
+    .header.w = 100,
+    .header.h = 100,
+    .header.stride = 400,
+    .data_size = 40000,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
+    .data = UI_CLOCK_CALENDAR_ICON_BIN + 8
+};
+
 const lv_image_dsc_t ui_clock_card_alarm =
 {
     .header.magic = LV_IMAGE_HEADER_MAGIC,

@@ -12,8 +12,6 @@ static cJSON *root;
 #include "cJSON.h"
 #endif
 
-#define M_PI 3.14159265358979323846
-
 static lv_obj_t *date_label;
 static lv_obj_t *time_img_container;
 static lv_obj_t *activity_arc;
@@ -315,8 +313,8 @@ static void timer_cb(lv_timer_t *timer)
 
 static void heartrate_cb(lv_event_t *event)
 {
-    _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0,
-                      lv_app_menu_init, 0);
+    _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
+                      &lv_app_menu_init, 0);
     LV_LOG("click heartrate icon\n");
     return;
 }

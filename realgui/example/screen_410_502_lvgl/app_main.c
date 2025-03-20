@@ -68,6 +68,7 @@ lv_obj_t *scr_left_curtain;
 lv_obj_t *scr_right_curtain;
 lv_obj_t *scr_right_curtain_2;
 lv_obj_t *scr_app_menu;
+lv_obj_t *scr_app_calendar;
 
 uint32_t event_snapshot_creat;
 uint32_t event_snapshot_delete;
@@ -97,7 +98,7 @@ void watch_demo_init(void)
     tileview = lv_tileview_create(NULL);
     lv_obj_set_style_bg_color(tileview, lv_color_make(0, 0, 0), 0);
     lv_obj_set_scrollbar_mode(tileview, LV_SCROLLBAR_MODE_OFF); // hide scroll bar
-    lv_obj_add_event_cb(tileview, (lv_event_cb_t)enter_menu_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(tileview, (lv_event_cb_t)enter_menu_cb, LV_EVENT_ALL, NULL);
 
     tile_center = lv_tileview_add_tile(tileview, 1, 1, LV_DIR_ALL); // create center tile
     tile_up = lv_tileview_add_tile(tileview, 1, 0, LV_DIR_BOTTOM); // create up tile
@@ -323,7 +324,7 @@ static void enter_menu_cb(lv_event_t *event)
         if (lv_indev_get_type(indev) == LV_INDEV_TYPE_KEYPAD &&
             lv_indev_get_state(indev) == LV_INDEV_STATE_PRESSED)
         {
-            _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0,
+            _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
                               lv_app_menu_init, 0);
             return;
         }

@@ -20,7 +20,7 @@ static app_item_t app_list[] =
 {
     {"Heart Rate", &ui_clock_heartrate_icon},
     {"Music", &ui_clock_music_icon},
-    {"Fruit Ninja", &ui_clock_fruit_ninja_icon},
+    {"Calendar", &ui_clock_calendar_icon},
     {"Box2d Ring", &ui_clock_box2d_ring_icon},
     {"Activity", &ui_clock_activity_icon},
     {"Heart Rate", &ui_clock_heartrate_icon},
@@ -37,7 +37,8 @@ static int16_t page_menu_y_his = 0;
 static void exit_menu(void)
 {
     // LV_LOG("enter exit_menu func\n");
-    lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
+    _ui_screen_change(&tileview, &scr_app_menu, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
+                      NULL, false);
 }
 
 static void enter_app_cb(lv_event_t *e)
@@ -48,12 +49,19 @@ static void enter_app_cb(lv_event_t *e)
     if (index == 1)
     {
         lv_tileview_set_tile_by_index(tileview, 2, 1, LV_ANIM_OFF);
-        lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
+        _ui_screen_change(&tileview, &scr_app_menu, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
+                          NULL, false);
     }
     else if (index == 4)
     {
         lv_tileview_set_tile_by_index(tileview, 3, 1, LV_ANIM_OFF);
-        lv_scr_load_anim(tileview, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, false);
+        _ui_screen_change(&tileview, &scr_app_menu, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
+                          NULL, false);
+    }
+    else if (index == 2)
+    {
+        _ui_screen_change(&scr_app_calendar, &scr_app_menu, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
+                          lv_app_calendar_init, false);
     }
 }
 
