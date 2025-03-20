@@ -22,9 +22,6 @@
 #include "gui_version.h"
 #include "gui_server.h"
 
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-#include "js_extern_io.h"
-#endif
 
 
 
@@ -54,11 +51,9 @@ void gui_task_ext_execution_sethook(void (*hook)(void))
  */
 static void gui_server_entry(void *parameter)
 {
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    extern void js_init(void);
-    js_init();
-#endif
+    GUI_UNUSED(parameter);
     gui_server_msg_init();
+    gui_components_init();
     while (1)
     {
 
@@ -136,4 +131,3 @@ int gui_server_init(void)
     return 0;
 }
 
-GUI_INIT_PREV_EXPORT(gui_server_init);

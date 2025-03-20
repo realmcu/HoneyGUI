@@ -32,7 +32,8 @@ int main(int argc, char **argv)
            PROJECT_NAME, \
            COMPILE_TIME);
 
-    gui_components_init();
+
+    gui_server_init();
 
     while (1)
     {

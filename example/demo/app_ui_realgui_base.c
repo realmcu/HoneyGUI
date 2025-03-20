@@ -44,6 +44,7 @@ static int app_init(void)
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_cb, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
     gui_obj_add_event_cb(img, (gui_event_cb_t)test_cb, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
+
     // gui_obj_create_timer(&(img->base), 1000, true, test_cb);
     // gui_obj_start_timer(&(img->base));
 
