@@ -100,6 +100,10 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
             tp.pressing = false;
             TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
         }
+        if (up_cnt == 2)
+        {
+            tp_do_reset();
+        }
         return tp_local_event;
     }
 
@@ -588,7 +592,6 @@ struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
         {
             TP_LOG("not cache tp up \n");
         }
-        tp_do_reset();
     }
     else
     {
