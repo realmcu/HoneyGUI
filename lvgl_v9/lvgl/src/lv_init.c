@@ -356,6 +356,10 @@ void lv_init(void)
     lv_bmp_init();
 #endif
 
+#if LV_USE_RTK_IDU
+    lv_rtk_idu_init();
+#endif
+
     /*Make FFMPEG last because the last converter will be checked first and
      *it's superior to any other */
 #if LV_USE_FFMPEG

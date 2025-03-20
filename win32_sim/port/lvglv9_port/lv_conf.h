@@ -876,6 +876,9 @@
 /** RLE decompress library */
 #define LV_USE_RLE 0
 
+/*RTK_IDU decoder library*/
+#define LV_USE_RTK_IDU 0
+
 /** QR code library */
 #define LV_USE_QRCODE 0
 
