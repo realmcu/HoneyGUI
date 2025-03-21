@@ -18,10 +18,21 @@ endif( LV_CONF_PATH )
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Set sources used for LVGL components
-file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.S)
+file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c )
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
+file(GLOB_RECURSE lvgl_ppe_remove_srcs 
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl87x2g/lv_draw_ppe_rtl87x2g.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl87x2g/lv_draw_ppe_rtl87x2g_fill.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl87x2g/lv_draw_ppe_rtl87x2g_img.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl87x2g/lv_ppe_rtl87x2g_utils.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl8773e/lv_draw_ppe_rtl8773e.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl8773e/lv_draw_ppe_rtl8773e_fill.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl8773e/lv_draw_ppe_rtl8773e_img.c"
+    "${LVGL_ROOT_DIR}/src/draw/ppe/rtl8773e/lv_ppe_rtl8773e_utils.c"
+)
+list(REMOVE_ITEM SOURCES ${lvgl_ppe_remove_srcs})
 
 # Build LVGL library
 add_library(lvgl ${SOURCES})
@@ -70,7 +81,10 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
     add_library(lvgl_demos ${DEMO_SOURCES})
     add_library(lvgl::demos ALIAS lvgl_demos)
 
-    target_include_directories(lvgl_demos SYSTEM PUBLIC ${LVGL_ROOT_DIR}/demos)
+    target_include_directories(lvgl_demos SYSTEM PUBLIC 
+    ${LVGL_ROOT_DIR}/demos
+    ${LVGL_ROOT_DIR}/demos/widgets
+    )
     target_link_libraries(lvgl_demos PUBLIC lvgl)
 endif()
 
