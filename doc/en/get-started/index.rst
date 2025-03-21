@@ -29,7 +29,7 @@ The :term:`GUI` framework has good portability, which can run on a variety of ch
 Software Architecture
 -----------------------
 
-.. image:: https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png
+.. image:: https://foruda.gitee.com/images/1744004732309092748/20ca09c7_1860080.png
    :align: center
    :width: 800
 
