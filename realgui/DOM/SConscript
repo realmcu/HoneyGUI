@@ -13,10 +13,8 @@ CPPDEFINES = []
 
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_XML_DOM') or GetDepend('CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP'):
 
-
     src = Glob('*.c')
 
-    CPPDEFINES += ['REALTEK_BUILD_GUI_XML_DOM']
 
 group = DefineGroup('realgui/dom', 
                    src, 

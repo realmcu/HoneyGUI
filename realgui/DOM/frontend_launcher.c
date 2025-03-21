@@ -14,13 +14,10 @@
 #include "gui_tab.h"
 #include "gui_grid.h"
 #include "gui_return.h"
-#ifdef MODULE_VG_LITE
-#include "gui_vg_lite_clock.h"
-#include "gui_cube.h"
-#else
-#endif
 #include "gui_components_init.h"
 #include "gui_api.h"
+
+
 static void app_launcher_frontend_ui_design(gui_app_t *app);
 static gui_app_t app_launcher_frontend =
 {
@@ -38,6 +35,17 @@ void *get_app_launcher_frontend(void)
 {
     return &app_launcher_frontend;
 }
+
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+static int app_init(void)
+{
+    gui_server_init();
+    gui_app_startup(&app_launcher_frontend);
+    return 0;
+}
+
+GUI_INIT_APP_EXPORT(app_init);
+#endif
 
 
 

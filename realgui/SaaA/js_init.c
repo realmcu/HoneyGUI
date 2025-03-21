@@ -1,6 +1,7 @@
 
 #include "js_user.h"
 #include "jcontext.h"
+#include "gui_components_init.h"
 
 extern int js_console_init(void);
 extern void jerry_port_set_default_context(jerry_context_t *context);
@@ -112,7 +113,7 @@ void js_run_file(const char *file, gui_app_t  *app)
         script_free(script);
     }
 }
-void js_init(void)
+static int js_init(void)
 {
     /* JERRY_ENABLE_EXTERNAL_CONTEXT */
     jerry_port_set_default_context(jerry_create_context(PKG_JMEM_HEAP_SIZE * 1024, context_alloc,
@@ -133,6 +134,7 @@ void js_init(void)
     js_smarthome_init();
     js_matter_init();
     js_mesh_init();
-    extern gui_app_t *get_app_launcher_frontend(void);
-    gui_app_startup(get_app_launcher_frontend());
+    return 0;
 }
+
+GUI_INIT_DEVICE_EXPORT(js_init);

@@ -110,40 +110,39 @@ DECLARE_HANDLER(test)
 #ifdef JS_DBG_WIFI
     uint32_t param = (uint32_t)jerry_get_number_value(args[0]);
 
-    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS};
-    // uint8_t data[] = {0x03, 0x01, 0x05, 0x01};
+    uint8_t sub_event = 0;
+    void *data32 = 0;
 
     gui_log("enter test %d\n", param);
     switch (param)
     {
     case 0:
-        msg.cb = (gui_msg_cb)0x0003;
-        msg.payload = (void *)0x00;
+        sub_event = WIFI_EVENT_MANAGE_ON;
+        data32 = (void *)0x00;
         break;
     case 1:
-        msg.cb = (gui_msg_cb)0x0003;
-        msg.payload = (void *)0x01;
+        sub_event = WIFI_EVENT_MANAGE_ON;
+        data32 = (void *)0x01;
         break;
     case 2:
-        msg.cb = (gui_msg_cb)0x0103;
-        msg.payload = (void *)0x00;
+        sub_event = WIFI_EVENT_MANAGE_OFF;
+        data32 = (void *)0x00;
         break;
     case 3:
-        msg.cb = (gui_msg_cb)0x0203;
-        msg.payload = (void *)&ap_array;
+        sub_event = WIFI_EVENT_MANAGE_SCAN;
+        data32 = (void *)&ap_array;
         break;
     case 4:
-        msg.cb = (gui_msg_cb)0x0303;
-        msg.payload = (void *)0x00;
+        sub_event = WIFI_EVENT_MANAGE_CONNECT;
+        data32 = (void *)0x00;
         break;
     case 5:
-        msg.cb = (gui_msg_cb)0x0303;
-        msg.payload = (void *)0x01;
+        sub_event = WIFI_EVENT_MANAGE_CONNECT;
+        data32 = (void *)0x01;
         break;
     }
 
-
-    gui_send_msg_to_server(&msg);
+    gui_send_msg_to_js(EXTERN_EVENT_WIFI, sub_event, (void *)data32);
 #endif
     return jerry_create_undefined();
 }
@@ -400,46 +399,13 @@ void js_wifi_init()
  *                           Event Handler Functions
  *============================================================================*/
 
-// same size and mem alignment as gui_msg_js_t
-#ifdef  __CC_ARM
-#pragma anon_unions
-#endif
-// typedef struct gui_msg
-// {
-//     uint16_t event;
-//     gui_msg_cb cb;  // typedef void (*gui_msg_cb)(void *);
-//     void *payload;
-// } gui_msg_t;
-
-typedef struct
-{
-    /* user field of event */
-    union
-    {
-        struct
-        {
-            uint8_t extern_event_type; // EXTERN_EVENT_WIFI
-            uint8_t sub_event_type;
-            uint8_t data[2];
-        };
-        gui_msg_cb cb;    // gui_msg
-    };
-    union
-    {
-        uint8_t data_rsv[4];   // reserve
-        void *param;
-        void *payload;   // gui_msg
-    };
-} gui_msg_wifi_t;
-
-
-static void gui_wifi_manage_on_handler(gui_msg_wifi_t *msg)
+static void gui_wifi_manage_on_handler(uint32_t data)
 {
     // gui_log("wifi on param: 0x%x\n", msg->param);
     if (js_wifi_data.on_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (uint32_t)(data);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.on_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -447,13 +413,13 @@ static void gui_wifi_manage_on_handler(gui_msg_wifi_t *msg)
         jerry_release_value(res);
     }
 }
-static void gui_wifi_manage_off_handler(gui_msg_wifi_t *msg)
+static void gui_wifi_manage_off_handler(uint32_t data)
 {
     // gui_log("wifi off param: 0x%x\n", msg->param);
     if (js_wifi_data.off_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (uint32_t)(data);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.off_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -461,14 +427,14 @@ static void gui_wifi_manage_off_handler(gui_msg_wifi_t *msg)
         jerry_release_value(res);
     }
 }
-static void gui_wifi_manage_scan_handler(gui_msg_wifi_t *msg)
+static void gui_wifi_manage_scan_handler(uint32_t data)
 {
     // gui_log("wifi scan param: 0x%x\n", *((int *)msg->param));
 #if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
 #if (defined RTL87x2G) || (defined __WIN32)
     if (js_wifi_data.scan_cb)
     {
-        ap_array_t *array = (ap_array_t *)msg->param;
+        ap_array_t *array = (ap_array_t *)data;
         js_wifi_data.ap_count = array->ap_count;
         js_wifi_data.ap_array = array;
 
@@ -490,7 +456,7 @@ static void gui_wifi_manage_scan_handler(gui_msg_wifi_t *msg)
         js_set_property(ap_info, "scrt", security_array);
 
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (uint32_t)(data);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.scan_cb),
                                                 jerry_create_undefined(), &ap_info, 1);
@@ -501,13 +467,13 @@ static void gui_wifi_manage_scan_handler(gui_msg_wifi_t *msg)
 #endif
 #endif
 }
-static void gui_wifi_manage_connect_handler(gui_msg_wifi_t *msg)
+static void gui_wifi_manage_connect_handler(uint32_t data)
 {
     // gui_log("wifi connect param: 0x%x\n", msg->param);
     if (js_wifi_data.connect_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (uint32_t)(data);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.connect_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -516,13 +482,13 @@ static void gui_wifi_manage_connect_handler(gui_msg_wifi_t *msg)
     }
 }
 
-static void gui_wifi_manage_disconnect_handler(gui_msg_wifi_t *msg)
+static void gui_wifi_manage_disconnect_handler(uint32_t data)
 {
     // gui_log("wifi disconnect param: 0x%x\n", msg->param);
     if (js_wifi_data.disconnect_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (uint32_t)(data);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.disconnect_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -534,34 +500,32 @@ static void gui_wifi_manage_disconnect_handler(gui_msg_wifi_t *msg)
 // wifi event
 void gui_extern_event_wifi_handler(gui_msg_js_t *js_msg)
 {
-    gui_msg_wifi_t *wifi_msg = (gui_msg_wifi_t *)js_msg;
-
-    gui_log("sub_event_type: %d\n", wifi_msg->sub_event_type);
-    switch (wifi_msg->sub_event_type)
+    gui_log("sub_event_type: %d\n", js_msg->js_subevent);
+    switch (js_msg->js_subevent)
     {
     case WIFI_EVENT_MANAGE_ON:
         {
-            gui_wifi_manage_on_handler(wifi_msg);
+            gui_wifi_manage_on_handler(js_msg->data32);
         }
         break;
     case WIFI_EVENT_MANAGE_OFF:
         {
-            gui_wifi_manage_off_handler(wifi_msg);
+            gui_wifi_manage_off_handler(js_msg->data32);
         }
         break;
     case WIFI_EVENT_MANAGE_SCAN:
         {
-            gui_wifi_manage_scan_handler(wifi_msg);
+            gui_wifi_manage_scan_handler(js_msg->data32);
         }
         break;
     case WIFI_EVENT_MANAGE_CONNECT:
         {
-            gui_wifi_manage_connect_handler(wifi_msg);
+            gui_wifi_manage_connect_handler(js_msg->data32);
         }
         break;
     case WIFI_EVENT_MANAGE_DISCONNECT:
         {
-            gui_wifi_manage_disconnect_handler(wifi_msg);
+            gui_wifi_manage_disconnect_handler(js_msg->data32);
         }
         break;
     default:

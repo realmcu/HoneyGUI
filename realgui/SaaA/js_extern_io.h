@@ -59,27 +59,65 @@ typedef enum
 //     void *payload;
 // } gui_msg_t;
 
+// typedef struct
+// {
+//     /* the event type */
+//     // uint16_t event;
+//     /* user field of event */
+//     union
+//     {
+//         uint32_t  param;
+//         uint8_t extern_event_type;
+//         gui_msg_cb cb;    // gui_msg
+//     };
+//     union
+//     {
+//         void  *data;
+//         uint8_t *data_rsv;   // reserve
+//         void *payload;   // gui_msg
+//     };
+// } gui_msg_js_t;
+
+
+// typedef void (*gui_msg_cb)(void *);
+// typedef struct gui_msg
+// {
+//     uint16_t event;
+//     uint16_t sub_event;
+//     gui_msg_cb cb;
+//     void *payload;
+// } gui_msg_t;
+
+
 typedef struct
 {
-    /* the event type */
-    // uint16_t event;
-    /* user field of event */
+//
     union
     {
-        uint32_t  param;
-        uint8_t extern_event_type;
-        gui_msg_cb cb;    // gui_msg
-    };
-    union
-    {
-        void  *data;
-        uint8_t *data_rsv;   // reserve
-        void *payload;   // gui_msg
+        uint16_t gui_event;  // fixed
+        union
+        {
+            struct
+            {
+                uint8_t js_event;       // module
+                uint8_t js_subevent;    // module internal event
+            };
+            uint16_t gui_sub_event;
+        };
+        gui_msg_cb gui_cb;   // fixed
+        union
+        {
+            uint32_t data32;            // data
+            uint8_t data[4];            // data
+            void *pdata;
+            void *gui_payload;
+        };
+        //
+        gui_msg_t gui_msg;
     };
 } gui_msg_js_t;
 
-
-
+void gui_send_msg_to_js(uint8_t event, uint8_t subevent, void *data);
 void gui_extern_event_js_handler(gui_msg_t *msg);
 
 #ifdef __cplusplus
