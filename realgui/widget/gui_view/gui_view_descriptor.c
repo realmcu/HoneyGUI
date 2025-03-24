@@ -43,7 +43,7 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static const gui_view_descriptor_t *descriptor_list[100];
+static gui_view_descriptor_t *descriptor_list[100];
 static uint32_t descriptor_count = 0;
 /*============================================================================*
  *                           Private Functions
@@ -54,13 +54,13 @@ static uint32_t descriptor_count = 0;
  *                           Public Functions
  *============================================================================*/
 
-void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor)
+void gui_view_descriptor_register(gui_view_descriptor_t *descriptor)
 {
     descriptor_list[descriptor_count] = descriptor;
     descriptor_count++;
 }
 
-const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
+gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
 {
     for (int i = 0; i < descriptor_count; i++)
     {

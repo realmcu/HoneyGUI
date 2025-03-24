@@ -20,16 +20,18 @@
 
 
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *blue_view = NULL;
-const static gui_view_descriptor_t *white_view = NULL;
+static gui_view_descriptor_t *blue_view = NULL;
+static gui_view_descriptor_t *white_view = NULL;
 static void app_ui_view_yellow_design(gui_view_t *view);
 
-static const gui_view_descriptor_t descriptor =
+static gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .design_cb = app_ui_view_yellow_design,
+    .created = false,
+    .keep_live = true,
 };
 
 

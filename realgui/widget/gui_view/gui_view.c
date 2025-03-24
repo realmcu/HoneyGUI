@@ -40,6 +40,7 @@ static gui_view_t *current_view = NULL;
  *                           Private Functions
  *============================================================================*/
 void gui_view_free(void *msg);
+static void gui_view_moveback_judge(gui_view_t *this);
 
 static void gui_view_input_prepare(gui_obj_t *obj)
 {
@@ -53,14 +54,109 @@ static void gui_view_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
     gui_view_t *this = (gui_view_t *)obj;
+    VIEW_SWITCH_STYLE style = this->style;
     uint8_t last = this->checksum;
 
-    extern void gui_view_prepare_internal(gui_view_t *this);
-    gui_view_prepare_internal(this);
+    if (this->event && style < VIEW_ANIMATION_NULL) // do not update release during animation
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    }
+
+    // touch
+    if (!this->event && this->view_switch_ready)
+    {
+        this->event |= (this->view_click       && gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED));
+        this->event |= (this->view_touch_long  && gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG));
+        if (this->event)
+        {
+            this->style = VIEW_ANIMATION_NULL;
+            return;
+        }
+    }
+    // keyboard
+    if (!this->event && this->view_switch_ready)
+    {
+        this->event |= (this->view_button      && gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED));
+        this->event |= (this->view_button_long && gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_CLICKED));
+        if (this->event)
+        {
+            this->style = VIEW_ANIMATION_NULL;
+            return;
+        }
+    }
+    // move
+    if (tp->pressing && style < VIEW_ANIMATION_NULL) // do not judge moveback during animation
+    {
+        gui_view_moveback_judge(this);
+    }
+    if ((!this->event || this->moveback) && this->view_switch_ready)
+    {
+        this->event |= (this->view_left  && gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT));
+        this->event |= (this->view_right && gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT));
+        this->event |= (this->view_up    && gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP));
+        this->event |= (this->view_down  && gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN));
+    }
+
+    // restore view offset
+    if (!this->view_tp)
+    {
+        if (this->release_x >= GUI_FRAME_STEP)
+        {
+            this->release_x -= GUI_FRAME_STEP;
+        }
+        else if (this->release_x <= -GUI_FRAME_STEP)
+        {
+            this->release_x += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_x = 0;
+        }
+
+        if (this->release_y >= GUI_FRAME_STEP)
+        {
+            this->release_y -= GUI_FRAME_STEP;
+        }
+        else if (this->release_y <= -GUI_FRAME_STEP)
+        {
+            this->release_y += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_y = 0;
+        }
+    }
+
+    extern void gui_view_reduction(gui_view_t *this);
+    extern void gui_view_cube(gui_view_t *this);
+    extern void gui_view_rotate(gui_view_t *this);
+    extern void gui_view_rotate_book(gui_view_t *this);
+
+    if (style == VIEW_TRANSPLATION)
+    {
+        matrix_translate(this->cur_id.x * (int)this->base.w + this->release_x, \
+                         this->cur_id.y * (int)this->base.h + this->release_y, \
+                         obj->matrix);
+    }
+    else if (style == VIEW_CUBE)
+    {
+        gui_view_cube(this);
+    }
+    else if (style == VIEW_ROTATE)
+    {
+        gui_view_rotate(this);
+    }
+    else if (style == VIEW_REDUCTION)
+    {
+        gui_view_reduction(this);
+    }
+
+    // animation update
+    animate_frame_update(this->animate, obj);
 
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, (uint8_t)sizeof(gui_view_t));
-
     if (last != this->checksum)
     {
         gui_fb_change();
@@ -107,14 +203,23 @@ static void gui_view_end(gui_obj_t *obj)
         this->view_tp = 1;
         if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
-            gui_msg_t msg =
+            if (!this->descriptor->keep_live)
             {
-                .event = GUI_EVENT_USER_DEFINE,
-                .cb = gui_view_free,
-                .payload = this,
-            };
-            gui_send_msg_to_server(&msg);
-            // obj->active = 1;
+                gui_msg_t msg =
+                {
+                    .event = GUI_EVENT_USER_DEFINE,
+                    .cb = gui_view_free,
+                    .payload = this,
+                };
+                gui_send_msg_to_server(&msg);
+                this->descriptor->created = false;
+            }
+            else
+            {
+                obj->not_show = true;
+                obj->has_prepare_cb = false;
+                obj->has_end_cb = false;
+            }
         }
         else
         {
@@ -125,23 +230,25 @@ static void gui_view_end(gui_obj_t *obj)
     if (this->moveback)
     {
         this->moveback = 0;
-        if (this->view_switch_ready)
+        if (!this->view_switch_ready)
         {
-            if (tp->pressing)
+            if (!this->descriptor->keep_live)
             {
-                this->event = 0;
+                gui_msg_t msg =
+                {
+                    .event = GUI_EVENT_USER_DEFINE,
+                    .cb = gui_view_free,
+                    .payload = this,
+                };
+                gui_send_msg_to_server(&msg);
+                this->descriptor->created = false;
             }
-        }
-        else
-        {
-            gui_msg_t msg =
+            else
             {
-                .event = GUI_EVENT_USER_DEFINE,
-                .cb = gui_view_free,
-                .payload = this,
-            };
-            gui_send_msg_to_server(&msg);
-            // obj->active = 1;
+                obj->not_show = true;
+                obj->has_prepare_cb = false;
+                obj->has_end_cb = false;
+            }
         }
     }
     if (this->view_switch_ready)
@@ -186,6 +293,33 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
+static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new)
+{
+    gui_list_t *list1 = &GUI_BASE(old)->brother_list;
+    gui_list_t *list2 = &GUI_BASE(new)->brother_list;
+
+    // Get adjacent pointers
+    gui_list_t *list1_next = list1->next;
+    gui_list_t *list2_prev = list2->prev;
+    gui_list_t *list2_next = list2->next;
+
+    // If node2 is already immediately after node1, no action needed
+    if (list1_next == list2)
+    {
+        return;
+    }
+
+    //Remove node2 from its original position
+    list2_prev->next = list2_next;
+    list2_next->prev = list2_prev;
+
+    //Insert node2 after node1
+    list2->next = list1_next;    // node2->next points to node1's original next
+    list2->prev = list1;         // node2->prev points to node1
+    list1_next->prev = list2;    // node1's original next's prev points to node2
+    list1->next = list2;         // node1->next points to node2
+}
+
 static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
 {
     gui_view_t *this = (gui_view_t *)obj;
@@ -194,23 +328,18 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
     gui_view_t *target_view = gui_view_create(GUI_BASE(this)->parent, on_event->descriptor, 0, 0, 0, 0);
     target_view->style = on_event->switch_in_style;
     target_view->event = 1;
+    gui_view_adjust_list(GUI_BASE(this), GUI_BASE(target_view));
     // change list for transplation cover
     if (target_view->style == VIEW_STILL)
     {
-        gui_obj_t *parent = GUI_BASE(this)->parent;
-        gui_obj_t *object = GUI_BASE(obj);
-        gui_list_t *next_tab = object->brother_list.next;
-        object->brother_list.prev = object->brother_list.next;
-        object->brother_list.next = object->brother_list.next->next;
-        next_tab->next = &object->brother_list;
-        next_tab->prev = object->brother_list.next;
-        GUI_BASE(parent)->child_list.next = next_tab;
-        GUI_BASE(parent)->child_list.prev = next_tab->next;
+        gui_view_adjust_list(GUI_BASE(target_view), GUI_BASE(this));
     }
     if (target_view->style < VIEW_ANIMATION_NULL)
     {
         target_view->release_x = this->release_x;
         target_view->release_y = this->release_y;
+        this->view_tp = 1;
+        target_view->view_tp = 1;
     }
     else
     {
@@ -271,6 +400,152 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
     target_view->cur_id.y = idy;
 }
 
+static void gui_view_pressing_cb(void *obj, gui_event_t e, void *param)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_view_t *this = (gui_view_t *)obj;
+
+    if (!this->view_tp)
+    {
+        return;
+    }
+
+    switch (tp->type)
+    {
+    case TOUCH_HOLD_X:
+        {
+            this->release_x = tp->deltaX;
+        }
+        break;
+
+    case TOUCH_HOLD_Y:
+        {
+            this->release_y = tp->deltaY;
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_view_t *this = (gui_view_t *)obj;
+    VIEW_SWITCH_STYLE style = this->style;
+
+    if (style >= VIEW_ANIMATION_NULL)
+    {
+        return;
+    }
+    this->view_tp = 0;
+    switch (tp->type)
+    {
+    case TOUCH_LEFT_SLIDE:
+        {
+            if (this->release_x < 0 && (this->view_left || !this->view_switch_ready))
+            {
+                gui_log("[VIEW]TOUCH_LEFT_SLIDE\n");
+                this->event = 1;
+                this->cur_id.x -= 1;
+                this->release_x = this->release_x + this->base.w;
+            }
+        }
+        break;
+
+    case TOUCH_RIGHT_SLIDE:
+        {
+            if (this->release_x > 0 && (this->view_right || !this->view_switch_ready))
+            {
+                gui_log("[VIEW]TOUCH_RIGHT_SLIDE\n");
+                this->event = 1;
+                this->cur_id.x += 1;
+                this->release_x = this->release_x - this->base.w;
+            }
+        }
+        break;
+
+    case TOUCH_DOWN_SLIDE:
+        {
+            if (this->release_y > 0 && (this->view_down || !this->view_switch_ready))
+            {
+                gui_log("[VIEW]TOUCH_DOWN_SLIDE\n");
+                this->event = 1;
+                this->cur_id.y += 1;
+                this->release_y = this->release_y - this->base.h;
+            }
+        }
+        break;
+
+    case TOUCH_UP_SLIDE:
+        {
+            if (this->release_y < 0 && (this->view_up || !this->view_switch_ready))
+            {
+                gui_log("[VIEW]TOUCH_UP_SLIDE\n");
+                this->event = 1;
+                this->cur_id.y -= 1;
+                this->release_y = this->release_y + this->base.h;
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+static void gui_view_moveback_judge(gui_view_t *this)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *obj = GUI_BASE(this);
+    switch (tp->type)
+    {
+    case TOUCH_HOLD_X:
+        {
+            if ((this->release_x != 0 && (this->release_x ^ tp->deltaX) < 0) || !tp->deltaX)
+            {
+                this->moveback = 1;
+            }
+            // Limiting the range of movement
+            if (abs(this->release_x) > obj->w)
+            {
+                if (this->release_x > 0)
+                {
+                    this->release_x = obj->w;
+                }
+                else
+                {
+                    this->release_x = -obj->w;
+                }
+            }
+        }
+        break;
+    case TOUCH_HOLD_Y:
+        {
+            if ((this->release_y != 0 && (this->release_y ^ tp->deltaY) < 0) || !tp->deltaY)
+            {
+                this->moveback = 1;
+            }
+
+            if (abs(this->release_y) > obj->h)
+            {
+                if (this->release_y > 0)
+                {
+                    this->release_y = obj->h;
+                }
+                else
+                {
+                    this->release_y = -obj->h;
+                }
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void gui_view_switch_via_msg(void *msg)
 {
     gui_view_t *this = (gui_view_t *)((gui_msg_t *)msg)->payload;
@@ -281,16 +556,31 @@ static void gui_view_switch_via_msg(void *msg)
  *                           Public Functions
  *============================================================================*/
 gui_view_t *gui_view_create(void       *parent,
-                            const gui_view_descriptor_t *descriptor,
+                            gui_view_descriptor_t *descriptor,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h)
 {
+    if (descriptor->created)
+    {
+        gui_view_t *this = *descriptor->pView;
+        this->view_switch_ready = false;
+
+        gui_obj_t *obj = (gui_obj_t *)this;
+        obj->not_show = false;
+        obj->has_prepare_cb = true;
+        obj->has_end_cb = true;
+        obj->x = 0;
+        obj->y = 0;
+        obj->opacity_value = UINT8_MAX;
+        gui_log("%s show\n", obj->name);
+        return this;
+    }
     gui_view_t *this = gui_malloc(sizeof(gui_view_t));
     gui_dispdev_t *dc = gui_get_dc();
     memset(this, 0, sizeof(gui_view_t));
-
+    this->descriptor = descriptor;
     if (w == 0)
     {
         w = (int)gui_get_screen_width();
@@ -328,11 +618,16 @@ gui_view_t *gui_view_create(void       *parent,
 
     *descriptor->pView = this;
     descriptor->design_cb(this);
+    descriptor->created = true;
+
+    gui_obj_add_event_cb(this, gui_view_pressing_cb, GUI_EVENT_TOUCH_PRESSING, NULL);
+    gui_obj_add_event_cb(this, gui_view_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_log("create %s\n", GET_BASE(this)->name);
     return this;
 }
 
 void gui_view_switch_on_event(gui_view_t *this,
-                              const gui_view_descriptor_t *descriptor,
+                              gui_view_descriptor_t *descriptor,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
                               gui_event_t event)
@@ -342,6 +637,8 @@ void gui_view_switch_on_event(gui_view_t *this,
     on_event->switch_out_style = switch_out_style;
     on_event->switch_in_style = switch_in_style;
     on_event->event = event;
+    this->on_event = gui_realloc(this->on_event,
+                                 sizeof(gui_view_on_event_t *) * (this->on_event_num + 1));
     this->on_event[this->on_event_num] = on_event;
     this->on_event_num++;
     GUI_ASSERT(this->on_event_num < EVENT_NUM_MAX);
@@ -413,7 +710,7 @@ void gui_view_switch_on_event(gui_view_t *this,
 
 }
 
-void gui_view_switch_direct(gui_view_t *this, const gui_view_descriptor_t *descriptor,
+void gui_view_switch_direct(gui_view_t *this, gui_view_descriptor_t *descriptor,
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style)
 {
@@ -421,14 +718,20 @@ void gui_view_switch_direct(gui_view_t *this, const gui_view_descriptor_t *descr
     {
         this->event = 1;
 
-        gui_view_on_event_t *on_event = gui_malloc(sizeof(gui_view_on_event_t));
+        gui_view_on_event_t *on_event = this->on_event[this->on_event_num - 1]; //prevent memory leak
+        if (on_event->event != GUI_EVENT_VIEW_SWITCH_DIRECT)
+        {
+            on_event = gui_malloc(sizeof(gui_view_on_event_t));
+            this->on_event = gui_realloc(this->on_event,
+                                         sizeof(gui_view_on_event_t *) * (this->on_event_num + 1));
+            this->on_event[this->on_event_num] = on_event;
+            this->on_event_num++;
+            GUI_ASSERT(this->on_event_num < EVENT_NUM_MAX);
+        }
         on_event->descriptor = descriptor;
         on_event->switch_out_style = switch_out_style;
         on_event->switch_in_style = switch_in_style;
         on_event->event = GUI_EVENT_VIEW_SWITCH_DIRECT;
-        this->on_event[this->on_event_num] = on_event;
-        this->on_event_num++;
-        GUI_ASSERT(this->on_event_num < EVENT_NUM_MAX);
 
         gui_msg_t msg =
         {
@@ -440,14 +743,20 @@ void gui_view_switch_direct(gui_view_t *this, const gui_view_descriptor_t *descr
     }
 }
 
-void gui_view_free(void *msg)
-{
-    gui_obj_t *obj = (gui_obj_t *)((gui_msg_t *)msg)->payload;
-    // gui_log("%s free!\n", obj->name);
-    gui_obj_tree_free(obj);
-}
-
 gui_view_t *gui_view_get_current_view(void)
 {
     return current_view;
+}
+
+void gui_view_free(void *msg)
+{
+    gui_obj_t *obj = (gui_obj_t *)((gui_msg_t *)msg)->payload;
+    gui_view_t *this = (gui_view_t *)obj;
+
+    gui_log("%s free!\n", obj->name);
+    gui_obj_tree_free(obj);
+    if (this->descriptor->cleanup_cb)
+    {
+        this->descriptor->cleanup_cb();
+    }
 }

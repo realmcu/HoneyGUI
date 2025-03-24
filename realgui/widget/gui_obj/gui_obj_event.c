@@ -160,14 +160,14 @@ bool gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
         }
         break;
     case GUI_EVENT_KB_SHORT_CLICKED:
-        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (kb->type == KB_SHORT))
+        if (kb->type == KB_SHORT)
         {
             gui_obj_store_event(obj, event);
             ret = true;
         }
         break;
     case GUI_EVENT_KB_LONG_CLICKED:
-        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (kb->type == KB_LONG))
+        if (kb->type == KB_LONG)
         {
             gui_obj_store_event(obj, event);
             ret = true;

@@ -18,17 +18,20 @@
 
 
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *yellow_view_descriptor = NULL;
-const static gui_view_descriptor_t *white_view_descriptor = NULL;
+static gui_view_descriptor_t *yellow_view_descriptor = NULL;
+static gui_view_descriptor_t *white_view_descriptor = NULL;
 static void app_ui_view_blue_design(gui_view_t *view);
+static void clean_cb(void);
 
-
-static gui_view_descriptor_t const descriptor =
+static gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .design_cb = app_ui_view_blue_design,
+    .cleanup_cb = clean_cb,
+    .created = false,
+    .keep_live = false,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -53,7 +56,23 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 /* view demo end*/
 
+static void img_cb(void *obj, gui_event_t e, void *param)
+{
 
+    if (e == GUI_EVENT_TOUCH_PRESSING)
+    {
+        gui_log("pressing blue tiger\n");
+    }
+    else
+    {
+        gui_log("move blue tiger\n");
+    }
+}
+
+static void clean_cb(void)
+{
+    gui_log("blue view clean\n");
+}
 
 static void app_ui_view_blue_design(gui_view_t *view)
 {
@@ -61,11 +80,13 @@ static void app_ui_view_blue_design(gui_view_t *view)
                                              0);
     gui_img_scale(img, 1.875f, 2.034f);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
+    // gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
+    // gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
 
     gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_CUBE, VIEW_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, white_view_descriptor, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, white_view_descriptor, VIEW_STILL, VIEW_TRANSPLATION,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
     gui_view_switch_on_event(view, white_view_descriptor, VIEW_CUBE, VIEW_CUBE,

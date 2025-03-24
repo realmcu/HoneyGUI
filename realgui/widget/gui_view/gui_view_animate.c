@@ -308,6 +308,7 @@ void view_transition_animation_function(void *p, void *this_widget,
                                         struct gui_animate *animate)
 {
     gui_view_t *this = this_widget;
+    gui_obj_t *obj = GUI_BASE(this);
     this->event = 1;
 
     float pro = animate->progress_percent;
@@ -316,24 +317,33 @@ void view_transition_animation_function(void *p, void *this_widget,
     {
         if (this->view_switch_ready)
         {
-            extern void gui_view_free(void *msg);
-            gui_msg_t msg =
+            if (!this->descriptor->keep_live)
             {
-                .event = GUI_EVENT_USER_DEFINE,
-                .cb = gui_view_free,
-                .payload = this,
-            };
-            gui_send_msg_to_server(&msg);
+                extern void gui_view_free(void *msg);
+                gui_msg_t msg =
+                {
+                    .event = GUI_EVENT_USER_DEFINE,
+                    .cb = gui_view_free,
+                    .payload = this,
+                };
+                gui_send_msg_to_server(&msg);
+                this->descriptor->created = false;
+            }
+            else
+            {
+                obj->not_show = true;
+                obj->has_prepare_cb = false;
+                obj->has_end_cb = false;
+            }
         }
         else
         {
-            GUI_BASE(this)->opacity_value = UINT8_MAX;
-            GUI_BASE(this)->x = 0;
-            GUI_BASE(this)->y = 0;
+            obj->opacity_value = UINT8_MAX;
+            obj->x = 0;
+            obj->y = 0;
             this->view_switch_ready = true;
             this->event = 0;
             this->view_tp = 1;
-            this->style = VIEW_STILL;
         }
     }
 }

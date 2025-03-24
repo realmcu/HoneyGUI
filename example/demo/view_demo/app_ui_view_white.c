@@ -21,16 +21,18 @@
 
 
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *blue_view = NULL;
-const static gui_view_descriptor_t *yellow_view = NULL;
+static gui_view_descriptor_t *blue_view = NULL;
+static gui_view_descriptor_t *yellow_view = NULL;
 static void app_ui_view_white_design(gui_view_t *view);
 
-static gui_view_descriptor_t const descriptor =
+static gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .design_cb = app_ui_view_white_design,
+    .created = false,
+    .keep_live = true,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -52,7 +54,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-void img_cb()
+static void img_cb()
 {
     gui_view_switch_direct(current_view, yellow_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2);
 }
@@ -78,8 +80,8 @@ static void app_ui_view_white_design(gui_view_t *view)
 
     gui_view_switch_on_event(view, blue_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2,
                              GUI_EVENT_KB_SHORT_CLICKED);
-    // gui_view_switch_on_event(view, yellow_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2,
-    //                          GUI_EVENT_TOUCH_CLICKED);
+    gui_view_switch_on_event(view, blue_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2,
+                             GUI_EVENT_TOUCH_CLICKED);
 }
 /* view white end*/
 
