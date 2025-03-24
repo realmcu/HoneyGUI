@@ -46,6 +46,10 @@
 // #define CONFIG_REALTEK_BUILD_REAL_DOG_3D
 // </c>
 
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_DISC_3D
+// </c>
+
 // <c> RTK GUI View Demo
 #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>

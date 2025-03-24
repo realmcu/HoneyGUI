@@ -14,9 +14,11 @@ extern "C" {
 typedef struct
 {
     uint32_t            state;
+    int32_t             order;
     gui_3d_vertex_t     vertex[4];
     gui_3d_vertex_t     transform_vertex[4];
     gui_3d_vertex_t     transform_world_vertex[4];
+    gui_point_4d_t      center;
 } gui_3d_rect_face_t;
 
 typedef struct

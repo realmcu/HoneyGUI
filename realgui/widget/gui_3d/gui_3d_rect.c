@@ -163,6 +163,85 @@ static void gui_3d_light_apply(gui_3d_rect_t *this, size_t i /*face_offset*/,
 
 }
 
+
+static void compare_face_order(gui_3d_rect_face_t *face, unsigned int num_faces)
+{
+    int32_t *back_faces = (int32_t *)gui_malloc(num_faces * sizeof(int32_t));
+    int32_t *front_faces = (int32_t *)gui_malloc(num_faces * sizeof(int32_t));
+    uint32_t back_count = 0;
+    uint32_t front_count = 0;
+
+    for (uint32_t i = 0; i < num_faces; i++)
+    {
+        if (face[i].state & GUI_3D_FACESTATE_BACKFACE)
+        {
+            // back face
+            back_faces[back_count++] = i;
+        }
+        else
+        {
+            // front face
+            front_faces[front_count++] = i;
+        }
+    }
+
+    // sort for back face
+    for (uint32_t i = 0; i < back_count; i++)
+    {
+        uint32_t min_index = i;
+        for (uint32_t j = i + 1; j < back_count; j++)
+        {
+            if (face[back_faces[j]].center.z < face[back_faces[min_index]].center.z)
+            {
+                min_index = j;
+            }
+        }
+
+        if (min_index != i)
+        {
+            int32_t temp = back_faces[i];
+            back_faces[i] = back_faces[min_index];
+            back_faces[min_index] = temp;
+        }
+    }
+
+    // sort for front face
+    for (uint32_t i = 0; i < front_count; i++)
+    {
+        uint32_t min_index = i;
+        for (uint32_t j = i + 1; j < front_count; j++)
+        {
+            if (face[front_faces[j]].center.z < face[front_faces[min_index]].center.z)
+            {
+                min_index = j;
+            }
+        }
+
+        if (min_index != i)
+        {
+            int32_t temp = front_faces[i];
+            front_faces[i] = front_faces[min_index];
+            front_faces[min_index] = temp;
+        }
+    }
+
+    // back face order start from 0
+    for (uint32_t i = 0; i < back_count; i++)
+    {
+        face[back_faces[i]].order = i;
+    }
+
+    // front face order start from back_count
+    for (uint32_t i = 0; i < front_count; i++)
+    {
+        face[front_faces[i]].order = back_count + i;
+    }
+
+    gui_free(back_faces);
+    gui_free(front_faces);
+}
+
+
 static void gui_3d_rect_face_transfrom(gui_3d_rect_t *this, size_t s/*shape_offset*/,
                                        size_t i /*face_offset*/,
                                        gui_3d_world_t *world, gui_3d_camera_t *camera)
@@ -185,7 +264,10 @@ static void gui_3d_rect_face_transfrom(gui_3d_rect_t *this, size_t s/*shape_offs
 
         dst[j].x = this->face[i].transform_vertex[j].position.x;
         dst[j].y = this->face[i].transform_vertex[j].position.y;
+
+        this->face[i].center.z += this->face[i].transform_vertex[j].position.z;
     }
+    this->face[i].center.z /= this->desc->attrib.face_num_verts[i];
 
     gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
     memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
@@ -281,6 +363,7 @@ static void gui_3d_rect_prepare(gui_3d_rect_t *this)
 
         }
     }
+    compare_face_order(this->face, this->desc->attrib.num_face_num_verts);
 
     if (tp->type == TOUCH_SHORT)
     {
@@ -326,42 +409,26 @@ static void gui_3d_rect_draw(gui_3d_rect_t *this)
 
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        if (!(this->face[i].state & GUI_3D_FACESTATE_BACKFACE)) // Non-backfaces
+        for (uint32_t j = 0; j < this->desc->attrib.num_face_num_verts; j++)
         {
-            continue;
+            if (this->face[j].order == i)
+            {
+                if (this->mask_img->data != NULL)
+                {
+                    draw_img_cache(this->mask_img + j, IMG_SRC_MEMADDR);
+                    gui_acc_blit_to_dc(this->mask_img + j, dc, NULL);
+                    draw_img_free(this->mask_img + j, IMG_SRC_MEMADDR);
+                }
+                else
+                {
+                    draw_img_cache(this->img + j, IMG_SRC_MEMADDR);
+                    gui_acc_blit_to_dc(this->img + j, dc, NULL);
+                    draw_img_free(this->img + j, IMG_SRC_MEMADDR);
+                }
+                break;
+            }
         }
-        if (this->mask_img->data != NULL)
-        {
-            draw_img_cache(this->mask_img + i, IMG_SRC_MEMADDR);
-            gui_acc_blit_to_dc(this->mask_img + i, dc, NULL);
-            draw_img_free(this->mask_img + i, IMG_SRC_MEMADDR);
-        }
-        else
-        {
-            draw_img_cache(this->img + i, IMG_SRC_MEMADDR);
-            gui_acc_blit_to_dc(this->img + i, dc, NULL);
-            draw_img_free(this->img + i, IMG_SRC_MEMADDR);
-        }
-    }
 
-    for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
-    {
-        if (this->face[i].state & GUI_3D_FACESTATE_BACKFACE)  // backfaces
-        {
-            continue;
-        }
-        if (this->mask_img->data != NULL)
-        {
-            draw_img_cache(this->mask_img + i, IMG_SRC_MEMADDR);
-            gui_acc_blit_to_dc(this->mask_img + i, dc, NULL);
-            draw_img_free(this->mask_img + i, IMG_SRC_MEMADDR);
-        }
-        else
-        {
-            draw_img_cache(this->img + i, IMG_SRC_MEMADDR);
-            gui_acc_blit_to_dc(this->img + i, dc, NULL);
-            draw_img_free(this->img + i, IMG_SRC_MEMADDR);
-        }
     }
 
 }
