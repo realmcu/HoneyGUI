@@ -8,7 +8,7 @@
  *********************/
 
 #include "../../../core/lv_refr.h"
-#include "../lv_draw_image_private.h"
+#include "../../lv_draw_image_private.h"
 #if LV_USE_DRAW_PPE_RTL8773E
 #include "lv_ppe_rtl8773e_utils.h"
 #include "section.h"

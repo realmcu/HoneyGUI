@@ -16,8 +16,8 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_PPE_RTL8773E
-#include "../../sw/lv_draw_sw.h"
-#include "../../../misc/lv_log.h"
+#include "../../../sw/lv_draw_sw.h"
+#include "../../../../misc/lv_log.h"
 #include "rtl_ppe.h"
 #include "rtl876x_rcc.h"
 

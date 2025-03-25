@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw_private.h"
+#include "../../lv_draw_private.h"
 #if LV_USE_DRAW_PPE_RTL872xG
 #include "../../misc/lv_area_private.h"
 #include "blend/lv_draw_sw_blend_private.h"
