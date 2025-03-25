@@ -73,6 +73,15 @@ extern "C" {
 gui_obj_t *gui_obj_get_root(void);
 
 /**
+ * @brief Get the fake_root GUI object, which would not be drawn.
+ *
+ * This function returns a pointer to the fake_root GUI object in the widget tree.
+ *
+ * @return A pointer to the fake_root GUI object.
+ */
+gui_obj_t *gui_obj_get_fake_root(void);
+
+/**
   * @param this_widget pointer to the GUI image object.
   * @param parent the father widget it nested in.
   * @param filename the obj widget name.

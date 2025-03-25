@@ -18,20 +18,21 @@
 
 
 static gui_view_t *current_view = NULL;
-static gui_view_descriptor_t *yellow_view_descriptor = NULL;
-static gui_view_descriptor_t *white_view_descriptor = NULL;
+static const gui_view_descriptor_t *yellow_view_descriptor = NULL;
+static const gui_view_descriptor_t *white_view_descriptor = NULL;
 static void app_ui_view_blue_design(gui_view_t *view);
-static void clean_cb(void);
+static void clean_cb(gui_view_t *view);
 
-static gui_view_descriptor_t descriptor =
+static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .design_cb = app_ui_view_blue_design,
-    .cleanup_cb = clean_cb,
-    .created = false,
-    .keep_live = false,
+
+    .on_switch_in = app_ui_view_blue_design,
+    .on_switch_out = clean_cb,
+
+    .keep = false,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -69,7 +70,7 @@ static void img_cb(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void clean_cb(void)
+static void clean_cb(gui_view_t *view)
 {
     gui_log("blue view clean\n");
 }
@@ -104,7 +105,7 @@ static void app_ui_view_blue_design(gui_view_t *view)
 static int app_init(void)
 {
     // gui_win_t *win_view = gui_win_create(gui_obj_get_root(), "win_view", 0, 0, 0, 0);
-    current_view = gui_view_create(gui_obj_get_root(), &descriptor, 0, 0, 0, 0);
+    gui_view_create(gui_obj_get_root(), &descriptor, 0, 0, 0, 0);
     // gui_fps_create(app->window);
     return 0;
 }

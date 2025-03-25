@@ -203,7 +203,7 @@ static void gui_view_end(gui_obj_t *obj)
         this->view_tp = 1;
         if (this->cur_id.x != 0 || this->cur_id.y != 0)
         {
-            if (!this->descriptor->keep_live)
+            if (!this->descriptor->keep)
             {
                 gui_msg_t msg =
                 {
@@ -212,7 +212,7 @@ static void gui_view_end(gui_obj_t *obj)
                     .payload = this,
                 };
                 gui_send_msg_to_server(&msg);
-                this->descriptor->created = false;
+                // this->descriptor->created = false;
             }
             else
             {
@@ -232,7 +232,7 @@ static void gui_view_end(gui_obj_t *obj)
         this->moveback = 0;
         if (!this->view_switch_ready)
         {
-            if (!this->descriptor->keep_live)
+            if (!this->descriptor->keep)
             {
                 gui_msg_t msg =
                 {
@@ -241,7 +241,6 @@ static void gui_view_end(gui_obj_t *obj)
                     .payload = this,
                 };
                 gui_send_msg_to_server(&msg);
-                this->descriptor->created = false;
             }
             else
             {
@@ -295,8 +294,8 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new)
 {
-    gui_list_t *list1 = &GUI_BASE(old)->brother_list;
-    gui_list_t *list2 = &GUI_BASE(new)->brother_list;
+    gui_list_t *list1 = &old->brother_list;
+    gui_list_t *list2 = &new->brother_list;
 
     // Get adjacent pointers
     gui_list_t *list1_next = list1->next;
@@ -446,7 +445,7 @@ static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
         {
             if (this->release_x < 0 && (this->view_left || !this->view_switch_ready))
             {
-                gui_log("[VIEW]TOUCH_LEFT_SLIDE\n");
+                // gui_log("[VIEW]TOUCH_LEFT_SLIDE\n");
                 this->event = 1;
                 this->cur_id.x -= 1;
                 this->release_x = this->release_x + this->base.w;
@@ -458,7 +457,7 @@ static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
         {
             if (this->release_x > 0 && (this->view_right || !this->view_switch_ready))
             {
-                gui_log("[VIEW]TOUCH_RIGHT_SLIDE\n");
+                // gui_log("[VIEW]TOUCH_RIGHT_SLIDE\n");
                 this->event = 1;
                 this->cur_id.x += 1;
                 this->release_x = this->release_x - this->base.w;
@@ -470,7 +469,7 @@ static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
         {
             if (this->release_y > 0 && (this->view_down || !this->view_switch_ready))
             {
-                gui_log("[VIEW]TOUCH_DOWN_SLIDE\n");
+                // gui_log("[VIEW]TOUCH_DOWN_SLIDE\n");
                 this->event = 1;
                 this->cur_id.y += 1;
                 this->release_y = this->release_y - this->base.h;
@@ -482,7 +481,7 @@ static void gui_view_released_cb(void *obj, gui_event_t e, void *param)
         {
             if (this->release_y < 0 && (this->view_up || !this->view_switch_ready))
             {
-                gui_log("[VIEW]TOUCH_UP_SLIDE\n");
+                // gui_log("[VIEW]TOUCH_UP_SLIDE\n");
                 this->event = 1;
                 this->cur_id.y -= 1;
                 this->release_y = this->release_y + this->base.h;
@@ -556,25 +555,28 @@ static void gui_view_switch_via_msg(void *msg)
  *                           Public Functions
  *============================================================================*/
 gui_view_t *gui_view_create(void       *parent,
-                            gui_view_descriptor_t *descriptor,
+                            const gui_view_descriptor_t *descriptor,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h)
 {
-    if (descriptor->created)
+    if (descriptor->keep && *descriptor->pView)
     {
         gui_view_t *this = *descriptor->pView;
         this->view_switch_ready = false;
 
         gui_obj_t *obj = (gui_obj_t *)this;
+        obj->parent = parent;
         obj->not_show = false;
         obj->has_prepare_cb = true;
         obj->has_end_cb = true;
         obj->x = 0;
         obj->y = 0;
         obj->opacity_value = UINT8_MAX;
+        gui_list_remove(&obj->brother_list);
         gui_log("%s show\n", obj->name);
+
         return this;
     }
     gui_view_t *this = gui_malloc(sizeof(gui_view_t));
@@ -617,8 +619,7 @@ gui_view_t *gui_view_create(void       *parent,
     this->view_tp = 1;
 
     *descriptor->pView = this;
-    descriptor->design_cb(this);
-    descriptor->created = true;
+    descriptor->on_switch_in(this);
 
     gui_obj_add_event_cb(this, gui_view_pressing_cb, GUI_EVENT_TOUCH_PRESSING, NULL);
     gui_obj_add_event_cb(this, gui_view_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
@@ -627,7 +628,7 @@ gui_view_t *gui_view_create(void       *parent,
 }
 
 void gui_view_switch_on_event(gui_view_t *this,
-                              gui_view_descriptor_t *descriptor,
+                              const gui_view_descriptor_t *descriptor,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
                               gui_event_t event)
@@ -710,7 +711,7 @@ void gui_view_switch_on_event(gui_view_t *this,
 
 }
 
-void gui_view_switch_direct(gui_view_t *this, gui_view_descriptor_t *descriptor,
+void gui_view_switch_direct(gui_view_t *this, const gui_view_descriptor_t *descriptor,
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style)
 {
@@ -755,8 +756,8 @@ void gui_view_free(void *msg)
 
     gui_log("%s free!\n", obj->name);
     gui_obj_tree_free(obj);
-    if (this->descriptor->cleanup_cb)
+    if (this->descriptor->on_switch_out)
     {
-        this->descriptor->cleanup_cb();
+        this->descriptor->on_switch_out(this);
     }
 }

@@ -317,7 +317,7 @@ void view_transition_animation_function(void *p, void *this_widget,
     {
         if (this->view_switch_ready)
         {
-            if (!this->descriptor->keep_live)
+            if (!this->descriptor->keep)
             {
                 extern void gui_view_free(void *msg);
                 gui_msg_t msg =
@@ -327,7 +327,6 @@ void view_transition_animation_function(void *p, void *this_widget,
                     .payload = this,
                 };
                 gui_send_msg_to_server(&msg);
-                this->descriptor->created = false;
             }
             else
             {

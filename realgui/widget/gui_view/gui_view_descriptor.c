@@ -23,6 +23,7 @@
 #include "gui_obj.h"
 #include "tp_algo.h"
 #include "gui_view.h"
+#include "gui_components_init.h"
 
 
 /*============================================================================*
@@ -43,7 +44,7 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_descriptor_t *descriptor_list[100];
+static const gui_view_descriptor_t *descriptor_list[100];
 static uint32_t descriptor_count = 0;
 /*============================================================================*
  *                           Private Functions
@@ -54,13 +55,13 @@ static uint32_t descriptor_count = 0;
  *                           Public Functions
  *============================================================================*/
 
-void gui_view_descriptor_register(gui_view_descriptor_t *descriptor)
+void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor)
 {
     descriptor_list[descriptor_count] = descriptor;
     descriptor_count++;
 }
 
-gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
+const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
 {
     for (int i = 0; i < descriptor_count; i++)
     {
@@ -71,3 +72,17 @@ gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
     }
     return NULL;
 }
+
+static int gui_view_create_during_init(void)
+{
+    for (int i = 0; i < descriptor_count; i++)
+    {
+        if (descriptor_list[i]->keep == 1)
+        {
+            gui_view_create((void *)gui_obj_get_fake_root(), descriptor_list[i], 0, 0, 0, 0);
+        }
+    }
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_CREATE(gui_view_create_during_init);

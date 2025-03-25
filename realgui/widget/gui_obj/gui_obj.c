@@ -55,6 +55,20 @@ static gui_obj_t root =
     .matrix = NULL,
 };
 
+static gui_obj_t fake_root =
+{
+    .name = "fake_root",
+    .parent = NULL,
+    .x = 0,
+    .y = 0,
+    .opacity_value = UINT8_MAX,
+    .magic = GUI_MAGIC_NUMBER,
+    .child_list = {&(fake_root.child_list), &(fake_root.child_list)},
+    .brother_list = {&(fake_root.brother_list), &(fake_root.brother_list)},
+    .create_done = true,
+    .matrix = NULL,
+};
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -153,6 +167,11 @@ static bool is_string(const char *str, size_t max_len)
 gui_obj_t *gui_obj_get_root(void)
 {
     return &root;
+}
+
+gui_obj_t *gui_obj_get_fake_root(void)
+{
+    return &fake_root;
 }
 
 void gui_obj_ctor(gui_obj_t  *this,

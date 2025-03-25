@@ -78,7 +78,7 @@ typedef struct gui_view
     gui_animate_t *animate;
     gui_view_id_t cur_id;
     VIEW_SWITCH_STYLE style;
-    struct gui_view_descriptor *descriptor;
+    const struct gui_view_descriptor *descriptor;
 
     uint32_t view_switch_ready       : 1; // 1: target view switch done
     uint32_t event                   : 1; // 1: stop setting event
@@ -104,16 +104,18 @@ typedef struct gui_view_descriptor
 {
     const char *name;
     gui_view_t **pView;
-    void (* design_cb)(gui_view_t *view);
-    void (* cleanup_cb)(void);
-    bool created;
-    bool keep_live;
-} gui_view_descriptor_t;
+
+    void (* on_switch_in)(gui_view_t *view);  // callback function when view is switched in and created
+    void (* on_switch_out)(gui_view_t
+                           *view); // callback function when view is switched out and destroyed
+
+    uint8_t keep       : 1;
+} gui_view_descriptor_t; // if keep is true, the view will not be destroyed when switch to other view and will be created when register view
 /* gui_view_descriptor end*/
 
 typedef struct gui_view_on_event
 {
-    gui_view_descriptor_t *descriptor;
+    const gui_view_descriptor_t *descriptor;
     VIEW_SWITCH_STYLE switch_out_style;
     VIEW_SWITCH_STYLE switch_in_style;
     gui_event_t event;
@@ -150,7 +152,7 @@ typedef struct gui_view_on_event
  *
  */
 gui_view_t *gui_view_create(void       *parent,
-                            gui_view_descriptor_t *descriptor,
+                            const gui_view_descriptor_t *descriptor,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,
@@ -161,13 +163,13 @@ gui_view_t *gui_view_create(void       *parent,
  * @brief Register view's descriptor.
  * @param descriptor Pointer to a descriptor that defines the new view to switch to.
  */
-void gui_view_descriptor_register(gui_view_descriptor_t *descriptor);
+void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor);
 
 /**
  * @brief Get target view's descriptor by name.
  * @param name View descriptor's name that can used to find target view.
  */
-gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
+const gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
 
 
 /**
@@ -185,7 +187,7 @@ gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
  * @param event The event that triggers the view switch.
  */
 void gui_view_switch_on_event(gui_view_t *_this,
-                              gui_view_descriptor_t *descriptor,
+                              const gui_view_descriptor_t *descriptor,
                               VIEW_SWITCH_STYLE switch_out_style,
                               VIEW_SWITCH_STYLE switch_in_style,
                               gui_event_t event);
@@ -203,7 +205,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
  * @param switch_out_style Style applied to the outgoing view during the switch.
  * @param switch_in_style Style applied to the incoming view during the switch.
  */
-void gui_view_switch_direct(gui_view_t *_this, gui_view_descriptor_t *descriptor,
+void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *descriptor,
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style);
 

@@ -35,7 +35,7 @@ static int rti_end(void)
 {
     return 0;
 }
-GUI_APP_INIT_EXPORT(rti_end, "6.end");
+GUI_APP_INIT_EXPORT(rti_end, "7.end");
 
 
 void gui_components_init(void)
