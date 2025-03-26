@@ -29,7 +29,7 @@ DECLARE_HANDLER(test)
     uint8_t id = 5;     // device ID (count from 0)
     uint8_t state = val;  // device Status (0:off, 1:on, 2:offline, 3:online)
     uint32_t data = 0;
-    uint8_t *pdata = &data;
+    uint8_t *pdata = (uint8_t *)&data;
 
     pdata[0] = id;
     pdata[1] = state;

@@ -9,12 +9,12 @@ extern void gui_extern_event_key_handler(gui_msg_js_t *js_msg);
 
 void gui_send_msg_to_js(uint8_t event, uint8_t subevent, void *data)
 {
-    gui_msg_js_t msg = {.gui_event = GUI_EVENT_USER_DEFINE, .gui_cb = gui_extern_event_js_handler};
+    gui_msg_js_t msg = {.gui_event = GUI_EVENT_USER_DEFINE, .gui_cb = (gui_msg_cb)gui_extern_event_js_handler};
     msg.js_event = event;
     msg.js_subevent = subevent;
     msg.pdata = data;
 
-    gui_send_msg_to_server(&msg);
+    gui_send_msg_to_server((gui_msg_t *)&msg);
 }
 
 
