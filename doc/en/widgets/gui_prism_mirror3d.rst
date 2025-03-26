@@ -52,7 +52,7 @@ GUI Load Prism Mirror Model
 
 3. GUI Load Descriptor
 
-   Place the :file:`desc.txt` file containing obj parsed data, mtl parsed data, and image data into the project directory, and load it by calling ``gui_get_3d_desc()`` function.
+   Place the :file:`desc.txt` file containing obj parsed data, mtl parsed data, and image data into the project directory, and load it in :cpp:any:`gui_prism_mirror3d_create`.
 
 Prism Mirror Widget Usage
 ---------------------------

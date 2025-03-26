@@ -38,28 +38,20 @@ GUI Load 3D Model
 
 3. GUI load descriptor
 
-   Place the desc file into the project directory, and call the ``gui_get_3d_desc()`` function to load it into the ``gui_3d_description_t`` structure.
+   Place the desc file containing parsed obj data, mtl data, and image data into the project directory, and load it using :cpp:any:`gui_3d_create`.
 
    **Example:**
 
    .. code-block:: c
 
-      gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
+      void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-   The ``gui_3d_description_t`` structure is defined as follows:
-
-   .. literalinclude:: ../../../realgui/widget/gui_3d/def_3d_common.h
-      :language: c
-      :start-after: /* gui_3d_description_t start*/
-      :end-before: /* gui_3d_description_t end*/
-   
-   In this context, ``GUI_3D_FACE_TYPE`` represents the face type of a 3D object. Currently, it supports 3D models composed of ``GUI_3D_FACE_RECTANGLE`` (rectangle) or ``GUI_3D_FACE_TRIANGLE`` (triangle).
 
 3D Widget Usage
 ----------------
 Create Widget
 ~~~~~~~~~~~~~~
-Use :cpp:any:`gui_3d_create` to create the 3D model. The imported ``desc`` is the parsed data extracted by the script.
+Use :cpp:any:`gui_3d_create` to create the 3D model. The imported ``desc_addr`` file is the parsed data extracted by the script.
 
 Global Shape Transformation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,7 +61,7 @@ Additionally, rectangular faces support the setting of ``light`` information.
 
 Local Shape Transformation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Use :cpp:any:`gui_3d_set_local_shape_transform_cb` to apply a local transformation to the 3D model, where ``cb`` allows setting different shape transformations for each face of the object, and ``face`` specifies the face to be transformed. In this function, ``world`` and ``camera`` represent the world coordinate transformation of the 3D object and the camera view projection, respectively. 
+Use :cpp:any:`gui_3d_set_local_shape_transform_cb` to apply a local transformation to the 3D model, where ``cb`` allows setting different shape transformations for each face of the object, and ``face_index`` specifies the face to be transformed. In this function, ``world`` and ``camera`` represent the world coordinate transformation of the 3D object and the camera view projection, respectively. 
 Additionally, rectangular faces support the setting of ``light`` information.
 
 World Transformation
@@ -167,7 +159,7 @@ Purpose:
 
 Set Animation
 ~~~~~~~~~~~~~~
-The :cpp:any:`gui_3d_set_animate` function is used to set animation properties for a 3D object. The ``callback`` parameter is a callback function for animation updates, which will be called when each frame of the animation is updated.
+The :cpp:any:`gui_obj_create_timer` function can be used to set animation properties for a 3D object. The ``callback`` parameter is a callback function for animation updates.
 
 
 Example
@@ -177,7 +169,7 @@ Example
 
 The model is composed entirely of rectangular faces. By calling :cpp:any:`gui_3d_set_local_shape_transform_cb()`, you can set local transformations for different faces to create animation effects.
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d.c
+.. literalinclude:: ../../../example/demo/app_ui_realgui_3d.c
    :language: c
    :start-after: /* 3d butterfly demo start*/
    :end-before: /* 3d butterfly demo end*/
@@ -186,7 +178,7 @@ The model is composed entirely of rectangular faces. By calling :cpp:any:`gui_3d
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1734070660330786955/61e4ff9d_13408154.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/butterfly.gif" width= "400" /></div>
    <br>
 
 
@@ -227,17 +219,16 @@ The model is composed entirely of rectangular faces. By calling ``gui_3d_light_i
       *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
 
    }
-   static void app_ui_design(gui_app_t *app)
+   static int app_init(void)
    {
+      void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-      gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+      gui_3d_set_global_shape_transform_cb(test_3d, (gui_3d_shape_transform_cb)cube_cb);
 
-      gui_3d_set_shape_transform_cb(test_3d, 0, cube_cb);
+      gui_obj_create_timer(&(((gui_3d_base_t *)test_3d)->base), 17, true, update_cube_animation);
+      gui_obj_start_timer(&(((gui_3d_base_t *)test_3d)->base));
 
-      gui_3d_set_animate(test_3d, 10000, -1, update_cube_animation, NULL);
-
-      return;
-
+      return 0;
    }
 
 .. raw:: html
@@ -252,7 +243,7 @@ The model is composed entirely of rectangular faces. By calling ``gui_3d_light_i
 
 The model is composed of 1,454 triangular faces.
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d_face.c
+.. literalinclude:: ../../../example/demo/app_ui_realgui_3d_face.c
    :language: c
    :start-after: /* 3d face demo start*/
    :end-before: /* 3d face demo end*/

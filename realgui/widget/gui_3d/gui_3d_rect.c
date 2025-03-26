@@ -557,8 +557,8 @@ void gui_3d_rect_set_global_shape_transform_cb(gui_3d_rect_t *this,
     this->global_shape_transform_cb = cb;
 }
 
-void gui_3d_rect_set_local_shape_transform_cb(gui_3d_rect_t *this, size_t face/*face_offset*/,
-                                              void (*cb)(gui_3d_rect_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
+void gui_3d_rect_set_local_shape_transform_cb(gui_3d_rect_t *this, size_t face_index,
+                                              void (*cb)(gui_3d_rect_t *this, size_t face_index, gui_3d_world_t *world, gui_3d_camera_t *camera,
                                                          gui_3d_light_t *light))
 {
     this->local_shape_transform_cb = cb;

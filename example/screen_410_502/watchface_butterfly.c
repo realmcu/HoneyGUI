@@ -156,7 +156,7 @@ static void update_animation()
     butterfly_rz = theta * (180.0f / M_PI);
 }
 
-static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
+static void cb(void *this, size_t face_index, gui_3d_world_t *world,
                gui_3d_camera_t *camera, gui_3d_light_t *light)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -169,22 +169,22 @@ static void cb(void *this, size_t face/*face offset*/, gui_3d_world_t *world,
     gui_3d_world_inititalize(&object_matrix, butterfly_x, butterfly_y, butterfly_z, 0, 0,
                              butterfly_rz + 90,
                              5);
-    if (face == 0)
+    if (face_index == 0)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
-    else if (face == 1)
+    else if (face_index == 1)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  -wing_angle, 1);
     }
-    else if (face == 2)
+    else if (face_index == 2)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
-    else if (face == 3)
+    else if (face_index == 3)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  -wing_angle, 1);

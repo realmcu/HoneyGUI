@@ -65,7 +65,7 @@ void update_disc_animation()
 }
 
 
-static void disc_cb(void *this, size_t face, gui_3d_world_t *world,
+static void disc_cb(void *this, size_t face_index, gui_3d_world_t *world,
                     gui_3d_camera_t *camera)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -81,7 +81,7 @@ static void disc_cb(void *this, size_t face, gui_3d_world_t *world,
     gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
                              rot_z_angle, 1);
 
-    uint8_t cube_index = face / 6;
+    uint8_t cube_index = face_index / 6;
     if (cube_index < CUBE_COUNT)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, -shift_z[cube_index], gui_3d_point(0, 0, 0),

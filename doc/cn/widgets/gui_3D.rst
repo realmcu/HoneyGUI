@@ -38,28 +38,20 @@ GUI加载3D模型
 
 3. GUI加载描述子
 
-   将该desc文件放入工程目录下，并调用 ``gui_get_3d_desc()`` 函数加载到 ``gui_3d_description_t`` 结构体中。
+   将包含obj解析数据、mtl解析数据和图片数据的desc文件放入工程目录下，并在 :cpp:any:`gui_3d_create` 中加载。
 
    **示例:**
 
    .. code-block:: c
 
-      gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
+      void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-   ``gui_3d_description_t`` 结构体定义如下：
-
-   .. literalinclude:: ../../../realgui/widget/gui_3d/def_3d_common.h
-      :language: c
-      :start-after: /* gui_3d_description_t start*/
-      :end-before: /* gui_3d_description_t end*/
-   
-   其中 ``GUI_3D_FACE_TYPE`` 表示3D对象的面类型，现支持 ``GUI_3D_FACE_RECTANGLE`` （矩形）或 ``GUI_3D_FACE_TRIANGLE`` （三角形）组成的3D模型。
 
 3D控件用法
 -------------
 创建控件
 ~~~~~~~~
-使用 :cpp:any:`gui_3d_create` 创建3D模型，传入的 ``desc`` 即为脚本中提取的解析数据。
+使用 :cpp:any:`gui_3d_create` 创建3D模型，导入的 ``desc_addr`` 文件即为脚本中提取的解析数据。
 
 全局形状变换
 ~~~~~~~~~~~~
@@ -67,7 +59,7 @@ GUI加载3D模型
 
 局部形状变换
 ~~~~~~~~~~~~
-使用 :cpp:any:`gui_3d_set_local_shape_transform_cb` 对3D模型进行局部变换，其中 ``cb`` 可以为物体的每个面设置不同的形状变换， ``face`` 为指定变换的面。该函数中的 ``world`` 和 ``camera`` 代表了3D对象的世界坐标变换和相机视角投影，矩形面还支持设置 ``light`` 光照信息。
+使用 :cpp:any:`gui_3d_set_local_shape_transform_cb` 对3D模型进行局部变换，其中 ``cb`` 可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。该函数中的 ``world`` 和 ``camera`` 代表了3D对象的世界坐标变换和相机视角投影，矩形面还支持设置 ``light`` 光照信息。
 
 世界变换
 ^^^^^^^^
@@ -164,7 +156,7 @@ GUI加载3D模型
 
 设置动画
 ~~~~~~~~~~
-:cpp:any:`gui_3d_set_animate` 函数用于为3D对象设置动画属性，其中 ``callback`` 为动画更新的回调函数，当动画每一帧更新时将调用这个函数。
+:cpp:any:`gui_obj_create_timer` 函数可以为3D对象设置动画属性，其中 ``callback`` 为动画更新的回调函数。
 
 
 示例
@@ -174,7 +166,7 @@ GUI加载3D模型
 
 该模型全部由矩形面组成，调用 :cpp:any:`gui_3d_set_local_shape_transform_cb()` 为不同面设置局部变换可以制作动画效果。
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d.c
+.. literalinclude:: ../../../example/demo/app_ui_realgui_3d.c
    :language: c
    :start-after: /* 3d butterfly demo start*/
    :end-before: /* 3d butterfly demo end*/
@@ -182,7 +174,7 @@ GUI加载3D模型
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1734070660330786955/61e4ff9d_13408154.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/butterfly.gif" width= "400" /></div>
    <br>
 
 
@@ -202,7 +194,7 @@ GUI加载3D模型
       rot_angle++;
    }
 
-   static void cube_cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
+   static void cube_cb(gui_3d_t *this, gui_3d_world_t *world,
                   gui_3d_camera_t *camera, gui_3d_light_t *light)
    {
       gui_dispdev_t *dc = gui_get_dc();
@@ -223,17 +215,16 @@ GUI加载3D模型
       *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
 
    }
-   static void app_ui_design(gui_app_t *app)
+   static int app_init(void)
    {
+      void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-      gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+      gui_3d_set_global_shape_transform_cb(test_3d, (gui_3d_shape_transform_cb)cube_cb);
 
-      gui_3d_set_shape_transform_cb(test_3d, 0, cube_cb);
+      gui_obj_create_timer(&(((gui_3d_base_t *)test_3d)->base), 17, true, update_cube_animation);
+      gui_obj_start_timer(&(((gui_3d_base_t *)test_3d)->base));
 
-      gui_3d_set_animate(test_3d, 10000, -1, update_cube_animation, NULL);
-
-      return;
-
+      return 0;
    }
 
 .. raw:: html
@@ -247,7 +238,7 @@ GUI加载3D模型
 
 该模型由1454个三角形面组成。
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d_face.c
+.. literalinclude:: ../../../example/demo/app_ui_realgui_3d_face.c
    :language: c
    :start-after: /* 3d face demo start*/
    :end-before: /* 3d face demo end*/

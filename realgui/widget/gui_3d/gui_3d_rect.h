@@ -49,7 +49,7 @@ typedef struct gui_3d_rect
 
     void (*global_shape_transform_cb)(struct gui_3d_rect *this, gui_3d_world_t *world,
                                       gui_3d_camera_t *camera, gui_3d_light_t *light);
-    void (*local_shape_transform_cb)(struct gui_3d_rect *this, size_t s/*shape_offset*/,
+    void (*local_shape_transform_cb)(struct gui_3d_rect *this, size_t face_index,
                                      gui_3d_world_t *world,
                                      gui_3d_camera_t *camera, gui_3d_light_t *light);
 
@@ -107,12 +107,12 @@ void gui_3d_rect_set_global_shape_transform_cb(gui_3d_rect_t *this,
  * @brief set local shape transform callback
  *
  * @param this the 3d widget pointer
- * @param face face offset
+ * @param face_index face offset
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
  *           and light source for the specified face
  */
-void gui_3d_rect_set_local_shape_transform_cb(gui_3d_rect_t *this, size_t face,
-                                              void (*cb)(gui_3d_rect_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera,
+void gui_3d_rect_set_local_shape_transform_cb(gui_3d_rect_t *this, size_t face_index,
+                                              void (*cb)(gui_3d_rect_t *this, size_t face_index, gui_3d_world_t *world, gui_3d_camera_t *camera,
                                                          gui_3d_light_t *light));
 
 

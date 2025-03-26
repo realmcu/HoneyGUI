@@ -308,8 +308,8 @@ void gui_3d_tria_set_global_shape_transform_cb(gui_3d_tria_t *this,
     this->global_shape_transform_cb = cb;
 }
 
-void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face/*face_offset*/,
-                                              void (*cb)(gui_3d_tria_t *this, size_t face, gui_3d_world_t *world, gui_3d_camera_t *camera))
+void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face_index,
+                                              void (*cb)(gui_3d_tria_t *this, size_t face_index, gui_3d_world_t *world, gui_3d_camera_t *camera))
 {
     this->local_shape_transform_cb = cb;
 }
