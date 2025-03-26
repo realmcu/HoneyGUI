@@ -4,7 +4,7 @@
         {
             "type": "shell",
             "label": "g++.exe build active file",
-            "command": "scons",
+            "command": "scons -j 32",
             "options": {
                 "cwd": "${workspaceFolder}\\win32_sim"
             },

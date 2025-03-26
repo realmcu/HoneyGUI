@@ -27,7 +27,7 @@
  *============================================================================*/
 
 #ifndef _GUI_FS_ROOT_DIR
-#define _GUI_FS_ROOT_DIR "realgui\\example\\screen_480_480\\root\\"
+#define _GUI_FS_ROOT_DIR "realgui\\example\\screen_640_360\\box\\root\\"
 #endif
 
 /*============================================================================*
@@ -35,7 +35,7 @@
  *============================================================================*/
 
 static struct gui_fs *fs = NULL;
-char *defaultPath = _GUI_FS_ROOT_DIR;
+char *defaultPath = "realgui\\example\\screen_640_360\\box\\root\\";
 static char *buffer;
 
 /*============================================================================*

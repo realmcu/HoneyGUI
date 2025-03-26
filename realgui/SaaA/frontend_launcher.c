@@ -214,4 +214,21 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
     gui_app_append(app);
     gui_fb_change();
 }
-
+#if defined _WIN32
+#ifdef ENABLE_MONKEY_TEST
+#include "test_cmd.h"
+void return_home(void *msg)
+{
+    gui_app_t *app = gui_current_app();
+    tabview_main->cur_id.x = 0;
+    tabview_main->cur_id.y = 0;
+    gui_app_switch(app, get_app_launcher_frontend());
+    gui_log("return_home done \n");
+}
+void cmd_return_home(void)
+{
+    gui_server_exec_cb(return_home);
+}
+GUI_EXPORT_CMD(return_home, cmd_return_home);
+#endif
+#endif

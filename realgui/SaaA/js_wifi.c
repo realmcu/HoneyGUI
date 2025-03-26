@@ -439,7 +439,7 @@ static void gui_wifi_manage_on_handler(gui_msg_wifi_t *msg)
     if (js_wifi_data.on_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (double)(size_t)(msg->param);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.on_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -453,7 +453,7 @@ static void gui_wifi_manage_off_handler(gui_msg_wifi_t *msg)
     if (js_wifi_data.off_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (double)(size_t)(msg->param);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.off_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -490,7 +490,7 @@ static void gui_wifi_manage_scan_handler(gui_msg_wifi_t *msg)
         js_set_property(ap_info, "scrt", security_array);
 
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (double)(size_t)(msg->param);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.scan_cb),
                                                 jerry_create_undefined(), &ap_info, 1);
@@ -507,7 +507,7 @@ static void gui_wifi_manage_connect_handler(gui_msg_wifi_t *msg)
     if (js_wifi_data.connect_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (double)(size_t)(msg->param);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.connect_cb),
                                                 jerry_create_undefined(), &param, 1);
@@ -522,7 +522,7 @@ static void gui_wifi_manage_disconnect_handler(gui_msg_wifi_t *msg)
     if (js_wifi_data.disconnect_cb)
     {
         // call func with param
-        double a = (uint32_t)(msg->param);
+        double a = (double)(size_t)(msg->param);
         jerry_value_t param = jerry_create_number(a);
         jerry_value_t res = jerry_call_function((const jerry_value_t)(js_wifi_data.disconnect_cb),
                                                 jerry_create_undefined(), &param, 1);
