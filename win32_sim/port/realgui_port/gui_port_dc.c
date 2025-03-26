@@ -165,17 +165,7 @@ static void *sdl_flush(void *arg)
         SDL_DestroyTexture(texture);
     }
 }
-#ifdef REALTEK_BUILD_GUI_XML_DOM
-static void key_gui_msg_cb(void *p)
-{
 
-    extern gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
-    gui_msg_t *msg = p;
-
-    gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
-
-}
-#endif
 void *rtk_gui_sdl(void *arg)
 {
     int quit = 0;
@@ -205,14 +195,64 @@ void *rtk_gui_sdl(void *arg)
     if (DRV_PIXEL_BITS == 16)
     {
         SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_RGB565, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
     }
     else if (DRV_PIXEL_BITS == 32)
     {
         SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ARGB8888, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
+    }
+    else if (DRV_PIXEL_BITS == 4)
+    {
+        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_INDEX4LSB, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
+
+        // SDL_Color palette[16] = {
+        //     {0, 0, 0, 255},       // Black
+        //     {255, 0, 0, 255},     // Red
+        //     {0, 255, 0, 255},     // Green
+        //     {0, 0, 255, 255},     // Blue
+        //     {255, 255, 0, 255},   // Yellow
+        //     {255, 0, 255, 255},   // Magenta
+        //     {0, 255, 255, 255},   // Cyan
+        //     {255, 255, 255, 255}, // White
+        //     {128, 128, 128, 255}, // Gray
+        //     {128, 0, 0, 255},     // Dark Red
+        //     {0, 128, 0, 255},     // Dark Green
+        //     {0, 0, 128, 255},     // Dark Blue
+        //     {128, 128, 0, 255},   // Olive
+        //     {128, 0, 128, 255},   // Purple
+        //     {0, 128, 128, 255},   // Teal
+        //     {192, 192, 192, 255}  // Silver
+        // };
+        SDL_Color greenPalette[16] =
+        {
+            {0,   0,   0, 255},  // Level 0: Black (no green)
+            {0,  17,   0, 255},  // Level 1
+            {0,  34,   0, 255},  // Level 2
+            {0,  51,   0, 255},  // Level 3
+            {0,  68,   0, 255},  // Level 4
+            {0,  85,   0, 255},  // Level 5
+            {0, 102,   0, 255},  // Level 6
+            {0, 119,   0, 255},  // Level 7
+            {0, 136,   0, 255},  // Level 8
+            {0, 153,   0, 255},  // Level 9
+            {0, 170,   0, 255},  // Level 10
+            {0, 187,   0, 255},  // Level 11
+            {0, 204,   0, 255},  // Level 12
+            {0, 221,   0, 255},  // Level 13
+            {0, 238,   0, 255},  // Level 14
+            {0, 255,   0, 255}   // Level 15: Full Green
+        };
+
+        SDL_SetPaletteColors(surface->format->palette, greenPalette, 0, 16);
     }
 
-    surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
-                                   Amask);
+
     SDL_RenderPresent(renderer);
 
     pthread_cond_signal(&sdl_ok_event);
@@ -299,16 +339,6 @@ void *rtk_gui_sdl(void *arg)
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
                 strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
                 kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
-#ifdef REALTEK_BUILD_GUI_XML_DOM
-                gui_msg_t msg =
-                {
-                    .event = GUI_EVENT_USER_DEFINE,
-                    .payload = (void *)(size_t)event.key.keysym.sym,
-                    .cb = (gui_msg_cb)key_gui_msg_cb,
-                };
-                extern bool gui_send_msg_to_server(gui_msg_t *msg);
-                gui_send_msg_to_server(&msg);
-#endif
             }
             break;
         case SDL_QUIT:
@@ -326,24 +356,6 @@ void *rtk_gui_sdl(void *arg)
 
 void gui_port_dc_init(void)
 {
-#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    char *apppath = "app";
-    char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);
-    sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);
-
-    extern void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight);
-    extern int sim_screen_width;
-    extern int sim_screen_hight;
-    xml_get_screen(path, 0, &sim_screen_width, &sim_screen_hight);
-    _rect.w = sim_screen_width;
-    _rect.h = sim_screen_hight;
-    dc.fb_width = sim_screen_width;
-    dc.screen_width = sim_screen_width;
-    dc.screen_height = sim_screen_hight;
-#ifndef USE_DC_PFB
-    dc.fb_height = sim_screen_hight;
-#endif
-#endif
     pthread_mutex_init(&sdl_ok_mutex, NULL);
     pthread_cond_init(&sdl_ok_event, NULL);
 
