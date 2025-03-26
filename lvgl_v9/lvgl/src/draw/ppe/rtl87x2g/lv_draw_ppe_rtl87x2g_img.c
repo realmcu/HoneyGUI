@@ -254,7 +254,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
                 zoom.global_alpha_en = true;
                 zoom.global_alpha = draw_dsc->opa;
             }
-            PPE_blend_rect(&zoom, &target, &trans, &draw_rect, mode);
+            PPE_Blend_Rect(&zoom, &target, &trans, &draw_rect, mode);
             lv_free(zoom.memory);
         }
         else
@@ -348,7 +348,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
                                         .y1 = y - draw_unit->target_layer->buf_area.y1,
                                         .y2 = y + actual_inc - draw_unit->target_layer->buf_area.y1 - 1
                                        };
-                err = PPE_blend_rect(&zoom, &target, &trans, &draw_rect, mode);
+                err = PPE_Blend_Rect(&zoom, &target, &trans, &draw_rect, mode);
                 if (compressed)
                 {
                     lv_free(source.memory);
@@ -435,7 +435,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
                 }
                 lv_ppe_recolor(&source, &recolor, &recolor_rect, recolor_value);
                 draw_rect.y2 = draw_rect.y1 + recolor.height - 1;
-                PPE_blend_rect(&recolor, &target, &recolor_pos, &draw_rect, mode);
+                PPE_Blend_Rect(&recolor, &target, &recolor_pos, &draw_rect, mode);
                 recolor_pos.y += recolor.height;
                 draw_rect.y1 = draw_rect.y2 + 1;
                 if (compressed)
@@ -493,7 +493,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
                         hal_idu_decompress(&info, (uint8_t *)source.memory);
                     }
                     draw_rect.y2 = draw_rect.y1 + source.height - 1;
-                    PPE_blend_rect(&source, &target, &recolor_pos, &draw_rect, mode);
+                    PPE_Blend_Rect(&source, &target, &recolor_pos, &draw_rect, mode);
                     recolor_pos.y += source.height;
                     draw_rect.y1 = draw_rect.y2 + 1;
                     if (compressed)
@@ -504,7 +504,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
             }
             else
             {
-                PPE_blend_rect(&source, &target, &trans, &draw_rect, mode);
+                PPE_Blend_Rect(&source, &target, &trans, &draw_rect, mode);
             }
         }
     }
@@ -611,7 +611,7 @@ static void lv_draw_ppe_tile(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_
                 ppe_translate_t trans_pos = {.x = tile_area.x1 - draw_unit->target_layer->buf_area.x1,
                                              .y = tile_area.y1 - draw_unit->target_layer->buf_area.y1
                                             };
-                PPE_blend_rect(&source, &target, &trans_pos, &draw_rect, mode);
+                PPE_Blend_Rect(&source, &target, &trans_pos, &draw_rect, mode);
             }
 
             tile_area.x1 += img_w;
