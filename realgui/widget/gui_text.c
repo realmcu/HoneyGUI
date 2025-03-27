@@ -51,31 +51,6 @@
  *                           Private Functions
  *============================================================================*/
 
-static bool gui_text_matrix_is_identity(gui_matrix_t *matrix)
-{
-    if (matrix == NULL)
-    {
-        return false;
-    }
-    if (
-        matrix->m[0][0] == 1.0f && \
-        matrix->m[0][1] == 0.0f && \
-        // matrix->m[0][2] == 0.0f &&
-        matrix->m[1][0] == 0.0f && \
-        matrix->m[1][1] == 1.0f && \
-        // matrix->m[1][2] == 0.0f &&
-        matrix->m[2][0] == 0.0f && \
-        matrix->m[2][1] == 0.0f && \
-        matrix->m[2][2] == 1.0f
-    )
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
@@ -100,7 +75,7 @@ static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 
     case GUI_FONT_SRC_MAT:
         {
-            if (gui_text_matrix_is_identity(text->base.matrix))
+            if (matrix_only_translate(text->base.matrix))
             {
                 gui_font_mem_load(text, rect);
             }
@@ -153,7 +128,7 @@ static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     case GUI_FONT_SRC_MAT:
         {
-            if (gui_text_matrix_is_identity(text->base.matrix))
+            if (matrix_only_translate(text->base.matrix))
             {
                 gui_font_mem_draw(text, rect);
             }

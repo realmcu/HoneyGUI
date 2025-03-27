@@ -231,6 +231,33 @@ bool matrix_is_identity(struct gui_matrix *matrix)
         return false;
     }
 }
+
+bool matrix_only_translate(struct gui_matrix *matrix)
+{
+    if (matrix == NULL)
+    {
+        return false;
+    }
+
+    if (
+        matrix->m[0][0] == 1.0f && \
+        matrix->m[0][1] == 0.0f && \
+        // matrix->m[0][2] == 0.0f &&
+        matrix->m[1][0] == 0.0f && \
+        matrix->m[1][1] == 1.0f && \
+        // matrix->m[1][2] == 0.0f &&
+        matrix->m[2][0] == 0.0f && \
+        matrix->m[2][1] == 0.0f && \
+        matrix->m[2][2] == 1.0f
+    )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 void matrix_identity(struct gui_matrix *matrix)
 {
     if (matrix == NULL)

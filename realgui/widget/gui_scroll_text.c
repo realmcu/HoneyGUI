@@ -85,7 +85,14 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 
     case GUI_FONT_SRC_MAT:
         {
-            gui_font_mat_load(text, rect);
+            if (matrix_only_translate(text->base.matrix))
+            {
+                gui_font_mem_load(text, rect);
+            }
+            else
+            {
+                gui_font_mat_load(text, rect);
+            }
         }
         break;
 
@@ -118,7 +125,14 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     case GUI_FONT_SRC_MAT:
         {
-            gui_font_mat_draw(text, rect);
+            if (matrix_only_translate(text->base.matrix))
+            {
+                gui_font_mem_draw(text, rect);
+            }
+            else
+            {
+                gui_font_mat_draw(text, rect);
+            }
         }
         break;
 
@@ -353,26 +367,31 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
 
     gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
 
-    if (text->duration_time_ms == 0)
-    {
-        gui_scroll_text_font_draw(&text->base, &draw_rect);
-    }
-    else
-    {
-        if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
-        {
-            gui_scroll_text_font_draw(&text->base, &draw_rect);
-        }
-    }
-    if (dc->pfb_type == PFB_X_DIRECTION)
-    {
-        total_section_count = dc->screen_width / dc->fb_width -
-                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
-    }
-    else
+    if (dc->pfb_type == PFB_Y_DIRECTION)
     {
         total_section_count = dc->screen_height / dc->fb_height -
                               ((dc->screen_height % dc->fb_height) ? 0 : 1);
+        if (text->duration_time_ms == 0 || (cur_time_ms < (text->init_time_ms + text->duration_time_ms)))
+        {
+            if (!(draw_rect.y1 >= (int)(dc->section_count + 2)*dc->fb_height || \
+                  draw_rect.y2 < (int)(dc->section_count - 1)*dc->fb_height))
+            {
+                gui_scroll_text_font_draw(&text->base, &draw_rect);
+            }
+        }
+    }
+    else //if (dc->pfb_type == PFB_X_DIRECTION)
+    {
+        total_section_count = dc->screen_width / dc->fb_width -
+                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
+        if (text->duration_time_ms == 0 || (cur_time_ms < (text->init_time_ms + text->duration_time_ms)))
+        {
+            if (!(draw_rect.x1 >= (int)(dc->section_count + 2)*dc->fb_width || \
+                  draw_rect.x2 < (int)(dc->section_count - 1)*dc->fb_width))
+            {
+                gui_scroll_text_font_draw(&text->base, &draw_rect);
+            }
+        }
     }
     if (dc->section_count == total_section_count)
     {
