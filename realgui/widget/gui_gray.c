@@ -74,6 +74,8 @@ static void gui_gray_prepare(gui_gray_t *this)
     memcpy(&this->gray16->inverse, obj->matrix, sizeof(struct gui_matrix));
     matrix_inverse(&this->gray16->inverse);
 
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+
 
 }
 

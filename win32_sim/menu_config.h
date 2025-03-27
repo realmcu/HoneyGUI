@@ -22,12 +22,13 @@
 #if (CONFIG_REALTEK_BUILD_GUI == 1)
 
 // <h> HoneyGUI Demo Select
+
 // <c> RTK GUI Base Demo
-#define CONFIG_REALTEK_BUILD_REAL_BASE
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 // </c>
 
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_MULTI_APP
+#define CONFIG_REALTEK_BUILD_EXAMPLE_GRAY_WIDGET
 // </c>
 
 // <c> RTK GUI 3D Demo

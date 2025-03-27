@@ -52,36 +52,6 @@ static void gui_img_reset_translate(gui_img_t *this);
 
 
 /**
- * @brief Prepares the GUI image input for processing.
- *
- * This function initializes and prepares the image input associated with
- * a given GUI object. It ensures that the image input is properly setup
- * to be used within the GUI application.
- *
- * @param[in] obj A pointer to the `gui_obj_t` object related to the image input
- *                that needs preparation. This object should have been previously
- *                initialized.
- */
-void gui_img_input_prepare(gui_obj_t *obj)
-{
-    touch_info_t *tp = tp_get_info();
-    gui_img_t *this = (gui_img_t *)obj;
-    GUI_UNUSED(tp);
-    GUI_UNUSED(this);
-
-    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
-    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
-    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
-    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
-
-    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
-        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
-    {
-        return;
-    }
-
-}
-/**
  * @brief Prepares the GUI image associated with the specified object.
  *
  * This function performs necessary initialization and setup for an image
@@ -92,7 +62,7 @@ void gui_img_input_prepare(gui_obj_t *obj)
  *                preparation is conducted. This object must be properly
  *                initialized before passing to this function.
  */
-void gui_img_prepare(gui_obj_t *obj)
+static void gui_img_prepare(gui_obj_t *obj)
 {
     uint8_t last;
     gui_img_t *this;
@@ -163,7 +133,7 @@ void gui_img_prepare(gui_obj_t *obj)
  *                to be drawn. The image should be prepared in advance using
  *                `gui_img_prepare`.
  */
-void gui_img_draw_cb(gui_obj_t *obj)
+static void gui_img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
@@ -202,7 +172,7 @@ void gui_img_draw_cb(gui_obj_t *obj)
  * @param[in] obj A pointer to the `gui_obj_t` object associated with the image
  *                whose resources are being cleaned up.
  */
-void gui_img_end(gui_obj_t *obj)
+static void gui_img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
@@ -219,7 +189,24 @@ void gui_img_end(gui_obj_t *obj)
     }
 }
 
-static void destroy(gui_obj_t *obj)
+
+/**
+ * @brief Destroys the GUI image and cleans up associated resources.
+ *
+ * This function is responsible for destroying the image associated with
+ * the specified GUI object. It ensures that any resources allocated for
+ * the image, such as memory, handles, or buffers, are properly released
+ * to prevent memory leaks.
+ *
+ * @param[in] obj A pointer to the `gui_obj_t` object whose image is to
+ *                be destroyed. The object should have been previously
+ *                prepared and possibly displayed using related functions.
+ *
+ * @note After calling this function, the image data associated with the
+ *       object is no longer valid and should not be used. This function
+ *       should be called when the image is no longer needed.
+ */
+static void gui_img_destroy(gui_obj_t *obj)
 {
     gui_img_t *this = (gui_img_t *)obj;
 
@@ -248,27 +235,6 @@ static void destroy(gui_obj_t *obj)
         gui_free(this->transform);
         this->transform = NULL;
     }
-
-}
-/**
- * @brief Destroys the GUI image and cleans up associated resources.
- *
- * This function is responsible for destroying the image associated with
- * the specified GUI object. It ensures that any resources allocated for
- * the image, such as memory, handles, or buffers, are properly released
- * to prevent memory leaks.
- *
- * @param[in] obj A pointer to the `gui_obj_t` object whose image is to
- *                be destroyed. The object should have been previously
- *                prepared and possibly displayed using related functions.
- *
- * @note After calling this function, the image data associated with the
- *       object is no longer valid and should not be used. This function
- *       should be called when the image is no longer needed.
- */
-void gui_img_destroy(gui_obj_t *obj)
-{
-    destroy(obj);
 }
 static gui_rgb_data_head_t gui_img_get_header(gui_img_t *this)
 {
@@ -305,11 +271,6 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-        case OBJ_INPUT_PREPARE:
-            {
-                gui_img_input_prepare(obj);
-            }
-            break;
         case OBJ_PREPARE:
             {
                 gui_img_prepare(obj);
@@ -357,7 +318,7 @@ static void gui_img_ctor(gui_img_t            *this,
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
     obj->obj_cb = gui_img_cb;
-    obj->has_input_prepare_cb = true;
+    obj->has_input_prepare_cb = false;
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;

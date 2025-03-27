@@ -30,6 +30,7 @@ extern "C" {
  *============================================================================*/
 #include "guidef.h"
 #include "gui_api.h"
+#include "gui_obj.h"
 #include "engine_gray16.h"
 
 
