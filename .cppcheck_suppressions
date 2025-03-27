@@ -1,9 +1,8 @@
 
 *:win32_sim\RTE\*
 *:realgui\3rd\*
-*:example\screen_454_454\*
-*:example\screen_320_385\*
-*:example\gui_menu\*
+*:example\application\screen_454_454\*
+*:example\application\screen_320_385\*
 
 
 
