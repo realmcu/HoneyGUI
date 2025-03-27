@@ -31,7 +31,7 @@
 // </c>
 
 // <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_3D
+// #define CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D
 // </c>
 
 // <c> RTK GUI 3D Demo
