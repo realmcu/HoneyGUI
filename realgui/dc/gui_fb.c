@@ -289,7 +289,7 @@ static void gui_fb_draw(gui_obj_t *root)
                 }
                 else
                 {
-                    memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
+                    memset(dc->frame_buf, 0x0, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
                 }
             }
             dc->section_count = i;
@@ -315,7 +315,7 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     else if (dc->type == DC_SINGLE)
     {
-        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
+        memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
 
         obj_draw_scan(root);
         if (dc->lcd_draw_sync != NULL)
@@ -334,7 +334,7 @@ static void gui_fb_draw(gui_obj_t *root)
         {
             dc->frame_buf = dc->disp_buf_1;
         }
-        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
+        memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
 
         obj_draw_scan(root);
         if (dc->lcd_draw_sync != NULL)

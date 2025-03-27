@@ -41,6 +41,14 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+static gui_matrix_t matrix =
+{
+    .m = {
+        {1, 0, 0},
+        {0, 1, 0},
+        {0, 0, 1}
+    }
+};
 static gui_obj_t root =
 {
     .name = "screen",
@@ -52,7 +60,7 @@ static gui_obj_t root =
     .child_list = {&(root.child_list), &(root.child_list)},
     .brother_list = {&(root.brother_list), &(root.brother_list)},
     .create_done = true,
-    .matrix = NULL,
+    .matrix = &matrix,
 };
 
 static gui_obj_t fake_root =
@@ -66,75 +74,13 @@ static gui_obj_t fake_root =
     .child_list = {&(fake_root.child_list), &(fake_root.child_list)},
     .brother_list = {&(fake_root.brother_list), &(fake_root.brother_list)},
     .create_done = true,
-    .matrix = NULL,
+    .matrix = &matrix,
 };
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/**
- * Count the number of widgets of a specified type in the tree
- * @param node Current node
- * @param target_type The type of widgets to count
- * @return Total number of matching widgets
- */
-static int count_widgets(gui_obj_t *node, T_OBJ_TYPE target_type)
-{
-    int count = 0;
-    gui_list_t *node_ptr = NULL;
-    gui_list_t *tmp = NULL;
 
-    gui_list_for_each_safe(node_ptr, tmp, &node->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node_ptr, gui_obj_t, brother_list);
-
-        if (obj->magic != GUI_MAGIC_NUMBER)
-        {
-            gui_log("Invalid object @line:%d, @%p", __LINE__, node);
-            gui_log("@name:%s, @type:%d\n", node->name, node->type);
-            continue;
-        }
-
-        if (target_type == obj->type)
-        {
-            count++;
-        }
-
-        count += count_widgets(obj, target_type);
-    }
-    return count;
-}
-/**
- * Fill the array with pointers to matching widgets
- * @param node Current node
- * @param target_type The type of widgets to find
- * @param array Target array to fill
- * @param index Pointer to the current fill position
- */
-static void fill_widgets(gui_obj_t *node, T_OBJ_TYPE target_type,
-                         gui_obj_t **array, int *index)
-{
-    gui_list_t *node_ptr = NULL;
-    gui_list_t *tmp = NULL;
-
-    gui_list_for_each_safe(node_ptr, tmp, &node->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node_ptr, gui_obj_t, brother_list);
-
-        if (obj->magic != GUI_MAGIC_NUMBER)
-        {
-            continue;
-        }
-
-        if (target_type == obj->type)
-        {
-            array[*index] = obj;
-            (*index)++;
-        }
-
-        fill_widgets(obj, target_type, array, index);
-    }
-}
 
 static size_t safe_strlen(const char *str, size_t max_len)
 {
@@ -552,57 +498,7 @@ void gui_obj_move(gui_obj_t *obj, int x, int y)
     obj->y = y;
 }
 
-/**
- * Get an array of pointers to all widgets of a specified type in the GUI object tree (two-phase method)
- * @param root The root node
- * @param type The type of widgets to find
- * @param output_array Pointer to the array of widget pointers, should be NULL initially
- * @param length Length of the array, should be 0 initially, returns the number of widgets found
- * @return 0 on success, -1 on failure (e.g., memory allocation failure or invalid parameters)
- */
-int gui_obj_tree_get_widget_array_by_type(gui_obj_t *root,
-                                          T_OBJ_TYPE type,
-                                          gui_obj_t ***output_array,
-                                          int *length)
-{
-    // Check input parameters
-    if (root == NULL || output_array == NULL || length == NULL)
-    {
-        gui_log("Invalid input parameters\n");
-        return -1;
-    }
 
-    // Step 1: Count the total number of matching widgets
-    int total_count = count_widgets(root, type);
-
-    // If no matches are found, return immediately
-    if (total_count == 0)
-    {
-        *output_array = NULL;
-        *length = 0;
-        return 0;
-    }
-
-    // Step 2: Allocate memory for the array in one go
-    gui_obj_t **new_array = (gui_obj_t **)gui_malloc(total_count * sizeof(gui_obj_t *));
-    if (new_array == NULL)
-    {
-        gui_log("Memory allocation failed for %d widgets\n", total_count);
-        *output_array = NULL;
-        *length = 0;
-        return -1;
-    }
-
-    // Step 3: Fill the array with widget pointers
-    int index = 0;
-    fill_widgets(root, type, new_array, &index);
-
-    // Set output parameters
-    *output_array = new_array;
-    *length = total_count;
-
-    return 0;
-}
 
 
 
