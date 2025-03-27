@@ -16,13 +16,13 @@ extern "C" {
 #include "../lv_draw.h"
 #if LV_USE_DRAW_PPE_RTL872xG
 
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
-#include "../../display/lv_display.h"
-#include "../../osal/lv_os.h"
+#include "../../../misc/lv_area.h"
+#include "../../../misc/lv_color.h"
+#include "../../../display/lv_display.h"
+#include "../../../osal/lv_os.h"
 
-#include "../lv_draw_rect.h"
-#include "../lv_draw_image.h"
+#include "../../lv_draw_rect.h"
+#include "../../lv_draw_image.h"
 
 #include "lv_draw_sw_utils.h"
 

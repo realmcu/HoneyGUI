@@ -24,6 +24,12 @@ if GetDepend('CONFIG_REALTEK_BUILD_GUI_410_502_LVGL_DEMO'):
     CPPDEFINES += ['DRV_LCD_HIGHT=502']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
-group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_410_502_LVGL_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+if not GetDepend(['CONFIG_REALTEK_8773E_DEVICE']):
+    SrcRemove(src,'app_rtk_port.c')
+
+if GetDepend(['CONFIG_REALTEK_8773E_DEVICE']):
+    SrcRemove(src,'app_sim_port.c')
+
+group = DefineGroup('lvgl_watch_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_410_502_LVGL_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

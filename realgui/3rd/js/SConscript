@@ -77,18 +77,11 @@ CPPDEFINES += ['JERRY_ENABLE_LOGGING']
 
 
 
-if GetDepend(['CONFIG_REALTEK_BUILD_WEB']):
-    group = DefineGroup('JerryScript', src, depend = ['CONFIG_REALTEK_BUILD_WEB'], CPPPATH = CPPPATH, 
-    CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
-    group = group + SConscript(os.path.join('js-port', 'SConscript'))
-    Return('group')
-else:
-
         
-    group = DefineGroup('JerryScript', src, depend = ['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
-        CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
+group = DefineGroup('JerryScript', src, depend = ['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
+    CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
 
-    if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
-        group = group + SConscript(os.path.join('js-port', 'SConscript'))
+if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
+    group = group + SConscript(os.path.join('js-port', 'SConscript'))
 
-    Return('group')
+Return('group')

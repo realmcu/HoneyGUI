@@ -15,9 +15,7 @@
 #include <gui_obj.h>
 #include <string.h>
 #include <gui_app.h>
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-#include "js_extern_io.h"
-#endif
+
 
 
 
@@ -101,13 +99,6 @@ void gui_server_msg_handler(gui_msg_t *msg)
         {
             gui_obj_tree_free(screen);
             gui_mem_debug();
-            break;
-        }
-    case GUI_EVENT_EXTERN_IO_JS:
-        {
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-            gui_extern_event_js_handler(msg);
-#endif
             break;
         }
     case GUI_EVENT_USER_DEFINE:

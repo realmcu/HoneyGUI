@@ -23,9 +23,7 @@
 #include "gui_version.h"
 #include "gui_server.h"
 
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-#include "js_extern_io.h"
-#endif
+
 
 /**
  * @brief External execution hook for GUI task
@@ -55,11 +53,8 @@ static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool 
  */
 static void gui_server_entry(void *parameter)
 {
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    extern void js_init(void);
-    js_init();
-#endif
     gui_server_msg_init();
+    gui_components_init();
     while (1)
     {
         gui_app_t *app_current = gui_current_app();
@@ -276,4 +271,3 @@ int gui_server_init(void)
     return 0;
 }
 
-GUI_INIT_PREV_EXPORT(gui_server_init);

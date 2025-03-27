@@ -520,33 +520,31 @@ section[id*="deprecated-api"] dd dl {
 a.no-cursor-link {
     cursor: default;
 }
-
+ 
 .img-modal {
-    display: none;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
     position: fixed;
     left: 0;
     top: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.6);
     z-index: 1000;
     overflow: auto;
+    touch-action: pan-x pan-y;
 }
 @keyframes imgzoom {
     from {transform: scale(0)}
     to {transform: scale(1)}
 }
 .img-in-modal {
-    max-width: 100%; /* 防止图片最大宽度限制 */
-    max-height: 100%; /* 防止图片最大高度限制 */
+    object-fit: contain;
     transform-origin: center center; /* 设置 transform 原点 */
+    transition: transform 0.75s ease;
     animation-name: imgzoom;
-    animation-duration: 0.6s;
-    transition: transform 0.6s ease;
+    animation-duration: 0.75s;
 }
 .img-modal-close {
     position: fixed;
@@ -564,5 +562,5 @@ a.no-cursor-link {
     text-decoration: none;
     cursor: pointer;
 }
-
+ 
 /* ====== Render image modal style ====== */

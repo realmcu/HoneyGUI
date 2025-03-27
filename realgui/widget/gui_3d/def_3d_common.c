@@ -631,8 +631,11 @@ gui_3d_description_t *gui_get_3d_desc(void *desc_addr)
         // texture content
         for (uint32_t i = 0; i < desc->num_materials; i++)
         {
-            desc->textures[i] = (unsigned char *)ptr;
-            ptr += desc->texture_sizes[i];
+            if (desc->texture_sizes[i] > 0)
+            {
+                desc->textures[i] = (unsigned char *)ptr;
+                ptr += desc->texture_sizes[i];
+            }
         }
 
     }

@@ -22,7 +22,7 @@
 
 
 
-.. literalinclude:: ../../../realgui/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

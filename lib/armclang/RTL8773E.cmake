@@ -1,6 +1,6 @@
 # Apply the flags to C and C++ compiler settings
 set(CONFIG_SOC_SERIES_RTL8773E y)
-set(HW_ACC_PATH "rtl8773e")
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -xc \
 	-std=c11 \

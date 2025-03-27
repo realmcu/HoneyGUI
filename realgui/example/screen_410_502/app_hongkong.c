@@ -129,6 +129,14 @@ static void kb_button_cb()
         time_press = kb->timestamp_ms_press;
         hold = 1;
     }
+    // kb_info_t *kb = kb_get_info();
+    // if (kb->short_click_twice)
+    // {
+    //     gui_log("change menu style\n");
+    //     extern uint8_t menu_style;
+    //     menu_style++;
+    //     menu_style %= 3;
+    // }
 }
 
 
@@ -182,7 +190,7 @@ char *read_file(const char *file_path)
 #else
 // #include "tuya_ble_feature_weather.h"
 // #include "watch_clock.h"
-
+#include "cJSON.h"
 void json_refreash()
 {
     uint16_t degree = xorshift16() % 359;
@@ -348,6 +356,11 @@ void clear_mem(void)
         extern void clear_down_view(void);
         clear_down_view();
     }
+    if (strcmp(name, "music_view"))
+    {
+        extern void clear_music();
+        clear_music();
+    }
 }
 
 static void watchface_design(gui_view_t *view)
@@ -467,8 +480,9 @@ static void inform_generate_task_entry()
         gui_send_msg_to_server(&msg);
     }
 }
-
+#if defined _WIN32
 uint8_t resource_root[1024 * 1024 * 20];
+#endif
 static int app_init(void)
 {
 #if defined _WIN32

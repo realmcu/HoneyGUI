@@ -1461,13 +1461,10 @@ DECLARE_HANDLER(sw_setState)
 #include "js_extern_io.h"
 void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
 {
-    gui_msg_t msg;
     jerry_value_t js_cb = 0;
     jerry_value_t res = 0;
 
-    memset(&msg, 0, sizeof(gui_msg_t));
-    memcpy(&(msg.cb), js_msg, sizeof(gui_msg_js_t));
-    js_cb = (jerry_value_t)(uintptr_t)msg.payload;
+    js_cb = (jerry_value_t)(uintptr_t)js_msg->data;
     // gui_log("timer msg cb 0x%x\n", js_cb);
 
     res = jerry_call_func_sem(js_cb, jerry_create_undefined(), 0, 0);
@@ -1527,8 +1524,8 @@ void arm_js_timercb(void *p_handle)
     js_cb = (void *)timer_id;
     // DBG_DIRECT("js_cb 0x%x\n", js_cb);
 
-    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .cb = (gui_msg_cb)EXTERN_EVENT_TIMER, .payload = js_cb};
-    gui_send_msg_to_server(&msg);
+    gui_send_msg_to_js(EXTERN_EVENT_TIMER, 0, js_cb);
+
 }
 #endif
 

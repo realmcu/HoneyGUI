@@ -2,7 +2,6 @@
 #include "app_main.h"
 #include "lv_img_dsc_list.h"
 #include <time.h>
-#include "cJSON.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -10,7 +9,9 @@
 #if LVGL_USE_CJSON
 extern char *cjson_content;
 static cJSON *root;
+#include "cJSON.h"
 #endif
+
 static lv_obj_t *date_label;
 static lv_obj_t *time_img_container;
 static lv_obj_t *activity_arc;
@@ -20,6 +21,10 @@ static lv_obj_t *compass_dial;
 static lv_obj_t *weather_current, *weather_range;
 
 static lv_timer_t *timer = NULL;
+
+#ifndef M_PI
+#define M_PI    ((float)3.14159265358979323846)
+#endif
 
 lv_image_dsc_t const *text_num_array[] =
 {
@@ -169,12 +174,12 @@ void arc_activity_cb(void)
             lv_obj_t *arc_move = activity_arc;
             lv_obj_t *arc_ex = lv_obj_get_sibling(arc_move, 1);
             lv_obj_t *arc_stand = lv_obj_get_sibling(arc_ex, 1);
-            uint16_t start_angel = 270;
+            uint16_t start_angle = 270;
             lv_arc_set_end_angle(arc_move,
-                                 start_angel + (uint16_t)(360 * move->valueint / 20000)); // cap 20000 steps
-            lv_arc_set_end_angle(arc_ex, start_angel + (uint16_t)(360 * ex->valueint / 60)); // cap 60 min
+                                 start_angle + (uint16_t)(360 * move->valueint / 20000)); // cap 20000 steps
+            lv_arc_set_end_angle(arc_ex, start_angle + (uint16_t)(360 * ex->valueint / 60)); // cap 60 min
             lv_arc_set_end_angle(arc_stand,
-                                 start_angel + (uint16_t)(360 * stand->valueint / 30)); // cap 30 times
+                                 start_angle + (uint16_t)(360 * stand->valueint / 30)); // cap 30 times
         }
     }
 }
@@ -305,71 +310,20 @@ static void timer_cb(lv_timer_t *timer)
     cJSON_Delete(root);
 #endif
 }
-static void scr_watchface_cb(lv_event_t *event)
-{
-    lv_event_code_t event_code = lv_event_get_code(event);
-
-    if (event_code == LV_EVENT_SCREEN_LOAD_START)
-    {
-        // left_Animation(ui_hour_group, 0);
-        // right_Animation(ui_label_min, 0);
-        // opa_on_Animation(&ui_weather_group_1, 300);
-        // opa_on_Animation(ui_date_group, 500);
-        // opa_on_Animation(&ui_weather_title_group_1, 400);
-    }
-    if (event_code == LV_EVENT_GESTURE)
-    {
-        switch (lv_indev_get_gesture_dir(lv_indev_get_act()))
-        {
-        case LV_DIR_LEFT:
-            {
-                lv_indev_wait_release(lv_indev_get_act());
-                _ui_screen_change(&scr_right_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_LEFT, 500, 0,
-                                  &lv_right_curtain_init, 1);
-                lv_timer_del(timer);
-                break;
-            }
-        case LV_DIR_RIGHT:
-            {
-                lv_indev_wait_release(lv_indev_get_act());
-                _ui_screen_change(&scr_left_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0,
-                                  &lv_left_curtain_init, 1);
-                lv_timer_del(timer);
-                break;
-            }
-        case LV_DIR_TOP:
-            {
-                lv_indev_wait_release(lv_indev_get_act());
-                _ui_screen_change(&scr_down_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_TOP, 500, 0,
-                                  &lv_down_curtain_init, 1);
-                lv_timer_del(timer);
-                break;
-            }
-        case LV_DIR_BOTTOM:
-            {
-                lv_indev_wait_release(lv_indev_get_act());
-                _ui_screen_change(&scr_up_curtain, &scr_watchface, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0,
-                                  &lv_up_curtain_init, 1);
-                lv_timer_del(timer);
-                break;
-            }
-        default:
-            break;
-        }
-    }
-}
 
 static void heartrate_cb(lv_event_t *event)
 {
-    LV_LOG("change to heartrate screen\n");
+    _ui_screen_change(&scr_app_menu, NULL, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0,
+                      &lv_app_menu_init, 0);
+    LV_LOG("click heartrate icon\n");
     return;
 }
 
 void lv_watchface_init(void)
 {
     // scr_watchface = lv_obj_create(NULL);
-    lv_obj_set_style_bg_color(scr_watchface, lv_color_make(0, 0, 0), 0);
-    lv_obj_set_style_bg_opa(scr_watchface, LV_OPA_COVER, 0);
+    // lv_obj_set_style_bg_color(scr_watchface, lv_color_make(0, 0, 0), 0);
+    // lv_obj_set_style_bg_opa(scr_watchface, LV_OPA_COVER, 0);
     lv_obj_clear_flag(scr_watchface, LV_OBJ_FLAG_SCROLLABLE);
 
     // extern const lv_image_dsc_t ui_clock_face_main;
@@ -414,7 +368,7 @@ void lv_watchface_init(void)
 
     // activity icon
     {
-        uint16_t start_angel = 270;
+        uint16_t start_angle = 270;
 
         lv_obj_t *arc_1 = lv_arc_create(scr_watchface);
         activity_arc = arc_1;
@@ -429,7 +383,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_1, lv_color_make(58, 23, 29), LV_PART_MAIN);
         lv_obj_remove_style(arc_1, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_1, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
-        lv_arc_set_end_angle(arc_1, start_angel + (uint16_t)(360 * 10000 / 20000)); // cap 20000 steps
+        lv_arc_set_end_angle(arc_1, start_angle + (uint16_t)(360 * 10000 / 20000)); // cap 20000 steps
 
         lv_obj_t *arc_2 = lv_arc_create(scr_watchface);
         radius = 38;
@@ -443,7 +397,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_2, lv_color_make(30, 55, 25), LV_PART_MAIN);
         lv_obj_remove_style(arc_2, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_2, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
-        lv_arc_set_end_angle(arc_2, start_angel + (uint16_t)(360 * 30 / 60)); // cap 60 min
+        lv_arc_set_end_angle(arc_2, start_angle + (uint16_t)(360 * 30 / 60)); // cap 60 min
 
         lv_obj_t *arc_3 = lv_arc_create(scr_watchface);
         radius = 26;
@@ -457,7 +411,7 @@ void lv_watchface_init(void)
         lv_obj_set_style_arc_color(arc_3, lv_color_make(22, 50, 47), LV_PART_MAIN);
         lv_obj_remove_style(arc_3, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
         lv_obj_remove_flag(arc_3, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
-        lv_arc_set_end_angle(arc_3, start_angel + (uint16_t)(360 * 15 / 30)); // cap 30 times
+        lv_arc_set_end_angle(arc_3, start_angle + (uint16_t)(360 * 15 / 30)); // cap 30 times
     }
 
     // weather condition
@@ -653,8 +607,10 @@ void lv_watchface_init(void)
         lv_obj_set_style_bg_opa(heartrate, LV_OPA_TRANSP, 0);
         lv_obj_add_event_cb(heartrate, (lv_event_cb_t)heartrate_cb, LV_EVENT_CLICKED, NULL);
     }
-    // lv_obj_add_event_cb(scr_watchface, (lv_event_cb_t)scr_watchface_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(scr_watchface, (lv_event_cb_t)tile_center_cb, LV_EVENT_ALL, NULL);
+#if defined __WIN32
     timer = lv_timer_create(timer_cb, 2000, scr_watchface);
     lv_timer_set_repeat_count(timer, -1);
+#endif
 }
 

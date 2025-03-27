@@ -12,32 +12,32 @@ This widget supports loading 3D prism mirror models consisting of OBJ and MTL fi
    </div>
    <br>
 
-Running the Prismatic Effect on the Simulator
+Run the Prism Mirror Widget on the Simulator
 ----------------------------------------------
 
 HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the :ref:`Get Started` section.
 
-After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator.In :file:`menu_config.h` ( :file:`your HoneyGUI dir/win32_sim/menu_config.h`), enable the macro definition **CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D** ;
+After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator.In :file:`menu_config.h` ( :file:`your HoneyGUI dir/win32_sim/menu_config.h`), enable the macro definition **CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D**.
 
 .. figure:: https://foruda.gitee.com/images/1736838781027776182/64086e10_13406851.jpeg
    :align: center
    :width: 400px
 
-   Simulator Runs the Prism Effect
+   Run the Prism Mirror Widget on the Simulator
 
-1. If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir/realgui/example/demo/`, and modify the values of :c:macro:`DRV_LCD_WIDTH` and :c:macro:`DRV_LCD_HEIGHT` to the desired pixel values.
+If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir/realgui/example/demo/`, and modify the values of :c:macro:`DRV_LCD_WIDTH` and :c:macro:`DRV_LCD_HEIGHT` to the desired pixel values.
 
 .. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center
    :width: 400
 
-   Simulator changes screen size
+   Simulator Changes Screen Size
 
 .. _GUI Load Prism Mirror Model:
 
 GUI Load Prism Mirror Model
 -----------------------------
-1. Add all necessary files for the prism model to a separate folder, including 6 PNG images, geometric information files for the 3D model (:file:`.obj`), and corresponding material information files (:file:`.mtl`).
+1. Add all necessary files for the prism model to a separate folder, including 6 PNG images, geometric information files for the 3D model (:file:`.obj`), and corresponding material information files (:file:`.mtl`)
 
    + OBJ file: Stores geometric data for the prism mirror model, including vertices, normals, texture coordinates, and faces.
    + MTL file: Describes the material properties of the prism mirror model, including color, glossiness, transparency, and texture mapping.
@@ -48,23 +48,23 @@ GUI Load Prism Mirror Model
 
    + In the prism mirror resource package directory, run the following command through the command line: :kbd:`extract_desc.exe prism.obj`. Please modify :file:`prism.obj` to the user's custom file name as needed.
    
-   + Generate binary array of images and prism mirror information descriptor: :file:`desc.txt`
+   + Generate binary array of images and prism mirror information descriptor: :file:`desc.txt`.
 
 3. GUI Load Descriptor
 
-   Place the :file:`desc.txt` file containing obj parsed data, mtl parsed data, and image data into the project directory, and load it in :cpp:any:`gui_prism_mirror3d_create`.
+   Place the :file:`desc.txt` file containing obj parsed data, mtl parsed data, and image data into the project directory, and load it by calling ``gui_get_3d_desc()`` function.
 
 Prism Mirror Widget Usage
 ---------------------------
 Create Widget
 ~~~~~~~~~~~~~~
-Create a prism model using the :cpp:any:`gui_prism_mirror3d_create` function. This function requires providing a parent object, name, descriptive data, as well as position and size parameters. The number of faces, automatic rotation, and input sensitivity of the prism can be specified through the optional configuration structure (`prism_mirror3d_comfig_t`). The parameter 'desc_add' file contains parsed data extracted from the script
+Create a prism model using the :cpp:any:`gui_prism_mirror3d_create` function. This function requires providing a parent object, name, descriptive data, as well as position and size parameters. The number of faces, automatic rotation, and input sensitivity of the prism can be specified through the optional configuration structure (:cpp:any:`prism_mirror3d_config_t`). The parameter ``desc`` contains parsed data extracted from the script.
 
 **Parameters:**
 
 + ``parent``: The parent object, the new prism model will be attached to this GUI component.
 + ``name``: Used as a name to identify and manage 3D objects.
-+ ``desc_add``: descriptor address, containing visualized parsing data.
++ ``desc``: Descriptor pointer, containing visualized parsing data.
 + ``x``: The x coordinate in the parent component coordinate system.
 + ``y``: The y coordinate in the parent component coordinate system.
 + ``w``: The width of the widget.
@@ -80,7 +80,8 @@ Create a prism model using the :cpp:any:`gui_prism_mirror3d_create` function. Th
     uint16_t x = 100, y = 100, w = 300, h = 300;
     prism_mirror3d_config_t config = {6, true, 0.05f};
 
-    gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(parent, name, desc_addr, x, y, w, h, &config);
+    gui_3d_description_t *desc = gui_get_3d_desc((void *)desc_addr);
+    gui_prism_mirror3d_t *prism_demo = gui_prism_mirror3d_create(parent, name, desc, x, y, w, h, &config);
 
 Add Dynamic Effects
 ~~~~~~~~~~~~~~~~~~~
@@ -119,7 +120,7 @@ Use the function :cpp:any:`gui_prism_mirror3d_click_switch_app_add_event` to add
 
 Set Size
 ~~~~~~~~
-Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Adjust the scaling factor to suit the requirements of the scene.
+Set the size of the prism model using :cpp:any:`gui_prism_mirror3d_det_scale`. Adjust the scaling factor to suit the requirements of the scene.
 
 **Parameters:**
 
@@ -134,7 +135,7 @@ Set the size of the prism model using cpp:any:`gui_prism_mirror3d_det_scale`. Ad
 
 Set Location
 ~~~~~~~~~~~~~
-Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism model. This function requires x, y. The z-coordinate is used to define the position of the model in 3D space.
+Use :cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism model. This function requires x, y. The z-coordinate is used to define the position of the model in 3D space.
 
 **Parameters:**
 
@@ -151,7 +152,7 @@ Use cpp:any:`gui_prism_mirror3d_det_position` to set the position of the prism m
 
 Set Orientation
 ~~~~~~~~~~~~~~~~
-Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mirror3d_set_rotation_angles`. This feature helps adjust the orientation of the model in the 3D environment.
+Use :cpp:any:`gui_prism_mirror3d_set_rotation_angles` to set the orientation of the prism model. This feature helps adjust the orientation of the model in the 3D environment.
 
 **Parameters:**
 
@@ -168,7 +169,7 @@ Use cpp: any to set the orientation of the prism model as cpp:any:`gui_prism_mir
 
 Set Original State
 ~~~~~~~~~~~~~~~~~~~
-Use the cpp: any function to set the original state of the 3D prism model as :cpp:any:`gui_prism_mirror3d_det_raw_date`. This function sets the initial position, camera position, rotation angle, and scaling ratio of the prism in the 3D world. Usually called immediately after the widget is initialized to define the initial display state.
+Use :cpp:any:`gui_prism_mirror3d_set_raw_state` to set the original state of the 3D prism model. This function sets the initial position, camera position, rotation angle, and scaling ratio of the prism in the 3D world. Usually called immediately after the widget is initialized to define the initial display state.
 
 **Parameters:**
 
@@ -191,13 +192,13 @@ Use the cpp: any function to set the original state of the 3D prism model as :cp
 Set Target Status
 ~~~~~~~~~~~~~~~~~~
 
-Use the cpp: any function to define the target state that the 3D prism model will achieve in animation or interaction. This feature is particularly suitable for creating smooth transition effects, such as changing from one position to another.
+Use :cpp:any:`gui_prism_mirror3d_set_target_state` to define the target state that the 3D prism model will achieve in animation or interaction. This feature is particularly suitable for creating smooth transition effects, such as changing from one position to another.
 
 **Parameters:**
 
 + ``prism-mirror3d``: The prism model object to be adjusted.
-+ ``world_position``: x in the target world coordinate system, y. Z coordinate (floating point array).
-+ ``camera_position``: an array of target position coordinates for the camera, specifying x relative to the prism, y, z。
++ ``world_position``: Target world coordinates x, y, z (float array).
++ ``camera_position``: Array of target position coordinates for the camera, specifying the x, y, z coordinates relative to the prism.
 + ``rot_x``: The rotation angle of the target around the X-axis.
 + ``rot_y``: The rotation angle of the target around the Y-axis.
 + ``rot_z``: The rotation angle of the target around the Z-axis.
@@ -263,7 +264,7 @@ Prism Mirror Widget Usage Notes
 
       + File path: :file:`HoneyGUI\\realgui\\example\\demo\\3d`, required files: :file:`extract_desc.exe` and :file:`png2c.py`.
 
-2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`: Create a description file that can be loaded into the GUI (please refer to: ref: GUI loading prism model for specific steps).
+2. If using a display screen of other proportions, in order to achieve better visual effects, it is necessary to re model it using 3D software and export the corresponding OBJ file (reference: :ref:`Prism Widget to Modify 3D Model`). Create a description file that can be loaded into the GUI (reference: :ref:`GUI Load Prism Mirror Model`).
 
 .. _Prism Widget to Modify 3D Model:
 
@@ -271,7 +272,7 @@ Prism Widget to Modify 3D Model
 -------------------------------
 This routine uses Blender software as a demonstration.
 
-1. Use 3D modeling software to open the file: ` prism. obj `, switch view effects, shortcut key: English mode, press the top left corner of the keyboard: kbd:`·`， Select the view and press: kbd:`Bottom`。
+1. Use 3D modeling software to open the file: :file:`prism.obj`, switch view effects, shortcut key: English mode, press the top left corner of the keyboard :kbd:`·`, Select the view and press :kbd:`Bottom`.
 
 .. figure:: https://foruda.gitee.com/images/1736508668989561574/99180bb7_13406851.jpeg
    :align: center

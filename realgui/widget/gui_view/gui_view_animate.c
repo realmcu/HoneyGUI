@@ -17,13 +17,8 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <string.h>
-#include "guidef.h"
-#include "gui_server.h"
 #include "gui_obj.h"
-#include "tp_algo.h"
 #include "gui_view.h"
-#include "gui_img.h"
 
 
 /*============================================================================*
@@ -335,9 +330,20 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(view_transition_animation_function
  *============================================================================*/
 void gui_view_set_animate(gui_view_t *this)
 {
-    uint32_t dur = VIEW_TRANSITION_DURATION_MS;
-    int repeat_count = 0;
-    gui_animate_callback_t callback = view_transition_animation_function;
-    void *p = NULL;
-    GUI_SET_ANIMATE_HELPER
+    gui_animate_t *animate = this->animate;
+    if (!animate)
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+        if (!animate)
+        {
+            gui_log("[VIEW] animate malloc failed!\n");
+            return;
+        }
+    }
+    memset(animate, 0, sizeof(gui_animate_t));
+    animate->animate = 1;
+    animate->dur = VIEW_TRANSITION_DURATION_MS;
+    animate->callback = (gui_animate_callback_t)view_transition_animation_function;
+    animate->repeat_count = 0;
+    this->animate = animate;
 }

@@ -37,20 +37,10 @@ DECLARE_HANDLER(test)
 {
     gui_log("enter test \n");
 
-    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS};
-    uint8_t extern_event_type = EXTERN_EVENT_KEY;
-    uint8_t sub_event_type = KEY_EVENT_CLICK;
     uint8_t id = 1;
-    uint8_t data[] = {0x00, 0x00, 0x00, 0x00};
+    uint32_t data = id;
 
-    data[0] = extern_event_type;
-    data[1] = sub_event_type;
-    data[2] = id;
-
-    memcpy(&(msg.cb), data, sizeof(data));
-    // gui_extern_event_js_handler(&msg);
-    gui_send_msg_to_server(&msg);
-
+    gui_send_msg_to_js(EXTERN_EVENT_KEY, KEY_EVENT_CLICK, (void *)data);
     return jerry_create_undefined();
 }
 #endif
@@ -212,7 +202,7 @@ void js_key_init(void)
 
 
 // back to js script field, enable complex action, not bond with widget
-void gui_key_event_press_handler(uint8_t id)
+void gui_key_event_press_handler(uint32_t id)
 {
     js_key_data_t *pkey_data = key_data[id];
 
@@ -232,7 +222,7 @@ void gui_key_event_press_handler(uint8_t id)
 
     jerry_release_value(res);
 }
-void gui_key_event_click_handler(uint8_t id)
+void gui_key_event_click_handler(uint32_t id)
 {
     js_key_data_t *pkey_data = key_data[id];
 
@@ -253,7 +243,7 @@ void gui_key_event_click_handler(uint8_t id)
 
     jerry_release_value(res);
 }
-void gui_key_event_longPress_handler(uint8_t id)
+void gui_key_event_longPress_handler(uint32_t id)
 {
     js_key_data_t *pkey_data = key_data[id];
 
@@ -273,7 +263,7 @@ void gui_key_event_longPress_handler(uint8_t id)
 
     jerry_release_value(res);
 }
-void gui_key_event_release_handler(uint8_t id)
+void gui_key_event_release_handler(uint32_t id)
 {
     js_key_data_t *pkey_data = key_data[id];
 
@@ -294,66 +284,31 @@ void gui_key_event_release_handler(uint8_t id)
     jerry_release_value(res);
 }
 
-// same size and mem alignment as gui_msg_js_t
-#ifdef  __CC_ARM
-#pragma anon_unions
-#endif
-// typedef struct gui_msg
-// {
-//     uint16_t event;
-//     gui_msg_cb cb;  // typedef void (*gui_msg_cb)(void *);
-//     void *payload;
-// } gui_msg_t;
-
-typedef struct
-{
-    /* user field of event */
-    union
-    {
-        struct
-        {
-            uint8_t extern_event_type; // EXTERN_EVENT_KEY
-            uint8_t sub_event_type;
-            uint8_t id;
-            uint8_t data[1];
-        };
-        gui_msg_cb cb;    // gui_msg
-    };
-    union
-    {
-        uint8_t data_rsv[4];   // reserve
-        void *param;
-        void *payload;   // gui_msg
-    };
-} gui_msg_key_t;
-
 
 // key event
 void gui_extern_event_key_handler(gui_msg_js_t *js_msg)
 {
-    gui_msg_key_t *key_msg = (gui_msg_key_t *)js_msg;
-
-    gui_log("sub_event_type: %d", key_msg->sub_event_type);
-    switch (key_msg->sub_event_type)
+    gui_log("sub_event_type: %d", js_msg->js_subevent);
+    switch (js_msg->js_subevent)
     {
     case KEY_EVENT_PRESS:
         {
-            gui_key_event_press_handler((key_msg->id));
+            gui_key_event_press_handler((js_msg->data32));
         }
         break;
     case KEY_EVENT_CLICK:
         {
-            gui_key_event_click_handler((key_msg->id));
+            gui_key_event_click_handler((js_msg->data32));
         }
         break;
     case KEY_EVENT_LONG_PRESS:
         {
-            gui_key_event_longPress_handler((key_msg->id));
+            gui_key_event_longPress_handler((js_msg->data32));
         }
         break;
     case KEY_EVENT_RELEASE:
         {
-            gui_key_event_release_handler((key_msg->id));
+            gui_key_event_release_handler((js_msg->data32));
         }
         break;
     default:

@@ -30,6 +30,7 @@ if(NOT DEFINED SOC)
     message(WARNING "SOC variable not specified. Using default SOC: ${DEFAULT_SOC}.")
     set(SOC "${DEFAULT_SOC}")
 endif()
+message("build soc = ${SOC}")
 
 # Set the SOC file path
 set(SOC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${SOC}.cmake")
@@ -81,6 +82,8 @@ install(TARGETS ${GUI_TARGET_NAME}
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
 
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/gui_version.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})		
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
@@ -104,7 +107,6 @@ install(FILES ${HEADER_FILES} DESTINATION include)
 
 install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")
 
-file(GLOB SRC_FILES "../../realgui/engine/hw_acc/${HW_ACC_PATH}/*.c")
 install(FILES ${SRC_FILES} DESTINATION src)
 
 

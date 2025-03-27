@@ -29,7 +29,7 @@
 开发者可以使用 :cpp:any:`gui_tabview_set_style` 来设置所需的选项卡容器样式。默认情况下，使用的是经典样式 ``CLASSIC``。具体的切换风格请参考下列枚举：
 
 
-.. literalinclude:: ../../../realgui/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

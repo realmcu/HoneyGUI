@@ -17,14 +17,9 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <string.h>
-#include "guidef.h"
-#include "gui_server.h"
+#include "gui_view.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-#include "gui_view.h"
-#include "kb_algo.h"
-#include "gui_img.h"
 
 /*============================================================================*
  *                            Macros
@@ -56,7 +51,6 @@ static void gui_view_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
     gui_view_t *this = (gui_view_t *)obj;
     uint8_t last = this->checksum;
 
@@ -246,6 +240,7 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
     this->style = on_event->switch_out_style;
     gui_view_t *target_view = gui_view_create(GUI_BASE(this)->parent, on_event->descriptor, 0, 0, 0, 0);
     target_view->style = on_event->switch_in_style;
+    target_view->event = 1;
     // change list for transplation cover
     if (target_view->style == VIEW_STILL)
     {
@@ -258,6 +253,11 @@ static void gui_view_on_event_cb(void *obj, gui_event_t e, void *param)
         next_tab->prev = object->brother_list.next;
         GUI_BASE(parent)->child_list.next = next_tab;
         GUI_BASE(parent)->child_list.prev = next_tab->next;
+    }
+    if (target_view->style < VIEW_ANIMATION_NULL)
+    {
+        target_view->release_x = this->release_x;
+        target_view->release_y = this->release_y;
     }
     int16_t idx = 0;
     int16_t idy = 0;

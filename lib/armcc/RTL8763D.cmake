@@ -1,6 +1,4 @@
 set(CONFIG_SOC_SERIES_RTL8763D y)
-# set(HW_ACC_PATH "rtl8763d")
-
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -c \

@@ -6,21 +6,21 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw_private.h"
+#include "../../lv_draw_private.h"
 #if LV_USE_DRAW_PPE_RTL8773E
-#include "../../misc/lv_area_private.h"
+#include "../../../misc/lv_area_private.h"
 #include "blend/lv_draw_sw_blend_private.h"
-#include "../lv_image_decoder_private.h"
-#include "../lv_draw_image_private.h"
-#include "../../display/lv_display.h"
-#include "../../display/lv_display_private.h"
-#include "../../misc/lv_log.h"
-#include "../../core/lv_refr_private.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
-#include "../../core/lv_global.h"
+#include "../../lv_image_decoder_private.h"
+#include "../../lv_draw_image_private.h"
+#include "../../../display/lv_display.h"
+#include "../../../display/lv_display_private.h"
+#include "../../../misc/lv_log.h"
+#include "../../../core/lv_refr_private.h"
+#include "../../../stdlib/lv_mem.h"
+#include "../../../misc/lv_math.h"
+#include "../../../misc/lv_color.h"
+#include "../../../stdlib/lv_string.h"
+#include "../../../core/lv_global.h"
 #include "lv_image_decoder.h"
 
 #include "lv_ppe_rtl8773e_utils.h"
@@ -215,7 +215,7 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         draw_rect.h = lv_area_get_height(&constraint_area);
     }
     if (!transform && draw_dsc->opa >= LV_OPA_MAX && draw_dsc->recolor_opa == 0 &&
-        target.format == source.format)
+        target.format == source.format && (target.format == PPE_RGB565 || target.format == PPE_RGB888))
     {
         int16_t target_x = constraint_area.x1 - draw_unit->target_layer->buf_area.x1;
         int16_t target_y = constraint_area.y1 - draw_unit->target_layer->buf_area.y1;
@@ -507,7 +507,7 @@ static void lv_draw_ppe_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         pre_trans.m[1][2] = coords->y1;
         ppe_mat_multiply(&ppe_mat, &pre_trans);
     }
-    ppe_get_area(&target_rect, &src_rect, &ppe_mat, &target);
+    lv_ppe_get_area(&target_rect, &src_rect, &ppe_mat);
     area_rot.x1 = target_rect.x;
     area_rot.y1 = target_rect.y;
     area_rot.x2 = target_rect.x + target_rect.w - 1;

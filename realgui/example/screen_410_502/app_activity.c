@@ -116,17 +116,17 @@ static void arc_activity_cb(NVGcontext *vg)
                 stand_val = stand->valueint;
 
                 {
-                    sprintf(move_content, "Move: %d/20000 steps", move_val);
+                    sprintf(move_content, "Move:%d/20000steps", move_val);
                     gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
                     // gui_text_convert_to_img((gui_text_t *)move_text, RGB565);
                 }
                 {
-                    sprintf(ex_content, "Exercise: %d/60 min", ex_val);
+                    sprintf(ex_content, "Exercise:%d/60min", ex_val);
                     gui_text_content_set(ex_text, ex_content, strlen(ex_content));
                     // gui_text_convert_to_img(ex_text, RGB565);
                 }
                 {
-                    sprintf(stand_content, "Stand: %d/30 times", stand_val);
+                    sprintf(stand_content, "Stand:%d/30times", stand_val);
                     gui_text_content_set(stand_text, stand_content, strlen(stand_content));
                     // gui_text_convert_to_img(stand_text, RGB565);
                 }
@@ -233,24 +233,27 @@ void activity_app(gui_view_t *view)
     // if (!move_text)
     {
         move_text = gui_text_create(obj, "move_text", 150, 300, 0, 0);
-        gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_BMP, gui_rgb(230, 67, 79),
+        gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_TTF, gui_rgb(230, 67, 79),
                      strlen(move_content), 32);
-        gui_text_type_set(move_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(move_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(move_text, LEFT);
+        gui_text_rendermode_set(move_text, 2);
         // gui_text_convert_to_img(move_text, RGB565);
 
         ex_text = gui_text_create(obj, "ex_text", 150, 350, 0, 0);
-        gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_BMP, gui_rgb(186, 253, 79),
+        gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_TTF, gui_rgb(186, 253, 79),
                      strlen(ex_content), 32);
-        gui_text_type_set(ex_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(ex_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(ex_text, LEFT);
+        gui_text_rendermode_set(ex_text, 2);
         // gui_text_convert_to_img(ex_text, RGB565);
 
         stand_text = gui_text_create(obj, "stand_text", 150, 400, 0, 0);
-        gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_BMP, gui_rgb(117, 230, 229),
+        gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_TTF, gui_rgb(117, 230, 229),
                      strlen(stand_content), 32);
-        gui_text_type_set(stand_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_type_set(stand_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(stand_text, LEFT);
+        gui_text_rendermode_set(stand_text, 2);
         // gui_text_convert_to_img(stand_text, RGB565);
     }
     {
@@ -261,7 +264,7 @@ void activity_app(gui_view_t *view)
         if (img_data == NULL)
         {
             img_data = gui_lower_malloc(buffer_size);
-            gui_log("enter gui_lower_malloc\n");
+            // gui_log("enter gui_lower_malloc\n");
         }
         memset(img_data, 0, buffer_size);
         // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);

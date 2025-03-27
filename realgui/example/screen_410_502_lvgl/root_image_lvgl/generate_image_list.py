@@ -19,6 +19,10 @@ def parse_bin_file(file_path):
             print(f"File {file_path} is too short to parse.")
             return None
 
+        # Extract the file name and its different formats
+        file_name = os.path.basename(file_path)
+        struct_name = os.path.splitext(file_name)[0].lower()
+
         # Get the second byte to determine the color space
         color_byte = data[1]
         if color_byte == 0:
@@ -31,24 +35,29 @@ def parse_bin_file(file_path):
             color_space = "LV_COLOR_FORMAT_RGB565"
             size = 2
 
+        compress = data[0]
+        if compress != 0:
+            color_space = "LV_COLOR_FORMAT_RAW"
+            data_name = file_name.upper().replace('.', '_')
+        else:
+            data_name = file_name.upper().replace('.', '_') + " + 8"
+
         # Read the 3rd and 4th bytes to determine the width W, note that the low byte comes first
         width = struct.unpack('<H', data[2:4])[0]
 
         # Read the 5th and 6th bytes to determine the height H, note that the low byte comes first
         height = struct.unpack('<H', data[4:6])[0]
 
-        data_size = width * height * size
+        stride = width * size
 
-        # Extract the file name and its different formats
-        file_name = os.path.basename(file_path)
-        struct_name = os.path.splitext(file_name)[0].lower()
-        data_name = file_name.upper().replace('.', '_')
+        data_size = width * height * size
 
         # Return the parsed result
         return {
             'struct_name': struct_name,
             'width': width,
             'height': height,
+            'stride': stride,
             'data_size': data_size,
             'color_space': color_space,
             'data_name': data_name
@@ -67,9 +76,10 @@ def generate_c_file(bin_file_data, output_c_file, output_h_file):
             f_c.write(f"    .header.magic = LV_IMAGE_HEADER_MAGIC,\n")
             f_c.write(f"    .header.w = {data['width']},\n")
             f_c.write(f"    .header.h = {data['height']},\n")
+            f_c.write(f"    .header.stride = {data['stride']},\n")
             f_c.write(f"    .data_size = {data['data_size']},\n")
             f_c.write(f"    .header.cf = {data['color_space']},\n")
-            f_c.write(f"    .data = {data['data_name']} + 8\n")
+            f_c.write(f"    .data = {data['data_name']}\n")
             f_c.write("};\n\n")
 
     # Generate the .h file
@@ -84,8 +94,8 @@ def generate_c_file(bin_file_data, output_c_file, output_h_file):
 if __name__ == '__main__':
     # Replace with your directory path
     directory = "./root"
-    output_c_file = "lv_img_dsc_list.c"  # Generated C file
-    output_h_file = "lv_img_dsc_list.h"  # Generated H file
+    output_c_file = "../images/lv_img_dsc_list.c"  # Generated C file
+    output_h_file = "../images/lv_img_dsc_list.h"  # Generated H file
 
     bin_files = read_bin_files(directory)
     bin_file_data = []

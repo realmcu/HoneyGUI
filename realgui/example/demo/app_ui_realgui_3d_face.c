@@ -1,3 +1,4 @@
+/* 3d face demo start*/
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_tabview.h"
@@ -39,14 +40,16 @@ static void face_cb(void *this, gui_3d_world_t *world,
     gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767, 90,
                                  dc->screen_width, dc->screen_height);
 
-    gui_3d_world_inititalize(&object_matrix, 0, 25, 120, 0, 0, 0,
-                             5);
+    // gui_3d_world_inititalize(&object_matrix, 0, 25, 120, 0, 0, 0,
+    //                          5);
 
-    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
-                             rot_angle,
-                             1);
+    // gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+    //                          rot_angle,
+    //                          1);
 
-    *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+    // *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+
+    gui_3d_world_inititalize(world, 0, 25, 120, 0, rot_angle, 0, 5);
 }
 
 
@@ -59,14 +62,14 @@ static void app_ui_design(gui_app_t *app)
     gui_3d_set_global_shape_transform_cb(test_3d, (gui_3d_shape_transform_cb)face_cb);
     gui_3d_set_animate(test_3d, 10000, -1, update_face_animation, NULL);
 
-    extern void gui_fps_create(void *parent);
-    gui_fps_create(&(app->screen));
+//    extern void gui_fps_create(void *parent);
+//    gui_fps_create(&(app->screen));
 
     return;
 
 }
 
-
+/* 3d face demo end*/
 
 static gui_app_t rtk_gui_demo =
 {

@@ -20,7 +20,7 @@ Set Tab Style
 If you want to exhibit various switching effects when switching tabs, you can utilize the :cpp:any:`gui_tab_set_style` to set it. By default, the classic style is employed. The available switching effects include the following:
 
 
-.. literalinclude:: ../../../realgui/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

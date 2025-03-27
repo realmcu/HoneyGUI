@@ -21,7 +21,6 @@
 #include <string.h>
 #include "gui_obj.h"
 #include "gui_pagelist_new.h"
-#include "gui_button.h"
 
 
 /*============================================================================*
@@ -54,8 +53,8 @@ static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
     {
         if (!(obj != ((void *)0)))
         {
-            gui_assert_handler("obj != NULL", __FUNCTION__, 53);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)obj)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 53);
@@ -67,8 +66,8 @@ static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
     {
         if (!(t != ((void *)0)))
         {
-            gui_assert_handler("t != NULL", __FUNCTION__, 53);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)t)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(t)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 53);
@@ -91,13 +90,16 @@ static void win_press(void *obj, gui_event_t e, void *param)
     // GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
     //                            MACRO_PAGE_LIST_NEW)
     {
+        if (!(obj != ((void *)0)))
+        {
+            return;
+        }
         {
             if (!(((gui_pagelist_new_t *)
                    ((gui_obj_t *)obj)->parent->parent->parent) != ((void *)0)))
             {
-                gui_assert_handler("((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != NULL",
-                                   __FUNCTION__, 80);
-            };
+                return;
+            }
             if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic ==
                    0x0b)))
             {
@@ -123,10 +125,7 @@ static void win_press(void *obj, gui_event_t e, void *param)
     }
     //GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
     {
-        if (!(obj != ((void *)0)))
-        {
-            gui_assert_handler("obj != NULL", __FUNCTION__, 82);
-        };
+
         if (!((((gui_obj_t *)obj)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 82);
@@ -138,8 +137,8 @@ static void win_press(void *obj, gui_event_t e, void *param)
     {
         if (!(img != ((void *)0)))
         {
-            gui_assert_handler("img != NULL", __FUNCTION__, 82);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)img)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(img)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 82);
@@ -156,12 +155,15 @@ static void win_release(void *obj, gui_event_t e, void *param)
     // GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
     //                            MACRO_PAGE_LIST_NEW)
     {
+        if (!(obj != ((void *)0)))
+        {
+            return;
+        }
         {
             if (!(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != ((void *)0)))
             {
-                gui_assert_handler("((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != NULL",
-                                   __FUNCTION__, 93);
-            };
+                return;
+            }
             if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic ==
                    0x0b)))
             {
@@ -187,10 +189,7 @@ static void win_release(void *obj, gui_event_t e, void *param)
     }
     //GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
     {
-        if (!(obj != ((void *)0)))
-        {
-            gui_assert_handler("obj != NULL", __FUNCTION__, 95);
-        };
+
         if (!((((gui_obj_t *)obj)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 95);
@@ -202,8 +201,8 @@ static void win_release(void *obj, gui_event_t e, void *param)
     {
         if (!(img != ((void *)0)))
         {
-            gui_assert_handler("img != NULL", __FUNCTION__, 95);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)img)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(img)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 95);

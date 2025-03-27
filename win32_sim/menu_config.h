@@ -42,6 +42,10 @@
 // #define CONFIG_REALTEK_BUILD_REAL_FACE_3D
 // </c>
 
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_DOG_3D
+// </c>
+
 // <c> RTK GUI View Demo
 // #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>
@@ -152,9 +156,7 @@
 // <c> RTK GUI Enable cJSON
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
-// <c> RTK GUI Enable web
-// #define CONFIG_REALTEK_BUILD_WEB
-// </c>
+
 // <c> RTK GUI Enable KeyBoard And Pinyin
 #define CONFIG_REALTEK_BUILD_PINYIN
 // </c>

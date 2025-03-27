@@ -36,9 +36,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
-static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
-static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
+// static void *SOURCEHANSANSSC_BIN = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
+// static void *SOURCEHANSANSSC_BIN = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
+// static void *SOURCEHANSANSSC_BIN = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
 
 gui_win_t *win_watch;
 static gui_text_t *date_text;
@@ -646,30 +646,33 @@ void page_ct_clock(gui_view_t *view)
         //text
         sprintf(tempera_cur_content, "22");
         temperature_cur = gui_text_create(img, "temperature_cur",  32, 16, 0, 0); //32
-        gui_text_set(temperature_cur, (void *)tempera_cur_content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
+        gui_text_set(temperature_cur, (void *)tempera_cur_content, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE,
                      strlen(tempera_cur_content),
                      48);
-        gui_text_type_set(temperature_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(temperature_cur, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(temperature_cur, LEFT);
+        gui_text_rendermode_set(temperature_cur, 2);
         // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
         //                          img_data_temperature);
         sprintf(tempera_low_content, "18");
         temperature_low = gui_text_create(img, "temperature_low",  19, 70, 0, 0);
-        gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
+        gui_text_set(temperature_low, (void *)tempera_low_content, GUI_FONT_SRC_TTF,
                      APP_COLOR_WHITE, //gui_rgba(191, 220, 48, UINT8_MAX),
                      strlen(tempera_low_content),
                      32);
-        gui_text_type_set(temperature_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(temperature_low, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(temperature_low, LEFT);
+        gui_text_rendermode_set(temperature_low, 2);
 
         sprintf(tempera_high_content, "37");
         temperature_high = gui_text_create(img, "temperature_high",  56, 70, 0, 0);
-        gui_text_set(temperature_high, (void *)tempera_high_content, GUI_FONT_SRC_BMP,
+        gui_text_set(temperature_high, (void *)tempera_high_content, GUI_FONT_SRC_TTF,
                      APP_COLOR_WHITE, //gui_rgba(250, 17, 79, UINT8_MAX),
                      strlen(tempera_high_content),
                      32);
-        gui_text_type_set(temperature_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(temperature_high, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(temperature_high, LEFT);
+        gui_text_rendermode_set(temperature_high, 2);
     }
 
     // weather condition
@@ -683,35 +686,38 @@ void page_ct_clock(gui_view_t *view)
         gui_img_create_from_mem(img_weather, "condition_5", UI_WEATHER_SUNNY_BIN, 272, 73, 0, 0);
         char *weather_content = "TODAY";
         gui_text_t *weather_text = gui_text_create(img_weather, "",  16, 110, 0, 0);
-        gui_text_set(weather_text, (void *)weather_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+        gui_text_set(weather_text, (void *)weather_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(weather_content),
                      24);
-        gui_text_type_set(weather_text, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(weather_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(weather_text, LEFT);
+        gui_text_rendermode_set(weather_text, 2);
 
         sprintf(weekday_content, "MON.  TUE.  WED.  THU.");
         weather_text = gui_text_create(img_weather, "weather_text",  88, 110, 0, 0);
-        gui_text_set(weather_text, (void *)weekday_content, GUI_FONT_SRC_BMP, gui_rgba(242, 242, 242, 255),
+        gui_text_set(weather_text, (void *)weekday_content, GUI_FONT_SRC_TTF, gui_rgba(242, 242, 242, 255),
                      strlen(weekday_content),
                      24);
-        gui_text_type_set(weather_text, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(weather_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(weather_text, LEFT);
 
         sprintf(content_cur, "22°");
         weather_cur = gui_text_create(img_weather, "weather_cur",  37, 5, 0, 0);
-        gui_text_set(weather_cur, (void *)content_cur, GUI_FONT_SRC_BMP, gui_rgba(124, 199, 243, 255),
+        gui_text_set(weather_cur, (void *)content_cur, GUI_FONT_SRC_TTF, gui_rgba(124, 199, 243, 255),
                      strlen(content_cur),
                      32);
-        gui_text_type_set(weather_cur, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(weather_cur, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(weather_cur, LEFT);
+        gui_text_rendermode_set(weather_cur, 2);
 
         sprintf(content_range, "H:37° L:18°");
         weather_range = gui_text_create(img_weather, "weather_range",  80, 5, 0, 0);
-        gui_text_set(weather_range, (void *)content_range, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+        gui_text_set(weather_range, (void *)content_range, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(content_range),
                      32);
-        gui_text_type_set(weather_range, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(weather_range, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(weather_range, LEFT);
+        gui_text_rendermode_set(weather_range, 2);
         gui_img_set_animate(img_weather, 3000, -1, weather_cb, img_weather);
     }
 // #endif
@@ -719,11 +725,12 @@ void page_ct_clock(gui_view_t *view)
     // date & time text
     sprintf(date_text_content, "SUN 0");
     date_text = gui_text_create(win_watch, "date_text",  -35, 33, 0, 0);
-    gui_text_set(date_text, (void *)date_text_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+    gui_text_set(date_text, (void *)date_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_text_content),
                  48);
-    gui_text_type_set(date_text, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(date_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, RIGHT);
+    gui_text_rendermode_set(date_text, 2);
     // gui_text_convert_to_img(date_text, RGB565);
     {
         int text_w = 35;
@@ -768,18 +775,21 @@ void page_ct_clock(gui_view_t *view)
     compass_pointer = gui_img_create_from_mem(img, "CLOCK_COMPASS_POINTER",
                                               UI_CLOCK_COMPASS_POINTER_ICON_BIN, 42, 10, 0, 0);
     compass_degree = gui_text_create(img, "compass_degree",  5, 23, 0, 0);
-    gui_text_set(compass_degree, (void *)degree_content, GUI_FONT_SRC_BMP,  gui_rgba(254, 106, 26,
+    gui_text_set(compass_degree, (void *)degree_content, GUI_FONT_SRC_TTF,  gui_rgba(254, 106, 26,
                  UINT8_MAX), //orange color
                  strlen(degree_content),
                  32);
-    gui_text_type_set(compass_degree, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(compass_degree, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(compass_degree, CENTER);
+    gui_text_rendermode_set(compass_degree, 2);
+
     compass_orien = gui_text_create(img, "compass_orien",  0, 47, 0, 0);
-    gui_text_set(compass_orien, (void *)orien_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+    gui_text_set(compass_orien, (void *)orien_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(orien_content),
                  32);
-    gui_text_type_set(compass_orien, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(compass_orien, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(compass_orien, CENTER);
+    gui_text_rendermode_set(compass_orien, 2);
     gui_img_set_animate(img, 1000, -1, compass_cb, NULL);
 
     img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",

@@ -8,18 +8,18 @@
  *********************/
 
 #if LV_USE_PPEE_RTL872xG
-#include "../../misc/lv_area_private.h"
+#include "../../../misc/lv_area_private.h"
 #include "lv_draw_sw_mask_private.h"
-#include "../lv_draw_private.h"
+#include "../../lv_draw_private.h"
 #include "lv_draw_ppe_rtl87x2g.h"
 #include "blend/lv_draw_sw_blend_private.h"
 #include "lv_draw_sw_gradient_private.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_text_ap.h"
-#include "../../core/lv_refr.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw_mask.h"
+#include "../../../misc/lv_math.h"
+#include "../../../misc/lv_text_ap.h"
+#include "../../../core/lv_refr.h"
+#include "../../../misc/lv_assert.h"
+#include "../../../stdlib/lv_string.h"
+#include "../../lv_draw_mask.h"
 #include "rtl_ppe.h"
 #include "lv_ppe_utils.h"
 /*********************

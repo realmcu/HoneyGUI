@@ -785,7 +785,7 @@ static void seekbar_write_text_cb(void *obj, gui_event_t e, char *text_name)
     snprintf(text->content, 5, "%d",
              (int)(GUI_API(gui_seekbar_t).get_progress(this) * 100 + 0.5f));
     gui_text_content_set(text, text->content, strlen(text->content));
-    gui_log("text->content:%s\n", text->content);
+    gui_log("text->content:%s\n", (char *)(text->content));
 }
 static char *open_switch_name;
 static char *pause_switch_name;
@@ -2550,9 +2550,13 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         char *ptxt = get_space_string_head(p->txt);
         if (text)
         {
-            if (font_type == 0 ||
-                font_size == 0 ||
-                gui_get_file_address(font_type) == 0)
+            if (strlen(text) == 0)
+            {
+                text = 0;
+            }
+            else if (font_type == 0 ||
+                     font_size == 0 ||
+                     gui_get_file_address(font_type) == 0)
             {
                 text = "Font Export failed! Try again.";
                 font_size = 16;
@@ -5448,6 +5452,14 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         {
             string_array[j++] = token;
             token = strtok(NULL, ",");
+        }
+        if (w == 0)
+        {
+            w = gui_get_screen_width();
+        }
+        if (w == 0)
+        {
+            w = 400;
         }
         if (!horizontal)
         {

@@ -26,7 +26,7 @@
 ~~~~~~~~
 卡片容器控件有5种风格，开发者可以使用 :cpp:any:`gui_cardview_set_style` 来设置风格。
 
-.. literalinclude:: ../../../realgui/widget/gui_tabview.h
+.. literalinclude:: ../../../realgui/widget/gui_tabview/gui_tabview.h
    :language: c
    :start-after: /* T_SLIDE_STYLE enum start*/
    :end-before: /* T_SLIDE_STYLE enum end*/

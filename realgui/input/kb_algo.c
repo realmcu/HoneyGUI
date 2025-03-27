@@ -84,12 +84,49 @@ static bool kb_judge_short_click(struct gui_kb_port_data *kb_raw)
     return false;
 }
 
+static void kb_judge_short_click_twice(struct gui_kb_port_data *kb_raw)
+{
+    static bool hold = 0;
+    static bool pressed_flag = 0;
+    static uint32_t time_release_his = 0;
+    if (kb_raw->event == GUI_KB_EVENT_DOWN && !hold)
+    {
+        hold = 1;
+    }
+    if (hold)
+    {
+        if (kb_raw->event == GUI_KB_EVENT_UP)
+        {
+            hold = 0;
+            uint32_t time_release = kb_raw->timestamp_ms_release;
+            uint32_t time_diff = time_release - kb_raw->timestamp_ms_press;
+            if (time_diff <= 300)
+            {
+                // gui_log("pressing time = %d\n", time_diff);
+                if (pressed_flag && (time_release - time_release_his) < 1000)
+                {
+                    // gui_log("short click twice\n");
+                    kb.short_click_twice = true;
+                }
+                pressed_flag = !pressed_flag;
+                time_release_his = time_release;
+                return;
+            }
+            else
+            {
+                // gui_log("pressing time = %d\n", time_diff);
+                pressed_flag = 0;
+            }
+        }
+    }
+    kb.short_click_twice = false;
+}
+
 struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
 {
     GUI_ASSERT(kb_raw != NULL);
 
     uint8_t flag = kb_raw->event;
-
     if (flag == GUI_KB_EVENT_DOWN)
     {
         if (kb.pressed == false)
@@ -137,6 +174,7 @@ struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
     {
         //KB_LOG("not cache kb down and up, do keep \n");
     }
+    kb_judge_short_click_twice(kb_raw);
     //KB_LOG("kb.type:%d\n", kb.type);
     memset(kb.string, 0x00, sizeof(kb.string));
     memcpy(kb.string, kb_raw->name, sizeof(kb_raw->name));

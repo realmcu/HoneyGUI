@@ -63,11 +63,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-
-static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN;
-static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
-static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
-
 static gui_win_t *win_hb;
 static uint8_t *img_data = NULL;
 
@@ -289,25 +284,22 @@ void clear_heart_rate_cache(void)
         img_data = NULL;
     }
 }
-static void return_cb()
+static void return_to_menu()
 {
-    const char *name = GUI_BASE(gui_view_get_current_view())->name;
-    if (strcmp(name, "menu_view") == 0)
-    {
-        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
-    }
-    else
-    {
-        gui_view_switch_direct(current_view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
-    }
+    gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
 }
+static void return_to_watchface()
+{
+    gui_view_switch_direct(current_view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+}
+
 void heart_rate_app(gui_view_t *view)
 {
     clear_mem();
 
     gui_obj_t *obj = GUI_BASE(view);
 
-    gui_log("current app:%s\n", gui_current_app()->screen.name);
+    // gui_log("current app:%s\n", gui_current_app()->screen.name);
 
     win_hb = gui_win_create(obj, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
@@ -320,9 +312,10 @@ void heart_rate_app(gui_view_t *view)
         int font_size = 32;
         gui_text_t *t = gui_text_create(win_hb, "txt", 51, 318, 0,
                                         font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         // sprintf(hr_content, "69");
@@ -343,9 +336,10 @@ void heart_rate_app(gui_view_t *view)
         int font_size = 48;
         gui_text_t *t = gui_text_create(win_hb, "txt", 156, 388, 0,
                                         96);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         int image_h = 300,
@@ -368,63 +362,70 @@ void heart_rate_app(gui_view_t *view)
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", -35, 78 + 70 * 0, 0,
                                         font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         char *text = "120";
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", -35, 78 + 70 * 1, 0,
                                         font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         char *text = "80";
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", -35, 78 + 70 * 2, 0,
                                         font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_RED, strlen(text), font_size);
         gui_text_mode_set(t, RIGHT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         char *text = "12AM";
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 0,
                                         288 - font_size, 0, font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         char *text = "6AM";
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 1,
                                         288 - font_size, 0, font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         char *text = "12PM";
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 2,
                                         288 - font_size, 0, font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     {
         char *text = "6PM";
         int font_size = 24;
         gui_text_t *t = gui_text_create(win_hb, "txt", 36 + 87 * 3,
                                         288 - font_size, 0, font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_TTF, COLOR_SILVER, strlen(text), font_size);
         gui_text_mode_set(t, LEFT);
-        gui_text_type_set(t, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(t, 2);
     }
     const char *name = GUI_BASE(gui_view_get_current_view())->name;
     if (strcmp(name, "music_view") == 0 || strcmp(name, "activity_view") == 0)
@@ -434,10 +435,16 @@ void heart_rate_app(gui_view_t *view)
         gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
     }
-    else
+    else if (strcmp(name, "menu_view") == 0)
     {
         extern const uint32_t *gui_app_return_array[17];
         gui_return_create(view, gui_app_return_array,
-                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_cb, 0);
+                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_to_menu, 0);
+    }
+    else if (strcmp(name, "watchface_view") == 0)
+    {
+        extern const uint32_t *gui_app_return_array[17];
+        gui_return_create(view, gui_app_return_array,
+                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_to_watchface, 0);
     }
 }

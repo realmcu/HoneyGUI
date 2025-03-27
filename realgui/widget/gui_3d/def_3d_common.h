@@ -154,6 +154,7 @@ typedef enum
     GUI_3D_FACE_RECTANGLE_TRIANGLE,
 } GUI_3D_FACE_TYPE;
 
+/* gui_3d_description_t start*/
 typedef struct
 {
     GUI_3D_FACE_TYPE face_type;
@@ -169,7 +170,7 @@ typedef struct
     unsigned char **textures;
 
 } gui_3d_description_t;
-
+/* gui_3d_description_t end*/
 
 typedef gui_3d_matrix_t gui_3d_world_t;
 

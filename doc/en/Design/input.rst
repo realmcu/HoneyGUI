@@ -60,7 +60,7 @@ Touchpad Algorithm Processor
 The code implementation of the touchpad algorithm processing is in the ``tp_algo_process`` function. Gesture recognition is performed by judging changes in X-axis and Y-axis coordinate data, as well as touch time. The input types obtained after the algorithm processing are as follows.
 
 
-.. literalinclude:: ../../../realgui/widget/guidef.h
+.. literalinclude:: ../../../realgui/core/def_input.h
    :language: c
    :start-after: /* T_GUI_INPUT_TYPE enum start*/
    :end-before: /* T_GUI_INPUT_TYPE enum end*/

@@ -83,9 +83,10 @@ typedef struct kb_info
 {
     uint32_t type;
     char *string[20];
-    uint8_t pressed  : 1;
-    uint8_t released : 1;
-    uint8_t pressing : 1;
+    uint8_t pressed             : 1;
+    uint8_t released            : 1;
+    uint8_t pressing            : 1;
+    uint8_t short_click_twice   : 1;
 } kb_info_t;
 
 typedef struct wheel_info
@@ -124,6 +125,7 @@ typedef struct gui_wheel_port_data
     uint32_t timestamp_ms;             /* The timestamp when the data was received */
 } gui_wheel_port_data_t;
 
+/* gui_indev struct define start */
 typedef struct gui_indev
 {
     uint16_t tp_witdh;
@@ -143,7 +145,7 @@ typedef struct gui_indev
 
     gui_wheel_port_data_t *(*wheel_get_port_data)(void);
 } gui_indev_t;
-
+/* gui_indev struct define end */
 
 
 #ifdef __cplusplus
