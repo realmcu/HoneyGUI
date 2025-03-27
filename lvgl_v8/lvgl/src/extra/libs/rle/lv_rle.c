@@ -1,3 +1,10 @@
+/**
+ * @file lv_rle.c
+ *
+ */
+/*********************
+ *      INCLUDES
+ *********************/
 #include "lvgl.h"
 
 #if LV_USE_RTK_IDU
@@ -11,10 +18,19 @@
 #include "trace.h"
 #endif
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
-#include "hal_idu.h"
+#if (LV_USE_GPU_RTK_PPE == 1)
+#include "rtl_idu.h"
+#include "lv_draw_rtk_ppe_utils.h"
+#include "rtl_gdma.h"
 #endif
 
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+#if (LV_USE_GPU_RTK_PPE == 1)
+static uint8_t high_speed_dma_channel = 0xFF;
+static uint8_t low_speed_dma_channel = 0xFF;
+#endif
 /**********************
  * GLOBAL VARIABLES
  **********************/
@@ -149,7 +165,7 @@ static lv_res_t decompress_rle_argb8565_data(const idu_file_t *file, uint8_t *im
 static lv_res_t decompress_rle_argb8888_data(const idu_file_t *file, uint8_t *img_data,
                                              uint16_t width, uint16_t height);
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
+#if (LV_USE_GPU_RTK_PPE == 1)
 static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_t width,
                                   uint16_t height);
 #endif
@@ -164,9 +180,9 @@ void lv_rtk_idu_init(void)
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
+#if (LV_USE_GPU_RTK_PPE == 1)
     uint8_t channel1 = 1, channel2 = 3;
-    hal_dma_channel_init(&channel1, &channel2);
+    lv_ppe_register_dma_channel(channel1, channel2);
 #endif
     LV_LOG_INFO("RLE decoder initialized");
 }
@@ -383,7 +399,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
             idu_file_t *file = (idu_file_t *)((uint8_t *)file_data + 8);
             lv_res_t ret;
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
+#if (LV_USE_GPU_RTK_PPE == 1)
             ret = hw_acc_idu_decode(file_data, img_data, width, height);
 
             if (ret == LV_RES_OK)
@@ -505,7 +521,7 @@ static lv_res_t decoder_open(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *ds
 
         lv_res_t ret;
 
-#if (LV_USE_GPU_RTK_PPE == 1) || (LV_USE_GPU_PPE_RTL8773E == 1)
+#if (LV_USE_GPU_RTK_PPE == 1)
         ret = hw_acc_idu_decode(data, img_data, width, height);
 
         if (ret == LV_RES_OK)
@@ -596,15 +612,20 @@ static lv_res_t hw_acc_idu_decode(const uint8_t *image, uint8_t *output, uint16_
         LV_ASSERT(image != NULL && output != NULL);
         return LV_RES_INV;
     }
-
-    hal_idu_decompress_info info;
+    idu_file_header_t *rle_headers = (idu_file_header_t *)image;
+    IDU_decode_range info;
     info.start_column = 0;
     info.end_column = width - 1;
     info.start_line = 0;
     info.end_line = height - 1;
-    info.raw_data_address = (uint32_t)(image + 8);
+    info.target_stride = rle_headers->raw_pic_width * rle_headers->algorithm_type.pixel_bytes;
+    IDU_DMA_config dma_cfg;
+    dma_cfg.output_buf = (uint32_t *)output;
+    dma_cfg.RX_DMA_channel_num = lv_ppe_get_high_speed_dma();
+    dma_cfg.TX_DMA_channel_num = lv_ppe_get_low_speed_dma();
 
-    bool ret = hal_idu_decompress(&info, output);
+//    bool ret = hal_idu_decompress(&info, output);
+    IDU_ERROR ret = IDU_Decode((uint8_t *)(image + 8), &info, &dma_cfg);
 
     if (!ret)
     {

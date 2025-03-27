@@ -33,6 +33,7 @@ void matrix_transfrom_rotate(gui_matrix_t *rotate, \
 void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult);
 void matrix_identity(struct gui_matrix *matrix);
 bool matrix_is_identity(struct gui_matrix *matrix);
+bool matrix_only_translate(struct gui_matrix *matrix);
 void matrix_translate(float x, float y, struct gui_matrix *matrix);
 void matrix_rotate(float degrees, struct gui_matrix *matrix);
 void matrix_inverse(struct gui_matrix *matrix);
