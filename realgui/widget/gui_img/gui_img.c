@@ -48,8 +48,6 @@
  *                           Private Functions
  *============================================================================*/
 
-static void gui_img_reset_translate(gui_img_t *this);
-
 
 /**
  * @brief Prepares the GUI image associated with the specified object.
@@ -73,11 +71,11 @@ static void gui_img_prepare(gui_obj_t *obj)
 
     this = (gui_img_t *)obj;
     tp = tp_get_info();
-    gui_img_reset_translate(this);
-    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
-    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
-    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
-    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
+
+    matrix_translate(this->t_x, this->t_y, obj->matrix);
+    matrix_rotate(this->degrees, obj->matrix);
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    matrix_translate(-this->f_x, -this->f_y, obj->matrix);
 
     if (gui_obj_out_screen(obj))
     {
@@ -113,10 +111,7 @@ static void gui_img_prepare(gui_obj_t *obj)
     last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
-    if (this->transform)
-    {
-        this->checksum += gui_obj_checksum(0, (uint8_t *)this->transform, sizeof(*this->transform));
-    }
+
     if (last != this->checksum)
     {
         gui_fb_change();
@@ -209,32 +204,7 @@ static void gui_img_end(gui_obj_t *obj)
 static void gui_img_destroy(gui_obj_t *obj)
 {
     gui_img_t *this = (gui_img_t *)obj;
-
-    if (this->animate)
-    {
-        if (this->animate_array_length == 0)
-        {
-            gui_free(this->animate);
-            this->animate = NULL;
-        }
-        else
-        {
-            for (size_t i = 0; i < this->animate_array_length; i++)
-            {
-                gui_free(((gui_animate_t **)(this->animate))[i]);
-                ((gui_animate_t **)(this->animate))[i] = NULL;
-            }
-            this->animate = 0;
-            this->animate_array_length = 0;
-        }
-
-
-    }
-    if (this->transform)
-    {
-        gui_free(this->transform);
-        this->transform = NULL;
-    }
+    GUI_UNUSED(this);
 }
 static gui_rgb_data_head_t gui_img_get_header(gui_img_t *this)
 {
@@ -314,6 +284,15 @@ static void gui_img_ctor(gui_img_t            *this,
     gui_obj_t *obj = (gui_obj_t *)this;
 
     this->src_mode = src_mode;
+    this->f_x = 0;
+    this->f_y = 0;
+    this->t_x = 0;
+    this->t_y = 0;
+    this->scale_x = 1;
+    this->scale_y = 1;
+    this->degrees = 0;
+    this->high_quality = false;
+    this->need_clip = false;
 
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
@@ -528,13 +507,6 @@ void gui_img_refresh_size(gui_img_t *this)
     this->base.h = gui_img_get_height(this);
 }
 
-void gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)
-{
-    gui_obj_t *root = (gui_obj_t *)this;
-
-    root->x = x;
-    root->y = y;
-}
 
 void gui_img_set_mode(gui_img_t *this, BLEND_MODE_TYPE mode)
 {
@@ -594,131 +566,70 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 }
 
 
+void gui_img_set_focus(gui_img_t *this, float f_x, float f_y)
+{
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
 
-#define DEFAULT_TRANSFORM_SCALE_X 1.0F
-#define DEFAULT_TRANSFORM_SCALE_Y 1.0F
-#define DEFAULT_TRANSFORM_DEGREE 0
-#define DEFAULT_TRANSFORM_C_X 0
-#define DEFAULT_TRANSFORM_C_Y 0
-#define DEFAULT_TRANSFORM_T_X 0
-#define DEFAULT_TRANSFORM_T_Y 0
-static struct gui_img_transform *get_transform(gui_img_t *this)
+    this->f_x = f_x;
+    this->f_y = f_y;
+}
+
+
+void gui_img_rotation(gui_img_t *this, float degrees)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform == 0)
-    {
-        this->transform = gui_malloc(sizeof(*this->transform));
-        if (this->transform)
-        {
-            memset(this->transform, 0, sizeof(*this->transform));
-            this->transform->degrees = DEFAULT_TRANSFORM_DEGREE;
-            this->transform->c_x     = DEFAULT_TRANSFORM_C_X;
-            this->transform->c_y     = DEFAULT_TRANSFORM_C_Y;
-            this->transform->scale_x = DEFAULT_TRANSFORM_SCALE_X;
-            this->transform->scale_y = DEFAULT_TRANSFORM_SCALE_Y;
-            this->transform->t_x     = DEFAULT_TRANSFORM_T_X;
-            this->transform->t_y     = DEFAULT_TRANSFORM_T_Y;
-        }
-    }
-    GUI_ASSERT(this->transform)
-    return this->transform;
+
+    this->degrees = degrees;
 }
-void gui_img_rotation(gui_img_t *this,
-                      float      degrees,
-                      float      c_x,
-                      float      c_y)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    get_transform(this)->degrees = degrees;
-    get_transform(this)->c_x = c_x;
-    get_transform(this)->c_y = c_y;
-}
-static void gui_img_reset_translate(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    get_transform(this)->t_x_old = 0;
-    get_transform(this)->t_y_old = 0;
-}
+
 void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if ((scale_x > 0) && (scale_y > 0))
-    {
-        get_transform(this)->scale_x = scale_x;
-        get_transform(this)->scale_y = scale_y;
-    }
+    this->scale_x = scale_x;
+    this->scale_y = scale_y;
 }
 
 void gui_img_translate(gui_img_t *this, float t_x, float t_y)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    get_transform(this)->t_x = t_x + get_transform(this)->t_x_old;
-    get_transform(this)->t_y = t_y + get_transform(this)->t_y_old;
-    get_transform(this)->t_x_old += t_x;
-    get_transform(this)->t_y_old += t_y;
+    this->t_x = t_x;
+    this->t_y = t_y;
 }
-float gui_img_get_transform_scale_x(gui_img_t *this)
+float gui_img_get_scale_x(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->scale_x;
-    }
-    return DEFAULT_TRANSFORM_SCALE_X;
+    return this->scale_x;
 }
-float gui_img_get_transform_scale_y(gui_img_t *this)
+float gui_img_get_scale_y(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->scale_y;
-    }
-    return DEFAULT_TRANSFORM_SCALE_Y;
+    return this->scale_y;
 }
-float gui_img_get_transform_degrees(gui_img_t *this)
+float gui_img_get_degrees(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->degrees;
-    }
-    return DEFAULT_TRANSFORM_DEGREE;
+    return this->degrees;
 }
-float gui_img_get_transform_c_x(gui_img_t *this)
+float gui_img_get_c_x(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->c_x;
-    }
-    return DEFAULT_TRANSFORM_C_X;
+    return this->f_x;
+
 }
-float gui_img_get_transform_c_y(gui_img_t *this)
+float gui_img_get_c_y(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->c_y;
-    }
-    return DEFAULT_TRANSFORM_C_Y;
+    return this->f_y;
 }
-float gui_img_get_transform_t_x(gui_img_t *this)
+float gui_img_get_t_x(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->t_x;
-    }
-    return DEFAULT_TRANSFORM_T_X;
+    return this->t_x;
 }
-float gui_img_get_transform_t_y(gui_img_t *this)
+float gui_img_get_t_y(gui_img_t *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    if (this->transform)
-    {
-        return this->transform->t_y;
-    }
-    return DEFAULT_TRANSFORM_T_Y;
+    return this->t_y;
 }
 
 void gui_img_skew_x(gui_img_t *this, float degrees)
