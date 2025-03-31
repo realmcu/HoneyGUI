@@ -117,5 +117,4 @@ void gui_obj_timer_handler(gui_obj_t *obj)
             obj->timer = NULL;
         }
     }
-
 }

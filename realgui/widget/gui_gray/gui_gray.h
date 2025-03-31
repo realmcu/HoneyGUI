@@ -1,26 +1,26 @@
 /**
-\internal
+ \internal
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_multi_level.h
-  * @brief multi_level widget
-  * @details A multi_level container widget
-  * @author triton_yu@realsil.com.cn
-  * @date 2024/06/03
+  * @file gui_gray.h
+  * @brief Gray scale widget
+  * @details Widget that converts content in its area to grayscale
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/25
   * @version 1.0
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
-\endinternal
+ \endinternal
   */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_MULTI_LEVEL_H__
-#define __GUI_MULTI_LEVEL_H__
+#ifndef __GUI_GRAY_H__
+#define __GUI_GRAY_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,67 +29,71 @@ extern "C" {
  *                        Header Files
  *============================================================================*/
 #include "guidef.h"
+#include "gui_api.h"
 #include "gui_obj.h"
+#include "engine_gray16.h"
+
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
 
-/** @brief  multi_level structure */
-typedef struct gui_multi_level
+/** @brief Gray scale widget structure */
+typedef struct
 {
-    gui_obj_t base;
-    void (*ui_design)(gui_obj_t *);
-    bool hidden;
-    uint8_t level;
-    uint8_t index;
-} gui_multi_level_t;
-_GUI_API_DEFINE(gui_multi_level_t)
-/**
- * @brief jump to a specitf multi_level widget.
- * @param this one of the multi_level widgets in app.
- * @param level specitf level. 0,1,2...
- * @param index index in this level. 0,1,2...
- *
- */
-void (*jump)(gui_multi_level_t *this, int levle, int index);
+    gui_obj_t base;         /* Base object structure */
+    void *data;         /* User data pointer */
+    engine_gray16_t *gray16; /* 4-bit gray scale image */
+    uint8_t gray_level;      /* Gray level (0-255), 0 for black, 255 for white */
+} gui_gray_t;
 
-_GUI_API_DECLARE(gui_multi_level_t)
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
 
+
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
 
 /**
- * @brief create a multi_level widget.
- * @param parent the father widget nested in.
- * @param widget_name the widget name.
- * @param x the X-axis coordinate.
- * @param y the Y-axis coordinate.
- * @param ui_design ui_design function pointer.
- * @return return the widget object pointer
+ * @brief Create a gray scale widget
  *
+ * @param parent Parent object pointer
+ * @param name Widget name
+ * @param data User data pointer
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param w Width
+ * @param h Height
+ * @return gui_gray_t* Pointer to the created gray scale widget
  */
-gui_multi_level_t *gui_multi_level_create(void *parent, const char *widget_name,
-                                          void (*ui_design)(gui_obj_t *));
+gui_gray_t *gui_gray_create(void       *parent,
+                            const char *name,
+                            void       *data,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h);
+
 /**
- * @brief jump to a specific multi_level widget.
- * @param this one of the multi_level widgets in app.
- * @param level specitf level. 0,1,2...
- * @param index index in this level. 0,1,2...
+ * @brief Set the gray level of the widget
  *
+ * @param gray Gray scale widget pointer
+ * @param level Gray level (0-255), 0 for black, 255 for white
  */
-void gui_multi_level_jump(gui_multi_level_t  *this, int level, int index);
+void gui_gray_set_level(gui_gray_t *gray, uint8_t level);
+
 
 #ifdef __cplusplus
 }

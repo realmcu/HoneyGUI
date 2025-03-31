@@ -6,10 +6,6 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-# src += Glob('*.cpp')
-src += ['gui_win.c']
-src += ['gui_gray.c']
-
 
 CPPPATH = [cwd]
 
