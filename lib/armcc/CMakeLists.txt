@@ -44,6 +44,21 @@ endif()
 execute_process( 
 				COMMAND 
 				python 
+				${CMAKE_CURRENT_SOURCE_DIR}/../../tool/git_generate_version.py 
+				${CMAKE_CURRENT_SOURCE_DIR}/../../realgui/
+				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+				)
+
+#find_program(menuconfig_EXECUTABLE menuconfig NO_CMAKE_FIND_ROOTO_PATH)
+#set(menuconfig_ARGS "${CMAKE_CURRENT_SOURCE_DIR}/../../Kconfig.gui")
+#execute_process( COMMAND 
+#				 ${menuconfig_EXECUTABLE} 
+#				 ${menuconfig_ARGS} 
+#				)
+
+execute_process( 
+				COMMAND 
+				python 
 				${CMAKE_CURRENT_SOURCE_DIR}/../../tool/convert_dot_config_to.py 
 				${CMAKE_CURRENT_SOURCE_DIR}/.config 
 				${CMAKE_CURRENT_SOURCE_DIR}/config.cmake
