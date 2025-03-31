@@ -88,6 +88,19 @@ gui_gray_t *gui_gray_create(void       *parent,
 
 /**
  * @brief Set the gray level of the widget
+ * @param this Gray scale widget pointer
+ * @param name Widget name
+ * @param data User data pointer
+ * @param x X coordinate
+ * @param y Y coordinate
+ */
+void gui_gray_set_attribute(gui_gray_t  *this,
+                            const char *name,
+                            void       *data,
+                            int16_t     x,
+                            int16_t     y);
+/**
+ * @brief Set the gray level of the widget
  *
  * @param gray Gray scale widget pointer
  * @param level Gray level (0-255), 0 for black, 255 for white

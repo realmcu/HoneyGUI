@@ -217,6 +217,34 @@ gui_gray_t *gui_gray_create(void       *parent,
     return this;
 }
 
+void gui_gray_set_attribute(gui_gray_t  *this,
+                            const char *name,
+                            void       *data,
+                            int16_t     x,
+                            int16_t     y)
+{
+    GUI_ASSERT(this != NULL);
+
+    if ((!name) && (!data))
+    {
+        return;
+    }
+
+    this->base.x = x;
+    this->base.y = y;
+
+    if (name != NULL)
+    {
+        this->base.name = name;
+    }
+    else
+    {
+        this->base.name = "gui_gray_set_attribute";
+    }
+
+    this->data = data;
+}
+
 /**
  * @brief Set the gray level of the widget
  *
