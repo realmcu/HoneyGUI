@@ -5,14 +5,14 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "tiger_blue.txt"
-#include "tiger_white.txt"
-#include "tiger_yellow.txt"
+#include "../../assets/tiger_blue.txt"
+#include "../../assets/tiger_white.txt"
+#include "../../assets/tiger_yellow.txt"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_win.h"
 #include "gui_view.h"
-#include "gui_fps.h"
+
 
 #define CURRENT_VIEW_NAME "blue_view"
 
@@ -20,8 +20,8 @@
 static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *yellow_view_descriptor = NULL;
 static const gui_view_descriptor_t *white_view_descriptor = NULL;
-static void app_ui_view_blue_design(gui_view_t *view);
-static void clean_cb(gui_view_t *view);
+static void switch_in_cb(gui_view_t *view);
+static void switch_out_cb(gui_view_t *view);
 
 static const gui_view_descriptor_t descriptor =
 {
@@ -29,8 +29,8 @@ static const gui_view_descriptor_t descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
 
-    .on_switch_in = app_ui_view_blue_design,
-    .on_switch_out = clean_cb,
+    .on_switch_in = switch_in_cb,
+    .on_switch_out = switch_out_cb,
 
     .keep = false,
 };
@@ -70,12 +70,12 @@ static void img_cb(void *obj, gui_event_t e, void *param)
     }
 }
 
-static void clean_cb(gui_view_t *view)
+static void switch_out_cb(gui_view_t *view)
 {
     gui_log("blue view clean\n");
 }
 
-static void app_ui_view_blue_design(gui_view_t *view)
+static void switch_in_cb(gui_view_t *view)
 {
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 0, 0, 0,
                                              0);
