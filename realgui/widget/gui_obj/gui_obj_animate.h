@@ -75,21 +75,6 @@ typedef void (* gui_animate_callback_t)(void *p, void *this_widget, gui_animate_
 void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj);
 
 /**
- * @brief set animate.
- *
- * @param animate pointer.
- * @param dur animation time cost in ms.
- * @param repeat_count rounds to repeat.
- * @param callback every frame callback.
- * @param p callback's parameter.
- */
-gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
-                                   uint32_t      dur,
-                                   int           repeat_count,
-                                   void         *callback,
-                                   void         *p);
-
-/**
  * @brief Retrieve the progress of an animation.
  *
  * This function returns the current progress of the specified animation.

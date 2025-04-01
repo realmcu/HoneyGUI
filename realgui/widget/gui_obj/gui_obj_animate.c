@@ -140,25 +140,6 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
     }
 }
 
-gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
-                                   uint32_t      dur,
-                                   int           repeat_count,
-                                   void         *callback,
-                                   void         *p)
-{
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (gui_animate_callback_t)callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    return animate;
-}
 
 float gui_animation_get_progress(gui_animate_t *animation)
 {

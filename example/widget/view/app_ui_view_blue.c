@@ -81,8 +81,6 @@ static void switch_in_cb(gui_view_t *view)
                                              0);
     gui_img_scale(img, 1.875f, 2.034f);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
-    // gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_MOVE_LEFT, NULL);
-    // gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_MOVE_RIGHT, NULL);
 
     gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_CUBE, VIEW_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);

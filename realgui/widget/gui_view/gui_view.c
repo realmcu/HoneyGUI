@@ -55,7 +55,6 @@ static void gui_view_prepare(gui_obj_t *obj)
     kb_info_t *kb = kb_get_info();
     gui_view_t *this = (gui_view_t *)obj;
     VIEW_SWITCH_STYLE style = this->style;
-    uint8_t last = this->checksum;
 
     if (this->event && style < VIEW_ANIMATION_NULL) // do not update release during animation
     {
@@ -155,6 +154,7 @@ static void gui_view_prepare(gui_obj_t *obj)
     // animation update
     animate_frame_update(this->animate, obj);
 
+    uint8_t last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, (uint8_t)sizeof(gui_view_t));
     if (last != this->checksum)
