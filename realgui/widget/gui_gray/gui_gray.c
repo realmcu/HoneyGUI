@@ -20,6 +20,7 @@
 #include <string.h>
 #include "guidef.h"
 #include "gui_obj.h"
+#include "gui_fb.h"
 #include "gui_gray.h"
 #include "tp_algo.h"
 
@@ -75,6 +76,15 @@ static void gui_gray_prepare(gui_gray_t *this)
     matrix_inverse(&this->gray16->inverse);
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_gray_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
+    }
 
 
 }

@@ -41,10 +41,11 @@ extern "C" {
 /** @brief Gray scale widget structure */
 typedef struct
 {
-    gui_obj_t base;         /* Base object structure */
-    void *data;         /* User data pointer */
-    engine_gray16_t *gray16; /* 4-bit gray scale image */
-    uint8_t gray_level;      /* Gray level (0-255), 0 for black, 255 for white */
+    gui_obj_t base;                    /* Base object structure */
+    void *data;                        /* User data pointer */
+    engine_gray16_t *gray16;           /* 4-bit gray scale image */
+    uint8_t gray_level;                /* Gray level (0-255), 0 for black, 255 for white */
+    uint8_t checksum;                  /* Checksum for change detection */
 } gui_gray_t;
 
 /*============================================================================*
