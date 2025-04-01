@@ -46,12 +46,13 @@ typedef struct gui_pagelist_new
 
 
 
-    const gui_event_cb_t *click_function_array;
+    gui_event_cb_t *click_function_array;
+    void **click_param;
     const char **item_text_array;
     const uint8_t *item_image;
     const uint8_t *item_image_hl;
     const uint8_t *font;
-
+    const uint8_t *item_image_selected;
     gui_color_t font_color;
 
 
@@ -65,6 +66,7 @@ typedef struct gui_pagelist_new
     uint16_t item_count;
     uint16_t row_space;
     uint16_t font_size;
+    uint16_t selected_id;
     unsigned char  alien, render_flag, end_speed;
 
 
@@ -202,6 +204,17 @@ void gui_page_list_new_pushback(gui_pagelist_new_t *pagelist_new,
  * @param id The ID of the item to be removed.
  */
 void gui_page_list_new_erase(gui_pagelist_new_t *pagelist_new, int id);
+
+/**
+ * @brief Sets the selected item id in the pagelist_new widget.
+ *
+ * This function sets the selected item id in the pagelist_new widget. The id is
+ * the index of the item in the pagelist_new widget.
+ *
+ * @param pagelist_new Pointer to the pagelist_new widget.
+ * @param id The index of the item to be selected in the pagelist_new widget.
+ */
+void gui_page_list_new_set_selected(gui_pagelist_new_t *pagelist_new, int id);
 #ifdef __cplusplus
 }
 #endif

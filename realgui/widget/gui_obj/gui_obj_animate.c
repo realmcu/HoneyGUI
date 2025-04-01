@@ -61,10 +61,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
     {
         animate->Beginning_frame = 0;
         animate->end_frame = 0;
-        if (animate->progress_percent == 0.0f)
-        {
-            animate->Beginning_frame = 1;
-        }
+
         if (animate->progress_percent == 0 && !animate->init)
         {
             animate->init = 1;
@@ -78,6 +75,10 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
         {
             animate->progress_percent = (float)(cur_time_gap % animate->dur) /
                                         (float)animate->dur;
+            if (animate->progress_percent == 0.0f)
+            {
+                animate->Beginning_frame = 1;
+            }
             if (cur_time_gap / animate->dur >= 1)
             {
                 animate->end_frame = 1;
@@ -95,6 +96,10 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
 
             animate->progress_percent = (float)(cur_time_gap % animate->dur) /
                                         (float)animate->dur;
+            if (animate->progress_percent == 0.0f)
+            {
+                animate->Beginning_frame = 1;
+            }
             if (animate->progress_percent < animate->last_per)
             {
 
@@ -130,6 +135,10 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
             animate->last_round = round_count;
             animate->progress_percent = (float)(cur_time_gap % animate->dur) /
                                         (float)animate->dur;
+            if (animate->progress_percent == 0.0f)
+            {
+                animate->Beginning_frame = 1;
+            }
             animate->current_frame++;
             animate->callback(animate->p, obj, animate);
         }

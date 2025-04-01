@@ -38,14 +38,40 @@
 #include "cJSON.h"
 #include "gui_multi_level.h"
 #include "gui_pagelist_new.h"
+#include "gui_canvas_rect.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
 struct widget_create
 {
     char *name;
-    T_OBJ_TYPE type;
+    int type;
 };
 
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
+#define XML_DOM_KEY_COUINT (UINT8_MAX + 1)
+#define XML_DOM_WIFI_COUINT (30)
+typedef struct xml_dom_wifi
+{
+    const char *name;
+} xml_dom_wifi_t;
+static int active_wifi_index;
+#define ACTIVE_WIFI_PASSWORD_MAX (30)
+static char active_wifi_password_input[ACTIVE_WIFI_PASSWORD_MAX];
+
+#define ACTIVE_WIFI_STATUS_DISCONNECTED (4)
+#define ACTIVE_WIFI_STATUS_CONNECTED (1)
+#define ACTIVE_WIFI_STATUS_CONNECTING (2)
+#define ACTIVE_WIFI_STATUS_DISABLECONNECT (0)
+static char active_wifi_status = ACTIVE_WIFI_STATUS_DISABLECONNECT;
+static xml_dom_wifi_t wifi_array[XML_DOM_WIFI_COUINT] =
+{
+    {"WiFi1"}, {"WiFi2"}, {"WiFi3"}, {"WiFi4"}, {"WiFi5"}, {"WiFi6"},  {"WiFi7"}, {"WiFi8"}, {"WiFi9"}, {"WiFi10"},
+    {"WiFi11"}, {"WiFi12"}, {"WiFi13"}, {"WiFi14"}, {"WiFi15"}, {"WiFi16"}, {"WiFi17"}, {"WiFi18"}, {"WiFi19"}, {"WiFi20"},
+    {"WiFi21"}, {"WiFi22"}, {"WiFi23"}, {"WiFi24"}, {"WiFi25"}, {"WiFi26"}, {"WiFi27"},
+};
+#define MACRO_CONNECTED 9001
+#define MACRO_DISCONNECTED 9002
+#define MACRO_CONNECTING 9003
+#define MACRO_WIFI 9004
 
 static struct widget_create widget[] =
 {
@@ -88,10 +114,15 @@ static struct widget_create widget[] =
     {"combo", MACRO_COMBO},
     {"onPeripheral", MACRO_ON_PERIPHERAL},
     {"chart", MACRO_CHART},
-    {"list", MACRO_PAGE_LIST_NEW},
+    {"listview", MACRO_PAGE_LIST_NEW},
     {"onComplete", MACRO_ONCOMPLETE},
     {"key", MACRO_KEY},
     {"onSelect", MACRO_ONSELECT},
+    {"rect", RECTANGLE},
+    {"wifi", MACRO_WIFI},
+    {"onConnected", MACRO_CONNECTED},
+    {"onDisconnected", MACRO_DISCONNECTED},
+    {"onConnecting", MACRO_CONNECTING},
 };
 
 typedef struct
@@ -176,6 +207,415 @@ struct on_click_jump_cb_param
     const char *to_widget_name;
     int id1;
     int id2;
+    int id;
+};
+
+/**
+ *  \brief The keyboard scancode representation.
+ *
+ *  Values of this type are used to represent keyboard keys, among other places
+ *  in the \link Keysym::scancode key.keysym.scancode \endlink field of the
+ *  Event structure.
+ *
+ *  The values in this enumeration are based on the USB usage page standard:
+ *  https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
+ */
+typedef enum
+{
+    SCANCODE_UNKNOWN = 0,
+
+    /**
+     *  \name Usage page 0x07
+     *
+     *  These values are from usage page 0x07 (USB keyboard page).
+     */
+    /* @{ */
+
+    SCANCODE_A = 4,
+    SCANCODE_B = 5,
+    SCANCODE_C = 6,
+    SCANCODE_D = 7,
+    SCANCODE_E = 8,
+    SCANCODE_F = 9,
+    SCANCODE_G = 10,
+    SCANCODE_H = 11,
+    SCANCODE_I = 12,
+    SCANCODE_J = 13,
+    SCANCODE_K = 14,
+    SCANCODE_L = 15,
+    SCANCODE_M = 16,
+    SCANCODE_N = 17,
+    SCANCODE_O = 18,
+    SCANCODE_P = 19,
+    SCANCODE_Q = 20,
+    SCANCODE_R = 21,
+    SCANCODE_S = 22,
+    SCANCODE_T = 23,
+    SCANCODE_U = 24,
+    SCANCODE_V = 25,
+    SCANCODE_W = 26,
+    SCANCODE_X = 27,
+    SCANCODE_Y = 28,
+    SCANCODE_Z = 29,
+
+    SCANCODE_1 = 30,
+    SCANCODE_2 = 31,
+    SCANCODE_3 = 32,
+    SCANCODE_4 = 33,
+    SCANCODE_5 = 34,
+    SCANCODE_6 = 35,
+    SCANCODE_7 = 36,
+    SCANCODE_8 = 37,
+    SCANCODE_9 = 38,
+    SCANCODE_0 = 39,
+
+    SCANCODE_RETURN = 40,
+    SCANCODE_ESCAPE = 41,
+    SCANCODE_BACKSPACE = 42,
+    SCANCODE_TAB = 43,
+    SCANCODE_SPACE = 44,
+
+    SCANCODE_MINUS = 45,
+    SCANCODE_EQUALS = 46,
+    SCANCODE_LEFTBRACKET = 47,
+    SCANCODE_RIGHTBRACKET = 48,
+    SCANCODE_BACKSLASH = 49, /**< Located at the lower left of the return
+                                  *   key on ISO keyboards and at the right end
+                                  *   of the QWERTY row on ANSI keyboards.
+                                  *   Produces REVERSE SOLIDUS (backslash) and
+                                  *   VERTICAL LINE in a US layout, REVERSE
+                                  *   SOLIDUS and VERTICAL LINE in a UK Mac
+                                  *   layout, NUMBER SIGN and TILDE in a UK
+                                  *   Windows layout, DOLLAR SIGN and POUND SIGN
+                                  *   in a Swiss German layout, NUMBER SIGN and
+                                  *   APOSTROPHE in a German layout, GRAVE
+                                  *   ACCENT and POUND SIGN in a French Mac
+                                  *   layout, and ASTERISK and MICRO SIGN in a
+                                  *   French Windows layout.
+                                  */
+    SCANCODE_NONUSHASH = 50, /**< ISO USB keyboards actually use this code
+                                  *   instead of 49 for the same key, but all
+                                  *   OSes I've seen treat the two codes
+                                  *   identically. So, as an implementor, unless
+                                  *   your keyboard generates both of those
+                                  *   codes and your OS treats them differently,
+                                  *   you should generate SCANCODE_BACKSLASH
+                                  *   instead of this code. As a user, you
+                                  *   should not rely on this code because SDL
+                                  *   will never generate it with most (all?)
+                                  *   keyboards.
+                                  */
+    SCANCODE_SEMICOLON = 51,
+    SCANCODE_APOSTROPHE = 52,
+    SCANCODE_GRAVE = 53, /**< Located in the top left corner (on both ANSI
+                              *   and ISO keyboards). Produces GRAVE ACCENT and
+                              *   TILDE in a US Windows layout and in US and UK
+                              *   Mac layouts on ANSI keyboards, GRAVE ACCENT
+                              *   and NOT SIGN in a UK Windows layout, SECTION
+                              *   SIGN and PLUS-MINUS SIGN in US and UK Mac
+                              *   layouts on ISO keyboards, SECTION SIGN and
+                              *   DEGREE SIGN in a Swiss German layout (Mac:
+                              *   only on ISO keyboards), CIRCUMFLEX ACCENT and
+                              *   DEGREE SIGN in a German layout (Mac: only on
+                              *   ISO keyboards), SUPERSCRIPT TWO and TILDE in a
+                              *   French Windows layout, COMMERCIAL AT and
+                              *   NUMBER SIGN in a French Mac layout on ISO
+                              *   keyboards, and LESS-THAN SIGN and GREATER-THAN
+                              *   SIGN in a Swiss German, German, or French Mac
+                              *   layout on ANSI keyboards.
+                              */
+    SCANCODE_COMMA = 54,
+    SCANCODE_PERIOD = 55,
+    SCANCODE_SLASH = 56,
+
+    SCANCODE_CAPSLOCK = 57,
+
+    SCANCODE_F1 = 58,
+    SCANCODE_F2 = 59,
+    SCANCODE_F3 = 60,
+    SCANCODE_F4 = 61,
+    SCANCODE_F5 = 62,
+    SCANCODE_F6 = 63,
+    SCANCODE_F7 = 64,
+    SCANCODE_F8 = 65,
+    SCANCODE_F9 = 66,
+    SCANCODE_F10 = 67,
+    SCANCODE_F11 = 68,
+    SCANCODE_F12 = 69,
+
+    SCANCODE_PRINTSCREEN = 70,
+    SCANCODE_SCROLLLOCK = 71,
+    SCANCODE_PAUSE = 72,
+    SCANCODE_INSERT = 73, /**< insert on PC, help on some Mac keyboards (but
+                                   does send code 73, not 117) */
+    SCANCODE_HOME = 74,
+    SCANCODE_PAGEUP = 75,
+    SCANCODE_DELETE = 76,
+    SCANCODE_END = 77,
+    SCANCODE_PAGEDOWN = 78,
+    SCANCODE_RIGHT = 79,
+    SCANCODE_LEFT = 80,
+    SCANCODE_DOWN = 81,
+    SCANCODE_UP = 82,
+
+    SCANCODE_NUMLOCKCLEAR = 83, /**< num lock on PC, clear on Mac keyboards
+                                     */
+    SCANCODE_KP_DIVIDE = 84,
+    SCANCODE_KP_MULTIPLY = 85,
+    SCANCODE_KP_MINUS = 86,
+    SCANCODE_KP_PLUS = 87,
+    SCANCODE_KP_ENTER = 88,
+    SCANCODE_KP_1 = 89,
+    SCANCODE_KP_2 = 90,
+    SCANCODE_KP_3 = 91,
+    SCANCODE_KP_4 = 92,
+    SCANCODE_KP_5 = 93,
+    SCANCODE_KP_6 = 94,
+    SCANCODE_KP_7 = 95,
+    SCANCODE_KP_8 = 96,
+    SCANCODE_KP_9 = 97,
+    SCANCODE_KP_0 = 98,
+    SCANCODE_KP_PERIOD = 99,
+
+    SCANCODE_NONUSBACKSLASH = 100, /**< This is the additional key that ISO
+                                        *   keyboards have over ANSI ones,
+                                        *   located between left shift and Y.
+                                        *   Produces GRAVE ACCENT and TILDE in a
+                                        *   US or UK Mac layout, REVERSE SOLIDUS
+                                        *   (backslash) and VERTICAL LINE in a
+                                        *   US or UK Windows layout, and
+                                        *   LESS-THAN SIGN and GREATER-THAN SIGN
+                                        *   in a Swiss German, German, or French
+                                        *   layout. */
+    SCANCODE_APPLICATION = 101, /**< windows contextual menu, compose */
+    SCANCODE_POWER = 102, /**< The USB document says this is a status flag,
+                               *   not a physical key - but some Mac keyboards
+                               *   do have a power key. */
+    SCANCODE_KP_EQUALS = 103,
+    SCANCODE_F13 = 104,
+    SCANCODE_F14 = 105,
+    SCANCODE_F15 = 106,
+    SCANCODE_F16 = 107,
+    SCANCODE_F17 = 108,
+    SCANCODE_F18 = 109,
+    SCANCODE_F19 = 110,
+    SCANCODE_F20 = 111,
+    SCANCODE_F21 = 112,
+    SCANCODE_F22 = 113,
+    SCANCODE_F23 = 114,
+    SCANCODE_F24 = 115,
+    SCANCODE_EXECUTE = 116,
+    SCANCODE_HELP = 117,    /**< AL Integrated Help Center */
+    SCANCODE_MENU = 118,    /**< Menu (show menu) */
+    SCANCODE_SELECT = 119,
+    SCANCODE_STOP = 120,    /**< AC Stop */
+    SCANCODE_AGAIN = 121,   /**< AC Redo/Repeat */
+    SCANCODE_UNDO = 122,    /**< AC Undo */
+    SCANCODE_CUT = 123,     /**< AC Cut */
+    SCANCODE_COPY = 124,    /**< AC Copy */
+    SCANCODE_PASTE = 125,   /**< AC Paste */
+    SCANCODE_FIND = 126,    /**< AC Find */
+    SCANCODE_MUTE = 127,
+    SCANCODE_VOLUMEUP = 128,
+    SCANCODE_VOLUMEDOWN = 129,
+    /* not sure whether there's a reason to enable these */
+    /*     SCANCODE_LOCKINGCAPSLOCK = 130,  */
+    /*     SCANCODE_LOCKINGNUMLOCK = 131, */
+    /*     SCANCODE_LOCKINGSCROLLLOCK = 132, */
+    SCANCODE_KP_COMMA = 133,
+    SCANCODE_KP_EQUALSAS400 = 134,
+
+    SCANCODE_INTERNATIONAL1 = 135, /**< used on Asian keyboards, see
+                                            footnotes in USB doc */
+    SCANCODE_INTERNATIONAL2 = 136,
+    SCANCODE_INTERNATIONAL3 = 137, /**< Yen */
+    SCANCODE_INTERNATIONAL4 = 138,
+    SCANCODE_INTERNATIONAL5 = 139,
+    SCANCODE_INTERNATIONAL6 = 140,
+    SCANCODE_INTERNATIONAL7 = 141,
+    SCANCODE_INTERNATIONAL8 = 142,
+    SCANCODE_INTERNATIONAL9 = 143,
+    SCANCODE_LANG1 = 144, /**< Hangul/English toggle */
+    SCANCODE_LANG2 = 145, /**< Hanja conversion */
+    SCANCODE_LANG3 = 146, /**< Katakana */
+    SCANCODE_LANG4 = 147, /**< Hiragana */
+    SCANCODE_LANG5 = 148, /**< Zenkaku/Hankaku */
+    SCANCODE_LANG6 = 149, /**< reserved */
+    SCANCODE_LANG7 = 150, /**< reserved */
+    SCANCODE_LANG8 = 151, /**< reserved */
+    SCANCODE_LANG9 = 152, /**< reserved */
+
+    SCANCODE_ALTERASE = 153,    /**< Erase-Eaze */
+    SCANCODE_SYSREQ = 154,
+    SCANCODE_CANCEL = 155,      /**< AC Cancel */
+    SCANCODE_CLEAR = 156,
+    SCANCODE_PRIOR = 157,
+    SCANCODE_RETURN2 = 158,
+    SCANCODE_SEPARATOR = 159,
+    SCANCODE_OUT = 160,
+    SCANCODE_OPER = 161,
+    SCANCODE_CLEARAGAIN = 162,
+    SCANCODE_CRSEL = 163,
+    SCANCODE_EXSEL = 164,
+
+    SCANCODE_KP_00 = 176,
+    SCANCODE_KP_000 = 177,
+    SCANCODE_THOUSANDSSEPARATOR = 178,
+    SCANCODE_DECIMALSEPARATOR = 179,
+    SCANCODE_CURRENCYUNIT = 180,
+    SCANCODE_CURRENCYSUBUNIT = 181,
+    SCANCODE_KP_LEFTPAREN = 182,
+    SCANCODE_KP_RIGHTPAREN = 183,
+    SCANCODE_KP_LEFTBRACE = 184,
+    SCANCODE_KP_RIGHTBRACE = 185,
+    SCANCODE_KP_TAB = 186,
+    SCANCODE_KP_BACKSPACE = 187,
+    SCANCODE_KP_A = 188,
+    SCANCODE_KP_B = 189,
+    SCANCODE_KP_C = 190,
+    SCANCODE_KP_D = 191,
+    SCANCODE_KP_E = 192,
+    SCANCODE_KP_F = 193,
+    SCANCODE_KP_XOR = 194,
+    SCANCODE_KP_POWER = 195,
+    SCANCODE_KP_PERCENT = 196,
+    SCANCODE_KP_LESS = 197,
+    SCANCODE_KP_GREATER = 198,
+    SCANCODE_KP_AMPERSAND = 199,
+    SCANCODE_KP_DBLAMPERSAND = 200,
+    SCANCODE_KP_VERTICALBAR = 201,
+    SCANCODE_KP_DBLVERTICALBAR = 202,
+    SCANCODE_KP_COLON = 203,
+    SCANCODE_KP_HASH = 204,
+    SCANCODE_KP_SPACE = 205,
+    SCANCODE_KP_AT = 206,
+    SCANCODE_KP_EXCLAM = 207,
+    SCANCODE_KP_MEMSTORE = 208,
+    SCANCODE_KP_MEMRECALL = 209,
+    SCANCODE_KP_MEMCLEAR = 210,
+    SCANCODE_KP_MEMADD = 211,
+    SCANCODE_KP_MEMSUBTRACT = 212,
+    SCANCODE_KP_MEMMULTIPLY = 213,
+    SCANCODE_KP_MEMDIVIDE = 214,
+    SCANCODE_KP_PLUSMINUS = 215,
+    SCANCODE_KP_CLEAR = 216,
+    SCANCODE_KP_CLEARENTRY = 217,
+    SCANCODE_KP_BINARY = 218,
+    SCANCODE_KP_OCTAL = 219,
+    SCANCODE_KP_DECIMAL = 220,
+    SCANCODE_KP_HEXADECIMAL = 221,
+
+    SCANCODE_LCTRL = 224,
+    SCANCODE_LSHIFT = 225,
+    SCANCODE_LALT = 226, /**< alt, option */
+    SCANCODE_LGUI = 227, /**< windows, command (apple), meta */
+    SCANCODE_RCTRL = 228,
+    SCANCODE_RSHIFT = 229,
+    SCANCODE_RALT = 230, /**< alt gr, option */
+    SCANCODE_RGUI = 231, /**< windows, command (apple), meta */
+
+    SCANCODE_MODE = 257,    /**< I'm not sure if this is really not covered
+                                 *   by any of the above, but since there's a
+                                 *   special KMOD_MODE for it I'm adding it here
+                                 */
+
+    /* @} *//* Usage page 0x07 */
+
+    /**
+     *  \name Usage page 0x0C
+     *
+     *  These values are mapped from usage page 0x0C (USB consumer page).
+     *  See https://usb.org/sites/default/files/hut1_2.pdf
+     *
+     *  There are way more keys in the spec than we can represent in the
+     *  current scancode range, so pick the ones that commonly come up in
+     *  real world usage.
+     */
+    /* @{ */
+
+    SCANCODE_AUDIONEXT = 258,
+    SCANCODE_AUDIOPREV = 259,
+    SCANCODE_AUDIOSTOP = 260,
+    SCANCODE_AUDIOPLAY = 261,
+    SCANCODE_AUDIOMUTE = 262,
+    SCANCODE_MEDIASELECT = 263,
+    SCANCODE_WWW = 264,             /**< AL Internet Browser */
+    SCANCODE_MAIL = 265,
+    SCANCODE_CALCULATOR = 266,      /**< AL Calculator */
+    SCANCODE_COMPUTER = 267,
+    SCANCODE_AC_SEARCH = 268,       /**< AC Search */
+    SCANCODE_AC_HOME = 269,         /**< AC Home */
+    SCANCODE_AC_BACK = 270,         /**< AC Back */
+    SCANCODE_AC_FORWARD = 271,      /**< AC Forward */
+    SCANCODE_AC_STOP = 272,         /**< AC Stop */
+    SCANCODE_AC_REFRESH = 273,      /**< AC Refresh */
+    SCANCODE_AC_BOOKMARKS = 274,    /**< AC Bookmarks */
+
+    /* @} *//* Usage page 0x0C */
+
+    /**
+     *  \name Walther keys
+     *
+     *  These are values that Christian Walther added (for mac keyboard?).
+     */
+    /* @{ */
+
+    SCANCODE_BRIGHTNESSDOWN = 275,
+    SCANCODE_BRIGHTNESSUP = 276,
+    SCANCODE_DISPLAYSWITCH = 277, /**< display mirroring/dual display
+                                           switch, video mode switch */
+    SCANCODE_KBDILLUMTOGGLE = 278,
+    SCANCODE_KBDILLUMDOWN = 279,
+    SCANCODE_KBDILLUMUP = 280,
+    SCANCODE_EJECT = 281,
+    SCANCODE_SLEEP = 282,           /**< SC System Sleep */
+
+    SCANCODE_APP1 = 283,
+    SCANCODE_APP2 = 284,
+
+    /* @} *//* Walther keys */
+
+    /**
+     *  \name Usage page 0x0C (additional media keys)
+     *
+     *  These values are mapped from usage page 0x0C (USB consumer page).
+     */
+    /* @{ */
+
+    SCANCODE_AUDIOREWIND = 285,
+    SCANCODE_AUDIOFASTFORWARD = 286,
+
+    /* @} *//* Usage page 0x0C (additional media keys) */
+
+    /**
+     *  \name Mobile keys
+     *
+     *  These are values that are often used on mobile phones.
+     */
+    /* @{ */
+
+    SCANCODE_SOFTLEFT = 287, /**< Usually situated below the display on phones and
+                                      used as a multi-function feature key for selecting
+                                      a software defined function shown on the bottom left
+                                      of the display. */
+    SCANCODE_SOFTRIGHT = 288, /**< Usually situated below the display on phones and
+                                       used as a multi-function feature key for selecting
+                                       a software defined function shown on the bottom right
+                                       of the display. */
+    SCANCODE_CALL = 289, /**< Used for accepting phone calls. */
+    SCANCODE_ENDCALL = 290, /**< Used for rejecting phone calls. */
+
+    /* @} *//* Mobile keys */
+
+    /* Add any other keys here. */
+
+    NUM_SCANCODES = 512 /**< not a key, just marks the number of scancodes
+                                 for array bounds */
+} scan_code;
+struct on_click_keyboard_cb_param
+{
+    gui_text_t *to_text;
+    scan_code key_board;
 };
 #define TEXT_WEATHER_CUR_ANIMATION 1
 #define ARC_ACTIVITY_EX_ANIMATION 2
@@ -183,6 +623,8 @@ struct on_click_jump_cb_param
 #define TEXT_HEART_RATE_CUR_ANIMATION 4
 #define TEXT_ACTIVITY_EX_ANIMATION 5
 #define TEXT_BATTERY_CAPACITY_ANIMATION 6
+#define TEXT_WIFI_NAME_ANIMATION 7
+#define TEXT_WIFI_PASSWORD_ANIMATION 8
 #define ANIMATION_CALC_MODE_DISCRETE 0
 #define ANIMATION_CALC_MODE_LINEAR 1
 #define ANIMATION_CALC_MODE_PACED 3
@@ -213,6 +655,14 @@ static void img_ontime_canvas_buffer_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_typ
 static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 static void parse_id_string(const char *id, struct on_click_jump_cb_param *param);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(page_list_animation_wifi_name);
+extern gui_multi_level_t *gui_multi_level_create_group(void *parent, const char *widget_name,
+                                                       void (*ui_design)(gui_obj_t *), const char *group_name);
+scan_code get_scan_code_by_keyboard_string(const char *keyboard);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_wifi_callback);
+static void on_click_keyboard_cb_switch_turn_on(void *obj, gui_event_t e,
+                                                struct on_click_keyboard_cb_param *param);
+static bool shift;
 /**
  * @brief Writes a key value in a array at the specified ID.
  *
@@ -223,6 +673,7 @@ static void parse_id_string(const char *id, struct on_click_jump_cb_param *param
  * @return A gui_error_t indicating the result of the operation.
  */
 gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_wifi_ani);
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
 {
@@ -724,7 +1175,199 @@ static void update_light_config(int index, const char *attribute, int value)
 
     write_file(config_file_path, config_str);
 }
+static void xml_dom_wifi_entry(void *parameter)
+{
+    gui_log("try to connect %s %d\n", parameter, active_wifi_status);
+    active_wifi_status = ACTIVE_WIFI_STATUS_CONNECTING;
+    gui_thread_mdelay(3000);
+    static int rand;
+    uint8_t wifi_status[] = {ACTIVE_WIFI_STATUS_DISCONNECTED, ACTIVE_WIFI_STATUS_CONNECTED};
+    active_wifi_status = wifi_status[(rand++) % (sizeof(wifi_status) / sizeof(wifi_status[0]))];
+    if (active_wifi_status == ACTIVE_WIFI_STATUS_DISCONNECTED)
+    {
+        gui_log("DISCONNECT %s \n", parameter);
+    }
+    else
+    {
+        gui_log(" CONNECTED  %s \n", parameter);
+    }
 
+
+}
+void gui_xml_dom_wifi_connect(uint8_t *status, const char *wifi_name)
+{
+
+    gui_thread_create("xml_dom_wifi",
+                      xml_dom_wifi_entry, (void *)wifi_name,
+                      1024 * 10,
+                      15);
+
+
+}
+static void wifi_connect(void *obj, gui_event_t e, void *p)
+{
+    gui_xml_dom_wifi_connect(&active_wifi_status, wifi_array[active_wifi_index].name);
+}
+#define GET_WIDGET_BY_NAME(NAME, obj)\
+    gui_obj_t *obj = 0;\
+    gui_obj_tree_get_widget_by_name((gui_obj_t *)gui_current_app(), NAME, (gui_obj_t **)&obj);\
+    if (!obj|| obj->magic!=GUI_MAGIC_NUMBER)\
+    {\
+        gui_log("GET_WIDGET_BY_NAME %s failed\n", NAME);\
+    }
+static char input_text_string[100];
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_input_win_ani)
+{
+    char *name = p;
+    GET_WIDGET_BY_NAME(p, widget);
+    if (!widget)
+    {
+        return;
+    }
+    gui_text_t *text = (void *)widget;
+
+
+    if (animate->Beginning_frame)
+    {
+        if (animate->current_repeat_count == 0)
+        {
+            if ((!text->inputable) && (!text->ispasswd))
+            {
+                strcpy(input_text_string, text->content);
+            }
+            text->inputable = 1;
+        }
+        else if (!text->inputable)
+        {
+            animate->animate = 0;
+            return;
+        }
+
+        char end = '|';
+        if ((animate->current_repeat_count % 2))
+        {
+            end = ' ';
+        }
+        gui_free(text->content);
+        text->content = gui_malloc(strlen(input_text_string) + 2);
+        if (!text->ispasswd)
+        {
+            sprintf(text->content, "%s%c", input_text_string, end);
+        }
+        else
+        {
+            char head[strlen(input_text_string) + 1];
+            memset(head, '*', strlen(input_text_string));
+            head[strlen(input_text_string)] = '\0';
+            sprintf(text->content, "%s%c", head, end);
+        }
+
+
+        gui_text_content_set(text, text->content, strlen(text->content));
+        //gui_log("%d,%d,%c,%s\n", animate->current_repeat_count, animate->current_repeat_count%2,end, text->content);
+    }
+
+
+
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_no_input_win_ani)
+{
+    char *name = p;
+    GET_WIDGET_BY_NAME(p, widget);
+    if (!widget)
+    {
+        return;
+    }
+    gui_text_t *text = (void *)widget;
+
+    if (text->inputable)
+    {
+        text->inputable = 0;
+        gui_free(text->content);
+        text->content = gui_strdup((input_text_string));
+        gui_text_content_set(text, text->content, strlen(text->content));
+        animate->animate = 0;
+    }
+
+
+
+
+
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(text_input)
+{
+    if (GUI_BASE(obj)->type == WINDOW)
+    {
+        gui_win_set_animate(obj, 300, -1, text_input_win_ani, param);
+    }
+    else if (GUI_BASE(obj)->type == ICON)
+    {
+        GUI_API(gui_button_t).animate(obj, 300, -1, text_input_win_ani, param);
+    }
+
+
+
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(text_no_input)
+{
+    gui_obj_t *objj = obj    ;
+    if (GUI_BASE(obj)->type == WINDOW)
+    {
+        gui_win_set_animate(obj, 300, -1, text_no_input_win_ani, param);
+    }
+    else if (GUI_BASE(obj)->type == BUTTON)
+    {
+        GUI_API(gui_button_t).animate(obj, 300, -1, text_no_input_win_ani, param);
+    }
+
+
+
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(on_on_text_password)
+{
+    char *name = param;
+    GET_WIDGET_BY_NAME(name, widget);
+    if (!widget)
+    {
+        return;
+    }
+    gui_text_t *text = (void *)widget;
+    text->ispasswd = true;
+    if (!text->inputable)
+    {
+        strcpy(input_text_string, text->content);
+        char head[strlen(input_text_string) + 1];
+        memset(head, '*', strlen(input_text_string));
+        head[strlen(input_text_string)] = '\0';
+        sprintf(text->content, "%s", head);
+        gui_text_content_set(text, text->content, strlen(text->content));
+    }
+
+
+
+
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(on_off_text_text)
+{
+    char *name = param;
+    GET_WIDGET_BY_NAME(name, widget);
+    if (!widget)
+    {
+        return;
+    }
+    gui_text_t *text = (void *)widget;
+
+    if (!text->inputable && text->ispasswd)
+    {
+
+
+        sprintf(text->content, "%s", input_text_string);
+        gui_text_content_set(text, text->content, strlen(text->content));
+    }
+    text->ispasswd = false;
+
+}
 static void light_control_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
@@ -1035,7 +1678,68 @@ static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_p
 {
     if (param->to_widget_name)
     {
-        GUI_WIDGET_POINTER_BY_NAME(ml, param->to_widget_name);
+        gui_multi_level_t *ml = gui_multi_level_get_group(param->to_widget_name);
+        if (!ml)
+        {
+            return;
+        }
+
+        if (param->id1 < 0)
+        {
+            setting_return_cb(obj, e, (void *)param);
+        }
+        else
+        {
+            GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
+        }
+    }
+    else
+    {
+        GUI_WIDGET_POINTER_BY_TYPE(ml, MULTI_LEVEL, &(gui_current_app()->screen));
+        if (!ml)
+        {
+            return;
+        }
+        if (param->id1 < 0)
+        {
+            setting_return_cb(obj, e, (void *)param);
+        }
+        else
+        {
+            GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
+        }
+    }
+}
+static void on_connect_wifi_listview_cb(void *obj, gui_event_t e, const char *listview_name)
+{
+    if (listview_name)
+    {
+        gui_obj_t *to = 0;
+        gui_obj_tree_get_widget_by_name((void *)gui_current_app(), listview_name, &to);
+        if (!to)
+        {
+            return;
+        }
+
+
+    }
+    else
+    {
+        GUI_WIDGET_POINTER_BY_TYPE(ml, MACRO_PAGE_LIST_NEW, &(gui_current_app()->screen));
+        if (!ml)
+        {
+            return;
+        }
+
+    }
+}
+static void on_click_jump_cb_wifi(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
+{
+    active_wifi_index = param->id;
+    active_wifi_status = ACTIVE_WIFI_STATUS_DISABLECONNECT;
+    if (param->to_widget_name)
+    {
+        gui_multi_level_t *ml = gui_multi_level_get_group(param->to_widget_name);
         if (param->id1 < 0)
         {
             setting_return_cb(obj, e, (void *)param);
@@ -1057,6 +1761,262 @@ static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_p
             GUI_API(gui_multi_level_t).jump((void *)ml, param->id1, param->id2);
         }
     }
+}
+static void on_click_keyboard_cb(void *obj, gui_event_t e, struct on_click_keyboard_cb_param *param)
+{
+    if (param->to_text && param->to_text->base.type == TEXTBOX &&
+        param->to_text->base.magic == GUI_MAGIC_NUMBER)
+    {
+        if (param->to_text->inputable || param->to_text->ispasswd)
+        {
+            gui_free(param->to_text->content);
+            param->to_text->content = gui_strdup(input_text_string);
+            gui_text_content_set(param->to_text, param->to_text->content, strlen(param->to_text->content));
+        }
+        char *content = param->to_text->content;
+
+        if (!content)
+        {
+            content = "";
+        }
+        if (param->key_board >= SCANCODE_1 && param->key_board < SCANCODE_0)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s%c", content, '1' + param->key_board - SCANCODE_1);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_0)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s%c", content, '0');
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board >= SCANCODE_A && param->key_board <= SCANCODE_Z)
+        {
+            char string[strlen(content) + 2];
+            char c = 'a' + param->key_board - SCANCODE_A;
+            if (shift)
+            {
+                c = toupper(c);
+            }
+            sprintf(string, "%s%c", content, c);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_BACKSPACE)
+        {
+            size_t new_length = strlen(content) - 1;
+            if (new_length > 0)
+            {
+                content[new_length] = '\0'; // Remove the last character
+            }
+            else
+            {
+                content[0] = '\0'; // If length is zero, just set it to an empty string
+            }
+        }
+        else if (param->key_board == SCANCODE_SPACE)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s ", content);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_LSHIFT || param->key_board == SCANCODE_RSHIFT)
+        {
+            // toggle shift
+            if (shift)
+            {
+                shift = false;
+            }
+            else
+            {
+                shift = true;
+            }
+        }
+
+        if (param->to_text->inputable)
+        {
+            strcpy(input_text_string, content);
+        }
+        if (param->to_text->ispasswd)
+        {
+            strcpy(input_text_string, content);
+            size_t len = strlen(content);
+            char *stars = gui_malloc(len + 1);
+            memset(stars, '*', len);
+            stars[len] = '\0';
+            gui_free(content);
+            content = stars;
+        }
+
+        gui_text_content_set(param->to_text, content, strlen(content));
+    }
+
+}
+static void on_click_keyboard_cb_switch_turn_on(void *obj, gui_event_t e,
+                                                struct on_click_keyboard_cb_param *param)
+{
+    if (param->to_text && param->to_text->base.type == TEXTBOX &&
+        param->to_text->base.magic == GUI_MAGIC_NUMBER)
+    {
+
+        char *content = param->to_text->content;
+        if (!content)
+        {
+            content = "";
+        }
+        if (param->key_board >= SCANCODE_1 && param->key_board < SCANCODE_0)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s%c", content, '1' + param->key_board - SCANCODE_1);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_0)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s%c", content, '0');
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board >= SCANCODE_A && param->key_board <= SCANCODE_Z)
+        {
+            char string[strlen(content) + 2];
+            char c = 'a' + param->key_board - SCANCODE_A;
+            if (shift)
+            {
+                c = toupper(c);
+            }
+            sprintf(string, "%s%c", content, c);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_BACKSPACE)
+        {
+            size_t new_length = strlen(content) - 1;
+            if (new_length > 0)
+            {
+                content[new_length] = '\0'; // Remove the last character
+            }
+            else
+            {
+                content[0] = '\0'; // If length is zero, just set it to an empty string
+            }
+        }
+        else if (param->key_board == SCANCODE_SPACE)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s ", content);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_LSHIFT || param->key_board == SCANCODE_RSHIFT)
+        {
+            // toggle shift
+            // if (shift)
+            // {
+            //     shift = false;
+            // }
+            // else
+            {
+                shift = true;
+            }
+        }
+
+
+        gui_text_content_set(param->to_text, content, strlen(content));
+    }
+
+}
+static void on_click_keyboard_cb_switch_turn_off(void *obj, gui_event_t e,
+                                                 struct on_click_keyboard_cb_param *param)
+{
+    if (param->to_text && param->to_text->base.type == TEXTBOX &&
+        param->to_text->base.magic == GUI_MAGIC_NUMBER)
+    {
+
+        char *content = param->to_text->content;
+        if (!content)
+        {
+            content = "";
+        }
+        if (param->key_board >= SCANCODE_1 && param->key_board < SCANCODE_0)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s%c", content, '1' + param->key_board - SCANCODE_1);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_0)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s%c", content, '0');
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board >= SCANCODE_A && param->key_board <= SCANCODE_Z)
+        {
+            char string[strlen(content) + 2];
+            char c = 'a' + param->key_board - SCANCODE_A;
+            if (shift)
+            {
+                c = toupper(c);
+            }
+            sprintf(string, "%s%c", content, c);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_BACKSPACE)
+        {
+            size_t new_length = strlen(content) - 1;
+            if (new_length > 0)
+            {
+                content[new_length] = '\0'; // Remove the last character
+            }
+            else
+            {
+                content[0] = '\0'; // If length is zero, just set it to an empty string
+            }
+        }
+        else if (param->key_board == SCANCODE_SPACE)
+        {
+            char string[strlen(content) + 2];
+            sprintf(string, "%s ", content);
+            gui_log("%s\n", string);
+            gui_free(content);
+            content  = gui_strdup(string);
+        }
+        else if (param->key_board == SCANCODE_LSHIFT || param->key_board == SCANCODE_RSHIFT)
+        {
+            // toggle shift
+            // if (shift)
+            {
+                shift = false;
+            }
+            // else
+            // {
+            //     shift = true;
+            // }
+        }
+
+
+        gui_text_content_set(param->to_text, content, strlen(content));
+    }
+
 }
 
 static void on_click_jump_cb_tabview(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
@@ -1328,6 +2288,63 @@ static gui_obj_t *widget_create_window(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
         }
     }
 
+    return parent;
+}
+static gui_obj_t *widget_create_rectangle(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+        gui_color_t color = APP_COLOR_WHITE;
+        uint8_t opacity = 255;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "color"))
+            {
+                color = string_rgb888(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "opacity"))
+            {
+                opacity = atof(p->attr[++i]);
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
+        {
+            if (opacity != 255)
+            {
+                color.color.rgba.a = opacity;
+            }
+
+            parent = (void *)gui_canvas_rect_create(parent, ptxt, x, y, w, h, color);
+        }
+    }
     return parent;
 }
 static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -2785,7 +3802,6 @@ static void radio_win_prepare(gui_obj_t *obj)
     {
         gui_event_dsc_t *event_dsc = obj->event_dsc + i;
         event_code = event_dsc->event_code;
-        gui_log("code%s   %d.   %d\n", obj->name, event_dsc->event_code, i);
     }
     if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0) && !(obj->event_dsc->event_code))
     {
@@ -3104,6 +4120,7 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     param->pic_hl = gui_get_image_file_address(hl_picture);
     param->pic = gui_get_image_file_address(picture);
     param->radio_name = radio_name;
+    img->blend_mode = blendMode;
 
 
 
@@ -3687,7 +4704,35 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
     {
         char *ptxt = get_space_string_head(p->txt);
         static unsigned char ml_count;
+        char *group_name = 0;
         //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "name"))
+            {
+                group_name = (p->attr[++i]);
+            }
+            // else if (!strcmp(p->attr[i], "switchPause"))
+            // {
+            //     pause_switch_name = gui_strdup(p->attr[++i]);
+            // }
+            i++;
+        }
+        if (group_name && strlen(group_name) == 0)
+        {
+            group_name = 0;
+        }
+        else if (group_name)
+        {
+            group_name = gui_strdup(group_name);
+        }
+
         if (ptxt && ptxt[0] == 0)
         {
             gui_free(ptxt);
@@ -3701,7 +4746,9 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
             ptxt = gui_strdup(buffer);
         }
 
-        parent = (void *)gui_multi_level_create(parent, ptxt, (void(*)(gui_obj_t *))multi_level_ui_design);
+        parent = (void *)gui_multi_level_create_group(parent, ptxt,
+                                                      (void(*)(gui_obj_t *))multi_level_ui_design, group_name);
+
 
     }
     return parent;
@@ -3852,7 +4899,20 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         {
                             gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
                         }
+                        else if (parent->type == MACRO_PAGE_LIST_NEW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_wifi, GUI_EVENT_6, param);
+
+                            gui_pagelist_new_t *pl = (void *)parent;
+                            pl->click_param = gui_malloc(sizeof(void *)*pl->item_count);
+                            for (size_t i = 0; i < pl->item_count; i++)
+                            {
+                                pl->click_function_array[i] = (gui_event_cb_t)on_click_jump_cb_wifi;
+                                pl->click_param[i] = param;
+                            }
+                        }
                     }
+
                     else if (!strcmp(to, "app"))
                     {
                         if (ends_with_xml(id))
@@ -4033,11 +5093,1292 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
 
                 }
             }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
+
+                        if (parent->type == BUTTON)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_keyboard_cb, param);
+                            }
+                        }
+
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "connect"))
+            {
+                if (!strcmp(to, "wifi"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, wifi_connect, 0);
+                        }
+                        else
+
+
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)wifi_connect, 0);
+                        }
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "input"))
+            {
+                if (!strcmp(to, "text"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, text_input, gui_strdup(id));
+                        }
+                        else
+
+
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)text_input, gui_strdup(id));
+                        }
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, text_input, gui_strdup(id));
+                        }
+                        else
+
+
+                        {
+                            gui_win_click((gui_win_t *)parent, text_input, gui_strdup(id));
+
+                        }
+                    }
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "no input"))
+            {
+                if (!strcmp(to, "text"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, text_no_input, gui_strdup(id));
+                        }
+                        else
+
+
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)text_no_input,
+                                                           gui_strdup(id));
+                        }
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, text_no_input, gui_strdup(id));
+                        }
+                        else
+
+
+                        {
+                            gui_win_click((gui_win_t *)parent, text_no_input, gui_strdup(id));
+
+                        }
+                    }
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
         }
     }
 
     return parent;
 }
+static gui_obj_t *widget_create_macro_on_connected(ezxml_t p, gui_obj_t *parent,
+                                                   T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+
+
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+                        parse_id_string(id, param);
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_PAGE_LIST_NEW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_wifi, GUI_EVENT_6, param);
+
+                            gui_pagelist_new_t *pl = (void *)parent;
+                            pl->click_param = gui_malloc(sizeof(void *)*pl->item_count);
+                            for (size_t i = 0; i < pl->item_count; i++)
+                            {
+                                pl->click_function_array[i] = (gui_event_cb_t)on_click_jump_cb_wifi;
+                                pl->click_param[i] = param;
+                            }
+                        }
+                    }
+
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                                               (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_KEY)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_WIFI)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                                                           gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
+                                                 gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
+                                                 gui_app_get_by_name(id));
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                           param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
+                        }
+                    }
+
+                }
+
+            }
+            else if (!strcmp(type, "control"))
+            {
+                if (!strcmp(to, "light"))
+                {
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                         (gui_event_cb_t)light_switch_on_cb, light);
+                        GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                          (gui_event_cb_t)light_switch_off_cb, light);
+                    }
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            {
+                char **param = gui_malloc(sizeof(char *) * 3);
+                param[0] = gui_strdup(to);
+                param[2] = (void *)parent;
+                if (id)
+                {
+                    param[1] = gui_strdup(id);
+                }
+                if (!strcmp(type, "animatePause"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)pause_animation_cb,
+                                                          (param));
+                    }
+
+                }
+                else if (!strcmp(type, "animate"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)start_animation_cb,
+                                                          (param));
+                    }
+
+                }
+            }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
+
+                        if (parent->type == BUTTON)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_keyboard_cb, param);
+                            }
+                        }
+
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "connect"))
+            {
+                if (!strcmp(to, "wifi"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, wifi_connect, 0);
+                        }
+                        else
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)wifi_connect, 0);
+                        }
+                    }
+                }
+            }
+            else if (!strcmp(type, "highlight"))
+            {
+                if (!strcmp(to, "listview"))
+                {
+                    if (parent->type == MACRO_WIFI)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_6)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_set_animate(win, 10000, -1, win_wifi_ani, 0);
+
+                            GUI_BASE(win)->type = MACRO_WIFI;
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_connect_wifi_listview_cb, GUI_EVENT_6,
+                                                 gui_strdup(id));
+                        }
+                        else
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)wifi_connect, 0);
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_connect_wifi_listview_cb, GUI_EVENT_6,
+                                                 gui_strdup(id));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_on_connecting(ezxml_t p, gui_obj_t *parent,
+                                                    T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+
+
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+                        parse_id_string(id, param);
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_7, param);
+                        }
+                        else if (parent->type == MACRO_PAGE_LIST_NEW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_wifi, GUI_EVENT_6, param);
+
+                            gui_pagelist_new_t *pl = (void *)parent;
+                            pl->click_param = gui_malloc(sizeof(void *)*pl->item_count);
+                            for (size_t i = 0; i < pl->item_count; i++)
+                            {
+                                pl->click_function_array[i] = (gui_event_cb_t)on_click_jump_cb_wifi;
+                                pl->click_param[i] = param;
+                            }
+                        }
+                    }
+
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                                               (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_KEY)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_WIFI)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_7, gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                                                           gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
+                                                 gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_7,
+                                                 gui_app_get_by_name(id));
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                           param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_7, param);
+                        }
+                    }
+
+                }
+
+            }
+            else if (!strcmp(type, "control"))
+            {
+                if (!strcmp(to, "light"))
+                {
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                         (gui_event_cb_t)light_switch_on_cb, light);
+                        GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                          (gui_event_cb_t)light_switch_off_cb, light);
+                    }
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            {
+                char **param = gui_malloc(sizeof(char *) * 3);
+                param[0] = gui_strdup(to);
+                param[2] = (void *)parent;
+                if (id)
+                {
+                    param[1] = gui_strdup(id);
+                }
+                if (!strcmp(type, "animatePause"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)pause_animation_cb,
+                                                          (param));
+                    }
+
+                }
+                else if (!strcmp(type, "animate"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)start_animation_cb,
+                                                          (param));
+                    }
+
+                }
+            }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
+
+                        if (parent->type == BUTTON)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_keyboard_cb, param);
+                            }
+                        }
+
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "connect"))
+            {
+                if (!strcmp(to, "wifi"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, wifi_connect, 0);
+                        }
+                        else
+
+
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)wifi_connect, 0);
+                        }
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_on_disconnected(ezxml_t p, gui_obj_t *parent,
+                                                      T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+
+
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+                        parse_id_string(id, param);
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_8, param);
+                        }
+                        else if (parent->type == MACRO_PAGE_LIST_NEW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_wifi, GUI_EVENT_6, param);
+
+                            gui_pagelist_new_t *pl = (void *)parent;
+                            pl->click_param = gui_malloc(sizeof(void *)*pl->item_count);
+                            for (size_t i = 0; i < pl->item_count; i++)
+                            {
+                                pl->click_function_array[i] = (gui_event_cb_t)on_click_jump_cb_wifi;
+                                pl->click_param[i] = param;
+                            }
+                        }
+                    }
+
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb,
+                                                               (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_app_cb, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_KEY)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_WIFI)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_8, gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                                                           gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb, 0);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
+                                                 gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_8,
+                                                 gui_app_get_by_name(id));
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                           param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb_tabview, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
+                        }
+                        else if (parent->type == MACRO_WIFI)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_8, param);
+                        }
+                    }
+
+                }
+
+            }
+            else if (!strcmp(type, "control"))
+            {
+                if (!strcmp(to, "light"))
+                {
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                         (gui_event_cb_t)light_switch_on_cb, light);
+                        GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                          (gui_event_cb_t)light_switch_off_cb, light);
+                    }
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            {
+                char **param = gui_malloc(sizeof(char *) * 3);
+                param[0] = gui_strdup(to);
+                param[2] = (void *)parent;
+                if (id)
+                {
+                    param[1] = gui_strdup(id);
+                }
+                if (!strcmp(type, "animatePause"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)pause_animation_cb,
+                                                          (param));
+                    }
+
+                }
+                else if (!strcmp(type, "animate"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)start_animation_cb,
+                                                          (param));
+                    }
+
+                }
+            }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
+
+                        if (parent->type == BUTTON)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_keyboard_cb, param);
+                            }
+                        }
+
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "connect"))
+            {
+                if (!strcmp(to, "wifi"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_win_click(win, wifi_connect, 0);
+                        }
+                        else
+
+
+                        {
+                            GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)wifi_connect, 0);
+                        }
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+        }
+    }
+
+    return parent;
+}
+
 static gui_obj_t *widget_create_macro_on_select(ezxml_t p, gui_obj_t *parent,
                                                 T_OBJ_TYPE widget_type)
 {
@@ -4637,10 +6978,11 @@ typedef struct xml_dom_key
     bool down;
     bool up;
 } xml_dom_key_t;
-static xml_dom_key_t xml_dom_key_array[UINT8_MAX + 1];
+
+static xml_dom_key_t xml_dom_key_array[XML_DOM_KEY_COUINT];
 gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down)
 {
-    if (id >= 0 && id <= UINT8_MAX)
+    if (id >= 0 && id <= XML_DOM_KEY_COUINT - 1)
     {
         xml_dom_key_array[id].up = up;
         xml_dom_key_array[id].down = down;
@@ -4651,13 +6993,45 @@ gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down)
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_key_ani)
 {
     intptr_t id = (size_t)p;
-    if (id >= 0 && id <= UINT8_MAX)
+    if (id >= 0 && id <= XML_DOM_KEY_COUINT - 1)
     {
         if (xml_dom_key_array[id].up)
         {
             gui_obj_enable_event(this_widget, GUI_EVENT_6);
             xml_dom_key_array[id].up = 0;
         }
+    }
+
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_wifi_ani)
+{
+    static bool connecting;
+    switch (active_wifi_status)
+    {
+    case ACTIVE_WIFI_STATUS_CONNECTED:
+        {
+            gui_obj_enable_event(this_widget, GUI_EVENT_6);
+            connecting = false;
+        }
+        break;
+    case ACTIVE_WIFI_STATUS_CONNECTING:
+        {
+            if (!connecting)
+            {
+                gui_obj_enable_event(this_widget, GUI_EVENT_7);
+                connecting = true;
+            }
+        }
+        break;
+    case ACTIVE_WIFI_STATUS_DISCONNECTED:
+        {
+            gui_obj_enable_event(this_widget, GUI_EVENT_8);
+            connecting = false;
+        }
+        break;
+    default:
+        break;
     }
 
 
@@ -4709,6 +7083,38 @@ static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
 
     }
 
+    return parent;
+}
+static gui_obj_t *widget_create_macro_wifi(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int id = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "id"))
+            {
+                id = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "name"))
+            {
+
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        gui_win_t *win = gui_win_create(parent, ptxt, 0,  0, 0, 0);
+        gui_win_set_animate(win, 10000, -1, win_wifi_ani, 0);
+
+        GUI_BASE(win)->type = MACRO_WIFI;
+        parent = (void *)win;
+    }
     return parent;
 }
 static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -4865,13 +7271,15 @@ static gui_obj_t *widget_create_macro_onchange(ezxml_t p, gui_obj_t *parent, T_O
 
     return parent;
 }
-static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
 
     {
         char *type = 0;
-        char *to = "null";
-        char *id = "null";
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
         size_t i = 0;
         while (true)
         {
@@ -4887,12 +7295,316 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
             {
                 to = (p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
             else if (!strcmp(p->attr[i], "id"))
             {
-                id = (p->attr[++i]);
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
             }
             i++;
         }
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type)
+        {
+            char **param = gui_malloc(sizeof(char *) * 2);
+            param[0] = gui_strdup(to);
+            param[1] = gui_strdup(id);
+            if (!strcmp(type, "animatePause"))
+            {
+
+                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                  (gui_event_cb_t)pause_animation_cb,
+                                                  (param));
+            }
+            else if (!strcmp(type, "animate"))
+            {
+                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                  (gui_event_cb_t)start_animation_cb,
+                                                  param);
+            }
+        }
+        if (type && to)
+        {
+            if (!strcmp(type, "jump"))
+            {
+                {
+
+
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+                        parse_id_string(id, param);
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)on_click_jump_cb,
+                                                              (param));
+                        }
+                    }
+
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+
+                            if (parent->type == CLICKSWITCH)
+                            {
+                                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                                  (gui_event_cb_t)on_click_jump_to_app_cb, (void *)gui_get_path_by_relative(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            GUI_API(gui_switch_t).on_turn_off((void *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                                                              (void *)gui_app_get_by_name(id));
+                        }
+
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            GUI_API(gui_switch_t).on_turn_off((void *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                              (void *)param);
+                        }
+
+                    }
+
+                }
+
+            }
+            else if (!strcmp(type, "control"))
+            {
+                if (!strcmp(to, "light"))
+                {
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_off((void *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            // else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            // {
+            //     char **param = gui_malloc(sizeof(char *) * 3);
+            //     param[0] = gui_strdup(to);
+            //     param[2] = (void *)parent;
+            //     if (id)
+            //     {
+            //         param[1] = gui_strdup(id);
+            //     }
+            //     if (!strcmp(type, "animatePause"))
+            //     {
+            //         if (parent->type == BUTTON)
+            //         {
+            //             GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //         }
+            //         else if (parent->type == WINDOW)
+            //         {
+            //             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //         }
+            //         else if (parent->type == CLICKSWITCH)
+            //         {
+            //             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+            //                                              (param));
+            //             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                               (gui_event_cb_t)pause_animation_cb,
+            //                                               (param));
+            //         }
+
+            //     }
+            //     else if (!strcmp(type, "animate"))
+            //     {
+            //         if (parent->type == BUTTON)
+            //         {
+            //             GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //         }
+            //         else if (parent->type == WINDOW)
+            //         {
+            //             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //         }
+            //         else if (parent->type == CLICKSWITCH)
+            //         {
+            //             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+            //                                              (param));
+            //             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                               (gui_event_cb_t)start_animation_cb,
+            //                                               (param));
+            //         }
+
+            //     }
+            // }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
+
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+
+                                {
+                                    GUI_API(gui_switch_t).on_turn_off((void *)parent,
+                                                                      (gui_event_cb_t)on_click_keyboard_cb_switch_turn_off, param);
+                                }
+                            }
+
+                        }
+
+
+                    }
+
+                    //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+                }
+            }
+            else if (!strcmp(type, "password"))
+            {
+                if (to && strlen(to) > 0 && GUI_STRINGS_EQUAL(to, "text"))
+                {
+
+                    GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                      (gui_event_cb_t)on_on_text_password, gui_strdup(id));
+                    //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+                }
+            }
+            else if (!strcmp(type, "text"))
+            {
+                if (to && strlen(to) > 0 && GUI_STRINGS_EQUAL(to, "text"))
+                {
+
+                    GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                      (gui_event_cb_t)on_off_text_text, gui_strdup(id));
+                    //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+                }
+            }
+        }
+    }
+
+    return parent;
+}
+static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        char *type = 0;
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
+        size_t i = 0;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            if (!strcmp(p->attr[i], "type"))
+            {
+                type = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "to"))
+            {
+                to = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "id"))
+            {
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            i++;
+        }
+        int to_widget = 0; GUI_UNUSED(to_widget);
         if (type)
         {
             char **param = gui_malloc(sizeof(char *) * 2);
@@ -4910,59 +7622,226 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
                                                  param);
             }
         }
-    }
-
-    return parent;
-}
-
-static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
-{
-
-    {
-        char *type = 0;
-        char *to = "null";
-        char *id = "null";
-        size_t i = 0;
-        while (true)
+        if (type && to)
         {
-            if (!(p->attr[i]))
+            if (!strcmp(type, "jump"))
             {
-                break;
-            }
-            if (!strcmp(p->attr[i], "type"))
-            {
-                type = (p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "to"))
-            {
-                to = (p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "id"))
-            {
-                id = (p->attr[++i]);
-            }
-            i++;
-        }
-        if (type)
-        {
-            char **param = gui_malloc(sizeof(char *) * 2);
-            param[0] = gui_strdup(to);
-            if (id)
-            {
-                param[1] = gui_strdup(id);
-            }
-            if (!strcmp(type, "animatePause"))
-            {
+                {
 
-                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                  (gui_event_cb_t)pause_animation_cb,
-                                                  (param));
+
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+                        parse_id_string(id, param);
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)on_click_jump_cb,
+                                                             (param));
+                        }
+                    }
+
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+
+                            if (parent->type == CLICKSWITCH)
+                            {
+                                GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent),
+                                                                 (gui_event_cb_t)on_click_jump_to_app_cb, (void *)gui_get_path_by_relative(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            GUI_API(gui_switch_t).on_turn_on((void *)parent, (gui_event_cb_t)on_click_jump_to_capp_cb,
+                                                             gui_app_get_by_name(id));
+                        }
+
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            GUI_API(gui_switch_t).on_turn_on((void *)parent, (gui_event_cb_t)on_click_jump_cb_tabview,
+                                                             param);
+                        }
+
+                    }
+
+                }
+
             }
-            else if (!strcmp(type, "animate"))
+            else if (!strcmp(type, "control"))
             {
-                GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                  (gui_event_cb_t)start_animation_cb,
-                                                  param);
+                if (!strcmp(to, "light"))
+                {
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on((void *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            // else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            // {
+            //     char **param = gui_malloc(sizeof(char *) * 3);
+            //     param[0] = gui_strdup(to);
+            //     param[2] = (void *)parent;
+            //     if (id)
+            //     {
+            //         param[1] = gui_strdup(id);
+            //     }
+            //     if (!strcmp(type, "animatePause"))
+            //     {
+            //         if (parent->type == BUTTON)
+            //         {
+            //             GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //         }
+            //         else if (parent->type == WINDOW)
+            //         {
+            //             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+            //         }
+            //         else if (parent->type == CLICKSWITCH)
+            //         {
+            //             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+            //                                              (param));
+            //             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                               (gui_event_cb_t)pause_animation_cb,
+            //                                               (param));
+            //         }
+
+            //     }
+            //     else if (!strcmp(type, "animate"))
+            //     {
+            //         if (parent->type == BUTTON)
+            //         {
+            //             GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //         }
+            //         else if (parent->type == WINDOW)
+            //         {
+            //             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+            //         }
+            //         else if (parent->type == CLICKSWITCH)
+            //         {
+            //             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+            //                                              (param));
+            //             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+            //                                               (gui_event_cb_t)start_animation_cb,
+            //                                               (param));
+            //         }
+
+            //     }
+            // }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
+
+                        if (parent->type == CLICKSWITCH)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+
+                                {
+                                    GUI_API(gui_switch_t).on_turn_on((void *)parent,
+                                                                     (gui_event_cb_t)on_click_keyboard_cb_switch_turn_on, param);
+                                }
+                            }
+
+                        }
+
+
+                    }
+
+                    //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+                }
+            }
+            else if (!strcmp(type, "password"))
+            {
+                if (to && strlen(to) > 0 && GUI_STRINGS_EQUAL(to, "text"))
+                {
+
+                    GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                     (gui_event_cb_t)on_on_text_password, gui_strdup(id));
+                    //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+                }
             }
         }
     }
@@ -5279,10 +8158,226 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
 
     return parent;
 }
+#include "gui_pagelist_new.h"
+static void ticket(void *obj, gui_event_t e, void *param)
+{
+    static int i;
+    gui_log("ticket%d\n", i++);
+}
+extern void gui_page_list_new_win_press(void *obj, gui_event_t e, void *param);
+extern void gui_page_list_new_win_release(void *obj, gui_event_t e, void *param);
+extern void gui_page_list_new_override(void *p, void *this_widget, gui_animate_t *animate);
+extern void gui_page_list_new_override_horizontal(void *p, void *this_widget,
+                                                  gui_animate_t *animate);
+static gui_error_t xml_dom_page_list_new_render(gui_pagelist_new_t *pagelist_new,
+                                                const uint16_t item_count,
+                                                const gui_event_cb_t *item_click_function_array,
+                                                const char **item_text_array
+                                               )
+{
+    if (!(item_count  && item_text_array && pagelist_new))
+    {
+        return GUI_ERROR_NULL;
+    }
+    gui_obj_child_free((void *)pagelist_new);
+    {
+        if (pagelist_new->click_function_array)
+        {
+            if (pagelist_new->append)
+            {
+                gui_free((void *)pagelist_new->click_function_array);
+            }
+        }
+        if (pagelist_new->item_text_array)
+        {
+            if (pagelist_new->append)
+            {
+                gui_free(pagelist_new->item_text_array);
+            }
+        }
+        pagelist_new->append = false;
+        pagelist_new->item_count = item_count;
+        pagelist_new->click_function_array = (void *)item_click_function_array;
+        pagelist_new->item_text_array = item_text_array;
+    }
+    gui_win_t *win = gui_win_create(pagelist_new, 0, 0, 0, GUI_BASE(pagelist_new)->w,
+                                    GUI_BASE(pagelist_new)->h);
+    gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, 0, 0);
+
+    pagelist_new->timer = timer1;
+    int count = pagelist_new->row_count;
+    if (item_count < count)
+    {
+        count = item_count;
+    }
+
+    if (pagelist_new->horizontal)
+    {
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)gui_page_list_new_override_horizontal,
+                            pagelist_new);
+        for (size_t i = 0; i < count; i++)
+        {
+            gui_win_t *win = gui_win_create(timer1, "_page_list_new_click_win", i * pagelist_new->row_space, 0,
+                                            pagelist_new->row_space,
+                                            GUI_BASE(pagelist_new)->h);
+            gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)pagelist_new->item_image, 0, 0, 0, 0);
+            gui_img_set_mode(img, pagelist_new->blending);
+            const char *text = pagelist_new->item_text_array[i];
+            gui_text_t *t = gui_text_create(win, 0, 0, 0, pagelist_new->row_space, GUI_BASE(win)->h);
+            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
+                         pagelist_new->font_size);
+            gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, pagelist_new->text_mode);
+            if (item_click_function_array && pagelist_new->click_function_array[i])
+            {
+                gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i], (gui_event_cb_t)i);
+            }
+
+            gui_win_press(win, gui_page_list_new_win_press, (void *)i);
+            gui_win_release(win, gui_page_list_new_win_release, (void *)i);
+        }
+    }
+    else
+    {
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)gui_page_list_new_override,
+                            pagelist_new);
+        for (size_t i = 0; i < count; i++)
+        {
+            gui_win_t *win = gui_win_create(timer1, "_page_list_new_click_win", 0, i * pagelist_new->row_space,
+                                            GUI_BASE(pagelist_new)->w, pagelist_new->row_space);
+            gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)pagelist_new->item_image, 0, 0, 0, 0);
+            gui_img_set_mode(img, pagelist_new->blending);
+            const char *text = pagelist_new->item_text_array[i];
+            gui_text_t *t = gui_text_create(win, 0, 0, 0, GUI_BASE(win)->w, pagelist_new->row_space);
+            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
+                         pagelist_new->font_size);
+            gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, pagelist_new->text_mode);
+
+            if (item_click_function_array && pagelist_new->click_function_array[i])
+            {
+                gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i], (gui_event_cb_t)i);
+            }
+            gui_win_press(win, gui_page_list_new_win_press, (void *)i);
+            gui_win_release(win, gui_page_list_new_win_release, (void *)i);
+        }
+    }
+    return GUI_SUCCESS;
+
+}
+
+static gui_error_t xml_dom_page_list_new_render_param(gui_pagelist_new_t *pagelist_new,
+                                                      const uint16_t item_count,
+                                                      const gui_event_cb_t *item_click_function_array,
+                                                      const char **item_text_array,
+                                                      void  **item_click_function_array_param
+                                                     )
+{
+    if (!(item_count  && item_text_array && pagelist_new))
+    {
+        return GUI_ERROR_NULL;
+    }
+    gui_obj_child_free((void *)pagelist_new);
+    {
+        if (pagelist_new->click_function_array)
+        {
+            if (pagelist_new->append)
+            {
+                gui_free((void *)pagelist_new->click_function_array);
+            }
+        }
+        if (pagelist_new->item_text_array)
+        {
+            if (pagelist_new->append)
+            {
+                gui_free(pagelist_new->item_text_array);
+            }
+        }
+        pagelist_new->append = false;
+        pagelist_new->item_count = item_count;
+        pagelist_new->click_function_array = (void *)item_click_function_array;
+        pagelist_new->item_text_array = item_text_array;
+    }
+    gui_win_t *win = gui_win_create(pagelist_new, 0, 0, 0, GUI_BASE(pagelist_new)->w,
+                                    GUI_BASE(pagelist_new)->h);
+    gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, 0, 0);
+
+    pagelist_new->timer = timer1;
+    int count = pagelist_new->row_count;
+    if (item_count < count)
+    {
+        count = item_count;
+    }
+
+    if (pagelist_new->horizontal)
+    {
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)gui_page_list_new_override_horizontal,
+                            pagelist_new);
+        for (size_t i = 0; i < count; i++)
+        {
+            gui_win_t *win = gui_win_create(timer1, "_page_list_new_click_win", i * pagelist_new->row_space, 0,
+                                            pagelist_new->row_space,
+                                            GUI_BASE(pagelist_new)->h);
+            gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)pagelist_new->item_image, 0, 0, 0, 0);
+            gui_img_set_mode(img, pagelist_new->blending);
+            const char *text = pagelist_new->item_text_array[i];
+            gui_text_t *t = gui_text_create(win, 0, 0, 0, pagelist_new->row_space, GUI_BASE(win)->h);
+            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
+                         pagelist_new->font_size);
+            gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, pagelist_new->text_mode);
+            if (item_click_function_array && pagelist_new->click_function_array[i])
+            {
+                struct on_click_jump_cb_param *p =  item_click_function_array_param[i];
+                gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i],
+                              item_click_function_array_param[i]);
+            }
+
+            gui_win_press(win, gui_page_list_new_win_press, (void *)i);
+            gui_win_release(win, gui_page_list_new_win_release, (void *)i);
+        }
+    }
+    else
+    {
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)gui_page_list_new_override,
+                            pagelist_new);
+        for (size_t i = 0; i < count; i++)
+        {
+            gui_win_t *win = gui_win_create(timer1, "_page_list_new_click_win", 0, i * pagelist_new->row_space,
+                                            GUI_BASE(pagelist_new)->w, pagelist_new->row_space);
+            gui_img_t *img = gui_img_create_from_mem(win, 0, (void *)pagelist_new->item_image, 0, 0, 0, 0);
+            gui_img_set_mode(img, pagelist_new->blending);
+            const char *text = pagelist_new->item_text_array[i];
+            gui_text_t *t = gui_text_create(win, 0, 0, 0, GUI_BASE(win)->w, pagelist_new->row_space);
+            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
+                         pagelist_new->font_size);
+            gui_text_type_set(t, (void *)pagelist_new->font, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, pagelist_new->text_mode);
+
+            if (item_click_function_array && pagelist_new->click_function_array[i])
+            {
+                struct on_click_jump_cb_param *p =  item_click_function_array_param[i];
+                gui_win_click(win, (gui_event_cb_t)pagelist_new->click_function_array[i],
+                              item_click_function_array_param[i]);
+            }
+            gui_win_press(win, gui_page_list_new_win_press, (void *)i);
+            gui_win_release(win, gui_page_list_new_win_release, (void *)i);
+        }
+    }
+    return GUI_SUCCESS;
+
+}
 static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent,
                                                     T_OBJ_TYPE widget_type)
 {
-
     {
 
         size_t i = 0;
@@ -5301,6 +8396,7 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         BLEND_MODE_TYPE blendMode = IMG_BYPASS_MODE;
         char *picture = NULL;
         char *hl_picture = NULL;
+        char *st_picture = NULL;
         while (true)
         {
             if (!(p->attr[i]))
@@ -5348,7 +8444,7 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
                 font_color = string_rgb888(p->attr[++i]);
             }
 
-            else if (!strcmp(p->attr[i], "horizontal"))
+            else if (!strcmp(p->attr[i], "horizontal") || !strcmp(p->attr[i], "orientation"))
             {
                 if (!strcmp(p->attr[++i], "horizontal"))
                 {
@@ -5397,11 +8493,15 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
             }
             else if (!strcmp(p->attr[i], "picture"))
             {
-                picture = gui_strdup(p->attr[++i]);
+                picture = (p->attr[++i]);
             }
             else if (!strcmp(p->attr[i], "highlightPicture"))
             {
-                hl_picture = gui_strdup(p->attr[++i]);
+                hl_picture = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "selectedPicture"))
+            {
+                st_picture = (p->attr[++i]);
             }
             else if (!strcmp(p->attr[i], "blendMode"))
             {
@@ -5461,11 +8561,13 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         {
             w = 400;
         }
+        parent = (void *)gui_win_create(parent, "pagelist_scope", x, y, w, h);
+        gui_win_set_scope((void *)parent, 1);
         if (!horizontal)
         {
             parent = (void *)gui_pagelist_new_create(parent,
-                                                     x,
-                                                     y,
+                                                     0,
+                                                     0,
                                                      w,
                                                      row_spacing,
                                                      gui_get_file_address(picture),
@@ -5478,8 +8580,8 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         else
         {
             parent = (void *)gui_pagelist_new_create_horizontal(parent,
-                                                                x,
-                                                                y,
+                                                                0,
+                                                                0,
                                                                 w,
                                                                 row_spacing,
                                                                 gui_get_file_address(picture),
@@ -5491,12 +8593,16 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         }
 
         GUI_TYPE(gui_pagelist_new_t, parent)->text_mode = style;
-        gui_page_list_new_render((void *)parent, item_count, 0, string_array);
-
-
-
+        gui_event_cb_t *item_click_function_array = gui_malloc(sizeof(gui_event_cb_t) * item_count);
+        for (size_t i = 0; i < item_count; i++)
+        {
+            item_click_function_array[i] = ticket;
+        }
+        xml_dom_page_list_new_render((void *)parent, item_count, item_click_function_array, string_array);
+        parent->h = h;
+        parent->name = get_space_string_head(p->txt);
+        GUI_TYPE(gui_pagelist_new_t, parent)->item_image_selected = gui_get_file_address(st_picture);
     }
-
     return parent;
 }
 static gui_obj_t *widget_create_macro_calendar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -6227,6 +9333,34 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
                                                  (void *)TEXT_BATTERY_CAPACITY_ANIMATION);
                         }
                     }
+                    else if (!strcmp(type, "wifi"))
+                    {
+                        if (!strcmp(id, "name"))
+                        {
+                            gui_text_set_animate(parent, 1000, -1, text_animate_wifi_callback,
+                                                 (void *)TEXT_WIFI_NAME_ANIMATION);
+                        }
+                        else if (!strcmp(id, "password"))
+                        {
+                            gui_text_set_animate(parent, 1000, -1, text_animate_wifi_callback,
+                                                 (void *)TEXT_WIFI_PASSWORD_ANIMATION);
+                        }
+                    }
+                }
+            }
+            break;
+        case MACRO_PAGE_LIST_NEW:
+            {
+                if (type)
+                {
+                    if (!strcmp(type, "wifi"))
+                    {
+                        if (!strcmp(id, "name"))
+                        {
+                            gui_win_set_animate((void *)parent->parent, 10000, -1, page_list_animation_wifi_name, parent);
+                        }
+                    }
+
                 }
             }
             break;
@@ -6659,6 +9793,11 @@ static xml_widget_create_t xml_widget_create_array[] =
     {MACRO_ONCOMPLETE, widget_create_macro_oncomplete},
     {MACRO_KEY, widget_create_macro_key},
     {MACRO_ONSELECT, widget_create_macro_on_select},
+    {RECTANGLE, widget_create_rectangle},
+    {MACRO_WIFI, widget_create_macro_wifi},
+    {MACRO_CONNECTED, widget_create_macro_on_connected},
+    {MACRO_DISCONNECTED, widget_create_macro_on_disconnected},
+    {MACRO_CONNECTING, widget_create_macro_on_connecting},
 };
 
 static gui_obj_t *widget_create_interface(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -7561,10 +10700,56 @@ void foreach_create(ezxml_t p, gui_obj_t *parent)
     ezxml_t i;
     for (i = p; i != NULL; i = i->ordered)
     {
-        if (parent->type == MULTI_LEVEL && strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0)
+        bool ml = 0;
+        if (parent->type == MULTI_LEVEL && strncmp(i->name, "multiLevel", strlen("multiLevel")) == 0)
         {
-            //gui_log("%s,%s\n", i->name, i->txt);
-            foreach_create(i->child, parent);
+            char *group_name = 0;
+            //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+            {
+                size_t ii = 0;
+
+                while (true)
+                {
+                    if (!(i->attr[ii]))
+                    {
+                        break;
+                    }
+                    ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+                    if (!strcmp(i->attr[ii], "name"))
+                    {
+                        group_name = (i->attr[++ii]);
+                    }
+                    // else if (!strcmp(p->attr[i], "switchPause"))
+                    // {
+                    //     pause_switch_name = gui_strdup(p->attr[++i]);
+                    // }
+                    ii++;
+                }
+            }
+            if (group_name && strlen(group_name) == 0)
+            {
+                group_name = 0;
+            }
+            if (!(GUI_STRINGS_EQUAL(GUI_TYPE(gui_multi_level_t, parent)->group_name, group_name)))
+            {
+                //gui_log("%s,%s\n", i->name, i->txt);
+                ml = 1;
+            }
+
+
+        }
+
+
+        if (parent->type == MULTI_LEVEL && (strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0 ||
+                                            ml))
+        {
+
+            {
+                //gui_log("%s,%s\n", i->name, i->txt);
+                foreach_create(i->child, parent);
+            }
+
+
         }
         else
         {
@@ -7612,17 +10797,76 @@ void foreach_scan_with_content(ezxml_t p, const char *element, ezxml_t *target, 
     }
 }
 static int level, order;
-void foreach_create_in_multilevel(ezxml_t p, gui_obj_t *parent)
+void foreach_create_in_multilevel(ezxml_t p, gui_obj_t *parent, const char *group_name_parent)
 {
     GUI_UNUSED(level); GUI_UNUSED(order);
     ezxml_t i;
     for (i = p; i != NULL; i = i->ordered)
     {
-        if (strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0)
+        bool ml = 0; bool ml2 = 0;
+        if (strncmp(i->name, "multiLevel", strlen("multiLevel")) == 0)
+        {
+            {
+                char *group_name = 0;
+                //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+                {
+                    size_t ii = 0;
+
+                    while (true)
+                    {
+                        if (!(i->attr[ii]))
+                        {
+                            break;
+                        }
+                        ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        if (!strcmp(i->attr[ii], "name"))
+                        {
+                            group_name = (i->attr[++ii]);
+                        }
+                        // else if (!strcmp(p->attr[i], "switchPause"))
+                        // {
+                        //     pause_switch_name = gui_strdup(p->attr[++i]);
+                        // }
+                        ii++;
+                    }
+                }
+                if (group_name && strlen(group_name) == 0)
+                {
+                    group_name = 0;
+                }
+
+
+                if (!(GUI_STRINGS_EQUAL(group_name, group_name_parent)))
+                {
+                    //gui_log("%s,%s\n", i->name, i->txt);
+                    ml = 1;
+                }
+
+
+            }
+        }
+        if (parent->type == MULTI_LEVEL &&
+            (!(GUI_STRINGS_EQUAL(group_name_parent, GUI_TYPE(gui_multi_level_t, parent)->group_name))))
+        {
+            ml2 = 1;
+        }
+        if (ml2)
+        {
+            if ((strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0))
+            {
+                foreach_create_in_multilevel(i->child,  parent, group_name_parent);
+            }
+            else { foreach_create_in_multilevel(i->child, widget_create_handle(i, parent), group_name_parent); }
+        }
+        else if ((strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0) || ml)
         {
             //gui_log("%s,%s\n", i->name, i->txt);
-            foreach_create_in_multilevel(i->child, widget_create_handle(i, parent));
+
+
+            foreach_create_in_multilevel(i->child, widget_create_handle(i, parent), group_name_parent);
         }
+
+
 
 
     }
@@ -7632,11 +10876,11 @@ static void foreach_create_for_multilevel(ezxml_t p, gui_obj_t *parent)
     ezxml_t i;
     for (i = p; i != NULL; i = i->ordered)
     {
-
+//gui_log("ml%s,%s,%s\n", i->name,i->txt,parent->name);
         if (strncmp(i->name, "multiLevel", strlen("multiLevel")) == 0 &&
             strncmp(i->txt, parent->name, strlen(parent->name)) == 0)
         {
-            foreach_create_in_multilevel(i->child, parent);
+            foreach_create_in_multilevel(i->child, parent, GUI_TYPE(gui_multi_level_t, parent)->group_name);
             return;
         }
 
@@ -7800,7 +11044,7 @@ void create_tree(gui_app_t *app)
 }
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent)
 {
-    gui_obj_tree_print((gui_obj_t *)parent);
+    //gui_obj_tree_print((gui_obj_t *)parent);
     ezxml_t title = 0; GUI_UNUSED(title);
     ezxml_t f = 0;
     if (f1 != 0)
@@ -7817,7 +11061,7 @@ static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent
     {
         ezxml_free(f);
     }
-    gui_obj_tree_print((gui_obj_t *)parent);
+    //gui_obj_tree_print((gui_obj_t *)parent);
 
 
 
@@ -8600,6 +11844,51 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_battery_callback)
     }
 
 }
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_wifi_callback)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+
+    switch ((size_t)p)
+    {
+    case TEXT_WIFI_NAME_ANIMATION:
+        {
+            if (active_wifi_index >= 0 && active_wifi_index < XML_DOM_WIFI_COUINT &&
+                wifi_array[active_wifi_index].name)
+            {
+                gui_text_content_set(this_widget, (void *)wifi_array[active_wifi_index].name,
+                                     strlen(wifi_array[active_wifi_index].name));
+            }
+        }
+        break;
+    case TEXT_WIFI_PASSWORD_ANIMATION:
+        {
+            if (active_wifi_index >= 0 && active_wifi_index < XML_DOM_WIFI_COUINT &&
+                wifi_array[active_wifi_index].name)
+            {
+                char *password = GUI_TYPE(gui_text_t, this_widget)->content;
+                if (password && strlen(password) > 0)
+                {
+                    {
+                        strncpy(active_wifi_password_input, password, sizeof(active_wifi_password_input) - 1);
+                        active_wifi_password_input[sizeof(active_wifi_password_input) - 1] =
+                            '\0'; // Null-terminate the array
+
+                    }
+
+                }
+
+
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+}
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(arc_animate_activity_callback)
 {
     if (!animate->Beginning_frame)
@@ -9152,4 +12441,493 @@ static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
+#include "gui_text.h"
+#include "gui_matrix.h"
+#include "font_mem.h"
+#include "font_ttf.h"
+#include "font_stb.h"
+#include "font_mem_img.h"
+#include "font_mem_matrix.h"
+#include "tp_algo.h"
+#include "gui_fb.h"
+static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
+{
+    text->scope = 0;
+    gui_obj_t *o = (gui_obj_t *)text;
+    gui_win_t *win_scope = NULL;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+        {
+            text->scope = 1;
+            win_scope = (void *)o;
+            break;
+        }
+    }
+    if (text->scope && win_scope != NULL)
+    {
+        int scopex = win_scope->base.matrix->m[0][2];
+        int scopey = win_scope->base.matrix->m[1][2];
+        int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
+        int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
+
+        rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
+        rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
+        rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
+        rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
+    }
+}
+
+
+
+
+
+static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
+{
+    extern void gui_text_font_load_global(gui_text_t *text, gui_text_rect_t *rect);
+    gui_text_font_load_global(text, rect);
+}
+
+static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
+{
+    extern void gui_text_font_draw_global(gui_text_t *text, gui_text_rect_t *rect);
+    gui_text_font_draw_global(text, rect);
+}
+
+static void gui_text_font_unload(gui_text_t *text)
+{
+    extern void gui_text_font_unload_global(gui_text_t *text);
+    gui_text_font_unload_global(text);
+}
+static void gui_text_draw(gui_obj_t *obj)
+{
+    gui_text_t *text = (gui_text_t *)obj;
+    struct gui_dispdev *dc;
+    gui_text_rect_t draw_rect = {0};
+    uint32_t total_section_count = UINT32_MAX;
+
+    if (text->len == 0)
+    {
+        text->content_refresh = false;
+        text->layout_refresh = false;
+        return;
+    }
+
+    dc = gui_get_dc();
+    draw_rect.x1 = text->offset_x;
+    draw_rect.y1 = text->offset_y;
+    draw_rect.x2 = draw_rect.x1 + obj->w - 1;
+    draw_rect.y2 = draw_rect.y1 + obj->h - 1;
+    draw_rect.xboundleft = draw_rect.x1;
+    draw_rect.xboundright = draw_rect.x2;
+    draw_rect.yboundtop = draw_rect.y1;
+    draw_rect.yboundbottom = draw_rect.y2;
+    gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
+
+    if (dc->section_count == 0)
+    {
+        gui_text_font_load(text, &draw_rect);
+    }
+    if (text->font_type == GUI_FONT_SRC_TTF)
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
+    }
+    if (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit)
+    {
+        gui_font_ttf_adapt_rect(text, &draw_rect);
+    }
+
+    if (dc->pfb_type == PFB_X_DIRECTION)
+    {
+        total_section_count = dc->screen_width / dc->fb_width -
+                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
+        if (!(draw_rect.x1 >= (int)(dc->section_count + 1)*dc->fb_width || \
+              draw_rect.x2 < (int)(dc->section_count)*dc->fb_width))
+        {
+            gui_text_font_draw(text, &draw_rect);
+        }
+    }
+    else if (dc->pfb_type == PFB_Y_DIRECTION)
+    {
+        total_section_count = dc->screen_height / dc->fb_height -
+                              ((dc->screen_height % dc->fb_height) ? 0 : 1);
+        if (!(draw_rect.y1 >= (int)(dc->section_count + 1)*dc->fb_height || \
+              draw_rect.y2 < (int)(dc->section_count)*dc->fb_height))
+        {
+            gui_text_font_draw(text, &draw_rect);
+        }
+    }
+
+    if (dc->section_count == total_section_count)
+    {
+        gui_text_font_unload(text);
+    }
+}
+
+
+void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        extern void gui_text_input_prepare_global(gui_obj_t *obj);
+
+        extern void gui_text_prepare_global(gui_obj_t *obj);
+
+        extern void gui_text_end_global(gui_obj_t *obj);
+
+        extern void gui_text_destroy_global(gui_obj_t *obj);
+
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_text_input_prepare_global(obj);
+            break;
+        case OBJ_PREPARE:
+            gui_text_prepare_global(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_text_draw(obj);
+            break;
+
+        case OBJ_END:
+            gui_text_end_global(obj);
+            break;
+
+        case OBJ_DESTROY:
+            gui_text_destroy_global(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(page_list_wifi_cb)
+{
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(page_list_animation_wifi_name)
+{
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+    int count = 0;
+    for (size_t i = 0; i < XML_DOM_WIFI_COUINT; i++)
+    {
+        if (wifi_array[i].name)
+        {
+            count++;
+        }
+
+    }
+    gui_event_cb_t *func_array = gui_malloc(sizeof(gui_event_cb_t) * (count + 1));
+    const char **item_text_array = gui_malloc(sizeof(char *) * (count + 1));
+    struct on_click_jump_cb_param **click_param = gui_malloc(sizeof(void *) * (count + 1));
+    gui_pagelist_new_t *pl = p;
+    for (size_t i = 0; i < count; i++)
+    {
+        item_text_array[i] = wifi_array[i].name;
+        func_array[i] = (void *)on_click_jump_cb_wifi;
+
+        if (pl->click_param)
+        {
+            click_param[i] = gui_malloc(sizeof(struct on_click_jump_cb_param));
+            memcpy(click_param[i], pl->click_param[0], sizeof(struct on_click_jump_cb_param));
+            click_param[i]->id = i;
+        }
+
+
+    }
+    pl->click_param = (void *)click_param;
+
+
+
+    xml_dom_page_list_new_render_param(p, count, func_array, item_text_array, (void *)click_param);
+
+
+
+}
+
+typedef struct keyboard_code_map
+{
+    const char *keyboard;
+    scan_code code;
+} keyboard_code_map_t;
+keyboard_code_map_t keyboard_map[] =
+{
+    {"K_a", SCANCODE_A},
+    {"K_b", SCANCODE_B},
+    {"K_c", SCANCODE_C},
+    {"K_d", SCANCODE_D},
+    {"K_e", SCANCODE_E},
+    {"K_f", SCANCODE_F},
+    {"K_g", SCANCODE_G},
+    {"K_h", SCANCODE_H},
+    {"K_i", SCANCODE_I},
+    {"K_j", SCANCODE_J},
+    {"K_k", SCANCODE_K},
+    {"K_l", SCANCODE_L},
+    {"K_m", SCANCODE_M},
+    {"K_n", SCANCODE_N},
+    {"K_o", SCANCODE_O},
+    {"K_p", SCANCODE_P},
+    {"K_q", SCANCODE_Q},
+    {"K_r", SCANCODE_R},
+    {"K_s", SCANCODE_S},
+    {"K_t", SCANCODE_T},
+    {"K_u", SCANCODE_U},
+    {"K_v", SCANCODE_V},
+    {"K_w", SCANCODE_W},
+    {"K_x", SCANCODE_X},
+    {"K_y", SCANCODE_Y},
+    {"K_z", SCANCODE_Z},
+    {"K_0", SCANCODE_0},
+    {"K_1", SCANCODE_1},
+    {"K_2", SCANCODE_2},
+    {"K_3", SCANCODE_3},
+    {"K_4", SCANCODE_4},
+    {"K_5", SCANCODE_5},
+    {"K_6", SCANCODE_6},
+    {"K_7", SCANCODE_7},
+    {"K_8", SCANCODE_8},
+    {"K_9", SCANCODE_9},
+    //{"K_RETURN", SCANCODE_RETURN},
+    //{"K_ESCAPE", SCANCODE_ESCAPE},
+    {"K_BACKSPACE", SCANCODE_BACKSPACE},
+    {"K_TAB", SCANCODE_TAB},
+    {"K_SPACE", SCANCODE_SPACE},
+    {"K_MINUS", SCANCODE_MINUS},
+    {"K_EQUALS", SCANCODE_EQUALS},
+    {"K_LEFTBRACKET", SCANCODE_LEFTBRACKET},
+    {"K_RIGHTBRACKET", SCANCODE_RIGHTBRACKET},
+    {"K_BACKSLASH", SCANCODE_BACKSLASH},
+    {"K_SEMICOLON", SCANCODE_SEMICOLON},
+    {"K_APOSTROPHE", SCANCODE_APOSTROPHE},
+    {"K_GRAVE", SCANCODE_GRAVE},
+    {"K_COMMA", SCANCODE_COMMA},
+    {"K_PERIOD", SCANCODE_PERIOD},
+    {"K_SLASH", SCANCODE_SLASH},
+    {"K_CAPSLOCK", SCANCODE_CAPSLOCK},
+    {"K_F1", SCANCODE_F1},
+    {"K_F2", SCANCODE_F2},
+    {"K_F3", SCANCODE_F3},
+    {"K_F4", SCANCODE_F4},
+    {"K_F5", SCANCODE_F5},
+    {"K_F6", SCANCODE_F6},
+    {"K_F7", SCANCODE_F7},
+    {"K_F8", SCANCODE_F8},
+    {"K_F9", SCANCODE_F9},
+    {"K_F10", SCANCODE_F10},
+    {"K_F11", SCANCODE_F11},
+    {"K_F12", SCANCODE_F12},
+    //{"K_PRINTSCREEN", SCANCODE_PRINTSCREEN},
+    //{"K_SCROLLLOCK", SCANCODE_SCROLLLOCK},
+    //{"K_PAUSE", SCANCODE_PAUSE},
+    //{"K_INSERT", SCANCODE_INSERT},
+    //{"K_HOME", SCANCODE_HOME},
+    // {"K_PAGEUP", SCANCODE_PAGEUP},
+    // {"K_DELETE", SCANCODE_DELETE},
+    // {"K_END", SCANCODE_END},
+    // {"K_PAGEDOWN", SCANCODE_PAGEDOWN},
+    {"K_RIGHT", SCANCODE_RIGHT},
+    {"K_LEFT", SCANCODE_LEFT},
+    {"K_DOWN", SCANCODE_DOWN},
+    {"K_UP", SCANCODE_UP},
+    // {"K_NUMLOCKCLEAR", SCANCODE_NUMLOCKCLEAR},
+    // {"K_KP_DIVIDE", SCANCODE_KP_DIVIDE},
+    // {"K_KP_MULTIPLY", SCANCODE_KP_MULTIPLY},
+    // {"K_KP_MINUS", SCANCODE_KP_MINUS},
+    // {"K_KP_PLUS", SCANCODE_KP_PLUS},
+    // {"K_KP_ENTER", SCANCODE_KP_ENTER},
+    // {"K_KP_1", SCANCODE_KP_1},
+    // {"K_KP_2", SCANCODE_KP_2},
+    // {"K_KP_3", SCANCODE_KP_3},
+    // {"K_KP_4", SCANCODE_KP_4},
+    // {"K_KP_5", SCANCODE_KP_5},
+    // {"K_KP_6", SCANCODE_KP_6},
+    // {"K_KP_7", SCANCODE_KP_7},
+    // {"K_KP_8", SCANCODE_KP_8},
+    // {"K_KP_9", SCANCODE_KP_9},
+    // {"K_KP_0", SCANCODE_KP_0},
+    // {"K_KP_PERIOD", SCANCODE_KP_PERIOD},
+    // {"K_APPLICATION", SCANCODE_APPLICATION},
+    // {"K_POWER", SCANCODE_POWER},
+    // {"K_KP_EQUALS", SCANCODE_KP_EQUALS},
+    // {"K_F13", SCANCODE_F13},
+    // {"K_F14", SCANCODE_F14},
+    // {"K_F15", SCANCODE_F15},
+    // {"K_F16", SCANCODE_F16},
+    // {"K_F17", SCANCODE_F17},
+    // {"K_F18", SCANCODE_F18},
+    // {"K_F19", SCANCODE_F19},
+    // {"K_F20", SCANCODE_F20},
+    // {"K_F21", SCANCODE_F21},
+    // {"K_F22", SCANCODE_F22},
+    // {"K_F23", SCANCODE_F23},
+    // {"K_F24", SCANCODE_F24},
+    // {"K_EXECUTE", SCANCODE_EXECUTE},
+    // {"K_HELP", SCANCODE_HELP},
+    // {"K_MENU", SCANCODE_MENU},
+    // {"K_SELECT", SCANCODE_SELECT},
+    // {"K_STOP", SCANCODE_STOP},
+    // {"K_AGAIN", SCANCODE_AGAIN},
+    // {"K_UNDO", SCANCODE_UNDO},
+    // {"K_CUT", SCANCODE_CUT},
+    // {"K_COPY", SCANCODE_COPY},
+    // {"K_PASTE", SCANCODE_PASTE},
+    // {"K_FIND", SCANCODE_FIND},
+    // {"K_MUTE", SCANCODE_MUTE},
+    // {"K_VOLUMEUP", SCANCODE_VOLUMEUP},
+    // {"K_VOLUMEDOWN", SCANCODE_VOLUMEDOWN},
+    // {"K_KP_COMMA", SCANCODE_KP_COMMA},
+    // {"K_KP_EQUALSAS400", SCANCODE_KP_EQUALSAS400},
+    // {"K_INTERNATIONAL1", SCANCODE_INTERNATIONAL1},
+    // {"K_INTERNATIONAL2", SCANCODE_INTERNATIONAL2},
+    // {"K_INTERNATIONAL3", SCANCODE_INTERNATIONAL3},
+    // {"K_INTERNATIONAL4", SCANCODE_INTERNATIONAL4},
+    // {"K_INTERNATIONAL5", SCANCODE_INTERNATIONAL5},
+    // {"K_INTERNATIONAL6", SCANCODE_INTERNATIONAL6},
+    // {"K_INTERNATIONAL7", SCANCODE_INTERNATIONAL7},
+    // {"K_INTERNATIONAL8", SCANCODE_INTERNATIONAL8},
+    // {"K_INTERNATIONAL9", SCANCODE_INTERNATIONAL9},
+    // {"K_LANG1", SCANCODE_LANG1},
+    // {"K_LANG2", SCANCODE_LANG2},
+    // {"K_LANG3", SCANCODE_LANG3},
+    // {"K_LANG4", SCANCODE_LANG4},
+    // {"K_LANG5", SCANCODE_LANG5},
+    // {"K_LANG6", SCANCODE_LANG6},
+    // {"K_LANG7", SCANCODE_LANG7},
+    // {"K_LANG8", SCANCODE_LANG8},
+    // {"K_LANG9", SCANCODE_LANG9},
+    // {"K_ALTERASE", SCANCODE_ALTERASE},
+    // {"K_SYSREQ", SCANCODE_SYSREQ},
+    // {"K_CANCEL", SCANCODE_CANCEL},
+    // {"K_CLEAR", SCANCODE_CLEAR},
+    // {"K_PRIOR", SCANCODE_PRIOR},
+    // {"K_RETURN2", SCANCODE_RETURN2},
+    // {"K_SEPARATOR", SCANCODE_SEPARATOR},
+    // {"K_OUT", SCANCODE_OUT},
+    // {"K_OPER", SCANCODE_OPER},
+    // {"K_CLEARAGAIN", SCANCODE_CLEARAGAIN},
+    // {"K_CRSEL", SCANCODE_CRSEL},
+    // {"K_EXSEL", SCANCODE_EXSEL},
+    // {"K_KP_00", SCANCODE_KP_00},
+    // {"K_KP_000", SCANCODE_KP_000},
+    // {"K_THOUSANDSSEPARATOR", SCANCODE_THOUSANDSSEPARATOR},
+    // {"K_DECIMALSEPARATOR", SCANCODE_DECIMALSEPARATOR},
+    // {"K_CURRENCYUNIT", SCANCODE_CURRENCYUNIT},
+    // {"K_CURRENCYSUBUNIT", SCANCODE_CURRENCYSUBUNIT},
+    // {"K_KP_LEFTPAREN", SCANCODE_KP_LEFTPAREN},
+    // {"K_KP_RIGHTPAREN", SCANCODE_KP_RIGHTPAREN},
+    // {"K_KP_LEFTBRACE", SCANCODE_KP_LEFTBRACE},
+    // {"K_KP_RIGHTBRACE", SCANCODE_KP_RIGHTBRACE},
+    // {"K_KP_TAB", SCANCODE_KP_TAB},
+    // {"K_KP_BACKSPACE", SCANCODE_KP_BACKSPACE},
+    // {"K_KP_A", SCANCODE_KP_A},
+    // {"K_KP_B", SCANCODE_KP_B},
+    // {"K_KP_C", SCANCODE_KP_C},
+    // {"K_KP_D", SCANCODE_KP_D},
+    // {"K_KP_E", SCANCODE_KP_E},
+    // {"K_KP_F", SCANCODE_KP_F},
+    // {"K_KP_XOR", SCANCODE_KP_XOR},
+    // {"K_KP_POWER", SCANCODE_KP_POWER},
+    // {"K_KP_PERCENT", SCANCODE_KP_PERCENT},
+    // {"K_KP_LESS", SCANCODE_KP_LESS},
+    // {"K_KP_GREATER", SCANCODE_KP_GREATER},
+    // {"K_KP_AMPERSAND", SCANCODE_KP_AMPERSAND},
+    // {"K_KP_DBLAMPERSAND", SCANCODE_KP_DBLAMPERSAND},
+    // {"K_KP_VERTICALBAR", SCANCODE_KP_VERTICALBAR},
+    // {"K_KP_DBLVERTICALBAR", SCANCODE_KP_DBLVERTICALBAR},
+    // {"K_KP_COLON", SCANCODE_KP_COLON},
+    // {"K_KP_HASH", SCANCODE_KP_HASH},
+    // {"K_KP_SPACE", SCANCODE_KP_SPACE},
+    // {"K_KP_AT", SCANCODE_KP_AT},
+    // {"K_KP_EXCLAM", SCANCODE_KP_EXCLAM},
+    // {"K_KP_MEMSTORE", SCANCODE_KP_MEMSTORE},
+    // {"K_KP_MEMRECALL", SCANCODE_KP_MEMRECALL},
+    // {"K_KP_MEMCLEAR", SCANCODE_KP_MEMCLEAR},
+    // {"K_KP_MEMADD", SCANCODE_KP_MEMADD},
+    // {"K_KP_MEMSUBTRACT", SCANCODE_KP_MEMSUBTRACT},
+    // {"K_KP_MEMMULTIPLY", SCANCODE_KP_MEMMULTIPLY},
+    // {"K_KP_MEMDIVIDE", SCANCODE_KP_MEMDIVIDE},
+    // {"K_KP_PLUSMINUS", SCANCODE_KP_PLUSMINUS},
+    // {"K_KP_CLEAR", SCANCODE_KP_CLEAR},
+    // {"K_KP_CLEARENTRY", SCANCODE_KP_CLEARENTRY},
+    // {"K_KP_BINARY", SCANCODE_KP_BINARY},
+    // {"K_KP_OCTAL", SCANCODE_KP_OCTAL},
+    // {"K_KP_DECIMAL", SCANCODE_KP_DECIMAL},
+    // {"K_KP_HEXADECIMAL", SCANCODE_KP_HEXADECIMAL},
+    // {"K_LCTRL", SCANCODE_LCTRL},
+    {"K_LSHIFT", SCANCODE_LSHIFT},
+    // {"K_LALT", SCANCODE_LALT},
+    // {"K_LGUI", SCANCODE_LGUI},
+    // {"K_RCTRL", SCANCODE_RCTRL},
+    {"K_RSHIFT", SCANCODE_RSHIFT},
+    // {"K_RALT", SCANCODE_RALT},
+    // {"K_RGUI", SCANCODE_RGUI},
+    // {"K_MODE", SCANCODE_MODE},
+    // {"K_AUDIONEXT", SCANCODE_AUDIONEXT},
+    // {"K_AUDIOPREV", SCANCODE_AUDIOPREV},
+    // {"K_AUDIOSTOP", SCANCODE_AUDIOSTOP},
+    // {"K_AUDIOPLAY", SCANCODE_AUDIOPLAY},
+    // {"K_AUDIOMUTE", SCANCODE_AUDIOMUTE},
+    // {"K_MEDIASELECT", SCANCODE_MEDIASELECT},
+    // {"K_WWW", SCANCODE_WWW},
+    // {"K_MAIL", SCANCODE_MAIL},
+    // {"K_CALCULATOR", SCANCODE_CALCULATOR},
+    // {"K_COMPUTER", SCANCODE_COMPUTER},
+    // {"K_AC_SEARCH", SCANCODE_AC_SEARCH},
+    // {"K_AC_HOME", SCANCODE_AC_HOME},
+    // {"K_AC_BACK", SCANCODE_AC_BACK},
+    // {"K_AC_FORWARD", SCANCODE_AC_FORWARD},
+    // {"K_AC_STOP", SCANCODE_AC_STOP},
+    // {"K_AC_REFRESH", SCANCODE_AC_REFRESH},
+    // {"K_AC_BOOKMARKS", SCANCODE_AC_BOOKMARKS},
+    // {"K_BRIGHTNESSDOWN", SCANCODE_BRIGHTNESSDOWN},
+    // {"K_BRIGHTNESSUP", SCANCODE_BRIGHTNESSUP},
+    // {"K_DISPLAYSWITCH", SCANCODE_DISPLAYSWITCH},
+    // {"K_KBDILLUMTOGGLE", SCANCODE_KBDILLUMTOGGLE},
+    // {"K_KBDILLUMDOWN", SCANCODE_KBDILLUMDOWN},
+    // {"K_KBDILLUMUP", SCANCODE_KBDILLUMUP},
+    // {"K_EJECT", SCANCODE_EJECT},
+    // {"K_SLEEP", SCANCODE_SLEEP},
+    // {"K_APP1", SCANCODE_APP1},
+    // {"K_APP2", SCANCODE_APP2},
+    // {"K_AUDIOREWIND", SCANCODE_AUDIOREWIND},
+    // {"K_AUDIOFASTFORWARD", SCANCODE_AUDIOFASTFORWARD},
+    // {"K_SOFTLEFT", SCANCODE_SOFTLEFT},
+    // {"K_SOFTRIGHT", SCANCODE_SOFTRIGHT},
+    // {"K_CALL", SCANCODE_CALL},
+    // {"K_ENDCALL", SCANCODE_ENDCALL}
+
+
+}
+;
+scan_code get_scan_code_by_keyboard_string(const char *keyboard)
+{
+    for (size_t i = 0; i < GUI_ARRAY_SIZE(keyboard_map); i++)
+    {
+        if (GUI_STRINGS_EQUAL(keyboard_map[i].keyboard, keyboard))
+        {
+            return keyboard_map[i].code;
+        }
+    }
+    return SCANCODE_UNKNOWN;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -725,3 +725,31 @@ gui_text_t *gui_text_create(void       *parent,
 
     return text;
 }
+void gui_text_input_prepare_global(gui_obj_t *obj)
+{
+    gui_text_input_prepare(obj);
+}
+void gui_text_prepare_global(gui_obj_t *obj)
+{
+    gui_text_prepare(obj);
+}
+void gui_text_end_global(gui_obj_t *obj)
+{
+    gui_text_end(obj);
+}
+void gui_text_destroy_global(gui_obj_t *obj)
+{
+    gui_text_destroy(obj);
+}
+void gui_text_font_load_global(gui_text_t *text, gui_text_rect_t *rect)
+{
+    gui_text_font_load(text, rect);
+}
+void gui_text_font_draw_global(gui_text_t *text, gui_text_rect_t *rect)
+{
+    gui_text_font_draw(text, rect);
+}
+void gui_text_font_unload_global(gui_text_t *text)
+{
+    gui_text_font_unload(text);
+}

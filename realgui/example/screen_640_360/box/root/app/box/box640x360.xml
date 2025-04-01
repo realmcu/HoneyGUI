@@ -72,7 +72,61 @@
     x="0"
     y="0">screen0
     
+<key
+            id="51"
+            >key1
+            <onClick
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,1,main">
+            </onClick>
+    </key>   
+<key
+            id="50"
+            >key2
+            <onClick
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,0, main   ">
+            </onClick>
+    </key>  
+    <key
+            id="49"
+            >key3
+            <onClick
+                    to="multiLevel"
+                    type="jump" 
+                    id="0,0, main">
+            </onClick>
+    </key>  
+    <wifi
+            >wifi1
+            <onConnected
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,2, wifi_pair">
+            </onConnected>
+            <onConnected
+                    to="listview"
+                    type="highlight" 
+                    id="pagelist1">
+            </onConnected>
+            <onDisconnected
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,1, wifi_pair">
+            </onDisconnected>
+            <onConnecting
+                    to="multiLevel"
+                    type="jump" 
+                    id="1,3, wifi_pair">
+            </onConnecting>
+    </wifi> 
+<multiLevel name="main">ml0
+   
     
+
+
     <slider
         x="202"
         y="180"
@@ -240,13 +294,14 @@
                 to="img_ctlamp"
                 type="animate" 
                 id="animateTranslate1">
+            </onOn>
             <onOn
                 to="img_ctlamp"
                 type="animate" 
                 id="animateRotate1">
             </onOn>
 
-            </onOn>
+            
             <onOff
                 to="imgAnimate4"
                 type="animate" 
@@ -313,8 +368,8 @@
                 type="animate" 
                 id="animateFrame2">
         </onClick>
-</icon>
-<roller
+    </icon>
+    <roller
                         x="450"              
                         y="150"             
                         w="50"           
@@ -330,7 +385,7 @@
                         loop = "false"
                         fontMode = "center"
                     >scrollWheel1
-                    </roller>
+    </roller>
     <calendar
         x="0"
         y="360"
@@ -345,7 +400,7 @@
         fontSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin">calendar
     </calendar>
-<combo
+    <combo
     x="450"              
     y="400"             
     w="220"                      
@@ -367,9 +422,9 @@
     fontColorSelection="#1a1a1a"   
     fontColorHighlight="#000000" 
     blendMode="imgSrcOverMode"  
->combo1
-</combo>
-<textbox
+    >combo1
+    </combo>
+    <textbox
             x="0"
             y="15"
             color="white"
@@ -385,7 +440,7 @@
                 id="Current">
             </onPeripheral>
         </textbox>
-<arc
+    <arc
         centerX="85"
         centerY="369"
         radius="27"
@@ -400,74 +455,8 @@
             to="arc1" 
             id="exercise">
         </onPeripheral>
-</arc>   
-
-<multiLevel>ml0
-    <multiLevel>ml10
-        <chart
-            w="400"
-            h="300"
-            x="10"
-            y="10"
-            color="yellow"
-            items="100,200,300,400,-100,-200,0,50,333,-333,499"
-            max="400"
-            min="-300"  
-            style="waveform"
-            strokeWidth="20"
-            >chart1
-            <onPeripheral 
-                    type="heart_rate" 
-                    to="chart1" 
-                    id="array">
-                </onPeripheral>
-        </chart>  
-    </multiLevel>
-    <multiLevel>ml11
-        <chart
-                w="400"
-                h="200"
-                x="10"
-                y="10"
-                color="red"
-                items="100,200,300,400,-100,-200,0,50,333,-333,499"
-                max="400"
-                min="-300"  
-                strokeWidth="20"
-                style="bar"
-                >chart2
-                <onPeripheral 
-                        type="heart_rate" 
-                        to="chart2" 
-                        id="array">
-                    </onPeripheral>
-        </chart> 
-                <chart
-            w="400"
-            h="100"
-            x="10"
-            y="210"
-            color="blue"
-            items="100,200,300,400,-100,-200,0,50,333,-333,499"
-            max="400"
-            min="-300"  
-            strokeWidth="4"
-            style="line"
-            >chart3
-            <onPeripheral 
-                    type="heart_rate" 
-                    to="chart3" 
-                    id="array">
-            </onPeripheral>
-        </chart> 
-    </multiLevel>
-</multiLevel>
-
-
-
-
-
-<textbox
+    </arc>   
+    <textbox
             x="0"
             y="130"
             color="red"
@@ -595,7 +584,7 @@
                 >
             </onTime>
     </textbox>
-        <textbox
+    <textbox
             x="0"
             y="300"
             color="red"
@@ -707,8 +696,923 @@
             >watchfacemask
 
     </img>
+    <multiLevel name="main">ml10
+        <chart
+            w="400"
+            h="300"
+            x="10"
+            y="10"
+            color="yellow"
+            items="100,200,300,400,-100,-200,0,50,333,-333,499"
+            max="400"
+            min="-300"  
+            style="waveform"
+            strokeWidth="20"
+            >chart1
+            <onPeripheral 
+                    type="heart_rate" 
+                    to="chart1" 
+                    id="array">
+                </onPeripheral>
+        </chart>  
+        <chart
+                w="400"
+                h="200"
+                x="10"
+                y="10"
+                color="red"
+                items="100,200,300,400,-100,-200,0,50,333,-333,499"
+                max="400"
+                min="-300"  
+                strokeWidth="20"
+                style="bar"
+                >chart2
+                <onPeripheral 
+                        type="heart_rate" 
+                        to="chart2" 
+                        id="array">
+                    </onPeripheral>
+        </chart> 
+                <chart
+            w="400"
+            h="100"
+            x="10"
+            y="210"
+            color="blue"
+            items="100,200,300,400,-100,-200,0,50,333,-333,499"
+            max="400"
+            min="-300"  
+            strokeWidth="4"
+            style="line"
+            >chart3
+            <onPeripheral 
+                    type="heart_rate" 
+                    to="chart3" 
+                    id="array">
+            </onPeripheral>
+        </chart> 
+    </multiLevel>
+    <multiLevel name="main">ml11
+        <listview
+            w="200"
+            h="300"
+            x="600"
+            y="100"
+            orientation="vertical"
+            rowSpacing="43"      
+            fontSize="16"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+            fontColor="gray"
+            fontMode="middle"
+            picture="app\\box\\resource\\combo\\itembk.bin"
+            highlightPicture="app\\box\\resource\\combo\\itemhighlight.bin"
+            selectedPicture="app\\box\\resource\\combo\\itemselection.bin"
+            blendMode="imgSrcOverMode"
+            items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11,Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11" 
+            >pagelist1
+            <onPeripheral 
+                    type="wifi" 
+                    to="pagelist1" 
+                    id="name">
+            </onPeripheral>
+            <onClick    
+                        to="multiLevel"
+                        type="jump" 
+                        id="1,0,wifi_pair">
+            </onClick>
+        </listview>
 
-<img
+        <multiLevel name="wifi_pair">wifi_pair00
+ 
+                
+            <multiLevel name="wifi_pair">wifi_pair10
+                <rect 
+                            x="100"             
+                            y="100"
+                            w="480"
+                            h="480"
+                            opacity="50"
+                            fill="white"
+                            >wifi_rect1
+                </rect>
+                <img
+                            x="100"             
+                            y="100"
+                            w="480"
+                            h="480"
+                            opacity="255"
+                            file="app/box/resource/wifi/enterpass.bin"
+                            blendMode="imgSrcOverMode"
+                            >wifi_img1
+                </img>
+                 <rect 
+                            x="150"             
+                            y="122"
+                            w="200"
+                            h="20"
+                            opacity="255"
+                            fill="white"
+                            >wifi_rect2
+                </rect>
+            <textbox
+                x="150"             
+                y="122"
+                color="black"
+                w="200"
+                h="20"
+                text="Wi-Fi"
+                fontSize="16"
+                font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                mode="center">txt_date4
+                <onPeripheral 
+                    type="wifi" 
+                    to="txt_date4" 
+                    id="name">
+                </onPeripheral>
+            </textbox>
+                <win
+                            x="116"             
+                            y="160"
+                            w="150"
+                            h="49">win_wifi_pass
+                            <onClick
+                                to="tabview"
+                                type="jump" 
+                                id="1,0,tv1">
+                            </onClick>
+                            <onClick
+                                to="text"
+                                type="input" 
+                                id="txt_password">
+                            </onClick>
+                </win>
+
+                
+                <tabview gestures="false">tv1
+                    <tab >t1
+                
+                    </tab>
+                    <tab idx="1">t2l
+                    
+                        
+                        <switch
+                                    x="400"
+                                    y="180"
+                                    w = "20"
+                                    h="13"
+                                    picture="app\\box\\resource\\wifi\\maskpassword.bin"
+                                    highlightPicture="app\\box\\resource\\wifi\\maskpasswordhl.bin">sw_living
+                                                <onOn 
+                                                                to="text"
+                                                                type="password" 
+                                                                id="txt_password">
+                                                </onOn>
+                                                <onOff 
+                                                                to="text"
+                                                                type="text" 
+                                                                id="txt_password">
+                                                </onOff>
+                        
+                        </switch>
+
+                    
+                      <!-- textbox for wifi password -->
+                        <textbox
+                                    x="135"
+                                    y="178"
+                                    w = "264"
+                                    h="49"
+                                    color="gray"
+                                    
+                                    text="password"
+                                    fontSize="16"
+                                    font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                                    mode="truncate">txt_password
+                                    <onPeripheral 
+                                        type="wifi" 
+                                        to="txt_password" 
+                                        id="password">
+                                    </onPeripheral>
+                        </textbox>
+                        
+                        <tabview gestures="false">tvkeyboard
+                        <switch
+                                                
+                                                picture="app\\box\\resource\\wifi\\123.bin"
+                                                highlightPicture="app\\box\\resource\\wifi\\123hl.bin"
+                                                blendMode="imgSrcOverMode"
+                                                opacity="255"
+                                                pictureX="0"
+                                                pictureY="0"
+                                                rotationAngle="0"
+                                                textX="0"
+                                                textY="0"
+                                                mode="normal"
+                                                w="91"
+                                                h="43"
+                                                x="330"
+                                                y="550">keyicon
+                                                <onOn 
+                                                                to="tabview"
+                                                                type="jump" 
+                                                                id="1,0,tvkeyboard">
+                                                </onOn>
+                                                <onOff 
+                                                                to="tabview"
+                                                                type="jump" 
+                                                                id="0,0,tvkeyboard">
+                                                </onOff>
+                                        </switch>
+                            <tab idx="1" idy="0">t1
+                            <win x="30" y="400">
+                        
+                            
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\0.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\0.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="0"
+                                        y="0">keyicon
+                                        <onClick  
+                                                        type="keyboard"  
+                                                        to="txt_password"
+                                                        id="K_0"  >
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\1.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\1.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="130"
+                                        y="0">keyicon
+                                        <onClick  
+                                                        type="keyboard"  
+                                                        to="txt_password"
+                                                        id="K_1"  >
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\2.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\2.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="260"
+                                        y="0">keyicon
+                                        <onClick  
+                                                        type="keyboard"  
+                                                        to="txt_password"
+                                                        id="K_2"  >
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\3.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\3.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="0"
+                                        y="50">keyicon
+                                        <onClick  
+                                                        type="keyboard"  
+                                                        to="txt_password"
+                                                        id="K_3"  >
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\4.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\4.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="130"
+                                        y="50">keyicon
+                                        <onClick  
+                                                        type="keyboard"  
+                                                        to="txt_password"
+                                                        id="K_4"  >
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\5.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\5.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="260"
+                                        y="50">keyicon
+                                        <onClick  
+                                                        type="keyboard"  
+                                                        to="txt_password"
+                                                        id="K_5"  >
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\6.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\6.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="0"
+                                        y="100">keyicon
+                                        <onClick  
+                                            type="keyboard"  
+                                            to="txt_password"
+                                            id="K_6">
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\7.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\7.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="130"
+                                        y="100">keyicon
+                                        <onClick  
+                                            type="keyboard"  
+                                            to="txt_password"
+                                            id="K_7">
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\8.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\8.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="260"
+                                        y="100">keyicon
+                                        <onClick  
+                                            type="keyboard"  
+                                            to="txt_password"
+                                            id="K_8">
+                                        </onClick>
+                                </icon>
+                                <icon
+                                        text=""
+                                        picture="app\\box\\resource\\wifi\\9.bin"
+                                        highlightPicture="app\\box\\resource\\wifi\\9.bin"
+                                        blendMode="imgBypassMode"
+                                        opacity="255"
+                                        pictureX="0"
+                                        pictureY="0"
+                                        rotationAngle="0"
+                                        textX="0"
+                                        textY="0"
+                                        mode="normal"
+                                        w="130"
+                                        h="49"
+                                        x="0"
+                                        y="150">keyicon
+                                        <onClick  
+                                            type="keyboard"  
+                                            to="txt_password"
+                                            id="K_9">
+                                        </onClick>
+                                </icon>
+
+                            </win>
+                            </tab>
+
+                            <tab idx="0" idy="0">t2                            
+                                <win x="230" y="400">
+                                
+                                
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi/letter/A.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\A.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="4"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_a"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\b.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\b.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="36"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_b"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\c.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\c.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="68"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_c"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\d.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\d.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="100"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_d"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\e.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\e.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="132"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_e"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\f.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\f.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="164"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_f"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\g.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\g.bin"
+                                            blendMode="imgBypassMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="33"
+                                            h="43"
+                                            x="196"
+                                            y="0">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_g"  >
+                                            </onClick>
+                                    </icon>
+                                    <icon
+                                            text=""
+                                            picture="app\\box\\resource\\wifi\\Delete.bin"
+                                            highlightPicture="app\\box\\resource\\wifi\\Delete.bin"
+                                            blendMode="imgSrcOverMode"
+                                            opacity="255"
+                                            pictureX="0"
+                                            pictureY="0"
+                                            rotationAngle="0"
+                                            textX="0"
+                                            textY="0"
+                                            mode="normal"
+                                            w="44"
+                                            h="42"
+                                            x="4"
+                                            y="43">keyicon
+                                            <onClick  
+                                                            type="keyboard"  
+                                                            to="txt_password"
+                                                            id="K_BACKSPACE"  >
+                                            </onClick>
+                                        </icon>
+                                        <icon
+                                                text=""
+                                                picture="app\\box\\resource\\wifi\\Space.bin"
+                                                highlightPicture="app\\box\\resource\\wifi\\Space.bin"
+                                                blendMode="imgSrcOverMode"
+                                                opacity="255"
+                                                pictureX="0"
+                                                pictureY="0"
+                                                rotationAngle="0"
+                                                textX="0"
+                                                textY="0"
+                                                mode="normal"
+                                                w="190"
+                                                h="43"
+                                                x="48"
+                                                y="43">keyicon
+                                                <onClick  
+                                                                type="keyboard"  
+                                                                to="txt_password"
+                                                                id="K_SPACE"  >
+                                                </onClick>
+                                        </icon>
+                                        <switch
+                                                
+                                                picture="app\\box\\resource\\wifi\\Shift.bin"
+                                                highlightPicture="app\\box\\resource\\wifi\\Shift.bin"
+                                                blendMode="imgSrcOverMode"
+                                                opacity="255"
+                                                pictureX="0"
+                                                pictureY="0"
+                                                rotationAngle="0"
+                                                textX="0"
+                                                textY="0"
+                                                mode="normal"
+                                                w="44"
+                                                h="42"
+                                                x="4"
+                                                y="86">keyicon
+                                                <onOn 
+                                                                type="keyboard"  
+                                                                to="txt_password"
+                                                                id="K_LSHIFT"  >
+                                                </onOn>
+                                                <onOff 
+                                                                type="keyboard"  
+                                                                to="txt_password"
+                                                                id="K_LSHIFT"  >
+                                                </onOff>
+                                        </switch>
+                                        
+                                </win>            
+                            </tab>
+                        </tabview>
+                        <icon
+                                text=""
+                                picture="app\\box\\resource\\wifi\\cancel.bin"
+                                highlightPicture="app\\box\\resource\\wifi\\cancel_hl.bin"
+                                blendMode="imgSrcOverMode"
+                                opacity="255"
+                                pictureX="0"
+                                pictureY="0"
+                                rotationAngle="0"
+                                textX="0"
+                                textY="0"
+                                mode="normal"
+                                w="116"
+                                h="45"
+                                x="120"
+                                y="240">keyicon
+                            <onClick
+                                to="text"
+                                type="no input" 
+                                id="txt_password">
+                            </onClick>
+                        </icon>
+                        <icon
+                                text=""
+                                picture="app\\box\\resource\\wifi\\connect.bin"
+                                highlightPicture="app\\box\\resource\\wifi\\connect_pressed.bin"
+                                blendMode="imgSrcOverMode"
+                                opacity="255"
+                                pictureX="0"
+                                pictureY="0"
+                                rotationAngle="0"
+                                textX="0"
+                                textY="0"
+                                mode="normal"
+                                w="116"
+                                h="45"
+                                x="250"
+                                y="240">keyicon
+                                <onClick
+                                    to="multiLevel"
+                                    type="jump" 
+                                    id="1,3,wifi_pair">
+                                </onClick>
+                                <onClick
+                                    to="wifi"
+                                    type="connect" 
+                                    id="">
+                                </onClick>
+                        </icon>                   
+                        
+                    </tab>
+                    
+                
+                </tabview>	
+
+            </multiLevel>
+            <multiLevel name="wifi_pair">wifi_pair11
+                <rect 
+                            x="100"             
+                            y="100"
+                            w="480"
+                            h="480"
+                            opacity="50"
+                            fill="white"
+                            >wifi_rect1
+                </rect>
+                <img
+                            x="100"             
+                            y="100"
+                            w="300"
+                            h="195"
+                            opacity="255"
+                            file="app/box/resource/wifi/passfailed.bin"
+                            blendMode="imgSrcOverMode"
+                            >wifi_img1
+                </img>
+                <win
+                            x="100"             
+                            y="100"
+                            w="300"
+                            h="195">win_wifi_pass
+                            <onClick
+                              to="multiLevel"
+                                    type="jump" 
+                                    id="1,1,main">
+                            </onClick>
+                </win>
+               <rect 
+                            x="150"             
+                            y="122"
+                            w="200"
+                            h="20"
+                            opacity="255"
+                            fill="white"
+                            >wifi_rect2
+                </rect>
+                <textbox
+                    x="150"             
+                    y="122"
+                    color="black"
+                    w="200"
+                    h="20"
+                    text="Wi-Fi"
+                    fontSize="16"
+                    font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                    mode="center">txt_date4
+                    <onPeripheral 
+                        type="wifi" 
+                        to="txt_date4" 
+                        id="name">
+                    </onPeripheral>
+                </textbox>
+            </multiLevel>
+            <multiLevel name="wifi_pair">wifi_pair12
+              
+                         <rect 
+                            x="100"             
+                            y="100"
+                            w="480"
+                            h="480"
+                            opacity="50"
+                            fill="white"
+                            >wifi_rect1
+                </rect>
+                <img
+                            x="100"             
+                            y="100"
+                            w="300"
+                            h="195"
+                            opacity="255"
+                            file="app/box/resource/wifi/passsucceed.bin"
+                            blendMode="imgSrcOverMode"
+                            >wifi_img1
+                </img>
+                <win
+                            x="100"             
+                            y="100"
+                            w="300"
+                            h="195">win_wifi_pass
+                            <onClick
+                              to="multiLevel"
+                                    type="jump" 
+                                    id="1,1,main">
+                            </onClick>
+                </win>
+               <rect 
+                            x="150"             
+                            y="122"
+                            w="200"
+                            h="20"
+                            opacity="255"
+                            fill="white"
+                            >wifi_rect2
+                </rect>
+                <textbox
+                    x="150"             
+                    y="122"
+                    color="black"
+                    w="200"
+                    h="20"
+                    text="Wi-Fi"
+                    fontSize="16"
+                    font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                    mode="center">txt_date4
+                    <onPeripheral 
+                        type="wifi" 
+                        to="txt_date4" 
+                        id="name">
+                    </onPeripheral>
+                </textbox>
+            </multiLevel>
+            <multiLevel name="wifi_pair">wifi_pair13
+              
+                         <rect 
+                            x="100"             
+                            y="100"
+                            w="480"
+                            h="480"
+                            opacity="50"
+                            fill="white"
+                            >wifi_rect1
+                </rect>
+                <img
+                            x="100"             
+                            y="100"
+                            w="300"
+                            h="195"
+                            opacity="255"
+                            file="app/box/resource/wifi/Capture.bin"
+                            blendMode="imgSrcOverMode"
+                            >wifi_img1
+                </img>
+                
+               <rect 
+                            x="150"             
+                            y="122"
+                            w="200"
+                            h="20"
+                            opacity="255"
+                            fill="white"
+                            >wifi_rect2
+                </rect>
+                <textbox
+                    x="150"             
+                    y="122"
+                    color="black"
+                    w="200"
+                    h="20"
+                    text="Wi-Fi"
+                    fontSize="16"
+                    font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+                    mode="center">txt_date4
+                    <onPeripheral 
+                        type="wifi" 
+                        to="txt_date4" 
+                        id="name">
+                    </onPeripheral>
+                </textbox>
+            </multiLevel>
+        </multiLevel>
+
+
+
+
+
+
+</multiLevel>
+</multiLevel>
+    <img
             x="0"
             y="753"
             opacity="255"
@@ -716,26 +1620,26 @@
             blendMode="imgSrcOverMode"
             >tabs_group
 
-    
-    <icon
-            picture="app/box/resource/tab/Tab1.bin"
+ <radio
+        picture="app/box/resource/tab/Tab1.bin"
             highlightPicture="app/box/resource/tab/Tab1hl.bin"
-            blendMode="imgSrcOverMode"
-            opacity="255"
-            pictureX="0"
-            pictureY="0"
-            rotationAngle="0"
-            w="32"
+        blendMode="imgSrcOverMode"
+        opacity="255"
+        pictureX="0"
+        pictureY="0"
+        rotationAngle="0"
+        w="32"
             h="47"
             x="0"
-            y="0">tab1
-            <onClick
+            y="0">tab_1
+            <onSelect
                     to="multiLevel"
                     type="jump" 
-                    id="1,0">
-            </onClick>
-    </icon>
-    <icon
+                    id="1,0,main">
+            </onSelect>
+</radio>      
+
+    <radio
             picture="app/box/resource/tab/Tab2.bin"
             highlightPicture="app/box/resource/tab/Tab2hl.bin"
             blendMode="imgSrcOverMode"
@@ -746,14 +1650,15 @@
             w="32"
             h="47"
             x="63"
-            y="0">tab1
-            <onClick
+            y="0"
+            name="main_radio">tab_2
+            <onSelect
                     to="multiLevel"
                     type="jump" 
-                    id="1,1">
-            </onClick>
-    </icon>
-    <icon
+                    id="1,1,main">
+            </onSelect>
+    </radio>
+    <radio
             picture="app/box/resource/tab/Tab3.bin"
             highlightPicture="app/box/resource/tab/Tab3hl.bin"
             blendMode="imgSrcOverMode"
@@ -764,13 +1669,14 @@
             w="32"
             h="47"
             x="126"
-            y="0">tab1
-            <onClick
+            y="0"
+            name="main_radio">tab_3
+            <onSelect
                     to="multiLevel"
                     type="jump" 
-                    id="0,0">
-            </onClick>
-    </icon>
+                    id="0,0,main">
+            </onSelect>
+    </radio>
 </img>
     <icon
             picture="app/box/resource/time/watchicon.bin"
@@ -808,21 +1714,6 @@
                     id="app_launcher_frontend">
             </onClick>
     </icon>
-    <list
-        w="100"
-        h="100"
-        x="700"
-        y="0"
-        horizontal="vertical"
-        rowSpacing="43"      
-        fontSize="16"
-        font="app/box/resource/font/arialbd_size16_bits4_font.bin"
-        fontColor="gray"
-        fontMode="middle"
-        picture="app\\box\\resource\\combo\\itembk.bin"
-        highlightPicture="app\\box\\resource\\combo\\itemhighlight.bin"
-        blendMode="imgSrcOverMode"
-        items="Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11,Item1,Item2,Item3,Item4,Item5,Item6,Item7,Item8,Item9,Item10,Item11" 
-        >pagelist1
-    </list>
+ 
+
 </screen></app>
