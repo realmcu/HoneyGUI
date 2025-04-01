@@ -64,19 +64,22 @@ void update_disc_animation()
     }
 }
 
-
-static void disc_cb(void *this, size_t face_index, gui_3d_world_t *world,
-                    gui_3d_camera_t *camera)
+static void disc_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t object_matrix;
-    gui_3d_matrix_t local_rotation_matrix;
 
-    gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 40), gui_point_4d(0, 0, 0), 1, 32767, 90,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 40), gui_point_4d(0, 0, 0), 1, 32767,
+                                 90,
                                  dc->screen_width, dc->screen_height);
 
-    gui_3d_world_inititalize(&object_matrix, 0, -5, 90, -65 + rot_x_angle, 0, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, -5, 90, -65 + rot_x_angle, 0, 0, 5);
+
+}
+
+static gui_3d_matrix_t disc_face_cb(gui_3d_t *this, size_t face_index)
+{
+    gui_3d_matrix_t face_matrix;
+    gui_3d_matrix_t transform_matrix;
 
     gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
                              rot_z_angle, 1);
@@ -89,18 +92,21 @@ static void disc_cb(void *this, size_t face_index, gui_3d_world_t *world,
                                  rot_z_angle, 1);
     }
 
-    *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+
+    return transform_matrix;
 
 }
 
 static int app_init(void)
 {
-    void *disc_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+    gui_3d_t *disc_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-    gui_3d_set_local_shape_transform_cb(disc_3d, 0, (gui_3d_shape_transform_cb)disc_cb);
+    gui_3d_set_global_transform_cb(disc_3d, (gui_3d_global_transform_cb)disc_global_cb);
+    gui_3d_set_face_transform_cb(disc_3d, (gui_3d_face_transform_cb)disc_face_cb);
 
-    gui_obj_create_timer(&(((gui_3d_base_t *)disc_3d)->base), 1, true, update_disc_animation);
-    gui_obj_start_timer(&(((gui_3d_base_t *)disc_3d)->base));
+    gui_obj_create_timer(&(disc_3d->base), 1, true, update_disc_animation);
+    gui_obj_start_timer(&(disc_3d->base));
 
 
     return 0;

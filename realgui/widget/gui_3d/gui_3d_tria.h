@@ -32,28 +32,12 @@ extern "C" {
 #include "gui_api.h"
 #include "gui_obj.h"
 #include "def_3d_tria.h"
-
+#include "gui_3d.h"
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
 
-typedef struct gui_3d_tria
-{
-    gui_obj_t base;
-
-    gui_3d_description_t *desc;
-    gui_3d_tria_face_t *face;
-    draw_img_t *img;
-    draw_img_t *mask_img;
-
-    void (*global_shape_transform_cb)(struct gui_3d_tria *this, gui_3d_world_t *world,
-                                      gui_3d_camera_t *camera);
-    void (*local_shape_transform_cb)(struct gui_3d_tria *this, size_t face_index,
-                                     gui_3d_world_t *world,
-                                     gui_3d_camera_t *camera);
-
-} gui_3d_tria_t;
 
 /*============================================================================*
  *                         Constants
@@ -71,8 +55,6 @@ typedef struct gui_3d_tria
  *                         Functions
  *============================================================================*/
 
-
-
 /**
  * @brief 3d widget create
  *
@@ -85,34 +67,13 @@ typedef struct gui_3d_tria
  * @param h height
  * @return the widget object pointer
  */
-gui_3d_tria_t *gui_3d_tria_create(void                  *parent,
-                                  const char            *name,
-                                  gui_3d_description_t  *desc,
-                                  int16_t                x,
-                                  int16_t                y,
-                                  int16_t                w,
-                                  int16_t                h);
-
-/**
- * @brief set global shape transform callback
- *
- * @param this the 3d widget pointer
- * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for all faces
- */
-void gui_3d_tria_set_global_shape_transform_cb(gui_3d_tria_t *this,
-                                               void (*cb)(gui_3d_tria_t *this, gui_3d_world_t *world, gui_3d_camera_t *camera));
-/**
- * @brief set local shape transform callback
- *
- * @param this the 3d widget pointer
- * @param face_index face offset
- * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for the specified face
- */
-void gui_3d_tria_set_local_shape_transform_cb(gui_3d_tria_t *this, size_t face_index,
-                                              void (*cb)(gui_3d_tria_t *this, size_t face_index, gui_3d_world_t *world, gui_3d_camera_t *camera));
-
+gui_3d_t *gui_3d_tria_create(void                  *parent,
+                             const char            *name,
+                             gui_3d_description_t  *desc,
+                             int16_t                x,
+                             int16_t                y,
+                             int16_t                w,
+                             int16_t                h);
 
 
 #ifdef __cplusplus

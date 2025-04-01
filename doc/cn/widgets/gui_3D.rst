@@ -2,64 +2,147 @@
 3D模型 (3D Model)
 =================
 
-该控件支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的3D模型，并支持添加动画特效。
+该控件支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的3D模型，能够处理模型的几何形状和材质信息，并支持为模型添加丰富的动画特效以增强视觉表现力。
 
-GUI加载3D模型
--------------
-1. 3D模型组成部分
+该控件支持两种基础几何面类型的3D模型绘制：矩形面和三角形面。矩形面适用于简单的几何体，如立方体、平面等，而三角形面则适用于更复杂的模型，如人脸、动物等。用户可以根据需要选择合适的面类型来创建3D模型。
 
-   + :file:`.obj` 文件：存储3D模型的几何数据，包括顶点、法线、纹理坐标、面等。
-   + :file:`.mtl` 文件：描述3D模型材质的属性，包括颜色、光泽度、透明度和纹理映射等。
-   + 图片文件：模型中使用到的贴图。
 
-   .. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
-      :width: 800px
-      :align: center
+3D模型组成要素
+---------------
 
-      3D模型组成示例
+完整的3D模型包含三个核心组件：
 
-2. 3D模型解析并生成3D信息描述子
+1. **.obj文件**
 
-   + 调用脚本处理 :file:`.obj` 文件。
+   - 存储几何数据，包括：
 
+     - 顶点坐标
+     - 法线向量
+     - 纹理坐标（UV映射）
+     - 面定义
+   - 需引用 :file:`.mtl` 文件中的材质信息。
+
+2. **.mtl文件（材质库）**
+
+   - 定义表面属性，包括：
+
+     - 环境光/漫反射/镜面反射颜色
+     - 折射率
+     - 透明度
+     - 光照模型
+     - 纹理贴图引用
+
+3. **纹理图片**
+
+   - 通常为PNG格式，用于：
+
+     - 漫反射贴图
+     - 法线贴图
+     - 高光贴图
+     - 透明贴图
+
+.. image:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
+   :width: 800px
+   :align: 
+   
+   3D模型组成示例
+
+3D模型处理流程
+---------------
+
+在HoneyGUI中使用3D模型前，需要将其转换为二进制格式。以下是处理流程：
+
+1. **定位转换工具**
+   
+   - 在HoneyGUI安装目录下找到以下工具：
+
+     - ``your_HoneyGUI_dir/tool/3D-tool/png2c.py``
+     - ``your_HoneyGUI_dir/tool/3D-tool/extract_desc.exe``
+
+2. **准备模型目录**
+   
+   - 将上述工具复制到模型目录。
+
+   - 该模型目录确保包含：
+
+     - :file:`.obj` 文件
+     - :file:`.mtl` 文件
+     - 所有引用的纹理图片
+
+3. **生成描述文件**
+   
+   - 使用提取器处理模型: ``extract_desc.exe xxx.obj``，该可执行文件会自动调用 :file:`png2c.py` 将所有的PNG纹理转换为二进制数组。
+   
    .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
       :width: 800px
       :align: center
 
       脚本处理
    
-   + 生成3D信息描述子，该文件包含obj解析数据、mtl解析数据以及纹理贴图。
+   - 生成的 :file:`desc.txt` 文件包含以下内容：
 
+     - obj解析数据
+     - mtl解析数据
+     - 内嵌纹理数据
+   
    .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
       :width: 800px
       :align: center
 
       生成二进制数组
 
-3. GUI加载描述子
+.. note::
+   三角形面组成的模型暂不支持纹理贴图。
 
-   将包含obj解析数据、mtl解析数据和图片数据的desc文件放入工程目录下，并在 :cpp:any:`gui_3d_create` 中加载。
 
-   **示例:**
+在HoneyGUI中的集成
+-------------------
+
+1. **添加描述文件到项目**
+
+   - 将生成的 :file:`desc.txt` 文件放入项目目录。
+
+2. **创建3D控件**
+
+   - 使用 :cpp:any:`gui_3d_create` 函数创建：
 
    .. code-block:: c
 
-      void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+      gui_3d_t *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
 
-3D控件用法
+用法
 -------------
+
 创建控件
 ~~~~~~~~
 使用 :cpp:any:`gui_3d_create` 创建3D模型，导入的 ``desc_addr`` 文件即为脚本中提取的解析数据。
 
-全局形状变换
-~~~~~~~~~~~~
-使用 :cpp:any:`gui_3d_set_global_shape_transform_cb` 对3D模型进行整体变换，其中 ``cb`` 为物体的所有面设置相同的形状变换。该函数中的 ``world`` 和 ``camera`` 代表了3D对象的世界坐标变换和相机视角投影，矩形面还支持设置 ``light`` 光照信息。
+变换控制
+~~~~~~~~
 
-局部形状变换
-~~~~~~~~~~~~
-使用 :cpp:any:`gui_3d_set_local_shape_transform_cb` 对3D模型进行局部变换，其中 ``cb`` 可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。该函数中的 ``world`` 和 ``camera`` 代表了3D对象的世界坐标变换和相机视角投影，矩形面还支持设置 ``light`` 光照信息。
+全局变换
+^^^^^^^^
+使用 :cpp:any:`gui_3d_set_global_transform_cb` 对3D模型进行整体变换，其中 ``gui_3d_global_transform_cb`` 类型的回调函数可以为物体的所有面设置相同的形状变换。例如 ``world`` 世界坐标变换和 ``camera`` 相机视角投影，矩形面还支持设置 ``light`` 光照信息。具体配置可参考 :ref:`坐标变换和光照系统` 章节。
+
+典型应用场景：
+
++ 模型整体旋转/平移
++ 场景视角切换
+
+面变换
+^^^^^^^^
+使用 :cpp:any:`gui_3d_set_face_transform_cb` 对3D模型进行局部变换，其中 ``gui_3d_global_transform_cb`` 类型的回调函数可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。
+
+功能特点：
+
++ 支持局部动画
++ 支持按面片索引独立控制
+
+.. _坐标变换和光照系统:
+
+坐标变换和光照系统
+~~~~~~~~~~~~~~~~~~
 
 世界变换
 ^^^^^^^^
@@ -164,9 +247,9 @@ GUI加载3D模型
 3D蝴蝶
 ~~~~~~~~
 
-该模型全部由矩形面组成，调用 :cpp:any:`gui_3d_set_local_shape_transform_cb()` 为不同面设置局部变换可以制作动画效果。
+该模型全部由矩形面组成，调用 :cpp:any:`gui_3d_set_face_transform_cb()` 为不同面设置局部变换可以制作动画效果。
 
-.. literalinclude:: ../../../example/demo/app_ui_realgui_3d.c
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_butterfly.c
    :language: c
    :start-after: /* 3d butterfly demo start*/
    :end-before: /* 3d butterfly demo end*/
@@ -186,7 +269,7 @@ GUI加载3D模型
 .. code-block:: c
 
    #include "math.h"
-   #include "cube3D/desc.txt"
+   #include "prism3d/desc.txt"
 
    static float rot_angle = 0.0f;
    void update_cube_animation()
@@ -194,35 +277,29 @@ GUI加载3D模型
       rot_angle++;
    }
 
-   static void cube_cb(gui_3d_t *this, gui_3d_world_t *world,
-                  gui_3d_camera_t *camera, gui_3d_light_t *light)
+   static void cube_global_cb(gui_3d_t *this)
    {
       gui_dispdev_t *dc = gui_get_dc();
       gui_3d_matrix_t face_matrix;
       gui_3d_matrix_t object_matrix;
 
-      gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 6, 15), gui_point_4d(0, 0, 0), 1, 32767, 90,
-                                    dc->screen_width, dc->screen_height);
+      gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767, 90,
+                                 dc->screen_width, dc->screen_height);
 
-      gui_3d_world_inititalize(&object_matrix, 0, 22, 40, 90, 0, 0,
-                              10);
+      gui_3d_world_inititalize(&this->world, 0, 10, 110, 0, rot_angle, 0, 19);
 
-      gui_3d_light_inititalize(light, gui_point_4d(0, 22, 45), gui_point_4d(0, 22, 40), 60, 0.6, (gui_3d_RGBAcolor_t){255, 215, 0, 255});
-
-      gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1), rot_angle,
-                                    1);
-      
-      *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+      gui_3d_light_inititalize(&this->light, gui_point_4d(0, 10, 112), gui_point_4d(0, 22, 40), 60, 0.6, (gui_3d_RGBAcolor_t){255, 215, 0, 255});
 
    }
+
    static int app_init(void)
    {
-      void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+      gui_3d_t *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-      gui_3d_set_global_shape_transform_cb(test_3d, (gui_3d_shape_transform_cb)cube_cb);
+      gui_3d_set_global_transform_cb(test_3d, (gui_3d_global_transform_cb)cube_global_cb);
 
-      gui_obj_create_timer(&(((gui_3d_base_t *)test_3d)->base), 17, true, update_cube_animation);
-      gui_obj_start_timer(&(((gui_3d_base_t *)test_3d)->base));
+      gui_obj_create_timer(&(test_3d->base), 17, true, update_cube_animation);
+      gui_obj_start_timer(&(test_3d->base));
 
       return 0;
    }
@@ -238,7 +315,7 @@ GUI加载3D模型
 
 该模型由1454个三角形面组成。
 
-.. literalinclude:: ../../../example/demo/app_ui_realgui_3d_face.c
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_face.c
    :language: c
    :start-after: /* 3d face demo start*/
    :end-before: /* 3d face demo end*/

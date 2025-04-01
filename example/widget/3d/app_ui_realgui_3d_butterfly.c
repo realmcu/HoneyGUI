@@ -90,20 +90,23 @@ void update_animation()
 
 }
 
-static void cb(void *this, size_t face_index/*face offset*/, gui_3d_world_t *world,
-               gui_3d_camera_t *camera, gui_3d_light_t *light)
+static void butterfly_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t object_matrix;
 
-    gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767, 90,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+                                 90,
                                  dc->screen_width, dc->screen_height);
 
-    gui_3d_world_inititalize(&object_matrix, butterfly_x, butterfly_y, butterfly_z, 0, 0,
-                             butterfly_rz,
+    gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
                              5);
 
+}
+
+static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
+{
+    gui_3d_matrix_t face_matrix;
+    gui_3d_matrix_t transform_matrix;
 
     if (face_index == 0)
     {
@@ -131,7 +134,9 @@ static void cb(void *this, size_t face_index/*face offset*/, gui_3d_world_t *wor
                                  1);
     }
 
-    *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+
+    return transform_matrix;
 
 }
 
@@ -139,12 +144,14 @@ static void cb(void *this, size_t face_index/*face offset*/, gui_3d_world_t *wor
 
 static int app_init(void)
 {
-    void *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
+    gui_3d_t *butterfly_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480,
+                                           480);
 
-    gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
+    gui_3d_set_global_transform_cb(butterfly_3d, (gui_3d_global_transform_cb)butterfly_global_cb);
+    gui_3d_set_face_transform_cb(butterfly_3d, (gui_3d_face_transform_cb)butterfly_face_cb);
 
-    gui_obj_create_timer(&(((gui_3d_base_t *)test_3d)->base), 17, true, update_animation);
-    gui_obj_start_timer(&(((gui_3d_base_t *)test_3d)->base));
+    gui_obj_create_timer(&(butterfly_3d->base), 17, true, update_animation);
+    gui_obj_start_timer(&(butterfly_3d->base));
 
     return 0;
 

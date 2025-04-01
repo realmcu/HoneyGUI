@@ -273,7 +273,7 @@ void gui_3d_rect_face_transform_screen(gui_3d_rect_face_t *face, gui_3d_camera_t
 void gui_3d_rect_scene(gui_3d_rect_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
     gui_3d_rect_face_transform_local_to_global(face, world);
-    gui_3d_camera_build_UVN_matrix(camera);
+    // gui_3d_camera_build_UVN_matrix(camera);
     gui_3d_rect_face_transform_camera(face, camera);
     gui_3d_rect_face_cull_region(face, camera);
     gui_3d_rect_face_calculate_normal(face);

@@ -35,13 +35,13 @@
  *                           Public Functions
  *============================================================================*/
 
-void *gui_3d_create(void                 *parent,
-                    const char           *name,
-                    void                 *desc_addr,
-                    int16_t               x,
-                    int16_t               y,
-                    int16_t               w,
-                    int16_t               h)
+gui_3d_t *gui_3d_create(void                 *parent,
+                        const char           *name,
+                        void                 *desc_addr,
+                        int16_t               x,
+                        int16_t               y,
+                        int16_t               w,
+                        int16_t               h)
 {
     gui_3d_description_t *desc = gui_load_3d_description((void *)desc_addr);
 
@@ -60,54 +60,23 @@ void *gui_3d_create(void                 *parent,
 }
 
 
-void gui_3d_set_global_shape_transform_cb(void *this, gui_3d_shape_transform_cb cb)
+void gui_3d_set_global_transform_cb(gui_3d_t *this, gui_3d_global_transform_cb cb)
 {
-    gui_3d_base_t *base = (gui_3d_base_t *)this;
-    switch (base->desc->face_type)
-    {
-    case GUI_3D_FACE_RECTANGLE:
-        ((gui_3d_rect_t *)this)->global_shape_transform_cb = (void (*)(gui_3d_rect_t *, gui_3d_world_t *,
-                                                                       gui_3d_camera_t *, gui_3d_light_t *))cb;
-        break;
-
-    case GUI_3D_FACE_TRIANGLE:
-        ((gui_3d_tria_t *)this)->global_shape_transform_cb = (void (*)(gui_3d_tria_t *, gui_3d_world_t *,
-                                                                       gui_3d_camera_t *))cb;
-        break;
-
-    default:
-        break;
-    }
+    this->global_transform_cb = (void (*)(gui_3d_t *))cb;
 }
 
-void gui_3d_set_local_shape_transform_cb(void *this, size_t face, gui_3d_shape_transform_cb cb)
+void gui_3d_set_face_transform_cb(gui_3d_t *this, gui_3d_face_transform_cb cb)
 {
-    gui_3d_base_t *base = (gui_3d_base_t *)this;
-    switch (base->desc->face_type)
-    {
-    case GUI_3D_FACE_RECTANGLE:
-        ((gui_3d_rect_t *)this)->local_shape_transform_cb = (void (*)(gui_3d_rect_t *, size_t,
-                                                                      gui_3d_world_t *, gui_3d_camera_t *, gui_3d_light_t *))cb;
-        break;
-
-    case GUI_3D_FACE_TRIANGLE:
-        ((gui_3d_tria_t *)this)->local_shape_transform_cb = (void (*)(gui_3d_tria_t *, size_t,
-                                                                      gui_3d_world_t *, gui_3d_camera_t *))cb;
-        break;
-
-    default:
-        break;
-    }
+    this->face_transform_cb = (gui_3d_matrix_t (*)(gui_3d_t *, size_t))cb;
 }
 
 
-void gui_3d_on_click(void *this, void *callback, void *parameter)
+void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter)
 {
-    gui_3d_base_t *base = (gui_3d_base_t *)this;
-    switch (base->desc->face_type)
+    switch (this->desc->face_type)
     {
     case GUI_3D_FACE_RECTANGLE:
-        gui_3d_rect_on_click((gui_3d_rect_t *)this, callback, parameter);
+        gui_3d_rect_on_click(this, callback, parameter);
         break;
 
     default:

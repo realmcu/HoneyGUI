@@ -33,18 +33,38 @@ extern "C" {
 #include "gui_obj.h"
 #include "def_3d_common.h"
 #include "def_3d_rect.h"
+#include "def_3d_tria.h"
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-typedef void (*gui_3d_shape_transform_cb)(void *this, gui_3d_world_t *world,
-                                          gui_3d_camera_t *camera, void *extra);
-
-typedef struct
+typedef struct gui_3d
 {
     gui_obj_t base;
+
     gui_3d_description_t *desc;
-} gui_3d_base_t;
+    union
+    {
+        gui_3d_tria_face_t *tria_face;
+        gui_3d_rect_face_t *rect_face;
+    } face;
+
+    draw_img_t *img;
+    draw_img_t *mask_img;
+
+    gui_3d_world_t world;
+    gui_3d_camera_t camera;
+    gui_3d_light_t light;
+
+    void (*global_transform_cb)(struct gui_3d *this);
+    gui_3d_matrix_t (*face_transform_cb)(struct gui_3d *this, size_t face_index);
+
+} gui_3d_t;
+
+typedef void (*gui_3d_global_transform_cb)(gui_3d_t *this);
+
+typedef void (*gui_3d_face_transform_cb)(gui_3d_t *this, size_t face_index/*face offset*/);
+
 
 /*============================================================================*
  *                         Constants
@@ -76,32 +96,31 @@ typedef struct
  * @param h height
  * @return the widget object pointer
  */
-void *gui_3d_create(void                 *parent,
-                    const char           *name,
-                    void                 *desc_addr,
-                    int16_t               x,
-                    int16_t               y,
-                    int16_t               w,
-                    int16_t               h);
+gui_3d_t *gui_3d_create(void                 *parent,
+                        const char           *name,
+                        void                 *desc_addr,
+                        int16_t               x,
+                        int16_t               y,
+                        int16_t               w,
+                        int16_t               h);
 
 /**
- * @brief set global shape transform callback
+ * @brief set global transform callback
  *
  * @param this the 3d widget pointer
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
  *           and light source for all faces
  */
-void gui_3d_set_global_shape_transform_cb(void *this, gui_3d_shape_transform_cb cb);
+void gui_3d_set_global_transform_cb(gui_3d_t *this, gui_3d_global_transform_cb cb);
 
 /**
- * @brief set local shape transform callback
+ * @brief set face transform callback
  *
  * @param this the 3d widget pointer
- * @param face face offset
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
  *           and light source for the specified face
  */
-void gui_3d_set_local_shape_transform_cb(void *this, size_t face, gui_3d_shape_transform_cb cb);
+void gui_3d_set_face_transform_cb(gui_3d_t *this, gui_3d_face_transform_cb cb);
 
 /**
  * @brief Set a callback function for when the 3D widget is clicked.
@@ -110,7 +129,7 @@ void gui_3d_set_local_shape_transform_cb(void *this, size_t face, gui_3d_shape_t
  * @param callback Callback function to execute on click.
  * @param parameter Additional parameter for the callback.
  */
-void gui_3d_on_click(void *this, void *callback, void *parameter);
+void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter);
 
 
 #ifdef __cplusplus
