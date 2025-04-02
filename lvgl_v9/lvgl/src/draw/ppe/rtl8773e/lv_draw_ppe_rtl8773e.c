@@ -15,7 +15,6 @@
 #include "../../../stdlib/lv_string.h"
 #include "../../../core/lv_global.h"
 #include "rtl_ppe.h"
-#include "hal_idu.h"
 
 /*********************
  *      DEFINES
@@ -59,9 +58,7 @@ void lv_draw_ppe_init(void)
     draw_ppe_unit->idx = 0;
     draw_ppe_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_ppe_delete : NULL;
     draw_ppe_unit->base_unit.name = "PPE";
-    uint8_t idu_tx = 0xFF;
-    uint8_t idu_rx = 0xFF;
-    hal_dma_channel_init(&idu_rx, &idu_tx);
+    lv_acc_dma_channel_init();
     RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
 #if LV_USE_OS
     lv_thread_init(&draw_ppe_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb,

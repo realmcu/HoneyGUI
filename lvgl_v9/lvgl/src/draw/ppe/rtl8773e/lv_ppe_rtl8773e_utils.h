@@ -45,6 +45,16 @@ lv_area_t lv_ppe_get_matrix_area(ppe_matrix_t *matrix, const lv_area_t *coords,
                                  const lv_draw_image_dsc_t *draw_dsc);
 
 bool lv_ppe_get_area(ppe_rect_t *result_rect, ppe_rect_t *source_rect, ppe_matrix_t *matrix);
+
+uint8_t lv_acc_get_high_speed_channel(void);
+
+uint8_t lv_acc_get_low_speed_channel(void);
+
+void lv_acc_dma_channel_init(void);
+
+void lv_acc_dma_copy(uint32_t length, uint32_t height, uint32_t src_stride,
+                     uint32_t dst_stride, uint8_t *src, uint8_t *dst);
+
 /**********************
  *      MACROS
  **********************/

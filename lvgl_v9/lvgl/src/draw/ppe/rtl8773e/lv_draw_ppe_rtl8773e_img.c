@@ -24,7 +24,7 @@
 #include "lv_image_decoder.h"
 
 #include "lv_ppe_rtl8773e_utils.h"
-#include "hal_idu.h"
+#include "rtl_idu.h"
 #include "string.h"
 /*********************
  *      DEFINES
@@ -221,14 +221,13 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
         int16_t target_y = constraint_area.y1 - draw_unit->target_layer->buf_area.y1;
         draw_rect.x = constraint_area.x1 - coords->x1;
         draw_rect.y = constraint_area.y1 - coords->y1;
-        hal_idu_dma_info copy_info;
-        copy_info.length = draw_rect.w * pixel_byte;
-        copy_info.height = draw_rect.h;
-        copy_info.src_stride = img_dsc->header.stride;
-        copy_info.dst_stride = target.width * pixel_byte;
+        uint32_t length = draw_rect.w * pixel_byte;
+        uint32_t height = draw_rect.h;
+        uint32_t src_stride = img_dsc->header.stride;
+        uint32_t dst_stride = target.width * pixel_byte;
         uint32_t src_addr = source.address + (source.stride * draw_rect.y + draw_rect.x) * pixel_byte;
         uint32_t dst_addr = target.address + (target.stride * target_y + target_x) * pixel_byte;
-        hal_dma_copy(&copy_info, (uint8_t *)src_addr, (uint8_t *)dst_addr);
+        lv_acc_dma_copy(length, height, src_stride, dst_stride, (uint8_t *)src_addr, (uint8_t *)dst_addr);
         return;
     }
     ppe_rect_t image_area;
@@ -244,23 +243,26 @@ static void lv_draw_ppe_normal(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
     {
         if (!compressed)
         {
-            hal_idu_dma_info copy_info;
-            copy_info.length = image_area.w * pixel_byte;
-            copy_info.height = image_area.h;
-            copy_info.src_stride = img_dsc->header.stride;
-            copy_info.dst_stride = copy_info.length;
+            uint32_t length = image_area.w * pixel_byte;
+            uint32_t height = image_area.h;
+            uint32_t src_stride = img_dsc->header.stride;
+            uint32_t dst_stride = length;
             uint32_t src_addr = source.address + (source.stride * image_area.y + image_area.x) * pixel_byte;
-            hal_dma_copy(&copy_info, (uint8_t *)src_addr, pic_buffer);
+            lv_acc_dma_copy(length, height, src_stride, dst_stride, (uint8_t *)src_addr, (uint8_t *)pic_buffer);
         }
         else
         {
-            hal_idu_decompress_info decode_info;
-            decode_info.raw_data_address = (uint32_t)img_dsc->data + 8;
-            decode_info.start_column = image_area.x;
-            decode_info.end_column = image_area.x + image_area.w - 1;
-            decode_info.start_line = image_area.y;
-            decode_info.end_line = image_area.y + image_area.h - 1;
-            hal_idu_decompress(&decode_info, pic_buffer);
+            IDU_decode_range range;
+            range.start_column = image_area.x;
+            range.end_column = image_area.x + image_area.w - 1;
+            range.start_line = image_area.y;
+            range.end_line = image_area.y + image_area.h - 1;
+            range.target_stride = image_area.w * pixel_byte;
+            IDU_DMA_config dma_cfg;
+            dma_cfg.output_buf = (uint32_t *)pic_buffer;
+            dma_cfg.RX_DMA_channel_num = lv_acc_get_high_speed_channel();
+            dma_cfg.TX_DMA_channel_num = lv_acc_get_low_speed_channel();
+            IDU_Decode((uint8_t *)img_dsc->data, &range, &dma_cfg);
         }
         source.width = image_area.w;
         source.height = image_area.h;
@@ -411,24 +413,27 @@ static void lv_draw_ppe_tile(lv_draw_unit_t *draw_unit, const lv_draw_image_dsc_
                     {
                         if (!compressed)
                         {
-                            hal_idu_dma_info copy_info;
-                            copy_info.length = draw_w * pixel_byte;
-                            copy_info.height = draw_h;
-                            copy_info.src_stride = img_dsc->header.stride;
-                            copy_info.dst_stride = copy_info.length;
+                            uint32_t length = draw_w * pixel_byte;
+                            uint32_t height = draw_h;
+                            uint32_t src_stride = img_dsc->header.stride;
+                            uint32_t dst_stride = length;
                             uint32_t src_addr = (uint32_t)img_dsc->data + img_dsc->header.stride * image_y + image_x *
                                                 pixel_byte;
-                            hal_dma_copy(&copy_info, (uint8_t *)src_addr, pic_buffer);
+                            lv_acc_dma_copy(length, height, src_stride, dst_stride, (uint8_t *)src_addr, (uint8_t *)pic_buffer);
                         }
                         else
                         {
-                            hal_idu_decompress_info decode_info;
-                            decode_info.raw_data_address = (uint32_t)img_dsc->data + 8;
-                            decode_info.start_column = image_x;
-                            decode_info.end_column = image_x + draw_w - 1;
-                            decode_info.start_line = image_y;
-                            decode_info.end_line = image_y + draw_h - 1;
-                            hal_idu_decompress(&decode_info, pic_buffer);
+                            IDU_decode_range range;
+                            range.start_column = image_x;
+                            range.end_column = image_x + draw_w - 1;
+                            range.start_line = image_y;
+                            range.end_line = image_y + draw_h - 1;
+                            range.target_stride = draw_w * pixel_byte;
+                            IDU_DMA_config dma_cfg;
+                            dma_cfg.output_buf = (uint32_t *)pic_buffer;
+                            dma_cfg.RX_DMA_channel_num = lv_acc_get_high_speed_channel();
+                            dma_cfg.TX_DMA_channel_num = lv_acc_get_low_speed_channel();
+                            IDU_Decode((uint8_t *)img_dsc->data, &range, &dma_cfg);
                         }
                         source.width = draw_w;
                         source.height = draw_h;
@@ -596,23 +601,26 @@ static void lv_draw_ppe_matrix(lv_draw_unit_t *draw_unit, const lv_draw_image_ds
     {
         if (!compressed)
         {
-            hal_idu_dma_info copy_info;
-            copy_info.length = image_area.w * pixel_byte;
-            copy_info.height = image_area.h;
-            copy_info.src_stride = img_dsc->header.stride;
-            copy_info.dst_stride = copy_info.length;
+            uint32_t length = image_area.w * pixel_byte;
+            uint32_t height = image_area.h;
+            uint32_t src_stride = img_dsc->header.stride;
+            uint32_t dst_stride = length;
             uint32_t src_addr = source.address + (source.stride * image_area.y + image_area.x) * pixel_byte;
-            hal_dma_copy(&copy_info, (uint8_t *)src_addr, pic_buffer);
+            lv_acc_dma_copy(length, height, src_stride, dst_stride, (uint8_t *)src_addr, (uint8_t *)pic_buffer);
         }
         else
         {
-            hal_idu_decompress_info decode_info;
-            decode_info.raw_data_address = (uint32_t)img_dsc->data + 8;
-            decode_info.start_column = image_area.x;
-            decode_info.end_column = image_area.x + image_area.w - 1;
-            decode_info.start_line = image_area.y;
-            decode_info.end_line = image_area.y + image_area.h - 1;
-            hal_idu_decompress(&decode_info, pic_buffer);
+            IDU_decode_range range;
+            range.start_column = image_area.x;
+            range.end_column = image_area.x + image_area.w - 1;
+            range.start_line = image_area.y;
+            range.end_line = image_area.y + image_area.h - 1;
+            range.target_stride = image_area.w * pixel_byte;
+            IDU_DMA_config dma_cfg;
+            dma_cfg.output_buf = (uint32_t *)pic_buffer;
+            dma_cfg.RX_DMA_channel_num = lv_acc_get_high_speed_channel();
+            dma_cfg.TX_DMA_channel_num = lv_acc_get_low_speed_channel();
+            IDU_Decode((uint8_t *)img_dsc->data, &range, &dma_cfg);
         }
         source.width = image_area.w;
         source.height = image_area.h;
