@@ -109,6 +109,8 @@ static gui_point_4d_t gui_3d_calculate_point_in_quad(gui_point_4d_t P0, gui_poin
 
 static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/)
 {
+    int material_id = this->desc->attrib.material_ids[i];
+    this->img[i].data = this->desc->textures[material_id];
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
     float width = head->w;
     float height = head->h;
@@ -163,154 +165,83 @@ static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/)
 }
 
 
-static void compare_face_order(gui_3d_rect_face_t *face, unsigned int num_faces)
+static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
 {
-    int32_t *back_faces = (int32_t *)gui_malloc(num_faces * sizeof(int32_t));
-    int32_t *front_faces = (int32_t *)gui_malloc(num_faces * sizeof(int32_t));
-    uint32_t back_count = 0;
-    uint32_t front_count = 0;
+    this->combined_img->data = gui_malloc(width * height * 4 + sizeof(gui_rgb_data_head_t));
+    memset(this->combined_img->data, 0x00, width * height * 4 + sizeof(gui_rgb_data_head_t));
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->combined_img->data;
+    head->w = width;
+    head->h = height;
+    head->type = ARGB8888;
 
-    for (uint32_t i = 0; i < num_faces; i++)
-    {
-        if (face[i].state & GUI_3D_FACESTATE_BACKFACE)
-        {
-            // back face
-            back_faces[back_count++] = i;
-        }
-        else
-        {
-            // front face
-            front_faces[front_count++] = i;
-        }
-    }
+    uint32_t *pixelData = (uint32_t *)((unsigned char *)this->combined_img->data + sizeof(
+                                           gui_rgb_data_head_t));
+    float *depthBuffer = gui_malloc(width * height * sizeof(float));
+    memset(depthBuffer, 0x00, width * height * sizeof(float));
 
-    // sort for back face
-    for (uint32_t i = 0; i < back_count; i++)
+    uint32_t color_value = 0xFFFFFFFF; // default white color
+    uint8_t opacity_value = UINT8_MAX;
+    GUI_3D_FILL_TYPE fill_type = GUI_3D_FILL_COLOR_ARGB8888;
+    void *fill_data = NULL;
+
+    for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        uint32_t min_index = i;
-        for (uint32_t j = i + 1; j < back_count; j++)
+        gui_3d_vertex_t p0 = this->face.rect_face[i].transform_vertex[0];
+        gui_3d_vertex_t p1 = this->face.rect_face[i].transform_vertex[1];
+        gui_3d_vertex_t p2 = this->face.rect_face[i].transform_vertex[2];
+        gui_3d_vertex_t p3 = this->face.rect_face[i].transform_vertex[3];
+
+        p0.v = 1.0f - p0.v;
+        p1.v = 1.0f - p1.v;
+        p2.v = 1.0f - p2.v;
+        p3.v = 1.0f - p3.v;
+
+        int material_id = this->desc->attrib.material_ids[i];
+        if (material_id >= 0)
         {
-            if (face[back_faces[j]].center.z < face[back_faces[min_index]].center.z)
+            fill_data = this->desc->textures[material_id];
+            opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
+
+            if (fill_data == NULL) // Fill with material color
             {
-                min_index = j;
+                float *color_diffuse = this->desc->materials[material_id].diffuse;
+                int color_r = (int)(*(color_diffuse) * 255);
+                int color_g = (int)(*(color_diffuse + 1) * 255);
+                int color_b = (int)(*(color_diffuse + 2) * 255);
+                int color_a = this->desc->materials[material_id].dissolve * 255;
+                color_value = (color_a << 24) | (color_r << 16) | (color_g << 8) | color_b;
+                fill_data = &color_value;
+            }
+            else  // Fill with material image
+            {
+                fill_type = GUI_3D_FILL_IMAGE;
             }
         }
 
-        if (min_index != i)
+        if (this->light.initialized)
         {
-            int32_t temp = back_faces[i];
-            back_faces[i] = back_faces[min_index];
-            back_faces[min_index] = temp;
-        }
-    }
-
-    // sort for front face
-    for (uint32_t i = 0; i < front_count; i++)
-    {
-        uint32_t min_index = i;
-        for (uint32_t j = i + 1; j < front_count; j++)
-        {
-            if (face[front_faces[j]].center.z < face[front_faces[min_index]].center.z)
-            {
-                min_index = j;
-            }
+            fill_data = this->mask_img[i].data;
+            opacity_value = this->mask_img[i].opacity_value;
         }
 
-        if (min_index != i)
-        {
-            int32_t temp = front_faces[i];
-            front_faces[i] = front_faces[min_index];
-            front_faces[min_index] = temp;
-        }
-    }
-
-    // back face order start from 0
-    for (uint32_t i = 0; i < back_count; i++)
-    {
-        face[back_faces[i]].order = i;
-    }
-
-    // front face order start from back_count
-    for (uint32_t i = 0; i < front_count; i++)
-    {
-        face[front_faces[i]].order = back_count + i;
-    }
-
-    gui_free(back_faces);
-    gui_free(front_faces);
-}
-
-
-static void gui_3d_rect_face_transfrom(gui_3d_t *this, size_t s/*shape_offset*/,
-                                       size_t i /*face_offset*/,
-                                       gui_3d_world_t *world, gui_3d_camera_t *camera)
-{
-    gui_3d_rect_scene(this->face.rect_face + i, world, camera);
-
-    int material_id = this->desc->attrib.material_ids[i];
-    this->img[i].data = (void *)this->desc->textures[material_id];
-
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img[i].data;
-    float width = head->w;
-    float height = head->h;
-
-    gui_3d_point_2d_t src[4];
-    gui_3d_point_2d_t dst[4];
-    for (size_t j = 0; j < 4; ++j)
-    {
-        src[j].x = this->face.rect_face[i].vertex[j].u * width;
-        src[j].y = (1.0f - this->face.rect_face[i].vertex[j].v) * height;
-
-        dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x;
-        dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y;
-
-        this->face.rect_face[i].center.z += this->face.rect_face[i].transform_vertex[j].position.z;
-    }
-    this->face.rect_face[i].center.z /= this->desc->attrib.face_num_verts[i];
-
-    gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
-    memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(gui_matrix_t));
-    matrix_inverse(&this->img[i].inverse);
-
-    this->img[i].img_w = width;
-    this->img[i].img_h = height;
-    this->img[i].blend_mode = IMG_SRC_OVER_MODE;
-    this->img[i].high_quality = true;
-    this->img[i].opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
-
-    draw_img_new_area(this->img + i, NULL);
-}
-
-static void gui_3d_rect_convert_to_face(gui_3d_t *this, size_t i /*face_offset*/)
-{
-    size_t index_offset = 0;
-    for (size_t s = 0; s < i; s++)
-    {
-        index_offset += this->desc->attrib.face_num_verts[i];
-    }
-
-    for (size_t j = 0; j < this->desc->attrib.face_num_verts[i]; j++)
-    {
-        gui_obj_vertex_index_t idx = this->desc->attrib.faces[index_offset + j];
-
-        gui_obj_vertex_coordinate_t *v = &this->desc->attrib.vertices[idx.v_idx];
-        gui_obj_texcoord_coordinate_t *vt = &this->desc->attrib.texcoords[idx.vt_idx];
-        gui_obj_vertex_coordinate_t *vn = &this->desc->attrib.normals[idx.vn_idx];
-
-        this->face.rect_face[i].vertex[j].position.x = v->x;
-        this->face.rect_face[i].vertex[j].position.y = v->y;
-        this->face.rect_face[i].vertex[j].position.z = v->z;
-        this->face.rect_face[i].vertex[j].position.w = 1;
-
-        this->face.rect_face[i].vertex[j].u = vt->u;
-        this->face.rect_face[i].vertex[j].v = vt->v;
-
-        this->face.rect_face[i].vertex[j].normal.x = vn->x;
-        this->face.rect_face[i].vertex[j].normal.y = vn->y;
-        this->face.rect_face[i].vertex[j].normal.z = vn->z;
-        this->face.rect_face[i].vertex[j].normal.w = 1;
+        gui_3d_fill_triangle(p0, p1, p2, depthBuffer, pixelData, width, height, fill_type, fill_data,
+                             opacity_value);
+        gui_3d_fill_triangle(p2, p3, p0, depthBuffer, pixelData, width, height, fill_type, fill_data,
+                             opacity_value);
 
     }
+
+    gui_free(depthBuffer);
+
+    this->combined_img->img_w = width;
+    this->combined_img->img_h = height;
+    this->combined_img->opacity_value = UINT8_MAX;
+
+    gui_obj_t *obj = (gui_obj_t *)this;
+    memcpy(&this->combined_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(&this->combined_img->inverse, &this->combined_img->matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&this->combined_img->inverse);
+    draw_img_new_area(this->combined_img, NULL);
 }
 
 static void gui_3d_rect_prepare(gui_3d_t *this)
@@ -322,7 +253,7 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
 
     this->face.rect_face = gui_malloc(sizeof(gui_3d_rect_face_t) *
                                       this->desc->attrib.num_face_num_verts);
-    memset(this->face.rect_face, 0x00,
+    memset(this->face.rect_face, 0x1,
            sizeof(gui_3d_rect_face_t) * this->desc->attrib.num_face_num_verts);
 
     this->img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
@@ -330,6 +261,9 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
 
     this->mask_img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->mask_img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
+
+    this->combined_img = gui_malloc(sizeof(draw_img_t));
+    memset(this->combined_img, 0x00, sizeof(draw_img_t));
 
     this->light.initialized = false;
     gui_3d_matrix_t transform_matrix;
@@ -354,9 +288,9 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
             {
                 transform_matrix = this->face_transform_cb(this, face_offset);
             }
-            gui_3d_rect_convert_to_face(this, face_offset);
 
-            gui_3d_rect_face_transfrom(this, i, face_offset, &transform_matrix, &this->camera);
+            gui_3d_rect_scene(this->face.rect_face + face_offset, face_offset, &this->desc->attrib,
+                              &transform_matrix, &this->camera);
 
             if (this->light.initialized)
             {
@@ -365,7 +299,7 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
 
         }
     }
-    compare_face_order(this->face.rect_face, this->desc->attrib.num_face_num_verts);
+    gui_3d_generate_rect_img(this, dc->screen_width, dc->screen_height);
 
     if (tp->type == TOUCH_SHORT)
     {
@@ -409,29 +343,10 @@ static void gui_3d_rect_draw(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
-    {
-        for (uint32_t j = 0; j < this->desc->attrib.num_face_num_verts; j++)
-        {
-            if (this->face.rect_face[j].order == i)
-            {
-                if (this->mask_img->data != NULL)
-                {
-                    draw_img_cache(this->mask_img + j, IMG_SRC_MEMADDR);
-                    gui_acc_blit_to_dc(this->mask_img + j, dc, NULL);
-                    draw_img_free(this->mask_img + j, IMG_SRC_MEMADDR);
-                }
-                else
-                {
-                    draw_img_cache(this->img + j, IMG_SRC_MEMADDR);
-                    gui_acc_blit_to_dc(this->img + j, dc, NULL);
-                    draw_img_free(this->img + j, IMG_SRC_MEMADDR);
-                }
-                break;
-            }
-        }
 
-    }
+    draw_img_cache(this->combined_img, IMG_SRC_MEMADDR);
+    gui_acc_blit_to_dc(this->combined_img, dc, NULL);
+    draw_img_free(this->combined_img, IMG_SRC_MEMADDR);
 
 }
 
@@ -446,15 +361,20 @@ static void gui_3d_rect_end(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
+    if (this->combined_img != NULL)
+    {
+        gui_free(this->combined_img->data);
+        this->combined_img->data = NULL;
+        if (draw_img_acc_end_cb != NULL)
+        {
+            draw_img_acc_end_cb(this->combined_img);
+        }
+        gui_free(this->combined_img);
+        this->combined_img = NULL;
+    }
+
     if (this->img != NULL)
     {
-        for (int i = 0; i < this->desc->attrib.num_face_num_verts; i++)
-        {
-            if (draw_img_acc_end_cb != NULL)
-            {
-                draw_img_acc_end_cb(this->img + i);
-            }
-        }
         gui_free(this->img);
         this->img = NULL;
     }

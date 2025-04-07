@@ -31,14 +31,14 @@
 
 static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
 {
-    this->img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
-    memset(this->img->data, 0x00, width * height * 2 + sizeof(gui_rgb_data_head_t));
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->img->data;
+    this->combined_img->data = gui_malloc(width * height * 2 + sizeof(gui_rgb_data_head_t));
+    memset(this->combined_img->data, 0x00, width * height * 2 + sizeof(gui_rgb_data_head_t));
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->combined_img->data;
     head->w = width;
     head->h = height;
     head->type = RGB565;
 
-    uint8_t *pixelData = (uint8_t *)this->img->data + sizeof(gui_rgb_data_head_t);
+    uint8_t *pixelData = (uint8_t *)this->combined_img->data + sizeof(gui_rgb_data_head_t);
     float *depthBuffer = gui_malloc(width * height * sizeof(float));
     memset(depthBuffer, 0x00, width * height * sizeof(float));
 
@@ -48,25 +48,9 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
         if (!(this->face.tria_face[i].state & GUI_3D_FACESTATE_BACKFACE))
         {
             // Cache vertex positions
-            gui_3d_vertex_t *vertices = this->face.tria_face[i].transform_vertex;
-            float x0 = vertices[0].position.x, y0 = vertices[0].position.y, z0 = vertices[0].position.z;
-            float x1 = vertices[1].position.x, y1 = vertices[1].position.y, z1 = vertices[1].position.z;
-            float x2 = vertices[2].position.x, y2 = vertices[2].position.y, z2 = vertices[2].position.z;
-
-            int min_x = floor(fminf(fminf(x0, x1), x2));
-            int max_x = ceil(fmaxf(fmaxf(x0, x1), x2));
-            int min_y = floor(fminf(fminf(y0, y1), y2));
-            int max_y = ceil(fmaxf(fmaxf(y0, y1), y2));
-
-            // for w0 w1
-            float dx1 = x1 - x0;
-            float dy1 = y1 - y0;
-            float dx2 = x2 - x0;
-            float dy2 = y2 - y0;
-            float inv_area = 1.0f / (dx1 * dy2 - dx2 * dy1);
-
-            float initial_w0_x_comp = dy2 * inv_area;
-            float initial_w1_x_comp = dy1 * inv_area;
+            gui_3d_vertex_t p0 = this->face.tria_face[i].transform_vertex[0];
+            gui_3d_vertex_t p1 = this->face.tria_face[i].transform_vertex[1];
+            gui_3d_vertex_t p2 = this->face.tria_face[i].transform_vertex[2];
 
             uint16_t color_value = 0;
             int material_id = this->desc->attrib.material_ids[i];
@@ -82,59 +66,33 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
             }
             else
             {
-                float nz = vertices[0].normal.z;
+                float nz = p0.normal.z;
                 uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
                 color_value = ((color_intensity & 0xF8) << 8) |
                               ((color_intensity & 0xFC) << 3) |
                               ((color_intensity & 0xF8) >> 3);
             }
 
-            // Iterate over the bounding box
-            for (int y = min_y; y <= max_y; y++)
-            {
-                float w0y = (y - y0) * dx2 * inv_area;
-                float w1y = (y - y0) * dx1 * inv_area;
+            gui_3d_fill_triangle(p0, p1, p2, depthBuffer, (uint32_t *)pixelData, width, height,
+                                 GUI_3D_FILL_COLOR_RGB565, &color_value, UINT8_MAX);
 
-                int pixel_offset = y * width;
-
-                for (int x = min_x; x <= max_x; x++)
-                {
-                    float w0 = (x - x0) * initial_w0_x_comp - w0y;
-                    float w1 = w1y - (x - x0) * initial_w1_x_comp;
-                    float w2 = 1.0f - w0 - w1;
-
-                    // Inside the triangle
-                    if ((w0 >= 0 && w1 >= 0 && w2 >= 0))
-                    {
-                        float z = w0 * z0 + w1 * z1 + w2 * z2;
-                        int index = x + pixel_offset;
-
-                        // Foreground
-                        if (depthBuffer[index] == 0 || z > depthBuffer[index])
-                        {
-                            depthBuffer[index] = z;
-                            ((uint16_t *)pixelData)[index] = color_value;
-                        }
-                    }
-                }
-            }
         }
 
     }
 
     gui_free(depthBuffer);
 
-    this->img->img_w = width;
-    this->img->img_h = height;
-    this->img->opacity_value = UINT8_MAX;
-    this->img->blend_mode = IMG_BYPASS_MODE;
-    // this->img->high_quality = true;
+    this->combined_img->img_w = width;
+    this->combined_img->img_h = height;
+    this->combined_img->opacity_value = UINT8_MAX;
+    this->combined_img->blend_mode = IMG_BYPASS_MODE;
+    // this->combined_img->high_quality = true;
 
     gui_obj_t *obj = (gui_obj_t *)this;
-    memcpy(&this->img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    memcpy(&this->img->inverse, &this->img->matrix, sizeof(gui_matrix_t));
-    matrix_inverse(&this->img->inverse);
-    draw_img_new_area(this->img, NULL);
+    memcpy(&this->combined_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(&this->combined_img->inverse, &this->combined_img->matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&this->combined_img->inverse);
+    draw_img_new_area(this->combined_img, NULL);
 }
 
 static void gui_3d_tria_prepare(gui_3d_t *this)
@@ -148,8 +106,8 @@ static void gui_3d_tria_prepare(gui_3d_t *this)
     memset(this->face.tria_face, 0x1,
            sizeof(gui_3d_tria_face_t) * this->desc->attrib.num_face_num_verts);
 
-    this->img = gui_malloc(sizeof(draw_img_t));
-    memset(this->img, 0x00, sizeof(draw_img_t));
+    this->combined_img = gui_malloc(sizeof(draw_img_t));
+    memset(this->combined_img, 0x00, sizeof(draw_img_t));
 
 
     gui_3d_matrix_t transform_matrix;
@@ -202,9 +160,9 @@ static void gui_3d_tria_draw(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    draw_img_cache(this->img, IMG_SRC_MEMADDR);
-    gui_acc_blit_to_dc(this->img, dc, NULL);
-    draw_img_free(this->img, IMG_SRC_MEMADDR);
+    draw_img_cache(this->combined_img, IMG_SRC_MEMADDR);
+    gui_acc_blit_to_dc(this->combined_img, dc, NULL);
+    draw_img_free(this->combined_img, IMG_SRC_MEMADDR);
 
 }
 
@@ -219,16 +177,16 @@ static void gui_3d_tria_end(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    if (this->img != NULL)
+    if (this->combined_img != NULL)
     {
-        gui_free(this->img->data);
-        this->img->data = NULL;
+        gui_free(this->combined_img->data);
+        this->combined_img->data = NULL;
         if (draw_img_acc_end_cb != NULL)
         {
-            draw_img_acc_end_cb(this->img);
+            draw_img_acc_end_cb(this->combined_img);
         }
-        gui_free(this->img);
-        this->img = NULL;
+        gui_free(this->combined_img);
+        this->combined_img = NULL;
     }
 
     gui_free(this->face.tria_face);

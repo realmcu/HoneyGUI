@@ -87,10 +87,33 @@ void gui_3d_rect_face_transform(gui_3d_rect_face_t *face, gui_3d_matrix_t mat,
     }
 }
 
-void gui_3d_rect_face_transform_local_to_global(gui_3d_rect_face_t *face, gui_3d_world_t *world)
+
+void gui_3d_rect_face_transform_local_to_global(gui_3d_rect_face_t *face, size_t face_index,
+                                                gui_obj_attrib_t *attrib, gui_3d_world_t *world)
 {
-    gui_3d_rect_face_transform(face, *world, GUI_3D_FACE_TRANSFORM_LOACL_TO_GLOBAL);
+    size_t index_offset = face_index * 4;
+
+    for (size_t j = 0; j < 4; j++)
+    {
+        gui_obj_vertex_index_t idx = attrib->faces[index_offset + j];
+
+        gui_obj_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
+        gui_obj_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
+        gui_obj_vertex_coordinate_t *vn = &attrib->normals[idx.vn_idx];
+
+        gui_point_4d_t local_position = {v->x, v->y, v->z, 1.0f};
+        face->transform_vertex[j].position = gui_3d_point4D_mul_matrix(local_position, *world);
+
+        face->transform_vertex[j].u = vt->u;
+        face->transform_vertex[j].v = vt->v;
+        face->transform_vertex[j].normal.x = vn->x;
+        face->transform_vertex[j].normal.y = vn->y;
+        face->transform_vertex[j].normal.z = vn->z;
+        // face->transform_vertex[j].normal.w = 1;
+
+    }
 }
+
 
 
 void gui_3d_rect_face_transform_local_to_local(gui_3d_rect_face_t *face, gui_3d_matrix_t *m)
@@ -270,9 +293,10 @@ void gui_3d_rect_face_transform_screen(gui_3d_rect_face_t *face, gui_3d_camera_t
 
 }
 
-void gui_3d_rect_scene(gui_3d_rect_face_t *face, gui_3d_world_t *world, gui_3d_camera_t *camera)
+void gui_3d_rect_scene(gui_3d_rect_face_t *face,  size_t face_index, gui_obj_attrib_t *attrib,
+                       gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
-    gui_3d_rect_face_transform_local_to_global(face, world);
+    gui_3d_rect_face_transform_local_to_global(face, face_index, attrib, world);
     // gui_3d_camera_build_UVN_matrix(camera);
     gui_3d_rect_face_transform_camera(face, camera);
     gui_3d_rect_face_cull_region(face, camera);

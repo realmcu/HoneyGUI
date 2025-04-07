@@ -49,8 +49,9 @@ typedef struct gui_3d
         gui_3d_rect_face_t *rect_face;
     } face;
 
-    draw_img_t *img;
-    draw_img_t *mask_img;
+    draw_img_t *img;          // material image
+    draw_img_t *mask_img;     // mask image for light
+    draw_img_t *combined_img; // full frame buffer
 
     gui_3d_world_t world;
     gui_3d_camera_t camera;

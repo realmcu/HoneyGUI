@@ -154,6 +154,13 @@ typedef enum
     GUI_3D_FACE_RECTANGLE_TRIANGLE,
 } GUI_3D_FACE_TYPE;
 
+typedef enum
+{
+    GUI_3D_FILL_IMAGE,
+    GUI_3D_FILL_COLOR_RGB565,
+    GUI_3D_FILL_COLOR_ARGB8888,
+} GUI_3D_FILL_TYPE;
+
 /* gui_3d_description_t start*/
 typedef struct
 {
@@ -241,6 +248,21 @@ void gui_3d_camera_build_UVN_matrix(gui_3d_camera_t *camera);
 
 
 gui_3d_description_t *gui_load_3d_description(void *desc_addr);
+
+
+typedef void (*gui_triangle_render_func)(float y, float y0, float y1, float y2,
+                                         float z0, float z1, float z2,
+                                         float s0, float s1, float s2,
+                                         float t0, float t1, float t2,
+                                         bool k01infinite, float k01, float b01,
+                                         bool k02infinite, float k02, float b02,
+                                         float *zbuffer, uint32_t *pixelData,
+                                         int width, int height, GUI_3D_FILL_TYPE fillType, void *fillData,
+                                         uint8_t opacity_value);
+
+void gui_3d_fill_triangle(gui_3d_vertex_t p0, gui_3d_vertex_t p1, gui_3d_vertex_t p2,
+                          float *zbuffer, uint32_t *pixelData, int width, int height,
+                          GUI_3D_FILL_TYPE fillType, void *fillData, uint8_t opacity_value);
 
 #ifdef __cplusplus
 }

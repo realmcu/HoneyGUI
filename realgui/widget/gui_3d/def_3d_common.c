@@ -634,8 +634,12 @@ gui_3d_description_t *gui_load_3d_description(void *desc_addr)
             if (desc->texture_sizes[i] > 0)
             {
                 desc->textures[i] = (unsigned char *)ptr;
-                ptr += desc->texture_sizes[i];
             }
+            else
+            {
+                desc->textures[i] = NULL;
+            }
+            ptr += desc->texture_sizes[i];
         }
 
     }
@@ -644,5 +648,407 @@ gui_3d_description_t *gui_load_3d_description(void *desc_addr)
 
 }
 
+// Helper function to determine triangle orientation
+static void determine_triangle_orientation(gui_3d_vertex_t *p0, gui_3d_vertex_t *p1,
+                                           gui_3d_vertex_t *p2)
+{
+    float x01m;
+    float x0 = p0->position.x;
+    float y0 = p0->position.y;
+    float x1 = p1->position.x;
+    float y1 = p1->position.y;
+    float x2 = p2->position.x;
+    float y2 = p2->position.y;
+
+    if (x0 == x1)
+    {
+        x01m = x0;
+    }
+    else
+    {
+        float k01 = (y0 - y1) / (x0 - x1);
+        float b01 = y0 - k01 * x0;
+        x01m = (y2 - b01) / k01;
+    }
+
+    if (x01m > x2)
+    {
+        gui_3d_vertex_t t = *p2;
+        *p2 = *p1;
+        *p1 = t;
+    }
+}
+
+// Calculate edge properties (slope and intercept)
+static void calculate_edge_properties(float x0, float y0, float x1, float y1,
+                                      bool *infinite, float *k, float *b)
+{
+    if (x0 == x1)
+    {
+        *infinite = true;
+        *k = 1;
+        *b = x0;
+    }
+    else
+    {
+        *infinite = false;
+        *k = (y0 - y1) / (x0 - x1);
+        *b = y0 - *k * x0;
+    }
+}
+
+// Fill with image data
+static void gui_3d_fill_image(int y, float xleft, float xright, float oneoverz, float oneoverz_step,
+                              float soverz, float soverz_step, float toverz, float toverz_step,
+                              float *zbuffer, uint32_t *pixelData, int width, int height,
+                              gui_rgb_data_head_t *src_head, uint32_t *src_pixels,
+                              uint8_t opacity_value)
+{
+    int iy = (int)y;
+
+    for (int ix = (int)(xleft + 0.5f); ix < (int)(xright + 0.5f); ++ix)
+    {
+        float s = soverz / oneoverz;
+        float t = toverz / oneoverz;
+
+        if (ix > 0 && ix < width && iy >= 0 && iy < height)
+        {
+            // Calculate texture coordinates
+            int srcX = (int)(s * (src_head->w - 1));
+            int srcY = (int)(t * (src_head->h - 1));
+
+            if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
+            {
+                float originalZ = 1.0f / oneoverz;
+                uint32_t originalColor = src_pixels[srcX + srcY * src_head->w];
+                uint8_t alpha = (originalColor >> 24) & 0xFF;
+                alpha = (alpha * opacity_value) / 255;
+
+                bool depthTestPassed = (zbuffer[ix + iy * width] == 0 || zbuffer[ix + iy * width] < originalZ);
+
+                // Completely opaque pixel processing
+                if (alpha == 255)
+                {
+                    if (depthTestPassed)
+                    {
+                        zbuffer[ix + iy * width] = originalZ;
+                        pixelData[ix + iy * width] = originalColor;
+                    }
+                }
+                // Translucent pixel processing, without updating depth buffer (keeping the objects behind visible)
+                else if (alpha > 0)
+                {
+                    if (depthTestPassed)
+                    {
+                        uint32_t dstColor = pixelData[ix + iy * width];
+
+                        uint8_t srcR = (originalColor >> 16) & 0xFF;
+                        uint8_t srcG = (originalColor >> 8) & 0xFF;
+                        uint8_t srcB = originalColor & 0xFF;
+
+                        uint8_t dstR = (dstColor >> 16) & 0xFF;
+                        uint8_t dstG = (dstColor >> 8) & 0xFF;
+                        uint8_t dstB = dstColor & 0xFF;
+                        uint8_t dstA = (dstColor >> 24) & 0xFF;
+
+                        // Blending
+                        uint8_t outA = alpha + (dstA * (255 - alpha)) / 255;
+                        uint8_t outR = (srcR * alpha + dstR * (255 - alpha)) / 255;
+                        uint8_t outG = (srcG * alpha + dstG * (255 - alpha)) / 255;
+                        uint8_t outB = (srcB * alpha + dstB * (255 - alpha)) / 255;
+
+                        pixelData[ix + iy * width] = (outA << 24) | (outR << 16) |
+                                                     (outG << 8) | outB;
+                    }
+                }
+            }
+        }
+
+        oneoverz += oneoverz_step;
+        soverz += soverz_step;
+        toverz += toverz_step;
+    }
+}
+
+// Fill with RGB565 color
+static void gui_3d_fill_rgb565(float y, float xleft, float xright, float oneoverz,
+                               float oneoverz_step,
+                               float *zbuffer, uint16_t *pixelData, int width, int height, uint16_t color)
+{
+    int iy = (int)y;
+
+    for (int ix = (int)(xleft + 0.5f); ix < (int)(xright + 0.5f); ++ix)
+    {
+        if (ix > 0 && ix < width && iy >= 0 && iy < height)
+        {
+            const float originalZ = 1.0f / oneoverz;
+            if (zbuffer[ix + iy * width] == 0 || zbuffer[ix + iy * width] < originalZ)
+            {
+                zbuffer[ix + iy * width] = originalZ;
+
+                pixelData[ix + iy * width] = color;
+            }
+        }
+
+        oneoverz += oneoverz_step;
+    }
+}
+
+// Fill with ARGB8888 color
+static void gui_3d_fill_argb8888(float y, float xleft, float xright, float oneoverz,
+                                 float oneoverz_step,
+                                 float *zbuffer, uint32_t *pixelData, int width, int height, uint32_t color)
+{
+    const int iy = (int)y;
+    const uint8_t alpha = (color >> 24) & 0xFF;
+
+    if (alpha == 255)
+    {
+        for (int ix = (int)(xleft + 0.5f); ix < (int)(xright + 0.5f); ++ix)
+        {
+            if (ix > 0 && ix < width && iy >= 0 && iy < height)
+            {
+                const float originalZ = 1.0f / oneoverz;
+                if (zbuffer[ix + iy * width] == 0 || zbuffer[ix + iy * width] < originalZ)
+                {
+                    zbuffer[ix + iy * width] = originalZ;
+
+                    pixelData[ix + iy * width] = color;
+                }
+            }
+            oneoverz += oneoverz_step;
+        }
+    }
+    else if (alpha > 0)
+    {
+        const uint8_t srcR = (color >> 16) & 0xFF;
+        const uint8_t srcG = (color >> 8) & 0xFF;
+        const uint8_t srcB = color & 0xFF;
+        const uint16_t inv_alpha = 255 - alpha;
+        for (int ix = (int)(xleft + 0.5f); ix < (int)(xright + 0.5f); ++ix)
+        {
+            if (ix > 0 && ix < width && iy >= 0 && iy < height)
+            {
+                const float originalZ = 1.0f / oneoverz;
+                if (zbuffer[ix + iy * width] == 0 || zbuffer[ix + iy * width] < originalZ)
+                {
+                    const uint32_t dstColor = pixelData[ix + iy * width];
+
+                    const uint16_t dstR = (dstColor >> 16) & 0xFF;
+                    const uint16_t dstG = (dstColor >> 8) & 0xFF;
+                    const uint16_t dstB = dstColor & 0xFF;
+                    const uint16_t dstA = (dstColor >> 24) & 0xFF;
+
+                    pixelData[ix + iy * width] = ((alpha + (dstA * inv_alpha) / 255) << 24) |
+                                                 (((srcR * alpha + dstR * inv_alpha) / 255) << 16) |
+                                                 (((srcG * alpha + dstG * inv_alpha) / 255) << 8) |
+                                                 ((srcB * alpha + dstB * inv_alpha) / 255);
+                }
+            }
+            oneoverz += oneoverz_step;
+        }
+
+    }
+}
+
+static void gui_3d_render_triangle_with_texture(float y, float y0, float y1, float y2, float z0,
+                                                float z1, float z2,
+                                                float s0, float s1, float s2, float t0, float t1, float t2,
+                                                bool k01infinite, float k01, float b01,
+                                                bool k02infinite, float k02, float b02,
+                                                float *zbuffer, uint32_t *pixelData, int width, int height,
+                                                GUI_3D_FILL_TYPE fillType, void *fillData, uint8_t opacity_value)
+{
+    float xleft = k01infinite ? b01 : (y - b01) / k01;
+    float xright = k02infinite ? b02 : (y - b02) / k02;
+
+    float oneoverz_top = 1.0f / z0;          // Reciprocal of the depth of vertex 0
+    float oneoverz_bottom = 1.0f / z1;       // Reciprocal of the depth of vertex 1
+    float oneoverz_left = (y - y0) * (oneoverz_bottom - oneoverz_top) / (y1 - y0) +
+                          oneoverz_top;  // 1/z interpolation on the left edge
+    oneoverz_bottom = 1.0f / z2;
+    float oneoverz_right = (y - y0) * (oneoverz_bottom - oneoverz_top) / (y2 - y0) +
+                           oneoverz_top; // 1/z interpolation on the right edge
+    float oneoverz_step = (oneoverz_right - oneoverz_left) / (xright -
+                                                              xleft);      // Horizontal step size of 1/z
+
+    float oneoverz = oneoverz_left;   // Initial value of oneoverz
+
+    float soverz_top = s0 / z0;          // Perspective correction of texture coordinates s
+    float soverz_bottom = s1 / z1;
+    float soverz_left = (y - y0) * (soverz_bottom - soverz_top) / (y1 - y0) +
+                        soverz_top;  // Interpolation of texture coordinates s (u) on the left edge
+    soverz_bottom = s2 / z2;
+    float soverz_right = (y - y0) * (soverz_bottom - soverz_top) / (y2 - y0) +
+                         soverz_top; // Interpolation of texture coordinates s (u) on the right edge
+    float soverz_step = (soverz_right - soverz_left) / (xright -
+                                                        xleft);       // Horizontal step size of texture coordinates s (u)
+
+    float toverz_top = t0 / z0;          // Perspective correction of texture coordinates t
+    float toverz_bottom = t1 / z1;
+    float toverz_left = (y - y0) * (toverz_bottom - toverz_top) / (y1 - y0) +
+                        toverz_top;  // Interpolation of texture coordinates t (v) on the left edge
+    toverz_bottom = t2 / z2;
+    float toverz_right = (y - y0) * (toverz_bottom - toverz_top) / (y2 - y0) +
+                         toverz_top;  // Interpolation of texture coordinates t (v) on the right edge
+    float toverz_step = (toverz_right - toverz_left) / (xright -
+                                                        xleft);       // Horizontal step size of texture coordinate t (v)
+
+    float soverz = soverz_left;
+    float toverz = toverz_left;
+
+    gui_rgb_data_head_t *src_head = (gui_rgb_data_head_t *)fillData;
+    uint32_t *src_pixels = (uint32_t *)((unsigned char *)fillData + sizeof(gui_rgb_data_head_t));
+
+    gui_3d_fill_image(y, xleft, xright, oneoverz, oneoverz_step,
+                      soverz, soverz_step, toverz, toverz_step,
+                      zbuffer, pixelData, width, height, src_head, src_pixels, opacity_value);
+}
+
+static void gui_3d_render_triangle_with_color(float y, float y0, float y1, float y2, float z0,
+                                              float z1, float z2,
+                                              float s0, float s1, float s2, float t0, float t1, float t2,
+                                              bool k01infinite, float k01, float b01,
+                                              bool k02infinite, float k02, float b02,
+                                              float *zbuffer, uint32_t *pixelData, int width, int height,
+                                              GUI_3D_FILL_TYPE fillType, void *fillData, uint8_t opacity_value)
+{
+    float xleft = k01infinite ? b01 : (y - b01) / k01;
+    float xright = k02infinite ? b02 : (y - b02) / k02;
+
+    float oneoverz_top = 1.0f / z0;
+    float oneoverz_bottom = 1.0f / z1;
+    float oneoverz_left = (y - y0) * (oneoverz_bottom - oneoverz_top) / (y1 - y0) + oneoverz_top;
+    oneoverz_bottom = 1.0f / z2;
+    float oneoverz_right = (y - y0) * (oneoverz_bottom - oneoverz_top) / (y2 - y0) + oneoverz_top;
+    float oneoverz_step = (oneoverz_right - oneoverz_left) / (xright - xleft);
+
+    float oneoverz = oneoverz_left;
+
+    switch (fillType)
+    {
+    case GUI_3D_FILL_COLOR_RGB565:
+        {
+            gui_3d_fill_rgb565(y, xleft, xright, oneoverz, oneoverz_step, zbuffer, (uint16_t *)pixelData, width,
+                               height, *((uint16_t *)fillData));
+            break;
+        }
+
+    case GUI_3D_FILL_COLOR_ARGB8888:
+        {
+            gui_3d_fill_argb8888(y, xleft, xright, oneoverz, oneoverz_step, zbuffer, pixelData, width, height,
+                                 *((uint32_t *)fillData));
+            break;
+        }
+
+    default:
+        break;
+
+    }
+}
+
+
+void gui_3d_fill_triangle(gui_3d_vertex_t p0, gui_3d_vertex_t p1, gui_3d_vertex_t p2,
+                          float *zbuffer, uint32_t *pixelData, int width, int height,
+                          GUI_3D_FILL_TYPE fillType, void *fillData, uint8_t opacity_value)
+{
+    bool k01infinite, k02infinite;
+    float k01, b01, k02, b02;
+    float x0, y0, z0, s0, t0;
+    float x1, y1, z1, s1, t1;
+    float x2, y2, z2, s2, t2;
+
+    // Set rendering function pointer
+    gui_triangle_render_func renderFunc = NULL;
+    switch (fillType)
+    {
+    case GUI_3D_FILL_IMAGE:
+        renderFunc = gui_3d_render_triangle_with_texture;
+        break;
+
+    case GUI_3D_FILL_COLOR_RGB565:
+    case GUI_3D_FILL_COLOR_ARGB8888:
+        renderFunc = gui_3d_render_triangle_with_color;
+        break;
+
+    default:
+        return;
+    }
+    //    p0
+    // p1   p2
+    // First pass: top part of the triangle
+    if (p1.position.y < p0.position.y)
+    {
+        gui_3d_vertex_t vt;
+        vt = p1;
+        p1 = p0;
+        p0 = vt;
+    }
+    if (p2.position.y < p0.position.y)
+    {
+        gui_3d_vertex_t vt;
+        vt = p2;
+        p2 = p0;
+        p0 = vt;
+    }
+
+    float midy = p2.position.y < p1.position.y ? p2.position.y : p1.position.y;
+
+    determine_triangle_orientation(&p0, &p1, &p2);
+
+    // Reassignment and reordering of vertex coordinates and texture coordinates
+    x0 = p0.position.x; y0 = p0.position.y; z0 = p0.position.z; s0 = p0.u; t0 = p0.v;
+    x1 = p1.position.x; y1 = p1.position.y; z1 = p1.position.z; s1 = p1.u; t1 = p1.v;
+    x2 = p2.position.x; y2 = p2.position.y; z2 = p2.position.z; s2 = p2.u; t2 = p2.v;
+
+    // Calculate slope and intercept
+    calculate_edge_properties(x0, y0, x1, y1, &k01infinite, &k01, &b01);
+    calculate_edge_properties(x0, y0, x2, y2, &k02infinite, &k02, &b02);
+
+
+    for (float y = (int)(y0 + 0.5f) + 0.5f; y <= midy; y++)
+    {
+        renderFunc(y, y0, y1, y2, z0, z1, z2, s0, s1, s2, t0, t1, t2, k01infinite, k01, b01, k02infinite,
+                   k02, b02,
+                   zbuffer, pixelData, width, height, fillType, fillData, opacity_value);
+    }
+
+
+    // p1   p2
+    //    p0
+    // Second pass: bottom part of the triangle
+    if (p1.position.y > p0.position.y)
+    {
+        gui_3d_vertex_t vt = p1;
+        p1 = p0;
+        p0 = vt;
+    }
+    if (p2.position.y > p0.position.y)
+    {
+        gui_3d_vertex_t vt = p2;
+        p2 = p0;
+        p0 = vt;
+    }
+
+    midy = p2.position.y < p1.position.y ? p1.position.y : p2.position.y;
+
+    determine_triangle_orientation(&p0, &p1, &p2);
+
+    x0 = p0.position.x; y0 = p0.position.y; z0 = p0.position.z; s0 = p0.u; t0 = p0.v;
+    x1 = p1.position.x; y1 = p1.position.y; z1 = p1.position.z; s1 = p1.u; t1 = p1.v;
+    x2 = p2.position.x; y2 = p2.position.y; z2 = p2.position.z; s2 = p2.u; t2 = p2.v;
+
+    calculate_edge_properties(x0, y0, x1, y1, &k01infinite, &k01, &b01);
+    calculate_edge_properties(x0, y0, x2, y2, &k02infinite, &k02, &b02);
+
+
+    for (float y = (int)(midy + 0.5f) + 0.5f; y < y0; y++)
+    {
+        renderFunc(y, y0, y1, y2, z0, z1, z2, s0, s1, s2, t0, t1, t2, k01infinite, k01, b01, k02infinite,
+                   k02, b02,
+                   zbuffer, pixelData, width, height, fillType, fillData, opacity_value);
+    }
+
+}
 
 
