@@ -251,6 +251,11 @@ static void gui_switch_prepare(gui_obj_t *obj)
     animate_frame_update(this->animate, GUI_BASE(this));
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
+        if (this->load == 0)
+        {
+            gui_obj_enable_event(obj, (gui_event_t)GUI_EVENT_SWITCH_LOAD);
+            this->load = 1;
+        }
         if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
         {
             switch (tp->type)
@@ -503,15 +508,17 @@ gui_switch_t *gui_switch_create_from_ftl(void    *parent,
 {
     return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_FTL);
 }
-_GUI_API_ASSIGN(gui_switch_t)
-.ctor = gui_switch_ctor,
- .on_turn_off = gui_switch_off,
-  .on_turn_on = gui_switch_on,
-   .turn_off = gui_switch_turn_off,
+//_GUI_API_ASSIGN(gui_switch_t)
+_gui_api_gui_switch_t _gui_api_for_gui_switch_t =
+{
+    .ctor = gui_switch_ctor,
+    .on_turn_off = gui_switch_off,
+    .on_turn_on = gui_switch_on,
+    .turn_off = gui_switch_turn_off,
     .turn_on = gui_switch_turn_on,
-     .on_press = on_press,
-      .animate = animate,
-       .on_release = on_release,
-        .turn_off_no_event = gui_switch_is_off,
-         .turn_on_no_event = gui_switch_is_on,
+    .on_press = on_press,
+    .animate = animate,
+    .on_release = on_release,
+    .turn_off_no_event = gui_switch_is_off,
+    .turn_on_no_event = gui_switch_is_on,
 };

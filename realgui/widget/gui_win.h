@@ -44,14 +44,16 @@ typedef struct gui_win
     gui_animate_t **animate_array;
     float scale;
     float scale_y;
-    bool press_flag;
-    bool long_flag;
-    bool release_flag;
-    bool enter_auto_scale;
-    bool event5_flag;
+
     uint8_t checksum;
-    bool scope;
-    bool hold_tp;
+    uint8_t press_flag   : 1;
+    uint8_t long_flag : 1;
+    uint8_t release_flag : 1;
+    uint8_t enter_auto_scale : 1;
+    uint8_t event5_flag : 1;
+    uint8_t scope : 1;
+    uint8_t hold_tp : 1;
+    uint8_t load : 1;
     uint8_t animate_array_length;
 } gui_win_t;
 
@@ -62,7 +64,7 @@ typedef struct gui_win
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-
+#define GUI_EVENT_WIN_LOAD (0XFF-1)
 /*============================================================================*
  *                         Variables
  *============================================================================*/

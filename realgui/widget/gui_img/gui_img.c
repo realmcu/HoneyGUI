@@ -387,6 +387,12 @@ void gui_img_draw_cb(gui_obj_t *obj)
 
     // release img if cached
     draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+    if (this->load == 0)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_2);
+        this->load = 1;
+    }
+
 
 }
 /**

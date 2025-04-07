@@ -663,6 +663,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_wifi_callback);
 static void on_click_keyboard_cb_switch_turn_on(void *obj, gui_event_t e,
                                                 struct on_click_keyboard_cb_param *param);
 static bool shift;
+static void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 /**
  * @brief Writes a key value in a array at the specified ID.
  *
@@ -2164,6 +2165,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             if (style == 0 || style == CENTER || style == RIGHT || style == LEFT)
             {
                 t = gui_text_create(parent, ptxt, x, y, w, h);
+                GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
                 gui_color_t color_temporary;
                 color_temporary = color;
                 gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
@@ -3221,7 +3223,9 @@ static gui_obj_t *widget_create_page(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         }
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
-        parent = (void *)gui_page_create(parent, ptxt, x, y, w, h);
+        parent = (void *)gui_win_create(parent, "_page_scope", x, y, w, h);
+        gui_win_set_scope((void *)parent, 1);
+        parent = (void *)gui_page_create(parent, ptxt, 0, 0, w, h);
     }
 
     return parent;
@@ -3436,6 +3440,9 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         // default image blend_mode
         BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
         uint8_t opacity = 255;
+        float scalex = 1;
+        float scaley = 1;
+        float angle = 0;
         while (true)
         {
             if (!(p->attr[i]))
@@ -3550,6 +3557,18 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             {
                 opacity = atof(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "scaleX"))
+            {
+                scalex = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "scaleY"))
+            {
+                scaley = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "rotationAngle"))
+            {
+                angle = atof(p->attr[++i]);
+            }
             i++;
         }
         void *img1;
@@ -3591,6 +3610,16 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         gui_button_text_move((void *)parent, text_x, text_y);
         gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
         gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
+        if (scalex != 1 || scaley != 1)
+        {
+            gui_img_scale((void *)GUI_TYPE(gui_button_t, parent)->img, scalex, scaley);
+        }
+        if (angle != 0)
+        {
+            gui_img_get_height((void *)GUI_TYPE(gui_button_t, parent)->img);
+            gui_img_rotation((void *)GUI_TYPE(gui_button_t, parent)->img, angle, GUI_BASE(GUI_TYPE(gui_button_t,
+                                                                                          parent)->img)->w / 2, GUI_BASE(GUI_TYPE(gui_button_t, parent)->img)->h / 2);
+        }
         if (text && GUI_TYPE(gui_button_t, parent)->text)
         {
             gui_color_t color_temporary;
@@ -3940,7 +3969,14 @@ static void radio_win_prepare(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_5);
 
     }
-
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()))
+    {
+        if (this->load == 0)
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_WIN_LOAD);
+            this->load = 1;
+        }
+    }
 
 }
 
@@ -7853,15 +7889,19 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
 
     {
         char *type = 0;
-        char *to = 0; GUI_UNUSED(to);
-        char *id = "null";
+        char *to = 0;
+        char *id = 0;
+        int x = 0;
+        int y = 0;
         size_t i = 0;
         while (true)
         {
+            //gui_log("p->attr[i]:%x\n",p->attr[i]);
             if (!(p->attr[i]))
             {
                 break;
             }
+            //gui_log("p->attr[i]:%s,\n", p->attr[i]);
             if (!strcmp(p->attr[i], "type"))
             {
                 type = (p->attr[++i]);
@@ -7870,38 +7910,503 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
             {
                 to = (p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "id1"))
+            {
+                x = atoi(p->attr[++i]);
+            }
             else if (!strcmp(p->attr[i], "id"))
             {
-                id = (p->attr[++i]);
+                id = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "id2"))
+            {
+                y = atoi(p->attr[++i]);
             }
             i++;
         }
-        if (type)
+        int to_widget = 0; GUI_UNUSED(to_widget);
+        if (type && to)
         {
-
-            if (!strcmp(type, "animate"))
+            if (!strcmp(type, "jump"))
             {
-                ezxml_t f = 0;
-                if (f1 != 0)
                 {
-                    f = f1;
+
+
+                    //to
+                    if (!strcmp(to, "multiLevel"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+                        }
+                        parse_id_string(id, param);
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        if (parent->type == BUTTON)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_2, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_WIN_LOAD, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_WIN_LOAD, param);
+                        }
+                        else if (parent->type == MACRO_PAGE_LIST_NEW)
+                        {
+                            // gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_wifi, GUI_EVENT_6, param);
+
+                            // gui_pagelist_new_t *pl = (void *)parent;
+                            // pl->click_param = gui_malloc(sizeof(void *)*pl->item_count);
+                            // for (size_t i = 0; i < pl->item_count; i++)
+                            // {
+                            //     pl->click_function_array[i] = (gui_event_cb_t)on_click_jump_cb_wifi;
+                            //     pl->click_param[i] = param;
+                            // }
+                        }
+                        else if (parent->type == RADIO)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_WIN_LOAD, param);
+                        }
+                    }
+
+                    else if (!strcmp(to, "app"))
+                    {
+                        if (ends_with_xml(id))
+                        {
+                            if (parent->type == BUTTON)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_2,
+                                                     (void *)gui_get_path_by_relative(id));
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_WIN_LOAD,
+                                                     gui_strdup(id));
+                            }
+                            else if (parent->type == MACRO_KEY)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_WIN_LOAD,
+                                                     gui_strdup(id));
+                            }
+                            else if (parent->type == RADIO)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_WIN_LOAD,
+                                                     gui_strdup(id));
+                            }
+                        }
+                        else
+                        {
+                            gui_log("[SaaA] error app jump format\n");
+                        }
+
+
+
+                    }
+                    else if (!strcmp(to, "C-APP"))
+                    {
+                        if (parent->type == BUTTON)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_2,
+                                                 (void *)gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_WIN_LOAD,
+                                                 (void *)gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_WIN_LOAD,
+                                                 gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == RADIO)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_WIN_LOAD,
+                                                 gui_app_get_by_name(id));
+                        }
+                    }
+                    else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
+                    {
+                        //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                        struct on_click_jump_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                        char *tabview_name = 0;
+                        if (id)
+                        {
+                            get_2_int_from_string(id, &x, &y);
+
+                            {
+                                // Find the first comma in the string
+                                const char *first_comma = strchr(id, ',');
+
+                                if (first_comma != NULL)
+                                {
+                                    // Find the second comma starting from the character after the first comma
+                                    const char *second_comma = strchr(first_comma + 1, ',');
+
+                                    // If the second comma was found and it's not at the end of the string
+                                    if (second_comma != NULL && *(second_comma + 1) != '\0')
+                                    {
+                                        tabview_name = gui_strdup(second_comma + 1);
+                                    }
+                                    else
+                                    {
+                                        // Handle the case where the second comma is not found or is at the end
+                                        gui_log("The second comma does not exist or is at the end.\n");
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where the first comma is not found
+                                    gui_log("The first comma is not found.\n");
+                                }
+                            }
+                        }
+
+                        param->id1 = x;
+                        param->id2 = y;
+                        param->to_widget_name = tabview_name;
+                        if (parent->type == BUTTON)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_2, param);
+                        }
+                        else if (parent->type == WINDOW)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_WIN_LOAD, param);
+                        }
+                        else if (parent->type == MACRO_KEY)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_WIN_LOAD, param);
+                        }
+                        else if (parent->type == RADIO)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_WIN_LOAD, param);
+                        }
+                    }
+
                 }
-                else
+
+            }
+            else if (!strcmp(type, "control"))
+            {
+                if (!strcmp(to, "light"))
                 {
-                    f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
+                    light_param_t *light;
+                    light = gui_malloc(sizeof(light_param_t));
+                    light->id = x;
+                    light->state = (bool)y;
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                         (gui_event_cb_t)light_switch_on_cb, light);
+                        GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                          (gui_event_cb_t)light_switch_off_cb, light);
+                    }
+
+
+                    if (parent->type == BUTTON)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)light_control_cb, GUI_EVENT_2, light);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)light_control_cb, GUI_EVENT_WIN_LOAD, light);
+                    }
+                    else if (parent->type == MACRO_KEY)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)light_control_cb, GUI_EVENT_WIN_LOAD, light);
+                    }
+                    else if (parent->type == RADIO)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)light_control_cb, GUI_EVENT_WIN_LOAD, light);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)light_control_cb, GUI_EVENT_SWITCH_LOAD, light);
+                    }
                 }
-                if (id)
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            {
                 {
-                    foreach_create_animate(f, parent, gui_strdup(id));
-                }
-                //gui_log(" ");
-                if (f1 == 0)
-                {
-                    ezxml_free(f);
+                    if (!strcmp(type, "animatePause"))
+                    {
+
+                        {
+                            char **param = gui_malloc(sizeof(char *) * 3);
+                            param[0] = gui_strdup(to);
+                            param[2] = (void *)parent;
+                            if (id)
+                            {
+                                param[1] = gui_strdup(id);
+                            }
+                            if (parent->type == BUTTON)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)pause_animation_cb, GUI_EVENT_2, param);
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)pause_animation_cb, GUI_EVENT_WIN_LOAD, param);
+                            }
+                            else if (parent->type == CLICKSWITCH)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)pause_animation_cb, GUI_EVENT_SWITCH_LOAD, param);
+                            }
+                            else if (parent->type == IMAGE)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)pause_animation_cb, GUI_EVENT_2, param);
+                            }
+                            else if (parent->type == RADIO)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)pause_animation_cb, GUI_EVENT_WIN_LOAD, param);
+                            }
+                        }
+                    }
+                    else if (!strcmp(type, "animate"))
+                    {
+
+                        if (GUI_STRINGS_EQUAL(to, parent->name))
+                        {
+                            ezxml_t f = 0;
+                            if (f1 != 0)
+                            {
+                                f = f1;
+                            }
+                            else
+                            {
+                                f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
+                            }
+                            if (id)
+                            {
+                                foreach_create_animate(f, parent, gui_strdup(id));
+                            }
+                            //gui_log(" ");
+                            if (f1 == 0)
+                            {
+                                ezxml_free(f);
+                            }
+                        }
+                        else
+                        {
+                            char **param = gui_malloc(sizeof(char *) * 3);
+                            param[0] = gui_strdup(to);
+                            param[2] = (void *)parent;
+                            if (id)
+                            {
+                                param[1] = gui_strdup(id);
+                            }
+                            if (parent->type == BUTTON)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)start_animation_cb, GUI_EVENT_2, param);
+                            }
+                            else if (parent->type == WINDOW)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)start_animation_cb, GUI_EVENT_WIN_LOAD, param);
+                            }
+                            else if (parent->type == CLICKSWITCH)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)start_animation_cb, GUI_EVENT_SWITCH_LOAD, param);
+                            }
+                            else if (parent->type == IMAGE_FROM_MEM)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)start_animation_cb, GUI_EVENT_2, param);
+                            }
+                            else if (parent->type == RADIO)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)start_animation_cb, GUI_EVENT_WIN_LOAD, param);
+                            }
+                        }
+                    }
                 }
             }
+            else if (!strcmp(type, "keyboard"))
+            {
+                if (to && strlen(to) > 0)
+                {
+                    GUI_WIDGET_POINTER_BY_NAME(to_text, to);
+                    if (to_text->type == TEXTBOX)
+                    {
+                        gui_text_t *widget_to_text = GUI_TYPE(gui_text_t, to_text);
+                        char *content = widget_to_text->content;
+                        struct on_click_keyboard_cb_param *param;
+                        param = gui_malloc(sizeof(struct on_click_keyboard_cb_param));
 
+                        if (parent->type == BUTTON)
+                        {
+                            param->to_text = (void *)to_text;
+                            param->key_board = get_scan_code_by_keyboard_string(id);
+                            if (param->key_board != SCANCODE_UNKNOWN)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_keyboard_cb, GUI_EVENT_WIN_LOAD, param);
+                            }
+                        }
+                    }
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "connect"))
+            {
+                if (!strcmp(to, "wifi"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_obj_add_event_cb(win, (gui_event_cb_t)wifi_connect, GUI_EVENT_WIN_LOAD, 0);
+                        }
+                        else
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)wifi_connect, GUI_EVENT_2, 0);
+                        }
+                    }
+
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "input"))
+            {
+                if (!strcmp(to, "text"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_obj_add_event_cb(win, (gui_event_cb_t)text_input, GUI_EVENT_WIN_LOAD, gui_strdup(id));
+                        }
+                        else
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)text_input, GUI_EVENT_2, gui_strdup(id));
+                        }
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_obj_add_event_cb(win, (gui_event_cb_t)text_input, GUI_EVENT_WIN_LOAD, gui_strdup(id));
+                        }
+                        else
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)text_input, GUI_EVENT_WIN_LOAD, gui_strdup(id));
+                        }
+                    }
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
+            else if (!strcmp(type, "no input"))
+            {
+                if (!strcmp(to, "text"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_obj_add_event_cb(win, (gui_event_cb_t)text_no_input, GUI_EVENT_WIN_LOAD, gui_strdup(id));
+                        }
+                        else
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)text_no_input, GUI_EVENT_2, gui_strdup(id));
+                        }
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        bool multi_click = false;
+                        for (uint8_t i = 0; i < parent->event_dsc_cnt; i++)
+                        {
+                            gui_event_dsc_t *event_dsc = parent->event_dsc + i;
+                            if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                            {
+                                multi_click = true;
+                                break;
+                            }
+                        }
+                        if (multi_click)
+                        {
+                            gui_win_t *win = gui_win_create(parent, "_win_for_multiclick", 0, 0, parent->w, parent->h);
+                            gui_obj_add_event_cb(win, (gui_event_cb_t)text_no_input, GUI_EVENT_WIN_LOAD, gui_strdup(id));
+                        }
+                        else
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)text_no_input, GUI_EVENT_WIN_LOAD, gui_strdup(id));
+                        }
+                    }
+
+                }
+
+                //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+            }
         }
+
     }
 
     return parent;
@@ -8224,7 +8729,7 @@ static gui_error_t xml_dom_page_list_new_render(gui_pagelist_new_t *pagelist_new
             gui_img_set_mode(img, pagelist_new->blending);
             const char *text = pagelist_new->item_text_array[i];
             gui_text_t *t = gui_text_create(win, 0, 0, 0, pagelist_new->row_space, GUI_BASE(win)->h);
-            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            //extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
             GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
             gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
                          pagelist_new->font_size);
@@ -8251,7 +8756,7 @@ static gui_error_t xml_dom_page_list_new_render(gui_pagelist_new_t *pagelist_new
             gui_img_set_mode(img, pagelist_new->blending);
             const char *text = pagelist_new->item_text_array[i];
             gui_text_t *t = gui_text_create(win, 0, 0, 0, GUI_BASE(win)->w, pagelist_new->row_space);
-            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            //extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
             GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
             gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
                          pagelist_new->font_size);
@@ -8326,7 +8831,7 @@ static gui_error_t xml_dom_page_list_new_render_param(gui_pagelist_new_t *pageli
             gui_img_set_mode(img, pagelist_new->blending);
             const char *text = pagelist_new->item_text_array[i];
             gui_text_t *t = gui_text_create(win, 0, 0, 0, pagelist_new->row_space, GUI_BASE(win)->h);
-            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            //extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
             GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
             gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
                          pagelist_new->font_size);
@@ -8355,7 +8860,7 @@ static gui_error_t xml_dom_page_list_new_render_param(gui_pagelist_new_t *pageli
             gui_img_set_mode(img, pagelist_new->blending);
             const char *text = pagelist_new->item_text_array[i];
             gui_text_t *t = gui_text_create(win, 0, 0, 0, GUI_BASE(win)->w, pagelist_new->row_space);
-            extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+            //extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
             GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
             gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, pagelist_new->font_color, strlen(text),
                          pagelist_new->font_size);
@@ -8561,7 +9066,7 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         {
             w = 400;
         }
-        parent = (void *)gui_win_create(parent, "pagelist_scope", x, y, w, h);
+        parent = (void *)gui_win_create(parent, "_pagelist_scope", x, y, w, h);
         gui_win_set_scope((void *)parent, 1);
         if (!horizontal)
         {
@@ -10413,18 +10918,26 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->textContent_to = to_num_f[0];
                         if (!strcmp(type, "textContent"))
                         {
-                            gui_text_set_animate((gui_text_t *)parent, dur_num, repeat_num, multi_animate_callback, params
-                                                );
+                            if (parent->type == TEXTBOX)
+                            {
+                                gui_text_set_animate((gui_text_t *)parent, dur_num, repeat_num, multi_animate_callback, params);
+                            }
                         }
                         else if (!strcmp(type, "progress"))
                         {
-                            GUI_API(gui_seekbar_t).animate((void *)parent, dur_num, repeat_num, multi_animate_callback, params);
+                            if (parent->type == SEEKBAR)
+                            {
+                                GUI_API(gui_seekbar_t).animate((void *)parent, dur_num, repeat_num, multi_animate_callback, params);
+                            }
                         }
-
                         else
                         {
-                            gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
-                                                   (aniamte_name));
+                            if (parent->type == IMAGE_FROM_MEM)
+                            {
+                                gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
+                                                       (aniamte_name));
+                            }
+
                         }
 
 
@@ -10679,11 +11192,12 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         memcpy(params->values_2, values2_num_f, sizeof(values2_num_f));
                         params->length = values_length;
                         params->calc_mode = calc_mode;
-                        gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_key_times_callback,
-                                               params,
-                                               (aniamte_name));
-
-
+                        if (parent->type == IMAGE_FROM_MEM)
+                        {
+                            gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_key_times_callback,
+                                                   params,
+                                                   (aniamte_name));
+                        }
                     }
                     return 0;
                 }
@@ -11543,7 +12057,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
     cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
     if (!cJSON_IsArray(json_array))
     {
-        gui_log("get %s_Array unsuccessful\n", parent_key);
+        //gui_log("get %s_Array unsuccessful\n", parent_key);
         cJSON_Delete(root);
         return;
     }
@@ -11552,7 +12066,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
         cJSON *obj = cJSON_GetArrayItem(json_array, 0);
         if (!obj)
         {
-            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            //gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
             cJSON_Delete(root);
             return;
         }
@@ -11561,7 +12075,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
             cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
             if (!json_key)
             {
-                gui_log("get %s_Key unsuccessful\n", key);
+                //gui_log("get %s_Key unsuccessful\n", key);
                 cJSON_Delete(root);
                 return;
             }
@@ -11623,7 +12137,7 @@ float *gui_get_json_array(const char *path, const char *parent_key, const char *
     cJSON *json_array = cJSON_GetObjectItemCaseSensitive(root, parent_key);
     if (!cJSON_IsArray(json_array))
     {
-        gui_log("get %s_Array unsuccessful\n", parent_key);
+        //gui_log("get %s_Array unsuccessful\n", parent_key);
         cJSON_Delete(root);
         return 0;
     }
@@ -11632,7 +12146,7 @@ float *gui_get_json_array(const char *path, const char *parent_key, const char *
         cJSON *obj = cJSON_GetArrayItem(json_array, 0);
         if (!obj)
         {
-            gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
+            //gui_log("get %s_ArrayItem unsuccessful\n", parent_key);
             cJSON_Delete(root);
             return 0;
         }
@@ -11641,7 +12155,7 @@ float *gui_get_json_array(const char *path, const char *parent_key, const char *
             cJSON *json_key = cJSON_GetObjectItemCaseSensitive(obj, key);
             if (!json_key)
             {
-                gui_log("get %s_Key unsuccessful\n", key);
+                //gui_log("get %s_Key unsuccessful\n", key);
                 cJSON_Delete(root);
                 return 0;
             }
@@ -12566,7 +13080,7 @@ static void gui_text_draw(gui_obj_t *obj)
 }
 
 
-void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+static void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

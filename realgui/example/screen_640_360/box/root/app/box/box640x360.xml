@@ -322,6 +322,7 @@
                 type="animate" 
                 id="animateFrame2">
             </onOn>
+            
     </switch>
     <img
         x="0"
@@ -350,7 +351,7 @@
         picture="app\\box\\resource\\lamp\\switchOff.bin"
         highlightPicture="app\\box\\resource\\lamp\\switchOn.bin"
         blendMode="imgBypassMode"
-        opacity="255"
+        opacity="100"
         pictureX="0"
         pictureY="0"
         rotationAngle="0"
@@ -358,6 +359,8 @@
         textY="0"
         fontColor="#ffffff"
         mode="normal"
+        scaleX="0.7"
+        scaleY="0.7"
         text=""
         w="184"
         h="97"
@@ -368,7 +371,11 @@
                 type="animate" 
                 id="animateFrame2">
         </onClick>
+        
     </icon>
+    <win>
+    
+    </win>
     <roller
                         x="450"              
                         y="150"             
@@ -697,60 +704,82 @@
 
     </img>
     <multiLevel name="main">ml10
-        <chart
-            w="400"
-            h="300"
-            x="10"
-            y="10"
-            color="yellow"
-            items="100,200,300,400,-100,-200,0,50,333,-333,499"
-            max="400"
-            min="-300"  
-            style="waveform"
-            strokeWidth="20"
-            >chart1
-            <onPeripheral 
-                    type="heart_rate" 
-                    to="chart1" 
-                    id="array">
-                </onPeripheral>
-        </chart>  
-        <chart
+        <page w="200"
+            h="400"
+            x="100"
+            y="20">page1
+       
+            <chart
                 w="400"
-                h="200"
+                h="300"
                 x="10"
                 y="10"
-                color="red"
+                color="yellow"
                 items="100,200,300,400,-100,-200,0,50,333,-333,499"
                 max="400"
                 min="-300"  
+                style="waveform"
                 strokeWidth="20"
-                style="bar"
-                >chart2
+                >chart1
                 <onPeripheral 
                         type="heart_rate" 
-                        to="chart2" 
+                        to="chart1" 
                         id="array">
                     </onPeripheral>
-        </chart> 
-                <chart
-            w="400"
-            h="100"
-            x="10"
-            y="210"
-            color="blue"
-            items="100,200,300,400,-100,-200,0,50,333,-333,499"
-            max="400"
-            min="-300"  
-            strokeWidth="4"
-            style="line"
-            >chart3
-            <onPeripheral 
-                    type="heart_rate" 
-                    to="chart3" 
-                    id="array">
-            </onPeripheral>
-        </chart> 
+            </chart>  
+            <chart
+                    w="400"
+                    h="200"
+                    x="10"
+                    y="310"
+                    color="red"
+                    items="100,200,300,400,-100,-200,0,50,333,-333,499"
+                    max="400"
+                    min="-300"  
+                    strokeWidth="20"
+                    style="bar"
+                    >chart2
+                    <onPeripheral 
+                            type="heart_rate" 
+                            to="chart2" 
+                            id="array">
+                        </onPeripheral>
+            </chart> 
+                    <chart
+                w="400"
+                h="1000"
+                x="10"
+                y="510"
+                color="blue"
+                items="100,200,300,400,-100,-200,0,50,333,-333,499"
+                max="400"
+                min="-300"  
+                strokeWidth="4"
+                style="line"
+                >chart3
+                <onPeripheral 
+                        type="heart_rate" 
+                        to="chart3" 
+                        id="array">
+                </onPeripheral>
+            </chart> 
+            <textbox
+                x="0"
+                y="240"
+                color="red"
+                w="454"
+                h="49"
+                text="12/MARCH"
+                fontSize="16"
+                font="app/box/resource/font/Michroma_Regular_size16_bits4_font.bin"
+                mode="center">txt_date5
+                <onTime
+                    type="Mon, January 1"
+                    to="txt_date"
+                    >
+                </onTime>
+            </textbox>
+        </page>
     </multiLevel>
     <multiLevel name="main">ml11
         <listview
@@ -1610,7 +1639,7 @@
 
 
 
-</multiLevel>
+    </multiLevel>
 </multiLevel>
     <img
             x="0"

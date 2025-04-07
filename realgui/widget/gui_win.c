@@ -180,7 +180,14 @@ static void prepare(gui_obj_t *obj)
     {
         gui_obj_enable_event(obj, GUI_EVENT_5);
     }
-
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()))
+    {
+        if (this->load == 0)
+        {
+            gui_obj_enable_event(obj, (gui_event_t)GUI_EVENT_WIN_LOAD);
+            this->load = 1;
+        }
+    }
 
 }
 

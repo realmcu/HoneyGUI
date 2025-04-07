@@ -621,16 +621,30 @@ void gui_page_update(gui_obj_t *obj)
         return;
     }
 
-    if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
+
+
+    int ax = 0 ;
+    int ay = 0;
     {
-        return;
+        gui_obj_t *o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            ax += o->x;
+            ay += o->y;
+        }
+    }
+    bool touch_in = 0;
+    if (ax < tp->x && (ax + obj->w) > tp->x && ay < tp->y && (ay + obj->parent->h) > tp->y)
+    {
+        touch_in = 1;
     }
 
-    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (touch_in)
     {
-        if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
+        //if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
         {
-            if ((tp->y > this->start_y) && (tp->y < this->start_y + obj->h))
+            //if ((tp->y > this->start_y) && (tp->y < this->start_y + obj->h))
             {
                 if ((tp->type == TOUCH_HOLD_Y))
                 {

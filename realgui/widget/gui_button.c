@@ -114,6 +114,11 @@ void gui_button_prepare(gui_obj_t *obj)
     {
         return;
     }
+    if (this->load == 0)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_2);
+        this->load = 1;
+    }
 
     if (TOUCH_INVALIDE != tp->type)
         switch (tp->type)
@@ -459,11 +464,13 @@ gui_button_t *gui_button_create_ftl(void             *parent,
                                   count, IMG_SRC_FTL);
 }
 
-_GUI_API_ASSIGN(gui_button_t)
-.on_click = gui_button_click,
- .on_long_press = gui_button_long,
-  .on_press = gui_button_press,
-   .on_release = gui_button_release,
+//_GUI_API_ASSIGN(gui_button_t)
+_gui_api_gui_button_t _gui_api_for_gui_button_t =
+{
+    .on_click = gui_button_click,
+    .on_long_press = gui_button_long,
+    .on_press = gui_button_press,
+    .on_release = gui_button_release,
     .animate = gui_button_set_animate,
 };
 

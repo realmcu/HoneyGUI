@@ -82,6 +82,7 @@ typedef struct gui_img
     uint32_t scope         : 1;
     uint32_t scope_flag    : 1;
     uint32_t tp_block      : 1;
+    uint32_t load          : 1;
     uint8_t checksum;
     uint8_t animate_array_length;
 } gui_img_t;
