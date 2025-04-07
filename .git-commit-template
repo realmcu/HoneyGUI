@@ -1,0 +1,60 @@
+# Limit the subject and body lines restricted within 72 characters
+
+# 1.0 [mandatory] input commit subject here, capitalize, don't end the subject line with a period
+# APP-audio: Fix issue ***
+
+
+# 2.0 [mandatory] jira info
+# refer to https://wiki.realtek.com/pages/viewpage.action?pageId=199985041
+# feture https://wiki.realtek.com/display/Bee1/BumbleBee+SDK+Feature+List+For+Jenkins+Verification multirepo column
+[JIRA] **** 
+
+[JIRA TYPE] Bug-Native-Minor
+#[JIRA TYPE] Bug-Native-Critical
+#[JIRA TYPE] Bug-Introduced-Minor
+#[JIRA TYPE] Bug-Introduced-Critical
+#[JIRA TYPE] Feature-
+
+[Introduced by]
+# changeID if JIRA TYPE is Bug-Introduced-Minor or Bug-Introduced-Critical
+# otherwise NA
+
+[Issue description]
+# Describe the issue.
+
+[Issue reproduction]
+# Describe the issue reproduction steps.
+
+[Cause]
+# Describe the issue root cause.
+
+
+[Solution]
+# Describe the issue solution.
+
+
+[Validation] NA
+# Describe the validation or test that has been done.
+
+
+# 3.0 [optional] related change
+#[Manifest]west:I34f5c994d043ba5af25dbf37c94c6da3a004504c
+
+#[Related Commit]
+#HoneyRepo/lowerpatch:lowerstack-dev:I6d998a8c5828
+# Extract the first 12 characters of the changeID
+
+# 4.0 [mandatory] For statistical purposes
+# https://wiki.realtek.com/display/Bee1/IO+Commit+Sync 
+#[Need Cherry Pick to] NA
+[Need Cherry Pick to] default
+#[Need Cherry Pick to] bb2-master-v2.0,bb2plus-master-v0.0
+
+# 5.0  [optional] chip info 
+# !!! [attention] Don't use it unless it's a critical moment
+# only the Specified ICs will be verified for this commit.
+# e.g. [Chip]rtl87x3d,rtl87x3e
+#[Chip]
+
+
+# 6.0 [optional] other commit message
