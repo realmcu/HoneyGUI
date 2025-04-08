@@ -28,6 +28,10 @@
 // </c>
 
 // <c> RTK GUI Base Demo
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
+// </c>
+
+// <c> RTK GUI Base Demo
 // #define CONFIG_REALTEK_BUILD_EXAMPLE_GRAY_WIDGET
 // </c>
 

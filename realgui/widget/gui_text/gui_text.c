@@ -343,8 +343,9 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         this->base.h = this->font_height;
     }
-    //gui_obj_enable_event(obj, (gui_event_t)TXT_EVENT_CLICK);
-    GUI_ASSERT(0);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
 
     last = this->checksum;
