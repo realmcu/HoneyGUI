@@ -111,6 +111,8 @@ void gui_3d_rect_face_transform_local_to_global(gui_3d_rect_face_t *face, size_t
         face->transform_vertex[j].normal.z = vn->z;
         // face->transform_vertex[j].normal.w = 1;
 
+        face->transform_world_vertex[j].position = face->transform_vertex[j].position;
+
     }
 }
 

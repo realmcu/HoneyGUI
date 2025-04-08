@@ -132,7 +132,7 @@ static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/)
 
             float v = (float)p_y / (height - 1);
 
-            if (this->face.rect_face[i].vertex[0].v == 1)
+            if (this->face.rect_face[i].transform_vertex[0].v == 1)
             {
                 v = 1.0f - v;
             }
@@ -221,7 +221,6 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
         if (this->light.initialized)
         {
             fill_data = this->mask_img[i].data;
-            opacity_value = this->mask_img[i].opacity_value;
         }
 
         gui_3d_fill_triangle(p0, p1, p2, depthBuffer, pixelData, width, height, fill_type, fill_data,

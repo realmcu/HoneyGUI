@@ -113,6 +113,7 @@ static int app_init(void)
 
 }
 
+/* 3d disc demo end*/
 
 GUI_INIT_APP_EXPORT(app_init);
 

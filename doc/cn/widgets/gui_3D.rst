@@ -41,7 +41,7 @@
      - 高光贴图
      - 透明贴图
 
-.. image:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
+.. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
    :width: 800px
    :align: 
    
@@ -244,10 +244,13 @@
 
 示例
 ----
+
+.. _3D蝴蝶:
+
 3D蝴蝶
 ~~~~~~~~
 
-该模型全部由矩形面组成，调用 :cpp:any:`gui_3d_set_face_transform_cb()` 为不同面设置局部变换可以制作动画效果。
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D`` 来运行此示例。该模型由 8 个矩形面构成，每个面都有相应的纹理贴图。通过调用 :cpp:any:`gui_3d_set_face_transform_cb()` 函数，可以为不同的面设置局部变换，从而实现动画效果。
 
 .. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_butterfly.c
    :language: c
@@ -260,60 +263,12 @@
    <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/butterfly.gif" width= "400" /></div>
    <br>
 
-
-3D棱镜
-~~~~~~~~
-
-该模型全部由矩形面组成，调用 ``gui_3d_light_inititalize()`` 可以添加光照效果。
-
-.. code-block:: c
-
-   #include "math.h"
-   #include "prism3d/desc.txt"
-
-   static float rot_angle = 0.0f;
-   void update_cube_animation()
-   {
-      rot_angle++;
-   }
-
-   static void cube_global_cb(gui_3d_t *this)
-   {
-      gui_dispdev_t *dc = gui_get_dc();
-      gui_3d_matrix_t face_matrix;
-      gui_3d_matrix_t object_matrix;
-
-      gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767, 90,
-                                 dc->screen_width, dc->screen_height);
-
-      gui_3d_world_inititalize(&this->world, 0, 10, 110, 0, rot_angle, 0, 19);
-
-      gui_3d_light_inititalize(&this->light, gui_point_4d(0, 10, 112), gui_point_4d(0, 22, 40), 60, 0.6, (gui_3d_RGBAcolor_t){255, 215, 0, 255});
-
-   }
-
-   static int app_init(void)
-   {
-      gui_3d_t *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
-
-      gui_3d_set_global_transform_cb(test_3d, (gui_3d_global_transform_cb)cube_global_cb);
-
-      gui_obj_create_timer(&(test_3d->base), 17, true, update_cube_animation);
-      gui_obj_start_timer(&(test_3d->base));
-
-      return 0;
-   }
-
-.. raw:: html
-
-   <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube3d.gif" width= "400" /></div>
-   <br>
+.. _3D人脸:
 
 3D人脸
 ~~~~~~~~
 
-该模型由1454个三角形面组成。
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_FACE_3D`` 来运行此示例。该模型由 1454 个三角形面构成，使用默认材质基础色进行填充。
 
 .. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_face.c
    :language: c
@@ -325,6 +280,58 @@
    <br>
    <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/face.gif" width= "400" /></div>
    <br>
+
+
+.. _3D小狗:
+
+3D小狗
+~~~~~~~~
+
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_DOG_3D`` 来运行此示例。该模型由 774 个三角形面组成，支持自定义材质基础色的填充。
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
+   :language: c
+   :start-after: /* 3d dog demo start*/
+   :end-before: /* 3d dog demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/dog.gif" width= "400" /></div>
+   <br>
+
+
+.. _3D圆盘:
+
+3D圆盘
+~~~~~~~~
+
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_DISC_3D`` 来运行此示例。该模型由 133 个矩形面构成，其中圆盘部分使用纹理贴图，而矩形部分采用颜色填充。
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_disc.c
+   :language: c
+   :start-after: /* 3d disc demo start*/
+   :end-before: /* 3d disc demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/disc.gif" width= "400" /></div>
+   <br>
+
+
+帧率测试
+--------
+
+以下表格记录了不同芯片平台下各个示例的帧率表现。
+
+.. csv-table:: 帧率测试结果
+   :header: 芯片型号,处理器主频,分辨率,:ref:`3D蝴蝶`,:ref:`3D人脸`,:ref:`3D小狗`,:ref:`3D圆盘`
+   :align: center
+   :name: 帧率测试结果
+
+   RTL8773E,100MHz,410 x 502,23 FPS,12 FPS,19 FPS,5 FPS
+
 
 API
 ---

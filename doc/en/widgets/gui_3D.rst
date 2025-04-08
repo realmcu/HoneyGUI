@@ -41,7 +41,7 @@ A complete 3D model consists of three core components:
      - Specular maps
      - Transparency maps
 
-.. image:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
+.. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
    :width: 800px
    :align: center
    
@@ -246,10 +246,12 @@ The :cpp:any:`gui_obj_create_timer` function can be used to set animation proper
 Example
 --------
 
+.. _3D Butterfly:
+
 3D Butterfly
 ~~~~~~~~~~~~~
 
-The model is composed entirely of rectangular faces. By calling :cpp:any:`gui_3d_set_face_transform_cb()`, you can set local transformations for different faces to create animation effects.
+To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D`` in :file:`menu_config.h`. This model consists of 8 rectangular surfaces, each with its corresponding texture mapping. By calling the function :cpp:any:`gui_3d_set_face_transform_cb()`, you can set local transformations for different surfaces to achieve animation effects.
 
 .. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_butterfly.c
    :language: c
@@ -263,60 +265,12 @@ The model is composed entirely of rectangular faces. By calling :cpp:any:`gui_3d
    <br>
 
 
-3D Prism
-~~~~~~~~
-
-The model is composed entirely of rectangular faces. By calling ``gui_3d_light_inititalize()``, you can add lighting effects.
-
-.. code-block:: c
-
-   #include "math.h"
-   #include "prism3d/desc.txt"
-
-   static float rot_angle = 0.0f;
-   void update_cube_animation()
-   {
-      rot_angle++;
-   }
-
-   static void cube_global_cb(gui_3d_t *this)
-   {
-      gui_dispdev_t *dc = gui_get_dc();
-      gui_3d_matrix_t face_matrix;
-      gui_3d_matrix_t object_matrix;
-
-      gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767, 90,
-                                 dc->screen_width, dc->screen_height);
-
-      gui_3d_world_inititalize(&this->world, 0, 10, 110, 0, rot_angle, 0, 19);
-
-      gui_3d_light_inititalize(&this->light, gui_point_4d(0, 10, 112), gui_point_4d(0, 22, 40), 60, 0.6, (gui_3d_RGBAcolor_t){255, 215, 0, 255});
-
-   }
-
-   static int app_init(void)
-   {
-      gui_3d_t *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
-
-      gui_3d_set_global_transform_cb(test_3d, (gui_3d_global_transform_cb)cube_global_cb);
-
-      gui_obj_create_timer(&(test_3d->base), 17, true, update_cube_animation);
-      gui_obj_start_timer(&(test_3d->base));
-
-      return 0;
-   }
-
-.. raw:: html
-
-   <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube3d.gif" width= "400" /></div>
-   <br>
-
+.. _3D Face:
 
 3D Face
 ~~~~~~~~
 
-The model is composed of 1,454 triangular faces.
+To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D`` in :file:`menu_config.h`. This model consists of 1454 triangular surfaces, filled with the default material base color.
 
 .. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_face.c
    :language: c
@@ -328,6 +282,57 @@ The model is composed of 1,454 triangular faces.
    <br>
    <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/face.gif" width= "400" /></div>
    <br>
+
+
+.. _3D Dog:
+
+3D Dog
+~~~~~~~~
+
+To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DOG_3D`` in :file:`menu_config.h`. The model consists of 774 triangular surfaces and supports filling with a custom material base color.
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
+   :language: c
+   :start-after: /* 3d dog demo start*/
+   :end-before: /* 3d dog demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/dog.gif" width= "400" /></div>
+   <br>
+
+
+.. _3D Disc:
+
+3D Disc
+~~~~~~~~
+
+To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DISC_3D`` in :file:`menu_config.h`. The model is composed of 133 rectangular surfaces, with the disc part using texture mapping and the rectangular part using color filling.
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_disc.c
+   :language: c
+   :start-after: /* 3d disc demo start*/
+   :end-before: /* 3d disc demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/disc.gif" width= "400" /></div>
+   <br>
+
+
+FPS Benchmark
+--------------
+
+The following table records the frame rate performance of different examples across various chip platforms.
+
+.. csv-table:: FPS Benchmark Results
+   :header: Chip Model,CPU Frequency,Resolution,:ref:`3D Butterfly`,:ref:`3D Face`,:ref:`3D Dog`,:ref:`3D Disc`
+   :align: center
+   :name: FPS Benchmark Results
+
+   RTL8773E,100MHz,410 x 502,23 FPS,12 FPS,19 FPS,5 FPS
 
 
 API

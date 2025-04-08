@@ -59,19 +59,19 @@ View
 ~~~~~~~~~~
 Below are three separate C files, each containing a descriptor for the view and the design function.
 
-.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_blue.c
+.. literalinclude:: ../../../example/widget/view/app_ui_view_blue.c
    :language: c
    :start-after: /* view blue start*/
    :end-before: /* view blue end*/
 
 
-.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_white.c
+.. literalinclude:: ../../../example/widget/view/app_ui_view_white.c
    :language: c
    :start-after: /* view white start*/
    :end-before: /* view white end*/
 
 
-.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_yellow.c
+.. literalinclude:: ../../../example/widget/view/app_ui_view_yellow.c
    :language: c
    :start-after: /* view yellow start*/
    :end-before: /* view yellow end*/
