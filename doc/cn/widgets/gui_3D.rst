@@ -43,7 +43,7 @@
 
 .. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
    :width: 800px
-   :align: 
+   :align: center
    
    3D模型组成示例
 
