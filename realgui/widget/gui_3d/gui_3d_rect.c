@@ -184,17 +184,21 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
     GUI_3D_FILL_TYPE fill_type = GUI_3D_FILL_COLOR_ARGB8888;
     void *fill_data = NULL;
 
+    const bool needs_lighting = this->light.initialized && this->mask_img != NULL;
+
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        gui_3d_vertex_t p0 = this->face.rect_face[i].transform_vertex[0];
-        gui_3d_vertex_t p1 = this->face.rect_face[i].transform_vertex[1];
-        gui_3d_vertex_t p2 = this->face.rect_face[i].transform_vertex[2];
-        gui_3d_vertex_t p3 = this->face.rect_face[i].transform_vertex[3];
+        if ((this->face.rect_face[i].state & GUI_3D_FACESTATE_BACKFACE))
+        {
+            continue;
+        }
 
-        p0.v = 1.0f - p0.v;
-        p1.v = 1.0f - p1.v;
-        p2.v = 1.0f - p2.v;
-        p3.v = 1.0f - p3.v;
+        gui_3d_vertex_t vertices[4];
+        memcpy(vertices, this->face.rect_face[i].transform_vertex, sizeof(vertices));
+        for (int j = 0; j < 4; j++)
+        {
+            vertices[j].v = 1.0f - vertices[j].v; // Inverse v coordinate
+        }
 
         int material_id = this->desc->attrib.material_ids[i];
         if (material_id >= 0)
@@ -205,27 +209,30 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
             if (fill_data == NULL) // Fill with material color
             {
                 float *color_diffuse = this->desc->materials[material_id].diffuse;
-                int color_r = (int)(*(color_diffuse) * 255);
-                int color_g = (int)(*(color_diffuse + 1) * 255);
-                int color_b = (int)(*(color_diffuse + 2) * 255);
-                int color_a = this->desc->materials[material_id].dissolve * 255;
+                uint8_t color_r = (uint8_t)(*(color_diffuse) * 255);
+                uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * 255);
+                uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * 255);
+                uint8_t color_a = this->desc->materials[material_id].dissolve * 255;
+
                 color_value = (color_a << 24) | (color_r << 16) | (color_g << 8) | color_b;
                 fill_data = &color_value;
             }
-            else  // Fill with material image
+            else // Fill with material image
             {
                 fill_type = GUI_3D_FILL_IMAGE;
             }
         }
 
-        if (this->light.initialized)
+        if (needs_lighting)
         {
             fill_data = this->mask_img[i].data;
         }
 
-        gui_3d_fill_triangle(p0, p1, p2, depthBuffer, pixelData, width, height, fill_type, fill_data,
+        gui_3d_fill_triangle(vertices[0], vertices[1], vertices[2], depthBuffer, pixelData, width, height,
+                             fill_type, fill_data,
                              opacity_value);
-        gui_3d_fill_triangle(p2, p3, p0, depthBuffer, pixelData, width, height, fill_type, fill_data,
+        gui_3d_fill_triangle(vertices[2], vertices[3], vertices[0], depthBuffer, pixelData, width, height,
+                             fill_type, fill_data,
                              opacity_value);
 
     }
@@ -248,7 +255,6 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
-
 
     this->face.rect_face = gui_malloc(sizeof(gui_3d_rect_face_t) *
                                       this->desc->attrib.num_face_num_verts);
@@ -298,7 +304,7 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
 
         }
     }
-    gui_3d_generate_rect_img(this, dc->screen_width, dc->screen_height);
+    gui_3d_generate_rect_img(this, this->camera.viewport_width, this->camera.viewport_height);
 
     if (tp->type == TOUCH_SHORT)
     {

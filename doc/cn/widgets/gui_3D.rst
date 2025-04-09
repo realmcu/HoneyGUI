@@ -330,7 +330,7 @@
    :align: center
    :name: 帧率测试结果
 
-   RTL8773E,100MHz,410 x 502,23 FPS,12 FPS,19 FPS,5 FPS
+   RTL8773E,100MHz,410 x 502,24 FPS,12 FPS,19 FPS,7 FPS
 
 
 API

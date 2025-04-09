@@ -95,8 +95,7 @@ static void butterfly_global_cb(gui_3d_t *this)
     gui_dispdev_t *dc = gui_get_dc();
 
     gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
-                                 90,
-                                 dc->screen_width, dc->screen_height);
+                                 90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
                              5);
@@ -144,8 +143,8 @@ static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face
 
 static int app_init(void)
 {
-    gui_3d_t *butterfly_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480,
-                                           480);
+    gui_3d_t *butterfly_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 50, 50,
+                                           380, 380);
 
     gui_3d_set_global_transform_cb(butterfly_3d, (gui_3d_global_transform_cb)butterfly_global_cb);
     gui_3d_set_face_transform_cb(butterfly_3d, (gui_3d_face_transform_cb)butterfly_face_cb);

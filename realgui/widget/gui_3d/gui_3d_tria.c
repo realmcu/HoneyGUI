@@ -42,6 +42,7 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
     float *depthBuffer = gui_malloc(width * height * sizeof(float));
     memset(depthBuffer, 0x00, width * height * sizeof(float));
 
+    uint16_t color_value = 0;
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
         // Non-backfaces
@@ -52,14 +53,13 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
             gui_3d_vertex_t p1 = this->face.tria_face[i].transform_vertex[1];
             gui_3d_vertex_t p2 = this->face.tria_face[i].transform_vertex[2];
 
-            uint16_t color_value = 0;
             int material_id = this->desc->attrib.material_ids[i];
             if (material_id >= 0)
             {
                 float *color_diffuse = this->desc->materials[material_id].diffuse;
-                int color_r = (int)(*color_diffuse * 255);
-                int color_g = (int)(*(color_diffuse + 1) * 255);
-                int color_b = (int)(*(color_diffuse + 2) * 255);
+                uint8_t color_r = (uint8_t)(*color_diffuse * 255);
+                uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * 255);
+                uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * 255);
                 color_value = ((color_r & 0xF8) << 8) |
                               ((color_g & 0xFC) << 3) |
                               ((color_b & 0xF8) >> 3);
@@ -85,8 +85,6 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
     this->combined_img->img_w = width;
     this->combined_img->img_h = height;
     this->combined_img->opacity_value = UINT8_MAX;
-    this->combined_img->blend_mode = IMG_BYPASS_MODE;
-    // this->combined_img->high_quality = true;
 
     gui_obj_t *obj = (gui_obj_t *)this;
     memcpy(&this->combined_img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -140,7 +138,7 @@ static void gui_3d_tria_prepare(gui_3d_t *this)
         }
     }
 
-    gui_3d_generate_triangle_img(this, 380, 380);
+    gui_3d_generate_triangle_img(this, this->camera.viewport_width, this->camera.viewport_height);
 
     gui_fb_change();
 
