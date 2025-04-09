@@ -304,26 +304,38 @@ static void animation_case(gui_view_t *this, float pro)
     }
 }
 
+static void gui_view_free_cb(void *msg)
+{
+    gui_obj_t *obj = (gui_obj_t *)((gui_msg_t *)msg)->payload;
+    gui_view_t *this = (gui_view_t *)obj;
+
+    gui_log("%s free!\n", obj->name);
+    gui_obj_tree_free(obj);
+    if (this->descriptor->on_switch_out)
+    {
+        this->descriptor->on_switch_out(this);
+    }
+}
+
 void view_transition_animation_function(void *p, void *this_widget,
                                         struct gui_animate *animate)
 {
     gui_view_t *this = this_widget;
     gui_obj_t *obj = GUI_BASE(this);
-    this->event = 1;
+    this->supressed_event_flag = 1;
 
     float pro = animate->progress_percent;
     animation_case(this, pro);
     if (animate->end_frame)
     {
-        if (this->view_switch_ready)
+        if (this->switch_in_done)
         {
             if (!this->descriptor->keep)
             {
-                extern void gui_view_free(void *msg);
                 gui_msg_t msg =
                 {
                     .event = GUI_EVENT_USER_DEFINE,
-                    .cb = gui_view_free,
+                    .cb = gui_view_free_cb,
                     .payload = this,
                 };
                 gui_send_msg_to_server(&msg);
@@ -340,9 +352,9 @@ void view_transition_animation_function(void *p, void *this_widget,
             obj->opacity_value = UINT8_MAX;
             obj->x = 0;
             obj->y = 0;
-            this->view_switch_ready = true;
-            this->event = 0;
-            this->view_tp = 1;
+            this->switch_in_done = true;
+            this->supressed_event_flag = 0;
+            this->supressed_tp_flag = 1;
         }
     }
 }

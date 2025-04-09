@@ -80,10 +80,12 @@ typedef struct gui_view
     VIEW_SWITCH_STYLE style;
     const struct gui_view_descriptor *descriptor;
 
-    uint32_t view_switch_ready       : 1; // 1: target view switch done
-    uint32_t event                   : 1; // 1: stop setting event
-    uint32_t moveback                : 1; // 1: move to the opposite direction
-    uint32_t view_tp                 : 1; // 1: enable to update release
+    uint32_t switch_in_done          : 1; // 1: view switch in done
+    uint32_t supressed_event_flag    : 1; // 1: stop setting event
+    uint32_t supressed_tp_flag       : 1; // 1: enable to update release
+
+    uint32_t moveback_flag           : 1; // 1: move to the opposite direction
+
     uint32_t view_left               : 1;
     uint32_t view_right              : 1;
     uint32_t view_up                 : 1;
