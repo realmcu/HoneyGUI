@@ -24,6 +24,7 @@
 #include "gui_obj.h"
 #include "gui_obj_tree.h"
 #include "gui_api.h"
+#include "gui_message.h"
 
 /*============================================================================*
  *                           Types
@@ -262,9 +263,9 @@ void gui_obj_child_free(gui_obj_t *object)
     gui_list_init(&object->child_list);
 }
 
+
 void gui_obj_tree_free(void *obj)
 {
-    //GUI_WIDGET_TRY_EXCEPT(obj)
     gui_obj_t *object = (gui_obj_t *)obj;
 
     gui_obj_tree_child_free(object);
@@ -296,6 +297,25 @@ void gui_obj_tree_free(void *obj)
         }
         gui_list_init(&object->child_list);
     }
+}
+
+static void __obj_tree_free_async(void *msg)
+{
+    gui_obj_t *obj = (gui_obj_t *)((gui_msg_t *)msg)->payload;
+
+    gui_log("%s asynchronous free!\n", obj->name);
+    gui_obj_tree_free(obj);
+}
+
+void gui_obj_tree_free_async(void *obj)
+{
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .cb = __obj_tree_free_async,
+        .payload = obj,
+    };
+    gui_send_msg_to_server(&msg);
 }
 
 void gui_obj_tree_show(gui_obj_t *obj, bool enable)

@@ -22,6 +22,10 @@ typedef enum
     GUI_EVENT_USER_DEFINE             = 0x0100,
 } gui_msg_event_t;
 
+bool gui_send_msg_to_server(gui_msg_t *msg);
+void gui_recv_msg_to_server(void);
+void gui_server_msg_handler(gui_msg_t *msg);
+void gui_server_msg_init(void);
 
 #ifdef __cplusplus
 }

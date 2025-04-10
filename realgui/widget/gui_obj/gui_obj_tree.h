@@ -59,6 +59,22 @@ extern "C" {
   */
 void gui_obj_tree_free(void *obj);
 
+
+/**
+  * @brief free the widget tree asynchronously.
+  * @param obj the root of the widget tree.
+  * <b>Example usage</b>
+  * \code{.c}
+  * static void app_main_task(gui_app_t *app)
+  * {
+  *    gui_obj_tree_free_async(&app->screen);
+  *
+  * }
+  *
+  * \endcode
+  */
+void gui_obj_tree_free_async(void *obj);
+
 /**
   * @brief free the widget tree recursively, without the root. Preorder traversal.
   * @param obj the root of the widget tree.
