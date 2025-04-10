@@ -5,15 +5,15 @@
 #include <gui_obj.h>
 #include <gui_curtain.h>
 #include <gui_button.h>
-#include "gui_canvas.h"
+
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
 #include <gui_app.h>
-#include "gui_tab.h"
+
 #include "gui_grid.h"
-#include "gui_return.h"
+
 #include "gui_components_init.h"
 #include "gui_api.h"
 

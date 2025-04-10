@@ -1186,11 +1186,11 @@ static void xml_dom_wifi_entry(void *parameter)
     active_wifi_status = wifi_status[(rand++) % (sizeof(wifi_status) / sizeof(wifi_status[0]))];
     if (active_wifi_status == ACTIVE_WIFI_STATUS_DISCONNECTED)
     {
-        gui_log("DISCONNECT %s \n", parameter);
+        gui_log("DISCONNECT %s \n", (char *)parameter);
     }
     else
     {
-        gui_log(" CONNECTED  %s \n", parameter);
+        gui_log(" CONNECTED  %s \n", (char *)parameter);
     }
 
 
@@ -1214,7 +1214,7 @@ static void wifi_connect(void *obj, gui_event_t e, void *p)
     gui_obj_tree_get_widget_by_name((gui_obj_t *)gui_current_app(), NAME, (gui_obj_t **)&obj);\
     if (!obj|| obj->magic!=GUI_MAGIC_NUMBER)\
     {\
-        gui_log("GET_WIDGET_BY_NAME %s failed\n", NAME);\
+        gui_log("GET_WIDGET_BY_NAME %s failed\n", (char *)NAME);\
     }
 static char input_text_string[100];
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_input_win_ani)
@@ -1234,7 +1234,8 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_input_win_ani)
         {
             if ((!text->inputable) && (!text->ispasswd))
             {
-                strcpy(input_text_string, text->content);
+                strncpy(input_text_string, text->content, sizeof(input_text_string) - 1);
+                input_text_string[sizeof(input_text_string) - 1] = '\0';
             }
             text->inputable = 1;
         }
@@ -1337,7 +1338,8 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(on_on_text_password)
     text->ispasswd = true;
     if (!text->inputable)
     {
-        strcpy(input_text_string, text->content);
+        strncpy(input_text_string, text->content, sizeof(input_text_string) - 1);
+        input_text_string[sizeof(input_text_string) - 1] = '\0';
         char head[strlen(input_text_string) + 1];
         memset(head, '*', strlen(input_text_string));
         head[strlen(input_text_string)] = '\0';
@@ -1697,10 +1699,10 @@ static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_p
     else
     {
         GUI_WIDGET_POINTER_BY_TYPE(ml, MULTI_LEVEL, &(gui_current_app()->screen));
-        if (!ml)
-        {
-            return;
-        }
+        // if (!ml)
+        // {
+        //     return;
+        // }
         if (param->id1 < 0)
         {
             setting_return_cb(obj, e, (void *)param);
@@ -1727,10 +1729,10 @@ static void on_connect_wifi_listview_cb(void *obj, gui_event_t e, const char *li
     else
     {
         GUI_WIDGET_POINTER_BY_TYPE(ml, MACRO_PAGE_LIST_NEW, &(gui_current_app()->screen));
-        if (!ml)
-        {
-            return;
-        }
+
+
+
+
 
     }
 }
@@ -5196,7 +5198,7 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             }
             else if (!strcmp(type, "input"))
             {
-                if (!strcmp(to, "text"))
+                if (!strcmp(to, "text") && id)
                 {
                     if (parent->type == BUTTON)
                     {
@@ -5606,7 +5608,7 @@ static gui_obj_t *widget_create_macro_on_connected(ezxml_t p, gui_obj_t *parent,
             }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -5990,7 +5992,7 @@ static gui_obj_t *widget_create_macro_on_connecting(ezxml_t p, gui_obj_t *parent
             }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -6346,7 +6348,7 @@ static gui_obj_t *widget_create_macro_on_disconnected(ezxml_t p, gui_obj_t *pare
             }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -7346,7 +7348,7 @@ static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_
             i++;
         }
         int to_widget = 0; GUI_UNUSED(to_widget);
-        if (type)
+        if (type && to && id)
         {
             char **param = gui_malloc(sizeof(char *) * 2);
             param[0] = gui_strdup(to);
@@ -7641,7 +7643,7 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
             i++;
         }
         int to_widget = 0; GUI_UNUSED(to_widget);
-        if (type)
+        if (type && to && id)
         {
             char **param = gui_malloc(sizeof(char *) * 2);
             param[0] = gui_strdup(to);
@@ -11244,7 +11246,7 @@ void foreach_create(ezxml_t p, gui_obj_t *parent)
             {
                 group_name = 0;
             }
-            if (!(GUI_STRINGS_EQUAL(GUI_TYPE(gui_multi_level_t, parent)->group_name, group_name)))
+            if (group_name && !(GUI_STRINGS_EQUAL(GUI_TYPE(gui_multi_level_t, parent)->group_name, group_name)))
             {
                 //gui_log("%s,%s\n", i->name, i->txt);
                 ml = 1;
@@ -11350,7 +11352,7 @@ void foreach_create_in_multilevel(ezxml_t p, gui_obj_t *parent, const char *grou
                 }
 
 
-                if (!(GUI_STRINGS_EQUAL(group_name, group_name_parent)))
+                if (group_name && !(GUI_STRINGS_EQUAL(group_name, group_name_parent)))
                 {
                     //gui_log("%s,%s\n", i->name, i->txt);
                     ml = 1;
@@ -12959,9 +12961,9 @@ static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 #include "gui_matrix.h"
 #include "font_mem.h"
 #include "font_ttf.h"
-#include "font_stb.h"
-#include "font_mem_img.h"
-#include "font_mem_matrix.h"
+
+
+
 #include "tp_algo.h"
 #include "gui_fb.h"
 static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
