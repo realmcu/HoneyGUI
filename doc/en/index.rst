@@ -15,6 +15,7 @@ HoneyGUI
   Samples <sample/index>
   Tool <tool/index>
   Design Spec<Design/index>
+  3rd Supported <3rd-supported/index>
   FAQ <FAQ/index>
   Get PDF <get-pdf/index>
   Glossary <Glossary>
