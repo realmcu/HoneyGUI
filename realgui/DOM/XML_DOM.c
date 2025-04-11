@@ -1178,7 +1178,7 @@ static void update_light_config(int index, const char *attribute, int value)
 }
 static void xml_dom_wifi_entry(void *parameter)
 {
-    gui_log("try to connect %s %d\n", parameter, active_wifi_status);
+    gui_log("try to connect %s %d\n", (char *)parameter, active_wifi_status);
     active_wifi_status = ACTIVE_WIFI_STATUS_CONNECTING;
     gui_thread_mdelay(3000);
     static int rand;
@@ -5133,7 +5133,7 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -5257,7 +5257,7 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
             }
             else if (!strcmp(type, "no input"))
             {
-                if (!strcmp(to, "text"))
+                if (!strcmp(to, "text") && id)
                 {
                     if (parent->type == BUTTON)
                     {
@@ -7545,7 +7545,7 @@ static gui_obj_t *widget_create_macro_onoff(ezxml_t p, gui_obj_t *parent, T_OBJ_
             // }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -7838,7 +7838,7 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
             // }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -8241,7 +8241,7 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
             }
             else if (!strcmp(type, "keyboard"))
             {
-                if (to && strlen(to) > 0)
+                if (to && strlen(to) > 0 && id)
                 {
                     GUI_WIDGET_POINTER_BY_NAME(to_text, to);
                     if (to_text->type == TEXTBOX)
@@ -8355,7 +8355,7 @@ static gui_obj_t *widget_create_macro_onload(ezxml_t p, gui_obj_t *parent, T_OBJ
             }
             else if (!strcmp(type, "no input"))
             {
-                if (!strcmp(to, "text"))
+                if (!strcmp(to, "text") && id)
                 {
                     if (parent->type == BUTTON)
                     {
@@ -12964,7 +12964,7 @@ static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 
 
-#include "tp_algo.h"
+
 #include "gui_fb.h"
 static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 {

@@ -22,6 +22,7 @@
 #include "gui_page.h"
 #include "gui_image_array.h"
 #include "math.h"
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -50,12 +51,12 @@ static void **get_image_pointers(const char *input, size_t *num_pointers,
                                  int16_t text_image_map_length, const struct gui_text_image_map *text_image_map);
 static int get_index(gui_scroll_wheel_new_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
+    //GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
     return this->index_offset;
 }
 static int set_index(gui_scroll_wheel_new_t *this, int index)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
+    //GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
     this->index_offset = index;
     return this->index_offset;
 }
@@ -185,10 +186,23 @@ static void render(const char *text, gui_obj_t *obj, unsigned char render_mode,
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers, text_image_map_length,
                                                        text_image_map);
-            gui_image_array_write((void *)obj, image_pointers, num_pointers);
-            // Free allocated memory
-            gui_free(image_pointers);
-            GUI_TYPE(gui_image_array_t, obj)->text = text;
+            if (num_pointers == 0)
+            {
+                if (image_pointers)
+                {
+                    gui_free(image_pointers);
+                }
+                break;
+
+            }
+            else
+            {
+                gui_image_array_write((void *)obj, image_pointers, num_pointers);
+                // Free allocated memory
+                gui_free(image_pointers);
+                GUI_TYPE(gui_image_array_t, obj)->text = text;
+            }
+
         }
         break;
     default:
@@ -640,6 +654,15 @@ void gui_scroll_wheel_new_render_image_array(gui_scroll_wheel_new_t *widget,
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers, widget->text_image_map_length,
                                                        widget->text_image_map);
+            if (num_pointers == 0)
+            {
+                gui_log("No image pointers found for input \"%s\"\n", input);
+                if (image_pointers)
+                {
+                    gui_free(image_pointers);
+                }
+                continue;
+            }
 
             // Print results
             gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
@@ -670,6 +693,15 @@ void gui_scroll_wheel_new_render_image_array_ftl(gui_scroll_wheel_new_t *widget,
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers, widget->text_image_map_length,
                                                        widget->text_image_map);
+            if (num_pointers == 0)
+            {
+                gui_log("No image pointers found for input \"%s\"\n", input);
+                if (image_pointers)
+                {
+                    gui_free(image_pointers);
+                }
+                continue;
+            }
 
             // Print results
             gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
@@ -725,7 +757,9 @@ void gui_scroll_wheel_new_render(const char *text, gui_obj_t *obj, unsigned char
 {
     render(text, obj, render_mode, text_image_map_length, text_image_map);
 }
-_GUI_API_ASSIGN(gui_scroll_wheel_new_t)
-.get_index = get_index,
- .set_index = set_index,
+//_GUI_API_ASSIGN(gui_scroll_wheel_new_t)
+_gui_api_gui_scroll_wheel_new_t _gui_api_for_gui_scroll_wheel_new_t =
+{
+    .get_index = get_index,
+    .set_index = set_index,
 };
