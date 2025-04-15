@@ -612,13 +612,17 @@ static void timer_start_window_callback(gui_win_t *win)
         minutes = atoi(get_text_from_widget(text2));
         seconds = atoi(get_text_from_widget(text3));
         total_seconds = hours * 3600 + minutes * 60 + seconds;
+#ifdef _WIN32
         start_time = time(NULL);
+#endif
         end_time   = start_time + total_seconds;
     }
     if (total_seconds > 0)
     {
+#ifdef _WIN32
         time_t current_time = time(NULL);
         total_seconds = difftime(end_time, current_time);
+#endif
         if (total_seconds < 0)
         {
             gui_win_stop_animation(win);

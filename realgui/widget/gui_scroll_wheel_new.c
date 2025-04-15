@@ -221,7 +221,7 @@ static void override(gui_obj_t *win)
     IMPORT_GUI_TOUCHPAD
     IMPORT_GUI_WHEEL
     bool wheel_take_over = this->wheel_take_over;
-    char time_array_offset = this->time_array_offset;
+    int16_t time_array_offset = this->time_array_offset;
     int time_array_size = this->string_array_size;
     if (wheel->pressed)
     {
