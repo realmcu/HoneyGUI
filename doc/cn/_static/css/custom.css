@@ -178,7 +178,7 @@ div.wy-menu-vertical {
 li[class*="toctree-"] * {
     font-size: 14px !important;
 }
-button.always-expand-toc-button::before {
+.always-expand-toc button::before {
     content: "\f147" !important;
 }
 
@@ -464,6 +464,10 @@ button.copybtn {
 button.copybtn.o-tooltip--left:after {  /* 隐藏代码复制按钮组件自带的文字提示 */
     display: none;
 }
+html.writer-html4 .rst-content dl:not(.docutils)>dt, 
+html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)>dt {
+    color: inherit;
+}
 /* ========= Render Code Block Style ========= */
 
 /* =========== Render Math Style =========== */
@@ -583,8 +587,8 @@ section[id*="deprecated-api"] dd dl {
 .red-text {
     color: red;
 }
-.glossary-highlighted {
-    background: #f1c40f;
+.dt-highlighted {
+    background: #f1c40f !important;
 }
 /* ========= Render text color ========= */
 
@@ -671,4 +675,3 @@ a.no-cursor-link {
 }
 
 /* ====== Render image modal style ====== */
-
