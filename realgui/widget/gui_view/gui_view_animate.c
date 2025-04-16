@@ -233,9 +233,9 @@ static void animation_case(gui_view_t *this, float pro)
     switch (style)
     {
     case VIEW_ANIMATION_NULL:
-        {
-            GUI_BASE(this)->not_show = 1;
-        }
+        // {
+        //     GUI_BASE(this)->not_show = 1;
+        // }
         break;
     case VIEW_ANIMATION_1:
         {
