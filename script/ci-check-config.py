@@ -36,7 +36,8 @@ ci_check_config = {
         r"doc/en/_templates/",
         r"menu_config_win.py",
         r"README.md",
-        r"README_zh.md"
+        r"README_zh.md",
+        r"example/widget/text/test_font_vector_rendering_benchmark.c",
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",
