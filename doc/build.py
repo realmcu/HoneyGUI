@@ -5,6 +5,7 @@ import os
 import re
 import time
 import shutil
+import json
 from conf_common import exclude_patterns
 
 
@@ -66,6 +67,21 @@ def record_doc_generate_time(index_path):
   with open(index_md, mode='w+', newline='', errors='surrogateescape') as fd:
       fd.write(stream)
 
+def move_contents(src_dir, dst_dir):
+    if not os.path.exists(dst_dir):
+        os.makedirs(dst_dir)
+
+    for filename in os.listdir(src_dir):
+        src_file_path = os.path.join(src_dir, filename)
+        dst_file_path = os.path.join(dst_dir, filename)
+
+        if os.path.isdir(src_file_path):
+            move_contents(src_file_path, dst_file_path)
+        else:
+            shutil.move(src_file_path, dst_file_path)
+
+    if os.path.exists(src_dir) and not os.listdir(src_dir):
+        os.rmdir(src_dir)
 
 #Enter pipenv
 #cmd("pipenv shell")
@@ -94,6 +110,7 @@ html_out = output_path + "/html_out"
 cn_html_out = r'cn'
 en_html_out = r'en'
 latex_out = "latex_out"
+rst_src_out = "rst_src"
 print("")
 print("****************")
 print("Building")
@@ -114,8 +131,14 @@ if not skip_doxygen:
 os.chdir(doc_path)
 cmd("python generate_jieba_dict.py ./cn ./cn/word_dict.txt")
 
+rst_src_out = os.path.join(doc_path, output_path, rst_src_out)
+if os.path.exists(rst_src_out):
+  shutil.rmtree(rst_src_out)
+os.makedirs(rst_src_out)
+
 # BUILD HTML
 os.chdir(doc_path)
+sdk_name = "gui"
 en_cn_build = [(" -c ./en en ./{}/{} -D language=en".format(html_out, en_html_out), 'en'), (" -c ./cn cn ./{}/{} -D language=zh_CN".format(html_out, cn_html_out), 'cn')]
 for l, p in en_cn_build:
   l_doc_path = os.path.join(doc_path, p)
@@ -151,10 +174,10 @@ for l, p in en_cn_build:
   ep = ''
   exclude_patterns_ins = []
   exclude_patterns_ins.extend(exclude_patterns)
-  if "en" in l:
+  if "en" in p:
     html_out_path = os.path.join(doc_path, html_out, en_html_out)
     exclude_patterns_ins.append('cn')
-  elif "cn" in l:
+  elif "cn" in p:
     html_out_path = os.path.join(doc_path, html_out, cn_html_out)
     exclude_patterns_ins.append('en')
   print("exclude_patterns_ins:",exclude_patterns_ins)
@@ -167,6 +190,52 @@ for l, p in en_cn_build:
   cmd_line += " -D exclude_patterns=" + ep
   print(cmd_line)
   cmd(cmd_line)
+
+  # update lnk map file
+  version = os.getenv("Release_Version")
+  if version:
+    #generate link map txt
+    link_map_file = os.path.join(html_out_path, "link_map.json")
+    print(f"Link map file: {link_map_file}")
+    if os.path.exists(link_map_file):
+      print("Start update url link")
+      link = "https://docsqa.realmcu.com/{}/{}/{}/".format(sdk_name, p, version)
+      with open(link_map_file, encoding='utf-8', mode='r') as fd:
+        json_data = json.load(fd)
+      updated_links = dict()
+      for pagename, _ in json_data.items():
+          updated_links[pagename + ".rst"] = link + json_data[pagename]
+      with open(link_map_file, 'w', encoding='utf-8') as fd:
+          json.dump(updated_links, fd, ensure_ascii=False, indent=4)
+    
+    #parse api reference html content
+    # rel_api_path = r"API_Reference"
+    # api_reference_html_path = os.path.join(html_out_path, rel_api_path)
+    # api_reference_content_path = os.path.join(rst_src_out, sdk_name, l, rel_api_path)
+    # os.makedirs(api_reference_content_path)
+    # jenkinsBuild_home = os.environ.get("jenkinsScript_abspath")
+    # JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
+    # sys.path.append(JenkinsBuild_doc_Dir)
+    # from parse_html import *
+    # parse_html(api_reference_html_path, api_reference_content_path)
+
+    # move rst src file to rst_src_out
+    doc_source_path = os.path.join(html_out_path, "doc_source")
+    doc_src_zip = "{}-{}-{}-src".format(sdk_name, version, p)
+    doc_html_zip = "{}-{}-{}-html".format(sdk_name, version, p)
+    dest_copy_path = os.path.join(rst_src_out, sdk_name, p)
+    #remove api reference rst src, use html content
+    # for f in os.listdir(os.path.join(doc_source_path, rel_api_path)):
+    #   api_f = os.path.join(doc_source_path, rel_api_path, f)
+    #   if os.path.isfile(api_f):
+    #     os.remove(api_f)
+    if os.path.exists(doc_source_path):
+      move_contents(doc_source_path, dest_copy_path)
+      shutil.copy2(link_map_file, dest_copy_path)
+      shutil.make_archive(base_name=doc_src_zip, format='zip', root_dir=dest_copy_path)
+      shutil.make_archive(base_name=doc_html_zip, format='zip', root_dir=html_out_path)
+
+shutil.copytree(os.path.join(doc_path, html_out), os.path.join(doc_path, html_out + "_" + sdk_name))
 
 if archive:
   os.chdir(gui_path)
