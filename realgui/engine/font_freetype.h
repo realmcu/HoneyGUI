@@ -3,15 +3,15 @@
  */
 #ifndef __FONT_FREETYPE_H__
 #define __FONT_FREETYPE_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <guidef.h>
 #include <gui_api.h>
 #include <draw_font.h>
 #include "gui_text.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "font_rendering_utils.h"
 
 typedef struct
 {

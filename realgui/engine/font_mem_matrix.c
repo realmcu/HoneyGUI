@@ -4,41 +4,6 @@
 #include "font_mem_matrix.h"
 #include "acc_init.h"
 
-gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
-{
-    alpha = (alpha + 4) >> 3;
-    bg = (bg | (bg << 16)) & 0x7e0f81f;
-    fg = (fg | (fg << 16)) & 0x7e0f81f;
-    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
-    result >>= 5;
-    result += bg;
-    result &= 0x7e0f81f;
-    return (uint16_t)((result >> 16) | result); // contract result
-}
-gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
-{
-    uint32_t mix;
-    uint8_t back_a = 0xff - alpha;
-#if defined(_WIN32)
-    mix = 0xff000000;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
-    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
-#else
-    mix = 0x000000ff;
-    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
-#endif
-    return mix;
-}
-gui_inline uint16_t rgba2565(gui_color_t rgba)
-{
-    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
-    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
-    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
-    return red + gre + blu;
-}
 static void rtk_draw_unicode_matrix(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
                                     gui_text_rect_t *rect, float scale)
 {
@@ -816,9 +781,3 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
     }
 
 }
-
-
-
-
-
-

@@ -3,15 +3,16 @@
  */
 #ifndef __FONT_MEM_IMG_H__
 #define __FONT_MEM_IMG_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "guidef.h"
 #include "gui_api.h"
 #include "draw_font.h"
 #include "gui_text.h"
 #include "font_mem.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "font_rendering_utils.h"
 
 /**
  * @brief Post-processing work for drawing bitmap fonts using internal engines
