@@ -31,7 +31,7 @@ extern "C" {
 #include "guidef.h"
 #include "gui_api.h"
 #include "gui_obj.h"
-#include "engine_gray16.h"
+#include "engine_gray.h"
 
 
 /*============================================================================*
@@ -43,7 +43,7 @@ typedef struct
 {
     gui_obj_t base;                    /* Base object structure */
     void *data;                        /* User data pointer */
-    engine_gray16_t *gray16;           /* 4-bit gray scale image */
+    engine_gray_t *gray;               /* gray scale image */
     uint8_t gray_level;                /* Gray level (0-255), 0 for black, 255 for white */
     uint8_t checksum;                  /* Checksum for change detection */
 } gui_gray_t;

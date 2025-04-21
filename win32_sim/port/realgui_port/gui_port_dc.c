@@ -251,6 +251,23 @@ void *rtk_gui_sdl(void *arg)
 
         SDL_SetPaletteColors(surface->format->palette, greenPalette, 0, 16);
     }
+    else if (DRV_PIXEL_BITS == 8)
+    {
+        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_INDEX8, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
+
+        SDL_Color greenPalette[256];
+        for (uint32_t i = 0; i < 256; i++)
+        {
+            greenPalette[i].a = 255;
+            greenPalette[i].r = 0;
+            greenPalette[i].g = i;
+            greenPalette[i].b = 0;
+        }
+        SDL_SetPaletteColors(surface->format->palette, greenPalette, 0, 256);
+    }
 
 
     SDL_RenderPresent(renderer);

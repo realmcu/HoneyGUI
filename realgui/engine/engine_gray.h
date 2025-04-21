@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 
-typedef struct engine_gray16
+typedef struct engine_gray
 {
     int16_t x; //display start X
     int16_t y;  //display start Y
@@ -23,12 +23,13 @@ typedef struct engine_gray16
     void *data;
     // gui_matrix_t matrix; //seems can remve by howie
     gui_matrix_t inverse;
-} engine_gray16_t;
+} engine_gray_t;
 
 
 
 
-void engine_gray16_blit_to_dc(engine_gray16_t *gray16, struct gui_dispdev *dc, gui_rect_t *rect);
+void engine_gray16_blit_to_dc(engine_gray_t *gray16, struct gui_dispdev *dc, gui_rect_t *rect);
+void engine_gray256_blit_to_dc(engine_gray_t *gray256, struct gui_dispdev *dc, gui_rect_t *rect);
 
 
 #ifdef __cplusplus

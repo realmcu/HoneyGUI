@@ -64,16 +64,16 @@ static void gui_gray_prepare(gui_gray_t *this)
     {
         return;
     }
-    this->gray16 = gui_malloc(sizeof(engine_gray16_t));
-    memset(this->gray16, 0x00, sizeof(engine_gray16_t));
-    this->gray16->x = obj->x;
-    this->gray16->y = obj->y;
-    this->gray16->w = obj->w;
-    this->gray16->h = obj->h;
-    this->gray16->data = this->data;
+    this->gray = gui_malloc(sizeof(engine_gray_t));
+    memset(this->gray, 0x00, sizeof(engine_gray_t));
+    this->gray->x = obj->x;
+    this->gray->y = obj->y;
+    this->gray->w = obj->w;
+    this->gray->h = obj->h;
+    this->gray->data = this->data;
 
-    memcpy(&this->gray16->inverse, obj->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(&this->gray16->inverse);
+    memcpy(&this->gray->inverse, obj->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&this->gray->inverse);
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
@@ -100,7 +100,16 @@ static void gui_gray_draw(gui_gray_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    engine_gray16_blit_to_dc(this->gray16, dc, NULL);
+    switch (dc->bit_depth)
+    {
+    case 4:
+        engine_gray16_blit_to_dc(this->gray, dc, NULL);
+        break;
+    case 8:
+        engine_gray256_blit_to_dc(this->gray, dc, NULL);
+    default:
+        break;
+    }
 }
 
 static void gui_gray_end(gui_gray_t *this)

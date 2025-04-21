@@ -26,7 +26,7 @@ src += ['acc_sw_filter.c']
 src += ['acc_sw_rle_bypass.c']
 src += ['acc_sw_rle_cover.c']
 src += ['acc_sw_rle_filter.c']
-src += ['engine_gray16.c']
+src += ['engine_gray.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
     src += ['acc_vg_lite.c']

@@ -7,6 +7,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "../../assets/test-gray16.txt"
+#include "../../assets/test_gray256.c"
 
 
 void test_event_cb(void *obj, gui_event_t e, void *param)
