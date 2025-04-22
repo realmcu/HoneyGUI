@@ -174,6 +174,10 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             obj->obj_cb(obj, OBJ_PREPARE);
         }
+
+        extern void gui_obj_timer_handler(gui_obj_t *obj); //not called for appliacation
+        gui_obj_timer_handler(obj);
+
         if (obj->not_show)
         {
             continue;
@@ -183,8 +187,7 @@ static void obj_draw_prepare(gui_obj_t *object)
             continue;
         }
 
-        extern void gui_obj_timer_handler(gui_obj_t *obj); //not called for appliacation
-        gui_obj_timer_handler(obj);
+
 
         obj_draw_prepare(obj);
     }
@@ -324,25 +327,7 @@ static void gui_fb_draw(gui_obj_t *root)
         }
         dc->lcd_update(dc);
     }
-    else if (dc->type == DC_DOUBLE)
-    {
-        if (dc->frame_buf == dc->disp_buf_1)
-        {
-            dc->frame_buf = dc->disp_buf_2;
-        }
-        else
-        {
-            dc->frame_buf = dc->disp_buf_1;
-        }
-        memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
 
-        obj_draw_scan(root);
-        if (dc->lcd_draw_sync != NULL)
-        {
-            dc->lcd_draw_sync();
-        }
-        dc->lcd_update(dc);
-    }
 }
 
 uint32_t gui_fps()
@@ -385,6 +370,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         dc->lcd_frame_monitor->input_prepare_cb();
     }
     obj_draw_prepare(root);
+
     if (dc->lcd_frame_monitor)
     {
         dc->lcd_frame_monitor->draw_prepare_cb();
@@ -416,10 +402,12 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     }
 
     obj_draw_end(root);
+
+    gui_obj_event_dispatch(enable_event);
+
     gui_obj_count = obj_count;
     obj_count = 0;
 
-    gui_obj_event_dispatch(enable_event);
     dc->frame_count++;
 
     if (dc->lcd_frame_monitor)

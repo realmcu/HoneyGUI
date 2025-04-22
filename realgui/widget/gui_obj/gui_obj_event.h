@@ -83,7 +83,7 @@ void gui_obj_add_event_cb(void           *obj,
   * }
   * \endcode
   */
-bool gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code);
+void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event_code);
 
 /**
  * @brief this_widget API only for Widget, not for Application.

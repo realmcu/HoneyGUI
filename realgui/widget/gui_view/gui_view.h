@@ -37,29 +37,69 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-typedef struct
-{
-    int8_t x;
-    int8_t y;
-} gui_view_id_t;
-
 /* VIEW_SWITCH_STYLE enum start*/
 typedef enum
 {
-    VIEW_STILL            = 0x0000, ///< Overlay effect with new view transplate in
-    VIEW_TRANSPLATION     = 0x0001, ///< Transplate from the slide direction
-    VIEW_REDUCTION        = 0x0002, ///< Zoom in from the slide direction
-    VIEW_ROTATE           = 0x0003, ///< Rotate in from the slide direction
-    VIEW_CUBE             = 0x0004, ///< Rotate in from the slide direction like cube
-    VIEW_ANIMATION_NULL   = 0x0005,
-    VIEW_ANIMATION_1,               ///< Recommended for startup
-    VIEW_ANIMATION_2,               ///< Recommended for startup
-    VIEW_ANIMATION_3,               ///< Recommended for startup
-    VIEW_ANIMATION_4,               ///< Recommended for startup
-    VIEW_ANIMATION_5,               ///< Recommended for startup
-    VIEW_ANIMATION_6,               ///< Recommended for shutdown
-    VIEW_ANIMATION_7,               ///< Recommended for shutdown
-    VIEW_ANIMATION_8,               ///< Recommended for shutdown
+    SWITCH_INIT_STATE = 0x0000, ///< Switch out to left
+
+
+    SWITCH_OUT_TO_LEFT_USE_TRANSLATION = 0x0100, ///< Switch out to left with transition effect
+    SWITCH_OUT_TO_RIGHT_USE_TRANSLATION, ///< Switch out to right with transition effect
+    SWITCH_OUT_TO_TOP_USE_TRANSLATION, ///< Switch out to top with transition effect
+    SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION, ///< Switch out to bottom with transition effect
+
+    SWITCH_IN_FROM_LEFT_USE_TRANSLATION, ///< Switch in from left with transition effect
+    SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, ///< Switch in from right with transition effect
+    SWITCH_IN_FROM_TOP_USE_TRANSLATION, ///< Switch in from top with transition effect
+    SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION, ///< Switch in from bottom with transition effect
+    SWITCH_IN_FROM_TOP_RIGHT_USE_TRANSLATION,
+    SWITCH_IN_CENTER_ZOOM_FADE,
+
+
+    SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0200, ///< Switch in from left with cube effect
+    SWITCH_IN_FROM_RIGHT_USE_CUBE, ///< Switch in from right with cube effect
+    SWITCH_IN_FROM_TOP_USE_CUBE, ///< Switch in from top with cube effect
+    SWITCH_IN_FROM_BOTTOM_USE_CUBE, ///< Switch in from bottom with cube effect
+
+    SWITCH_OUT_TO_LEFT_USE_CUBE, ///< Switch out to left with cube effect
+    SWITCH_OUT_TO_RIGHT_USE_CUBE, ///< Switch out to right with cube effect
+    SWITCH_OUT_TO_TOP_USE_CUBE, ///< Switch out to top with cube effect
+    SWITCH_OUT_TO_BOTTOM_USE_CUBE, ///< Switch out to bottom with cube effect
+
+
+    SWITCH_IN_FROM_LEFT_USE_ROTATE = 0x0300, ///< Switch in from left with rotate effect
+    SWITCH_IN_FROM_RIGHT_USE_ROTATE, ///< Switch in from right with rotate effect
+    SWITCH_IN_FROM_TOP_USE_ROTATE, ///< Switch in from top with rotate effect
+    SWITCH_IN_FROM_BOTTOM_USE_ROTATE, ///< Switch in from bottom with rotate effect
+
+    SWITCH_OUT_TO_LEFT_USE_ROTATE, ///< Switch out to left with rotate effect
+    SWITCH_OUT_TO_RIGHT_USE_ROTATE, ///< Switch out to right with rotate effect
+    SWITCH_OUT_TO_TOP_USE_ROTATE, ///< Switch out to top with rotate effect
+    SWITCH_OUT_TO_BOTTOM_USE_ROTATE, ///< Switch out to bottom with rotate effect
+
+    SWITCH_IN_FROM_LEFT_USE_REDUCTION = 0x0400, ///< Switch in from left with reduction effect
+    SWITCH_IN_FROM_RIGHT_USE_REDUCTION, ///< Switch in from right with reduction effect
+    SWITCH_IN_FROM_TOP_USE_REDUCTION, ///< Switch in from top with reduction effect
+    SWITCH_IN_FROM_BOTTOM_USE_REDUCTION, ///< Switch in from bottom with reduction effect
+
+    SWITCH_OUT_TO_LEFT_USE_REDUCTION, ///< Switch out to left with reduction effect
+    SWITCH_OUT_TO_RIGHT_USE_REDUCTION, ///< Switch out to right with reduction effect
+    SWITCH_OUT_TO_TOP_USE_REDUCTION, ///< Switch out to top with reduction effect
+    SWITCH_OUT_TO_BOTTOM_USE_REDUCTION, ///< Switch out to bottom with reduction effect
+
+
+    SWITCH_OUT_NONE_ANIMATION = 0x0500, ///< No animation
+    SWITCH_OUT_ANIMATION_ZOOM,
+    SWITCH_OUT_ANIMATION_FADE,
+    SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+    SWITCH_IN_NONE_ANIMATION,           ///< No animation
+    SWITCH_IN_ANIMATION_ZOOM,
+    SWITCH_IN_ANIMATION_FADE,
+    SWITCH_IN_ANIMATION_MOVE_FADE,
+    SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT,
+    SWITCH_IN_ANIMATION_BOUNCE_FROM_RIGHT,
+
+
 } VIEW_SWITCH_STYLE;
 /* VIEW_SWITCH_STYLE enum end*/
 
@@ -73,27 +113,12 @@ struct gui_view_on_event;
 typedef struct gui_view
 {
     gui_obj_t base;
-    int16_t release_x;
-    int16_t release_y;
-    gui_animate_t *animate;
-    gui_view_id_t cur_id;
-    VIEW_SWITCH_STYLE style;
+    uint16_t animate_step;
+    uint8_t opacity;
+
+    VIEW_SWITCH_STYLE current_transition_style;
+    gui_event_t current_event;
     const struct gui_view_descriptor *descriptor;
-
-    uint32_t switch_in_done          : 1; // 1: view switch in done
-    uint32_t supressed_event_flag    : 1; // 1: stop setting event
-    uint32_t supressed_tp_flag       : 1; // 1: enable to update release
-
-    uint32_t moveback_flag           : 1; // 1: move to the opposite direction
-
-    uint32_t view_left               : 1;
-    uint32_t view_right              : 1;
-    uint32_t view_up                 : 1;
-    uint32_t view_down               : 1;
-    uint32_t view_click              : 1;
-    uint32_t view_touch_long         : 1;
-    uint32_t view_button             : 1;
-    uint32_t view_button_long        : 1;
 
     struct gui_view_on_event **on_event;
     uint8_t on_event_num;
@@ -211,13 +236,27 @@ void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *desc
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style);
 
+/**
+ * @brief Set view animate step.
+ * @param _this Pointer to view.
+ * @param step Animate step.
+ */
+void gui_view_set_animate_step(gui_view_t *_this, uint16_t step);
+
+/**
+ * @brief Set view opacity.
+ * @param _this Pointer to view.
+ * @param opacity
+ */
+void gui_view_set_opacity(gui_view_t *this, uint8_t opacity);
+
 
 /**
  * @brief Get current view pointer.
  *
  * @return return current view pointer.
  */
-gui_view_t *gui_view_get_current_view(void);
+gui_view_t *gui_view_get_current(void);
 
 #ifdef __cplusplus
 }

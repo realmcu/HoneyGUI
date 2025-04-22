@@ -20,6 +20,7 @@
 static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *yellow_view_descriptor = NULL;
 static const gui_view_descriptor_t *white_view_descriptor = NULL;
+static const gui_view_descriptor_t *lime_view_descriptor = NULL;
 static void switch_in_cb(gui_view_t *view);
 static void switch_out_cb(gui_view_t *view);
 
@@ -49,6 +50,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     /* you can get other view descriptor point here */
     yellow_view_descriptor = gui_view_descriptor_get("yellow_view");
     white_view_descriptor = gui_view_descriptor_get("white_view");
+    lime_view_descriptor = gui_view_descriptor_get("lime_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -77,27 +79,30 @@ static void switch_out_cb(gui_view_t *view)
 
 static void switch_in_cb(gui_view_t *view)
 {
-    gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 0, 0, 0,
-                                             0);
-    gui_img_scale(img, 1.875f, 2.034f);
-    gui_img_set_mode(img, IMG_BYPASS_MODE);
+    gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 200, 200, 0, 0);
 
-    gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_CUBE, VIEW_CUBE,
+
+    gui_view_switch_on_event(view, yellow_view_descriptor, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+                             SWITCH_IN_FROM_LEFT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, white_view_descriptor, VIEW_STILL, VIEW_TRANSPLATION,
+    gui_view_switch_on_event(view, white_view_descriptor, SWITCH_OUT_TO_LEFT_USE_CUBE,
+                             SWITCH_IN_FROM_RIGHT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, white_view_descriptor, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, yellow_view_descriptor, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+                             SWITCH_IN_CENTER_ZOOM_FADE,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, lime_view_descriptor, SWITCH_INIT_STATE,
+                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, white_view_descriptor, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
+    gui_view_switch_on_event(view, white_view_descriptor, SWITCH_OUT_ANIMATION_ZOOM,
+                             SWITCH_IN_ANIMATION_ZOOM,
                              GUI_EVENT_TOUCH_CLICKED);
-    gui_view_switch_on_event(view, yellow_view_descriptor, VIEW_ANIMATION_7, VIEW_ANIMATION_3,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+
+
 }
 
 static int app_init(void)

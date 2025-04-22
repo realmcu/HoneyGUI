@@ -57,32 +57,39 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void img_cb()
 {
-    gui_view_switch_direct(current_view, yellow_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2);
+    gui_view_switch_direct(current_view, blue_view, SWITCH_OUT_ANIMATION_ZOOM,
+                           SWITCH_IN_ANIMATION_ZOOM);
 }
 
 static void app_ui_view_white_design(gui_view_t *view)
 {
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_white, 0, 0, 0,
                                              0);
-    gui_img_scale(img, 1.875f, 2.034f);
-    gui_img_set_mode(img, IMG_BYPASS_MODE);
+
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_view_switch_on_event(view, blue_view, VIEW_REDUCTION, VIEW_REDUCTION,
+    gui_view_switch_on_event(view, blue_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+                             SWITCH_IN_FROM_LEFT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, yellow_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_LEFT);
+    gui_view_switch_on_event(view, yellow_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+                             SWITCH_IN_FROM_RIGHT_USE_ROTATE,
+                             GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, yellow_view, VIEW_STILL, VIEW_TRANSPLATION,
+    gui_view_switch_on_event(view, blue_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, blue_view, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, yellow_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, blue_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2,
-                             GUI_EVENT_KB_SHORT_CLICKED);
-    gui_view_switch_on_event(view, blue_view, VIEW_ANIMATION_6, VIEW_ANIMATION_2,
+    gui_view_switch_on_event(view, yellow_view, SWITCH_OUT_ANIMATION_ZOOM,
+                             SWITCH_IN_ANIMATION_ZOOM,
                              GUI_EVENT_TOUCH_CLICKED);
+
+    gui_view_set_animate_step(view, 10);
+
 }
 /* view white end*/
 
