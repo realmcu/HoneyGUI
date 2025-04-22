@@ -22,6 +22,7 @@
 #include "gui_obj.h"
 #include "gui_matrix.h"
 #include "gui_api.h"
+#include "def_type.h"
 
 /*============================================================================*
  *                           Types
@@ -247,75 +248,63 @@ bool gui_obj_out_screen(gui_obj_t *obj)
 void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect)
 {
 #define MAX_OBJ_LIST 20
-    gui_obj_t *obj_list[MAX_OBJ_LIST];
-    gui_rect_t absolute_rect_list[MAX_OBJ_LIST];
-    gui_rect_t relative_rect_list[MAX_OBJ_LIST];
+    gui_obj_t *obj_list[MAX_OBJ_LIST] = {NULL};
+    gui_rect_t rect_list[MAX_OBJ_LIST];
+    gui_rect_t clip_rect_list[MAX_OBJ_LIST];
+
     uint32_t i = 0;
     uint32_t j = 0;
     for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
     {
         obj_list[i++] = o;
     }
-    for (j = 0; j < i; j++)
-    {
-        relative_rect_list[j].x1 = obj_list[i - 1 - j]->x;
-        relative_rect_list[j].y1 = obj_list[i - 1 - j]->y;
-        relative_rect_list[j].x2 = obj_list[i - 1 - j]->x + obj_list[j]->w - 1;
-        relative_rect_list[j].y2 = obj_list[i - 1 - j]->y + obj_list[j]->h - 1;
-    }
-    int16_t x1_max = 0;
-    int16_t y1_max = 0;
-    int16_t x2_min = 0;
-    int16_t y2_min = 0;
-    for (j = 0; j < i; j++)
-    {
 
-        if (j == 0)
-        {
-            absolute_rect_list[j].x1 = relative_rect_list[j].x1;
-            absolute_rect_list[j].y1 = relative_rect_list[j].y1;
-            absolute_rect_list[j].x2 = absolute_rect_list[j].x1 + relative_rect_list[j].x2 -
-                                       relative_rect_list[j].x1;
-            absolute_rect_list[j].y2 = absolute_rect_list[j].y1 + relative_rect_list[j].y2 -
-                                       relative_rect_list[j].y1;
-            x1_max = absolute_rect_list[j].x1;
-            y1_max = absolute_rect_list[j].y1;
-            x2_min = absolute_rect_list[j].x2;
-            y2_min = absolute_rect_list[j].y2;
-        }
-        else
-        {
-            absolute_rect_list[j].x1 = absolute_rect_list[j - 1].x1 + relative_rect_list[j].x1;
-            absolute_rect_list[j].y1 = absolute_rect_list[j - 1].y1 + relative_rect_list[j].y1;
-            absolute_rect_list[j].x2 = absolute_rect_list[j].x1 + relative_rect_list[j].x2 -
-                                       relative_rect_list[j].x1;
-            absolute_rect_list[j].y2 = absolute_rect_list[j].y1 + relative_rect_list[j].y2 -
-                                       relative_rect_list[j].y1;
-            if (absolute_rect_list[j].x1 > x1_max)
-            {
-                x1_max = absolute_rect_list[j].x1;
-            }
-            if (absolute_rect_list[j].y1 > y1_max)
-            {
-                y1_max = absolute_rect_list[j].y1;
-            }
-            if (absolute_rect_list[j].x2 < x2_min)
-            {
-                x2_min = absolute_rect_list[j].x2;
-            }
-            if (absolute_rect_list[j].y2 < y2_min)
-            {
-                y2_min = absolute_rect_list[j].y2;
-            }
-        }
-
+    for (uint32_t k = 0; k < i / 2; k++)
+    {
+        gui_obj_t *temp = obj_list[k];
+        obj_list[k] = obj_list[i - 1 - k];
+        obj_list[i - 1 - k] = temp;
     }
 
 
-    rect->x1 = x1_max - absolute_rect_list[0].x1;
-    rect->y1 = y1_max - absolute_rect_list[0].y1;
-    rect->x2 = x2_min - absolute_rect_list[0].x1;
-    rect->y2 = y2_min - absolute_rect_list[0].y1;
+    rect_list[0].x1 = obj_list[0]->x;
+    rect_list[0].y1 = obj_list[0]->y;
+    rect_list[0].x2 = obj_list[0]->x + obj_list[0]->w - 1;
+    rect_list[0].y2 = obj_list[0]->y + obj_list[0]->h - 1;
+
+    clip_rect_list[0].x1 = obj_list[0]->x;
+    clip_rect_list[0].y1 = obj_list[0]->y;
+    clip_rect_list[0].x2 = obj_list[0]->x + obj_list[0]->w - 1;
+    clip_rect_list[0].y2 = obj_list[0]->y + obj_list[0]->h - 1;
+
+    for (j = 1; j < i; j++)
+    {
+        rect_list[j].x1 = obj_list[j]->x + rect_list[j - 1].x1;
+        rect_list[j].y1 = obj_list[j]->y + rect_list[j - 1].y1;
+        rect_list[j].x2 = obj_list[j]->x + rect_list[j - 1].x1 + obj_list[j]->w - 1;
+        rect_list[j].y2 = obj_list[j]->y + rect_list[j - 1].y1 + obj_list[j]->h - 1;
+
+        clip_rect_list[j].x1 = _UI_MAX(rect_list[j - 1].x1, rect_list[j].x1);
+        clip_rect_list[j].y1 = _UI_MAX(rect_list[j - 1].y1, rect_list[j].y1);
+        clip_rect_list[j].x2 = _UI_MIN(rect_list[j - 1].x2, rect_list[j].x2);
+        clip_rect_list[j].y2 = _UI_MIN(rect_list[j - 1].y2, rect_list[j].y2);
+    }
+    j  = j - 1;
+    rect->x1 = clip_rect_list[j].x1 - rect_list[j].x1;
+    rect->y1 = clip_rect_list[j].y1 - rect_list[j].y1;
+    int16_t w = clip_rect_list[j].x2 - clip_rect_list[j].x1;
+    int16_t h = clip_rect_list[j].y2 - clip_rect_list[j].y1;
+    if (w < 0)
+    {
+        w = 0;
+    }
+    if (h < 0)
+    {
+        h = 0;
+    }
+    rect->x2 = rect->x1 + w;
+    rect->y2 = rect->y1 + h;
+
 }
 
 void gui_obj_get_area(gui_obj_t *obj,

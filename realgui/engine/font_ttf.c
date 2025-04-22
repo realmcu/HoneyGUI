@@ -22,6 +22,7 @@
 #include "font_mem.h"
 #include <stddef.h>
 #include <math.h>
+#include "font_rendering_utils.h"
 
 
 /*============================================================================*

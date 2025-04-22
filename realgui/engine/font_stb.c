@@ -19,6 +19,7 @@
  *============================================================================*/
 #include "draw_font.h"
 #include "font_stb.h"
+#include "font_rendering_utils.h"
 
 /*stb truetype function macro*/
 

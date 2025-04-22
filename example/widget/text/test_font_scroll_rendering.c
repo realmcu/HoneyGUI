@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file test_font_bitmap_img_rendering.c
+  * @file test_font_scroll_rendering.c
   * @brief font rendering test
   * @details
   * @author luke_sun@realsil.com.cn
@@ -31,7 +31,7 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "test_font_bitmap_img_rendering"
+#define CURRENT_VIEW_NAME "test_font_scroll_rendering"
 #define FONT_NUM 4
 
 /*============================================================================*
@@ -51,13 +51,6 @@ static const gui_view_descriptor_t descriptor =
     .on_switch_in = ui_text_font,
     .on_switch_out = NULL,
 };
-static char *text_string[FONT_NUM] =
-{
-    "abcdefg",
-    "1234567",
-    "!@#$%^&",
-    "QWERTYU",
-};
 
 /*============================================================================*
  *                           Private Functions
@@ -71,70 +64,53 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static int gui_view_get_other_view_descriptor_init(void)
 {
-    left_view = gui_view_descriptor_get("test_font_bitmap_matrix_img_rendering");
-    right_view = gui_view_descriptor_get("test_font_scroll_rendering");
+    left_view = gui_view_descriptor_get("test_font_bitmap_img_rendering");
+    right_view = gui_view_descriptor_get("test_font_bitmap_normal_rendering");
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void ui_text_font(gui_view_t *view)
 {
-    gui_color_t color[FONT_NUM];
-    color[0] = APP_COLOR_WHITE;
-    color[1] = APP_COLOR_RED;
-    color[2] = APP_COLOR_GREEN;
-    color[3] = APP_COLOR_BLUE;
-    gui_text_t *text1[FONT_NUM];
-    gui_text_t *text2[FONT_NUM];
-    gui_text_t *text4[FONT_NUM];
-    gui_text_t *text8[FONT_NUM];
-    GUI_FormatType cf[4] = {RGB565, RGB888, ARGB8565, ARGB8888};
     struct gui_dispdev *dc = gui_get_dc();
     uint32_t font_size = 32;
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text1[i] = gui_text_create(view, "text1", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 0 / 2, 300, font_size);
-        gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text1[i], font32b1, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(text1[i], cf[i]);
-    }
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text2[i] = gui_text_create(view, "text2", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 1 / 2, 300, font_size);
-        gui_text_set(text2[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text2[i], font32b2, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(text2[i], cf[i]);
-    }
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text4[i] = gui_text_create(view, "text4", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 2 / 2, 300, font_size);
-        gui_text_set(text4[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text4[i], font32b4, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(text4[i], cf[i]);
-    }
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text8[i] = gui_text_create(view, "text8", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 3 / 2, 300, font_size);
-        gui_text_set(text8[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text8[i], font32b8, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(text8[i], cf[i]);
-    }
+
+    gui_scroll_text_t *scroll_text1 = gui_scroll_text_create(view, "scroll_text1", 50, 0, 200, 32);
+    gui_scroll_text_set(scroll_text1, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                        strlen(descriptor.name), font_size);
+    gui_scroll_text_type_set(scroll_text1, font32b1, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(scroll_text1, SCROLL_X, 100, 100, 3000, 0);
+
+    gui_scroll_text_t *scroll_text2 = gui_scroll_text_create(view, "scroll_text2", 50, 50, 200, 32);
+    gui_scroll_text_set(scroll_text2, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                        strlen(descriptor.name), font_size);
+    gui_scroll_text_type_set(scroll_text2, font32b2, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(scroll_text2, SCROLL_X, 100, 100, 3000, 0);
+
+    gui_scroll_text_t *scroll_text3 = gui_scroll_text_create(view, "scroll_text3", 50, 100, 200, 32);
+    gui_scroll_text_set(scroll_text3, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                        strlen(descriptor.name), font_size);
+    gui_scroll_text_type_set(scroll_text3, font32b4, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(scroll_text3, SCROLL_X, 100, 100, 3000, 0);
+
+    gui_scroll_text_t *scroll_text4 = gui_scroll_text_create(view, "scroll_text4", 50, 150, 200, 32);
+    gui_scroll_text_set(scroll_text4, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                        strlen(descriptor.name), font_size);
+    gui_scroll_text_type_set(scroll_text4, font32b8, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(scroll_text4, SCROLL_X, 100, 100, 3000, 0);
+
+    gui_scroll_text_t *scroll_text5 = gui_scroll_text_create(view, "scroll_text5", 50, 200, 200, 32);
+    gui_scroll_text_set(scroll_text5, (void *)descriptor.name, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+                        strlen(descriptor.name), font_size);
+    gui_scroll_text_type_set(scroll_text5, font32vb4, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(scroll_text5, SCROLL_X, 100, 100, 3000, 0);
+
 
     gui_text_t *test_name = gui_text_create(view, "test_name", 0, dc->screen_height - font_size,
                                             dc->screen_width, font_size);
     gui_text_set(test_name, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(descriptor.name), font_size);
     gui_text_type_set(test_name, font32b2, FONT_SRC_MEMADDR);
-    gui_text_convert_to_img(test_name, ARGB8565);
-
 
     gui_view_switch_on_event(view, left_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_RIGHT);
     gui_view_switch_on_event(view, right_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_LEFT);

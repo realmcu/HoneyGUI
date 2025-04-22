@@ -36,7 +36,7 @@ extern "C" {
 #include "gui_components_init.h"
 #include "gui_text.h"
 #include "gui_view.h"
-
+#include "gui_scroll_text.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/

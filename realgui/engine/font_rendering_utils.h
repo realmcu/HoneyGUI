@@ -1,6 +1,24 @@
-/*
- * File      : font_rendering_utils.h
- */
+/**
+ \internal
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file font_rendering_utils.h
+  * @brief
+  * @details
+  * @author luke_sun@realsil.com.cn
+  * @date 2025/04/17
+  * @version v1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+ \endinternal
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __FONT_RENDERING_UTILES_H__
 #define __FONT_RENDERING_UTILES_H__
 #ifdef __cplusplus
@@ -8,8 +26,58 @@ extern "C" {
 #endif
 
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <string.h>
 #include "def_color.h"
 #include "def_list.h"
+#include "def_type.h"
+#include "draw_img.h"
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+typedef struct draw_font
+{
+    uint8_t render_mode;
+
+    gui_color_t color;
+    gui_rect_t clip_rect;
+
+    uint8_t *target_buf;
+    gui_rect_t target_rect;
+    uint16_t target_buf_stride;
+    GUI_FormatType target_format;
+
+    // gui_matrix_t transform;
+    // BLEND_MODE_TYPE blend_mode;
+} draw_font_t;
+
+typedef struct font_glyph
+{
+    uint8_t *data;
+    int16_t pos_x;
+    int16_t pos_y;
+    uint16_t width;
+    uint16_t height;
+    uint16_t stride;
+} font_glyph_t;
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
 
 // Fast RGB565 pixel blending
 // Found in a pull request for the Adafruit framebuffer library. Clever!
@@ -57,6 +125,26 @@ gui_inline uint16_t rgba2565(gui_color_t rgba)
     uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
     return red + gre + blu;
 }
+
+/**
+ * @brief Render glyph to target buffer
+ *
+ * @param font Font rendering context containing color, clipping rect, target buffer config
+ * @param glyph Glyph data including bitmap, position and dimensions
+ */
+void font_glyph_render(draw_font_t *font, font_glyph_t *glyph);
+
+/**
+ * @brief Get bit depth for given color format
+ *
+ * @param cf Color format type, supported values:
+ *          - RGB565     : 16-bit (5-6-5)
+ *          - ARGB8565   : 24-bit (8-5-6-5)
+ *          - RGB888     : 24-bit (8-8-8)
+ *          - ARGB8888   : 32-bit (8-8-8-8)
+ * @return uint8_t Corresponding bit depth (16/24/32), returns 0 for unsupported formats
+ */
+uint8_t font_get_bitdepth_by_cf(GUI_FormatType cf);
 
 #ifdef __cplusplus
 }

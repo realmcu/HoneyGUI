@@ -2,6 +2,7 @@
 #include "font_freetype.h"
 #include "gui_api.h"
 #include <math.h>
+#include "font_rendering_utils.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
