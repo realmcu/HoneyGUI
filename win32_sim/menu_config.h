@@ -59,6 +59,10 @@
 #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>
 
+// <c> RTK GUI List Demo
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_LIST_WIDGET
+// </c>
+
 // <c> RTK GUI Paint Engine Demo
 // #define CONFIG_REALTEK_BUILD_REAL_PAINTENGINE
 // </c>

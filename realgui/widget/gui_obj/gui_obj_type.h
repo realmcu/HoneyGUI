@@ -110,6 +110,7 @@ typedef enum t_obj_type
     MACRO_ONCOMPLETE,
     MACRO_KEY,
     MACRO_ONSELECT,
+    LIST,
 } T_OBJ_TYPE;
 typedef enum
 {
