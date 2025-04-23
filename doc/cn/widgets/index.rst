@@ -56,6 +56,8 @@
     3D模型 (3D Model) <gui_3D>
     视图 (View) <gui_view>
     列表 (List) <gui_list>
+    画布 (Canvas) <gui_canvas>
+
 
 .. 窗口 (Window) <gui_window>
 .. 简单图像 (Simple Img) <gui_simple_img>

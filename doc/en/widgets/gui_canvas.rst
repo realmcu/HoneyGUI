@@ -2,111 +2,149 @@
 Canvas
 ==========
 
-The canvas widget is the basic widget used to drawing graphics in nanovg.
-
-.. warning::
-
-    Sufficient memory is needed to open a framebuffer.
-
-
-Usage
-------------
-Creat Canvas
-~~~~~~~~~~~~~
-:cpp:any:`gui_canvas_create` creates a canvas.
-
-Add Callback Function
-~~~~~~~~~~~~~~~~~~~~~~
-:cpp:any:`gui_canvas_set_canvas_cb` sets the callback function for drawing specific shapes.
-
-Example
-------------
-Rounded Rectangle
-~~~~~~~~~~~~~~~~~~
-
-A simple example of drawing three rounded rectangles of different colors.
-
-* Three color refer to `Colors' RGB Data <https://www.rapidtables.com/web/color/RGB_Color.html>`_.
-* ``firebrick``
-* ``olive drab``
-* ``dodger blue`` with 100 value opacity
-
-.. code-block:: c
-
-    #include "gui_canvas.h"
-    static void canvas_cb(gui_canvas_t *canvas)
-    {
-        nvgRoundedRect(canvas->vg, 10, 10, 348, 200, 30);
-        nvgFillColor(canvas->vg, nvgRGB(178,34,34));
-        nvgFill(canvas->vg);
-        nvgBeginPath(canvas->vg);
-        nvgRoundedRect(canvas->vg, 10, 220, 348, 200, 30);
-        nvgFillColor(canvas->vg, nvgRGB(107,142,35));
-        nvgFill(canvas->vg);
-        nvgBeginPath(canvas->vg);
-        nvgRoundedRect(canvas->vg, 110, 125, 148, 200, 30);
-        nvgFillColor(canvas->vg, nvgRGBA(30,144,255, 100));
-        nvgFill(canvas->vg);
-    }
-    static void app_ui_design(gui_app_t *app)
-    {
-        gui_canvas_t *canvas = gui_canvas_create(&(app->screen), "canvas", 0, 0, 0, 368, 448);
-        gui_canvas_set_canvas_cb(canvas, canvas_cb);
-    }
-
-
-.. figure:: https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png
-   :align: center
-   :width: 400px
-
-Arc Animation
-~~~~~~~~~~~~~
-
-An example of drawing an arc animation. ``arc_cb`` will be triggered every frame.
-
-.. code-block:: c
-
-    #include "math.h"
-    #include "gui_canvas.h"
-    static void arc_cb(gui_canvas_t *canvas)
-    {
-        static float  progress;
-        progress +=0.01;
-        nvgArc(canvas->vg, 368/2, 448/2, 150, 0, 3.14*(sinf(progress)+1), NVG_CCW);
-        nvgStrokeWidth(canvas->vg, 20);
-        nvgStrokeColor(canvas->vg, nvgRGB(178,34,34));
-        nvgStroke(canvas->vg);
-    }
-    static void app_ui_design(gui_app_t *app)
-    {
-        gui_canvas_t *canvas = gui_canvas_create(&(app->screen), "canvas", 0, 0, 0, 368, 448);
-        gui_canvas_set_canvas_cb(canvas, arc_cb);
-    }
-
+The Canvas widget provides 2D graphics rendering capabilities based on NanoVG, supporting software-accelerated rendering and multiple image output formats.
 
 .. raw:: html
 
-    <br/>
-    <div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/canvas_arc.gif"></div>
-    <br/>
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1745388769584294665/63042bc7_13406851.gif" width="500" />
+   </div>
+   <br>
 
-API
+.. warning::
+
+   Before usage, ensure: Sufficient frame buffer memory.
+
+Overview
+--------
+GUI Canvas is a 2D drawing component based on NanoVG, providing:
+
+- Basic shape drawing (rectangles, circles, arcs, etc.)
+- Support for RGBA/RGB565/PNG/JPG output formats
+- NanoVG software-accelerated rendering (via AGGE backend)
+- Direct buffer output functionality
+- Blank buffer initialization support
+
+Core Features
 ------------
-Nanovg API
-~~~~~~~~~~~~~
-Please refer to
 
-`Nanovg Introduction`_
+Creation & Initialization
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Nanovg Introduction: https://openplanet.dev/docs/tutorials/nanovg-introduction
+1. Using ``gui_canvas_create`` function
 
-`Nanovg Github`_
+   Creates a NanoVG-based canvas widget and returns a pointer to the canvas object.
 
-.. _Nanovg Github: https://github.com/memononen/nanovg
+   .. code-block:: c
+   
+       // Example: Create 200x200 canvas
+       gui_canvas_t* canvas = gui_canvas_create(
+           parent,     // Parent widget pointer
+           "my_canvas", // Canvas name
+           NULL,       // Reserved parameter
+           0, 0,       // x,y coordinates
+           200, 200    // width,height
+       );
+       
+       if (canvas == NULL) {
+           // Error handling
+       }
 
-RealGUI API
-~~~~~~~~~~~~~
+2. Using ``gui_canvas_set_canvas_cb`` to set drawing callback
+
+   Sets the redraw callback function that gets called when canvas needs refreshing.
+
+   .. code-block:: c
+   
+       // Example drawing function
+       static void my_draw_function(gui_canvas_t* canvas) {
+           NVGcontext* vg = canvas->vg;
+           
+           // Draw red rectangle
+           nvgBeginPath(vg);
+           nvgRect(vg, 50, 50, 100, 100);
+           nvgFillColor(vg, nvgRGBA(255, 0, 0, 255));
+           nvgFill(vg);
+       }
+       
+       // Set callback
+       gui_canvas_set_canvas_cb(canvas, my_draw_function);
+
+
+Manual Refresh:
+Set canvas->render = 1 to manually trigger redraw (callback will be called next frame).
+
+Image Output
+~~~~~~~~~~~~
+
+1. Using ``gui_canvas_output`` (dynamically allocated buffer)
+
+   Allocates memory and returns rendering result, suitable for one-time output.
+
+   .. code-block:: c
+   
+       // Example: Output PNG image
+       const uint8_t* png_data = gui_canvas_output(
+           GUI_CANVAS_OUTPUT_PNG,
+           false,  // PNG doesn't support compression
+           640, 480,
+           my_render_func);
+       
+       // Must free memory after use
+       free((void*)png_data);
+
+2. Using ``gui_canvas_output_buffer`` (pre-allocated buffer)
+
+   Requires pre-allocated buffer, suitable for repeated rendering or memory-constrained scenarios.
+
+   .. code-block:: c
+   
+       // Example: Output to RGBA buffer
+       uint8_t buffer[640*480*4]; // RGBA requires width*height*4 bytes
+       gui_canvas_output_buffer(
+           GUI_CANVAS_OUTPUT_RGBA,
+           false,   
+           640, 480,
+           my_render_func,
+           buffer);
+
+3. Using ``gui_canvas_output_buffer_blank`` and ``gui_canvas_output_buffer_blank_close``
+
+   This pair of functions creates and destroys blank canvas contexts, suitable for multiple rendering operations.
+
+   .. code-block:: c
+   
+       // Example: Create blank canvas
+       uint8_t buffer[480*480*4];
+       NVGcontext* vg = gui_canvas_output_buffer_blank(
+           GUI_CANVAS_OUTPUT_RGBA,
+           false,
+           480, 480,
+           buffer);
+       
+       // Draw on blank canvas
+       nvgBeginPath(vg);
+       nvgRect(vg, 100, 100, 200, 200);
+       nvgFillColor(vg, nvgRGBA(255,0,0,255));
+       nvgFill(vg);
+       
+       // Close canvas when done
+       gui_canvas_output_buffer_blank_close(vg);
+
+Example Code
+------------
+
+Complete card view usage example:
+
+Enable macro ``CONFIG_REALTEK_BUILD_CANVAS`` in :file:`menu_config.h` to run this example.
+
+.. literalinclude:: ../../../example/widget/canvas/example_gui_canvas.c
+   :language: c
+   :start-after: /* canvas example start */
+   :end-before: /* canvas example end */
+
+API Reference
+--------------
 
 .. doxygenfile:: gui_canvas.h
-
-

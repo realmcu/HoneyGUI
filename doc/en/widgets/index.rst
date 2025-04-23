@@ -55,6 +55,7 @@ Widgets
     3D Model <gui_3D>
     View <gui_view>
     List <gui_list>
+    Canvas <gui_canvas>
 
 .. Window <gui_window>
 .. Simple Img <gui_simple_img>
