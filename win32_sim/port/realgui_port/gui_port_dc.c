@@ -56,16 +56,33 @@ int32_t sim_get_hight(void)
 static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, uint16_t yStart,
                               uint16_t w, uint16_t h)
 {
+    uint32_t x1 = xStart;
+    uint32_t y1 = yStart;
+    uint32_t x2 = xStart + w;
+    uint32_t y2 = yStart + h;
 #if (DRV_PIXEL_BITS == 32)
     uint32_t *read = (uint32_t *)input;
     uint32_t *write = (uint32_t *)output;
-#else
+#elif (DRV_PIXEL_BITS == 16)
     uint16_t *read = (uint16_t *)input;
     uint16_t *write = (uint16_t *)output;
+#elif (DRV_PIXEL_BITS == 8)
+    uint8_t *read = (uint8_t *)input;
+    uint8_t *write = (uint8_t *)output;
+#elif (DRV_PIXEL_BITS == 4)
+    uint8_t *read = (uint8_t *)input;
+    uint8_t *write = (uint8_t *)output;
+    x1 = x1 / 2;
+    x2 = x2 / 2;
+    y1 = y1 / 2;
+    y2 = y2 / 2;
+#else
+    uint32_t *read = (uint32_t *)input;
+    uint32_t *write = (uint32_t *)output;
 #endif
-    for (uint32_t i = yStart; i < (h + yStart); i++)
+    for (uint32_t i = y1; i < y2; i++)
     {
-        for (uint32_t j = xStart; j < (w + xStart); j++)
+        for (uint32_t j = x1; j < x2; j++)
         {
             write[i * sim_get_width() + j] = *read;
             read++;

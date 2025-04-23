@@ -37,6 +37,11 @@ typedef enum
     PNG = 13,
     GIF = 14,
     RTKARGB8565 = 15,
+
+    ALPHA1BIT = 0X20, /*Gray 2*/
+    ALPHA2BIT = 0X21, /*Gray 4*/
+    ALPHA4BIT = 0X22, /*Gray 16*/
+    ALPHA8BIT = 0X23, /*Gray 256*/
 } GUI_FormatType;
 
 /* BLEND_MODE_TYPE structure start*/

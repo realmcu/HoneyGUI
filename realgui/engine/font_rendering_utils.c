@@ -463,6 +463,29 @@ static void font_render_8bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
         }
     }
 }
+
+static void font_render_8bpp_to_ALPHA8BIT(draw_font_t *font, font_glyph_t *glyph)
+{
+    uint8_t *dots = glyph->data;
+    uint8_t *writebuf = (uint8_t *)font->target_buf;
+    uint8_t ppb = 1; //pixel_per_byte = 8 / rendor_mode
+    uint32_t write_stride = font->target_buf_stride;
+    uint32_t dots_stride = glyph->stride / ppb;
+    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride;
+        int dots_off = (i - glyph->pos_y) * dots_stride;
+
+        memcpy(&writebuf[write_off + font->clip_rect.x1 - font->target_rect.x1],
+               &dots[dots_off + font->clip_rect.x1 - glyph->pos_x],
+               font->clip_rect.x2 - font->clip_rect.x1 + 1);
+        // for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        // {
+        //     uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
+        //     writebuf[write_off + j - font->target_rect.x1] = alpha;
+        // }
+    }
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -544,6 +567,9 @@ void font_glyph_render(draw_font_t *font, font_glyph_t *glyph)
             break;
         case ARGB8888:
             font_render_8bpp_to_ARGB8888(font, glyph);
+            break;
+        case ALPHA8BIT:
+            font_render_8bpp_to_ALPHA8BIT(font, glyph);
             break;
         default:
             break;
