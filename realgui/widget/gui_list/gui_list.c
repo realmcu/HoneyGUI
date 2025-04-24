@@ -236,6 +236,8 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
 
     if (list->style == LIST_CIRCLE)
     {
+        matrix_translate(-obj->x, -obj->y, obj->matrix);
+
         int32_t r = (list->dir == HORIZONTAL) ? list->base.h : list->base.w;
         int32_t diff = (list->dir == HORIZONTAL)
                        ? (list->base.w / 2 + list->base.x) - (obj->x + list->tab_length / 2)
@@ -251,6 +253,8 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
         {
             obj->x = coord;
         }
+
+        matrix_translate(obj->x, obj->y, obj->matrix);
     }
     else if (list->style == LIST_ZOOM)
     {
@@ -272,9 +276,11 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
     {
         matrix_translate(-obj->x, -obj->y, obj->matrix);
 
+        float scale_0 = 1.0f;
+        float scale_1 = 0.9f;
         if (list->dir == HORIZONTAL)
         {
-            int16_t limit = (int16_t)(list->base.x + list->base.w - list->tab_length);
+            int16_t limit = (int16_t)(list->base.x + list->base.w - (int16_t)(list->tab_length * scale_1));
             if (obj->x > limit)
             {
                 obj->x = limit;
@@ -282,31 +288,33 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
         }
         else
         {
-            int16_t limit = (int16_t)(list->base.y + list->base.h - list->tab_length);
+            int16_t limit = (int16_t)(list->base.y + list->base.h - (int16_t)(list->tab_length * scale_1));
             if (obj->y > limit)
             {
                 obj->y = limit;
             }
         }
 
-        float scale_0 = 1.0f;
-        float scale_1 = 0.9f;
-
         int obj_location = (list->dir == HORIZONTAL) ? obj->x : obj->y;
         int list_length = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
         int list_location = (list->dir == HORIZONTAL) ? list->base.x : list->base.y;
-        int location_1 = list_location + list_length - list->tab_length;
+        int location_1 = list_location + list_length - (int16_t)(list->tab_length * scale_1);
         int location_0 = location_1 - list->tab_length / 3;
 
         if (obj_location >= location_0 && obj_location <= location_1)
         {
             float scale = scale_0 - (scale_0 - scale_1) * (obj_location - location_0) /
                           (location_1 - location_0);
+            matrix_translate(obj->x, obj->y, obj->matrix); //prevent bottom space of screen
+
             matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
             matrix_scale(scale, scale, obj->matrix);
             matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
         }
-        matrix_translate(obj->x, obj->y, obj->matrix);
+        else
+        {
+            matrix_translate(obj->x, obj->y, obj->matrix);
+        }
     }
 
     uint8_t last = this->checksum;
@@ -521,7 +529,7 @@ gui_list_tab_t *gui_list_add_tab(gui_list_widget_t *list)
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_end_cb = false;
     GET_BASE(this)->has_destroy_cb  = false;
-    GET_BASE(this)->type = LIST;
+    GET_BASE(this)->type = LIST_TAB;
     GET_BASE(this)->create_done = true;
     gui_list_init(&(GET_BASE(this)->child_list));
 

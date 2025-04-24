@@ -9,7 +9,10 @@ The list widget is a container for any number of list table, horizontally or ver
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1745398337318690441/61f817f2_10737458.gif" width= "400" /></div>
+   <div style="text-align: center">
+      <img src="https://foruda.gitee.com/images/1745465574757113257/5e8ee605_10737458.gif" width= "400" />
+      <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CLASSIC LIST</p>
+   </div>
    <br>
 
 
@@ -49,9 +52,18 @@ Example
 
    <br>
    <div style="display: flex; justify-content: space-between;">
-      <img src="https://foruda.gitee.com/images/1745398396237626690/156a4565_10737458.gif" style="width: 30%;">
-      <img src="https://foruda.gitee.com/images/1745398373494570427/8336b58a_10737458.gif" style="width: 30%;">
-      <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 30%;">
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745398396237626690/156a4565_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CIRCLE STYLE</p>
+      </div>
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745465641258093460/9ee9d166_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CARD STYLE</p>
+      </div>
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL ZOOM STYLE</p>
+      </div>
    </div>
    <br>
 
