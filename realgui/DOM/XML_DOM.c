@@ -72,7 +72,11 @@ static xml_dom_wifi_t wifi_array[XML_DOM_WIFI_COUINT] =
 #define MACRO_DISCONNECTED 9002
 #define MACRO_CONNECTING 9003
 #define MACRO_WIFI 9004
+#define MACRO_FRAME 9005
+#define MACRO_INTERACTION 9006
+#define MACRO_FPS 9007
 
+#define GUI_EVENT_WIN_FRAME_PARAM (0XFF-2)
 static struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -123,6 +127,9 @@ static struct widget_create widget[] =
     {"onConnected", MACRO_CONNECTED},
     {"onDisconnected", MACRO_DISCONNECTED},
     {"onConnecting", MACRO_CONNECTING},
+    {"frame", MACRO_FRAME},
+    {"interaction", MACRO_INTERACTION},
+    {"fps", MACRO_FPS},
 };
 
 typedef struct
@@ -7123,6 +7130,1416 @@ static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
 
     return parent;
 }
+#include "gui_fps.h"
+static gui_obj_t *widget_create_macro_fps(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+
+
+
+        char *ptxt = get_space_string_head(p->txt);
+        gui_fps_create(parent);
+
+
+    }
+
+    return parent;
+}
+#define SWAP_PROGRESS_THRESHOLD (0.2f)
+#define SWAP_RETURN_DURATION 300
+typedef enum _figma_interaction_trigger_t
+{
+    FIGMA_INTERACTION_TRIGGER_ON_NONE,
+    FIGMA_INTERACTION_TRIGGER_ON_TAP,
+    FIGMA_INTERACTION_TRIGGER_ON_DRAG,
+    FIGMA_INTERACTION_TRIGGER_WHILE_HOVERING,
+    FIGMA_INTERACTION_TRIGGER_WHILE_PRESSING,
+    FIGMA_INTERACTION_TRIGGER_KEY_GAMEPAD,
+    FIGMA_INTERACTION_TRIGGER_MOUSE_ENTER,
+    FIGMA_INTERACTION_TRIGGER_MOUSE_LEAVE,
+    FIGMA_INTERACTION_TRIGGER_TOUCH_DOWN,
+    FIGMA_INTERACTION_TRIGGER_TOUCH_UP,
+    FIGMA_INTERACTION_TRIGGER_AFTER_DELAY,
+
+} figma_interaction_trigger_t;
+
+typedef enum _figma_interaction_action_t
+{
+    FIGMA_INTERACTION_ACTION_NONE,
+    FIGMA_INTERACTION_ACTION_NAVIGATE_TO,
+    FIGMA_INTERACTION_ACTION_CHANGE_TO,
+    FIGMA_INTERACTION_ACTION_BACK,
+    FIGMA_INTERACTION_ACTION_SCROLL_TO,
+    FIGMA_INTERACTION_ACTION_OPEN_LINK,
+    FIGMA_INTERACTION_ACTION_SET_VARIABLE,
+    FIGMA_INTERACTION_ACTION_SET_VARIABLE_MODE,
+    FIGMA_INTERACTION_ACTION_CONDITIONAL,
+    FIGMA_INTERACTION_ACTION_OPEN_OVERLAY,
+    FIGMA_INTERACTION_ACTION_SWAP_OVERLAY,
+    FIGMA_INTERACTION_ACTION_CLOSE_OVERLAY
+} figma_interaction_action_t;
+
+typedef enum _figma_interaction_animation_t
+{
+    FIGMA_INTERACTION_ANIMATION_INSTANT,
+    FIGMA_INTERACTION_ANIMATION_DISSOLVE,
+    FIGMA_INTERACTION_ANIMATION_SMART_ANIMATE,
+    FIGMA_INTERACTION_ANIMATION_SLIDE_IN,
+    FIGMA_INTERACTION_ANIMATION_SLIDE_OUT,
+    FIGMA_INTERACTION_ANIMATION_MOVE_IN,
+    FIGMA_INTERACTION_ANIMATION_MOVE_OUT,
+    FIGMA_INTERACTION_ANIMATION_PUSH,
+} figma_interaction_animation_t;
+
+typedef enum _figma_interaction_direction_t
+{
+    FIGMA_INTERACTION_DIRECTION_NONE,
+    FIGMA_INTERACTION_DIRECTION_LEFT,
+    FIGMA_INTERACTION_DIRECTION_RIGHT,
+    FIGMA_INTERACTION_DIRECTION_UP,
+    FIGMA_INTERACTION_DIRECTION_DOWN,
+} figma_interaction_direction_t;
+
+typedef enum _figma_interaction_curve_t
+{
+    FIGMA_INTERACTION_CURVE_LINEAR,
+    FIGMA_INTERACTION_CURVE_EASE_IN,
+    FIGMA_INTERACTION_CURVE_EASE_OUT,
+    FIGMA_INTERACTION_CURVE_EASE_IN_AND_OUT,
+    FIGMA_INTERACTION_CURVE_EASE_IN_BACK,
+    FIGMA_INTERACTION_CURVE_EASE_OUT_BACK,
+    FIGMA_INTERACTION_CURVE_EASE_IN_AND_OUT_BACK,
+    FIGMA_INTERACTION_CURVE_CUSTOM_BEZIER,
+    FIGMA_INTERACTION_CURVE_GENTLE,
+    FIGMA_INTERACTION_CURVE_QUICK,
+    FIGMA_INTERACTION_CURVE_BOUNCY,
+    FIGMA_INTERACTION_CURVE_SLOW,
+    FIGMA_INTERACTION_CURVE_CUSTOM_SPRING,
+} figma_interaction_curve_t;
+typedef struct frame_macro_interaction_param
+{
+    figma_interaction_curve_t curve;
+    figma_interaction_direction_t direction;
+    figma_interaction_animation_t animation;
+    figma_interaction_action_t action;
+    const char *destination;
+    int duration;
+    gui_obj_t *destination_widget;
+    figma_interaction_direction_t touchpad_direction;
+} frame_macro_interaction_param_t;
+#include <math.h>
+typedef struct frame_attritube
+{
+    const char *flow_starting_point;
+    uint8_t scrollBehavior;
+    int16_t x;
+    int16_t y;
+    int16_t start_x;
+    int16_t start_y;
+    int16_t end_x;
+    int16_t end_y;
+} frame_attritube_t;
+static frame_attritube_t *frame_get_attritube(gui_win_t *frame)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(frame, WINDOW);
+    gui_obj_t *obj = (void *)frame;
+    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+        if (event_dsc->filter == GUI_EVENT_WIN_FRAME_PARAM)
+        {
+            return (frame_attritube_t *)event_dsc->user_data;
+        }
+    }
+    return 0;
+}
+static gui_obj_t *widget_create_macro_frame(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
+{
+
+    {
+        size_t i = 0;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t w = 0;
+        int16_t h = 0;
+#define FRAME_NO_SCROLLING 0
+#define FRAME_SCROLL_VERTICAL 1
+#define FRAME_SCROLL_HORIZONTAL 2
+#define FRAME_SCROLL_BOTH_DIRECTION 3
+        char *flow_starting_point = 0;
+        bool clip_content = true;
+        uint8_t scrollBehavior = FRAME_NO_SCROLLING;
+        while (true)
+        {
+            if (!(p->attr[i]))
+            {
+                break;
+            }
+            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
+            if (!strcmp(p->attr[i], "x"))
+            {
+                x = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "y"))
+            {
+                y = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "w"))
+            {
+                w = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "h"))
+            {
+                h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "flowStartingPoint"))
+            {
+                flow_starting_point = (p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "clipContent"))
+            {
+                clip_content = !strcmp((p->attr[++i]), "true");
+            }
+            else if (!strcmp(p->attr[i], "scrollBehavior"))
+            {
+                if (strcmp(p->attr[++i], "No scrolling") == 0)
+                {
+                    scrollBehavior = FRAME_NO_SCROLLING;
+                }
+                else if (strcmp(p->attr[i], "Vertical") == 0)
+                {
+                    scrollBehavior = FRAME_SCROLL_VERTICAL;
+                }
+                else if (strcmp(p->attr[i], "Horizontal") == 0)
+                {
+                    scrollBehavior = FRAME_SCROLL_HORIZONTAL;
+                }
+                else if (strcmp(p->attr[i], "Both directions") == 0)
+                {
+                    scrollBehavior = FRAME_SCROLL_BOTH_DIRECTION;
+                }
+            }
+            i++;
+        }
+        char *ptxt = get_space_string_head(p->txt);
+        //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
+        {
+            parent = (void *)gui_win_create(parent, ptxt, 0, 0, w, h);
+            if (!flow_starting_point)
+            {
+                gui_obj_hidden(parent, 1);
+            }
+            gui_win_t *win = GUI_TYPE(gui_win_t, parent);
+
+            if (clip_content)
+            {
+                gui_win_set_scope(win, 1);
+            }
+            frame_attritube_t *param = gui_malloc(sizeof(frame_attritube_t));
+            if (param)
+            {
+                memset(param, 0, sizeof(frame_attritube_t));
+                if (flow_starting_point)
+                {
+                    param->flow_starting_point = gui_strdup(flow_starting_point);
+                }
+                param->scrollBehavior = scrollBehavior;
+                //param->x = x;
+                //param->y = y;
+                gui_obj_add_event_cb(parent, (gui_event_cb_t)0, GUI_EVENT_WIN_FRAME_PARAM, param);
+            }
+
+
+
+
+
+        }
+    }
+
+    return parent;
+}
+
+// Easing function: input pro (0.0 to 1.0), output eased_pro (usually between 0.0 and 1.0, may slightly overshoot for bounce)
+float figma_easing_function(float pro, figma_interaction_curve_t curve)
+{
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+    float c = 10.0f; // Spring frequency
+    float y1 = 0.42f; // Control point, simulate ease-in and ease-out
+    switch (curve)
+    {
+    case FIGMA_INTERACTION_CURVE_LINEAR:
+        return pro; // Linear: y = x
+
+    case FIGMA_INTERACTION_CURVE_EASE_IN:
+        return pro * pro; // Quadratic ease-in: y = x^2
+
+    case FIGMA_INTERACTION_CURVE_EASE_OUT:
+        return 1.0f - (1.0f - pro) * (1.0f - pro); // Quadratic ease-out: y = 1 - (1-x)^2
+
+    case FIGMA_INTERACTION_CURVE_EASE_IN_AND_OUT:
+        // Cubic ease-in and ease-out: y = (2x)^2 * (3 - 2x) / 2
+        pro *= 2.0f;
+        if (pro < 1.0f) { return 0.5f * pro * pro * pro; }
+        pro -= 2.0f;
+        return 0.5f * (pro * pro * pro + 2.0f);
+
+    case FIGMA_INTERACTION_CURVE_EASE_IN_BACK:
+        // Ease-in with bounce: y = x^2 * (2.70158x - 1.70158)
+        return pro * pro * (2.70158f * pro - 1.70158f);
+
+    case FIGMA_INTERACTION_CURVE_EASE_OUT_BACK:
+        // Ease-out with bounce: y = 1 + (x-1)^2 * (2.70158(x-1) + 1.70158)
+        pro -= 1.0f;
+        return 1.0f + pro * pro * (2.70158f * pro + 1.70158f);
+
+    case FIGMA_INTERACTION_CURVE_EASE_IN_AND_OUT_BACK:
+        // Simplified ease-in and ease-out with bounce
+        pro *= 2.0f;
+        if (pro < 1.0f)
+        {
+            return 0.5f * pro * pro * (3.59491f * pro - 2.59491f);
+        }
+        pro -= 2.0f;
+        return 0.5f * (pro * pro * (3.59491f * pro + 2.59491f) + 2.0f);
+
+    case FIGMA_INTERACTION_CURVE_GENTLE:
+        // Ease-out with bounce: y = 1 + (x-1)^2 * (2.70158(x-1) + 1.70158)
+        pro -= 1.0f;
+        return 1.0f + pro * pro * (2.70158f * pro + 1.70158f);
+
+    case FIGMA_INTERACTION_CURVE_QUICK:
+        // Ease-out with bounce: y = 1 + (x-1)^2 * (2.70158(x-1) + 1.70158)
+        pro -= 1.0f;
+        return 1.0f + pro * pro * (2.70158f * pro + 1.70158f);
+
+    case FIGMA_INTERACTION_CURVE_SLOW:
+        // Slow (slower ease-out): y = 1 - (1-x)^4
+        return 1.0f - powf(1.0f - pro, 4.0f);
+
+    case FIGMA_INTERACTION_CURVE_BOUNCY:
+    case FIGMA_INTERACTION_CURVE_CUSTOM_SPRING:
+        // Spring/Bouncy (simple damped oscillation simulation)
+
+        return 1.0f - cosf(pro * c) * expf(-4.0f * pro); // Damped sine wave
+
+    case FIGMA_INTERACTION_CURVE_CUSTOM_BEZIER:
+        // Custom Bezier curve (e.g. quadratic ease-in and ease-out)
+        // Using quadratic Bezier formula: y = 2x(1-x)y1 + x^2
+
+        return 2.0f * pro * (1.0f - pro) * y1 + pro * pro;
+
+    default:
+        return pro; // Default linear
+    }
+}
+static void frame_on_tab_navigate_to_push_gentle_from(float pro, gui_win_t *win,
+                                                      frame_macro_interaction_param_t *interaction_param)
+{
+    // Ensure progress is between 0.0 and 1.0
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function to transform progress
+    float eased_pro = figma_easing_function(pro, interaction_param->curve);
+    gui_log("ease %f,%f\n", pro, eased_pro);
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+    int start_x = 0; // Right side of the screen
+    int end_x = -screen_width; // Left side position
+    // Get window's Y-coordinate to keep it unchanged
+    int start_y = 0; // Right side of the screen
+    int end_y = 0; // Left side position
+    if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+    {
+        start_x = 0;
+        end_x = -screen_width;
+        start_y = 0;
+        end_y = 0;
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+    {
+        start_x = 0;
+        end_x = screen_width;
+        start_y = 0;
+        end_y = 0;
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = 0;
+        end_y = -screen_hight;
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = 0;
+        end_y = screen_hight;
+    }
+    // Calculate current position
+    int new_x_position = start_x - (int)((start_x - end_x) * eased_pro);
+    int new_y_position = start_y - (int)((start_y - end_y) * eased_pro);
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+}
+
+static void frame_on_tab_navigate_to_push_gentle_to(float pro, gui_win_t *win,
+                                                    frame_macro_interaction_param_t *interaction_param)
+{
+    // Ensure progress is between 0.0 and 1.0
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function to transform progress
+    float eased_pro = figma_easing_function(pro, interaction_param->curve);
+    //gui_log("ease %f,%f\n", pro, eased_pro);
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+    int start_x = screen_width; // Right side of the screen
+    int end_x = 0; // Left side position
+    // Get window's Y-coordinate to keep it unchanged
+    int start_y = 0; // Right side of the screen
+    int end_y = 0; // Left side position
+    if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+    {
+        start_x = screen_width;
+        end_x = 0;
+        start_y = 0;
+        end_y = 0;
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+    {
+        start_x = -screen_width;
+        end_x = 0;
+        start_y = 0;
+        end_y = 0;
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = screen_hight;
+        end_y = 0;
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = -screen_hight;
+        end_y = 0;
+    }
+    // Calculate current position
+    int new_x_position = start_x - (int)((start_x - end_x) * eased_pro);
+    int new_y_position = start_y - (int)((start_y - end_y) * eased_pro);
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_tap_ani)
+{
+    frame_macro_interaction_param_t *interaction_param = p;
+    if (animate->Beginning_frame)
+    {
+        gui_obj_hidden(interaction_param->destination_widget, 0);
+        gui_obj_hidden(this_widget, 0);
+    }
+    if (animate->end_frame)
+    {
+        gui_obj_hidden(this_widget, 1);
+        gui_obj_hidden(interaction_param->destination_widget, 0);
+    }
+    frame_on_tab_navigate_to_push_gentle_from(animate->progress_percent, (gui_win_t *)this_widget,
+                                              interaction_param);
+    frame_on_tab_navigate_to_push_gentle_to(animate->progress_percent,
+                                            (gui_win_t *)interaction_param->destination_widget, interaction_param);
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_tap_func)
+{
+    gui_log("tap\n");
+    frame_macro_interaction_param_t *interaction_param = param;
+    GUI_WIDGET_POINTER_BY_NAME(win_to, interaction_param->destination);
+    interaction_param->destination_widget = win_to;
+    if (GUI_TYPE(gui_win_t, win_to)->animate)
+    {
+        memset(GUI_TYPE(gui_win_t, win_to)->animate, 0, sizeof(gui_animate_t));
+        gui_free(GUI_TYPE(gui_win_t, win_to)->animate);
+        GUI_TYPE(gui_win_t, win_to)->animate = NULL;
+
+    }
+
+    if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
+    {
+        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        {
+            gui_win_set_animate(obj, interaction_param->duration, 0, win_frame_on_tap_ani, param);
+        }
+    }
+    //gui_obj_hidden(win_to, 0);
+    //gui_obj_hidden(obj, 1);
+}
+static float frame_on_drag_navigate_to_push_from(float pro, gui_win_t *win,
+                                                 frame_macro_interaction_param_t *interaction_param)
+{
+
+    IMPORT_GUI_TOUCHPAD
+    // Use easing function to transform progress
+    float eased_pro = 0;
+
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+    int start_x = 0; // Right side of the screen
+    int end_x = -screen_width; // Left side position
+    // Get window's Y-coordinate to keep it unchanged
+    int start_y = 0; // Right side of the screen
+    int end_y = 0; // Left side position
+    if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+    {
+        start_x = 0;
+        end_x = -screen_width;
+        start_y = 0;
+        end_y = 0;
+        eased_pro = -((float)(touch->deltaX)) / ((float)(screen_width));
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+    {
+        start_x = 0;
+        end_x = screen_width;
+        start_y = 0;
+        end_y = 0;
+        eased_pro = ((float)(touch->deltaX)) / ((float)(screen_width));
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = 0;
+        end_y = -screen_hight;
+        eased_pro = -((float)(touch->deltaY)) / ((float)(screen_hight));
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = 0;
+        end_y = screen_hight;
+        eased_pro = ((float)(touch->deltaY)) / ((float)(screen_hight));
+    }
+    if (eased_pro < 0.0f) { eased_pro = 0.0f; }
+    if (eased_pro > 1.0f) { eased_pro = 1.0f; }
+    // Calculate current position
+    int new_x_position = start_x - (int)((start_x - end_x) * eased_pro);
+    int new_y_position = start_y - (int)((start_y - end_y) * eased_pro);
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+    return eased_pro;
+}
+static void frame_on_drag_navigate_to_push_to(float pro, gui_win_t *win,
+                                              frame_macro_interaction_param_t *interaction_param)
+{
+
+    IMPORT_GUI_TOUCHPAD
+    // Use easing function to transform progress
+    float eased_pro = 0;
+
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+    int start_x = 0; // Right side of the screen
+    int end_x = -screen_width; // Left side position
+    // Get window's Y-coordinate to keep it unchanged
+    int start_y = 0; // Right side of the screen
+    int end_y = 0; // Left side position
+    if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+    {
+        start_x = screen_width;
+        end_x = 0;
+        start_y = 0;
+        end_y = 0;
+        eased_pro = -((float)(touch->deltaX)) / ((float)(screen_width));
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+    {
+        start_x = -screen_width;
+        end_x = 0;
+        start_y = 0;
+        end_y = 0;
+        eased_pro = ((float)(touch->deltaX)) / ((float)(screen_width));
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = screen_hight;
+        end_y = 0;
+        eased_pro = -((float)(touch->deltaY)) / ((float)(screen_hight));
+    }
+    else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+    {
+        start_x = 0;
+        end_x = 0;
+        start_y = -screen_hight;
+        end_y = 0;
+        eased_pro = ((float)(touch->deltaY)) / ((float)(screen_hight));
+    }
+    if (eased_pro < 0.0f) { eased_pro = 0.0f; }
+    if (eased_pro > 1.0f) { eased_pro = 1.0f; }
+    // Calculate current position
+    int new_x_position = start_x - (int)((start_x - end_x) * eased_pro);
+    int new_y_position = start_y - (int)((start_y - end_y) * eased_pro);
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_out);
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_out_return);
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_in);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani)
+{
+    frame_macro_interaction_param_t *interaction_param = p;
+    if (animate->Beginning_frame)
+    {
+        gui_obj_hidden(interaction_param->destination_widget, 0);
+        gui_obj_hidden(this_widget, 0);
+    }
+    // if (animate->end_frame)
+    // {
+    //     gui_obj_hidden(this_widget, 1);
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    // }
+    float pro = frame_on_drag_navigate_to_push_from(animate->progress_percent, (gui_win_t *)this_widget,
+                                                    interaction_param);
+    //frame_on_drag_navigate_to_push_to(animate->progress_percent, (gui_win_t *)interaction_param->destination_widget, interaction_param);
+
+    GUI_TYPE(gui_win_t, this_widget)->release_flag;
+    //gui_log("release_flag %d\n", GUI_TYPE(gui_win_t, this_widget)->release_flag);
+    if (GUI_TYPE(gui_win_t, this_widget)->release_flag)
+    {
+        if (pro < SWAP_PROGRESS_THRESHOLD)
+        {
+            win_frame_on_drag_func_out_return(this_widget, 0, interaction_param);
+        }
+        else
+        {
+            win_frame_on_drag_func_out(this_widget, 0, interaction_param);
+        }
+
+
+    }
+
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani_judge)
+{
+    IMPORT_GUI_TOUCHPAD
+    frame_macro_interaction_param_t *interaction_param = p;
+    interaction_param->touchpad_direction = FIGMA_INTERACTION_DIRECTION_NONE;
+    if (touch->type == TOUCH_HOLD_X)
+    {
+        if (touch->deltaX > 0)
+        {
+            interaction_param->touchpad_direction = FIGMA_INTERACTION_DIRECTION_RIGHT;
+        }
+        else if (touch->deltaX < 0)
+        {
+            interaction_param->touchpad_direction = FIGMA_INTERACTION_DIRECTION_LEFT;
+        }
+    }
+    else if (touch->type == TOUCH_HOLD_Y)
+    {
+        if (touch->deltaY > 0)
+        {
+            interaction_param->touchpad_direction = FIGMA_INTERACTION_DIRECTION_DOWN;
+        }
+        else if (touch->deltaY < 0)
+        {
+            interaction_param->touchpad_direction = FIGMA_INTERACTION_DIRECTION_UP;
+        }
+    }
+    if (interaction_param->touchpad_direction == interaction_param->direction)
+    {
+        gui_log("Left side value: %d, Right side value: %d\n", interaction_param->touchpad_direction,
+                interaction_param->direction);
+        animate->animate = 0;
+        gui_win_t *this = (gui_win_t *)this_widget;
+        if (this->animate_array)
+        {
+            for (size_t i = 0; i < this->animate_array_length; i++)
+            {
+                //gui_free(this->animate_array[i]);
+                this->animate_array[i] = NULL;
+            }
+            //gui_free(this->animate_array);
+            this->animate_array = 0;
+            this->animate_array_length = 0;
+        }
+        win_frame_on_drag_func_in(this_widget, 0, p);
+        return;
+    }
+
+
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani_to)
+{
+    frame_macro_interaction_param_t *interaction_param = p;
+    // if (animate->Beginning_frame)
+    // {
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    //     gui_obj_hidden(this_widget, 0);
+    // }
+    // if (animate->end_frame)
+    // {
+    //     gui_obj_hidden(this_widget, 1);
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    // }
+    //frame_on_drag_navigate_to_push_from(animate->progress_percent, (gui_win_t *)this_widget, interaction_param);
+    frame_on_drag_navigate_to_push_to(animate->progress_percent,
+                                      (gui_win_t *)interaction_param->destination_widget, interaction_param);
+
+    // GUI_TYPE(gui_win_t, this_widget)->release_flag;
+    // //gui_log("release_flag %d\n", GUI_TYPE(gui_win_t, this_widget)->release_flag);
+    // if (GUI_TYPE(gui_win_t, this_widget)->release_flag)
+    // {
+    //     win_frame_on_drag_func_out(this_widget, 0, interaction_param);
+    // }
+
+
+}
+static void frame_on_drag_navigate_to_push_from_out(float pro, gui_win_t *win,
+                                                    frame_macro_interaction_param_t *interaction_param, struct gui_animate *animate)
+{
+    // Ensure progress is between 0.0 and 1.0
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function to transform progress
+    float eased_pro = figma_easing_function(pro, interaction_param->curve);
+    //gui_log("ease %f,%f\n", pro, eased_pro);
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+
+    //gui_log("interaction_param->direction %d\n", interaction_param->direction);
+    if (pro == 0)
+    {
+        if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = -screen_width;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = screen_width;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = -screen_hight;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = screen_hight;
+        }
+    }
+
+    //gui_log("start_x: %d, end_x: %d\n", attritube->start_x, attritube->end_x);
+    // Calculate current position
+    int new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) *
+                                                    eased_pro);
+    int new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) *
+                                                    eased_pro);
+    //gui_log("new_x_position: %d, new_y_position: %d\n", new_x_position, new_y_position);
+
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+    if (animate->end_frame)
+    {
+        new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) * 1);
+        new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) * 1);
+        gui_win_move(win, new_x_position, new_y_position);
+        win->enter_auto_scale = 1;
+    }
+
+}
+static void frame_on_drag_navigate_to_push_from_out_return(float pro, gui_win_t *win,
+                                                           frame_macro_interaction_param_t *interaction_param, struct gui_animate *animate)
+{
+    // Ensure progress is between 0.0 and 1.0
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function to transform progress
+    float eased_pro = figma_easing_function(pro, interaction_param->curve);
+    //gui_log("ease %f,%f\n", pro, eased_pro);
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+
+    //gui_log("interaction_param->direction %d\n", interaction_param->direction);
+    if (pro == 0)
+    {
+        if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = -0;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = 0;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = -0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = 0;
+        }
+    }
+
+    //gui_log("start_x: %d, end_x: %d\n", attritube->start_x, attritube->end_x);
+    // Calculate current position
+    int new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) *
+                                                    eased_pro);
+    int new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) *
+                                                    eased_pro);
+
+
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+    if (animate->end_frame)
+    {
+        new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) * 1);
+        new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) * 1);
+        gui_win_move(win, new_x_position, new_y_position);
+        win->enter_auto_scale = 1;
+    }
+    //gui_log("new_x_position: %d, new_y_position: %d\n", new_x_position, new_y_position);
+}
+static void frame_on_drag_navigate_to_push_to_out(float pro, gui_win_t *win,
+                                                  frame_macro_interaction_param_t *interaction_param, struct gui_animate *animate)
+{
+    // Ensure progress is between 0.0 and 1.0
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function to transform progress
+    float eased_pro = figma_easing_function(pro, interaction_param->curve);
+    //gui_log("ease %f,%f\n", pro, eased_pro);
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+
+    if (pro == 0)
+    {
+        if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = 0;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = 0;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = 0;
+        }
+    }
+    // Calculate current position
+    int new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) *
+                                                    eased_pro);
+    int new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) *
+                                                    eased_pro);
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+    if (animate->end_frame)
+    {
+        new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) * 1);
+        new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) * 1);
+        gui_win_move(win, new_x_position, new_y_position);
+        win->enter_auto_scale = 1;
+    }
+}
+static void frame_on_drag_navigate_to_push_to_out_return(float pro, gui_win_t *win,
+                                                         frame_macro_interaction_param_t *interaction_param, struct gui_animate *animate)
+{
+    // Ensure progress is between 0.0 and 1.0
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function to transform progress
+    float eased_pro = figma_easing_function(pro, interaction_param->curve);
+    //gui_log("ease %f,%f\n", pro, eased_pro);
+    // Get screen width
+    uint32_t screen_width = gui_get_screen_width();
+    uint32_t screen_hight = gui_get_screen_height();
+    frame_attritube_t *attritube = frame_get_attritube(win);
+    // Set initial and final positions of the window
+
+    if (pro == 0)
+    {
+        if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_LEFT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = screen_width;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_RIGHT)
+        {
+            attritube->start_x = GUI_BASE(win)->x;
+            attritube->end_x = -screen_width;
+            attritube->start_y = 0;
+            attritube->end_y = 0;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_UP)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = screen_hight;
+        }
+        else if (interaction_param->direction == FIGMA_INTERACTION_DIRECTION_DOWN)
+        {
+            attritube->start_x = 0;
+            attritube->end_x = 0;
+            attritube->start_y = GUI_BASE(win)->y;
+            attritube->end_y = -screen_hight;
+        }
+    }
+    // Calculate current position
+    int new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) *
+                                                    eased_pro);
+    int new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) *
+                                                    eased_pro);
+    // Move window
+    gui_win_move(win, new_x_position, new_y_position);
+    if (animate->end_frame)
+    {
+        new_x_position = attritube->start_x - (int)((attritube->start_x - attritube->end_x) * 1);
+        new_y_position = attritube->start_y - (int)((attritube->start_y - attritube->end_y) * 1);
+        gui_win_move(win, new_x_position, new_y_position);
+        win->enter_auto_scale = 1;
+    }
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani_out)
+{
+    gui_log("win_frame_on_drag_ani_out1\n");
+    frame_macro_interaction_param_t *interaction_param = p;
+    if (animate->Beginning_frame)
+    {
+        gui_obj_hidden(interaction_param->destination_widget, 0);
+        gui_obj_hidden(this_widget, 0);
+    }
+    if (animate->end_frame)
+    {
+        gui_obj_hidden(this_widget, 1);
+        gui_obj_hidden(interaction_param->destination_widget, 0);
+    }
+    frame_on_drag_navigate_to_push_from_out(animate->progress_percent, (gui_win_t *)this_widget,
+                                            interaction_param, animate);
+    //frame_on_drag_navigate_to_push_to_out(animate->progress_percent, (gui_win_t *)interaction_param->destination_widget, interaction_param);
+    gui_log("win_frame_on_drag_ani_out2\n");
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani_out_return)
+{
+    frame_macro_interaction_param_t *interaction_param = p;
+    if (animate->Beginning_frame)
+    {
+        gui_obj_hidden(interaction_param->destination_widget, 0);
+        gui_obj_hidden(this_widget, 0);
+    }
+    if (animate->end_frame)
+    {
+        gui_obj_hidden(this_widget, 0);
+        gui_obj_hidden(interaction_param->destination_widget, 1);
+    }
+    frame_on_drag_navigate_to_push_from_out_return(animate->progress_percent, (gui_win_t *)this_widget,
+                                                   interaction_param, animate);
+    //frame_on_drag_navigate_to_push_to_out(animate->progress_percent, (gui_win_t *)interaction_param->destination_widget, interaction_param);
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani_out_to)
+{
+    gui_log("win_frame_on_drag_ani_out_to1\n");
+    frame_macro_interaction_param_t *interaction_param = p;
+    // if (animate->Beginning_frame)
+    // {
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    //     gui_obj_hidden(this_widget, 0);
+    // }
+    // if (animate->end_frame)
+    // {
+    //     gui_obj_hidden(this_widget, 1);
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    // }
+    //frame_on_drag_navigate_to_push_from_out(animate->progress_percent, (gui_win_t *)this_widget, interaction_param);
+    frame_on_drag_navigate_to_push_to_out(animate->progress_percent,
+                                          (gui_win_t *)interaction_param->destination_widget, interaction_param, animate);
+    gui_log("win_frame_on_drag_ani_out_to2\n");
+}
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani_out_to_return)
+{
+    frame_macro_interaction_param_t *interaction_param = p;
+    // if (animate->Beginning_frame)
+    // {
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    //     gui_obj_hidden(this_widget, 0);
+    // }
+    // if (animate->end_frame)
+    // {
+    //     gui_obj_hidden(this_widget, 1);
+    //     gui_obj_hidden(interaction_param->destination_widget, 0);
+    // }
+    //frame_on_drag_navigate_to_push_from_out(animate->progress_percent, (gui_win_t *)this_widget, interaction_param);
+    frame_on_drag_navigate_to_push_to_out_return(animate->progress_percent,
+                                                 (gui_win_t *)interaction_param->destination_widget, interaction_param, animate);
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_in)
+{
+    gui_log("drag in@%s\n", GUI_BASE(obj)->name);
+
+    frame_macro_interaction_param_t *interaction_param = param;
+    GUI_WIDGET_POINTER_BY_NAME(win_to, interaction_param->destination);
+    interaction_param->destination_widget = win_to;
+    if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
+    {
+        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        {
+            gui_win_set_animate(obj, 1000, -1, win_frame_on_drag_ani, param);
+            gui_win_set_animate((void *)win_to, 1000, -1, win_frame_on_drag_ani_to, param);
+        }
+    }
+    //gui_obj_hidden(win_to, 0);
+    //gui_obj_hidden(obj, 1);
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_in_judge)
+{
+    gui_log("drag in judge @%s\n", GUI_BASE(obj)->name);
+
+    frame_macro_interaction_param_t *interaction_param = param;
+    GUI_WIDGET_POINTER_BY_NAME(win_to, interaction_param->destination);
+    interaction_param->destination_widget = win_to;
+    if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
+    {
+        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        {
+            gui_win_append_animate(obj, 1000, -1, win_frame_on_drag_ani_judge, param,
+                                   "win_frame_on_drag_ani_judge");
+
+        }
+    }
+    //gui_obj_hidden(win_to, 0);
+    //gui_obj_hidden(obj, 1);
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_out)
+{
+    gui_log("drag out\n");
+    // if (GUI_BASE(obj)->x>gui_get_screen_width()||GUI_BASE(obj)->x+GUI_BASE(obj)->w<0||GUI_BASE(obj)->y>gui_get_screen_height()||GUI_BASE(obj)->y+GUI_BASE(obj)->h<0)
+    // {
+    //     return;
+    // }
+
+    frame_macro_interaction_param_t *interaction_param = param;
+    GUI_WIDGET_POINTER_BY_NAME(win_to, interaction_param->destination);
+    interaction_param->destination_widget = win_to;
+    if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
+    {
+        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        {
+            gui_win_set_animate(obj, interaction_param->duration, 0, win_frame_on_drag_ani_out, param);
+            gui_win_set_animate((void *)win_to, interaction_param->duration, 0, win_frame_on_drag_ani_out_to,
+                                param);
+        }
+    }
+    //gui_obj_hidden(win_to, 0);
+    //gui_obj_hidden(obj, 1);
+    gui_log("drag out2\n");
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_out_return)
+{
+    gui_log("drag out return\n");
+    // if (GUI_BASE(obj)->x>gui_get_screen_width()||GUI_BASE(obj)->x+GUI_BASE(obj)->w<0||GUI_BASE(obj)->y>gui_get_screen_height()||GUI_BASE(obj)->y+GUI_BASE(obj)->h<0)
+    // {
+    //     return;
+    // }
+
+    frame_macro_interaction_param_t *interaction_param = param;
+    GUI_WIDGET_POINTER_BY_NAME(win_to, interaction_param->destination);
+    interaction_param->destination_widget = win_to;
+    if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
+    {
+        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        {
+            gui_win_set_animate(obj, SWAP_RETURN_DURATION, 0, win_frame_on_drag_ani_out_return, param);
+            gui_win_set_animate((void *)win_to, SWAP_RETURN_DURATION, 0, win_frame_on_drag_ani_out_to_return,
+                                param);
+        }
+    }
+    //gui_obj_hidden(win_to, 0);
+    //gui_obj_hidden(obj, 1);
+}
+static gui_obj_t *widget_create_macro_interaction(ezxml_t p, gui_obj_t *parent,
+                                                  T_OBJ_TYPE widget_type)
+{
+    char *destination = NULL;
+    int duration = 0;
+    size_t i = 0;
+    figma_interaction_animation_t interaction_ani =
+        FIGMA_INTERACTION_ANIMATION_INSTANT; // Default animation is Instant
+    figma_interaction_direction_t interaction_direction =
+        FIGMA_INTERACTION_DIRECTION_LEFT; // Default direction is Left
+    figma_interaction_curve_t interaction_curve =
+        FIGMA_INTERACTION_CURVE_LINEAR; // Default curve is Linear
+    figma_interaction_trigger_t interaction_trigger = FIGMA_INTERACTION_TRIGGER_ON_NONE;
+    figma_interaction_action_t interaction_action = FIGMA_INTERACTION_ACTION_NONE;
+    // Parse XML attributes
+    while (p->attr[i])
+    {
+        if (!strcmp(p->attr[i], "trigger"))
+        {
+            const char *trigger_str = p->attr[++i];
+
+            if (!strcmp(trigger_str, "On tap"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_ON_TAP;
+            }
+            else if (!strcmp(trigger_str, "None"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_ON_NONE;
+            }
+            else if (!strcmp(trigger_str, "On drag"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_ON_DRAG;
+            }
+            else if (!strcmp(trigger_str, "While hovering"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_WHILE_HOVERING;
+            }
+            else if (!strcmp(trigger_str, "While pressing"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_WHILE_PRESSING;
+            }
+            else if (!strcmp(trigger_str, "Key/Gamepad"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_KEY_GAMEPAD;
+            }
+            else if (!strcmp(trigger_str, "Mouse enter"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_MOUSE_ENTER;
+            }
+            else if (!strcmp(trigger_str, "Mouse leave"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_MOUSE_LEAVE;
+            }
+            else if (!strcmp(trigger_str, "Touch down"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_TOUCH_DOWN;
+            }
+            else if (!strcmp(trigger_str, "Touch up"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_TOUCH_UP;
+            }
+            else if (!strcmp(trigger_str, "After delay"))
+            {
+                interaction_trigger = FIGMA_INTERACTION_TRIGGER_AFTER_DELAY;
+            }
+
+
+        }
+        else if (!strcmp(p->attr[i], "action"))
+        {
+
+            const char *action_str = p->attr[++i];
+
+            if (!strcmp(action_str, "None"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_NONE;
+            }
+            else if (!strcmp(action_str, "Navigate to"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_NAVIGATE_TO;
+            }
+            else if (!strcmp(action_str, "Change to"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_CHANGE_TO;
+            }
+            else if (!strcmp(action_str, "Back"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_BACK;
+            }
+            else if (!strcmp(action_str, "Scroll to"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_SCROLL_TO;
+            }
+            else if (!strcmp(action_str, "Open link"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_OPEN_LINK;
+            }
+            else if (!strcmp(action_str, "Set variable"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_SET_VARIABLE;
+            }
+            else if (!strcmp(action_str, "Set variable mode"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_SET_VARIABLE_MODE;
+            }
+            else if (!strcmp(action_str, "Conditional"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_CONDITIONAL;
+            }
+            else if (!strcmp(action_str, "Open overlay"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_OPEN_OVERLAY;
+            }
+            else if (!strcmp(action_str, "Swap overlay"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_SWAP_OVERLAY;
+            }
+            else if (!strcmp(action_str, "Close overlay"))
+            {
+                interaction_action = FIGMA_INTERACTION_ACTION_CLOSE_OVERLAY;
+            }
+
+
+        }
+        else if (!strcmp(p->attr[i], "destination"))
+        {
+            destination = p->attr[++i];
+        }
+        else if (!strcmp(p->attr[i], "animation"))
+        {
+            const char *ani_str = p->attr[++i];
+            if (!strcmp(ani_str, "Instant"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_INSTANT;
+            }
+            else if (!strcmp(ani_str, "Dissolve"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_DISSOLVE;
+            }
+            else if (!strcmp(ani_str, "Smart animate"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_SMART_ANIMATE;
+            }
+            else if (!strcmp(ani_str, "Slide in"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_SLIDE_IN;
+            }
+            else if (!strcmp(ani_str, "Slide out"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_SLIDE_OUT;
+            }
+            else if (!strcmp(ani_str, "Move in"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_MOVE_IN;
+            }
+            else if (!strcmp(ani_str, "Move out"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_MOVE_OUT;
+            }
+            else if (!strcmp(ani_str, "Push"))
+            {
+                interaction_ani = FIGMA_INTERACTION_ANIMATION_PUSH;
+            }
+        }
+        else if (!strcmp(p->attr[i], "direction"))
+        {
+            const char *dir_str = p->attr[++i];
+            if (!strcmp(dir_str, "Left"))
+            {
+                interaction_direction = FIGMA_INTERACTION_DIRECTION_LEFT;
+            }
+            else if (!strcmp(dir_str, "Right"))
+            {
+                interaction_direction = FIGMA_INTERACTION_DIRECTION_RIGHT;
+            }
+            else if (!strcmp(dir_str, "Up"))
+            {
+                interaction_direction = FIGMA_INTERACTION_DIRECTION_UP;
+            }
+            else if (!strcmp(dir_str, "Down"))
+            {
+                interaction_direction = FIGMA_INTERACTION_DIRECTION_DOWN;
+            }
+            else
+            {
+                gui_log("Warning: Unknown direction '%s', using default Left\n", dir_str);
+                interaction_direction = FIGMA_INTERACTION_DIRECTION_LEFT;
+            }
+        }
+        else if (!strcmp(p->attr[i], "duration"))
+        {
+            const char *duration_str = p->attr[++i];
+            //dur
+            int from_length = strlen(duration_str);
+            int ms = 0;
+            for (size_t i = 0; i < from_length + 1; i++)
+            {
+                if (duration_str[i] == 'm')
+                {
+                    ms = 1;
+                    break;
+                }
+
+            }
+            duration = atoi(duration_str);
+            if (!ms)
+            {
+                duration = duration * 1000;
+            }
+        }
+        else if (!strcmp(p->attr[i], "curve"))
+        {
+            const char *curve_str = p->attr[++i];
+
+            if (!strcmp(curve_str, "Linear"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_LINEAR;
+            }
+            else if (!strcmp(curve_str, "Ease in"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_EASE_IN;
+            }
+            else if (!strcmp(curve_str, "Ease out"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_EASE_OUT;
+            }
+            else if (!strcmp(curve_str, "Ease in out"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_EASE_IN_AND_OUT;
+            }
+            else if (!strcmp(curve_str, "Ease in back"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_EASE_IN_BACK;
+            }
+            else if (!strcmp(curve_str, "Ease out back"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_EASE_OUT_BACK;
+            }
+            else if (!strcmp(curve_str, "Ease in out back"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_EASE_IN_AND_OUT_BACK;
+            }
+            else if (!strcmp(curve_str, "Custom bezier"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_CUSTOM_BEZIER;
+            }
+            else if (!strcmp(curve_str, "Gentle"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_GENTLE;
+            }
+            else if (!strcmp(curve_str, "Quick"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_QUICK;
+            }
+            else if (!strcmp(curve_str, "Bouncy"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_BOUNCY;
+            }
+            else if (!strcmp(curve_str, "Slow"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_SLOW;
+            }
+            else if (!strcmp(curve_str, "Custom spring"))
+            {
+                interaction_curve = FIGMA_INTERACTION_CURVE_CUSTOM_SPRING;
+            }
+            else
+            {
+                gui_log("Error: Unknown curve '%s', using default Linear\n", curve_str);
+            }
+
+
+        }
+        i++;
+    }
+
+
+    char *ptxt = get_space_string_head(p->txt);
+    gui_win_t *win = (void *)parent;
+    frame_macro_interaction_param_t *param = malloc(sizeof(frame_macro_interaction_param_t));
+    if (param == NULL)
+    {
+        gui_log("Error: Memory allocation failed for frame_macro_interaction_param");
+        return NULL;
+    }
+    param->action = interaction_action;
+    param->animation = interaction_ani;
+    param->curve = interaction_curve;
+    param->direction = interaction_direction;
+    param->duration = duration;
+    if (destination)
+    {
+        param->destination = gui_strdup(destination);
+    }
+    if (interaction_trigger == FIGMA_INTERACTION_TRIGGER_ON_TAP)
+    {
+        gui_win_click(win, win_frame_on_tap_func, param);
+    }
+    else if (interaction_trigger == FIGMA_INTERACTION_TRIGGER_ON_DRAG)
+    {
+        //gui_win_press(win, win_frame_on_drag_func_in, param);
+        gui_win_press(win, win_frame_on_drag_func_in_judge, param);
+        //gui_win_release(win, win_frame_on_drag_func_out, param);
+    }
+
+
+    return parent;
+}
 static gui_obj_t *widget_create_macro_wifi(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
 
@@ -10305,6 +11722,9 @@ static xml_widget_create_t xml_widget_create_array[] =
     {MACRO_CONNECTED, widget_create_macro_on_connected},
     {MACRO_DISCONNECTED, widget_create_macro_on_disconnected},
     {MACRO_CONNECTING, widget_create_macro_on_connecting},
+    {MACRO_FRAME, widget_create_macro_frame},
+    {MACRO_INTERACTION, widget_create_macro_interaction},
+    {MACRO_FPS, widget_create_macro_fps},
 };
 
 static gui_obj_t *widget_create_interface(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
