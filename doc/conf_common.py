@@ -194,6 +194,7 @@ breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
 
 breathe_default_members = ('inner', 'members', 'protected-members', 'private-members', 'undoc-members')
 breathe_show_include = False
+breathe_show_define_initializer=True
 # breathe_debug_trace_directives = True
 # breathe_debug_trace_qualification = True
 

@@ -468,6 +468,18 @@ html.writer-html4 .rst-content dl:not(.docutils)>dt,
 html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)>dt {
     color: inherit;
 }
+dl.macro span.sig-name + span.pre,
+dl.macro span.sig-name + span.sig-paren,
+dl.macro span.sig-name + a.reference {
+    margin-left: 15px;
+}
+dl.macro span.sig-name ~ span.pre,
+dl.macro span.sig-name ~ span.sig-paren,
+dl.macro span.sig-name ~ span.n,
+dl.macro span.sig-name ~ p {
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+    color: darkcyan;
+}
 /* ========= Render Code Block Style ========= */
 
 /* =========== Render Math Style =========== */
@@ -616,18 +628,18 @@ section[id*="deprecated-api"] dd dl {
     line-height: 40px;
     text-align: center;
     font-size: 24px;
-    background-color: #0068B6;
+    background-color: #2980b9;
     color: #fff;
     border-color: transparent;
     border-radius: 50%;
     box-shadow: 0 0 5px 0 rgba(0,0,0,.27);
     cursor: pointer;
     z-index: 900;
-    transition: all .3s ease-out;
+    /* transition: all .3s ease-out; */
 }
  
 #back-to-top:hover {
-    background-color: #064778;
+    background-color: #0068B6;
 }
 /* ==== Render back-to-top icon style ==== */
 
