@@ -51,7 +51,7 @@ static const gui_view_descriptor_t descriptor =
     .on_switch_in = ui_text_font,
     .on_switch_out = NULL,
 };
-char *text_string[FONT_NUM] =
+static char *text_string[FONT_NUM] =
 {
     "滕王高阁临江渚，佩玉鸣鸾罢歌舞。",
     "画栋朝飞南浦云，珠帘暮卷西山雨。",
@@ -82,7 +82,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     left_view = gui_view_descriptor_get("test_font_vector_rendering");
-    right_view = gui_view_descriptor_get("test_font_bitmap_matrix_rendering");
+    right_view = gui_view_descriptor_get("test_font_bitmap_rendering_benchmark");
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);

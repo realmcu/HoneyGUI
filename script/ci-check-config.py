@@ -38,6 +38,7 @@ ci_check_config = {
         r"README.md",
         r"README_zh.md",
         r"example/widget/text/test_font_vector_rendering_benchmark.c",
+        r"example/widget/text/test_font_bitmap_rendering_benchmark.c",
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",

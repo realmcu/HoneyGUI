@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file test_font_bitmap_matrix_rendering.c
+  * @file test_font_bitmap_rendering_benchmark.c
   * @brief font rendering test
   * @details
   * @author luke_sun@realsil.com.cn
@@ -31,8 +31,8 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define CURRENT_VIEW_NAME "test_font_bitmap_matrix_rendering"
-#define FONT_NUM 4
+#define CURRENT_VIEW_NAME "test_font_bitmap_rendering_benchmark"
+#define FONT_NUM 15
 
 /*============================================================================*
  *                            Variables
@@ -53,12 +53,22 @@ static const gui_view_descriptor_t descriptor =
 };
 static char *text_string[FONT_NUM] =
 {
-    "abcdefg",
-    "1234567",
-    "!@#$%^&",
-    "QWERTYU",
+    "滕王高阁临江渚, 佩玉鸣鸾罢歌舞. ",
+    "画栋朝飞南浦云, 珠帘暮卷西山雨. ",
+    "闲云潭影日悠悠, 物换星移几度秋. ",
+    "阁中帝子今何在? 槛外长江空自流. ",
+    "滕王高阁临江渚, 佩玉鸣鸾罢歌舞. ",
+    "画栋朝飞南浦云, 珠帘暮卷西山雨. ",
+    "闲云潭影日悠悠, 物换星移几度秋. ",
+    "阁中帝子今何在? 槛外长江空自流. ",
+    "滕王高阁临江渚, 佩玉鸣鸾罢歌舞. ",
+    "画栋朝飞南浦云, 珠帘暮卷西山雨. ",
+    "闲云潭影日悠悠, 物换星移几度秋. ",
+    "阁中帝子今何在? 槛外长江空自流. ",
+    "滕王高阁临江渚, 佩玉鸣鸾罢歌舞. ",
+    "画栋朝飞南浦云, 珠帘暮卷西山雨. ",
+    "闲云潭影日悠悠, 物换星移几度秋. ",
 };
-
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -71,68 +81,32 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static int gui_view_get_other_view_descriptor_init(void)
 {
-    left_view = gui_view_descriptor_get("test_font_bitmap_rendering_benchmark");
-    right_view = gui_view_descriptor_get("test_font_bitmap_matrix_img_rendering");
+    left_view = gui_view_descriptor_get("test_font_vector_rendering_benchmark");
+    right_view = gui_view_descriptor_get("test_font_bitmap_matrix_rendering");
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void ui_text_font(gui_view_t *view)
 {
-    gui_color_t color[FONT_NUM];
-    color[0] = APP_COLOR_WHITE;
-    color[1] = APP_COLOR_RED;
-    color[2] = APP_COLOR_GREEN;
-    color[3] = APP_COLOR_BLUE;
-    gui_text_t *text1[FONT_NUM];
-    gui_text_t *text2[FONT_NUM];
-    gui_text_t *text4[FONT_NUM];
-    gui_text_t *text8[FONT_NUM];
+    gui_text_t *text[FONT_NUM];
     struct gui_dispdev *dc = gui_get_dc();
     uint32_t font_size = 32;
+
     for (int i = 0; i < FONT_NUM; i++)
     {
-        text1[i] = gui_text_create(view, "text1", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 0 / 2, 300, font_size);
-        gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_MAT, color[i], strlen(text_string[i]),
+        text[i] = gui_text_create(view, "text1", 0, font_size * i, 0, font_size);
+        gui_text_set(text[i], text_string[i], GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(text_string[i]),
                      font_size);
-        gui_text_type_set(text1[i], font32b1, FONT_SRC_MEMADDR);
-        gui_text_use_matrix_by_img(text1[i], 0);
-    }
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text2[i] = gui_text_create(view, "text2", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 1 / 2, 300, font_size);
-        gui_text_set(text2[i], text_string[i], GUI_FONT_SRC_MAT, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text2[i], font32b2, FONT_SRC_MEMADDR);
-        gui_text_use_matrix_by_img(text2[i], 0);
-    }
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text4[i] = gui_text_create(view, "text4", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 2 / 2, 300, font_size);
-        gui_text_set(text4[i], text_string[i], GUI_FONT_SRC_MAT, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text4[i], font32b4, FONT_SRC_MEMADDR);
-        gui_text_use_matrix_by_img(text4[i], 0);
-    }
-    for (int i = 0; i < FONT_NUM; i++)
-    {
-        text8[i] = gui_text_create(view, "text8", i % 2 * dc->screen_width / 2,
-                                   font_size * (i / 2) + font_size * FONT_NUM * 3 / 2, 300, font_size);
-        gui_text_set(text8[i], text_string[i], GUI_FONT_SRC_MAT, color[i], strlen(text_string[i]),
-                     font_size);
-        gui_text_type_set(text8[i], font32b8, FONT_SRC_MEMADDR);
-        gui_text_use_matrix_by_img(text8[i], 0);
+        gui_text_type_set(text[i], font32b2, FONT_SRC_MEMADDR);
     }
 
     gui_text_t *test_name = gui_text_create(view, "test_name", 0, dc->screen_height - font_size,
                                             dc->screen_width, font_size);
-    gui_text_set(test_name, (void *)descriptor.name, GUI_FONT_SRC_MAT, APP_COLOR_WHITE,
+    gui_text_set(test_name, (void *)descriptor.name, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(descriptor.name), font_size);
     gui_text_type_set(test_name, font32b2, FONT_SRC_MEMADDR);
-    gui_text_use_matrix_by_img(test_name, 0);
+
 
     gui_view_switch_on_event(view, left_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_RIGHT);
     gui_view_switch_on_event(view, right_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_LEFT);
