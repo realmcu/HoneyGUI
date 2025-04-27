@@ -8,3 +8,8 @@
 cmake -G "MinGW Makefiles" -B ttt
 
 cmake -G "MinGW Makefiles" -B ttt -DSOC=RTL8762G
+
+
+cmake -G "MinGW Makefiles" -B ttt && cmake --build ttt
+
+rmdir /S /Q ttt && cmake -G "MinGW Makefiles" -B ttt && cmake --build ttt

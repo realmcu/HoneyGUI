@@ -16,7 +16,7 @@ CC = PREFIX + 'gcc'
 AS = PREFIX + 'gcc'
 AR = PREFIX + 'ar'
 CXX = PREFIX + 'g++'
-LINK = PREFIX + 'gcc'
+LINK = PREFIX + 'g++'
 TARGET_EXT = 'elf'
 SIZE = PREFIX + 'size'
 OBJDUMP = PREFIX + 'objdump'
@@ -32,7 +32,7 @@ CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11'
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
 
 LFLAGS = ' -T default.ld'
-LFLAGS += ' -flto' #for arm2d
+# LFLAGS += ' -flto' #for arm2d
 LFLAGS += ' -pthread'
 LFLAGS += ' -Wl,-Map=gui.map'
 

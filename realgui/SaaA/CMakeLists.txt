@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.10)
 # Define a variable for the library name
 if(CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP)
 
+    target_compile_definitions(${GUI_TARGET_NAME} PRIVATE ENABLE_RTK_GUI_SCRIPT_AS_A_APP)
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 

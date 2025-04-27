@@ -26,6 +26,7 @@ TARGET = 'gui.' + 'exe'
 
 env = Environment(tools = ['mingw'],
                   CC=menu_config.CC, CFLAGS = menu_config.CFLAGS,
+                  LINK=menu_config.LINK,
                   CXX = menu_config.CXX, CXXFLAGS = menu_config.CXXFLAGS,
                   LINKFLAGS = menu_config.LFLAGS)
 
@@ -47,12 +48,28 @@ LEGACY_UI = os.path.abspath('./../rtkv0/')
 
 
 print("CC: ", env['CC'])
+print("LINK: ", env['LINK'])
+
 print("CCFLAGS: ", env['CCFLAGS'])
 print("CXXFLAGS: ", env['CXXFLAGS'])
 print("LINKFLAGS: ", env['LINKFLAGS'])
 
 print('TOOL ROOT = ' + TOOL_ROOT)
 print('RTK GUI ENGINE ROOT = ' + RTK_GUI_ENGINE)
+
+import subprocess
+
+def compile_resource(rc_file, output_file):
+    try:
+        subprocess.run(['windres', rc_file, '-O', 'coff', '-o', output_file], check=True)
+        print(f'Successfully compiled {rc_file} to {output_file}')
+    except subprocess.CalledProcessError as e:
+        print(f'An error occurred: {e}')
+    except FileNotFoundError:
+        print('windres command not found. Ensure MinGW is installed and windres is in the system PATH.')
+
+compile_resource('version.rc', 'version.o')
+
 
 # prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)

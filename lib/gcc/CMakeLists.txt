@@ -7,7 +7,7 @@ SET(CMAKE_CXX_COMPILER g++)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS ON) 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS ON)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -19,7 +19,19 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/install" CACHE PATH "Insta
 
 
 
+# Apply the flags to C and C++ compiler settings
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
+    -xc \
+	-O0 -g -gdwarf-2 -static-libgcc -fno-strict-aliasing \
+	-std=gnu11 ")
+	
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+	-O0 -g -gdwarf-2 -static-libgcc \
+	-std=c++11 ")
 
+
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
 project(HoneyGUI)
 
 
@@ -29,6 +41,8 @@ set(GUI_TARGET_NAME gui)
 add_library(${GUI_TARGET_NAME} STATIC)
 add_subdirectory(../../realgui build/realgui)
 
+set(CMAKE_INSTALL_PREFIX "C:/Users/howie_wang.RSDOMAIN/Desktop/test/HoneyGUI/install")
+
 install(TARGETS ${GUI_TARGET_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
@@ -37,6 +51,22 @@ install(TARGETS ${GUI_TARGET_NAME}
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/gui_version.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})		
+
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/core/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/app/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/dc/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/input/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/engine/*.h")
+list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/3rd/cJSON/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 
 install(FILES ${HEADER_FILES} DESTINATION include)
