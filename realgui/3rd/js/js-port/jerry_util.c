@@ -246,12 +246,12 @@ void js_value_dump(jerry_value_t value)
     _js_value_dump(value);
     printf("\n");
 }
-#ifdef __arm__
-#include "romfs.h"
-#else
+
+#ifdef __WIN32
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
+
 int js_read_file(const char *filename, char **script)
 {
 #ifdef __WIN32

@@ -1511,8 +1511,8 @@ void js_ui_timerThread(void *param)
     pthread_exit(NULL);
 }
 #else
-#include "os_timer.h"
-#include "trace.h"
+//#include "os_timer.h"
+//#include "trace.h"
 
 #if defined (RTL87x2G)
 void arm_js_timercb(void *p_handle)

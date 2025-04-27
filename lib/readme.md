@@ -1,7 +1,3 @@
-1. support gcc generate lib
-2. support cmsis pack
-
-
 
 
 
@@ -10,6 +6,9 @@ cmake -G "MinGW Makefiles" -B ttt
 cmake -G "MinGW Makefiles" -B ttt -DSOC=RTL8762G
 
 
-cmake -G "MinGW Makefiles" -B ttt && cmake --build ttt
+cmake -G "MinGW Makefiles" -B ttt && cmake --build ttt ---target install
+rmdir /S /Q ttt cmake -G "MinGW Makefiles" -B ttt && cmake --build ttt ---target install
 
-rmdir /S /Q ttt && cmake -G "MinGW Makefiles" -B ttt && cmake --build ttt
+
+cmake -G "MinGW Makefiles" -B ttt  -DSOC=RTL8773E && cmake --build ttt  ---target install
+rmdir /S /Q ttt && cmake -G "MinGW Makefiles" -B ttt   -DSOC=RTL8773E && cmake --build ttt ---target install

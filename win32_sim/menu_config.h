@@ -125,10 +125,6 @@
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
 // </c>
 
-// <c> RTK GUI Font Enable RTK MEM
-#define CONFIG_REALTEK_BUILD_GUI_FONT_RTK_MEM
-// </c>
-
 // <c> RTK GUI Font Enable TTF SVG
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
 // </c>
