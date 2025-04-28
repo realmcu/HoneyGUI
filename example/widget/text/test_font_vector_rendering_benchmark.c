@@ -99,6 +99,7 @@ static void ui_text_font(gui_view_t *view)
         gui_text_set(text[i], text_string[i], GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(text_string[i]),
                      font_size);
         gui_text_type_set(text[i], font32vb4, FONT_SRC_MEMADDR);
+        gui_text_rendermode_set(text[i], 2);
     }
 
     gui_text_t *test_name = gui_text_create(view, "test_name", 0, dc->screen_height - font_size,

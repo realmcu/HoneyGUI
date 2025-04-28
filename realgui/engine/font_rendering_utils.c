@@ -31,22 +31,19 @@ static const uint8_t alpha_list_4bpp[16] = {0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x6
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/* Architecture feature detection */
-#if defined(__ARM_FEATURE_MVE)
-#define FONT_RENDERING_MVE  1  // [Config] Enable MVE acceleration (0-disable)
-#include "arm_mve.h"
-#else
-#define FONT_RENDERING_MVE  0  // Auto-set based on arch
-#endif
+/* User-configurable options (can be placed in header or compile options) */
+#define CONFIG_USE_MVE     1  // [Config] Enable MVE acceleration
+#define CONFIG_USE_TURBO   1  // [Config] Enable Turbo mode
 
-/* Rendering pipeline configuration */
-#if FONT_RENDERING_MVE
-#define FONT_RENDERING_TURBO  0  // Disable Turbo when MVE active
-#define FONT_RENDERING_STABLE 0  // Disable Stable when MVE active
+/* Final rendering mode decision */
+#if CONFIG_USE_MVE && defined(__ARM_FEATURE_MVE)
+#include "arm_mve.h"
+#define FONT_RENDERING_MVE   1
 #else
-#define FONT_RENDERING_TURBO  1  // [Config] Turbo mode (0-enables Stable)
-#define FONT_RENDERING_STABLE (!FONT_RENDERING_TURBO) // Auto-fallback
+#define FONT_RENDERING_MVE   0
 #endif
+#define FONT_RENDERING_TURBO CONFIG_USE_TURBO
+#define FONT_RENDERING_STABLE 1
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -54,30 +51,8 @@ static const uint8_t alpha_list_4bpp[16] = {0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x6
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-#if FONT_RENDERING_STABLE
-static void font_render_1bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *glyph)
-{
-    uint8_t *dots = glyph->data;
-    uint16_t *writebuf = (uint16_t *)font->target_buf;
-    uint16_t color_output = rgba2565(font->color);
-    uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
-    uint32_t write_stride = font->target_buf_stride / 2;
-    uint32_t dots_stride = glyph->stride / ppb;
-    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
-    {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
-        {
-            if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
-            {
-                writebuf[write_off + j - font->target_rect.x1] = color_output;
-            }
-        }
-    }
-}
-#endif
-#if FONT_RENDERING_TURBO
+#if FONT_RENDERING_MVE
+#elif FONT_RENDERING_TURBO
 static void font_render_1bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
@@ -167,6 +142,28 @@ static void font_render_1bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
         dots_off += dots_stride;
     }
 }
+#elif FONT_RENDERING_STABLE
+static void font_render_1bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *glyph)
+{
+    uint8_t *dots = glyph->data;
+    uint16_t *writebuf = (uint16_t *)font->target_buf;
+    uint16_t color_output = rgba2565(font->color);
+    uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
+    uint32_t write_stride = font->target_buf_stride / 2;
+    uint32_t dots_stride = glyph->stride / ppb;
+    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride;
+        int dots_off = (i - glyph->pos_y) * dots_stride;
+        for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        {
+            if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
+            {
+                writebuf[write_off + j - font->target_rect.x1] = color_output;
+            }
+        }
+    }
+}
 #endif
 static void font_render_1bpp_to_ARGB8565_stable(draw_font_t *font, font_glyph_t *glyph)
 {
@@ -240,34 +237,8 @@ static void font_render_1bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
         }
     }
 }
-#if FONT_RENDERING_STABLE
-static void font_render_2bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *glyph)
-{
-    uint8_t *dots = glyph->data;
-    uint16_t *writebuf = (uint16_t *)font->target_buf;
-    uint16_t color_output = rgba2565(font->color);
-    uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
-    uint32_t write_stride = font->target_buf_stride / 2;
-    uint32_t dots_stride = glyph->stride / ppb;
-    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
-    {
-        int write_off = (i - font->target_rect.y1) * write_stride;
-        int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
-        {
-            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
-            alpha &= 0x03;
-            if (alpha)
-            {
-                alpha = alpha_list_2bpp[alpha];
-                uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
-                writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-            }
-        }
-    }
-}
-#endif
-#if FONT_RENDERING_TURBO
+#if FONT_RENDERING_MVE
+#elif FONT_RENDERING_TURBO
 static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
@@ -411,6 +382,32 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
         }
         write_off += font->target_rect.x2 - font->target_rect.x1 + 1;
         dots_off += (glyph->stride / ppb);
+    }
+}
+#elif FONT_RENDERING_STABLE
+static void font_render_2bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *glyph)
+{
+    uint8_t *dots = glyph->data;
+    uint16_t *writebuf = (uint16_t *)font->target_buf;
+    uint16_t color_output = rgba2565(font->color);
+    uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
+    uint32_t write_stride = font->target_buf_stride / 2;
+    uint32_t dots_stride = glyph->stride / ppb;
+    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride;
+        int dots_off = (i - glyph->pos_y) * dots_stride;
+        for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        {
+            uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
+            alpha &= 0x03;
+            if (alpha)
+            {
+                alpha = alpha_list_2bpp[alpha];
+                uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
+                writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
+            }
+        }
     }
 }
 #endif
@@ -618,6 +615,100 @@ static void font_render_4bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
     }
 }
 
+#if FONT_RENDERING_MVE
+static void font_render_8bpp_to_RGB565_mve(draw_font_t *font, font_glyph_t *glyph)
+{
+    uint8_t *dots = glyph->data;
+    uint16_t *writebuf = (uint16_t *)font->target_buf;
+    uint16_t color_output = rgba2565(font->color);
+    uint16_t color_back;
+    uint32_t write_stride = font->target_buf_stride / 2;
+    uint32_t dots_stride = glyph->stride;
+
+    const int x_start = font->clip_rect.x1;
+    const int y_start = font->clip_rect.y1;
+    const int x_end = font->clip_rect.x2 + 1;
+    const int y_end = font->clip_rect.y2 + 1;
+
+    uint32_t loopCount = (x_end - x_start) / 8;
+    uint32_t loopsLeft = (x_end - x_start) % 8;
+
+
+    bool max_opacity = false;
+
+    if (font->color.color.rgba.a == 0xff)
+    {
+        max_opacity = true;
+    }
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - font->target_rect.y1) * write_stride - font->target_rect.x1;
+        int dots_off = (i - glyph->pos_y) * dots_stride - glyph->pos_x;
+
+        /*helium code start*/
+        for (uint32_t loopc = 0; loopc < loopCount; loopc ++)
+        {
+            uint16_t js = x_start + 8 * loopc;
+            uint16x8_t alphav = vldrbq_u16(&dots[dots_off + js]);
+
+            if (vaddvq_u16(alphav) == 0)
+            {
+                continue;
+            }
+            if (!max_opacity)
+            {
+                alphav = vmulq_n_u16(alphav, (uint16_t)font->color.color.rgba.a);
+                alphav = vrshrq_n_u16(alphav, 8);
+            }
+
+            uint16x8_t outrv = vmulq_n_u16(alphav, (uint16_t)font->color.color.rgba.r);
+            uint16x8_t outgv = vmulq_n_u16(alphav, (uint16_t)font->color.color.rgba.g);
+            uint16x8_t outbv = vmulq_n_u16(alphav, (uint16_t)font->color.color.rgba.b);
+
+            //read back color
+            uint16x8_t color_backv = vld1q(&writebuf[write_off + js]);
+
+            uint16x8_t color_backr = vbicq_n_u16(color_backv, 0x0700);
+            color_backr = vshrq_n_u16(color_backr, 8);
+            uint16x8_t color_backg = vbicq_n_u16(color_backv, 0xF800);
+            color_backg = vbicq_n_u16(color_backg, 0x001F);
+            color_backg = vshrq_n_u16(color_backg, 3);
+            uint16x8_t color_backb = vbicq_n_u16(color_backv, 0xFF00);
+            color_backb = vbicq_n_u16(color_backb, 0x00E0);
+            color_backb = vshlq_n_u16(color_backb, 3);
+
+            uint16x8_t alphabv = vdupq_n_u16(0xff);
+            alphabv = vsubq_u16(alphabv, alphav);
+
+            color_backr = vmulq_u16(color_backr, alphabv);
+            color_backg = vmulq_u16(color_backg, alphabv);
+            color_backb = vmulq_u16(color_backb, alphabv);
+
+            outrv = vaddq_u16(outrv, color_backr);
+            outgv = vaddq_u16(outgv, color_backg);
+            outbv = vaddq_u16(outbv, color_backb);
+
+            uint16x8_t resultv = vdupq_n_u16(0);
+            resultv = vsriq_n_u16(outbv, resultv, 5);
+            resultv = vsriq_n_u16(outgv, resultv, 6);
+            resultv = vsriq_n_u16(outrv, resultv, 5);
+
+            vst1q_u16(&writebuf[write_off + js], resultv);
+        }
+        /*helium code end*/
+        for (uint32_t j = x_end - loopsLeft; j < x_end; j++)
+        {
+            uint8_t alpha = dots[dots_off + j];
+            if (alpha)
+            {
+                alpha = font->color.color.rgba.a * alpha / 0xff;
+                color_back = writebuf[write_off + j];
+                writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
+            }
+        }
+    }
+}
+#elif FONT_RENDERING_STABLE
 static void font_render_8bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
@@ -641,6 +732,7 @@ static void font_render_8bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
         }
     }
 }
+#endif
 
 static void font_render_8bpp_to_ARGB8565_stable(draw_font_t *font, font_glyph_t *glyph)
 {
@@ -754,24 +846,25 @@ static void font_render_1bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
      * Stable   - 100% speed baseline
      * Turbo    - 200% faster (2x speedup) in tests
      */
-#if FONT_RENDERING_TURBO
-    font_render_1bpp_to_RGB565_turbo(font, glyph);      // 200% optimized
-#endif
-#if FONT_RENDERING_STABLE
-    font_render_1bpp_to_RGB565_stable(font, glyph);     // 100% baseline
+#if FONT_RENDERING_MVE
+
+#elif FONT_RENDERING_TURBO
+    font_render_1bpp_to_RGB565_turbo(font, glyph);
+#elif FONT_RENDERING_STABLE
+    font_render_1bpp_to_RGB565_stable(font, glyph);
 #endif
 }
 static void font_render_1bpp_to_ARGB8565(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_1bpp_to_ARGB8565_stable(font, glyph);     // 100% baseline
+    font_render_1bpp_to_ARGB8565_stable(font, glyph);
 }
 static void font_render_1bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_1bpp_to_ARGB8888_stable(font, glyph);     // 100% baseline
+    font_render_1bpp_to_ARGB8888_stable(font, glyph);
 }
 static void font_render_1bpp_to_RGB888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_1bpp_to_RGB888_stable(font, glyph);     // 100% baseline
+    font_render_1bpp_to_RGB888_stable(font, glyph);
 }
 
 static void font_render_2bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
@@ -780,58 +873,67 @@ static void font_render_2bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
      * Stable   - 100% speed baseline
      * Turbo    - 154% faster (1.54x speedup) in tests
      */
-#if FONT_RENDERING_TURBO
-    font_render_2bpp_to_RGB565_turbo(font, glyph);      // 154% optimized
-#endif
-#if FONT_RENDERING_STABLE
-    font_render_2bpp_to_RGB565_stable(font, glyph);     // 100% baseline
+#if FONT_RENDERING_MVE
+
+#elif FONT_RENDERING_TURBO
+    font_render_2bpp_to_RGB565_turbo(font, glyph);
+#elif FONT_RENDERING_STABLE
+    font_render_2bpp_to_RGB565_stable(font, glyph);
 #endif
 }
 static void font_render_2bpp_to_RGB888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_2bpp_to_RGB888_stable(font, glyph);     // 100% baseline
+    font_render_2bpp_to_RGB888_stable(font, glyph);
 }
 static void font_render_2bpp_to_ARGB8565(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_2bpp_to_ARGB8565_stable(font, glyph);     // 100% baseline
+    font_render_2bpp_to_ARGB8565_stable(font, glyph);
 }
 static void font_render_2bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_2bpp_to_ARGB8888_stable(font, glyph);     // 100% baseline
+    font_render_2bpp_to_ARGB8888_stable(font, glyph);
 }
 
 static void font_render_4bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_4bpp_to_RGB565_stable(font, glyph);     // 100% baseline
+    font_render_4bpp_to_RGB565_stable(font, glyph);
 }
 static void font_render_4bpp_to_RGB888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_4bpp_to_RGB888_stable(font, glyph);     // 100% baseline
+    font_render_4bpp_to_RGB888_stable(font, glyph);
 }
 static void font_render_4bpp_to_ARGB8565(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_4bpp_to_ARGB8565_stable(font, glyph);     // 100%
+    font_render_4bpp_to_ARGB8565_stable(font, glyph);
 }
 static void font_render_4bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_4bpp_to_ARGB8888_stable(font, glyph);     // 100% baseline
+    font_render_4bpp_to_ARGB8888_stable(font, glyph);
 }
 
 static void font_render_8bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_8bpp_to_RGB565_stable(font, glyph);     // 100% baseline
+    /* Version performance markers:
+     * Stable   - 100% speed baseline
+     * MVE      - 250% faster (2.5x speedup) in tests
+     */
+#if FONT_RENDERING_MVE
+    font_render_8bpp_to_RGB565_mve(font, glyph);
+#elif FONT_RENDERING_STABLE
+    font_render_8bpp_to_RGB565_stable(font, glyph);
+#endif
 }
 static void font_render_8bpp_to_ARGB8565(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_8bpp_to_ARGB8565_stable(font, glyph);     // 100% baseline
+    font_render_8bpp_to_ARGB8565_stable(font, glyph);
 }
 static void font_render_8bpp_to_RGB888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_8bpp_to_RGB888_stable(font, glyph);     // 100% baseline
+    font_render_8bpp_to_RGB888_stable(font, glyph);
 }
 static void font_render_8bpp_to_ARGB8888(draw_font_t *font, font_glyph_t *glyph)
 {
-    font_render_8bpp_to_ARGB8888_stable(font, glyph);     // 100% baseline
+    font_render_8bpp_to_ARGB8888_stable(font, glyph);
 }
 
 /*============================================================================*
