@@ -4,7 +4,7 @@
 列表 (List)
 =====================
 
-列表控件 (List) 作为容器可以在水平或垂直方向上添加任意数量的表格，每个表格都可以添加其他的控件，如按钮控件，图片控件等等，用户可以通过上下左右滑动来访问添加到列表控件上的其他控件。
+列表控件 (List) 作为容器可以在水平或垂直方向上添加任意数量的表格，每个表格都可以添加其他的控件，如文本控件，图片控件等等，用户可以通过上下左右滑动来访问添加到列表控件上的其他控件。
 
 .. raw:: html
 
@@ -39,6 +39,15 @@
    :end-before: /* LIST_STYLE enum end*/
 
 
+设置列表控件的减速系数
+~~~~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_list_set_factor` 函数设置列表控件的减速系数。
+
+
+设置列表控件的偏移位置
+~~~~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_list_set_offset` 函数设置列表控件的偏移位置。
+
 示例
 -----
 
@@ -57,12 +66,22 @@
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CIRCLE STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745465641258093460/9ee9d166_10737458.gif" style="width: 100%;">
+         <img src="https://foruda.gitee.com/images/1745829566941521625/3f80e640_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CARD STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL ZOOM STYLE</p>
+      </div>
+   </div>
+   <div style="display: flex; justify-content: space-between;">
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745819904731135543/290c9d96_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL FAN STYLE</p>
+      </div>
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745819920755179437/13b09db2_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL HELIX STYLE</p>
       </div>
    </div>
    <br>

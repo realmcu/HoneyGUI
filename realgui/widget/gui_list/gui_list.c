@@ -40,6 +40,20 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static void gui_list_tab_animate_timer_cb(void *obj)
+{
+    gui_list_tab_t *this = (gui_list_tab_t *)obj;
+    gui_obj_t *o = GUI_BASE(obj);
+
+    this->animate_cnt++;
+    if (this->animate_cnt > LIST_TAB_ANIMATE_MAX)
+    {
+        this->animate_cnt = 0;
+        gui_free(o->timer);
+        o->timer = NULL;
+    }
+}
+
 static void gui_list_update_speed(gui_list_widget_t *this, int16_t tp_delta)
 {
     int record_num = 4;
@@ -84,38 +98,39 @@ static void gui_list_input_prepare(gui_obj_t *obj)
     if (!tp->pressing)
     {
         int temp = this->dir == HORIZONTAL ? obj->w : obj->h;
-        int offset_min = temp - this->total_length;
-        int offset_max = OUT_SCOPE;
-        if (this->style == LIST_CARD)
-        {
-            offset_max = temp - this->tab_length;
-            offset_min -= temp / 3;
-        }
 
         // restore list offset
         if (this->speed == 0)
         {
-            if (this->offset >= GUI_FRAME_STEP)
+            int offset_min = temp - this->total_length;
+            int offset_max = 0;
+            if (this->style == LIST_CARD)
             {
-                this->offset -= GUI_FRAME_STEP;
+                offset_max = temp - this->tab_length;
+                offset_min -= temp / 3;
             }
-            else if (this->offset > 0)
+            if (this->offset > offset_max || this->offset < offset_min)
             {
-                this->offset = 0;
-            }
-            else if (this->offset <= offset_min - GUI_FRAME_STEP)
-            {
-                this->offset += GUI_FRAME_STEP;
-            }
-            else if (this->offset < offset_min)
-            {
-                this->offset = offset_min;
+                float e_factor = 0.2f;
+                int16_t target = this->offset >= 0 ? offset_max : offset_min;
+                int16_t distance = target - this->offset;
+                int delta = (int16_t)(distance * e_factor); //exponential decay
+                if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
+                this->offset += delta;
             }
         }
         else
         {
+            int offset_min = temp - this->total_length;
+            int offset_max = OUT_SCOPE;
+            if (this->style == LIST_CARD)
+            {
+                offset_max = temp - this->tab_length;
+                offset_min -= temp / 3;
+            }
+
             this->offset += this->speed;
-            this->speed >= 0 ? this->speed-- : this->speed++;
+            this->speed = (int16_t)((1 - this->factor) * this->speed);
             if (this->offset > offset_max)
             {
                 this->offset = offset_max;
@@ -140,17 +155,12 @@ static void gui_list_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
 
-
-    // animation update
-    // animate_frame_update(this->animate, obj);
-
     uint8_t last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, (uint8_t)sizeof(gui_list_widget_t));
     if (last != this->checksum)
     {
         gui_fb_change();
-        // gui_log("fb_change, obj->y = %d, m[0][2] = %f\n", obj->y, obj->matrix->m[0][2]);
     }
 }
 
@@ -221,11 +231,47 @@ static void gui_list_tab_input_prepare(gui_obj_t *obj)
 
     if (list->dir == HORIZONTAL)
     {
+        int16_t x_old = obj->x;
         obj->x = this->start_x + list->offset;
+        if ((list->style >= LIST_FAN) && list->speed)
+        {
+            if (x_old + obj->w <= 0 && obj->x + obj->w > 0)
+            {
+                this->is_speed_positive = true;
+                gui_obj_create_timer(obj, 20, true, gui_list_tab_animate_timer_cb);
+                gui_obj_start_timer(obj);
+                this->animate_cnt = 1;
+            }
+            else if (x_old >= list->base.w && obj->x < list->base.w)
+            {
+                this->is_speed_positive = false;
+                gui_obj_create_timer(obj, 20, true, gui_list_tab_animate_timer_cb);
+                gui_obj_start_timer(obj);
+                this->animate_cnt = 1;
+            }
+        }
     }
     else
     {
+        int16_t y_old = obj->y;
         obj->y = this->start_y + list->offset;
+        if ((list->style >= LIST_FAN) && list->speed)
+        {
+            if (y_old + obj->h <= 0 && obj->y + obj->h > 0)
+            {
+                this->is_speed_positive = true;
+                gui_obj_create_timer(obj, 20, true, gui_list_tab_animate_timer_cb);
+                gui_obj_start_timer(obj);
+                this->animate_cnt = 1;
+            }
+            else if (y_old >= list->base.h && obj->y < list->base.h)
+            {
+                this->is_speed_positive = false;
+                gui_obj_create_timer(obj, 20, true, gui_list_tab_animate_timer_cb);
+                gui_obj_start_timer(obj);
+                this->animate_cnt = 1;
+            }
+        }
     }
 }
 
@@ -316,6 +362,33 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
             matrix_translate(obj->x, obj->y, obj->matrix);
         }
     }
+    else if (list->style == LIST_FAN)
+    {
+        if (obj->timer)
+        {
+            float start;
+            if (list->dir == HORIZONTAL)
+            {
+                start = this->is_speed_positive ? 30.0f : -30.0f;
+            }
+            else
+            {
+                start = this->is_speed_positive ? -30.0f : 30.0f;
+            }
+            float angle = start * (1.0f - (float)this->animate_cnt / LIST_TAB_ANIMATE_MAX);
+            matrix_rotate(angle, obj->matrix);
+        }
+    }
+    else if (list->style == LIST_HELIX)
+    {
+        extern void gui_list_rotate_helix(gui_list_tab_t *this, float degree);
+        if (obj->timer)
+        {
+            float start = this->is_speed_positive ? -180.0f : 180.0f;
+            float degree = start * (1.0f - (float)this->animate_cnt / LIST_TAB_ANIMATE_MAX);
+            gui_list_rotate_helix(this, degree);
+        }
+    }
 
     uint8_t last = this->checksum;
     this->checksum = 0;
@@ -343,18 +416,6 @@ static void gui_list_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
                 gui_list_tab_prepare(obj);
             }
             break;
-
-        // case OBJ_END:
-        //     {
-        //         gui_list_end(obj);
-        //     }
-        //     break;
-
-        // case OBJ_DESTROY:
-        //     {
-        //         gui_list_destroy(obj);
-        //     }
-        //     break;
 
         default:
             break;
@@ -464,6 +525,7 @@ gui_list_widget_t *gui_list_create(void       *parent,
     this->tab_length = tab_length;
     this->space = space;
     this->dir = dir;
+    this->factor = 0.05;
     if (dir == HORIZONTAL)
     {
         this->total_length = w;
@@ -545,4 +607,14 @@ gui_list_tab_t *gui_list_add_tab(gui_list_widget_t *list)
 void gui_list_set_style(gui_list_widget_t *list, LIST_STYLE style)
 {
     list->style = style;
+}
+
+void gui_list_set_factor(gui_list_widget_t *list, float factor)
+{
+    list->factor = factor;
+}
+
+void gui_list_set_offset(gui_list_widget_t *list, int16_t offset)
+{
+    list->offset = offset;
 }

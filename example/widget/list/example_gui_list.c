@@ -59,6 +59,28 @@ static int app_init(void)
     // }
     // gui_list_set_style(list, LIST_ZOOM);
 
+
+    /* VERTICAL FAN STYLE */
+    // int length = 100;
+    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
+    // for (uint8_t i = 0; i < 20; i++)
+    // {
+    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length, APP_COLOR_SILVER_OPACITY(150));
+    // }
+    // gui_list_set_style(list, LIST_FAN);
+
+
+    /* VERTICAL HELIX STYLE */
+    // int length = 100;
+    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
+    // for (uint8_t i = 0; i < 20; i++)
+    // {
+    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length, APP_COLOR_SILVER_OPACITY(150));
+    // }
+    // gui_list_set_style(list, LIST_HELIX);
+
     return 0;
 }
 

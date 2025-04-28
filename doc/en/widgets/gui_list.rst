@@ -4,7 +4,7 @@
 List
 =====================
 
-The list widget is a container for any number of list table, horizontally or vertically, and each table can have other widgets added to it, such as buttons, images, etc. Users can swipe up, down, left, or right to access other widgets added to the list table.
+The list widget is a container for any number of list table, horizontally or vertically, and each table can have other widgets added to it, such as text widgets, image widgets, etc. Users can swipe up, down, left, or right to access other widgets added to the list table.
 
 .. raw:: html
 
@@ -39,6 +39,15 @@ The :cpp:any:`gui_list_set_style` function can be used to set list moving style.
    :end-before: /* LIST_STYLE enum end*/
 
 
+Set List Widget Deceleration Factor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_factor` function can be used to set list deceleration factor.
+
+
+Set List Widget Offset
+~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_offset` function can be used to set list offset of position.
+
 Example
 ---------
 
@@ -57,12 +66,22 @@ Example
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CIRCLE STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745465641258093460/9ee9d166_10737458.gif" style="width: 100%;">
+         <img src="https://foruda.gitee.com/images/1745829566941521625/3f80e640_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CARD STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL ZOOM STYLE</p>
+      </div>
+   </div>
+   <div style="display: flex; justify-content: space-between;">
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745819904731135543/290c9d96_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL FAN STYLE</p>
+      </div>
+      <div style="width: 30%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1745819920755179437/13b09db2_10737458.gif" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL HELIX STYLE</p>
       </div>
    </div>
    <br>

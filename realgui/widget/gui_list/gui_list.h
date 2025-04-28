@@ -39,9 +39,11 @@ extern "C" {
 typedef enum
 {
     LIST_CLASSIC = 0x0000, ///< Classic list
-    LIST_CIRCLE  = 0x0001, ///< Circle list
-    LIST_ZOOM    = 0x0002, ///< Zoom center list
-    LIST_CARD    = 0x0003, ///< Stack like card
+    LIST_CIRCLE,           ///< Circle list
+    LIST_ZOOM,             ///< Zoom center list
+    LIST_CARD,             ///< Stack like card
+    LIST_FAN,              ///< Rotate like fan
+    LIST_HELIX,            ///< Rotate like helix
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/
@@ -64,8 +66,9 @@ typedef struct gui_list
     uint16_t tab_length; // list tab length
     int16_t speed;
     int16_t record[5];
+    float factor;        // (0~1.0] deceleration factor, defaults to 0.05
 
-    int offset;         // offset = hold + tp_delta, when sliding
+    int offset;          // offset = hold + tp_delta, when sliding
     int hold;
     int total_length;
 
@@ -77,6 +80,8 @@ typedef struct gui_list_tab
     gui_obj_t base;
     int start_x;
     int start_y;
+    uint16_t animate_cnt;
+    bool is_speed_positive;    // to judge move direction
 
     uint8_t checksum;
 } gui_list_tab_t;
@@ -92,6 +97,7 @@ typedef struct gui_list_tab
 #define OUT_SCOPE 100 // out scope of list
 #define GUI_MAX_SPEED 50
 #define GUI_MIN_SPEED 7
+#define LIST_TAB_ANIMATE_MAX 15
 /*============================================================================*
  *                         Variables
  *============================================================================*/
@@ -137,6 +143,20 @@ gui_list_tab_t *gui_list_add_tab(gui_list_widget_t *list);
  * @param style The moving style of the list.
  */
 void gui_list_set_style(gui_list_widget_t *list, LIST_STYLE style);
+
+/**
+ * @brief Set list deceleration factor, which defaults to 0.05.
+ * @param list Pointer to the list widget.
+ * @param factor The deceleration factor.
+ */
+void gui_list_set_factor(gui_list_widget_t *list, float factor);
+
+/**
+ * @brief Set list offset.
+ * @param list Pointer to the list widget.
+ * @param offset The list offset.
+ */
+void gui_list_set_offset(gui_list_widget_t *list, int16_t offset);
 
 
 #ifdef __cplusplus
