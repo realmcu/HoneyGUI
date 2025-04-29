@@ -12,6 +12,7 @@ if(1) #set to 1 to enable or variable to for depnedency
 			"${CMAKE_CURRENT_SOURCE_DIR}/draw_img.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/gui_matrix.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/draw_font.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_rendering_utils.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_img.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_matrix.c"
