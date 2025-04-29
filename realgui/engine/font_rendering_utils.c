@@ -51,8 +51,7 @@ static const uint8_t alpha_list_4bpp[16] = {0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x6
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-#if FONT_RENDERING_MVE
-#elif FONT_RENDERING_TURBO
+#if FONT_RENDERING_TURBO
 static void font_render_1bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
@@ -237,8 +236,7 @@ static void font_render_1bpp_to_ARGB8888_stable(draw_font_t *font, font_glyph_t 
         }
     }
 }
-#if FONT_RENDERING_MVE
-#elif FONT_RENDERING_TURBO
+#if FONT_RENDERING_TURBO
 static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *glyph)
 {
     uint8_t *dots = glyph->data;
@@ -846,9 +844,7 @@ static void font_render_1bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
      * Stable   - 100% speed baseline
      * Turbo    - 200% faster (2x speedup) in tests
      */
-#if FONT_RENDERING_MVE
-
-#elif FONT_RENDERING_TURBO
+#if FONT_RENDERING_TURBO
     font_render_1bpp_to_RGB565_turbo(font, glyph);
 #elif FONT_RENDERING_STABLE
     font_render_1bpp_to_RGB565_stable(font, glyph);
@@ -873,9 +869,7 @@ static void font_render_2bpp_to_RGB565(draw_font_t *font, font_glyph_t *glyph)
      * Stable   - 100% speed baseline
      * Turbo    - 154% faster (1.54x speedup) in tests
      */
-#if FONT_RENDERING_MVE
-
-#elif FONT_RENDERING_TURBO
+#if FONT_RENDERING_TURBO
     font_render_2bpp_to_RGB565_turbo(font, glyph);
 #elif FONT_RENDERING_STABLE
     font_render_2bpp_to_RGB565_stable(font, glyph);
