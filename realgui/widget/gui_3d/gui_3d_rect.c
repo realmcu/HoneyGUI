@@ -29,7 +29,7 @@
 #include "gui_fb.h"
 #include <guidef.h>
 
-
+#if 0
 static float gui_3d_calculate_light_to_point(gui_3d_light_t *light, float point_x, float point_y,
                                              float point_z)
 {
@@ -163,7 +163,7 @@ static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/)
     }
 
 }
-
+#endif
 
 static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
 {
@@ -183,8 +183,6 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
     uint8_t opacity_value = UINT8_MAX;
     GUI_3D_FILL_TYPE fill_type = GUI_3D_FILL_COLOR_ARGB8888;
     void *fill_data = NULL;
-
-    const bool needs_lighting = this->light.initialized && this->mask_img != NULL;
 
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
@@ -212,7 +210,7 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
                 uint8_t color_r = (uint8_t)(*(color_diffuse) * 255);
                 uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * 255);
                 uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * 255);
-                uint8_t color_a = this->desc->materials[material_id].dissolve * 255;
+                uint8_t color_a = opacity_value;
 
                 color_value = (color_a << 24) | (color_r << 16) | (color_g << 8) | color_b;
                 fill_data = &color_value;
@@ -221,11 +219,6 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
             {
                 fill_type = GUI_3D_FILL_IMAGE;
             }
-        }
-
-        if (needs_lighting)
-        {
-            fill_data = this->mask_img[i].data;
         }
 
         gui_3d_fill_triangle(vertices[0], vertices[1], vertices[2], depthBuffer, pixelData, width, height,
@@ -264,13 +257,9 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
     this->img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
     memset(this->img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
 
-    this->mask_img = gui_malloc(sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
-    memset(this->mask_img, 0x00, sizeof(draw_img_t) * this->desc->attrib.num_face_num_verts);
-
     this->combined_img = gui_malloc(sizeof(draw_img_t));
     memset(this->combined_img, 0x00, sizeof(draw_img_t));
 
-    this->light.initialized = false;
     gui_3d_matrix_t transform_matrix;
 
     // global transform
@@ -297,13 +286,10 @@ static void gui_3d_rect_prepare(gui_3d_t *this)
             gui_3d_rect_scene(this->face.rect_face + face_offset, face_offset, &this->desc->attrib,
                               &transform_matrix, &this->camera);
 
-            if (this->light.initialized)
-            {
-                gui_3d_light_apply(this, face_offset);
-            }
 
         }
     }
+
     gui_3d_generate_rect_img(this, this->camera.viewport_width, this->camera.viewport_height);
 
     if (tp->type == TOUCH_SHORT)
@@ -384,20 +370,6 @@ static void gui_3d_rect_end(gui_3d_t *this)
         this->img = NULL;
     }
 
-    if (this->mask_img != NULL)
-    {
-        for (int i = 0; i < this->desc->attrib.num_face_num_verts; i++)
-        {
-            if (this->mask_img[i].data != NULL)
-            {
-                gui_free(this->mask_img[i].data);
-                this->mask_img[i].data = NULL;
-            }
-        }
-    }
-    gui_free(this->mask_img);
-    this->mask_img = NULL;
-
     gui_free(this->face.rect_face);
     this->face.rect_face = NULL;
 }
@@ -444,10 +416,6 @@ static void gui_3d_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
-
-
-
-
 
 
 void gui_3d_rect_ctor(gui_3d_t          *this,

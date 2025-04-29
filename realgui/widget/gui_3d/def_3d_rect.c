@@ -58,10 +58,10 @@ void gui_3d_rect_face_transform(gui_3d_rect_face_t *face, gui_3d_matrix_t mat,
                 face->transform_vertex[2].position = gui_3d_point4D_mul_matrix(face->vertex[2].position, mat);
                 face->transform_vertex[3].position = gui_3d_point4D_mul_matrix(face->vertex[3].position, mat);
 
-                face->transform_world_vertex[0].position = face->transform_vertex[0].position;
-                face->transform_world_vertex[1].position = face->transform_vertex[1].position;
-                face->transform_world_vertex[2].position = face->transform_vertex[2].position;
-                face->transform_world_vertex[3].position = face->transform_vertex[3].position;
+                // face->transform_world_vertex[0].position = face->transform_vertex[0].position;
+                // face->transform_world_vertex[1].position = face->transform_vertex[1].position;
+                // face->transform_world_vertex[2].position = face->transform_vertex[2].position;
+                // face->transform_world_vertex[3].position = face->transform_vertex[3].position;
 
             }
             break;
@@ -111,7 +111,7 @@ void gui_3d_rect_face_transform_local_to_global(gui_3d_rect_face_t *face, size_t
         face->transform_vertex[j].normal.z = vn->z;
         // face->transform_vertex[j].normal.w = 1;
 
-        face->transform_world_vertex[j].position = face->transform_vertex[j].position;
+        // face->transform_world_vertex[j].position = face->transform_vertex[j].position;
 
     }
 }
@@ -218,21 +218,21 @@ void gui_3d_rect_face_update_back_face(gui_3d_rect_face_t *face, GUI_3D_CULLMODE
 void gui_3d_rect_face_transform_perspective(gui_3d_rect_face_t *face, gui_3d_camera_t *camera)
 {
     float z;
-    z = face->transform_vertex[0].position.z;
-    face->transform_vertex[0].position.x = camera->d * face->transform_vertex[0].position.x / z;
-    face->transform_vertex[0].position.y = camera->d * face->transform_vertex[0].position.y / z;
+    z = 1 / face->transform_vertex[0].position.z;
+    face->transform_vertex[0].position.x = camera->d * face->transform_vertex[0].position.x * z;
+    face->transform_vertex[0].position.y = camera->d * face->transform_vertex[0].position.y * z;
 
-    z = face->transform_vertex[1].position.z;
-    face->transform_vertex[1].position.x = camera->d * face->transform_vertex[1].position.x / z;
-    face->transform_vertex[1].position.y = camera->d * face->transform_vertex[1].position.y / z;
+    z = 1 / face->transform_vertex[1].position.z;
+    face->transform_vertex[1].position.x = camera->d * face->transform_vertex[1].position.x * z;
+    face->transform_vertex[1].position.y = camera->d * face->transform_vertex[1].position.y * z;
 
-    z = face->transform_vertex[2].position.z;
-    face->transform_vertex[2].position.x = camera->d * face->transform_vertex[2].position.x / z;
-    face->transform_vertex[2].position.y = camera->d * face->transform_vertex[2].position.y / z;
+    z = 1 / face->transform_vertex[2].position.z;
+    face->transform_vertex[2].position.x = camera->d * face->transform_vertex[2].position.x * z;
+    face->transform_vertex[2].position.y = camera->d * face->transform_vertex[2].position.y * z;
 
-    z = face->transform_vertex[3].position.z;
-    face->transform_vertex[3].position.x = camera->d * face->transform_vertex[3].position.x / z;
-    face->transform_vertex[3].position.y = camera->d * face->transform_vertex[3].position.y / z;
+    z = 1 / face->transform_vertex[3].position.z;
+    face->transform_vertex[3].position.x = camera->d * face->transform_vertex[3].position.x * z;
+    face->transform_vertex[3].position.y = camera->d * face->transform_vertex[3].position.y * z;
 }
 
 

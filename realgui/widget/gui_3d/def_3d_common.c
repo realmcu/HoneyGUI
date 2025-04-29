@@ -19,6 +19,12 @@
 #include "def_3d_common.h"
 #include "gui_api.h"
 
+#define GUI_ENABLE_MVE      1
+#if  __ARM_FEATURE_MVE & GUI_ENABLE_MVE
+#define GUI_3D_USE_MVE
+#include <arm_mve.h>
+#endif
+
 /* Calculates coefficients of perspective transformation
 * which maps (xi,yi) to (ui,vi), (i=1,2,3,4):
 *
@@ -232,139 +238,187 @@ gui_point_4d_t gui_point_4d_sub(gui_point_4d_t p1, gui_point_4d_t p2)
     return v;
 }
 
+gui_3d_matrix_t identity_matrix =
+{
+    .m =
+    {
+        {1.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f}
+    }
+};
 void gui_3d_matrix_identity(gui_3d_matrix_t *m)
 {
-    m->_11 = 1.0f;    m->_12 = 0.0f;    m->_13 = 0.0f;    m->_14 = 0.0f;
-    m->_21 = 0.0f;    m->_22 = 1.0f;    m->_23 = 0.0f;    m->_24 = 0.0f;
-    m->_31 = 0.0f;    m->_32 = 0.0f;    m->_33 = 1.0f;    m->_34 = 0.0f;
-    m->_41 = 0.0f;    m->_42 = 0.0f;    m->_43 = 0.0f;    m->_44 = 1.0f;
+    memcpy(m, &identity_matrix, sizeof(gui_3d_matrix_t));
 }
 
 void gui_3d_matrix_zero(gui_3d_matrix_t *Mat)
 {
-    Mat->m[0][0] = 0; Mat->m[0][1] = 0; Mat->m[0][2] = 0; Mat->m[0][3] = 0;
-    Mat->m[1][0] = 0; Mat->m[1][1] = 0; Mat->m[1][2] = 0; Mat->m[1][3] = 0;
-    Mat->m[2][0] = 0; Mat->m[2][1] = 0; Mat->m[2][2] = 0; Mat->m[2][3] = 0;
-    Mat->m[3][0] = 0; Mat->m[3][1] = 0; Mat->m[3][2] = 0; Mat->m[3][3] = 0;
+    memset(Mat, 0, sizeof(gui_3d_matrix_t));
 }
 
 void gui_3d_matrix_rotateX(gui_3d_matrix_t *m, float rotX)
 {
-    m->_11 = 1.0f;    m->_12 = 0;                               m->_13 = 0.0f;
-    m->_14 = 0.0f;
-    m->_21 = 0.0f;    m->_22 = gui_3d_cos(rotX);                m->_23 = gui_3d_sin(rotX);
-    m->_24 = 0.0f;
-    m->_31 = 0.0f;    m->_32 = -gui_3d_sin(rotX);               m->_33 = gui_3d_cos(rotX);
-    m->_34 = 0.0f;
-    m->_41 = 0.0f;    m->_42 = 0.0f;                            m->_43 = 0.0f;
-    m->_44 = 1.0f;
+    float cosX = gui_3d_cos(rotX);
+    float sinX = gui_3d_sin(rotX);
+
+    memcpy(m, &identity_matrix, sizeof(gui_3d_matrix_t));
+    m->_22 = cosX;  m->_23 = sinX;
+    m->_32 = -sinX; m->_33 = cosX;
 }
 
 void gui_3d_matrix_rotateY(gui_3d_matrix_t *m, float rotY)
 {
-    gui_3d_matrix_t *mat = m;
-    float Angle = rotY;
-    mat->_11 = gui_3d_cos(Angle);     mat->_12 = 0.0f;
-    mat->_13 = gui_3d_sin(Angle);         mat->_14 = 0.0f;
-    mat->_21 = 0.0f;                      mat->_22 = 1.0f;                          mat->_23 = 0.0f;
-    mat->_24 = 0.0f;
-    mat->_31 = -gui_3d_sin(Angle);        mat->_32 = 0.0f;
-    mat->_33 = gui_3d_cos(Angle);         mat->_34 = 0.0f;
-    mat->_41 = 0.0f;                      mat->_42 = 0.0f;                          mat->_43 = 0.0f;
-    mat->_44 = 1.0f;
+    float cosX = gui_3d_cos(rotY);
+    float sinX = gui_3d_sin(rotY);
+
+    memcpy(m, &identity_matrix, sizeof(gui_3d_matrix_t));
+    m->_11 = cosX; m->_13 = sinX;
+    m->_31 = -sinX; m->_33 = cosX;
 }
 
 void gui_3d_matrix_rotateZ(gui_3d_matrix_t *m, float rotZ)
 {
-    gui_3d_matrix_t *mat = m;
-    float Angle = rotZ;
-    mat->_11 = gui_3d_cos(Angle);     mat->_12 = gui_3d_sin(Angle);         mat->_13 = 0.0f;
-    mat->_14 = 0.0f;
-    mat->_21 = -gui_3d_sin(Angle);        mat->_22 = gui_3d_cos(Angle);         mat->_23 = 0.0f;
-    mat->_24 = 0.0f;
-    mat->_31 = 0.0f;                      mat->_32 = 0.0f;                          mat->_33 = 1.0f;
-    mat->_34 = 0.0f;
-    mat->_41 = 0.0f;                      mat->_42 = 0.0f;                          mat->_43 = 0.0f;
-    mat->_44 = 1.0f;
+    float cosX = gui_3d_cos(rotZ);
+    float sinX = gui_3d_sin(rotZ);
+
+    memcpy(m, &identity_matrix, sizeof(gui_3d_matrix_t));
+    m->_11 = cosX;  m->_12 = sinX;
+    m->_21 = -sinX; m->_22 = cosX;
 }
 
 void gui_3d_matrix_scale(gui_3d_matrix_t *m, float scale_x, float scale_y, float scale_z)
 {
-    gui_3d_matrix_t *mat = m;
-    mat->_11 = scale_x;   mat->_12 = 0.0f;      mat->_13 = 0.0f;      mat->_14 = 0.0f;
-    mat->_21 = 0.0f;      mat->_22 = scale_y;   mat->_23 = 0.0f;      mat->_24 = 0.0f;
-    mat->_31 = 0.0f;      mat->_32 = 0.0f;      mat->_33 = scale_z;   mat->_34 = 0.0f;
-    mat->_41 = 0.0f;      mat->_42 = 0.0f;      mat->_43 = 0.0f;      mat->_44 = 1.0f;
+    memcpy(m, &identity_matrix, sizeof(gui_3d_matrix_t));
+    m->_11 = scale_x;
+    m->_22 = scale_y;
+    m->_33 = scale_z;
 }
 
 void gui_3d_matrix_translate(gui_3d_matrix_t *m, float t_x, float t_y, float t_z)
 {
-    gui_3d_matrix_t *mat = m;
-    mat->_11 = 1.0f;  mat->_12 = 0.0f;  mat->_13 = 0.0f;  mat->_14 = 0.0f;
-    mat->_21 = 0.0f;  mat->_22 = 1.0f;  mat->_23 = 0.0f;  mat->_24 = 0.0f;
-    mat->_31 = 0.0f;  mat->_32 = 0.0f;  mat->_33 = 1.0f;  mat->_34 = 0.0f;
-    mat->_41 = t_x;   mat->_42 = t_y;   mat->_43 = t_z;   mat->_44 = 1.0f;
+    memcpy(m, &identity_matrix, sizeof(gui_3d_matrix_t));
+    m->_41 = t_x;   m->_42 = t_y;   m->_43 = t_z;
 }
 
 gui_3d_matrix_t gui_3d_matrix_multiply(gui_3d_matrix_t Mat1, gui_3d_matrix_t Mat2)
 {
+#ifdef GUI_3D_USE_MVE
     gui_3d_matrix_t ptmat;
-    ptmat.m[0][0] = Mat1.m[0][0] * Mat2.m[0][0]/**/ + Mat1.m[0][1] * Mat2.m[1][0]/**/ + Mat1.m[0][2] *
-                    Mat2.m[2][0]/**/ + Mat1.m[0][3] * Mat2.m[3][0];
-    ptmat.m[0][1] = Mat1.m[0][0] * Mat2.m[0][1]/**/ + Mat1.m[0][1] * Mat2.m[1][1]/**/ + Mat1.m[0][2] *
-                    Mat2.m[2][1]/**/ + Mat1.m[0][3] * Mat2.m[3][1];
-    ptmat.m[0][2] = Mat1.m[0][0] * Mat2.m[0][2]/**/ + Mat1.m[0][1] * Mat2.m[1][2]/**/ + Mat1.m[0][2] *
-                    Mat2.m[2][2]/**/ + Mat1.m[0][3] * Mat2.m[3][2];
-    ptmat.m[0][3] = Mat1.m[0][0] * Mat2.m[0][3]/**/ + Mat1.m[0][1] * Mat2.m[1][3]/**/ + Mat1.m[0][2] *
-                    Mat2.m[2][3]/**/ + Mat1.m[0][3] * Mat2.m[3][3];
+    float *a = (float *)Mat1.m;
+    float *b = (float *)Mat2.m;
+    float *c = (float *)ptmat.m;
 
-    ptmat.m[1][0] = Mat1.m[1][0] * Mat2.m[0][0]/**/ + Mat1.m[1][1] * Mat2.m[1][0]/**/ + Mat1.m[1][2] *
-                    Mat2.m[2][0]/**/ + Mat1.m[1][3] * Mat2.m[3][0];
-    ptmat.m[1][1] = Mat1.m[1][0] * Mat2.m[0][1]/**/ + Mat1.m[1][1] * Mat2.m[1][1]/**/ + Mat1.m[1][2] *
-                    Mat2.m[2][1]/**/ + Mat1.m[1][3] * Mat2.m[3][1];
-    ptmat.m[1][2] = Mat1.m[1][0] * Mat2.m[0][2]/**/ + Mat1.m[1][1] * Mat2.m[1][2]/**/ + Mat1.m[1][2] *
-                    Mat2.m[2][2]/**/ + Mat1.m[1][3] * Mat2.m[3][2];
-    ptmat.m[1][3] = Mat1.m[1][0] * Mat2.m[0][3]/**/ + Mat1.m[1][1] * Mat2.m[1][3]/**/ + Mat1.m[1][2] *
-                    Mat2.m[2][3]/**/ + Mat1.m[1][3] * Mat2.m[3][3];
+    float32x4_t m2;
+    float32x4_t out00, out10, out20, out30;
 
-    ptmat.m[2][0] = Mat1.m[2][0] * Mat2.m[0][0]/**/ + Mat1.m[2][1] * Mat2.m[1][0]/**/ + Mat1.m[2][2] *
-                    Mat2.m[2][0]/**/ + Mat1.m[2][3] * Mat2.m[3][0];
-    ptmat.m[2][1] = Mat1.m[2][0] * Mat2.m[0][1]/**/ + Mat1.m[2][1] * Mat2.m[1][1]/**/ + Mat1.m[2][2] *
-                    Mat2.m[2][1]/**/ + Mat1.m[2][3] * Mat2.m[3][1];
-    ptmat.m[2][2] = Mat1.m[2][0] * Mat2.m[0][2]/**/ + Mat1.m[2][1] * Mat2.m[1][2]/**/ + Mat1.m[2][2] *
-                    Mat2.m[2][2]/**/ + Mat1.m[2][3] * Mat2.m[3][2];
-    ptmat.m[2][3] = Mat1.m[2][0] * Mat2.m[0][3]/**/ + Mat1.m[2][1] * Mat2.m[1][3]/**/ + Mat1.m[2][2] *
-                    Mat2.m[2][3]/**/ + Mat1.m[2][3] * Mat2.m[3][3];
+    m2 = vldrwq_f32(&b[0]);
+    out00 = vmulq_n_f32(m2, a[0]);
+    out10 = vmulq_n_f32(m2, a[4]);
+    out20 = vmulq_n_f32(m2, a[8]);
+    out30 = vmulq_n_f32(m2, a[12]);
 
-    ptmat.m[3][0] = Mat1.m[3][0] * Mat2.m[0][0]/**/ + Mat1.m[3][1] * Mat2.m[1][0]/**/ + Mat1.m[3][2] *
-                    Mat2.m[2][0]/**/ + Mat1.m[3][3] * Mat2.m[3][0];
-    ptmat.m[3][1] = Mat1.m[3][0] * Mat2.m[0][1]/**/ + Mat1.m[3][1] * Mat2.m[1][1]/**/ + Mat1.m[3][2] *
-                    Mat2.m[2][1]/**/ + Mat1.m[3][3] * Mat2.m[3][1];
-    ptmat.m[3][2] = Mat1.m[3][0] * Mat2.m[0][2]/**/ + Mat1.m[3][1] * Mat2.m[1][2]/**/ + Mat1.m[3][2] *
-                    Mat2.m[2][2]/**/ + Mat1.m[3][3] * Mat2.m[3][2];
-    ptmat.m[3][3] = Mat1.m[3][0] * Mat2.m[0][3]/**/ + Mat1.m[3][1] * Mat2.m[1][3]/**/ + Mat1.m[3][2] *
-                    Mat2.m[2][3]/**/ + Mat1.m[3][3] * Mat2.m[3][3];
+    m2 = vldrwq_f32(&b[4]);
+    out00 = vfmaq_n_f32(out00, m2, a[1]);
+    out10 = vfmaq_n_f32(out10, m2, a[5]);
+    out20 = vfmaq_n_f32(out20, m2, a[9]);
+    out30 = vfmaq_n_f32(out30, m2, a[13]);
+
+    m2 = vldrwq_f32(&b[8]);
+    out00 = vfmaq_n_f32(out00, m2, a[2]);
+    out10 = vfmaq_n_f32(out10, m2, a[6]);
+    out20 = vfmaq_n_f32(out20, m2, a[10]);
+    out30 = vfmaq_n_f32(out30, m2, a[14]);
+
+    m2 = vldrwq_f32(&b[12]);
+    out00 = vfmaq_n_f32(out00, m2, a[3]);
+    out10 = vfmaq_n_f32(out10, m2, a[7]);
+    out20 = vfmaq_n_f32(out20, m2, a[11]);
+    out30 = vfmaq_n_f32(out30, m2, a[15]);
+
+    vst1q_f32(&c[0], out00);
+    vst1q_f32(&c[4], out10);
+    vst1q_f32(&c[8], out20);
+    vst1q_f32(&c[12], out30);
+
     return ptmat;
+#else
+    gui_3d_matrix_t ptmat;
+    ptmat.m[0][0] = Mat1.m[0][0] * Mat2.m[0][0] + Mat1.m[0][1] * Mat2.m[1][0] + Mat1.m[0][2] *
+                    Mat2.m[2][0] + Mat1.m[0][3] * Mat2.m[3][0];
+    ptmat.m[0][1] = Mat1.m[0][0] * Mat2.m[0][1] + Mat1.m[0][1] * Mat2.m[1][1] + Mat1.m[0][2] *
+                    Mat2.m[2][1] + Mat1.m[0][3] * Mat2.m[3][1];
+    ptmat.m[0][2] = Mat1.m[0][0] * Mat2.m[0][2] + Mat1.m[0][1] * Mat2.m[1][2] + Mat1.m[0][2] *
+                    Mat2.m[2][2] + Mat1.m[0][3] * Mat2.m[3][2];
+    ptmat.m[0][3] = Mat1.m[0][0] * Mat2.m[0][3] + Mat1.m[0][1] * Mat2.m[1][3] + Mat1.m[0][2] *
+                    Mat2.m[2][3] + Mat1.m[0][3] * Mat2.m[3][3];
+
+    ptmat.m[1][0] = Mat1.m[1][0] * Mat2.m[0][0] + Mat1.m[1][1] * Mat2.m[1][0] + Mat1.m[1][2] *
+                    Mat2.m[2][0] + Mat1.m[1][3] * Mat2.m[3][0];
+    ptmat.m[1][1] = Mat1.m[1][0] * Mat2.m[0][1] + Mat1.m[1][1] * Mat2.m[1][1] + Mat1.m[1][2] *
+                    Mat2.m[2][1] + Mat1.m[1][3] * Mat2.m[3][1];
+    ptmat.m[1][2] = Mat1.m[1][0] * Mat2.m[0][2] + Mat1.m[1][1] * Mat2.m[1][2] + Mat1.m[1][2] *
+                    Mat2.m[2][2] + Mat1.m[1][3] * Mat2.m[3][2];
+    ptmat.m[1][3] = Mat1.m[1][0] * Mat2.m[0][3] + Mat1.m[1][1] * Mat2.m[1][3] + Mat1.m[1][2] *
+                    Mat2.m[2][3] + Mat1.m[1][3] * Mat2.m[3][3];
+
+    ptmat.m[2][0] = Mat1.m[2][0] * Mat2.m[0][0] + Mat1.m[2][1] * Mat2.m[1][0] + Mat1.m[2][2] *
+                    Mat2.m[2][0] + Mat1.m[2][3] * Mat2.m[3][0];
+    ptmat.m[2][1] = Mat1.m[2][0] * Mat2.m[0][1] + Mat1.m[2][1] * Mat2.m[1][1] + Mat1.m[2][2] *
+                    Mat2.m[2][1] + Mat1.m[2][3] * Mat2.m[3][1];
+    ptmat.m[2][2] = Mat1.m[2][0] * Mat2.m[0][2] + Mat1.m[2][1] * Mat2.m[1][2] + Mat1.m[2][2] *
+                    Mat2.m[2][2] + Mat1.m[2][3] * Mat2.m[3][2];
+    ptmat.m[2][3] = Mat1.m[2][0] * Mat2.m[0][3] + Mat1.m[2][1] * Mat2.m[1][3] + Mat1.m[2][2] *
+                    Mat2.m[2][3] + Mat1.m[2][3] * Mat2.m[3][3];
+
+    ptmat.m[3][0] = Mat1.m[3][0] * Mat2.m[0][0] + Mat1.m[3][1] * Mat2.m[1][0] + Mat1.m[3][2] *
+                    Mat2.m[2][0] + Mat1.m[3][3] * Mat2.m[3][0];
+    ptmat.m[3][1] = Mat1.m[3][0] * Mat2.m[0][1] + Mat1.m[3][1] * Mat2.m[1][1] + Mat1.m[3][2] *
+                    Mat2.m[2][1] + Mat1.m[3][3] * Mat2.m[3][1];
+    ptmat.m[3][2] = Mat1.m[3][0] * Mat2.m[0][2] + Mat1.m[3][1] * Mat2.m[1][2] + Mat1.m[3][2] *
+                    Mat2.m[2][2] + Mat1.m[3][3] * Mat2.m[3][2];
+    ptmat.m[3][3] = Mat1.m[3][0] * Mat2.m[0][3] + Mat1.m[3][1] * Mat2.m[1][3] + Mat1.m[3][2] *
+                    Mat2.m[2][3] + Mat1.m[3][3] * Mat2.m[3][3];
+    return ptmat;
+
+#endif
 }
 
 
 
 gui_point_4d_t gui_3d_point4D_mul_matrix(gui_point_4d_t p, gui_3d_matrix_t mat)
 {
+#ifdef GUI_3D_USE_MVE
+    gui_point_4d_t point;
+    float32x4_t m200, m210, m220, m230;
+    float32x4_t out;
+
+    m200 = vldrwq_f32(&mat.m[0][0]);
+    m210 = vldrwq_f32(&mat.m[1][0]);
+    m220 = vldrwq_f32(&mat.m[2][0]);
+    m230 = vldrwq_f32(&mat.m[3][0]);
+
+    out = vmulq_n_f32(m200, p.x) + vmulq_n_f32(m210, p.y) + vmulq_n_f32(m220, p.z);
+    out = vaddq_f32(out, m230);
+
+    vst1q_f32((float *)&point, out);
+
+    return point;
+#else
     gui_point_4d_t point;
     point.x = p.x * mat._11 + p.y * mat._21 + p.z * mat._31 + 1 * mat._41;
     point.y = p.x * mat._12 + p.y * mat._22 + p.z * mat._32 + 1 * mat._42;
     point.z = p.x * mat._13 + p.y * mat._23 + p.z * mat._33 + 1 * mat._43;
     point.w = p.x * mat._14 + p.y * mat._24 + p.z * mat._34 + 1 * mat._44;
     return point;
+#endif
 }
 
 
 static void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *mrot, float px, float py, float pz,
                                                float ux, float uy, float uz, float angle_degrees)
 {
-    // Convert degrees to radians
-    float angle = angle_degrees * (3.141562f / 180.0f);
     // Normalize the direction vector (u)
     float mag = sqrt(ux * ux + uy * uy + uz * uz);
     float a = ux / mag, b = uy / mag, c = uz / mag;
@@ -377,44 +431,44 @@ static void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *mrot, float px, 
     T1.m[3][2] = -pz;
 
     // Step 2: Rotate to align u with the Z-axis
-    float theta = atan2(b, c);
+    float theta = atan2(b, c) * (180.0f / 3.141562f);  // Convert radians to degrees
     gui_3d_matrix_t Rx;
     gui_3d_matrix_identity(&Rx);
-    Rx.m[1][1] = cos(theta);
-    Rx.m[1][2] = -sin(theta);
-    Rx.m[2][1] = sin(theta);
-    Rx.m[2][2] = cos(theta);
+    Rx.m[1][1] = gui_3d_cos(theta);
+    Rx.m[1][2] = -gui_3d_sin(theta);
+    Rx.m[2][1] = gui_3d_sin(theta);
+    Rx.m[2][2] = gui_3d_cos(theta);
 
-    float phi = atan2(a, sqrt(b * b + c * c));
+    float phi = atan2(a, sqrt(b * b + c * c)) * (180.0f / 3.141562f);
     gui_3d_matrix_t Ry;
     gui_3d_matrix_identity(&Ry);
-    Ry.m[0][0] = cos(phi);
-    Ry.m[0][2] = sin(phi);
-    Ry.m[2][0] = -sin(phi);
-    Ry.m[2][2] = cos(phi);
+    Ry.m[0][0] = gui_3d_cos(phi);
+    Ry.m[0][2] = gui_3d_sin(phi);
+    Ry.m[2][0] = -gui_3d_sin(phi);
+    Ry.m[2][2] = gui_3d_cos(phi);
 
     // Step 3: Rotate around the Z-axis
     gui_3d_matrix_t Rz;
     gui_3d_matrix_identity(&Rz);
-    Rz.m[0][0] = cos(angle);
-    Rz.m[0][1] = -sin(angle);
-    Rz.m[1][0] = sin(angle);
-    Rz.m[1][1] = cos(angle);
+    Rz.m[0][0] = gui_3d_cos(angle_degrees);
+    Rz.m[0][1] = -gui_3d_sin(angle_degrees);
+    Rz.m[1][0] = gui_3d_sin(angle_degrees);
+    Rz.m[1][1] = gui_3d_cos(angle_degrees);
 
     // Inverse rotations
     gui_3d_matrix_t Ryi;
     gui_3d_matrix_identity(&Ryi);
-    Ryi.m[0][0] = cos(-phi);
-    Ryi.m[0][2] = sin(-phi);
-    Ryi.m[2][0] = -sin(-phi);
-    Ryi.m[2][2] = cos(-phi);
+    Ryi.m[0][0] = gui_3d_cos(-phi);
+    Ryi.m[0][2] = gui_3d_sin(-phi);
+    Ryi.m[2][0] = -gui_3d_sin(-phi);
+    Ryi.m[2][2] = gui_3d_cos(-phi);
 
     gui_3d_matrix_t Rxi;
     gui_3d_matrix_identity(&Rxi);
-    Rxi.m[1][1] = cos(-theta);
-    Rxi.m[1][2] = -sin(-theta);
-    Rxi.m[2][1] = sin(-theta);
-    Rxi.m[2][2] = cos(-theta);
+    Rxi.m[1][1] = gui_3d_cos(-theta);
+    Rxi.m[1][2] = -gui_3d_sin(-theta);
+    Rxi.m[2][1] = gui_3d_sin(-theta);
+    Rxi.m[2][2] = gui_3d_cos(-theta);
 
     // Step 4: Translate back to the original position
     gui_3d_matrix_t T2;
@@ -702,12 +756,20 @@ static void calculate_edge_properties(float x0, float y0, float x1, float y1,
 static void gui_3d_fill_image(int y, float xleft, float xright, float oneoverz, float oneoverz_step,
                               float soverz, float soverz_step, float toverz, float toverz_step,
                               float *zbuffer, uint32_t *pixelData, int width, int height,
-                              gui_rgb_data_head_t *src_head, uint32_t *src_pixels,
+                              int src_head_w, int src_head_h, uint32_t *src_pixels,
                               uint8_t opacity_value)
 {
     const int iy = (int)y;
-    const int startX = (int)(xleft + 0.5f);
-    const int endX = (int)(xright + 0.5f);
+    int startX = (int)(xleft + 0.5f);
+    int endX = ((int)(xright + 0.5f) > width) ? width : (int)(xright + 0.5f);
+
+    if (startX < 0)
+    {
+        oneoverz += (0 - startX) * oneoverz_step;
+        soverz += (0 - startX) * soverz_step;
+        toverz += (0 - startX) * toverz_step;
+        startX = 0;
+    }
 
     int rowOffset = iy * width;
 
@@ -716,13 +778,13 @@ static void gui_3d_fill_image(int y, float xleft, float xright, float oneoverz, 
         float originalZ = 1.0f / oneoverz;
 
         // Calculate texture coordinates
-        int srcX = (int)(soverz * originalZ * (src_head->w - 1));
-        int srcY = (int)(toverz * originalZ * (src_head->h - 1));
+        int srcX = (int)(soverz * originalZ * (src_head_w - 1));
+        int srcY = (int)(toverz * originalZ * (src_head_h - 1));
 
-        if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
+        if (srcX >= 0 && srcX < src_head_w && srcY >= 0 && srcY < src_head_h)
         {
             int pixelIdx = ix + rowOffset;
-            uint32_t originalColor = src_pixels[srcX + srcY * src_head->w];
+            uint32_t originalColor = src_pixels[srcX + srcY * src_head_w];
             uint8_t alpha = (originalColor >> 24) & 0xFF;
             alpha = (alpha * opacity_value) / 255;
 
@@ -770,11 +832,18 @@ static void gui_3d_fill_image(int y, float xleft, float xright, float oneoverz, 
 // Fill with RGB565 color
 static void gui_3d_fill_rgb565(float y, float xleft, float xright, float oneoverz,
                                float oneoverz_step,
-                               float *zbuffer, uint16_t *pixelData, int width, int height, uint16_t color)
+                               float *zbuffer, uint16_t *pixelData, int width, uint16_t color)
 {
     const int iy = (int)y;
-    const int startX = (int)(xleft + 0.5f);
-    const int endX = (int)(xright + 0.5f);
+    int startX = (int)(xleft + 0.5f);
+    int endX = ((int)(xright + 0.5f) > width) ? width : (int)(xright + 0.5f);
+
+    if (startX < 0)
+    {
+        oneoverz += (0 - startX) * oneoverz_step;
+        startX = 0;
+    }
+
     int rowOffset = iy * width;
 
     for (int ix = startX; ix < endX; ++ix)
@@ -793,11 +862,18 @@ static void gui_3d_fill_rgb565(float y, float xleft, float xright, float oneover
 // Fill with ARGB8888 color
 static void gui_3d_fill_argb8888(float y, float xleft, float xright, float oneoverz,
                                  float oneoverz_step,
-                                 float *zbuffer, uint32_t *pixelData, int width, int height, uint32_t color)
+                                 float *zbuffer, uint32_t *pixelData, int width, uint32_t color)
 {
     const int iy = (int)y;
-    const int startX = (int)(xleft + 0.5f);
-    const int endX = (int)(xright + 0.5f);
+    int startX = (int)(xleft + 0.5f);
+    int endX = ((int)(xright + 0.5f) > width) ? width : (int)(xright + 0.5f);
+
+    if (startX < 0)
+    {
+        oneoverz += (0 - startX) * oneoverz_step;
+        startX = 0;
+    }
+
     int rowOffset = iy * width;
     const uint8_t alpha = (color >> 24) & 0xFF;
 
@@ -846,21 +922,17 @@ static void gui_3d_fill_argb8888(float y, float xleft, float xright, float oneov
     }
 }
 
-static void gui_3d_render_triangle_with_texture(float y, float y0, float y1, float y2, float z0,
-                                                float z1, float z2,
-                                                float s0, float s1, float s2, float t0, float t1, float t2,
+static void gui_3d_render_triangle_with_texture(float y, float y0, float y1, float y2,
+                                                float inv_z0, float inv_z1, float inv_z2,
+                                                float soverz0, float soverz1, float soverz2,
+                                                float toverz0, float toverz1, float toverz2,
                                                 bool k01infinite, float k01, float b01,
                                                 bool k02infinite, float k02, float b02,
                                                 float *zbuffer, uint32_t *pixelData, int width, int height,
-                                                GUI_3D_FILL_TYPE fillType, void *fillData, uint8_t opacity_value)
+                                                int src_head_w, int src_head_h, uint32_t *src_pixels, uint8_t opacity_value)
 {
     float xleft = k01infinite ? b01 : (y - b01) / k01;
     float xright = k02infinite ? b02 : (y - b02) / k02;
-
-    // Pre calculate constants
-    const float inv_z0 = 1.0f / z0;
-    const float inv_z1 = 1.0f / z1;
-    const float inv_z2 = 1.0f / z2;
 
     const float y_y0 = y - y0;
     const float inv_y1_y0 = 1.0f / (y1 - y0);
@@ -875,21 +947,12 @@ static void gui_3d_render_triangle_with_texture(float y, float y0, float y1, flo
                                                               xleft);   // Horizontal step size of 1/z
 
 
-    // Interpolate texture coordinates
-    const float soverz0 = s0 * inv_z0;
-    const float soverz1 = s1 * inv_z1;
-    const float soverz2 = s2 * inv_z2;
-
     float soverz_left = y_y0 * (soverz1 - soverz0) * inv_y1_y0 +
                         soverz0;      // Interpolation of texture coordinates s (u) on the left edge
     float soverz_right = y_y0 * (soverz2 - soverz0) * inv_y2_y0 +
                          soverz0;     // Interpolation of texture coordinates s (u) on the right edge
     float soverz_step = (soverz_right - soverz_left) / (xright -
                                                         xleft);       // Horizontal step size of texture coordinates s (u)
-
-    const float toverz0 = t0 * inv_z0;
-    const float toverz1 = t1 * inv_z1;
-    const float toverz2 = t2 * inv_z2;
 
     float toverz_left = y_y0 * (toverz1 - toverz0) * inv_y1_y0 +
                         toverz0;      // Interpolation of texture coordinates t (v) on the left edge
@@ -898,30 +961,20 @@ static void gui_3d_render_triangle_with_texture(float y, float y0, float y1, flo
     float toverz_step = (toverz_right - toverz_left) / (xright -
                                                         xleft);       // Horizontal step size of texture coordinate t (v)
 
-
-    gui_rgb_data_head_t *src_head = (gui_rgb_data_head_t *)fillData;
-    uint32_t *src_pixels = (uint32_t *)((unsigned char *)fillData + sizeof(gui_rgb_data_head_t));
-
     gui_3d_fill_image(y, xleft, xright, oneoverz_left, oneoverz_step,
                       soverz_left, soverz_step, toverz_left, toverz_step,
-                      zbuffer, pixelData, width, height, src_head, src_pixels, opacity_value);
+                      zbuffer, pixelData, width, height, src_head_w, src_head_h, src_pixels, opacity_value);
 }
 
-static void gui_3d_render_triangle_with_color(float y, float y0, float y1, float y2, float z0,
-                                              float z1, float z2,
-                                              float s0, float s1, float s2, float t0, float t1, float t2,
+static void gui_3d_render_triangle_with_color(float y, float y0, float y1, float y2,
+                                              float inv_z0, float inv_z1, float inv_z2,
                                               bool k01infinite, float k01, float b01,
                                               bool k02infinite, float k02, float b02,
-                                              float *zbuffer, uint32_t *pixelData, int width, int height,
-                                              GUI_3D_FILL_TYPE fillType, void *fillData, uint8_t opacity_value)
+                                              float *zbuffer, uint32_t *pixelData, int width,
+                                              GUI_3D_FILL_TYPE fillType, void *fillData)
 {
     float xleft = k01infinite ? b01 : (y - b01) / k01;
     float xright = k02infinite ? b02 : (y - b02) / k02;
-
-    // Pre calculate constants
-    const float inv_z0 = 1.0f / z0;
-    const float inv_z1 = 1.0f / z1;
-    const float inv_z2 = 1.0f / z2;
 
     const float y_y0 = y - y0;
     const float inv_y1_y0 = 1.0f / (y1 - y0);
@@ -940,15 +993,13 @@ static void gui_3d_render_triangle_with_color(float y, float y0, float y1, float
     case GUI_3D_FILL_COLOR_RGB565:
         {
             gui_3d_fill_rgb565(y, xleft, xright, oneoverz_left, oneoverz_step, zbuffer, (uint16_t *)pixelData,
-                               width,
-                               height, *((uint16_t *)fillData));
+                               width, *((uint16_t *)fillData));
             break;
         }
 
     case GUI_3D_FILL_COLOR_ARGB8888:
         {
             gui_3d_fill_argb8888(y, xleft, xright, oneoverz_left, oneoverz_step, zbuffer, pixelData, width,
-                                 height,
                                  *((uint32_t *)fillData));
             break;
         }
@@ -970,22 +1021,11 @@ void gui_3d_fill_triangle(gui_3d_vertex_t p0, gui_3d_vertex_t p1, gui_3d_vertex_
     float x1, y1, z1, s1, t1;
     float x2, y2, z2, s2, t2;
 
-    // Set rendering function pointer
-    gui_triangle_render_func renderFunc = NULL;
-    switch (fillType)
-    {
-    case GUI_3D_FILL_IMAGE:
-        renderFunc = gui_3d_render_triangle_with_texture;
-        break;
+    float inv_z0, inv_z1, inv_z2;
+    float soverz0, soverz1, soverz2;
+    float toverz0, toverz1, toverz2;
 
-    case GUI_3D_FILL_COLOR_RGB565:
-    case GUI_3D_FILL_COLOR_ARGB8888:
-        renderFunc = gui_3d_render_triangle_with_color;
-        break;
 
-    default:
-        break;
-    }
     //    p0
     // p1   p2
     // First pass: top part of the triangle
@@ -1017,12 +1057,45 @@ void gui_3d_fill_triangle(gui_3d_vertex_t p0, gui_3d_vertex_t p1, gui_3d_vertex_
     calculate_edge_properties(x0, y0, x1, y1, &k01infinite, &k01, &b01);
     calculate_edge_properties(x0, y0, x2, y2, &k02infinite, &k02, &b02);
 
+    // Pre calculate constants
+    inv_z0 = 1.0f / z0;
+    inv_z1 = 1.0f / z1;
+    inv_z2 = 1.0f / z2;
 
-    for (float y = (int)(y0 + 0.5f) + 0.5f; y <= midy; y++)
+    float y_start = fmaxf((int)(y0 + 0.5f) + 0.5f, 0.5f);
+    float y_end = fminf(midy, height);
+
+    if (fillType == GUI_3D_FILL_IMAGE)
     {
-        renderFunc(y, y0, y1, y2, z0, z1, z2, s0, s1, s2, t0, t1, t2, k01infinite, k01, b01, k02infinite,
-                   k02, b02,
-                   zbuffer, pixelData, width, height, fillType, fillData, opacity_value);
+        // Interpolate texture coordinates
+        soverz0 = s0 * inv_z0;
+        soverz1 = s1 * inv_z1;
+        soverz2 = s2 * inv_z2;
+
+        toverz0 = t0 * inv_z0;
+        toverz1 = t1 * inv_z1;
+        toverz2 = t2 * inv_z2;
+
+        gui_rgb_data_head_t *src_head = (gui_rgb_data_head_t *)fillData;
+        uint32_t *src_pixels = (uint32_t *)((unsigned char *)fillData + sizeof(gui_rgb_data_head_t));
+
+        for (float y = y_start; y <= y_end; y++)
+        {
+            gui_3d_render_triangle_with_texture(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                                soverz0, soverz1, soverz2, toverz0, toverz1, toverz2,
+                                                k01infinite, k01, b01, k02infinite, k02, b02,
+                                                zbuffer, pixelData, width, height, src_head->w, src_head->h, src_pixels, opacity_value);
+
+        }
+    }
+    else  // GUI_3D_FILL_COLOR_RGB565 or GUI_3D_FILL_COLOR_ARGB8888
+    {
+        for (float y = y_start; y <= y_end; y++)
+        {
+            gui_3d_render_triangle_with_color(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                              k01infinite, k01, b01, k02infinite, k02, b02,
+                                              zbuffer, pixelData, width, fillType, fillData);
+        }
     }
 
 
@@ -1053,12 +1126,44 @@ void gui_3d_fill_triangle(gui_3d_vertex_t p0, gui_3d_vertex_t p1, gui_3d_vertex_
     calculate_edge_properties(x0, y0, x1, y1, &k01infinite, &k01, &b01);
     calculate_edge_properties(x0, y0, x2, y2, &k02infinite, &k02, &b02);
 
+    // Pre calculate constants
+    inv_z0 = 1.0f / z0;
+    inv_z1 = 1.0f / z1;
+    inv_z2 = 1.0f / z2;
 
-    for (float y = (int)(midy + 0.5f) + 0.5f; y < y0; y++)
+    y_start = fmaxf((int)(midy + 0.5f) + 0.5f, 0.5f);
+    y_end = fminf(y0, height);
+
+    if (fillType == GUI_3D_FILL_IMAGE)
     {
-        renderFunc(y, y0, y1, y2, z0, z1, z2, s0, s1, s2, t0, t1, t2, k01infinite, k01, b01, k02infinite,
-                   k02, b02,
-                   zbuffer, pixelData, width, height, fillType, fillData, opacity_value);
+        // Interpolate texture coordinates
+        soverz0 = s0 * inv_z0;
+        soverz1 = s1 * inv_z1;
+        soverz2 = s2 * inv_z2;
+
+        toverz0 = t0 * inv_z0;
+        toverz1 = t1 * inv_z1;
+        toverz2 = t2 * inv_z2;
+
+        gui_rgb_data_head_t *src_head = (gui_rgb_data_head_t *)fillData;
+        uint32_t *src_pixels = (uint32_t *)((unsigned char *)fillData + sizeof(gui_rgb_data_head_t));
+
+        for (float y = y_start; y < y_end; y++)
+        {
+            gui_3d_render_triangle_with_texture(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                                soverz0, soverz1, soverz2, toverz0, toverz1, toverz2,
+                                                k01infinite, k01, b01, k02infinite, k02, b02,
+                                                zbuffer, pixelData, width, height, src_head->w, src_head->h, src_pixels, opacity_value);
+        }
+    }
+    else // GUI_3D_FILL_COLOR_RGB565 or GUI_3D_FILL_COLOR_ARGB8888
+    {
+        for (float y = y_start; y < y_end; y++)
+        {
+            gui_3d_render_triangle_with_color(y, y0, y1, y2, inv_z0, inv_z1, inv_z2,
+                                              k01infinite, k01, b01, k02infinite, k02, b02,
+                                              zbuffer, pixelData, width, fillType, fillData);
+        }
     }
 
 }
