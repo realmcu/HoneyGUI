@@ -49,8 +49,7 @@ static void gui_list_tab_animate_timer_cb(void *obj)
     if (this->animate_cnt > LIST_TAB_ANIMATE_MAX)
     {
         this->animate_cnt = 0;
-        gui_free(o->timer);
-        o->timer = NULL;
+        gui_obj_delete_timer(o);
     }
 }
 
@@ -324,6 +323,7 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
 
         float scale_0 = 1.0f;
         float scale_1 = 0.9f;
+        int obj_location, list_length, list_location;
         if (list->dir == HORIZONTAL)
         {
             int16_t limit = (int16_t)(list->base.x + list->base.w - (int16_t)(list->tab_length * scale_1));
@@ -331,6 +331,9 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
             {
                 obj->x = limit;
             }
+            obj_location = obj->x;
+            list_length = list->base.w;
+            list_location = list->base.x;
         }
         else
         {
@@ -339,11 +342,10 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
             {
                 obj->y = limit;
             }
+            obj_location = obj->y;
+            list_length = list->base.h;
+            list_location = list->base.y;
         }
-
-        int obj_location = (list->dir == HORIZONTAL) ? obj->x : obj->y;
-        int list_length = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
-        int list_location = (list->dir == HORIZONTAL) ? list->base.x : list->base.y;
         int location_1 = list_location + list_length - (int16_t)(list->tab_length * scale_1);
         int location_0 = location_1 - list->tab_length / 3;
 
@@ -387,6 +389,15 @@ static void gui_list_tab_prepare(gui_obj_t *obj)
             float start = this->is_speed_positive ? -180.0f : 180.0f;
             float degree = start * (1.0f - (float)this->animate_cnt / LIST_TAB_ANIMATE_MAX);
             gui_list_rotate_helix(this, degree);
+        }
+    }
+    else if (list->style == LIST_CURL)
+    {
+        extern void gui_list_rotate_curl(gui_list_tab_t *this, float degree);
+        if (obj->timer)
+        {
+            float degree = 90.0f * (1.0f - (float)this->animate_cnt / LIST_TAB_ANIMATE_MAX);
+            gui_list_rotate_curl(this, degree);
         }
     }
 

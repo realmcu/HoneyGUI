@@ -44,6 +44,7 @@ typedef enum
     LIST_CARD,             ///< Stack like card
     LIST_FAN,              ///< Rotate like fan
     LIST_HELIX,            ///< Rotate like helix
+    LIST_CURL,             ///< Rotate curly
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/

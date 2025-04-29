@@ -90,7 +90,7 @@ void gui_obj_stop_timer(gui_obj_t *obj)
 
     GUI_ASSERT(obj->timer != NULL);
 
-    obj->timer->expire_time = 0;
+    obj->timer->expire_time = 0xFFFFFFFF;
 }
 
 void gui_obj_timer_handler(gui_obj_t *obj)
@@ -107,14 +107,14 @@ void gui_obj_timer_handler(gui_obj_t *obj)
 
     if (obj->timer->expire_time < gui_ms_get())
     {
-        obj->timer->p_timer_callback(obj);
         if (obj->timer->reload)
         {
             obj->timer->expire_time = gui_ms_get() + obj->timer->interval_ms;
         }
         else
         {
-            obj->timer = NULL;
+            gui_obj_stop_timer(obj);
         }
+        obj->timer->p_timer_callback(obj);
     }
 }
