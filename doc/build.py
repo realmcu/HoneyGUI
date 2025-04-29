@@ -14,6 +14,11 @@ doc_path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(doc_path)
 gui_path = os.path.join(doc_path, "..")
 
+jenkinsBuild_home = os.environ.get("jenkinsScript_abspath", "")
+JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
+
+version = os.getenv("Release_Version")
+
 def cmd(s):
   print("")
   print(s)
@@ -136,6 +141,12 @@ if os.path.exists(rst_src_out):
   shutil.rmtree(rst_src_out)
 os.makedirs(rst_src_out)
 
+# Add si summary content
+if version:
+  sys.path.append(JenkinsBuild_doc_Dir)
+  from add_ai_summary_src import *
+  add_raw_html_to_rst(doc_path, os.path.join(doc_path, "script/ai_summary_config.txt"))
+
 # BUILD HTML
 os.chdir(doc_path)
 sdk_name = "gui"
@@ -192,7 +203,6 @@ for l, p in en_cn_build:
   cmd(cmd_line)
 
   # update lnk map file
-  version = os.getenv("Release_Version")
   if version:
     #generate link map txt
     link_map_file = os.path.join(html_out_path, "link_map.json")
@@ -213,8 +223,6 @@ for l, p in en_cn_build:
     # api_reference_html_path = os.path.join(html_out_path, rel_api_path)
     # api_reference_content_path = os.path.join(rst_src_out, sdk_name, l, rel_api_path)
     # os.makedirs(api_reference_content_path)
-    # jenkinsBuild_home = os.environ.get("jenkinsScript_abspath")
-    # JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
     # sys.path.append(JenkinsBuild_doc_Dir)
     # from parse_html import *
     # parse_html(api_reference_html_path, api_reference_content_path)

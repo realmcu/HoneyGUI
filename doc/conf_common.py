@@ -10,6 +10,7 @@ import os
 import sys
 import re
 import json
+import shutil
 from datetime import datetime
 from docutils import nodes
 from docutils.parsers.rst import roles
@@ -242,6 +243,7 @@ def write_json(app, exception):
         with open(output_file, 'w') as f:
             json.dump(link_data, f, indent=4)
         print(f"Successfully wrote URL map to {output_file}")
+        shutil.copy2(output_file, os.path.join(os.path.dirname(output_file), "origin_link_map.json"))
     except Exception as e:
         print(f"Error writing URL map: {e}")
 
