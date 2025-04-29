@@ -1,0 +1,4 @@
+../en/Glossary.rst
+../cn/Glossary.rst
+../en/FAQ/*
+../cn/FAQ/*
