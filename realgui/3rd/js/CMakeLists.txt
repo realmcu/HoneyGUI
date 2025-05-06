@@ -7,6 +7,10 @@ cmake_minimum_required(VERSION 3.10)
 # Define a variable for the library name
 if(CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP) #set to 1 to enable or variable to for depnedency
 
+	target_compile_definitions(${GUI_TARGET_NAME} PRIVATE JERRY_JS_PARSER)
+	target_compile_definitions(${GUI_TARGET_NAME} PRIVATE JERRY_ENABLE_EXTERNAL_CONTEXT)
+	target_compile_definitions(${GUI_TARGET_NAME} PRIVATE JERRY_ENABLE_ERROR_MESSAGES)
+	target_compile_definitions(${GUI_TARGET_NAME} PRIVATE JERRY_ENABLE_LOGGING)
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
 
