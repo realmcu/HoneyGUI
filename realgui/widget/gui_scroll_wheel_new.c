@@ -177,7 +177,7 @@ static void render(const char *text, gui_obj_t *obj, unsigned char render_mode,
     case GUI_SCROLL_WHEEL_NEW_RENDER_TEXT:
         {
             gui_text_content_set((void *)obj, (void *)text, strlen(text));
-            gui_text_convert_to_img((void *)obj, RGB565);
+            gui_text_convert_to_img((void *)obj, ARGB8565);
         }
         break;
     case GUI_SCROLL_WHEEL_NEW_RENDER_IMAGE_ARRAY:
@@ -627,7 +627,7 @@ void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
                 const void *addr1 = font_file_pointer;
                 gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
                 gui_text_mode_set(t, mode);
-                gui_text_convert_to_img(t, RGB565);
+                gui_text_convert_to_img(t, ARGB8565);
 
             }
         }

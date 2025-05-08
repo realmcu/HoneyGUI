@@ -812,8 +812,8 @@ static void img_opacity_key_times_cb(image_animate_key_times_params_t *animate_p
     {
         opacity = animate_params->values[animate_params->length - 1];
     }
-
     // Set the image opacity
+    gui_fb_change();
     gui_img_set_opacity(animate_params->img,
                         (int)(opacity)); // Assuming gui_img_set_opacity expects an integer between 0 and 255
 
@@ -9060,23 +9060,23 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
             i++;
         }
         int to_widget = 0; GUI_UNUSED(to_widget);
-        if (type && to && id)
-        {
-            char **param = gui_malloc(sizeof(char *) * 2);
-            param[0] = gui_strdup(to);
-            param[1] = gui_strdup(id);
-            if (!strcmp(type, "animatePause"))
-            {
+        // if (type && to && id)
+        // {
+        //     char **param = gui_malloc(sizeof(char *) * 2);
+        //     param[0] = gui_strdup(to);
+        //     param[1] = gui_strdup(id);
+        //     if (!strcmp(type, "animatePause"))
+        //     {
 
-                GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
-                                                 (param));
-            }
-            else if (!strcmp(type, "animate"))
-            {
-                GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
-                                                 param);
-            }
-        }
+        //         GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+        //                                          (param));
+        //     }
+        //     else if (!strcmp(type, "animate"))
+        //     {
+        //         GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+        //                                          param);
+        //     }
+        // }
         if (type && to)
         {
             if (!strcmp(type, "jump"))
@@ -9203,56 +9203,56 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
                 //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
 
             }
-            // else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
-            // {
-            //     char **param = gui_malloc(sizeof(char *) * 3);
-            //     param[0] = gui_strdup(to);
-            //     param[2] = (void *)parent;
-            //     if (id)
-            //     {
-            //         param[1] = gui_strdup(id);
-            //     }
-            //     if (!strcmp(type, "animatePause"))
-            //     {
-            //         if (parent->type == BUTTON)
-            //         {
-            //             GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
-            //         }
-            //         else if (parent->type == WINDOW)
-            //         {
-            //             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
-            //         }
-            //         else if (parent->type == CLICKSWITCH)
-            //         {
-            //             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
-            //                                              (param));
-            //             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-            //                                               (gui_event_cb_t)pause_animation_cb,
-            //                                               (param));
-            //         }
+            else if ((!strcmp(type, "animatePause")) || (!strcmp(type, "animate")))
+            {
+                char **param = gui_malloc(sizeof(char *) * 3);
+                param[0] = gui_strdup(to);
+                param[2] = (void *)parent;
+                if (id)
+                {
+                    param[1] = gui_strdup(id);
+                }
+                if (!strcmp(type, "animatePause"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)pause_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)pause_animation_cb,
+                                                          (param));
+                    }
 
-            //     }
-            //     else if (!strcmp(type, "animate"))
-            //     {
-            //         if (parent->type == BUTTON)
-            //         {
-            //             GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
-            //         }
-            //         else if (parent->type == WINDOW)
-            //         {
-            //             gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
-            //         }
-            //         else if (parent->type == CLICKSWITCH)
-            //         {
-            //             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
-            //                                              (param));
-            //             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-            //                                               (gui_event_cb_t)start_animation_cb,
-            //                                               (param));
-            //         }
+                }
+                else if (!strcmp(type, "animate"))
+                {
+                    if (parent->type == BUTTON)
+                    {
+                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == WINDOW)
+                    {
+                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)start_animation_cb, param);
+                    }
+                    else if (parent->type == CLICKSWITCH)
+                    {
+                        GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
+                                                         (param));
+                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                          (gui_event_cb_t)start_animation_cb,
+                                                          (param));
+                    }
 
-            //     }
-            // }
+                }
+            }
             else if (!strcmp(type, "keyboard"))
             {
                 if (to && strlen(to) > 0 && id)
@@ -11225,9 +11225,9 @@ static gui_obj_t *widget_create_macro_on_peripheral(ezxml_t p, gui_obj_t *parent
             {
                 if (type)
                 {
-                    if (!strcmp(type, "Weather"))
+                    if ((!strcmp(type, "Weather")) || (!strcmp(type, "weather")))
                     {
-                        if (!strcmp(id, "current"))
+                        if ((!strcmp(id, "current")) || (!strcmp(id, "Current")))
                         {
                             gui_text_set_animate(parent, 1000, -1, text_animate_weather_callback,
                                                  (void *)TEXT_WEATHER_CUR_ANIMATION);
@@ -11644,6 +11644,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             if (angle != 0)
             {
                 gui_img_get_height((void *)parent);
+                gui_img_translate((void *)parent, parent->w / 2, parent->h / 2);
                 gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
             }
             parent->obj_cb = img_render;
@@ -11660,6 +11661,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             if (angle != 0)
             {
                 gui_img_get_height((void *)parent);
+                gui_img_translate((void *)parent, parent->w / 2, parent->h / 2);
                 gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
             }
             gui_img_set_mode((gui_img_t *)parent, blendMode);
@@ -13270,7 +13272,7 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         for (size_t i = 0; i < img->animate_array_length; i++)
                         {
                             image_animate_params_t *params = ((((gui_animate_t **)(img->animate))[i])->p);
-                            gui_free(params->animate_type);
+                            //gui_free(params->animate_type);
                             gui_free((((gui_animate_t **)(img->animate))[i])->p);
                             gui_free(((gui_animate_t **)(img->animate))[i]);
                             ((gui_animate_t **)(img->animate))[i] = NULL;

@@ -353,7 +353,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                int pro = circle->last_pro + tp->deltaX;
+                int pro = circle->last_pro * (obj->w - circle->base.thumb_width) / circle->base.max + tp->deltaX;
                 if (pro <= 0) { pro = 0; }
                 if (pro >= (obj->w - circle->base.thumb_width)) { pro = (obj->w - circle->base.thumb_width); }
                 if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)

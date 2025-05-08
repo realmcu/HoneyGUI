@@ -33,7 +33,9 @@ table below.
    +----+---------------+
    | 4  | RTL8772G      |
    +----+---------------+
-   | 5  | TBD           |
+   | 5  | RTL8773E      |
+   +----+---------------+
+   | 6  | TBD           |
    +----+---------------+
 
 RTKIOT Visual Designer supports:
@@ -44,6 +46,9 @@ RTKIOT Visual Designer supports:
 
 This document mainly consists of:
 
+  * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Examples`
+  * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Event_Setting`
+  * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Animation_Setting`  
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Function_Panels`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Resource_Management`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Menu_Bar`
@@ -52,6 +57,362 @@ This document mainly consists of:
 
 To simplify the document, *Tool* is used below to refer to the *RTKIOT
 Visual Designer*.
+
+.. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Examples:
+
+Examples
+---------------
+
+Example1
+~~~~~~~~~~~~~~~
+
+- **Layout**: The left side features three radio buttons, and the right side displays an image.
+- **Functionality**: Pressing different buttons on the Evaluation Board (EVB) triggers the switching of the image content on the right.
+
+.. figure:: https://foruda.gitee.com/images/1745737972534824178/c62da3af_10088396.png
+   :align: center
+   :width: 400px
+   :name: First UI Effect
+
+   Example1 UI Effect
+
+**Creating the Example1**
+
+
+1. **Create a New RVD Project**
+
+   - After opening the RVD tool, you can see this page.
+   - Click the yellow folder icon to create a project.
+
+   .. figure:: https://foruda.gitee.com/images/1745738269558331190/7495790a_10088396.png
+      :align: center
+      :width: 400px
+      :name: Create a New RVD Project
+
+      Create a New RVD Project
+
+2. **Add Image Resources**
+
+   - Add image resources based on the steps shown in the image
+
+   .. figure:: https://foruda.gitee.com/images/1745738540104414413/e31300d8_10088396.png
+      :align: center
+      :width: 400px
+      :name: Add Image Resources
+
+      Add Image Resources
+
+   - After adding the image resources, the interface displays similarly to the figure below.
+
+   .. figure:: https://foruda.gitee.com/images/1745738620568950463/af89cae9_10088396.png
+      :align: center
+      :width: 400px
+      :name: add images done
+
+      Add images done
+
+3. **Add Three Radio Buttons**:
+
+   - Drag the ``RadioButton`` widget to the central canvas.
+   - Set the background image (``BG Image``) for the radio buttons, with the highlighted image displayed when pressed.
+
+
+   .. figure:: https://foruda.gitee.com/images/1745808568359598574/8232c321_10088396.png
+      :align: center
+      :width: 400px
+      :name: Radio Buttons Setting
+
+      Radio Buttons Setting
+
+   - Adjust the position and size of the three radio buttons, aligning them on the left.
+   - Right-click a radio button to set its size to match the background image.
+
+
+   .. figure:: https://foruda.gitee.com/images/1745808941071192592/f29f7f07_10088396.png
+      :align: center
+      :width: 400px
+      :name: Adjust the position and size
+
+      Adjust the position and size
+
+4. **Add Two Image Pages**:
+
+   - Drag the ``TabView`` widget to the canvas.
+   - Click the blue arrow on the right side of the canvas to create a second tab.
+   - Select ``tab0`` and ``tab1``, and add an image to each tab.
+
+   .. figure:: https://foruda.gitee.com/images/1745809454174368310/c380f8ca_10088396.png
+      :align: center
+      :width: 400px
+      :name: Add New Tab
+
+      Add New Tab
+
+
+
+5. **Add Radio Button Selection to Switch Images**:
+
+   - Configure the radio buttons' selection events.
+   - In the ``Widget Tree``, select ``radiobutton0``. In the ``Property`` panel's yellow lightning ``Event Setting`` interface.
+   - Set the trigger to ``OnSelect`` and the action to jump to ``tab1``.
+   - Similarly, set ``radiobutton1`` to jump to ``tab0`` and ``radiobutton2`` to jump to the launcher.
+
+   .. figure:: https://foruda.gitee.com/images/1745809610213583909/3d0065d2_10088396.png
+      :align: center
+      :width: 400px
+      :name: Radio Button Selection Events
+
+      Radio Button Selection Events
+
+6. **Add Keyboard-Based Image Switching**:
+
+   - Drag two ``Peripheral Device Key`` widgets to the canvas.
+   - Configure the key click events:
+   - In the ``Widget Tree``, select ``key0``. In the ``Property`` panel's yellow lightning ``Event Setting`` interface.
+   - Set the trigger to ``OnClick`` and the action to jump to ``tab1``.
+   - Set ``key1`` to jump to ``tab0``.
+   - In the ``Property`` panel's ``Property Setting`` interface, set ``key0``'s ID to 49 and ``key1``'s ID to 50 (corresponding to keyboard keys 1 and 2 in the PC environment).
+
+   .. figure:: https://foruda.gitee.com/images/1745809853776415161/ac8f0d54_10088396.png
+      :align: center
+      :width: 400px
+      :name: Key Click Events
+
+      Key Click Events
+
+
+7. **Preview and Export**:
+
+   - Click the ``Export`` and ``Simulate`` options in the top menu to preview the effect.
+   - Check the exported files in the directory: ``<project_folder>\Export\root``.
+
+
+Example2
+~~~~~~~~~~~~~~~
+
+- **Left Upper**: Displays two images with mixed effects (transparent and black background).
+- **Left Lower**: Shows text in two different font sizes.
+- **Right**: Features an image with an up-and-down reciprocating animation.
+
+.. figure:: https://foruda.gitee.com/images/1745739513678951688/bcb3b0f2_10088396.png
+   :align: center
+   :width: 400px
+   :name: Second UI Effect
+
+   Example2 UI Effect
+
+**Creating the Example2**
+
+
+1. **Create a New RVD Project**
+
+   - After opening the RVD tool, you can see this page.
+   - Click the yellow folder icon to create a project.
+
+.. figure:: https://foruda.gitee.com/images/1745739395361023371/1dfd00b4_10088396.png
+   :align: center
+   :width: 400px
+   :name: Create a New RVD Project for Example2
+
+   Create a New RVD Project
+
+2. **Add Image Resources**
+
+   - Please refer to Example1.
+
+3. **Add Four Images**:
+
+   - Drag the ``Image`` widget from the ``Widget`` panel to the canvas.
+   - Set the ``Image`` property in the ``Property`` panel to the specified image resource.
+   - Right-click the image widget on the canvas to set its size to match the image resource.
+   - Adjust the layout of the image widgets.
+
+4. **Set Image Export Format**:
+
+   - By default, image conversion uses ``GlobalSetting`` (with ``Color Space`` set to ``RGB565``). To apply a different conversion for specific image resources (e.g., to retain transparency effects), a new conversion setting must be used for that image resource.
+   - Go to ``Setting -> Image Convert -> Create`` to create a new conversion setting.
+   - Configure options such as ``Color Space``, ``Compress``, and ``Mix Alpha Channel``.
+
+   .. figure:: https://foruda.gitee.com/images/1745740074880329292/510c8669_10088396.png
+      :align: center
+      :width: 400px
+      :name: Set Image Export Format
+
+      Set Image Export Format
+
+   - Close the dialog, then in the ``Images`` window, select the image resource and apply the newly created conversion setting in the ``Image Convert Setting`` section.
+   
+   .. figure:: https://foruda.gitee.com/images/1745740381172650681/cbbdb633_10088396.png
+      :align: center
+      :width: 400px
+      :name: Apply the conversion setting
+
+      Apply the conversion setting 
+
+5. **Handle PNG Transparent Images**:
+
+   - For PNG images with transparency effects, it is recommended to use the following two settings.
+   - Transparent Effect Setting:
+
+     - For images with non-pure black background layers.
+     - Set the image conversion format's ``Color Space`` to ``ARGB8565`` or ``ARGB``.
+     - Set the image widget's ``Blending Mode`` to ``SrcOverMode``.
+
+   .. figure:: https://foruda.gitee.com/images/1745745800531690844/7ea2f80b_10088396.png
+      :align: center
+      :width: 400px
+      :name: Transparent Effect Setting
+
+      Transparent Effect Setting
+
+   .. figure:: https://foruda.gitee.com/images/1745745582092188954/316866ba_10088396.png
+      :align: center
+      :width: 400px
+      :name: Blending Mode Setting
+
+      Blending Mode Setting  
+
+   - Pre-mixed Black Background Effect Setting:
+   
+     - For images with pure black background layers (to optimize file size and display efficiency).
+     - Set the image conversion format's ``Color Space`` to ``RGB565`` or ``RGB``.
+     - Check ``Mix Alpha Channel``.
+     - Set the image widget's ``Blending Mode`` to ``BypassMode``.
+
+   .. figure:: https://foruda.gitee.com/images/1745745835243226253/ecb3a5c0_10088396.png
+      :align: center
+      :width: 400px
+      :name: Black Background Effect Setting
+
+      Black Background Effect Setting    
+
+   - Apply transparent effect to ``image3`` and pre-mixed black background to ``image2``.
+   - In the figure below, Effect 1 is the pre-mixed black background effect, and Effect 2 is the transparent effect.
+
+   .. figure:: https://foruda.gitee.com/images/1745741856777234666/786ff313_10088396.png
+      :align: center
+      :width: 400px
+      :name: 2 Effects
+
+      Two Image Effects 
+
+
+6. **Add Image Animation** (for ``image1`` with up-and-down reciprocating motion):
+
+   - **Create an Animation**:
+
+     - In the ``Animation`` menu, set the type to ``AdvancedTranslate`` and click ``Add``.
+     - This is a keyframe animation allowing operations at multiple time points.
+     - Design the animation to move the image to the bottom of the screen at 30% progress and return to the top at 100% progress.
+     - Set ``Key Times`` to ``0;0.3;1`` (animation start, 30% progress, 100% progress).
+     - Set ``Values`` to ``0,0;0,300;0,0`` (three sets of 2D translations: no horizontal movement, vertical movement of 300 pixels down, then back up).
+     - Set ``Duration`` to the animation cycle duration (in milliseconds). Set ``Repeat`` to 0 for infinite looping.
+   
+   .. figure:: https://foruda.gitee.com/images/1745747629263669367/c7c911d5_10088396.png
+      :align: center
+      :width: 400px
+      :name: Create an Animation
+
+      Create an Animation
+
+   - **Apply Animation to Image**:
+
+     - Select ``image1`` and go to the ``Property`` panel.
+     - In the yellow lightning ``Event Setting`` interface, set the trigger to ``OnLoad`` (triggered when the image widget is displayed).
+     - Click ``Add Event``, set the ``Action`` to ``Animation``, and select the newly created animation (``animate0``).
+
+   .. figure:: https://foruda.gitee.com/images/1745753304113520373/abcbabfa_10088396.png
+      :align: center
+      :width: 400px
+      :name: Apply Animation to Image
+
+      Apply Animation to Image   
+
+7. **Add Two Text Boxes**:
+
+   - Drag the ``Text`` widget from the ``Widget`` panel to the canvas.
+   - Set the text content in the ``Property`` panel's ``Content->Text`` field.
+   - Configure the font in ``Appearance->Font``. By default, no font is set.
+
+   .. figure:: https://foruda.gitee.com/images/1745754152945794898/312ceea5_10088396.png
+      :align: center
+      :width: 400px
+      :name: Text setting
+
+      Text Setting
+   
+   - **Create a Font Setting**:
+
+     - Go to ``Setting -> Font Convert -> Create`` to create a new conversion setting.
+     - Configure the font file, font size, anti-aliasing level, and character range.
+     - For ``Text type`` set to ``Random``, specify the ``Code Page`` (e.g., ``CP037`` for English, ``CP936`` for Chinese).
+     - For ``Text type`` set to ``Range``, specify the ``Unicode Range``. ``Code Page`` is optional and, if set, combines with the range.
+     - Available fonts include PC system fonts and user-added fonts.
+     
+      .. figure:: https://foruda.gitee.com/images/1745754869649440065/606a2221_10088396.png
+         :align: center
+         :width: 400px
+         :name: Font Setting
+
+         Font Setting     
+     
+     - If your font size is large and the number of characters to display is small, using the Range method is an effective optimization strategy for reducing the size of exported resource files.
+     - For example, the configuration in the figure below is used for a text widget that only needs to display digits and a colon, with Unicode ranges of 0x0030-0x003A and 0x003A-0x003B. (Start Unicode to End Unicode + 1)
+
+      .. figure:: https://foruda.gitee.com/images/1745756420938128273/7afd8a6c_10088396.png
+         :align: center
+         :width: 400px
+         :name: Font Setting optimization
+
+         Font Setting optimization 
+
+   - **Add a Custom Font**:
+
+     - In the ``Fonts`` section, click the plus sign to add a TTF font file.
+     - The added font appears at the top of the ``Font`` dropdown in the font settings.
+
+      .. figure:: https://foruda.gitee.com/images/1745756985069687194/c26b25cf_10088396.png
+         :align: center
+         :width: 400px
+         :name: Add a Custom Font
+
+         Add a Custom Font
+     
+
+8. **Preview and Export**:
+
+   - Click the ``Export`` and ``Simulate`` options in the top menu to preview the effect.
+   - Check the exported files in the directory: ``<project_folder>\Export\root``.
+
+
+
+Flashing to EVB
+~~~~~~~~~~~~~~~
+
+To view the UI effects on the EVB, the RVD export pack need to be flashed.
+
+1. **Pre-Flashing the RVD Project firmware for EVB**
+
+   - The pre-download operation needs to be performed once. The downloaded firmware can parse and display the RVD exported package.
+   - Different EVBs and chips correspond to different firmware, which can be found in the corresponding SDK along with the firmware projects.
+
+2. **Flashing the RVD Exported Package**
+
+   - Check the exported folder: ``<project_folder>\Export\root``.
+   - To package the root folder using the image packaging tool corresponding to the EVB, you generally need to pay attention to the address settings or flash partition configuration. 
+   - Refer to the packaging tool's documentation for detailed operational instructions. The image packaging tool can typically be found in the SDK corresponding to the EVB.
+   - Flash the file.
+   - Restart the EVB to view the screen display effect.
+
+.. figure:: https://foruda.gitee.com/images/1745833726498330826/59e236a8_10088396.jpeg
+   :align: center
+   :width: 400px
+   :name: screen display effect
+
+   screen display effect
+
+
+
 
 .. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Function_Panels:
 
@@ -176,6 +537,59 @@ shown in the table below.
    | BG Image Rotation Angle | Background image rotation angle, range: 0~360 degree.                                                                    |      Y      |      Y      |  Y  |
    +-------------------------+--------------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
 
+
+RadioButton
+''''''''''''
+
+- A radio button is a UI element that allows users to select one option from a group of mutually exclusive choices.
+- The properties are shown in the table below.
+
+
+.. figure:: https://foruda.gitee.com/images/1745894565905113170/8ba3d87a_10088396.gif
+   :align: center
+   :width: 400px
+   :name: RadioButton
+
+   RadioButton
+
+
+.. table:: RadioButton Widget Properties
+   :align: center
+   :width: 100%
+
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Property                | Description                                                                                                              |
+   +=========================+==========================================================================================================================+
+   | Name                    | Widget name.                                                                                                             |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Group Name              | links this button to a group where only one can be selected at a time.                                                   |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Size (Height)           | Widget height.                                                                                                           |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Size (Width)            | Widget width.                                                                                                            |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | X                       | Horizontal coordinate relative to the parent widget.                                                                     |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Y                       | Vertical coordinate relative to the parent widget.                                                                       |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | BG Image X              | Horizontal Position of the background image.                                                                             |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | BG Image Y              | Vertical Position of the background image.                                                                               |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | BG Image (Default)      | Default background image.                                                                                                |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | BG Image (Highlight)    | Selected/Highlight background image.                                                                                     |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Image Rotation Angle    | Background image rotation angle, range: 0~360 degree.                                                                    |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Blend Mode              | Blending mode determines how the pixels of a UI element combine with the pixels of the underlying layers or background.  |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+   | Opacity                 | Transparency level 0~255                                                                                                 |
+   +-------------------------+--------------------------------------------------------------------------------------------------------------------------+
+
+
+
+
 Image
 '''''
 
@@ -209,8 +623,56 @@ Image
    +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
    | Image Scale Y        | Image vertical scaling degree, is a multiplier/percentage.                                                         |      Y      |      Y      |  Y  |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Blend Mode           |  how the pixels of a UI element combine with the pixels of the underlying layers or background.                    |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Opacity              |  Transparency level 0~255                                                                                          |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
 
-Widget that can set image. The properties are shown in the table below.
+ImageMovie
+''''''''''
+
+- ImageMovie achieves a video playback effect by sequentially displaying a series of image frames. 
+- This requires setting up a folder containing the image frame sequence, with frames sorted and displayed based on their filenames.
+
+
+
+.. table:: ImageMovie Widget Properties
+   :align: center
+   :width: 100%
+
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Property             | Description                                                                                                        |
+   +======================+====================================================================================================================+
+   | Name                 | Widget name.                                                                                                       |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Size (Height)        | Widget height.                                                                                                     |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Size (Width)         | Widget width.                                                                                                      |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | X                    | Horizontal coordinate relative to the parent widget.                                                               |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Y                    | Vertical coordinate relative to the parent widget.                                                                 |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Image Directory      | Image Directory Path                                                                                               |
+   |                      |                                                                                                                    |
+   |                      | Note: The image must be pre-imported into the project.                                                             |
+   |                      | Please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Resource_Management` for details.               |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Image Rotation Angle | Image rotation angle.                                                                                              |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Image Scale X        | Image horizontal scaling degree, is a multiplier/percentage.                                                       |
+   |                      |                                                                                                                    |
+   |                      | For example, set scale x 0.5 means that the actual display width of the image is half of the original image width. |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Image Scale Y        | Image vertical scaling degree, is a multiplier/percentage.                                                         |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Blend Mode           |  how the pixels of a UI element combine with the pixels of the underlying layers or background.                    |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Opacity              |  Transparency level 0~255                                                                                          |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Duration             |  Duration of the video effect                                                                                      |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+
 
 .. note::
    
@@ -309,6 +771,254 @@ images as the user swipes. The properties are shown in the table below.
    |                 | horizontal/H: Horizontal orientation                                                                                  |             |             |     |
    +-----------------+-----------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
 
+
+SingleImage SeekBar
+'''''''''''''''''''
+
+Sliding widget with a image as background, and change the display scope as the user swipes. The properties are shown in the table below.
+
+
+
+.. figure:: https://foruda.gitee.com/images/1745910726644453215/24d73f89_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-SingleImage
+
+   SingleImage
+
+
+.. table:: SingleImage SeekBar Widget Properties
+   :align: center
+   :width: 100%
+
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Property        | Description                                                                                                           |
+   +=================+=======================================================================================================================+
+   | Name            | Widget name.                                                                                                          |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Size (Height)   | Widget height.                                                                                                        |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Size (Width)    | Widget width.                                                                                                         |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | X               | Horizontal coordinate relative to the parent widget.                                                                  |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Y               | Vertical coordinate relative to the parent widget.                                                                    |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | BG Image        | The image file.                                                                                                       |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Orientation     | Widget display orientation and gesture response orientation with the following types:                                 |
+   |                 |                                                                                                                       |
+   |                 | vertical/V: Vertical orientation                                                                                      |
+   |                 |                                                                                                                       |
+   |                 | arc: Direction of a curve                                                                                             |
+   |                 |                                                                                                                       |
+   |                 | horizontal/H: Horizontal orientation                                                                                  |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Blend Mode      |  how the pixels of a UI element combine with the pixels of the underlying layers or background.                       |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Opacity         |  Transparency level 0~255                                                                                             |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+
+
+
+ThumbSeekBar
+'''''''''''''''''''
+
+- ThumbSeekBar is a widget where a thumb image follows the touch point during sliding to indicate progress.
+- When the progress reaches 100%, the thumb image switches to a highlighted image for display.
+- The properties are shown in the table below.
+
+
+.. table:: ThumbSeekBar Widget Properties
+   :align: center
+   :width: 100%
+
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Property        | Description                                                                                                           |
+   +=================+=======================================================================================================================+
+   | Name            | Widget name.                                                                                                          |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Size (Height)   | Widget height.                                                                                                        |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Size (Width)    | Widget width.                                                                                                         |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | X               | Horizontal coordinate relative to the parent widget.                                                                  |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Y               | Vertical coordinate relative to the parent widget.                                                                    |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Thumb X         | Thumb image offset.                                                                                                   |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Thumb Y         | Thumb image offset.                                                                                                   |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Background      | The background image file                                                                                             |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Thumb           | The Thumb image file                                                                                                  |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Thumb(highlight)| The highlighted thumb image will be displayed when the progress reaches 100%.                                         |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Orientation     | Widget display orientation and gesture response orientation with the following types:                                 |
+   |                 |                                                                                                                       |
+   |                 | vertical/V: Vertical orientation                                                                                      |
+   |                 |                                                                                                                       |
+   |                 | arc: Direction of a curve                                                                                             |
+   |                 |                                                                                                                       |
+   |                 | horizontal/H: Horizontal orientation                                                                                  |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Blend Mode      |  how the pixels of a UI element combine with the pixels of the underlying layers or background.                       |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+   | Opacity         |  Transparency level 0~255                                                                                             |
+   +-----------------+-----------------------------------------------------------------------------------------------------------------------+
+
+
+
+SideBar
+''''''''''
+
+- SideBar is a widget that can slide in from any of the four sides of the screen. 
+- It allows you to specify the proportion of the screen it occupies after sliding in.
+
+
+.. table:: SideBar Widget Properties
+   :align: center
+   :width: 100%
+
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Property             | Description                                                                                                        |
+   +======================+====================================================================================================================+
+   | Name                 | Widget name.                                                                                                       |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Size (Height)        | Widget height.                                                                                                     |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Size (Width)         | Widget width.                                                                                                      |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | X                    | Horizontal coordinate relative to the parent widget.                                                               |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Y                    | Vertical coordinate relative to the parent widget.                                                                 |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Orientation          | Slide in from which side of the screen.                                                                            |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Scope                | The proportion of the screen it occupies.                                                                          |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+
+Roller
+''''''''''
+
+- Roller is a widget that scrolls through rows of text based on upward or downward swipe gestures. 
+- The text in the middle row is highlighted in a distinct color. 
+- The scrolling features inertia and alignment effects for a smooth user experience.
+
+.. figure:: https://foruda.gitee.com/images/1745914810308863014/d9025424_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-Roller
+
+   Roller
+
+
+.. table:: Roller Widget Properties
+   :align: center
+   :width: 100%
+
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Property             | Description                                                                                                        |
+   +======================+====================================================================================================================+
+   | Name                 | Widget name.                                                                                                       |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Size (Height)        | Widget height.                                                                                                     |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Size (Width)         | Widget width.                                                                                                      |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | X                    | Horizontal coordinate relative to the parent widget.                                                               |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Y                    | Vertical coordinate relative to the parent widget.                                                                 |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Row Count            | Row count                                                                                                          |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Row Space            | Height of one row                                                                                                  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Row Space            | Height of one row                                                                                                  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Font                 | Font setting, please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Font_Convert_Setting`.                  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Font Color (RGBA)    | Font color setting, use RGBA.                                                                                      |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Highlight Font Color | Middle row's Font color setting, use RGBA.                                                                         |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   | Content alignment    | Text layout                                                                                                        |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+   
+   | Loop scrolling       | If loop while scrolling.                                                                                           |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+ 
+   | Items                | Texts for each row                                                                                                 |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+ 
+
+
+
+
+Chart
+''''''''''
+
+- Chart is a widget that supports three styles: waveform, bar, and line. 
+- It allows customization of the chart's vertical range and color.
+
+
+
+.. figure:: https://foruda.gitee.com/images/1745917347774483906/2412b17b_10088396.png
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-Chart
+
+   Chart
+
+ComboBox
+''''''''''
+
+- ComboBox is a dropdown widget that expands when clicked. 
+- Upon selecting an option, the dropdown collapses, displaying the chosen option. 
+- Both clicking and selecting options feature a highlight effect.
+
+.. figure:: https://foruda.gitee.com/images/1745918646533630134/034c1b3b_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-ComboBox
+
+   ComboBox
+
+Calendar 
+''''''''''
+
+- Calendar is a perpetual calendar widget that displays the dates of a month. 
+- Users can swipe left or right to switch between months, with the current date highlighted.
+
+
+
+.. figure:: https://foruda.gitee.com/images/1745921254906327275/87799f1b_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-Calendar
+
+   Calendar
+
+
+Menu
+''''''''''
+
+- Menu is a multi-level menu container widget where each menu is mutually exclusive in display. 
+- By navigating through the menu, users can switch between them.
+
+Key
+''''''''''
+
+- Key is a widget for physical button. 
+- On PC, Key's ID maps to QWERTY keyboard character's ASCII value.
+- On EVB, Key's ID mapping is based on porting in SDK.
+
+.. figure:: https://foruda.gitee.com/images/1746619930224908218/7fe6fcb1_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Clicking Key to Navigate to Tab 
+
+   Clicking Key to Navigate to Tab
+
 Switch
 ''''''
 
@@ -358,7 +1068,7 @@ table below.
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
    | X              | Horizontal coordinate relative to the parent widget.                                |      Y      |      Y      |  N  |
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
-   | Y              | Vertical coordinate relative to the parent control.                                 |      Y      |      Y      |  N  |
+   | Y              | Vertical coordinate relative to the parent widget.                                 |      Y      |      Y      |  N  |
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
    | Central X      | Horizontal coordinate of the center of the arc relative to the parent widget.       |      N      |      Y      |  N  |
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
@@ -711,6 +1421,551 @@ Widget Tree supports the following operations.
    :align: center
 
    Locked
+
+.. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Event_Setting:
+
+Event Setting
+---------------
+
+Trigger Events Brief
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table:: Trigger Events
+   :widths: 20 40 40
+   :header-rows: 1
+
+   * - Name
+     - Description
+     - Supported Controls
+   * - OnClick
+     - Triggered when a widget is clicked.
+     - Button, Win, Key
+   * - OnSelect
+     - Triggered when an option or item is selected.
+     - RadioButton
+   * - OnLoad
+     - Triggered when a widget or page is loaded.
+     - Image, SeekBar set, Win
+   * - OnValueChange
+     - Triggered when a widget's value or state changes.
+     - ThumbSeekBar, ImageSeekBar, SingleImageSeekBar
+   * - OnOn
+     - Triggered when a widget is turned on or activated.
+     - Switch
+   * - OnOff
+     - Triggered when a widget is turned off or deactivated.
+     - Switch
+   * - OnTime
+     - Triggered by real time or data.
+     - Image(type: hour, minute, second), Text
+   * - OnPeripheral
+     - Triggered by a peripheral device.
+     - Text, Chart, Arc
+   * - OnComplete
+     - Triggered when an action or process is completed.
+     - ThumbSeekBar, ImageSeekBar, SingleImageSeekBar
+
+
+Action Brief
+~~~~~~~~~~~~~~
+
+.. list-table:: Action
+   :widths: 20 40 40
+   :header-rows: 1
+
+   * - Name
+     - Description
+     - Supported Trigger Events
+   * - Animation
+     - Start or pause a animation.
+     - OnClick, OnLoad, OnOff, OnOn
+   * - Set Time
+     - A widget displays real time or date.
+     - OnTime
+   * - Set Peripheral
+     - A widget displays peripheral's data.
+     - OnPeripheral
+   * - Jump
+     - Navigate to a display effect(Tab, Menu, App, launcher).
+     - OnClick, OnSelect, OnComplete
+   * - Set Text Property
+     - Update a Text's content.
+     - OnValueChange
+
+
+Event Setting Example
+~~~~~~~~~~~~~~~~~~~~~
+
+1. Text - OnTime - Set Time
+
+- The Text shows real time in "00:00" format.
+- Select a Text widget, click the yellow lightning icon in Property panel, Choose OnTime Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746534321715090170/409729a5_10088396.png
+   :align: center
+   :width: 400px
+   :name: Text - OnTime - Set Time
+
+   Text - OnTime - Set Time
+
+.. figure:: https://foruda.gitee.com/images/1746534115101519614/2a71cc0b_10088396.png
+   :align: center
+   :width: 400px
+   :name: "00:00" Format
+
+   "00:00" Format
+
+
+2. Text - OnPeripheral - Set Peripheral
+
+- The Text shows Temperture value.
+- Select a Text widget, click the yellow lightning icon in Property panel, Choose OnPeripheral Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746536661568009147/585acc2b_10088396.png
+   :align: center
+   :width: 400px
+   :name: Text - OnPeripheral - Set Peripheral
+
+   Text - OnPeripheral - Set Peripheral
+
+.. figure:: https://foruda.gitee.com/images/1746536593655244781/847265cf_10088396.png
+   :align: center
+   :width: 400px
+   :name: Temperture value
+
+   Temperture Value Effect 
+
+
+3. Button - OnClick - Jump
+
+- Click the Button to navigate to the Launcher
+- Select a Button widget, click the yellow lightning icon in Property panel, Choose OnClick Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746537843864983728/aeb22ac7_10088396.png
+   :align: center
+   :width: 400px
+   :name: Button - OnClick - Jump
+
+   Button - OnClick - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746537471468564505/73316780_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Navigate to the Launcher
+
+   Navigate to Launcher
+
+4. RadioButton - OnSelect - Jump
+
+- Click the RadioButton to navigate to the specific Tab or Launcher
+- Select a RadioButton widget, click the yellow lightning icon in Property panel, Choose OnSelect Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746538686942083962/221748a3_10088396.png
+   :align: center
+   :width: 400px
+   :name: RadioButton - OnSelect - Jump
+
+   RadioButton - OnSelect - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746538630891468492/dad921e7_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Navigate to Tab or Launcher
+
+   Navigate to Tab or Launcher
+
+5. Image - OnTime - Set Time
+
+- Image rotates as a watch's hand.
+- Select a Image widget, click the yellow lightning icon in Property panel, Choose OnTime Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746541398866452997/e2383aac_10088396.png
+   :align: center
+   :width: 400px
+   :name: Image - OnTime - Set Time
+
+   Image - OnTime - Set Time
+
+.. figure:: https://foruda.gitee.com/images/1746541349306828139/be90966b_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Rotating as Watch's Hands
+
+   Rotating as Watch's Hands
+
+6. Win - OnClick - Jump
+
+- Click in Win's scope to navigate to the specific Tab.
+- Select a Win widget (800*480), click the yellow lightning icon in Property panel, Choose OnClick Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746541398866452997/e2383aac_10088396.png
+   :align: center
+   :width: 400px
+   :name: Win - OnClick - Jump
+
+   Win - OnClick - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746583144736863278/8534f639_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Navigate to Tab by Clicking Win
+
+   Navigate to Tab by Clicking Win
+
+7. ImageSeekBar - OnComplete - Jump
+
+- Drag SeekBar to 100% to navigate to the specific Tab.
+- Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose OnComplete Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746587643812005158/1bbdb703_10088396.png
+   :align: center
+   :width: 400px
+   :name: ImageSeekBar - OnComplete - Jump
+
+   ImageSeekBar - OnComplete - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746587570975949917/26ce7d0a_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Navigate to Tab by SeekBar to 100%
+
+   Navigate to Tab by SeekBar to 100%
+
+8. ImageSeekBar - OnValueChange - Set Text Property
+
+- Drag SeekBar, and text show the current progress.
+- Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose OnValueChange Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746596718815338059/ac4bd71f_10088396.png
+   :align: center
+   :width: 400px
+   :name: ImageSeekBar - OnValueChange - Set Text Property
+
+   ImageSeekBar - OnValueChange - Set Text Property
+
+.. figure:: https://foruda.gitee.com/images/1746596678776826816/3fc7f1a9_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Current Progress
+
+   Current Progress
+
+9. Switch - OnOn - Animation
+
+- Turn on a Switch to start a image animation.
+- Select a Switch widget, click the yellow lightning icon in Property panel, Choose OnOn Trigger, and click Add Event icon.
+- Onoff setting is similar to OnOn's.
+
+.. figure:: https://foruda.gitee.com/images/1746618191372066531/edcb2463_10088396.png
+   :align: center
+   :width: 400px
+   :name: Switch - OnOn - Animation
+
+   Switch - OnOn - Animation
+
+.. figure:: https://foruda.gitee.com/images/1746618094829096897/d9c77001_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Start a Image Animation
+
+   Start a Image Animation
+
+10. Key - OnClick - Jump
+
+- Click the Key on the keyboard to navigate to the specific Tab.
+- Select a Key widget, click the yellow lightning icon in Property panel, Choose OnClick Trigger, and click Add Event icon.
+
+.. figure:: https://foruda.gitee.com/images/1746619969278276032/5298b16e_10088396.png
+   :align: center
+   :width: 400px
+   :name: Key - OnClick - Jump
+
+   Key - OnClick - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746619930224908218/7fe6fcb1_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Navigate to Tab by Clicking Key
+
+   Navigate to Tab by Clicking Key
+
+
+
+
+
+.. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Animation_Setting:
+
+Animation Setting
+--------------------
+- Animations in RVD work by changing a specific widget's properties over time. 
+- They come with attributes like loop count, duration, target parameters
+- And value control methods such as 'from-to' or key-frames, along with interpolation options.
+- The 'from-to' method involves specifying the start and end values of a property within a single duration. 
+- Key-frames build on this by allowing you to define a sequence of percentage-based progress nodes within that duration, with each node tied to a specific property value. 
+- Events as OnClick, OnLoad, OnOff, OnOn are able to trigger animation start or pause.
+
+Animation Type Brief
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table:: Animation Types
+   :widths: 20 50 30
+   :header-rows: 1
+
+   * - Type
+     - Description
+     - Supported Controls
+   * - Rotation
+     - Rotates the element around a specified axis or point.
+     - Image
+   * - Opacity
+     - Changes the transparency level of the element.
+     - Image
+   * - AdvancedOpacity
+     - Changes the transparency level in Key-frames type. 
+     - Image
+   * - Translation
+     - Moves the element along a specified direction.
+     - Image
+   * - AdvancedTranslate
+     - Moves the element in Key-frames type.
+     - Image
+   * - Scale
+     - Resizes the element, either enlarging or shrinking it.
+     - Image
+   * - Progress
+     - Animates a progress indicator, often used for loading or completion bars.
+     - ProgressBar, SeekBar
+
+Animation Example
+~~~~~~~~~~~~~~~~~~~~~
+
+
+1. Rotation
+
+- The Image rotating around it's center in a 2000ms loop infinitely.
+- Select the Animation panel, Choose Rotation Type, and click Add icon.
+- Angle unit is degree.
+- Rotating Central X and Central Y is 150px, as the image resolution is 300px * 300px, for a around it's center effect.
+- Duration uint is millisecond.
+- Repeat 0 means indefinite.
+
+.. figure:: https://foruda.gitee.com/images/1746625013725409821/5120844e_10088396.png
+   :align: center
+   :width: 400px
+   :name: Rotation Setting
+
+   Rotation Setting
+
+.. figure:: https://foruda.gitee.com/images/1746625315257430404/231e36ab_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Rotating around It's Center
+
+   Rotating around It's Center
+
+- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+- Choose animate2 which is the Rotation as Animation.
+- Choose image0 which is the Image itself as Target Widget.
+
+.. figure:: https://foruda.gitee.com/images/1746626898865085480/4a10b3d2_10088396.png
+   :align: center
+   :width: 400px
+   :name: Setting Image's OnLoad
+
+   Setting Image's OnLoad for Rotation
+
+
+2. Opacity
+
+- Changes the transparency level of the image in a 2000ms loop infinitely from 255 opacity to 100 opacity.
+- Select the Animation panel, Choose Opacity Type, and click Add icon.
+- Scope of Start Value and End Value is 0~255.
+- Duration uint is millisecond.
+- Repeat 0 means indefinite.
+
+.. figure:: https://foruda.gitee.com/images/1746625850523787642/1602b1d2_10088396.png
+   :align: center
+   :width: 400px
+   :name: Opacity Setting
+
+   Opacity Setting
+
+.. figure:: https://foruda.gitee.com/images/1746626034581611764/af8a8a36_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Changes the transparency level
+
+   Changes the transparency level
+
+- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+- Choose animate1 which is the Opacity as Animation.
+- Choose image0 which is the Image itself as Target Widget.
+
+.. figure:: https://foruda.gitee.com/images/1746626159340482410/e8bee870_10088396.png
+   :align: center
+   :width: 400px
+   :name: Setting Image's OnLoad for Opacity
+
+   Setting Image's OnLoad for Opacity
+
+3. AdvancedTranslate
+
+- Moves the image along a rectangle path.
+- Path is relative 2D coordinate: 0,0;0,150;400,150;400,0;0,0, means down 150, then right 400, then up 150, then left 400.
+- Key Times are 0;0.2;0.5;0.7;1, means at these progress node within a duration, reaching the corresponding coordinate.
+- coordinate uint is pixel.
+- Repeat 0 means indefinite.
+- Calc Mode is Linear means linear moving.
+- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+
+.. figure:: https://foruda.gitee.com/images/1746628004131074559/b2312fba_10088396.png
+   :align: center
+   :width: 400px
+   :name: AdvancedTranslate Setting
+
+   AdvancedTranslate Setting
+
+.. figure:: https://foruda.gitee.com/images/1746627400796126478/27364d84_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Rectangle Path
+
+   Rectangle Path
+
+- Calc Mode Discrete effect.
+
+.. figure:: https://foruda.gitee.com/images/1746628523731815603/e8632d15_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Discrete Effect
+
+   Discrete Effect
+
+
+4. AdvancedOpacity
+
+- Modify the transparency of four images in sequence to achieve a marquee effect.
+- Image P: Values are "255;50;50", Key Times are "0;0.25;1", meaning it starts fully opaque, at 25% progress the transparency becomes 50, and the image darkens.
+- Image R: Values are "50;255;50;50", Key Times are "0;0.25;0.5;1", meaning it starts with transparency 50, becomes fully opaque at 25% progress, returns to transparency 50 at 50% progress, and remains at transparency 50 until the end.
+- Image N: Values are "50;255;50;50", Key Times are "0;0.5;0.75;1", meaning it starts with transparency 50, becomes fully opaque at 50% progress, returns to transparency 50 at 75% progress, and remains at transparency 50 until the end.
+- Image D: Values are "50;255;50", Key Times are "0;0.75;1", meaning it starts with transparency 50, becomes fully opaque at 75% progress, and returns to transparency 50 at the end.
+- Calc Mode is Discrete means the transparency values change instantly at the specified key times without smooth interpolation between them.
+- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+
+.. figure:: https://foruda.gitee.com/images/1746687165856460117/17efb850_10088396.png
+   :align: center
+   :width: 400px
+   :name: AdvancedOpacity Setting
+
+   AdvancedOpacity Setting
+
+.. figure:: https://foruda.gitee.com/images/1746684786170372465/827aa5f3_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Marquee Effect
+
+   Marquee Effect
+
+- Calc Mode is Linear means the transparency values change smoothly and linearly between the specified key times, creating a gradual transition effect.
+
+
+.. figure:: https://foruda.gitee.com/images/1746687410946462671/7ce203ac_10088396.gif
+   :align: center
+   :width: 400px
+   :name: AdvancedOpacity Linear Effect 
+
+   AdvancedOpacity Linear Effect 
+
+5. Translation
+
+- The Image moves to the right-down corner.
+- Start X is 0, End X is 800, Start Y is 0, End Y is 480, meaning the image starts at its original position (0,0) relative to its initial location and moves 800 pixels to the right and 480 pixels down to the bottom-right corner relative to its original position.
+- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+
+.. figure:: https://foruda.gitee.com/images/1746687959723538000/85b82b79_10088396.png
+   :align: center
+   :width: 400px
+   :name: Translation Setting
+
+   Translation Setting
+
+.. figure:: https://foruda.gitee.com/images/1746687915633385177/757fd07c_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Right-Down Effect
+
+   Right-Down Effect
+
+6. Scale
+
+- The Image scales toward its center.
+- Start Scale X is 1, End Scale X is 0.10, Start Scale Y is 1, End Scale Y is 0.10, meaning the image begins at its original size (100% scale) and uniformly shrinks to 10% of its original width and height, scaling down symmetrically from its center point.
+- Start Central X is 400, End Central X is 400, Start Central Y is 240, End Central Y is 240, meaning the image's center point remains fixed at coordinates (400, 240), which is the center of the 800x480 resolution image, throughout the scaling process.
+- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+
+.. figure:: https://foruda.gitee.com/images/1746688570327220104/3d53ca69_10088396.png
+   :align: center
+   :width: 400px
+   :name: Scale Setting
+
+   Scale Setting
+
+.. figure:: https://foruda.gitee.com/images/1746688538540976083/6035cc85_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Scale Effect
+
+   Scale Effect
+
+7. Progress
+
+- The progress of this ImageSeekBar increases from 0 to 100%. 
+- Start Value 0.00 means the initial progress is 0%, and End Value 1.00 means the progress reaches 100% at the end of one animation cycle.
+
+
+.. figure:: https://foruda.gitee.com/images/1746689450841370398/8b4c10f8_10088396.png
+   :align: center
+   :width: 400px
+   :name: Progress Setting
+
+   Progress Setting
+
+.. figure:: https://foruda.gitee.com/images/1746689390015636943/e654d618_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 0 - 100% Effect
+
+   0 - 100% Effect
+
+- Configure the OnLoad event of ImageSeekBar to trigger the animation playback immediately upon its appearance.
+
+.. figure:: https://foruda.gitee.com/images/1746689431861966468/858c665b_10088396.png
+   :align: center
+   :width: 400px
+   :name: Setting ImageSeekBar's OnLoad
+
+   Setting ImageSeekBar's OnLoad
+
+8. Multiple Animation Settings
+
+- The image simultaneously rotates, changes transparency, and moves from the top-left corner to the bottom-right corner.
+
+.. figure:: https://foruda.gitee.com/images/1746690669445832106/ef75fb51_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Multiple Animation Effect
+
+   Multiple Animation Effect
+
+- Configure the OnLoad event of Image to trigger the multiple animation playback immediately upon its appearance.
+
+.. figure:: https://foruda.gitee.com/images/1746690703380172709/4942fe98_10088396.png
+   :align: center
+   :width: 400px
+   :name: Multiple Animation Effect Trigger
+
+   Multiple Animation Effect Trigger
+
 
 .. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Resource_Management:
 
