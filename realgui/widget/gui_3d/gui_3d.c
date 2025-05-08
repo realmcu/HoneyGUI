@@ -38,6 +38,7 @@
 gui_3d_t *gui_3d_create(void                 *parent,
                         const char           *name,
                         void                 *desc_addr,
+                        GUI_3D_DRAW_TYPE      type,
                         int16_t               x,
                         int16_t               y,
                         int16_t               w,
@@ -48,17 +49,16 @@ gui_3d_t *gui_3d_create(void                 *parent,
     switch (desc->face_type)
     {
     case GUI_3D_FACE_RECTANGLE:
-        return gui_3d_rect_create(parent, name, desc, x, y, w, h);
+        return gui_3d_rect_create(parent, name, desc, type, x, y, w, h);
 
     case GUI_3D_FACE_TRIANGLE:
-        return gui_3d_tria_create(parent, name, desc, x, y, w, h);
+        return gui_3d_tria_create(parent, name, desc, type, x, y, w, h);
 
     default:
         return NULL;
     }
 
 }
-
 
 void gui_3d_set_global_transform_cb(gui_3d_t *this, gui_3d_global_transform_cb cb)
 {

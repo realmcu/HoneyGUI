@@ -70,6 +70,7 @@ extern "C" {
 gui_3d_t *gui_3d_tria_create(void                  *parent,
                              const char            *name,
                              gui_3d_description_t  *desc,
+                             GUI_3D_DRAW_TYPE       type,
                              int16_t                x,
                              int16_t                y,
                              int16_t                w,

@@ -250,7 +250,11 @@ void gui_3d_tria_ctor(gui_3d_t          *this,
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
-    obj->obj_cb = gui_3d_tria_cb;
+    if (this->draw_type == GUI_3D_DRAW_FRONT_AND_SORT)
+    {
+        obj->obj_cb = gui_3d_tria_cb;
+    }
+
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
@@ -267,6 +271,7 @@ void gui_3d_tria_ctor(gui_3d_t          *this,
 gui_3d_t *gui_3d_tria_create(void                  *parent,
                              const char            *name,
                              gui_3d_description_t  *desc,
+                             GUI_3D_DRAW_TYPE       type,
                              int16_t                x,
                              int16_t                y,
                              int16_t                w,
@@ -283,6 +288,7 @@ gui_3d_t *gui_3d_tria_create(void                  *parent,
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_3d_t));
 
+    this->draw_type = type;
     gui_3d_tria_ctor(this, (gui_obj_t *)parent, name, desc, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));

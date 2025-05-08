@@ -38,6 +38,13 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
+typedef enum
+{
+    GUI_3D_DRAW_FRONT_ONLY,
+    GUI_3D_DRAW_FRONT_AND_BACK,
+    GUI_3D_DRAW_FRONT_AND_SORT,
+} GUI_3D_DRAW_TYPE;
+
 typedef struct gui_3d
 {
     gui_obj_t base;
@@ -48,6 +55,8 @@ typedef struct gui_3d
         gui_3d_tria_face_t *tria_face;
         gui_3d_rect_face_t *rect_face;
     } face;
+
+    GUI_3D_DRAW_TYPE draw_type;
 
     draw_img_t *img;          // material image
     draw_img_t *mask_img;     // mask image for light
@@ -100,6 +109,7 @@ typedef void (*gui_3d_face_transform_cb)(gui_3d_t *this, size_t face_index/*face
 gui_3d_t *gui_3d_create(void                 *parent,
                         const char           *name,
                         void                 *desc_addr,
+                        GUI_3D_DRAW_TYPE      type,
                         int16_t               x,
                         int16_t               y,
                         int16_t               w,

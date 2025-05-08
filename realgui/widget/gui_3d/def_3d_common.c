@@ -238,7 +238,7 @@ gui_point_4d_t gui_point_4d_sub(gui_point_4d_t p1, gui_point_4d_t p2)
     return v;
 }
 
-gui_3d_matrix_t identity_matrix =
+static gui_3d_matrix_t identity_matrix =
 {
     .m =
     {
