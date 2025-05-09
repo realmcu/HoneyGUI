@@ -30,15 +30,15 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_translation(gui_view_t *this, int16_t release)
+void gui_view_translation(gui_view_t *_this, int16_t release)
 {
-    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_obj_t *obj = (gui_obj_t *)_this;
     int16_t w = obj->w;
     int16_t h = obj->h;
 
     int16_t offset_x, offset_y;
-    if (this->current_event == GUI_EVENT_TOUCH_MOVE_LEFT ||
-        this->current_event == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    if (_this->current_event == GUI_EVENT_TOUCH_MOVE_LEFT ||
+        _this->current_event == GUI_EVENT_TOUCH_MOVE_RIGHT)
     {
         offset_x = release;
         offset_y = release * (h / w);
@@ -49,43 +49,43 @@ void gui_view_translation(gui_view_t *this, int16_t release)
         offset_y = release;
     }
 
-    if (this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_TRANSLATION)
+    if (_this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_TRANSLATION)
     {
         matrix_translate(offset_x, 0, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_TRANSLATION)
     {
         matrix_translate(offset_x, 0, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_TRANSLATION)
     {
         matrix_translate(abs(offset_x) - w, 0, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_TRANSLATION)
     {
         matrix_translate(-abs(offset_x) + w, 0, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_OUT_TO_TOP_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_OUT_TO_TOP_USE_TRANSLATION)
     {
         matrix_translate(0, offset_y, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION)
     {
         matrix_translate(0, offset_y, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_TOP_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_USE_TRANSLATION)
     {
         matrix_translate(0, abs(release) - h, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION)
     {
         matrix_translate(0, -abs(release) + h, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_TOP_RIGHT_USE_TRANSLATION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_RIGHT_USE_TRANSLATION)
     {
         matrix_translate(-abs(offset_x) + w, abs(offset_y) - h, obj->matrix);
     }
-    else if (this->current_transition_style == SWITCH_IN_CENTER_ZOOM_FADE)
+    else if (_this->current_transition_style == SWITCH_IN_CENTER_ZOOM_FADE)
     {
         float scale = (float)abs(offset_x) / w;
         obj->opacity_value = (uint32_t)(UINT8_MAX * scale);

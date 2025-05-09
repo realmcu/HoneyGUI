@@ -48,32 +48,32 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_reduction(gui_view_t *this, int16_t release)
+void gui_view_reduction(gui_view_t *_this, int16_t release)
 {
-    gui_obj_t *obj = GUI_BASE(this);
-    int16_t w = this->base.w;
-    int16_t h = this->base.h;
+    gui_obj_t *obj = GUI_BASE(_this);
+    int16_t w = _this->base.w;
+    int16_t h = _this->base.h;
     float s;
 
     int16_t offset_x = 0, offset_y = 0;
-    if (this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_REDUCTION)
+    if (_this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_REDUCTION)
     {
         offset_x = release - w;
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_REDUCTION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_REDUCTION)
     {
         offset_x = release + w;
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_TOP_USE_REDUCTION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_USE_REDUCTION)
     {
         offset_y = release - h;
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_REDUCTION)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_REDUCTION)
     {
         offset_y = release + h;
     }
-    else if (this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_REDUCTION ||
-             this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_REDUCTION)
+    else if (_this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_REDUCTION ||
+             _this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_REDUCTION)
     {
         offset_x = release;
     }

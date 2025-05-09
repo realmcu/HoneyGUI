@@ -83,7 +83,7 @@ gui_obj_t *gui_obj_get_fake_root(void);
 
 #ifndef DOXYGEN
 /**
-  * @param this pointer to the GUI image object.
+  * @param _this pointer to the GUI image object.
   * @param parent the father widget it nested in.
   * @param filename the obj widget name.
   * @param x the X-axis coordinate of the widget.
@@ -101,7 +101,7 @@ gui_obj_t *gui_obj_get_fake_root(void);
   * }
   * \endcode
   */
-void gui_obj_ctor(gui_obj_t  *this,
+void gui_obj_ctor(gui_obj_t  *_this,
                   gui_obj_t  *parent,
                   const char *name,
                   int16_t     x,

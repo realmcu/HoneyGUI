@@ -248,7 +248,7 @@ void gui_view_set_animate_step(gui_view_t *_this, uint16_t step);
  * @param _this Pointer to view.
  * @param opacity
  */
-void gui_view_set_opacity(gui_view_t *this, uint8_t opacity);
+void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity);
 
 
 /**

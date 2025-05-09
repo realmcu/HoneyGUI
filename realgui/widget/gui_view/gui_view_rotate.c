@@ -49,14 +49,14 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_view_rotate(gui_view_t *this, int16_t release)
+void gui_view_rotate(gui_view_t *_this, int16_t release)
 {
-    gui_obj_t *obj = GUI_BASE(this);
+    gui_obj_t *obj = GUI_BASE(_this);
     gui_dispdev_t *dc = gui_get_dc();
     gui_matrix_t temp;
     gui_matrix_t rotate_3D;
-    float w = this->base.w;
-    float h = this->base.h;
+    float w = _this->base.w;
+    float h = _this->base.h;
     float rotate_degree_x = 0;
     float rotate_degree_y = 0;
     float xoff;
@@ -72,24 +72,24 @@ void gui_view_rotate(gui_view_t *this, int16_t release)
     gui_vertex_t rv0, rv1, rv2, rv3;
 
     int16_t offset_x = 0, offset_y = 0;
-    if (this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_ROTATE)
+    if (_this->current_transition_style == SWITCH_IN_FROM_LEFT_USE_ROTATE)
     {
         offset_x = release - w;
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_ROTATE)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_ROTATE)
     {
         offset_x = release + w;
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_TOP_USE_ROTATE)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_TOP_USE_ROTATE)
     {
         offset_y = release - h;
     }
-    else if (this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_ROTATE)
+    else if (_this->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_ROTATE)
     {
         offset_y = release + h;
     }
-    else if (this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_ROTATE ||
-             this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_ROTATE)
+    else if (_this->current_transition_style == SWITCH_OUT_TO_LEFT_USE_ROTATE ||
+             _this->current_transition_style == SWITCH_OUT_TO_RIGHT_USE_ROTATE)
     {
         offset_x = release;
     }
@@ -97,8 +97,8 @@ void gui_view_rotate(gui_view_t *this, int16_t release)
     {
         offset_y = release;
     }
-    rotate_degree_x = 90 * offset_y / (this->base.h / 2);
-    rotate_degree_y = 90 * offset_x / (this->base.w / 2);
+    rotate_degree_x = 90 * offset_y / (_this->base.h / 2);
+    rotate_degree_y = 90 * offset_x / (_this->base.w / 2);
     matrix_compute_rotate(-rotate_degree_x, rotate_degree_y, 0, &rotate_3D);
 
     matrix_transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
@@ -118,14 +118,14 @@ void gui_view_rotate(gui_view_t *this, int16_t release)
 
     gui_vertex_t p = {(float)(dc->screen_width) / 2, (float)(dc->screen_height) / 2, -zoff};
 
-    matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
+    matrix_transfrom_blit(_this->base.w, _this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);
 
     if (rotate_degree_x > 90 || rotate_degree_x < -90 ||
         rotate_degree_y > 90 || rotate_degree_y < -90)
     {
-        matrix_translate((int)this->base.w, \
-                         (int)this->base.h, \
+        matrix_translate((int)_this->base.w, \
+                         (int)_this->base.h, \
                          obj->matrix);
     }
 

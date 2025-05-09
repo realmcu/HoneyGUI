@@ -121,7 +121,7 @@ gui_obj_t *gui_obj_get_fake_root(void)
     return &fake_root;
 }
 
-void gui_obj_ctor(gui_obj_t  *this,
+void gui_obj_ctor(gui_obj_t  *_this,
                   gui_obj_t  *parent,
                   const char *name,
                   int16_t     x,
@@ -131,16 +131,16 @@ void gui_obj_ctor(gui_obj_t  *this,
 {
     GUI_ASSERT(parent != NULL);
 
-    this->parent = parent;
+    _this->parent = parent;
 
     if (!name)
     {
         name = "_default_widget";
     }
 
-    this->name = name;
-    this->x = x;
-    this->y = y;
+    _this->name = name;
+    _this->x = x;
+    _this->y = y;
 
     if (w == 0)
     {
@@ -152,13 +152,13 @@ void gui_obj_ctor(gui_obj_t  *this,
         h = (int)gui_get_screen_height();
     }
 
-    this->w = w;
-    this->h = h;
-    this->opacity_value = UINT8_MAX;
-    this->matrix = gui_malloc(sizeof(struct gui_matrix));
+    _this->w = w;
+    _this->h = h;
+    _this->opacity_value = UINT8_MAX;
+    _this->matrix = gui_malloc(sizeof(struct gui_matrix));
 
-    matrix_identity(this->matrix);
-    this->magic = GUI_MAGIC_NUMBER;
+    matrix_identity(_this->matrix);
+    _this->magic = GUI_MAGIC_NUMBER;
 }
 
 gui_obj_t *gui_obj_create(void       *parent,

@@ -102,7 +102,7 @@ gui_scroll_text_t *gui_scroll_text_create(void       *parent,
  * @return void
  *
  */
-void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
+void gui_scroll_text_scroll_set(gui_scroll_text_t *_this,
                                 TEXT_MODE          mode,
                                 uint32_t           start_value,
                                 uint32_t           end_value,
@@ -121,7 +121,7 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
 * @return void
 *
 */
-void gui_scroll_text_set(gui_scroll_text_t *this,
+void gui_scroll_text_set(gui_scroll_text_t *_this,
                          void              *text,
                          FONT_SRC_TYPE      text_type,
                          gui_color_t        color,
@@ -133,7 +133,7 @@ void gui_scroll_text_set(gui_scroll_text_t *this,
  * @param this the scroll text box widget pointer
  * @param encoding_type encoding_type
  */
-void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset);
+void gui_scroll_text_encoding_set(gui_scroll_text_t *_this, TEXT_CHARSET charset);
 
 /**
  * @brief set font type
@@ -142,7 +142,7 @@ void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
  * @param font_source the addr of .ttf or .bin
  * @param font_mode font source mode
  */
-void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source, FONT_SRC_MODE font_mode);
+void gui_scroll_text_type_set(gui_scroll_text_t *_this, void *font_source, FONT_SRC_MODE font_mode);
 
 /**
  * @brief set content of text widget
@@ -151,7 +151,7 @@ void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source, FONT_S
  * @param text the text string
  * @param length the text string's length
  */
-void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t length);
+void gui_scroll_text_content_set(gui_scroll_text_t *_this, void *text, uint16_t length);
 
 /**
  * @brief set scroll text skip frame
@@ -166,7 +166,7 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame);
  *
  * @param this the scroll text widget pointer
  */
-void gui_scroll_text_restart(gui_scroll_text_t *this);
+void gui_scroll_text_restart(gui_scroll_text_t *_this);
 
 
 #ifdef __cplusplus

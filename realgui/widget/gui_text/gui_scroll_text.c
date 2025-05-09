@@ -168,8 +168,8 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
 
 static void gui_scroll_text_update_att(gui_obj_t *obj)
 {
-    gui_scroll_text_t *this = (void *)obj;
-    animate_frame_update(this->base.animate, obj);
+    gui_scroll_text_t *_this = (void *)obj;
+    animate_frame_update(_this->base.animate, obj);
 }
 
 static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
@@ -203,10 +203,10 @@ static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
-    gui_text_t *this = (void *)obj;
+    gui_text_t *_this = (void *)obj;
     gui_point3f_t point = {0, 0, 1};
 
-    if (!this->base.not_show)
+    if (!_this->base.not_show)
     {
         if (scroll_skip_frame == 0)
         {
@@ -230,26 +230,26 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
         }
     }
 #if 0 // font mat scale min scale function
-    if (this->base.matrix->m[0][0] < this->min_scale)
+    if (_this->base.matrix->m[0][0] < _this->min_scale)
     {
-        this->base.matrix->m[0][0] = this->min_scale;
-        this->scale_img->base.matrix->m[0][0] = this->min_scale;
+        _this->base.matrix->m[0][0] = _this->min_scale;
+        _this->scale_img->base.matrix->m[0][0] = _this->min_scale;
     }
-    if (this->base.matrix->m[1][1] < this->min_scale)
+    if (_this->base.matrix->m[1][1] < _this->min_scale)
     {
-        this->base.matrix->m[1][1] = this->min_scale;
-        this->scale_img->base.matrix->m[1][1] = this->min_scale;
+        _this->base.matrix->m[1][1] = _this->min_scale;
+        _this->scale_img->base.matrix->m[1][1] = _this->min_scale;
     }
     // gui_log("text scale x %f, y %f ; img scale x %f, y %f",
-    //         this->base.matrix->m[0][0],this->base.matrix->m[1][1],
-    //         this->scale_img->base.matrix->m[0][0],this->scale_img->base.matrix->m[1][1]);
+    //         _this->base.matrix->m[0][0],_this->base.matrix->m[1][1],
+    //         _this->scale_img->base.matrix->m[0][0],_this->scale_img->base.matrix->m[1][1]);
 #endif
-    this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
+    _this->color.color.rgba.a = (_this->color.color.rgba.a * _this->base.parent->opacity_value) / 255;
     gui_scroll_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
 
-    this->offset_x = point.p[0];
-    this->offset_y = point.p[1];
+    _this->offset_x = point.p[0];
+    _this->offset_y = point.p[1];
 }
 
 static void gui_scroll_text_draw(gui_obj_t *obj)
@@ -418,7 +418,7 @@ static void gui_scroll_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void gui_scroll_text_ctor(gui_scroll_text_t *this,
+static void gui_scroll_text_ctor(gui_scroll_text_t *_this,
                                  gui_obj_t         *parent,
                                  const char        *name,
                                  int16_t            x,
@@ -426,8 +426,8 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *this,
                                  int16_t            w,
                                  int16_t            h)
 {
-    gui_text_t *base = (gui_text_t *)this;
-    gui_obj_t *root = (gui_obj_t *)this;
+    gui_text_t *base = (gui_text_t *)_this;
+    gui_obj_t *root = (gui_obj_t *)_this;
 
     //for base class
     gui_text_ctor(base, parent, name, x, y, w, h);
@@ -441,7 +441,7 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *this,
     root->has_end_cb = true;
     root->has_destroy_cb = true;
 
-    this->init_time_ms = gui_ms_get();
+    _this->init_time_ms = gui_ms_get();
 }
 
 /*============================================================================*
@@ -453,53 +453,53 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame)
     scroll_skip_frame = skip_frame;
 }
 
-void gui_scroll_text_set(gui_scroll_text_t *this,
+void gui_scroll_text_set(gui_scroll_text_t *_this,
                          void              *text,
                          FONT_SRC_TYPE      text_type,
                          gui_color_t        color,
                          uint16_t           length,
                          uint8_t            font_size)
 {
-    gui_text_set(&this->base, text, text_type, color, length, font_size);
-    gui_scroll_text_restart(this);
+    gui_text_set(&_this->base, text, text_type, color, length, font_size);
+    gui_scroll_text_restart(_this);
 }
 
-void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source, FONT_SRC_MODE font_mode)
+void gui_scroll_text_type_set(gui_scroll_text_t *_this, void *font_source, FONT_SRC_MODE font_mode)
 {
-    gui_text_type_set(&this->base, font_source, font_mode);
+    gui_text_type_set(&_this->base, font_source, font_mode);
 }
 
-void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t length)
+void gui_scroll_text_content_set(gui_scroll_text_t *_this, void *text, uint16_t length)
 {
-    gui_text_content_set(&this->base, text, length);
-    gui_scroll_text_restart(this);
+    gui_text_content_set(&_this->base, text, length);
+    gui_scroll_text_restart(_this);
 }
 
-void gui_scroll_text_restart(gui_scroll_text_t *this)
+void gui_scroll_text_restart(gui_scroll_text_t *_this)
 {
-    this->base.char_width_sum = 0;
-    this->base.char_line_sum = 0;
-    this->init_time_ms = gui_ms_get();
+    _this->base.char_width_sum = 0;
+    _this->base.char_line_sum = 0;
+    _this->init_time_ms = gui_ms_get();
     gui_fb_change();
 }
 
-void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
+void gui_scroll_text_encoding_set(gui_scroll_text_t *_this, TEXT_CHARSET charset)
 {
-    this->base.charset = charset;
+    _this->base.charset = charset;
 }
 
-void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
+void gui_scroll_text_scroll_set(gui_scroll_text_t *_this,
                                 TEXT_MODE          mode,
                                 uint32_t           start_value,
                                 uint32_t           end_value,
                                 uint32_t           interval_time_ms,
                                 uint32_t           duration_time_ms)
 {
-    this->base.mode = mode;
-    this->start_value = start_value;
-    this->end_value = end_value;
-    this->interval_time_ms = interval_time_ms;
-    this->duration_time_ms = duration_time_ms;
+    _this->base.mode = mode;
+    _this->start_value = start_value;
+    _this->end_value = end_value;
+    _this->interval_time_ms = interval_time_ms;
+    _this->duration_time_ms = duration_time_ms;
 }
 
 gui_scroll_text_t *gui_scroll_text_create(void       *parent,
