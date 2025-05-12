@@ -100,7 +100,7 @@ typedef struct gui_img
  * @param this The image widget pointer.
  * @return uint16_t Image's width.
  */
-uint16_t gui_img_get_width(gui_img_t *this);
+uint16_t gui_img_get_width(gui_img_t *_this);
 
 /**
  * @brief Load the image to read its height.
@@ -108,14 +108,14 @@ uint16_t gui_img_get_width(gui_img_t *this);
  * @param this The image widget pointer.
  * @return uint16_t Image's height.
  */
-uint16_t gui_img_get_height(gui_img_t *this);
+uint16_t gui_img_get_height(gui_img_t *_this);
 
 /**
  * @brief Refresh the image size from source.
  *
  * @param this The image widget pointer.
  */
-void gui_img_refresh_size(gui_img_t *this);
+void gui_img_refresh_size(gui_img_t *_this);
 
 /**
  * @brief Set the image's blend mode.
@@ -123,7 +123,7 @@ void gui_img_refresh_size(gui_img_t *this);
  * @param this The image widget pointer.
  * @param mode The enumeration value of the mode (BLEND_MODE_TYPE).
  */
-void gui_img_set_mode(gui_img_t *this, BLEND_MODE_TYPE mode);
+void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode);
 
 /**
  * @brief Set image attributes (name, path, position).
@@ -134,7 +134,7 @@ void gui_img_set_mode(gui_img_t *this, BLEND_MODE_TYPE mode);
  * @param x X-axis coordinate.
  * @param y Y-axis coordinate.
  */
-void gui_img_set_attribute(gui_img_t  *this,
+void gui_img_set_attribute(gui_img_t  *_this,
                            const char *name,
                            void       *addr,
                            int16_t     x,
@@ -146,7 +146,7 @@ void gui_img_set_attribute(gui_img_t  *this,
  * @param this The image widget pointer.
  * @param degrees Clockwise rotation absolute angle.
  */
-void gui_img_rotation(gui_img_t *this,
+void gui_img_rotation(gui_img_t *_this,
                       float      degrees);
 
 /**
@@ -156,7 +156,7 @@ void gui_img_rotation(gui_img_t *this,
  * @param scale_x Scale factor in X direction.
  * @param scale_y Scale factor in Y direction.
  */
-void gui_img_scale(gui_img_t *this, float scale_x, float scale_y);
+void gui_img_scale(gui_img_t *_this, float scale_x, float scale_y);
 
 /**
  * @brief Translate (move) the image.
@@ -165,7 +165,7 @@ void gui_img_scale(gui_img_t *this, float scale_x, float scale_y);
  * @param t_x New X-axis coordinate.
  * @param t_y New Y-axis coordinate.
  */
-void gui_img_translate(gui_img_t *this, float t_x, float t_y);
+void gui_img_translate(gui_img_t *_this, float t_x, float t_y);
 
 /**
  * @brief Skew the image on X-axis.
@@ -173,7 +173,7 @@ void gui_img_translate(gui_img_t *this, float t_x, float t_y);
  * @param this The image widget pointer.
  * @param degrees Skew angle.
  */
-void gui_img_skew_x(gui_img_t *this, float degrees);
+void gui_img_skew_x(gui_img_t *_this, float degrees);
 
 /**
  * @brief Skew the image on Y-axis.
@@ -181,7 +181,7 @@ void gui_img_skew_x(gui_img_t *this, float degrees);
  * @param this The image widget pointer.
  * @param degrees Skew angle.
  */
-void gui_img_skew_y(gui_img_t *this, float degrees);
+void gui_img_skew_y(gui_img_t *_this, float degrees);
 
 /**
  * @brief Set the opacity of the image.
@@ -189,7 +189,7 @@ void gui_img_skew_y(gui_img_t *this, float degrees);
  * @param this The image widget pointer.
  * @param opacity_value Opacity value (0-255, default 255).
  */
-void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
+void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value);
 
 /**
  * @brief Set the focus point for image transformations.
@@ -198,7 +198,7 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
  * @param c_x Center X coordinate.
  * @param c_y Center Y coordinate.
  */
-void gui_img_set_focus(gui_img_t *this, float c_x, float c_y);
+void gui_img_set_focus(gui_img_t *_this, float c_x, float c_y);
 
 /**
  * @brief creat an image widget from memory address.
@@ -261,27 +261,12 @@ gui_img_t *gui_img_create_from_fs(void       *parent,
                                   int16_t     h);
 
 /**
- * @brief Set animation parameters for the image.
- *
- * @param this Image widget pointer.
- * @param dur Animation duration in milliseconds.
- * @param repeat_count Number of times to repeat the animation.
- * @param callback Function called for each animation frame.
- * @param p Callback parameter.
- */
-void gui_img_set_animate(gui_img_t *this,
-                         uint32_t   dur,
-                         int        repeat_count,
-                         void      *callback,
-                         void      *p);
-
-/**
  * @brief Set the image's quality.
  *
  * @param this The image widget pointer.
  * @param high_quality True for high quality rendering, false otherwise.
  */
-void gui_img_set_quality(gui_img_t *this, bool high_quality);
+void gui_img_set_quality(gui_img_t *_this, bool high_quality);
 
 /**
  * @brief convert a tree to a image data.
@@ -298,7 +283,7 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
  * @param this The image widget pointer.
  * @return Scale factor in X direction.
  */
-float gui_img_get_scale_x(gui_img_t *this);
+float gui_img_get_scale_x(gui_img_t *_this);
 
 /**
  * @brief Get the scale factor in Y direction.
@@ -306,7 +291,7 @@ float gui_img_get_scale_x(gui_img_t *this);
  * @param this The image widget pointer.
  * @return Scale factor in Y direction.
  */
-float gui_img_get_scale_y(gui_img_t *this);
+float gui_img_get_scale_y(gui_img_t *_this);
 
 /**
  * @brief Get the rotation angle in degrees.
@@ -314,7 +299,7 @@ float gui_img_get_scale_y(gui_img_t *this);
  * @param this The image widget pointer.
  * @return Rotation angle in degrees.
  */
-float gui_img_get_degrees(gui_img_t *this);
+float gui_img_get_degrees(gui_img_t *_this);
 
 /**
  * @brief Get the center X coordinate for transformations.
@@ -322,7 +307,7 @@ float gui_img_get_degrees(gui_img_t *this);
  * @param this The image widget pointer.
  * @return Center X coordinate.
  */
-float gui_img_get_c_x(gui_img_t *this);
+float gui_img_get_c_x(gui_img_t *_this);
 
 /**
  * @brief Get the center Y coordinate for transformations.
@@ -330,7 +315,7 @@ float gui_img_get_c_x(gui_img_t *this);
  * @param this The image widget pointer.
  * @return Center Y coordinate.
  */
-float gui_img_get_c_y(gui_img_t *this);
+float gui_img_get_c_y(gui_img_t *_this);
 
 /**
  * @brief Get the translation in X direction.
@@ -338,7 +323,7 @@ float gui_img_get_c_y(gui_img_t *this);
  * @param this The image widget pointer.
  * @return Translation in X direction.
  */
-float gui_img_get_t_x(gui_img_t *this);
+float gui_img_get_t_x(gui_img_t *_this);
 
 /**
  * @brief Get the translation in Y direction.
@@ -346,7 +331,7 @@ float gui_img_get_t_x(gui_img_t *this);
  * @param this The image widget pointer.
  * @return Translation in Y direction.
  */
-float gui_img_get_t_y(gui_img_t *this);
+float gui_img_get_t_y(gui_img_t *_this);
 
 
 /**
@@ -360,7 +345,7 @@ float gui_img_get_t_y(gui_img_t *this);
  * @param image_data_pointer  The pointer to the image data to be set to the widget.
  *                            The data should persist as long as the widget needs it or until it is explicitly updated.
  */
-void gui_img_set_image_data(gui_img_t *widget, const uint8_t *image_data_pointer);
+void gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer);
 
 /**
  * @brief Gets the image data from a specified image widget.
@@ -371,7 +356,7 @@ void gui_img_set_image_data(gui_img_t *widget, const uint8_t *image_data_pointer
  *
  * @return A pointer to the image data currently set in the widget. If no image data is set, the result may be `NULL`.
  */
-const uint8_t *gui_img_get_image_data(gui_img_t *widget);
+const uint8_t *gui_img_get_image_data(gui_img_t *_this);
 
 
 

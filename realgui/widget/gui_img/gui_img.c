@@ -63,32 +63,32 @@
 static void gui_img_prepare(gui_obj_t *obj)
 {
     uint8_t last;
-    gui_img_t *this;
+    gui_img_t *_this;
     touch_info_t *tp;
     GUI_UNUSED(tp);
 
     GUI_ASSERT(obj != NULL);
 
-    this = (gui_img_t *)obj;
+    _this = (gui_img_t *)obj;
     tp = tp_get_info();
 
-    matrix_translate(this->t_x, this->t_y, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    matrix_translate(-this->f_x, -this->f_y, obj->matrix);
+    matrix_translate(_this->t_x, _this->t_y, obj->matrix);
+    matrix_rotate(_this->degrees, obj->matrix);
+    matrix_scale(_this->scale_x, _this->scale_y, obj->matrix);
+    matrix_translate(-_this->f_x, -_this->f_y, obj->matrix);
 
     if (gui_obj_out_screen(obj))
     {
         return;
     }
 
-    this->draw_img = gui_malloc(sizeof(draw_img_t));
-    memset(this->draw_img, 0x00, sizeof(draw_img_t));
+    _this->draw_img = gui_malloc(sizeof(draw_img_t));
+    memset(_this->draw_img, 0x00, sizeof(draw_img_t));
 
-    this->draw_img->data = this->data;
-    this->draw_img->blend_mode = this->blend_mode;
-    this->draw_img->high_quality = this->high_quality;
-    this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
+    _this->draw_img->data = _this->data;
+    _this->draw_img->blend_mode = _this->blend_mode;
+    _this->draw_img->high_quality = _this->high_quality;
+    _this->draw_img->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
 
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
@@ -98,21 +98,21 @@ static void gui_img_prepare(gui_obj_t *obj)
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
     // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED);
 
-    memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(&_this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
-    matrix_inverse(&this->draw_img->inverse);
-    draw_img_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
-
-
-    draw_img_new_area(this->draw_img, NULL);
+    matrix_inverse(&_this->draw_img->inverse);
+    draw_img_load_scale(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->src_mode);
 
 
-    last = this->checksum;
-    this->checksum = 0;
-    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+    draw_img_new_area(_this->draw_img, NULL);
 
-    if (last != this->checksum)
+
+    last = _this->checksum;
+    _this->checksum = 0;
+    _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, sizeof(gui_img_t));
+
+    if (last != _this->checksum)
     {
         gui_fb_change();
     }
@@ -132,30 +132,30 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
-    gui_img_t *this = (gui_img_t *)obj;
+    gui_img_t *_this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
     // cache img to buffer
 
-    draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->src_mode);
 
-    if (this->need_clip)
+    if (_this->need_clip)
     {
         gui_rect_t rect = {0};
         gui_obj_get_clip_rect(obj, &rect);
-        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+        gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
     }
     else
     {
         gui_rect_t rect = {0};
         gui_obj_get_clip_rect(obj, &rect);
-        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
-        // gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+        gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
+        // gui_acc_blit_to_dc(_this->draw_img, dc, NULL);
     }
 
 
     // release img if cached
-    draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->src_mode);
 
 }
 /**
@@ -171,16 +171,16 @@ static void gui_img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
-    gui_img_t *this = (gui_img_t *)obj;
+    gui_img_t *_this = (gui_img_t *)obj;
 
-    if (this->draw_img != NULL)
+    if (_this->draw_img != NULL)
     {
         if (draw_img_acc_end_cb != NULL)
         {
-            draw_img_acc_end_cb(this->draw_img);
+            draw_img_acc_end_cb(_this->draw_img);
         }
-        gui_free(this->draw_img);
-        this->draw_img = NULL;
+        gui_free(_this->draw_img);
+        _this->draw_img = NULL;
     }
 }
 
@@ -203,33 +203,33 @@ static void gui_img_end(gui_obj_t *obj)
  */
 static void gui_img_destroy(gui_obj_t *obj)
 {
-    gui_img_t *this = (gui_img_t *)obj;
-    GUI_UNUSED(this);
+    gui_img_t *_this = (gui_img_t *)obj;
+    GUI_UNUSED(_this);
 }
-static gui_rgb_data_head_t gui_img_get_header(gui_img_t *this)
+static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
 {
     struct gui_rgb_data_head head = {0};
 
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (_this->src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_fs_open(this->data,  0);
+        int fd = gui_fs_open(_this->data,  0);
 
         if (fd <= 0)
         {
-            gui_log("open file fail:%s !\n", (char *)this->data);
+            gui_log("open file fail:%s !\n", (char *)_this->data);
         }
 
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
     }
-    else if (this->src_mode == IMG_SRC_FTL)
+    else if (_this->src_mode == IMG_SRC_FTL)
     {
-        uint32_t base = (uint32_t)(uintptr_t)this->data;
+        uint32_t base = (uint32_t)(uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (_this->src_mode == IMG_SRC_MEMADDR)
     {
-        memcpy(&head, this->data, sizeof(head));
+        memcpy(&head, _this->data, sizeof(head));
     }
 
     return head;
@@ -271,7 +271,7 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void gui_img_ctor(gui_img_t            *this,
+static void gui_img_ctor(gui_img_t            *_this,
                          gui_obj_t            *parent,
                          const char           *name,
                          IMG_SOURCE_MODE_TYPE  src_mode,
@@ -281,18 +281,18 @@ static void gui_img_ctor(gui_img_t            *this,
                          int16_t               w,
                          int16_t               h)
 {
-    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_obj_t *obj = (gui_obj_t *)_this;
 
-    this->src_mode = src_mode;
-    this->f_x = 0;
-    this->f_y = 0;
-    this->t_x = 0;
-    this->t_y = 0;
-    this->scale_x = 1;
-    this->scale_y = 1;
-    this->degrees = 0;
-    this->high_quality = false;
-    this->need_clip = false;
+    _this->src_mode = src_mode;
+    _this->f_x = 0;
+    _this->f_y = 0;
+    _this->t_x = 0;
+    _this->t_y = 0;
+    _this->scale_x = 1;
+    _this->scale_y = 1;
+    _this->degrees = 0;
+    _this->high_quality = false;
+    _this->need_clip = false;
 
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
@@ -309,45 +309,45 @@ static void gui_img_ctor(gui_img_t            *this,
 #ifdef _WIN32
         path = gui_filepath_transforming(path);
 #endif
-        this->data = (void *)path;
-        this->filename = (void *)path;
+        _this->data = (void *)path;
+        _this->filename = (void *)path;
     }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
-        this->data = (void *)path;
+        _this->data = (void *)path;
     }
     else if (src_mode == IMG_SRC_FTL)
     {
-        this->data = (void *)path;
-        this->ftl = (void *)path;
+        _this->data = (void *)path;
+        _this->ftl = (void *)path;
     }
 
-    this->opacity_value = 255;
-    this->blend_mode = IMG_FILTER_BLACK;
-    this->opacity_value = UINT8_MAX;
+    _this->opacity_value = 255;
+    _this->blend_mode = IMG_FILTER_BLACK;
+    _this->opacity_value = UINT8_MAX;
 
 
-    obj->w = gui_img_get_width(this);
-    obj->h = gui_img_get_height(this);
+    obj->w = gui_img_get_width(_this);
+    obj->h = gui_img_get_height(_this);
 
-    gui_rgb_data_head_t head = gui_img_get_header(this);
+    gui_rgb_data_head_t head = gui_img_get_header(_this);
     if (head.resize == 0)
     {
-        gui_img_scale(this, 1, 1);
+        gui_img_scale(_this, 1, 1);
     }
     else if (head.resize == 1) //unsigned char resize:2;//0-no resize;1-50%(x&y);2-70%;3-80%
     {
-        gui_img_scale(this, 2, 2);
+        gui_img_scale(_this, 2, 2);
         gui_log("resize image!! \n");
     }
     else if (head.resize == 2)
     {
-        gui_img_scale(this, 10.0f / 7.0f, 10.0f / 7.0f);
+        gui_img_scale(_this, 10.0f / 7.0f, 10.0f / 7.0f);
         gui_log("resize image!! \n");
     }
     else if (head.resize == 3)
     {
-        gui_img_scale(this, 10.0f / 8.0f, 10.0f / 8.0f);
+        gui_img_scale(_this, 10.0f / 8.0f, 10.0f / 8.0f);
         gui_log("resize image!! \n");
     }
 
@@ -368,19 +368,19 @@ gui_img_t *gui_img_create_from_mem(void       *parent,
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_img_t *this = gui_malloc(sizeof(gui_img_t));
-    GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(gui_img_t));
-    gui_img_ctor(this, (gui_obj_t *)parent, name, IMG_SRC_MEMADDR, addr, x, y, w, h);
+    gui_img_t *_this = gui_malloc(sizeof(gui_img_t));
+    GUI_ASSERT(_this != NULL);
+    memset(_this, 0x00, sizeof(gui_img_t));
+    gui_img_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_MEMADDR, addr, x, y, w, h);
 
-    gui_list_init(&(GET_BASE(this)->child_list));
-    if ((GET_BASE(this)->parent) != NULL)
+    gui_list_init(&(GET_BASE(_this)->child_list));
+    if ((GET_BASE(_this)->parent) != NULL)
     {
-        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));
+        gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
     }
-    GET_BASE(this)->create_done = true;
+    GET_BASE(_this)->create_done = true;
 
-    return this;
+    return _this;
 }
 
 gui_img_t *gui_img_create_from_ftl(void       *parent,
@@ -393,19 +393,19 @@ gui_img_t *gui_img_create_from_ftl(void       *parent,
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_img_t *this = gui_malloc(sizeof(gui_img_t));
-    GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(gui_img_t));
-    gui_img_ctor(this, (gui_obj_t *)parent, name, IMG_SRC_FTL, ftl, x, y, w, h);
+    gui_img_t *_this = gui_malloc(sizeof(gui_img_t));
+    GUI_ASSERT(_this != NULL);
+    memset(_this, 0x00, sizeof(gui_img_t));
+    gui_img_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FTL, ftl, x, y, w, h);
 
-    gui_list_init(&(GET_BASE(this)->child_list));
-    if ((GET_BASE(this)->parent) != NULL)
+    gui_list_init(&(GET_BASE(_this)->child_list));
+    if ((GET_BASE(_this)->parent) != NULL)
     {
-        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));
+        gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
     }
-    GET_BASE(this)->create_done = true;
+    GET_BASE(_this)->create_done = true;
 
-    return this;
+    return _this;
 }
 
 
@@ -419,225 +419,225 @@ gui_img_t *gui_img_create_from_fs(void       *parent,
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_img_t *this = gui_malloc(sizeof(gui_img_t));
-    GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(gui_img_t));
-    gui_img_ctor(this, (gui_obj_t *)parent, name, IMG_SRC_FILESYS, file, x, y, w, h);
+    gui_img_t *_this = gui_malloc(sizeof(gui_img_t));
+    GUI_ASSERT(_this != NULL);
+    memset(_this, 0x00, sizeof(gui_img_t));
+    gui_img_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FILESYS, file, x, y, w, h);
 
-    gui_list_init(&(GET_BASE(this)->child_list));
-    if ((GET_BASE(this)->parent) != NULL)
+    gui_list_init(&(GET_BASE(_this)->child_list));
+    if ((GET_BASE(_this)->parent) != NULL)
     {
-        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));
+        gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list), &(GET_BASE(_this)->brother_list));
     }
-    GET_BASE(this)->create_done = true;
+    GET_BASE(_this)->create_done = true;
 
-    return this;
+    return _this;
 }
 
-uint16_t gui_img_get_width(gui_img_t *this)
+uint16_t gui_img_get_width(gui_img_t *_this)
 {
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (_this->src_mode == IMG_SRC_FILESYS)
     {
         struct gui_rgb_data_head head;
         head.w = 0;
-        int fd = gui_fs_open(this->data,  0);
+        int fd = gui_fs_open(_this->data,  0);
 
         if (fd <= 0)
         {
-            gui_log("open file fail:%s !\n", (char *)this->data);
+            gui_log("open file fail:%s !\n", (char *)_this->data);
         }
 
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
         return head.w;
     }
-    else if (this->src_mode == IMG_SRC_FTL)
+    else if (_this->src_mode == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
-        uint32_t base = (uint32_t)(uintptr_t)this->data;
+        uint32_t base = (uint32_t)(uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.w;
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (_this->src_mode == IMG_SRC_MEMADDR)
     {
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->data;
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->data;
         return head->w;
     }
 
     return 0;
 }
 
-uint16_t gui_img_get_height(gui_img_t *this)
+uint16_t gui_img_get_height(gui_img_t *_this)
 {
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (_this->src_mode == IMG_SRC_FILESYS)
     {
         struct gui_rgb_data_head head;
         head.h = 0;
-        int fd = gui_fs_open(this->data,  0);
+        int fd = gui_fs_open(_this->data,  0);
 
         if (fd <= 0)
         {
-            gui_log("open file fail:%s !\n", (char *)this->data);
+            gui_log("open file fail:%s !\n", (char *)_this->data);
         }
 
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
         return head.h;
     }
-    else if (this->src_mode == IMG_SRC_FTL)
+    else if (_this->src_mode == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
-        uint32_t base = (uint32_t)(uintptr_t)this->data;
+        uint32_t base = (uint32_t)(uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.h;
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (_this->src_mode == IMG_SRC_MEMADDR)
     {
-        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->data;
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->data;
         return head->h;
     }
 
     return 0;
 }
 
-void gui_img_refresh_size(gui_img_t *this)
+void gui_img_refresh_size(gui_img_t *_this)
 {
-    // gui_image_load_scale(this->draw_img);
-    this->base.w = gui_img_get_width(this);
-    this->base.h = gui_img_get_height(this);
+    // gui_image_load_scale(_this->draw_img);
+    _this->base.w = gui_img_get_width(_this);
+    _this->base.h = gui_img_get_height(_this);
 }
 
 
-void gui_img_set_mode(gui_img_t *this, BLEND_MODE_TYPE mode)
+void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(_this != NULL);
 
-    this->blend_mode = mode;
+    _this->blend_mode = mode;
 }
 
-void gui_img_set_quality(gui_img_t *this, bool high_quality)
+void gui_img_set_quality(gui_img_t *_this, bool high_quality)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(_this != NULL);
 
-    this->high_quality = high_quality;
+    _this->high_quality = high_quality;
 }
 
-void gui_img_set_attribute(gui_img_t  *this,
+void gui_img_set_attribute(gui_img_t  *_this,
                            const char *name,
                            void       *path,
                            int16_t     x,
                            int16_t     y)
 {
-    GUI_ASSERT(this != NULL);
+    GUI_ASSERT(_this != NULL);
 
     if ((!name) && (!path))
     {
         return;
     }
 
-    this->base.x = x;
-    this->base.y = y;
+    _this->base.x = x;
+    _this->base.y = y;
 
     if (name != NULL)
     {
-        this->base.name = name;
+        _this->base.name = name;
     }
     else
     {
-        this->base.name = "gui_img_set_attribute";
+        _this->base.name = "gui_img_set_attribute";
     }
 
-    this->data = path;
+    _this->data = path;
 }
-void gui_img_set_image_data(gui_img_t  *this, const uint8_t *file_pointer)
+void gui_img_set_image_data(gui_img_t  *_this, const uint8_t *file_pointer)
 {
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(file_pointer != NULL);
-    this->data = (void *)file_pointer;
+    _this->data = (void *)file_pointer;
 }
-const uint8_t *gui_img_get_image_data(gui_img_t  *this)
+const uint8_t *gui_img_get_image_data(gui_img_t  *_this)
 {
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->data;
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->data;
 }
-void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
+void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)
 {
-    this->opacity_value = opacity_value;
+    _this->opacity_value = opacity_value;
 }
 
 
-void gui_img_set_focus(gui_img_t *this, float f_x, float f_y)
+void gui_img_set_focus(gui_img_t *_this, float f_x, float f_y)
 {
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
 
-    this->f_x = f_x;
-    this->f_y = f_y;
-}
-
-
-void gui_img_rotation(gui_img_t *this, float degrees)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-
-    this->degrees = degrees;
+    _this->f_x = f_x;
+    _this->f_y = f_y;
 }
 
-void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
+
+void gui_img_rotation(gui_img_t *_this, float degrees)
 {
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    this->scale_x = scale_x;
-    this->scale_y = scale_y;
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+
+    _this->degrees = degrees;
 }
 
-void gui_img_translate(gui_img_t *this, float t_x, float t_y)
+void gui_img_scale(gui_img_t *_this, float scale_x, float scale_y)
 {
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    this->t_x = t_x;
-    this->t_y = t_y;
-}
-float gui_img_get_scale_x(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->scale_x;
-}
-float gui_img_get_scale_y(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->scale_y;
-}
-float gui_img_get_degrees(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->degrees;
-}
-float gui_img_get_c_x(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->f_x;
-
-}
-float gui_img_get_c_y(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->f_y;
-}
-float gui_img_get_t_x(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->t_x;
-}
-float gui_img_get_t_y(gui_img_t *this)
-{
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
-    return this->t_y;
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    _this->scale_x = scale_x;
+    _this->scale_y = scale_y;
 }
 
-void gui_img_skew_x(gui_img_t *this, float degrees)
+void gui_img_translate(gui_img_t *_this, float t_x, float t_y)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    _this->t_x = t_x;
+    _this->t_y = t_y;
+}
+float gui_img_get_scale_x(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->scale_x;
+}
+float gui_img_get_scale_y(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->scale_y;
+}
+float gui_img_get_degrees(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->degrees;
+}
+float gui_img_get_c_x(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->f_x;
+
+}
+float gui_img_get_c_y(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->f_y;
+}
+float gui_img_get_t_x(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->t_x;
+}
+float gui_img_get_t_y(gui_img_t *_this)
+{
+    GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
+    return _this->t_y;
+}
+
+void gui_img_skew_x(gui_img_t *_this, float degrees)
 {
 
 }
 
-void gui_img_skew_y(gui_img_t *this, float degrees)
+void gui_img_skew_y(gui_img_t *_this, float degrees)
 {
 
 }
