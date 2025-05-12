@@ -58,6 +58,7 @@ static int set_index(gui_scroll_wheel_new_t *this, int index)
 {
     //GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
     this->index_offset = index;
+    this->take_over = true;
     return this->index_offset;
 }
 static void ctor(struct gui_scroll_wheel_new *this,
@@ -291,11 +292,7 @@ static void override(gui_obj_t *win)
             time_array_offset = -(this->touch_y / this->gap % time_array_size);
             int widget_offset = this->touch_y % this->gap;
             GUI_BASE(win)->y = widget_offset;
-            if (this->alien && widget_offset == 0 && this->speed <= this->end_speed &&
-                this->speed >= -this->end_speed)
-            {
-                this->render = 0;
-            }
+
             if (this->alien && widget_offset != 0)
             {
                 if (this->speed > 0 && this->speed <= this->end_speed)
@@ -371,7 +368,7 @@ static void override(gui_obj_t *win)
                         index += time_array_size;
                     }
                     const char *text = this->string_array[index];
-                    if (i == (this->count + 2) / 2)
+                    if (i == (this->count + 2) / 2 && !this->take_over)
                     {
                         this->index_offset = index;
                     }
@@ -390,6 +387,11 @@ static void override(gui_obj_t *win)
                 }
             }
 
+            if (this->alien && widget_offset == 0 && this->speed <= this->end_speed &&
+                this->speed >= -this->end_speed)
+            {
+                this->render = 0;
+            }
         }
         else
         {
@@ -478,7 +480,7 @@ static void override(gui_obj_t *win)
                         index += time_array_size;
                     }
                     const char *text = this->string_array[index];
-                    if (i == (this->count + 2) / 2)
+                    if (i == (this->count + 2) / 2 && !this->take_over)
                     {
                         this->index_offset = index;
                     }
@@ -497,6 +499,50 @@ static void override(gui_obj_t *win)
             }
         }
     }
+    if (this->take_over)
+    {
+        this->take_over = false;
+        this->history_y = -(this->index_offset - (this->count + 2) / 2) * this->gap;
+        this->touch_y = this->history_y;
+        gui_obj_t *text_widget_array[this->count + 2];
+        text_widget_array_foreach(this, text_widget_array, this->count + 2);
+        time_array_offset = -(this->touch_y / this->gap % time_array_size);
+        for (size_t i = 0; i < this->count + 2; i++)
+        {
+
+            int index = time_array_offset + i;
+
+            if (index >= time_array_size)
+            {
+                index -= time_array_size;
+            }
+            if (index < 0)
+            {
+                index += time_array_size;
+            }
+
+            const char *text = this->string_array[index];
+            // if (i == (this->count + 2) / 2)
+            // {
+            //     this->index_offset = index;
+            // }
+            if (win->y + this->win2->base.y + i * this->gap <= this->gap * this->count / 2 &&
+                win->y + this->win2->base.y + i * this->gap + this->gap > this->gap * this->count / 2)
+            {
+                GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color_highlight;
+            }
+            else
+            {
+                GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color;
+            }
+            render(text, (void *)text_widget_array[i], this->render_mode, this->text_image_map_length,
+                   this->text_image_map);
+        }
+
+    }
+
+
+
 }
 // Function to retrieve image data based on text input
 static void *get_image_data(const char *text, int16_t text_image_map_length,

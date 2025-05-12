@@ -129,7 +129,10 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
 #endif
                     button->data = gui_strdup(path);
-
+                    {
+                        gui_app_t *app = get_app_xml();
+                        app->xml = button->data;
+                    }
 
                     gui_button_text_move(button, -70, 73);
                     {

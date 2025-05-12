@@ -13,7 +13,7 @@
 Overview
 --------
 
-RTKIOT Visual Designer is a tool to create graphical interface designs
+Realtek Visual Designer is a tool to create graphical interface designs
 for Realtek series ICs; its currently supported ICs are shown in the
 table below.
 
@@ -38,7 +38,7 @@ table below.
    | 6  | TBD           |
    +----+---------------+
 
-RTKIOT Visual Designer supports:
+Realtek Visual Designer supports:
   * Drag the widgets from the toolbox and drop them in the Design View.
   * Drag and drop the widget to change its position in the Design View, or modify the position and appearance of the widget via the Property View.
   * Export the user-designed GUI project to ``.bin``, and the ``.bin`` can be programmed into the IC to display the graphical interface.
@@ -55,8 +55,7 @@ This document mainly consists of:
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Quick_Start_Tutorials`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_GUI_Demo_Project`
 
-To simplify the document, *Tool* is used below to refer to the *RTKIOT
-Visual Designer*.
+To simplify the document, *Tool* is used below to refer to the *Realtek Visual Designer*.
 
 .. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Examples:
 
@@ -67,7 +66,7 @@ Example1
 ~~~~~~~~~~~~~~~
 
 - **Layout**: The left side features three radio buttons, and the right side displays an image.
-- **Functionality**: Pressing different buttons on the Evaluation Board (EVB) triggers the switching of the image content on the right.
+- **Functionality**: Pressing different buttons on the Evaluation Board (:term:`EVB`) triggers the switching of the image content on the right.
 
 .. figure:: https://foruda.gitee.com/images/1745737972534824178/c62da3af_10088396.png
    :align: center
@@ -81,7 +80,7 @@ Example1
 
 1. **Create a New RVD Project**
 
-   - After opening the RVD tool, you can see this page.
+   - After opening the :term:`RVD` tool, you can see this page.
    - Click the yellow folder icon to create a project.
 
    .. figure:: https://foruda.gitee.com/images/1745738269558331190/7495790a_10088396.png
@@ -93,7 +92,7 @@ Example1
 
 2. **Add Image Resources**
 
-   - Add image resources based on the steps shown in the image
+   - Add image resources based on the steps shown in the image.
 
    .. figure:: https://foruda.gitee.com/images/1745738540104414413/e31300d8_10088396.png
       :align: center
@@ -113,8 +112,8 @@ Example1
 
 3. **Add Three Radio Buttons**:
 
-   - Drag the ``RadioButton`` widget to the central canvas.
-   - Set the background image (``BG Image``) for the radio buttons, with the highlighted image displayed when pressed.
+   - Drag the :guilabel:`RadioButton` widget to the central canvas.
+   - Set the background image (:guilabel:`BG Image`) for the radio buttons, with the highlighted image displayed when pressed.
 
 
    .. figure:: https://foruda.gitee.com/images/1745808568359598574/8232c321_10088396.png
@@ -137,9 +136,9 @@ Example1
 
 4. **Add Two Image Pages**:
 
-   - Drag the ``TabView`` widget to the canvas.
+   - Drag the :guilabel:`TabView` widget to the canvas.
    - Click the blue arrow on the right side of the canvas to create a second tab.
-   - Select ``tab0`` and ``tab1``, and add an image to each tab.
+   - Select :guilabel:`tab0` and :guilabel:`tab1`, and add an image to each tab.
 
    .. figure:: https://foruda.gitee.com/images/1745809454174368310/c380f8ca_10088396.png
       :align: center
@@ -153,9 +152,9 @@ Example1
 5. **Add Radio Button Selection to Switch Images**:
 
    - Configure the radio buttons' selection events.
-   - In the ``Widget Tree``, select ``radiobutton0``. In the ``Property`` panel's yellow lightning ``Event Setting`` interface.
-   - Set the trigger to ``OnSelect`` and the action to jump to ``tab1``.
-   - Similarly, set ``radiobutton1`` to jump to ``tab0`` and ``radiobutton2`` to jump to the launcher.
+   - In the :menuselection:`Widget Tree`, select :guilabel:`radiobutton0`. 
+   - In the :menuselection:`Property` panel's yellow lightning :guilabel:`Event Setting` interface, set the trigger to :guilabel:`OnSelect` and the action to jump to :guilabel:`tab1`.
+   - Similarly, set :guilabel:`radiobutton1` to jump to :guilabel:`tab0` and :guilabel:`radiobutton2` to jump to the launcher.
 
    .. figure:: https://foruda.gitee.com/images/1745809610213583909/3d0065d2_10088396.png
       :align: center
@@ -166,12 +165,12 @@ Example1
 
 6. **Add Keyboard-Based Image Switching**:
 
-   - Drag two ``Peripheral Device Key`` widgets to the canvas.
-   - Configure the key click events:
-   - In the ``Widget Tree``, select ``key0``. In the ``Property`` panel's yellow lightning ``Event Setting`` interface.
-   - Set the trigger to ``OnClick`` and the action to jump to ``tab1``.
-   - Set ``key1`` to jump to ``tab0``.
-   - In the ``Property`` panel's ``Property Setting`` interface, set ``key0``'s ID to 49 and ``key1``'s ID to 50 (corresponding to keyboard keys 1 and 2 in the PC environment).
+   - Drag two :guilabel:`Peripheral Device Key` widgets to the canvas.
+   - Configure the key click events.
+   - In the :menuselection:`Widget Tree`, select :guilabel:`key0`. 
+   - In the :menuselection:`Property` panel's yellow lightning :guilabel:`Event Setting` interface, set the trigger to :guilabel:`OnClick` and the action to jump to :guilabel:`tab1`.
+   - Set :guilabel:`key1` to jump to :guilabel:`tab0`.
+   - In the :menuselection:`Property` panel's :menuselection:`Property Setting` interface, set :guilabel:`key0`'s ID to 49 and :guilabel:`key1`'s ID to 50 (corresponding to keyboard keys 1 and 2 in the PC environment).
 
    .. figure:: https://foruda.gitee.com/images/1745809853776415161/ac8f0d54_10088396.png
       :align: center
@@ -183,7 +182,7 @@ Example1
 
 7. **Preview and Export**:
 
-   - Click the ``Export`` and ``Simulate`` options in the top menu to preview the effect.
+   - Click the :guilabel:`Export` and :guilabel:`Simulate` options in the top menu to preview the effect.
    - Check the exported files in the directory: ``<project_folder>\Export\root``.
 
 
@@ -204,6 +203,7 @@ Example2
 **Creating the Example2**
 
 
+
 1. **Create a New RVD Project**
 
    - After opening the RVD tool, you can see this page.
@@ -222,16 +222,17 @@ Example2
 
 3. **Add Four Images**:
 
-   - Drag the ``Image`` widget from the ``Widget`` panel to the canvas.
-   - Set the ``Image`` property in the ``Property`` panel to the specified image resource.
+   - Drag the :guilabel:`Image` widget from the :guilabel:`Widget` panel to the canvas.
+   - Set the :guilabel:`Image` property in the :menuselection:`Property` panel to the specified image resource.
    - Right-click the image widget on the canvas to set its size to match the image resource.
    - Adjust the layout of the image widgets.
 
 4. **Set Image Export Format**:
 
-   - By default, image conversion uses ``GlobalSetting`` (with ``Color Space`` set to ``RGB565``). To apply a different conversion for specific image resources (e.g., to retain transparency effects), a new conversion setting must be used for that image resource.
-   - Go to ``Setting -> Image Convert -> Create`` to create a new conversion setting.
-   - Configure options such as ``Color Space``, ``Compress``, and ``Mix Alpha Channel``.
+   - By default, image conversion uses :guilabel:`GlobalSetting` (with :guilabel:`Color Space` set to :guilabel:`RGB565`). 
+   - To apply a different conversion for specific image resources (e.g., to retain transparency effects), a new conversion setting must be used for that image resource.
+   - Go to :menuselection:`Setting --> Image Convert --> Create` to create a new conversion setting.
+   - Configure options such as :guilabel:`Color Space`, :guilabel:`Compress`, and :guilabel:`Mix Alpha Channel`.
 
    .. figure:: https://foruda.gitee.com/images/1745740074880329292/510c8669_10088396.png
       :align: center
@@ -240,7 +241,7 @@ Example2
 
       Set Image Export Format
 
-   - Close the dialog, then in the ``Images`` window, select the image resource and apply the newly created conversion setting in the ``Image Convert Setting`` section.
+   - Close the dialog, then in the :guilabel:`Images` window, select the image resource and apply the newly created conversion setting in the :menuselection:`Image Convert Setting` section.
    
    .. figure:: https://foruda.gitee.com/images/1745740381172650681/cbbdb633_10088396.png
       :align: center
@@ -251,12 +252,12 @@ Example2
 
 5. **Handle PNG Transparent Images**:
 
-   - For PNG images with transparency effects, it is recommended to use the following two settings.
+   - For :term:`PNG` images with transparency effects, it is recommended to use the following two settings.
    - Transparent Effect Setting:
 
      - For images with non-pure black background layers.
-     - Set the image conversion format's ``Color Space`` to ``ARGB8565`` or ``ARGB``.
-     - Set the image widget's ``Blending Mode`` to ``SrcOverMode``.
+     - Set the image conversion format's :guilabel:`Color Space` to :guilabel:`ARGB8565` or :guilabel:`ARGB`.
+     - Set the image widget's :guilabel:`Blending Mode` to :guilabel:`SrcOverMode`.
 
    .. figure:: https://foruda.gitee.com/images/1745745800531690844/7ea2f80b_10088396.png
       :align: center
@@ -275,9 +276,9 @@ Example2
    - Pre-mixed Black Background Effect Setting:
    
      - For images with pure black background layers (to optimize file size and display efficiency).
-     - Set the image conversion format's ``Color Space`` to ``RGB565`` or ``RGB``.
-     - Check ``Mix Alpha Channel``.
-     - Set the image widget's ``Blending Mode`` to ``BypassMode``.
+     - Set the image conversion format's :guilabel:`Color Space` to :guilabel:`RGB565` or :guilabel:`RGB`.
+     - Check :guilabel:`Mix Alpha Channel`.
+     - Set the image widget's :guilabel:`Blending Mode` to :guilabel:`BypassMode`.
 
    .. figure:: https://foruda.gitee.com/images/1745745835243226253/ecb3a5c0_10088396.png
       :align: center
@@ -286,7 +287,7 @@ Example2
 
       Black Background Effect Setting    
 
-   - Apply transparent effect to ``image3`` and pre-mixed black background to ``image2``.
+   - Apply transparent effect to :guilabel:`image3` and pre-mixed black background to :guilabel:`image2`.
    - In the figure below, Effect 1 is the pre-mixed black background effect, and Effect 2 is the transparent effect.
 
    .. figure:: https://foruda.gitee.com/images/1745741856777234666/786ff313_10088396.png
@@ -297,16 +298,16 @@ Example2
       Two Image Effects 
 
 
-6. **Add Image Animation** (for ``image1`` with up-and-down reciprocating motion):
+6. **Add Image Animation** (for :guilabel:`image1` with up-and-down reciprocating motion):
 
    - **Create an Animation**:
 
-     - In the ``Animation`` menu, set the type to ``AdvancedTranslate`` and click ``Add``.
+     - In the :menuselection:`Animation` menu, set the type to :guilabel:`AdvancedTranslate` and click :guilabel:`Add`.
      - This is a keyframe animation allowing operations at multiple time points.
      - Design the animation to move the image to the bottom of the screen at 30% progress and return to the top at 100% progress.
-     - Set ``Key Times`` to ``0;0.3;1`` (animation start, 30% progress, 100% progress).
-     - Set ``Values`` to ``0,0;0,300;0,0`` (three sets of 2D translations: no horizontal movement, vertical movement of 300 pixels down, then back up).
-     - Set ``Duration`` to the animation cycle duration (in milliseconds). Set ``Repeat`` to 0 for infinite looping.
+     - Set :guilabel:`Key Times` to :kbd:`0;0.3;1` (animation start, 30% progress, 100% progress).
+     - Set :guilabel:`Values` to :kbd:`0,0;0,300;0,0` (three sets of 2D translations: no horizontal movement, vertical movement of 300 pixels down, then back up).
+     - Set :guilabel:`Duration` to the animation cycle duration (in milliseconds). Set :guilabel:`Repeat` to :kbd:`0` for infinite looping.
    
    .. figure:: https://foruda.gitee.com/images/1745747629263669367/c7c911d5_10088396.png
       :align: center
@@ -317,9 +318,9 @@ Example2
 
    - **Apply Animation to Image**:
 
-     - Select ``image1`` and go to the ``Property`` panel.
-     - In the yellow lightning ``Event Setting`` interface, set the trigger to ``OnLoad`` (triggered when the image widget is displayed).
-     - Click ``Add Event``, set the ``Action`` to ``Animation``, and select the newly created animation (``animate0``).
+     - Select :guilabel:`image1` and go to the :menuselection:`Property` panel.
+     - In the yellow lightning :guilabel:`Event Setting` interface, set the trigger to :guilabel:`OnLoad` (triggered when the image widget is displayed).
+     - Click :guilabel:`Add Event`, set the :guilabel:`Action` to :guilabel:`Animation`, and select the newly created animation (:guilabel:`animate0`).
 
    .. figure:: https://foruda.gitee.com/images/1745753304113520373/abcbabfa_10088396.png
       :align: center
@@ -330,9 +331,9 @@ Example2
 
 7. **Add Two Text Boxes**:
 
-   - Drag the ``Text`` widget from the ``Widget`` panel to the canvas.
-   - Set the text content in the ``Property`` panel's ``Content->Text`` field.
-   - Configure the font in ``Appearance->Font``. By default, no font is set.
+   - Drag the :guilabel:`Text` widget from the :menuselection:`Widget` panel to the canvas.
+   - Set the text content in the :menuselection:`Property` panel's :menuselection:`Content --> Text` field.
+   - Configure the font in :menuselection:`Appearance --> Font`. By default, no font is set.
 
    .. figure:: https://foruda.gitee.com/images/1745754152945794898/312ceea5_10088396.png
       :align: center
@@ -343,10 +344,10 @@ Example2
    
    - **Create a Font Setting**:
 
-     - Go to ``Setting -> Font Convert -> Create`` to create a new conversion setting.
+     - Go to :menuselection:`Setting --> Font Convert --> Create` to create a new conversion setting.
      - Configure the font file, font size, anti-aliasing level, and character range.
-     - For ``Text type`` set to ``Random``, specify the ``Code Page`` (e.g., ``CP037`` for English, ``CP936`` for Chinese).
-     - For ``Text type`` set to ``Range``, specify the ``Unicode Range``. ``Code Page`` is optional and, if set, combines with the range.
+     - For :guilabel:`Text type` set to :guilabel:`Random`, specify the :guilabel:`Code Page` (e.g., :guilabel:`CP037` for English, :guilabel:`CP936` for Chinese).
+     - For :guilabel:`Text type` set to :guilabel:`Range`, specify the :guilabel:`Unicode Range`. :guilabel:`Code Page` is optional and, if set, combines with the range.
      - Available fonts include PC system fonts and user-added fonts.
      
       .. figure:: https://foruda.gitee.com/images/1745754869649440065/606a2221_10088396.png
@@ -357,7 +358,7 @@ Example2
          Font Setting     
      
      - If your font size is large and the number of characters to display is small, using the Range method is an effective optimization strategy for reducing the size of exported resource files.
-     - For example, the configuration in the figure below is used for a text widget that only needs to display digits and a colon, with Unicode ranges of 0x0030-0x003A and 0x003A-0x003B. (Start Unicode to End Unicode + 1)
+     - For example, the configuration in the figure below is used for a text widget that only needs to display digits and a colon, with Unicode ranges of 0x0030-0x003A and 0x003A-0x003B (Start Unicode to End Unicode + 1).
 
       .. figure:: https://foruda.gitee.com/images/1745756420938128273/7afd8a6c_10088396.png
          :align: center
@@ -368,8 +369,8 @@ Example2
 
    - **Add a Custom Font**:
 
-     - In the ``Fonts`` section, click the plus sign to add a TTF font file.
-     - The added font appears at the top of the ``Font`` dropdown in the font settings.
+     - In the :menuselection:`Fonts` section, click the plus sign to add a TTF font file.
+     - The added font appears at the top of the :guilabel:`Font` dropdown in the font settings.
 
       .. figure:: https://foruda.gitee.com/images/1745756985069687194/c26b25cf_10088396.png
          :align: center
@@ -381,9 +382,8 @@ Example2
 
 8. **Preview and Export**:
 
-   - Click the ``Export`` and ``Simulate`` options in the top menu to preview the effect.
+   - Click the :menuselection:`Export` and :menuselection:`Simulate` options in the top menu to preview the effect.
    - Check the exported files in the directory: ``<project_folder>\Export\root``.
-
 
 
 Flashing to EVB
@@ -936,8 +936,6 @@ Roller
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
    | Row Space            | Height of one row                                                                                                  |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Row Space            | Height of one row                                                                                                  |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
    | Font                 | Font setting, please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Font_Convert_Setting`.                  |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
    | Font Color (RGBA)    | Font color setting, use RGBA.                                                                                      |
@@ -1004,6 +1002,32 @@ Menu
 
 - Menu is a multi-level menu container widget where each menu is mutually exclusive in display. 
 - By navigating through the menu, users can switch between them.
+
+
+.. figure:: https://foruda.gitee.com/images/1747020603782294715/2419a981_10088396.gif
+   :align: center
+   :width: 400px
+   :name: Navigating Through Menus
+
+   Navigating Through Menus
+
+- Setting RadioButton OnSelect event for navigating.
+
+.. figure:: https://foruda.gitee.com/images/1747020682739326978/3585cd1e_10088396.png
+   :align: center
+   :width: 400px
+   :name: Setting RadioButton OnSelect
+
+   Setting RadioButton OnSelect
+
+- Each image nested in a menu.
+
+.. figure:: https://foruda.gitee.com/images/1747020732982303314/1f42f79a_10088396.png
+   :align: center
+   :width: 400px
+   :name: Widget Tree for Menu
+
+   Widget Tree for Menu
 
 Key
 ''''''''''
@@ -1498,8 +1522,8 @@ Event Setting Example
 
 1. Text - OnTime - Set Time
 
-- The Text shows real time in "00:00" format.
-- Select a Text widget, click the yellow lightning icon in Property panel, Choose OnTime Trigger, and click Add Event icon.
+- The Text shows real time in :kbd:`00:00` format.
+- Select a Text widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnTime` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746534321715090170/409729a5_10088396.png
    :align: center
@@ -1519,7 +1543,7 @@ Event Setting Example
 2. Text - OnPeripheral - Set Peripheral
 
 - The Text shows Temperture value.
-- Select a Text widget, click the yellow lightning icon in Property panel, Choose OnPeripheral Trigger, and click Add Event icon.
+- Select a Text widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnPeripheral` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746536661568009147/585acc2b_10088396.png
    :align: center
@@ -1539,7 +1563,7 @@ Event Setting Example
 3. Button - OnClick - Jump
 
 - Click the Button to navigate to the Launcher
-- Select a Button widget, click the yellow lightning icon in Property panel, Choose OnClick Trigger, and click Add Event icon.
+- Select a Button widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnClick` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746537843864983728/aeb22ac7_10088396.png
    :align: center
@@ -1558,7 +1582,7 @@ Event Setting Example
 4. RadioButton - OnSelect - Jump
 
 - Click the RadioButton to navigate to the specific Tab or Launcher
-- Select a RadioButton widget, click the yellow lightning icon in Property panel, Choose OnSelect Trigger, and click Add Event icon.
+- Select a RadioButton widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnSelect` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746538686942083962/221748a3_10088396.png
    :align: center
@@ -1577,7 +1601,7 @@ Event Setting Example
 5. Image - OnTime - Set Time
 
 - Image rotates as a watch's hand.
-- Select a Image widget, click the yellow lightning icon in Property panel, Choose OnTime Trigger, and click Add Event icon.
+- Select a Image widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnTime` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746541398866452997/e2383aac_10088396.png
    :align: center
@@ -1596,7 +1620,7 @@ Event Setting Example
 6. Win - OnClick - Jump
 
 - Click in Win's scope to navigate to the specific Tab.
-- Select a Win widget (800*480), click the yellow lightning icon in Property panel, Choose OnClick Trigger, and click Add Event icon.
+- Select a Win widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnClick` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746541398866452997/e2383aac_10088396.png
    :align: center
@@ -1615,7 +1639,7 @@ Event Setting Example
 7. ImageSeekBar - OnComplete - Jump
 
 - Drag SeekBar to 100% to navigate to the specific Tab.
-- Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose OnComplete Trigger, and click Add Event icon.
+- Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnComplete` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746587643812005158/1bbdb703_10088396.png
    :align: center
@@ -1634,7 +1658,7 @@ Event Setting Example
 8. ImageSeekBar - OnValueChange - Set Text Property
 
 - Drag SeekBar, and text show the current progress.
-- Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose OnValueChange Trigger, and click Add Event icon.
+- Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnValueChange` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746596718815338059/ac4bd71f_10088396.png
    :align: center
@@ -1653,7 +1677,7 @@ Event Setting Example
 9. Switch - OnOn - Animation
 
 - Turn on a Switch to start a image animation.
-- Select a Switch widget, click the yellow lightning icon in Property panel, Choose OnOn Trigger, and click Add Event icon.
+- Select a Switch widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnOn` Trigger, and click :guilabel:`Add Event` icon.
 - Onoff setting is similar to OnOn's.
 
 .. figure:: https://foruda.gitee.com/images/1746618191372066531/edcb2463_10088396.png
@@ -1673,7 +1697,7 @@ Event Setting Example
 10. Key - OnClick - Jump
 
 - Click the Key on the keyboard to navigate to the specific Tab.
-- Select a Key widget, click the yellow lightning icon in Property panel, Choose OnClick Trigger, and click Add Event icon.
+- Select a Key widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnClick` Trigger, and click :guilabel:`Add Event` icon.
 
 .. figure:: https://foruda.gitee.com/images/1746619969278276032/5298b16e_10088396.png
    :align: center
@@ -1699,9 +1723,9 @@ Animation Setting
 --------------------
 - Animations in RVD work by changing a specific widget's properties over time. 
 - They come with attributes like loop count, duration, target parameters
-- And value control methods such as 'from-to' or key-frames, along with interpolation options.
-- The 'from-to' method involves specifying the start and end values of a property within a single duration. 
-- Key-frames build on this by allowing you to define a sequence of percentage-based progress nodes within that duration, with each node tied to a specific property value. 
+- And value control methods such as **from-to** or **key-frames**, along with interpolation options.
+- The **from-to** method involves specifying the start and end values of a property within a single duration. 
+- **Key-frames** build on this by allowing you to define a sequence of percentage-based progress nodes within that duration, with each node tied to a specific property value. 
 - Events as OnClick, OnLoad, OnOff, OnOn are able to trigger animation start or pause.
 
 Animation Type Brief
@@ -1743,11 +1767,11 @@ Animation Example
 1. Rotation
 
 - The Image rotating around it's center in a 2000ms loop infinitely.
-- Select the Animation panel, Choose Rotation Type, and click Add icon.
+- Select the :menuselection:`Animation` panel, Choose :guilabel:`Rotation` Type, and click :guilabel:`Add` icon.
 - Angle unit is degree.
-- Rotating Central X and Central Y is 150px, as the image resolution is 300px * 300px, for a around it's center effect.
+- Rotating :guilabel:`Start Central X`, :guilabel:`Start Central Y`, :guilabel:`End Central X`, :guilabel:`End Central Y` are all 150px, as the image resolution is :math:`300px * 300px`, for a around it's center effect.
 - Duration uint is millisecond.
-- Repeat 0 means indefinite.
+- :guilabel:`Repeat 0` means indefinite.
 
 .. figure:: https://foruda.gitee.com/images/1746625013725409821/5120844e_10088396.png
    :align: center
@@ -1763,9 +1787,9 @@ Animation Example
 
    Rotating around It's Center
 
-- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
-- Choose animate2 which is the Rotation as Animation.
-- Choose image0 which is the Image itself as Target Widget.
+- Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
+- Choose :guilabel:`animate2` which is the Rotation as :guilabel:`Animation`.
+- Choose :guilabel:`image0` which is the Image itself as :guilabel:`Target Widget`.
 
 .. figure:: https://foruda.gitee.com/images/1746626898865085480/4a10b3d2_10088396.png
    :align: center
@@ -1778,10 +1802,10 @@ Animation Example
 2. Opacity
 
 - Changes the transparency level of the image in a 2000ms loop infinitely from 255 opacity to 100 opacity.
-- Select the Animation panel, Choose Opacity Type, and click Add icon.
-- Scope of Start Value and End Value is 0~255.
-- Duration uint is millisecond.
-- Repeat 0 means indefinite.
+- Select the :menuselection:`Animation` panel, Choose :guilabel:`Opacity` Type, and click :guilabel:`Add` icon.
+- Set :guilabel:`Start Value` and :guilabel:`End Value` to range from :kbd:`255` to :kbd:`100`.
+- Specify :guilabel:`Duration` in milliseconds.
+- Set :guilabel:`Repeat` to :kbd:`0` for indefinite looping.
 
 .. figure:: https://foruda.gitee.com/images/1746625850523787642/1602b1d2_10088396.png
    :align: center
@@ -1797,9 +1821,9 @@ Animation Example
 
    Changes the transparency level
 
-- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
-- Choose animate1 which is the Opacity as Animation.
-- Choose image0 which is the Image itself as Target Widget.
+- Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
+- Choose :guilabel:`animate1` which is the :guilabel:`Opacity` as Animation.
+- Choose :guilabel:`image0` which is the Image itself as :guilabel:`Target Widget`.
 
 .. figure:: https://foruda.gitee.com/images/1746626159340482410/e8bee870_10088396.png
    :align: center
@@ -1811,12 +1835,12 @@ Animation Example
 3. AdvancedTranslate
 
 - Moves the image along a rectangle path.
-- Path is relative 2D coordinate: 0,0;0,150;400,150;400,0;0,0, means down 150, then right 400, then up 150, then left 400.
-- Key Times are 0;0.2;0.5;0.7;1, means at these progress node within a duration, reaching the corresponding coordinate.
-- coordinate uint is pixel.
+- Path is relative 2D coordinate: :kbd:`0,0;0,150;400,150;400,0;0,0`, means down 150, then right 400, then up 150, then left 400.
+- Key Times are :guilabel:`0;0.2;0.5;0.7;1`, means at these progress node within a duration, reaching the corresponding coordinate.
+- Coordinate unit is pixel.
 - Repeat 0 means indefinite.
-- Calc Mode is Linear means linear moving.
-- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+- Calc Mode is :guilabel:`Linear` means linear moving.
+- Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
 
 .. figure:: https://foruda.gitee.com/images/1746628004131074559/b2312fba_10088396.png
    :align: center
@@ -1845,12 +1869,12 @@ Animation Example
 4. AdvancedOpacity
 
 - Modify the transparency of four images in sequence to achieve a marquee effect.
-- Image P: Values are "255;50;50", Key Times are "0;0.25;1", meaning it starts fully opaque, at 25% progress the transparency becomes 50, and the image darkens.
-- Image R: Values are "50;255;50;50", Key Times are "0;0.25;0.5;1", meaning it starts with transparency 50, becomes fully opaque at 25% progress, returns to transparency 50 at 50% progress, and remains at transparency 50 until the end.
-- Image N: Values are "50;255;50;50", Key Times are "0;0.5;0.75;1", meaning it starts with transparency 50, becomes fully opaque at 50% progress, returns to transparency 50 at 75% progress, and remains at transparency 50 until the end.
-- Image D: Values are "50;255;50", Key Times are "0;0.75;1", meaning it starts with transparency 50, becomes fully opaque at 75% progress, and returns to transparency 50 at the end.
-- Calc Mode is Discrete means the transparency values change instantly at the specified key times without smooth interpolation between them.
-- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+- Image P: :guilabel:`Values` are :kbd:`255;50;50`, :guilabel:`Key Times` are :kbd:`0;0.25;1`, meaning it starts fully opaque, at 25% progress the transparency becomes 50, and the image darkens.
+- Image R: :guilabel:`Values` are :kbd:`50;255;50;50`, :guilabel:`Key Times` are :kbd:`0;0.25;0.5;1`, meaning it starts with transparency 50, becomes fully opaque at 25% progress, returns to transparency 50 at 50% progress, and remains at transparency 50 until the end.
+- Image N: :guilabel:`Values` are :kbd:`50;255;50;50`, :guilabel:`Key Times` are :kbd:`0;0.5;0.75;1`, meaning it starts with transparency 50, becomes fully opaque at 50% progress, returns to transparency 50 at 75% progress, and remains at transparency 50 until the end.
+- Image D: :guilabel:`Values` are :kbd:`50;255;50`, :guilabel:`Key Times` are :kbd:`0;0.75;1`, meaning it starts with transparency 50, becomes fully opaque at 75% progress, and returns to transparency 50 at the end.
+- :guilabel:`Calc Mode` is :guilabel:`Discrete` means the transparency values change instantly at the specified key times without smooth interpolation between them.
+- Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
 
 .. figure:: https://foruda.gitee.com/images/1746687165856460117/17efb850_10088396.png
    :align: center
@@ -1866,7 +1890,7 @@ Animation Example
 
    Marquee Effect
 
-- Calc Mode is Linear means the transparency values change smoothly and linearly between the specified key times, creating a gradual transition effect.
+- :guilabel:`Calc Mode` is :guilabel:`Linear` means the transparency values change smoothly and linearly between the specified key times, creating a gradual transition effect.
 
 
 .. figure:: https://foruda.gitee.com/images/1746687410946462671/7ce203ac_10088396.gif
@@ -1879,8 +1903,8 @@ Animation Example
 5. Translation
 
 - The Image moves to the right-down corner.
-- Start X is 0, End X is 800, Start Y is 0, End Y is 480, meaning the image starts at its original position (0,0) relative to its initial location and moves 800 pixels to the right and 480 pixels down to the bottom-right corner relative to its original position.
-- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+- :guilabel:`Start X` :kbd:`0`, :guilabel:`End X` :kbd:`800`, :guilabel:`Start Y` :kbd:`0`, :guilabel:`End Y` :kbd:`480`, meaning the image starts at its original position (:kbd:`0,0`) relative to its initial location and moves :kbd:`800` pixels to the right and :kbd:`480` pixels down to the bottom-right corner relative to its original position.
+- Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
 
 .. figure:: https://foruda.gitee.com/images/1746687959723538000/85b82b79_10088396.png
    :align: center
@@ -1899,9 +1923,9 @@ Animation Example
 6. Scale
 
 - The Image scales toward its center.
-- Start Scale X is 1, End Scale X is 0.10, Start Scale Y is 1, End Scale Y is 0.10, meaning the image begins at its original size (100% scale) and uniformly shrinks to 10% of its original width and height, scaling down symmetrically from its center point.
-- Start Central X is 400, End Central X is 400, Start Central Y is 240, End Central Y is 240, meaning the image's center point remains fixed at coordinates (400, 240), which is the center of the 800x480 resolution image, throughout the scaling process.
-- Configure the OnLoad event of Image to trigger the animation playback immediately upon its appearance.
+- :guilabel:`Start Scale X` :kbd:`1`, :guilabel:`End Scale X` :kbd:`0.10`, :guilabel:`Start Scale Y` :kbd:`1`, :guilabel:`End Scale Y` :kbd:`0.10`, meaning the image begins at its original size (100% scale) and uniformly shrinks to 10% of its original width and height, scaling down symmetrically from its center point.
+- :guilabel:`Start Central X` :kbd:`400`, :guilabel:`End Central X` :kbd:`400`, :guilabel:`Start Central Y` :kbd:`240`, :guilabel:`End Central Y` :kbd:`240`, meaning the image's center point remains fixed at coordinates (400, 240), which is the center of the 800x480 resolution image, throughout the scaling process.
+- Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
 
 .. figure:: https://foruda.gitee.com/images/1746688570327220104/3d53ca69_10088396.png
    :align: center
@@ -1919,8 +1943,8 @@ Animation Example
 
 7. Progress
 
-- The progress of this ImageSeekBar increases from 0 to 100%. 
-- Start Value 0.00 means the initial progress is 0%, and End Value 1.00 means the progress reaches 100% at the end of one animation cycle.
+- The progress of this :guilabel:`ImageSeekBar` increases from :kbd:`0%` to :kbd:`100%`.
+- :guilabel:`Start Value` :kbd:`0.00` means the initial progress is :kbd:`0%`, and :guilabel:`End Value` :kbd:`1.00` means the progress reaches :kbd:`100%` at the end of one animation cycle.
 
 
 .. figure:: https://foruda.gitee.com/images/1746689450841370398/8b4c10f8_10088396.png
@@ -1937,7 +1961,7 @@ Animation Example
 
    0 - 100% Effect
 
-- Configure the OnLoad event of ImageSeekBar to trigger the animation playback immediately upon its appearance.
+- Configure the :guilabel:`OnLoad` event of :guilabel:`ImageSeekBar` to trigger the animation playback immediately upon its appearance.
 
 .. figure:: https://foruda.gitee.com/images/1746689431861966468/858c665b_10088396.png
    :align: center
@@ -1957,7 +1981,7 @@ Animation Example
 
    Multiple Animation Effect
 
-- Configure the OnLoad event of Image to trigger the multiple animation playback immediately upon its appearance.
+- Configure the :guilabel:`OnLoad` event of :guilabel:`Image` to trigger the multiple animation playback immediately upon its appearance.
 
 .. figure:: https://foruda.gitee.com/images/1746690703380172709/4942fe98_10088396.png
    :align: center
@@ -1987,8 +2011,8 @@ as shown in the figure below.
    :align: center
    :width: 750px
 
-Font Resource Management
-~~~~~~~~~~~~~~~~~~~~~~~~~
+   Font Resource Management
+
 
 .. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Resource_Management:
 

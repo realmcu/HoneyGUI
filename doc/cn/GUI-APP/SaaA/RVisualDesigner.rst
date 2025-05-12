@@ -1,7 +1,7 @@
 概述
 ----
 
-RTKIOT 可视化设计工具是一个用于为 Realtek 系列 IC 制作图形界面设计的工具，目前支持的 IC 列表如下表所示。
+Realtek Visual Designer 可视化设计工具是一个用于为 Realtek 系列 IC 制作图形界面设计的工具，目前支持的 IC 列表如下表所示。
 
 .. table:: 支持的 IC
    :widths: 25 50
@@ -19,10 +19,12 @@ RTKIOT 可视化设计工具是一个用于为 Realtek 系列 IC 制作图形界
    +------+-----------+
    | 4    | RTL8772G  |
    +------+-----------+
-   | 5    | TBD       |
+   | 5    | RTL8773E  |
+   +------+-----------+
+   | 6    | TBD       |
    +------+-----------+
 
-RTKIOT 可视化设计工具支持以下功能：
+Realtek Visual Designer 可视化设计工具支持以下功能：
 
   * 从工具箱中拖拽控件并将其放置在设计视图中；
   * 拖放控件以在设计视图中更改其位置，或通过属性视图修改控件的位置和外观；
@@ -31,13 +33,367 @@ RTKIOT 可视化设计工具支持以下功能：
 
 本文档主要包括以下内容：
 
+  * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Examples_CN`
+  * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Event_Setting_CN`
+  * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Animation_Setting_CN`  
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Function_Panels_CN`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Resource_Management_CN`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Menu_Bar_CN`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Quick_Start_Tutorials_CN`
   * :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_GUI_Demo_Project_CN`
 
-为了简化文档，下文中使用 *工具* 来指代 *RTKIOT 可视化设计工具*。
+为了简化文档，下文中使用 *工具* 来指代 *Realtek Visual Designer 可视化设计工具*。
+
+.. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Examples_CN:
+
+示例
+----------
+
+示例1
+~~~~~
+
+
+
+- **布局**：左侧包含三个单选按钮，右侧显示一张图片。
+- **功能**：通过按下评估板 (:term:`EVB`) 上的不同按钮，触发右侧图片内容的切换。
+
+.. figure:: https://foruda.gitee.com/images/1745737972534824178/c62da3af_10088396.png
+   :align: center
+   :width: 400px
+   :name: 第一个用户界面效果
+
+   示例1 用户界面效果
+
+**创建示例1**
+
+1. **创建新的 RVD 项目**
+
+   - 打开 :term:`RVD` 工具后，可看到此页面。
+   - 点击黄色文件夹图标创建项目。
+
+   .. figure:: https://foruda.gitee.com/images/1745738269558331190/7495790a_10088396.png
+      :align: center
+      :width: 400px
+      :name: 创建新的 RVD 项目
+
+      创建新的 RVD 项目
+
+2. **添加图片资源**
+
+   - 根据图片所示步骤添加图片资源。
+
+   .. figure:: https://foruda.gitee.com/images/1745738540104414413/e31300d8_10088396.png
+      :align: center
+      :width: 400px
+      :name: 添加图片资源
+
+      添加图片资源
+
+   - 添加图片资源后，界面显示类似于下图。
+
+   .. figure:: https://foruda.gitee.com/images/1745738620568950463/af89cae9_10088396.png
+      :align: center
+      :width: 400px
+      :name: 图片添加完成
+
+      图片添加完成
+
+3. **添加三个单选按钮**：
+
+   - 将 :guilabel:`RadioButton` 控件拖动到中央画布。
+   - 为单选按钮设置背景图片（:guilabel:`BG Image`），按下时显示高亮图片。
+
+   .. figure:: https://foruda.gitee.com/images/1745808568359598574/8232c321_10088396.png
+      :align: center
+      :width: 400px
+      :name: 单选按钮设置
+
+      单选按钮设置
+
+   - 调整三个单选按钮的位置和大小，使其在左侧对齐。
+   - 右键单击单选按钮，将其大小设置为与背景图片一致。
+
+   .. figure:: https://foruda.gitee.com/images/1745808941071192592/f29f7f07_10088396.png
+      :align: center
+      :width: 400px
+      :name: 调整位置和大小
+
+      调整位置和大小
+
+4. **添加两个图片页面**：
+
+   - 将 :guilabel:`TabView` 控件拖动到画布。
+   - 点击画布右侧的蓝色箭头创建第二个选项卡。
+   - 选择 :guilabel:`tab0` 和 :guilabel:`tab1`，分别为每个选项卡添加一张图片。
+
+   .. figure:: https://foruda.gitee.com/images/1745809454174368310/c380f8ca_10088396.png
+      :align: center
+      :width: 400px
+      :name: 添加新选项卡
+
+      添加新选项卡
+
+5. **添加单选按钮选择以切换图片**：
+
+   - 配置单选按钮的选中事件。
+   - 在 :menuselection:`Widget Tree` 中选择 :guilabel:`radiobutton0`。 
+   - 在 :menuselection:`Property` 面板的黄色闪电 :guilabel:`Event Setting` 界面中，设置触发条件为 :guilabel:`OnSelect`，动作设置为跳转到 :guilabel:`tab1`。
+   - 类似地，设置 :guilabel:`radiobutton1` 跳转到 :guilabel:`tab0`，:guilabel:`radiobutton2` 跳转到启动器。
+
+   .. figure:: https://foruda.gitee.com/images/1745809610213583909/3d0065d2_10088396.png
+      :align: center
+      :width: 400px
+      :name: 单选按钮选择事件
+
+      单选按钮选择事件
+
+6. **添加基于键盘的图片切换**：
+
+   - 将两个 :guilabel:`Peripheral Device --> Key` 控件拖动到画布。
+   - 配置按键点击事件。
+   - 在 :menuselection:`Widget Tree` 中选择 :guilabel:`key0`。
+   - 在 :menuselection:`Property` 面板的黄色闪电 :guilabel:`Event Setting` 界面中，设置触发条件为 :guilabel:`OnClick`，动作设置为跳转到 :guilabel:`tab1`。
+   - 设置 :guilabel:`key1` 跳转到 :guilabel:`tab0`。
+   - 在 :menuselection:`Property` 面板的 :menuselection:`Property Setting` 界面中，将 :guilabel:`key0` 的 ID 设置为 49，:guilabel:`key1` 的 ID 设置为 50（对应 PC 环境中的键盘按键 1 和 2）。
+
+   .. figure:: https://foruda.gitee.com/images/1745809853776415161/ac8f0d54_10088396.png
+      :align: center
+      :width: 400px
+      :name: 按键点击事件
+
+      按键点击事件
+
+7. **预览和导出**：
+
+   - 点击顶部菜单中的 :guilabel:`Export` 和 :guilabel:`Simulate` 选项以预览效果。
+   - 检查导出文件目录：``<project_folder>\Export\root``。
+
+示例2
+~~~~~
+
+- **左上**：显示两张具有混合效果（透明和黑色背景）的图片。
+- **左下**：显示两种不同字体大小的文本。
+- **右侧**：一张具有上下往复动画的图片。
+
+.. figure:: https://foruda.gitee.com/images/1745739513678951688/bcb3b0f2_10088396.png
+   :align: center
+   :width: 400px
+   :name: 第二个用户界面效果
+
+   示例2 用户界面效果
+
+**创建示例2**
+
+1. **创建新的 RVD 项目**
+
+   - 打开 RVD 工具后，可看到此页面。
+   - 点击黄色文件夹图标创建项目。
+
+   .. figure:: https://foruda.gitee.com/images/1745739395361023371/1dfd00b4_10088396.png
+      :align: center
+      :width: 400px
+      :name: 创建示例2的新 RVD 项目
+
+      创建新的 RVD 项目
+
+2. **添加图片资源**
+
+   - 请参阅示例1。
+
+3. **添加四张图片**：
+
+   - 从 :menuselection:`Widget` 面板将 :guilabel:`Image` 控件拖动到画布。
+   - 在 :menuselection:`Property` 面板中设置 :guilabel:`Image` 属性为指定的图片资源。
+   - 右键单击画布上的图片控件，将其大小设置为与图片资源一致。
+   - 调整图片控件的布局。
+
+4. **设置图片导出格式**：
+
+   - 默认情况下，图片转换使用 :guilabel:`GlobalSetting` （ :guilabel:`Color Space` 设置为 :guilabel:`RGB565` ）。
+   - 若需为特定图片资源应用不同的转换（例如保留透明效果），需为该图片资源使用新的转换设置。
+   - 前往 :menuselection:`Setting --> Image Convert --> Create` 创建新的转换设置。
+   - 配置选项，如 :guilabel:`Color Space`、:guilabel:`Compress` 和 :guilabel:`Mix Alpha Channel`。
+
+   .. figure:: https://foruda.gitee.com/images/1745740074880329292/510c8669_10088396.png
+      :align: center
+      :width: 400px
+      :name: 设置图片导出格式
+
+      设置图片导出格式
+
+   - 关闭对话框后，在 :guilabel:`Images` 窗口中选择图片资源，并在 :menuselection:`Image Convert Setting` 部分应用新创建的转换设置。
+
+   .. figure:: https://foruda.gitee.com/images/1745740381172650681/cbbdb633_10088396.png
+      :align: center
+      :width: 400px
+      :name: 应用转换设置
+
+      应用转换设置
+
+5. **处理 PNG 透明图片**：
+
+   - 对于具有透明效果的 :term:`PNG` 图片，建议使用以下两种设置。
+   - 透明效果设置：
+
+     - 对于非纯黑色背景层的图片。
+     - 将图片转换格式的 :guilabel:`Color Space` 设置为 :guilabel:`ARGB8565` 或 :guilabel:`ARGB`。
+     - 将图片控件的 :guilabel:`Blending Mode` 设置为 :guilabel:`SrcOverMode`。
+
+   .. figure:: https://foruda.gitee.com/images/1745745800531690844/7ea2f80b_10088396.png
+      :align: center
+      :width: 400px
+      :name: 透明效果设置
+
+      透明效果设置
+
+   .. figure:: https://foruda.gitee.com/images/1745745582092188954/316866ba_10088396.png
+      :align: center
+      :width: 400px
+      :name: 混合模式设置
+
+      混合模式设置
+
+   - 预混合黑色背景效果设置：
+
+     - 对于具有纯黑色背景层的图片（以优化文件大小和显示效率）。
+     - 将图片转换格式的 :guilabel:`Color Space` 设置为 :guilabel:`RGB565` 或 :guilabel:`RGB`。
+     - 勾选 :guilabel:`Mix Alpha Channel`。
+     - 将图片控件的 :guilabel:`Blending Mode` 设置为 :guilabel:`BypassMode`。
+
+   .. figure:: https://foruda.gitee.com/images/1745745835243226253/ecb3a5c0_10088396.png
+      :align: center
+      :width: 400px
+      :name: 黑色背景效果设置
+
+      黑色背景效果设置
+
+   - 对 :guilabel:`image3` 应用透明效果，对 :guilabel:`image2` 应用预混合黑色背景效果。
+   - 下图中，效果1为预混合黑色背景效果，效果2为透明效果。
+
+   .. figure:: https://foruda.gitee.com/images/1745741856777234666/786ff313_10088396.png
+      :align: center
+      :width: 400px
+      :name: 两种图片效果
+
+      两种图片效果
+
+6. **添加图片动画** （对 :guilabel:`image1` 应用上下往复运动）：
+
+   - **创建动画**：
+
+     - 在 :menuselection:`Animation` 菜单中，将类型设置为 :guilabel:`AdvancedTranslate` 并点击 :guilabel:`Add`。
+     - 这是一个关键帧动画，允许在多个时间点进行操作。
+     - 设计动画，使图片在 30% 进度时移动到屏幕底部，在 100% 进度时返回顶部。
+     - 设置 :guilabel:`Key Times` 为 :kbd:`0;0.3;1` （动画开始、30% 进度、100% 进度）。
+     - 设置 :guilabel:`Values` 为 :kbd:`0,0;0,300;0,0` （三组 2D 平移：无水平移动，垂直向下移动 300 像素，然后返回）。
+     - 设置 :guilabel:`Duration` 为动画循环持续时间（以毫秒为单位）。将 :guilabel:`Repeat` 设置为 :kbd:`0` 表示无限循环。
+
+   .. figure:: https://foruda.gitee.com/images/1745747629263669367/c7c911d5_10088396.png
+      :align: center
+      :width: 400px
+      :name: 创建动画
+
+      创建动画
+
+   - **将动画应用于图片**：
+
+     - 选择 :guilabel:`image1` 并转到 :menuselection:`Property` 面板。
+     - 在黄色闪电 :guilabel:`Event Setting` 界面中，将触发条件设置为 :guilabel:`OnLoad` （当图片控件显示时触发）。
+     - 点击 :guilabel:`Add Event`，将 :guilabel:`Action` 设置为 :guilabel:`Animation`，并选择新创建的动画（:guilabel:`animate0`）。
+
+   .. figure:: https://foruda.gitee.com/images/1745753304113520373/abcbabfa_10088396.png
+      :align: center
+      :width: 400px
+      :name: 将动画应用于图片
+
+      将动画应用于图片
+
+7. **添加两个文本框**：
+
+   - 从 :menuselection:`Widget` 面板将 :guilabel:`Text` 控件拖动到画布。
+   - 在 :menuselection:`Property` 面板的 :menuselection:`Content --> Text` 字段中设置文本内容。
+   - 在 :menuselection:`Appearance --> Font` 中配置字体。默认情况下未设置字体。
+
+   .. figure:: https://foruda.gitee.com/images/1745754152945794898/312ceea5_10088396.png
+      :align: center
+      :width: 400px
+      :name: 文本设置
+
+      文本设置
+
+   - **创建字体设置**：
+
+     - 前往 :menuselection:`Setting --> Font Convert --> Create` 创建新的转换设置。
+     - 配置字体文件、字体大小、抗锯齿级别和字符范围。
+     - 对于 :guilabel:`Text type` 设置为 :guilabel:`Random`，指定 :guilabel:`Code Page` （例如，:guilabel:`CP037` 用于英文，:guilabel:`CP936` 用于中文）。
+     - 对于 :guilabel:`Text type` 设置为 :guilabel:`Range`，指定 :guilabel:`Unicode Range`。:guilabel:`Code Page` 为可选，若设置，则同时生效。
+     - 可用字体包括 PC 系统字体和用户添加的字体。
+
+      .. figure:: https://foruda.gitee.com/images/1745754869649440065/606a2221_10088396.png
+         :align: center
+         :width: 400px
+         :name: 字体设置
+
+         字体设置
+
+     - 如果字体较大且需要显示的字符较少，使用 Range 方法是一种有效的优化策略，可减小导出资源文件的大小。
+     - 例如下图中的配置用于仅需显示数字和冒号的文本控件，Unicode 范围为 :kbd:`0x0030-0x003A` 和 :kbd:`0x003A-0x003B` （起始 Unicode 到结束 Unicode + 1）。
+
+      .. figure:: https://foruda.gitee.com/images/1745756420938128273/7afd8a6c_10088396.png
+         :align: center
+         :width: 400px
+         :name: 字体设置优化
+
+         字体设置优化
+
+   - **添加自定义字体**：
+
+     - 在 :menuselection:`Fonts` 部分，点击加号添加 TTF 字体文件。
+     - 添加的字体将出现在字体设置的 :guilabel:`Font` 下拉菜单顶部。
+
+      .. figure:: https://foruda.gitee.com/images/1745756985069687194/c26b25cf_10088396.png
+         :align: center
+         :width: 400px
+         :name: 添加自定义字体
+
+         添加自定义字体
+
+8. **预览和导出**：
+
+   - 点击顶部菜单中的 :menuselection:`Export` 和 :menuselection:`Simulate` 选项以预览效果。
+   - 检查导出文件目录：``<project_folder>\Export\root``。
+
+烧录到 EVB
+~~~~~~~~~~
+
+要查看 EVB 上的用户界面效果，需将 RVD 导出包烧录到设备。
+
+1. **为 EVB 预烧录 RVD 项目固件**
+
+   - 预下载操作只需执行一次。下载的固件能够解析并显示 RVD 导出的包。
+   - 不同 EVB 和芯片对应不同的固件，可在相应的 SDK 中找到固件及固件工程。
+
+2. **烧录 RVD 导出包**
+
+   - 检查导出文件夹：``<project_folder>\Export\root``。
+   - 使用与 EVB 对应的图片打包工具打包根文件夹，通常需注意地址设置或闪存分区配置。
+   - 参考打包工具的文档获取详细操作说明。图片打包工具通常可在与 EVB 对应的 SDK 中找到。
+   - 烧录文件。
+   - 重启 EVB 以查看屏幕显示效果。
+
+   .. figure:: https://foruda.gitee.com/images/1745833726498330826/59e236a8_10088396.jpeg
+      :align: center
+      :width: 400px
+      :name: 屏幕显示效果
+
+      屏幕显示效果
+
+
+
+
+
+
+
 
 .. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Function_Panels_CN:
 
@@ -60,7 +416,7 @@ RTKIOT 可视化设计工具支持以下功能：
   - 当子控件超出父控件范围时仍可显示。
   - 可从工具箱中将控件拖放到容器控件中。
 
-本节列出了小部件支持的属性，并用 **Y** 或 **N** 标记是否 IC 支持该属性。
+本节列出了控件支持的属性，并用 **Y** 或 **N** 标记是否 IC 支持该属性。
 
 非容器化控件
 ^^^^^^^^^^^^
@@ -158,45 +514,133 @@ RTKIOT 可视化设计工具支持以下功能：
    | BG Imge Rotation Angle | 背景图像旋转角度，范围：0~360 度                                           |      Y      |      Y      |  Y  |
    +------------------------+----------------------------------------------------------------------------+-------------+-------------+-----+
 
+单选按钮（RadioButton）
+'''''''''''''''''''''
+
+- 单选按钮是一个用户界面元素，允许用户从一组互斥选项中选择一个选项。
+- 属性如下表所示。
+
+.. figure:: https://foruda.gitee.com/images/1745894565905113170/8ba3d87a_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 单选按钮
+
+   单选按钮
+
+.. list-table:: 单选按钮控件属性
+   :widths: 20 80
+   :header-rows: 1
+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称。
+   * - Group Name
+     - 将此按钮链接到一个组，组内同一时间只能选择一个按钮。
+   * - Size (Height)
+     - 控件高度。
+   * - Size (Width)
+     - 控件宽度。
+   * - X
+     - 相对于父控件的水平坐标。
+   * - Y
+     - 相对于父控件的垂直坐标。
+   * - BG Image X
+     - 背景图片的水平位置。
+   * - BG Image Y
+     - 背景图片的垂直位置。
+   * - BG Image (Default)
+     - 默认背景图片。
+   * - BG Image (Highlight)
+     - 选中/高亮背景图片。
+   * - Image Rotation Angle
+     - 背景图片旋转角度，范围：0~360 度。
+   * - Blend Mode
+     - 混合模式，决定 UI 元素的像素如何与底层或背景像素组合。
+   * - Opacity
+     - 透明度级别，范围 0~255。
+
+
+
 图像（Image）
 '''''''''''''
 
 能够设置图像的控件，其属性如下表所示。
 
-.. table:: 图像（Image）控件属性
-   :align: center
-   :width: 100%
+.. list-table:: 图像（Image）控件属性
+   :widths: 20 80
+   :header-rows: 1
 
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | 属性                 | 描述                                                               | 8762D/8763E | 8762G/8772G | TBD |
-   +======================+====================================================================+=============+=============+=====+
-   | Name                 | 控件名称                                                           |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Size (Height)        | 控件高度                                                           |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Size (Width)         | 控件宽度                                                           |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | X                    | 相对于父控件的水平坐标                                             |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Y                    | 相对于父控件的垂直坐标                                             |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Image                | 图像路径                                                           |      Y      |      Y      |  Y  |
-   |                      |                                                                    |             |             |     |
-   |                      | 注意：图像必须预先导入到项目中。详细请参考 图像资源管理            |             |             |     |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Image Rotation Angle | 图像旋转角度                                                       |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Image Scale X        | 图像水平缩放程度，是一个倍数/百分比。                              |      Y      |      Y      |  Y  |
-   |                      |                                                                    |             |             |     |
-   |                      | 例如，设置比例 x 为 0.5 表示图像的实际显示宽度是原始图像宽度的一半 |             |             |     |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
-   | Image Scale Y        | 图像垂直缩放程度，是一个倍数/百分比                                |      Y      |      Y      |  Y  |
-   +----------------------+--------------------------------------------------------------------+-------------+-------------+-----+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称
+   * - Size (Height)
+     - 控件高度
+   * - Size (Width)
+     - 控件宽度
+   * - X
+     - 相对于父控件的水平坐标
+   * - Y
+     - 相对于父控件的垂直坐标
+   * - Image
+     - 图像路径。注意：图像必须预先导入到项目中。详细请参考 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Convert_Setting_CN` 
+   * - Image Rotation Angle
+     - 图像旋转角度
+   * - Image Scale X
+     - 图像水平缩放程度，是一个倍数/百分比。例如，设置比例 x 为 0.5 表示图像的实际显示宽度是原始图像宽度的一半
+   * - Image Scale Y
+     - 图像垂直缩放程度，是一个倍数/百分比
 
 .. note::
    
    1.  在导出时，工具将转换导入的图像。可以在 :menuselection:`菜单栏 --> 设置 --> 图像转换设置` 中设置图像转换参数，详细请参考 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Convert_Setting_CN`;
    2.  如果导入的图像大小与控件的大小不匹配，工具不会对图像进行缩放或裁剪。
+
+图片影片（ImageMovie）
+'''''''''''''''''''''
+
+- 图片影片通过按顺序显示一系列图片帧来实现视频播放效果。
+- 需要设置一个包含图片帧序列的文件夹，帧根据文件名排序并显示。
+
+.. list-table:: 图片影片控件属性
+   :widths: 20 80
+   :header-rows: 1
+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称。
+   * - Size (Height)
+     - 控件高度。
+   * - Size (Width)
+     - 控件宽度。
+   * - X
+     - 相对于父控件的水平坐标。
+   * - Y
+     - 相对于父控件的垂直坐标。
+   * - Image Directory
+     - 图片目录路径。注意：图片必须预先导入项目。请参阅 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Convert_Setting_CN` 获取详情
+   * - Image Rotation Angle
+     - 图片旋转角度。
+   * - Image Scale X
+     - 图片水平缩放程度，为倍数/百分比。例如，设置缩放 X 为 0.5 表示图片实际显示宽度为原始图片宽度的一半。
+   * - Image Scale Y
+     - 图片垂直缩放程度，为倍数/百分比。
+   * - Blend Mode
+     - UI 元素的像素如何与底层或背景像素组合。
+   * - Opacity
+     - 透明度级别，范围 0~255。
+   * - Duration
+     - 视频效果的持续时间。
+
+.. note::
+
+   1. 导出时，工具将转换导入的图片。图片转换参数可在 :menuselection:`Menu Bar --> Setting --> Image Convert Setting` 中设置，请参阅 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Convert_Setting_CN` 获取详情；
+   2. 如果导入的图片大小与控件大小不匹配，工具不会对图片进行缩放或裁剪。
+
+
+
 
 滑动条（SeekBar）
 '''''''''''''''''
@@ -286,6 +730,247 @@ RTKIOT 可视化设计工具支持以下功能：
    |                 |                                                           |             |             |     |
    |                 | horizontal/H: 水平方向                                    |             |             |     |
    +-----------------+-----------------------------------------------------------+-------------+-------------+-----+
+
+单图片滑动条（SingleImage SeekBar）
+'''''''''''''''''''''''''''''''''''
+
+滑动控件，使用图片作为背景，并根据用户的滑动操作更改显示范围。其属性如下表所示。
+
+.. figure:: https://foruda.gitee.com/images/1745910726644453215/24d73f89_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-SingleImage
+
+   单图片滑动条
+
+.. list-table:: 单图片滑动条控件属性
+   :widths: 20 80
+   :header-rows: 1
+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称。
+   * - Size (Height)
+     - 控件高度。
+   * - Size (Width)
+     - 控件宽度。
+   * - X
+     - 相对于父控件的水平坐标。
+   * - Y
+     - 相对于父控件的垂直坐标。
+   * - BG Image
+     - 图片文件。
+   * - Orientation
+     - 控件显示方向及手势响应方向，支持以下类型：vertical/V：垂直方向；arc：曲线方向；horizontal/H：水平方向。
+   * - Blend Mode
+     - UI 元素的像素如何与底层或背景像素组合。
+   * - Opacity
+     - 透明度级别，范围 0~255。
+
+
+拇指滑动条（ThumbSeekBar）
+''''''''''''''''''''''''''
+
+- 拇指滑动条是一个控件，滑动时拇指图片跟随触摸点移动以指示进度。
+- 当进度达到 100% 时，拇指图片切换为高亮图片进行显示。
+- 属性如下表所示。
+
+.. list-table:: 拇指滑动条控件属性
+   :widths: 20 80
+   :header-rows: 1
+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称。
+   * - Size (Height)
+     - 控件高度。
+   * - Size (Width)
+     - 控件宽度。
+   * - X
+     - 相对于父控件的水平坐标。
+   * - Y
+     - 相对于父控件的垂直坐标。
+   * - Thumb X
+     - 拇指图片的水平偏移。
+   * - Thumb Y
+     - 拇指图片的垂直偏移。
+   * - Background
+     - 背景图片文件。
+   * - Thumb
+     - 拇指图片文件。
+   * - Thumb(highlight)
+     - 进度达到 100% 时显示的高亮拇指图片。
+   * - Orientation
+     - 控件显示方向及手势响应方向，支持以下类型：vertical/V：垂直方向；arc：曲线方向；horizontal/H：水平方向。
+   * - Blend Mode
+     - UI 元素的像素如何与底层或背景像素组合。
+   * - Opacity
+     - 透明度级别，范围 0~255。
+
+侧边栏（SideBar）
+'''''''''''''''''
+
+- 侧边栏是一个可以从屏幕四个侧边滑入的控件。
+- 可以指定滑入后占用屏幕的比例。
+
+.. list-table:: 侧边栏控件属性
+   :widths: 20 80
+   :header-rows: 1
+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称。
+   * - Size (Height)
+     - 控件高度。
+   * - Size (Width)
+     - 控件宽度。
+   * - X
+     - 相对于父控件的水平坐标。
+   * - Y
+     - 相对于父控件的垂直坐标。
+   * - Orientation
+     - 从屏幕的哪个侧边滑入。
+   * - Scope
+     - 占用屏幕的比例。
+     
+滚轮（Roller）
+''''''''''''''
+
+- 滚轮是一个根据向上或向下滑动手势滚动文本行的控件。
+- 中间行的文本以不同的颜色高亮显示。
+- 滚动具有惯性和对齐效果，提供流畅的用户体验。
+
+.. figure:: https://foruda.gitee.com/images/1745914810308863014/d9025424_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-Roller
+
+   滚轮
+
+.. list-table:: 滚轮控件属性
+   :widths: 20 80
+   :header-rows: 1
+
+   * - 属性
+     - 描述
+   * - Name
+     - 控件名称。
+   * - Size (Height)
+     - 控件高度。
+   * - Size (Width)
+     - 控件宽度。
+   * - X
+     - 相对于父控件的水平坐标。
+   * - Y
+     - 相对于父控件的垂直坐标。
+   * - Row Count
+     - 行数。
+   * - Row Space
+     - 单行高度。
+   * - Font
+     - 字体设置，请参阅 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Font_Convert_Setting`。
+   * - Font Color (RGBA)
+     - 字体颜色设置，使用 RGBA 格式。
+   * - Highlight Font Color
+     - 中间行的字体颜色设置，使用 RGBA 格式。
+   * - Content alignment
+     - 文本布局。
+   * - Loop scrolling
+     - 是否在滚动时循环。
+   * - Items
+     - 每行的文本内容。
+
+
+图表（Chart）
+''''''''''''
+
+- 图表是一个支持三种样式的控件：波形、柱状图和折线图。
+- 可以自定义图表的垂直范围和颜色。
+
+.. figure:: https://foruda.gitee.com/images/1745917347774483906/2412b17b_10088396.png
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-Chart
+
+   图表
+
+下拉框（ComboBox）
+'''''''''''''''''
+
+- 下拉框是一个点击时展开的下拉控件。
+- 选择选项后，下拉框收起并显示所选选项。
+- 点击和选择选项时具有高亮效果。
+
+.. figure:: https://foruda.gitee.com/images/1745918646533630134/034c1b3b_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-ComboBox
+
+   组合框
+
+日历（Calendar）
+'''''''''''''''
+
+- 日历是一个显示一个月日期的万年历控件。
+- 用户可以通过左右滑动切换月份，当前日期高亮显示。
+
+.. figure:: https://foruda.gitee.com/images/1745921254906327275/87799f1b_10088396.gif
+   :align: center
+   :width: 400px
+   :name: {9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}-Calendar
+
+   日历
+
+菜单（Menu）
+''''''''''''
+
+- 菜单是一个多级菜单容器控件，每个菜单在显示时互斥。
+- 用户可以通过导航在菜单之间切换。
+
+.. figure:: https://foruda.gitee.com/images/1747020603782294715/2419a981_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 菜单导航
+
+   菜单导航
+
+- 设置单选按钮的 :guilabel:`OnSelect` 事件以进行导航。
+
+.. figure:: https://foruda.gitee.com/images/1747020682739326978/3585cd1e_10088396.png
+   :align: center
+   :width: 400px
+   :name: 设置单选按钮 OnSelect
+
+   设置单选按钮 OnSelect
+
+- 每个图片嵌套在菜单中。
+
+.. figure:: https://foruda.gitee.com/images/1747020732982303314/1f42f79a_10088396.png
+   :align: center
+   :width: 400px
+   :name: 菜单控件树
+
+   菜单控件树
+
+按键（Key）
+'''''''''''
+
+- 按键是一个用于物理按钮的控件。
+- 在 PC 上，按键的 ID 映射到 QWERTY 键盘字符的 ASCII 值。
+- 在 :term:`EVB` 上，按键的 ID 映射基于 SDK 中的移植。
+
+.. figure:: https://foruda.gitee.com/images/1746619930224908218/7fe6fcb1_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 点击按键导航到选项卡
+
+   点击按键导航到选项卡
+
+
+
 
 开关（Switch）
 ''''''''''''''
@@ -668,6 +1353,548 @@ RTKIOT 可视化设计工具支持以下功能：
    :align: center
 
    锁定
+
+.. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Event_Setting_CN:
+
+事件设置
+----------
+
+触发事件简介
+~~~~~~~~~~~~
+
+.. list-table:: 触发事件
+   :widths: 20 40 40
+   :header-rows: 1
+
+   * - 名称
+     - 描述
+     - 支持的控件
+   * - OnClick
+     - 当控件被点击时触发。
+     - Button、Win、Key
+   * - OnSelect
+     - 当选择一个选项或项目时触发。
+     - RadioButton
+   * - OnLoad
+     - 当控件或页面加载时触发。
+     - Image、SeekBar 系列、Win
+   * - OnValueChange
+     - 当控件的值或状态发生变化时触发。
+     - ThumbSeekBar、ImageSeekBar、SingleImageSeekBar
+   * - OnOn
+     - 当控件被打开或激活时触发。
+     - Switch
+   * - OnOff
+     - 当控件被关闭或停用时触发。
+     - Switch
+   * - OnTime
+     - 由实时时间或数据触发。
+     - Image（类型：hour、minute、second）、Text
+   * - OnPeripheral
+     - 由外设触发。
+     - Text、Chart、Arc
+   * - OnComplete
+     - 当一个动作或过程完成时触发。
+     - ThumbSeekBar、ImageSeekBar、SingleImageSeekBar
+
+动作简介
+~~~~~~~~
+
+.. list-table:: 动作
+   :widths: 20 40 40
+   :header-rows: 1
+
+   * - 名称
+     - 描述
+     - 支持的触发事件
+   * - Animation
+     - 启动或暂停动画。
+     - OnClick、OnLoad、OnOff、OnOn
+   * - Set Time
+     - 控件显示实时时间或日期。
+     - OnTime
+   * - Set Peripheral
+     - 控件显示外设的数据。
+     - OnPeripheral
+   * - Jump
+     - 导航到显示效果（Tab、Menu、App、launcher）。
+     - OnClick、OnSelect、OnComplete
+   * - Set Text Property
+     - 更新文本的内容。
+     - OnValueChange
+
+事件设置示例
+~~~~~~~~~~~~
+
+1. Text - OnTime - Set Time
+
+- 文本以 :kbd:`00:00` 格式显示实时时间。
+- 选择一个 Text 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnTime` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746534321715090170/409729a5_10088396.png
+   :align: center
+   :width: 400px
+   :name: Text - OnTime - Set Time
+
+   Text - OnTime - Set Time
+
+.. figure:: https://foruda.gitee.com/images/1746534115101519614/2a71cc0b_10088396.png
+   :align: center
+   :width: 400px
+   :name: "00:00" 格式
+
+   "00:00" 格式
+
+2. Text - OnPeripheral - Set Peripheral
+
+- 文本显示温度值。
+- 选择一个 Text 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnPeripheral` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746536661568009147/585acc2b_10088396.png
+   :align: center
+   :width: 400px
+   :name: Text - OnPeripheral - Set Peripheral
+
+   Text - OnPeripheral - Set Peripheral
+
+.. figure:: https://foruda.gitee.com/images/1746536593655244781/847265cf_10088396.png
+   :align: center
+   :width: 400px
+   :name: 温度值效果
+
+   温度值效果
+
+3. Button - OnClick - Jump
+
+- 点击按钮导航到启动器。
+- 选择一个 Button 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnClick` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746537843864983728/aeb22ac7_10088396.png
+   :align: center
+   :width: 400px
+   :name: Button - OnClick - Jump
+
+   Button - OnClick - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746537471468564505/73316780_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 导航到启动器
+
+   导航到启动器
+
+4. RadioButton - OnSelect - Jump
+
+- 点击单选按钮导航到特定选项卡或启动器。
+- 选择一个 RadioButton 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnSelect` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746538686942083962/221748a3_10088396.png
+   :align: center
+   :width: 400px
+   :name: RadioButton - OnSelect - Jump
+
+   RadioButton - OnSelect - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746538630891468492/dad921e7_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 导航到选项卡或启动器
+
+   导航到选项卡或启动器
+
+5. Image - OnTime - Set Time
+
+- 图片像手表指针一样旋转。
+- 选择一个 Image 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnTime` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746541398866452997/e2383aac_10088396.png
+   :align: center
+   :width: 400px
+   :name: Image - OnTime - Set Time
+
+   Image - OnTime - Set Time
+
+.. figure:: https://foruda.gitee.com/images/1746541349306828139/be90966b_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 像手表指针一样旋转
+
+   像手表指针一样旋转
+
+6. Win - OnClick - Jump
+
+- 在窗口范围内点击以导航到特定选项卡。
+- 选择一个 Win 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnClick` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746541398866452997/e2383aac_10088396.png
+   :align: center
+   :width: 400px
+   :name: Win - OnClick - Jump
+
+   Win - OnClick - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746583144736863278/8534f639_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 通过点击窗口导航到选项卡
+
+   通过点击窗口导航到选项卡
+
+7. ImageSeekBar - OnComplete - Jump
+
+- 将滑动条拖动到 100% 以导航到特定选项卡。
+- 选择一个 ImageSeekBar 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnComplete` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746587643812005158/1bbdb703_10088396.png
+   :align: center
+   :width: 400px
+   :name: ImageSeekBar - OnComplete - Jump
+
+   ImageSeekBar - OnComplete - Jump
+
+.. figure:: https://foruda.gitee.com/images/1746587570975949917/26ce7d0a_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 通过滑动条到 100% 导航到选项卡
+
+   通过滑动条到 100% 导航到选项卡
+
+8. ImageSeekBar - OnValueChange - Set Text Property
+
+- 拖动滑动条，文本显示当前进度。
+- 选择一个 ImageSeekBar 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnValueChange` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746596718815338059/ac4bd71f_10088396.png
+   :align: center
+   :width: 400px
+   :name: ImageSeekBar - OnValueChange - Set Text Property
+
+   ImageSeekBar - OnValueChange - Set Text Property
+
+.. figure:: https://foruda.gitee.com/images/1746596678776826816/3fc7f1a9_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 当前进度
+
+   当前进度
+
+9. Switch - OnOn - Animation
+
+- 打开开关以启动图片动画。
+- 选择一个 Switch 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnOn` 触发器，然后点击 :guilabel:`Add Event` 图标。
+- OnOff 设置与 OnOn 类似。
+
+.. figure:: https://foruda.gitee.com/images/1746618191372066531/edcb2463_10088396.png
+   :align: center
+   :width: 400px
+   :name: Switch - OnOn - Animation
+
+   Switch - OnOn - Animation
+
+.. figure:: https://foruda.gitee.com/images/1746618094829096897/d9c77001_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 启动图片动画
+
+   启动图片动画
+
+10. Key - OnClick - Jump
+
+
+- 点击键盘上的按键以导航到特定选项卡。
+- 选择一个 Key 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnClick` 触发器，然后点击 :guilabel:`Add Event` 图标。
+
+.. figure:: https://foruda.gitee.com/images/1746619969278276032/5298b16e_10088396.png
+   :align: center
+   :width: 400px
+   :name: Key - OnClick - Jump
+
+
+   Key - OnClick - Jump
+
+
+.. figure:: https://foruda.gitee.com/images/1746619930224908218/7fe6fcb1_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 通过点击按键导航到选项卡
+
+   通过点击按键导航到选项卡
+
+
+.. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Animation_Setting_CN:
+
+动画设置
+---------------
+
+
+- RVD 中的动画通过随时间改变特定控件的属性来实现。
+- 动画包含循环次数、持续时间、目标参数等属性。
+- 以及值控制方法，如 **from-to** 或 **key-frames**，并支持插值选项。
+- **from-to** 方法涉及在单一持续时间内指定属性的起始值和结束值。
+- **key-frames** 在此基础上允许定义持续时间内基于百分比的进度节点序列，每个节点与特定的属性值相关联。
+- 事件如 :guilabel:`OnClick`、:guilabel:`OnLoad`、:guilabel:`OnOff`、:guilabel:`OnOn` 可触发动画的开始或暂停。
+
+动画类型简介
+~~~~~~~~~~~~
+
+.. list-table:: 动画类型
+   :widths: 20 50 30
+   :header-rows: 1
+
+   * - 类型
+     - 描述
+     - 支持的控件
+   * - Rotation
+     - 围绕指定轴或点旋转元素。
+     - Image
+   * - Opacity
+     - 更改元素的透明度级别。
+     - Image
+   * - AdvancedOpacity
+     - 以关键帧类型更改透明度级别。
+     - Image
+   * - Translation
+     - 沿指定方向移动元素。
+     - Image
+   * - AdvancedTranslate
+     - 以关键帧类型移动元素。
+     - Image
+   * - Scale
+     - 调整元素大小，放大或缩小。
+     - Image
+   * - Progress
+     - 动画显示进度指示器，常用于加载或完成条。
+     - ProgressBar、SeekBar
+
+动画示例
+~~~~~~~~
+
+1. 旋转
+
+- 图片围绕其中心以 2000 毫秒的循环无限旋转。
+- 选择 :menuselection:`Animation` 面板，选择 :guilabel:`Rotation` 类型，然后点击 :guilabel:`Add` 图标。
+- 角度单位为度。
+- 旋转的 :guilabel:`Start Central X`、:guilabel:`Start Central Y`、:guilabel:`End Central X`、:guilabel:`End Central Y` 均设为 150 像素，因为图片分辨率为 :math:`300px * 300px`，以实现围绕中心的旋转效果。
+- 持续时间单位为毫秒。
+- :guilabel:`Repeat 0` 表示无限循环。
+
+.. figure:: https://foruda.gitee.com/images/1746625013725409821/5120844e_10088396.png
+   :align: center
+   :width: 400px
+   :name: 旋转设置
+
+   旋转设置
+
+.. figure:: https://foruda.gitee.com/images/1746625315257430404/231e36ab_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 围绕中心旋转
+
+   围绕中心旋转
+
+- 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+- 选择 :guilabel:`animate2` （即 :guilabel:`Rotation` 动画）作为 :guilabel:`Animation`。
+- 选择 :guilabel:`image0` （即图片本身）作为 :guilabel:`Target Widget`。
+
+.. figure:: https://foruda.gitee.com/images/1746626898865085480/4a10b3d2_10088396.png
+   :align: center
+   :width: 400px
+   :name: 设置图片的 OnLoad 用于旋转
+
+   设置图片的 OnLoad 用于旋转
+
+2. 透明度
+
+- 以 2000 毫秒的循环无限改变图片的透明度，从 255 透明度到 100 透明度。
+- 选择 :menuselection:`Animation` 面板，选择 :guilabel:`Opacity` 类型，然后点击 :guilabel:`Add` 图标。
+- 设置 :guilabel:`Start Value` 和 :guilabel:`End Value` 范围从 :kbd:`255` 到 :kbd:`100`。
+- 指定 :guilabel:`Duration` （以毫秒为单位）。
+- 设置 :guilabel:`Repeat` 为 :kbd:`0` 表示无限循环。
+
+.. figure:: https://foruda.gitee.com/images/1746625850523787642/1602b1d2_10088396.png
+   :align: center
+   :width: 400px
+   :name: 透明度设置
+
+   透明度设置
+
+.. figure:: https://foruda.gitee.com/images/1746626034581611764/af8a8a36_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 更改透明度级别
+
+   更改透明度级别
+
+- 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+- 选择 :guilabel:`animate1` （即 :guilabel:`Opacity` 动画）作为 :guilabel:`Animation`。
+- 选择 :guilabel:`image0` （即图片本身）作为 :guilabel:`Target Widget`。
+
+.. figure:: https://foruda.gitee.com/images/1746626159340482410/e8bee870_10088396.png
+   :align: center
+   :width: 400px
+   :name: 设置图片的 OnLoad 用于透明度
+
+   设置图片的 OnLoad 用于透明度
+
+3. 高级平移
+
+- 图片沿矩形路径移动。
+- 路径为相对 2D 坐标：:kbd:`0,0;0,150;400,150;400,0;0,0`，表示向下 150 像素，向右 400 像素，向上 150 像素，向左 400 像素。
+- 关键时间为 :kbd:`0;0.2;0.5;0.7;1`，表示在持续时间内的这些进度节点到达对应的坐标。
+- 坐标单位为像素。
+- :guilabel:`Repeat 0` 表示无限循环。
+- 计算模式为 :guilabel:`Linear`，表示线性移动。
+- 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+
+.. figure:: https://foruda.gitee.com/images/1746628004131074559/b2312fba_10088396.png
+   :align: center
+   :width: 400px
+   :name: 高级平移设置
+
+   高级平移设置
+
+.. figure:: https://foruda.gitee.com/images/1746627400796126478/27364d84_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 矩形路径
+
+   矩形路径
+
+- 计算模式为 :guilabel:`Discrete` 的效果。
+
+.. figure:: https://foruda.gitee.com/images/1746628523731815603/e8632d15_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 离散效果
+
+   离散效果
+
+4. 高级透明度
+
+- 按顺序修改四张图片的透明度以实现跑马灯效果。
+- 图片 P：:guilabel:`Values` 为 :kbd:`255;50;50`，:guilabel:`Key Times` 为 :kbd:`0;0.25;1`，表示开始时完全不透明，在 25% 进度时透明度变为 50，图片变暗。
+- 图片 R：:guilabel:`Values` 为 :kbd:`50;255;50;50`，:guilabel:`Key Times` 为 :kbd:`0;0.25;0.5;1`，表示开始时透明度为 50，在 25% 进度时完全不透明，在 50% 进度时恢复透明度 50，并保持到结束。
+- 图片 N：:guilabel:`Values` 为 :kbd:`50;255;50;50`，:guilabel:`Key Times` 为 :kbd:`0;0.5;0.75;1`，表示开始时透明度为 50，在 50% 进度时完全不透明，在 75% 进度时恢复透明度 50，并保持到结束。
+- 图片 D：:guilabel:`Values` 为 :kbd:`50;255;50`，:guilabel:`Key Times` 为 :kbd:`0;0.75;1`，表示开始时透明度为 50，在 75% 进度时完全不透明，在结束时恢复透明度 50。
+- :guilabel:`Calc Mode` 为 :guilabel:`Discrete`，表示透明度值在指定的关键时间点立即更改，没有平滑插值。
+- 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+
+.. figure:: https://foruda.gitee.com/images/1746687165856460117/17efb850_10088396.png
+   :align: center
+   :width: 400px
+   :name: 高级透明度设置
+
+   高级透明度设置
+
+.. figure:: https://foruda.gitee.com/images/1746684786170372465/827aa5f3_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 跑马灯效果
+
+   跑马灯效果
+
+- :guilabel:`Calc Mode` 为 :guilabel:`Linear`，表示透明度值在指定的关键时间点之间平滑线性变化，产生渐进过渡效果。
+
+.. figure:: https://foruda.gitee.com/images/1746687410946462671/7ce203ac_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 高级透明度线性效果
+
+   高级透明度线性效果
+
+5. 平移
+
+- 图片向右下角移动。
+- :guilabel:`Start X` 为 :kbd:`0`，:guilabel:`End X` 为 :kbd:`800`，:guilabel:`Start Y` 为 :kbd:`0`，:guilabel:`End Y` 为 :kbd:`480`，表示图片从其原始位置 (:kbd:`0,0`) 开始，相对于初始位置向右移动 800 像素，向下移动 480 像素，到达右下角。
+- 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+
+.. figure:: https://foruda.gitee.com/images/1746687959723538000/85b82b79_10088396.png
+   :align: center
+   :width: 400px
+   :name: 平移设置
+
+   平移设置
+
+.. figure:: https://foruda.gitee.com/images/1746687915633385177/757fd07c_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 右下角效果
+
+   右下角效果
+
+6. 缩放
+
+- 图片向其中心缩放。
+- :guilabel:`Start Scale X` 为 :kbd:`1`，:guilabel:`End Scale X` 为 :kbd:`0.10`，:guilabel:`Start Scale Y` 为 :kbd:`1`，:guilabel:`End Scale Y` 为 :kbd:`0.10`，表示图片从原始大小（100% 比例）开始，均匀缩小到原始宽度和高度的 10%，从中心点对称缩放。
+- :guilabel:`Start Central X` 为 :kbd:`400`，:guilabel:`End Central X` 为 :kbd:`400`，:guilabel:`Start Central Y` 为 :kbd:`240`，:guilabel:`End Central Y` 为 :kbd:`240`，表示图片的中心点在整个缩放过程中固定在坐标 (400, 240)，这是 800x480 分辨率图片的中心。
+- 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+
+.. figure:: https://foruda.gitee.com/images/1746688570327220104/3d53ca69_10088396.png
+   :align: center
+   :width: 400px
+   :name: 缩放设置
+
+   缩放设置
+
+.. figure:: https://foruda.gitee.com/images/1746688538540976083/6035cc85_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 缩放效果
+
+   缩放效果
+
+7. 进度
+
+- :guilabel:`ImageSeekBar` 的进度从 :kbd:`0%` 增加到 :kbd:`100%`。
+- :guilabel:`Start Value` 为 :kbd:`0.00` 表示初始进度为 :kbd:`0%`，:guilabel:`End Value` 为 :kbd:`1.00` 表示在一个动画周期结束时进度达到 :kbd:`100%`。
+
+.. figure:: https://foruda.gitee.com/images/1746689450841370398/8b4c10f8_10088396.png
+   :align: center
+   :width: 400px
+   :name: 进度设置
+
+   进度设置
+
+.. figure:: https://foruda.gitee.com/images/1746689390015636943/e654d618_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 0 - 100% 效果
+
+   0 - 100% 效果
+
+- 配置 :guilabel:`ImageSeekBar` 的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
+
+.. figure:: https://foruda.gitee.com/images/1746689431861966468/858c665b_10088396.png
+   :align: center
+   :width: 400px
+   :name: 设置 ImageSeekBar 的 OnLoad
+
+   设置 ImageSeekBar 的 OnLoad
+
+8. 多重动画设置
+
+- 图片同时旋转、改变透明度，并从左上角移动到右下角。
+
+.. figure:: https://foruda.gitee.com/images/1746690669445832106/ef75fb51_10088396.gif
+   :align: center
+   :width: 400px
+   :name: 多重动画效果
+
+   多重动画效果
+
+- 配置 :guilabel:`Image` 的 :guilabel:`OnLoad` 事件，以在其出现时立即触发多重动画播放。
+
+.. figure:: https://foruda.gitee.com/images/1746690703380172709/4942fe98_10088396.png
+   :align: center
+   :width: 400px
+   :name: 多重动画效果触发
+
+   多重动画效果触发
+
+
+
+
+
 
 .. _{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Resource_Management_CN:
 
