@@ -24,7 +24,7 @@
 
 
 
-
+extern void gui_components_init(void);
 
 /**
  * @brief External execution hook for GUI task

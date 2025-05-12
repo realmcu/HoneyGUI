@@ -17,7 +17,6 @@
 #include "gui_server.h"
 #include "unistd.h"
 #include "time.h"
-#include "gui_components_init.h"
 
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__

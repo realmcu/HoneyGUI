@@ -79,12 +79,6 @@ typedef int (*gui_init_fn_t)(void);
  *                         Functions
  *============================================================================*/
 
-/**
- * @brief
- *
- */
-void gui_components_init(void);
-
 
 #ifdef __cplusplus
 }
