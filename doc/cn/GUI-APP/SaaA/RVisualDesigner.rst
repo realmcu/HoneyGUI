@@ -1,3 +1,8 @@
+==============================
+Realtek Visual Designer
+==============================
+
+
 概述
 ----
 
@@ -1426,7 +1431,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 事件设置示例
 ~~~~~~~~~~~~
 
-1. Text - OnTime - Set Time
+Text - OnTime - Set Time
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 文本以 :kbd:`00:00` 格式显示实时时间。
 - 选择一个 Text 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnTime` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1445,7 +1451,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    "00:00" 格式
 
-2. Text - OnPeripheral - Set Peripheral
+Text - OnPeripheral - Set Peripheral
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 文本显示温度值。
 - 选择一个 Text 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnPeripheral` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1464,7 +1471,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    温度值效果
 
-3. Button - OnClick - Jump
+Button - OnClick - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 点击按钮导航到启动器。
 - 选择一个 Button 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnClick` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1483,7 +1491,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    导航到启动器
 
-4. RadioButton - OnSelect - Jump
+RadioButton - OnSelect - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 点击单选按钮导航到特定选项卡或启动器。
 - 选择一个 RadioButton 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnSelect` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1502,7 +1511,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    导航到选项卡或启动器
 
-5. Image - OnTime - Set Time
+Image - OnTime - Set Time
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片像手表指针一样旋转。
 - 选择一个 Image 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnTime` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1521,7 +1531,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    像手表指针一样旋转
 
-6. Win - OnClick - Jump
+Win - OnClick - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 在窗口范围内点击以导航到特定选项卡。
 - 选择一个 Win 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnClick` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1540,7 +1551,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    通过点击窗口导航到选项卡
 
-7. ImageSeekBar - OnComplete - Jump
+ImageSeekBar - OnComplete - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 将滑动条拖动到 100% 以导航到特定选项卡。
 - 选择一个 ImageSeekBar 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnComplete` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1559,7 +1571,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    通过滑动条到 100% 导航到选项卡
 
-8. ImageSeekBar - OnValueChange - Set Text Property
+ImageSeekBar - OnValueChange - Set Text Property
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 拖动滑动条，文本显示当前进度。
 - 选择一个 ImageSeekBar 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnValueChange` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1578,7 +1591,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    当前进度
 
-9. Switch - OnOn - Animation
+Switch - OnOn - Animation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 打开开关以启动图片动画。
 - 选择一个 Switch 控件，点击属性面板中的黄色闪电图标，选择 :guilabel:`OnOn` 触发器，然后点击 :guilabel:`Add Event` 图标。
@@ -1598,7 +1612,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    启动图片动画
 
-10. Key - OnClick - Jump
+Key - OnClick - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 - 点击键盘上的按键以导航到特定选项卡。
@@ -1669,7 +1684,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 动画示例
 ~~~~~~~~
 
-1. 旋转
+旋转
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片围绕其中心以 2000 毫秒的循环无限旋转。
 - 选择 :menuselection:`Animation` 面板，选择 :guilabel:`Rotation` 类型，然后点击 :guilabel:`Add` 图标。
@@ -1703,7 +1719,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    设置图片的 OnLoad 用于旋转
 
-2. 透明度
+透明度
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 以 2000 毫秒的循环无限改变图片的透明度，从 255 透明度到 100 透明度。
 - 选择 :menuselection:`Animation` 面板，选择 :guilabel:`Opacity` 类型，然后点击 :guilabel:`Add` 图标。
@@ -1736,7 +1753,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    设置图片的 OnLoad 用于透明度
 
-3. 高级平移
+高级平移
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片沿矩形路径移动。
 - 路径为相对 2D 坐标：:kbd:`0,0;0,150;400,150;400,0;0,0`，表示向下 150 像素，向右 400 像素，向上 150 像素，向左 400 像素。
@@ -1769,7 +1787,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    离散效果
 
-4. 高级透明度
+高级透明度
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 按顺序修改四张图片的透明度以实现跑马灯效果。
 - 图片 P：:guilabel:`Values` 为 :kbd:`255;50;50`，:guilabel:`Key Times` 为 :kbd:`0;0.25;1`，表示开始时完全不透明，在 25% 进度时透明度变为 50，图片变暗。
@@ -1802,7 +1821,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    高级透明度线性效果
 
-5. 平移
+平移
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片向右下角移动。
 - :guilabel:`Start X` 为 :kbd:`0`，:guilabel:`End X` 为 :kbd:`800`，:guilabel:`Start Y` 为 :kbd:`0`，:guilabel:`End Y` 为 :kbd:`480`，表示图片从其原始位置 (:kbd:`0,0`) 开始，相对于初始位置向右移动 800 像素，向下移动 480 像素，到达右下角。
@@ -1822,7 +1842,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    右下角效果
 
-6. 缩放
+缩放
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片向其中心缩放。
 - :guilabel:`Start Scale X` 为 :kbd:`1`，:guilabel:`End Scale X` 为 :kbd:`0.10`，:guilabel:`Start Scale Y` 为 :kbd:`1`，:guilabel:`End Scale Y` 为 :kbd:`0.10`，表示图片从原始大小（100% 比例）开始，均匀缩小到原始宽度和高度的 10%，从中心点对称缩放。
@@ -1843,7 +1864,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    缩放效果
 
-7. 进度
+进度
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - :guilabel:`ImageSeekBar` 的进度从 :kbd:`0%` 增加到 :kbd:`100%`。
 - :guilabel:`Start Value` 为 :kbd:`0.00` 表示初始进度为 :kbd:`0%`，:guilabel:`End Value` 为 :kbd:`1.00` 表示在一个动画周期结束时进度达到 :kbd:`100%`。
@@ -1871,7 +1893,8 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    设置 ImageSeekBar 的 OnLoad
 
-8. 多重动画设置
+多重动画设置
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片同时旋转、改变透明度，并从左上角移动到右下角。
 

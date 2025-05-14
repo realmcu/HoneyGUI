@@ -10,6 +10,11 @@
 ..        }
 ..    </style>
 
+
+==============================
+Realtek Visual Designer
+==============================
+
 Overview
 --------
 
@@ -1520,7 +1525,8 @@ Action Brief
 Event Setting Example
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. Text - OnTime - Set Time
+Text - OnTime - Set Time
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - The Text shows real time in :kbd:`00:00` format.
 - Select a Text widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnTime` Trigger, and click :guilabel:`Add Event` icon.
@@ -1540,7 +1546,8 @@ Event Setting Example
    "00:00" Format
 
 
-2. Text - OnPeripheral - Set Peripheral
+Text - OnPeripheral - Set Peripheral
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - The Text shows Temperture value.
 - Select a Text widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnPeripheral` Trigger, and click :guilabel:`Add Event` icon.
@@ -1560,7 +1567,8 @@ Event Setting Example
    Temperture Value Effect 
 
 
-3. Button - OnClick - Jump
+Button - OnClick - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Click the Button to navigate to the Launcher
 - Select a Button widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnClick` Trigger, and click :guilabel:`Add Event` icon.
@@ -1579,7 +1587,8 @@ Event Setting Example
 
    Navigate to Launcher
 
-4. RadioButton - OnSelect - Jump
+RadioButton - OnSelect - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Click the RadioButton to navigate to the specific Tab or Launcher
 - Select a RadioButton widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnSelect` Trigger, and click :guilabel:`Add Event` icon.
@@ -1598,7 +1607,8 @@ Event Setting Example
 
    Navigate to Tab or Launcher
 
-5. Image - OnTime - Set Time
+Image - OnTime - Set Time
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Image rotates as a watch's hand.
 - Select a Image widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnTime` Trigger, and click :guilabel:`Add Event` icon.
@@ -1617,7 +1627,8 @@ Event Setting Example
 
    Rotating as Watch's Hands
 
-6. Win - OnClick - Jump
+Win - OnClick - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Click in Win's scope to navigate to the specific Tab.
 - Select a Win widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnClick` Trigger, and click :guilabel:`Add Event` icon.
@@ -1636,7 +1647,8 @@ Event Setting Example
 
    Navigate to Tab by Clicking Win
 
-7. ImageSeekBar - OnComplete - Jump
+ImageSeekBar - OnComplete - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Drag SeekBar to 100% to navigate to the specific Tab.
 - Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnComplete` Trigger, and click :guilabel:`Add Event` icon.
@@ -1655,7 +1667,8 @@ Event Setting Example
 
    Navigate to Tab by SeekBar to 100%
 
-8. ImageSeekBar - OnValueChange - Set Text Property
+ImageSeekBar - OnValueChange - Set Text Property
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Drag SeekBar, and text show the current progress.
 - Select a ImageSeekBar widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnValueChange` Trigger, and click :guilabel:`Add Event` icon.
@@ -1674,7 +1687,8 @@ Event Setting Example
 
    Current Progress
 
-9. Switch - OnOn - Animation
+Switch - OnOn - Animation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Turn on a Switch to start a image animation.
 - Select a Switch widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnOn` Trigger, and click :guilabel:`Add Event` icon.
@@ -1694,7 +1708,8 @@ Event Setting Example
 
    Start a Image Animation
 
-10. Key - OnClick - Jump
+Key - OnClick - Jump
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Click the Key on the keyboard to navigate to the specific Tab.
 - Select a Key widget, click the yellow lightning icon in Property panel, Choose :guilabel:`OnClick` Trigger, and click :guilabel:`Add Event` icon.
@@ -1764,7 +1779,8 @@ Animation Example
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-1. Rotation
+Rotation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - The Image rotating around it's center in a 2000ms loop infinitely.
 - Select the :menuselection:`Animation` panel, Choose :guilabel:`Rotation` Type, and click :guilabel:`Add` icon.
@@ -1799,7 +1815,8 @@ Animation Example
    Setting Image's OnLoad for Rotation
 
 
-2. Opacity
+Opacity
+^^^^^^^^^^^^
 
 - Changes the transparency level of the image in a 2000ms loop infinitely from 255 opacity to 100 opacity.
 - Select the :menuselection:`Animation` panel, Choose :guilabel:`Opacity` Type, and click :guilabel:`Add` icon.
@@ -1832,7 +1849,8 @@ Animation Example
 
    Setting Image's OnLoad for Opacity
 
-3. AdvancedTranslate
+AdvancedTranslate
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Moves the image along a rectangle path.
 - Path is relative 2D coordinate: :kbd:`0,0;0,150;400,150;400,0;0,0`, means down 150, then right 400, then up 150, then left 400.
@@ -1866,7 +1884,8 @@ Animation Example
    Discrete Effect
 
 
-4. AdvancedOpacity
+AdvancedOpacity
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Modify the transparency of four images in sequence to achieve a marquee effect.
 - Image P: :guilabel:`Values` are :kbd:`255;50;50`, :guilabel:`Key Times` are :kbd:`0;0.25;1`, meaning it starts fully opaque, at 25% progress the transparency becomes 50, and the image darkens.
@@ -1900,7 +1919,8 @@ Animation Example
 
    AdvancedOpacity Linear Effect 
 
-5. Translation
+Translation
+^^^^^^^^^^^^
 
 - The Image moves to the right-down corner.
 - :guilabel:`Start X` :kbd:`0`, :guilabel:`End X` :kbd:`800`, :guilabel:`Start Y` :kbd:`0`, :guilabel:`End Y` :kbd:`480`, meaning the image starts at its original position (:kbd:`0,0`) relative to its initial location and moves :kbd:`800` pixels to the right and :kbd:`480` pixels down to the bottom-right corner relative to its original position.
@@ -1920,7 +1940,8 @@ Animation Example
 
    Right-Down Effect
 
-6. Scale
+Scale
+^^^^^^^^^^^^
 
 - The Image scales toward its center.
 - :guilabel:`Start Scale X` :kbd:`1`, :guilabel:`End Scale X` :kbd:`0.10`, :guilabel:`Start Scale Y` :kbd:`1`, :guilabel:`End Scale Y` :kbd:`0.10`, meaning the image begins at its original size (100% scale) and uniformly shrinks to 10% of its original width and height, scaling down symmetrically from its center point.
@@ -1941,7 +1962,8 @@ Animation Example
 
    Scale Effect
 
-7. Progress
+Progress
+^^^^^^^^^^^^
 
 - The progress of this :guilabel:`ImageSeekBar` increases from :kbd:`0%` to :kbd:`100%`.
 - :guilabel:`Start Value` :kbd:`0.00` means the initial progress is :kbd:`0%`, and :guilabel:`End Value` :kbd:`1.00` means the progress reaches :kbd:`100%` at the end of one animation cycle.
@@ -1970,7 +1992,8 @@ Animation Example
 
    Setting ImageSeekBar's OnLoad
 
-8. Multiple Animation Settings
+Multiple Animation Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - The image simultaneously rotates, changes transparency, and moves from the top-left corner to the bottom-right corner.
 
