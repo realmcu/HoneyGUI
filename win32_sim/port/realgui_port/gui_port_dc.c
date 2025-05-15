@@ -63,23 +63,6 @@ static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, 
 #if (DRV_PIXEL_BITS == 32)
     uint32_t *read = (uint32_t *)input;
     uint32_t *write = (uint32_t *)output;
-#elif (DRV_PIXEL_BITS == 16)
-    uint16_t *read = (uint16_t *)input;
-    uint16_t *write = (uint16_t *)output;
-#elif (DRV_PIXEL_BITS == 8)
-    uint8_t *read = (uint8_t *)input;
-    uint8_t *write = (uint8_t *)output;
-#elif (DRV_PIXEL_BITS == 4)
-    uint8_t *read = (uint8_t *)input;
-    uint8_t *write = (uint8_t *)output;
-    x1 = x1 / 2;
-    x2 = x2 / 2;
-    y1 = y1 / 2;
-    y2 = y2 / 2;
-#else
-    uint32_t *read = (uint32_t *)input;
-    uint32_t *write = (uint32_t *)output;
-#endif
     for (uint32_t i = y1; i < y2; i++)
     {
         for (uint32_t j = x1; j < x2; j++)
@@ -88,6 +71,71 @@ static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, 
             read++;
         }
     }
+#elif (DRV_PIXEL_BITS == 16)
+    uint16_t *read = (uint16_t *)input;
+    uint16_t *write = (uint16_t *)output;
+    for (uint32_t i = y1; i < y2; i++)
+    {
+        for (uint32_t j = x1; j < x2; j++)
+        {
+            write[i * sim_get_width() + j] = *read;
+            read++;
+        }
+    }
+#elif (DRV_PIXEL_BITS == 8)
+    uint8_t *read = (uint8_t *)input;
+    uint8_t *write = (uint8_t *)output;
+    for (uint32_t i = y1; i < y2; i++)
+    {
+        for (uint32_t j = x1; j < x2; j++)
+        {
+            write[i * sim_get_width() + j] = *read;
+            read++;
+        }
+    }
+#elif (DRV_PIXEL_BITS == 4)
+    uint8_t *read = (uint8_t *)input;
+    uint8_t *write = (uint8_t *)output;
+
+    uint16_t byte_x_start = xStart / 2;
+    uint16_t byte_x_end = (xStart + w + 1) / 2;
+    uint16_t x_offset = xStart % 2;
+
+    for (uint32_t y = yStart; y < yStart + h; y++)
+    {
+        uint32_t src_row_offset = (y - yStart) * w / 2;
+        uint32_t dst_row_offset = y * (sim_get_width() / 2);
+
+        if (x_offset)
+        {
+            uint8_t src_byte = read[src_row_offset];
+            uint8_t dst_byte = write[dst_row_offset + byte_x_start];
+
+            write[dst_row_offset + byte_x_start] = (dst_byte & 0x0F) | (src_byte << 4);
+            byte_x_start++;
+            src_row_offset++;
+        }
+
+        if (byte_x_start < byte_x_end)
+        {
+            uint32_t byte_count = byte_x_end - byte_x_start;
+            memcpy(&write[dst_row_offset + byte_x_start],
+                   &read[src_row_offset],
+                   byte_count);
+        }
+    }
+#else
+    uint32_t *read = (uint32_t *)input;
+    uint32_t *write = (uint32_t *)output;
+    for (uint32_t i = y1; i < y2; i++)
+    {
+        for (uint32_t j = x1; j < x2; j++)
+        {
+            write[i * sim_get_width() + j] = *read;
+            read++;
+        }
+    }
+#endif
 }
 
 void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t height,

@@ -660,5 +660,4 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
             rtk_draw_unicode_matrix(chr + i, text->color, rendor_mode, rect, text->base.matrix->m[0][0]);
         }
     }
-
 }
