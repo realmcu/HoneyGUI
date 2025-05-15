@@ -176,8 +176,8 @@ for l, p in en_cn_build:
 
   os.chdir(doc_path)
   if release_build:
-    sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-    from script.jira_helper import *
+    sys.path.append(os.path.join(os.path.dirname(__file__), "../script"))
+    from jira_helper import *
     download_tool_list = download_tools(l_doc_path)
     add_download_link(download_tool_list, l_doc_path)
   print("Current path: {}".format(os.getcwd()))
