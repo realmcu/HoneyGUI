@@ -8,6 +8,9 @@
 #include <gui_matrix.h>
 #include <math.h>
 
+#define MAX(a,b) (a > b ? a : b)
+#define MIN(a,b) (a < b ? a : b)
+
 #define USE_FIX_SIN 1
 
 #if USE_FIX_SIN
@@ -21,6 +24,30 @@ static const int16_t sin_table[] =
     29451, 29697, 29934, 30162, 30381, 30591, 30791, 30982, 31163, 31335, 31498, 31650, 31794, 31927, 32051, 32165,
     32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767
 };
+
+bool rect_intersect(gui_rect_t *result_rect, gui_rect_t *rect1, gui_rect_t *rect2)
+{
+    int16_t x1, x2, y1, y2;
+    x1 = MAX(rect1->x1, rect2->x1);
+    y1 = MAX(rect1->y1, rect2->y1);
+    x2 = MIN(rect1->x2, rect2->x2);
+    y2 = MIN(rect1->y2, rect2->y2);
+    if (x1 > x2 || y1 > y2)
+    {
+        return false;
+    }
+    else
+    {
+        if (result_rect != NULL)
+        {
+            result_rect->x1 = x1;
+            result_rect->x2 = x2;
+            result_rect->y1 = y1;
+            result_rect->y2 = y2;
+        }
+        return true;
+    }
+}
 
 float fix_sin(int angle)
 {
@@ -219,6 +246,33 @@ bool matrix_is_identity(struct gui_matrix *matrix)
         matrix->m[1][0] == 0.0f && \
         matrix->m[1][1] == 1.0f && \
         matrix->m[1][2] == 0.0f && \
+        matrix->m[2][0] == 0.0f && \
+        matrix->m[2][1] == 0.0f && \
+        matrix->m[2][2] == 1.0f
+    )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool matrix_only_translate(struct gui_matrix *matrix)
+{
+    if (matrix == NULL)
+    {
+        return false;
+    }
+
+    if (
+        matrix->m[0][0] == 1.0f && \
+        matrix->m[0][1] == 0.0f && \
+        // matrix->m[0][2] == 0.0f &&
+        matrix->m[1][0] == 0.0f && \
+        matrix->m[1][1] == 1.0f && \
+        // matrix->m[1][2] == 0.0f &&
         matrix->m[2][0] == 0.0f && \
         matrix->m[2][1] == 0.0f && \
         matrix->m[2][2] == 1.0f
@@ -657,5 +711,96 @@ bool matrix_is_full_rank(struct gui_matrix *m)
     return true;
 }
 
+bool matrix_get_transform_area(gui_matrix_t *matrix, gui_rect_t *input_area,
+                               gui_rect_t *result_area)
+{
+    gui_point3f_t pox = {0.0f};
+    float x_min = 0.0f;
+    float x_max = 0.0f;
+    float y_min = 0.0f;
+    float y_max = 0.0f;
 
+    float x1 = input_area->x1;
+    float y1 = input_area->y1;
+    float x2 = input_area->x2;
+    float y2 = input_area->y2;
+
+    pox.p[0] = x1;
+    pox.p[1] = y1;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    x_min = pox.p[0];
+    x_max = pox.p[0];
+    y_min = pox.p[1];
+    y_max = pox.p[1];
+
+    pox.p[0] = x2;
+    pox.p[1] = y1;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = x2;
+    pox.p[1] = y2;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = x1;
+    pox.p[1] = y2;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    result_area->x1 = (int16_t)x_min;
+    result_area->y1 = (int16_t)y_min;
+    result_area->x2 = ceil(x_max);
+    result_area->y2 = ceil(y_max);
+    return true;
+}
 

@@ -69,7 +69,7 @@ static void app_ui_view_lime_design(gui_view_t *view)
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_view_switch_on_event(view, blue_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
-                             SWITCH_INIT_STATE,
+                             SWITCH_IN_STILL_USE_BLUR,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_view_set_opacity(view, 150);

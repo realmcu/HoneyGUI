@@ -88,7 +88,7 @@ static void app_ui_view_white_design(gui_view_t *view)
                              SWITCH_IN_ANIMATION_ZOOM,
                              GUI_EVENT_TOUCH_CLICKED);
 
-    gui_view_set_animate_step(view, 10);
+    gui_view_set_animate_step(view, 30);
 
 }
 /* view white end*/

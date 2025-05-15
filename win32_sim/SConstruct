@@ -49,7 +49,7 @@ Export('RTK_GUI_ENGINE')
 
 
 print("CC: ", env['CC'])
-print("CCFLAGS: ", env['CCFLAGS'])
+print("CFLAGS: ", env['CFLAGS'])
 print("CXXFLAGS: ", env['CXXFLAGS'])
 print("LINKFLAGS: ", env['LINKFLAGS'])
 
@@ -94,7 +94,6 @@ if platform.system() == 'Windows':
 # include app
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
-
 
 # bsp_vdir = 'build'
 

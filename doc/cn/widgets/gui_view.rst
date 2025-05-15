@@ -9,9 +9,14 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747277180941537085/ac88ed70_10737458.jpeg" width= "1000" /></div>
+   <p style="margin: 5px 0 0 0; text-align: center;">View流程图</p>
    <br>
 
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif" width= "400" /></div>
+   <p style="margin: 5px 0 0 0; text-align: center;">View切换示意图</p>
+   <br>
 
 用法
 -----
@@ -50,9 +55,25 @@
 ~~~~~~~~~~~~~~~~~~
 使用 :cpp:any:`gui_view_switch_direct` 立即切换视图，可以配合视图控件中子控件的事件或动画使用，注意切换风格仅限于动画风格，不可设置滑动风格。
 
+
+设置动画步进长度
+~~~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_set_animate_step` 设置切换控件时的动画步进长度。
+
+
+设置透明度
+~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_set_opacity` 设置控件透明度，可实现view重叠显示效果。
+
+
 获取当前显示的视图控件指针
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-使用 :cpp:any:`gui_view_get_current_view` 函数可以获取当前显示的视图控件指针，可以搭配 :cpp:any:`gui_view_switch_direct` 使用，将当前view切换。
+使用 :cpp:any:`gui_view_get_current` 函数可以获取当前显示的视图控件指针，可以搭配 :cpp:any:`gui_view_switch_direct` 使用，将当前view切换。
+
+
+获取切换过程中新创建视图控件指针
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_view_get_next` 函数可以获取切换过程中新创建视图控件指针。
 
 
 示例
@@ -79,10 +100,16 @@
    :end-before: /* view yellow end*/
 
 
+.. literalinclude:: ../../../example/widget/view/app_ui_view_lime.c
+   :language: c
+   :start-after: /* view lime start*/
+   :end-before: /* view lime end*/
+
+
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739865862383021432/c0d24c3a_10737458.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747296823504521615/c45fc393_10737458.gif" width= "400" /></div>
    <br>
 
 API

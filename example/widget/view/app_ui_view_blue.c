@@ -94,7 +94,7 @@ static void switch_in_cb(gui_view_t *view)
                              SWITCH_IN_CENTER_ZOOM_FADE,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, lime_view_descriptor, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, lime_view_descriptor, SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
@@ -107,9 +107,7 @@ static void switch_in_cb(gui_view_t *view)
 
 static int app_init(void)
 {
-    // gui_win_t *win_view = gui_win_create(gui_obj_get_root(), "win_view", 0, 0, 0, 0);
     gui_view_create(gui_obj_get_root(), &descriptor, 0, 0, 0, 0);
-    // gui_fps_create(app->window);
     return 0;
 }
 

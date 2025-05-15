@@ -117,6 +117,7 @@ typedef enum
 {
     OBJ_INPUT_PREPARE,
     OBJ_PREPARE,
+    OBJ_PREPROCESS,
     OBJ_DRAW,
     OBJ_END,
     OBJ_DESTROY,
@@ -159,6 +160,7 @@ typedef struct _gui_obj_t
     uint32_t has_draw_cb                : 1;
     uint32_t has_end_cb                 : 1;
     uint32_t has_destroy_cb             : 1;
+    uint32_t need_preprocess            : 1;
     uint32_t magic                      : 4;
     gui_event_dsc_t   *event_dsc;
     struct _gui_obj_t **suppress_conflict_obj_list; //chrild obj list that has the same event

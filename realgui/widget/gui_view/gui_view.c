@@ -26,6 +26,7 @@
 #include "kb_algo.h"
 #include "gui_img.h"
 #include "gui_view_transition.h"
+#include "gauss_blur_process.h"
 
 
 /*============================================================================*
@@ -68,16 +69,13 @@ static void __released_view_timer_cb(void *obj)
 
     if (g_Release == g_Target)
     {
-
         if (g_Target != 0) // change view, need reset
         {
             // gui_log("obj name = %s, g_Release = %d!\n", ((gui_obj_t *)obj)->name, g_Release);
-            g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
 
             gui_view_not_show(g_PreView);
             g_PreView = g_CurrentView;
             g_CurrentView = g_NextView;
-            g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
 
             if (g_CurrentView->opacity != UINT8_MAX) //decrease time of processing PreView
             {
@@ -97,6 +95,7 @@ static void __released_view_timer_cb(void *obj)
         g_SurpressEvent = false;
         g_Release = 0;
         g_NextView = NULL;
+        g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         // gui_log("preview name = %s, current view name = %s\n", g_PreView->base.name,
         //          g_CurrentView->base.name);
 
@@ -231,6 +230,12 @@ static void __view_transition(gui_view_t *_this, int16_t release)
     {
         gui_view_reduction(_this, release);
     }
+    else if (_this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR ||
+             _this->current_transition_style == SWITCH_IN_STILL_USE_BLUR)
+    {
+        _this->base.need_preprocess = true;
+        gui_view_blur(_this, release);
+    }
 }
 
 static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
@@ -249,7 +254,7 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
 
     g_NextView->current_transition_style = on_event->switch_in_style;
     g_CurrentView->current_transition_style = on_event->switch_out_style;
-    if (on_event->switch_in_style == SWITCH_INIT_STATE) // cover CurrentView
+    if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR) // cover CurrentView
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
     }
@@ -339,6 +344,7 @@ static void gui_view_prepare(gui_obj_t *obj)
     kb_info_t *kb = kb_get_info();
     gui_view_t *_this = (gui_view_t *)obj;
     obj->opacity_value = _this->opacity;
+    _this->base.need_preprocess = false;
 
     if (!g_SurpressTP)
     {
@@ -378,7 +384,16 @@ static void gui_view_prepare(gui_obj_t *obj)
     {
         gui_fb_change();
     }
+}
 
+static void gui_view_preprocess(gui_obj_t *obj)
+{
+    gui_view_t *_this = (gui_view_t *)obj;
+    gauss_blur_param *blur_param = (gauss_blur_param *)_this->blur_param;
+    if (blur_param != NULL)
+    {
+        gauss_blur_pre_process_handle(blur_param);
+    }
 }
 
 static void gui_view_destroy(gui_obj_t *obj)
@@ -410,7 +425,17 @@ static void gui_view_end(gui_obj_t *obj)
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
-
+    if (obj->need_preprocess)
+    {
+        gui_view_t *_this = (gui_view_t *)obj;
+        gauss_blur_param *blur_param = (gauss_blur_param *)_this->blur_param;
+        if (blur_param != NULL)
+        {
+            blur_depose(&blur_param->cache_mem);
+            gui_free(blur_param);
+            _this->blur_param = NULL;
+        }
+    }
 }
 
 static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -424,19 +449,21 @@ static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
                 gui_view_prepare(obj);
             }
             break;
-
+        case OBJ_PREPROCESS:
+            {
+                gui_view_preprocess(obj);
+            }
+            break;
         case OBJ_END:
             {
                 gui_view_end(obj);
             }
             break;
-
         case OBJ_DESTROY:
             {
                 gui_view_destroy(obj);
             }
             break;
-
         default:
             break;
         }
@@ -625,6 +652,11 @@ void gui_view_set_animate_step(gui_view_t *_this, uint16_t step)
 gui_view_t *gui_view_get_current(void)
 {
     return g_CurrentView;
+}
+
+gui_view_t *gui_view_get_next(void)
+{
+    return g_NextView;
 }
 
 void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity)

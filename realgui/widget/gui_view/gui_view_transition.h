@@ -42,6 +42,8 @@ void gui_view_rotate(gui_view_t *_this, int16_t release);
 
 void gui_view_reduction(gui_view_t *_this, int16_t release);
 
+void gui_view_blur(gui_view_t *this, int16_t release);
+
 void view_transition_animation(void *obj, float pro);
 
 

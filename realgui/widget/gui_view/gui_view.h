@@ -41,6 +41,8 @@ extern "C" {
 typedef enum
 {
     SWITCH_INIT_STATE = 0x0000, ///< Switch out to left
+    SWITCH_IN_STILL_USE_BLUR,   ///< Switch in still with gauss blur
+    SWITCH_OUT_STILL_USE_BLUR,  ///< Switch out still with gauss blur
 
 
     SWITCH_OUT_TO_LEFT_USE_TRANSLATION = 0x0100, ///< Switch out to left with transition effect
@@ -119,6 +121,7 @@ typedef struct gui_view
     VIEW_SWITCH_STYLE current_transition_style;
     gui_event_t current_event;
     const struct gui_view_descriptor *descriptor;
+    void *blur_param;
 
     struct gui_view_on_event **on_event;
     uint8_t on_event_num;
@@ -239,14 +242,14 @@ void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *desc
 /**
  * @brief Set view animate step.
  * @param _this Pointer to view.
- * @param step Animate step.
+ * @param step Animate step, the larger the value, the faster the animation speed.
  */
 void gui_view_set_animate_step(gui_view_t *_this, uint16_t step);
 
 /**
  * @brief Set view opacity.
  * @param _this Pointer to view.
- * @param opacity
+ * @param opacity 0 is tatolly transparent, 255 is opaque.
  */
 void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity);
 
@@ -257,6 +260,13 @@ void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity);
  * @return return current view pointer.
  */
 gui_view_t *gui_view_get_current(void);
+
+/**
+ * @brief Get next view pointer.
+ *
+ * @return return next view pointer.
+ */
+gui_view_t *gui_view_get_next(void);
 
 #ifdef __cplusplus
 }
