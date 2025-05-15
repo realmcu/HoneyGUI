@@ -1,15 +1,15 @@
 /**
- * @file acc_sw_filter.h
+ * @file acc_sw_bypass.h
  * @author wenjing_jiang (wenjing_jiang@realtek.com.cn)
  * @brief
  * @version 0.1
- * @date 2023-12-23
+ * @date 2023-12-06
  *
  * @copyright Copyright (c) 2023
  *
  */
-#ifndef __ACC_SW_FILTER_H__
-#define __ACC_SW_FILTER_H__
+#ifndef __ACC_SW_BYPASS_H__
+#define __ACC_SW_BYPASS_H__
 
 #include <draw_img.h>
 #include <stdio.h>
@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void bypass_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
                           gui_rect_t *rect);
 
 #ifdef __cplusplus

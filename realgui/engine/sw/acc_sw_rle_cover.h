@@ -1,5 +1,5 @@
 /**
- * @file acc_sw_rle_filter.h
+ * @file acc_sw_rle_cover.h
  * @author wenjing_jiang@realsil.com.cn
  * @brief
  * @version 0.1
@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023
  *
  */
-#ifndef __ACC_SW_RLE_FILTER_H__
-#define __ACC_SW_RLE_FILTER_H__
+#ifndef __ACC_SW_RLE_COVER_H__
+#define __ACC_SW_RLE_COVER_H__
 
 #include <guidef.h>
 #include <draw_img.h>
@@ -20,8 +20,8 @@
 extern "C" {
 #endif
 
-void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                              struct gui_rect *rect);
+void rle_cover_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
+                             struct gui_rect *rect);
 
 #ifdef __cplusplus
 }

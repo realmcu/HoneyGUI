@@ -58,7 +58,7 @@ static void rle_bypass_rgb565_draw(imdc_file_t *file, uint32_t line,  uint16_t *
         node ++;
     }
 }
-void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void rle_bypass_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
                               struct gui_rect *rect)
 {
     int32_t x_start = 0;

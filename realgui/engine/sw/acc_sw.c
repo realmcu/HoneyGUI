@@ -24,7 +24,7 @@
 #include "acc_sw_bypass.h"
 #include "acc_sw_cover.h"
 #include "acc_sw_filter.h"
-#include <acc_sw_raster.h>
+#include "acc_sw_raster.h"
 #include "acc_sw.h"
 
 /*============================================================================*
@@ -52,7 +52,7 @@
  *============================================================================*/
 
 
-void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
@@ -115,7 +115,7 @@ void sw_acc_end_cb(draw_img_t *image)
 }
 
 
-void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     gui_rgb_data_head_t *header = (gui_rgb_data_head_t *)image->data;
 

@@ -23,11 +23,11 @@ extern "C" {
 
 
 
-void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, gui_dispdev_t *dc,
                                      gui_rect_t *rect);
-void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, gui_dispdev_t *dc,
                                       gui_rect_t *rect);
-void rle(draw_img_t *image, struct gui_dispdev *dc,
+void rle(draw_img_t *image, gui_dispdev_t *dc,
          gui_rect_t *rect);
 
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len);

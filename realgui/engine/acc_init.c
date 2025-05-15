@@ -9,12 +9,8 @@
  *
  */
 #include <stdio.h>
-//#include "acc_sw_rle.h"
 #include "acc_init.h"
 
-
-extern void sw_acc_init(void);
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 /**
  * Represents the absolute bounds of an image.

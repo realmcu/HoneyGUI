@@ -252,7 +252,7 @@ bool is_identity_matrix(gui_matrix_t *matrix)
            (matrix->m[2][0] == 0) && (matrix->m[2][1] == 0);
 }
 
-void handle_image_blend_mode(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     switch (image->blend_mode)
     {
@@ -271,7 +271,7 @@ void handle_image_blend_mode(draw_img_t *image, struct gui_dispdev *dc, gui_rect
         break;
     }
 }
-void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+void rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (!is_identity_matrix(&image->matrix))
     {
