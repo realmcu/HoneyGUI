@@ -305,7 +305,8 @@ figcaption p{
 .rst-content section ul li ol.arabic li {
     list-style-type: decimal;
 }
-.rst-content .admonition ol li {
+.rst-content .admonition ol li,
+.rst-content .admonition ul li ol li {
     list-style-type: decimal !important;
 }
 /* 二级有序列表 */
@@ -315,7 +316,8 @@ figcaption p{
 .rst-content section ul li ol.arabic li ol li {
     list-style-type: lower-latin;
 }
-.rst-content .admonition ol li ol li {
+.rst-content .admonition ol li ol li,
+.rst-content .admonition ul li ol li ol li {
     list-style-type: lower-latin !important;
 }
 /* 三级有序列表 */
@@ -342,27 +344,34 @@ figcaption p{
 .rst-content section ol.arabic li ul li {
     list-style-type: disc;
 }
+.rst-content .admonition ul li,
+.rst-content .admonition ol li ul li {
+    list-style-type: disc !important;
+}
 /* 二级无序列表 */
 .rst-content section ul li ul li,
 .rst-content section ol ul li ul li,
 .rst-content section ol.arabic ul li ul li {
     list-style-type: circle;
 }
+.rst-content .admonition ul li ul li,
+.rst-content .admonition ol ul li ul li {
+    list-style-type: circle !important;
+}
 /* 三级无序列表 */
 .rst-content section ul li ul li ul li {
     list-style-type: square;
 }
+.rst-content .admonition ul li ul li ul li {
+    list-style-type: square !important;
+}
 /* 四级无序列表 */
-.rst-content section ul li ul li ul li ul li,
-.rst-content section ul li ul li ul li ul li,
 .rst-content section ul li ul li ul li ul li {
     list-style-type: none;
     position: relative;
     margin-left: 0;
     padding-left: 1em;
 }
-.rst-content section ul li ul li ul li ul li::before,
-.rst-content section ul li ul li ul li ul li::before,
 .rst-content section ul li ul li ul li ul li::before {
     content: "-";
     position: absolute;
@@ -687,3 +696,133 @@ a.no-cursor-link {
 }
 
 /* ====== Render image modal style ====== */
+
+
+/* ====== Render ai summary style ====== */
+#AISummaryButton {
+    margin-bottom: 12px;
+    padding: 6px 10px;
+    background-color: #e6f6f9;
+    border: 1px solid #0068B6;
+    border-radius: 5px;
+    color: #0068B6;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+}
+#AISummaryButton.disabled-button {
+    background-color: #f0f0f0;
+    border: 1px solid #e6e6e6;
+    color: grey;
+    cursor: not-allowed;
+}
+.ai-summary-header {
+    padding: 8px 10px;
+    background-color: #2980b9;
+    color: #fff;
+    font-size: 105%;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+}
+.ai-summary-content {
+    min-height: 40px;
+    background-color: #f8f8f8;
+    font-size: 18px;
+    line-height: 28px;
+    color: #212529;
+    text-align: left !important;
+}
+/* ---- ai summary text header ---- */
+.ai-summary-content h1,
+.ai-summary-content h2,
+.ai-summary-content h3,
+.ai-summary-content h4,
+.ai-summary-content h5,
+.ai-summary-content h6 {
+    font-weight: 600;
+    margin: 5px 0;
+}
+.ai-summary-content h1 {
+    font-size: 110%;
+}
+.ai-summary-content h2 {
+    font-size: 108%;
+}
+.ai-summary-content h3 {
+    font-size: 105%;
+}
+.ai-summary-content h4,
+.ai-summary-content h5,
+.ai-summary-content h6 {
+    font-size: 100%;
+}
+/* ---- ai summary text header ---- */
+
+.ai-summary-text-box {
+    max-height: 420px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.ai-summary-text {
+    margin: 18px 20px;
+    line-height: 26px;
+}
+
+/* ---- ai summary text list ---- */
+.ai-summary-text ul,
+.ai-summary-text ol {
+    padding-inline-start: 1.5em;
+}
+/* 一级无序列表 */
+.ai-summary-text ul,
+.ai-summary-text ol ul {
+    list-style-type: disc;
+}
+/* 二级无序列表 */
+.ai-summary-text ul ul,
+.ai-summary-text ol ul ul {
+    list-style-type: circle;
+}
+/* 三级无序列表 */
+.ai-summary-text ul ul ul {
+    list-style-type: square;
+}
+/* 一级有序列表 */
+.ai-summary-text ol,
+.ai-summary-text ul ol {
+    list-style-type: decimal;
+}
+/* 二级有序列表 */
+.ai-summary-text ol ol,
+.ai-summary-text ul ol ol {
+    list-style-type: lower-latin;
+}
+/* 三级有序列表 */
+.ai-summary-text ol ol ol {
+    list-style-type: lower-roman;
+}
+.ai-summary-text li {
+    list-style-type: inherit;
+}
+/* ---- ai summary text list ---- */
+
+.text-hidden {
+    display: none;
+}
+.text-loading {
+    width: 10px;
+    height: 10px;
+    background-color: #2980b9;
+    border-radius: 100%;
+    animation: loadingCircle infinite 1s linear;
+}
+/* 闪烁动画 */
+@keyframes loadingCircle {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+/* ====== Render ai summary style ====== */

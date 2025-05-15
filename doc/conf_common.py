@@ -96,6 +96,10 @@ html_js_files = [
     'js/custom.js',
     'js/versions.js',
     'js/imgmodal.js',
+    'js/aisummary.js',
+    'js/chatwidget.js',
+    'js/marked.min.js',
+    'js/typed.umd.js',
 ]
 
 html_logo = './_static/image/logo.png'

@@ -223,3 +223,51 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('toEN').href = newEnUrl;
     document.getElementById('toCN').href = newCnUrl;
 })
+
+/* ================= Add AI ASK Fetch request ================= */
+document.addEventListener('DOMContentLoaded', function () {
+    function fetchChatAnwser(chatInputText, chatHistory) {
+        let curVersion = (document.querySelector("#version-selector")?.value) || "latest";
+        // If the current version is "latest", check and update it from LatestVersion
+        if (curVersion === "latest") {
+            const latestEle = document.querySelector('#LatestVersion');
+            if (latestEle && latestEle.value) {
+                curVersion = latestEle.value;
+            }
+        }
+        return new Promise((resolve, reject) => {
+            const rawBody = {
+                rawData: chatInputText, // required, 要詢問 AI 的問句
+                docBase: "2039", // required, 知識庫id(測試區請使用 2039)
+                docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答
+                // optional, 過去的對話紀錄，請符合範例的格式，目前可以輸入長度最多為 6 (三組 user-assistant 組合)，若無對話紀錄則不需輸入
+                historyMsg: chatHistory,
+            };
+            $.ajax({
+                url: 'https://wwwdev.realmcu.com/docs/aichat',
+                type: 'POST',
+                dataType: "json",
+                contentType: "application/x-www-form-urlencoded",
+                async: true,
+                data: JSON.stringify(rawBody),
+                success: function (resp) {
+                    resolve(resp);
+                },
+                error: function (err) {
+                    if(err) {
+                        reject(err);
+                    }
+                    else {
+                        reject("Realmcu Server Network Error!");
+                    }
+                }
+            });
+        });
+    }
+
+    chatWidgetInit({
+        makeRequest: fetchChatAnwser,
+        chatWidgetTitle: "AI Ask",
+        chatWidgetPlaceholder: "Please type your question"
+    });
+});
