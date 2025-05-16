@@ -19,6 +19,7 @@ if(1) #set to 1 to enable or variable to for depnedency
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_matrix.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_stb.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_ttf.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/engine_gray.c"
 	)
 
 
