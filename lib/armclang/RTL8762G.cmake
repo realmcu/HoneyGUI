@@ -29,10 +29,13 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wno-implicit-function-declaration ")
 	
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+	-xc++ \
 	-std=c++11 \
     --target=arm-arm-none-eabi \
     -march=armv8.1-m.main+dsp+mve.fp+fp \
     -mfloat-abi=hard \
+	-c \
+	-fno-rtti \
     -flto \
     -funsigned-char \
     -fshort-enums \
@@ -40,6 +43,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -mlittle-endian \
     -gdwarf-4 \
     -O2 \
+	-fno-exceptions \
     -fno-function-sections \
     -Wno-packed \
     -Wno-missing-variable-declarations \
