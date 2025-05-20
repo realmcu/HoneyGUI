@@ -55,7 +55,7 @@ typedef enum
     HORIZONTAL  = 0x0001,
 } LIST_DIR;
 
-/** @brief  list structure */
+/** @brief  List Structure */
 
 typedef struct gui_list
 {
@@ -76,6 +76,7 @@ typedef struct gui_list
     uint8_t checksum;
 } gui_list_widget_t;
 
+/** @brief  List_tab Structure */
 typedef struct gui_list_tab
 {
     gui_obj_t base;

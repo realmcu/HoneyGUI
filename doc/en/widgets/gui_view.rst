@@ -68,7 +68,7 @@ The :cpp:any:`gui_view_set_opacity` function can be used to set opacity of widge
 
 Get Current View Pointer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_view_get_current_view` function can be used to get current view pointer, and can be used with :cpp:any:`gui_view_switch_direct` to switch the current view.
+The :cpp:any:`gui_view_get_current` function can be used to get current view pointer, and can be used with :cpp:any:`gui_view_switch_direct` to switch the current view.
 
 
 Get Next View Pointer
