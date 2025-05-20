@@ -22,6 +22,4 @@ The GUI framework diagram is shown in the figure below:
     :maxdepth: 2
 
     C-APP Application<Native/Native>
-    Use LVGL Design An Application <LVGL/app_lvgl>
-    Use ARM-2D Design An Application <ARM-2D/fwk_app_arm2d>
     Use RVD Tool Design An Application <SaaA/index>

@@ -18,6 +18,9 @@ Glossary
     DMA
         Direct Memory Access
 
+    EVB
+        Evaluation Board
+
     FB
         Frame Buffer
 
@@ -48,6 +51,9 @@ Glossary
     PC
         Personal Computer
     
+    PNG
+        Portable Network Graphics
+
     PSRAM
         Pseudo Static Random Access Memory
 
@@ -58,11 +64,13 @@ Glossary
         Run-Length Encoding
 
     RVD
-        RTKIOT Visual Designer
+        Realtek Visual Designer
 
     TP
         Touch Pad
-
+        
+    UI
+        User Interface
 
 
 .. raw:: html

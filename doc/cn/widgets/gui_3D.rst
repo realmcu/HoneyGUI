@@ -323,14 +323,14 @@
 帧率测试
 --------
 
-以下表格记录了不同芯片平台下各个示例的帧率表现。
+以下表格展示了不同芯片平台上，各个示例的帧率表现。编译环境采用 ``ARMCLANG V6.22``，编译选项为 ``-O3 LTO``。
 
 .. csv-table:: 帧率测试结果
    :header: 芯片型号,处理器主频,分辨率,:ref:`3D蝴蝶`,:ref:`3D人脸`,:ref:`3D小狗`,:ref:`3D圆盘`
    :align: center
    :name: 帧率测试结果
 
-   RTL8773E,100MHz,410 x 502,24 FPS,12 FPS,19 FPS,7 FPS
+   RTL8773E,100MHz,410 x 502,40 FPS,13 FPS,20 FPS,10 FPS
 
 
 API

@@ -138,9 +138,9 @@ Use :cpp:any:`gui_3d_set_face_transform_cb` to apply a local transformation to t
 Features:
 
 + Supports local animations
-+ Supports independent control by face index
++ Supports independent control by face indexs
 
-.. _Coordinate Transformations and Lighting System:_
+.. _Coordinate Transformations and Lighting System:
 
 Coordinate Transformations and Lighting System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,14 +325,14 @@ To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DIS
 FPS Benchmark
 --------------
 
-The following table records the frame rate performance of different examples across various chip platforms.
+The table below shows the frame rate performance of various examples on different chip platforms. The compilation environment uses ``ARMCLANG V6.22`` with the ``-O3 LTO`` compilation option.
 
 .. csv-table:: FPS Benchmark Results
    :header: Chip Model,CPU Frequency,Resolution,:ref:`3D Butterfly`,:ref:`3D Face`,:ref:`3D Dog`,:ref:`3D Disc`
    :align: center
    :name: FPS Benchmark Results
 
-   RTL8773E,100MHz,410 x 502,24 FPS,12 FPS,19 FPS,7 FPS
+   RTL8773E,100MHz,410 x 502,40 FPS,13 FPS,20 FPS,10 FPS
 
 
 API

@@ -95,16 +95,16 @@ typedef void (*gui_3d_face_transform_cb)(gui_3d_t *this, size_t face_index/*face
 
 
 /**
- * @brief 3d widget create
+ * @brief Create 3d widget.
  *
- * @param parent parent widget
- * @param name widget name
- * @param desc_addr description file data
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
- * @return the widget object pointer
+ * @param parent Parent widget.
+ * @param name Widget name.
+ * @param desc_addr Description file data.
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Width.
+ * @param h Height.
+ * @return The widget object pointer.
  */
 gui_3d_t *gui_3d_create(void                 *parent,
                         const char           *name,
@@ -116,20 +116,20 @@ gui_3d_t *gui_3d_create(void                 *parent,
                         int16_t               h);
 
 /**
- * @brief set global transform callback
+ * @brief Set global transform callback.
  *
- * @param this the 3d widget pointer
+ * @param this The 3d widget pointer.
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for all faces
+ *           and light source for all faces.
  */
 void gui_3d_set_global_transform_cb(gui_3d_t *this, gui_3d_global_transform_cb cb);
 
 /**
- * @brief set face transform callback
+ * @brief Set face transform callback.
  *
- * @param this the 3d widget pointer
+ * @param this The 3d widget pointer.
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for the specified face
+ *           and light source for the specified face.
  */
 void gui_3d_set_face_transform_cb(gui_3d_t *this, gui_3d_face_transform_cb cb);
 
