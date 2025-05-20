@@ -242,6 +242,12 @@ for l, p in en_cn_build:
       shutil.copy2(link_map_file, dest_copy_path)
       shutil.make_archive(base_name=doc_src_zip, format='zip', root_dir=dest_copy_path)
       shutil.make_archive(base_name=doc_html_zip, format='zip', root_dir=html_out_path)
+  else:
+    sys.path.append(JenkinsBuild_doc_Dir)
+    from push import replace_version_js
+    version_list_file = "https://docsqa.realmcu.com/version_test.txt"
+    version_js = os.path.join(html_out_path, r"_static\js\versions.js")
+    replace_version_js(version_js, version_list_file)
 
 shutil.copytree(os.path.join(doc_path, html_out), os.path.join(doc_path, html_out + "_" + sdk_name))
 
