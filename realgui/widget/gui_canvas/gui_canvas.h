@@ -32,12 +32,13 @@ extern "C" {
 #include "gui_api.h"
 #include "nanovg.h"
 #include "gui_obj.h"
+#include "draw_img.h"
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
 
-/** @brief  canvas structure */
+/** @brief  Canvas structure */
 typedef struct gui_canvas
 {
     gui_obj_t base;
@@ -68,7 +69,7 @@ typedef struct gui_canvas
  *============================================================================*/
 
 /**
- * @brief create a canvas widget used to drawing graphics in nanovg.
+ * @brief Create a canvas widget used to drawing graphics in nanovg.
  *
  * @param parent the father widget nested in.
  * @param name this_widget canvas widget's name.
@@ -88,7 +89,7 @@ gui_canvas_t *gui_canvas_create(void       *parent,
                                 int16_t     h);
 
 /**
- * @brief set the callback function for drawing specific shapes.
+ * @brief Set the callback function for drawing specific shapes.
  *
  * @param this_widget this_widget widget pointer
  * @param cb the callback function for drawing specific shapes
@@ -102,84 +103,31 @@ void gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t
 typedef void (*gui_canvas_render_function)(NVGcontext *vg);
 
 /**
- * @brief Renders a canvas and outputs it in the specified format.
+ * @brief Render a graphical canvas to a specified buffer in a chosen image format.
  *
- * This function renders a canvas using the provided renderer function and
- * outputs the result in one of the specified formats. The output can be
- * optionally compressed, depending on the format.
+ * Utilizes the provided renderer function to generate graphical content within
+ * a canvas, subsequently outputting the rendered image into the designated target buffer
+ * in accordance with the specified format. Optional compression is available based on the format.
  *
- * @param output_format The format of the output image. Should be one of the following:
- *                      - GUI_CANVAS_OUTPUT_PNG
- *                      - GUI_CANVAS_OUTPUT_JPG
- *                      - GUI_CANVAS_OUTPUT_RGBA
- *                      - GUI_CANVAS_OUTPUT_RGB565
- * @param compression   Whether to apply compression to the output (applicable for RGBA/RGB565 format).
- * @param image_width   The width of the output image.
- * @param image_height  The height of the output image.
- * @param renderer      A function pointer to the rendering function that takes an NVGcontext.
- *                      This function is responsible for all drawing operations.
+ * @param format        The format of the output image. It should be specified as one of the following options:
+ *                      - GUI_CANVAS_OUTPUT_PNG for PNG format
+ *                      - GUI_CANVAS_OUTPUT_JPG for JPG format
+ *                      - GUI_CANVAS_OUTPUT_RGBA for RGBA format
+ *                      - GUI_CANVAS_OUTPUT_RGB565 for RGB565 format
+ * @param compression   A boolean flag indicating whether to compress the output image data.
+ *                      Note: Compression is only applicable for RGBA/RGB565 formats.
+ * @param image_width   The width of the output image, specified in pixels.
+ * @param image_height  The height of the output image, specified in pixels.
+ * @param renderer      Function pointer to the rendering callback function, responsible for executing
+ *                      drawing operations within the rendering context (NVGcontext).
+ * @param target_buffer A pointer to the pre-allocated buffer designated for storing the rendered image data.
+ *                      Ensure the buffer size is adequate to hold the image data in the specified format.
  *
- * @return A pointer to the buffer containing the output image data. The format of
- *         the data depends on the specified output_format. The user is responsible
- *         for managing the memory associated with this buffer.
+ * @return A pointer to a gui_img_t structure representing the rendered image stored in the target buffer.
  */
-const uint8_t *gui_canvas_output(int output_format, bool compression, int image_width,
-                                 int image_height, gui_canvas_render_function renderer);
-
-/**
- * @brief Renders a canvas and outputs the result to a target buffer in the specified format.
- *
- * This function uses the provided renderer function to render a canvas, and then
- * writes the output image to the provided target buffer in the specified format.
- * The output can be optionally compressed, depending on the format.
- *
- * @param format        The format of the output image. Should be one of the following:
- *                      - GUI_CANVAS_OUTPUT_PNG
- *                      - GUI_CANVAS_OUTPUT_JPG
- *                      - GUI_CANVAS_OUTPUT_RGBA
- *                      - GUI_CANVAS_OUTPUT_RGB565
- * @param compression   Whether to apply compression to the output (applicable for RGBA/RGB565 format).
- * @param image_width   The width of the output image.
- * @param image_height  The height of the output image.
- * @param renderer      A function pointer to the rendering function that takes an NVGcontext.
- *                      This function is responsible for all drawing operations.
- * @param target_buffer A pointer to the buffer where the rendered image data will be written.
- *                      The buffer must be pre-allocated and large enough to hold the image data
- *                      in the specified format.
- */
-void gui_canvas_output_buffer(int format, bool compression, int image_width, int image_height,
-                              gui_canvas_render_function renderer, uint8_t *target_buffer);
-
-
-#include "draw_img.h"
-/**
- * @brief Initializes a blank output buffer for the canvas.
- *
- * This function initializes a NanoVG context with a blank output buffer
- * and returns a pointer to the context. The buffer can be configured with
- * the specified format, compression option, width, and height.
- *
- * @param format        The format of the output buffer.
- * @param compression   Boolean flag indicating whether compression should be used.
- * @param image_width   The width of the image.
- * @param image_height  The height of the image.
- * @param target_buffer Pointer to the target buffer where the output will be stored.
- *
- * @return A pointer to the initialized NanoVG context.
- */
-NVGcontext *gui_canvas_output_buffer_blank(int format, bool compression, int image_width,
-                                           int image_height,
-                                           uint8_t *target_buffer);
-
-/**
- * @brief Closes the canvas and frees resources.
- *
- * This function closes the NanoVG context created by gui_canvas_output_buffer_blank
- *
- * @param vg Pointer to the NanoVG context to be closed.
- */
-void gui_canvas_output_buffer_blank_close(NVGcontext *vg);
-
+void *gui_canvas_render_to_image_buffer(int format, bool compression, int image_width,
+                                        int image_height,
+                                        gui_canvas_render_function renderer, uint8_t *target_buffer);
 
 #ifdef __cplusplus
 }

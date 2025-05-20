@@ -34,7 +34,8 @@ void test_circle_drawing()
 static void canvas_rect_cb(gui_canvas_t *canvas)
 {
     NVGcontext *vg = canvas->vg;
-    nvgRect(vg, 150, 150, 200, 180);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, 150, 150, 200, 180, 20);
 
     nvgStrokeWidth(vg, 8.0f);
     nvgStrokeColor(vg, nvgRGB(255, 0, 0));
@@ -44,11 +45,6 @@ static void canvas_rect_cb(gui_canvas_t *canvas)
                                           255));
     nvgFillPaint(vg, gradient);
     nvgFill(vg);
-
-    nvgFontSize(vg, 20.0f);
-    nvgFontFace(vg, "sans");
-    nvgFillColor(vg, nvgRGBA(0, 0, 255, 255));
-    nvgText(vg, 10, 0, "Hello", NULL);
 }
 void test_rect_drawing()
 {
@@ -89,7 +85,7 @@ void test_render(NVGcontext *vg)
     nvgFillColor(vg, nvgRGBA(0, 255, 0, 255));
     nvgFill(vg);
 }
-static void app_init(void)
+static int app_init(void)
 {
     test_rect_drawing();
     test_arc_drawing();

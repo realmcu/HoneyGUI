@@ -2,7 +2,7 @@
 画布（Canvas）
 ===============
 
-画布控件提供基于NanoVG的2D图形绘制能力，并支持软件加速渲染和多种图像输出格式。
+画布控件提供基于 NanoVG 的 2D 图形绘制能力，并支持软件加速渲染和多种图像输出格式。
 
 .. raw:: html
 
@@ -18,11 +18,11 @@
 
 组件概述
 --------
-GUI Canvas是基于NanoVG的2D绘图组件，提供：
+GUI Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
 
 - 基础形状绘制（矩形/圆形/弧形等）
-- 支持RGBA/RGB565/PNG/JPG输出格式
-- NanoVG软件加速渲染（通过AGGE后端）
+- 支持 RGBA/RGB565/PNG/JPG 输出格式
+- NanoVG 软件加速渲染（通过 AGGE 后端）
 - 直接缓冲区输出功能
 - 空白缓冲区初始化支持
 
@@ -72,64 +72,28 @@ GUI Canvas是基于NanoVG的2D绘图组件，提供：
        gui_canvas_set_canvas_cb(canvas, my_draw_function);
 
 触发重绘：
-可通过设置canvas->render = 1来手动触发重绘，系统会在下一帧调用绘制回调。
+可通过设置 canvas->render = 1 来手动触发重绘，系统会在下一帧调用绘制回调。
 
 图像输出
 ~~~~~~~~~~
 
-1. 使用 ``gui_canvas_output`` 函数（动态分配缓冲区）
-
-   此函数会动态分配内存并返回渲染结果，适用于需要一次性输出的场景。
-
-   .. code-block:: c
-   
-       // 示例：输出PNG格式图像
-       const uint8_t* png_data = gui_canvas_output(
-           GUI_CANVAS_OUTPUT_PNG,
-           false,  // PNG格式不支持压缩参数
-           640, 480,
-           my_render_func);
-       
-       // 使用后需要手动释放内存
-       free((void*)png_data);
-
-2. 使用 ``gui_canvas_output_buffer`` 函数（预分配缓冲区）
+使用 ``gui_canvas_output_buffer`` 函数（预分配缓冲区）
 
    此函数需要预先分配缓冲区，适用于需要重复渲染或内存受限的场景。
 
    .. code-block:: c
    
-       // 示例：输出到预分配的RGBA缓冲区
-       uint8_t buffer[640*480*4]; // RGBA格式需要 width*height*4 字节
-       gui_canvas_output_buffer(
-           GUI_CANVAS_OUTPUT_RGBA,
-           false,   
-           640, 480,
-           my_render_func,
-           buffer);
+        // 示例：输出到预分配的RGBA缓冲区
+        uint8_t img_head_size = sizeof(gui_rgb_data_head_t);
+        uint8_t img_size = img_head_size + 640 * 480 * 4;// RGBA 需分配 width*height*4 字节，加上头部
+        uint8_t *buffer = gui_lower_malloc(img_size); 
+        gui_canvas_render_to_image_buffer(
+            GUI_CANVAS_OUTPUT_RGBA,
+            false,
+            640, 480,
+            my_render_func,
+            buffer);
 
-3. 使用 ``gui_canvas_output_buffer_blank`` 和 ``gui_canvas_output_buffer_blank_close`` 函数
-
-   这对函数用于创建和销毁空白画布上下文，适用于需要多次渲染操作的场景。
-
-   .. code-block:: c
-   
-       // 示例：创建空白画布
-       uint8_t buffer[480*480*4];
-       NVGcontext* vg = gui_canvas_output_buffer_blank(
-           GUI_CANVAS_OUTPUT_RGBA,
-           false,
-           480, 480,
-           buffer);
-       
-       // 在空白画布上绘制
-       nvgBeginPath(vg);
-       nvgRect(vg, 100, 100, 200, 200);
-       nvgFillColor(vg, nvgRGBA(255,0,0,255));
-       nvgFill(vg);
-       
-       // 完成后关闭画布
-       gui_canvas_output_buffer_blank_close(vg);
 
 示例代码
 --------

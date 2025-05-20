@@ -78,59 +78,20 @@ Set canvas->render = 1 to manually trigger redraw (callback will be called next 
 Image Output
 ~~~~~~~~~~~~
 
-1. Using ``gui_canvas_output`` (dynamically allocated buffer)
-
-   Allocates memory and returns rendering result, suitable for one-time output.
+This function requires a pre-allocated buffer and is suitable for scenarios where repeated rendering or memory constraints are important.
 
    .. code-block:: c
-   
-       // Example: Output PNG image
-       const uint8_t* png_data = gui_canvas_output(
-           GUI_CANVAS_OUTPUT_PNG,
-           false,  // PNG doesn't support compression
-           640, 480,
-           my_render_func);
-       
-       // Must free memory after use
-       free((void*)png_data);
 
-2. Using ``gui_canvas_output_buffer`` (pre-allocated buffer)
-
-   Requires pre-allocated buffer, suitable for repeated rendering or memory-constrained scenarios.
-
-   .. code-block:: c
-   
-       // Example: Output to RGBA buffer
-       uint8_t buffer[640*480*4]; // RGBA requires width*height*4 bytes
-       gui_canvas_output_buffer(
-           GUI_CANVAS_OUTPUT_RGBA,
-           false,   
-           640, 480,
-           my_render_func,
-           buffer);
-
-3. Using ``gui_canvas_output_buffer_blank`` and ``gui_canvas_output_buffer_blank_close``
-
-   This pair of functions creates and destroys blank canvas contexts, suitable for multiple rendering operations.
-
-   .. code-block:: c
-   
-       // Example: Create blank canvas
-       uint8_t buffer[480*480*4];
-       NVGcontext* vg = gui_canvas_output_buffer_blank(
-           GUI_CANVAS_OUTPUT_RGBA,
-           false,
-           480, 480,
-           buffer);
-       
-       // Draw on blank canvas
-       nvgBeginPath(vg);
-       nvgRect(vg, 100, 100, 200, 200);
-       nvgFillColor(vg, nvgRGBA(255,0,0,255));
-       nvgFill(vg);
-       
-       // Close canvas when done
-       gui_canvas_output_buffer_blank_close(vg);
+        // Example: Output to a pre-allocated RGBA buffer
+        uint8_t img_head_size = sizeof(gui_rgb_data_head_t);
+        uint32_t img_size = img_head_size + 640 * 480 * 4; // RGBA requires width*height*4 bytes plus header
+        uint8_t *buffer = gui_lower_malloc(img_size);
+        gui_canvas_render_to_image_buffer(
+            GUI_CANVAS_OUTPUT_RGBA,
+            false,
+            640, 480,
+            my_render_func,
+            buffer);
 
 Example Code
 ------------
