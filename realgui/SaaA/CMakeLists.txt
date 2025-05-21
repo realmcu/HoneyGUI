@@ -12,6 +12,14 @@ if(CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP)
     file(GLOB HEADERS "*.h" "*.hpp")
 
 
+
+if(TARGET gui) 
+    get_target_property(TARGET_TYPE gui TYPE)
+    if(TARGET_TYPE MATCHES "STATIC_LIBRARY|SHARED_LIBRARY")
+        list(FILTER SOURCES EXCLUDE REGEX ".*frontend_launcher\\.c$")
+    endif()
+endif()
+
     # Determine if we should create a library
     if((NOT HEADERS) AND (NOT SOURCES))
         message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")

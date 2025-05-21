@@ -3,10 +3,10 @@ cmake_policy(SET CMP0123 NEW)
 
 set(CMAKE_SYSTEM_NAME Generic)
 
-set(ARMCLANG_PATH "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.3 rel1/bin")
 
-set(CMAKE_C_COMPILER "${ARMCLANG_PATH}/arm-none-eabi-gcc.exe")
-set(CMAKE_CXX_COMPILER "${ARMCLANG_PATH}/arm-none-eabi-g++.exe")
+
+set(CMAKE_C_COMPILER arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 
 
 set(CMAKE_CXX_STANDARD 11)

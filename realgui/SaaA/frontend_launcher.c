@@ -33,23 +33,16 @@ static gui_app_t app_launcher_frontend =
     .active_ms = (uint32_t) - 1,
     .ui_design = app_launcher_frontend_ui_design,
 };
-
 void *get_app_launcher_frontend(void)
 {
     return &app_launcher_frontend;
 }
-
-
-
 extern void *get_app_xml(void);
-
-
 #include "draw_font.h"
 gui_grid_t *g;
 void button_cb(gui_button_t *b)
 {
     gui_img_set_opacity((void *)b->img, 100);
-
 }
 void button_click_cb(gui_button_t *b)
 {
@@ -57,6 +50,7 @@ void button_click_cb(gui_button_t *b)
     app->xml = b->data;
     gui_app_switch(get_app_launcher_frontend(), app);
 }
+//#define ENABLE_APP_AUTOSTART
 void button_release_cb(gui_button_t *b)
 {
     gui_img_set_opacity((void *)b->img, 255);
@@ -75,7 +69,6 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     }
     while ((entry = gui_fs_readdir(dir)) != NULL)
     {
-
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
             strcmp(entry->d_name, "widget.ts") != 0)
         {
@@ -99,8 +92,6 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     char *pic = 0;
                     char *text = "app";
                     app->xml = path;
-
-
                     get_app(app, &pic, &text);
                     gui_log("get:%s,%s\n", pic, text);
                     void *img1;
@@ -110,19 +101,15 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     {
                         continue;
                     }
-
                     gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, BUTTON_BG_ICON, 0);
                     gui_button_press(button, (gui_event_cb_t)button_cb, button);
                     gui_button_release(button, (gui_event_cb_t)button_release_cb, button);
-
 #ifdef ENABLE_APP_AUTOSTART
                     gui_obj_enable_event((void *)button, GUI_EVENT_TOUCH_RELEASED);
                     button->flag = 1;
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
 #endif
                     button->data = gui_strdup(path);
-
-
                     gui_button_text_move(button, -70, 73);
                     {
                         int font_size = 16;
@@ -135,14 +122,126 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         GUI_BASE(button->text)->w = 70 * 3;
                     }
                 }
-
             }
             gui_fs_closedir(dirr);
         }
-
-
     }
     gui_fs_closedir(dir);
+}
+#include "rvd.h"
+// Static array to store paths of XML files, with size defined by XML_ARRAY_SIZE
+static char *rvd_xml_array[XML_ARRAY_SIZE];
+int rvd_scan_xml_files()
+{
+
+    char *dirPath = (void *)gui_get_path_by_relative("/app"); // Base directory path to scan
+    gui_fs_dir *dir = 0; // Directory handle
+    struct gui_fs_dirent *entry; // Directory entry
+    int index = 0; // Index to track number of XML files found
+    rvd_free_xml_array();
+    // Clear the XML array to ensure no stale data
+    memset(rvd_xml_array, 0, XML_ARRAY_SIZE * sizeof(rvd_xml_array[0]));
+    // Open the base directory
+    if ((dir = gui_fs_opendir(dirPath)) == NULL)
+    {
+        gui_log("gui_fs_opendir(%s) failed", dirPath);
+        gui_free(dirPath);
+        return index; // Exit if directory cannot be opened
+    }
+    // Iterate through directory entries
+    while ((entry = gui_fs_readdir(dir)) != NULL)
+    {
+        // Skip ".", "..", "widget.ts", and "system" directories
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
+            strcmp(entry->d_name, "widget.ts") != 0)
+        {
+            if (GUI_STRINGS_EQUAL(entry->d_name, "system"))
+            {
+                continue; // Skip the "system" directory
+            }
+            // Construct path to subdirectory
+            char path2[100];
+            sprintf(path2, "%s/%s", dirPath, entry->d_name);
+            gui_fs_dir *dirr = 0;
+            // Open subdirectory
+            if ((dirr = gui_fs_opendir(path2)) == NULL)
+            {
+                gui_log("gui_fs_opendir(%s) failed", path2);
+                gui_free(dirPath);
+                return index; // Exit if subdirectory cannot be opened
+            }
+            struct gui_fs_dirent *entryy;
+            // Iterate through subdirectory entries
+            while ((entryy = gui_fs_readdir(dirr)) != NULL)
+            {
+                // Check for files with ".xml" extension
+                if (strstr(entryy->d_name, ".xml") != NULL)
+                {
+                    // Construct full path to XML file
+                    char path[100];
+                    sprintf(path, "%s/%s", path2, entryy->d_name);
+                    // Store path in array if within size limit
+                    if (index < XML_ARRAY_SIZE)
+                    {
+                        gui_log("rvd_xml_array %d:%s\n", index, path);
+                        rvd_xml_array[index++] = gui_strdup(path); // Duplicate and store path
+                    }
+                    else
+                    {
+                        gui_log("More than XML_ARRAY_SIZE\n"); // Log if array is full
+                    }
+                }
+            }
+            gui_fs_closedir(dirr); // Close subdirectory
+        }
+    }
+    gui_fs_closedir(dir); // Close base directory
+    gui_free(dirPath);
+    return index; // Return number of XML files found
+}
+char **rvd_get_xml_array()
+{
+    return rvd_xml_array;
+}
+void rvd_free_xml_array()
+{
+    for (size_t i = 0; i < XML_ARRAY_SIZE; i++)
+    {
+        if (rvd_get_xml_array()[i])
+        {
+            gui_free(rvd_get_xml_array()[i]);
+            rvd_get_xml_array()[i] = 0;
+        }
+    }
+}
+int rvd_startup_app(int app_index)
+{
+    // Scan for XML files to populate rvd_xml_array
+    int app_count = rvd_scan_xml_files();
+    // Check if no XML files were found
+    if (app_count <= 0)
+    {
+        gui_log("rvd_startup_app failed, no app");
+        return RVD_ERROR_NO_APP; // Return error if no apps available
+    }
+    // Check if app_index is out of range
+    if (app_index >= app_count)
+    {
+        return RVD_ERROR_INDEX_INVALID; // Return error if index is invalid
+    }
+    // Get application structure for XML-based app
+    gui_app_t *app = get_app_xml();
+    app->xml = rvd_get_xml_array()[app_index]; // Set app's XML file path
+    // Switch to or start the application
+    if (gui_current_app())
+    {
+        gui_app_switch(gui_current_app(), app); // Switch to new app if one is running
+    }
+    else
+    {
+        gui_app_startup(app); // Start new app if none is running
+    }
+    return 0;
 }
 void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
 {
@@ -178,25 +277,19 @@ void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
                     extern void get_app(gui_app_t *app, char **pic, char **text);
                     extern void get_app_by_file(char *xml, char *pic, char *text);
                     char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
-
                     gui_log("debug line%d\n", __LINE__);
                     get_app_by_file(path, (char *)&pic, (char *)&text); gui_log("get:%s,%s\n", pic, text);
                     if (strcmp(text, "launcher") == 0)
                     {
                         extern void get_screen_size(char *xml, int *widgt, int *hight);
                         get_screen_size(path, width, hight);
-
                         return;
                     }
-
 //                    button->text->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
                 }
-
             }
             gui_fs_closedir(dirr);
         }
-
-
     }
     gui_fs_closedir(dir);
 }
@@ -204,8 +297,6 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");
     //gui_font_stb_init(gui_get_file_address("app/system/resource/font/malgunbd.ttf"));
-
-
     g = gui_grid_create(&app->screen, 100, 100, 3, 4, 100, 100);
     char *apppath = "app";
     char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);

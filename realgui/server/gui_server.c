@@ -55,10 +55,7 @@ static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool 
  */
 static void gui_server_entry(void *parameter)
 {
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    extern void js_init(void);
-    js_init();
-#endif
+
     gui_server_msg_init();
     while (1)
     {
@@ -268,7 +265,11 @@ int gui_server_init(void)
     gui_log("GUI commit Version: %s\n", VERSION_COMMIT);
     gui_log("GUI build Date: %s\n", VERSION_BUILD_DATE);
     gui_log("GUI repo Status: %s\n", VERSION_REPO_STATUS);
-
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+    gui_log("ENABLE RVD \n");
+    extern void js_init(void);
+    js_init();
+#endif
     gui_thread_create(GUI_SERVER_THREAD_NAME,
                       gui_server_entry, NULL,
                       1024 * 10,

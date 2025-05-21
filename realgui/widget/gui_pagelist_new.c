@@ -21,7 +21,6 @@
 #include <string.h>
 #include "gui_obj.h"
 #include "gui_pagelist_new.h"
-#include "gui_button.h"
 
 
 /*============================================================================*
@@ -54,8 +53,8 @@ static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
     {
         if (!(obj != ((void *)0)))
         {
-            gui_assert_handler("obj != NULL", __FUNCTION__, 53);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)obj)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 53);
@@ -67,8 +66,8 @@ static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
     {
         if (!(t != ((void *)0)))
         {
-            gui_assert_handler("t != NULL", __FUNCTION__, 53);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)t)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(t)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 53);
@@ -80,8 +79,19 @@ static void render(int index, gui_obj_t *obj, gui_pagelist_new_t *pl)
     if (pl->click_function_array && pl->click_function_array[index])
     {
         obj->event_dsc->event_cb = pl->click_function_array[index];
-        obj->event_dsc->user_data = (void *)(size_t)index;
+
+        if (pl->click_param)
+        {
+            obj->event_dsc->user_data =  pl->click_param[index];
+        }
+        else
+        {
+            obj->event_dsc->user_data = (void *)(size_t)index;
+        }
+
+
     }
+
 
 
 
@@ -91,13 +101,16 @@ static void win_press(void *obj, gui_event_t e, void *param)
     // GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
     //                            MACRO_PAGE_LIST_NEW)
     {
+        if (!(obj != ((void *)0)))
+        {
+            return;
+        }
         {
             if (!(((gui_pagelist_new_t *)
                    ((gui_obj_t *)obj)->parent->parent->parent) != ((void *)0)))
             {
-                gui_assert_handler("((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != NULL",
-                                   __FUNCTION__, 80);
-            };
+                return;
+            }
             if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic ==
                    0x0b)))
             {
@@ -123,10 +136,7 @@ static void win_press(void *obj, gui_event_t e, void *param)
     }
     //GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
     {
-        if (!(obj != ((void *)0)))
-        {
-            gui_assert_handler("obj != NULL", __FUNCTION__, 82);
-        };
+
         if (!((((gui_obj_t *)obj)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 82);
@@ -138,8 +148,8 @@ static void win_press(void *obj, gui_event_t e, void *param)
     {
         if (!(img != ((void *)0)))
         {
-            gui_assert_handler("img != NULL", __FUNCTION__, 82);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)img)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(img)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 82);
@@ -156,12 +166,15 @@ static void win_release(void *obj, gui_event_t e, void *param)
     // GUI_WIDGET_TYPE_TRY_EXCEPT(GUI_TYPE(gui_pagelist_new_t, GUI_BASE(obj)->parent->parent->parent),
     //                            MACRO_PAGE_LIST_NEW)
     {
+        if (!(obj != ((void *)0)))
+        {
+            return;
+        }
         {
             if (!(((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != ((void *)0)))
             {
-                gui_assert_handler("((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent) != NULL",
-                                   __FUNCTION__, 93);
-            };
+                return;
+            }
             if (!((((gui_obj_t *)((gui_pagelist_new_t *)((gui_obj_t *)obj)->parent->parent->parent))->magic ==
                    0x0b)))
             {
@@ -187,10 +200,7 @@ static void win_release(void *obj, gui_event_t e, void *param)
     }
     //GUI_WIDGET_POINTER_BY_TYPE(img, IMAGE_FROM_MEM, obj)
     {
-        if (!(obj != ((void *)0)))
-        {
-            gui_assert_handler("obj != NULL", __FUNCTION__, 95);
-        };
+
         if (!((((gui_obj_t *)obj)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 95);
@@ -202,8 +212,8 @@ static void win_release(void *obj, gui_event_t e, void *param)
     {
         if (!(img != ((void *)0)))
         {
-            gui_assert_handler("img != NULL", __FUNCTION__, 95);
-        };
+            return;
+        }
         if (!((((gui_obj_t *)img)->magic == 0x0b)))
         {
             gui_assert_handler("(GUI_BASE(img)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 95);
@@ -370,9 +380,10 @@ static void if_not_pl_wheel_take_over(int gap,
         }
     }
 
-    if (pl->touch_y < -gap * (time_array_size) + (int)gui_get_screen_height())
+    if (pl->touch_y < -gap * (time_array_size) + (int)pl->base.h)
     {
-        pl->touch_y = -gap * (time_array_size) + (int)gui_get_screen_height();
+        pl->touch_y = -gap * (time_array_size) + (int)pl->base.h;
+        //gui_log("touch_y:%d\n",pl->touch_y);
     }
     if (pl->render_flag)
     {
@@ -486,7 +497,7 @@ static void if_not_pl_wheel_take_over(int gap,
                 }
                 gui_obj_t *output = 0;
                 gui_obj_tree_get_widget_by_type_and_index((void *)timer1, WINDOW, &output, i);
-                //gui_log("type_and_index:%d, %x,%x\n", timer1, output, i);
+                //gui_log("type_and_index:%d, %x,%x,%d,\n", timer1, output, i, index);
                 render(index, output, pl);
             }
         }
@@ -1005,6 +1016,7 @@ static void ctor(gui_pagelist_new_t *this, void       *parent,
         GUI_BASE(this)->h = w;
     }
     this->text_mode = MID_CENTER;
+    this->selected_id = UINT16_MAX;
 }
 
 
@@ -1070,7 +1082,7 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
         }
         pagelist_new->append = false;
         pagelist_new->item_count = item_count;
-        pagelist_new->click_function_array = item_click_function_array;
+        pagelist_new->click_function_array = (void *)item_click_function_array;
         pagelist_new->item_text_array = item_text_array;
     }
     gui_win_t *win = gui_win_create(pagelist_new, 0, 0, 0, GUI_BASE(pagelist_new)->w,
@@ -1215,4 +1227,25 @@ void gui_page_list_new_erase(gui_pagelist_new_t *pagelist_new, int id)
                                  (void *)item_text_array);
     }
     pagelist_new->append = true;
+}
+
+void gui_page_list_new_set_selected(gui_pagelist_new_t *pagelist_new, int id)
+{
+    pagelist_new->selected_id = id;
+}
+void gui_page_list_new_win_press(void *obj, gui_event_t e, void *param)
+{
+    win_press(obj, e, param);
+}
+void gui_page_list_new_win_release(void *obj, gui_event_t e, void *param)
+{
+    win_release(obj, e, param);
+}
+void gui_page_list_new_override(void *p, void *this_widget, gui_animate_t *animate)
+{
+    override(p, this_widget, animate);
+}
+void gui_page_list_new_override_horizontal(void *p, void *this_widget, gui_animate_t *animate)
+{
+    override_horizontal(p, this_widget, animate);
 }

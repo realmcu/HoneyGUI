@@ -404,6 +404,11 @@ void gui_obj_tree_print_mmd(gui_obj_t *obj)
 
 void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
 {
+    if (!name)
+    {
+        return;
+    }
+
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &object->child_list)

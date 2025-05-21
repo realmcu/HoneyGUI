@@ -18,7 +18,8 @@
 #include "unistd.h"
 #include "time.h"
 #include "gui_components_init.h"
-
+#include "rvd.h"
+#define RVD_APP_STARTUP
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
 #define PROJECT_NAME                   "HoneyGUI Simulator"
@@ -34,7 +35,19 @@ int main(int argc, char **argv)
 
     gui_change_default_path(argc, argv);
     gui_components_init();
+#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+    extern gui_app_t *get_app_launcher_frontend(void);
+    gui_app_install(get_app_launcher_frontend(), get_app_launcher_frontend()->ui_design, NULL);
+#ifdef RVD_APP_STARTUP
+    /*Startup RVD APP (index 0)*/
+    int rst = rvd_startup_app(0);
+    gui_log("RVD_APP_STARTUP:%d\n", rst);
+#else
+    /*Startup RVD launcher*/
 
+    gui_app_startup(get_app_launcher_frontend());
+#endif
+#endif
     while (1)
     {
         time_t now;

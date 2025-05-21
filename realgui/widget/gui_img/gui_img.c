@@ -319,19 +319,20 @@ void gui_img_prepare(gui_obj_t *obj)
     }
 
     draw_img_new_area(this->draw_img, NULL);
-
-    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-    {
-        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
-        {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-        }
-    }
+    bool honeycomb_click = false;
     if (gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
     {
         if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
         {
             gui_obj_enable_event(obj, GUI_EVENT_1);
+            honeycomb_click = true;
+        }
+    }
+    if (!honeycomb_click && gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    {
+        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
         }
     }
     last = this->checksum;
@@ -386,6 +387,12 @@ void gui_img_draw_cb(gui_obj_t *obj)
 
     // release img if cached
     draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+    if (this->load == 0)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_2);
+        this->load = 1;
+    }
+
 
 }
 /**

@@ -3,10 +3,10 @@ cmake_policy(SET CMP0123 NEW)
 
 set(CMAKE_SYSTEM_NAME Generic)
 
-set(ARMCLANG_PATH "C:/Keil_v5/ARM/ArmCompilerforEmbedded6.22/bin")
 
-set(CMAKE_C_COMPILER "${ARMCLANG_PATH}/armclang.exe")
-set(CMAKE_CXX_COMPILER "${ARMCLANG_PATH}/armclang.exe")
+
+set(CMAKE_C_COMPILER armclang)
+set(CMAKE_CXX_COMPILER armclang)
 
 
 set(CMAKE_CXX_STANDARD 11)
