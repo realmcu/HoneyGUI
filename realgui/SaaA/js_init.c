@@ -12,8 +12,8 @@ jerry_value_t ret_value;
 
 static void *context_alloc(size_t size, void *cb_data_p)
 {
-    void *js_buffer = NULL;
-    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
+    void *js_buffer = NULL; gui_log("context_alloc%d", (PKG_JMEM_HEAP_SIZE + 32) * 1024);
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 32) * 1024);
 
     return (void *)js_buffer;
 }
@@ -21,7 +21,7 @@ static void *context_alloc(size_t size, void *cb_data_p)
 // Only for js script loading !
 static void *script_malloc(void)
 {
-#define JS_SCRIPT_BUFF_SIZE (100 * 1024)
+#define JS_SCRIPT_BUFF_SIZE (50 * 1024)
     void *scipt_buff = NULL;
     scipt_buff = gui_lower_malloc(JS_SCRIPT_BUFF_SIZE);
 
@@ -70,8 +70,13 @@ void js_run_file(const char *file, gui_app_t  *app)
         }
         /* Parsed source code must be freed */
         jerry_release_value(parsed_code);
+
+    }
+    if (script)
+    {
         script_free(script);
     }
+
 }
 void js_init(void)
 {

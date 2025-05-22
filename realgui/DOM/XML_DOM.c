@@ -2038,12 +2038,12 @@ static void on_click_jump_cb_tabview(void *obj, gui_event_t e, struct on_click_j
     if (param->to_widget_name)
     {
         GUI_WIDGET_POINTER_BY_NAME(tabview, param->to_widget_name);
-        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2); gui_log("on_click_jump_cb_tabview1");
     }
     else
     {
         GUI_WIDGET_POINTER_BY_TYPE(tabview, TABVIEW, &(gui_current_app()->screen));
-        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2); gui_log("on_click_jump_cb_tabview2");
     }
 
 
@@ -14141,7 +14141,7 @@ static void app_xml_ui_design(gui_app_t *app)
 {
     extern void create_tree(gui_app_t *app);
     create_tree(app);
-    gui_fps_create(app);
+    //gui_fps_create(app);
     gui_fb_change();
 }
 static gui_app_t app_xml =

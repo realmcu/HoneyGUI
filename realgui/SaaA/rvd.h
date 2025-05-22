@@ -60,4 +60,33 @@ void rvd_free_xml_array(void);
  * @return gui_error_t Returns GUI_SUCCESS if the update is successful, or GUI_ERROR_NULL if the ID is out of range.
  */
 gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
+#include "gui_img.h"
+typedef struct
+{
+    int x;
+    int y;
+    int translate_from_x;
+    int translate_from_y;
+    int translate_to_x;
+    int translate_to_y;
+    int rotate_x;
+    int rotate_y;
+    int rotate_from;
+    int rotate_to;
+    float textContent_from;
+    float textContent_to;
+    float scale_x;
+    float scale_y;
+    float scale_x_from;
+    float scale_y_from;
+    int scale_x_center;
+    int scale_y_center;
+    uint8_t opacity;
+    uint8_t opacity_from;
+    void **image_arr;
+    int image_count;
+    char *img_name;
+    char *animate_type;
+    gui_img_t *img;
+} image_animate_params_t;
 #endif /* _RVD_H_ */
