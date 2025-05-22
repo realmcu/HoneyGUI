@@ -68,18 +68,6 @@
     网格 (Grid) <gui_grid>
     进度条 (Progressbar) <gui_progressbar>
     画布 (Canvas) <gui_canvas>
-    立方体 (Cube) <gui_cube>
-    轮形列表 (Wheel List) <gui_wheel_list>
-    透视 (Perspective) <gui_perspective>
-    可缩放矢量图形 (SVG) <gui_svg>
-    监视点渐变 (Watch Gradient Spot) <gui_watch_gradient_spot>
-    表盘渐变 (Watchface Gradient) <gui_watchface_gradient>
-    蜂窝菜单 (Menu Celllar) <gui_menu_cellular>
     返回 (Return) <gui_return>
 	二维码或条形码 (Qbcode) <gui_qbcode>
     多级菜单 (Multi Level) <gui_multi_level>
-    趣戴特效 (LiteGFX) <gui_widget_litegfx>
-    2.5D足球 (2.5D Soccer) <gui_soccer>
-    3D模型 (3D Model) <gui_3D>
-    棱镜模型 (Prism Mirror 3D Model) <gui_prism_mirror3d>
-    视图 (View) <gui_view>

@@ -67,18 +67,6 @@ Widgets
     Grid <gui_grid>
     Progressbar <gui_progressbar>
     Canvas <gui_canvas>
-    Cube <gui_cube>
-    Wheel List <gui_wheel_list>
-    Perspective <gui_perspective>
-    SVG <gui_svg>
-    Watch Gradient Spot <gui_watch_gradient_spot>
-    Watchface Gradient <gui_watchface_gradient>
-    Menu Cellular <gui_menu_cellular>
     Return <gui_return>
 	Qbcode <gui_qbcode>
     Multi Level <gui_multi_level>
-    LiteGFX <gui_widget_litegfx>
-    2.5D Soccer <gui_soccer>
-    3D Model <gui_3D>
-    Prism Mirror 3D Model <gui_prism_mirror3d>
-    View <gui_view>
