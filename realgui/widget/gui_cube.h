@@ -163,81 +163,52 @@ typedef struct gui_cube
  *============================================================================*/
 
 /**
- * @brief get the cube image's blend mode
- *
- * @param cube the cube widget pointer
- * @param cube_side the cube image's side, CUBE_SIDE_ALL is not supported
- * @return the cube image's blend mode
- *
+ * @brief Get the cube image's blend mode.
+ * @param cube The cube widget pointer.
+ * @param cube_side The cube image's side, CUBE_SIDE_ALL is not supported.
+ * @return Return the cube image's blend mode.
  */
 BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE side);
 
 /**
- * @brief set the cube image's blend mode
- *
- * @param cube the cube widget pointer
- * @param cube_side the cube image's side
- * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
- *
+ * @brief Set the cube image's blend mode.
+ * @param cube The cube widget pointer.
+ * @param cube_side The cube image's side.
+ * @param mode The enumeration value of the mode is BLEND_MODE_TYPE.
  */
 void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode);
 
 /**
- * @brief get the cube image's opacity
- *
- * @param cube the cube widget pointer
- * @param cube_side the cube image's side, CUBE_SIDE_ALL is not supported
- * @return the cube image's opacity
- *
+ * @brief Get the cube image's opacity.
+ * @param cube The cube widget pointer.
+ * @param cube_side The cube image's side, CUBE_SIDE_ALL is not supported.
+ * @return Return the cube image's opacity.
  */
 uint8_t gui_cube_get_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side);
 
 /**
- * @brief set the cube image's opacity
- *
- * @param cube the cube widget pointer
- * @param cube_side the cube image's side
- * @param opacity the cube image's opacity
- *
+ * @brief Set the cube image's opacity.
+ * @param cube The cube widget pointer.
+ * @param cube_side The cube image's side.
+ * @param opacity The cube image's opacity.
  */
 void gui_cube_set_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side, uint8_t opacity);
 
 /**
- * @brief set cube image
- *
- * @param cube the cube widget pointer
- * @param img_file the image file data, set flg_fs true when using filesystem
+ * @brief Set cube image.
+ * @param cube The cube widget pointer.
+ * @param img_file The image file data, set flg_fs true when using filesystem.
  */
 void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file);
 
 /**
- * @brief cube create, images can be loaded from filesystem or memory address
- *
- * @param parent parent widget
- * @param name  widget name
- * @param img_file the image file data, set flg_fs true when using filesystem
- * @param x  left
- * @param y top
- * @return gui_cube_t* widget pointer
- * <b>Example usage</b>
- * \code{.c}
- *{
- *    gui_cube_imgfile_t imgfile =
- *    {
- *        .flg_fs = true,
- *        .img_path.img_path_front = "Activity.bin",
- *        .img_path.img_path_back = "Weather.bin",
- *        .img_path.img_path_up = "HeartRate.bin",
- *        .img_path.img_path_down = "Clockn.bin",
- *        .img_path.img_path_left = "Music.bin",
- *        .img_path.img_path_right = "QuickCard.bin"
- *    };
- *
- *    gui_cube_t *cube4 = gui_cube_create(parent, "cube", &imgfile, 0, 0);
- *    gui_cube_set_size(cube4, 100);
- *    gui_cube_set_center(cube4, 200, 200);
- *}
- * \endcode
+ * @brief Create a cube widget, images can be loaded from filesystem or memory address.
+ * @param parent Parent widget.
+ * @param name Widget name.
+ * @param img_file The image file data, set flg_fs true when using filesystem.
+ * @param x Left.
+ * @param y Top.
+ * @return Return the cube widget pointer.
  */
 gui_cube_t *gui_cube_create(void               *parent,
                             const char         *name,
@@ -246,54 +217,48 @@ gui_cube_t *gui_cube_create(void               *parent,
                             int16_t             y);
 
 /**
- * @brief set center
- *
- * @param _this widget pointer
- * @param c_x center x
- * @param c_y center y
+ * @brief Set the center of the cube.
+ * @param _this Widget pointer.
+ * @param c_x Center X.
+ * @param c_y Center Y.
  */
 void gui_cube_set_center(gui_cube_t *_this, float c_x, float c_y);
 
 /**
- * @brief set size
- *
- * @param _this widget pointer
- * @param size scale size
+ * @brief Set the size of the cube.
+ * @param _this Widget pointer.
+ * @param size Scale size.
  */
 void gui_cube_set_size(gui_cube_t *_this, float size);
 
 /**
- * @brief set click cb
- *
- * @param _this widget pointer
- * @param cb_list click cb list
+ * @brief Add click callback for the cube.
+ * @param _this Widget pointer.
+ * @param cb_list Click callback list.
  */
 void gui_cube_add_click_cb(gui_cube_t *_this, gui_cube_cb_t cb_list);
 
 /**
- * @brief
- *
- * @param _this widget pointer
- * @param internal_ms rotation interval
- * @param degree angle per rotation
+ * @brief Enable automatic rotation of the cube along the X-axis.
+ * @param _this Widget pointer.
+ * @param internal_ms Rotation interval.
+ * @param degree Angle per rotation.
  */
 void gui_cube_auto_rotation_by_x(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /**
- * @brief
- *
- * @param _this widget pointer
- * @param internal_ms rotation interval
- * @param degree angle per rotation
+ * @brief Enable automatic rotation of the cube along the Y-axis.
+ * @param _this Widget pointer.
+ * @param internal_ms Rotation interval.
+ * @param degree Angle per rotation.
  */
 void gui_cube_auto_rotation_by_y(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /**
- * @brief
- *
- * @param _this widget pointer
- * @param internal_ms rotation interval
- * @param degree angle per rotation
+ * @brief Enable automatic rotation of the cube along the Z-axis.
+ * @param _this Widget pointer.
+ * @param internal_ms Rotation interval.
+ * @param degree Angle per rotation.
  */
 void gui_cube_auto_rotation_by_z(gui_cube_t *_this, uint32_t internal_ms, float degree);
 

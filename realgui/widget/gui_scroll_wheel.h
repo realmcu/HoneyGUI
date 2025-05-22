@@ -76,14 +76,14 @@ typedef struct gui_scroll_wheel
  *============================================================================*/
 
 /**
- * @brief Create a scroll_whell.https://drive.google.com/file/d/1VzPxmv5Cjtlzjs7UGs_dBfI7zKDI_nwV/view?usp=sharing
+ * @brief Create a scroll wheel.
  *
- * @param parent the father widget it nested in.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @return return the widget object pointer.
+ * @param parent The father widget it nested in.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @return Return the widget object pointer.
  */
 gui_scroll_wheel_t *gui_scroll_wheel_create(void    *parent,
                                             void    *addr,
@@ -94,18 +94,18 @@ gui_scroll_wheel_t *gui_scroll_wheel_create(void    *parent,
 /**
  * @brief Append a picture in the wheel, images are loaded from memory address.
  *
- * @param this  The pointer of scroll_wheel widget.
+ * @param this The pointer of scroll wheel widget.
  * @param num_pic The picture array memory address.
- * @param num_pic_hl The picture(highlight) array memory address.
+ * @param num_pic_hl The picture (highlight) array memory address.
  */
 void gui_scroll_wheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 
 /**
  * @brief Append a picture in the wheel, images are loaded from filesystem.
  *
- * @param this  The pointer of scroll_wheel widget.
+ * @param this The pointer of scroll wheel widget.
  * @param num_pic The picture filepath.
- * @param num_pic_hl The picture(highlight) filepath.
+ * @param num_pic_hl The picture (highlight) filepath.
  */
 void gui_scroll_wheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 

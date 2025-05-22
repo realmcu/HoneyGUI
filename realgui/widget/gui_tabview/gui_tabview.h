@@ -118,15 +118,15 @@ typedef enum
  *============================================================================*/
 
 /**
- * @brief create a tabview widget, which can nest tabs.
- * @param parent the father widget it nested in.
- * @param filename _this tabview widget's name.
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
- * @return return the widget object pointer.
+ * @brief Creates a tabview widget, which can nest tabs.
  *
+ * @param parent The parent widget it is nested in.
+ * @param filename The tabview widget's name.
+ * @param x The X-axis coordinate relative to the parent widget.
+ * @param y The Y-axis coordinate relative to the parent widget.
+ * @param w Width.
+ * @param h Height.
+ * @return The widget object pointer.
  */
 gui_tabview_t *gui_tabview_create(void       *parent,
                                   const char *name,
@@ -136,60 +136,60 @@ gui_tabview_t *gui_tabview_create(void       *parent,
                                   int16_t     h);
 
 /**
- * @brief jump to a specify tab
+ * @brief Jumps to a specified tab.
  *
- * @param parent_tabview tabview pointer
- * @param idx Horizontal index value
- * @param idy Vertical index value
+ * @param parent_tabview Tabview pointer.
+ * @param idx Horizontal index value.
+ * @param idy Vertical index value.
  */
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy);
 
 /**
- * @brief config slide effect
+ * @brief Configures the slide effect.
  *
- * @param _this tabview pointer
- * @param style refer to T_SLIDE_STYLE
+ * @param _this Tabview pointer.
+ * @param style Refer to T_SLIDE_STYLE.
  */
 void gui_tabview_set_style(gui_tabview_t *_this, T_SLIDE_STYLE style);
 
 /**
- * @brief Config tabview loop_x sliding feature. The default setting is no looping.
+ * @brief Configures the tabview loop_x sliding feature.
  *
- * @param tabview tabview pointer.
+ * @param tabview Tabview pointer.
  * @param loop Loops when set to true, does not loop when set to false.
  */
 void gui_tabview_loop_x(gui_tabview_t *tabview, bool loop);
 
 /**
- * @brief Config tabview loop_y sliding feature. The default setting is no looping.
+ * @brief Configures the tabview loop_y sliding feature.
  *
- * @param tabview tabview pointer.
+ * @param tabview Tabview pointer.
  * @param loop Loops when set to true, does not loop when set to false.
  */
 void gui_tabview_loop_y(gui_tabview_t *tabview, bool loop);
 
 /**
- * @brief disable tp action for _this tabview.
+ * @brief Disables touchpad action for the tabview.
  *
- * @param tabview tabview pointer.
- * @param disable_tp true: disable tp action,  false: enable tp action.
+ * @param tabview Tabview pointer.
+ * @param disable_tp True to disable touchpad action, false to enable it.
  */
 void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp);
 
 /**
- * @brief enable tab widget cache
+ * @brief Enables or disables tab widget cache.
  *
- * @param _this tabview pointer.
- * @param enable true: enable tab widget cache,  false: disable tab widget cache.
+ * @param _this Tabview pointer.
+ * @param enable True to enable tab widget cache, false to disable it.
  */
 void gui_tabview_enable_pre_load(gui_tabview_t *_this, bool enable);
 
 /**
- * @brief Register callback for tab change.
+ * @brief Registers a callback for tab change.
  *
- * @param tabview tabview pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param tabview Tabview pointer.
+ * @param callback Callback function.
+ * @param parameter Callback parameter.
  */
 void gui_tabview_tab_change(gui_tabview_t *tabview, void *callback, void *parameter);
 

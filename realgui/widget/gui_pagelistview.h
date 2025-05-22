@@ -69,7 +69,7 @@ typedef struct gui_pagelistview
  *============================================================================*/
 
 /**
- * @brief
+ * @brief Create a pagelistview widget.
  *
  * @param parent parent of this widget
  * @param name name of this widget
@@ -87,7 +87,7 @@ gui_pagelistview_t *gui_pagelistview_create(void       *parent,
                                             int16_t     h);
 
 /**
- * @brief
+ * @brief Add a top mask to the pagelistview.
  *
  * @param this pagelistview
  * @param mask_bottom top mask pickture, should be created by app
@@ -96,7 +96,7 @@ gui_pagelistview_t *gui_pagelistview_create(void       *parent,
 void gui_pagelistview_add_top_mask(gui_pagelistview_t *this, gui_img_t *mask_top);
 
 /**
- * @brief
+ * @brief Add a bottom mask to the pagelistview.
  *
  * @param this pagelistview
  * @param mask_bottom bottom mask pickture, should be created by app

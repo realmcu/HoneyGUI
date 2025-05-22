@@ -77,14 +77,14 @@ extern void nvgDeleteAGGE(NVGcontext *ctx);
  *============================================================================*/
 
 /**
-  * @brief  create a watch widget
-  * @param  parent  parent widget
-  * @param  name    widget name
-  * @param  x       left
-  * @param  y       top
-  * @param  w       width
-  * @param  h       high
-  * @return         gui_watch_gradient_spot_t* widget pointer
+  * @brief  Create a watch widget.
+  * @param  parent  Parent widget.
+  * @param  name    Widget name.
+  * @param  x       Left.
+  * @param  y       Top.
+  * @param  w       Width.
+  * @param  h       High.
+  * @return         gui_watch_gradient_spot_t* Widget pointer.
   *
   * <b>Example usage</b>
   * \code{.c}
@@ -104,11 +104,11 @@ gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void       *parent,
                                                           int16_t     h);
 
 /**
-  * @brief  set watch center
-  * @param  this  gui_watch_gradient_spot_t widget
-  * @param  c_x   left
-  * @param  c_y   top
-  * @return       void
+  * @brief  Set watch center.
+  * @param  this  gui_watch_gradient_spot_t Widget.
+  * @param  c_x   Left.
+  * @param  c_y   Top.
+  * @return       void.
   *
   * <b>Example usage</b>
   * \code{.c}

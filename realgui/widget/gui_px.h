@@ -74,7 +74,7 @@ typedef struct gui_px
  *============================================================================*/
 
 /**
- * @brief
+ * @brief Creates a GUI PX object.
  *
  * @param parent
  * @param name

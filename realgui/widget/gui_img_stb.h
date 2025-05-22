@@ -97,14 +97,14 @@ typedef struct
  *============================================================================*/
 
 /**
- * @brief set stb image widget attribute
+ * @brief Set stb image widget attribute.
  *
- * @param this stb image widget
- * @param addr image address
- * @param size image file size by Byte
- * @param type image type
- * @param x X-axis coordinate
- * @param y Y-axis coordinate
+ * @param this stb image widget.
+ * @param addr Image address.
+ * @param size Image file size by Byte.
+ * @param type Image type.
+ * @param x X-axis coordinate.
+ * @param y Y-axis coordinate.
  */
 void gui_img_stb_set_attribute(gui_stb_img_t  *this,
                                void           *addr,
@@ -113,14 +113,14 @@ void gui_img_stb_set_attribute(gui_stb_img_t  *this,
                                int16_t         x,
                                int16_t         y);
 /**
- * @brief set stb image widget attribute without free rgb data
+ * @brief Set stb image widget attribute without free rgb data.
  *
- * @param this stb image widget
- * @param addr image address
- * @param size image file size by Byte
- * @param type image type
- * @param x X-axis coordinate
- * @param y Y-axis coordinate
+ * @param this stb image widget.
+ * @param addr Image address.
+ * @param size Image file size by Byte.
+ * @param type Image type.
+ * @param x X-axis coordinate.
+ * @param y Y-axis coordinate.
  */
 void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
                                       void           *addr,
@@ -129,17 +129,17 @@ void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
                                       int16_t         x,
                                       int16_t         y);
 /**
- * @brief Creat a image widget with buffer.
- * @note This widget is use to display image which needs to decode.
- * @note The data of image can be static char or data transformed by BLE.
- * @param parent The father widget which the scroll text nested in.
+ * @brief Create an image widget with buffer.
+ * @note This widget is used to display an image that needs decoding.
+ * @note The data of the image can be static char or data transformed by BLE.
+ * @param parent The parent widget in which the scroll text is nested.
  * @param name The widget's name.
- * @param addr The data address of image.
- * @param size The data size of image.The unit is bytes.
- * @param input_type The input type of image. bmp 11, jpeg 12, png 13,
- * @param output_type The output type of image. RGB565 RGB888,
+ * @param addr The data address of the image.
+ * @param size The data size of the image. The unit is bytes.
+ * @param input_type The input type of the image. bmp 11, jpeg 12, png 13.
+ * @param output_type The output type of the image. RGB565 RGB888.
  * @param x The X-axis coordinate of the text box.
- * @param x The Y-axis coordinate of the text box.
+ * @param y The Y-axis coordinate of the text box.
  * @return gui_stb_img_t*
  */
 gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
@@ -152,10 +152,10 @@ gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
                                            int16_t         y);
 
 /**
- * @brief set output_format
- * @note RGB565 or RGB888
- * @param this stb image widget
- * @param output output format
+ * @brief Set output format.
+ * @note RGB565 or RGB888.
+ * @param this stb image widget.
+ * @param output Output format.
  */
 void gui_img_stb_set_output_format(gui_stb_img_t  *this, GUI_FormatType output);
 

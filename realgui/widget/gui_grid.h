@@ -90,38 +90,15 @@ typedef struct gui_grid
  *============================================================================*/
 
 /**
- * @brief create a grid widget.
- * @param parent the father widget the grid nested in.
- * @param x the X-axis coordinate.
- * @param y the Y-axis coordinate.
- * @param row Rows number.
- * @param col Columns number.
- * @param gap_col gap between two Columns.
- * @param gap_row gap between two Rows.
- * @return return the widget object pointer.
- * <b>Example usage</b>
- * \code{.c}
- * {
- *   void *array[] = {
- *       DOG40_BIN,
- *       DOG60_BIN,
- *       DOG80_BIN,
- *       DOG100_BIN,
- *       DOG120_BIN,
- *       DOG140_BIN,
- *       DOG160_BIN,
- *       DOG180_BIN,
- *       DOG200_BIN,
- *       DOG220_BIN,
- *       DOG240_BIN,};
- *   gui_grid_t *grid = gui_grid_create(&(app->screen), 100, 200, 7
- *                                      , 2, 30, 30);
- *   for (size_t i = 0; i < 6; i++)
- *   {
- *       gui_img_creat_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
- *   }
- * }
- * \endcode
+ * @brief Create a grid widget.
+ * @param parent The father widget the grid is nested in.
+ * @param x The X-axis coordinate.
+ * @param y The Y-axis coordinate.
+ * @param row Number of rows.
+ * @param col Number of columns.
+ * @param gap_col Gap between two columns.
+ * @param gap_row Gap between two rows.
+ * @return Return the grid widget pointer.
  */
 gui_grid_t *gui_grid_create(void     *parent,
                             int16_t   x,
@@ -132,34 +109,9 @@ gui_grid_t *gui_grid_create(void     *parent,
                             uint16_t  gap_row);
 
 /**
- * @brief config grid style.
- *
- * @param grid grid wodget pointer.
- * @param style GRID_CLASSIC, GRID_SCALE.
- * <b>Example usage</b>
- * \code{.c}
- * {
- *   void *array[] = {
- *       DOG40_BIN,
- *       DOG60_BIN,
- *       DOG80_BIN,
- *       DOG100_BIN,
- *       DOG120_BIN,
- *       DOG140_BIN,
- *       DOG160_BIN,
- *       DOG180_BIN,
- *       DOG200_BIN,
- *       DOG220_BIN,
- *       DOG240_BIN,};
- *   gui_grid_t *grid = gui_grid_create(&(app->screen), 100, 200, 7
- *                                      , 2, 30, 30);
- *   gui_grid_style(grid, GRID_SCALE);
- *   for (size_t i = 0; i < 6; i++)
- *   {
- *       gui_img_creat_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
- *   }
- * }
- * \endcode
+ * @brief Configure the grid style.
+ * @param grid The grid widget pointer.
+ * @param style The grid style (GRID_CLASSIC or GRID_SCALE).
  */
 void gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style);
 

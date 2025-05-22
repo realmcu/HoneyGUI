@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_page.h
-  * @brief page widget
-  * @details page widget
+  * @brief Page widget.
+  * @details Page widget.
   * @author howie_wang@realsil.com.cn
   * @date 2023/11/07
   * @version 1.0
@@ -96,31 +96,31 @@ typedef enum
  *============================================================================*/
 
 /**
- * @brief update the page widget.
+ * @brief Update the page widget.
  *
- * @param obj widget pointer.
+ * @param obj Widget pointer.
  *
  */
 void gui_page_update(gui_obj_t *obj);
 
 /**
- * @brief destroy the page widget.
+ * @brief Destroy the page widget.
  *
- * @param obj widget pointer.
+ * @param obj Widget pointer.
  *
  */
 void gui_page_destroy(gui_obj_t *obj);
 
 /**
- * @brief construct a page widget.
+ * @brief Construct a page widget.
  *
- * @param this widget pointer.
- * @param parent the father widget the page nested in.
- * @param filename the page widget name.
- * @param x the X-axis coordinate.
- * @param x the Y-axis coordinate.
- * @param w the width.
- * @param h the hight.
+ * @param this Widget pointer.
+ * @param parent The father widget the page nested in.
+ * @param filename The page widget name.
+ * @param x The X-axis coordinate.
+ * @param x The Y-axis coordinate.
+ * @param w The width.
+ * @param h The height.
  *
  */
 void gui_page_ctor(gui_page_t *,
@@ -132,15 +132,15 @@ void gui_page_ctor(gui_page_t *,
                    int16_t     h);
 
 /**
- * @brief create a page widget.
+ * @brief Create a page widget.
  *
- * @param parent the father widget the page nested in.
- * @param filename the page widget name.
- * @param x the X-axis coordinate.
- * @param x the Y-axis coordinate.
- * @param w the width.
- * @param h the hight.
- * @return return the widget object pointer
+ * @param parent The father widget the page nested in.
+ * @param filename The page widget name.
+ * @param x The X-axis coordinate.
+ * @param x The Y-axis coordinate.
+ * @param w The width.
+ * @param h The height.
+ * @return Return the widget object pointer.
  *
  * <b>Example usage</b>
  * \code{.c}
@@ -157,15 +157,15 @@ gui_page_t *gui_page_create(void       *parent,
                             int16_t     w,
                             int16_t     h);
 /**
- * @brief create a page widget horizontal.
+ * @brief Create a page widget horizontal.
  *
- * @param parent the father widget the page nested in.
- * @param filename the page widget name.
- * @param x the X-axis coordinate.
- * @param x the Y-axis coordinate.
- * @param w the width.
- * @param h the hight.
- * @return return the widget object pointer
+ * @param parent The father widget the page nested in.
+ * @param filename The page widget name.
+ * @param x The X-axis coordinate.
+ * @param x The Y-axis coordinate.
+ * @param w The width.
+ * @param h The height.
+ * @return Return the widget object pointer.
  *
  * \endcode
  */
@@ -177,38 +177,38 @@ gui_page_t *gui_page_create_horizontal(void       *parent,
                                        int16_t     h);
 
 /**
- * @brief
+ * @brief Add a scroll bar to the page widget.
  *
- * @param this widget object pointer
- * @param bar_pic bar picture address
- * @param src_mode image source mode, 0 memory and 1 file system
+ * @param this Widget object pointer.
+ * @param bar_pic Bar picture address.
+ * @param src_mode Image source mode, 0 memory and 1 file system.
  */
 void gui_page_add_scroll_bar(gui_page_t *, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode);
 
 /**
- * @brief
+ * @brief Set the page offset.
  *
- * @param this widget object pointer
- * @param offset page offset
+ * @param this Widget object pointer.
+ * @param offset Page offset.
  */
 void gui_page_set_offset(gui_page_t *, int offset);
 
 /**
- * @brief
+ * @brief Get the page offset.
  *
- * @param  this widget object pointer
- * @return page offset
+ * @param this Widget object pointer.
+ * @return Page offset.
  */
 int gui_page_get_offset(gui_page_t *);
 
 /**
- * @brief
+ * @brief Set animation for the page widget.
  *
- * @param o widget object pointer
- * @param dur Animation duration
- * @param repeat_count Repeat play times, -1 means play on repeat forever
- * @param callback animate frame callback
- * @param p parameter
+ * @param o Widget object pointer.
+ * @param dur Animation duration.
+ * @param repeat_count Repeat play times, -1 means play on repeat forever.
+ * @param callback Animate frame callback.
+ * @param p Parameter.
  */
 void gui_page_set_animate(gui_page_t *,
                           uint32_t    dur,
@@ -217,32 +217,32 @@ void gui_page_set_animate(gui_page_t *,
                           void       *p);
 
 /**
- * @brief config rebound
+ * @brief Configure rebound for the page widget.
  *
- * @param this widget object pointer
- * @param rebound true: config rebound; false: not rebound;
+ * @param this Widget object pointer.
+ * @param rebound True: configure rebound; false: not rebound.
  */
 void gui_page_rebound(gui_page_t *, bool rebound);
 /**
- * @brief config rebound
+ * @brief Configure horizontal rebound for the page widget.
  *
- * @param this widget object pointer
- * @param rebound true: config rebound; false: not rebound;
+ * @param this Widget object pointer.
+ * @param rebound True: configure rebound; false: not rebound.
  */
 void gui_page_rebound_horizontal(gui_page_t *, bool rebound);
 /**
- * @brief automatic center alignment
+ * @brief Perform automatic center alignment for the page widget.
  *
- * @param page widget pointer
- * @param align_height page center aligned height
+ * @param page Widget pointer.
+ * @param align_height Page center aligned height.
  */
 void gui_page_center_alignment(gui_page_t *page, int align_height);
 
 /**
- * @brief set only top slide flag
+ * @brief Set the only top slide flag for the page widget.
  *
- * @param page widget pointer
- * @param flag true:only top slide; false:all slide
+ * @param page Widget pointer.
+ * @param flag True: only top slide; false: all slide.
  */
 void gui_page_set_only_top_slide(gui_page_t *page, bool flag);
 

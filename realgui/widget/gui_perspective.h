@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_perspective.h
-  * @brief perspective widget
-  * @details create 3D widget
+  * @brief Perspective widget.
+  * @details Create 3D widget.
   * @author howie_wang@realsil.com.cn
   * @date 2023/10/20
   * @version 1.0
@@ -44,25 +44,25 @@ extern "C" {
 /* perspective imgfile structure start*/
 typedef struct
 {
-    IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< flag: indicate file src
+    IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< Flag: indicate file src.
     union
     {
-        char *img_path[6];               //!< images file path
-        void *data_addr[6];              //!< images memory address
+        char *img_path[6];               //!< Images file path.
+        void *data_addr[6];              //!< Images memory address.
     };
 } gui_perspective_imgfile_t;
 /* perspective imgfile structure end*/
 
 typedef struct gui_perspective
 {
-    gui_obj_t base;             //!< base structure
+    gui_obj_t base;             //!< Base structure.
     draw_img_t img[6];
     int ry[6];
     int temp[6];
 
     union
     {
-        void *file_path[6];                         // keep the filepath for partial draw
+        void *file_path[6];                         // Keep the filepath for partial draw.
         void *ftl[6];
     };
     void *data[6];
@@ -81,7 +81,7 @@ typedef struct gui_perspective
  *                         Macros
  *============================================================================*/
 
-#define RAD(d)        (d*3.1415926f/180.0f)     //!< angle to rad
+#define RAD(d)        (d*3.1415926f/180.0f)     //!< Angle to rad.
 
 
 /*============================================================================*
@@ -94,11 +94,11 @@ typedef struct gui_perspective
  *============================================================================*/
 
 /**
- * @brief set the perspective image's blend mode
+ * @brief Set the perspective image's blend mode.
  *
- * @param perspective the perspective widget pointer
- * @param img_index the perspective image's index
- * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
+ * @param perspective The perspective widget pointer.
+ * @param img_index The perspective image's index.
+ * @param mode The enumeration value of the mode is BLEND_MODE_TYPE.
  *
  */
 void gui_perspective_set_mode(gui_perspective_t *perspective,
@@ -106,21 +106,21 @@ void gui_perspective_set_mode(gui_perspective_t *perspective,
                               BLEND_MODE_TYPE    mode);
 
 /**
- * @brief set perspective image
+ * @brief Set perspective image.
  *
- * @param perspective the perspective widget pointer
- * @param img_file the image file data, set flg_fs true when using filesystem
+ * @param perspective The perspective widget pointer.
+ * @param img_file The image file data, set flg_fs true when using filesystem.
  */
 void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file);
 
 /**
-  * @brief  create 3D perspective, images can be loaded from filesystem or memory address
-  * @param  parent parent widget
-  * @param  name  widget name
-  * @param  img_file the image file data, set flg_fs true when using filesystem
-  * @param  x  left
-  * @param  y top
-  * @return gui_perspective_t* widget pointer
+  * @brief Create 3D perspective, images can be loaded from filesystem or memory address.
+  * @param parent Parent widget.
+  * @param name Widget name.
+  * @param img_file The image file data, set flg_fs true when using filesystem.
+  * @param x Left.
+  * @param y Top.
+  * @return gui_perspective_t* Widget pointer.
   *
   *
   * <b>Example usage</b>

@@ -78,7 +78,7 @@ extern void nvgDeleteAGGE(NVGcontext *ctx);
  *============================================================================*/
 
 /**
-  * @brief  create watchface gradient
+  * @brief  Create a watchface gradient widget.
   * @param  parent parent widget
   * @param  name   widget name
   * @param  x      left

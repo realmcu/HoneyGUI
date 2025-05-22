@@ -48,10 +48,10 @@ typedef struct gui_multi_level
 typedef struct __gui_api_gui_multi_level_t
 {
     /**
-     * @brief jump to a specitf multi_level widget.
-     * @param this one of the multi_level widgets in app.
-     * @param level specitf level. 0,1,2...
-     * @param index index in this level. 0,1,2...
+     * @brief Jump to a specific multi_level widget.
+     * @param this One of the multi_level widgets in app.
+     * @param level Specific level. 0,1,2...
+     * @param index Index in this level. 0,1,2...
      *
      */
     void (*jump)(gui_multi_level_t *this, int levle, int index);
@@ -75,29 +75,29 @@ typedef struct __gui_api_gui_multi_level_t
  *============================================================================*/
 
 /**
- * @brief create a multi_level widget.
- * @param parent the father widget nested in.
- * @param widget_name the widget name.
- * @param x the X-axis coordinate.
- * @param y the Y-axis coordinate.
- * @param ui_design ui_design function pointer.
- * @return return the widget object pointer
+ * @brief Create a multi_level widget.
+ * @param parent The father widget nested in.
+ * @param widget_name The widget name.
+ * @param x The X-axis coordinate.
+ * @param y The Y-axis coordinate.
+ * @param ui_design Ui_design function pointer.
+ * @return Return the widget object pointer.
  *
  */
 gui_multi_level_t *gui_multi_level_create(void *parent, const char *widget_name,
                                           void (*ui_design)(gui_obj_t *));
 /**
- * @brief jump to a specific multi_level widget.
- * @param this one of the multi_level widgets in app.
- * @param level specitf level. 0,1,2...
- * @param index index in this level. 0,1,2...
+ * @brief Jump to a specific multi_level widget.
+ * @param this One of the multi_level widgets in app.
+ * @param level Specific level. 0,1,2...
+ * @param index Index in this level. 0,1,2...
  *
  */
 void gui_multi_level_jump(gui_multi_level_t  *this, int level, int index);
 /**
- * @brief get a multi_level widget by group name.
- * @param group_name multi_level widget group name.
- * @return return the widget object pointer.
+ * @brief Get a multi_level widget by group name.
+ * @param group_name Multi_level widget group name.
+ * @return Return the widget object pointer.
  *
  */
 gui_multi_level_t *gui_multi_level_get_group(const char *group_name);

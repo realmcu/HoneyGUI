@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_win.h
-  * @brief Window widget
-  * @details A rectangular container widget which can listen to many gestures
+  * @brief Window widget.
+  * @details A rectangular container widget which can listen to many gestures.
   * @author triton_yu@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0
@@ -36,7 +36,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  window structure */
+/** @brief  Window structure. */
 typedef struct gui_win
 {
     gui_obj_t base;
@@ -74,14 +74,14 @@ typedef struct gui_win
  *============================================================================*/
 
 /**
- * @brief create a window widget.
- * @param parent the father widget the window nested in.
- * @param filename the window widget name.
- * @param x the X-axis coordinate.
- * @param x the Y-axis coordinate.
- * @param w the width.
- * @param h the hight.
- * @return return the widget object pointer
+ * @brief Create a window widget.
+ * @param parent The father widget the window nested in.
+ * @param filename The window widget name.
+ * @param x The X-axis coordinate.
+ * @param x The Y-axis coordinate.
+ * @param w The width.
+ * @param h The height.
+ * @return Return the widget object pointer.
  *
  */
 gui_win_t *gui_win_create(void       *parent,
@@ -92,13 +92,13 @@ gui_win_t *gui_win_create(void       *parent,
                           int16_t     h);
 
 /**
- * @brief set animate.
+ * @brief Set animate.
  *
- * @param _this widget object pointer.
- * @param dur animation duration.
- * @param repeat_count repeat play times, -1 means play on repeat forever.
- * @param callback animate frame callback.
- * @param p parameter.
+ * @param _this Widget object pointer.
+ * @param dur Animation duration.
+ * @param repeat_count Repeat play times, -1 means play on repeat forever.
+ * @param callback Animate frame callback.
+ * @param p Parameter.
  */
 void gui_win_set_animate(gui_win_t *_this,
                          uint32_t   dur,
@@ -107,162 +107,162 @@ void gui_win_set_animate(gui_win_t *_this,
                          void      *p);
 
 /**
- * @brief register a callback function for the left slide event of the win widget.
+ * @brief Register a callback function for the left slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_left(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the right slide event of the win widget.
+ * @brief Register a callback function for the right slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_right(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the up slide event of the win widget.
+ * @brief Register a callback function for the up slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_up(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the down slide event of the win widget.
+ * @brief Register a callback function for the down slide event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_down(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for the press event of the win widget.
+ * @brief Register a callback function for the press event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_press(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
- * @brief register a callback function for the release event of the win widget.
+ * @brief Register a callback function for the release event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func (void *obj, gui_event_t e, void *param).
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func (void *obj, gui_event_t e, void *param).
+ * @param parameter Callback parameter.
  */
 void gui_win_release(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
- * @brief register a callback function for a long press event of the win widget.
+ * @brief Register a callback function for a long press event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func.
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func.
+ * @param parameter Callback parameter.
  */
 void gui_win_long(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief register a callback function for a click event of the win widget.
+ * @brief Register a callback function for a click event of the win widget.
  *
- * @param _this win pointer.
- * @param callback callback func (void *obj, gui_event_t e, void *param).
- * @param parameter callback parameter.
+ * @param _this Win pointer.
+ * @param callback Callback func (void *obj, gui_event_t e, void *param).
+ * @param parameter Callback parameter.
  */
 void gui_win_click(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
- * @brief set the hold_tp state.
+ * @brief Set the hold_tp state.
  *
- * @param _this win pointer.
- * @param hold_tp a boolean value to set the state to true or false.
+ * @param _this Win pointer.
+ * @param hold_tp A boolean value to set the state to true or false.
  */
 void gui_win_hold_tp(gui_win_t *_this, bool hold_tp);
 
 /**
- * @brief get the animation progress percentage.
+ * @brief Get the animation progress percentage.
  *
- * @param win pointer to the window structure that contains the animation.
- * @return the current animation progress percentage.
+ * @param win Pointer to the window structure that contains the animation.
+ * @return The current animation progress percentage.
  */
 float gui_win_get_animation_progress_percent(gui_win_t *win);
 
 /**
- * @brief set the scale rate for the window both horizontally and vertically.
+ * @brief Set the scale rate for the window both horizontally and vertically.
  *
- * @param win pointer to the window structure.
- * @param scale_rate_horizontal the horizontal scale rate.
- * @param scale_rate_vertical the vertical scale rate.
+ * @param win Pointer to the window structure.
+ * @param scale_rate_horizontal The horizontal scale rate.
+ * @param scale_rate_vertical The vertical scale rate.
  */
 void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical);
 
 /**
- * @brief enable or disable the scope for the window.
+ * @brief Enable or disable the scope for the window.
  *
- * @param win pointer to the window structure.
- * @param enable a boolean value to enable or disable the scope.
+ * @param win Pointer to the window structure.
+ * @param enable A boolean value to enable or disable the scope.
  */
 void gui_win_set_scope(gui_win_t *win, bool enable);
 
 /**
- * @brief set the opacity value for the window.
+ * @brief Set the opacity value for the window.
  *
- * @param win pointer to the window structure.
- * @param opacity_value the desired opacity value to set.
+ * @param win Pointer to the window structure.
+ * @param opacity_value The desired opacity value to set.
  */
 void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value);
 
 /**
- * @brief check if the animation is at its end frame.
+ * @brief Check if the animation is at its end frame.
  *
- * @param win pointer to the window structure that contains the animation.
- * @return true if the end_frame is not 0, false otherwise.
+ * @param win Pointer to the window structure that contains the animation.
+ * @return True if the end_frame is not 0, false otherwise.
  */
 bool gui_win_is_animation_end_frame(gui_win_t *win);
 
 /**
- * @brief start the animation by setting the animate field to 1.
+ * @brief Start the animation by setting the animate field to 1.
  *
- * @param win pointer to the window structure that contains the animation.
+ * @param win Pointer to the window structure that contains the animation.
  * If win or win->animate is NULL, the function will log an error message.
  */
 void gui_win_start_animation(gui_win_t *win);
 
 /**
- * @brief stop the animation by setting the animate field to 0.
+ * @brief Stop the animation by setting the animate field to 0.
  *
- * @param win pointer to the window structure that contains the animation.
+ * @param win Pointer to the window structure that contains the animation.
  * If win or win->animate is NULL, the function will log an error message.
  */
 void gui_win_stop_animation(gui_win_t *win);
 
 /**
- * @brief window widget prepare.
+ * @brief Window widget prepare.
  *
- * @param obj pointer.
+ * @param obj Pointer.
  */
 void gui_win_prepare(gui_obj_t *obj);
 
 /**
- * @brief append an animation to a GUI window.
+ * @brief Append an animation to a GUI window.
  *
  * This function appends an animation to the specified GUI window. The animation
  * will run for the specified duration, repeat the specified number of times, and
  * call the provided callback function at each frame.
  *
- * @param win pointer to the GUI window object.
- * @param dur duration of the animation in milliseconds.
- * @param repeat_count number of times the animation should repeat.
- * @param callback function to be called at each frame.
- * @param p user data to be passed to the callback function.
- * @param name aniamte name.
+ * @param win Pointer to the GUI window object.
+ * @param dur Duration of the animation in milliseconds.
+ * @param repeat_count Number of times the animation should repeat.
+ * @param callback Function to be called at each frame.
+ * @param p User data to be passed to the callback function.
+ * @param name Animate name.
  *
  * @note The `callback` function should match the expected signature for animation
  *       callbacks in the GUI library being used. The `p` parameter allows the

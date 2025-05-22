@@ -86,27 +86,27 @@ typedef struct gui_pagelist
  *============================================================================*/
 
 /**
- * @brief increase number of real lists.
+ * @brief Increase the number of real lists.
  *
- * @param this pagelist widget.
- * @param real_list_max number to increase.
+ * @param this Pagelist widget.
+ * @param real_list_max Number to increase.
  */
 void gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max);
 
 /**
- * @brief decrease number of real lists.
+ * @brief Decrease the number of real lists.
  *
- * @param this pagelist widget.
- * @param real_list_max number to decrease.
+ * @param this Pagelist widget.
+ * @param real_list_max Number to decrease.
  */
 void gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list_max);
 
 /**
- * @brief add update callback when pagelist slide up and down to update text typically.
+ * @brief Add update callback when pagelist slides up and down to update text typically.
  *
- * @param this pagelist widget.
- * @param list_first_cb update callback of the top show list.
- * @param list_last_cb update callback of the botoom show list.
+ * @param this Pagelist widget.
+ * @param list_first_cb Update callback of the top show list.
+ * @param list_last_cb Update callback of the bottom show list.
  */
 
 void gui_pagelist_add_list_update_cb(gui_pagelist_t          *this,
@@ -114,14 +114,14 @@ void gui_pagelist_add_list_update_cb(gui_pagelist_t          *this,
                                      gui_pagelist_update_cb_t list_last_cb);
 
 /**
- * @brief set attribute for a pagelist widget.
+ * @brief Set attribute for a pagelist widget.
  *
- * @param this pagelist widget.
- * @param real_list_max real quality of file lists to show. larger than show_list_max typically.
- * @param show_list_max quality of switch widgets, which should be created as child nodes of this pagelist widget.
- * @param list_gap_y y gap between two show lists.
- * @param list_first index of the top show list.
- * @param list_last index of the bottom show list.
+ * @param this Pagelist widget.
+ * @param real_list_max Real quality of file lists to show. Larger than show_list_max typically.
+ * @param show_list_max Quality of switch widgets, which should be created as child nodes of this pagelist widget.
+ * @param list_gap_y Y gap between two show lists.
+ * @param list_first Index of the top show list.
+ * @param list_last Index of the bottom show list.
  */
 void gui_pagelist_set_att(gui_pagelist_t *this,
                           int16_t         real_list_max,
@@ -131,23 +131,23 @@ void gui_pagelist_set_att(gui_pagelist_t *this,
                           gui_switch_t   *list_last);
 
 /**
- * @brief add a scroll bar picture for a pagelist widget, file source is memory address.
+ * @brief Add a scroll bar picture for a pagelist widget, file source is memory address.
  *
- * @param this pagelist widget.
- * @param bar_pic bar picture.
+ * @param this Pagelist widget.
+ * @param bar_pic Bar picture.
  */
 void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic,
                                  IMG_SOURCE_MODE_TYPE src_mode);
 
 /**
- * @brief create a pagelist widget.
+ * @brief Create a pagelist widget.
  *
- * @param parent parent of this widget.
- * @param name name of this widget.
- * @param x x of this widget.
- * @param y y of this widget.
- * @param w w of this widget.
- * @param h h of this widget.
+ * @param parent Parent of this widget.
+ * @param name Name of this widget.
+ * @param x X of this widget.
+ * @param y Y of this widget.
+ * @param w W of this widget.
+ * @param h H of this widget.
  * @return gui_pagelist_t*.
  */
 gui_pagelist_t *gui_pagelist_create(void       *parent,

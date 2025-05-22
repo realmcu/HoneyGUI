@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_keyboard.h
-  * @brief keyboard widget
-  * @details keyboard widget
+  * @brief Keyboard widget.
+  * @details Keyboard widget.
   * @author roy@realsil.com.cn
   * @date 2024/5/20
   * @version 1.0
@@ -42,7 +42,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  image widget structure */
+/** @brief  Image widget structure. */
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
@@ -187,47 +187,47 @@ typedef enum
  *============================================================================*/
 
 /**
- * @brief get input password
+ * @brief Get input password.
  * @note
- * @return password buffer
+ * @return Password buffer.
  */
 char *gui_kb_get_pswd(void);
 
 /**
- * @brief set history password
+ * @brief Set history password.
  * @note
- * @param pswd  history password string
- * @param pswd_len  history password string length
+ * @param pswd  History password string.
+ * @param pswd_len  History password string length.
  */
 void gui_kb_set_pswd(char *pswd, uint8_t pswd_len);
 
 /**
- * @brief launch keyboard input
+ * @brief Launch keyboard input.
  * @note
- * @param obj the widget call
+ * @param obj The widget call.
  */
 void gui_keyboard_launch(gui_obj_t *obj);
 
 /**
- * @brief launch keyboard input from widget event
+ * @brief Launch keyboard input from widget event.
  * @note
- * @param obj the widget call
- * @param e   the event cb
- * @param obj the widget call
+ * @param obj The widget call.
+ * @param e   The event cb.
+ * @param obj The widget call.
  */
 void gui_keyboard_launch_by_widget(void *obj, gui_event_t e, void *param);
 
 /**
- * @brief creat an image widget from memory address
- * @note creat an image widget and set attribute
- * @param parent the father widget it nested in.
- * @param name widget name.
- * @param addr bin file address.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @return return the widget object pointer.
+ * @brief Create an image widget from memory address.
+ * @note Create an image widget and set attribute.
+ * @param parent The father widget it nested in.
+ * @param name Widget name.
+ * @param addr Bin file address.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @return Return the widget object pointer.
  */
 gui_kb_t *gui_keyboard_create(void       *parent,
                               const char *name,

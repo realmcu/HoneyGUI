@@ -62,19 +62,17 @@ typedef struct
  *                         Functions
  *============================================================================*/
 
-
-
 /**
- * @brief 3d widget create
+ * @brief Creates a 3D widget.
  *
- * @param parent parent widget
- * @param name widget name
- * @param desc description file data
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
- * @return the widget object pointer
+ * @param parent Parent widget.
+ * @param name Widget name.
+ * @param desc Description file data.
+ * @param x The X-axis coordinate relative to the parent widget.
+ * @param y The Y-axis coordinate relative to the parent widget.
+ * @param w Width.
+ * @param h Height.
+ * @return The widget object pointer.
  */
 void *gui_3d_create(void                 *parent,
                     const char           *name,
@@ -85,32 +83,30 @@ void *gui_3d_create(void                 *parent,
                     int16_t               h);
 
 /**
- * @brief set global shape transform callback
+ * @brief Sets the global shape transform callback for the 3D widget.
  *
- * @param this the 3d widget pointer
- * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for all faces
+ * @param this The 3D widget pointer.
+ * @param cb Callback function for the world coordinate system, camera coordinate system, and light source for all faces.
  */
 void gui_3d_set_global_shape_transform_cb(void *this, gui_3d_shape_transform_cb cb);
 
 /**
- * @brief set local shape transform callback
+ * @brief Sets the local shape transform callback for the 3D widget.
  *
- * @param this the 3d widget pointer
- * @param face face offset
- * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for the specified face
+ * @param this The 3D widget pointer.
+ * @param face Face offset.
+ * @param cb Callback function for the world coordinate system, camera coordinate system, and light source for the specified face.
  */
 void gui_3d_set_local_shape_transform_cb(void *this, size_t face, gui_3d_shape_transform_cb cb);
 
 /**
- * @brief set 3D animation effects
+ * @brief Sets 3D animation effects for the widget.
  *
- * @param this the 3d widget pointer
- * @param dur animation time cost in ms
- * @param repeat_count rounds to repeat
- * @param callback every frame callback
- * @param p callback's parameter
+ * @param this The 3D widget pointer.
+ * @param dur Animation time cost in milliseconds.
+ * @param repeat_count Number of rounds to repeat.
+ * @param callback Callback function for every frame.
+ * @param p Parameter for the callback function.
  */
 void gui_3d_set_animate(void       *this,
                         uint32_t    dur,
@@ -119,14 +115,13 @@ void gui_3d_set_animate(void       *this,
                         void       *p);
 
 /**
- * @brief Set a callback function for when the 3D widget is clicked.
+ * @brief Sets a callback function for when the 3D widget is clicked.
  *
  * @param this Pointer to the 3D widget.
  * @param callback Callback function to execute on click.
  * @param parameter Additional parameter for the callback.
  */
 void gui_3d_on_click(void *this, void *callback, void *parameter);
-
 
 #ifdef __cplusplus
 }

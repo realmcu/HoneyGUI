@@ -98,16 +98,16 @@ typedef struct
  *============================================================================*/
 
 /**
- * @brief Creat a image live widget with buffer.
- * @note This widget is use to display live image which can be play.
- * @note The data of image can be static char or data transformed by BLE.
- * @param parent The father widget .
+ * @brief Create a live image widget with buffer.
+ * @note This widget is used to display live images that can be played.
+ * @note The data of the image can be static char or data transformed by BLE.
+ * @param parent The parent widget.
  * @param name The widget's name.
- * @param addr The data address of image.
- * @param x The X-axis coordinate .
- * @param y The Y-axis coordinate .
- * @param w The widget width .
- * @param h The widget hight .
+ * @param addr The data address of the image.
+ * @param x The X-axis coordinate.
+ * @param y The Y-axis coordinate.
+ * @param w The widget width.
+ * @param h The widget height.
  * @return gui_img_live_t*
  */
 gui_img_live_t *gui_img_live_create_from_mem(void           *parent,

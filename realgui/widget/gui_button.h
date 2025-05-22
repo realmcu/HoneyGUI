@@ -111,23 +111,18 @@ typedef struct __gui_api_gui_button_t
  *============================================================================*/
 
 /**
- * @brief Creat a button widget from memory, images are loaded from memory address.
- *
- * @param parent The father widget which the button nested in.
- * @param x The X-axis relative coordinate of the button(left).
- * @param y The Y-axis v coordinate of the button(up).
- * @param w The width of the button(response area).
- * @param h The hight of the button(response area).
- * @param background_pic The image shown when button was not pressed.
- * @param highlight_pic The image shown when button was pressed.
- * @param text The text of the button which always shown.
- * @param image_type shoule be 0.
- * @param count shoule be 0.
- * @return Return the widget object pointer
- * <b>Example usage</b>
- * \code{.c}
- * gui_button_t *button = gui_button_create(parent, 0, 0, 100, 100, img1, img2, text, 0, 0);
- * \endcode
+ * @brief Create a button widget from memory, with images loaded from memory address.
+ * @param parent The father widget which the button is nested in.
+ * @param x The X-axis relative coordinate of the button (left).
+ * @param y The Y-axis relative coordinate of the button (up).
+ * @param w The width of the button (response area).
+ * @param h The height of the button (response area).
+ * @param background_pic The image shown when the button is not pressed.
+ * @param highlight_pic The image shown when the button is pressed.
+ * @param text The text of the button which is always shown.
+ * @param image_type Should be 0.
+ * @param count Should be 0.
+ * @return Return the widget object pointer.
  */
 gui_button_t *gui_button_create(void             *parent,
                                 int16_t           x,
@@ -141,23 +136,18 @@ gui_button_t *gui_button_create(void             *parent,
                                 int               count);
 
 /**
- * @brief Creat a button widget from fs, images are loaded from filesystem.
- *
- * @param parent The father widget which the button nested in.
- * @param x The X-axis relative coordinate of the button(left).
- * @param y The Y-axis v coordinate of the button(up).
- * @param w The width of the button(response area).
- * @param h The hight of the button(response area).
- * @param background_pic The image shown when button was not pressed.
- * @param highlight_pic The image shown when button was pressed.
- * @param text The text of the button which always shown.
- * @param image_type shoule be 0.
- * @param count shoule be 0.
- * @return Return the widget object pointer
- * <b>Example usage</b>
- * \code{.c}
- * gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img2, text, 0, 0);
- * \endcode
+ * @brief Create a button widget from the filesystem, with images loaded from the filesystem.
+ * @param parent The father widget which the button is nested in.
+ * @param x The X-axis relative coordinate of the button (left).
+ * @param y The Y-axis relative coordinate of the button (up).
+ * @param w The width of the button (response area).
+ * @param h The height of the button (response area).
+ * @param background_pic The image shown when the button is not pressed.
+ * @param highlight_pic The image shown when the button is pressed.
+ * @param text The text of the button which is always shown.
+ * @param image_type Should be 0.
+ * @param count Should be 0.
+ * @return Return the widget object pointer.
  */
 gui_button_t *gui_button_create_from_fs(void             *parent,
                                         int16_t           x,
@@ -171,74 +161,67 @@ gui_button_t *gui_button_create_from_fs(void             *parent,
                                         int               count);
 
 /**
- * @brief please use gui_obj_add_event_cb to set gesture trigger.
- *
- * @param this
- * @param event_cb
+ * @brief Set gesture trigger using gui_obj_add_event_cb.
+ * @param this Widget pointer.
+ * @param event_cb Event callback.
+ * @param parameter Additional parameter.
  */
 void gui_button_click(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
- * @brief please use gui_obj_add_event_cb to set gesture trigger.
- *
- * @param this
- * @param event_cb
- * @param parameter
+ * @brief Set gesture trigger using gui_obj_add_event_cb.
+ * @param this Widget pointer.
+ * @param event_cb Event callback.
+ * @param parameter Additional parameter.
  */
 void gui_button_press(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
- * @brief please use gui_obj_add_event_cb to set gesture trigger.
- *
- * @param this
- * @param event_cb
- * @param parameter
+ * @brief Set gesture trigger using gui_obj_add_event_cb.
+ * @param this Widget pointer.
+ * @param event_cb Event callback.
+ * @param parameter Additional parameter.
  */
 void gui_button_long(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
- * @brief please use gui_obj_add_event_cb to set gesture trigger.
- *
- * @param this
- * @param event_cb
- * @param parameter
+ * @brief Set gesture trigger using gui_obj_add_event_cb.
+ * @param this Widget pointer.
+ * @param event_cb Event callback.
+ * @param parameter Additional parameter.
  */
 void gui_button_release(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
- * @brief Set the color of text which belongs to a button.
- *
+ * @brief Set the color of the text belonging to a button.
  * @param this The pointer of this button widget.
- * @param color The color of text.
+ * @param color The color of the text.
  */
 void gui_button_text_color(gui_button_t *, gui_color_t color);
 
 /**
- * @brief Move the img of this button.
- *
+ * @brief Move the image of this button.
  * @param this The pointer of this button widget.
- * @param img_x The X value of img.
- * @param img_y The Y value of img.
+ * @param img_x The X value of the image.
+ * @param img_y The Y value of the image.
  */
 void gui_button_img_move(gui_button_t *, int16_t img_x, int16_t img_y);
 
 /**
- * @brief
- *
- * @param this Move the text of this button.
- * @param text_x  The X relative coordinates value of text(left).
- * @param text_y The y relative coordinates value of text(up).
+ * @brief Move the text of this button.
+ * @param this The pointer of this button widget.
+ * @param text_x The X relative coordinate value of the text (left).
+ * @param text_y The Y relative coordinate value of the text (up).
  */
 void gui_button_text_move(gui_button_t *, int16_t text_x, int16_t text_y);
 
 /**
- * @brief
- *
- * @param o
- * @param dur
- * @param repeatCount
- * @param callback
- * @param p
+ * @brief Set animation for the button.
+ * @param this The pointer of this button widget.
+ * @param dur Duration of the animation.
+ * @param repeatCount Number of repetitions.
+ * @param callback Callback function.
+ * @param p Additional parameter.
  */
 void gui_button_set_animate(gui_button_t *,
                             uint32_t      dur,
@@ -247,21 +230,19 @@ void gui_button_set_animate(gui_button_t *,
                             void         *p);
 
 /**
- * @brief change button img.
- *
- * @param this The button widget .
- * @param background_pic The image shown when button was not pressed.
- * @param highlight_pic The image shown when button was pressed.
+ * @brief Change the button's images.
+ * @param this The button widget pointer.
+ * @param background_pic The image shown when the button is not pressed.
+ * @param highlight_pic The image shown when the button is pressed.
  */
 void gui_button_set_img(gui_button_t *,
                         void                 *background_pic,
                         void                 *highlight_pic);
 
 /**
- * @brief Set button function enable.
- *
+ * @brief Enable or disable the button function.
  * @param this The pointer of this button widget.
- * @param enable enable.
+ * @param enable Enable or disable flag.
  */
 void gui_button_set_enable(gui_button_t *, bool enable);
 

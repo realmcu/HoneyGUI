@@ -71,25 +71,15 @@ typedef struct gui_colorwheel
  *============================================================================*/
 
 /**
- * @brief colorwheel create
- *
- * @param parent parent widget
- * @param name  widget name
- * @param addr
- * @param x  left
- * @param y  top
- * @param w  width
- * @param h  hight
- * @return gui_colorwheel_t* widget pointer
- * <b>Example usage</b>
- * \code{.c}
- *{
- *    gui_dispdev_t *dc = gui_get_dc();
- *
- *    gui_colorwheel_t *colorwheel = gui_colorwheel_create(parent,  "tb_10", NULL, 0, 0, 454, 454);
- *    gui_colorwheel_set(colorwheel, 0, 0, dc->screen_width, dc->screen_height, 0);
- *}
- * \endcode
+ * @brief Create a colorwheel widget.
+ * @param parent Parent widget.
+ * @param name Widget name.
+ * @param addr Address.
+ * @param x Left.
+ * @param y Top.
+ * @param w Width.
+ * @param h Height.
+ * @return Return the colorwheel widget pointer.
  */
 gui_colorwheel_t *gui_colorwheel_create(void       *parent,
                                         const char *name,
@@ -100,14 +90,13 @@ gui_colorwheel_t *gui_colorwheel_create(void       *parent,
                                         int16_t     h);
 
 /**
- * @brief set colorwheel size
- *
- * @param this widget pointer
- * @param x  left
- * @param y  top
- * @param w  width
- * @param h  hight
- * @param t  one frame time
+ * @brief Set the size of the colorwheel.
+ * @param this Widget pointer.
+ * @param x Left.
+ * @param y Top.
+ * @param w Width.
+ * @param h Height.
+ * @param t One frame time.
  */
 void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float h, float t);
 

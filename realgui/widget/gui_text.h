@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_text.h
-  * @brief text widget header file
-  * @details text widget header file
+  * @brief Text widget header file.
+  * @details Text widget header file.
   * @author luke_sun@realsil.com.cn
   * @date 2023/10/25
   * @version v1.0
@@ -64,7 +64,7 @@ typedef enum
 } TEXT_MODE;
 /* TEXT_MODE end */
 
-/** @brief  font type enum */
+/** @brief  Font type enum. */
 typedef enum
 {
     GUI_FONT_SRC_BMP = 0,
@@ -89,7 +89,7 @@ typedef enum
 
 } T_GUI_TEXT_EVENT;
 
-/** @brief  text widget structure */
+/** @brief  Text widget structure. */
 typedef struct gui_text
 {
     gui_obj_t base;
@@ -130,7 +130,7 @@ typedef struct gui_text
     uint8_t rendermode    : 2;
 } gui_text_t;
 
-/** @brief  text line structure */
+/** @brief  Text line structure. */
 typedef struct gui_text_line
 {
     uint16_t line_char;
@@ -157,32 +157,32 @@ typedef struct gui_text_line
  *============================================================================*/
 
 /**
- * @brief set textbox click event cb .
+ * @brief Set textbox click event callback.
  *
- * @param this_widget      text widget.
- * @param event_cb  cb function.
- * @param parameter cb parameter.
+ * @param this_widget      Text widget.
+ * @param event_cb  Callback function.
+ * @param parameter Callback parameter.
  */
 void gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
 
 /**
- * @brief set textbox password done event cb, to handle password.
+ * @brief Set textbox password done event callback to handle password.
  *
- * @param this_widget      text widget.
- * @param event_cb  cb function.
- * @param parameter cb parameter.
+ * @param this_widget      Text widget.
+ * @param event_cb  Callback function.
+ * @param parameter Callback parameter.
  */
 void gui_text_pswd_done(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
 
 /**
-* @brief set the string in a text box widget.
-* @note The font size must match the font file!
-* @param this_widget the text box widget pointer.
-* @param text the text string.
-* @param text_type text type.
-* @param color the text's color.
-* @param length the text string's length.
-* @param font_size the text string's font size.
+* @brief Set the string in a text box widget.
+* @note The font size must match the font file.
+* @param this_widget The text box widget pointer.
+* @param text The text string.
+* @param text_type Text type.
+* @param color The text's color.
+* @param length The text string's length.
+* @param font_size The text string's font size.
 * @return void
 */
 void gui_text_set(gui_text_t    *this_widget,
@@ -193,13 +193,13 @@ void gui_text_set(gui_text_t    *this_widget,
                   uint8_t        font_size);
 
 /**
- * @brief set animate.
+ * @brief Set animate.
  *
- * @param o text widget.
- * @param dur durtion. time length of the animate.
+ * @param o Text widget.
+ * @param dur Duration. Time length of the animate.
  * @param repeat_count  0:one shoot -1:endless.
- * @param callback happens at every frame.
- * @param p callback's parameter.
+ * @param callback Happens at every frame.
+ * @param p Callback's parameter.
  */
 void gui_text_set_animate(void     *o,
                           uint32_t  dur,
@@ -208,85 +208,85 @@ void gui_text_set_animate(void     *o,
                           void     *p);
 
 /**
- * @brief set text mode of this_widget text widget.
- * @note if text line count was more than one, it will display on the left even if it was set lft or right.
- * @param this_widget the text widget pointer.
- * @param mode there was three mode: LEFT, CENTER and RIGHT.
+ * @brief Set text mode of this_widget text widget.
+ * @note If text line count was more than one, it will display on the left even if it was set left or right.
+ * @param this_widget The text widget pointer.
+ * @param mode There was three mode: LEFT, CENTER and RIGHT.
  */
 void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 
 /**
- * @brief set inputable.
+ * @brief Set inputable.
  *
- * @param this_widget the text box widget pointer.
- * @param inputable inputable.
+ * @param this_widget The text box widget pointer.
+ * @param inputable Inputable.
  */
 void gui_text_input_set(gui_text_t *this_widget, bool inputable);
 
 /**
  * @brief By setting wordwrap to enable English word wrapping.
  *
- * @param this_widget the text box widget pointer.
- * @param wordwrap wordwrap.
+ * @param this_widget The text box widget pointer.
+ * @param wordwrap Wordwrap.
  */
 void gui_text_wordwrap_set(gui_text_t *this_widget, bool wordwrap);
 
 /**
- * @brief Enable/disable matrix-based image rendering for text
- * @param this Pointer to the text widget
- * @param use_img_blit true = use image matrix blitting (for complex transformations),
- *                     false = use standard rendering
+ * @brief Enable or disable matrix-based image rendering for text.
+ * @param this Pointer to the text widget.
+ * @param use_img_blit True = use image matrix blitting (for complex transformations),
+ *                     false = use standard rendering.
  */
 void gui_text_use_matrix_by_img(gui_text_t *this_widget, bool use_img_blit);
 
 /**
  * @brief Set ttf raster render mode.
  *
- * @param this_widget the text box widget pointer.
- * @param rendermode rendermode.1/2/4/8
+ * @param this_widget The text box widget pointer.
+ * @param rendermode Rendermode.1/2/4/8.
  */
 void gui_text_rendermode_set(gui_text_t *this_widget, uint8_t rendermode);
 
 /**
- * @brief set text min scale.
+ * @brief Set text min scale.
  *
- * @param this the text box widget pointer.
- * @param min_scale minimum scale.
+ * @param this The text box widget pointer.
+ * @param min_scale Minimum scale.
  */
 void gui_text_set_min_scale(gui_text_t *this_widget, float min_scale);
 
 /**
- * @brief move the text widget.
+ * @brief Move the text widget.
  *
- * @param this_widget the text box widget pointer.
- * @param x the X-axis coordinate of the text box.
- * @param y the Y-axis coordinate of the text box.
+ * @param this_widget The text box widget pointer.
+ * @param x The X-axis coordinate of the text box.
+ * @param y The Y-axis coordinate of the text box.
  */
 void gui_text_move(gui_text_t *this_widget, int16_t x, int16_t y);
 
 /**
- * @brief set font size or width and height.
- * @note if use freetype, width and height is effective, else height will be applied as font size.
- * @param this_widget the text widget pointer.
- * @param height font height or font size.
- * @param width font width(only be effective when freetype was used).
+ * @brief Set font size or width and height.
+ * @note If use freetype, width and height is effective, else height will be applied as font size.
+ * @param this_widget The text widget pointer.
+ * @param height Font height or font size.
+ * @param width Font width(only be effective when freetype was used).
  */
 void gui_text_size_set(gui_text_t *this_widget, uint8_t height, uint8_t width);
 
 /**
- * @brief set text font mode.
+ * @brief Set text font mode.
  *
- * @param this_widget the text widget pointer.
- * @param font_mode font source mode.
+ * @param this_widget The text widget pointer.
+ * @param font_mode Font source mode.
  */
 void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
 
 /**
- * @brief set font type.
- * @note The type must match the font size!
- * @param this_widget the text widget pointer.
- * @param font_source the addr of .ttf or .bin.
- * @param font_mode font source mode.
+ * @brief Set font type.
+ * @note The type must match the font size.
+ * @param this_widget The text widget pointer.
+ * @param font_source The addr of .ttf or .bin.
+ * @param font_mode Font source mode.
  */
 void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode);
 
@@ -303,48 +303,48 @@ void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE
 void gui_text_emoji_set(gui_text_t *this_widget, uint8_t *path, uint8_t size);
 
 /**
- * @brief set font encoding.
- * @note utf-8 or unicode.
- * @param this_widget the text widget pointer.
- * @param encoding_type encoding_type.
+ * @brief Set font encoding.
+ * @note Utf-8 or unicode.
+ * @param this_widget The text widget pointer.
+ * @param encoding_type Encoding_type.
  */
 void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
 
 /**
- * @brief set text matrix
+ * @brief Set text matrix.
  * @note
- * @param this_widget the text widget pointer.
- * @param encoding_type encoding_type.
+ * @param this_widget The text widget pointer.
+ * @param encoding_type Encoding_type.
  */
 void gui_text_set_matrix(gui_text_t *this_widget, gui_matrix_t *matrix);
 
 /**
- * @brief set text content.
+ * @brief Set text content.
  *
- * @param this_widget the text widget pointer.
- * @param text the text string.
- * @param length the text string's length.
+ * @param this_widget The text widget pointer.
+ * @param text The text string.
+ * @param length The text string's length.
  */
 void gui_text_content_set(gui_text_t *this_widget, void *text, uint16_t length);
 
 /**
- * @brief to draw text by img, so that text can be scaled.
+ * @brief To draw text by img, so that text can be scaled.
  *
- * @param this_widget the text widget pointer.
- * @param font_img_type color format.
+ * @param this_widget The text widget pointer.
+ * @param font_img_type Color format.
  */
 void gui_text_convert_to_img(gui_text_t *this_widget, GUI_FormatType font_img_type);
 
 /**
- * @brief create a text box widget.
+ * @brief Create a text box widget.
  * @note The area of the text box should be larger than that of the string to be shown, otherwise, part of the text will be hidden.
- * @param parent the father widget which the text nested in.
- * @param filename the widget's name.
- * @param x the X-axis coordinate of the text box.
- * @param y the Y-axis coordinate of the text box.
- * @param w the width of the text box.
- * @param h the hight of the text box.
- * @return return the widget object pointer.
+ * @param parent The father widget which the text nested in.
+ * @param filename The widget's name.
+ * @param x The X-axis coordinate of the text box.
+ * @param y The Y-axis coordinate of the text box.
+ * @param w The width of the text box.
+ * @param h The height of the text box.
+ * @return Return the widget object pointer.
  *
  */
 gui_text_t *gui_text_create(void       *parent,

@@ -67,16 +67,15 @@ typedef struct gui_curtain
 
 /**
  * @brief Create a curtain effect widget, which should be nested in a curtainview.
- *
- * @param parent the father widget nested in(hould be a curtainview.)
- * @param filename this curtain widget's name.
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
- * @param orientation  the orientation of the curtain,refer to gui_curtain_t_ORIENTATION.
- * @param scope The range in which curtains can be expanded
- * @return gui_curtain_t*
+ * @param parent The father widget nested in (should be a curtainview).
+ * @param filename This curtain widget's name.
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Width.
+ * @param h Height.
+ * @param orientation The orientation of the curtain, refer to gui_curtain_t_ORIENTATION.
+ * @param scope The range in which curtains can be expanded.
+ * @return Return the curtain widget pointer.
  */
 gui_curtain_t *gui_curtain_create(void              *parent,
                                   const char        *filename,

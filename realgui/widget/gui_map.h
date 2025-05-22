@@ -78,9 +78,9 @@ typedef struct gui_map
  *============================================================================*/
 
 /**
- * @brief Create a MAP,
+ * @brief Create a map widget.
  *
- * @param parent the father widget nested in
+ * @param parent The parent widget to nest in.
  * @return gui_map_t*
  */
 gui_map_t *gui_map_create(void *parent);

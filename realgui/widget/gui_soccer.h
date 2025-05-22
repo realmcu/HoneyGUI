@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_soccer.h
-  * @brief soccer widget
-  * @details soccer widget
+  * @brief Soccer widget.
+  * @details Soccer widget.
   * @author howie_wang@realsil.com.cn
   * @date 2024/08/16
   * @version 1.0
@@ -46,14 +46,14 @@ typedef struct
     float z;
 } gui_quaternion_t;
 
-/** @brief  SOCCER widget structure */
+/** @brief  Soccer widget structure. */
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
 typedef struct gui_soccer
 {
-    gui_obj_t base;                 //!< base structure
-    draw_img_t draw_img[20];         // please refer to enum T_SOCCER_SIDE_TYPE.
+    gui_obj_t base;                 //!< Base structure.
+    draw_img_t draw_img[20];         // Please refer to enum T_SOCCER_SIDE_TYPE.
     float xrot;
     float yrot;
     float zrot;
@@ -77,7 +77,7 @@ typedef struct gui_soccer
  *                         Macros
  *============================================================================*/
 
-#define RAD(d)        (d*3.1415926f/180.0f) //!< angle to rad
+#define RAD(d)        (d*3.1415926f/180.0f) //!< Angle to rad.
 #define PHI           ((1 + sqrt(5)) / 2)
 
 
@@ -91,14 +91,14 @@ typedef struct gui_soccer
  *============================================================================*/
 
 /**
- * @brief soccer create, images can be loaded from filesystem or memory address
+ * @brief Soccer create, images can be loaded from filesystem or memory address.
  *
- * @param parent parent widget
- * @param name  widget name
- * @param addr the image file data
- * @param x  left
- * @param y top
- * @return gui_soccer_t* widget pointer
+ * @param parent Parent widget.
+ * @param name  Widget name.
+ * @param addr The image file data.
+ * @param x  Left.
+ * @param y Top.
+ * @return gui_soccer_t* Widget pointer.
  *
  * <b>Example usage</b>
  * \code{.c}
@@ -128,80 +128,80 @@ gui_soccer_t *gui_soccer_create(void               *parent,
 
 
 /**
- * @brief get the soccer image's blend mode
+ * @brief Get the soccer image's blend mode.
  *
- * @param soccer the soccer widget pointer
- * @return the soccer image's blend mode
+ * @param soccer The soccer widget pointer.
+ * @return The soccer image's blend mode.
  *
  */
 BLEND_MODE_TYPE gui_soccer_get_mode(gui_soccer_t *soccer);
 
 /**
- * @brief set the soccer image's blend mode
+ * @brief Set the soccer image's blend mode.
  *
- * @param soccer the soccer widget pointer
- * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
+ * @param soccer The soccer widget pointer.
+ * @param mode The enumeration value of the mode is BLEND_MODE_TYPE.
  *
  */
 void gui_soccer_set_mode(gui_soccer_t *soccer, BLEND_MODE_TYPE mode);
 
 /**
- * @brief get the soccer image's opacity
+ * @brief Get the soccer image's opacity.
  *
- * @param soccer the cube widget pointer
- * @return the soccer image's opacity
+ * @param soccer The cube widget pointer.
+ * @return The soccer image's opacity.
  *
  */
 uint8_t gui_soccer_get_opacity(gui_soccer_t *soccer);
 
 /**
- * @brief set the soccer image's opacity
+ * @brief Set the soccer image's opacity.
  *
- * @param soccer the soccer widget pointer
- * @param opacity the soccer image's opacity
+ * @param soccer The soccer widget pointer.
+ * @param opacity The soccer image's opacity.
  *
  */
 void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity);
 
 /**
- * @brief set soccer image
+ * @brief Set soccer image.
  *
- * @param cube the soccer widget pointer
- * @param addr the image file data
+ * @param cube The soccer widget pointer.
+ * @param addr The image file data.
  */
 void gui_soccer_set_img(gui_soccer_t *soccer, uint32_t *frame_array[]);
 
 /**
- * @brief set center
+ * @brief Set center.
  *
- * @param this widget pointer
- * @param c_x center x
- * @param c_y center y
+ * @param this Widget pointer.
+ * @param c_x Center x.
+ * @param c_y Center y.
  */
 void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y);
 
 /**
- * @brief set size
+ * @brief Set size.
  *
- * @param this widget pointer
- * @param size scale size
+ * @param this Widget pointer.
+ * @param size Scale size.
  */
 void gui_soccer_set_size(gui_soccer_t *this, float size);
 
 /**
- * @brief set slide range
+ * @brief Set slide range.
  *
- * @param this widget pointer
- * @param range slide range
+ * @param this Widget pointer.
+ * @param range Slide range.
  */
 void gui_soccer_set_slide_range(gui_soccer_t *this, float range);
 
 /**
- * @brief set on_click event
+ * @brief Set on_click event.
  *
- * @param this widget pointer
- * @param callback callback function
- * @param parameter callback function parameter
+ * @param this Widget pointer.
+ * @param callback Callback function.
+ * @param parameter Callback function parameter.
  */
 void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter);
 /**

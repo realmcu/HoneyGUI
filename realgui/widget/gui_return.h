@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_return.h
-  * @brief slide to return to home
-  * @details return to launcher
+  * @brief Slide to return to home.
+  * @details Return to launcher.
   * @author triton_yu@realsil.com.cn
   * @date 2023/11/8
   * @version 1.0
@@ -71,7 +71,7 @@ typedef struct gui_return
  * @param array_size Return effect image frame array's index count.
  * @param return_cb Return behavior instance .
  * @param ignore_gesture_widget The widget that need to be blocked for gesture response.
- * @return return the widget object pointer.
+ * @return Return the widget object pointer.
  *
  */
 gui_return_t *gui_return_create(void           *parent,

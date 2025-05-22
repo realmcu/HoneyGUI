@@ -89,52 +89,37 @@ typedef struct __gui_api_gui_seekbar_t
  *============================================================================*/
 
 /**
-  * @brief  create a vertical based on picture seekbar
-  * @param  parent the father widget it nested in
-  * @param  filename _this seekbar widget's name
-  * @param  x   the X-axis coordinate relative to parent widget
-  * @param  y   the y-axis coordinate relative to parent widget
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  * \code{.c}
-  * static void app_main_task(void *parent)
-  * {
-  *  parent = (void *)gui_seekbar_create_img_v(parent, gui_get_file_address(picture), x, y);
-  *
-  *    return;
-  * }
-  * \endcode
+  * @brief  Create a vertical seekbar based on a picture.
+  * @param  parent The parent widget it is nested in.
+  * @param  filename The name of this seekbar widget.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_img_v(void       *parent,
                                         const char *name,
                                         int16_t     x,
                                         int16_t     y);
 /**
-  * @brief  create a horizontal based on picture seekbar
-  * @param  parent the father widget it nested in
-  * @param  filename _this seekbar widget's name
-  * @param  x   the X-axis coordinate relative to parent widget
-  * @param  y   the y-axis coordinate relative to parent widget
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  *
-  * \endcode
+  * @brief  Create a horizontal seekbar based on a picture.
+  * @param  parent The parent widget it is nested in.
+  * @param  filename The name of this seekbar widget.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_img_h(void       *parent,
                                         const char *name,
                                         int16_t     x,
                                         int16_t     y);
 /**
-  * @brief  create a horizontal movie based on picture seekbar
-  * @param  parent the father widget it nested in
-  * @param  picture_array image array address
-  * @param  array_length image array length
-  * @param  x the X-axis coordinate relative to parent widget
-  * @param  y the y-axis coordinate relative to parent widget
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  *
-  * \endcode
+  * @brief  Create a horizontal movie seekbar based on a picture.
+  * @param  parent The parent widget it is nested in.
+  * @param  picture_array The image array address.
+  * @param  array_length The image array length.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_movie_h(void      *parent,
                                           void     **picture_array,
@@ -142,16 +127,13 @@ gui_seekbar_t *gui_seekbar_create_movie_h(void      *parent,
                                           int16_t    x,
                                           int16_t    y);
 /**
-  * @brief  create a vertical movie based on picture seekbar
-  * @param  parent the father widget it nested in
-  * @param  picture_array image array address
-  * @param  array_length image array length
-  * @param  x   the X-axis coordinate relative to parent widget
-  * @param  y   the y-axis coordinate relative to parent widget
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  *
-  * \endcode
+  * @brief  Create a vertical movie seekbar based on a picture.
+  * @param  parent The parent widget it is nested in.
+  * @param  picture_array The image array address.
+  * @param  array_length The image array length.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_movie_v(void      *parent,
                                           void     **picture_array,
@@ -159,21 +141,18 @@ gui_seekbar_t *gui_seekbar_create_movie_v(void      *parent,
                                           int16_t    x,
                                           int16_t    y);
 /**
-  * @brief  create a arc movie based on picture seekbar
-  * @param  parent the father widget it nested in
-  * @param  picture_array image array address
-  * @param  array_length image array length
-  * @param  x the X-axis coordinate relative to parent widget
-  * @param  y the y-axis coordinate relative to parent widget
-  * @param  arc_x arc x
-  * @param  arc_y arc y
-  * @param  arc_w arc width
-  * @param  arc_start arc start
-  * @param  arc_end arc end
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  *
-  * \endcode
+  * @brief  Create an arc movie seekbar based on a picture.
+  * @param  parent The parent widget it is nested in.
+  * @param  picture_array The image array address.
+  * @param  array_length The image array length.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @param  arc_x The X coordinate of the arc.
+  * @param  arc_y The Y coordinate of the arc.
+  * @param  arc_w The width of the arc.
+  * @param  arc_start The start angle of the arc.
+  * @param  arc_end The end angle of the arc.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_movie_arc(void      *parent,
                                             void     **picture_array,
@@ -187,16 +166,13 @@ gui_seekbar_t *gui_seekbar_create_movie_arc(void      *parent,
                                             float      arc_start,
                                             float      arc_end);
 /**
-  * @brief  create a horizontal movie based on picture seekbar
-  * @param  parent the father widget it nested in
-  * @param  picture_array image array address
-  * @param  array_length image array length
-  * @param  x the X-axis coordinate relative to parent widget
-  * @param  y the y-axis coordinate relative to parent widget
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  *
-  * \endcode
+  * @brief  Create a horizontal movie seekbar based on a picture.
+  * @param  parent The parent widget it is nested in.
+  * @param  picture_array The image array address.
+  * @param  array_length The image array length.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_movie_h_double(void      *parent,
                                                  void     **picture_array,
@@ -204,17 +180,14 @@ gui_seekbar_t *gui_seekbar_create_movie_h_double(void      *parent,
                                                  int16_t    x,
                                                  int16_t    y);
 /**
-  * @brief  create a horizontal seekbar with thumb image
-  * @param  parent the father widget it nested in
-  * @param  picture_pointer thumb image pointer
-  * @param  picture_highlight_pointer thumb image highlight pointer
-  * @param  x the X-axis coordinate relative to parent widget
-  * @param  y the y-axis coordinate relative to parent widget
-  * @param  bar_width seekbar width
-  * @return return the widget object pointer
-  * <b>Example usage</b>
-  *
-  * \endcode
+  * @brief  Create a horizontal seekbar with a thumb image.
+  * @param  parent The parent widget it is nested in.
+  * @param  picture_pointer The thumb image pointer.
+  * @param  picture_highlight_pointer The thumb image highlight pointer.
+  * @param  x The X-axis coordinate relative to the parent widget.
+  * @param  y The Y-axis coordinate relative to the parent widget.
+  * @param  bar_width The width of the seekbar.
+  * @return Return the widget object pointer.
   */
 gui_seekbar_t *gui_seekbar_create_thumb_h(void    *parent,
                                           void    *picture_pointer,

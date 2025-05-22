@@ -114,14 +114,14 @@ typedef struct gui_turn_table
  *============================================================================*/
 
 /**
- * @brief crear turn table widget
+ * @brief Create a turn table widget.
  *
- * @param parent Pointer to parent app or container on which the turn table will be created
- * @param icon_quantity The number of icons to be displayed on the turn table
- * @param icon_radius The radius of the icons, usually half of the icon width, used to control the size of the icons
- * @param top_bottom_icon_quantity The number of icons at the top and bottom
- * @param left_right_icon_quantity The number of icons on the left and right sides
- * @return gui_turn_table_t* Returns a pointer to the newly created turn table
+ * @param parent Pointer to parent app or container on which the turn table will be created.
+ * @param icon_quantity The number of icons to be displayed on the turn table.
+ * @param icon_radius The radius of the icons, usually half of the icon width, used to control the size of the icons.
+ * @param top_bottom_icon_quantity The number of icons at the top and bottom.
+ * @param left_right_icon_quantity The number of icons on the left and right sides.
+ * @return gui_turn_table_t* Returns a pointer to the newly created turn table.
  */
 gui_turn_table_t *gui_turn_table_create(void *parent,
                                         uint8_t icon_quantity,
@@ -132,24 +132,21 @@ gui_turn_table_t *gui_turn_table_create(void *parent,
 /**
  * @brief Sets the edge icon quantities for the turn table GUI.
  *
- * This function sets the quantities of different icons appearing on the top/bottom and left/right edges of the GUI turn table.
- *
  * @param this Pointer to the GUI turn table object.
  * @param top_bottom_quantity The desired quantity of icons to be displayed on the top and bottom edges of the turn table.
  * @param left_right_quantity The desired quantity of icons to be displayed on the left and right edges of the turn table.
- *
  */
 void gui_turn_table_set_edge_icon_quantity(gui_turn_table_t *this,
                                            uint8_t top_bottom_quantity,
                                            uint8_t left_right_quantity);
 
 /**
- * @brief
+ * @brief Generate layout by calculating parameters.
  *
- * @param this
- * @param icon_margin
- * @param icon_distence
- * @param screen_fillet_radius
+ * @param this Pointer to the GUI turn table object.
+ * @param icon_margin Margin between icons.
+ * @param icon_distence Distance between icons.
+ * @param screen_fillet_radius Radius of the screen fillet.
  */
 void gui_turn_table_generate_layout_by_calculate(gui_turn_table_t *this,
                                                  uint8_t icon_margin,
@@ -159,7 +156,7 @@ void gui_turn_table_generate_layout_by_calculate(gui_turn_table_t *this,
 /**
  * @brief Set turn table tp.
  *
- * @param this Pointer to the GUI turn table object
+ * @param this Pointer to the GUI turn table object.
  * @param up If up is true, touchpad 'up' sustain is allowed.
  * @param down If down is true, touchpad 'down' sustain is allowed.
  * @param left If left is true, touchpad 'left' sustain is allowed.
@@ -172,86 +169,52 @@ void gui_turn_table_set_tp(gui_turn_table_t *this,
                            bool right);
 
 /**
- * @brief Generates a layout for the turn table GUI using a specified array.
- *
- * This function sets up the layout configuration of the GUI turn table using a given
- * fixed point array and the active icon quantity.
- * If the supplied active icon quantity does not match the one set on the turn table,
- * it logs an error message and returns without creating the layout.
+ * @brief Generate layout using a fixed point array.
  *
  * @param this Pointer to the GUI turn table object.
  * @param fixed_point The array of coordinates used to generate the layout of the turn table.
  * @param active_icon_quantity The quantity of active icons that will be displayed on the turn table.
- *
- * @note Assumes centerX and centerY to be at the center of the icon after scale.
- *       The offset from the fixed point to the center of the scaled icon is the icon's radius times its scale.
- *
- * @return Void
  */
 void gui_turn_table_generate_layout_by_array(gui_turn_table_t *this,
                                              gui_turn_table_coordinate_t *fixed_point,
                                              uint8_t active_icon_quantity);
 
 /**
- * @brief Adds a default icon to the turn table GUI.
- *
- * This function adds an icon to the GUI turn table at a specific location described in the `static_list`.
- * If the `icon_list` at the index is not NULL, it will continue to the next index.
- * The function also scales the added icon according to the `icon_scale` of the table.
- * If the highlight index matches the current index, it will generate a highlighted icon at screen center.
+ * @brief Add a default icon to the turn table.
  *
  * @param this Pointer to the GUI turn table object.
  * @param icon_addr The address of the icon to be added.
  * @param event_cb This is the callback function that will be called when the icon is clicked.
- *
- * @note The x & y for the non-active icons are the same as the first active icon.
- * @note The function will return immediately after an icon is added.
- *
- * @return Void
  */
 void gui_turn_table_add_icon_default(gui_turn_table_t *this,
                                      void *icon_addr,
                                      gui_event_cb_t event_cb);
 
 /**
- * @brief Sets the highlight index for the turn table GUI.
- *
- * This function sets the index at which the icon will be highlighted in the GUI turn table.
+ * @brief Set the highlight index for the turn table.
  *
  * @param this Pointer to the GUI turn table object.
  * @param highlight_index Index of the icon to be highlighted.
- *
- * @return Void
  */
 void gui_turn_table_set_highlight_index(gui_turn_table_t *this,
                                         uint8_t highlight_index);
 
 /**
- * @brief Sets the scale of icons for the turn table GUI.
+ * @brief Set the scale of icons for the turn table.
  *
- * This function sets the scale for all icons and the highlighted icon in the GUI turn table.
- *
- * @param this Pointer to the GUI turn table object on which the operation is performed.
+ * @param this Pointer to the GUI turn table object.
  * @param icon_scale The scale for all icons.
  * @param icon_highlight_scale The scale for highlighted icon.
- *
- * @return Void
  */
 void gui_turn_table_set_icon_scale(gui_turn_table_t *this,
                                    float icon_scale,
                                    float icon_highlight_scale);
 
 /**
- * @brief Adds a static icon to the turn table GUI.
+ * @brief Add a static icon to the turn table.
  *
- * This function creates an image from the provided memory address and adds it to the GUI turn table.
- * If a static icon already exists, it is freed before the new icon is added.
- * The new icon is scaled according to the turn table's icon scale.
- *
- * @param this Pointer to the GUI turn table object on which the operation is performed.
+ * @param this Pointer to the GUI turn table object.
  * @param icon_addr The memory address of the icon to be added.
- *
- * @return Void
  */
 void gui_turn_table_add_icon_static(gui_turn_table_t *this,
                                     void *icon_addr);

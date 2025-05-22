@@ -81,24 +81,22 @@ typedef struct gui_image_array
  *============================================================================*/
 
 /**
- * @brief set image array
- *
- * @param obj the widget pointer
- * @param image_data_array the image file data
- * @param array_length array_length
+ * @brief Set the image array for the widget.
+ * @param obj The widget pointer.
+ * @param image_data_array The image file data.
+ * @param array_length The length of the array.
  */
 void gui_image_array_write(gui_image_array_t *obj, void **image_data_array, int array_length);
 
 /**
- * @brief image array create
- *
- * @param parent parent widget
- * @param x left
- * @param y top
- * @param image_data_array  image_data_array
- * @param array_lenght  array_lenght
- * @param name  widget name
- * @return gui_image_array_t* widget pointer
+ * @brief Create an image array widget.
+ * @param parent Parent widget.
+ * @param x Left coordinate.
+ * @param y Top coordinate.
+ * @param image_data_array The image data array.
+ * @param array_lenght The length of the array.
+ * @param name Widget name.
+ * @return Return the image array widget pointer.
  */
 gui_image_array_t *gui_image_array_create(void *parent,
                                           int16_t x,
@@ -106,16 +104,16 @@ gui_image_array_t *gui_image_array_create(void *parent,
                                           void **image_data_array,
                                           int array_lenght,
                                           const char *widget_name);
+
 /**
- * @brief image array create (ftl address mode)
- *
- * @param parent parent widget
- * @param x left
- * @param y top
- * @param image_data_array  image_data_array (ftl address mode)
- * @param array_lenght  array_lenght
- * @param name  widget name
- * @return gui_image_array_t* widget pointer
+ * @brief Create an image array widget in FTL address mode.
+ * @param parent Parent widget.
+ * @param x Left coordinate.
+ * @param y Top coordinate.
+ * @param image_data_array The image data array (FTL address mode).
+ * @param array_lenght The length of the array.
+ * @param name Widget name.
+ * @return Return the image array widget pointer.
  */
 gui_image_array_t *gui_image_array_create_ftl(void *parent,
                                               int16_t x,

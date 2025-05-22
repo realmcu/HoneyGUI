@@ -73,15 +73,14 @@ typedef struct
  *============================================================================*/
 
 /**
- * @brief create a card widget.
- * @param parent the father widget it nested in.
- * @param filename this tab widget's name.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @return return the widget object pointer.
- *
+ * @brief Create a card widget.
+ * @param parent The father widget it nested in.
+ * @param filename This tab widget's name.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @return Return the widget object pointer.
  */
 gui_card_t *gui_card_create(void       *parent,
                             const char *name,

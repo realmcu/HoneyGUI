@@ -120,53 +120,33 @@ typedef enum
  *============================================================================*/
 
 /**
- * @brief set the perspective image's blend mode
- *
- * @param perspective the perspective widget pointer
- * @param img_index the perspective image's index
- * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
- *
+ * @brief Set the blend mode for the perspective image.
+ * @param perspective The perspective widget pointer.
+ * @param img_index The perspective image's index.
+ * @param mode The enumeration value of the mode is BLEND_MODE_TYPE.
  */
 void gui_gallery_set_mode(gui_gallery_t *perspective,
                           uint8_t            img_index,
                           BLEND_MODE_TYPE    mode);
 
 /**
- * @brief set perspective image
- *
- * @param perspective the perspective widget pointer
- * @param img_file the image file data, set flg_fs true when using filesystem
+ * @brief Set the perspective image.
+ * @param perspective The perspective widget pointer.
+ * @param img_file The image file data, set flg_fs true when using filesystem.
  */
 void gui_gallery_set_img(gui_gallery_t *perspective, gui_gallery_config_t *config);
 
 /**
-  * @brief  create 3D perspective, images can be loaded from filesystem or memory address
-  * @param  parent parent widget
-  * @param  name  widget name
-  * @param  img_file the image file data, set flg_fs true when using filesystem
-  * @param  x  left
-  * @param  y top
-  * @return gui_perspective_t* widget pointer
-  *
-  *
-  * <b>Example usage</b>
-  * \code{.c}
-  * void perspctive_example(void *parent)
-  * {
-  *     gui_perspective_imgfile_t imgfile =
-  *     {
-  *         .flg_fs = true,
-  *         .img_path[0] = "Clockn.bin",
-  *         .img_path[1] = "Weather.bin",
-  *         .img_path[2] = "Music.bin",
-  *         .img_path[3] = "QuickCard.bin",
-  *         .img_path[4] = "HeartRate.bin",
-  *         .img_path[5] = "Activity.bin"
-  *     };
-  *     img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);
-  * }
-  * \endcode
-  */
+ * @brief Create a 3D perspective widget, with images loaded from filesystem or memory address.
+ * @param parent Parent widget.
+ * @param name Widget name.
+ * @param img_file The image file data, set flg_fs true when using filesystem.
+ * @param x Left coordinate.
+ * @param y Top coordinate.
+ * @param w Width.
+ * @param h Height.
+ * @return Return the perspective widget pointer.
+ */
 gui_gallery_t *gui_gallery_create(void                      *parent,
                                   const char                *name,
                                   gui_gallery_config_t *config,

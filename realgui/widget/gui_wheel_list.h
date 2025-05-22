@@ -88,8 +88,8 @@ typedef struct gui_wheel_list
 /**
  * @brief Create a scroll wheel icon list widget.
  *
- * @param parent the father widget the page nested in.
- * @param layer the layer of the wheel list, 0 means there is only one icon in the middle.
+ * @param parent The father widget the page nested in.
+ * @param layer The layer of the wheel list, 0 means there is only one icon in the middle.
  * @param radius Icon image radius.
  * @param distence Distance between the shortest circle center of two layer icon images.
  * @return gui_wheel_list_t*
@@ -101,24 +101,24 @@ gui_wheel_list_t *gui_wheel_list_create(void *parent,
 
 
 /**
- * @brief Add icon images in the default order
+ * @brief Add icon images in the default order.
  *
- * @param this widget object pointer
- * @param event_cb click cb of this image
- * @param icon_addr picture address
+ * @param this Widget object pointer.
+ * @param event_cb Click callback of this image.
+ * @param icon_addr Picture address.
  */
 void gui_wheel_list_add_icon_default(gui_wheel_list_t *this,
                                      void *icon_addr,
                                      gui_event_cb_t event_cb);
 
 /**
- * @brief Add icon images
+ * @brief Add icon images.
  *
- * @param this widget object pointer
- * @param icon_addr picture address
- * @param event_cb click cb of this image
- * @param layer layer
- * @param index index
+ * @param this Widget object pointer.
+ * @param icon_addr Picture address.
+ * @param event_cb Click callback of this image.
+ * @param layer Layer.
+ * @param index Index.
  */
 void gui_wheel_list_set_icon(gui_wheel_list_t *this,
                              void *icon_addr,

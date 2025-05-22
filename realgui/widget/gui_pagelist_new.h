@@ -4,7 +4,7 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_pagelist_new.h
-  * @brief pagelist widget sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c
+  * @brief Pagelist widget sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c.
   * @details A ram friendly page widget to show large amount of lists.
   * @author triton_yu@realsil.com
   * @date 2024/11/04
@@ -104,7 +104,7 @@ typedef struct gui_pagelist_new
 /**
  * @brief Create a new vertical pagelist.
  *
- * This function initializes and creates a new vertical pagelist with the specified parameters. Sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c
+ * This function initializes and creates a new vertical pagelist with the specified parameters. Sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c.
  *
  * @param parent Pointer to the parent GUI object.
  * @param x The X coordinate of the pagelist.
@@ -135,7 +135,7 @@ gui_pagelist_new_t *gui_pagelist_new_create(void *parent,
 /**
  * @brief Render the pagelist with the specified items.
  *
- * This function renders the pagelist with the provided items, their click functions, and their text labels. Sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c
+ * This function renders the pagelist with the provided items, their click functions, and their text labels. Sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c.
  *
  * @param pagelist_new Pointer to the pagelist object to render.
  * @param item_count The number of items in the pagelist.
@@ -152,7 +152,7 @@ gui_error_t gui_page_list_new_render(gui_pagelist_new_t *pagelist_new,
 /**
  * @brief Create a new horizontal pagelist.
  *
- * This function initializes and creates a new horizontal pagelist with the specified parameters. Sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c
+ * This function initializes and creates a new horizontal pagelist with the specified parameters. Sample at APP_PAGE_LIST realgui\example\screen_454_454\gui_menu\apps_in_menu.c.
  *
  * @param parent Pointer to the parent GUI object.
  * @param x The X coordinate of the pagelist.
@@ -182,8 +182,7 @@ gui_pagelist_new_t *gui_pagelist_new_create_horizontal(void *parent,
 /**
  * @brief Adds a new item to the end of the page list.
  *
- * This function adds a new item to the end of the `gui_pagelist_new_t` structure.
- * The item will contain the specified text and an associated click event callback function.
+ * This function adds a new item to the end of the `gui_pagelist_new_t` structure. The item will contain the specified text and an associated click event callback function.
  *
  * @param pagelist_new Pointer to the page list where the item will be added.
  * @param item_click_function Callback function that will be triggered when the item is clicked.
@@ -196,9 +195,7 @@ void gui_page_list_new_pushback(gui_pagelist_new_t *pagelist_new,
 /**
  * @brief Removes an item from the page list by its ID.
  *
- * This function removes the item identified by the given ID from the
- * `gui_pagelist_new_t` structure. If the ID is not valid, the behavior
- * of this function is unspecified.
+ * This function removes the item identified by the given ID from the `gui_pagelist_new_t` structure. If the ID is not valid, the behavior of this function is unspecified.
  *
  * @param pagelist_new Pointer to the page list from which the item will be removed.
  * @param id The ID of the item to be removed.
@@ -208,8 +205,7 @@ void gui_page_list_new_erase(gui_pagelist_new_t *pagelist_new, int id);
 /**
  * @brief Sets the selected item id in the pagelist_new widget.
  *
- * This function sets the selected item id in the pagelist_new widget. The id is
- * the index of the item in the pagelist_new widget.
+ * This function sets the selected item id in the pagelist_new widget. The id is the index of the item in the pagelist_new widget.
  *
  * @param pagelist_new Pointer to the pagelist_new widget.
  * @param id The index of the item to be selected in the pagelist_new widget.

@@ -127,14 +127,13 @@ typedef struct gui_curtainview
 
 /**
  * @brief Create a curtainview widget, which can nest curtains.
- * @param parent the father widget it nested in.
- * @param filename this curtainview widget's name.
- * @param x the X-axis coordinate relative to parent widget.
- * @param y the Y-axis coordinate relative to parent widget.
- * @param w width.
- * @param h height.
- * @return return the widget object pointer.
- *
+ * @param parent The father widget it nested in.
+ * @param filename This curtainview widget's name.
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Width.
+ * @param h Height.
+ * @return Return the widget object pointer.
  */
 gui_curtainview_t *gui_curtainview_create(void       *parent,
                                           const char *name,
@@ -144,10 +143,9 @@ gui_curtainview_t *gui_curtainview_create(void       *parent,
                                           int16_t     h);
 
 /**
- * @brief Curtain expanding completed event
- *
- * @param this widget pointer
- * @param cb event callback
+ * @brief Set the callback for curtain expanding completed event.
+ * @param this Widget pointer.
+ * @param cb Event callback.
  */
 void gui_curtainview_set_done_cb(gui_curtainview_t *_this, void (*cb)(gui_curtainview_t *_this));
 

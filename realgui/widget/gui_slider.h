@@ -91,17 +91,17 @@ _GUI_API_DECLARE(gui_slider_t)
 /**
  * @brief Create a slider widget.
  *
- * @param parent the father widget the page nested in.
- * @param bg_img the background image of the slider widget.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @param minValue minimum value of slider range.
- * @param maxValue maximum value of slider range.
- * @param slider_img the slider image of the slider widget.
- * @param currentValue the current value selected by the slider.
- * @param slider_size the size of slider.
+ * @param parent The father widget the page nested in.
+ * @param bg_img The background image of the slider widget.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @param minValue Minimum value of slider range.
+ * @param maxValue Maximum value of slider range.
+ * @param slider_img The slider image of the slider widget.
+ * @param currentValue The current value selected by the slider.
+ * @param slider_size The size of slider.
  * @return gui_slider_t*
  */
 gui_slider_t *gui_slider_create(void          *parent,

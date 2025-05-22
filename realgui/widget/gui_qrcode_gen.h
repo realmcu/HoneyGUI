@@ -77,11 +77,11 @@ int gui_qrcode_gen_get_size(const uint8_t qrcode[]);
 bool gui_qrcode_gen_get_module(const uint8_t qrcode[], int x, int y);
 
 /**
- * @brief obtain the encoded data
+ * @brief Obtain the encoded data.
  *
- * @param data data that needs to be encoded
- * @param data_length the length of data
- * @param flag data format, 0 representing text and 1 representing binary
+ * @param data Data that needs to be encoded.
+ * @param data_length The length of data.
+ * @param flag Data format, 0 representing text and 1 representing binary.
  */
 uint8_t *gui_qrcode_gen_get_data(unsigned char *data, uint16_t data_length, uint8_t flag);
 

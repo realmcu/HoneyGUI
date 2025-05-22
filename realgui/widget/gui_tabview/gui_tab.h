@@ -85,17 +85,17 @@ typedef struct
  *============================================================================*/
 
 /**
- * @brief create a tab widget, which should be nested in a tabview.
- * @param parent the father widget it nested in.
- * @param filename _this tab widget's name.
- * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @param idx the X-axis index in a tabview.
- * @param idy the Y-axis index in a tabview.
- * @return return the widget object pointer.
+ * @brief Creates a tab widget, which should be nested in a tabview.
  *
+ * @param parent The parent widget it is nested in.
+ * @param filename The tab widget's name.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @param idx The X-axis index in a tabview.
+ * @param idy The Y-axis index in a tabview.
+ * @return The widget object pointer.
  */
 gui_tab_t *gui_tab_create(void       *parent,
                           const char *name,
@@ -107,72 +107,79 @@ gui_tab_t *gui_tab_create(void       *parent,
                           int16_t     idy);
 
 /**
- * @brief get run time envriment obj
+ * @brief Gets the runtime environment object.
  *
- * @param _this tab widget pointer
+ * @param _this Tab widget pointer.
  */
 gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *_this);
 
 /**
- * @brief set style of _this tab
+ * @brief Sets the style of the tab.
  *
- * @param _this tab widget pointer
- * @param style slide style
+ * @param _this Tab widget pointer.
+ * @param style Slide style.
  */
 void gui_tab_set_style(gui_tab_t *_this, T_SLIDE_STYLE style);
 
 /**
- * @brief when enable preload, call _this API can update preload buffer
+ * @brief Updates the preload buffer when preload is enabled.
  *
- * @param obj tab widget pointer
+ * @param obj Tab widget pointer.
  */
 void gui_tab_update_preload(gui_obj_t *obj);
 
 /**
- * @brief
+ * @brief Rotates the tab widget.
  *
- * @param obj tab widget pointer
- * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
- * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
+ * @param obj Tab widget pointer.
+ * @param tab_x_gap The relative position difference in the X direction.
+ * @param tab_y_gap The relative position difference in the Y direction.
  */
 void gui_tab_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
- * @brief
+ * @brief Reduces the tab widget.
  *
- * @param obj tab widget pointer
- * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
- * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
+ * @param obj Tab widget pointer.
+ * @param tab_x_gap The relative position difference in the X direction.
+ * @param tab_y_gap The relative position difference in the Y direction.
  */
 void gui_tab_reduction(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
- * @brief
+ * @brief Reduces and fades the tab widget.
  *
- * @param obj tab widget pointer
- * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
- * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
+ * @param obj Tab widget pointer.
+ * @param tab_x_gap The relative position difference in the X direction.
+ * @param tab_y_gap The relative position difference in the Y direction.
  */
 void gui_tab_reduction_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
- * @brief
+ * @brief Fades the tab widget.
  *
- * @param obj tab widget pointer
- * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
- * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
+ * @param obj Tab widget pointer.
+ * @param tab_x_gap The relative position difference in the X direction.
+ * @param tab_y_gap The relative position difference in the Y direction.
  */
 void gui_tab_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
- * @brief
+ * @brief Applies a cube effect to the tab widget.
  *
- * @param obj tab widget pointer
- * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
- * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
+ * @param obj Tab widget pointer.
+ * @param tab_x_gap The relative position difference in the X direction.
+ * @param tab_y_gap The relative position difference in the Y direction.
  */
 void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
+/**
+ * @brief Applies a rotate book effect to the tab widget.
+ *
+ * @param obj Tab widget pointer.
+ * @param tab_x_gap The relative position difference in the X direction.
+ * @param tab_y_gap The relative position difference in the Y direction.
+ */
 void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 #ifdef __cplusplus

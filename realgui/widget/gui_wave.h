@@ -69,15 +69,15 @@ typedef struct gui_wave
  *============================================================================*/
 
 /**
- * @brief create a wave widget.
+ * @brief Create a wave widget.
  *
- * @param parent the father widget the wave nested in.
- * @param filename the wave widget name.
- * @param x X-axis coordinate
- * @param x Y-axis coordinate
- * @param w width
- * @param h hight
- * @return return the widget object pointer
+ * @param parent The father widget the wave nested in.
+ * @param filename The wave widget name.
+ * @param x X-axis coordinate.
+ * @param x Y-axis coordinate.
+ * @param w Width.
+ * @param h Height.
+ * @return Return the widget object pointer.
  *
  * <b>Example usage</b>
  * \code{.c}
@@ -94,14 +94,14 @@ gui_wave_t *gui_wave_create(void       *parent,
                             int16_t     h);
 
 /**
- * @brief set wave size
+ * @brief Set wave size.
  *
- * @param this widget pointer
- * @param x  X-axis coordinate
- * @param y  Y-axis coordinate
- * @param w  width
- * @param h  hight
- * @param t  one frame time
+ * @param this Widget pointer.
+ * @param x  X-axis coordinate.
+ * @param y  Y-axis coordinate.
+ * @param w  Width.
+ * @param h  Height.
+ * @param t  One frame time.
  */
 void gui_wave_set(gui_wave_t *this,
                   float       x,

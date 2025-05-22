@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_img_scope.h
-  * @brief  create a picture with scope
-  * @details only display pixels in scope
+  * @brief  Create a picture with scope.
+  * @details Only display pixels in scope.
   * @author triton_yu@realsil.com.cn
   * @date 2023/11/8
   * @version 1.0
@@ -69,12 +69,12 @@ typedef struct gui_img_scope
  *============================================================================*/
 
 /**
- * @brief create a picture with scope,only display pixels in scope
+ * @brief Create a picture with scope. Only display pixels in scope.
  *
- * @param parent parent widget
- * @param addr ftl or xip address, use xip address
- * @param x the x coordinate
- * @param y the y coordinate
+ * @param parent Parent widget.
+ * @param addr Ftl or xip address, use xip address.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
  * @return gui_img_scope_t*
  */
 gui_img_scope_t *gui_img_scope_create(void    *parent,
@@ -83,12 +83,12 @@ gui_img_scope_t *gui_img_scope_create(void    *parent,
                                       int16_t  x,
                                       int16_t  y);
 /**
- * @brief create a picture from with scope,only display pixels in scope
+ * @brief Create a picture from with scope. Only display pixels in scope.
  *
- * @param parent parent widget
- * @param ftl not xip address, use ftl address
- * @param x the x coordinate
- * @param y the y coordinate
+ * @param parent Parent widget.
+ * @param ftl Not xip address, use ftl address.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
  * @return gui_img_scope_t*
  */
 gui_img_scope_t *gui_img_scope_create_from_ftl(void    *parent,
@@ -98,13 +98,13 @@ gui_img_scope_t *gui_img_scope_create_from_ftl(void    *parent,
                                                int16_t  y);
 
 /**
- * @brief
+ * @brief Set the range of the image scope.
  *
- * @param _this
- * @param x1
- * @param y1
- * @param x2
- * @param y2
+ * @param _this The image scope object.
+ * @param x1 The x1 coordinate.
+ * @param y1 The y1 coordinate.
+ * @param x2 The x2 coordinate.
+ * @param y2 The y2 coordinate.
  */
 void gui_img_scope_set_range(gui_img_scope_t *_this, int16_t x1, int16_t y1, int16_t x2,
                              int16_t y2);

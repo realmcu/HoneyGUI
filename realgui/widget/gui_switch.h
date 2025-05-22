@@ -119,15 +119,15 @@ typedef enum
  *============================================================================*/
 
 /**
- * @brief create a switch widget, file source is memory address.
- * @param parent the father widget it nested in.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @param off_pic off status image memory address.
- * @param on_pic on status image memory address.
- * @return return the widget object pointer.
+ * @brief Create a switch widget, file source is memory address.
+ * @param parent The father widget it nested in.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @param off_pic Off status image memory address.
+ * @param on_pic On status image memory address.
+ * @return Return the widget object pointer.
  *
  */
 gui_switch_t *gui_switch_create(void    *parent,
@@ -139,15 +139,15 @@ gui_switch_t *gui_switch_create(void    *parent,
                                 void    *on_pic);
 
 /**
- * @brief create a switch widget, file source is filesystem.
- * @param parent the father widget it nested in.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @param off_pic off status image filepath.
- * @param on_pic on status image filepath.
- * @return return the widget object pointer.
+ * @brief Create a switch widget, file source is filesystem.
+ * @param parent The father widget it nested in.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @param off_pic Off status image filepath.
+ * @param on_pic On status image filepath.
+ * @return Return the widget object pointer.
  *
  */
 gui_switch_t *gui_switch_create_from_fs(void    *parent,
@@ -158,15 +158,15 @@ gui_switch_t *gui_switch_create_from_fs(void    *parent,
                                         void    *off_pic,
                                         void    *on_pic);
 /**
- * @brief create a switch widget, file source is memory address.
- * @param parent the father widget it nested in.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @param off_pic off status image filepath.
- * @param on_pic on status image filepath.
- * @return return the widget object pointer.
+ * @brief Create a switch widget, file source is memory address.
+ * @param parent The father widget it nested in.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @param off_pic Off status image filepath.
+ * @param on_pic On status image filepath.
+ * @return Return the widget object pointer.
  *
  */
 gui_switch_t *gui_switch_create_from_ftl(void    *parent,
@@ -178,38 +178,38 @@ gui_switch_t *gui_switch_create_from_ftl(void    *parent,
                                          void    *on_pic);
 
 /**
- * @brief turn on the switch, event will be triggered.
+ * @brief Turn on the switch, event will be triggered.
  *
- * @param this widget object pointer.
+ * @param this Widget object pointer.
  */
 void gui_switch_turn_on(gui_switch_t *);
 
 /**
- * @brief turn off the switch, event will be triggered.
+ * @brief Turn off the switch, event will be triggered.
  *
- * @param this widget object pointer.
+ * @param this Widget object pointer.
  */
 void gui_switch_turn_off(gui_switch_t *);
 
 /**
- * @brief if the switch has been turned on somehow, it can upadte the status to on status.
+ * @brief If the switch has been turned on somehow, it can update the status to on status.
  *
- * @param this widget object pointer.
+ * @param this Widget object pointer.
  */
 void gui_switch_is_on(gui_switch_t *);
 
 /**
- * @brief if the switch has been turned off somehow, it can upadte the status to off status.
+ * @brief If the switch has been turned off somehow, it can update the status to off status.
  *
- * @param this widget object pointer.
+ * @param this Widget object pointer.
  */
 void gui_switch_is_off(gui_switch_t *);
 
 /**
- * @brief set sw state and change ui, NO event will be trigered.
+ * @brief Set sw state and change ui, NO event will be triggered.
  *
- * @param this widget object pointer.
- * @param ifon set sw state.
+ * @param this Widget object pointer.
+ * @param ifon Set sw state.
  */
 void gui_switch_change_state(gui_switch_t *, bool ifon);
 

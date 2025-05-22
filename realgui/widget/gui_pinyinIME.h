@@ -101,18 +101,18 @@ typedef struct
  *============================================================================*/
 
 /**
-* @brief set dictonary and info file for ime
+* @brief Set dictionary and info file for IME.
 * @note
-* @param this the ime object pointer
-* @param file_dict_info   the dictionary info file
-* @param file_dict the dictionary file
+* @param this the IME object pointer.
+* @param file_dict_info The dictionary info file.
+* @param file_dict The dictionary file.
 */
 void gui_IME_set_dict(gui_ime_t *this, void *file_dict_info, void *file_dict);
 
 /**
- * @brief create a pinyin ime object
+ * @brief Create a pinyin IME object.
  * @note
- * @param kb_cand_page_size number of candidate words for one page, depended on keyboard ui layout
+ * @param kb_cand_page_size Number of candidate words for one page, depended on keyboard UI layout.
  */
 gui_ime_t *gui_pinyin_IME_create(uint16_t kb_cand_page_size);
 
