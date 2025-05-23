@@ -17,14 +17,14 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #ifdef RTL8763EP
     return malloc(size);
 #elif defined RTL87x2G
-    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 32) * 1024);
 #elif defined CONFIG_SOC_SERIES_RTL8773E
-    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 32) * 1024);
 #elif defined RTL8762D
     js_buffer = (void *)(0x6900000);
 
 #elif defined __WIN32
-    static uint8_t buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
+    static uint8_t buffer[(PKG_JMEM_HEAP_SIZE + 32) * 1024] = {0};
     js_buffer = buffer;
 #else
     js_buffer = malloc(size);
@@ -36,7 +36,7 @@ static void *context_alloc(size_t size, void *cb_data_p)
 // Only for js script loading !
 static void *script_malloc(void)
 {
-#define JS_SCRIPT_BUFF_SIZE (100 * 1024)
+#define JS_SCRIPT_BUFF_SIZE (50 * 1024)
     void *scipt_buff = NULL;
 
 #ifdef RTL8763EP

@@ -47,7 +47,11 @@ struct widget_create
 };
 
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
-#define XML_DOM_KEY_COUINT (UINT8_MAX + 1)
+#define XML_DOM_KEY_COUINT (INT8_MAX + 1)
+int gui_dom_get_key_count()
+{
+    return XML_DOM_KEY_COUINT;
+}
 #define XML_DOM_WIFI_COUINT (30)
 typedef struct xml_dom_wifi
 {
@@ -2034,12 +2038,12 @@ static void on_click_jump_cb_tabview(void *obj, gui_event_t e, struct on_click_j
     if (param->to_widget_name)
     {
         GUI_WIDGET_POINTER_BY_NAME(tabview, param->to_widget_name);
-        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2); gui_log("on_click_jump_cb_tabview1");
     }
     else
     {
         GUI_WIDGET_POINTER_BY_TYPE(tabview, TABVIEW, &(gui_current_app()->screen));
-        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2); gui_log("on_click_jump_cb_tabview2");
     }
 
 
@@ -7018,13 +7022,35 @@ static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_O
 
 #define BOARD_SDL2
 //#include "board_xml.h"
+/**
+ * @brief Structure to represent the state of a key in the XML DOM.
+ *
+ * This structure holds the state of a key, indicating whether it is pressed (down) or released (up).
+ */
 typedef struct xml_dom_key
 {
-    bool down;
-    bool up;
+    bool down; /**< True if the key is pressed, false otherwise. */
+    bool up;   /**< True if the key is released, false otherwise. */
 } xml_dom_key_t;
 
+/**
+ * @brief Global array to store the state of all keys in the XML DOM.
+ *
+ * This array holds the state of keys, indexed by their ID, with a size defined by XML_DOM_KEY_COUINT.
+ */
 static xml_dom_key_t xml_dom_key_array[XML_DOM_KEY_COUINT];
+
+/**
+ * @brief Updates the state of a key in the XML DOM key array.
+ *
+ * This function sets the `up` and `down` states of a key identified by its ID in the `xml_dom_key_array`.
+ * It validates the ID to ensure it is within the valid range before updating the state.
+ *
+ * @param id The index of the key in the `xml_dom_key_array` (must be between 0 and XML_DOM_KEY_COUINT - 1).
+ * @param up The state of the key release (true for released, false otherwise).
+ * @param down The state of the key press (true for pressed, false otherwise).
+ * @return gui_error_t Returns GUI_SUCCESS if the update is successful, or GUI_ERROR_NULL if the ID is out of range.
+ */
 gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down)
 {
     if (id >= 0 && id <= XML_DOM_KEY_COUINT - 1)
@@ -14115,6 +14141,7 @@ static void app_xml_ui_design(gui_app_t *app)
 {
     extern void create_tree(gui_app_t *app);
     create_tree(app);
+    //gui_fps_create(app);
     gui_fb_change();
 }
 static gui_app_t app_xml =
