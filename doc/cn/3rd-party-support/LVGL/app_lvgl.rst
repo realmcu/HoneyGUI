@@ -156,19 +156,19 @@ HoneyGUI LVGL
 
 1. HoneyGUI 中 LVGL 源文件在目录 :file:`your HoneyGUI dir/lvgl` 下：
 
-- demos：存放 LVGL 一些综合的内置示例，部分示例可以在 `LVGL Demo <https://lvgl.io/demos>`_ 中体验。
+- :file:`demos`：存放 LVGL 一些综合的内置示例，部分示例可以在 `LVGL Demo <https://lvgl.io/demos>`_ 中体验。
 
-- docs：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：`LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ 。
+- :file:`docs`：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：`LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ 。
 
-- env_support：一些环境或者平台的支持。
+- :file:`env_support`：一些环境或者平台的支持。
 
-- examples：存放 LVGL 的内置示例，可在 `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ 中体验。
+- :file:`examples`：存放 LVGL 的内置示例，可在 `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ 中体验。
 
-- scripts：存放一些处理脚本，在使用 LVGL 时基本不会用到。
+- :file:`scripts`：存放一些处理脚本，在使用 LVGL 时基本不会用到。
 
-- src：存放 LVGL 实际的源码，使用 LVGL 进行开发时，都是使用这里面的代码文件。
+- :file:`src`：存放 LVGL 实际的源码，使用 LVGL 进行开发时，都是使用这里面的代码文件。
 
-- tests：存放一些 CI 测试文件，在使用 LVGL 时不会用到。
+- :file:`tests`：存放一些 CI 测试文件，在使用 LVGL 时不会用到。
 
 2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 :file:`your HoneyGUI dir/realgui/example/demo` 下的 :file:`app_ui_lvgl.c` 开始运行。
 

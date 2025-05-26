@@ -145,19 +145,19 @@ The directories and files related to LVGL in HoneyGUI are as follows:
 
 1. In HoneyGUI, the LVGL source files are located in the directory :file:`your HoneyGUI dir/lvgl`:
 
-   - demos: Contains various comprehensive built-in examples of LVGL. Some examples can be experienced on  `LVGL Demo <https://lvgl.io/demos>`_ .
+   - :file:`demos`: Contains various comprehensive built-in examples of LVGL. Some examples can be experienced on  `LVGL Demo <https://lvgl.io/demos>`_ .
 
-   - docs: Contains the development documentation for LVGL. It can be read online on the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_.
+   - :file:`docs`: Contains the development documentation for LVGL. It can be read online on the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_.
 
-   - env_support: Provides support for various environments or platforms.
+   - :file:`env_support`: Provides support for various environments or platforms.
 
-   - examples: Stores the built-in examples of LVGL. They can be experienced on `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ .
+   - :file:`examples`: Stores the built-in examples of LVGL. They can be experienced on `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ .
 
-   - scripts: Contains some processing scripts that are not typically used when using LVGL.
+   - :file:`scripts`: Contains some processing scripts that are not typically used when using LVGL.
 
-   - src: Stores the actual source code of LVGL. When developing with LVGL, the code files from this directory are used.
+   - :file:`src`: Stores the actual source code of LVGL. When developing with LVGL, the code files from this directory are used.
 
-   - tests: Contains some CI testing files that are not used when using LVGL.
+   - :file:`tests`: Contains some CI testing files that are not used when using LVGL.
 
 2. When running LVGL with the HoneyGUI simulator, the LVGL UI will start running from the file :file:`app_ui_lvgl.c` under the directory :file:`your HoneyGUI dir/realgui/example/demo`.
 
@@ -177,7 +177,7 @@ Display
 ----------------
 - Documentation:  `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_, `LVGL Overview Display <https://docs.lvgl.io/8.3/overview/display.html>`_
 
-Once the developers have completed the debugging of the display device driver, and the device can communicate properly with the display device and show colors. This section explains how to interface the driver with LVGL's display interface to render LVGL's UI.”
+Once the developers have completed the debugging of the display device driver, and the device can communicate properly with the display device and show colors. This section explains how to interface the driver with LVGL's display interface to render LVGL's UI.
 
 The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function :func:`void lv_port_disp_init(void)`, such as screen size and frame buffer configuration. The display refresh function is defined as :func:`void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)`.
 
@@ -656,7 +656,7 @@ Benchmark for Reference
   RTL8772G, 125MHz, PPE1.0, 240*280, Double buffing, Weighted FPS:721; Opa. speed: 77%
   RTL8773E, 100MHz, PPE2.0, 390*450, Double buffing, Weighted FPS:159; Opa. speed: 86%
 
-.. csv-table:: Render acceleration on different platforms
+.. csv-table:: Render Acceleration On Different Platforms
   :header: Chip Model, CPU CLK, Hardware Accelerator, Image Rendering, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Filling, RLE Decoding, Characters, Lines
   :align: center
   
@@ -1018,7 +1018,7 @@ HoneyGUI vs LVGL Picture Drawing Frame Rate
 
 GRAM Screen (280x456) RAM Block Drawing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Background: RTL8772G, RGB565, uncompressed images, test for the performance of displaying a single image (HoneyGUI rectangle fill data is temporarily unavailable; LVGL has not adapted PPE hardware acceleration for image scaling yet).
+Background: RTL8772G, RGB565, uncompressed images, test for the performance of displaying a single image.
 
 .. csv-table:: RAM Block Drawing
   :header: Test Case, HoneyGUI FPS (SW), HoneyGUI FPS (PPE), LVGL FPS (SW), LVGL FPS (PPE)
