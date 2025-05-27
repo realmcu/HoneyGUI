@@ -18,7 +18,8 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D'):
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D'):
-    src += ['app_ui_realgui_3d_prism_mirror.c']
+    src += [cwd + '/prism3d/src/app_ui_realgui_3d_view_image.c']
+    src += [cwd + '/prism3d/src/app_ui_realgui_3d_view_prism.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_FACE_3D'):
