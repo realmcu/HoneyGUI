@@ -37,10 +37,10 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  curtain structure */
+/** @brief  Curtain structure. */
 typedef struct gui_curtain
 {
-    gui_obj_t base; //!< base structure
+    gui_obj_t base; //!< Base structure.
     T_GUI_CURTAIN_ENUM orientation;
     float scope;
 } gui_curtain_t;

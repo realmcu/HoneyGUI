@@ -293,11 +293,11 @@ void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE
 /**
  * @brief Set emoji file path and emoji size.
  * @note Need romfs.
- * @note Example of a full emoji image file path: "font/emoji/emoji_u1f30d.bin".
+ * @note Example of a full emoji image file path: 'font/emoji/emoji_u1f30d.bin'.
  * @param this The text widget pointer.
- * @param path Path contain folder path and file name prefix. Path eg:"font/emoji/emoji_u".
- * Folder path is emoji image file folder path, eg:"font/emoji/".
- * File name prefix is prefix before the filename for Unicode sorting, eg:"emoji_u".
+ * @param path Path contain folder path and file name prefix. Path eg: 'font/emoji/emoji_u'.
+ * Folder path is emoji image file folder path, eg: 'font/emoji/'.
+ * File name prefix is prefix before the filename for Unicode sorting, eg: 'emoji_u'.
  * @param size Emoji image file size. eg 32.
  */
 void gui_text_emoji_set(gui_text_t *this_widget, uint8_t *path, uint8_t size);

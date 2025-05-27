@@ -10,7 +10,7 @@
 创建控件
 ~~~~~~~~
 
-开发者可以调用 :cpp:any:`gui_switch_create` 或者 :cpp:any:`gui_switch_create_from_ftl` 从内存地址创建开关控件，使用:cpp:any:`gui_switch_create_from_fs` 从文件系统创建开关控件。
+开发者可以调用 :cpp:any:`gui_switch_create` 或者 :cpp:any:`gui_switch_create_from_ftl` 从内存地址创建开关控件，使用 :cpp:any:`gui_switch_create_from_fs` 从文件系统创建开关控件。
 可以参考`gui_switch_t`中的具体参数，例如base、switch_picture、on_pic_addr、off_pic_addr等。
 
 开/关

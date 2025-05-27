@@ -70,7 +70,7 @@ typedef enum
 } T_GUI_CURTAIN_ENUM;
 /* T_GUI_CURTAIN_ENUM end*/
 
-/** @brief  curtainview structure */
+/** @brief  Curtainview structure. */
 typedef struct gui_curtainview
 {
     gui_obj_t base;

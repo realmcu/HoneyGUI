@@ -37,7 +37,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  tab widget ID structure */
+/** @brief  Tab widget ID structure. */
 typedef struct
 {
     int32_t x;
@@ -45,7 +45,7 @@ typedef struct
     int32_t z;
 } gui_tab_id_t;
 
-/** @brief  tab widget structure */
+/** @brief  Tab widget structure. */
 typedef struct
 {
     gui_obj_t base;             //!< base structure
@@ -57,7 +57,7 @@ typedef struct
     gui_obj_t *rte_obj; //run time envriment
 } gui_tab_t;
 
-/** @brief  tab widget stacking structure */
+/** @brief  Tab widget stacking structure. */
 typedef struct
 {
     float scale;

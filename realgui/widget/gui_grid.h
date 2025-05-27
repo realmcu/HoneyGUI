@@ -39,11 +39,11 @@ extern "C" {
  *============================================================================*/
 
 /* T_GUI_GRID_STYLE enum start*/
-/** @brief  support two style */
+/** @brief  Support two style. */
 typedef enum
 {
-    GRID_CLASSIC,         //!< Evenly layout vertically and horizontally
-    GRID_SCALE,           //!< scale by slide
+    GRID_CLASSIC,         //!< Evenly layout vertically and horizontally.
+    GRID_SCALE,           //!< Scale by slide.
 } T_GUI_GRID_STYLE;
 /* T_GUI_GRID_STYLE enum end*/
 
