@@ -49,18 +49,13 @@ Widgets
 .. toctree::
     :maxdepth: 2
 
-    Obj <gui_obj>
     Window <gui_window>
     Img <gui_img>
-    Simple Img <gui_simple_img>
-    STB Img <gui_img_stb>
     Text <gui_text>
     Tabview <gui_tabview>
     Tab <gui_tab>
     Curtainview <gui_curtainview>
     Curtain <gui_curtain>
-    Cardview <gui_cardview>
-    Card <gui_card>
     Page <gui_page>
     Page List <gui_pagelist>
     Switch <gui_switch>
@@ -68,5 +63,4 @@ Widgets
     Progressbar <gui_progressbar>
     Canvas <gui_canvas>
     Return <gui_return>
-	Qbcode <gui_qbcode>
-    Multi Level <gui_multi_level>
+	

@@ -50,18 +50,13 @@
 .. toctree::
     :maxdepth: 2
 
-    对象 (Obj) <gui_obj>
     窗口 (Window) <gui_window>
     图像 (Img) <gui_img>
-    简单图像 (Simple Img) <gui_simple_img>
-    STB图像 (STB Img) <gui_img_stb>
     文本 (Text) <gui_text>
     选项卡容器 (Tabview) <gui_tabview>
     选项卡 (Tab) <gui_tab>
     幕布容器 (Curtainview) <gui_curtainview>
     幕布 (Curtain) <gui_curtain>
-    卡片容器 (Cardview) <gui_cardview>
-    卡片 (Card) <gui_card>
     页面 (Page) <gui_page>
     页面列表 (Page List) <gui_pagelist>
     开关(Switch) <gui_switch>
@@ -69,5 +64,4 @@
     进度条 (Progressbar) <gui_progressbar>
     画布 (Canvas) <gui_canvas>
     返回 (Return) <gui_return>
-	二维码或条形码 (Qbcode) <gui_qbcode>
-    多级菜单 (Multi Level) <gui_multi_level>
+	
