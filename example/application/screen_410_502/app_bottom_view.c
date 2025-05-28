@@ -73,13 +73,13 @@ const char *month[12] =
 };
 const char *day[7] =
 {
-    "SUN",
-    "MON",
-    "TUE",
-    "WED",
-    "THU",
-    "FRI",
-    "SAT"
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat"
 };
 
 extern void *text_num_array[];

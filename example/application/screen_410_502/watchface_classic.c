@@ -31,7 +31,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 gui_win_t *win_watch;
 static gui_text_t *date_text;
 static char date_text_content[10];
-static char weekday_content[30];
+// static char weekday_content[30];
 extern struct tm *timeinfo;
 
 bool return_to_watchface_flag; //true: return to watchface; false: return to app_menu
@@ -55,6 +55,8 @@ static gui_img_t *img_heart_rate;
 static uint8_t *img_data_temperature;
 static uint8_t *img_data_activity;
 static size_t buffer_size;
+
+static gui_text_t *weather_date_text[4];
 
 extern char *cjson_content;
 
@@ -101,14 +103,17 @@ static void refreash_time()
     // gui_text_convert_to_img(date_text, RGB565);
 
     // refreash weather date
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "weather_text", win_watch)
-    uint8_t index = timeinfo->tm_wday;
+    // GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "weather_text", win_watch)
+    uint8_t index = timeinfo->tm_wday + 1;
 
-    sprintf(weekday_content, "%s.  %s.  %s.  %s.", day[(index + 1) % 7], day[(index + 2) % 7],
-            day[(index + 3) % 7],
-            day[(index + 4) % 7]);
+    // sprintf(weekday_content, "%s.   %s.  %s.   %s.", day[(index + 1) % 7], day[(index + 2) % 7],
+    //         day[(index + 3) % 7],
+    //         day[(index + 4) % 7]);
     // gui_log("%s\r\n", weekday_content);
-    gui_text_content_set((gui_text_t *)obj, weekday_content, strlen(weekday_content));
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        gui_text_content_set(weather_date_text[i], day[(index + i) % 7], 3);
+    }
 }
 
 void clear_clock(void)
@@ -673,8 +678,8 @@ void create_watchface_classic(gui_view_t *view)
         gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_M_BIN, 150, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_4", UI_WEATHER_RAIN_S_BIN, 208, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_5", UI_WEATHER_SUNNY_BIN, 272, 73, 0, 0);
-        char *weather_content = "TODAY";
-        gui_text_t *weather_text = gui_text_create(img_weather, "",  16, 110, 0, 0);
+        char *weather_content = "Today";
+        gui_text_t *weather_text = gui_text_create(img_weather, "txt", 20, 110, 0, 0);
         gui_text_set(weather_text, (void *)weather_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                      strlen(weather_content),
                      24);
@@ -682,13 +687,15 @@ void create_watchface_classic(gui_view_t *view)
         gui_text_mode_set(weather_text, LEFT);
         gui_text_rendermode_set(weather_text, 2);
 
-        sprintf(weekday_content, "MON.  TUE.  WED.  THU.");
-        weather_text = gui_text_create(img_weather, "weather_text",  88, 110, 0, 0);
-        gui_text_set(weather_text, (void *)weekday_content, GUI_FONT_SRC_TTF, gui_rgba(242, 242, 242, 255),
-                     strlen(weekday_content),
-                     24);
-        gui_text_type_set(weather_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
-        gui_text_mode_set(weather_text, LEFT);
+        for (uint8_t i = 0; i < 4; i++)
+        {
+            weather_date_text[i] = gui_text_create(img_weather, "weather_date_text",
+                                                   88 + i * 60, 110, 0, 0);
+            gui_text_set(weather_date_text[i], (void *)day[i], GUI_FONT_SRC_TTF, gui_rgba(242, 242, 242, 255),
+                         3, 24);
+            gui_text_type_set(weather_date_text[i], SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(weather_date_text[i], LEFT);
+        }
 
         sprintf(content_cur, "22°");
         weather_cur = gui_text_create(img_weather, "weather_cur",  37, 5, 0, 0);

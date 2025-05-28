@@ -268,11 +268,18 @@ void app_menu_design(gui_view_t *view)
             UI_CLOCK_BOX2D_RING_ICON_BIN,
             UI_CLOCK_ACTIVITY_ICON_BIN,
             UI_CLOCK_HEARTRATE_ICON_BIN,
-            UI_CLOCK_HEARTRATE_ICON_BIN,
-            UI_CLOCK_HEARTRATE_ICON_BIN,
+            UI_CLOCK_MUSIC_ICON_BIN,
+            UI_CLOCK_FRUIT_NINJA_ICON_BIN,
+            UI_CLOCK_BOX2D_RING_ICON_BIN,
+            UI_CLOCK_ACTIVITY_ICON_BIN,
         };
         char *text_array[] =
         {
+            "Heart Rate",
+            "Music",
+            "Fruit Ninja",
+            "Box2d Ring",
+            "Activity",
             "Heart Rate",
             "Music",
             "Fruit Ninja",
