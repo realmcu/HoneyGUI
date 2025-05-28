@@ -2,18 +2,15 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "gui_app.h"
 #include "time.h"
-#include "gui_curtainview.h"
 #include <math.h>
 #include "cJSON.h"
 #include "gui_canvas_img.h"
-#include "gui_curtain.h"
 #include "gui_canvas_rect.h"
 #include "guidef.h"
-#include "gui_tabview.h"
+#include "gui_view.h"
 #include "app_hongkong.h"
-#include "gui_return.h"
+#include "tp_algo.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -25,13 +22,15 @@ const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *heartrate_view = NULL;
 void activity_app(gui_view_t *view);
+void clear_activity();
 
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .design_cb = activity_app,
+    .on_switch_in = activity_app,
+    .on_switch_out = clear_activity,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -55,17 +54,16 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 extern char *cjson_content;
 static uint8_t *img_data = NULL;
+static gui_img_t *img;
 static float progress = 0;
-static bool animate_flag = 0;
 static bool draw_flag = 0;
+static size_t buffer_size = 0;
 static char move_content[30], ex_content[30], stand_content[30];
 
 static gui_text_t *move_text, *ex_text, *stand_text;
-static gui_img_t *img;
 
-void clear_activity(void)
+void clear_activity()
 {
-    // move_text = NULL;
     if (img_data)
     {
         gui_lower_free(img_data);
@@ -83,7 +81,6 @@ static void arc_activity_cb(NVGcontext *vg)
     if (!draw_flag)
     {
         draw_flag = 1;
-        // progress = 1.0f;
         if (!cjson_content)
         {
             return;
@@ -182,55 +179,57 @@ static void arc_activity_cb(NVGcontext *vg)
     // gui_log("progress: %f\n", progress);
 }
 // cppcheck-suppress syntaxError
-static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(canvas_activity_animation)
+static void activity_timer_cb(void *obj)
 {
-    if (animate_flag)
+    static uint16_t count = 0;
+    uint16_t count_max = 500;
+
+    gui_obj_timer_t *timer = img->base.timer;
+
+    count += timer->interval_ms;
+    progress = count / (float)count_max;
+    uint8_t *img_data = (void *)gui_img_get_image_data(img);
+    memset(img_data, 0, buffer_size);
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 200, 200, arc_activity_cb, img_data);
+    gui_img_set_image_data(img, img_data);
+    gui_img_refresh_size(img);
+    if (count >= count_max)
     {
-        progress = ((gui_img_t *)this_widget)->animate->progress_percent;
-        if (progress == 1.0f)
-        {
-            animate_flag = 0;
-        }
-        uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
-        memset(img_data, 0, (size_t)p);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 200, 200, arc_activity_cb, img_data);
-        gui_img_set_image_data(this_widget, img_data);
+        count = 0;
+        progress = 0;
+        gui_obj_stop_timer(GUI_BASE(img));
     }
 }
 
-static void return_cb()
+static void back2menu_cb()
 {
-    gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
 }
 
-static void win_cb(void *buffer_size)
+static void return_timer_cb()
 {
-    static bool flag = 0;
-    gui_view_t *view = gui_view_get_current_view();
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, SCREEN_WIDTH, back2menu_cb)
+}
+
+static void win_cb(void *obj)
+{
+    gui_view_t *view = gui_view_get_current();
     if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) == 0)
     {
-        if (!flag)
-        {
-            gui_img_set_animate(img, 1000, 0, canvas_activity_animation, buffer_size);
-            flag = 1;
-        }
-    }
-    else
-    {
-        flag = 0;
+        gui_obj_create_timer(GUI_BASE(img), 20, true, activity_timer_cb);
+        gui_obj_start_timer(GUI_BASE(img));
+        gui_obj_stop_timer(GUI_BASE(obj));
     }
 }
 
 void activity_app(gui_view_t *view)
 {
-    clear_mem();
-
     gui_obj_t *obj = GUI_BASE(view);
-    gui_win_t *win_animate = gui_win_create(obj, "win", 0, 0, 0, 0);
+    gui_win_t *win = gui_win_create(obj, "win", 0, 0, 0, 0);
 
-    size_t buffer_size = 0;
     // text
-    // if (!move_text)
     {
         move_text = gui_text_create(obj, "move_text", 150, 300, 0, 0);
         gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_TTF, gui_rgb(230, 67, 79),
@@ -267,32 +266,31 @@ void activity_app(gui_view_t *view)
             // gui_log("enter gui_lower_malloc\n");
         }
         memset(img_data, 0, buffer_size);
-        // gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
-        // if (img)
-        // {
-        //     gui_obj_tree_free(img);
-        // }
+        // gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
         img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
                                       50, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
-    animate_flag = 1;
     draw_flag = 0;
 
-    const char *name = GUI_BASE(gui_view_get_current_view())->name;
+    const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "watchface_view") == 0 || strcmp(name, "heartrate_view") == 0)
     {
-        gui_win_set_animate(win_animate, 1000, -1, (gui_animate_callback_t)win_cb, (void *)buffer_size);
-        gui_view_switch_on_event(view, watchface_view, VIEW_CUBE, VIEW_CUBE,
+        gui_obj_create_timer(GUI_BASE(win), 100, true, win_cb);
+        gui_obj_start_timer(GUI_BASE(win));
+        gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+                                 SWITCH_IN_FROM_LEFT_USE_CUBE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, heartrate_view, VIEW_CUBE, VIEW_CUBE,
+        gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_LEFT_USE_CUBE,
+                                 SWITCH_IN_FROM_RIGHT_USE_CUBE,
                                  GUI_EVENT_TOUCH_MOVE_LEFT);
     }
     else
     {
-        gui_img_set_animate(img, 1000, 0, canvas_activity_animation, (void *)buffer_size);
-        extern const uint32_t *gui_app_return_array[17];
-        gui_return_create(view, gui_app_return_array,
-                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_cb, 0);
+        gui_obj_create_timer(GUI_BASE(img), 20, true, activity_timer_cb);
+        gui_obj_start_timer(GUI_BASE(img));
+
+        gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
+        gui_obj_start_timer(GUI_BASE(win));
     }
 }

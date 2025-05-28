@@ -60,7 +60,7 @@ static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
             return;
         }
     }
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -101,7 +101,7 @@ static void gui_page_set_width(gui_obj_t *object, gui_obj_t *page)
             return;
         }
     }
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);

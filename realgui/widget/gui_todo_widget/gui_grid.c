@@ -51,8 +51,8 @@ static void gui_grid_update_att(struct _gui_obj_t *obj)
 {
     uint32_t member_count = 0;
     gui_grid_t *this = (void *)obj;
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
 
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
@@ -77,8 +77,8 @@ static void gui_grid_update_att(struct _gui_obj_t *obj)
 
 static void gui_grid_deal_img_in_root(gui_obj_t *object, float x, float y)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
 
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {

@@ -88,8 +88,8 @@ static void gui_gallery_reset_position(gui_gallery_t *this, gui_img_t *img, int1
 
 static void gui_gallery_img_copy(gui_img_t *img_des, gui_img_t *img_src)
 {
-    gui_list_t  child_list_tmp;
-    gui_list_t  brother_list_tmp;
+    gui_node_list_t  child_list_tmp;
+    gui_node_list_t  brother_list_tmp;
 
     child_list_tmp = img_des->base.child_list;
     brother_list_tmp = img_des->base.brother_list;

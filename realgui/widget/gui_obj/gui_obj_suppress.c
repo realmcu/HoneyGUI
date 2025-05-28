@@ -51,8 +51,8 @@
  *============================================================================*/
 static void gui_obj_suppress_child_event(gui_obj_t *obj, gui_event_t filter)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);

@@ -3,10 +3,8 @@
 #include "gui_canvas.h"
 #include "gui_win.h"
 #include "gui_obj.h"
-#include "gui_app.h"
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
-#include "gui_page.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -60,7 +58,8 @@ void page_ct_sidebar(void *parent)
             gui_img_t *img = gui_img_create_from_mem(win, 0, sidebar_app_array[index].img_addr,
                                                      SCREEN_WIDTH - 120, 20 + 110 * index, 0, 0);
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-            gui_obj_add_event_cb(GUI_BASE(img), sidebar_app_array[index].callback_function, GUI_EVENT_1, NULL);
+            gui_obj_add_event_cb(GUI_BASE(img), sidebar_app_array[index].callback_function,
+                                 GUI_EVENT_TOUCH_CLICKED, NULL);
             index++;
         }
         else

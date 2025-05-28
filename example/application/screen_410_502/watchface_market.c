@@ -1,33 +1,13 @@
-#include "gui_app.h"
+
+#if 0
 #include "gui_win.h"
-#include "gui_page.h"
+#include "app_hongkong.h"
 #include "gui_api.h"
+#include "gui_img.h"
 #include "root_image_hongkong/ui_resource.h"
 #include "guidef.h"
-#include "app_hongkong.h"
-
-// #define CURRENT_VIEW_NAME "watchface_market_view"
-
-// static gui_view_t *current_view = NULL;
 
 const static gui_view_descriptor_t *watchface_view = NULL;
-// void watchface_mask_design(gui_view_t* view);
-
-// static gui_view_descriptor_t const descriptor =
-// {
-//     /* change Here for current view */
-//     .name = (const char *)CURRENT_VIEW_NAME,
-//     .pView = &current_view,
-//     .design_cb = watchface_mask_design,
-// };
-
-// static int gui_view_descriptor_register_init(void)
-// {
-//     gui_view_descriptor_register(&descriptor);
-//     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-//     return 0;
-// }
-// static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
 static int gui_view_get_other_view_descriptor_init(void)
 {
@@ -128,17 +108,17 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
         if (strcmp(GUI_BASE(obj)->name, "wf_UI") == 0)
         {
             watchface_index = 1;
-            // gui_view_switch_direct(view_parent, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+            // gui_view_switch_direct(view_parent, watchface_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
         }
         else if (strcmp(GUI_BASE(obj)->name, "wf_ring") == 0)
         {
             watchface_index = 3;
-            // gui_view_switch_direct(view_parent, watchface_ring_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+            // gui_view_switch_direct(view_parent, watchface_ring_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
         }
         else if (strcmp(GUI_BASE(obj)->name, "wf_butterfly") == 0)
         {
             watchface_index = 2;
-            // gui_view_switch_direct(view_parent, watchface_butterfly_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+            // gui_view_switch_direct(view_parent, watchface_butterfly_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
         }
     }
     else
@@ -163,7 +143,8 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_click_cb)
             watchface_index = 0;
         }
     }
-    gui_view_switch_direct(view_parent, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    gui_view_switch_direct(view_parent, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
     int count = 0;
     while (1)
     {
@@ -251,18 +232,4 @@ void WATCHFACE_MARKET_list(gui_view_t *view)
         }
     }
 }
-
-// void watchface_mask_design(gui_view_t* view)
-// {
-//     gui_view_switch_on_event(view, app_down_view, VIEW_STILL, VIEW_TRANSPLATION,
-//                               GUI_EVENT_TOUCH_MOVE_UP);
-//     gui_view_switch_on_event(view, app_up_view, VIEW_STILL, VIEW_TRANSPLATION,
-//                               GUI_EVENT_TOUCH_MOVE_DOWN);
-//     gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
-//                               GUI_EVENT_TOUCH_MOVE_LEFT);
-//     gui_view_switch_on_event(view, watchface_select_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5,
-//                               GUI_EVENT_TOUCH_LONG);
-
-//     extern void create_tree_nest(const char *xml, void *obj);
-//     create_tree_nest((void *)watchface_path, view);
-// }
+#endif

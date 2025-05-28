@@ -30,7 +30,7 @@ uint32_t gui_get_obj_count(void)
 }
 static void obj_reset_active(gui_obj_t *obj)
 {
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -122,7 +122,7 @@ static bool obj_is_active(gui_obj_t *obj)
 static void obj_input_prepare(gui_obj_t *object)
 {
     GUI_ASSERT(object->name != NULL);
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
 
     gui_list_for_each(node, &object->child_list)
     {
@@ -152,7 +152,7 @@ static void obj_input_prepare(gui_obj_t *object)
 static void obj_draw_prepare(gui_obj_t *object)
 {
     GUI_ASSERT(object->name != NULL);
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
 
     gui_list_for_each(node, &object->child_list)
     {
@@ -197,7 +197,7 @@ static void obj_draw_prepare(gui_obj_t *object)
 static void obj_draw_scan(gui_obj_t *obj)
 {
 
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     struct gui_dispdev *dc = gui_get_dc();
     gui_list_for_each(node, &obj->child_list)
     {
@@ -238,7 +238,7 @@ static void obj_draw_scan(gui_obj_t *obj)
 
 static void obj_draw_end(gui_obj_t *obj)
 {
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);

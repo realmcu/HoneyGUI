@@ -58,7 +58,7 @@ static bool move_flag = 1;
 static void gui_menu_cellular_image(gui_obj_t *object, gui_menu_cellular_t *parent, int deltaX,
                                     int deltaY)
 {
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     touch_info_t *tp = tp_get_info();
     float tx, ty;
 
@@ -483,7 +483,7 @@ gui_menu_cellular_t *gui_menu_cellular_create_ftl(void     *parent,
 }
 void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y)
 {
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
 
     gui_list_for_each(node, &menu_cellular->child_list)
     {
@@ -501,8 +501,8 @@ void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset
 void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
                                 struct gui_menu_cellular_gesture_parameter *para_array, int array_length)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_obj_t *object = GUI_BASE(menu_cellular);
     int index = 0;
     gui_list_for_each_safe(node, tmp, &object->child_list)

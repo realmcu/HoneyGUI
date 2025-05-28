@@ -108,7 +108,7 @@ void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
                           &temp);
 
     static bool list_change = 1; //0: list change; 1: list restore
-    static gui_list_t *parent_child_list_next = NULL;
+    static gui_node_list_t *parent_child_list_next = NULL;
 
     if (release_x > 0)
     {
@@ -130,7 +130,7 @@ void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
             {
                 list_change = 1;
                 GUI_BASE(parent)->child_list.next = parent_child_list_next;
-                gui_list_t *next_tab = obj->brother_list.next;
+                gui_node_list_t *next_tab = obj->brother_list.next;
                 obj->brother_list.next = obj->brother_list.next->next;
                 next_tab->next = &obj->brother_list;
             }
@@ -155,7 +155,7 @@ void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
         {
             // when there is no more tabs on the left
             list_change = 0;
-            gui_list_t *next_tab = obj->brother_list.next;
+            gui_node_list_t *next_tab = obj->brother_list.next;
             obj->brother_list.next = obj->brother_list.next->next;
             next_tab->next = &obj->brother_list;
             GUI_BASE(parent)->child_list.next = next_tab;
@@ -172,7 +172,7 @@ void gui_tab_rotate_book(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
         if (tab_x_gap == 1 && GUI_BASE(parent)->child_list.next == &obj->brother_list)
         {
             GUI_BASE(parent)->child_list.next = parent_child_list_next;
-            gui_list_t *next_tab = obj->brother_list.next;
+            gui_node_list_t *next_tab = obj->brother_list.next;
             obj->brother_list.next = obj->brother_list.next->next;
             next_tab->next = &obj->brother_list;
 

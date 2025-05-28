@@ -1,0 +1,77 @@
+/* Reset some default styles */
+body, h1, h2, h3, p, div {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    color: black;
+    font-family: Arial, sans-serif;
+}
+
+/* Main content area */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Each section styling */
+section {
+    flex: 1;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* Lights container styles */
+#lights-container {
+    display: grid;
+    grid-template-columns: repeat(5, 114px);
+    gap: 10px;
+}
+
+.light {
+    width: 104px;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background-size: cover;
+    position: relative; 
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.light .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* 确保 overlay 也是圆形 */
+    background-color: transparent; /* 初始状态透明 */
+}
+
+/* Simulator Interface styles */
+#simulator-interface-section {
+    flex: 2;
+}
+
+input[type=range] {
+    width: 300px;
+}

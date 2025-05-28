@@ -1,64 +1,20 @@
 #include "guidef.h"
 #include "gui_img.h"
-#include "gui_tabview.h"
-#include "gui_tab.h"
-#include "gui_img.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include <gui_app.h>
+#include "gui_win.h"
 #include "gui_server.h"
-#include "gui_components_init.h"
+#include "app_hongkong.h"
 #include "gui_canvas.h"
-
 #include "gui_3d.h"
 #include "math.h"
-
 #include <time.h>
 #include "root_image_hongkong/ui_resource.h"
-#include "app_hongkong.h"
 
-#define SCREEN_WIDTH 410
+#define SCREEN_WIDTH  410
 #define SCREEN_HEIGHT 502
-
-// #define CURRENT_VIEW_NAME "watchface_butterfly_view"
-
-// static gui_view_t *current_view = NULL;
-// const static gui_view_descriptor_t *app_down_view = NULL;
-// const static gui_view_descriptor_t *app_up_view = NULL;
-// const static gui_view_descriptor_t *activity_view = NULL;
-// const static gui_view_descriptor_t *watchface_select_view = NULL;
-// void create_watchface_bf(gui_view_t *view);
-
-// static gui_view_descriptor_t const descriptor =
-// {
-//     /* change Here for current view */
-//     .name = (const char *)CURRENT_VIEW_NAME,
-//     .pView = &current_view,
-//     .design_cb = create_watchface_bf,
-// };
-
-// static int gui_view_descriptor_register_init(void)
-// {
-//     gui_view_descriptor_register(&descriptor);
-//     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-//     return 0;
-// }
-// static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-// static int gui_view_get_other_view_descriptor_init(void)
-// {
-//     /* you can get other view descriptor point here */
-//     app_down_view = gui_view_descriptor_get("app_down_view");
-//     app_up_view = gui_view_descriptor_get("app_up_view");
-//     activity_view = gui_view_descriptor_get("activity_view");
-//     watchface_select_view  = gui_view_descriptor_get("watchface_select_view");
-//     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-//     return 0;
-// }
-// static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
 
 static float radius = 20.0f, theta = 0;
 static int frame_counter = 0;
@@ -71,12 +27,12 @@ static bool fly_flag = 1;
 
 static gui_img_t *h_hand, *m_hand, *s_hand;
 
-static void callback_touch_win()
+static void win_touch_cb()
 {
     fly_flag = !fly_flag;
 }
 
-static void win_cb(gui_obj_t *obj)
+static void win_cb(void *p)
 {
     int millisecond = 0;
 #ifdef __WIN32
@@ -109,22 +65,19 @@ static void win_cb(gui_obj_t *obj)
         hand = h_hand;
         float angle_hour = (hour % 12) * M_PI / 6 + minute * M_PI / 360;
         gui_img_translate(hand, hand->base.w / 2, SCREEN_HEIGHT / 2 - hand->base.y);
-        gui_img_rotation(hand, angle_hour * 180 / M_PI,  hand->base.w / 2,
-                         SCREEN_HEIGHT / 2 - hand->base.y);
+        gui_img_rotation(hand, angle_hour * 180 / M_PI);
     }
     {
         hand = m_hand;
         float angle_min  = minute * M_PI / 30 + seconds * M_PI / 1800;
         gui_img_translate(hand, hand->base.w / 2, SCREEN_HEIGHT / 2 - hand->base.y);
-        gui_img_rotation(hand, angle_min * 180 / M_PI, hand->base.w / 2,
-                         SCREEN_HEIGHT / 2 - hand->base.y);
+        gui_img_rotation(hand, angle_min * 180 / M_PI);
     }
     {
         hand = s_hand;
         float angle_sec = (seconds + millisecond / 1000.0f) * angle_per_second;
         gui_img_translate(hand, hand->base.w / 2, SCREEN_HEIGHT / 2 - hand->base.y);
-        gui_img_rotation(hand, angle_sec,  hand->base.w / 2,
-                         SCREEN_HEIGHT / 2 - hand->base.y);
+        gui_img_rotation(hand, angle_sec);
         // gui_log("seconds: %d, millisecond: %d \n", seconds, millisecond);
     }
 }
@@ -156,19 +109,23 @@ static void update_animation()
     butterfly_rz = theta * (180.0f / M_PI);
 }
 
-static void cb(void *this, size_t face_index, gui_3d_world_t *world,
-               gui_3d_camera_t *camera, gui_3d_light_t *light)
+static void butterfly_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t object_matrix;
 
-    gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 0, 50), gui_point_4d(0, 0, 0), 1, 32767, 90,
-                                 dc->screen_width, dc->screen_height);
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+                                 90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&object_matrix, butterfly_x, butterfly_y, butterfly_z, 0, 0,
-                             butterfly_rz + 90,
+    gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
                              5);
+
+}
+
+static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
+{
+    gui_3d_matrix_t face_matrix;
+    gui_3d_matrix_t transform_matrix;
+
     if (face_index == 0)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
@@ -195,7 +152,9 @@ static void cb(void *this, size_t face_index, gui_3d_world_t *world,
                                  1);
     }
 
-    *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
+    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+
+    return transform_matrix;
 
 }
 
@@ -203,31 +162,26 @@ static void cb(void *this, size_t face_index, gui_3d_world_t *world,
 
 void create_watchface_bf(gui_view_t *view)
 {
-    // gui_view_switch_on_event(view, app_down_view, VIEW_STILL, VIEW_TRANSPLATION,
-    //                           GUI_EVENT_TOUCH_MOVE_UP);
-    // gui_view_switch_on_event(view, app_up_view, VIEW_STILL, VIEW_TRANSPLATION,
-    //                           GUI_EVENT_TOUCH_MOVE_DOWN);
-    // gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
-    //                           GUI_EVENT_TOUCH_MOVE_LEFT);
-    // gui_view_switch_on_event(view, watchface_select_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5,
-    //                           GUI_EVENT_TOUCH_LONG);
-
     gui_obj_t *obj = GUI_BASE(view);
-    gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gui_win_set_animate(win, 2000, -1, (gui_animate_callback_t)win_cb, win);
+    gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
+    gui_obj_start_timer(GUI_BASE(win));
 
-    void *test_3d = gui_3d_create(obj, "3d-widget", DESC_BUTTERFLY_BIN, 0, 0, 410, 502);
+    gui_3d_t *butterfly_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", DESC_BUTTERFLY_BIN,
+                                           GUI_3D_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
-    gui_3d_set_local_shape_transform_cb(test_3d, 0, (gui_3d_shape_transform_cb)cb);
+    gui_3d_set_global_transform_cb(butterfly_3d, (gui_3d_global_transform_cb)butterfly_global_cb);
+    gui_3d_set_face_transform_cb(butterfly_3d, (gui_3d_face_transform_cb)butterfly_face_cb);
 
-    gui_obj_set_timer(&(((gui_3d_base_t *)test_3d)->base), 1000, true, update_animation);
+    gui_obj_create_timer(&(butterfly_3d->base), 17, true, update_animation);
+    gui_obj_start_timer(&(butterfly_3d->base));
 
     gui_img_t *img = gui_img_create_from_mem(win, "mask", W1ELLIPSE5_BIN, 204, 246, 0, 0);
     h_hand = gui_img_create_from_mem(win, "h_hand", W1UNION2_BIN, 199, 170, 0, 0);
     m_hand = gui_img_create_from_mem(win, "m_hand", W1UNION_BIN, 200, 90, 0, 0);
     s_hand = gui_img_create_from_mem(win, "s_hand", W1VECTOR7_BIN, 206, 124, 0, 0);
 
-    gui_win_click(win, (gui_event_cb_t)callback_touch_win, NULL);
+    gui_win_click(win, (gui_event_cb_t)win_touch_cb, NULL);
 }
 
 

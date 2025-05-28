@@ -1,34 +1,29 @@
-#include <gui_tabview.h>
-#include "gui_card.h"
 #include <gui_obj.h>
 #include <gui_win.h>
 #include <gui_text.h>
-#include <gui_curtain.h>
 #include "root_image_hongkong/ui_resource.h"
-#include <gui_app.h>
-#include "gui_tab.h"
-#include "app_hongkong.h"
 #include "gui_win.h"
 #include "gui_server.h"
-#include "gui_components_init.h"
+#include "app_hongkong.h"
 #include <stdio.h>
 #include "guidef.h"
 #include "wheel_algo.h"
 #include "kb_algo.h"
 #include <time.h>
-#include "gui_fps.h"
 #include "gui_view.h"
 #include "cJSON.h"
+#include "gui_view.h"
 
 #define CURRENT_VIEW_NAME "watchface_view"
 
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *app_control_view = NULL;
-const static gui_view_descriptor_t *app_down_view = NULL;
-const static gui_view_descriptor_t *app_up_view = NULL;
+const static gui_view_descriptor_t *app_bottom_view = NULL;
+const static gui_view_descriptor_t *app_top_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *watchface_select_view = NULL;
+const static gui_view_descriptor_t *music_view = NULL;
 
 static void watchface_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
@@ -36,7 +31,7 @@ static gui_view_descriptor_t const descriptor =
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .design_cb = watchface_design,
+    .on_switch_in = watchface_design,
 };
 static int gui_view_descriptor_register_init(void)
 {
@@ -51,42 +46,45 @@ static int gui_view_get_other_view_descriptor_init(void)
     /* you can get other view descriptor point here */
     menu_view = gui_view_descriptor_get("menu_view");
     app_control_view = gui_view_descriptor_get("app_control_view");
-    app_down_view = gui_view_descriptor_get("app_down_view");
-    app_up_view = gui_view_descriptor_get("app_up_view");
+    app_bottom_view = gui_view_descriptor_get("app_bottom_view");
+    app_top_view = gui_view_descriptor_get("app_top_view");
     activity_view = gui_view_descriptor_get("activity_view");
     watchface_select_view  = gui_view_descriptor_get("watchface_select_view");
+    music_view  = gui_view_descriptor_get("music_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-static void app_hongkong_ui_design(gui_app_t *app);
-
 bool control_flag = 0;
 static bool enter_menu_flag = 0;
+uint8_t menu_style = 2;
 
 char watchface_path[100];
 uint8_t watchface_index = 1;
 
-static gui_app_t app_hongkong =
+/*Define gui_app_return_array*/
+const uint8_t *gui_app_return_array[] =
 {
-    .screen =
-    {
-        .name = "app_hongkong",
-        .x    = 0,
-        .y    = 0,
-        .parent = NULL,
-    },
-    .ui_design = app_hongkong_ui_design,
-    .active_ms = 1000000,
-    // .shutdown_animation_flag = GUI_APP_ANIMATION_10,
-    // .startup_animation_flag = GUI_APP_ANIMATION_9,
+    PATH04_BIN,
+    PATH05_BIN,
+    PATH07_BIN,
+    PATH08_BIN,
+    PATH09_BIN,
+    PATH11_BIN,
+    PATH12_BIN,
+    PATH14_BIN,
+    PATH15_BIN,
+    PATH16_BIN,
+    PATH18_BIN,
+    PATH19_BIN,
+    PATH20_BIN,
+    PATH22_BIN,
+    PATH23_BIN,
+    PATH24_BIN,
+    PATH25_BIN,
 };
 
-gui_app_t *get_app_hongkong(void)
-{
-    return &app_hongkong;
-}
 
 static void kb_button_cb()
 {
@@ -108,7 +106,6 @@ static void kb_button_cb()
                 if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
                 {
                     gui_log("change menu style\n");
-                    extern uint8_t menu_style;
                     menu_style++;
                     menu_style %= 3;
                 }
@@ -120,7 +117,8 @@ static void kb_button_cb()
             {
                 gui_log("pressing time = %d\n", time);
                 press_his = 0;
-                gui_view_switch_direct(gui_view_get_current_view(), menu_view, VIEW_ANIMATION_6, VIEW_ANIMATION_1);
+                gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
+                                       SWITCH_IN_ANIMATION_FADE);
             }
         }
     }
@@ -156,7 +154,7 @@ uint16_t xorshift16()
 
 #if defined __WIN32
 const char *filename =
-    "./realgui/example/web/peripheral_simulation/json/simulation_data.json";
+    "./example/application/screen_410_502/root_image_hongkong/web/peripheral_simulation/json/simulation_data.json";
 /* read CJSON to string */
 char *read_file(const char *file_path)
 {
@@ -259,139 +257,72 @@ void json_refreash()
 }
 #endif
 
-void win_cb(void *p, void *this_widget, gui_animate_t *animate)
+static void win_cb()
 {
-    if (animate->Beginning_frame)
-    {
 #if defined __WIN32
-        time_t rawtime;
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        char *temp = cjson_content;
-        cjson_content = read_file(filename);
-        if (!cjson_content)
-        {
-            cjson_content = temp;
-            perror("fopen");
-        }
-        else
-        {
-            free(temp);
-        }
-        canvas_update_flag = 0b1111;
-        // gui_log("canvas_update_flag %x\n", canvas_update_flag);
-#else
-        // extern struct tm watch_clock_get(void);
-        // watch_time = watch_clock_get();
-        timeinfo = &watch_time;
-        // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
-        // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
-        // json_refreash();
-//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
-#endif
-    }
-    // kb_button_cb();
-}
-
-static void app_hongkong_ui_design(gui_app_t *app)
-{
-    gui_log("app_hongkong_ui_design\n");
-
-    enter_menu_flag = 0;
-
-#if defined __WIN32
+    time_t rawtime;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    char *temp = cjson_content;
     cjson_content = read_file(filename);
     if (!cjson_content)
     {
+        cjson_content = temp;
         perror("fopen");
     }
+    else
+    {
+        free(temp);
+    }
+    canvas_update_flag = 0b1111;
+    // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
-    cjson_content = gui_malloc(700);
-    memcpy(cjson_content, TUYA_CJSON_BIN, 700);
+    // extern struct tm watch_clock_get(void);
+    // watch_time = watch_clock_get();
+    timeinfo = &watch_time;
+    // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
+    // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
+    // json_refreash();
+//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
-
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "view_win", 0, 0, 0, 0);
-    gui_view_t *view = gui_view_create(win, &descriptor, 0, 0, 0, 0);
-
-    gui_win_set_animate(win, 2000, -1, win_cb, NULL);
-    gui_fps_create(GUI_APP_ROOT_SCREEN);
+    // kb_button_cb();
 }
 
-void clear_mem(void)
-{
-    gui_view_t *view = gui_view_get_current_view();
-    if (!view)
-    {
-        return;
-    }
-    const char *name = GUI_BASE(view)->name;
-
-    if (strcmp(name, "heartrate_view"))
-    {
-        extern void clear_heart_rate_cache(void);
-        clear_heart_rate_cache();
-    }
-    if (strcmp(name, "box2d_ring_view"))
-    {
-        extern void close_box2d_ring(void);
-        close_box2d_ring();
-    }
-    if (strcmp(name, "fruit_ninja_view"))
-    {
-        extern void close_FN(void);
-        close_FN();
-    }
-    if (strcmp(name, "activity_view"))
-    {
-        extern void clear_activity(void);
-        clear_activity();
-    }
-    if (strcmp(name, "watchface_view"))
-    {
-        extern void clear_clock(void);
-        clear_clock();
-    }
-    if (strcmp(name, "app_down_view"))
-    {
-        extern void clear_down_view(void);
-        clear_down_view();
-    }
-    if (strcmp(name, "music_view"))
-    {
-        extern void clear_music();
-        clear_music();
-    }
-}
-
+static void win_cb();
 static void watchface_design(gui_view_t *view)
 {
-    clear_mem();
+    win_cb();
 
-    gui_view_switch_on_event(view, app_down_view, VIEW_STILL, VIEW_TRANSPLATION,
+    gui_view_switch_on_event(view, app_bottom_view, SWITCH_INIT_STATE,
+                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, app_up_view, VIEW_STILL, VIEW_TRANSPLATION,
+    gui_view_switch_on_event(view, app_top_view, SWITCH_INIT_STATE, SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-    gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
+    gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_LEFT_USE_CUBE,
+                             SWITCH_IN_FROM_RIGHT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, app_control_view, VIEW_STILL, VIEW_TRANSPLATION,
+    gui_view_switch_on_event(view, app_control_view, SWITCH_INIT_STATE,
+                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, watchface_select_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5,
-                             GUI_EVENT_TOUCH_LONG);
+    // gui_view_switch_on_event(view, watchface_select_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
+    //                          GUI_EVENT_TOUCH_LONG);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
-    extern void page_ct_clock(gui_view_t *view);
+    extern void create_watchface_classic(gui_view_t *view);
     extern void create_tree_nest(const char *xml, void *obj);
     extern void create_watchface_bf(gui_view_t *view);
     extern void create_watchface_ring(gui_view_t *view);
     switch (watchface_index)
     {
-    case 0:
-        {
-            create_tree_nest((void *)watchface_path, view);
-        }
-        break;
+    // case 0:
+    //     {
+    //         create_tree_nest((void *)watchface_path, view);
+    //     }
+    //     break;
     case 1:
         {
-            page_ct_clock(view);
+            create_watchface_classic(view);
         }
         break;
     case 2:
@@ -404,20 +335,23 @@ static void watchface_design(gui_view_t *view)
             create_watchface_ring(view);
         }
         break;
-    case 4:
-        {
-            create_tree_nest((void *)watchface_path, view);
-        }
-        break;
-    case 5:
-        {
-            create_tree_nest((void *)watchface_path, view);
-        }
-        break;
+    // case 4:
+    //     {
+    //         create_tree_nest((void *)watchface_path, view);
+    //     }
+    //     break;
+    // case 5:
+    //     {
+    //         create_tree_nest((void *)watchface_path, view);
+    //     }
+    //     break;
     default:
-        page_ct_clock(view);
+        create_watchface_classic(view);
         break;
     }
+    gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win), 2000, true, win_cb);
+    gui_obj_start_timer(GUI_BASE(win));
 }
 
 // static void data_generate_task_entry()
@@ -444,6 +378,7 @@ typedef struct information
     app_name app;
 } information_t;
 static char *content = NULL;
+#if 1
 static void inform_generate_task_entry()
 {
     while (true)
@@ -469,29 +404,51 @@ static void inform_generate_task_entry()
             time,
             OS
         };
-        extern void pagelist_create(information_t *payload);
+        extern void add_information(information_t *payload);
         gui_msg_t msg =
         {
             .event = GUI_EVENT_USER_DEFINE,
             .payload = &payload,
-            .cb = (gui_msg_cb)pagelist_create,
+            .cb = (gui_msg_cb)add_information,
         };
 
         gui_send_msg_to_server(&msg);
     }
 }
+#endif
 #if defined _WIN32
 uint8_t resource_root[1024 * 1024 * 20];
 #endif
+
+static void app_hongkong_ui_design(void)
+{
+    gui_log("app_hongkong_ui_design\n");
+
+    enter_menu_flag = 0;
+
+#if defined __WIN32
+    cjson_content = read_file(filename);
+    if (!cjson_content)
+    {
+        perror("fopen");
+    }
+#else
+    cjson_content = gui_malloc(700);
+    memcpy(cjson_content, TUYA_CJSON_BIN, 700);
+#endif
+    gui_view_t *view = gui_view_create(gui_obj_get_root(), &descriptor, 0, 0, 0, 0);
+    // gui_view_t *view = gui_view_create(gui_obj_get_root(), app_top_view, 0, 0, 0, 0);
+}
+
 static int app_init(void)
 {
 #if defined _WIN32
     extern int open(const char *file, int flags, ...);
     extern int read(int fd, void *buf, size_t len);
     extern int close(int fd);
-    defaultPath = "realgui\\example\\screen_410_502\\root_image_hongkong\\root\\";
+    defaultPath = "example\\application\\screen_410_502\\root_image_hongkong\\root\\";
     int fd;
-    fd = open("./realgui/example/screen_410_502/root_image_hongkong/root(0x253E400).bin", 0);
+    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x253E400).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x253E400).bin Successful!\n");
@@ -505,10 +462,10 @@ static int app_init(void)
         return 0;
     }
 #endif
-    gui_server_init();
-    gui_app_startup(get_app_hongkong());
     // gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
     gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
+    app_hongkong_ui_design();
+
     return 0;
 }
 

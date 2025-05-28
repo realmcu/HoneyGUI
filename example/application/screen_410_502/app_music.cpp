@@ -12,9 +12,9 @@
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
+#include "gui_view.h"
+#include "gui_list.h"
 #include "app_hongkong.h"
-#include "gui_return.h"
-
 #define CURRENT_VIEW_NAME "music_view"
 
 extern "C" {
@@ -28,7 +28,7 @@ extern "C" {
         /* change Here for current view */
         .name = (const char *)CURRENT_VIEW_NAME,
         .pView = &current_view,
-        .design_cb = app_music_ui_design,
+        .on_switch_in = app_music_ui_design,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -171,16 +171,12 @@ extern "C" {
         return e;
     }
 }
-#include<memory>
-#include "gui_switch.h"
+#include <memory>
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_canvas_rect.h"
-#include "gui_button.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "tp_algo.h"
-#include "gui_pagelist_new.h"
-#include "gui_page.h"
 #include "gui_text.h"
 #include <vector>
 #include <string>
@@ -211,7 +207,6 @@ std::string mp3_file =
     "realgui\\example\\screen_454_454\\root_image\\SDCARD\\music\\Free_Test_Data_5MB_MP3.mp3";
 gui_text_t *current_time;
 gui_canvas_rect_t *current_time_bar;
-gui_pagelist_new_t *pl;
 int page_list_item_space;
 int lyrics_array_length;
 
@@ -219,6 +214,7 @@ bool startsWith(const std::string &str, const std::string &prefix)
 {
     return str.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), str.begin());
 }
+#if 0
 class MusicPlayer
 {
 public:
@@ -232,11 +228,11 @@ public:
     {
         setupUI(parent);
     }
-    void win_cover_animation(void *p, void *this_widget, gui_animate_t *animate)
+    void win_cover_animation(void *p)
     {
         touch_info_t *touch = tp_get_info();
-        gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
-        gui_obj_t *obj = GUI_BASE(this_widget);
+        gui_win_t *win = GUI_TYPE(gui_win_t, p);
+        gui_obj_t *obj = GUI_BASE(p);
         //std::cout << "win_cover_gesture:" << win_cover_gesture << std::endl;
         if (!win_cover_gesture)
         {
@@ -421,14 +417,13 @@ public:
                 {
                     gui_obj_hidden(GUI_BASE(lrc_win), 0);
                 }
-                GUI_BASE(pl)->gesture = win_lrc_gesture;
 
             }
 
         }
 
     }
-    void win_list_animation(void *p, void *this_widget, gui_animate_t *animate)
+    void win_list_animation(void *p)
     {
         // std::cout << win_list_gesture_page_y << ";" << GUI_BASE(list_page)->y << std::endl;
         GUI_BASE(list_page)->gesture = win_cover_gesture;
@@ -524,13 +519,6 @@ private:
     gui_page_t *list_page;
     int value;
 
-
-//static void ticket(void *obj, gui_event_t e, void *param);
-// static const void *item_click_function_array[] =
-// {
-//     ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
-//     ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
-// };
     const char *item_text_array;
 // Example LRC content
     std::string lrcContent = R"(
@@ -602,7 +590,7 @@ private:
     )";
 
 
-    static void switchOnCallback(void *null1, void *null2, void *param)
+    static void switchOnCallback(void *param)
     {
         //gui_music_play("realgui\\example\\screen_454_454\\root_image\\root\\music_player\\sample_3s.mp3");
         gui_music_play(mp3_file.c_str());
@@ -620,7 +608,7 @@ private:
         static_assert(std::is_arithmetic<T>::value, "T must be an arithmetic type");
         return (container_width - item_width) / 2;
     }
-    static void switchOffCallback(void)
+    static void switchOffCallback(void *param)
     {
         gui_music_stop();
     }
@@ -637,9 +625,9 @@ private:
         //gui_log("current_time_array:%s\n", current_time_array);
         gui_text_content_set(current_time, current_time_array, 5);
         gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
-        pl->app_y = -(time / duration * (page_list_item_space * lyrics_array_length -
-                                         gui_get_screen_height() / 2));
-        pl->app_take_over = true;
+        // pl->app_y = -(time / duration * (page_list_item_space * lyrics_array_length -
+        //                                  gui_get_screen_height() / 2));
+        // pl->app_take_over = true;
         if (gui_music_completion_status())
         {
             GUI_API(gui_switch_t).turn_off_no_event(static_cast<gui_switch_t *>(this_widget));
@@ -673,8 +661,8 @@ private:
         return t;
     }
 
-    static void cover_animation(void *p, void *this_widget, gui_animate_t *animate);
-    static void list_animation(void *p, void *this_widget, gui_animate_t *animate);
+    static void cover_animation(void *p);
+    static void list_animation(void *p);
     static void win_cover_head_callback(void *obj, gui_event_t e, void *param);
     void setupUI(gui_obj_t *parent)
     {
@@ -717,29 +705,17 @@ private:
         lyrics_array_length = arrayLength;
         page_list_item_space = 40;
 
-        // std::cout << "Lyrics from 0 to 60 seconds:" << std::endl;
-        for (int i = 0; allLyricsArray[i] != nullptr; ++i)
+        gui_list_t *list = gui_list_create(lrc_win, "list", 0, 0, SCREEN_W, SCREEN_H, SCREEN_H * 2,
+                                           0, VERTICAL);
+        gui_list_note_t *tab = gui_list_add_note(list, false);
+        for (size_t i = 0; i < lyrics_array_length; i++)
         {
-            // std::cout << lyricsArray[i] << std::endl;
-            // gui_log("%s\n", allLyricsArray[i]);
-            //delete[] lyricsArray[i];  // Free each string
+            const char *text = pagelist_new->item_text_array[i];
+            gui_text_t *t = gui_text_create(tab, 0, 0, page_list_item_space * i, 0, 0);
+            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_RED, strlen(text), 16);
+            gui_text_type_set(t, (void *)ARIALBD_SIZE16_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MID_CENTER);
         }
-
-
-
-
-        pl = gui_pagelist_new_create(
-                 lrc_win,
-                 0, 0, WINDOW_WIGTH, page_list_item_space, (const uint8_t *)SKIPBACK_BIN,
-                 (const uint8_t *)SKIPBACK_BIN,
-                 IMG_SRC_OVER_MODE,
-                 (const uint8_t *)ARIALBD_SIZE16_BITS4_FONT_BIN,
-                 16, APP_COLOR_RED
-
-             );
-        gui_page_list_new_render(pl, arrayLength, 0, (const char **)allLyricsArray);
-
-
 
 
 
@@ -753,17 +729,17 @@ private:
         sw = (gui_switch_create(parent, SWITCH_X,
                                 BUTTON_Y, SWITCH_W, SWITCH_H, PLAY_BIN, PAUSE_BIN));
 
-        GUI_API(gui_switch_t).on_turn_on(sw, (gui_event_cb_t)switchOnCallback, nullptr);
-        GUI_API(gui_switch_t).on_turn_off(sw, (gui_event_cb_t)switchOffCallback, nullptr);
-        gui_img_set_mode(static_cast<gui_img_t *>(sw->switch_picture), IMG_SRC_OVER_MODE);
+        gui_switch_set_turn_on_cb(sw, switchOnCallback);
+        gui_switch_set_turn_off_cb(sw, switchOffCallback);
+        gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
 
 
-        skipBack = (gui_button_create(parent, SWITCH_X - SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPBACK_BIN,
-                                      SKIPBACKHL_BIN, nullptr,
-                                      BUTTON_BG_ICON, 0));
-        skipFwd = (gui_button_create(parent, SWITCH_X + SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPFWD_BIN,
-                                     SKIPFWDHL_BIN, nullptr,
-                                     BUTTON_BG_ICON, 0));
+        // skipBack = (gui_button_create(parent, SWITCH_X - SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPBACK_BIN,
+        //                               SKIPBACKHL_BIN, nullptr,
+        //                               BUTTON_BG_ICON, 0));
+        // skipFwd = (gui_button_create(parent, SWITCH_X + SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPFWD_BIN,
+        //                              SKIPFWDHL_BIN, nullptr,
+        //                              BUTTON_BG_ICON, 0));
         gui_win_t *win_cover_head = gui_win_create(parent, "win_cover_head", 0, 0, SCREEN_W,
                                                    MINIMIZE_WINDOW_HEIGHT);
         gui_win_press(win_cover_head, win_cover_head_callback, win_cover_head);
@@ -787,9 +763,12 @@ private:
                     COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
         gui_img_scale(img_cover, 0.5, 0.5);
 
-        gui_win_set_animate(win_cover, 1000, -1, cover_animation, win_cover);
+        gui_obj_create_timer(GUI_BASE(win_cover), 20, true, cover_animation);
+        gui_obj_start_timer(GUI_BASE(win_cover));
+        gui_obj_create_timer(GUI_BASE(list_win), 20, true, list_animation);
+        gui_obj_start_timer(GUI_BASE(list_win));
+
         GUI_API(gui_switch_t).animate(sw, 1000, -1, (void *)onCompletion, nullptr);
-        gui_win_set_animate(list_win, 1000, -1, list_animation, list_win);
     }
 
 
@@ -1039,13 +1018,13 @@ private:
     }
 };
 std::unique_ptr<MusicPlayer> player = nullptr;
-void MusicPlayer::cover_animation(void *p, void *this_widget, gui_animate_t *animate)
+void MusicPlayer::cover_animation(void *p)
 {
-    player->win_cover_animation(p, this_widget, animate);
+    player->win_cover_animation(p);
 }
-void MusicPlayer::list_animation(void *p, void *this_widget, gui_animate_t *animate)
+void MusicPlayer::list_animation(void *p)
 {
-    player->win_list_animation(p, this_widget, animate);
+    player->win_list_animation(p);
 }
 void MusicPlayer::win_cover_head_callback(void *obj, gui_event_t e, void *param)
 {
@@ -1055,33 +1034,41 @@ void appMusicUIDesign(gui_obj_t *parent)
 {
     player = std::make_unique<MusicPlayer>(parent);
 }
+#endif
 }
 
 
-extern "C" {
+extern "C"
+{
     static void return_cb()
     {
-        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
+
+    static void return_timer_cb(void *obj)
+    {
+        touch_info_t *tp = tp_get_info();
+        GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
     }
 
     void app_music_ui_design(gui_view_t *view)
     {
-        clear_mem();
-
         gui_obj_t *parent = GUI_BASE(view);
-        gui_music_app::appMusicUIDesign(parent);
+        gui_log("app_music_ui_design\n");
+        // gui_music_app::appMusicUIDesign(parent);
 
-        const char *name = GUI_BASE(gui_view_get_current_view())->name;
+        const char *name = GUI_BASE(gui_view_get_current())->name;
         if (strcmp(name, "heartrate_view") == 0)
         {
-            gui_view_switch_on_event(view, heartrate_view, VIEW_CUBE, VIEW_CUBE,
+            gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+                                     SWITCH_IN_FROM_LEFT_USE_CUBE,
                                      GUI_EVENT_TOUCH_MOVE_RIGHT);
         }
         else
         {
-            extern const uint32_t *gui_app_return_array[17];
-            gui_return_create(view, gui_app_return_array,
-                              sizeof(gui_app_return_array) / sizeof(uint32_t *), (void *)return_cb, 0);
+            gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
+            gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
         }
     }
 }

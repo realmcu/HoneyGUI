@@ -1,17 +1,15 @@
+#if 0
 #include "guidef.h"
-#include "gui_tabview.h"
-#include "gui_tab.h"
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "gui_app.h"
-#include "gui_components_init.h"
+#include "app_hongkong.h"
 #include "math.h"
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_cube.h"
-#include "app_hongkong.h"
+
 
 const static gui_view_descriptor_t *watchface_view = NULL;
 
@@ -57,7 +55,7 @@ static void app_cb(void *obj, gui_event_t e, void *param)
     default:
         break;
     }
-    gui_view_switch_direct(view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    gui_view_switch_direct(view, watchface_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 void WATCHFACE_CUBE_ui_design(gui_view_t *view)
@@ -89,4 +87,4 @@ void WATCHFACE_CUBE_ui_design(gui_view_t *view)
     };
     gui_cube_add_click_cb(cube, cube_cb);
 }
-
+#endif

@@ -1,5 +1,4 @@
 #include "gui_win.h"
-#include "gui_app.h"
 #include "gui_img.h"
 #include "box2d/box2d.h"
 #include <iostream>
@@ -7,13 +6,12 @@
 #include <cmath>
 #include <box2d/box2d.h>
 #include <vector>
-
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
 #include "gui_canvas_rect.h"
+#include "gui_view.h"
 #include "app_hongkong.h"
-#include "gui_return.h"
 
 #define CURRENT_VIEW_NAME "box2d_ring_view"
 extern "C" {
@@ -26,7 +24,7 @@ extern "C" {
         /* change Here for current view */
         .name = (const char *)CURRENT_VIEW_NAME,
         .pView = &current_view,
-        .design_cb = app_box2d_ring_ui_design,
+        .on_switch_in = app_box2d_ring_ui_design,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -106,7 +104,7 @@ static uint16_t xorshift16()
 }
 
 // App callback function
-void app_box2d_cb(void *p, void *this_widget, gui_animate_t *animate)
+void app_box2d_cb(void *obj)
 {
     for (const Ball &ball : balls)
     {
@@ -199,7 +197,9 @@ bool init()
     }
 
     // Set the animation function of the window
-    gui_win_set_animate(win, 1000, -1, app_box2d_cb, win);
+    gui_obj_create_timer(GUI_BASE(win), 20, true, app_box2d_cb);
+    gui_obj_start_timer(GUI_BASE(win));
+
     gui_win_press(win, win_press_callback, win);
     gui_win_release(win, (gui_event_cb_t)win_release_callback, win);
     render();
@@ -339,8 +339,14 @@ void render()
         float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
         float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
 
-        const uint8_t *img_data = gui_canvas_output(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
-                                                    BALL_RADIUS * 2, canvas_callback);
+
+        size_t buffer_size = BALL_RADIUS * BALL_RADIUS * 4 * GUI_CANVAS_OUTPUT_RGBA * 4 + sizeof(
+                                 gui_rgb_data_head_t);
+        uint8_t *img_data = (uint8_t *)gui_lower_malloc(buffer_size);
+        memset(img_data, 0, buffer_size);
+
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
+                                          BALL_RADIUS * 2, canvas_callback, img_data);
         gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)img_data, ballX - BALL_RADIUS,
                                                  ballY - BALL_RADIUS, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
@@ -381,20 +387,21 @@ int ui_design(gui_obj_t *obj)
 extern "C" {
     static void return_cb()
     {
-        gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
+    static void return_timer_cb(void *obj)
+    {
+        touch_info_t *tp = tp_get_info();
+        GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
     }
 
     void app_box2d_ring_ui_design(gui_view_t *view)
     {
-        clear_mem();
-
         gui_obj_t *obj = GUI_BASE(view);
+        gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
+        gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
         app_box2d_ring::ui_design(obj);
-
-        extern const uint32_t *gui_app_return_array[17];
-
-        gui_return_create(view, gui_app_return_array,
-                          sizeof(gui_app_return_array) / sizeof(uint32_t *), (void *)return_cb, 0);
     }
     void app_box2d_ring_watchface(gui_obj_t *obj)
     {

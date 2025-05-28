@@ -1,22 +1,19 @@
+#if 0
 #include "guidef.h"
-#include "gui_tabview.h"
-#include "gui_tab.h"
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "gui_app.h"
 #include "gui_server.h"
-#include "gui_components_init.h"
+#include "app_hongkong.h"
 #include "gui_canvas.h"
 #include "gui_3d_rect.h"
 #include "math.h"
 #include "root_image_hongkong/ui_resource.h"
-
 #include "gui_prism_mirror3d.h"
 #include "tp_algo.h"
-#include "app_hongkong.h"
+
 
 const static gui_view_descriptor_t *watchface_view = NULL;
 extern uint8_t watchface_index;
@@ -86,7 +83,8 @@ static void app_cb(void *obj)
     default:
         break;
     }
-    gui_view_switch_direct(gui_view_get_current_view(), watchface_view, VIEW_ANIMATION_NULL,
-                           VIEW_ANIMATION_5);
+    gui_view_switch_direct(gui_view_get_current(), watchface_view, VIEW_ANIMATION_NULL,
+                           SWITCH_IN_ANIMATION_FADE);
 }
+#endif
 

@@ -1,23 +1,15 @@
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
-#include "gui_watch_gradient_spot.h"
 #include "gui_text.h"
-#include "gui_watchface_gradient.h"
-#include "gui_cardview.h"
-#include "gui_card.h"
-#include "gui_tab.h"
-#include "gui_app.h"
 #include "time.h"
-#include "gui_curtainview.h"
 #include "tp_algo.h"
 #include <math.h>
 #include "cJSON.h"
 #include "gui_canvas_img.h"
-#include "gui_curtain.h"
 #include "gui_canvas_rect.h"
 #include "app_hongkong.h"
-#include "gui_return.h"
+#include "gui_view.h"
 
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
@@ -32,14 +24,17 @@ const static gui_view_descriptor_t *music_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
-void heart_rate_app(gui_view_t *view);
+const static gui_view_descriptor_t *pre_view = NULL;
+static void heart_rate_app(gui_view_t *view);
+static void clear_heart_rate_cache();
 
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .design_cb = heart_rate_app,
+    .on_switch_in = heart_rate_app,
+    .on_switch_out = clear_heart_rate_cache,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -65,35 +60,37 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static gui_win_t *win_hb;
 static uint8_t *img_data = NULL;
+size_t buffer_size = 0;
 
 extern void *text_num_array[];
 extern char *cjson_content;
 extern uint8_t canvas_update_flag;
 
-// heart_rate
-static void win_hb_cb(gui_win_t *win)
+static void return_cb()
+{
+    gui_view_switch_direct(current_view, pre_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
+static void win_hb_cb(void *obj)
 {
 #ifdef __WIN32
     extern char *read_file(const char *file_path);
-    if (win->animate->Beginning_frame)
+    char *temp = cjson_content;
+    cjson_content = read_file(NULL);
+    if (!cjson_content)
     {
-        if (strcmp(gui_current_app()->screen.name, "app_hongkong") != 0)
-        {
-            char *temp = cjson_content;
-            cjson_content = read_file(NULL);
-            if (!cjson_content)
-            {
-                cjson_content = temp;
-                perror("fopen");
-            }
-            else
-            {
-                free(temp);
-            }
-        }
-        canvas_update_flag = 0b1111;
+        cjson_content = temp;
+        perror("fopen");
     }
+    else
+    {
+        free(temp);
+    }
+    canvas_update_flag = 0b1111;
 #endif
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
 }
 
 static void heartrate_graph(NVGcontext *vg)
@@ -265,18 +262,20 @@ static void heartrate_graph(NVGcontext *vg)
     nvgStrokeWidth(vg, 1.0f);
 }
 
-static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(hr_animation)
+static void hr_timer_cb(void *obj)
 {
+    gui_img_t *img = (gui_img_t *)obj;
     if (canvas_update_flag & 0x01)
     {
         canvas_update_flag &= 0b1110;
-        uint8_t *img_data = (void *)gui_img_get_image_data(this_widget);
-        memset(img_data, 0, (size_t)p);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartrate_graph, img_data);
-        gui_img_set_image_data(this_widget, img_data);
+        uint8_t *img_data = (void *)gui_img_get_image_data(img);
+        memset(img_data, 0, buffer_size);
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartrate_graph,
+                                          img_data);
+        gui_img_set_image_data(img, img_data);
     }
 }
-void clear_heart_rate_cache(void)
+static void clear_heart_rate_cache()
 {
     if (img_data)
     {
@@ -284,29 +283,18 @@ void clear_heart_rate_cache(void)
         img_data = NULL;
     }
 }
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
-}
-static void return_to_watchface()
-{
-    gui_view_switch_direct(current_view, watchface_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
-}
 
-void heart_rate_app(gui_view_t *view)
+static void heart_rate_app(gui_view_t *view)
 {
-    clear_mem();
-
     gui_obj_t *obj = GUI_BASE(view);
-
-    // gui_log("current app:%s\n", gui_current_app()->screen.name);
 
     win_hb = gui_win_create(obj, "hb_win", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
     gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                            gui_rgb(0, 0, 0));
 
-    gui_win_set_animate(win_hb, 2000, -1, (gui_animate_callback_t)win_hb_cb, win_hb);
+    gui_obj_create_timer(GUI_BASE(win_hb), 10, true, win_hb_cb);
+    gui_obj_start_timer(GUI_BASE(win_hb));
     {
         char *text = "Current heartrate";
         int font_size = 32;
@@ -345,17 +333,19 @@ void heart_rate_app(gui_view_t *view)
         int image_h = 300,
             image_w = SCREEN_WIDTH,
             pixel_bytes = 4;
-        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+        buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         if (img_data == NULL)
         {
             img_data = gui_lower_malloc(buffer_size);
         }
         memset(img_data, 0, buffer_size);
-        gui_canvas_output_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartrate_graph, img_data);
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartrate_graph,
+                                          img_data);
         gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
                                                  SCREEN_HEIGHT);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_set_animate(img, 1000, -1, hr_animation, (void *)buffer_size);
+        gui_obj_create_timer(GUI_BASE(img), 1000, true, hr_timer_cb);
+        gui_obj_start_timer(GUI_BASE(img));
     }
     {
         char *text = "160";
@@ -427,24 +417,21 @@ void heart_rate_app(gui_view_t *view)
         gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
-    const char *name = GUI_BASE(gui_view_get_current_view())->name;
+    const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "music_view") == 0 || strcmp(name, "activity_view") == 0)
     {
-        gui_view_switch_on_event(view, music_view, VIEW_CUBE, VIEW_CUBE,
-                                 GUI_EVENT_TOUCH_MOVE_LEFT);
-        gui_view_switch_on_event(view, activity_view, VIEW_CUBE, VIEW_CUBE,
+        // gui_view_switch_on_event(view, music_view, SWITCH_OUT_TO_LEFT_USE_CUBE, SWITCH_IN_FROM_RIGHT_USE_CUBE,
+        //                          GUI_EVENT_TOUCH_MOVE_LEFT);
+        gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+                                 SWITCH_IN_FROM_LEFT_USE_CUBE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
     }
     else if (strcmp(name, "menu_view") == 0)
     {
-        extern const uint32_t *gui_app_return_array[17];
-        gui_return_create(view, gui_app_return_array,
-                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_to_menu, 0);
+        pre_view = menu_view;
     }
-    else if (strcmp(name, "watchface_view") == 0)
+    else
     {
-        extern const uint32_t *gui_app_return_array[17];
-        gui_return_create(view, gui_app_return_array,
-                          sizeof(gui_app_return_array) / sizeof(uint32_t *), return_to_watchface, 0);
+        pre_view = watchface_view;
     }
 }

@@ -74,19 +74,25 @@ static void __released_view_timer_cb(void *obj)
             // gui_log("obj name = %s, g_Release = %d!\n", ((gui_obj_t *)obj)->name, g_Release);
 
             gui_view_not_show(g_PreView);
-            g_PreView = g_CurrentView;
-            g_CurrentView = g_NextView;
-
-            if (g_CurrentView->opacity != UINT8_MAX) //decrease time of processing PreView
+            // g_PreView = g_CurrentView;
+            gui_view_not_show(g_CurrentView);
+            if (g_CurrentView->descriptor->keep)
             {
-                g_PreView->base.not_show = false;
-                g_PreView->base.has_prepare_cb = true;
+                g_PreView = g_CurrentView;
+                if (g_NextView->opacity != UINT8_MAX) //decrease time of processing PreView
+                {
+                    gui_obj_hidden(&g_PreView->base, false);
+                }
+                else
+                {
+                    gui_obj_hidden(&g_PreView->base, true);
+                }
             }
             else
             {
-                g_PreView->base.not_show = true;
-                g_PreView->base.has_prepare_cb = false;
+                g_PreView = NULL;
             }
+            g_CurrentView = g_NextView;
         }
         else
         {
@@ -115,9 +121,17 @@ static void __view_animate_timer_cb(void *obj)
         gui_obj_delete_timer(obj);
         gui_view_not_show(g_PreView);
 
-        g_PreView = g_CurrentView;
-        g_PreView->base.not_show = true;
-        g_PreView->base.has_prepare_cb = false;
+        // g_PreView = g_CurrentView;
+        if (_this->descriptor->keep)
+        {
+            g_PreView = g_CurrentView;
+        }
+        else
+        {
+            g_PreView = NULL;
+        }
+        gui_view_not_show(g_CurrentView);
+
         g_CurrentView = g_NextView;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         g_NextView = NULL;
@@ -188,24 +202,43 @@ static void __view_pressing_cb(void *obj, gui_event_t e, void *param)
     touch_info_t *tp = tp_get_info();
     gui_event_t trigger_event = g_CurrentView->current_event;
 
-    if (trigger_event == GUI_EVENT_TOUCH_MOVE_LEFT || trigger_event == GUI_EVENT_TOUCH_MOVE_RIGHT)
+    if (trigger_event == GUI_EVENT_TOUCH_MOVE_LEFT)
     {
-        g_Release = tp->deltaX;
+        g_Release = tp->deltaX < 0 ? tp->deltaX : 0;
 
         if (abs(g_Release) > dc->screen_width)
         {
-            g_Release = g_Release > 0 ? dc->screen_width : -dc->screen_width;
+            g_Release = -dc->screen_width;
         }
     }
-    else
+    else if (trigger_event == GUI_EVENT_TOUCH_MOVE_RIGHT)
     {
-        g_Release = tp->deltaY;
+        g_Release = tp->deltaX > 0 ? tp->deltaX : 0;
+
+        if (abs(g_Release) > dc->screen_width)
+        {
+            g_Release = dc->screen_width;
+        }
+    }
+    else if (trigger_event == GUI_EVENT_TOUCH_MOVE_UP)
+    {
+        g_Release = tp->deltaY < 0 ? tp->deltaY : 0;
 
         if (abs(g_Release) > dc->screen_height)
         {
-            g_Release = g_Release > 0 ? dc->screen_height : -dc->screen_height;
+            g_Release = -dc->screen_height;
         }
     }
+    else if (trigger_event == GUI_EVENT_TOUCH_MOVE_DOWN)
+    {
+        g_Release = tp->deltaY > 0 ? tp->deltaY : 0;
+
+        if (abs(g_Release) > dc->screen_height)
+        {
+            g_Release = dc->screen_height;
+        }
+    }
+    // gui_log("g_release = %d\n", g_Release);
 }
 
 static void __view_transition(gui_view_t *_this, int16_t release)
@@ -241,16 +274,16 @@ static void __view_transition(gui_view_t *_this, int16_t release)
 static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
                                             gui_view_on_event_t *on_event)
 {
-    if ((gui_view_t *)obj != g_CurrentView)
+    // gui_log("enter event_trigger_move_cb \n");
+    if (g_NextView == g_PreView)
     {
-        return;
+        g_PreView = NULL; // prevent NextView from being freed when g_NextView == g_PreView
     }
-    gui_view_not_show(g_NextView);
-    if (g_NextView == g_PreView) { g_PreView = NULL; }
-
     g_SurpressTP = false;
 
+    gui_view_t *next_view_rec = g_NextView;
     g_NextView = gui_view_create(obj->parent, on_event->descriptor, 0, 0, 0, 0);
+    if (g_NextView != next_view_rec) {gui_view_not_show(next_view_rec);}
 
     g_NextView->current_transition_style = on_event->switch_in_style;
     g_CurrentView->current_transition_style = on_event->switch_out_style;
@@ -267,10 +300,6 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
 
 static void __view_on_event_change_cb(gui_obj_t *obj, gui_event_t e, gui_view_on_event_t *on_event)
 {
-    if ((gui_view_t *)obj != g_CurrentView)
-    {
-        return;
-    }
     gui_view_not_show(g_NextView);
 
     g_NextView = gui_view_create(obj->parent, on_event->descriptor, 0, 0, 0, 0);
@@ -290,12 +319,12 @@ static void __view_on_event_change_cb(gui_obj_t *obj, gui_event_t e, gui_view_on
     g_SurpressEvent = true;
     g_SurpressTP = true;
 
-    gui_log("gui_view_on_event_cb\n");
+    // gui_log("gui_view_on_event_cb\n");
 }
 
 static void gui_view_not_show(gui_view_t *_this)
 {
-    if (_this == NULL || (g_NextView == g_PreView && g_SurpressEvent)) { return; }
+    if (_this == NULL || (_this == g_NextView && _this == g_PreView && g_SurpressEvent)) { return; }
 
     gui_obj_t *obj = GUI_BASE(_this);
     if (!_this->descriptor->keep)
@@ -304,21 +333,20 @@ static void gui_view_not_show(gui_view_t *_this)
     }
     else
     {
-        obj->not_show = true;
-        obj->has_prepare_cb = false;
+        gui_obj_hidden(obj, true);
         gui_log("%s hide\n", obj->name);
     }
 }
 
 static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new)
 {
-    gui_list_t *list1 = &old->brother_list;
-    gui_list_t *list2 = &new->brother_list;
+    gui_node_list_t *list1 = &old->brother_list;
+    gui_node_list_t *list2 = &new->brother_list;
 
     // Get adjacent pointers
-    gui_list_t *list1_next = list1->next;
-    gui_list_t *list2_prev = list2->prev;
-    gui_list_t *list2_next = list2->next;
+    gui_node_list_t *list1_next = list1->next;
+    gui_node_list_t *list2_prev = list2->prev;
+    gui_node_list_t *list2_next = list2->next;
 
     // If node2 is already immediately after node1, no action needed
     if (list1_next == list2)
@@ -346,13 +374,15 @@ static void gui_view_prepare(gui_obj_t *obj)
     obj->opacity_value = _this->opacity;
     _this->base.need_preprocess = false;
 
-    if (!g_SurpressTP)
+    if (!g_SurpressTP && _this == g_CurrentView)
     {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
+        // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
     }
 
-    if (!g_SurpressEvent)
+    if (!g_SurpressEvent && _this == g_CurrentView)
     {
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
@@ -487,7 +517,6 @@ gui_view_t *gui_view_create(void       *parent,
         gui_obj_t *obj = (gui_obj_t *)_this;
         obj->parent = parent;
         obj->not_show = false;
-        obj->has_prepare_cb = true;
         obj->x = 0;
         obj->y = 0;
         gui_list_remove(&obj->brother_list);
@@ -613,6 +642,7 @@ void gui_view_switch_on_event(gui_view_t *_this,
 
     if (event == 0)
     {
+        gui_obj_add_event_cb(_this, (gui_event_cb_t)__view_on_event_change_cb, event, on_event);
         __view_on_event_change_cb(obj, event, on_event);
         return;
     }
@@ -622,7 +652,9 @@ void gui_view_switch_on_event(gui_view_t *_this,
         event == GUI_EVENT_TOUCH_MOVE_LEFT ||
         event == GUI_EVENT_TOUCH_MOVE_RIGHT)
     {
-        gui_obj_add_event_cb(_this, __view_pressing_cb, GUI_EVENT_TOUCH_PRESSING, NULL);
+        // gui_obj_add_event_cb(_this, __view_pressing_cb, GUI_EVENT_TOUCH_PRESSING, NULL);
+        gui_obj_add_event_cb(_this, __view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL, NULL);
+        gui_obj_add_event_cb(_this, __view_pressing_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
         gui_obj_add_event_cb(_this, __view_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
         gui_obj_add_event_cb(_this, (gui_event_cb_t)__view_on_event_trigger_move_cb, event, on_event);
     }

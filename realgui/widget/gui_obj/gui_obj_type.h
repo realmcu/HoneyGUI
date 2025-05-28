@@ -141,8 +141,8 @@ typedef struct _gui_obj_t
     int16_t w;
     int16_t h;
 
-    gui_list_t  child_list;
-    gui_list_t  brother_list;
+    gui_node_list_t  child_list;
+    gui_node_list_t  brother_list;
 
     //start of run time
     void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);

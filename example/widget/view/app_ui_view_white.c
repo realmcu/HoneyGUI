@@ -33,7 +33,7 @@ static const gui_view_descriptor_t descriptor =
     .on_switch_in = app_ui_view_white_design,
     .on_switch_out = NULL,
 
-    .keep = true,
+    .keep = false,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -57,8 +57,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void img_cb()
 {
-    gui_view_switch_direct(current_view, blue_view, SWITCH_OUT_ANIMATION_ZOOM,
-                           SWITCH_IN_ANIMATION_ZOOM);
+    gui_view_switch_direct(current_view, blue_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_OUT_NONE_ANIMATION);
 }
 
 static void app_ui_view_white_design(gui_view_t *view)

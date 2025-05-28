@@ -27,11 +27,11 @@ static int app_init(void)
 
     /* VERTICAL CIRCLE STYLE */
     int length = 100;
-    gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space,
-                                              VERTICAL);
+    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space,
+                                       VERTICAL);
     for (uint8_t i = 0; i < 8; i++)
     {
-        gui_list_tab_t *tab = gui_list_add_tab(list);
+        gui_list_note_t *tab = gui_list_add_note(list, false);
         gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, 480, length,
                                                            color[i]);
     }
@@ -40,10 +40,10 @@ static int app_init(void)
 
     /* VERTICAL CARD STYLE */
     // int length = 150;
-    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
+    // gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
     // for (uint8_t i = 0; i < 8; i++)
     // {
-    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_list_note_t *tab = gui_list_add_note(list, false);
     //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length, color[i]);
     // }
     // gui_list_set_style(list, LIST_CARD);
@@ -51,21 +51,21 @@ static int app_init(void)
 
     /*HORIZONTAL ZOOM STYLE*/
     // int length = 100;
-    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, HORIZONTAL);
+    // gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, HORIZONTAL);
     // for (uint8_t i = 0; i < 8; i++)
     // {
-    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_list_note_t *tab = gui_list_add_note(list, false);
     //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, length, 480, color[i]);
     // }
-    // gui_list_set_style(list, LIST_CARD);
+    // gui_list_set_style(list, LIST_ZOOM);
 
 
     /* VERTICAL FAN STYLE */
     // int length = 100;
-    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
+    // gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
     // for (uint8_t i = 0; i < 20; i++)
     // {
-    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_list_note_t *tab = gui_list_add_note(list, false);
     //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length, APP_COLOR_SILVER_OPACITY(150));
     // }
     // gui_list_set_style(list, LIST_FAN);
@@ -73,10 +73,10 @@ static int app_init(void)
 
     /* VERTICAL HELIX STYLE */
     // int length = 100;
-    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
+    // gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
     // for (uint8_t i = 0; i < 20; i++)
     // {
-    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_list_note_t *tab = gui_list_add_note(list, false);
     //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length, APP_COLOR_SILVER_OPACITY(150));
     // }
     // gui_list_set_style(list, LIST_HELIX);
@@ -90,10 +90,10 @@ static int app_init(void)
     //     APP_COLOR_SILVER_OPACITY(150),
     //     APP_COLOR_WHITE_OPACITY,
     // };
-    // gui_list_widget_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
+    // gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL);
     // for (uint8_t i = 0; i < 20; i++)
     // {
-    //     gui_list_tab_t *tab = gui_list_add_tab(list);
+    //     gui_list_note_t *tab = gui_list_add_note(list, false);
     //     gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, 0, length, color_t[i%2]);
     // }
     // gui_list_set_style(list, LIST_CURL);

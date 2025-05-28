@@ -58,10 +58,30 @@ static uint8_t event_cnt = 0;
  *============================================================================*/
 static void gui_obj_store_event(gui_obj_t *obj, gui_event_t event)
 {
+
+    if (event != GUI_EVENT_TOUCH_RELEASED)
+    {
+        for (uint32_t i = 0; i < event_cnt; i++)
+        {
+            if (event_code[i] == event)
+            {
+                for (uint32_t j = i; j < event_cnt; j++)
+                {
+                    event_cb[j] = event_cb[j + 1];
+                    event_code[j] = event_code[j + 1];
+                    event_cb_param[j] = event_cb_param[j + 1];
+                    event_obj[j] = event_obj[j + 1];
+                }
+                event_cnt--;
+                break;
+            }
+        }
+    }
+
     for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
     {
         gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-        if (event_dsc->filter == event)
+        if (event_dsc->filter == event && event_cnt < MAX_EVENT_CNT)
         {
             event_cb[event_cnt] = event_dsc->event_cb;
             event_code[event_cnt] = event;
@@ -132,10 +152,10 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
         return;
     }
 
-    if (gui_obj_event_is_suppressed(obj, event) == true)
-    {
-        return;
-    }
+    // if (gui_obj_event_is_suppressed(obj, event) == true)
+    // {
+    //     return;
+    // }
 
     switch (event)
     {
@@ -208,6 +228,18 @@ void gui_obj_enable_event(gui_obj_t *obj, gui_event_t event)
         break;
     case GUI_EVENT_TOUCH_MOVE_DOWN:
         if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->down_moved == true))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        break;
+    case GUI_EVENT_TOUCH_SCROLL_HORIZONTAL:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_HOLD_X))
+        {
+            gui_obj_store_event(obj, event);
+        }
+        break;
+    case GUI_EVENT_TOUCH_SCROLL_VERTICAL:
+        if ((gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true) && (tp->type == TOUCH_HOLD_Y))
         {
             gui_obj_store_event(obj, event);
         }

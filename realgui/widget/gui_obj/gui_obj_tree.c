@@ -66,8 +66,8 @@ static void gui_obj_destroy_cb(gui_obj_t *obj)
 
 static void gui_obj_tree_child_free(gui_obj_t *object)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
 
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
@@ -93,8 +93,8 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
 
 static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_obj_t *object = obj;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
@@ -192,8 +192,8 @@ static void sanitize_identifier(char *id)
 #if _WIN32
 static void internal_gui_obj_tree_print_mmd(FILE *file, gui_obj_t *obj)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
 
     // Traverse the child list of the current object
     gui_list_for_each_safe(node, tmp, &obj->child_list)
@@ -226,8 +226,8 @@ static void obj_tree_get_widget_by_type_and_index(gui_obj_t *root,
         return;
     }
 
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &root->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -344,8 +344,8 @@ gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj)
 
 gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -360,8 +360,8 @@ gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)
 
 void gui_obj_tree_print(gui_obj_t *obj)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_obj_t *object = obj;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
@@ -379,8 +379,8 @@ void gui_obj_tree_print(gui_obj_t *obj)
 
 void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_obj_t *object = obj;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
@@ -424,8 +424,8 @@ void gui_obj_tree_print_mmd(gui_obj_t *obj)
 
 void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -448,8 +448,8 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_ob
 
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &root->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -494,8 +494,8 @@ void gui_obj_tree_print_bfs(gui_obj_t *root)
     {
         gui_obj_t *current_obj = queue[front++];
         gui_log(" %s \n", current_obj->name);
-        gui_list_t *node = NULL;
-        gui_list_t *tmp = NULL;
+        gui_node_list_t *node = NULL;
+        gui_node_list_t *tmp = NULL;
         gui_list_for_each_safe(node, tmp, &current_obj->child_list)
         {
             gui_obj_t *child_obj = gui_list_entry(node, gui_obj_t, brother_list);

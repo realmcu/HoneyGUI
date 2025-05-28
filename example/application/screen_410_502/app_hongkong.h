@@ -4,13 +4,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <gui_app.h>
+
 #include "gui_view.h"
 #include "gui_components_init.h"
 
 
-extern gui_app_t *get_app_hongkong(void);
-extern void clear_mem(void);
+extern const uint8_t *gui_app_return_array[17];
 
 #ifdef __cplusplus
 }

@@ -499,7 +499,7 @@ static gui_obj_t *gui_kb_get_subobj(gui_obj_t *win, uint16_t obj_idx)
 {
     gui_obj_t *obj = NULL;
     uint16_t idx = 0;
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
 
     gui_list_for_each(node, &win->child_list)
     {
@@ -520,7 +520,7 @@ static void gui_kb_refresh_cand(void)
 {
     gui_kb_t *this = gui_get_kb();
     gui_obj_t *win = (gui_obj_t *)this->win_ime;
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     uint8_t idx_cnt = 0;
     gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
     uint8_t char_len = ime_api->get_char_len_byte(this->ime);
@@ -541,7 +541,7 @@ static void gui_kb_clear_cand(void)
 {
     gui_kb_t *this = gui_get_kb();
     gui_obj_t *win = (gui_obj_t *)this->win_ime;
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     gui_ime_api_t *ime_api = NULL;
 
     if (!this->ime)
@@ -1076,7 +1076,7 @@ static void gui_kb_set_func_mode(gui_kb_t *this, uint8_t mode)
     // KB_MODE_BASIC_NUM,
     // KB_MODE_BASIC_SYMBOL_EN,
     // KB_MODE_BASIC_SYMBOL_CN,
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     uint16_t idx = KB_SW_IDX_CAP;
     gui_list_for_each(node, &win->child_list)
     {
@@ -1184,7 +1184,7 @@ static void gui_kb_set_letter_mode(gui_kb_t *this, uint8_t mode)
     uint32_t key_val = 0;
     uint16_t i = 0;
 
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     uint16_t idx = 0;
     gui_list_for_each(node, &win->child_list)
     {

@@ -49,7 +49,7 @@ void gui_scroll_wheel_update_att(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_scroll_wheel_t *this = (gui_scroll_wheel_t *)obj;
-    gui_list_t *node = NULL;
+    gui_node_list_t *node = NULL;
     scroll_wheel_picture_t *picture;
 
     int child_count = 0;

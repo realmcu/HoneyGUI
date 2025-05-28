@@ -67,8 +67,8 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
     gui_curtainview_t *this = (gui_curtainview_t *)obj;
     touch_info_t *tp = tp_get_info();
 
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
     gui_curtain_t *c_middle = NULL;
     GUI_UNUSED(c_middle);
     gui_curtain_t *c_up = NULL;

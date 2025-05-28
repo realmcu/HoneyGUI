@@ -25,7 +25,7 @@ The :cpp:any:`gui_list_create` function can be used to create a list widget, the
 
 Create List Table Widget
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_list_add_tab` function can be used to create a list table widget. Users can add other widgets to the table.
+The :cpp:any:`gui_list_add_note` function can be used to create a list table widget. Users can add other widgets to the table.
 
 
 Set List Widget Style

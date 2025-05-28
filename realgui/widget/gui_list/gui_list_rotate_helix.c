@@ -47,11 +47,11 @@
  *                           Private Functions
  *============================================================================*/
 
-void gui_list_rotate_helix(gui_list_tab_t *this, float degree)
+void gui_list_rotate_helix(gui_list_note_t *this, float degree)
 {
     gui_obj_t *obj = GUI_BASE(this);
     gui_dispdev_t *dc = gui_get_dc();
-    gui_list_widget_t *list = (gui_list_widget_t *)obj->parent;
+    gui_list_t *list = (gui_list_t *)obj->parent;
     gui_matrix_t rotate_3D;
     gui_matrix_t temp;
     float w = dc->screen_width;

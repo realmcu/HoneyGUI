@@ -33,7 +33,7 @@ static const gui_view_descriptor_t descriptor =
     .on_switch_in = switch_in_cb,
     .on_switch_out = switch_out_cb,
 
-    .keep = false,
+    .keep = true,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -61,15 +61,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
-
-    if (e == GUI_EVENT_TOUCH_PRESSING)
-    {
-        gui_log("pressing blue tiger\n");
-    }
-    else
-    {
-        gui_log("move blue tiger\n");
-    }
+    gui_view_switch_direct(current_view, white_view_descriptor, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_OUT_NONE_ANIMATION);
 }
 
 static void switch_out_cb(gui_view_t *view)
@@ -80,7 +73,7 @@ static void switch_out_cb(gui_view_t *view)
 static void switch_in_cb(gui_view_t *view)
 {
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 200, 200, 0, 0);
-
+    gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_view_switch_on_event(view, yellow_view_descriptor, SWITCH_OUT_TO_RIGHT_USE_CUBE,
                              SWITCH_IN_FROM_LEFT_USE_CUBE,
