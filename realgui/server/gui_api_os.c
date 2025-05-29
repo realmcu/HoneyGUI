@@ -187,6 +187,8 @@ void *gui_malloc(size_t n)
     }
     if (ptr == NULL)
     {
+        gui_log("SRAM OVERFLOW!!!%d\n", n);
+        gui_mem_used();
         ptr = gui_lower_malloc(n);
     }
     // if (ptr == (void *)0x0000000000749D30)
@@ -228,6 +230,8 @@ void *gui_calloc(size_t num, size_t size)
 
     if (ptr == NULL)
     {
+        gui_log("SRAM OVERFLOW!!!%d\n", total_size);
+        gui_mem_used();
         ptr = gui_lower_malloc(total_size);
     }
 
@@ -270,6 +274,8 @@ void *gui_realloc(void *ptr_old, size_t n)
             ptr = tlsf_realloc(tlsf, ptr_old, n);
             if (ptr == NULL)
             {
+                gui_log("SRAM OVERFLOW!!!%d\n", n);
+                gui_mem_used();
                 ptr = tlsf_malloc(lower_tlsf, n);
                 memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
                 tlsf_free(tlsf, ptr_old);
@@ -325,6 +331,7 @@ uint32_t gui_mem_used(void)
     GUI_UNUSED(total_used_size);
     GUI_ASSERT(tlsf != NULL);
     tlsf_walk_pool(tlsf_get_pool(tlsf), walker, &total_used_size);
+    gui_log("gui sram used: %d", total_used_size);
     return total_used_size;
 }
 
@@ -371,6 +378,7 @@ uint32_t gui_low_mem_used(void)
     GUI_UNUSED(total_used_size);
     GUI_ASSERT(lower_tlsf != NULL);
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), walker, &total_used_size);
+    gui_log("gui psram used: %d", total_used_size);
     return total_used_size;
 }
 void gui_sleep_cb(void)

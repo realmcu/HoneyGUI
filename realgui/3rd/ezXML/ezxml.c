@@ -54,9 +54,9 @@
 #include <ctype.h>
 #include "guidef.h"
 
-extern void *gui_malloc(size_t n);
-extern void *gui_realloc(void *ptr_old, size_t n);
-extern void gui_free(void *rmem);
+extern void *gui_lower_malloc(size_t n);
+extern void *gui_lower_realloc(void *ptr_old, size_t n);
+extern void gui_lower_free(void *rmem);
 extern void gui_fs_fstat(int fildes, gui_fs_stat_t *buf);
 
 extern int gui_fs_open(const char *file, int flags);
@@ -65,23 +65,23 @@ extern int gui_fs_read(int fd, void *buf, size_t len);
 
 static void *xml_malloc(unsigned int size)
 {
-    return gui_malloc(size);
+    return gui_lower_malloc(size);
 }
 
 static void *xml_realloc(void *ptr, size_t size)
 {
-    return gui_realloc(ptr, size);
+    return gui_lower_realloc(ptr, size);
 }
 
 static void xml_free(void *ptr)
 {
-    gui_free(ptr);
+    gui_lower_free(ptr);
 }
 
 static char *ezxml_strdup(const char *s)
 {
     size_t len = strlen(s) + 1;
-    char *tmp = (char *)gui_malloc(len);
+    char *tmp = (char *)gui_lower_malloc(len);
 
     if (!tmp)
     {

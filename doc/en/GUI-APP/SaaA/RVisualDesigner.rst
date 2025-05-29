@@ -251,9 +251,9 @@ Example2
    .. figure:: https://foruda.gitee.com/images/1747379389473127316/bb924260_10088396.png
       :align: center
       :width: 400px
-      :name: Apply the conversion setting
+      :name: Apply the Conversion Setting
 
-      Apply the conversion setting 
+      Apply the Conversion Setting 
 
 5. **Handle PNG Transparent Images**:
 
@@ -598,6 +598,8 @@ RadioButton
 Image
 '''''
 
+A widget to display a image.
+
 .. table:: Image Widget Properties
    :align: center
    :width: 100%
@@ -632,6 +634,11 @@ Image
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
    | Opacity              |  Transparency level 0~255                                                                                          |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
+
+.. note::
+
+   1. During export, the tool will convert the imported images. You can set the image conversion parameters via :menuselection:`Menu Bar --> Settings --> Image Conversion Settings`. For more details, please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Convert_Setting`;
+   2. If the size of the imported image does not match the size of the component, the tool will not scale or crop the image.
 
 ImageMovie
 ''''''''''
@@ -1039,7 +1046,7 @@ Key
 
 - Key is a widget for physical button. 
 - On PC, Key's ID maps to QWERTY keyboard character's ASCII value.
-- On EVB, Key's ID mapping is based on porting in SDK.
+- On  :term:`EVB`, Key's ID mapping is based on porting in SDK.
 
 .. figure:: https://foruda.gitee.com/images/1746619930224908218/7fe6fcb1_10088396.gif
    :align: center
@@ -2048,7 +2055,7 @@ Click |image1| to bring up the Image Management view.
    :align: center
    :width: 450px
 
-Image Resource Management Window
+   Image Resource Management Window
 
 Add Images
 ^^^^^^^^^^
@@ -2454,7 +2461,7 @@ The following table lists the description of each parameter.
    |                   |                                                                                                                                                                                                        |
    |                   | Random: If the text’s Unicode range cannot be pre-determined, please select this type.                                                                                                                 |
    |                   |                                                                                                                                                                                                        |
-   |                   | Note: All characters of the Font will be converted and saved to ``.bin`` file.                                                                                                                         |
+   |                   | Note: All characters of Code Page will be converted and saved to ``.bin`` file.                                                                                                                        |
    +-------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 Vector Font parameters are shown in the figure below.

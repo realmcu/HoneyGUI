@@ -37,7 +37,8 @@ static void obj_reset_active(gui_obj_t *obj)
         obj_reset_active(obj);
     }
 }
-
+static gui_obj_t *obj_array_active[300];
+static int obj_array_active_index;
 static bool obj_is_active(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -134,6 +135,7 @@ static bool obj_is_active(gui_obj_t *obj)
         (y_min < (int)gui_get_screen_height()) && (y_max > 0))
     {
         obj->active = true;
+        obj_array_active[obj_array_active_index++] = obj;
         return true;
     }
     obj->active = false;
@@ -163,10 +165,10 @@ static void obj_input_prepare(gui_obj_t *object)
         {
             obj->obj_cb(obj, OBJ_INPUT_PREPARE);
         }
-        if (obj_is_active(obj) == false)
-        {
-            continue;
-        }
+        // if (obj_is_active(obj) == false)
+        // {
+        //     continue;
+        // }
         obj_input_prepare(obj);
     }
 }
@@ -184,7 +186,10 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
-
+        if (obj->not_show)
+        {
+            continue;
+        }
         obj->opacity_value = obj->parent->opacity_value;
 
         if (obj->parent->matrix)
@@ -200,10 +205,7 @@ static void obj_draw_prepare(gui_obj_t *object)
                 obj->obj_cb(obj, OBJ_PREPARE);
             }
         }
-        if (obj->not_show)
-        {
-            continue;
-        }
+
         if (obj_is_active(obj) == false)
         {
             continue;
@@ -215,38 +217,28 @@ static void obj_draw_prepare(gui_obj_t *object)
 
 static void obj_draw_scan(gui_obj_t *obj)
 {
-
-    gui_list_t *node = NULL;
     struct gui_dispdev *dc = gui_get_dc();
-    gui_list_for_each(node, &obj->child_list)
+
+    for (size_t i = 0; i < obj_array_active_index; i++)
     {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->active)
-        {
-            if (obj->has_draw_cb)
-            {
-                if (dc->pfb_type == PFB_Y_DIRECTION)
-                {
-                    dc->section.x1 = 0;
-                    dc->section.y1 = dc->section_count * dc->fb_height;
-                }
-                else
-                {
-                    dc->section.x1 = dc->section_count * dc->fb_width;
-                    dc->section.y1 = 0;
-                }
 
-                dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
-                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
+        gui_obj_t *obj_active = obj_array_active[i];
 
-                obj->obj_cb(obj, OBJ_DRAW);
-            }
-        }
-        else
+        if (obj_active == 0)
         {
             continue;
         }
-        obj_draw_scan(obj);
+
+        if (obj_active->not_show)
+        {
+            continue;
+        }
+        if (obj_active->has_draw_cb)
+        {
+            obj_active->obj_cb(obj_active, OBJ_DRAW);
+
+        }
+
     }
 }
 
@@ -257,6 +249,11 @@ static void obj_draw_end(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+
+        if (obj->not_show)
+        {
+            continue;
+        }
         obj_count++;
         if (obj->has_end_cb)
         {
@@ -324,7 +321,19 @@ static void gui_fb_draw(gui_obj_t *root)
                 }
             }
             dc->section_count = i;
+            if (dc->pfb_type == PFB_Y_DIRECTION)
+            {
+                dc->section.x1 = 0;
+                dc->section.y1 = dc->section_count * dc->fb_height;
+            }
+            else
+            {
+                dc->section.x1 = dc->section_count * dc->fb_width;
+                dc->section.y1 = 0;
+            }
 
+            dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
+            dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
             obj_draw_scan(root);
             if (dc->get_lcd_us != NULL)
             {
@@ -340,6 +349,7 @@ static void gui_fb_draw(gui_obj_t *root)
                 dc->lcd_draw_sync();
             }
             dc->lcd_update(dc);
+
         }
 
         gui_flash_boost_disable();
@@ -384,7 +394,11 @@ void gui_fb_change(void)
 {
     fb_change = true;
 }
-
+static bool force_fb_change;
+void gui_update_screen_force(bool if_change)
+{
+    force_fb_change = if_change;
+}
 uint32_t gui_spf()
 {
     return spf;
@@ -415,6 +429,8 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     {
         dc->lcd_frame_monitor->input_prepare_cb();
     }
+    obj_array_active_index = 0;
+    memset(obj_array_active, 0, sizeof(obj_array_active));
     obj_draw_prepare(root);
     if (dc->lcd_frame_monitor)
     {
@@ -431,7 +447,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         frame_count = 0;
         gui_log("fps:%d\r", frame_count_per_second);
     }
-    if (fb_change == true)
+    if (fb_change == true || force_fb_change)
     {
         frame_count++;
         gui_fb_draw(root);

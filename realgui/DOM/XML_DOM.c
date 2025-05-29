@@ -686,6 +686,20 @@ static void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
  */
 gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_wifi_ani);
+static char *gui_low_strdup(const char *s)
+{
+    size_t len = strlen(s) + 1;
+    char *tmp = (char *)gui_lower_malloc(len);
+
+    if (!tmp)
+    {
+        return NULL;
+    }
+
+    memcpy(tmp, s, len);
+
+    return tmp;
+}
 static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                           gui_animate_t *animate)
 {
@@ -753,6 +767,14 @@ static void progress_content_cb(image_animate_params_t *animate_params, void *nu
     float opacity = animate_params->textContent_from - animate->progress_percent *
                     (animate_params->textContent_from - animate_params->textContent_to);
     gui_progressbar_set_percentage((void *)animate_params->img, opacity);
+    if (animate->end_frame)
+    {
+
+        {
+            gui_obj_enable_event(GUI_BASE(animate_params->img), GUI_EVENT_4);
+        }
+    }
+
 }
 static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
                            gui_animate_t *animate)
@@ -1056,7 +1078,7 @@ static char *read_file(const char *path)
         fclose(file);
         return 0;
     }
-    char *content = (char *)gui_malloc(length + 1);
+    char *content = (char *)gui_lower_malloc(length + 1);
     //if (content)
     {
         size_t size = fread(content, 1, length, file);
@@ -1548,7 +1570,7 @@ static char *get_space_string_head(const char *string)
     }
     if (strlen(s) > 0)
     {
-        rst = gui_strdup(s);
+        rst = gui_low_strdup(s);
     }
     gui_free(s);
     return rst;
@@ -2999,7 +3021,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 }
                 gui_fs_closedir(dir);
             }
-            void **image_array = gui_malloc(file_count * sizeof(void *));
+            void **image_array = gui_lower_malloc(file_count * sizeof(void *));
             {
                 gui_fs_dir *dir = 0;
                 struct gui_fs_dirent *entry;
@@ -3019,6 +3041,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                         char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                         sprintf(path2, "%s/%s", folder, entry->d_name);
                         image_array[count++] = (void *)gui_get_image_file_address(path2);
+                        gui_free(path2);
                     }
 
                 }
@@ -3669,7 +3692,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
                     }
                     gui_fs_closedir(dir);
                 }
-                void **image_array = gui_malloc(file_count * sizeof(void *));
+                void **image_array = gui_lower_malloc(file_count * sizeof(void *));
                 {
                     gui_fs_dir *dir = 0;
                     struct gui_fs_dirent *entry;
@@ -3689,6 +3712,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
                             char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                             sprintf(path2, "%s/%s", folder, entry->d_name);
                             image_array[count++] = (void *)gui_get_image_file_address(path2);
+                            gui_free(path2);
                         }
 
                     }
@@ -4355,7 +4379,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
                     }
                     gui_fs_closedir(dir);
                 }
-                void **image_array = gui_malloc(file_count * sizeof(void *));
+                void **image_array = gui_lower_malloc(file_count * sizeof(void *));
                 {
                     gui_fs_dir *dir = 0;
                     struct gui_fs_dirent *entry;
@@ -4375,6 +4399,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
                             char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                             sprintf(path2, "%s/%s", folder, entry->d_name);
                             image_array[count++] = (void *)gui_get_image_file_address(path2);
+                            gui_free(path2);
                         }
 
                     }
@@ -4784,7 +4809,7 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
         if (ptxt && ptxt[0] == 0)
         {
-            gui_free(ptxt);
+            gui_lower_free(ptxt);
             ptxt = 0;
         }
         if (!ptxt)
@@ -4792,7 +4817,7 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
             char buffer[20];
             sprintf(buffer, "__ml%d_", ml_count++);
-            ptxt = gui_strdup(buffer);
+            ptxt = gui_low_strdup(buffer);
         }
 
         parent = (void *)gui_multi_level_create_group(parent, ptxt,
@@ -11631,7 +11656,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                 gui_fs_closedir(dir);
             }
 
-            void **image_array = gui_malloc(file_count * sizeof(void *));
+            void **image_array = gui_lower_malloc(file_count * sizeof(void *));
             {
                 gui_fs_dir *dir = NULL;
                 struct gui_fs_dirent *entry;
@@ -11651,6 +11676,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                         char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                         sprintf(path2, "%s/%s", folder, entry->d_name);
                         image_array[count++] = (void *)gui_get_image_file_address(path2);
+                        gui_free(path2);
                     }
                 }
                 gui_free(path);
@@ -12102,10 +12128,10 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     char *ptxt = get_space_string_head(p->txt);
                     if (strcmp(aniamte_name, ptxt))
                     {
-                        gui_free(ptxt);
+                        gui_lower_free(ptxt);
                         continue;
                     }
-                    gui_free(ptxt);
+                    gui_lower_free(ptxt);
                     //gui_log("animate_create_handle:%s: %s", name, p->txt);
                     char *type = 0;
                     char *from = 0;
@@ -12267,7 +12293,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                 gui_fs_closedir(dir);
                             }
 
-                            image_array = gui_malloc(file_count * sizeof(void *));
+                            image_array = gui_lower_malloc(file_count * sizeof(void *));
                             {
                                 gui_fs_dir *dir = NULL;
                                 struct gui_fs_dirent *entry;
@@ -12287,6 +12313,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                         char *path2 = gui_malloc(strlen(entry->d_name) + strlen(from) + 2);
                                         sprintf(path2, "%s/%s", from, entry->d_name);
                                         image_array[count++] = (void *)gui_get_image_file_address(path2);
+                                        gui_free(path2);
                                     }
                                 }
                                 gui_free(path);
@@ -12563,7 +12590,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                 gui_fs_closedir(dir);
                             }
 
-                            image_array = gui_malloc(file_count * sizeof(void *));
+                            image_array = gui_lower_malloc(file_count * sizeof(void *));
                             {
                                 gui_fs_dir *dir = NULL;
                                 struct gui_fs_dirent *entry;
@@ -12583,6 +12610,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                         char *path2 = gui_malloc(strlen(entry->d_name) + strlen(values) + 2);
                                         sprintf(path2, "%s/%s", values, entry->d_name);
                                         image_array[count++] = (void *)gui_get_image_file_address(path2);
+                                        gui_free(path2);
                                     }
                                 }
                                 gui_free(path);
@@ -12940,7 +12968,7 @@ static void load_return_array()
         }
         gui_fs_closedir(dir);
     }
-    image_array = gui_malloc(file_count * sizeof(void *));
+    image_array = gui_lower_malloc(file_count * sizeof(void *));
     {
         gui_fs_dir *dir = 0;
         struct gui_fs_dirent *entry;
@@ -12961,6 +12989,7 @@ static void load_return_array()
                 char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                 sprintf(path2, "%s/%s", folder, entry->d_name);
                 image_array[count++] = (void *)gui_get_image_file_address(path2);
+                gui_free(path2);
             }
 
         }
@@ -12985,7 +13014,7 @@ static void system_load()
 }
 void create_tree(gui_app_t *app)
 {
-    system_load();
+    //system_load();
     f1 = ezxml_parse_file(app->xml);
     js = NULL;
     foreach_create(f1, &app->screen);
@@ -14142,6 +14171,8 @@ static void app_xml_ui_design(gui_app_t *app)
     extern void create_tree(gui_app_t *app);
     create_tree(app);
     //gui_fps_create(app);
+    gui_low_mem_used();
+    gui_mem_used();
     gui_fb_change();
 }
 static gui_app_t app_xml =
@@ -14323,7 +14354,7 @@ static void img_ontime_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 static void img_destroy(gui_obj_t *obj)
 {
-    gui_free((void *)obj->name);
+    gui_lower_free((void *)obj->name);
     gui_img_destroy(obj);
 }
 static void img_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -14376,7 +14407,7 @@ static void gui_button_destroy(gui_obj_t *obj)
     }
     if (obj)
     {
-        gui_free((void *)obj->name);
+        gui_lower_free((void *)obj->name);
     }
 
 
