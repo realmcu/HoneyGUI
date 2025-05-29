@@ -1,7 +1,7 @@
 #include "__arm_2d_filter_iir_blur.h"
 #include "guidef.h"
 #include "gui_api.h"
-#include "gauss_blur_process.h"
+#include "gui_post_process.h"
 #include "gui_matrix.h"
 
 void arm_2d_blur(struct gui_dispdev *dc, gui_rect_t *rect, uint8_t blur_degree, void *cache_mem)

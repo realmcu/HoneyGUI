@@ -14,7 +14,7 @@
 #include "gui_fb.h"
 #include "gui_obj.h"
 #include "gui_server.h"
-#include "gauss_blur_process.h"
+#include "gui_post_process.h"
 
 
 static bool fb_change = false;
@@ -303,7 +303,7 @@ static void gui_fb_draw(gui_obj_t *root)
             dc->section_count = i;
 
             obj_draw_scan(root);
-            gauss_blur_post_process_handle();
+            post_process_handle();
             if (dc->get_lcd_us != NULL)
             {
                 read_time = line_time * (i * dc->fb_height + hfp_line);
@@ -327,7 +327,7 @@ static void gui_fb_draw(gui_obj_t *root)
         memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
 
         obj_draw_scan(root);
-        gauss_blur_post_process_handle();
+        post_process_handle();
         if (dc->lcd_draw_sync != NULL)
         {
             dc->lcd_draw_sync();

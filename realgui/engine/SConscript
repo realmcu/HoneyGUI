@@ -19,7 +19,7 @@ src += ['font_rendering_utils.c']
 src += ['font_stb.c']
 src += ['font_ttf.c']
 src += ['engine_gray.c']
-src += ['gauss_blur_process.c']
+src += ['gui_post_process.c']
 src += ['acc_arm2d.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):

@@ -24,15 +24,15 @@ typedef struct
     uint8_t blur_degree;
     BLUR_DIRECTION dir;
     void *cache_mem;
-} gauss_blur_param;
+} post_process_param;
 
-void gauss_blur_post_process_add(gauss_blur_param *event);
+void gauss_blur_post_process_add(post_process_param *event);
 
-void gauss_blur_post_process_handle(void);
+void post_process_handle(void);
 
 void gauss_blur_post_process_end(void);
 
-void gauss_blur_pre_process_handle(gauss_blur_param *event);
+void pre_process_handle(post_process_param *event);
 
 #ifdef __cplusplus
 }

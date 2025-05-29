@@ -24,7 +24,7 @@
 #include "gui_img.h"
 #include "gui_view.h"
 #include "gui_view_transition.h"
-#include "gauss_blur_process.h"
+#include "gui_post_process.h"
 
 
 /*============================================================================*
@@ -129,12 +129,12 @@ void gui_view_blur(gui_view_t *this, int16_t release)
     {
         blur_degree = (uint8_t)(562.5f * blur_ratio - 56.25f);
     }
-    gauss_blur_param *blur_param = (gauss_blur_param *)this->blur_param;
+    post_process_param *blur_param = (post_process_param *)this->blur_param;
     if (blur_param == NULL)
     {
-        blur_param = gui_malloc(sizeof(gauss_blur_param));
-        this->blur_param = (gauss_blur_param *)blur_param;
-        memset(blur_param, 0, sizeof(gauss_blur_param));
+        blur_param = gui_malloc(sizeof(post_process_param));
+        this->blur_param = (post_process_param *)blur_param;
+        memset(blur_param, 0, sizeof(post_process_param));
         blur_param->area = new_rect;
         blur_param->blur_degree = blur_degree;
         blur_param->dir = dir;

@@ -26,7 +26,7 @@
 #include "kb_algo.h"
 #include "gui_img.h"
 #include "gui_view_transition.h"
-#include "gauss_blur_process.h"
+#include "gui_post_process.h"
 
 
 /*============================================================================*
@@ -419,10 +419,10 @@ static void gui_view_prepare(gui_obj_t *obj)
 static void gui_view_preprocess(gui_obj_t *obj)
 {
     gui_view_t *_this = (gui_view_t *)obj;
-    gauss_blur_param *blur_param = (gauss_blur_param *)_this->blur_param;
+    post_process_param *blur_param = (post_process_param *)_this->blur_param;
     if (blur_param != NULL)
     {
-        gauss_blur_pre_process_handle(blur_param);
+        pre_process_handle(blur_param);
     }
 }
 
@@ -458,7 +458,7 @@ static void gui_view_end(gui_obj_t *obj)
     if (obj->need_preprocess)
     {
         gui_view_t *_this = (gui_view_t *)obj;
-        gauss_blur_param *blur_param = (gauss_blur_param *)_this->blur_param;
+        post_process_param *blur_param = (post_process_param *)_this->blur_param;
         if (blur_param != NULL)
         {
             blur_depose(&blur_param->cache_mem);
