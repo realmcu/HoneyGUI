@@ -419,7 +419,7 @@ static void gui_view_prepare(gui_obj_t *obj)
 static void gui_view_preprocess(gui_obj_t *obj)
 {
     gui_view_t *_this = (gui_view_t *)obj;
-    post_process_param *blur_param = (post_process_param *)_this->blur_param;
+    post_process_event *blur_param = (post_process_event *)_this->blur_param;
     if (blur_param != NULL)
     {
         pre_process_handle(blur_param);
@@ -458,10 +458,19 @@ static void gui_view_end(gui_obj_t *obj)
     if (obj->need_preprocess)
     {
         gui_view_t *_this = (gui_view_t *)obj;
-        post_process_param *blur_param = (post_process_param *)_this->blur_param;
+        post_process_event *blur_param = (post_process_event *)_this->blur_param;
         if (blur_param != NULL)
         {
-            blur_depose(&blur_param->cache_mem);
+            post_process_event *event = blur_param;
+            if (event->param != NULL)
+            {
+                if (event->type == POST_PROCESS_BLUR)
+                {
+                    post_process_blur_param *param = (post_process_blur_param *)event->param;
+                    blur_depose(&param->cache_mem);
+                }
+                gui_free(event->param);
+            }
             gui_free(blur_param);
             _this->blur_param = NULL;
         }

@@ -12,6 +12,11 @@ extern void (*blur_depose)(void **mem);
 
 typedef enum
 {
+    POST_PROCESS_BLUR,
+} POST_PROCESS_TYPE;
+
+typedef enum
+{
     BLUR_HORIZONTAL,
     BLUR_HORIZONTAL_REVERSE,
     BLUR_VERTICAL,
@@ -24,15 +29,21 @@ typedef struct
     uint8_t blur_degree;
     BLUR_DIRECTION dir;
     void *cache_mem;
-} post_process_param;
+} post_process_blur_param;
 
-void gauss_blur_post_process_add(post_process_param *event);
+typedef struct
+{
+    POST_PROCESS_TYPE type;
+    void *param;
+} post_process_event;
+
+void post_process_add(post_process_event *event);
 
 void post_process_handle(void);
 
-void gauss_blur_post_process_end(void);
+void post_process_end(void);
 
-void pre_process_handle(post_process_param *event);
+void pre_process_handle(post_process_event *event);
 
 #ifdef __cplusplus
 }

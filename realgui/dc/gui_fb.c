@@ -334,7 +334,7 @@ static void gui_fb_draw(gui_obj_t *root)
         }
         dc->lcd_update(dc);
     }
-    gauss_blur_post_process_end();
+    post_process_end();
 }
 
 uint32_t gui_fps()

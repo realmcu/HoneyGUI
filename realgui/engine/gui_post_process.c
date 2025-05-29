@@ -7,14 +7,14 @@ void (*blur_depose)(void **mem) = NULL;
 
 typedef struct post_process_item
 {
-    post_process_param *param;
+    post_process_event *event;
     struct post_process_item *next;
 } T_PROCESS_ITEM;
 
 static T_PROCESS_ITEM *process_list = NULL;
 static T_PROCESS_ITEM *list_tail = NULL;
 
-void gauss_blur_post_process_add(post_process_param *param)
+void post_process_add(post_process_event *event)
 {
     bool new_list = false;
     if (process_list == NULL)
@@ -23,36 +23,44 @@ void gauss_blur_post_process_add(post_process_param *param)
         list_tail = process_list;
         new_list = true;
     }
-    post_process_param *new_param = (post_process_param *)gui_malloc(sizeof(post_process_param));
-    memcpy(new_param, param, sizeof(post_process_param));
+    post_process_event *new_event = (post_process_event *)gui_malloc(sizeof(post_process_event));
+    memcpy(new_event, event, sizeof(post_process_event));
 
     if (new_list)
     {
-        list_tail->param = new_param;
+        list_tail->event = new_event;
         list_tail->next = NULL;
     }
     else
     {
         T_PROCESS_ITEM *new_item = (T_PROCESS_ITEM *)gui_malloc(sizeof(T_PROCESS_ITEM));
         list_tail->next = new_item;
-        new_item->param = new_param;
+        new_item->event = new_event;
         new_item->next = NULL;
         list_tail = new_item;
     }
 }
 
-void gauss_blur_post_process_end(void)
+void post_process_end(void)
 {
     T_PROCESS_ITEM *current = process_list;
     while (current != NULL)
     {
-        if (current->param != NULL)
+        if (current->event != NULL)
         {
-            if (blur_depose != NULL)
+            if (current->event->param != NULL)
             {
-                blur_depose(&current->param->cache_mem);
+                if (current->event->type == POST_PROCESS_BLUR)
+                {
+                    if (blur_depose != NULL)
+                    {
+                        post_process_blur_param *param = (post_process_blur_param *)current->event->param;
+                        blur_depose(&param->cache_mem);
+                    }
+                }
+                gui_free(current->event->param);
             }
-            gui_free(current->param);
+            gui_free(current->event);
         }
         T_PROCESS_ITEM *next = current->next;
         gui_free(current);
@@ -67,31 +75,50 @@ void post_process_handle(void)
     T_PROCESS_ITEM *current = process_list;
     while (current != NULL)
     {
-        struct acc_engine *acc = gui_get_acc();
-        post_process_param *param = (post_process_param *)current->param;
-        if (acc->blur != NULL)
+        switch (current->event->type)
         {
-            if (blur_prepare != NULL)
+        case POST_PROCESS_BLUR:
             {
-                blur_prepare(&param->area, &param->cache_mem);
+                struct acc_engine *acc = gui_get_acc();
+                post_process_blur_param *param = (post_process_blur_param *)current->event->param;
+                if (acc->blur != NULL)
+                {
+                    if (blur_prepare != NULL)
+                    {
+                        blur_prepare(&param->area, &param->cache_mem);
+                    }
+                    if (param->blur_degree != 0)
+                    {
+                        acc->blur(gui_get_dc(), &param->area, param->blur_degree, param->cache_mem);
+                    }
+                }
+                break;
             }
-            if (param->blur_degree != 0)
-            {
-                acc->blur(gui_get_dc(), &param->area, param->blur_degree, param->cache_mem);
-            }
+        default:
+            break;
         }
         current = current->next;
     }
 }
 
-void pre_process_handle(post_process_param *param)
+void pre_process_handle(post_process_event *event)
 {
-    struct acc_engine *acc = gui_get_acc();
-    if (acc->blur != NULL)
+    switch (event->type)
     {
-        if (param->blur_degree != 0)
+    case POST_PROCESS_BLUR:
         {
-            acc->blur(gui_get_dc(), &param->area, param->blur_degree, param->cache_mem);
+            struct acc_engine *acc = gui_get_acc();
+            post_process_blur_param *param = (post_process_blur_param *)event->param;
+            if (acc->blur != NULL)
+            {
+                if (param->blur_degree != 0)
+                {
+                    acc->blur(gui_get_dc(), &param->area, param->blur_degree, param->cache_mem);
+                }
+            }
+            break;
         }
+    default:
+        break;
     }
 }

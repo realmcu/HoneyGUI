@@ -129,18 +129,23 @@ void gui_view_blur(gui_view_t *this, int16_t release)
     {
         blur_degree = (uint8_t)(562.5f * blur_ratio - 56.25f);
     }
-    post_process_param *blur_param = (post_process_param *)this->blur_param;
+    uint8_t *blur_param = this->blur_param;
     if (blur_param == NULL)
     {
-        blur_param = gui_malloc(sizeof(post_process_param));
-        this->blur_param = (post_process_param *)blur_param;
-        memset(blur_param, 0, sizeof(post_process_param));
-        blur_param->area = new_rect;
-        blur_param->blur_degree = blur_degree;
-        blur_param->dir = dir;
-        if (blur_param->cache_mem == NULL)
+        blur_param = gui_malloc(sizeof(post_process_event));
+        this->blur_param = blur_param;
+        memset(blur_param, 0, sizeof(post_process_event));
+        post_process_event *event = (post_process_event *)blur_param;
+        event->param = gui_malloc(sizeof(post_process_blur_param));
+        memset(event->param, 0, sizeof(post_process_blur_param));
+        post_process_blur_param *param = (post_process_blur_param *)event->param;
+        param->area = new_rect;
+        param->blur_degree = blur_degree;
+        param->dir = dir;
+        event->type = POST_PROCESS_BLUR;
+        if (param->cache_mem == NULL)
         {
-            blur_prepare(&blur_param->area, &blur_param->cache_mem);
+            blur_prepare(&param->area, &param->cache_mem);
         }
     }
 }
