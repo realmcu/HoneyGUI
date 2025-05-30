@@ -86,7 +86,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 extern uint8_t menu_style;
-static gui_list_note_t *tab_array[APP_NUM];
 static int16_t list_offset_his = 0;
 bool sidebar_flag = 0;
 
@@ -333,10 +332,10 @@ void app_menu_design(gui_view_t *view)
     }
     else if (menu_style == 2)
     {
+        gui_list_note_t *tab_array[APP_NUM];
         uint32_t *array[] =
         {
             UI_CLOCK_HEARTRATE_ICON_BIN,
-            UI_CLOCK_MUSIC_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
             UI_CLOCK_BOX2D_RING_ICON_BIN,
             UI_CLOCK_ACTIVITY_ICON_BIN,
@@ -356,7 +355,6 @@ void app_menu_design(gui_view_t *view)
         char *text_array[] =
         {
             "Heart Rate",
-            "Music",
             "Fruit Ninja",
             "Box2d Ring",
             "Activity",
@@ -395,49 +393,47 @@ void app_menu_design(gui_view_t *view)
         {
             gui_list_note_t *tab = gui_list_add_note(list, false);
             gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, 0, length, color_t[i % 2]);
-            gui_img_t *img = gui_img_create_from_mem(tab, 0, array[i], 0, 0, 0, 0);
+            gui_img_t *img = gui_img_create_from_mem(tab, 0, array[i], 30, 0, 0, 0);
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             tab_array[i] = tab;
             char *text = text_array[i];
             int font_size = 32;
-            gui_text_t *t = gui_text_create(tab, "txt", 120, 27, gui_get_screen_width(), font_size);
+            gui_text_t *t = gui_text_create(tab, "txt", 180, 27, gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 0, 0), strlen(text), font_size);
             gui_text_type_set(t, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
         }
         gui_obj_add_event_cb(tab_array[0], (gui_event_cb_t)switch_APP_HEART_RATE,  GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[1], (gui_event_cb_t)switch_APP_MUSIC,       GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[1], (gui_event_cb_t)switch_APP_FRUIT_NINJA, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[2], (gui_event_cb_t)switch_APP_FRUIT_NINJA, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[2], (gui_event_cb_t)switch_APP_BOX2D_RING,  GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[3], (gui_event_cb_t)switch_APP_BOX2D_RING,  GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[3], (gui_event_cb_t)switch_APP_ACTIVITY,    GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[4], (gui_event_cb_t)switch_APP_ACTIVITY,    GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[4], (gui_event_cb_t)switch_APP_SOCCER,      GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[5], (gui_event_cb_t)switch_APP_SOCCER,      GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[5], (gui_event_cb_t)switch_APP_FLOWER,      GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[6], (gui_event_cb_t)switch_APP_FLOWER,      GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[6], (gui_event_cb_t)switch_APP_WEATHER,     GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[7], (gui_event_cb_t)switch_APP_WEATHER,     GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[7], (gui_event_cb_t)switch_APP_BUTTERFLY,   GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[8], (gui_event_cb_t)switch_APP_BUTTERFLY,   GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[8], (gui_event_cb_t)switch_APP_APPLIST,     GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[9], (gui_event_cb_t)switch_APP_APPLIST,     GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[9], (gui_event_cb_t)switch_APP_DISC,       GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[10], (gui_event_cb_t)switch_APP_DISC,       GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[10], (gui_event_cb_t)switch_APP_FACE,       GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[11], (gui_event_cb_t)switch_APP_FACE,       GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[11], (gui_event_cb_t)switch_APP_PRISM_THICK, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[12], (gui_event_cb_t)switch_APP_PRISM_THICK, GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_APP_PRISM_MIRROR,
+        gui_obj_add_event_cb(tab_array[12], (gui_event_cb_t)switch_APP_PRISM_MIRROR,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_WINDMILL, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_APP_WINDMILL, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_ENERGYBOX, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_ENERGYBOX, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_APP_NOTIFICATION,
+        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_NOTIFICATION,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
 

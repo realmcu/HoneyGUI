@@ -204,6 +204,7 @@ static void set_arc_img_ftl(gui_canvas_round_rect_t *this, draw_img_t **input_im
 
 static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
 {
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED);
     if (this->color.color.rgba.a == 255)
     {
         touch_info_t *tp = tp_get_info();

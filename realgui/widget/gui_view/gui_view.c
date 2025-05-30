@@ -45,6 +45,10 @@ static bool g_SurpressTP = true;
 static int16_t g_Release = 0;
 static int16_t g_Target = 0;
 
+static bool g_TriggerMove = false; // whether trigger move event
+static int16_t g_Offset = 0; // offset of the g_Release
+static bool g_OffsetNeedUpdate = false;
+
 
 /*============================================================================*
  *                           Private Functions
@@ -73,8 +77,7 @@ static void __released_view_timer_cb(void *obj)
         {
             // gui_log("obj name = %s, g_Release = %d!\n", ((gui_obj_t *)obj)->name, g_Release);
 
-            gui_view_not_show(g_PreView);
-            // g_PreView = g_CurrentView;
+            if (g_PreView != g_NextView) {gui_view_not_show(g_PreView);}
             gui_view_not_show(g_CurrentView);
             if (g_CurrentView->descriptor->keep)
             {
@@ -146,10 +149,6 @@ static void __view_animate_timer_cb(void *obj)
 
 static void __view_released_cb(void *obj, gui_event_t e, void *param)
 {
-    if (obj != g_CurrentView)
-    {
-        return;
-    }
     touch_info_t *tp = tp_get_info();
     gui_view_t *_this = (gui_view_t *)obj;
     gui_obj_t *o = (gui_obj_t *)_this;
@@ -164,18 +163,47 @@ static void __view_released_cb(void *obj, gui_event_t e, void *param)
     if (tp->type == TOUCH_LEFT_SLIDE)
     {
         g_Target = -o->w;
+        if (g_Release <= -o->w / 2)
+        {
+            g_Target = -o->w;
+        }
+        else
+        {
+            g_Target = 0;
+        }
     }
     else if (tp->type == TOUCH_RIGHT_SLIDE)
     {
-        g_Target = o->w;
+        if (g_Release >= o->w / 2)
+        {
+            g_Target = o->w;
+        }
+        else
+        {
+            g_Target = 0;
+        }
     }
     else if (tp->type == TOUCH_UP_SLIDE)
     {
-        g_Target = -o->h;
+        if (g_Release <= -o->h / 2)
+        {
+            g_Target = -o->h;
+        }
+        else
+        {
+            g_Target = 0;
+        }
     }
     else if (tp->type == TOUCH_DOWN_SLIDE)
     {
-        g_Target = o->h;
+        if (g_Release >= o->h / 2)
+        {
+            g_Target = o->h;
+        }
+        else
+        {
+            g_Target = 0;
+        }
     }
     else if (tp->type == TOUCH_ORIGIN_FROM_X)
     {
@@ -190,15 +218,13 @@ static void __view_released_cb(void *obj, gui_event_t e, void *param)
         // GUI_ASSERT(0);
         g_Target = 0;
     }
+    g_Offset = 0;
 }
 
 static void __view_pressing_cb(void *obj, gui_event_t e, void *param)
 {
+    // gui_log("g_Offset %d\n", g_Offset);
     gui_dispdev_t *dc = gui_get_dc();
-    if (obj != g_CurrentView)
-    {
-        return;
-    }
     touch_info_t *tp = tp_get_info();
     gui_event_t trigger_event = g_CurrentView->current_event;
 
@@ -238,6 +264,15 @@ static void __view_pressing_cb(void *obj, gui_event_t e, void *param)
             g_Release = dc->screen_height;
         }
     }
+    // gui_log("delta = %d\n", g_Release);
+    if (abs(g_Release) < abs(g_Offset))
+    {
+        g_Release = 0;
+        return;
+    }
+    g_Release -= g_Offset;
+    g_TriggerMove = false;
+
     // gui_log("g_release = %d\n", g_Release);
 }
 
@@ -275,10 +310,6 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
                                             gui_view_on_event_t *on_event)
 {
     // gui_log("enter event_trigger_move_cb \n");
-    if (g_NextView == g_PreView)
-    {
-        g_PreView = NULL; // prevent NextView from being freed when g_NextView == g_PreView
-    }
     g_SurpressTP = false;
 
     gui_view_t *next_view_rec = g_NextView;
@@ -295,6 +326,9 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
     g_NextView->current_event = e;
     g_CurrentView->current_event = e;
 
+    g_TriggerMove = true;
+    g_OffsetNeedUpdate = false;
+    g_Offset = 0;
     // gui_log("__view_on_event_trigger_move_cb next view name = %s\n", g_NextView->base.name);
 }
 
@@ -380,6 +414,26 @@ static void gui_view_prepare(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+
+        if (tp->left_moved || tp->right_moved ||
+            tp->up_moved || tp->down_moved)
+        {
+            g_Offset = 0;
+            g_Release = 0;
+        }
+
+        if (g_TriggerMove)
+        {
+            if (g_OffsetNeedUpdate)
+            {
+                if (tp->type == TOUCH_HOLD_X)      {g_Offset = tp->deltaX;}
+                else if (tp->type == TOUCH_HOLD_Y) {g_Offset = tp->deltaY;}
+            }
+            else
+            {
+                g_OffsetNeedUpdate = true;
+            }
+        }
     }
 
     if (!g_SurpressEvent && _this == g_CurrentView)

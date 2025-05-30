@@ -46,8 +46,9 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define __STATIC_FORCEINLINE static inline __attribute__((always_inline))
+#ifndef   __STATIC_INLINE
 #define __STATIC_INLINE static inline
+#endif
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
