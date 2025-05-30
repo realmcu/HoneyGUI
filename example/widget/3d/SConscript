@@ -33,5 +33,10 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_DOG_3D'):
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_DISC_3D'):
     src += ['app_ui_realgui_3d_disc.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_SEAWATER_3D'):
+    src += [cwd +'/SeaWaterDClock/example_gui_SeaWater.c']
+    src += [cwd +'/SeaWaterDClock/gui_nanovg_wave.c']
+    CPPPATH +=[cwd +'/SeaWaterDClock' ]
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)     
 
 Return('group')
