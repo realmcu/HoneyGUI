@@ -116,6 +116,15 @@ gui_3d_t *gui_3d_create(void                 *parent,
                         int16_t               h);
 
 /**
+ * @brief Set the image for a specific face of the 3D widget.
+ *
+ * @param this Pointer to the 3D widget.
+ * @param face_index Index of the face to set the image.
+ * @param image_addr Pointer to the image data to be set for the face.
+ */
+void gui_3d_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_addr);
+
+/**
  * @brief Set global transform callback.
  *
  * @param this The 3d widget pointer.

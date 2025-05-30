@@ -1,0 +1,266 @@
+#include "root_image_hongkong/ui_resource.h"
+#include "gui_img.h"
+#include "gui_win.h"
+#include "gui_text.h"
+#include "time.h"
+#include "tp_algo.h"
+#include <math.h>
+#include "cJSON.h"
+#include "app_hongkong.h"
+#include "gui_view.h"
+
+
+#define CURRENT_VIEW_NAME "flower_view"
+
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+void flower_app(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .on_switch_in = flower_app,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+
+static void return_to_menu()
+{
+    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
+static void return_timer_cb()
+{
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+}
+
+#define NUM_PETALS 30
+#define NUM_GHOST 2
+
+typedef struct
+{
+    float driftX;    // Horizontal drift
+    float driftY;    // Vertical drift
+    float scale;     // Scale factor, size is 64*scale
+    gui_img_t *img;  // Petal's image object
+    gui_img_t *ghosts[NUM_GHOST]; // ghost images
+
+    float target_dx; // gather target X position
+    float move_speed;
+} Petal;
+
+static Petal petals[NUM_PETALS];
+static gui_img_t *branch1;
+static gui_img_t *branch2;
+
+static float branch_rot_angle = 0.0f;
+static int branch_direction = 1;
+static float petal_rot_angle = 0.0f;
+static float petal_oscillation = 0.0f; // petals oscillation effect
+
+static void update_branch_rotation()
+{
+    if (branch_direction == 1)
+    {
+        branch_rot_angle += 0.1f;
+        if (branch_rot_angle >= 10.0f)
+        {
+            branch_rot_angle = 10.0f;
+            branch_direction = 0;
+        }
+    }
+    else
+    {
+        branch_rot_angle -= 0.1f;
+        if (branch_rot_angle <= 0.0f)
+        {
+            branch_rot_angle = 0.0f;
+            branch_direction = 1;
+        }
+    }
+    gui_img_rotation(branch1, -branch_rot_angle);
+    gui_img_rotation(branch2, branch_rot_angle);
+}
+
+static void update_flower_animation()
+{
+    touch_info_t *tp = tp_get_info();
+    gui_dispdev_t *dc = gui_get_dc();
+
+    // branch animation
+    update_branch_rotation();
+
+    // petals animation
+    petal_rot_angle++;
+    if (tp->pressed || tp->pressing)
+    {
+        if (tp->pressed) // ghost effect on touch
+        {
+            for (int i = 0; i < NUM_PETALS; i++)
+            {
+                float ghost0_offset, ghost1_offset;
+                if (tp->x < petals[i].driftX)
+                {
+                    ghost0_offset = petals[i].scale * 16.0f;
+                    ghost1_offset = petals[i].scale * 32.0f;
+                }
+                else
+                {
+                    ghost0_offset = -petals[i].scale * 64.0f;
+                    ghost1_offset = -petals[i].scale * 80.0f;
+                }
+
+                gui_img_translate(petals[i].ghosts[0], petals[i].driftX + ghost0_offset,
+                                  petals[i].driftY - petals[i].scale * 32.0f);
+                gui_img_translate(petals[i].ghosts[1], petals[i].driftX + ghost1_offset,
+                                  petals[i].driftY - petals[i].scale * 32.0f);
+
+                petals[i].ghosts[0]->base.not_show = false;
+                petals[i].ghosts[1]->base.not_show = false;
+            }
+        }
+        else // petals drift towards touch point
+        {
+            int new_x = tp->x + tp->deltaX;
+            if (new_x != tp->history_x)
+            {
+                for (int i = 0; i < NUM_PETALS; i++)
+                {
+                    petals[i].target_dx = tp->deltaX;
+
+                    float dist = fabs(new_x - petals[i].driftX);
+                    petals[i].move_speed =  fmaxf(1.0f, dist / 20.0f); // Adjust the speed based on the distance
+
+                    if (fabs(petals[i].driftX - petals[i].target_dx) > 5.0f)
+                    {
+                        int direction = (petals[i].target_dx > 0) ? 1 : -1;
+                        petals[i].driftX += direction * petals[i].move_speed;
+                    }
+
+                    petals[i].ghosts[0]->base.not_show = true;
+                    petals[i].ghosts[1]->base.not_show = true;
+
+                }
+                tp->history_x = new_x;
+            }
+            else // petals hover
+            {
+                petal_oscillation += 0.1f;
+                for (int i = 0; i < NUM_PETALS; i++)
+                {
+                    petals[i].driftX += (4.0f + i * 0.2f) * sin(petal_oscillation + i * 0.3f);
+                }
+            }
+        }
+    }
+    else // when no touch, petals drift down
+    {
+        for (int i = 0; i < NUM_PETALS; i++)
+        {
+            petals[i].driftY += 3.0f * petals[i].scale; // big petals drift faster
+
+            petals[i].ghosts[0]->base.not_show = true;
+            petals[i].ghosts[1]->base.not_show = true;
+        }
+    }
+
+    for (int i = 0; i < NUM_PETALS; i++)
+    {
+        gui_img_set_focus(petals[i].img, 32, 32);
+        gui_img_translate(petals[i].img, petals[i].driftX, petals[i].driftY);
+        gui_img_rotation(petals[i].img, petal_rot_angle);
+
+        if (petals[i].driftY > dc->screen_height + 100)
+        {
+            petals[i].driftX = rand() % dc->screen_width;
+            petals[i].driftY = -rand() % dc->screen_height;
+            petals[i].scale = (rand() % 41) / 100.0f + 0.1f;
+            gui_img_scale(petals[i].img, petals[i].scale, petals[i].scale);
+        }
+        if (petals[i].driftX < -dc->screen_width)
+        {
+            petals[i].driftX += 2 * dc->screen_width;
+        }
+        else if (petals[i].driftX > dc->screen_width)
+        {
+            petals[i].driftX -= 2 * dc->screen_width;
+        }
+    }
+
+}
+
+void flower_app(gui_view_t *view)
+{
+    gui_obj_t *obj = GUI_BASE(view);
+    gui_dispdev_t *dc = gui_get_dc();
+
+    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+
+    gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
+                                                    0);
+
+    branch1 = gui_img_create_from_mem(background, "branch1", BRANCH01_BIN, 0, 0, 0, 0);
+    gui_img_set_focus(branch1, 336, 0);
+    gui_img_translate(branch1, 410, 50);
+
+    branch2 = gui_img_create_from_mem(background, "branch2", BRANCH02_BIN, 0, 300, 0, 0);
+
+    for (int i = 0; i < NUM_PETALS; i++)
+    {
+        petals[i].driftX = rand() % dc->screen_width;
+        petals[i].driftY = -rand() % dc->screen_height;
+        petals[i].scale = (rand() % 41) / 100.0f + 0.1f;
+
+        int random_image_index = rand() % 6;
+        void *images[6] = {(void *)LEAF01_BIN, (void *)LEAF02_BIN, (void *)LEAF03_BIN,
+                           (void *)LEAF04_BIN, (void *)LEAF05_BIN, (void *)LEAF06_BIN
+                          };
+
+        petals[i].img = gui_img_create_from_mem(background, "petal", images[random_image_index], 0, 0,
+                                                0, 0);
+        gui_img_set_focus(petals[i].img, 32, 32);
+        gui_img_translate(petals[i].img, petals[i].driftX, petals[i].driftY);
+
+        gui_img_scale(petals[i].img, petals[i].scale, petals[i].scale);
+
+
+        petals[i].ghosts[0] = gui_img_create_from_mem(background, "ghost0", DOT01_BIN, 0, 0, 0, 0);
+        petals[i].ghosts[1] = gui_img_create_from_mem(background, "ghost1", DOT02_BIN, 0, 0, 0, 0);
+
+        gui_img_translate(petals[i].ghosts[0], petals[i].driftX, petals[i].driftY);
+        gui_img_translate(petals[i].ghosts[1], petals[i].driftX, petals[i].driftY);
+
+        gui_img_scale(petals[i].ghosts[0], petals[i].scale, petals[i].scale);
+        gui_img_scale(petals[i].ghosts[1], petals[i].scale, petals[i].scale);
+        petals[i].ghosts[0]->base.not_show = true;
+        petals[i].ghosts[1]->base.not_show = true;
+        petals[i].ghosts[0]->opacity_value = 100;
+        petals[i].ghosts[1]->opacity_value = 150;
+
+
+    }
+
+    gui_obj_create_timer(obj, 10, true, update_flower_animation);
+    gui_obj_start_timer(obj);
+
+}

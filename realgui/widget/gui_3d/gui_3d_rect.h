@@ -80,6 +80,16 @@ gui_3d_t *gui_3d_rect_create(void                  *parent,
 
 
 /**
+ * @brief Set the image for a specific face of the 3D rectangle widget.
+ *
+ * @param this Pointer to the 3D widget.
+ * @param face_index Index of the face to set the image.
+ * @param image_addr Pointer to the image data to be set for the face.
+ */
+void gui_3d_rect_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_addr);
+
+
+/**
  * @brief Set a callback function for when the 3D widget is clicked.
  *
  * @param this Pointer to the 3D widget.

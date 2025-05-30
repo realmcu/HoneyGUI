@@ -85,6 +85,7 @@ static void gui_3d_generate_triangle_img(gui_3d_t *this, int width, int height)
     this->combined_img->img_w = width;
     this->combined_img->img_h = height;
     this->combined_img->opacity_value = UINT8_MAX;
+    this->combined_img->blend_mode = IMG_FILTER_BLACK;
 
     gui_obj_t *obj = (gui_obj_t *)this;
     memcpy(&this->combined_img->matrix, obj->matrix, sizeof(struct gui_matrix));

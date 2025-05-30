@@ -60,6 +60,18 @@ gui_3d_t *gui_3d_create(void                 *parent,
 
 }
 
+void gui_3d_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_addr)
+{
+    if (this->desc->face_type == GUI_3D_FACE_RECTANGLE)
+    {
+        gui_3d_rect_set_face_image(this, face_index, image_addr);
+    }
+    else
+    {
+        //todo
+    }
+}
+
 void gui_3d_set_global_transform_cb(gui_3d_t *this, gui_3d_global_transform_cb cb)
 {
     this->global_transform_cb = (void (*)(gui_3d_t *))cb;

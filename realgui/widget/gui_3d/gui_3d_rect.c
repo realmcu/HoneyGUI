@@ -168,6 +168,7 @@ static void gui_3d_light_apply(gui_3d_t *this, size_t i /*face_offset*/)
 static void gui_3d_rect_face_transfrom(gui_3d_t *this, size_t i /*face_offset*/,
                                        gui_3d_world_t *world, gui_3d_camera_t *camera)
 {
+    gui_obj_t *obj = (gui_obj_t *)this;
     gui_3d_rect_scene(this->face.rect_face + i, i, &this->desc->attrib, world, camera);
 
     int material_id = this->desc->attrib.material_ids[i];
@@ -184,8 +185,8 @@ static void gui_3d_rect_face_transfrom(gui_3d_t *this, size_t i /*face_offset*/,
         src[j].x = this->face.rect_face[i].transform_vertex[j].u * width;
         src[j].y = (1.0f - this->face.rect_face[i].transform_vertex[j].v) * height;
 
-        dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x;
-        dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y;
+        dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x + obj->matrix->m[0][2];
+        dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y + obj->matrix->m[1][2];
     }
 
     gui_3d_generate_2d_matrix(src, dst, (float *)&this->img[i].matrix);
@@ -271,6 +272,7 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
     this->combined_img->img_w = width;
     this->combined_img->img_h = height;
     this->combined_img->opacity_value = UINT8_MAX;
+    this->combined_img->blend_mode = IMG_FILTER_BLACK;
 
     gui_obj_t *obj = (gui_obj_t *)this;
     memcpy(&this->combined_img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -743,6 +745,12 @@ gui_3d_t *gui_3d_rect_create(void                  *parent,
 
     GET_BASE(this)->create_done = true;
     return this;
+}
+
+void gui_3d_rect_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_addr)
+{
+    int material_id = this->desc->attrib.material_ids[face_index];
+    this->desc->textures[material_id] = image_addr;
 }
 
 void gui_3d_rect_on_click(gui_3d_t *this, void *callback, void *parameter)
