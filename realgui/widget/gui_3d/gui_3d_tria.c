@@ -141,6 +141,22 @@ static void gui_3d_tria_prepare(gui_3d_t *this)
 
     gui_3d_generate_triangle_img(this, this->camera.viewport_width, this->camera.viewport_height);
 
+    if (tp->type == TOUCH_SHORT)
+    {
+        const int target_x = this->combined_img->img_target_x;
+        const int target_y = this->combined_img->img_target_y;
+        const int target_w = this->combined_img->img_target_w;
+        const int target_h = this->combined_img->img_target_h;
+
+        if (tp->x >= target_x &&
+            tp->x <= (target_x + target_w) &&
+            tp->y >= target_y &&
+            tp->y <= (target_y + target_h))
+        {
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+        }
+    }
+
     gui_fb_change();
 
     GUI_UNUSED(this);
@@ -204,8 +220,17 @@ static void gui_3d_tria_destroy(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    gui_free(this->desc->textures);
-    gui_free(this->desc);
+    if (this->desc != NULL)
+    {
+        if (this->desc->textures != NULL)
+        {
+            gui_free(this->desc->textures);
+            this->desc->textures = NULL;
+        }
+
+        gui_free(this->desc);
+        this->desc = NULL;
+    }
 }
 
 static void gui_3d_tria_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)

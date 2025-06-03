@@ -404,25 +404,17 @@ static void gui_3d_rect_draw_front_sort_prepare(gui_3d_t *this)
 
     if (tp->type == TOUCH_SHORT)
     {
-        // Cache the num_face_num_verts
-        const int num_face_vertices = this->desc->attrib.num_face_num_verts;
+        const int target_x = this->combined_img->img_target_x;
+        const int target_y = this->combined_img->img_target_y;
+        const int target_w = this->combined_img->img_target_w;
+        const int target_h = this->combined_img->img_target_h;
 
-        for (int i = 0; i < num_face_vertices; ++i)
+        if (tp->x >= target_x &&
+            tp->x <= (target_x + target_w) &&
+            tp->y >= target_y &&
+            tp->y <= (target_y + target_h))
         {
-            // Cache the img_target and face attributes
-            const int target_x = this->img[i].img_target_x;
-            const int target_y = this->img[i].img_target_y;
-            const int target_w = this->img[i].img_target_w;
-            const int target_h = this->img[i].img_target_h;
-
-            if (tp->x >= target_x &&
-                tp->x <= (target_x + target_w) &&
-                tp->y >= target_y &&
-                tp->y <= (target_y + target_h))
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-                break;
-            }
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
         }
     }
 
@@ -585,8 +577,17 @@ static void gui_3d_rect_destroy(gui_3d_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    gui_free(this->desc->textures);
-    gui_free(this->desc);
+    if (this->desc != NULL)
+    {
+        if (this->desc->textures != NULL)
+        {
+            gui_free(this->desc->textures);
+            this->desc->textures = NULL;
+        }
+
+        gui_free(this->desc);
+        this->desc = NULL;
+    }
 }
 
 static void gui_3d_rect_draw_front_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -751,10 +752,5 @@ void gui_3d_rect_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_
 {
     int material_id = this->desc->attrib.material_ids[face_index];
     this->desc->textures[material_id] = image_addr;
-}
-
-void gui_3d_rect_on_click(gui_3d_t *this, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 

@@ -12,9 +12,54 @@
 #include "math.h"
 #include <time.h>
 #include "root_image_hongkong/ui_resource.h"
+#include "tp_algo.h"
 
 #define SCREEN_WIDTH  410
 #define SCREEN_HEIGHT 502
+
+#define CURRENT_VIEW_NAME "watchface_butterfly_view"
+
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+void watchface_butterfly_app(gui_view_t *view);
+
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .on_switch_in = watchface_butterfly_app,
+};
+
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+
+static void return_to_menu()
+{
+    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
+static void return_timer_cb()
+{
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+}
 
 static float radius = 20.0f, theta = 0;
 static int frame_counter = 0;
@@ -109,7 +154,7 @@ static void update_animation()
     butterfly_rz = theta * (180.0f / M_PI);
 }
 
-static void butterfly_global_cb(gui_3d_t *this)
+static void watchface_butterfly_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
@@ -121,7 +166,7 @@ static void butterfly_global_cb(gui_3d_t *this)
 
 }
 
-static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
+static gui_3d_matrix_t watchface_butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
 {
     gui_3d_matrix_t face_matrix;
     gui_3d_matrix_t transform_matrix;
@@ -160,26 +205,30 @@ static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face
 
 
 
-void create_watchface_bf(gui_view_t *view)
+void watchface_butterfly_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
+    gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));
-
-    gui_3d_t *butterfly_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", DESC_BUTTERFLY_BIN,
-                                           GUI_3D_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-
-    gui_3d_set_global_transform_cb(butterfly_3d, (gui_3d_global_transform_cb)butterfly_global_cb);
-    gui_3d_set_face_transform_cb(butterfly_3d, (gui_3d_face_transform_cb)butterfly_face_cb);
-
-    gui_obj_create_timer(&(butterfly_3d->base), 17, true, update_animation);
-    gui_obj_start_timer(&(butterfly_3d->base));
 
     gui_img_t *img = gui_img_create_from_mem(win, "mask", W1ELLIPSE5_BIN, 204, 246, 0, 0);
     h_hand = gui_img_create_from_mem(win, "h_hand", W1UNION2_BIN, 199, 170, 0, 0);
     m_hand = gui_img_create_from_mem(win, "m_hand", W1UNION_BIN, 200, 90, 0, 0);
     s_hand = gui_img_create_from_mem(win, "s_hand", W1VECTOR7_BIN, 206, 124, 0, 0);
+
+    gui_3d_t *watchface_butterfly_3d = gui_3d_create(win, "3d-widget", DESC_BUTTERFLY_BIN,
+                                                     GUI_3D_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+
+    gui_3d_set_global_transform_cb(watchface_butterfly_3d,
+                                   (gui_3d_global_transform_cb)watchface_butterfly_global_cb);
+    gui_3d_set_face_transform_cb(watchface_butterfly_3d,
+                                 (gui_3d_face_transform_cb)watchface_butterfly_face_cb);
+
+    gui_obj_create_timer(&(watchface_butterfly_3d->base), 17, true, update_animation);
+    gui_obj_start_timer(&(watchface_butterfly_3d->base));
+
 
     gui_win_click(win, (gui_event_cb_t)win_touch_cb, NULL);
 }

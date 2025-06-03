@@ -89,15 +89,6 @@ gui_3d_t *gui_3d_rect_create(void                  *parent,
 void gui_3d_rect_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_addr);
 
 
-/**
- * @brief Set a callback function for when the 3D widget is clicked.
- *
- * @param this Pointer to the 3D widget.
- * @param callback Callback function to execute on click.
- * @param parameter Additional parameter for the callback.s
- */
-void gui_3d_rect_on_click(gui_3d_t *this, void *callback, void *parameter);
-
 #ifdef __cplusplus
 }
 #endif

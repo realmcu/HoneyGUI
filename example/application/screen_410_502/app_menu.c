@@ -31,6 +31,7 @@ const static gui_view_descriptor_t *soccer_view = NULL;
 const static gui_view_descriptor_t *weather_view = NULL;
 const static gui_view_descriptor_t *flower_view = NULL;
 const static gui_view_descriptor_t *butterfly_view = NULL;
+const static gui_view_descriptor_t *watchface_butterfly_view = NULL;
 const static gui_view_descriptor_t *applist_view = NULL;
 const static gui_view_descriptor_t *disc_view = NULL;
 const static gui_view_descriptor_t *face_view = NULL;
@@ -71,6 +72,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     weather_view = gui_view_descriptor_get("weather_view");
     flower_view = gui_view_descriptor_get("flower_view");
     butterfly_view = gui_view_descriptor_get("butterfly_view");
+    watchface_butterfly_view = gui_view_descriptor_get("watchface_butterfly_view");
     applist_view = gui_view_descriptor_get("applist_view");
     disc_view = gui_view_descriptor_get("disc_view");
     face_view = gui_view_descriptor_get("face_view");
@@ -148,6 +150,12 @@ void switch_APP_WEATHER(void *obj, gui_event_t e, void *param)
 void switch_APP_BUTTERFLY(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, butterfly_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
+void switch_APP_WATCHFACE_BUTTERFLY(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, watchface_butterfly_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -343,6 +351,7 @@ void app_menu_design(gui_view_t *view)
             FLOWER_ICON_BIN,
             WEATHER_ICON_BIN,
             BUTTERFLY_ICON_BIN,
+            WATCHFACE_BUTTERFLY_ICON_BIN,
             APPLIST_ICON_BIN,
             DISC_ICON_BIN,
             FACE_ICON_BIN,
@@ -362,6 +371,7 @@ void app_menu_design(gui_view_t *view)
             "Flower",
             "Weather",
             "Butterfly",
+            "Watchface Butterfly",
             "App List",
             "Disc",
             "Face",
@@ -418,25 +428,27 @@ void app_menu_design(gui_view_t *view)
                              NULL);
         gui_obj_add_event_cb(tab_array[7], (gui_event_cb_t)switch_APP_BUTTERFLY,   GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[8], (gui_event_cb_t)switch_APP_APPLIST,     GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[9], (gui_event_cb_t)switch_APP_DISC,       GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[10], (gui_event_cb_t)switch_APP_FACE,       GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[11], (gui_event_cb_t)switch_APP_PRISM_THICK, GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[12], (gui_event_cb_t)switch_APP_PRISM_MIRROR,
+        gui_obj_add_event_cb(tab_array[8], (gui_event_cb_t)switch_APP_WATCHFACE_BUTTERFLY,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_APP_WINDMILL, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[9], (gui_event_cb_t)switch_APP_APPLIST,     GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_ENERGYBOX, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[10], (gui_event_cb_t)switch_APP_DISC,       GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_NOTIFICATION,
+        gui_obj_add_event_cb(tab_array[11], (gui_event_cb_t)switch_APP_FACE,       GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[12], (gui_event_cb_t)switch_APP_PRISM_THICK, GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_APP_PRISM_MIRROR,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-
+        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_WINDMILL, GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_ENERGYBOX, GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_APP_NOTIFICATION,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
 
     }
 }

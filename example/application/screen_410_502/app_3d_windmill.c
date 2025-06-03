@@ -59,8 +59,6 @@ static void return_timer_cb()
 
 typedef struct
 {
-    float x;         // Bubble's horizontal position
-    float y;         // Bubble's vertical position
     float driftX;    // Horizontal drift
     float driftY;    // Vertical drift
     float scale;     // Scale factor, size is 96*scale
@@ -82,14 +80,14 @@ static void update_bubbles()
     {
         // Adjust horizontal drift based on rot_y_angle and external speed
         bubbles[i].driftX += rot_y_angle * pressing_time / 10.0f;
-        bubbles[i].driftY -= 5.0f;
+        bubbles[i].driftY -= 8.0f * (1.0f - bubbles[i].scale);
 
         gui_img_translate(bubbles[i].img, bubbles[i].driftX, bubbles[i].driftY);
 
         // Reset bubble position if it drifts off-screen vertically
-        if (bubbles[i].y + bubbles[i].driftY < 0)
+        if (bubbles[i].driftY < -100)
         {
-            bubbles[i].driftX = 0;
+            bubbles[i].driftX = rand() % dc->screen_width;
             bubbles[i].driftY = rand() % dc->screen_height + dc->screen_height;
             bubbles[i].scale = (rand() % 701) / 1000.0f + 0.1f;
             gui_img_scale(bubbles[i].img, bubbles[i].scale, bubbles[i].scale);
@@ -185,9 +183,9 @@ void windmill_app(gui_view_t *view)
 
     gui_img_t *bg = gui_img_create_from_mem(obj, "background", WINDMILL_BG_BIN, 0, 0, 0, 0);
 
-    gui_img_t *stick = gui_img_create_from_mem(bg, "stick", STICK_BIN, 197, 246, 0, 0);
+    gui_img_t *stick = gui_img_create_from_mem(obj, "stick", STICK_BIN, 197, 246, 0, 0);
 
-    gui_3d_t *windmill_3d = gui_3d_create(bg, "3d-widget", DESC_WINDMILL_BIN,
+    gui_3d_t *windmill_3d = gui_3d_create(obj, "3d-widget", DESC_WINDMILL_BIN,
                                           GUI_3D_DRAW_FRONT_AND_SORT, 15, 52,
                                           380, 380);
 
@@ -196,12 +194,13 @@ void windmill_app(gui_view_t *view)
 
     for (int i = 0; i < NUM_BUBBLES; i++)
     {
-        bubbles[i].x = rand() % dc->screen_width;
-        bubbles[i].y = rand() % dc->screen_height + dc->screen_height;
+        bubbles[i].driftX = rand() % dc->screen_width;
+        bubbles[i].driftY = rand() % dc->screen_height + dc->screen_height;
         bubbles[i].scale = (rand() % 701) / 1000.0f + 0.1f;
-        bubbles[i].img = gui_img_create_from_mem(bg, "bubble", BUBBLE_BIN, bubbles[i].x, bubbles[i].y, 0,
+        bubbles[i].img = gui_img_create_from_mem(obj, "bubble", BUBBLE_BIN, 0, 0, 0,
                                                  0);
 
+        gui_img_translate(bubbles[i].img, bubbles[i].driftX, bubbles[i].driftY);
         gui_img_scale(bubbles[i].img, bubbles[i].scale, bubbles[i].scale);
     }
 

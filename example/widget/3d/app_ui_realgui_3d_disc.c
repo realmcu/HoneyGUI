@@ -21,11 +21,11 @@
 static float rot_x_angle = 0.0f;
 static float rot_z_angle = 0.0f;
 
-float shift_z[CUBE_COUNT] = {0}; // cube shift
-int step_direction[CUBE_COUNT] = {1};  // cube move direction, 1 rise, -1 fall
-int active_cube = 0;
+static float shift_z[CUBE_COUNT] = {0}; // cube shift
+static int step_direction[CUBE_COUNT] = {1};  // cube move direction, 1 rise, -1 fall
+static int active_cube = 0;
 
-void update_disc_animation()
+static void update_disc_animation()
 {
     touch_info_t *tp = tp_get_info();
 

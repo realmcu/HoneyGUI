@@ -697,6 +697,12 @@ gui_3d_description_t *gui_load_3d_description(void *desc_addr)
         }
 
     }
+    else
+    {
+        desc->materials = NULL;
+        desc->textures = NULL;
+        desc->texture_sizes = NULL;
+    }
 
     return desc;
 

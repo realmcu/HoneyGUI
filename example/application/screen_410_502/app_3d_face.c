@@ -64,7 +64,7 @@ static void update_face_animation()
 
     if (tp->pressed || tp->pressing)
     {
-        if (tp->x > 20)
+        if (tp->x > 20 && tp->x < 390)
         {
             rot_angle += tp->deltaX / 5.0f;
         }
@@ -92,7 +92,6 @@ void face_app(gui_view_t *view)
                                       380, 380);
     gui_3d_set_global_transform_cb(face_3d, (gui_3d_global_transform_cb)face_global_cb);
 
-    gui_obj_create_timer(&(face_3d->base), 17, true, update_face_animation);
-    gui_obj_start_timer(&(face_3d->base));
+    gui_obj_create_timer(&(face_3d->base), 10, true, update_face_animation);
 
 }

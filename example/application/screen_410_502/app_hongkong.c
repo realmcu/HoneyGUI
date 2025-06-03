@@ -63,28 +63,6 @@ uint8_t menu_style = 2;
 char watchface_path[100];
 uint8_t watchface_index = 1;
 
-/*Define gui_app_return_array*/
-const uint8_t *gui_app_return_array[] =
-{
-    PATH04_BIN,
-    PATH05_BIN,
-    PATH07_BIN,
-    PATH08_BIN,
-    PATH09_BIN,
-    PATH11_BIN,
-    PATH12_BIN,
-    PATH14_BIN,
-    PATH15_BIN,
-    PATH16_BIN,
-    PATH18_BIN,
-    PATH19_BIN,
-    PATH20_BIN,
-    PATH22_BIN,
-    PATH23_BIN,
-    PATH24_BIN,
-    PATH25_BIN,
-};
-
 
 static void kb_button_cb()
 {
@@ -327,7 +305,7 @@ static void watchface_design(gui_view_t *view)
         break;
     case 2:
         {
-            create_watchface_bf(view);
+            // create_watchface_bf(view);
         }
         break;
     case 3:

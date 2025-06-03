@@ -14,7 +14,7 @@
 
 static float rot_angle = 0.0f;
 
-void update_dog_animation()
+static void update_dog_animation()
 {
     touch_info_t *tp = tp_get_info();
 

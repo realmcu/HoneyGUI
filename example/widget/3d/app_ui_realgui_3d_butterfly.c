@@ -28,7 +28,7 @@ static float source_dx = 0.0f;
 static float source_dy = 0.0f;
 static float move_speed = 0.02f;
 static float wing_time = 0.0f;
-void update_animation()
+static void update_animation()
 {
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();

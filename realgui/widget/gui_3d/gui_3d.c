@@ -85,13 +85,5 @@ void gui_3d_set_face_transform_cb(gui_3d_t *this, gui_3d_face_transform_cb cb)
 
 void gui_3d_on_click(gui_3d_t *this, void *callback, void *parameter)
 {
-    switch (this->desc->face_type)
-    {
-    case GUI_3D_FACE_RECTANGLE:
-        gui_3d_rect_on_click(this, callback, parameter);
-        break;
-
-    default:
-        break;
-    }
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }

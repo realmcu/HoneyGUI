@@ -65,6 +65,7 @@ static void update_notification_animation()
     if (tp->pressed || tp->pressing)
     {
         shift_y += tp->deltaY / 100.0f;
+        shift_y = fmaxf(-10, fminf(2, shift_y)); // Limit shift_y to [-8, 2]
 
         face2_rot_x += tp->deltaY * 3.0f;
 
@@ -86,7 +87,7 @@ static void notification_global_cb(gui_3d_t *this)
     gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 2), gui_point_4d(0, 0, 0), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 25, 0, 0, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, 10, 25, 0, 0, 0, 5);
 
 }
 static gui_3d_matrix_t notification_face_cb(gui_3d_t *this, size_t face_index)
@@ -118,8 +119,8 @@ void notification_app(gui_view_t *view)
 
 
     gui_3d_t *notification_3d = gui_3d_create(obj, "3d-widget", DESC_NOTIFICATION_BIN,
-                                              GUI_3D_DRAW_FRONT_AND_SORT, 15, 40,
-                                              380, 380);
+                                              GUI_3D_DRAW_FRONT_AND_SORT, 5, 0,
+                                              400, 400);
 
     gui_3d_set_global_transform_cb(notification_3d, (gui_3d_global_transform_cb)notification_global_cb);
     gui_3d_set_face_transform_cb(notification_3d, (gui_3d_face_transform_cb)notification_face_cb);

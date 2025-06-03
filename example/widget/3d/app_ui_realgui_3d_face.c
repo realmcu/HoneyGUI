@@ -15,7 +15,7 @@
 
 static float rot_angle = 0.0f;
 
-void update_face_animation()
+static void update_face_animation()
 {
     touch_info_t *tp = tp_get_info();
 
