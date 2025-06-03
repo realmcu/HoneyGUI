@@ -445,20 +445,27 @@ static void app_ui_wave_nums_design(gui_view_t *view)
     gui_3d_set_face_transform_cb(fish3, (gui_3d_face_transform_cb)fish_face_cb);
 
     can0_window = gui_win_create(view, "can_window", 70, 190, 64, 116);
-    can0 = gui_img_create_from_mem(can0_window, "can0", GREEN_COLA_BIN, 0, 0, 0, 0);
+    can0 = gui_img_create_from_mem(can0_window, "can0", CAN_BIN, 0, 0, 0, 0);
+    gui_img_t *CanSkin_purple = gui_img_create_from_mem(can0_window, "can2", CANSKIN_PURPLE_BIN, 0, 0,
+                                                        0, 0);
     time0 = gui_img_create_from_mem(can0_window, "time0", display_time_resource_def[2], 16, 32, 0, 0);
 
 
     can1_window = gui_win_create(view, "can_window", 155, 190, 64, 116);
-    can1 = gui_img_create_from_mem(can1_window, "can1", YELLOW_COLA_BIN, 0, 0, 0, 0);
+    can1 = gui_img_create_from_mem(can1_window, "can1", CAN_BIN, 0, 0, 0, 0);
+    gui_img_t *CanSkin_yellow = gui_img_create_from_mem(can1_window, "can2", CANSKIN_YELLOW_BIN, 0, 0,
+                                                        0, 0);
     time1 = gui_img_create_from_mem(can1_window, "can1", display_time_resource_def[0], 16, 32, 0, 0);
 
     can2_window = gui_win_create(view, "can_window", 240, 190, 64, 116);
-    can2 = gui_img_create_from_mem(can2_window, "can2", ORANGE_COLA_BIN, 0, 0, 0, 0);
+    can2 = gui_img_create_from_mem(can2_window, "can2", CAN_BIN, 0, 0, 0, 0);
+    gui_img_t *CanSkin_green = gui_img_create_from_mem(can2_window, "can2", CANSKIN_GREEN_BIN, 0, 0, 0,
+                                                       0);
     time2 = gui_img_create_from_mem(can2_window, "can2", display_time_resource_def[2], 16, 32, 0, 0);
 
     can3_window = gui_win_create(view, "can_window", 330, 190, 64, 116);
-    can3 = gui_img_create_from_mem(can3_window, "can3", RED_BIN, 0, 0, 0, 0);
+    can3 = gui_img_create_from_mem(can3_window, "can3", CAN_BIN, 0, 0, 0, 0);
+    gui_img_t *CanSkin_red = gui_img_create_from_mem(can3_window, "can2", CANSKIN_RED_BIN, 0, 0, 0, 0);
     time3 = gui_img_create_from_mem(can3_window, "can3", display_time_resource_def[5], 16, 32, 0, 0);
 
     wave_window = gui_win_create(view, "wave_window", 0, 0, 410, 502);

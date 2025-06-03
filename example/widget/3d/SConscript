@@ -8,8 +8,7 @@ src = Split("""
 """)
 
 group = []
-CPPDEFINES = ['DRV_LCD_WIDTH=480']
-CPPDEFINES += ['DRV_LCD_HIGHT=480']
+CPPDEFINES = []
 CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
 
@@ -34,6 +33,8 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_DISC_3D'):
     src += ['app_ui_realgui_3d_disc.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_SEAWATER_3D'):
+    CPPDEFINES += ['DRV_LCD_WIDTH=410']
+    CPPDEFINES += ['DRV_LCD_HIGHT=502']
     src += [cwd +'/SeaWaterDClock/example_gui_SeaWater.c']
     src += [cwd +'/SeaWaterDClock/gui_nanovg_wave.c']
     CPPPATH +=[cwd +'/SeaWaterDClock' ]
