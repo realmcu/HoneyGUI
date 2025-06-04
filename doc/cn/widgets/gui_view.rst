@@ -9,7 +9,7 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747277180941537085/ac88ed70_10737458.jpeg" width= "1000" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1748934340615345297/cd6f8678_10737458.jpeg" width= "1000" /></div>
    <p style="margin: 5px 0 0 0; text-align: center;">View流程图</p>
    <br>
 
@@ -80,7 +80,7 @@
 -----
 视图控件
 ~~~~~~~~~~
-以下是三个单独的C文件，每个C文件中包含view控件的描述子以及design函数。
+以下是四个单独的C文件，每个C文件中包含view控件的描述子以及design函数。
 
 .. literalinclude:: ../../../example/widget/view/app_ui_view_blue.c
    :language: c

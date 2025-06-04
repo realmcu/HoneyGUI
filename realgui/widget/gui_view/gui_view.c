@@ -122,18 +122,25 @@ static void __view_animate_timer_cb(void *obj)
         g_Release = 0;
         _this->current_transition_style = SWITCH_INIT_STATE;
         gui_obj_delete_timer(obj);
-        gui_view_not_show(g_PreView);
 
-        // g_PreView = g_CurrentView;
-        if (_this->descriptor->keep)
+        if (g_PreView != g_NextView) {gui_view_not_show(g_PreView);}
+        gui_view_not_show(g_CurrentView);
+        if (g_CurrentView->descriptor->keep)
         {
             g_PreView = g_CurrentView;
+            if (g_NextView->opacity != UINT8_MAX) //decrease time of processing PreView
+            {
+                gui_obj_hidden(&g_PreView->base, false);
+            }
+            else
+            {
+                gui_obj_hidden(&g_PreView->base, true);
+            }
         }
         else
         {
             g_PreView = NULL;
         }
-        gui_view_not_show(g_CurrentView);
 
         g_CurrentView = g_NextView;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;

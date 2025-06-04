@@ -147,10 +147,10 @@ static void gui_img_draw_cb(gui_obj_t *obj)
     }
     else
     {
-        gui_rect_t rect = {0};
-        gui_obj_get_clip_rect(obj, &rect);
-        gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
-        // gui_acc_blit_to_dc(_this->draw_img, dc, NULL);
+        // gui_rect_t rect = {0};
+        // gui_obj_get_clip_rect(obj, &rect);
+        // gui_acc_blit_to_dc(_this->draw_img, dc, &rect);
+        gui_acc_blit_to_dc(_this->draw_img, dc, NULL);
     }
 
 

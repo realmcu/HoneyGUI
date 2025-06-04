@@ -9,7 +9,7 @@ The view widget is a kind of container that makes switching more convenient. Any
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747277567411511936/2b5787ad_10737458.jpeg" width= "1000" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1748934358553458872/76fc7506_10737458.jpeg" width= "1000" /></div>
    <p style="margin: 5px 0 0 0; text-align: center;">VIEW FLOWCHART</p>
    <br>
 
@@ -80,7 +80,7 @@ Example
 ---------
 View
 ~~~~~~~~~~
-Below are three separate C files, each containing a descriptor for the view and the design function.
+Below are four separate C files, each containing a descriptor for the view and the design function.
 
 .. literalinclude:: ../../../example/widget/view/app_ui_view_blue.c
    :language: c
