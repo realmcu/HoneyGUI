@@ -40,6 +40,8 @@ const static gui_view_descriptor_t *prism_mirror_view = NULL;
 const static gui_view_descriptor_t *windmill_view = NULL;
 const static gui_view_descriptor_t *energybox_view = NULL;
 const static gui_view_descriptor_t *notification_view = NULL;
+const static gui_view_descriptor_t *pandkoi_view = NULL;
+const static gui_view_descriptor_t *seawater_view = NULL;
 void app_menu_design(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
@@ -81,6 +83,8 @@ static int gui_view_get_other_view_descriptor_init(void)
     windmill_view = gui_view_descriptor_get("windmill_view");
     energybox_view = gui_view_descriptor_get("energybox_view");
     notification_view = gui_view_descriptor_get("notification_view");
+    pandkoi_view = gui_view_descriptor_get("pandkoi_view");
+    seawater_view = gui_view_descriptor_get("seawater_view");
 
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -206,7 +210,16 @@ void switch_APP_NOTIFICATION(void *obj, gui_event_t e, void *param)
     gui_view_switch_direct(current_view, notification_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-
+void switch_APP_PANDKOI(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, pandkoi_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+void switch_APP_SEAWATER(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, seawater_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
 static void return_timer_cb()
 {
     touch_info_t *tp = tp_get_info();
@@ -360,6 +373,8 @@ void app_menu_design(gui_view_t *view)
             WINDMILL_ICON_BIN,
             ENERGYBOX_ICON_BIN,
             NOTIFICATION_ICON_BIN,
+            PANDKOI_ICON_BIN,
+            SEAWATER_ICON_BIN,
         };
         char *text_array[] =
         {
@@ -380,6 +395,8 @@ void app_menu_design(gui_view_t *view)
             "Windmill",
             "Energybox",
             "Notification",
+            "Pand Koi",
+            "Sea Water",
 
         };
         int array_size = sizeof(array) / sizeof(array[0]);
@@ -447,6 +464,12 @@ void app_menu_design(gui_view_t *view)
         gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_ENERGYBOX, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
         gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_APP_NOTIFICATION,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[17], (gui_event_cb_t)switch_APP_PANDKOI,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[18], (gui_event_cb_t)switch_APP_SEAWATER,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
 

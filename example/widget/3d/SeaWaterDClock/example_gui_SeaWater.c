@@ -378,7 +378,6 @@ static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offs
                                  fish_angle, 1);
     }
 
-
     transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
 
     return transform_matrix;
@@ -424,7 +423,7 @@ static void app_ui_wave_nums_design(gui_view_t *view)
     gui_img_t *background = gui_img_create_from_mem(view, "background", BACKGROUND_BIN, 0, 0, 0, 0);
     gui_img_t *ForeGround = gui_img_create_from_mem(view, "ForeGround", FOREGROUND_BIN, 0, 270, 0, 0);
 
-    fish_window = gui_win_create(view, "fish_window", 0, 236, 410, 244);
+    fish_window = gui_win_create(view, "fish_window", 0, 0, 410, 502);
 
     fish0 = gui_3d_create(fish_window, "3d-fish0", (void *)_acdesc_fish0, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
                           410, 502);
