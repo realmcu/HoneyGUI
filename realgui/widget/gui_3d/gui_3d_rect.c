@@ -251,11 +251,21 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
 
                 color_value = (color_a << 24) | (color_r << 16) | (color_g << 8) | color_b;
                 fill_data = &color_value;
+                fill_type = GUI_3D_FILL_COLOR_ARGB8888;
             }
             else // Fill with material image
             {
                 fill_type = GUI_3D_FILL_IMAGE;
             }
+        }
+        else
+        {
+            float nz = this->face.rect_face[i].transform_vertex[0].normal.z;
+            uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
+
+            color_value = (opacity_value << 24) | (color_intensity << 16) | (color_intensity << 8) |
+                          color_intensity;
+            fill_data = &color_value;
         }
 
         gui_3d_fill_triangle(vertices[0], vertices[1], vertices[2], depthBuffer, pixelData, width, height,

@@ -181,12 +181,12 @@ void windmill_app(gui_view_t *view)
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
 
-    gui_img_t *bg = gui_img_create_from_mem(obj, "background", WINDMILL_BG_BIN, 0, 0, 0, 0);
+    gui_img_t *bg = gui_img_create_from_mem(obj, "background", WINDMILL_BACKGROUND_BIN, 0, 0, 0, 0);
 
-    gui_img_t *stick = gui_img_create_from_mem(obj, "stick", STICK_BIN, 197, 246, 0, 0);
+    gui_img_t *stick = gui_img_create_from_mem(obj, "stick", WINDMILL_STICK_BIN, 202, 246, 0, 0);
 
     gui_3d_t *windmill_3d = gui_3d_create(obj, "3d-widget", DESC_WINDMILL_BIN,
-                                          GUI_3D_DRAW_FRONT_AND_SORT, 15, 52,
+                                          GUI_3D_DRAW_FRONT_AND_BACK, 15, 52,
                                           380, 380);
 
     gui_3d_set_global_transform_cb(windmill_3d, (gui_3d_global_transform_cb)windmill_global_cb);

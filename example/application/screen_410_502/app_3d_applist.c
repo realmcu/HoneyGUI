@@ -59,7 +59,7 @@ static void return_timer_cb()
 #define MAX_APPS 10  // Maximum number of 3D objects stored
 
 gui_3d_t *app_3d_list[MAX_APPS];  // Static array
-size_t app_count = 0;             // Current number of stored objects
+static size_t app_count = 0;             // Current number of stored objects
 
 static float rot_y_angle = 0.0f;   // Current angle
 static float velocity = 0.0f;       // Angular velocity
@@ -178,26 +178,27 @@ void applist_app(gui_view_t *view)
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
 
+    app_count = 0; // Reset app count
     gui_3d_t *app1_3d = gui_3d_create(obj, "app1", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 0, 50, 200, 200);
 
-    gui_3d_t *app2_3d = gui_3d_create(obj, "app2", (void *)DESC_APP_BIN,
+    gui_3d_t *app2_3d = gui_3d_create(obj, "app2", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 100, 50, 200, 200);
     gui_3d_set_face_image(app2_3d, 0, ALIPAY_BIN);
 
-    gui_3d_t *app3_3d = gui_3d_create(obj, "app3", (void *)DESC_APP_BIN,
+    gui_3d_t *app3_3d = gui_3d_create(obj, "app3", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 200, 50, 200, 200);
     gui_3d_set_face_image(app3_3d, 0, MUSIC_BIN);
 
-    gui_3d_t *app4_3d = gui_3d_create(obj, "app4", (void *)DESC_APP_BIN,
+    gui_3d_t *app4_3d = gui_3d_create(obj, "app4", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 0, 200, 200, 200);
     gui_3d_set_face_image(app4_3d, 0, QQ_BIN);
 
-    gui_3d_t *app5_3d = gui_3d_create(obj, "app5", (void *)DESC_APP_BIN,
+    gui_3d_t *app5_3d = gui_3d_create(obj, "app5", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 100, 200, 200, 200);
     gui_3d_set_face_image(app5_3d, 0, VOICE_BIN);
 
-    gui_3d_t *app6_3d = gui_3d_create(obj, "app6", (void *)DESC_APP_BIN,
+    gui_3d_t *app6_3d = gui_3d_create(obj, "app6", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 200, 200, 200, 200);
     gui_3d_set_face_image(app6_3d, 0, WECHAT_BIN);
 
@@ -217,8 +218,6 @@ void applist_app(gui_view_t *view)
         gui_3d_on_click(app_3d_list[i], (gui_event_cb_t)gui_app_switch, app_3d_list[i]);
     }
 
-
     gui_obj_create_timer(&(app1_3d->base), 10, true, update_applist_animation);
-    gui_obj_start_timer(&(app1_3d->base));
 
 }

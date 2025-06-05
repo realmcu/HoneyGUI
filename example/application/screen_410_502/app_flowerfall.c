@@ -219,11 +219,11 @@ void flower_app(gui_view_t *view)
     gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
                                                     0);
 
-    branch1 = gui_img_create_from_mem(background, "branch1", BRANCH01_BIN, 0, 0, 0, 0);
+    branch1 = gui_img_create_from_mem(obj, "branch1", BRANCH01_BIN, 0, 0, 0, 0);
     gui_img_set_focus(branch1, 336, 0);
     gui_img_translate(branch1, 410, 50);
 
-    branch2 = gui_img_create_from_mem(background, "branch2", BRANCH02_BIN, 0, 300, 0, 0);
+    branch2 = gui_img_create_from_mem(obj, "branch2", BRANCH02_BIN, 0, 300, 0, 0);
 
     for (int i = 0; i < NUM_PETALS; i++)
     {
@@ -236,7 +236,7 @@ void flower_app(gui_view_t *view)
                            (void *)LEAF04_BIN, (void *)LEAF05_BIN, (void *)LEAF06_BIN
                           };
 
-        petals[i].img = gui_img_create_from_mem(background, "petal", images[random_image_index], 0, 0,
+        petals[i].img = gui_img_create_from_mem(obj, "petal", images[random_image_index], 0, 0,
                                                 0, 0);
         gui_img_set_focus(petals[i].img, 32, 32);
         gui_img_translate(petals[i].img, petals[i].driftX, petals[i].driftY);
@@ -260,7 +260,6 @@ void flower_app(gui_view_t *view)
 
     }
 
-    gui_obj_create_timer(obj, 10, true, update_flower_animation);
-    gui_obj_start_timer(obj);
+    gui_obj_create_timer(GUI_BASE(background), 10, true, update_flower_animation);
 
 }
