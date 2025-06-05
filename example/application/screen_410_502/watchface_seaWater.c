@@ -17,9 +17,8 @@
 #include <math.h>
 #include "gui_components_init.h"
 #include "root_image_hongkong/ui_resource.h"
+#include "app_hongkong.h"
 
-
-// gui_view_t *view = NULL;
 gui_3d_t *fish0 = NULL;
 gui_3d_t *fish1 = NULL;
 gui_3d_t *fish2 = NULL;
@@ -76,6 +75,7 @@ static void *display_time_resource_def[] =
 
 static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *yellow_view_descriptor = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
 static void app_ui_wave_nums_design(gui_view_t *view);
 
 static const gui_view_descriptor_t descriptor =
@@ -97,7 +97,25 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+static void return_to_menu()
+{
+    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
 
+static void return_timer_cb()
+{
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+}
 typedef struct BubbleNode
 {
     gui_img_t *img;
@@ -415,6 +433,9 @@ static void wave_animate_cb(void *parent)
 }
 static void app_ui_wave_nums_design(gui_view_t *view)
 {
+    gui_obj_t *obj = GUI_BASE(view);
+    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+
     init_bubble_pool();
 
     gui_img_t *background = gui_img_create_from_mem(view, "background", SEABACKGROUND_BIN, 0, 0, 0, 0);

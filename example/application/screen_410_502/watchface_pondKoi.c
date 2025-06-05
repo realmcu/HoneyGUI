@@ -17,6 +17,7 @@
 #include <math.h>
 #include "gui_components_init.h"
 #include "root_image_hongkong/ui_resource.h"
+#include "app_hongkong.h"
 
 static gui_3d_t *fish0 = NULL;
 static gui_3d_t *fish0_shadow = NULL;
@@ -80,6 +81,7 @@ static float fish3_rz = 0.0f;
 
 
 static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
 static void app_ui_pond_koi_design(gui_view_t *view);
 
 static const gui_view_descriptor_t descriptor =
@@ -100,7 +102,25 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+static void return_to_menu()
+{
+    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
 
+static void return_timer_cb()
+{
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+}
 
 static bool koi_moving_to_target = true;
 static float target_dx = 30.0f;
@@ -608,6 +628,9 @@ static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offs
 static void app_ui_pond_koi_design(gui_view_t *view)
 {
     srand((unsigned int)gui_ms_get());
+    gui_obj_t *obj = GUI_BASE(view);
+    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+
     fish0_y = (float)(rand() % 191 - 80);
     fish0_x = (float)(rand() % 161 - 80);
     fish1_x = (float)(rand() % 161 - 80);

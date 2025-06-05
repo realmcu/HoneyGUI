@@ -36,7 +36,7 @@ const static gui_view_descriptor_t *applist_view = NULL;
 const static gui_view_descriptor_t *disc_view = NULL;
 const static gui_view_descriptor_t *face_view = NULL;
 const static gui_view_descriptor_t *prism_thick_view = NULL;
-const static gui_view_descriptor_t *prism_mirror_view = NULL;
+const static gui_view_descriptor_t *prism3d_mirror_view = NULL;
 const static gui_view_descriptor_t *windmill_view = NULL;
 const static gui_view_descriptor_t *energybox_view = NULL;
 const static gui_view_descriptor_t *notification_view = NULL;
@@ -79,7 +79,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     disc_view = gui_view_descriptor_get("disc_view");
     face_view = gui_view_descriptor_get("face_view");
     prism_thick_view = gui_view_descriptor_get("prism_thick_view");
-    prism_mirror_view = gui_view_descriptor_get("prism_mirror_view");
+    prism3d_mirror_view = gui_view_descriptor_get("prism3d_mirror_view");
     windmill_view = gui_view_descriptor_get("windmill_view");
     energybox_view = gui_view_descriptor_get("energybox_view");
     notification_view = gui_view_descriptor_get("notification_view");
@@ -189,7 +189,7 @@ void switch_APP_PRISM_THICK(void *obj, gui_event_t e, void *param)
 
 void switch_APP_PRISM_MIRROR(void *obj, gui_event_t e, void *param)
 {
-    gui_view_switch_direct(current_view, prism_mirror_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(current_view, prism3d_mirror_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -369,7 +369,7 @@ void app_menu_design(gui_view_t *view)
             DISC_ICON_BIN,
             FACE_ICON_BIN,
             PRISM_THICK_ICON_BIN,
-            PRISM_MIRROR_ICON_BIN,
+            PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
             ENERGYBOX_ICON_BIN,
             NOTIFICATION_ICON_BIN,
