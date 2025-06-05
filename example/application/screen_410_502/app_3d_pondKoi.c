@@ -45,7 +45,6 @@ static gui_img_t *leaf0 = NULL;
 static gui_img_t *leaf1 = NULL;
 static gui_img_t *leaf2 = NULL;
 static gui_img_t *leaf3 = NULL;
-static gui_img_t *pondground = NULL;
 static gui_img_t *wave_img = NULL;
 
 
@@ -627,6 +626,7 @@ static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offs
 }
 static void app_ui_pond_koi_design(gui_view_t *view)
 {
+    wave_animating = false;
     srand((unsigned int)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
@@ -639,7 +639,7 @@ static void app_ui_pond_koi_design(gui_view_t *view)
     fish2_y = (float)(rand() % 191 - 80);
     fish3_x = (float)(rand() % 161 - 80);
     fish3_y = (float)(rand() % 191 - 80);
-    pondground = gui_img_create_from_mem(view, "img_1_test", PONDGROUND_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(view, "img_1_test", PONDGROUND_BIN, 0, 0, 0, 0);
 
     fish0_window = gui_win_create(view, "fish_window", 0, 0, 48, 100);
     fish1_window = gui_win_create(view, "fish1_window", 0, 0, 48, 100);

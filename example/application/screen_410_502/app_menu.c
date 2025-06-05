@@ -181,8 +181,9 @@ void switch_APP_PRISM_THICK(void *obj, gui_event_t e, void *param)
 
 void switch_APP_PRISM_MIRROR(void *obj, gui_event_t e, void *param)
 {
-    gui_view_switch_direct(current_view, prism3d_mirror_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
+    gui_view_switch_direct(current_view, prism3d_mirror_view, SWITCH_IN_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
 void switch_APP_WINDMILL(void *obj, gui_event_t e, void *param)

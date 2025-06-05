@@ -63,40 +63,40 @@ static void app_ui_view_image_design(gui_view_t *view)
     {
         image = gui_img_create_from_mem(view, "image0", PRISM_FACE5_BIN, 0, 0,
                                         410, 502);
-        // gui_img_scale(image, 4.1, 4.1);
+        gui_img_scale(image, 2, 2);
     }
     if (face_flags_rotation == 1)
     {
         image = gui_img_create_from_mem(view, "image1", PRISM_FACE0_BIN, 0, 0, 410,
                                         502);
-        // gui_img_scale(image, 4.1, 4.1);
+        gui_img_scale(image, 2, 2);
     }
     if (face_flags_rotation == 2)
     {
         image = gui_img_create_from_mem(view, "image2", PRISM_FACE1_BIN, 0, 0,
                                         410, 502);
-        // gui_img_scale(image, 4.1, 4.1);
+        gui_img_scale(image, 2, 2);
     }
     if (face_flags_rotation == 3)
     {
         image = gui_img_create_from_mem(view, "image3", PRISM_FACE2_BIN, 0, 0,
                                         410,
                                         502);
-        // gui_img_scale(image, 4.1, 4.1);
+        gui_img_scale(image, 2, 2);
     }
     if (face_flags_rotation == 4)
     {
         image = gui_img_create_from_mem(view, "image4", PRISM_FACE3_BIN, 0, 0,
                                         410, 502);
-        // gui_img_scale(image, 4.1, 4.1);
+        gui_img_scale(image, 2, 2);
     }
     if (face_flags_rotation == 5)
     {
         image = gui_img_create_from_mem(view, "image5", PRISM_FACE4_BIN, 0, 0,
                                         410, 502);
-        // gui_img_scale(image, 4.1, 4.1);
+        gui_img_scale(image, 2, 2);
     }
-    gui_img_set_mode(image, IMG_BYPASS_MODE);
+    gui_img_set_mode(image, IMG_SRC_OVER_MODE);
     gui_view_set_animate_step(view, 1000);
     gui_view_switch_on_event(view, prism_view, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_OUT_NONE_ANIMATION,
