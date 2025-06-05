@@ -7,7 +7,7 @@
 #include "gui_img.h"
 #include <time.h>
 
-
+#if 0
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 
@@ -78,3 +78,4 @@ void create_watchface_ring(gui_view_t *view)
 
     gui_obj_create_timer(GUI_BASE(win), 30000, true, win_cb);
 }
+#endif

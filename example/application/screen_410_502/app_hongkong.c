@@ -23,7 +23,6 @@ const static gui_view_descriptor_t *app_bottom_view = NULL;
 const static gui_view_descriptor_t *app_top_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *watchface_select_view = NULL;
-const static gui_view_descriptor_t *music_view = NULL;
 
 static void watchface_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
@@ -32,6 +31,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = watchface_design,
+    .keep = false,
 };
 static int gui_view_descriptor_register_init(void)
 {
@@ -50,18 +50,14 @@ static int gui_view_get_other_view_descriptor_init(void)
     app_top_view = gui_view_descriptor_get("app_top_view");
     activity_view = gui_view_descriptor_get("activity_view");
     watchface_select_view  = gui_view_descriptor_get("watchface_select_view");
-    music_view  = gui_view_descriptor_get("music_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-bool control_flag = 0;
-static bool enter_menu_flag = 0;
-uint8_t menu_style = 2;
-
-char watchface_path[100];
-uint8_t watchface_index = 1;
+bool menu_style = 0;
+// char watchface_path[100];
+// uint8_t watchface_index = 1;
 
 
 static void kb_button_cb()
@@ -78,14 +74,13 @@ static void kb_button_cb()
         {
             hold = 0;
             uint32_t time = kb->timestamp_ms_release - time_press;
-            if (time <= 300)
+            if (time <= 150)
             {
                 // gui_log("pressing time = %d\n", time);
                 if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
                 {
                     gui_log("change menu style\n");
-                    menu_style++;
-                    menu_style %= 3;
+                    menu_style = !menu_style;
                 }
                 press_his = !press_his;
                 release_his = kb->timestamp_ms_release;
@@ -266,7 +261,6 @@ static void win_cb()
     // kb_button_cb();
 }
 
-static void win_cb();
 static void watchface_design(gui_view_t *view)
 {
     win_cb();
@@ -274,7 +268,8 @@ static void watchface_design(gui_view_t *view)
     gui_view_switch_on_event(view, app_bottom_view, SWITCH_INIT_STATE,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, app_top_view, SWITCH_INIT_STATE, SWITCH_IN_FROM_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, app_top_view, SWITCH_OUT_STILL_USE_BLUR,
+                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
     gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_LEFT_USE_CUBE,
                              SWITCH_IN_FROM_RIGHT_USE_CUBE,
@@ -284,52 +279,55 @@ static void watchface_design(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
     // gui_view_switch_on_event(view, watchface_select_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
     //                          GUI_EVENT_TOUCH_LONG);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+    // gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
+    //                          GUI_EVENT_KB_SHORT_CLICKED);
 
     extern void create_watchface_classic(gui_view_t *view);
-    extern void create_tree_nest(const char *xml, void *obj);
-    extern void create_watchface_bf(gui_view_t *view);
-    extern void create_watchface_ring(gui_view_t *view);
-    switch (watchface_index)
-    {
+    create_watchface_classic(view);
+    // extern void create_tree_nest(const char *xml, void *obj);
+    // extern void create_watchface_bf(gui_view_t *view);
+    // extern void create_watchface_ring(gui_view_t *view);
+    // switch (watchface_index)
+    // {
     // case 0:
     //     {
     //         create_tree_nest((void *)watchface_path, view);
     //     }
     //     break;
-    case 1:
-        {
-            create_watchface_classic(view);
-        }
-        break;
-    case 2:
-        {
-            // create_watchface_bf(view);
-        }
-        break;
-    case 3:
-        {
-            create_watchface_ring(view);
-        }
-        break;
-    // case 4:
+    // case 1:
     //     {
-    //         create_tree_nest((void *)watchface_path, view);
+    //         create_watchface_classic(view);
     //     }
     //     break;
-    // case 5:
+    // case 2:
     //     {
-    //         create_tree_nest((void *)watchface_path, view);
+    //         // create_watchface_bf(view);
     //     }
     //     break;
-    default:
-        create_watchface_classic(view);
-        break;
-    }
+    // case 3:
+    //     {
+    //         // create_watchface_ring(view);
+    //     }
+    //     break;
+    // // case 4:
+    // //     {
+    // //         create_tree_nest((void *)watchface_path, view);
+    // //     }
+    // //     break;
+    // // case 5:
+    // //     {
+    // //         create_tree_nest((void *)watchface_path, view);
+    // //     }
+    // //     break;
+    // default:
+    //     create_watchface_classic(view);
+    //     break;
+    // }
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win), 2000, true, win_cb);
-    gui_obj_start_timer(GUI_BASE(win));
+
+    gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win), 10, true, kb_button_cb);
 }
 
 // static void data_generate_task_entry()
@@ -401,8 +399,6 @@ uint8_t resource_root[1024 * 1024 * 20];
 static void app_hongkong_ui_design(void)
 {
     gui_log("app_hongkong_ui_design\n");
-
-    enter_menu_flag = 0;
 
 #if defined __WIN32
     cjson_content = read_file(filename);

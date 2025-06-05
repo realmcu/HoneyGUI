@@ -109,19 +109,16 @@ static void win_cb(void *p)
     {
         hand = h_hand;
         float angle_hour = (hour % 12) * M_PI / 6 + minute * M_PI / 360;
-        gui_img_translate(hand, hand->base.w / 2, SCREEN_HEIGHT / 2 - hand->base.y);
         gui_img_rotation(hand, angle_hour * 180 / M_PI);
     }
     {
         hand = m_hand;
         float angle_min  = minute * M_PI / 30 + seconds * M_PI / 1800;
-        gui_img_translate(hand, hand->base.w / 2, SCREEN_HEIGHT / 2 - hand->base.y);
         gui_img_rotation(hand, angle_min * 180 / M_PI);
     }
     {
         hand = s_hand;
         float angle_sec = (seconds + millisecond / 1000.0f) * angle_per_second;
-        gui_img_translate(hand, hand->base.w / 2, SCREEN_HEIGHT / 2 - hand->base.y);
         gui_img_rotation(hand, angle_sec);
         // gui_log("seconds: %d, millisecond: %d \n", seconds, millisecond);
     }
@@ -209,14 +206,18 @@ void watchface_butterfly_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
-    gui_win_t *win = gui_win_create(obj, "win_wf_ring", 0, 0, 0, 0);
-    gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
+    gui_win_t *win = gui_win_create(obj, "win_wf", 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win), 17, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));
 
     gui_img_t *img = gui_img_create_from_mem(win, "mask", W1ELLIPSE5_BIN, 204, 246, 0, 0);
-    h_hand = gui_img_create_from_mem(win, "h_hand", W1UNION2_BIN, 199, 170, 0, 0);
-    m_hand = gui_img_create_from_mem(win, "m_hand", W1UNION_BIN, 200, 90, 0, 0);
-    s_hand = gui_img_create_from_mem(win, "s_hand", W1VECTOR7_BIN, 206, 124, 0, 0);
+    h_hand = gui_img_create_from_mem(win, "h_hand", W1UNION2_BIN, 200 + 7, 249, 0,
+                                     0); // 246 + 3(mask_h)
+    m_hand = gui_img_create_from_mem(win, "m_hand", W1UNION_BIN, 200 + 6, 249, 0, 0);
+    s_hand = gui_img_create_from_mem(win, "s_hand", W1VECTOR7_BIN, 206, 249, 0, 0);
+    gui_img_set_focus(h_hand, m_hand->base.w / 2, 249 - 165); // img target x is 165
+    gui_img_set_focus(m_hand, m_hand->base.w / 2, 249 - 84);
+    gui_img_set_focus(s_hand, 0, 249 - 120);
 
     gui_3d_t *watchface_butterfly_3d = gui_3d_create(win, "3d-widget", DESC_BUTTERFLY_BIN,
                                                      GUI_3D_DRAW_FRONT_ONLY, 0, 0, 410, 502);

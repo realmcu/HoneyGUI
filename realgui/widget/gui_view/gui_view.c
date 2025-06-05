@@ -279,6 +279,7 @@ static void __view_pressing_cb(void *obj, gui_event_t e, void *param)
     }
     g_Release -= g_Offset;
     g_TriggerMove = false;
+    gui_obj_hidden(GUI_BASE(g_NextView), false);
 
     // gui_log("g_release = %d\n", g_Release);
 }
@@ -328,6 +329,10 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
     if (on_event->switch_in_style <= SWITCH_IN_STILL_USE_BLUR) // cover CurrentView
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
+    }
+    else
+    {
+        gui_obj_hidden(GUI_BASE(g_NextView), true);
     }
 
     g_NextView->current_event = e;
@@ -607,7 +612,7 @@ gui_view_t *gui_view_create(void       *parent,
     gui_dispdev_t *dc = gui_get_dc();
     memset(_this, 0, sizeof(gui_view_t));
     _this->descriptor = descriptor;
-    _this->animate_step = 20;
+    _this->animate_step = 30;
     _this->opacity = UINT8_MAX;
     if (w == 0)
     {

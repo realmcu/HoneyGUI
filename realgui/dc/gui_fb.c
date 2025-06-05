@@ -206,20 +206,6 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             if (obj->has_draw_cb)
             {
-                if (dc->pfb_type == PFB_Y_DIRECTION)
-                {
-                    dc->section.x1 = 0;
-                    dc->section.y1 = dc->section_count * dc->fb_height;
-                }
-                else
-                {
-                    dc->section.x1 = dc->section_count * dc->fb_width;
-                    dc->section.y1 = 0;
-                }
-
-                dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
-                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
-
                 obj->obj_cb(obj, OBJ_DRAW);
             }
         }
@@ -302,6 +288,19 @@ static void gui_fb_draw(gui_obj_t *root)
             }
             dc->section_count = i;
 
+            if (dc->pfb_type == PFB_Y_DIRECTION)
+            {
+                dc->section.x1 = 0;
+                dc->section.y1 = dc->section_count * dc->fb_height;
+            }
+            else
+            {
+                dc->section.x1 = dc->section_count * dc->fb_width;
+                dc->section.y1 = 0;
+            }
+
+            dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
+            dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
             obj_draw_scan(root);
             post_process_handle();
             if (dc->get_lcd_us != NULL)
@@ -325,7 +324,7 @@ static void gui_fb_draw(gui_obj_t *root)
     else if (dc->type == DC_SINGLE)
     {
         memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
-
+        dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
         post_process_handle();
         if (dc->lcd_draw_sync != NULL)

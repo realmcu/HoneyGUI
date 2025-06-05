@@ -9,7 +9,7 @@
 #define SCREEN_WIDTH 410
 #define SCREEN_HEIGHT 502
 #define APP_NUM 4
-
+#if 0
 typedef struct gui_sidebar_app
 {
     void *img_addr;
@@ -68,3 +68,4 @@ void page_ct_sidebar(void *parent)
         }
     }
 }
+#endif

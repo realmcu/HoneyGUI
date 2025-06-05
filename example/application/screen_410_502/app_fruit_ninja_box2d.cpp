@@ -274,7 +274,7 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
     int intersection_count = 0;
     Point intersect;
 
-    /* Check if the line segment intersects any of the sides and count the number of intersections */
+    /* Check if the line segment intersects any of the sides and time_cnt the number of intersections */
     for (int i = 0; i < 4; i++)
     {
         if (segments_intersect(line_start, line_end, rect_edges[i][0], rect_edges[i][1]))
@@ -526,14 +526,13 @@ static void restart_cb(void)
 static void fruit_ninja_cb(void *obj)
 {
     gui_win_t *win = (gui_win_t *)obj;
-    static uint16_t count = 0;
-    count += win->base.timer->interval_ms;
-    if (count >= 1000)
+    static uint8_t time_cnt = 0; // time counter
+    time_cnt++;
+    if (time_cnt >= 30)
     {
-        count = 0;
+        time_cnt = 0;
         game_time--;
     }
-
     if (world != NULL)
     {
         sprintf((char *)time_counter_content, "TIME: %d", game_time);
@@ -542,7 +541,7 @@ static void fruit_ninja_cb(void *obj)
         {
             img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
                                                    0);
-            gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
+            gui_obj_add_event_cb(img_gameover, (gui_event_cb_t)restart_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
             gui_obj_stop_timer(GUI_BASE(win));
             return;
         }
@@ -636,7 +635,6 @@ static void fruit_ninja_cb(void *obj)
             {
                 img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
                                                        0);
-                gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
                 gui_obj_add_event_cb(img_gameover, (gui_event_cb_t)restart_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
                 gui_obj_stop_timer(GUI_BASE(win));
             }
@@ -661,7 +659,7 @@ static void fruit_ninja_design(gui_obj_t *obj)
                                     "FRUIT_NINJA_BOX2D", 0, 0, 410, 502);
 
     // Set the animation function of the window
-    gui_obj_create_timer(GUI_BASE(win), 10, true, fruit_ninja_cb);
+    gui_obj_create_timer(GUI_BASE(win), 30, true, fruit_ninja_cb);
     gui_obj_start_timer(GUI_BASE(win));
 
     app_design_core(win);
@@ -689,7 +687,7 @@ extern "C" {
     {
         gui_obj_t *obj = GUI_BASE(view);
         gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
-        gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
+        gui_obj_create_timer(GUI_BASE(win), 17, true, return_timer_cb);
         app_fruit_ninja::fruit_ninja_design(obj);
     }
     void close_FN(gui_view_t *view)

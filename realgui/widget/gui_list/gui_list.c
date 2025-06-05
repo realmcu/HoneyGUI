@@ -544,7 +544,7 @@ static void gui_list_released_cb(void *obj, gui_event_t e, void *param)
     gui_list_t *_this = (gui_list_t *)obj;
     _this->hold = _this->offset;
 
-    memset(_this->record, 0, 10);
+    memset(_this->record, 0, sizeof(_this->record));
 }
 
 /*============================================================================*

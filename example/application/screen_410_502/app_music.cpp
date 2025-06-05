@@ -16,7 +16,7 @@
 #include "gui_list.h"
 #include "app_hongkong.h"
 #define CURRENT_VIEW_NAME "music_view"
-
+#if 0
 extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
@@ -1072,3 +1072,4 @@ extern "C"
         }
     }
 }
+#endif

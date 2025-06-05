@@ -63,7 +63,7 @@ void *__arm_2d_allocate_scratch_memory(uint32_t wSize,
     /* ensure nAlign is 2^n */
     assert((((~nAlign) + 1) & nAlign) == nAlign);
 
-    void *pBuff = gui_lower_malloc(wSize);
+    void *pBuff = gui_malloc(wSize);
     assert(0 == ((uintptr_t)pBuff & (nAlign - 1)));
 
     return pBuff;
@@ -74,7 +74,7 @@ void __arm_2d_free_scratch_memory(arm_2d_mem_type_t tType,
 {
     ARM_2D_UNUSED(tType);
 
-    gui_lower_free(pBuff);
+    gui_free(pBuff);
 }
 
 arm_2d_scratch_mem_t *arm_2d_scratch_memory_new(arm_2d_scratch_mem_t *ptMemory,

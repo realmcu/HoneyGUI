@@ -169,7 +169,6 @@ static void page_tb_control(gui_view_t *view)
     gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-
     // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(view), NULL, 0, 0,
                                                             SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));

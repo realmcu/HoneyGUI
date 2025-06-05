@@ -112,6 +112,7 @@ typedef enum t_obj_type
     MACRO_ONSELECT,
     LIST,
     LIST_TAB,
+    MENU_CELLULAR,
 } T_OBJ_TYPE;
 typedef enum
 {
