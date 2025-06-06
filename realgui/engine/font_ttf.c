@@ -914,6 +914,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                     windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
                     windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
                 }
+                gui_free(windingsfm);
                 gui_free(windingsd);
 #else
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
