@@ -769,7 +769,9 @@ void create_watchface_classic(gui_view_t *view)
                                              UI_CLOCK_COMPASS_DIAL_ICON_BIN, 155, 348, 0, 0);
     compass_pointer = gui_img_create_from_mem(img, "CLOCK_COMPASS_POINTER",
                                               UI_CLOCK_COMPASS_POINTER_ICON_BIN, 42, 10, 0, 0);
-    compass_degree = gui_text_create(img, "compass_degree",  5, 23, 0, 0);
+    compass_pointer->base.w = 14;
+    compass_pointer->base.h = 10;
+    compass_degree = gui_text_create(img, "compass_degree", 0, 23, 100, 100);
     gui_text_set(compass_degree, (void *)degree_content, GUI_FONT_SRC_TTF,  gui_rgba(254, 106, 26,
                  UINT8_MAX), //orange color
                  strlen(degree_content),
@@ -778,7 +780,7 @@ void create_watchface_classic(gui_view_t *view)
     gui_text_mode_set(compass_degree, CENTER);
     gui_text_rendermode_set(compass_degree, 2);
 
-    compass_orien = gui_text_create(img, "compass_orien",  0, 47, 0, 0);
+    compass_orien = gui_text_create(img, "compass_orien", 0, 47, 100, 100);
     gui_text_set(compass_orien, (void *)orien_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(orien_content),
                  32);
@@ -792,7 +794,8 @@ void create_watchface_classic(gui_view_t *view)
     img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",
                                              UI_CLOCK_HEARTRATE_ICON_BIN, 272, 348, 0,
                                              0);
-
+    img_heart_rate->base.w = 100;
+    img_heart_rate->base.h = 100;
     gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_heartrate, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
     gui_obj_create_timer(GUI_BASE(win_watch), 30000, true, refreash_time);

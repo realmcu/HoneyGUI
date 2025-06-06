@@ -317,7 +317,7 @@ static void __view_transition(gui_view_t *_this, int16_t release)
 static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
                                             gui_view_on_event_t *on_event)
 {
-    gui_log("enter event_trigger_move_cb \n");
+    // gui_log("enter event_trigger_move_cb \n");
     g_SurpressTP = false;
 
     gui_view_t *next_view_rec = g_NextView;
