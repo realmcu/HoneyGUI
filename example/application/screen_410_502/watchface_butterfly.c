@@ -1,3 +1,4 @@
+#if 0
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_obj.h"
@@ -233,6 +234,7 @@ void watchface_butterfly_app(gui_view_t *view)
 
     gui_win_click(win, (gui_event_cb_t)win_touch_cb, NULL);
 }
+#endif
 
 
 

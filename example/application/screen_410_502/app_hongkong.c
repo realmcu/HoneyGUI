@@ -12,7 +12,7 @@
 #include <time.h>
 #include "gui_view.h"
 #include "cJSON.h"
-#include "gui_view.h"
+#include "gui_canvas_rect.h"
 
 #define CURRENT_VIEW_NAME "watchface_view"
 
@@ -31,7 +31,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = watchface_design,
-    .keep = false,
+    .keep = true,
 };
 static int gui_view_descriptor_register_init(void)
 {
@@ -65,7 +65,7 @@ static void kb_button_cb()
     extern gui_kb_port_data_t *kb_get_data(void);
     gui_kb_port_data_t *kb = kb_get_data();
     static uint32_t time_press = 0;
-    static uint8_t hold = 0;
+    static bool hold = 0;
     static bool press_his = 0;
     static uint32_t release_his = 0;
     if (hold)
@@ -95,7 +95,7 @@ static void kb_button_cb()
             }
         }
     }
-    if (kb->event == GUI_KB_EVENT_DOWN && !hold)
+    if (kb->event == GUI_KB_EVENT_DOWN)
     {
         time_press = kb->timestamp_ms_press;
         hold = 1;
@@ -396,6 +396,59 @@ static void inform_generate_task_entry()
 uint8_t resource_root[1024 * 1024 * 20];
 #endif
 
+static gui_text_t *t_fps;
+static gui_text_t *widget_count;
+static char fps[10];
+static char widget_count_string[20];
+static gui_text_t *mem;
+static gui_text_t *low_mem;
+static char mem_string[20];
+static char low_mem_string[20];
+
+static void gui_fps_cb(void *p)
+{
+    int fps_num = gui_fps();
+    sprintf(fps, "FPS:%d", fps_num);
+    gui_text_content_set(t_fps, fps, strlen(fps));
+    int widget_count_number = gui_get_obj_count();
+    sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
+    gui_text_content_set(widget_count, widget_count_string, strlen(widget_count_string));
+    uint32_t mem_number =  gui_mem_used();
+    uint32_t low_mem_number =  gui_low_mem_used();
+    sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
+    gui_text_content_set(mem, mem_string, strlen(mem_string));
+    sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
+    gui_text_content_set(low_mem, low_mem_string, strlen(low_mem_string));
+
+}
+
+static void fps_create(void *parent)
+{
+    char *text;
+    int font_size = 24;
+    gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
+                                                     gui_get_screen_width() / 2 - 140 / 2, 0, 140, 70, APP_COLOR_GRAY_OPACITY(150));
+    gui_win_t *win = gui_win_create(parent, 0, 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win), 17, true, gui_fps_cb);
+
+    sprintf(fps, "FPS:%d", gui_fps());
+    text = fps;
+    t_fps = gui_text_create(rect, "WIDGET gui_fps_text", 0, 0, gui_get_screen_width(), font_size);
+    gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(t_fps, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+    widget_count = gui_text_create(rect, "WIDGET gui_fps_text", 0, 16, gui_get_screen_width(),
+                                   font_size);
+    gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(widget_count, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+    mem = gui_text_create(rect, "WIDGET gui_fps_text", 0, 16 * 2, gui_get_screen_width(), font_size);
+    gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+    low_mem = gui_text_create(rect, "WIDGET gui_fps_text", 0, 16 * 3, gui_get_screen_width(),
+                              font_size);
+    gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(low_mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+}
+
 static void app_hongkong_ui_design(void)
 {
     gui_log("app_hongkong_ui_design\n");
@@ -410,8 +463,9 @@ static void app_hongkong_ui_design(void)
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, TUYA_CJSON_BIN, 700);
 #endif
-    gui_view_t *view = gui_view_create(gui_obj_get_root(), &descriptor, 0, 0, 0, 0);
-    // gui_view_t *view = gui_view_create(gui_obj_get_root(), app_top_view, 0, 0, 0, 0);
+    gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
+    gui_view_t *view = gui_view_create(win, &descriptor, 0, 0, 0, 0);
+    fps_create(gui_obj_get_root());
 }
 
 static int app_init(void)

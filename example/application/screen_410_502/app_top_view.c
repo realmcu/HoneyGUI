@@ -31,7 +31,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = top_view_design,
-    .keep = true,
+    .keep = false,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -188,9 +188,11 @@ static void clear_list_note(gui_list_note_t *note)
     gui_obj_tree_free_async(GUI_BASE(note));
     list->total_length -= (list->note_length + list->space);
     list->widget_num--;
-    while (INFOR_NUM_MAX - 1 - index)
+    index = infor_num - 1 - index;
+    gui_free(infor_rec[index]);
+    gui_log("free infor_rec[%d]\n", index);
+    while (index < infor_num - 1)
     {
-        gui_free(infor_rec[index]);
         infor_rec[index] = infor_rec[index + 1];
         index++;
     }
@@ -282,7 +284,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     {
     case MESSAGE:
         {
-            char *name = gui_malloc(40);
+            char name[40];
             sprintf(name, "\"message\" dialog\n%s", informer);
             text = gui_text_create(win, "message",  37, 90, 0, 0);
             gui_text_set(text, (void *)name, GUI_FONT_SRC_BMP, gui_rgb(153, 153, 153),
@@ -350,6 +352,7 @@ static void create_inform_note(information_t *inform)
     const char *content = inform->content;
     const char *time = inform->time;
     app_name app = inform->app;
+    gui_log("content: 0x%x\n", content);
 
     gui_list_note_t *note = gui_list_add_note(list, true);
     gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note), "0", 30, 0, 350, 220,
@@ -424,7 +427,7 @@ static void list_timer_cb(void *param)
     struct touch_info *tp = tp_get_info();
     if (!tp->pressing && !clear_flag)
     {
-        while (infor_need_update_num)
+        while (infor_need_update_num) //need fix by shel deng
         {
             infor_need_update_num--;
             create_inform_note(infor_rec[0]);
@@ -490,7 +493,13 @@ static void clear_all_timer_cb(void *widget)
     }
     if (abs(note->start_x - note->t_x) >= SCREEN_WIDTH)
     {
-        gui_obj_child_free(GUI_BASE(list));
+        // gui_obj_child_free(GUI_BASE(list));
+        gui_list_for_each(node, &(list->base.child_list))
+        {
+            gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+            gui_obj_tree_free_async(obj);
+        }
+
         list->total_length = gui_get_dc()->screen_height;
         list->widget_num = 0;
         while (infor_num)
@@ -546,6 +555,7 @@ void add_information(gui_msg_t *msg)
     infor_rec[0] = gui_malloc(sizeof(information_t));
     memcpy(infor_rec[0], msg->payload, sizeof(information_t));
     gui_log("add new information\r\n");
+    // gui_log("msg->payload: 0x%x\n", msg->payload);
 }
 
 void top_view_design(gui_view_t *view)
@@ -570,6 +580,7 @@ void top_view_design(gui_view_t *view)
     {
         create_inform_note(infor_rec[i]);
     }
+    infor_need_update_num = 0;
 
     // arrow = gui_img_create_from_mem(view, "arrow", UI_LINE_STILL_BIN, 181, SCREEN_HEIGHT - 25, 0,
     //                                 0);

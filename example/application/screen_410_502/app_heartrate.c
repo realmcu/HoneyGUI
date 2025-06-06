@@ -25,7 +25,7 @@ const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *pre_view = NULL;
 static void heart_rate_app(gui_view_t *view);
-static void clear_heart_rate_cache();
+static void clear_heart_rate_cache(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -273,7 +273,7 @@ static void hr_timer_cb(void *obj)
         gui_img_set_image_data(img, img_data);
     }
 }
-static void clear_heart_rate_cache()
+static void clear_heart_rate_cache(gui_view_t *view)
 {
     if (img_data)
     {

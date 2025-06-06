@@ -317,7 +317,7 @@ static void __view_transition(gui_view_t *_this, int16_t release)
 static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
                                             gui_view_on_event_t *on_event)
 {
-    // gui_log("enter event_trigger_move_cb \n");
+    gui_log("enter event_trigger_move_cb \n");
     g_SurpressTP = false;
 
     gui_view_t *next_view_rec = g_NextView;
@@ -460,13 +460,14 @@ static void gui_view_prepare(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
     }
 
-    if (_this->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
-    {
-        view_transition_animation(obj, g_Release / (float)g_Target);
-    }
-    else
+    if (_this->current_transition_style == SWITCH_INIT_STATE) {}
+    else if (_this->current_transition_style < SWITCH_OUT_NONE_ANIMATION)
     {
         __view_transition(_this, g_Release);
+    }
+    else if (_this->current_transition_style >= SWITCH_OUT_NONE_ANIMATION)
+    {
+        view_transition_animation(obj, g_Release / (float)g_Target);
     }
 
     uint8_t last = _this->checksum;
@@ -507,6 +508,11 @@ static void gui_view_destroy(gui_obj_t *obj)
     {
         gui_free(_this->on_event[i]);
         _this->on_event[i] = NULL;
+    }
+
+    if (_this->descriptor->on_switch_out != NULL)
+    {
+        _this->descriptor->on_switch_out(_this);
     }
     *_this->descriptor->pView = NULL;
 }
@@ -645,7 +651,7 @@ gui_view_t *gui_view_create(void       *parent,
 
 
     gui_log("create %s\n", GET_BASE(_this)->name);
-    if (g_CurrentView == NULL && parent == gui_obj_get_root())
+    if (g_CurrentView == NULL && parent != gui_obj_get_fake_root())
     {
         g_CurrentView = _this;
     }

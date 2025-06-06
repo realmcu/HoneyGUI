@@ -22,7 +22,7 @@ const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *heartrate_view = NULL;
 void activity_app(gui_view_t *view);
-void clear_activity();
+void clear_activity(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -62,7 +62,7 @@ static char move_content[30], ex_content[30], stand_content[30];
 
 static gui_text_t *move_text, *ex_text, *stand_text;
 
-void clear_activity()
+void clear_activity(gui_view_t *view)
 {
     if (img_data)
     {
@@ -237,7 +237,6 @@ void activity_app(gui_view_t *view)
         gui_text_type_set(move_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(move_text, LEFT);
         gui_text_rendermode_set(move_text, 2);
-        // gui_text_convert_to_img(move_text, RGB565);
 
         ex_text = gui_text_create(obj, "ex_text", 150, 350, 0, 0);
         gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_TTF, gui_rgb(186, 253, 79),
@@ -245,15 +244,12 @@ void activity_app(gui_view_t *view)
         gui_text_type_set(ex_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(ex_text, LEFT);
         gui_text_rendermode_set(ex_text, 2);
-        // gui_text_convert_to_img(ex_text, RGB565);
-
         stand_text = gui_text_create(obj, "stand_text", 150, 400, 0, 0);
         gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_TTF, gui_rgb(117, 230, 229),
                      strlen(stand_content), 32);
         gui_text_type_set(stand_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(stand_text, LEFT);
         gui_text_rendermode_set(stand_text, 2);
-        // gui_text_convert_to_img(stand_text, RGB565);
     }
     {
         int image_h = 200,
