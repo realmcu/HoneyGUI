@@ -40,6 +40,7 @@ gui_win_t *can2_window = NULL;
 gui_win_t *can3_window = NULL;
 gui_win_t *wave_window = NULL;
 gui_win_t *bubble_window = NULL;
+gui_canvas_t *canvas_wave = NULL;
 
 float can_rotation = 0.0f;
 float time_rotation = 0.0f;
@@ -74,9 +75,9 @@ static void *display_time_resource_def[] =
 #define CURRENT_VIEW_NAME "seawater_view"
 
 static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *yellow_view_descriptor = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 static void app_ui_wave_nums_design(gui_view_t *view);
+static void cleanup_resources(gui_view_t *view);
 
 static const gui_view_descriptor_t descriptor =
 {
@@ -85,7 +86,7 @@ static const gui_view_descriptor_t descriptor =
     .pView = &current_view,
 
     .on_switch_in = app_ui_wave_nums_design,
-    .on_switch_out = NULL,
+    .on_switch_out = cleanup_resources,
 
     .keep = false,
 };
@@ -116,122 +117,104 @@ static void return_timer_cb()
     touch_info_t *tp = tp_get_info();
     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
 }
-typedef struct BubbleNode
+typedef struct
 {
     gui_img_t *img;
     float scale;
-    int opacity;
-    float speed;
     int start_x;
     int start_y;
     uint32_t create_time;
-    struct BubbleNode *next;
-} BubbleNode;
-
+} Bubble;
 
 #define MAX_BUBBLES 20
-static BubbleNode bubble_pool[MAX_BUBBLES];
-static BubbleNode *free_bubble_list = NULL;
-static BubbleNode *active_bubble_list = NULL;
+static Bubble bubbles[MAX_BUBBLES];
+static int active_bubble_count = 0;
+
 static void init_bubble_pool()
 {
-    for (int i = 0; i < MAX_BUBBLES - 1; i++)
+    for (int i = 0; i < MAX_BUBBLES; i++)
     {
-        bubble_pool[i].next = &bubble_pool[i + 1];
+        bubbles[i].img = NULL;
     }
-    bubble_pool[MAX_BUBBLES - 1].next = NULL;
-    free_bubble_list = &bubble_pool[0];
+    active_bubble_count = 0;
 }
-static BubbleNode *get_bubble()
+
+static void create_bubble(int x, int y)
 {
-    if (free_bubble_list == NULL) { return NULL; }
+    if (active_bubble_count >= MAX_BUBBLES) { return; }
 
-    BubbleNode *new_bubble = free_bubble_list;
-    free_bubble_list = free_bubble_list->next;
-
-    new_bubble->next = active_bubble_list;
-    active_bubble_list = new_bubble;
-
-    return new_bubble;
-}
-static void release_bubble(BubbleNode *bubble)
-{
-    if (active_bubble_list == bubble)
+    for (int i = 0; i < MAX_BUBBLES; i++)
     {
-        active_bubble_list = bubble->next;
-    }
-    else
-    {
-        BubbleNode *prev = active_bubble_list;
-        while (prev && prev->next != bubble)
+        if (!bubbles[i].img || bubbles[i].img->base.not_show)
         {
-            prev = prev->next;
+            if (!bubbles[i].img)
+            {
+                bubbles[i].img = gui_img_create_from_mem(bubble_window, "bubble", DROPLET_BIN, x, y, 0, 0);
+                if (!bubbles[i].img) { return; }
+            }
+            else
+            {
+                bubbles[i].img->base.x = x;
+                bubbles[i].img->base.y = y;
+                bubbles[i].img->base.not_show = false;
+            }
+
+            bubbles[i].scale = 0.3f + (rand() % 7) / 20.0f;
+            bubbles[i].img->opacity_value = 150 + rand() % 105;
+            bubbles[i].start_x = x;
+            bubbles[i].start_y = y;
+            bubbles[i].create_time = gui_ms_get();
+
+            gui_img_scale(bubbles[i].img, bubbles[i].scale, bubbles[i].scale);
+            gui_img_set_opacity(bubbles[i].img, bubbles[i].img->opacity_value);
+
+            active_bubble_count++;
+            break;
         }
-        if (prev) { prev->next = bubble->next; }
     }
-
-    bubble->next = free_bubble_list;
-    free_bubble_list = bubble;
-
-    bubble->img->base.not_show = true;
-}
-
-static void create_bubble(void *parent, int x, int y)
-{
-    BubbleNode *new_bubble = get_bubble();
-    if (!new_bubble) { return; }
-
-    if (new_bubble->img == NULL)
-    {
-        new_bubble->img = gui_img_create_from_mem(bubble_window, "droplet", DROPLET_BIN, x, y, 0, 0);
-        // gui_log("create bubble at %d, %d\n", x, y);
-    }
-    else
-    {
-        new_bubble->img->base.x = x;
-        new_bubble->img->base.y = y;
-        new_bubble->img->base.not_show = false;
-    }
-
-    new_bubble->scale = 0.3f + (rand() % 7) / 20.0f;
-    new_bubble->opacity = 150 + rand() % 105;
-    new_bubble->speed = 0.8f + (rand() % 14) / 20.0f;
-    new_bubble->start_x = x;
-    new_bubble->start_y = y;
-    new_bubble->create_time = gui_ms_get();
-
-    gui_img_scale(new_bubble->img, new_bubble->scale, new_bubble->scale);
-    gui_img_set_opacity(new_bubble->img, new_bubble->opacity);
 }
 
 static void update_all_bubbles()
 {
-    BubbleNode *current = active_bubble_list;
     uint32_t current_time = gui_ms_get();
 
-    while (current)
+    for (int i = 0; i < MAX_BUBBLES; i++)
     {
-        uint32_t elapsed = current_time - current->create_time;
-
-        int y_offset = (int)(current->speed * elapsed / 20.0f);
-        current->img->base.y = current->start_y - y_offset;
-        current->img->base.x = current->start_x + 5 * sin(elapsed / 200.0f);
-        current->scale += 0.002f;
-        current->opacity = 255 - (elapsed / 10);
-
-        gui_img_scale(current->img, current->scale, current->scale);
-        gui_img_set_opacity(current->img, current->opacity > 0 ? current->opacity : 0);
-
-        if (elapsed > 2500 || current->opacity <= 0)
+        if (bubbles[i].img && !bubbles[i].img->base.not_show)
         {
-            BubbleNode *to_remove = current;
-            current = current->next;
-            release_bubble(to_remove);
-            continue;
+            uint32_t elapsed = current_time - bubbles[i].create_time;
+
+            int y_offset = (int)(elapsed / 20.0f);
+            bubbles[i].img->base.y = bubbles[i].start_y - y_offset;
+            bubbles[i].img->base.x = bubbles[i].start_x + 5 * sin(elapsed / 200.0f);
+            bubbles[i].scale += 0.002f;
+            bubbles[i].img->opacity_value = 255 - (elapsed / 10);
+
+            gui_img_scale(bubbles[i].img, bubbles[i].scale, bubbles[i].scale);
+            gui_img_set_opacity(bubbles[i].img,
+                                bubbles[i].img->opacity_value > 0 ? bubbles[i].img->opacity_value : 0);
+
+            if (elapsed > 2500 || bubbles[i].img->opacity_value <= 0)
+            {
+                bubbles[i].img->base.not_show = true;
+                active_bubble_count--;
+            }
         }
-        current = current->next;
     }
 }
+
+static void cleanup_resources(gui_view_t *view)
+{
+    for (int i = 0; i < MAX_BUBBLES; i++)
+    {
+        if (bubbles[i].img)
+        {
+            bubbles[i].img = NULL;
+        }
+    }
+    active_bubble_count = 0;
+}
+
 int fish_x_to_screen(float fish_x)
 {
     float a = 80.0f;   //left fish's max x (most left)
@@ -250,8 +233,6 @@ static uint32_t fish_last_bubble_time[4] = {0};
 static void fish_animate_cb(void *parent)
 {
     touch_info_t *tp = tp_get_info();
-
-    static uint32_t last_bubble_time = 0;
 
     float fish_pos_x[4];
 
@@ -288,25 +269,25 @@ static void fish_animate_cb(void *parent)
         uint32_t current_time = gui_ms_get();
         if ((current_time - fish_last_bubble_time[0] > 200) && (fish0_x < 70))
         {
-            create_bubble(parent, fish_x_to_screen(fish0_x), -(fish0_y - 60));
+            create_bubble(fish_x_to_screen(fish0_x), -(fish0_y - 80));
             fish_last_bubble_time[0] = current_time;
         }
 
         if (current_time - fish_last_bubble_time[1] > 400)
         {
-            create_bubble(parent, fish_x_to_screen(fish1_x), -(fish1_y - 60));
+            create_bubble(fish_x_to_screen(fish1_x), -(fish1_y - 80));
             fish_last_bubble_time[1] = current_time;
         }
 
-        if (current_time - fish_last_bubble_time[2] > 800)
+        if (current_time - fish_last_bubble_time[2] > 600)
         {
-            create_bubble(parent, fish_x_to_screen(fish2_x), -(fish2_y - 60));
+            create_bubble(fish_x_to_screen(fish2_x), -(fish2_y - 80));
             fish_last_bubble_time[2] = current_time;
         }
 
-        if (current_time - fish_last_bubble_time[3] > 1200)
+        if (current_time - fish_last_bubble_time[3] > 800)
         {
-            create_bubble(parent, fish_x_to_screen(fish3_x), -(fish3_y - 60));
+            create_bubble(fish_x_to_screen(fish3_x), -(fish3_y - 80));
             fish_last_bubble_time[3] = current_time;
         }
         if (fish0)
@@ -411,7 +392,7 @@ static void canvas_cb_black(gui_canvas_t *canvas)
     nvgFill(vg);
 
 }
-gui_canvas_t *canvas_wave = NULL;
+
 extern void gui_wave_draw_graph(gui_canvas_t *canvas);
 static void wave_animate_cb(void *parent)
 {
@@ -433,13 +414,12 @@ static void wave_animate_cb(void *parent)
 }
 static void app_ui_wave_nums_design(gui_view_t *view)
 {
+    srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
 
-    init_bubble_pool();
-
-    gui_img_t *background = gui_img_create_from_mem(view, "background", SEABACKGROUND_BIN, 0, 0, 0, 0);
-    gui_img_t *ForeGround = gui_img_create_from_mem(view, "ForeGround", FOREGROUND_BIN, 0, 270, 0, 0);
+    gui_img_create_from_mem(view, "background", SEABACKGROUND_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(view, "ForeGround", FOREGROUND_BIN, 0, 270, 0, 0);
 
     fish_window = gui_win_create(view, "fish_window", 0, 0, 410, 502);
 
@@ -485,6 +465,7 @@ static void app_ui_wave_nums_design(gui_view_t *view)
     gui_img_t *CanSkin_red = gui_img_create_from_mem(can3_window, "can2", CANSKIN_RED_BIN, 0, 0, 0, 0);
     time3 = gui_img_create_from_mem(can3_window, "can3", display_time_resource_def[5], 16, 32, 0, 0);
 
+    wave_active = false;
     wave_window = gui_win_create(view, "wave_window", 0, 0, 410, 502);
     waterface_bg = gui_img_create_from_mem(wave_window, "waterface", WATERFACTOR_BG_BIN, 0, 240, 0,
                                            244);
@@ -496,8 +477,10 @@ static void app_ui_wave_nums_design(gui_view_t *view)
     gui_canvas_set_canvas_cb(canvas_wave, NULL);
     extern void can_animate_cb(void *parent);
 
+
     //bubble
     bubble_window = gui_win_create(view, "bubble_window", 0, 240, 410, 240);
+    init_bubble_pool();
 
     gui_obj_create_timer(&(wave_window->base), 17, true, wave_animate_cb);
     gui_obj_start_timer(&(wave_window->base));

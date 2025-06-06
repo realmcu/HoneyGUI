@@ -42,7 +42,7 @@ static Position_rot_t prism_world_rot_temp = {0.0f, 0.0f, 0.0f};
 
 
 
-static Position_pos_t prism_world_pos_raw = {0.0f, 10.0f, 100.0f};
+static Position_pos_t prism_world_pos_raw = {0.0f, 10.0f, 95.0f};
 static Position_pos_t prism_camera_pos_raw = {0.0f, 3.0f, 55.0f};
 static Position_rot_t prism_world_rot_raw = {0.0f, 0.0f, 0.0f};
 
