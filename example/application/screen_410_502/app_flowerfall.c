@@ -209,6 +209,38 @@ static void update_flower_animation()
 
 }
 
+static void single_petal_init(Petal *single_petal, gui_obj_t *obj, gui_dispdev_t *dc, float scale)
+{
+    single_petal->driftX = rand() % dc->screen_width;
+    single_petal->driftY = -rand() % dc->screen_height;
+    single_petal->scale = scale;
+
+    int random_image_index = rand() % 6;
+    void *images[6] = {(void *)LEAF01_BIN, (void *)LEAF02_BIN, (void *)LEAF03_BIN,
+                       (void *)LEAF04_BIN, (void *)LEAF05_BIN, (void *)LEAF06_BIN
+                      };
+
+    single_petal->img = gui_img_create_from_mem(obj, "petal", images[random_image_index], 0, 0, 0, 0);
+    gui_img_set_focus(single_petal->img, 32, 32);
+    gui_img_translate(single_petal->img, single_petal->driftX, single_petal->driftY);
+
+    gui_img_scale(single_petal->img, single_petal->scale, single_petal->scale);
+
+
+    single_petal->ghosts[0] = gui_img_create_from_mem(obj, "ghost0", DOT01_BIN, 0, 0, 0, 0);
+    single_petal->ghosts[1] = gui_img_create_from_mem(obj, "ghost1", DOT02_BIN, 0, 0, 0, 0);
+
+    gui_img_translate(single_petal->ghosts[0], single_petal->driftX, single_petal->driftY);
+    gui_img_translate(single_petal->ghosts[1], single_petal->driftX, single_petal->driftY);
+
+    gui_img_scale(single_petal->ghosts[0], single_petal->scale, single_petal->scale);
+    gui_img_scale(single_petal->ghosts[1], single_petal->scale, single_petal->scale);
+    single_petal->ghosts[0]->base.not_show = true;
+    single_petal->ghosts[1]->base.not_show = true;
+    single_petal->ghosts[0]->opacity_value = 100;
+    single_petal->ghosts[1]->opacity_value = 150;
+}
+
 void flower_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
@@ -219,46 +251,23 @@ void flower_app(gui_view_t *view)
     gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
                                                     0);
 
+    for (int i = 0; i < NUM_PETALS / 2; i++)
+    {
+        float scale = (rand() % 21) / 100.0f + 0.1f;
+        single_petal_init(&petals[i], obj, dc, scale);
+    }
+
     branch1 = gui_img_create_from_mem(obj, "branch1", BRANCH01_BIN, 0, 0, 0, 0);
     gui_img_set_focus(branch1, 336, 0);
     gui_img_translate(branch1, 410, 50);
 
-    branch2 = gui_img_create_from_mem(obj, "branch2", BRANCH02_BIN, 0, 300, 0, 0);
-
-    for (int i = 0; i < NUM_PETALS; i++)
+    for (int i = NUM_PETALS / 2; i < NUM_PETALS; i++)
     {
-        petals[i].driftX = rand() % dc->screen_width;
-        petals[i].driftY = -rand() % dc->screen_height;
-        petals[i].scale = (rand() % 41) / 100.0f + 0.1f;
-
-        int random_image_index = rand() % 6;
-        void *images[6] = {(void *)LEAF01_BIN, (void *)LEAF02_BIN, (void *)LEAF03_BIN,
-                           (void *)LEAF04_BIN, (void *)LEAF05_BIN, (void *)LEAF06_BIN
-                          };
-
-        petals[i].img = gui_img_create_from_mem(obj, "petal", images[random_image_index], 0, 0,
-                                                0, 0);
-        gui_img_set_focus(petals[i].img, 32, 32);
-        gui_img_translate(petals[i].img, petals[i].driftX, petals[i].driftY);
-
-        gui_img_scale(petals[i].img, petals[i].scale, petals[i].scale);
-
-
-        petals[i].ghosts[0] = gui_img_create_from_mem(background, "ghost0", DOT01_BIN, 0, 0, 0, 0);
-        petals[i].ghosts[1] = gui_img_create_from_mem(background, "ghost1", DOT02_BIN, 0, 0, 0, 0);
-
-        gui_img_translate(petals[i].ghosts[0], petals[i].driftX, petals[i].driftY);
-        gui_img_translate(petals[i].ghosts[1], petals[i].driftX, petals[i].driftY);
-
-        gui_img_scale(petals[i].ghosts[0], petals[i].scale, petals[i].scale);
-        gui_img_scale(petals[i].ghosts[1], petals[i].scale, petals[i].scale);
-        petals[i].ghosts[0]->base.not_show = true;
-        petals[i].ghosts[1]->base.not_show = true;
-        petals[i].ghosts[0]->opacity_value = 100;
-        petals[i].ghosts[1]->opacity_value = 150;
-
-
+        float scale = (rand() % 21) / 100.0f + 0.3f;
+        single_petal_init(&petals[i], obj, dc, scale);
     }
+
+    branch2 = gui_img_create_from_mem(obj, "branch2", BRANCH02_BIN, 0, 300, 0, 0);
 
     gui_obj_create_timer(GUI_BASE(background), 10, true, update_flower_animation);
 

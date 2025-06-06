@@ -99,7 +99,9 @@ static void update_prism_thick_angle()
     }
     else if (world_rot_temp.rot_y != corrected_angle)
     {
-        world_rot_temp.rot_y = world_rot_temp.rot_y + (corrected_angle - world_rot_temp.rot_y) * 0.1f;
+        float t = 0.15f;
+        float delta = corrected_angle - world_rot_temp.rot_y;
+        world_rot_temp.rot_y +=  delta * t * (2.0f - t);
 
         if (fabsf(world_rot_temp.rot_y - corrected_angle) < 0.1f)
         {

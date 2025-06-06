@@ -142,7 +142,7 @@ static void app_click_on_cb(gui_3d_t *this)
         click_on_shift_z += 0.2f;
     }
     this->base.x = 0;
-    this->base.y = 0;
+    this->base.y = 46;
     this->base.w = 410;
     this->base.h = 410;
     gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 5), gui_point_4d(0, 0, 0), 1, 32767,

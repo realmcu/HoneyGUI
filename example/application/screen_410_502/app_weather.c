@@ -363,8 +363,13 @@ static void update_weather_animation(void *param)
 
 static void add_panel(gui_list_note_t *tab)
 {
-    gui_img_create_from_mem(tab, "panel0", PANEL00_BIN, 0, 20, 0, 0);
-    gui_img_create_from_mem(tab, "panel1", PANEL00_BIN, 0, 300, 0, 0);
+    gui_img_create_from_mem(tab, "panel0", PANEL00_BIN, 0, 44, 0, 0);
+
+    gui_img_t *panel_down = gui_img_create_from_mem(tab, "panel1", PANEL00_BIN, 0, 200, 0, 0);
+    gui_img_set_focus(panel_down, 0, 400);
+    gui_img_scale(panel_down, 1.0f, -1.0f);
+    gui_img_set_opacity(panel_down, 125);
+
 }
 
 void weather_app(gui_view_t *view)

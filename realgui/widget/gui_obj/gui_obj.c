@@ -228,6 +228,13 @@ bool gui_obj_out_screen(gui_obj_t *obj)
         float y_min = m12;
         float y_max = m12 + m11 * obj->h;
 
+        if (y_min > y_max)
+        {
+            float temp = y_min;
+            y_min = y_max;
+            y_max = temp;
+        }
+
         if ((x_min > (int)gui_get_screen_width())
             || (x_max < 0)
             || (y_min > (int)gui_get_screen_height())
