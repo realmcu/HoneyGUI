@@ -120,6 +120,11 @@ static void gui_canvas_rect_end(gui_canvas_rect_t *this)
 
     if (this->draw_img != NULL)
     {
+        if (draw_img_acc_end_cb != NULL)
+        {
+            draw_img_acc_end_cb(this->draw_img);
+        }
+
         if (this->draw_img->data != NULL)
         {
             gui_free(this->draw_img->data);

@@ -375,6 +375,7 @@ void app_menu_design(gui_view_t *view)
             NOTIFICATION_ICON_BIN,
             PANDKOI_ICON_BIN,
             SEAWATER_ICON_BIN,
+            FIREFLY_ICON_BIN,
             UI_CLOCK_HEARTRATE_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
             UI_CLOCK_BOX2D_RING_ICON_BIN,
@@ -393,6 +394,7 @@ void app_menu_design(gui_view_t *view)
             NOTIFICATION_ICON_BIN,
             PANDKOI_ICON_BIN,
             SEAWATER_ICON_BIN,
+            FIREFLY_ICON_BIN,
         };
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, array,
                                                              sizeof(array) / sizeof(uint32_t *));
@@ -404,12 +406,12 @@ void app_menu_design(gui_view_t *view)
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
                 {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
                 {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_ENERGYBOX, NULL},
-                {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL},
+                {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
                 {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
                 {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_ENERGYBOX, NULL},
-                {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL},
+                {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

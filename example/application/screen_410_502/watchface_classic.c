@@ -633,7 +633,6 @@ void create_watchface_classic(gui_view_t *view)
                                                  348, 100, 100);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_obj_create_timer(GUI_BASE(img), 2000, true, temp_timer_cb);
-        gui_obj_start_timer(GUI_BASE(img));
         //text
         // sprintf(tempera_cur_content, "22");
         temperature_cur = gui_text_create(img, "temperature_cur",  32, 16, 0, 0); //32
@@ -715,8 +714,6 @@ void create_watchface_classic(gui_view_t *view)
         gui_text_mode_set(weather_range, LEFT);
         gui_text_rendermode_set(weather_range, 2);
         gui_obj_create_timer(GUI_BASE(img_weather), 3000, true, weather_cb);
-        gui_obj_start_timer(GUI_BASE(img_weather));
-        weather_cb();
     }
 // #endif
 
@@ -761,8 +758,7 @@ void create_watchface_classic(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 37,
                                                  68, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_create_timer(GUI_BASE(img), 1000, true, activity_timer_cb);
-        gui_obj_start_timer(GUI_BASE(img));
+        gui_obj_create_timer(GUI_BASE(img), 2000, true, activity_timer_cb);
     }
     // compass icon
     gui_img_t *img = gui_img_create_from_mem(win_watch, "CLOCK_COMPASS_DIAL",
@@ -788,7 +784,6 @@ void create_watchface_classic(gui_view_t *view)
     gui_text_mode_set(compass_orien, CENTER);
     gui_text_rendermode_set(compass_orien, 2);
     gui_obj_create_timer(GUI_BASE(img), 20, true, compass_cb);
-    gui_obj_start_timer(GUI_BASE(img));
     compass_cb();
 
     img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",
@@ -799,7 +794,4 @@ void create_watchface_classic(gui_view_t *view)
     gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_heartrate, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
     gui_obj_create_timer(GUI_BASE(win_watch), 30000, true, refreash_time);
-    gui_obj_start_timer(GUI_BASE(win_watch));
-
-    refreash_time();
 }

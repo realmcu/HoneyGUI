@@ -203,6 +203,7 @@ void prism_thick_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    gui_view_set_animate_step(view, 1000);
 
     gui_3d_t *prism_thick_3d = gui_3d_create(obj, "3d-widget", DESC_PRISM_THICK_BIN,
                                              GUI_3D_DRAW_FRONT_AND_SORT, 0, 0,
