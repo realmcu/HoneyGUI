@@ -53,23 +53,15 @@ static float fish_angle = 0.0f;
 
 static float fish0_x = 0.0f;
 static float fish0_y = 0.0f;
-static float fish0_shadow_x = 0;
-static float fish0_shadow_y = 0;
 
 static float fish1_x = 0;
 static float fish1_y = 0;
-static float fish1_shadow_x = 0;
-static float fish1_shadow_y = 0;
 
 static float fish2_x = 0;
 static float fish2_y = 0;
-static float fish2_shadow_x = 0;
-static float fish2_shadow_y = 0;
 
 static float fish3_x = 0;
 static float fish3_y = 0;
-static float fish3_shadow_x = 0;
-static float fish3_shadow_y = 0;
 
 static float fish0_rz = 0.0f;
 static float fish1_rz = 0.0f;
