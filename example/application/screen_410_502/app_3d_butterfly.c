@@ -56,7 +56,6 @@ static void return_timer_cb()
 }
 
 
-static int frame_counter = 0;
 static float wing_angle = 0.0f;
 static float butterfly_x = 0.0f;
 static float butterfly_y = 0.0f;
@@ -70,6 +69,9 @@ static float source_dx = 0.0f;
 static float source_dy = 0.0f;
 static float move_speed = 0.02f;
 static float wing_time = 0.0f;
+static float total_flight_distance = 0.0f;
+static float flight_progress = 1.0f;
+
 static void update_animation()
 {
     touch_info_t *tp = tp_get_info();
@@ -77,27 +79,34 @@ static void update_animation()
 
     if (tp->pressed)
     {
-        target_dx = (tp->x - dc->screen_width / 2) / 2.5f;
-        target_dy = (tp->y - dc->screen_height / 2) / 2.5f;
+        target_dx = (tp->x - dc->screen_width / 2) / 4.0f;
+        target_dy = (tp->y - dc->screen_height / 2) / 4.0f;
         is_moving_to_target = true;
+
+        float dx = target_dx - source_dx;
+        float dy = target_dy - source_dy;
+
+        total_flight_distance = sqrtf(dx * dx + dy * dy);
+        flight_progress = 0.0f;
     }
 
     if (is_moving_to_target)
     {
-        float dx = target_dx - source_dx;
-        float dy = target_dy - source_dy;
+        float current_dx = target_dx - source_dx;
+        float current_dy = target_dy - source_dy;
 
-        float distance = sqrtf(dx * dx + dy * dy);
+        float remaining_distance = sqrtf(current_dx * current_dx + current_dy * current_dy);
+        flight_progress = fminf(1.0f - (remaining_distance / total_flight_distance), 1.0f);
 
-        if (distance > 10.0f)
+        if (flight_progress < 0.8f)
         {
             // Acceleration and deceleration
-            float speed_factor = fminf(distance / 40.0f, 1.0f);
-            source_dx += dx * move_speed * speed_factor;
-            source_dy += dy * move_speed * speed_factor;
+            // float speed_factor = fminf(remaining_distance / 40.0f, 1.0f);
+            source_dx += current_dx * move_speed * (1.0f - flight_progress);
+            source_dy += current_dy * move_speed * (1.0f - flight_progress);
 
             // Caculate new rotate angle
-            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI) + 90;
+            float desired_angle = atan2f(current_dy, current_dx) * (180.0f / M_PI) + 90;
             float angle_difference = desired_angle - butterfly_rz;
 
             if (angle_difference > 180.0f)
@@ -111,11 +120,13 @@ static void update_animation()
             butterfly_rz += angle_difference * 0.1f;
 
             // Adjust wing flapping frequency based on speed
-            wing_time += 0.2f + speed_factor * 0.2f;
+            wing_time += 0.2f + (1.0f - flight_progress) * 0.2f;
             wing_angle = 60.0f * sinf(wing_time);
 
             butterfly_x = -source_dx;
             butterfly_y = -source_dy;
+
+            butterfly_z = 30.0f * (4.0f * flight_progress * (0.8f - flight_progress));
         }
         else
         {
@@ -124,10 +135,9 @@ static void update_animation()
     }
     else
     {
-        frame_counter++;
         wing_time += 0.1f;
         wing_angle = 50.0f * sinf(wing_time);
-        butterfly_z = 5.0f * sinf(frame_counter * 0.05f);
+        butterfly_z = -5.0f * sinf(wing_time);
     }
 
 }
@@ -136,7 +146,7 @@ static void butterfly_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 40), gui_point_4d(0, 0, 0), 1, 32767,
                                  90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
@@ -149,22 +159,12 @@ static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face
     gui_3d_matrix_t face_matrix;
     gui_3d_matrix_t transform_matrix;
 
-    if (face_index == 0)
+    if (face_index == 0 || face_index == 2)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
-    else if (face_index == 1)
-    {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
-                                 -wing_angle, 1);
-    }
-    else if (face_index == 2)
-    {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
-                                 wing_angle, 1);
-    }
-    else if (face_index == 3)
+    else if (face_index == 1 || face_index == 3)
     {
         gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
                                  -wing_angle, 1);
