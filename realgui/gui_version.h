@@ -4,8 +4,8 @@
 
 #define VERSION_TAG "v1.1.0.0.RVD"
 #define VERSION_BRANCH "dev"
-#define VERSION_COMMIT "49902bca"
-#define VERSION_BUILD_DATE "2025-03-31 11:24:54"
-#define VERSION_REPO_STATUS "clean"
+#define VERSION_COMMIT "0212d7b5"
+#define VERSION_BUILD_DATE "2025-06-10 19:22:35"
+#define VERSION_REPO_STATUS "dirty"
 
 #endif // GUI_VERSION_H
