@@ -41,6 +41,7 @@ const static gui_view_descriptor_t *seawater_view = NULL;
 const static gui_view_descriptor_t *firefly_view = NULL;
 const static gui_view_descriptor_t *rainbow_digital_view = NULL;
 const static gui_view_descriptor_t *koiclock_view = NULL;
+const static gui_view_descriptor_t *digital_clock_view = NULL;
 void app_menu_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
 {
@@ -83,6 +84,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     firefly_view = gui_view_descriptor_get("firefly_view");
     rainbow_digital_view = gui_view_descriptor_get("rainbow_digital_view");
     koiclock_view = gui_view_descriptor_get("koiclock_view");
+    digital_clock_view = gui_view_descriptor_get("digital_clock_view");
 
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -224,6 +226,12 @@ void switch_APP_KOICLOCK(void *obj, gui_event_t e, void *param)
                            SWITCH_IN_ANIMATION_FADE);
 }
 
+void switch_APP_DIGITAL_CLOCK(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, digital_clock_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
 static void return_timer_cb()
 {
     touch_info_t *tp = tp_get_info();
@@ -268,6 +276,7 @@ void app_menu_design(gui_view_t *view)
             FIREFLY_ICON_BIN,
             RAINBOW_DIGITAL_ICON_BIN,
             KOI_CLOCK_ICON_BIN,
+            DIGITAL_CLOCK_ICON_BIN,
         };
         char *text_array[] =
         {
@@ -292,6 +301,7 @@ void app_menu_design(gui_view_t *view)
             "Fire Fly",
             "Rainbow Digital",
             "koi a clock",
+            "Digital Clock",
         };
         int array_size = sizeof(array) / sizeof(array[0]);
 
@@ -372,6 +382,9 @@ void app_menu_design(gui_view_t *view)
         gui_obj_add_event_cb(tab_array[20], (gui_event_cb_t)switch_APP_KOICLOCK,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
+        gui_obj_add_event_cb(tab_array[21], (gui_event_cb_t)switch_APP_DIGITAL_CLOCK,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
     }
     else
     {
@@ -400,6 +413,7 @@ void app_menu_design(gui_view_t *view)
             FIREFLY_ICON_BIN,
             RAINBOW_DIGITAL_ICON_BIN,
             KOI_CLOCK_ICON_BIN,
+            DIGITAL_CLOCK_ICON_BIN,
             UI_CLOCK_HEARTRATE_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
             UI_CLOCK_BOX2D_RING_ICON_BIN,
@@ -421,6 +435,7 @@ void app_menu_design(gui_view_t *view)
             FIREFLY_ICON_BIN,
             RAINBOW_DIGITAL_ICON_BIN,
             KOI_CLOCK_ICON_BIN,
+            DIGITAL_CLOCK_ICON_BIN,
         };
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, array,
                                                              sizeof(array) / sizeof(uint32_t *));
@@ -433,12 +448,14 @@ void app_menu_design(gui_view_t *view)
                 {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
                 {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_ENERGYBOX, NULL},
                 {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
+                {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
+
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
                 {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
                 {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_ENERGYBOX, NULL},
                 {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
-                {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL},
+                {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

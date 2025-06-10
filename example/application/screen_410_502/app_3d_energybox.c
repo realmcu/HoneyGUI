@@ -57,7 +57,7 @@ static void return_timer_cb()
 
 static float overall_rot_y = 0.0f;
 static float face_shift = 0.0f;
-static int is_increasing = 1;
+static float shift_angle = 0.0f;
 
 static void update_energybox_animation()
 {
@@ -71,24 +71,9 @@ static void update_energybox_animation()
     {
         overall_rot_y++;
 
-        if (is_increasing)
-        {
-            face_shift += 0.01f;
-            if (face_shift >= 0.5f)
-            {
-                face_shift = 0.5f;
-                is_increasing = 0;
-            }
-        }
-        else
-        {
-            face_shift -= 0.01f;
-            if (face_shift <= 0.0f)
-            {
-                face_shift = 0.0f;
-                is_increasing = 1;
-            }
-        }
+        shift_angle += 0.05f;
+        face_shift = 0.25f * sinf(shift_angle) + 0.25f;  // 0 ~ 0.5f
+
     }
 }
 

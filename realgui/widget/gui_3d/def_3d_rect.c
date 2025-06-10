@@ -99,16 +99,16 @@ void gui_3d_rect_face_transform_local_to_global(gui_3d_rect_face_t *face, size_t
 
         gui_obj_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
         gui_obj_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
-        gui_obj_vertex_coordinate_t *vn = &attrib->normals[idx.vn_idx];
+        // gui_obj_vertex_coordinate_t *vn = &attrib->normals[idx.vn_idx];
 
         gui_point_4d_t local_position = {v->x, v->y, v->z, 1.0f};
         face->transform_vertex[j].position = gui_3d_point4D_mul_matrix(local_position, *world);
 
         face->transform_vertex[j].u = vt->u;
         face->transform_vertex[j].v = vt->v;
-        face->transform_vertex[j].normal.x = vn->x;
-        face->transform_vertex[j].normal.y = vn->y;
-        face->transform_vertex[j].normal.z = vn->z;
+        // face->transform_vertex[j].normal.x = vn->x;
+        // face->transform_vertex[j].normal.y = vn->y;
+        // face->transform_vertex[j].normal.z = vn->z;
         // face->transform_vertex[j].normal.w = 1;
 
         // face->transform_world_vertex[j].position = face->transform_vertex[j].position;
