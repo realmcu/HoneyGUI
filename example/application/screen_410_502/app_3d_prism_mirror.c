@@ -253,7 +253,7 @@ static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *para
 
     face_flags_rotation = (int32_t)(prism_world_rot_temp.rot_y + 0.5f);
 
-    gui_prism_mirror3d_update_face_flags(prism_mirror3d);
+    gui_prism_mirror3d_update_face_flags();
     // gui_log("face: %d\n",face_flags_rotation);
 
     if (face_flags_rotation < 0 ||
