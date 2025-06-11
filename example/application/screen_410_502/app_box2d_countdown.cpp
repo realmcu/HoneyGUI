@@ -15,6 +15,7 @@ extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
     void app_box2d_time_ui_design(gui_view_t *view);
+    static void clear_mem(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
     {
@@ -22,6 +23,7 @@ extern "C" {
         .name = (const char *)CURRENT_VIEW_NAME,
         .pView = &current_view,
         .on_switch_in = app_box2d_time_ui_design,
+        .on_switch_out = clear_mem,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -71,6 +73,7 @@ struct Particle
     b2Body *body;
     NVGcolor color;
     gui_img_t *img;
+    void *img_data;
     b2Vec2 originalPos;
     float opacity;
     float scaleFactor;
@@ -176,7 +179,9 @@ void createNumber(int number)
     for (auto &p : particles)
     {
         world->DestroyBody(p.body);
-        // p.img = nullptr;
+        gui_lower_free(p.img_data);
+        gui_obj_tree_free(p.img);
+        p.img = nullptr;
     }
     particles.clear();
 
@@ -220,7 +225,7 @@ void createNumber(int number)
                                                  (int)(pos.y - PARTICLE_RADIUS),
                                                  0, 0);
 
-        particles.push_back({body, color, img, pos, 255.0f, 1.0f});
+        particles.push_back({body, color, img, img_data, pos, 255.0f, 1.0f});
     }
 }
 
@@ -301,7 +306,7 @@ void app_box2d_cb(void *obj)
             isExploding = false;
             for (auto &p : particles)
             {
-                p.img->base.not_show = true;
+                gui_obj_hidden(GUI_BASE(p.img), true);
             }
 
             if (currentNumber > 0)
@@ -337,6 +342,7 @@ void close()
         for (auto &p : particles)
         {
             world->DestroyBody(p.body);
+            gui_lower_free(p.img_data);
         }
         particles.clear();
 
@@ -368,7 +374,7 @@ int ui_design(gui_obj_t *obj)
 extern "C" {
     static void return_cb()
     {
-        app_box2d_countdown::close();
+
         gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
@@ -376,6 +382,11 @@ extern "C" {
     {
         touch_info_t *tp = tp_get_info();
         GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
+    }
+
+    static void clear_mem(gui_view_t *view)
+    {
+        app_box2d_countdown::close();
     }
 
     void app_box2d_time_ui_design(gui_view_t *view)
