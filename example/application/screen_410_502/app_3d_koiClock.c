@@ -98,7 +98,7 @@ float rotation_factor = 60.0f;
 void update_koi0()
 {
     static float theta0 = 0.0f; // starting angle for fish0
-    float angular_velocity = 0.05f; // Adjust as needed for speed
+    float angular_velocity = 0.03f; // Adjust as needed for speed
 
     // Updating position for each fish using the circular path calculation
     fish0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta0);
@@ -119,7 +119,7 @@ void update_koi0()
 void update_koi1()
 {
     static float theta1 = M_PI / 4; // starting angle for fish1
-    float angular_velocity = 0.03f; // Adjust as needed for speed
+    float angular_velocity = 0.02f; // Adjust as needed for speed
 
     fish1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta1);
     fish1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta1);
@@ -132,7 +132,7 @@ void update_koi1()
 void update_koi2()
 {
     static float theta2 = 2 * M_PI / 3; // starting angle for fish2
-    float angular_velocity = 0.03f; // Adjust as needed for speed
+    float angular_velocity = 0.02f; // Adjust as needed for speed
 
     fish2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta2);
     fish2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta2);
@@ -253,10 +253,10 @@ static void app_ui_koiclock_design(gui_view_t *view)
     gui_dispdev_t *dc = gui_get_dc();
     gui_img_create_from_mem(view, "koiclock_bg", LOTUS_BG_BIN, 0, 0, dc->screen_width,
                             dc->screen_height);
-    gui_img_t *clock_bg = gui_img_create_from_mem(view, "koiclock_bg", CLOCK_BG_BIN, 0, 46,
-                                                  dc->screen_width, dc->screen_height);
-    gui_img_set_mode(clock_bg, IMG_SRC_OVER_MODE);
-    gui_img_set_opacity(clock_bg, 230);
+    // gui_img_t *clock_bg = gui_img_create_from_mem(view, "koiclock_bg", CLOCK_BG_BIN, 0, 46,
+    //                                               dc->screen_width, dc->screen_height);
+    // gui_img_set_mode(clock_bg, IMG_SRC_OVER_MODE);
+    // gui_img_set_opacity(clock_bg, 230);
     fish0_window = gui_win_create(obj, "fish0_window", 0, 46, 48, 100);
     fish1_window = gui_win_create(obj, "fish1_window", 0, 46, 48, 100);
     fish2_window = gui_win_create(obj, "fish2_window", 0, 46, 48, 100);
