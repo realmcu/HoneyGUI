@@ -1,3 +1,4 @@
+#if 0
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -145,3 +146,4 @@ void energybox_app(gui_view_t *view)
     gui_obj_start_timer(&(energybox_3d->base));
 
 }
+#endif

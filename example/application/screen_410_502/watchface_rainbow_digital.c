@@ -122,13 +122,6 @@ static float damping = 0.1f;      // Damping coefficient
 static bool is_animating = false; // Animation state
 static int reached_target_count = 0; // Counter for layers reaching the target
 
-static uint32_t current_time;
-static uint8_t *digit5_img_bin[5] = {RAINBOWDCLOCK_NUMBER9_0_BIN,
-                                     RAINBOWDCLOCK_NUMBER9_1_BIN,
-                                     RAINBOWDCLOCK_NUMBER9_2_BIN,
-                                     RAINBOWDCLOCK_NUMBER9_3_BIN,
-                                     RAINBOWDCLOCK_NUMBER9_4_BIN
-                                    };
 // Initialize a single digit
 static void init_digit(RainbowDigit *digit, gui_win_t *win, uint8_t *img_bin[5], int x_base,
                        int y_base)
@@ -257,15 +250,6 @@ static void number_animation_cb(void *param)
     {
         // On release: Elastic reset for all digit positions
         reset_shared_offsets();
-    }
-
-    if (gui_ms_get() - current_time > 60000)
-    {
-        current_time = gui_ms_get();
-        for (int i = 4; i >= 0; i--)
-        {
-            gui_img_set_image_data(digits[3].layers[i], digit5_img_bin[i]);
-        }
     }
 }
 

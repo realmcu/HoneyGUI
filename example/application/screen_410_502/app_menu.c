@@ -34,8 +34,6 @@ const static gui_view_descriptor_t *face_view = NULL;
 const static gui_view_descriptor_t *prism_thick_view = NULL;
 const static gui_view_descriptor_t *prism3d_mirror_view = NULL;
 const static gui_view_descriptor_t *windmill_view = NULL;
-const static gui_view_descriptor_t *energybox_view = NULL;
-const static gui_view_descriptor_t *notification_view = NULL;
 const static gui_view_descriptor_t *pandkoi_view = NULL;
 const static gui_view_descriptor_t *seawater_view = NULL;
 const static gui_view_descriptor_t *firefly_view = NULL;
@@ -78,8 +76,6 @@ static int gui_view_get_other_view_descriptor_init(void)
     prism_thick_view = gui_view_descriptor_get("prism_thick_view");
     prism3d_mirror_view = gui_view_descriptor_get("prism3d_mirror_view");
     windmill_view = gui_view_descriptor_get("windmill_view");
-    energybox_view = gui_view_descriptor_get("energybox_view");
-    notification_view = gui_view_descriptor_get("notification_view");
     pandkoi_view = gui_view_descriptor_get("pandkoi_view");
     seawater_view = gui_view_descriptor_get("seawater_view");
     firefly_view = gui_view_descriptor_get("firefly_view");
@@ -192,17 +188,6 @@ void switch_APP_WINDMILL(void *obj, gui_event_t e, void *param)
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_ENERGYBOX(void *obj, gui_event_t e, void *param)
-{
-    gui_view_switch_direct(current_view, energybox_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-void switch_APP_NOTIFICATION(void *obj, gui_event_t e, void *param)
-{
-    gui_view_switch_direct(current_view, notification_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
 void switch_APP_PANDKOI(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, pandkoi_view, SWITCH_OUT_ANIMATION_FADE,
@@ -276,8 +261,6 @@ void app_menu_design(gui_view_t *view)
             PRISM_THICK_ICON_BIN,
             PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
-            ENERGYBOX_ICON_BIN,
-            NOTIFICATION_ICON_BIN,
             PANDKOI_ICON_BIN,
             SEAWATER_ICON_BIN,
             FIREFLY_ICON_BIN,
@@ -302,8 +285,6 @@ void app_menu_design(gui_view_t *view)
             "Prism Thick",
             "Prism Mirror",
             "Windmill",
-            "Energybox",
-            "Notification",
             "Pand Koi",
             "Sea Water",
             "Fire Fly",
@@ -371,30 +352,25 @@ void app_menu_design(gui_view_t *view)
                              NULL);
         gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_APP_WINDMILL, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_ENERGYBOX, GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_NOTIFICATION,
+        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_PANDKOI,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_APP_PANDKOI,
+        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_SEAWATER,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[17], (gui_event_cb_t)switch_APP_SEAWATER,
+        gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_APP_FIREFLY,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[18], (gui_event_cb_t)switch_APP_FIREFLY,
+        gui_obj_add_event_cb(tab_array[17], (gui_event_cb_t)switch_APP_RAINBOW_DIGITAL,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[19], (gui_event_cb_t)switch_APP_RAINBOW_DIGITAL,
+        gui_obj_add_event_cb(tab_array[18], (gui_event_cb_t)switch_APP_KOICLOCK,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[20], (gui_event_cb_t)switch_APP_KOICLOCK,
+        gui_obj_add_event_cb(tab_array[19], (gui_event_cb_t)switch_APP_DIGITAL_CLOCK,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[21], (gui_event_cb_t)switch_APP_DIGITAL_CLOCK,
-                             GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
-        gui_obj_add_event_cb(tab_array[22], (gui_event_cb_t)switch_APP_COUNTDOWN,
+        gui_obj_add_event_cb(tab_array[20], (gui_event_cb_t)switch_APP_COUNTDOWN,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
     }
@@ -418,8 +394,6 @@ void app_menu_design(gui_view_t *view)
             PRISM_THICK_ICON_BIN,
             PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
-            ENERGYBOX_ICON_BIN,
-            NOTIFICATION_ICON_BIN,
             PANDKOI_ICON_BIN,
             SEAWATER_ICON_BIN,
             FIREFLY_ICON_BIN,
@@ -441,8 +415,6 @@ void app_menu_design(gui_view_t *view)
             PRISM_THICK_ICON_BIN,
             PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
-            ENERGYBOX_ICON_BIN,
-            NOTIFICATION_ICON_BIN,
             PANDKOI_ICON_BIN,
             SEAWATER_ICON_BIN,
             FIREFLY_ICON_BIN,
@@ -460,15 +432,15 @@ void app_menu_design(gui_view_t *view)
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
                 {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
-                {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_ENERGYBOX, NULL},
-                {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
+                {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL},
+                {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
                 {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
 
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
                 {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
-                {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_ENERGYBOX, NULL},
-                {switch_APP_NOTIFICATION, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
+                {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL},
+                {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
                 {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL}, {switch_APP_COUNTDOWN, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,

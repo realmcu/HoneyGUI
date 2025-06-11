@@ -1,3 +1,4 @@
+#if 0
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -130,3 +131,4 @@ void notification_app(gui_view_t *view)
     gui_obj_start_timer(&(notification_3d->base));
 
 }
+#endif
