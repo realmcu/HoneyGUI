@@ -134,8 +134,10 @@ static void ui_text_font(gui_view_t *view)
     gui_text_type_set(test_name, font32vb4, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(test_name, 2);
 
-    gui_view_switch_on_event(view, left_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, right_view, VIEW_CUBE, VIEW_CUBE, GUI_EVENT_TOUCH_MOVE_LEFT);
+    gui_view_switch_on_event(view, left_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+                             SWITCH_IN_FROM_LEFT_USE_CUBE, GUI_EVENT_TOUCH_MOVE_RIGHT);
+    gui_view_switch_on_event(view, right_view, SWITCH_OUT_TO_LEFT_USE_CUBE,
+                             SWITCH_IN_FROM_RIGHT_USE_CUBE, GUI_EVENT_TOUCH_MOVE_LEFT);
 }
 
 /*============================================================================*
