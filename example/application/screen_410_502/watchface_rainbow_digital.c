@@ -332,7 +332,6 @@ void rainbow_digital_app(gui_view_t *view)
     init_digit(&digits[3], clock_win, digit4_img_bin, 195, 261);
 
     // Dots
-    srand((unsigned int)time(NULL));
     gui_win_t *dot_win = gui_win_create(obj, "clock_win", 0, 0, 0, 0);
     for (int i = 0; i < DOT_NUM; i++)
     {

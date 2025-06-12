@@ -256,14 +256,14 @@ static void gui_list_note_input_prepare(gui_obj_t *obj)
             if (x_old + obj->w <= 0 && obj->x + obj->w > 0)
             {
                 _this->is_speed_positive = true;
-                gui_obj_create_timer(obj, 20, true, gui_list_note_animate_timer_cb);
+                gui_obj_create_timer(obj, 17, true, gui_list_note_animate_timer_cb);
                 gui_obj_start_timer(obj);
                 _this->animate_cnt = 1;
             }
             else if (x_old >= list->base.w && obj->x < list->base.w)
             {
                 _this->is_speed_positive = false;
-                gui_obj_create_timer(obj, 20, true, gui_list_note_animate_timer_cb);
+                gui_obj_create_timer(obj, 17, true, gui_list_note_animate_timer_cb);
                 gui_obj_start_timer(obj);
                 _this->animate_cnt = 1;
             }
@@ -278,14 +278,14 @@ static void gui_list_note_input_prepare(gui_obj_t *obj)
             if (y_old + obj->h <= 0 && obj->y + obj->h > 0)
             {
                 _this->is_speed_positive = true;
-                gui_obj_create_timer(obj, 20, true, gui_list_note_animate_timer_cb);
+                gui_obj_create_timer(obj, 17, true, gui_list_note_animate_timer_cb);
                 gui_obj_start_timer(obj);
                 _this->animate_cnt = 1;
             }
             else if (y_old >= list->base.h && obj->y < list->base.h)
             {
                 _this->is_speed_positive = false;
-                gui_obj_create_timer(obj, 20, true, gui_list_note_animate_timer_cb);
+                gui_obj_create_timer(obj, 17, true, gui_list_note_animate_timer_cb);
                 gui_obj_start_timer(obj);
                 _this->animate_cnt = 1;
             }

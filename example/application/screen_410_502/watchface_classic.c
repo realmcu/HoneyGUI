@@ -19,10 +19,12 @@
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
 
 const static gui_view_descriptor_t *heartrate_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     heartrate_view = gui_view_descriptor_get("heartrate_view");
+    menu_view = gui_view_descriptor_get("menu_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -609,6 +611,12 @@ void switch_heartrate()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
+void switch_menu()
+{
+    gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
 void create_watchface_classic(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
@@ -672,6 +680,8 @@ void create_watchface_classic(gui_view_t *view)
     {
         gui_img_t *img_weather = gui_img_create_from_mem(win_watch, "CLOCK_CARD_WEATHER",
                                                          UI_CLOCK_CARD_WEATHER_BIN, 41, 178, 0, 0);
+        gui_obj_add_event_cb(img_weather, (gui_event_cb_t)switch_menu, GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
         gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_2", UI_WEATHER_RAIN_L_BIN, 89, 73, 0, 0);
         gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_M_BIN, 150, 73, 0, 0);

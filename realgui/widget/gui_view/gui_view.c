@@ -330,10 +330,8 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
     {
         gui_view_adjust_list(GUI_BASE(g_NextView), obj);
     }
-    else
-    {
-        gui_obj_hidden(GUI_BASE(g_NextView), true);
-    }
+
+    gui_obj_hidden(GUI_BASE(g_NextView), true);
 
     g_NextView->current_event = e;
     g_CurrentView->current_event = e;
@@ -356,7 +354,7 @@ static void __view_on_event_change_cb(gui_obj_t *obj, gui_event_t e, gui_view_on
     g_NextView->current_event = e;
     g_CurrentView->current_event = e;
 
-    gui_obj_create_timer(obj, 20, true, __view_animate_timer_cb);
+    gui_obj_create_timer(obj, 17, true, __view_animate_timer_cb);
     gui_obj_start_timer(obj);
 
     g_Release = g_CurrentView->animate_step; //prevent new view abnormal display of the first frame
@@ -618,7 +616,7 @@ gui_view_t *gui_view_create(void       *parent,
     gui_dispdev_t *dc = gui_get_dc();
     memset(_this, 0, sizeof(gui_view_t));
     _this->descriptor = descriptor;
-    _this->animate_step = 30;
+    _this->animate_step = 40;
     _this->opacity = UINT8_MAX;
     if (w == 0)
     {

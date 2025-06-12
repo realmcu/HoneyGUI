@@ -182,7 +182,7 @@ static void arc_activity_cb(NVGcontext *vg)
 static void activity_timer_cb(void *obj)
 {
     static uint16_t count = 0;
-    uint16_t count_max = 500;
+    uint16_t count_max = 250;
 
     gui_obj_timer_t *timer = img->base.timer;
 
@@ -218,7 +218,7 @@ static void win_cb(void *obj)
     gui_view_t *view = gui_view_get_current();
     if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) == 0)
     {
-        gui_obj_create_timer(GUI_BASE(img), 20, true, activity_timer_cb);
+        gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
         gui_obj_stop_timer(GUI_BASE(obj));
     }
@@ -272,8 +272,7 @@ void activity_app(gui_view_t *view)
     const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "watchface_view") == 0 || strcmp(name, "heartrate_view") == 0)
     {
-        gui_obj_create_timer(GUI_BASE(win), 100, true, win_cb);
-        gui_obj_start_timer(GUI_BASE(win));
+        gui_obj_create_timer(GUI_BASE(win), 10, true, win_cb);
         gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
                                  SWITCH_IN_FROM_LEFT_USE_CUBE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
@@ -283,10 +282,8 @@ void activity_app(gui_view_t *view)
     }
     else
     {
-        gui_obj_create_timer(GUI_BASE(img), 20, true, activity_timer_cb);
-        gui_obj_start_timer(GUI_BASE(img));
+        gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
 
-        gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
-        gui_obj_start_timer(GUI_BASE(win));
+        gui_obj_create_timer(GUI_BASE(win), 17, true, return_timer_cb);
     }
 }
