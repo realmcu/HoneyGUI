@@ -29,6 +29,7 @@
 
 gui_win_t *fireworks_win = NULL;
 static gui_img_t *current_img = NULL;
+static uint8_t *img_data = NULL;
 
 float firework_start = 50.0f;
 float firework_alpha = 255.0f;
@@ -196,18 +197,17 @@ static void create_firework_clock_cb(NVGcontext *vg)
         firework_sim_cb(vg);
     }
 }
-
 static void create_firework_clock()
 {
-    static uint8_t *previous_img_data = NULL;
-    if (previous_img_data)
+
+    if (img_data)
     {
-        gui_lower_free(previous_img_data);
-        previous_img_data = NULL;
+        gui_lower_free(img_data);
+        img_data = NULL;
     }
 
     size_t buffer_size = screenWidth * screenHeight * 4 + sizeof(gui_rgb_data_head_t);
-    uint8_t *img_data = (uint8_t *)gui_lower_malloc(buffer_size);
+    img_data = (uint8_t *)gui_lower_malloc(buffer_size);
     memset(img_data, 0, buffer_size);
 
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, screenWidth,
@@ -221,11 +221,14 @@ static void create_firework_clock()
 
     current_img = gui_img_create_from_mem(fireworks_win, 0, (void *)img_data, 0, 0, 0, 0);
 
-    previous_img_data = img_data;
 }
 static void cleanup_resources(gui_view_t *view)
 {
-
+    if (img_data)
+    {
+        gui_lower_free(img_data);
+        img_data = NULL;
+    }
 }
 
 static void drawClockHand(NVGcontext *vg, float centerX, float centerY, float length,
