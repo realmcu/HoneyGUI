@@ -77,9 +77,13 @@ struct Particle
     b2Vec2 originalPos;
     float opacity;
     float scaleFactor;
-};
+    bool isActive;
+} Particle_t;
 
-std::vector<Particle> particles;
+#define MAX_PARTICLES_IMG 140
+static Particle particles_img[MAX_PARTICLES_IMG];
+static int active_particle_count = 0;
+
 int currentNumber = COUNTDOWN_START;
 float countdownTimer = COUNTDOWN_INTERVAL;
 bool isExploding = false;
@@ -96,7 +100,67 @@ uint16_t xorshift16()
     xorshift16_state = x;
     return x;
 }
-// Definition of numerical shapes
+
+void particle_canvas_callback(NVGcontext *vg)
+{
+    NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
+    nvgBeginPath(vg);
+    nvgCircle(vg, PARTICLE_RADIUS, PARTICLE_RADIUS, PARTICLE_RADIUS);
+    nvgFillColor(vg, color);
+    nvgFill(vg);
+}
+
+void initParticlesPool()
+{
+    size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * GUI_CANVAS_OUTPUT_RGBA * 4 + sizeof(
+                             gui_rgb_data_head_t);
+
+    for (int i = 0; i < MAX_PARTICLES_IMG; i++)
+    {
+        particles_img[i].img_data = (uint8_t *)gui_lower_malloc(buffer_size);
+        memset(particles_img[i].img_data, 0, buffer_size);
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, PARTICLE_RADIUS * 2,
+                                          PARTICLE_RADIUS * 2, particle_canvas_callback, (uint8_t *)particles_img[i].img_data);
+        particles_img[i].isActive = false;
+    }
+}
+
+void resetParticles()
+{
+    for (int i = 0; i < MAX_PARTICLES_IMG; i++)
+    {
+        if (particles_img[i].isActive)
+        {
+            if (particles_img[i].body)
+            {
+                world->DestroyBody(particles_img[i].body);
+                particles_img[i].body = nullptr;
+            }
+            if (particles_img[i].img)
+            {
+                gui_obj_tree_free(particles_img[i].img);
+                particles_img[i].img = nullptr;
+            }
+            particles_img[i].isActive = false;
+        }
+    }
+    active_particle_count = 0;
+}
+
+Particle *getAvailableParticle()
+{
+    for (int i = 0; i < MAX_PARTICLES_IMG; i++)
+    {
+        if (!particles_img[i].isActive)
+        {
+            particles_img[i].isActive = true;
+            active_particle_count++;
+            return &particles_img[i];
+        }
+    }
+    return nullptr;
+}
+
 std::vector<b2Vec2> getNumberShape(int number)
 {
     std::vector<b2Vec2> shape;
@@ -165,42 +229,27 @@ std::vector<b2Vec2> getNumberShape(int number)
     return shape;
 }
 
-void particle_canvas_callback(NVGcontext *vg)
-{
-    NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
-    nvgBeginPath(vg);
-    nvgCircle(vg, PARTICLE_RADIUS, PARTICLE_RADIUS, PARTICLE_RADIUS);
-    nvgFillColor(vg, color);
-    nvgFill(vg);
-}
-
 void createNumber(int number)
 {
-    for (auto &p : particles)
-    {
-        world->DestroyBody(p.body);
-        gui_lower_free(p.img_data);
-        gui_obj_tree_free(p.img);
-        p.img = nullptr;
-    }
-    particles.clear();
+    resetParticles();
 
     // Create particles for new numbers
     auto numberShape = getNumberShape(number);
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> colorDist(100, 255);
-
-    float scale = std::min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.4f;
     // gui_log("Creating number %d with %d particles\n", number, numberShape.size());
 
     for (const auto &pos : numberShape)
     {
+        Particle *p = getAvailableParticle();
+        if (!p)
+        {
+            gui_log("No more particles available!\n");
+            break;
+        }
 
         b2BodyDef bodyDef;
         bodyDef.type = b2_dynamicBody;
         bodyDef.position.Set(pos.x / PIXELS_PER_METER, pos.y / PIXELS_PER_METER);
-        b2Body *body = world->CreateBody(&bodyDef);
+        p->body = world->CreateBody(&bodyDef);
 
         b2CircleShape circle;
         circle.m_radius = PARTICLE_RADIUS / PIXELS_PER_METER;
@@ -209,23 +258,16 @@ void createNumber(int number)
         fixtureDef.shape = &circle;
         fixtureDef.density = PARTICLE_DENSITY;
         fixtureDef.restitution = PARTICLE_RESTITUTION;
-        body->CreateFixture(&fixtureDef);
+        p->body->CreateFixture(&fixtureDef);
 
-        NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
-        size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * 4 + sizeof(
-                                 gui_rgb_data_head_t);
-        uint8_t *img_data = (uint8_t *)gui_lower_malloc(buffer_size);
-        memset(img_data, 0, buffer_size);
-
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, PARTICLE_RADIUS * 2,
-                                          PARTICLE_RADIUS * 2, particle_canvas_callback, img_data);
-
-        gui_img_t *img = gui_img_create_from_mem(parent, 0, img_data,
-                                                 (int)(pos.x - PARTICLE_RADIUS),
-                                                 (int)(pos.y - PARTICLE_RADIUS),
-                                                 0, 0);
-
-        particles.push_back({body, color, img, img_data, pos, 255.0f, 1.0f});
+        p->color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
+        p->img = gui_img_create_from_mem(parent, 0, p->img_data,
+                                         (int)(pos.x - PARTICLE_RADIUS),
+                                         (int)(pos.y - PARTICLE_RADIUS),
+                                         0, 0);
+        p->originalPos = pos;
+        p->opacity = 255.0f;
+        p->scaleFactor = 1.0f;
     }
 }
 
@@ -237,14 +279,18 @@ void explode()
     const float minScale = 0.2f;
     const float scaleDecrement = 0.02f;
 
-    for (auto &p : particles)
+    for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
-        b2Vec2 randomDir(forceDist(gen), forceDist(gen));
-        randomDir.Normalize();
-        p.body->ApplyLinearImpulse(EXPLOSION_FORCE * 0.5f * randomDir, p.body->GetWorldCenter(), true);
-        p.body->SetLinearDamping(1.0f);
-        p.body->SetAngularDamping(1.0f);
-        p.scaleFactor = 1.0f;
+        if (particles_img[i].isActive)
+        {
+            b2Vec2 randomDir(forceDist(gen), forceDist(gen));
+            randomDir.Normalize();
+            particles_img[i].body->ApplyLinearImpulse(EXPLOSION_FORCE * 0.5f * randomDir,
+                                                      particles_img[i].body->GetWorldCenter(), true);
+            particles_img[i].body->SetLinearDamping(1.0f);
+            particles_img[i].body->SetAngularDamping(1.0f);
+            particles_img[i].scaleFactor = 1.0f;
+        }
     }
 
     isExploding = true;
@@ -267,22 +313,30 @@ void app_box2d_cb(void *obj)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> scaleDist(0.5f, 1.0f);
 
-    for (auto &p : particles)
+    for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
-        float x = p.body->GetPosition().x * PIXELS_PER_METER - PARTICLE_RADIUS;
-        float y = p.body->GetPosition().y * PIXELS_PER_METER - PARTICLE_RADIUS;
-
-        if (isExploding && p.opacity > 0)
+        if (particles_img[i].isActive)
         {
-            p.opacity -= 5;
-            p.opacity = std::max(0.0f, p.opacity);
-            gui_img_set_opacity(p.img, static_cast<int>(p.opacity));
+            float x = particles_img[i].body->GetPosition().x * PIXELS_PER_METER - PARTICLE_RADIUS;
+            float y = particles_img[i].body->GetPosition().y * PIXELS_PER_METER - PARTICLE_RADIUS;
 
-            float scaleFactor = scaleDist(gen);
-            gui_img_scale(p.img, scaleFactor, scaleFactor);
+            if (isExploding && particles_img[i].opacity > 0)
+            {
+                particles_img[i].opacity -= 5;
+                particles_img[i].opacity = std::max(0.0f, particles_img[i].opacity);
+                gui_img_set_opacity(particles_img[i].img, static_cast<int>(particles_img[i].opacity));
 
-            GUI_BASE(p.img)->x = x;
-            GUI_BASE(p.img)->y = y;
+                float scaleFactor = scaleDist(gen);
+                gui_img_scale(particles_img[i].img, scaleFactor, scaleFactor);
+
+                GUI_BASE(particles_img[i].img)->x = x;
+                GUI_BASE(particles_img[i].img)->y = y;
+            }
+            else if (!isExploding)
+            {
+                GUI_BASE(particles_img[i].img)->x = x;
+                GUI_BASE(particles_img[i].img)->y = y;
+            }
         }
     }
 
@@ -304,9 +358,12 @@ void app_box2d_cb(void *obj)
         if (explosionTimer <= 0)
         {
             isExploding = false;
-            for (auto &p : particles)
+            for (int i = 0; i < MAX_PARTICLES_IMG; i++)
             {
-                gui_obj_hidden(GUI_BASE(p.img), true);
+                if (particles_img[i].isActive)
+                {
+                    gui_obj_hidden(GUI_BASE(particles_img[i].img), true);
+                }
             }
 
             if (currentNumber > 0)
@@ -339,12 +396,26 @@ void close()
 {
     if (world)
     {
-        for (auto &p : particles)
         {
-            world->DestroyBody(p.body);
-            gui_lower_free(p.img_data);
+            for (int i = 0; i < MAX_PARTICLES_IMG; i++)
+            {
+                if (particles_img[i].isActive)
+                {
+                    if (particles_img[i].body)
+                    {
+                        world->DestroyBody(particles_img[i].body);
+                        particles_img[i].body = nullptr;
+                    }
+                    particles_img[i].isActive = false;
+                }
+                if (particles_img[i].img_data)
+                {
+                    gui_lower_free(particles_img[i].img_data);
+                    particles_img[i].img_data = nullptr;
+                }
+            }
+            active_particle_count = 0;
         }
-        particles.clear();
 
         world->~b2World();
         gui_free(world);
@@ -358,6 +429,10 @@ int ui_design(gui_obj_t *obj)
     SCREEN_WIDTH = gui_get_screen_width();
     SCREEN_HEIGHT = gui_get_screen_height();
     isExploding = false;
+
+
+    // Initialize particles pool
+    initParticlesPool();
 
     b2Vec2 gravity(0.0f, 0.0f);
     world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
@@ -374,7 +449,6 @@ int ui_design(gui_obj_t *obj)
 extern "C" {
     static void return_cb()
     {
-
         gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
