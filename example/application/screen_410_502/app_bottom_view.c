@@ -15,8 +15,8 @@
 
 #define __WIN_NAME    "win_timecard"
 #define __IMG_NAME    "timecard"
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
 #define CURRENT_VIEW_NAME "app_bottom_view"
 static gui_view_t *current_view = NULL;
@@ -419,16 +419,16 @@ void bottom_view_design(gui_view_t *view)
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
     {
-        int image_h = 157,
-            image_w = 352,
-            pixel_bytes = 2;
+        int image_h = 157;
+        int image_w = 352;
+        int pixel_bytes = 4;
         size_t bg_buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         if (!img_data_bg)
         {
             img_data_bg = gui_lower_malloc(bg_buffer_size);
         }
         memset(img_data_bg, 0, bg_buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, img_bg_cb,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, img_bg_cb,
                                           img_data_bg);
     }
 
@@ -470,9 +470,9 @@ void bottom_view_design(gui_view_t *view)
         gui_text_mode_set(stand_text, LEFT);
         // activity icon
         {
-            int image_h = 100,
-                image_w = 100,
-                pixel_bytes = 4;
+            int image_h = 100;
+            int image_w = 100;
+            int pixel_bytes = 4;
             buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
             if (!img_data_activity)
             {

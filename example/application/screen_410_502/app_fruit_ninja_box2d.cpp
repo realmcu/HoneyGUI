@@ -16,8 +16,8 @@
 #include "gui_api.h"
 #include "gui_view.h"
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define HEIGHT_OFFSET 100
 
 #define CURRENT_VIEW_NAME "fruit_ninja_view"

@@ -1,21 +1,55 @@
-#include <gui_obj.h>
-#include <gui_win.h>
-#include <gui_text.h>
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdio.h>
+#include <time.h>
+#include "cJSON.h"
 #include "root_image_hongkong/ui_resource.h"
+#include "gui_obj.h"
+#include "gui_text.h"
 #include "gui_win.h"
+#include "guidef.h"
+#include "kb_algo.h"
+#include "wheel_algo.h"
+#include "gui_canvas_rect.h"
+#include "gui_view.h"
 #include "gui_server.h"
 #include "app_hongkong.h"
-#include <stdio.h>
-#include "guidef.h"
-#include "wheel_algo.h"
-#include "kb_algo.h"
-#include <time.h>
-#include "gui_view.h"
-#include "cJSON.h"
-#include "gui_canvas_rect.h"
+#include "gui_img_live.h"
 
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+typedef enum
+{
+    MESSAGE = 0,
+    OS,
+} app_name;
+
+typedef struct information
+{
+    const char *informer;
+    const char *content;
+    const char *time;
+    app_name app;
+} information_t;
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "watchface_view"
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void watchface_design(gui_view_t *view);
+#ifdef __WIN32
+char *read_file(const char *file_path);
+#endif
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* VIEW */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *app_control_view = NULL;
@@ -23,8 +57,6 @@ const static gui_view_descriptor_t *app_bottom_view = NULL;
 const static gui_view_descriptor_t *app_top_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *watchface_select_view = NULL;
-
-static void watchface_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -33,6 +65,34 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = watchface_design,
     .keep = false,
 };
+
+bool menu_style = 0;
+// char watchface_path[100];
+// uint8_t watchface_index = 1;
+char *cjson_content = NULL;
+uint8_t canvas_update_flag = 0;
+struct tm *timeinfo;
+static struct tm watch_time;
+
+/* FPS */
+static gui_text_t *t_fps;
+static gui_text_t *widget_count;
+static char fps[10];
+static char widget_count_string[20];
+static gui_text_t *mem;
+static gui_text_t *low_mem;
+static char mem_string[20];
+static char low_mem_string[20];
+
+#ifdef _WIN32
+uint8_t resource_root[1024 * 1024 * 20];
+const char *filename =
+    "./example/application/screen_410_502/root_image_hongkong/web/peripheral_simulation/json/simulation_data.json";
+#endif
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -55,10 +115,47 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-bool menu_style = 0;
-// char watchface_path[100];
-// uint8_t watchface_index = 1;
+static void gui_fps_cb(void *p)
+{
+    int fps_num = gui_fps();
+    sprintf(fps, "FPS:%d", fps_num);
+    gui_text_content_set(t_fps, fps, strlen(fps));
+    int widget_count_number = gui_get_obj_count();
+    sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
+    gui_text_content_set(widget_count, widget_count_string, strlen(widget_count_string));
+    uint32_t mem_number =  gui_mem_used();
+    uint32_t low_mem_number =  gui_low_mem_used();
+    sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
+    gui_text_content_set(mem, mem_string, strlen(mem_string));
+    sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
+    gui_text_content_set(low_mem, low_mem_string, strlen(low_mem_string));
 
+}
+
+static void fps_create(void *parent)
+{
+    char *text;
+    int font_size = 24;
+    gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
+                                                     gui_get_screen_width() / 2 - 140 / 2, 0, 140, 70, APP_COLOR_GRAY_OPACITY(150));
+    gui_obj_create_timer(GUI_BASE(rect), 17, true, gui_fps_cb);
+    sprintf(fps, "FPS:%d", gui_fps());
+    text = fps;
+    t_fps = gui_text_create(rect, "WIDGET gui_fps_text", 10, 0, gui_get_screen_width(), font_size);
+    gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(t_fps, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+    widget_count = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16, gui_get_screen_width(),
+                                   font_size);
+    gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(widget_count, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+    mem = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16 * 2, gui_get_screen_width(), font_size);
+    gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+    low_mem = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16 * 3, gui_get_screen_width(),
+                              font_size);
+    gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(low_mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+}
 
 static void kb_button_cb()
 {
@@ -100,69 +197,19 @@ static void kb_button_cb()
         time_press = kb->timestamp_ms_press;
         hold = 1;
     }
-    // kb_info_t *kb = kb_get_info();
-    // if (kb->short_click_twice)
-    // {
-    //     gui_log("change menu style\n");
-    //     extern uint8_t menu_style;
-    //     menu_style++;
-    //     menu_style %= 3;
-    // }
 }
 
-
-char *cjson_content = NULL;
-uint8_t canvas_update_flag = 0;
-struct tm *timeinfo;
-static struct tm watch_time;
-
-static uint16_t seed = 12345;
-uint16_t xorshift16()
+static uint16_t xorshift16()
 {
+    static uint16_t seed = 12345;
     seed ^= seed << 6;
     seed ^= seed >> 9;
     seed ^= seed << 2;
     return seed;
 }
 
-#if defined __WIN32
-const char *filename =
-    "./example/application/screen_410_502/root_image_hongkong/web/peripheral_simulation/json/simulation_data.json";
-/* read CJSON to string */
-char *read_file(const char *file_path)
-{
-    const char *path = NULL;
-    if (!file_path)
-    {
-        path = filename;
-    }
-    else
-    {
-        path = file_path;
-    }
-    FILE *file = fopen(path, "r");
-    if (!file)
-    {
-        perror("fopen");
-        return NULL;
-    }
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    char *content = (char *)malloc(length + 1);
-    if (content)
-    {
-        fread(content, 1, length, file);
-        content[length] = '\0';
-    }
-    fclose(file);
-    return content;
-}
-#else
-// #include "tuya_ble_feature_weather.h"
-// #include "watch_clock.h"
-#include "cJSON.h"
-void json_refreash()
+#ifndef __WIN32
+static void json_refreash()
 {
     uint16_t degree = xorshift16() % 359;
     uint16_t move = xorshift16() % 20000;
@@ -226,7 +273,16 @@ void json_refreash()
     cJSON_Delete(root);
     canvas_update_flag = 0b1111;
     // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
-//    gui_log("cjson_content: %s\n", cjson_content);
+    // gui_log("cjson_content: %s\n", cjson_content);
+}
+static void data_generate_task_entry()
+{
+    while (true)
+    {
+        extern void json_refreash();
+        json_refreash();
+        gui_thread_mdelay(2000);
+    }
 }
 #endif
 
@@ -253,12 +309,8 @@ static void win_cb()
     // extern struct tm watch_clock_get(void);
     // watch_time = watch_clock_get();
     timeinfo = &watch_time;
-    // gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
-    // gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
     // json_refreash();
-//        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
-    // kb_button_cb();
 }
 
 static void watchface_design(gui_view_t *view)
@@ -324,40 +376,15 @@ static void watchface_design(gui_view_t *view)
     //     break;
     // }
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
-    gui_obj_create_timer(GUI_BASE(win), 2000, true, win_cb);
+    gui_obj_create_timer(GUI_BASE(win), 500, true, win_cb);
 
     gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
 }
-#ifndef __WIN32
-static void data_generate_task_entry()
-{
-    while (true)
-    {
-        extern void json_refreash();
-        json_refreash();
-        gui_thread_mdelay(2000);
-    }
-}
-#endif
 
-typedef enum
-{
-    MESSAGE = 0,
-    OS,
-} app_name;
-
-typedef struct information
-{
-    const char *informer;
-    const char *content;
-    const char *time;
-    app_name app;
-} information_t;
-static char *content = NULL;
-#if 1
 static void inform_generate_task_entry()
 {
+    static char *content = NULL;
     while (true)
     {
         gui_thread_mdelay(2000);
@@ -392,61 +419,7 @@ static void inform_generate_task_entry()
         gui_send_msg_to_server(&msg);
     }
 }
-#endif
-#if defined _WIN32
-uint8_t resource_root[1024 * 1024 * 20];
-#endif
 
-static gui_text_t *t_fps;
-static gui_text_t *widget_count;
-static char fps[10];
-static char widget_count_string[20];
-static gui_text_t *mem;
-static gui_text_t *low_mem;
-static char mem_string[20];
-static char low_mem_string[20];
-
-static void gui_fps_cb(void *p)
-{
-    int fps_num = gui_fps();
-    sprintf(fps, "FPS:%d", fps_num);
-    gui_text_content_set(t_fps, fps, strlen(fps));
-    int widget_count_number = gui_get_obj_count();
-    sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
-    gui_text_content_set(widget_count, widget_count_string, strlen(widget_count_string));
-    uint32_t mem_number =  gui_mem_used();
-    uint32_t low_mem_number =  gui_low_mem_used();
-    sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
-    gui_text_content_set(mem, mem_string, strlen(mem_string));
-    sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
-    gui_text_content_set(low_mem, low_mem_string, strlen(low_mem_string));
-
-}
-
-static void fps_create(void *parent)
-{
-    char *text;
-    int font_size = 24;
-    gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
-                                                     gui_get_screen_width() / 2 - 140 / 2, 0, 140, 70, APP_COLOR_GRAY_OPACITY(150));
-    gui_obj_create_timer(GUI_BASE(rect), 17, true, gui_fps_cb);
-    sprintf(fps, "FPS:%d", gui_fps());
-    text = fps;
-    t_fps = gui_text_create(rect, "WIDGET gui_fps_text", 10, 0, gui_get_screen_width(), font_size);
-    gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(t_fps, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-    widget_count = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16, gui_get_screen_width(),
-                                   font_size);
-    gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(widget_count, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-    mem = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16 * 2, gui_get_screen_width(), font_size);
-    gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-    low_mem = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16 * 3, gui_get_screen_width(),
-                              font_size);
-    gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(low_mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-}
 
 static void app_hongkong_ui_design(void)
 {
@@ -461,10 +434,12 @@ static void app_hongkong_ui_design(void)
 #else
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, TUYA_CJSON_BIN, 700);
-    // extern void json_refreash();
     // json_refreash();
     // canvas_update_flag = 0b1111;
 #endif
+    // gui_video_t *vedio = gui_video_create_from_mem(gui_obj_get_root(), "earth", (void *)WATCH_FACE_EARTH_1_MJPEG, 0, 0, 410,
+    //                           502);
+    //                           return;
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, &descriptor, 0, 0, 0, 0);
     fps_create(gui_obj_get_root());
@@ -472,23 +447,23 @@ static void app_hongkong_ui_design(void)
 
 static int app_init(void)
 {
-#if defined _WIN32
+#ifdef _WIN32
     extern int open(const char *file, int flags, ...);
     extern int read(int fd, void *buf, size_t len);
     extern int close(int fd);
     defaultPath = "example\\application\\screen_410_502\\root_image_hongkong\\root\\";
     int fd;
-    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x7044F000).bin", 0);
+    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x704BB000).bin", 0);
     if (fd > 0)
     {
-        printf("open root(0x7044F000).bin Successful!\n");
+        printf("open root(0x704BB000).bin Successful!\n");
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
-        printf("open root(0x7044F000).bin Fail!\n");
-        printf("open root(0x7044F000).bin Fail!\n");
-        printf("open root(0x7044F000).bin Fail!\n");
+        printf("open root(0x704BB000).bin Fail!\n");
+        printf("open root(0x704BB000).bin Fail!\n");
+        printf("open root(0x704BB000).bin Fail!\n");
         return 0;
     }
 #else
@@ -499,5 +474,42 @@ static int app_init(void)
 
     return 0;
 }
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+#if defined __WIN32
+/* read CJSON to string */
+char *read_file(const char *file_path)
+{
+    const char *path = NULL;
+    if (!file_path)
+    {
+        path = filename;
+    }
+    else
+    {
+        path = file_path;
+    }
+    FILE *file = fopen(path, "r");
+    if (!file)
+    {
+        perror("fopen");
+        return NULL;
+    }
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *content = (char *)malloc(length + 1);
+    if (content)
+    {
+        fread(content, 1, length, file);
+        content[length] = '\0';
+    }
+    fclose(file);
+    return content;
+}
+#endif
+
 
 GUI_INIT_APP_EXPORT(app_init);

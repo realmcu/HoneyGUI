@@ -6,8 +6,8 @@
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define APP_NUM 4
 #if 0
 typedef struct gui_sidebar_app

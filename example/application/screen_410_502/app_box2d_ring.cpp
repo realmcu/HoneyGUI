@@ -18,6 +18,7 @@ extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
     void app_box2d_ring_ui_design(gui_view_t *view);
+    void close_box2d_ring(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
     {
@@ -25,6 +26,7 @@ extern "C" {
         .name = (const char *)CURRENT_VIEW_NAME,
         .pView = &current_view,
         .on_switch_in = app_box2d_ring_ui_design,
+        .on_switch_out = close_box2d_ring,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -63,14 +65,11 @@ const float EFFECT_RADIUS = 20.0f; // Effect radius of the finger
 constexpr float MINIMUM_LINEAR_VELOCITY = 5.0f; // Minimum linear velocity to avoid stopping
 constexpr float MAX_ANGULAR_VELOCITY = 15.0f; // Maximum angular velocity for balls
 gui_obj_t *parent;
-gui_canvas *this_widget;
-NVGcontext *vg = nullptr; // NanoVG context
 b2World *world = nullptr; // Box2D world
 float OUTER_RING_RADIUS; // Outer ring radius
 float INNER_RING_RADIUS; // Inner ring radius
 int SCREEN_WIDTH; // Screen width
 int SCREEN_HEIGHT; // Screen height
-static const uint8_t *img_array[BALL_COUNT] = {NULL};
 
 struct Ball
 {
@@ -191,11 +190,6 @@ bool init()
 
     gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    if (!win)
-    {
-        return false; // Handle window creation failure
-    }
-
     // Set the animation function of the window
     gui_obj_create_timer(GUI_BASE(win), 20, true, app_box2d_cb);
     gui_obj_start_timer(GUI_BASE(win));
@@ -210,9 +204,9 @@ void close()
 {
     if (world)
     {
-        for (uint8_t ball_cnt = 0; ball_cnt < BALL_COUNT; ++ball_cnt)
+        for (Ball &ball : balls)
         {
-            gui_free((void *)img_array[ball_cnt++]);
+            gui_free((void *)gui_img_get_image_data(ball.img));
         }
         balls.clear();
         win_release_callback();
@@ -258,7 +252,7 @@ void createBalls(b2World *world)
         float ballX = (SCREEN_WIDTH / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * cos(
                            angle)); // Position the ball between two rings
         float ballY = (SCREEN_HEIGHT / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * sin(angle));
-        // gui_log("ball_%d %f,%f\n", i, ballX, ballY);
+        gui_log("ball_%d %f,%f\n", i, ballX, ballY);
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody; // Set as dynamic body
         ballBodyDef.position.Set(ballX / PIXELS_PER_METER, ballY / PIXELS_PER_METER);
@@ -332,7 +326,6 @@ void render()
         // gui_canvas_rect_create(parent, 0, 0,0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(BACKGROUND_COLOR.r*255, BACKGROUND_COLOR.g*255, BACKGROUND_COLOR.b*255, BACKGROUND_COLOR.a*255));
     }
 
-    uint8_t ball_cnt = 0;
     // Draw balls
     for (Ball &ball : balls)
     {
@@ -340,7 +333,7 @@ void render()
         float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
 
 
-        size_t buffer_size = BALL_RADIUS * BALL_RADIUS * 4 * GUI_CANVAS_OUTPUT_RGBA * 4 + sizeof(
+        size_t buffer_size = BALL_RADIUS * BALL_RADIUS * 4 * 4 + sizeof(
                                  gui_rgb_data_head_t);
         uint8_t *img_data = (uint8_t *)gui_lower_malloc(buffer_size);
         memset(img_data, 0, buffer_size);
@@ -351,22 +344,19 @@ void render()
                                                  ballY - BALL_RADIUS, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         ball.img = img;
-        img_array[ball_cnt++] = img_data;
     }
+    gui_log("count: %d\n", count);
 }
 
 // Main function
 int ui_design(gui_obj_t *obj)
 {
     parent = obj;
-    // render();
-    // return 1;
 
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
 
     world_mem = gui_malloc(sizeof(b2World));
     world = new (world_mem) b2World(gravity);
-    // world = new b2World(gravity);
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
@@ -403,12 +393,7 @@ extern "C" {
         gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
         app_box2d_ring::ui_design(obj);
     }
-    void app_box2d_ring_watchface(gui_obj_t *obj)
-    {
-        app_box2d_ring::close();
-        app_box2d_ring::ui_design(obj);
-    }
-    void close_box2d_ring(void)
+    void close_box2d_ring(gui_view_t *view)
     {
         app_box2d_ring::close();
     }

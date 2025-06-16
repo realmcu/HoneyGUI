@@ -11,8 +11,8 @@
 #include "gui_list.h"
 #include "tp_algo.h"
 #include "gui_canvas_rect.h"
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
 
 #define MENU_GAP 125
@@ -348,8 +348,11 @@ void app_menu_design(gui_view_t *view)
             char *text = text_array[i];
             int font_size = 32;
             gui_text_t *t = gui_text_create(tab, "txt", 180, 27, gui_get_screen_width(), font_size);
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 0, 0), strlen(text), font_size);
-            gui_text_type_set(t, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+            // gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 0, 0), strlen(text), font_size);
+            // gui_text_type_set(t, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+            gui_text_set(t, text, GUI_FONT_SRC_TTF, gui_rgb(0, 0, 0), strlen(text), font_size);
+            gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+            gui_text_rendermode_set(t, 2);
         }
         gui_obj_add_event_cb(tab_array[0], (gui_event_cb_t)switch_APP_HEART_RATE,  GUI_EVENT_TOUCH_CLICKED,
                              NULL);

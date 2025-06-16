@@ -1,25 +1,40 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <math.h>
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
 #include "time.h"
 #include "tp_algo.h"
-#include <math.h>
 #include "cJSON.h"
 #include "gui_canvas_img.h"
 #include "gui_canvas_rect.h"
 #include "guidef.h"
 #include "app_hongkong.h"
 
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
 
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
 const static gui_view_descriptor_t *heartrate_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
+
+
+
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
@@ -627,9 +642,9 @@ void create_watchface_classic(gui_view_t *view)
 
     // temperature
     {
-        int image_h = 100,
-            image_w = 100,
-            pixel_bytes = 4;
+        int image_h = 100;
+        int image_w = 100;
+        int pixel_bytes = 4;
         buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         if (!img_data_temperature)
         {

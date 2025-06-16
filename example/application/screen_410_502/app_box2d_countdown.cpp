@@ -212,7 +212,7 @@ void createNumber(int number)
         body->CreateFixture(&fixtureDef);
 
         NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
-        size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * GUI_CANVAS_OUTPUT_RGBA * 4 + sizeof(
+        size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * 4 + sizeof(
                                  gui_rgb_data_head_t);
         uint8_t *img_data = (uint8_t *)gui_lower_malloc(buffer_size);
         memset(img_data, 0, buffer_size);

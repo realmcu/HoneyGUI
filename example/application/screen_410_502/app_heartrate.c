@@ -11,8 +11,8 @@
 #include "app_hongkong.h"
 #include "gui_view.h"
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
@@ -87,6 +87,10 @@ static void win_hb_cb(void *obj)
     }
     canvas_update_flag = 0b1111;
 #endif
+}
+
+static void timer_cb(void *p)
+{
     touch_info_t *tp = tp_get_info();
     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
 }
@@ -328,9 +332,9 @@ static void heart_rate_app(gui_view_t *view)
         gui_text_rendermode_set(t, 2);
     }
     {
-        int image_h = 300,
-            image_w = SCREEN_WIDTH,
-            pixel_bytes = 4;
+        int image_h = 300;
+        int image_w = SCREEN_WIDTH;
+        int pixel_bytes = 4;
         buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         if (img_data == NULL)
         {
@@ -421,6 +425,7 @@ static void heart_rate_app(gui_view_t *view)
         gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
                                  SWITCH_IN_FROM_LEFT_USE_CUBE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
+        return;
     }
     else if (strcmp(name, "menu_view") == 0)
     {
@@ -430,4 +435,5 @@ static void heart_rate_app(gui_view_t *view)
     {
         pre_view = watchface_view;
     }
+    gui_obj_create_timer(GUI_BASE(view), 17, true, timer_cb);
 }

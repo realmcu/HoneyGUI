@@ -12,8 +12,8 @@
 #include "app_hongkong.h"
 #include "tp_algo.h"
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
 #define CURRENT_VIEW_NAME "activity_view"
 
@@ -52,10 +52,11 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
+#define COUNT_MAX 250
 extern char *cjson_content;
 static uint8_t *img_data = NULL;
 static gui_img_t *img;
-static float progress = 0;
+static uint16_t count = 0;
 static bool draw_flag = 0;
 static size_t buffer_size = 0;
 static char move_content[30], ex_content[30], stand_content[30];
@@ -68,6 +69,8 @@ void clear_activity(gui_view_t *view)
     {
         gui_lower_free(img_data);
         img_data = NULL;
+
+        count = COUNT_MAX;
     }
 }
 
@@ -136,6 +139,7 @@ static void arc_activity_cb(NVGcontext *vg)
     uint8_t line_width = 16;
     uint8_t radius_max = 100 - line_width / 2;
     uint8_t interval = 5;
+    float progress = count / (float)COUNT_MAX;
 
     nvgBeginPath(vg);
     nvgArc(vg, 100, 100, radius_max, 3 * M_PI / 2,
@@ -181,22 +185,17 @@ static void arc_activity_cb(NVGcontext *vg)
 // cppcheck-suppress syntaxError
 static void activity_timer_cb(void *obj)
 {
-    static uint16_t count = 0;
-    uint16_t count_max = 250;
-
     gui_obj_timer_t *timer = img->base.timer;
 
     count += timer->interval_ms;
-    progress = count / (float)count_max;
     uint8_t *img_data = (void *)gui_img_get_image_data(img);
     memset(img_data, 0, buffer_size);
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 200, 200, arc_activity_cb, img_data);
     gui_img_set_image_data(img, img_data);
     gui_img_refresh_size(img);
-    if (count >= count_max)
+    if (count >= COUNT_MAX)
     {
         count = 0;
-        progress = 0;
         gui_obj_stop_timer(GUI_BASE(img));
     }
 }
@@ -218,6 +217,7 @@ static void win_cb(void *obj)
     gui_view_t *view = gui_view_get_current();
     if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) == 0)
     {
+        count = 0;
         gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
         gui_obj_stop_timer(GUI_BASE(obj));
@@ -251,27 +251,28 @@ void activity_app(gui_view_t *view)
         gui_text_mode_set(stand_text, LEFT);
         gui_text_rendermode_set(stand_text, 2);
     }
+    // img
+    int image_h = 200;
+    int image_w = 200;
+    int pixel_bytes = 4;
+    buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    if (img_data == NULL)
     {
-        int image_h = 200,
-            image_w = 200,
-            pixel_bytes = 4;
-        buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        if (img_data == NULL)
-        {
-            img_data = gui_lower_malloc(buffer_size);
-            // gui_log("enter gui_lower_malloc\n");
-        }
-        memset(img_data, 0, buffer_size);
-        // gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb, img_data);
-        img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
-                                      50, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img_data = gui_lower_malloc(buffer_size);
+        // gui_log("enter gui_lower_malloc\n");
     }
+    memset(img_data, 0, buffer_size);
+    img = gui_img_create_from_mem(obj, 0, (void *)img_data, 50,
+                                  50, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     draw_flag = 0;
 
     const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "watchface_view") == 0 || strcmp(name, "heartrate_view") == 0)
     {
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb,
+                                          img_data);
+        gui_img_refresh_size(img);
         gui_obj_create_timer(GUI_BASE(win), 10, true, win_cb);
         gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
                                  SWITCH_IN_FROM_LEFT_USE_CUBE,
@@ -282,6 +283,7 @@ void activity_app(gui_view_t *view)
     }
     else
     {
+        count = 0;
         gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
 
         gui_obj_create_timer(GUI_BASE(win), 17, true, return_timer_cb);

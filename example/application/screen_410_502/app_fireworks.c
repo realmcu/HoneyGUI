@@ -320,7 +320,7 @@ static void firework_sim_cb(NVGcontext *vg)
         float spreadAngle = baseAngle;
 
         //(25-60)
-        float length = 25.0 + ((float)rand() / RAND_MAX) * 30.0;
+        float length = 25.0 + ((float)rand() / (float)RAND_MAX) * 30.0;
 
         float endX = startX + cos(spreadAngle) * length;
         float endY = startY + sin(spreadAngle) * length;
@@ -329,7 +329,7 @@ static void firework_sim_cb(NVGcontext *vg)
         int g = rand() % 255;
         int b = rand() % 255;
         NVGcolor lineColor = nvgRGBA(r, g, b, firework_alpha);
-        float startWidth = 5.0 + ((float)rand() / RAND_MAX) * 2.0;
+        float startWidth = 5.0 + ((float)rand() / (float)RAND_MAX) * 2.0;
         float endWidth = 1.0;
 
         drawTaperedLine(vg, endX, endY, startX, startY, startWidth, endWidth, lineColor);

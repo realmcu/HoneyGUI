@@ -10,8 +10,8 @@
 
 
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
 #define CURRENT_VIEW_NAME "app_control_view"
 

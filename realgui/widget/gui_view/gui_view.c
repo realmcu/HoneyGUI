@@ -49,7 +49,7 @@ static bool g_TriggerMove = false; // whether trigger move event
 static int16_t g_Offset = 0; // offset of the g_Release
 static bool g_OffsetNeedUpdate = false;
 
-
+static bool g_SwitchDone = false;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -101,12 +101,11 @@ static void __released_view_timer_cb(void *obj)
         {
             gui_view_not_show(g_NextView);
         }
-        g_SurpressEvent = false;
+        g_SwitchDone = true;
         g_Release = 0;
         g_NextView = NULL;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
-        // gui_log("preview name = %s, current view name = %s\n", g_PreView->base.name,
-        //          g_CurrentView->base.name);
+        // gui_log("current view name = %s\n", g_CurrentView->base.name);
 
         gui_obj_delete_timer(obj);
     }
@@ -141,11 +140,10 @@ static void __view_animate_timer_cb(void *obj)
         {
             g_PreView = NULL;
         }
-
+        g_SwitchDone = true;
         g_CurrentView = g_NextView;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         g_NextView = NULL;
-        g_SurpressEvent = false;
     }
 }
 
@@ -161,7 +159,7 @@ static void __view_released_cb(void *obj, gui_event_t e, void *param)
     gui_obj_t *o = (gui_obj_t *)_this;
     // gui_log("name = %s, detalX = %d, detalY = %d\n", o->name, tp->deltaX, tp->deltaY);
 
-    gui_obj_create_timer(o, 20, true, __released_view_timer_cb);
+    gui_obj_create_timer(o, 17, true, __released_view_timer_cb);
     gui_obj_start_timer(o);
 
     g_SurpressTP = true;
@@ -319,6 +317,10 @@ static void __view_on_event_trigger_move_cb(gui_obj_t *obj, gui_event_t e,
 {
     // gui_log("enter event_trigger_move_cb \n");
     g_SurpressTP = false;
+    // if (g_NextView != NULL && *on_event->descriptor->pView == g_NextView)
+    // {
+    //     return;
+    // }
 
     gui_view_t *next_view_rec = g_NextView;
     g_NextView = gui_view_create(obj->parent, on_event->descriptor, 0, 0, 0, 0);
@@ -418,6 +420,19 @@ static void gui_view_prepare(gui_obj_t *obj)
     obj->opacity_value = _this->opacity;
     _this->base.need_preprocess = false;
 
+    if (!g_SurpressEvent && _this == g_CurrentView)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_CLICKED);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP);
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
+        g_SwitchDone = false;
+    }
+
     if (!g_SurpressTP && _this == g_CurrentView)
     {
         // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
@@ -444,18 +459,6 @@ static void gui_view_prepare(gui_obj_t *obj)
                 g_OffsetNeedUpdate = true;
             }
         }
-    }
-
-    if (!g_SurpressEvent && _this == g_CurrentView)
-    {
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_LONG);
-        gui_obj_enable_event(obj, GUI_EVENT_KB_SHORT_CLICKED);
-        gui_obj_enable_event(obj, GUI_EVENT_KB_LONG_CLICKED);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP);
-        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
     }
 
     if (_this->current_transition_style == SWITCH_INIT_STATE) {}
@@ -525,6 +528,11 @@ static void gui_view_end(gui_obj_t *obj)
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
+
+    if (_this == g_CurrentView && g_SwitchDone)
+    {
+        g_SurpressEvent = false;
+    }
     if (obj->need_preprocess)
     {
         gui_view_t *_this = (gui_view_t *)obj;
@@ -747,7 +755,7 @@ void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *desc
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style)
 {
-    if (g_SurpressEvent) { return; }
+    if (g_SurpressEvent || g_SwitchDone) { return; }
     gui_view_switch_on_event(_this, descriptor, switch_out_style, switch_in_style, GUI_EVENT_INVALIDE);
 }
 

@@ -13,8 +13,8 @@
 #include "gui_list.h"
 
 
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define TAB_HEIGHT 220
 #define TAB_INTERVAL 20
 #define TAB_START 140
@@ -425,9 +425,9 @@ static void create_inform_note(information_t *inform)
 static void list_timer_cb(void *param)
 {
     struct touch_info *tp = tp_get_info();
-    if (!tp->pressing && !clear_flag)
+    if (!tp->pressing && !clear_flag && list->offset != (SCREEN_HEIGHT - list->total_length))
     {
-        while (infor_need_update_num) //need fix by shel deng
+        while (infor_need_update_num)
         {
             infor_need_update_num--;
             create_inform_note(infor_rec[0]);

@@ -8,8 +8,8 @@
 #include <time.h>
 
 #if 0
-#define SCREEN_WIDTH 410
-#define SCREEN_HEIGHT 502
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
 static gui_img_t *h_hand, *m_hand, *s_hand;
 
