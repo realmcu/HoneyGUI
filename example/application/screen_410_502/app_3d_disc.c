@@ -126,6 +126,20 @@ static gui_3d_matrix_t disc_face_cb(gui_3d_t *this, size_t face_index)
     gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
                              rot_z_angle, 1);
 
+    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+
+    return transform_matrix;
+
+}
+
+static gui_3d_matrix_t disc_cube_face_cb(gui_3d_t *this, size_t face_index)
+{
+    gui_3d_matrix_t face_matrix;
+    gui_3d_matrix_t transform_matrix;
+
+    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
+                             rot_z_angle, 1);
+
     uint8_t cube_index = face_index / 6;
     if (cube_index < CUBE_COUNT)
     {
@@ -146,11 +160,17 @@ void disc_app(gui_view_t *view)
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
 
     gui_3d_t *disc_3d = gui_3d_create(obj, "3d-widget", DESC_DISC_BIN,
-                                      GUI_3D_DRAW_FRONT_AND_SORT, 15, 60, 380,
+                                      GUI_3D_DRAW_FRONT_ONLY, 15, 60, 380,
                                       380);
-
     gui_3d_set_global_transform_cb(disc_3d, (gui_3d_global_transform_cb)disc_global_cb);
     gui_3d_set_face_transform_cb(disc_3d, (gui_3d_face_transform_cb)disc_face_cb);
+
+    gui_3d_t *disc_cube = gui_3d_create(obj, "3d-widget", DESC_DISC_CUBE_BIN,
+                                        GUI_3D_DRAW_FRONT_AND_SORT, 15, 60, 380,
+                                        380);
+
+    gui_3d_set_global_transform_cb(disc_cube, (gui_3d_global_transform_cb)disc_global_cb);
+    gui_3d_set_face_transform_cb(disc_cube, (gui_3d_face_transform_cb)disc_cube_face_cb);
 
     gui_obj_create_timer(&(disc_3d->base), 1, true, update_disc_animation);
     gui_obj_start_timer(&(disc_3d->base));

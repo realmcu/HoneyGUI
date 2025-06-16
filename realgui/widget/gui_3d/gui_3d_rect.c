@@ -209,16 +209,16 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->combined_img->data;
     head->w = width;
     head->h = height;
-    head->type = ARGB8888;
+    head->type = RGB565;
 
     uint32_t *pixelData = (uint32_t *)((unsigned char *)this->combined_img->data + sizeof(
                                            gui_rgb_data_head_t));
     float *depthBuffer = gui_malloc(width * height * sizeof(float));
     memset(depthBuffer, 0x00, width * height * sizeof(float));
 
-    uint32_t color_value = 0xFFFFFFFF; // default white color
+    uint16_t color_value = 0;
     uint8_t opacity_value = UINT8_MAX;
-    GUI_3D_FILL_TYPE fill_type = GUI_3D_FILL_COLOR_ARGB8888;
+    GUI_3D_FILL_TYPE fill_type = GUI_3D_FILL_COLOR_RGB565;
     void *fill_data = NULL;
 
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
@@ -247,15 +247,16 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
                 uint8_t color_r = (uint8_t)(*(color_diffuse) * 255);
                 uint8_t color_g = (uint8_t)(*(color_diffuse + 1) * 255);
                 uint8_t color_b = (uint8_t)(*(color_diffuse + 2) * 255);
-                uint8_t color_a = opacity_value;
 
-                color_value = (color_a << 24) | (color_r << 16) | (color_g << 8) | color_b;
+                color_value = ((color_r & 0xF8) << 8) |
+                              ((color_g & 0xFC) << 3) |
+                              ((color_b & 0xF8) >> 3);
                 fill_data = &color_value;
-                fill_type = GUI_3D_FILL_COLOR_ARGB8888;
+                fill_type = GUI_3D_FILL_COLOR_RGB565;
             }
             else // Fill with material image
             {
-                fill_type = GUI_3D_FILL_IMAGE;
+                fill_type = GUI_3D_FILL_IMAGE_RGB565;
             }
         }
         else
@@ -263,8 +264,9 @@ static void gui_3d_generate_rect_img(gui_3d_t *this, int width, int height)
             float nz = this->face.rect_face[i].transform_vertex[0].normal.z;
             uint8_t color_intensity = (uint8_t)(255 * fmaxf(0.0f, fminf(1.0f, nz)));
 
-            color_value = (opacity_value << 24) | (color_intensity << 16) | (color_intensity << 8) |
-                          color_intensity;
+            color_value = ((color_intensity & 0xF8) << 8) |
+                          ((color_intensity & 0xFC) << 3) |
+                          ((color_intensity & 0xF8) >> 3);
             fill_data = &color_value;
         }
 
