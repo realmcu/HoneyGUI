@@ -304,8 +304,8 @@ static void __view_transition(gui_view_t *_this, int16_t release)
     {
         gui_view_reduction(_this, release);
     }
-    else if (_this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR ||
-             _this->current_transition_style == SWITCH_IN_STILL_USE_BLUR)
+    else if ((_this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR ||
+              _this->current_transition_style == SWITCH_IN_STILL_USE_BLUR) && blur_prepare != NULL)
     {
         _this->base.need_preprocess = true;
         gui_view_blur(_this, release);
@@ -597,6 +597,8 @@ gui_view_t *gui_view_create(void       *parent,
                             int16_t     w,
                             int16_t     h)
 {
+    GUI_ASSERT(descriptor != NULL);
+
     if (*descriptor->pView) // don't recreate view whether keep set of not
     {
         gui_view_t *_this = *descriptor->pView;
