@@ -15,7 +15,7 @@
 #include "gui_view.h"
 #include "gui_server.h"
 #include "app_hongkong.h"
-// #include "gui_img_live.h"
+#include "gui_video.h"
 
 /*============================================================================*
  *                           Types

@@ -507,6 +507,12 @@ void gui_img_refresh_size(gui_img_t *_this)
     _this->base.h = gui_img_get_height(_this);
 }
 
+void gui_img_refresh_draw_data(gui_img_t  *this)
+{
+    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
+    GUI_ASSERT(this->data != NULL);
+    this->draw_img->data = this->data;
+}
 
 void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)
 {

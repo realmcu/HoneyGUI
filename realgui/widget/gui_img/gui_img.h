@@ -117,6 +117,7 @@ uint16_t gui_img_get_height(gui_img_t *_this);
  */
 void gui_img_refresh_size(gui_img_t *_this);
 
+void gui_img_refresh_draw_data(gui_img_t  *_this);
 /**
  * @brief Set the image's blend mode.
  *
