@@ -65,13 +65,12 @@ gui_img_t *butterfly_wing4 = NULL;
 gui_3d_t *butterfly_particle_3d = NULL;
 
 static float wing_angle = 0.0f;
+static float wing_time = 0.0f;
 static float butterfly_x = 0.0f;
 static float butterfly_y = 0.0f;
 static float butterfly_z = 0.0f;
 static float butterfly_rz = 0.0f;
 
-static float move_speed = 0.02f;
-static float wing_time = 0.0f;
 
 typedef enum
 {
@@ -252,7 +251,7 @@ static void butterfly_particle_global_cb(gui_3d_t *this)
                                  90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
-                             4);
+                             4.5);
 
 }
 
@@ -295,7 +294,7 @@ typedef struct
     uint32_t spawn_time; // Time when particle was spawned
 } Particle;
 
-#define MAX_PARTICLES 50
+#define MAX_PARTICLES 100
 static Particle particles[MAX_PARTICLES];
 static gui_win_t *particle_win = NULL;
 static uint32_t last_particle_spawn = 0;
@@ -303,8 +302,8 @@ static uint32_t last_particle_spawn = 0;
 #define VIRTUAL_PATH_LENGTH 10
 static gui_point2f_t virtual_path[VIRTUAL_PATH_LENGTH] =
 {
-    {200.0f, 250.0f}, {190.0f, 240.0f}, {185.0f, 250.0f}, {180.0f, 240.0f}, {200.0f, 250.0f},
-    {190.0f, 240.0f}, {200.0f, 250.0f}, {200.0f, 240.0f}, {200.0f, 250.0f}, {200.0f, 240.0f}
+    {200.0f, 250.0f}, {190.0f, 270.0f}, {185.0f, 250.0f}, {180.0f, 280.0f}, {200.0f, 250.0f},
+    {190.0f, 280.0f}, {200.0f, 250.0f}, {200.0f, 270.0f}, {200.0f, 250.0f}, {200.0f, 270.0f}
 };
 
 static int current_virtual_index = 0;
@@ -486,6 +485,10 @@ void butterfly_particle_app(gui_view_t *view)
                                               FIREFLY_14_BIN, x_to_screen_w(0), y_to_screen_h(0), 0, 0);
     butterfly_wing2 = gui_img_create_from_mem(butterfly_win, "particle",
                                               FIREFLY_14_BIN, x_to_screen_w(0), y_to_screen_h(0), 0, 0);
+    gui_img_set_mode(butterfly_wing1, IMG_SRC_OVER_MODE);
+    gui_img_set_mode(butterfly_wing2, IMG_SRC_OVER_MODE);
+    gui_img_set_mode(butterfly_wing3, IMG_SRC_OVER_MODE);
+    gui_img_set_mode(butterfly_wing4, IMG_SRC_OVER_MODE);
     butterfly_particle_3d = gui_3d_create(butterfly_win, "3d-widget", DESC_BUTTERFLY_BIN,
                                           GUI_3D_DRAW_FRONT_ONLY, 0, 0,
                                           410, 502);
