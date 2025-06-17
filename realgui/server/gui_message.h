@@ -27,6 +27,8 @@ void gui_recv_msg_to_server(void);
 void gui_server_msg_handler(gui_msg_t *msg);
 void gui_server_msg_init(void);
 
+void gui_set_keep_active_time(uint32_t active_time);
+
 #ifdef __cplusplus
 }
 #endif

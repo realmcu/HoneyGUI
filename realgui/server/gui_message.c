@@ -21,6 +21,11 @@ static void *gui_server_mq = NULL;
 static uint32_t keep_active_time = 5000; //ms
 static uint32_t reset_time = 0;
 
+void gui_set_keep_active_time(uint32_t active_time)
+{
+    keep_active_time = active_time;
+}
+
 void gui_server_msg_init(void)
 {
     gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(gui_msg_t), 16);
