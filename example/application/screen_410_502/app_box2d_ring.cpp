@@ -252,7 +252,7 @@ void createBalls(b2World *world)
         float ballX = (SCREEN_WIDTH / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * cos(
                            angle)); // Position the ball between two rings
         float ballY = (SCREEN_HEIGHT / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * sin(angle));
-        gui_log("ball_%d %f,%f\n", i, ballX, ballY);
+        // gui_log("ball_%d %f,%f\n", i, ballX, ballY);
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody; // Set as dynamic body
         ballBodyDef.position.Set(ballX / PIXELS_PER_METER, ballY / PIXELS_PER_METER);
@@ -345,7 +345,7 @@ void render()
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         ball.img = img;
     }
-    gui_log("count: %d\n", count);
+    // gui_log("count: %d\n", count);
 }
 
 // Main function

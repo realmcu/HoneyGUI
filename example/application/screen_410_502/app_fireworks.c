@@ -171,10 +171,7 @@ static void create_firework_clock_cb(NVGcontext *vg)
     NVGcolor offsetHexColor = nvgRGB(255, 255, 255);
     drawHexagon(vg, centerX, centerY, hexagonRadius, M_PI / 6, offsetHexColor);
 //clock
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
+    extern struct tm *timeinfo;
 
     int hours = timeinfo->tm_hour;
     int minutes = timeinfo->tm_min;
