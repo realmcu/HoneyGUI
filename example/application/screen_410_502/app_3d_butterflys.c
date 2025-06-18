@@ -11,6 +11,7 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 #include <math.h>
+#include "gui_canvas_rect.h"
 
 static gui_win_t *butterfly0_window = NULL;
 static gui_win_t *butterfly1_window = NULL;
@@ -127,10 +128,10 @@ static int y_to_screen_h(float butterfly_y)
     float screen_y = c + ((butterfly_y - a) / (b - a)) * (d - c);
     return (int)screen_y;
 }
+float angular_velocity = 0.03f; // Adjust as needed for speed
 void update_butterfly0()
 {
     static float theta0 = 0.0f; // starting angle for butterfly0
-    float angular_velocity = 0.02f; // Adjust as needed for speed
 
     // Updating position for each butterfly using the circular path calculation
     butterfly0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta0);
@@ -150,7 +151,6 @@ void update_butterfly0()
 void update_butterfly1()
 {
     static float theta1 = 2 * M_PI / 3; // starting angle for butterfly1
-    float angular_velocity = 0.02f; // Adjust as needed for speed
 
     butterfly1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta1);
     butterfly1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta1);
@@ -164,7 +164,6 @@ void update_butterfly1()
 void update_butterfly2()
 {
     static float theta2 = M_PI + M_PI / 3; // starting angle for butterfly2
-    float angular_velocity = 0.02f; // Adjust as needed for speed
 
     butterfly2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta2);
     butterfly2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta2);
@@ -185,7 +184,6 @@ static void butterfly0_global_cb(gui_3d_t *this)
 
     gui_3d_world_inititalize(&this->world, butterfly0_x, butterfly0_y, 0, 0, 0, butterfly0_rz,
                              4);
-
 }
 static void butterfly1_global_cb(gui_3d_t *this)
 {
@@ -196,7 +194,6 @@ static void butterfly1_global_cb(gui_3d_t *this)
 
     gui_3d_world_inititalize(&this->world, butterfly1_x, butterfly1_y, 0, 0, 0, butterfly1_rz,
                              4);
-
 }
 
 static void butterfly2_global_cb(gui_3d_t *this)
@@ -208,7 +205,6 @@ static void butterfly2_global_cb(gui_3d_t *this)
 
     gui_3d_world_inititalize(&this->world, butterfly2_x, butterfly2_y, 0, 0, 0, butterfly2_rz,
                              4);
-
 }
 
 static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
@@ -245,8 +241,6 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
     float centerY = (vertexes[0].position.y + vertexes[1].position.y + vertexes[2].position.y +
                      vertexes[3].position.y) / 4.0;
 
-
-
     // Calculate width and height of the face
     float width = sqrt(pow(vertexes[1].position.x - vertexes[0].position.x, 2) +
                        pow(vertexes[1].position.y - vertexes[0].position.y, 2));
@@ -262,17 +256,17 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
         {
             wing->base.x = (int16_t)(centerX - 10); // Adjust by 25 as per your scaling offset requirement
             wing->base.y = (int16_t)(centerY - 10); // Adjust by 25 similarly
-            scale_factor = fmax(width, height) / 40.0;
+            scale_factor = fmax(width, height) / 45.0;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, (-wing->base.w / 2) * 0.4, -wing->base.h / 2 * 0.4);
+            gui_img_translate(wing, (-wing->base.w / 2) * 0.3, -wing->base.h / 2 * 0.3);
         }
         else
         {
             wing->base.x = (int16_t)(centerX + 20); // Adjust by 25 as per your scaling offset requirement
             wing->base.y = (int16_t)(centerY + 20); // Adjust by 25 similarly
-            scale_factor = fmax(width, height) / 25.0;
+            scale_factor = fmax(width, height) / 30.0;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, -wing->base.w / 2 * 1.8, -wing->base.h / 2 * 1.8);
+            gui_img_translate(wing, -wing->base.w / 2 * 1.5, -wing->base.h / 2 * 1.6);
         }
     }
 
@@ -380,7 +374,6 @@ static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, floa
         screen_x = x_to_screen_w(butterfly2_x);
         screen_y = y_to_screen_h(butterfly2_y);
     }
-
 
     float angle_rad = (butterfly0_rz - 90) * M_PI / 180.0f;
     float offset_x = cosf(angle_rad) * 10.0f;
@@ -770,6 +763,8 @@ static void app_ui_butterflys_design(gui_view_t *view)
 
     gui_dispdev_t *dc = gui_get_dc();
 
+    gui_canvas_rect_create(obj, 0, 0, 0, 410, 502, gui_rgba(30, 30, 30, 255));
+
     butterfly0_wing_win = gui_win_create(obj, "butterfly0_win", 0, 0, dc->screen_width,
                                          dc->screen_height);
     butterfly1_wing_win = gui_win_create(obj, "butterfly1_win", 0, 0, dc->screen_width,
@@ -804,7 +799,7 @@ static void app_ui_butterflys_design(gui_view_t *view)
     gui_3d_set_face_transform_cb(butterfly2, (gui_3d_face_transform_cb)butterfly_face_cb);
 
 
-    gui_img_t *clock_img = gui_img_create_from_mem(butterfly0_wing_win, "img_clock", CLOCK_BIN, 26,
+    gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 26,
                                                    (gui_get_screen_height() - 189) / 3, 0, 0);
     gui_img_set_mode(clock_img, IMG_SRC_OVER_MODE);
 

@@ -5,12 +5,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-// #include "../../widget/3d/prism3d/root/homelist_dog.c"
-// #include "../../widget/3d/prism3d/root/homelist_line_black.c"
-// #include "../../widget/3d/prism3d/root/homelist_line_orange.c"
-// #include "../../widget/3d/prism3d/root/homelist_number.c"
-// #include "../../widget/3d/prism3d/root/homelist_watch_black.c"
-// #include "../../widget/3d/prism3d/root/homelist_watch_white.c"
+#include "app_hongkong.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
@@ -20,6 +15,7 @@
 #define CURRENT_VIEW_NAME "image_view"
 
 static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
 static const gui_view_descriptor_t *prism_view = NULL;
 static void app_ui_view_image_design(gui_view_t *view);
 
@@ -47,17 +43,31 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
     prism_view = gui_view_descriptor_get("prism3d_mirror_view");
 
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+static void return_to_menu()
+{
+    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
 
+static void return_timer_cb()
+{
+    touch_info_t *tp = tp_get_info();
+    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+}
 extern int16_t face_flags_rotation;
 static void app_ui_view_image_design(gui_view_t *view)
 {
     touch_info_t *tp = tp_get_info();
+    gui_obj_t *obj = GUI_BASE(view);
+    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+
     gui_img_t *image;
     if (face_flags_rotation == 0)
     {
