@@ -60,6 +60,11 @@
 #define SOS   0xDA  // Start Of Scan
 #define EOI   0xD9  // End Of Image
 
+#define YUV_SAMPLE_444 0x11
+#define YUV_SAMPLE_422 0x21
+#define YUV_SAMPLE_420 0x22
+#define YUV_SAMPLE_400 0x01
+// #define YUV_SAMPLE_224 0x12
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -101,12 +106,43 @@ static int get_jpeg_size(const unsigned char *jpeg_data, size_t jpeg_size, uint1
         unsigned char marker = jpeg_data[i + 1];
         i += 2;
 
-        if (marker == SOF0 || marker == SOF2)
+        if (marker == SOF0)
         {
             i += 3; // Skip length and precision
             *height = (jpeg_data[i] << 8) + jpeg_data[i + 1];
             *width = (jpeg_data[i + 2] << 8) + jpeg_data[i + 3];
-            gui_log("w %d h %d", *width, *height);
+            uint8_t comp = jpeg_data[i + 4];
+            uint8_t subsample = jpeg_data[i + 6];
+            gui_log("w %d h %d comp %d subsample 0x%x", *width, *height, comp, subsample);
+#ifdef USE_JPU
+            if (comp == 4 || ((subsample != YUV_SAMPLE_420) && (subsample != YUV_SAMPLE_422) &&
+                              (subsample != YUV_SAMPLE_444) && (subsample != YUV_SAMPLE_400)))
+            {
+                gui_log("unknown sample! %d 0x%x", comp, subsample);
+                return -1;
+            }
+            else
+            {
+                if (subsample == YUV_SAMPLE_420 || subsample == YUV_SAMPLE_422)
+                {
+                    *width = ((*width + 15) >> 4) << 4;
+                }
+                else
+                {
+                    *width = ((*width + 7) >> 3) << 3;
+                }
+                if (subsample == YUV_SAMPLE_420)
+                {
+                    *height = ((*height + 15) >> 4) << 4;
+                }
+                else
+                {
+                    *height = ((*height + 7) >> 3) << 3;
+                }
+            }
+
+            gui_log("align w %d h %d ", *width, *height);
+#endif
             return 0; // Success
         }
         else if (marker == SOS || marker == EOI)
@@ -743,13 +779,11 @@ static void gui_img_video_ctor(gui_video_t  *this,
     if (this->img_type == VIDEO_TYPE_MJPEG)
     {
         memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
-#ifdef USE_JPU
-        this->header.w = 336;
-        this->header.h = 416;
-        this->header.type = 0x00; // RGB565
-#else
         this->header.w = root->w;
         this->header.h = root->h;
+#ifdef USE_JPU
+        this->header.type = 0x00; // RGB565
+#else
         this->header.type = 0x03; // RGB888
 #endif
     }
