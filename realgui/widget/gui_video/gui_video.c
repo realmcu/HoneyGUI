@@ -35,8 +35,22 @@
 #endif
 #endif
 
-#include "stb_image.h"
+#ifndef USE_JPU
+#define GUI_STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_JPEG
+#define STBI_NO_PNG
+#define STBI_NO_HDR
+#define STBI_NO_LINEAR
+#define STBI_NO_GIF
+#define STBI_NO_PIC
+#define STBI_NO_THREAD_LOCALS
 
+#include "gui_api.h"
+#define STBI_MALLOC(sz)           gui_malloc(sz)
+#define STBI_REALLOC(p,newsz)     gui_realloc(p, newsz)
+#define STBI_FREE(p)              gui_free(p)
+#include "gui_stb_image.h"
+#endif
 
 /*============================================================================*
  *                           Types
@@ -113,7 +127,7 @@ static int get_jpeg_size(const unsigned char *jpeg_data, size_t jpeg_size, uint1
             *width = (jpeg_data[i + 2] << 8) + jpeg_data[i + 3];
             uint8_t comp = jpeg_data[i + 4];
             uint8_t subsample = jpeg_data[i + 6];
-            gui_log("w %d h %d comp %d subsample 0x%x", *width, *height, comp, subsample);
+            gui_log("w %d h %d comp %d subsample 0x%x\n", *width, *height, comp, subsample);
 #ifdef USE_JPU
             if (comp == 4 || ((subsample != YUV_SAMPLE_420) && (subsample != YUV_SAMPLE_422) &&
                               (subsample != YUV_SAMPLE_444) && (subsample != YUV_SAMPLE_400)))
@@ -279,10 +293,10 @@ static void gui_video_draw(gui_obj_t *obj)
 #ifdef USE_JPU
         hal_jpu_free_cache(this->frame_buff_raw);
 #else
-        extern void stbi_image_free(void *retval_from_stbi_load);
+        extern void gui_stbi_image_free(void *retval_from_stbi_load);
         if (this->frame_buff_raw)
         {
-            stbi_image_free(this->frame_buff_raw);
+            gui_stbi_image_free(this->frame_buff_raw);
         }
 #endif
         this->frame_buff = NULL;
@@ -375,11 +389,11 @@ static void gui_video_draw(gui_obj_t *obj)
         // stb decode
         int x = 0, y = 0, n = 0;
         typedef unsigned char stbi_uc;
-        extern stbi_uc *stbi_load_from_memory(stbi_uc const * buffer, int len, int *x, int *y,
-                                              int *channels_in_file, int desired_channels);
+        extern stbi_uc *gui_stbi_load_from_memory(stbi_uc const * buffer, int len, int *x, int *y,
+                                                  int *channels_in_file, int desired_channels);
 
-        frame_buff = (void *)stbi_load_from_memory(img_data, img_sz, &x, &y, &n,
-                                                   0);
+        frame_buff = (void *)gui_stbi_load_from_memory(img_data, img_sz, &x, &y, &n,
+                                                       0);
         if (!frame_buff)
         {
             gui_log("decode jpeg file failed");
@@ -469,7 +483,7 @@ static void gui_video_destory(gui_obj_t *obj)
 #ifdef USE_JPU
         hal_jpu_free_cache(this->frame_buff_raw);
 #else
-        stbi_image_free(this->frame_buff_raw);
+        gui_stbi_image_free(this->frame_buff_raw);
 #endif
         this->frame_buff_raw = NULL;
         this->frame_buff = NULL;
