@@ -54,7 +54,7 @@ const float PIXELS_PER_METER = 30.0f;
 const float PARTICLE_RADIUS = 6.0f;
 const float PARTICLE_DENSITY = 0.3f;
 const float PARTICLE_RESTITUTION = 0.3f;
-const NVGcolor BACKGROUND_COLOR = nvgRGB(20, 20, 30);
+const NVGcolor BACKGROUND_COLOR = nvgRGB(30, 30, 30);
 
 const int COUNTDOWN_START = 30; // Countdown from 30
 const float COUNTDOWN_INTERVAL = 1.0f; // Updated every second
@@ -71,7 +71,6 @@ int SCREEN_HEIGHT;
 struct Particle
 {
     b2Body *body;
-    NVGcolor color;
     gui_img_t *img;
     void *img_data;
     b2Vec2 originalPos;
@@ -260,7 +259,6 @@ void createNumber(int number)
         fixtureDef.restitution = PARTICLE_RESTITUTION;
         p->body->CreateFixture(&fixtureDef);
 
-        p->color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
         p->img = gui_img_create_from_mem(parent, 0, p->img_data,
                                          (int)(pos.x - PARTICLE_RADIUS),
                                          (int)(pos.y - PARTICLE_RADIUS),
@@ -276,8 +274,6 @@ void explode()
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> forceDist(-1.0f, 1.0f);
-    const float minScale = 0.2f;
-    const float scaleDecrement = 0.02f;
 
     for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
@@ -332,7 +328,7 @@ void app_box2d_cb(void *obj)
                 GUI_BASE(particles_img[i].img)->x = x;
                 GUI_BASE(particles_img[i].img)->y = y;
             }
-            else if (!isExploding)
+            else if (!isExploding && currentNumber > 0)
             {
                 GUI_BASE(particles_img[i].img)->x = x;
                 GUI_BASE(particles_img[i].img)->y = y;

@@ -468,11 +468,80 @@ static void update_particles()
         }
     }
 }
+extern void *text_num_array[];
+static char date_text_content[10];
+static void time_update_cb(void *p)
+{
+    int millisecond = 0;
+#ifdef __WIN32
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    uint16_t seconds = timeinfo->tm_sec;
+    uint16_t minute = timeinfo->tm_min;
+    uint16_t hour = timeinfo->tm_hour;
+#else
+    // extern struct tm watch_clock_get(void);
+    // struct tm watch_time = watch_clock_get();
+    // uint16_t seconds = watch_time.tm_sec;
+    // uint16_t minute = watch_time.tm_min;
+    // uint16_t hour = watch_time.tm_hour;
+
+    extern struct tm *timeinfo;
+#endif
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
+    gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", current_view);
+    gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10]);
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", current_view);
+    gui_img_set_image_data((gui_img_t *)img_minute_decimal,
+                           text_num_array[timeinfo->tm_min / 10]);
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
+    gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
+}
+static void data_create(void *p)
+{
+    gui_obj_t *obj = GUI_BASE(p);
+    gui_win_t *data_win = gui_win_create(obj, "particle_win", 0, 0, 410, 502);
+    sprintf(date_text_content, "FRI 16");
+    gui_text_t *text = gui_text_create(data_win, "date_text", -40, 33, 0, 0);
+    gui_text_set(text, (void *)date_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+                 strlen(date_text_content),
+                 48);
+    gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, RIGHT);
+    gui_text_rendermode_set(text, 2);
+    {
+        int text_w = 35;
+        gui_img_t *img = gui_img_create_from_mem(data_win, "watch_hour_decimal", text_num_array[0],
+                                                 211, 88, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(data_win, "watch_hour_single", text_num_array[0],
+                                      211 + text_w, 88, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(data_win, "colon", text_num_array[10],
+                                      211 + text_w * 2 + 5, 88 + 5, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(data_win, "watch_minute_decimal", text_num_array[0],
+                                      211 + text_w * 2 + 17, 88, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        img = gui_img_create_from_mem(data_win, "watch_minute_single", text_num_array[0],
+                                      211 + text_w * 3 + 17, 88, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    gui_obj_create_timer(&(data_win->base), 3000, true, time_update_cb);
+}
 void butterfly_particle_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // date & time text
+    data_create(obj);
 
     butterfly_win = gui_win_create(obj, "butterfly_win", 0, 0, dc->screen_width, dc->screen_height);
 
@@ -501,7 +570,6 @@ void butterfly_particle_app(gui_view_t *view)
                                  (gui_3d_face_transform_cb)butterfly_particle_face_cb);
 
     gui_obj_create_timer(&(butterfly_particle_3d->base), 17, true, update_butterfly);
-    gui_obj_start_timer(&(butterfly_particle_3d->base));
 
     for (int i = 0; i < MAX_PARTICLES; i++)
     {
@@ -515,5 +583,4 @@ void butterfly_particle_app(gui_view_t *view)
     gui_obj_hidden(GUI_BASE(butterfly_wing4), true);
 
     gui_obj_create_timer(&(particle_win->base), 17, true, update_particles);
-    gui_obj_start_timer(&(particle_win->base));
 }
