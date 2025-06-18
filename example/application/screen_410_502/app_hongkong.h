@@ -9,9 +9,6 @@ extern "C" {
 #include "gui_components_init.h"
 
 
-extern const uint8_t *gui_app_return_array[17];
-
-
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT(obj != NULL);GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
 
 /**

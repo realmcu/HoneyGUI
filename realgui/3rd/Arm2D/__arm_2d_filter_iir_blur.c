@@ -175,7 +175,7 @@ void arm_2dp_filter_iir_blur_mode_set(arm_2d_filter_iir_blur_descriptor_t *ptOP,
 }
 
 /* default low level implementation */
-void __arm_2d_impl_rgb565_filter_iir_blur(
+__WEAK void __arm_2d_impl_rgb565_filter_iir_blur(
     uint16_t *__restrict phwTarget,
     int16_t iTargetStride,
     arm_2d_region_t *__restrict ptValidRegionOnVirtualScreen,

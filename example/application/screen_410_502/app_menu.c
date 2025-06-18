@@ -45,6 +45,8 @@ const static gui_view_descriptor_t *fireworks_view = NULL;
 const static gui_view_descriptor_t *heart_particle_view = NULL;
 const static gui_view_descriptor_t *butterfly_particle_view = NULL;
 const static gui_view_descriptor_t *butterflys_view = NULL;
+const static gui_view_descriptor_t *earth_clock_view = NULL;
+const static gui_view_descriptor_t *labubu_digital_view = NULL;
 void app_menu_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
 {
@@ -91,6 +93,8 @@ static int gui_view_get_other_view_descriptor_init(void)
     heart_particle_view = gui_view_descriptor_get("heart_particle_view");
     butterfly_particle_view = gui_view_descriptor_get("butterfly_particle_view");
     butterflys_view = gui_view_descriptor_get("butterflys_view");
+    earth_clock_view = gui_view_descriptor_get("earth_clock_view");
+    labubu_digital_view = gui_view_descriptor_get("labubu_digital_view");
 
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -241,6 +245,7 @@ void switch_APP_HEART_PARTICLE(void *obj, gui_event_t e, void *param)
     gui_view_switch_direct(current_view, heart_particle_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
+
 void switch_APP_BUTTERFLY_PARTICLE(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, butterfly_particle_view, SWITCH_OUT_ANIMATION_FADE,
@@ -250,6 +255,20 @@ void switch_APP_BUTTERFLYS(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, butterflys_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
+}
+
+void switch_APP_EARTH_CLOCK(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, earth_clock_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
+}
+
+static void switch_APP_LABUBU_DIGITAL(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, labubu_digital_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
 static void return_timer_cb()
@@ -300,6 +319,8 @@ void app_menu_design(gui_view_t *view)
             HEART_PARTICLE_ICON_BIN,
             BUTTERFLY_PARTICLE_ICON_BIN,
             BUTTERFLYS_ICON_BIN,
+            EARTH_DIGITAL_ICON_BIN,
+            LABUBU_DIGITAL_ICON_BIN,
         };
         char *text_array[] =
         {
@@ -328,6 +349,8 @@ void app_menu_design(gui_view_t *view)
             "Heart Particle",
             "Butterfly Shadow",
             "Butterflys",
+            "Earth Clock",
+            "Labubu Digital",
         };
         int array_size = sizeof(array) / sizeof(array[0]);
 
@@ -424,6 +447,12 @@ void app_menu_design(gui_view_t *view)
         gui_obj_add_event_cb(tab_array[24], (gui_event_cb_t)switch_APP_BUTTERFLYS,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
+        gui_obj_add_event_cb(tab_array[25], (gui_event_cb_t)switch_APP_EARTH_CLOCK,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
+        gui_obj_add_event_cb(tab_array[26], (gui_event_cb_t)switch_APP_LABUBU_DIGITAL,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
 
     }
     else
@@ -457,6 +486,8 @@ void app_menu_design(gui_view_t *view)
             HEART_PARTICLE_ICON_BIN,
             BUTTERFLY_PARTICLE_ICON_BIN,
             BUTTERFLYS_ICON_BIN,
+            EARTH_DIGITAL_ICON_BIN,
+            LABUBU_DIGITAL_ICON_BIN,
 
             UI_CLOCK_HEARTRATE_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
@@ -483,6 +514,8 @@ void app_menu_design(gui_view_t *view)
             HEART_PARTICLE_ICON_BIN,
             BUTTERFLY_PARTICLE_ICON_BIN,
             BUTTERFLYS_ICON_BIN,
+            EARTH_DIGITAL_ICON_BIN,
+            LABUBU_DIGITAL_ICON_BIN,
         };
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, array,
                                                              sizeof(array) / sizeof(uint32_t *));
@@ -492,19 +525,19 @@ void app_menu_design(gui_view_t *view)
             {
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
-                {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
-                {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL},
-                {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
-                {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL}, {switch_APP_COUNTDOWN, NULL},
-                {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL}, {switch_APP_BUTTERFLYS, NULL},
+                {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL}, {switch_APP_PRISM_THICK, NULL},
+                {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL},
+                {switch_APP_FIREFLY, NULL}, {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
+                {switch_APP_COUNTDOWN, NULL}, {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL},
+                {switch_APP_BUTTERFLYS, NULL}, {switch_APP_EARTH_CLOCK, NULL}, {switch_APP_LABUBU_DIGITAL, NULL},
 
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
-                {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL},
-                {switch_APP_PRISM_THICK, NULL}, {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL},
-                {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL}, {switch_APP_FIREFLY, NULL},
-                {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL}, {switch_APP_COUNTDOWN, NULL},
-                {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL}, {switch_APP_BUTTERFLYS, NULL},
+                {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL}, {switch_APP_PRISM_THICK, NULL},
+                {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL},
+                {switch_APP_FIREFLY, NULL}, {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
+                {switch_APP_COUNTDOWN, NULL}, {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL},
+                {switch_APP_BUTTERFLYS, NULL}, {switch_APP_EARTH_CLOCK, NULL}, {switch_APP_LABUBU_DIGITAL, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

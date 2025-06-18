@@ -15,7 +15,6 @@
 #include "gui_view.h"
 #include "gui_server.h"
 #include "app_hongkong.h"
-#include "gui_video.h"
 
 /*============================================================================*
  *                           Types
@@ -323,11 +322,11 @@ static void watchface_design(gui_view_t *view)
     gui_view_switch_on_event(view, app_top_view, SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-    gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_LEFT_USE_CUBE,
-                             SWITCH_IN_FROM_RIGHT_USE_CUBE,
+    gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+                             SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_view_switch_on_event(view, app_control_view, SWITCH_INIT_STATE,
-                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
+    gui_view_switch_on_event(view, app_control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+                             SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
     // gui_view_switch_on_event(view, watchface_select_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
     //                          GUI_EVENT_TOUCH_LONG);
@@ -437,9 +436,6 @@ static void app_hongkong_ui_design(void)
     // json_refreash();
     // canvas_update_flag = 0b1111;
 #endif
-    // gui_video_t *vedio = gui_video_create_from_mem(gui_obj_get_root(), "earth", (void *)WATCH_FACE_EARTH_1_MJPEG, 0, 0, 410,
-    //                           502);
-    //                           return;
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, &descriptor, 0, 0, 0, 0);
     fps_create(gui_obj_get_root());

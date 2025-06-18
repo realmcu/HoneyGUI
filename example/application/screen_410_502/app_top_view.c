@@ -190,7 +190,7 @@ static void clear_list_note(gui_list_note_t *note)
     list->widget_num--;
     index = infor_num - 1 - index;
     gui_free(infor_rec[index]);
-    gui_log("free infor_rec[%d]\n", index);
+    // gui_log("free infor_rec[%d]\n", index);
     while (index < infor_num - 1)
     {
         infor_rec[index] = infor_rec[index + 1];
@@ -352,7 +352,6 @@ static void create_inform_note(information_t *inform)
     const char *content = inform->content;
     const char *time = inform->time;
     app_name app = inform->app;
-    gui_log("content: 0x%x\n", content);
 
     gui_list_note_t *note = gui_list_add_note(list, true);
     gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note), "0", 30, 0, 350, 220,

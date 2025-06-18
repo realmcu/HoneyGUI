@@ -21,6 +21,7 @@
 
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
+const static gui_view_descriptor_t *qrcode_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *pre_view = NULL;
@@ -48,6 +49,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     activity_view = gui_view_descriptor_get("activity_view");
+    qrcode_view = gui_view_descriptor_get("qrcode_view");
     menu_view = gui_view_descriptor_get("menu_view");
     watchface_view = gui_view_descriptor_get("watchface_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
@@ -420,11 +422,14 @@ static void heart_rate_app(gui_view_t *view)
         gui_text_rendermode_set(t, 2);
     }
     const char *name = GUI_BASE(gui_view_get_current())->name;
-    if (strcmp(name, "activity_view") == 0)
+    if (strcmp(name, "activity_view") == 0 || strcmp(name, "qrcode_view") == 0)
     {
-        gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
-                                 SWITCH_IN_FROM_LEFT_USE_CUBE,
+        gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+                                 SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
+        gui_view_switch_on_event(view, qrcode_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+                                 SWITCH_IN_FROM_RIGHT_USE_ROTATE,
+                                 GUI_EVENT_TOUCH_MOVE_LEFT);
         return;
     }
     else if (strcmp(name, "menu_view") == 0)

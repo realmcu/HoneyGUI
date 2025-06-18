@@ -56,7 +56,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 extern char *cjson_content;
 static uint8_t *img_data = NULL;
 static gui_img_t *img;
-static uint16_t count = 0;
+static uint16_t count = COUNT_MAX;
 static bool draw_flag = 0;
 static size_t buffer_size = 0;
 static char move_content[30], ex_content[30], stand_content[30];
@@ -274,11 +274,11 @@ void activity_app(gui_view_t *view)
                                           img_data);
         gui_img_refresh_size(img);
         gui_obj_create_timer(GUI_BASE(win), 10, true, win_cb);
-        gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
-                                 SWITCH_IN_FROM_LEFT_USE_CUBE,
+        gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+                                 SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_LEFT_USE_CUBE,
-                                 SWITCH_IN_FROM_RIGHT_USE_CUBE,
+        gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+                                 SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_LEFT);
     }
     else

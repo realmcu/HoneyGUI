@@ -166,8 +166,8 @@ static void switch_cb(void *obj, gui_event_t e, void *param)
 
 static void page_tb_control(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
-                             SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+                             SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
     // draw background
     gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(view), NULL, 0, 0,
