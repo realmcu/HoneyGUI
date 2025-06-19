@@ -516,6 +516,11 @@ static void gui_view_destroy(gui_obj_t *obj)
         _this->descriptor->on_switch_out(_this);
     }
     *_this->descriptor->pView = NULL;
+
+    if (_this == g_CurrentView)
+    {
+        g_CurrentView = NULL;
+    }
 }
 
 static void gui_view_end(gui_obj_t *obj)

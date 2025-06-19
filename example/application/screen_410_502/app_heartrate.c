@@ -72,25 +72,6 @@ static void return_cb()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void win_hb_cb(void *obj)
-{
-#ifdef __WIN32
-    extern char *read_file(const char *file_path);
-    char *temp = cjson_content;
-    cjson_content = read_file(NULL);
-    if (!cjson_content)
-    {
-        cjson_content = temp;
-        perror("fopen");
-    }
-    else
-    {
-        free(temp);
-    }
-    canvas_update_flag = 0b1111;
-#endif
-}
-
 static void timer_cb(void *p)
 {
     touch_info_t *tp = tp_get_info();
@@ -296,9 +277,6 @@ static void heart_rate_app(gui_view_t *view)
                             SCREEN_HEIGHT);
     gui_canvas_rect_create(GUI_BASE(win_hb), "hb_background", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                            gui_rgb(0, 0, 0));
-
-    gui_obj_create_timer(GUI_BASE(win_hb), 10, true, win_hb_cb);
-    gui_obj_start_timer(GUI_BASE(win_hb));
     {
         char *text = "Current heartrate";
         int font_size = 32;

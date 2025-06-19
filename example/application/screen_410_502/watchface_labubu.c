@@ -16,6 +16,7 @@
 
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
 
 static void create_watchface_labubu(gui_view_t *view);
 static const gui_view_descriptor_t descriptor =
@@ -40,6 +41,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     menu_view = gui_view_descriptor_get("menu_view");
+    watchface_view = gui_view_descriptor_get("watchface_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -76,41 +78,32 @@ static void return_timer_cb()
 
 static void time_update_cb(void *p)
 {
-    int millisecond = 0;
-#ifdef __WIN32
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    uint16_t seconds = timeinfo->tm_sec;
-    uint16_t minute = timeinfo->tm_min;
-    uint16_t hour = timeinfo->tm_hour;
-#else
-    // extern struct tm watch_clock_get(void);
-    // struct tm watch_time = watch_clock_get();
-    // uint16_t seconds = watch_time.tm_sec;
-    // uint16_t minute = watch_time.tm_min;
-    // uint16_t hour = watch_time.tm_hour;
-
     extern struct tm *timeinfo;
-#endif
+    if (!timeinfo)
+    {
+        return;
+    }
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
     gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_black_array[timeinfo->tm_hour / 10]);
+    gui_img_refresh_size((gui_img_t *)img_hour_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", current_view);
     gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_black_array[timeinfo->tm_hour % 10]);
+    gui_img_refresh_size((gui_img_t *)img_hour_single);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", current_view);
     gui_img_set_image_data((gui_img_t *)img_minute_decimal,
                            text_num_black_array[timeinfo->tm_min / 10]);
+    gui_img_refresh_size((gui_img_t *)img_minute_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
     gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_black_array[timeinfo->tm_min % 10]);
+    gui_img_refresh_size((gui_img_t *)img_minute_single);
 }
 
 static void create_watchface_labubu(gui_view_t *view)
 {
-    gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
     video = gui_video_create_from_mem(win, "labubu", LABUBU_MJPG, 0, 0, 410,
                                       502);
@@ -136,5 +129,17 @@ static void create_watchface_labubu(gui_view_t *view)
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     gui_obj_create_timer(GUI_BASE(win), 30000, true, time_update_cb);
-    gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
+
+    gui_view_t *pre_view = gui_view_get_current();
+    if (pre_view && strcmp(GUI_BASE(gui_view_get_current())->name, "menu_view") == 0)
+    {
+        gui_obj_hidden(&(gui_view_get_current()->base), true);
+        gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
+    }
+    else
+    {
+        gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+                                 SWITCH_IN_ANIMATION_FADE,
+                                 GUI_EVENT_TOUCH_CLICKED);
+    }
 }

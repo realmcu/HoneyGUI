@@ -4,8 +4,8 @@ function updateValue(id) {
 }
 
 function sendData() {
-    const arrayInput = document.getElementById('arrayInput').value;
-    const arrayElements = arrayInput.split(',').map(element => element.trim()).map(Number);
+    // const arrayInput = document.getElementById('arrayInput').value;
+    // const arrayElements = arrayInput.split(',').map(element => element.trim()).map(Number);
     
     const data = {
         weather: [
@@ -39,13 +39,13 @@ function sendData() {
         ],
         heart_rate: [
             {
-                array: arrayElements
-                // range_min: parseInt(document.getElementById('hrMin').value),
-                // range_max: parseInt(document.getElementById('hrMax').value),
-                // AM12: parseInt(document.getElementById('heart_rate12AM').value),
-                // AM6: parseInt(document.getElementById('heart_rate6AM').value),
-                // PM12: parseInt(document.getElementById('heart_rate12PM').value),
-                // PM6: parseInt(document.getElementById('heart_rate6PM').value)
+                // array: arrayElements
+                range_min: parseInt(document.getElementById('hrMin').value),
+                range_max: parseInt(document.getElementById('hrMax').value),
+                AM12: parseInt(document.getElementById('heart_rate12AM').value),
+                AM6: parseInt(document.getElementById('heart_rate6AM').value),
+                PM12: parseInt(document.getElementById('heart_rate12PM').value),
+                PM6: parseInt(document.getElementById('heart_rate6PM').value)
             }
         ]
     };
@@ -120,66 +120,66 @@ function updateActivityMax() {
     updateValue('activityStand');
 }
 
-function addArrayInput() {
-    const container = document.getElementById('dynamicArrayInputs');
+// function addArrayInput() {
+//     const container = document.getElementById('dynamicArrayInputs');
 
-    const label = document.createElement("span");
-    label.innerText = `Element ${inputCount + 1}: `;
+//     const label = document.createElement("span");
+//     label.innerText = `Element ${inputCount + 1}: `;
     
-    const input = document.createElement("input");
-    input.type = "text";
-    input.id = "arrayElement" + inputCount;
+//     const input = document.createElement("input");
+//     input.type = "text";
+//     input.id = "arrayElement" + inputCount;
     
-    container.appendChild(label);
-    container.appendChild(input);
-    container.appendChild(document.createElement("br"));
+//     container.appendChild(label);
+//     container.appendChild(input);
+//     container.appendChild(document.createElement("br"));
 
-    inputCount++;
-}
-
-// function updateHrRange() {
-//     var minValue = document.getElementById('hrMin').value;
-//     var maxValue = document.getElementById('hrMax').value;
-//     document.getElementById('heart_rate12AM').setAttribute('min', minValue);
-//     document.getElementById('heart_rate12AM').setAttribute('max', maxValue); //heart_rate6AM
-//     document.getElementById('heart_rate6AM').setAttribute('min', minValue);
-//     document.getElementById('heart_rate6AM').setAttribute('max', maxValue);
-//     document.getElementById('heart_rate12PM').setAttribute('min', minValue);
-//     document.getElementById('heart_rate12PM').setAttribute('max', maxValue);
-//     document.getElementById('heart_rate6PM').setAttribute('min', minValue);
-//     document.getElementById('heart_rate6PM').setAttribute('max', maxValue);
-
-//     // Ensure the current values are within the new range
-//     if (parseInt(document.getElementById('heart_rate12AM').value) < minValue) {
-//         document.getElementById('heart_rate12AM').value = minValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate12AM').value) > maxValue) {
-//         document.getElementById('heart_rate12AM').value = maxValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate6AM').value) < minValue) {
-//         document.getElementById('heart_rate6AM').value = minValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate6AM').value) > maxValue) {
-//         document.getElementById('heart_rate6AM').value = maxValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate12PM').value) < minValue) {
-//         document.getElementById('heart_rate12PM').value = minValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate12PM').value) > maxValue) {
-//         document.getElementById('heart_rate12PM').value = maxValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate6PM').value) < minValue) {
-//         document.getElementById('heart_rate6PM').value = minValue;
-//     }
-//     if (parseInt(document.getElementById('heart_rate6PM').value) > maxValue) {
-//         document.getElementById('heart_rate6PM').value = maxValue;
-//     }
-
-//     updateValue('heart_rate12AM');
-//     updateValue('heart_rate6AM');
-//     updateValue('heart_rate12PM');
-//     updateValue('heart_rate6PM');
+//     inputCount++;
 // }
+
+function updateHrRange() {
+    var minValue = document.getElementById('hrMin').value;
+    var maxValue = document.getElementById('hrMax').value;
+    document.getElementById('heart_rate12AM').setAttribute('min', minValue);
+    document.getElementById('heart_rate12AM').setAttribute('max', maxValue); //heart_rate6AM
+    document.getElementById('heart_rate6AM').setAttribute('min', minValue);
+    document.getElementById('heart_rate6AM').setAttribute('max', maxValue);
+    document.getElementById('heart_rate12PM').setAttribute('min', minValue);
+    document.getElementById('heart_rate12PM').setAttribute('max', maxValue);
+    document.getElementById('heart_rate6PM').setAttribute('min', minValue);
+    document.getElementById('heart_rate6PM').setAttribute('max', maxValue);
+
+    // Ensure the current values are within the new range
+    if (parseInt(document.getElementById('heart_rate12AM').value) < minValue) {
+        document.getElementById('heart_rate12AM').value = minValue;
+    }
+    if (parseInt(document.getElementById('heart_rate12AM').value) > maxValue) {
+        document.getElementById('heart_rate12AM').value = maxValue;
+    }
+    if (parseInt(document.getElementById('heart_rate6AM').value) < minValue) {
+        document.getElementById('heart_rate6AM').value = minValue;
+    }
+    if (parseInt(document.getElementById('heart_rate6AM').value) > maxValue) {
+        document.getElementById('heart_rate6AM').value = maxValue;
+    }
+    if (parseInt(document.getElementById('heart_rate12PM').value) < minValue) {
+        document.getElementById('heart_rate12PM').value = minValue;
+    }
+    if (parseInt(document.getElementById('heart_rate12PM').value) > maxValue) {
+        document.getElementById('heart_rate12PM').value = maxValue;
+    }
+    if (parseInt(document.getElementById('heart_rate6PM').value) < minValue) {
+        document.getElementById('heart_rate6PM').value = minValue;
+    }
+    if (parseInt(document.getElementById('heart_rate6PM').value) > maxValue) {
+        document.getElementById('heart_rate6PM').value = maxValue;
+    }
+
+    updateValue('heart_rate12AM');
+    updateValue('heart_rate6AM');
+    updateValue('heart_rate12PM');
+    updateValue('heart_rate6PM');
+}
 
 window.onload = function() {
     // Send initial data to the server

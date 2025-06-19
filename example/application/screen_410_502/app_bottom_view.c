@@ -207,12 +207,6 @@ static void timer_cb(void *obj)
 
 static void switch_app_cb(void *obj)
 {
-    gui_log("enter switch_app_cb\n");
-    extern void close_box2d_ring(void);
-    close_box2d_ring();
-    extern void clear_activity(void);
-    clear_activity();
-
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "RING") == 0)
     {
@@ -229,7 +223,7 @@ static void switch_app_cb(void *obj)
         gui_view_switch_direct(current_view, heartrate_view, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
-    else if (strcmp(obj_name, "appview") == 0)
+    else if (strcmp(obj_name, "app_menu") == 0)
     {
         gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
@@ -505,9 +499,22 @@ void bottom_view_design(gui_view_t *view)
         gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
 
-    img = gui_img_create_from_mem(note_appview, "appview", UI_CARD_APPVIEW_BIN, 57, 0, 0, 0);
-    gui_img_set_mode(img, IMG_BYPASS_MODE);
-    gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    {
+        // gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note_appview), "app_menu",
+        //                                                                57, 0, 292, 76, 40, gui_rgb(100, 100, 100));
+        // img = gui_img_create_from_mem(canvas, 0, APP_MENU_ICON_BIN, 38, 20, 0, 0);
+        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+        // gui_text_t *text = gui_text_create(canvas, 0, 90, 20, 0, 0);
+        // gui_text_set(text, (void *)"ALL APP", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 7, 32);
+        // gui_text_type_set(text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        // gui_text_mode_set(text, LEFT);
+
+        img = gui_img_create_from_mem(note_appview, "app_menu", UI_APPVIEW_CARD_BIN, 76, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    }
+
 
     display_time();
 }

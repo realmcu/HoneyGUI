@@ -75,6 +75,7 @@ static uint8_t infor_num = 0;
 static uint8_t infor_need_update_num = 0;
 static bool clear_flag = false;
 static bool in_view_more = false;
+static bool note_dur_animation = false;
 
 
 static void cancel_cb(void *p)
@@ -171,6 +172,11 @@ static void view_more_cb(void *p)
     }
 }
 
+static void view_more_event_cb(void *widget, gui_event_t e, void *param)
+{
+    ; // This function is intentionally left empty.
+}
+
 static void clear_list_note(gui_list_note_t *note)
 {
     gui_node_list_t *node = NULL;
@@ -187,6 +193,7 @@ static void clear_list_note(gui_list_note_t *note)
     }
     gui_obj_tree_free_async(GUI_BASE(note));
     list->total_length -= (list->note_length + list->space);
+    list->total_length = list->total_length < SCREEN_HEIGHT ? SCREEN_HEIGHT : list->total_length;
     list->widget_num--;
     index = infor_num - 1 - index;
     gui_free(infor_rec[index]);
@@ -210,6 +217,7 @@ static void note_timer_cb(void *widget)
         // gui_log("clear note\n");
         clear_list_note(note);
         gui_obj_stop_timer(obj);
+        note_dur_animation = false;
     }
     else if (note->t_x - note->start_x >= SCREEN_WIDTH / 2)
     {
@@ -227,6 +235,7 @@ static void note_timer_cb(void *widget)
     {
         note->t_x = note->start_x;
         gui_obj_stop_timer(obj);
+        note_dur_animation = false;
     }
 }
 
@@ -237,6 +246,7 @@ static void note_pressing_cb(void *widget)
     gui_list_note_t *note = (gui_list_note_t *)obj;
     struct touch_info *tp = tp_get_info();
     note->t_x = note->start_x + tp->deltaX;
+    note_dur_animation = true;
 }
 
 static void note_released_cb(void *widget)
@@ -257,9 +267,11 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     const char *time = inform->time;
     app_name app = inform->app;
 
-    gui_win_t *win = gui_win_create(current_view, "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
+    gui_win_t *win = gui_win_create(gui_obj_get_root(), "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
                                     SCREEN_HEIGHT);
     gui_obj_create_timer(GUI_BASE(win), 20, true, view_more_cb);
+    gui_obj_add_event_cb(GUI_BASE(win), (gui_event_cb_t)view_more_event_cb,
+                         GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
     gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), "0", 0, 0,
                                                           SCREEN_WIDTH,
                                                           SCREEN_HEIGHT, gui_rgb(0, 0, 0));
@@ -341,8 +353,6 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
                  32);
     gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, CENTER);
-
-    // gui_obj_add_event_cb(tv, (gui_event_cb_t)view_more_enter, GUI_EVENT_2, (void *)win);
 }
 
 static void create_inform_note(information_t *inform)
@@ -423,8 +433,8 @@ static void create_inform_note(information_t *inform)
 
 static void list_timer_cb(void *param)
 {
-    struct touch_info *tp = tp_get_info();
-    if (!tp->pressing && !clear_flag && list->offset != (SCREEN_HEIGHT - list->total_length))
+    if (!note_dur_animation && !clear_flag && (list->total_length == SCREEN_HEIGHT ||
+                                               list->offset != (SCREEN_HEIGHT - list->total_length)))
     {
         while (infor_need_update_num)
         {

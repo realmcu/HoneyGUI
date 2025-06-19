@@ -469,6 +469,7 @@ static void update_particles()
     }
 }
 extern void *text_num_array[];
+extern const char *day[];
 static char date_text_content[10];
 static void time_update_cb(void *p)
 {
@@ -490,6 +491,10 @@ static void time_update_cb(void *p)
 
     extern struct tm *timeinfo;
 #endif
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", current_view);
+    sprintf(date_text_content, "%s %d", day[timeinfo->tm_wday], timeinfo->tm_mday);
+    gui_text_content_set((gui_text_t *)text, date_text_content, strlen(date_text_content));
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
     gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
 

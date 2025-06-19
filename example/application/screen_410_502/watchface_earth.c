@@ -55,13 +55,12 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static gui_video_t *video = NULL;
 extern void *text_num_array[11];
-extern char *day[7];
+extern const char *day[7];
 
 static char date_text_content[10];
 
 static void return_to_menu()
 {
-
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
@@ -74,35 +73,31 @@ static void return_timer_cb()
 
 static void time_update_cb(void *p)
 {
-    int millisecond = 0;
-#ifdef __WIN32
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    uint16_t seconds = timeinfo->tm_sec;
-    uint16_t minute = timeinfo->tm_min;
-    uint16_t hour = timeinfo->tm_hour;
-#else
-    // extern struct tm watch_clock_get(void);
-    // struct tm watch_time = watch_clock_get();
-    // uint16_t seconds = watch_time.tm_sec;
-    // uint16_t minute = watch_time.tm_min;
-    // uint16_t hour = watch_time.tm_hour;
-
     extern struct tm *timeinfo;
-#endif
+    if (!timeinfo)
+    {
+        return;
+    }
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", current_view);
+    sprintf(date_text_content, "%s %d", day[timeinfo->tm_wday], timeinfo->tm_mday);
+    gui_text_content_set((gui_text_t *)text, date_text_content, strlen(date_text_content));
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "watch_hour_decimal", current_view);
     gui_img_set_image_data((gui_img_t *)img_hour_decimal, text_num_array[timeinfo->tm_hour / 10]);
+    gui_img_refresh_size((gui_img_t *)img_hour_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "watch_hour_single", current_view);
     gui_img_set_image_data((gui_img_t *)img_hour_single, text_num_array[timeinfo->tm_hour % 10]);
+    gui_img_refresh_size((gui_img_t *)img_hour_single);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "watch_minute_decimal", current_view);
     gui_img_set_image_data((gui_img_t *)img_minute_decimal, text_num_array[timeinfo->tm_min / 10]);
+    gui_img_refresh_size((gui_img_t *)img_minute_decimal);
 
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
     gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
+    gui_img_refresh_size((gui_img_t *)img_minute_single);
 }
 
 static void enter_cb(void *p)
@@ -120,7 +115,7 @@ static void enter_cb(void *p)
     {
         gui_obj_create_timer(GUI_BASE(p), 30000, true, time_update_cb);
         count = 0;
-        gui_video_set_frame_rate(video, 24.f);
+        gui_video_set_frame_rate(video, 30.f);
     }
 }
 
@@ -136,7 +131,6 @@ void create_watchface_earth(gui_view_t *view)
     gui_img_scale(video->img, 1.5f, 1.5f);
     gui_video_set_frame_rate(video, 60.f);
     gui_obj_create_timer(GUI_BASE(win), 17, true, enter_cb);
-
 
     // date & time text
     sprintf(date_text_content, "FRI 16");

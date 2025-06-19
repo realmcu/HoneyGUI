@@ -45,6 +45,7 @@ static void watchface_design(gui_view_t *view);
 #ifdef __WIN32
 char *read_file(const char *file_path);
 #endif
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -55,7 +56,7 @@ const static gui_view_descriptor_t *app_control_view = NULL;
 const static gui_view_descriptor_t *app_bottom_view = NULL;
 const static gui_view_descriptor_t *app_top_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
-const static gui_view_descriptor_t *watchface_select_view = NULL;
+const static gui_view_descriptor_t *labubu_digital_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -108,7 +109,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     app_bottom_view = gui_view_descriptor_get("app_bottom_view");
     app_top_view = gui_view_descriptor_get("app_top_view");
     activity_view = gui_view_descriptor_get("activity_view");
-    watchface_select_view  = gui_view_descriptor_get("watchface_select_view");
+    labubu_digital_view  = gui_view_descriptor_get("labubu_digital_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -300,7 +301,7 @@ static void win_cb()
     }
     else
     {
-        free(temp);
+        gui_free(temp);
     }
     canvas_update_flag = 0b1111;
     // gui_log("canvas_update_flag %x\n", canvas_update_flag);
@@ -308,7 +309,6 @@ static void win_cb()
     // extern struct tm watch_clock_get(void);
     // watch_time = watch_clock_get();
     timeinfo = &watch_time;
-    // json_refreash();
 #endif
 }
 
@@ -335,47 +335,6 @@ static void watchface_design(gui_view_t *view)
 
     extern void create_watchface_classic(gui_view_t *view);
     create_watchface_classic(view);
-    // extern void create_tree_nest(const char *xml, void *obj);
-    // extern void create_watchface_bf(gui_view_t *view);
-    // extern void create_watchface_ring(gui_view_t *view);
-    // switch (watchface_index)
-    // {
-    // case 0:
-    //     {
-    //         create_tree_nest((void *)watchface_path, view);
-    //     }
-    //     break;
-    // case 1:
-    //     {
-    //         create_watchface_classic(view);
-    //     }
-    //     break;
-    // case 2:
-    //     {
-    //         // create_watchface_bf(view);
-    //     }
-    //     break;
-    // case 3:
-    //     {
-    //         // create_watchface_ring(view);
-    //     }
-    //     break;
-    // // case 4:
-    // //     {
-    // //         create_tree_nest((void *)watchface_path, view);
-    // //     }
-    // //     break;
-    // // case 5:
-    // //     {
-    // //         create_tree_nest((void *)watchface_path, view);
-    // //     }
-    // //     break;
-    // default:
-    //     create_watchface_classic(view);
-    //     break;
-    // }
-    gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
-    gui_obj_create_timer(GUI_BASE(win), 500, true, win_cb);
 
     gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
@@ -437,8 +396,9 @@ static void app_hongkong_ui_design(void)
     // canvas_update_flag = 0b1111;
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
-    gui_view_t *view = gui_view_create(win, &descriptor, 0, 0, 0, 0);
+    gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0);
     fps_create(gui_obj_get_root());
+    gui_obj_create_timer(GUI_BASE(win), 2000, true, win_cb);
 }
 
 static int app_init(void)
@@ -496,7 +456,7 @@ char *read_file(const char *file_path)
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
     fseek(file, 0, SEEK_SET);
-    char *content = (char *)malloc(length + 1);
+    char *content = (char *)gui_malloc(length + 1);
     if (content)
     {
         fread(content, 1, length, file);
