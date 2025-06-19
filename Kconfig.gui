@@ -49,10 +49,10 @@ menu "HoneyGUI Framework Config"
 
             choice
                 prompt "select gui demo"
-                default REALTEK_BUILD_GUI_448_368_DEMO
+                default REALTEK_BUILD_GUI_410_502_DEMO
 
-                config REALTEK_BUILD_GUI_448_368_DEMO
-                    bool "Enable 448_368_DEMO"
+                config REALTEK_BUILD_GUI_410_502_DEMO
+                    bool "Enable 410_502_DEMO"
 
                 config REALTEK_BUILD_GUI_DEMO
                     bool "Enable Simple GUI_DEMO"
@@ -62,18 +62,4 @@ menu "HoneyGUI Framework Config"
             endchoice
         endif
 
-    menuconfig REALTEK_BUILD_LVGL_GUI
-        bool "Enalbe LVGL"
-        default n
-
-        if REALTEK_BUILD_LVGL_GUI
-            config REALTEK_BUILD_LVGL_EXAMPLES
-            bool "Enable lvgl"
-            default n
-
-            config REALTEK_BUILD_LVGL_EXAMPLES
-            bool "Enable OS Heap"
-            default n
-
-        endif
 endmenu
