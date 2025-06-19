@@ -12,8 +12,7 @@
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_view.h"
 #include "app_hongkong.h"
-#include <queue>
-#include <unordered_set>
+
 
 #define CURRENT_VIEW_NAME "heart_particle_view"
 extern "C" {
@@ -141,7 +140,7 @@ void createHeartShape(gui_obj_t *obj, std::vector<Heart> &hearts)
                 fixtureDef.shape = &circleShape;
                 fixtureDef.density = 0.8f;
                 fixtureDef.friction = 0.3f;
-                fixtureDef.restitution = 0.4f;
+                fixtureDef.restitution = 0.0f;
                 heart.body->CreateFixture(&fixtureDef);
 
                 hearts.push_back(heart);
@@ -222,7 +221,7 @@ void bounce_animation_cb(void *obj)
 
     if (isWaveActive)
     {
-        wave_radius += 3.0f; // Gradually increasing to simulate ripple diffusion
+        wave_radius += 5.0f; // Gradually increasing to simulate ripple diffusion
 
         if (wave_radius > 2 * DRAW_CENTER)
         {

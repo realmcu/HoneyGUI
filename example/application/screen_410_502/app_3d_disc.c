@@ -64,45 +64,48 @@ static void return_timer_cb()
 static float rot_x_angle = 0.0f;
 static float rot_z_angle = 0.0f;
 
-float shift_z[CUBE_COUNT] = {0}; // cube shift
-int step_direction[CUBE_COUNT] = {1};  // cube move direction, 1 rise, -1 fall
-int active_cube = 0;
+static float shift_z[CUBE_COUNT] = {0}; // cube shift
+static int step_direction[CUBE_COUNT] = {1};  // cube move direction, 1 rise, -1 fall
+static int active_cube = 0;
 
-static void update_disc_animation()
+static bool is_playing = false;
+
+static void update_disc_animation(void *param)
 {
+    gui_win_t *win_3d = (gui_win_t *)param;
     touch_info_t *tp = tp_get_info();
 
-    if (tp->pressed || tp->pressing)
+    if ((tp->pressed || tp->pressing) && tp->y < (win_3d->base.y + win_3d->base.h))
     {
         rot_z_angle += tp->deltaX / 5.0f;
         rot_x_angle += tp->deltaY / 5.0f;
         rot_x_angle = fmax(MIN_ROT_X_ANGLE, fmin(rot_x_angle, MAX_ROT_X_ANGLE));
     }
-    else
+    else if (is_playing)
     {
         rot_z_angle ++;
-    }
 
-    // update all cube states
-    for (int i = 0; i < CUBE_COUNT; i++)
-    {
-        if (step_direction[i] == 1 && shift_z[i] >= STEP_HEIGHT)
+        // update all cube states
+        for (int i = 0; i < CUBE_COUNT; i++)
         {
-            // change direction to fall
-            step_direction[i] = -1;
-            if (i == active_cube)
+            if (step_direction[i] == 1 && shift_z[i] >= STEP_HEIGHT)
             {
-                // activate the next cube to rise
-                active_cube = (active_cube + 1) % CUBE_COUNT;
-                step_direction[active_cube] = 1;
+                // change direction to fall
+                step_direction[i] = -1;
+                if (i == active_cube)
+                {
+                    // activate the next cube to rise
+                    active_cube = (active_cube + 1) % CUBE_COUNT;
+                    step_direction[active_cube] = 1;
+                }
             }
-        }
 
-        // Update the current cube height
-        shift_z[i] += step_direction[i] * 0.4f;
-        if (shift_z[i] < 0.0f)
-        {
-            shift_z[i] = 0.0f;
+            // Update the current cube height
+            shift_z[i] += step_direction[i] * 0.4f;
+            if (shift_z[i] < 0.0f)
+            {
+                shift_z[i] = 0.0f;
+            }
         }
     }
 }
@@ -154,25 +157,97 @@ static gui_3d_matrix_t disc_cube_face_cb(gui_3d_t *this, size_t face_index)
 
 }
 
+static void switch_to_origin_img(void *param)
+{
+    gui_img_t *img = (gui_img_t *)param;
+    if (strcmp(img->base.name, "music_backward") == 0)
+    {
+        gui_img_set_image_data(img, MUSIC_BACKWARD_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, MUSIC_FORWARD_BIN);
+    }
+}
+
+static void switch_to_highlight_img(void *obj, gui_event_t e, void *param)
+{
+    gui_img_t *img = (gui_img_t *)obj;
+    if (strcmp(img->base.name, "music_backward") == 0)
+    {
+        gui_img_set_image_data(img, MUSIC_BACKWARD_HIGHLIGHT_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, MUSIC_FORWARD_HIGHLIGHT_BIN);
+    }
+
+    gui_obj_create_timer(GUI_BASE(img), 200, false, switch_to_origin_img);
+    gui_obj_start_timer(GUI_BASE(img));
+}
+
+static void switch_to_play_pause_img(void *obj, gui_event_t e, void *param)
+{
+    gui_img_t *img = (gui_img_t *)obj;
+
+    is_playing = !is_playing;
+    if (is_playing == false)
+    {
+        gui_img_set_image_data(img, MUSIC_PAUSE_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, MUSIC_PLAY_BIN);
+    }
+
+}
+
 void disc_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
     gui_obj_create_timer(obj, 10, true, return_timer_cb);
 
-    gui_3d_t *disc_3d = gui_3d_create(obj, "3d-widget", DESC_DISC_BIN,
-                                      GUI_3D_DRAW_FRONT_ONLY, 15, 60, 380,
+    is_playing = false;
+    active_cube = 0;
+    for (int i = 0; i < CUBE_COUNT; i++)
+    {
+        shift_z[i] = 0.0f;
+        step_direction[i] = 0;
+    }
+    step_direction[0] = 1;
+
+    gui_win_t *win_3d = gui_win_create(obj, "win_3d", 15, 0, 380, 380);
+    gui_3d_t *disc_3d = gui_3d_create(win_3d, "3d-widget", DESC_DISC_BIN,
+                                      GUI_3D_DRAW_FRONT_ONLY, 0, 0, 380,
                                       380);
     gui_3d_set_global_transform_cb(disc_3d, (gui_3d_global_transform_cb)disc_global_cb);
     gui_3d_set_face_transform_cb(disc_3d, (gui_3d_face_transform_cb)disc_face_cb);
 
-    gui_3d_t *disc_cube = gui_3d_create(obj, "3d-widget", DESC_DISC_CUBE_BIN,
-                                        GUI_3D_DRAW_FRONT_AND_SORT, 15, 60, 380,
+    gui_3d_t *disc_cube = gui_3d_create(win_3d, "3d-widget", DESC_DISC_CUBE_BIN,
+                                        GUI_3D_DRAW_FRONT_AND_SORT, 0, 0, 380,
                                         380);
 
     gui_3d_set_global_transform_cb(disc_cube, (gui_3d_global_transform_cb)disc_global_cb);
     gui_3d_set_face_transform_cb(disc_cube, (gui_3d_face_transform_cb)disc_cube_face_cb);
 
-    gui_obj_create_timer(&(disc_3d->base), 1, true, update_disc_animation);
-    gui_obj_start_timer(&(disc_3d->base));
+    gui_obj_create_timer(GUI_BASE(win_3d), 10, true, update_disc_animation);
+
+
+    gui_win_t *win_music = gui_win_create(obj, "win_music", 0, 380, 0, 0);
+
+    gui_img_t *backward_img = gui_img_create_from_mem(win_music, "music_backward", MUSIC_BACKWARD_BIN,
+                                                      40, 0, 0, 0);
+    gui_obj_add_event_cb(backward_img, (gui_event_cb_t)switch_to_highlight_img, GUI_EVENT_TOUCH_CLICKED,
+                         NULL);
+
+    gui_img_t *play_pause_img = gui_img_create_from_mem(win_music, "music_play_pause", MUSIC_PAUSE_BIN,
+                                                        165, 0, 0, 0);
+    gui_obj_add_event_cb(play_pause_img, (gui_event_cb_t)switch_to_play_pause_img,
+                         GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    gui_img_t *forward_img = gui_img_create_from_mem(win_music, "music_forward", MUSIC_FORWARD_BIN, 290,
+                                                     0, 0, 0);
+    gui_obj_add_event_cb(forward_img, (gui_event_cb_t)switch_to_highlight_img, GUI_EVENT_TOUCH_CLICKED,
+                         NULL);
 
 }
