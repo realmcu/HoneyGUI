@@ -145,6 +145,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         gui_text_mode_set(button->text, CENTER);
                         GUI_BASE(button->text)->w = 70 * 3;
                     }
+                    gui_log("APP found.\n");
                 }
 
             }
@@ -154,6 +155,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
 
     }
     gui_fs_closedir(dir);
+    gui_log("APP list init done.\n");
 }
 void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
 {
