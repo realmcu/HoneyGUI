@@ -1,16 +1,12 @@
 
 menu "HoneyGUI Framework Config"
-        
+
     menuconfig REALTEK_BUILD_GUI
         bool "Enalbe RealGUI"
         default n
 
         if REALTEK_BUILD_GUI
 
-            config REALTEK_BUILD_GUI_FONT_STB
-            bool "Enable STB FONT"
-            default n
-			
             config REALTEK_BUILD_GUI_BOX2D
             bool "Enable Box2D"
             default n
@@ -19,14 +15,10 @@ menu "HoneyGUI Framework Config"
             bool "Enable FreeTYPE FONT"
             default n
 
-            config REALTEK_BUILD_GUI_FONT_RTK_MEM
-            bool "Enable RTK MEM FONT"
-            default n
-
             config REALTEK_BUILD_GUI_FONT_TTF_SVG
             bool "Enable TTF SVG FONT"
             default n
-        
+
             config REALTEK_BUILD_VG_LITE
             bool "Enable VG LITE GPU acc"
             default n
@@ -56,7 +48,7 @@ menu "HoneyGUI Framework Config"
 
                 config REALTEK_BUILD_GUI_DEMO
                     bool "Enable Simple GUI_DEMO"
-                    
+
                 config REALTEK_BUILD_GUI_320_384_DEMO
                     bool "Enable 320_384_DEMO"
             endchoice
