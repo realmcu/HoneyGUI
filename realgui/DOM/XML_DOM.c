@@ -72,13 +72,13 @@ static xml_dom_wifi_t wifi_array[XML_DOM_WIFI_COUINT] =
     {"WiFi11"}, {"WiFi12"}, {"WiFi13"}, {"WiFi14"}, {"WiFi15"}, {"WiFi16"}, {"WiFi17"}, {"WiFi18"}, {"WiFi19"}, {"WiFi20"},
     {"WiFi21"}, {"WiFi22"}, {"WiFi23"}, {"WiFi24"}, {"WiFi25"}, {"WiFi26"}, {"WiFi27"},
 };
-#define MACRO_CONNECTED 9001
-#define MACRO_DISCONNECTED 9002
-#define MACRO_CONNECTING 9003
-#define MACRO_WIFI 9004
-#define MACRO_FRAME 9005
-#define MACRO_INTERACTION 9006
-#define MACRO_FPS 9007
+#define MACRO_CONNECTED         (uint32_t)255
+#define MACRO_DISCONNECTED      (uint32_t)254
+#define MACRO_CONNECTING        (uint32_t)253
+#define MACRO_WIFI              (uint32_t)252
+#define MACRO_FRAME             (uint32_t)251
+#define MACRO_INTERACTION       (uint32_t)250
+#define MACRO_FPS               (uint32_t)249
 
 #define GUI_EVENT_WIN_FRAME_PARAM (0XFF-2)
 static struct widget_create widget[] =
@@ -1218,7 +1218,7 @@ void gui_xml_dom_wifi_connect(uint8_t *status, const char *wifi_name)
 }
 static void wifi_connect(void *obj, gui_event_t e, void *p)
 {
-    gui_xml_dom_wifi_connect(&active_wifi_status, wifi_array[active_wifi_index].name);
+    gui_xml_dom_wifi_connect((uint8_t *)&active_wifi_status, wifi_array[active_wifi_index].name);
 }
 #define GET_WIDGET_BY_NAME(NAME, obj)\
     gui_obj_t *obj = 0;\
@@ -7603,7 +7603,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_tap_func)
 
     if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
     {
-        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        if (interaction_param->animation == FIGMA_INTERACTION_ANIMATION_PUSH)
         {
             gui_win_set_animate(obj, interaction_param->duration, 0, win_frame_on_tap_ani, param);
         }
@@ -7748,7 +7748,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_ani)
                                                     interaction_param);
     //frame_on_drag_navigate_to_push_to(animate->progress_percent, (gui_win_t *)interaction_param->destination_widget, interaction_param);
 
-    GUI_TYPE(gui_win_t, this_widget)->release_flag;
+//    GUI_TYPE(gui_win_t, this_widget)->release_flag;
     //gui_log("release_flag %d\n", GUI_TYPE(gui_win_t, this_widget)->release_flag);
     if (GUI_TYPE(gui_win_t, this_widget)->release_flag)
     {
@@ -8183,7 +8183,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_in)
     interaction_param->destination_widget = win_to;
     if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
     {
-        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        if (interaction_param->animation == FIGMA_INTERACTION_ANIMATION_PUSH)
         {
             gui_win_set_animate(obj, 1000, -1, win_frame_on_drag_ani, param);
             gui_win_set_animate((void *)win_to, 1000, -1, win_frame_on_drag_ani_to, param);
@@ -8201,7 +8201,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_in_judge)
     interaction_param->destination_widget = win_to;
     if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
     {
-        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        if (interaction_param->animation == FIGMA_INTERACTION_ANIMATION_PUSH)
         {
             gui_win_append_animate(obj, 1000, -1, win_frame_on_drag_ani_judge, param,
                                    "win_frame_on_drag_ani_judge");
@@ -8224,7 +8224,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_out)
     interaction_param->destination_widget = win_to;
     if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
     {
-        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        if (interaction_param->animation == FIGMA_INTERACTION_ANIMATION_PUSH)
         {
             gui_win_set_animate(obj, interaction_param->duration, 0, win_frame_on_drag_ani_out, param);
             gui_win_set_animate((void *)win_to, interaction_param->duration, 0, win_frame_on_drag_ani_out_to,
@@ -8248,7 +8248,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_frame_on_drag_func_out_return)
     interaction_param->destination_widget = win_to;
     if (interaction_param->action == FIGMA_INTERACTION_ACTION_NAVIGATE_TO)
     {
-        if (interaction_param->animation = FIGMA_INTERACTION_ANIMATION_PUSH)
+        if (interaction_param->animation == FIGMA_INTERACTION_ANIMATION_PUSH)
         {
             gui_win_set_animate(obj, SWAP_RETURN_DURATION, 0, win_frame_on_drag_ani_out_return, param);
             gui_win_set_animate((void *)win_to, SWAP_RETURN_DURATION, 0, win_frame_on_drag_ani_out_to_return,
