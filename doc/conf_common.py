@@ -14,6 +14,7 @@ import shutil
 from datetime import datetime
 from docutils import nodes
 from docutils.parsers.rst import roles
+from pathlib import Path
 
 ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
  
@@ -200,6 +201,22 @@ breathe_show_include = False
 
 numfig = False
 
+GA_ID_MAPPING = {
+    ("gui", "en"): "G-YSMY2F6NER",
+    ("gui", "cn"):  "G-L7QPTX3F0Z",
+    "default": "G-8MDP27F36Q"
+}
+
+def get_ga_id():
+    return GA_ID_MAPPING.get((os.getenv("current_sdk_type", ""), os.getenv("current_language", "")), GA_ID_MAPPING["default"])
+
+def add_google_analytics(app, options):
+    static_js_dir = Path(app.confdir) / "_static" / "js"
+    with open(static_js_dir / "ga_config.js", "w") as f:
+        f.write(f"window.GA_CONFIG = {{ id: '{get_ga_id()}' }};")
+
+    app.add_js_file("js/ga_config.js")
+    app.add_js_file("js/ga-insert.js")
 
 def custom_role(role_name, rawtext, text, lineno, inliner, options={}, content=[]):
     node = nodes.inline(rawtext, text, classes=[role_name])
@@ -269,3 +286,4 @@ def setup(app):
     app.connect('build-finished', write_json)
     # app.add_css_file('css/customdoxygen.css')
     # app.add_css_file('css/my_customdoxygen.css')
+    add_google_analytics(app, html_theme_options)
