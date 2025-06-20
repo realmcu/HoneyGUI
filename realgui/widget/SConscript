@@ -9,7 +9,7 @@ src = Split("""
 
 CPPPATH = [cwd]
 
-objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 list = os.listdir(cwd)
 for d in list:

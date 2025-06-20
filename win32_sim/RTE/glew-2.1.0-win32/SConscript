@@ -16,6 +16,6 @@ include += [cwd + '/glew-2.1.0/include']
 include += [cwd + '/glew-2.1.0/include/GL']
 
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
 
 Return('group')

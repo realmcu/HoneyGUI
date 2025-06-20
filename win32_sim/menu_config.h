@@ -17,9 +17,9 @@
 
 
 // <e> HoneyGUI Enable RTK Real GUI
-#define CONFIG_REALTEK_BUILD_GUI     1
+#define CONFIG_REALTEK_HONEYGUI     1
 
-#if (CONFIG_REALTEK_BUILD_GUI == 1)
+#if (CONFIG_REALTEK_HONEYGUI == 1)
 
 // <h> HoneyGUI Demo Select
 
@@ -145,10 +145,6 @@
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
 // </c>
 
-// <c> RTK GUI Font Enable TTF SVG
-// #define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
-// </c>
-
 // <c> RTK GUI Enable VGLITE GPU
 // #define CONFIG_REALTEK_BUILD_VG_LITE
 // </c>
@@ -177,10 +173,6 @@
 
 // <c> RTK GUI Enable u8g2
 // #define CONFIG_REALTEK_BUILD_U8G2
-// </c>
-
-// <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 // <c> RTK GUI Enable LiteGFX

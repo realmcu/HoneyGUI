@@ -9,6 +9,6 @@ src = Split("""
 src = Glob('*.c')
 CPPPATH = [cwd]
 
-group = DefineGroup('gui_port', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('gui_port', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 Return('group')

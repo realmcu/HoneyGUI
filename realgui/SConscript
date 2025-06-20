@@ -22,9 +22,9 @@ if GetDepend('CONFIG_REALTEK_BUILD_PPEV2'):
 if GetDepend('CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE'):
     CPPDEFINES += ['ENABLE_RTK_GUI_WATCHFACE_UPDATE']
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-if GetDepend('CONFIG_REALTEK_BUILD_GUI'):
+if GetDepend('CONFIG_REALTEK_HONEYGUI'):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):

@@ -1,44 +1,47 @@
 
-menu "HoneyGUI Framework Config"
 
-    menuconfig REALTEK_BUILD_GUI
-        bool "Enalbe RealGUI"
+
+menuconfig REALTEK_HONEYGUI
+    bool "Enalbe RealTek HoneyGUI"
+    default n
+
+    if REALTEK_HONEYGUI
+
+        config REALTEK_BUILD_GUI_BOX2D
+        bool "Enable Box2D"
         default n
 
-        if REALTEK_BUILD_GUI
+        config REALTEK_BUILD_GUI_FONT_FREETYPE
+        bool "Enable FreeTYPE FONT"
+        default n
 
-            config REALTEK_BUILD_GUI_BOX2D
-            bool "Enable Box2D"
-            default n
+        config REALTEK_BUILD_SCRIPT_AS_A_APP
+        bool "Enable SaaA"
+        default n
+        
+        config REALTEK_HONEYGUI_HW_ACC
+        bool "Enable HoneyGUI HW ACC"
+        default n
+        
+        if REALTEK_HONEYGUI_HW_ACC
+            choice
+                prompt "Select hw ACC type"
+                default REALTEK_BUILD_PPE
 
-            config REALTEK_BUILD_GUI_FONT_FREETYPE
-            bool "Enable FreeTYPE FONT"
-            default n
+                config REALTEK_BUILD_VG_LITE
+                    bool "Enable VG LITE GPU acc"
 
-            config REALTEK_BUILD_GUI_FONT_TTF_SVG
-            bool "Enable TTF SVG FONT"
-            default n
+                config REALTEK_BUILD_PPE
+                    bool "Enable PPE ACC"
 
-            config REALTEK_BUILD_VG_LITE
-            bool "Enable VG LITE GPU acc"
-            default n
+            endchoice
+        endif
 
-            config REALTEK_BUILD_PPE
-            bool "Enable PPE ACC"
-            default n
-
-            config REALTEK_NANOVG_HW_VGLITE
-            bool "Enable NANOVG GPU MODE"
-            default n
-
-            config REALTEK_BUILD_SCRIPT_AS_A_APP
-            bool "Enable SaaA"
-            default n
-
-            config REALTEK_BUILD_PAINTER_ENGINE
-            bool "Enable Painter engine"
-            default n
-
+        config REALTEK_HONEYGUI_DEMO
+        bool "Select a HoneyGUI demo"
+        default n
+        
+        if REALTEK_HONEYGUI_DEMO
             choice
                 prompt "select gui demo"
                 default REALTEK_BUILD_GUI_410_502_DEMO
@@ -53,5 +56,5 @@ menu "HoneyGUI Framework Config"
                     bool "Enable 320_384_DEMO"
             endchoice
         endif
+    endif
 
-endmenu

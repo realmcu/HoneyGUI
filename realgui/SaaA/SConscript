@@ -15,6 +15,6 @@ if GetDepend(['CONFIG_REALTEK_BUILD_WEB']):
     CPPPATH += [cwd+'/web']
 
 
-group = DefineGroup('realgui/SaaA', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/SaaA', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 Return('group')
