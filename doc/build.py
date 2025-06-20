@@ -153,6 +153,10 @@ sdk_name = "gui"
 en_cn_build = [(" -c ./en en ./{}/{} -D language=en".format(html_out, en_html_out), 'en'), (" -c ./cn cn ./{}/{} -D language=zh_CN".format(html_out, cn_html_out), 'cn')]
 for l, p in en_cn_build:
   l_doc_path = os.path.join(doc_path, p)
+
+  os.environ['current_sdk_type'] = sdk_name
+  os.environ['current_language'] = p
+  
   # BUILD PDF
   if not skip_latex:
     # Silly workaround to include the more or less correct PDF download link in the PDF
@@ -181,6 +185,7 @@ for l, p in en_cn_build:
     download_tool_list = download_tools(l_doc_path)
     add_download_link(download_tool_list, l_doc_path)
   print("Current path: {}".format(os.getcwd()))
+
   cmd_line = "pipenv run sphinx-build -b html -j 8"
   ep = ''
   exclude_patterns_ins = []
