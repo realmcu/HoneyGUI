@@ -42,12 +42,12 @@ static Position_rot_t prism_world_rot_temp = {0.0f, 0.0f, 0.0f};
 
 
 
-static Position_pos_t prism_world_pos_raw = {0.0f, 10.0f, 95.0f};
-static Position_pos_t prism_camera_pos_raw = {0.0f, 3.0f, 55.0f};
+static Position_pos_t prism_world_pos_raw = {0.0f, 0.0f, 0.0f};
+static Position_pos_t prism_camera_pos_raw = {0.0f, 0.0f, 0.0f};
 static Position_rot_t prism_world_rot_raw = {0.0f, 0.0f, 0.0f};
 
-static Position_pos_t prism_world_pos_target = {0.0f, 11.3f, 109.0f};//10.5,109
-static Position_pos_t prism_camera_pos_target = {0.0f, 0.0f, 80.0f};//80
+static Position_pos_t prism_world_pos_target = {0.0f, 0.0f, 0.0f};
+static Position_pos_t prism_camera_pos_target = {0.0f, 0.0f, 0.0f};
 static Position_rot_t prism_world_rot_target = {0.0f, 0.0f, 0.0f};
 
 static gui_prism_mirror3d_t *prism_mirror3d = NULL;
@@ -317,7 +317,32 @@ static void prism_view_switch_to_other_view()
                                SWITCH_OUT_NONE_ANIMATION);
     }
 }
+static void prism_position_init()
+{
+    prism_world_pos_raw.pos_x = 0.0f;
+    prism_world_pos_raw.pos_y = 10.0f;
+    prism_world_pos_raw.pos_z = 95.0f;
 
+    prism_camera_pos_raw.pos_x = 0.0f;
+    prism_camera_pos_raw.pos_y = 3.0f;
+    prism_camera_pos_raw.pos_z = 55.0f;
+
+    prism_world_rot_raw.rot_x = 0.0f;
+    prism_world_rot_raw.rot_y = 0.0f;
+    prism_world_rot_raw.rot_z = 0.0f;
+
+    prism_world_pos_target.pos_x = 0.0f;
+    prism_world_pos_target.pos_y = 11.3f;
+    prism_world_pos_target.pos_z = 109.0f;
+
+    prism_camera_pos_target.pos_x = 0.0f;
+    prism_camera_pos_target.pos_y = 0.0f;
+    prism_camera_pos_target.pos_z = 80.0f;
+
+    prism_world_rot_target.rot_x = 0.0f;
+    prism_world_rot_target.rot_y = 0.0f;
+    prism_world_rot_target.rot_z = 0.0f;
+}
 static void app_ui_prism_mirror_design(gui_view_t *view)
 {
 
