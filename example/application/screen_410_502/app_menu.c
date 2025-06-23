@@ -47,6 +47,7 @@ const static gui_view_descriptor_t *butterflys_view = NULL;
 const static gui_view_descriptor_t *earth_clock_view = NULL;
 const static gui_view_descriptor_t *labubu_digital_view = NULL;
 const static gui_view_descriptor_t *flower_clock_view = NULL;
+const static gui_view_descriptor_t *rainbow_analog_view = NULL;
 void app_menu_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
 {
@@ -96,6 +97,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     earth_clock_view = gui_view_descriptor_get("earth_clock_view");
     labubu_digital_view = gui_view_descriptor_get("labubu_digital_view");
     flower_clock_view = gui_view_descriptor_get("flower_clock_view");
+    rainbow_analog_view = gui_view_descriptor_get("rainbow_analog_view");
 
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -289,6 +291,13 @@ static void switch_APP_FLOWER_CLOCK(void *obj, gui_event_t e, void *param)
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
+void switch_APP_RAINBOW_ANALOG(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, rainbow_analog_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
+}
+
 static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
 {
     gui_obj_t *parent = GUI_BASE(current_view)->parent;
@@ -355,6 +364,7 @@ void app_menu_design(gui_view_t *view)
         EARTH_DIGITAL_ICON_BIN,
         LABUBU_DIGITAL_ICON_BIN,
         FLOWER_CLOCK_ICON_BIN,
+        RAINBOW_ANALOG_ICON_BIN,
 
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
@@ -390,7 +400,8 @@ void app_menu_design(gui_view_t *view)
             "Butterflys",
             "Earth Clock",
             "Labubu Digital",
-            "Flower Clock "
+            "Flower Clock ",
+            "Rainbow Analog",
         };
         int array_size = sizeof(text_array) / sizeof(text_array[0]);
         gui_list_note_t *tab_array[array_size];
@@ -497,6 +508,9 @@ void app_menu_design(gui_view_t *view)
         gui_obj_add_event_cb(tab_array[27], (gui_event_cb_t)switch_APP_FLOWER_CLOCK,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
+        gui_obj_add_event_cb(tab_array[28], (gui_event_cb_t)switch_APP_RAINBOW_ANALOG,
+                             GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
         {
             gui_list_note_t *tab = gui_list_add_note(list, false);
             // gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(tab), 0, 72, 0, 262, 56, 30,
@@ -532,6 +546,7 @@ void app_menu_design(gui_view_t *view)
                 {switch_APP_FIREFLY, NULL}, {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
                 {switch_APP_COUNTDOWN, NULL}, {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL},
                 {switch_APP_BUTTERFLYS, NULL}, {switch_APP_EARTH_CLOCK, NULL}, {switch_APP_LABUBU_DIGITAL, NULL}, {switch_APP_FLOWER_CLOCK, NULL},
+                {switch_APP_RAINBOW_ANALOG, NULL},
 
                 {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
                 {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
@@ -540,6 +555,7 @@ void app_menu_design(gui_view_t *view)
                 {switch_APP_FIREFLY, NULL}, {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
                 {switch_APP_COUNTDOWN, NULL}, {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL},
                 {switch_APP_BUTTERFLYS, NULL}, {switch_APP_EARTH_CLOCK, NULL}, {switch_APP_LABUBU_DIGITAL, NULL}, {switch_APP_FLOWER_CLOCK, NULL},
+                {switch_APP_RAINBOW_ANALOG, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));
