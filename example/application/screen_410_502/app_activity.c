@@ -200,6 +200,12 @@ static void arc_activity_cb(NVGcontext *vg)
 
 static void activity_timer_cb(void *obj)
 {
+    if (current_view->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
+        gui_view_get_next() != NULL)
+    {
+        return;
+    }
+
     gui_obj_timer_t *timer = img->base.timer;
 
     count += timer->interval_ms;
@@ -222,11 +228,11 @@ static void back2menu_cb()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, SCREEN_WIDTH, back2menu_cb)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, SCREEN_WIDTH, back2menu_cb)
+// }
 
 static void enter_timer_cb(void *obj)
 {
@@ -300,6 +306,9 @@ static void activity_design(gui_view_t *view)
         count = 0;
         gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
 
-        gui_obj_create_timer(obj, 17, true, return_timer_cb);
+        // gui_obj_create_timer(obj, 17, true, return_timer_cb);
+        gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                                 SWITCH_IN_ANIMATION_FADE,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
     }
 }

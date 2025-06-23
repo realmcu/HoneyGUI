@@ -49,11 +49,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 static float rot_x = 0.0f;
 static float rot_y = 0.0f;
@@ -150,7 +150,10 @@ static void digital_clock_global_cb(gui_3d_t *this)
 void digital_clock_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
     gui_3d_t *digital_clock_3d = gui_3d_create(obj, "3d-widget", DESC_DIGITAL_CLOCK_BIN,
                                                GUI_3D_DRAW_FRONT_AND_BACK, 0, 0,

@@ -52,17 +52,17 @@ extern char *day[7];
 
 static char date_text_content[10];
 
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+// static void return_to_menu()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 unsigned char *flower[] = {FLOWER_MJPG, PEONY_RED_MJPG, PEONY_BLUE_MJPG};
 static uint8_t flower_index = 0;
@@ -115,6 +115,10 @@ static void flower_change_cb(void *obj, gui_event_t e, void *param)
 
 void create_watchface_flower(gui_view_t *view)
 {
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
+
     gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
 
@@ -158,5 +162,5 @@ void create_watchface_flower(gui_view_t *view)
     // gui_obj_create_timer(, 17, true, flower_change_cb);
     gui_obj_add_event_cb(video, flower_change_cb, GUI_EVENT_TOUCH_CLICKED, 0);
 
-    gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
+    // gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
 }

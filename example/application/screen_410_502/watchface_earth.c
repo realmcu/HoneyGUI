@@ -65,11 +65,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 static void time_update_cb(void *p)
 {
@@ -160,5 +160,8 @@ void create_watchface_earth(gui_view_t *view)
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     time_update_cb(NULL);
-    gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
+    // gui_obj_create_timer(GUI_BASE(view), 17, true, return_timer_cb);
 }

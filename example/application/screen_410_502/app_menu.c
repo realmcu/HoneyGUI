@@ -16,7 +16,6 @@
 
 
 #define MENU_GAP 125
-#define APP_NUM 30
 #define CURRENT_VIEW_NAME "menu_view"
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
@@ -187,8 +186,10 @@ void switch_APP_DISC(void *obj, gui_event_t e, void *param)
 
 void switch_APP_FACE(void *obj, gui_event_t e, void *param)
 {
-    gui_view_switch_direct(current_view, face_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
+    gui_view_switch_direct(current_view, face_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
+    gui_obj_hidden(GUI_BASE(current_view), true);
 }
 
 void switch_APP_PRISM_THICK(void *obj, gui_event_t e, void *param)
@@ -199,7 +200,7 @@ void switch_APP_PRISM_THICK(void *obj, gui_event_t e, void *param)
 
 void switch_APP_PRISM_MIRROR(void *obj, gui_event_t e, void *param)
 {
-    gui_view_switch_direct(current_view, prism3d_mirror_view, SWITCH_IN_NONE_ANIMATION,
+    gui_view_switch_direct(current_view, prism3d_mirror_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
@@ -297,11 +298,11 @@ static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
     gui_view_create(parent, &descriptor, 0, 0, 0, 0);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, app_back2watchface_cb)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, app_back2watchface_cb)
+// }
 
 static void list_timer_cb(void *obj)
 {
@@ -317,7 +318,10 @@ static void cellular_timer_cb(void *obj)
 void app_menu_design(gui_view_t *view)
 {
     gui_win_t *win = gui_win_create(view, "win_app_menu", 0, 0, 0, 0);
-    gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
+    // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
+    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
     extern bool return_to_watchface_flag;
     return_to_watchface_flag = false;
@@ -354,19 +358,9 @@ void app_menu_design(gui_view_t *view)
 
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
-        UI_CLOCK_BOX2D_RING_ICON_BIN,
-        UI_CLOCK_ACTIVITY_ICON_BIN,
-        SOCCER_ICON_BIN,
-        FLOWER_ICON_BIN,
-        WEATHER_ICON_BIN,
-        BUTTERFLY_ICON_BIN,
-        APPLIST_ICON_BIN,
-        DISC_ICON_BIN,
-        FACE_ICON_BIN,
     };
     if (menu_style == 0)
     {
-        gui_list_note_t *tab_array[APP_NUM];
         char *text_array[] =
         {
             "Heart Rate",
@@ -399,6 +393,7 @@ void app_menu_design(gui_view_t *view)
             "Flower Clock "
         };
         int array_size = sizeof(text_array) / sizeof(text_array[0]);
+        gui_list_note_t *tab_array[array_size];
 
         uint8_t space = 5;
 
@@ -522,66 +517,6 @@ void app_menu_design(gui_view_t *view)
     {
         gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), "background", 0, 0,
                                                               SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
-        uint32_t *img_data_array[] =
-        {
-            UI_CLOCK_HEARTRATE_ICON_BIN,
-            UI_CLOCK_FRUIT_NINJA_ICON_BIN,
-            UI_CLOCK_BOX2D_RING_ICON_BIN,
-            UI_CLOCK_ACTIVITY_ICON_BIN,
-            SOCCER_ICON_BIN,
-            FLOWER_ICON_BIN,
-            WEATHER_ICON_BIN,
-            BUTTERFLY_ICON_BIN,
-            APPLIST_ICON_BIN,
-            DISC_ICON_BIN,
-            FACE_ICON_BIN,
-            PRISM_THICK_ICON_BIN,
-            PRISM3D_ICON_BIN,
-            WINDMILL_ICON_BIN,
-            PANDKOI_ICON_BIN,
-            SEAWATER_ICON_BIN,
-            FIREFLY_ICON_BIN,
-            RAINBOW_DIGITAL_ICON_BIN,
-            KOI_CLOCK_ICON_BIN,
-            DIGITAL_CLOCK_ICON_BIN,
-            COUNT_DOWN_TIME_ICON_BIN,
-            FIREWORKS_CLOCK_ICON_BIN,
-            HEART_PARTICLE_ICON_BIN,
-            BUTTERFLY_PARTICLE_ICON_BIN,
-            BUTTERFLYS_ICON_BIN,
-            EARTH_DIGITAL_ICON_BIN,
-            LABUBU_DIGITAL_ICON_BIN,
-            FLOWER_CLOCK_ICON_BIN,
-
-            UI_CLOCK_HEARTRATE_ICON_BIN,
-            UI_CLOCK_FRUIT_NINJA_ICON_BIN,
-            UI_CLOCK_BOX2D_RING_ICON_BIN,
-            UI_CLOCK_ACTIVITY_ICON_BIN,
-            SOCCER_ICON_BIN,
-            FLOWER_ICON_BIN,
-            WEATHER_ICON_BIN,
-            BUTTERFLY_ICON_BIN,
-            APPLIST_ICON_BIN,
-            DISC_ICON_BIN,
-            FACE_ICON_BIN,
-            PRISM_THICK_ICON_BIN,
-            PRISM3D_ICON_BIN,
-            WINDMILL_ICON_BIN,
-            PANDKOI_ICON_BIN,
-            SEAWATER_ICON_BIN,
-            FIREFLY_ICON_BIN,
-            RAINBOW_DIGITAL_ICON_BIN,
-            KOI_CLOCK_ICON_BIN,
-            DIGITAL_CLOCK_ICON_BIN,
-            COUNT_DOWN_TIME_ICON_BIN,
-            FIREWORKS_CLOCK_ICON_BIN,
-            HEART_PARTICLE_ICON_BIN,
-            BUTTERFLY_PARTICLE_ICON_BIN,
-            BUTTERFLYS_ICON_BIN,
-            EARTH_DIGITAL_ICON_BIN,
-            LABUBU_DIGITAL_ICON_BIN,
-            FLOWER_CLOCK_ICON_BIN,
-        };
         gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, img_data_array,
                                                              sizeof(img_data_array) / sizeof(uint32_t *));
         menu_cellular = menu;

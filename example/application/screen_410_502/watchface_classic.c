@@ -133,7 +133,7 @@ static void refreash_time()
     }
 }
 
-void clear_clock(void)
+void clear_watchface_classic(gui_view_t *view)
 {
     if (img_data_temperature)
     {
@@ -655,6 +655,7 @@ void create_watchface_classic(gui_view_t *view)
                                                  37,
                                                  348, 100, 100);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         gui_obj_create_timer(GUI_BASE(img), 2000, true, temp_timer_cb);
         //text
         // sprintf(tempera_cur_content, "22");
@@ -695,13 +696,20 @@ void create_watchface_classic(gui_view_t *view)
     {
         gui_img_t *img_weather = gui_img_create_from_mem(win_watch, "CLOCK_CARD_WEATHER",
                                                          UI_CLOCK_CARD_WEATHER_BIN, 41, 178, 0, 0);
+        gui_img_set_quality(img_weather, true);
         gui_obj_add_event_cb(img_weather, (gui_event_cb_t)switch_menu, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73, 0, 0);
-        gui_img_create_from_mem(img_weather, "condition_2", UI_WEATHER_RAIN_L_BIN, 89, 73, 0, 0);
-        gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_M_BIN, 150, 73, 0, 0);
-        gui_img_create_from_mem(img_weather, "condition_4", UI_WEATHER_RAIN_S_BIN, 208, 73, 0, 0);
-        gui_img_create_from_mem(img_weather, "condition_5", UI_WEATHER_SUNNY_BIN, 272, 73, 0, 0);
+        gui_img_t *img = gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73,
+                                                 0, 0);
+        gui_img_set_quality(img, true);
+        img = gui_img_create_from_mem(img_weather, "condition_2", UI_WEATHER_RAIN_L_BIN, 89, 73, 0, 0);
+        gui_img_set_quality(img, true);
+        img = gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_M_BIN, 150, 73, 0, 0);
+        gui_img_set_quality(img, true);
+        img = gui_img_create_from_mem(img_weather, "condition_4", UI_WEATHER_RAIN_S_BIN, 208, 73, 0, 0);
+        gui_img_set_quality(img, true);
+        img = gui_img_create_from_mem(img_weather, "condition_5", UI_WEATHER_SUNNY_BIN, 272, 73, 0, 0);
+        gui_img_set_quality(img, true);
         char *weather_content = "Today";
         gui_text_t *weather_text = gui_text_create(img_weather, "txt", 20, 110, 0, 0);
         gui_text_set(weather_text, (void *)weather_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
@@ -743,7 +751,7 @@ void create_watchface_classic(gui_view_t *view)
 // #endif
 
     // date & time text
-    sprintf(date_text_content, "SUN 0");
+    sprintf(date_text_content, "%s", day[0]);
     date_text = gui_text_create(win_watch, "date_text",  -35, 33, 0, 0);
     gui_text_set(date_text, (void *)date_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_text_content),
@@ -757,18 +765,23 @@ void create_watchface_classic(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win_watch, "watch_hour_decimal", text_num_array[0],
                                                  211, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "watch_hour_single", text_num_array[0],
                                       211 + text_w, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "colon", text_num_array[10],
                                       211 + text_w * 2 + 5, 88 + 5, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "watch_minute_decimal", text_num_array[0],
                                       211 + text_w * 2 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "watch_minute_single", text_num_array[0],
                                       211 + text_w * 3 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
     }
 
     // activity icon
@@ -783,15 +796,20 @@ void create_watchface_classic(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 37,
                                                  68, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         gui_obj_create_timer(GUI_BASE(img), 2000, true, activity_timer_cb);
     }
     // compass icon
     gui_img_t *img = gui_img_create_from_mem(win_watch, "CLOCK_COMPASS_DIAL",
                                              UI_CLOCK_COMPASS_DIAL_ICON_BIN, 155, 348, 0, 0);
+    gui_img_set_quality(img, true);
+
     compass_pointer = gui_img_create_from_mem(img, "CLOCK_COMPASS_POINTER",
                                               UI_CLOCK_COMPASS_POINTER_ICON_BIN, 42, 10, 0, 0);
-    compass_pointer->base.w = 14;
-    compass_pointer->base.h = 10;
+    // compass_pointer->base.w = 14;
+    // compass_pointer->base.h = 10;
+    gui_img_set_quality(img, true);
+
     compass_degree = gui_text_create(img, "compass_degree", 0, 23, 100, 100);
     gui_text_set(compass_degree, (void *)degree_content, GUI_FONT_SRC_TTF,  gui_rgba(254, 106, 26,
                  UINT8_MAX), //orange color
@@ -814,8 +832,10 @@ void create_watchface_classic(gui_view_t *view)
     img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",
                                              UI_CLOCK_HEARTRATE_ICON_BIN, 272, 348, 0,
                                              0);
-    img_heart_rate->base.w = 100;
-    img_heart_rate->base.h = 100;
+    // img_heart_rate->base.w = 100;
+    // img_heart_rate->base.h = 100;
+    gui_img_set_quality(img_heart_rate, true);
+
     gui_obj_add_event_cb(img_heart_rate, (gui_event_cb_t)switch_heartrate, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
     gui_obj_create_timer(GUI_BASE(win_watch), 30000, true, refreash_time);

@@ -159,7 +159,7 @@ static void __view_released_cb(void *obj, gui_event_t e, void *param)
     gui_obj_t *o = (gui_obj_t *)_this;
     // gui_log("name = %s, detalX = %d, detalY = %d\n", o->name, tp->deltaX, tp->deltaY);
 
-    gui_obj_create_timer(o, 17, true, __released_view_timer_cb);
+    gui_obj_create_timer(o, 10, true, __released_view_timer_cb);
     gui_obj_start_timer(o);
 
     g_SurpressTP = true;
@@ -356,7 +356,7 @@ static void __view_on_event_change_cb(gui_obj_t *obj, gui_event_t e, gui_view_on
     g_NextView->current_event = e;
     g_CurrentView->current_event = e;
 
-    gui_obj_create_timer(obj, 17, true, __view_animate_timer_cb);
+    gui_obj_create_timer(obj, 10, true, __view_animate_timer_cb);
     gui_obj_start_timer(obj);
 
     g_Release = g_CurrentView->animate_step; //prevent new view abnormal display of the first frame

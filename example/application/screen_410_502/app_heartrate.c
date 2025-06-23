@@ -72,11 +72,11 @@ static void return_cb()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void timer_cb(void *p)
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-}
+// static void timer_cb(void *p)
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
+// }
 
 static void heartrate_graph(NVGcontext *vg)
 {
@@ -293,13 +293,14 @@ static void heart_rate_app(gui_view_t *view)
         // uint8_t number = atoi(hr_content);
         gui_img_t *img = gui_img_create_from_mem(win_hb, "hr_content_percentile", text_num_array[1],
                                                  51, 368, 0, 0);
+        gui_img_set_quality(img, true);
         GUI_BASE(img)->not_show = 1;
         img = gui_img_create_from_mem(win_hb, "hr_content_decimal", text_num_array[6],
                                       51 + text_w, 368, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_hb, "hr_content_single", text_num_array[9],
                                       51 + text_w * 2, 368, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
     }
     {
         char *text = "times/min";
@@ -326,6 +327,7 @@ static void heart_rate_app(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
                                                  SCREEN_HEIGHT);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_img_set_quality(img, true);
         gui_obj_create_timer(GUI_BASE(img), 1000, true, hr_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
     }
@@ -418,5 +420,8 @@ static void heart_rate_app(gui_view_t *view)
     {
         pre_view = watchface_view;
     }
-    gui_obj_create_timer(GUI_BASE(view), 17, true, timer_cb);
+    gui_view_switch_on_event(view, pre_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
+    // gui_obj_create_timer(GUI_BASE(view), 17, true, timer_cb);
 }

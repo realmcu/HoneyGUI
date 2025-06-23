@@ -49,11 +49,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 
 static float rot_angle = 0.0f;
@@ -76,7 +76,7 @@ static void face_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 70), gui_point_4d(0, 0, 0), 1, 32767,
                                  90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, 0, 25, 120, 0, rot_angle, 0, 5);
@@ -85,7 +85,10 @@ static void face_global_cb(gui_3d_t *this)
 void face_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
     gui_3d_t *face_3d = gui_3d_create(obj, "3d-widget", DESC_FACE_BIN,
                                       GUI_3D_DRAW_FRONT_AND_SORT, 15, 60,

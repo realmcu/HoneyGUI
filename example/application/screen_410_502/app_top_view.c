@@ -76,12 +76,11 @@ static uint8_t infor_need_update_num = 0;
 static bool clear_flag = false;
 static bool in_view_more = false;
 static bool note_dur_animation = false;
-
+static uint16_t count = 0;
 
 static void cancel_cb(void *p)
 {
-    gui_win_t *win = (gui_win_t *)p;
-    static uint16_t count = 0;
+    gui_win_t *win = (gui_win_t *)(GUI_BASE(p)->parent);
     uint16_t count_max = 300;
     count += win->base.timer->interval_ms;
     float percent = count / (float)count_max;
@@ -100,7 +99,6 @@ static void view_more_cb(void *p)
 {
     // enter animation
     gui_win_t *win = (gui_win_t *)p;
-    static uint16_t count = 0;
     uint16_t count_max = 300;
     count += win->base.timer->interval_ms;
     float percent = 1 - count / (float)count_max;
@@ -112,64 +110,26 @@ static void view_more_cb(void *p)
     {
         win->base.x = 0;
         count = 0;
+        gui_obj_stop_timer(GUI_BASE(win));
     }
-    if (win->base.x == 0)
+}
+
+static void canvas_color_change_cb(void *p)
+{
+    gui_canvas_round_rect_set_color((gui_canvas_round_rect_t *)p, gui_rgb(39, 43, 44));
+}
+
+static void view_more_click_cb(void *widget, gui_event_t e, void *param)
+{
+    gui_obj_t *obj = GUI_BASE(widget);
+    if (strcmp(obj->name, "cancel") == 0)
     {
-        static gui_canvas_round_rect_t *canvas = NULL;
-        char *canvas_name;
-        touch_info_t *tp = tp_get_info();
-        if (tp->released)
-        {
-            if ((tp->y > 35 && tp->y < 67))
-            {
-                if (tp->x > 37 && tp->x < 116)
-                {
-                    gui_obj_create_timer(GUI_BASE(win), 20, true, cancel_cb);
-                    gui_obj_start_timer(GUI_BASE(win));
-                }
-            }
-            else
-            {
-                uint16_t base_y = 160, h = 80, interval = 10;
-                if (tp->x > 30 && tp->x < 380)
-                {
-                    uint16_t y = base_y;
-                    if ((tp->y > y && tp->y < y + h))
-                    {
-                        gui_log("click canvas1\r\n");
-                        canvas_name = "canvas_1";
-                    }
-                    y = y + h + interval;
-                    if ((tp->y > y && tp->y < y + h))
-                    {
-                        gui_log("click canvas2\r\n");
-                        canvas_name = "canvas_2";
-                    }
-                    y = y + h + interval;
-                    if ((tp->y > y && tp->y < y + h))
-                    {
-                        gui_log("click canvas3\r\n");
-                        canvas_name = "canvas_3";
-                    }
-                    gui_node_list_t *node = NULL;
-                    gui_list_for_each(node, &(win->base.child_list))
-                    {
-                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-                        if (strcmp(obj->name, canvas_name) == 0)
-                        {
-                            canvas = (gui_canvas_round_rect_t *)obj;
-                            gui_canvas_round_rect_set_color(canvas, gui_rgb(255, 255, 255));
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        if (canvas)
-        {
-            gui_canvas_round_rect_set_color(canvas, gui_rgb(39, 43, 44));
-        }
+        gui_obj_create_timer(obj, 20, true, cancel_cb);
+        return;
     }
+    gui_canvas_round_rect_set_color((gui_canvas_round_rect_t *)obj, APP_COLOR_WHITE);
+    gui_obj_create_timer(obj, 10, false, canvas_color_change_cb);
+    gui_obj_start_timer(obj);
 }
 
 static void view_more_event_cb(void *widget, gui_event_t e, void *param)
@@ -283,6 +243,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
                      32);
         gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, LEFT);
+        gui_obj_add_event_cb(GUI_BASE(text), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
 
     gui_text_t *text = gui_text_create(win, "time", -60, 35, 0, 0);
@@ -333,6 +294,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
                  32);
     gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, CENTER);
+    gui_obj_add_event_cb(GUI_BASE(canvas), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_2", 30, 250, 350, 80, 15,
                                           gui_rgb(39, 43, 44));
@@ -343,6 +305,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
                  32);
     gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, CENTER);
+    gui_obj_add_event_cb(GUI_BASE(canvas), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     canvas = gui_canvas_round_rect_create(GUI_BASE(win), "canvas_3", 30, 340, 350, 80, 15,
                                           gui_rgb(39, 43, 44));
@@ -353,6 +316,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
                  32);
     gui_text_type_set(text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, CENTER);
+    gui_obj_add_event_cb(GUI_BASE(canvas), view_more_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 }
 
 static void create_inform_note(information_t *inform)
@@ -572,7 +536,7 @@ void top_view_design(gui_view_t *view)
     gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_STILL_USE_BLUR,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_set_opacity(view, 200);
+    // gui_view_set_opacity(view, 200);
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
     gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(parent), "background", 0, 0,

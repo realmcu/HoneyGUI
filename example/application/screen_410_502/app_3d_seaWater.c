@@ -112,11 +112,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 typedef struct
 {
     gui_img_t *img;
@@ -416,7 +416,10 @@ static void app_ui_wave_nums_design(gui_view_t *view)
 {
     srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
     gui_img_create_from_mem(view, "background", SEABACKGROUND_BIN, 0, 0, 0, 0);
     // gui_img_create_from_mem(view, "ForeGround", FOREGROUND_BIN, 0, 270, 0, 0);

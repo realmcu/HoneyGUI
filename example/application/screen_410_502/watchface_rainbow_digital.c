@@ -49,11 +49,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 
 
@@ -294,7 +294,10 @@ void rainbow_digital_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
     gui_win_t *clock_win = gui_win_create(obj, "clock_win", 0, 0, 0, 0);
 

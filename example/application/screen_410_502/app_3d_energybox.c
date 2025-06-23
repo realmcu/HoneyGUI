@@ -50,11 +50,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 static float overall_rot_y = 0.0f;
 static float face_shift = 0.0f;
@@ -132,7 +132,7 @@ void energybox_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
 
     gui_3d_t *energybox_3d = gui_3d_create(obj, "3d-widget", DESC_ENERGYBOX_BIN,
                                            GUI_3D_DRAW_FRONT_AND_BACK, 5, 0,

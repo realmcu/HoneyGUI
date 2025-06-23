@@ -26,6 +26,7 @@ const static gui_view_descriptor_t *heartrate_view = NULL;
 const static gui_view_descriptor_t *box2d_ring_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 void bottom_view_design(gui_view_t *view);
+static void clear_bottom_view(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -33,6 +34,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = bottom_view_design,
+    .on_switch_out = clear_bottom_view,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -98,7 +100,7 @@ static uint8_t *img_data_bg = NULL;
 
 static size_t buffer_size = 0;
 
-void clear_down_view(void)
+static void clear_bottom_view(gui_view_t *view)
 {
     if (img_data_bg)
     {

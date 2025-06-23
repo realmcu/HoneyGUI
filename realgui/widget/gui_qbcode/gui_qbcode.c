@@ -393,6 +393,7 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
                                                         qbcode->base.w, qbcode->base.h);
 
         qbcode->image_data = img_data;
+        qbcode->qbcode_img = qbcode_img;
     }
     else if ((qbcode->data) && (qbcode->type == BARCODE_DISPLAY_IMAGE))
     {
@@ -439,6 +440,7 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
                                                         qbcode->base.w, qbcode->base.h);
 
         qbcode->image_data = img_data;
+        qbcode->qbcode_img = qbcode_img;
     }
 
 }

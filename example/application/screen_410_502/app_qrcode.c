@@ -67,4 +67,5 @@ void qrcode_app(gui_view_t *view)
 
     gui_qbcode_config(qrcode, (uint8_t *)str, strlen(str), 3);
 
+    gui_img_set_quality(qrcode->qbcode_img, true);
 }

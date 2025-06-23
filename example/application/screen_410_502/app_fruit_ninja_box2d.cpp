@@ -679,16 +679,19 @@ extern "C" {
         gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
-    static void return_timer_cb(void *obj)
-    {
-        touch_info_t *tp = tp_get_info();
-        GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    }
+    // static void return_timer_cb(void *obj)
+    // {
+    //     touch_info_t *tp = tp_get_info();
+    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
+    // }
     void app_fruit_ninja_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
         gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
-        gui_obj_create_timer(GUI_BASE(win), 17, true, return_timer_cb);
+        // gui_obj_create_timer(GUI_BASE(win), 17, true, return_timer_cb);
+        gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                                 SWITCH_IN_ANIMATION_FADE,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
         app_fruit_ninja::fruit_ninja_design(obj);
     }
     void close_FN(gui_view_t *view)

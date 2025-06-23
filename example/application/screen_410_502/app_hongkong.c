@@ -46,6 +46,8 @@ static void watchface_design(gui_view_t *view);
 char *read_file(const char *file_path);
 #endif
 
+extern void clear_watchface_classic(gui_view_t *view);
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -63,6 +65,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = watchface_design,
+    .on_switch_out = clear_watchface_classic,
     .keep = false,
 };
 
@@ -279,9 +282,11 @@ static void data_generate_task_entry()
 {
     while (true)
     {
-        extern void json_refreash();
-        json_refreash();
-        gui_thread_mdelay(2000);
+        if (gui_view_get_next() == NULL)
+        {
+            json_refreash();
+        }
+        gui_thread_mdelay(4000);
     }
 }
 #endif
@@ -303,7 +308,10 @@ static void win_cb()
     {
         gui_free(temp);
     }
-    canvas_update_flag = 0b1111;
+    if (gui_view_get_next() == NULL)
+    {
+        canvas_update_flag = 0b1111;
+    }
     // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
     // extern struct tm watch_clock_get(void);
@@ -345,7 +353,7 @@ static void inform_generate_task_entry()
     static char *content = NULL;
     while (true)
     {
-        gui_thread_mdelay(2000);
+        gui_thread_mdelay(4000);
 
         if (!content)
         {
@@ -392,8 +400,7 @@ static void app_hongkong_ui_design(void)
 #else
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, TUYA_CJSON_BIN, 700);
-    // json_refreash();
-    // canvas_update_flag = 0b1111;
+    canvas_update_flag = 0b1111;
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0);
@@ -409,17 +416,17 @@ static int app_init(void)
     extern int close(int fd);
     defaultPath = "example\\application\\screen_410_502\\root_image_hongkong\\root\\";
     int fd;
-    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x704BB000).bin", 0);
+    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x704AC000).bin", 0);
     if (fd > 0)
     {
-        printf("open root(0x704BB000).bin Successful!\n");
+        printf("open root(0x704AC000).bin Successful!\n");
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
-        printf("open root(0x704BB000).bin Fail!\n");
-        printf("open root(0x704BB000).bin Fail!\n");
-        printf("open root(0x704BB000).bin Fail!\n");
+        printf("open root(0x704AC000).bin Fail!\n");
+        printf("open root(0x704AC000).bin Fail!\n");
+        printf("open root(0x704AC000).bin Fail!\n");
         return 0;
     }
 #else

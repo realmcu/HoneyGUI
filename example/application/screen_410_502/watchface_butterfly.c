@@ -56,11 +56,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 static float radius = 20.0f, theta = 0;
 static int frame_counter = 0;
@@ -206,7 +206,7 @@ static gui_3d_matrix_t watchface_butterfly_face_cb(gui_3d_t *this, size_t face_i
 void watchface_butterfly_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_win_t *win = gui_win_create(obj, "win_wf", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win), 17, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));

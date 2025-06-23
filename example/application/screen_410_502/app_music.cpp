@@ -1046,11 +1046,11 @@ extern "C"
                                SWITCH_IN_ANIMATION_FADE);
     }
 
-    static void return_timer_cb(void *obj)
-    {
-        touch_info_t *tp = tp_get_info();
-        GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    }
+    // static void return_timer_cb(void *obj)
+    // {
+    //     touch_info_t *tp = tp_get_info();
+    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
+    // }
 
     void app_music_ui_design(gui_view_t *view)
     {
@@ -1068,7 +1068,7 @@ extern "C"
         else
         {
             gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
-            gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
+            // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
         }
     }
 }

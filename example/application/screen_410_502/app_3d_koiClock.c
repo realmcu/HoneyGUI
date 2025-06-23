@@ -82,11 +82,11 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void return_timer_cb()
-{
-    touch_info_t *tp = tp_get_info();
-    GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-}
+// static void return_timer_cb()
+// {
+//     touch_info_t *tp = tp_get_info();
+//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
+// }
 
 #define CLOCK_RADIUS_X 60
 #define CLOCK_RADIUS_Y 55
@@ -248,7 +248,10 @@ static void app_ui_koiclock_design(gui_view_t *view)
 {
     srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
-    gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
 
     gui_dispdev_t *dc = gui_get_dc();
     gui_img_create_from_mem(view, "koiclock_bg", LOTUS_BG_BIN, 0, 0, dc->screen_width,
