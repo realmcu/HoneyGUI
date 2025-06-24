@@ -15,6 +15,9 @@ from datetime import datetime
 from docutils import nodes
 from docutils.parsers.rst import roles
 from pathlib import Path
+jenkinsBuild_home = os.environ.get("jenkinsScript_abspath", "")
+JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
+sys.path.append(JenkinsBuild_doc_Dir)
 
 ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
  
@@ -27,7 +30,10 @@ project = 'RTKIOT GUI'
 author = 'RTKIOT GUI'
 release = 'v0.0.0.1'
 
-link_data = dict()
+ai_ask_split_exclude_patterns = [
+    #'legacy/**',     # skip legacy path and sub path
+    # 'text/API_Reference/*.rst'
+]
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -37,7 +43,8 @@ extensions = ["breathe",
               "sphinx_copybutton",
               "sphinx_rtd_theme",
               "sphinx.ext.intersphinx",
-              "sphinxcontrib.mermaid"]
+              "sphinxcontrib.mermaid",
+              "ai_ask.generate_ai_ask_src",]
 
 myst_enable_extensions = [
     # "amsmath",
@@ -71,7 +78,6 @@ highlight_language = 'cpp'
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
 
 source_encoding = "utf-8"
 
@@ -222,48 +228,6 @@ def custom_role(role_name, rawtext, text, lineno, inliner, options={}, content=[
     node = nodes.inline(rawtext, text, classes=[role_name])
     return [node], []
 
-def process_rst_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        content = file.read()
-
-    figure_pattern = re.compile(r'^[ \t]*\.{1,2}\s+(figure|image)::[^\n]*\n(?:^[ \t]+:[^:]+:.*\n?)*', re.MULTILINE)
-    processed_content = re.sub(figure_pattern, '', content)
-
-    return processed_content
-
-
-def record_link(app, pagename, templatename, context, doctree):
-    # get uri
-    uri = app.builder.get_target_uri(pagename)
-    link_data[pagename] = uri
-
-    if os.getenv('COPY_RST_FILES', 'false').lower() == 'true':
-        source_dir = app.srcdir
-        target_base_dir = os.path.join(app.outdir, "doc_source")
-
-        for suffix in source_suffix:
-            rst_file_path = os.path.join(source_dir, pagename + suffix)
-            
-            if os.path.exists(rst_file_path):
-                modified_content = process_rst_file(rst_file_path)
-                target_dir = os.path.join(target_base_dir, os.path.dirname(pagename))
-                os.makedirs(target_dir, exist_ok=True)
-                
-                target_file_path = os.path.join(target_dir, os.path.basename(rst_file_path))
-                with open(target_file_path, 'w', encoding='utf-8') as target_file:
-                    target_file.write(modified_content)
-                break 
-
-def write_json(app, exception):
-    output_file = os.path.join(app.outdir, 'link_map.json')
-    try:
-        with open(output_file, 'w') as f:
-            json.dump(link_data, f, indent=4)
-        print(f"Successfully wrote URL map to {output_file}")
-        shutil.copy2(output_file, os.path.join(os.path.dirname(output_file), "origin_link_map.json"))
-    except Exception as e:
-        print(f"Error writing URL map: {e}")
-
 custom_role_list = ['red-text', 'bolditalic']
 
 # Example configuration for intersphinx: refer to the Python standard library.
@@ -281,9 +245,9 @@ def setup(app):
     # register custom class role
     for role in custom_role_list:
         app.add_role(role, custom_role)
-    # listen html-page-context event, record html link
-    app.connect('html-page-context', record_link)
-    app.connect('build-finished', write_json)
-    # app.add_css_file('css/customdoxygen.css')
-    # app.add_css_file('css/my_customdoxygen.css')
+    try:
+        from ai_ask.generate_ai_ask_src import setup as ai_ask_src_setup
+        ai_ask_src_setup(app)
+    except Exception as e:
+        print(f"Import ai_ask_src_setup error: {e}")
     add_google_analytics(app, html_theme_options)
