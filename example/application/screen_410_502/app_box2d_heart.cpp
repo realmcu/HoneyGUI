@@ -19,7 +19,7 @@ extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
     void app_heart_particle_ui_design(gui_view_t *view);
-    static void return_cb(gui_view_t *view);
+    static void app_close(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
     {
@@ -27,7 +27,7 @@ extern "C" {
         .name = (const char *)CURRENT_VIEW_NAME,
         .pView = &current_view,
         .on_switch_in = app_heart_particle_ui_design,
-        .on_switch_out = return_cb,
+        .on_switch_out = app_close,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -314,23 +314,15 @@ int ui_design(gui_obj_t *obj)
 
 // C interface
 extern "C" {
-    static void return_cb(gui_view_t *view)
+    static void app_close(gui_view_t *view)
     {
         app_heart_particle::close();
-        // gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-        //                        SWITCH_IN_ANIMATION_FADE);
     }
-    // static void return_timer_cb(void *obj)
-    // {
-    //     touch_info_t *tp = tp_get_info();
-    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    // }
 
     void app_heart_particle_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
         gui_win_t *win = gui_win_create(view, "win_heart", 0, 0, 0, 0);
-        // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
