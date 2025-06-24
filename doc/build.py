@@ -116,6 +116,7 @@ cn_html_out = r'cn'
 en_html_out = r'en'
 latex_out = "latex_out"
 rst_src_out = "rst_src"
+rst_split_src_out = "rst_split_src"
 print("")
 print("****************")
 print("Building")
@@ -136,15 +137,10 @@ if not skip_doxygen:
 os.chdir(doc_path)
 cmd("python generate_jieba_dict.py ./cn ./cn/word_dict.txt")
 
-rst_src_out = os.path.join(doc_path, output_path, rst_src_out)
-if os.path.exists(rst_src_out):
-  shutil.rmtree(rst_src_out)
-os.makedirs(rst_src_out)
-
 # Add si summary content
 if version:
   sys.path.append(JenkinsBuild_doc_Dir)
-  from add_ai_summary_src import *
+  from ai_summary.add_ai_summary_src import *
   add_raw_html_to_rst(doc_path, os.path.join(doc_path, "script/ai_summary_config.txt"))
 
 # BUILD HTML
@@ -209,20 +205,6 @@ for l, p in en_cn_build:
 
   # update lnk map file
   if version:
-    #generate link map txt
-    link_map_file = os.path.join(html_out_path, "link_map.json")
-    print(f"Link map file: {link_map_file}")
-    if os.path.exists(link_map_file):
-      print("Start update url link")
-      link = "https://docsqa.realmcu.com/{}/{}/{}/".format(sdk_name, p, version)
-      with open(link_map_file, encoding='utf-8', mode='r') as fd:
-        json_data = json.load(fd)
-      updated_links = dict()
-      for pagename, _ in json_data.items():
-          updated_links[pagename + ".rst"] = link + json_data[pagename]
-      with open(link_map_file, 'w', encoding='utf-8') as fd:
-          json.dump(updated_links, fd, ensure_ascii=False, indent=4)
-    
     #parse api reference html content
     # rel_api_path = r"API_Reference"
     # api_reference_html_path = os.path.join(html_out_path, rel_api_path)
@@ -234,19 +216,21 @@ for l, p in en_cn_build:
 
     # move rst src file to rst_src_out
     doc_source_path = os.path.join(html_out_path, "doc_source")
+    doc_split_source_path = os.path.join(html_out_path, "rst_split_source")
     doc_src_zip = "{}-{}-{}-src".format(sdk_name, version, p)
+    doc_split_src_zip = "{}-{}-{}-split-src".format(sdk_name, version, p)
     doc_html_zip = "{}-{}-{}-html".format(sdk_name, version, p)
-    dest_copy_path = os.path.join(rst_src_out, sdk_name, p)
-    #remove api reference rst src, use html content
-    # for f in os.listdir(os.path.join(doc_source_path, rel_api_path)):
-    #   api_f = os.path.join(doc_source_path, rel_api_path, f)
-    #   if os.path.isfile(api_f):
-    #     os.remove(api_f)
+    if os.path.exists(doc_split_source_path):
+      anchor_file = os.path.join(html_out_path, "anchors.json")
+      shutil.copy2(anchor_file, doc_split_source_path)
+      shutil.make_archive(base_name=doc_split_src_zip, format='zip', root_dir=doc_split_source_path)
+      shutil.rmtree(doc_split_source_path)
     if os.path.exists(doc_source_path):
-      move_contents(doc_source_path, dest_copy_path)
-      shutil.copy2(link_map_file, dest_copy_path)
-      shutil.make_archive(base_name=doc_src_zip, format='zip', root_dir=dest_copy_path)
+      link_map_file = os.path.join(html_out_path, "link_map.json")
+      shutil.copy2(link_map_file, doc_source_path)
+      shutil.make_archive(base_name=doc_src_zip, format='zip', root_dir=doc_source_path)
       shutil.make_archive(base_name=doc_html_zip, format='zip', root_dir=html_out_path)
+      shutil.rmtree(doc_source_path)
   else:
     sys.path.append(JenkinsBuild_doc_Dir)
     from push import replace_version_js
