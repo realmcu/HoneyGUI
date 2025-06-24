@@ -154,7 +154,7 @@ void createHeartShape(gui_obj_t *obj, std::vector<Heart> &hearts)
 // easing function
 float easeInOutQuad(float t)
 {
-    return t < 0.5 ? 2 * t * t : 1 - pow(-2 * t + 2, 2) / 2;
+    return t < 0.5f ? 2 * t * t : 1 - powf(-2 * t + 2, 2) / 2.0f;
 }
 
 void expand_animation_cb(void *param)
@@ -204,7 +204,7 @@ void bounce_animation_cb(void *obj)
             float dy = GUI_BASE(heart.img)->y - waveOrigin.y;
             float distance = sqrt(dx * dx + dy * dy);
 
-            float wave_effect = 2.0f * exp(-pow(distance - wave_radius, 2) / (2.0f * sigma));
+            float wave_effect = 2.0f * expf(-powf(distance - wave_radius, 2) / (2.0f * sigma));
 
             b2Vec2 wave_force(0.0f, -wave_effect); // Downward ripple force
             heart.body->ApplyForceToCenter(wave_force, true);

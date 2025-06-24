@@ -191,7 +191,7 @@ static void reset_shared_offsets()
     reached_target_count = 0;
     for (int i = 0; i < 5; i++)
     {
-        float damping_effect = exp(-damping);
+        float damping_effect = expf(-damping);
 
         LayerOffset *current_offset = &shared_state.current_offsets[i];
         LayerOffset *target_offset = &shared_state.target_offsets[i];
@@ -204,14 +204,14 @@ static void reset_shared_offsets()
         current_offset->dx += dx_diff;
         current_offset->dy += dy_diff;
 
-        if (fabs(dx_diff) < 0.1f && fabs(dy_diff) < 0.1f)
+        if (fabsf(dx_diff) < 0.1f && fabsf(dy_diff) < 0.1f)
         {
             shared_state.move_direction = -shared_state.move_direction; // Switch direction for elastic effect
             target_offset->dx = shared_state.move_direction * target_offset->dx * damping_effect;
             target_offset->dy = shared_state.move_direction * target_offset->dy * damping_effect;
         }
 
-        if (fabs(current_offset->dx) < 0.2f && fabs(current_offset->dy) < 0.2f)
+        if (fabsf(current_offset->dx) < 0.2f && fabsf(current_offset->dy) < 0.2f)
         {
             reached_target_count++;
             // If close to the default offset, reset to default offset

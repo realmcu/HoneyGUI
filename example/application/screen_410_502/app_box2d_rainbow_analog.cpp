@@ -359,6 +359,11 @@ void drawClockHand(NVGcontext *vg, float length, float width, int angleInDegrees
     nvgStroke(vg);
 }
 
+#ifndef __WIN32
+extern "C" {
+    extern struct tm *timeinfo;
+}
+#endif
 
 void nvg_create_clock_cb(NVGcontext *vg)
 {
@@ -367,23 +372,16 @@ void nvg_create_clock_cb(NVGcontext *vg)
     struct tm *timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-#else
-    // extern struct tm watch_clock_get(void);
-    // struct tm watch_time = watch_clock_get();
-    // uint16_t seconds = watch_time.tm_sec;
-    // uint16_t minute = watch_time.tm_min;
-    // uint16_t hour = watch_time.tm_hour;
-
-    extern struct tm *timeinfo;
 #endif
+
     uint16_t second = timeinfo->tm_sec;
     uint16_t minute = timeinfo->tm_min;
     uint16_t hour = timeinfo->tm_hour;
 
     // Calculate angles for each hand
-    int hourAngle = (hour % 12 + minute / 60) * 30;  // 360/12 = 30 degrees per hour
-    int minuteAngle = (minute + second / 60) * 6;    // 360/60 = 6 degrees per minute
-    int secondAngle = second * 6;                    // 360/60 = 6 degrees per second
+    int hourAngle = (hour % 12 + minute / 60.0f) * 30.0f;  // 360/12 = 30 degrees per hour
+    int minuteAngle = (minute + second / 60.0f) * 6.0f;    // 360/60 = 6 degrees per minute
+    int secondAngle = second * 6.0f;                    // 360/60 = 6 degrees per second
 
     drawClockHand(vg, hourLength, hourWidth, hourAngle, hourHandState);
     drawClockHand(vg, minuteLength, minuteWidth, minuteAngle, minuteHandState);
@@ -426,6 +424,7 @@ void close()
     {
         capsules.clear();
         world->~b2World();
+        gui_free(world);
         world = nullptr;
         gui_log("close world done\n");
     }

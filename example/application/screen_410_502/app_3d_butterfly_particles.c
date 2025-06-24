@@ -123,18 +123,18 @@ void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
 {
     // Calculate the center of the four vertices
     float centerX = (vertexes[0].position.x + vertexes[1].position.x + vertexes[2].position.x +
-                     vertexes[3].position.x) / 4.0;
+                     vertexes[3].position.x) / 4.0f;
     float centerY = (vertexes[0].position.y + vertexes[1].position.y + vertexes[2].position.y +
-                     vertexes[3].position.y) / 4.0;
+                     vertexes[3].position.y) / 4.0f;
 
     wing->base.x = (int16_t)(centerX - 25); // Adjust by 25 as per your scaling offset requirement
     wing->base.y = (int16_t)(centerY - 25); // Adjust by 25 similarly
 
     // Calculate width and height of the face
-    float width = sqrt(pow(vertexes[1].position.x - vertexes[0].position.x, 2) +
-                       pow(vertexes[1].position.y - vertexes[0].position.y, 2));
-    float height = sqrt(pow(vertexes[3].position.y - vertexes[0].position.y, 2) +
-                        pow(vertexes[3].position.x - vertexes[0].position.x, 2));
+    float width = sqrtf(powf(vertexes[1].position.x - vertexes[0].position.x, 2) +
+                        powf(vertexes[1].position.y - vertexes[0].position.y, 2));
+    float height = sqrtf(powf(vertexes[3].position.y - vertexes[0].position.y, 2) +
+                         powf(vertexes[3].position.x - vertexes[0].position.x, 2));
 
     // Determine scale factor based on largest dimension
     float scale_factor = 0.0; // Adjust 50.0 based on expected size
@@ -143,13 +143,13 @@ void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
     {
         if (face_index == 2 || face_index == 3)
         {
-            scale_factor = fmax(width, height) / 40.0;
+            scale_factor = fmaxf(width, height) / 40.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
             gui_img_translate(wing, (-wing->base.w / 2) * 0.4, -wing->base.h / 2 * 0.4);
         }
         else
         {
-            scale_factor = fmax(width, height) / 20.0;
+            scale_factor = fmaxf(width, height) / 20.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
             gui_img_translate(wing, -wing->base.w / 2 * 1.8, -wing->base.h / 2 * 1.8);
         }

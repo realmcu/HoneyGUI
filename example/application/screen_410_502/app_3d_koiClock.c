@@ -101,12 +101,12 @@ void update_koi0()
     float angular_velocity = 0.03f; // Adjust as needed for speed
 
     // Updating position for each fish using the circular path calculation
-    fish0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta0);
-    fish0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta0);
+    fish0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta0);
+    fish0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta0);
     // gui_log("fish0_x: %f, fish0_y: %f\n", fish0_x, fish0_y);
 
     // d +=3;
-    fish0_rz = theta0 * rotation_factor + sin(theta0 * 5) * 0.8f;;
+    fish0_rz = theta0 * rotation_factor + sinf(theta0 * 5) * 0.8f;;
     // gui_log("fish0_rz %f\n",fish0_rz);
 
     theta0 += angular_velocity;
@@ -121,9 +121,9 @@ void update_koi1()
     static float theta1 = M_PI / 4; // starting angle for fish1
     float angular_velocity = 0.02f; // Adjust as needed for speed
 
-    fish1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta1);
-    fish1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta1);
-    fish1_rz = theta1 * rotation_factor + sin(theta1 * 5) * 0.8f;
+    fish1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta1);
+    fish1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta1);
+    fish1_rz = theta1 * rotation_factor + sinf(theta1 * 5) * 0.8f;
 
     theta1 += angular_velocity;
 
@@ -134,9 +134,9 @@ void update_koi2()
     static float theta2 = 2 * M_PI / 3; // starting angle for fish2
     float angular_velocity = 0.02f; // Adjust as needed for speed
 
-    fish2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta2);
-    fish2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta2);
-    fish2_rz = theta2 * rotation_factor + sin(theta2 * 5) * 0.8f;
+    fish2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta2);
+    fish2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta2);
+    fish2_rz = theta2 * rotation_factor + sinf(theta2 * 5) * 0.8f;
 
     theta2 += angular_velocity;
 

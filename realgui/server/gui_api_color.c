@@ -187,7 +187,7 @@ gui_color_t gui_color_css(const char *color_str)
                 return gui_rgba((unsigned char)red,
                                 (unsigned char)green,
                                 (unsigned char)blue,
-                                (unsigned char)round(alpha * 255));
+                                (unsigned char)roundf(alpha * 255));
             }
         }
         else
@@ -213,7 +213,7 @@ gui_color_t gui_color_css(const char *color_str)
             {
                 unsigned char r, g, b;
                 hsl_to_rgb(hue, saturation / 100.0, lightness / 100.0, &r, &g, &b);
-                return gui_rgba(r, g, b, (unsigned char)round(alpha * 255));
+                return gui_rgba(r, g, b, (unsigned char)roundf(alpha * 255));
             }
         }
         else

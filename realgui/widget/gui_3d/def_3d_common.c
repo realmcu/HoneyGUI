@@ -66,7 +66,7 @@ static bool gui_3d_gauss(float A[][9], int equ, int var,
         int max_r = row;
         for (int i = row + 1; i < equ; i++)
         {
-            if (fabs(A[i][col]) > fabs(A[max_r][col]))
+            if (fabsf(A[i][col]) > fabsf(A[max_r][col]))
             {
                 max_r = i;
             }
@@ -79,7 +79,7 @@ static bool gui_3d_gauss(float A[][9], int equ, int var,
             }
         }
 
-        if (fabs(A[row][col]) < (1e-6))
+        if (fabsf(A[row][col]) < (1e-6f))
         {
             //row--;
             //continue;
@@ -89,7 +89,7 @@ static bool gui_3d_gauss(float A[][9], int equ, int var,
         for (int i = row + 1; i < equ; i++)
         {
 
-            if (fabs(A[i][col]) < (1e-6))
+            if (fabsf(A[i][col]) < (1e-6f))
             {
                 continue;
             }
@@ -420,7 +420,7 @@ static void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *mrot, float px, 
                                                float ux, float uy, float uz, float angle_degrees)
 {
     // Normalize the direction vector (u)
-    float mag = sqrt(ux * ux + uy * uy + uz * uz);
+    float mag = sqrtf(ux * ux + uy * uy + uz * uz);
     float a = ux / mag, b = uy / mag, c = uz / mag;
 
     // Step 1: Translate to the origin
@@ -431,7 +431,7 @@ static void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *mrot, float px, 
     T1.m[3][2] = -pz;
 
     // Step 2: Rotate to align u with the Z-axis
-    float theta = atan2(b, c) * (180.0f / 3.141562f);  // Convert radians to degrees
+    float theta = atan2f(b, c) * (180.0f / 3.141562f);  // Convert radians to degrees
     gui_3d_matrix_t Rx;
     gui_3d_matrix_identity(&Rx);
     Rx.m[1][1] = gui_3d_cos(theta);
@@ -439,7 +439,7 @@ static void gui_3d_generate_rotate_around_line(gui_3d_matrix_t *mrot, float px, 
     Rx.m[2][1] = gui_3d_sin(theta);
     Rx.m[2][2] = gui_3d_cos(theta);
 
-    float phi = atan2(a, sqrt(b * b + c * c)) * (180.0f / 3.141562f);
+    float phi = atan2f(a, sqrtf(b * b + c * c)) * (180.0f / 3.141562f);
     gui_3d_matrix_t Ry;
     gui_3d_matrix_identity(&Ry);
     Ry.m[0][0] = gui_3d_cos(phi);

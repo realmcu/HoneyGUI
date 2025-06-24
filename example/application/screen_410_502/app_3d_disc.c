@@ -79,7 +79,7 @@ static void update_disc_animation(void *param)
     {
         rot_z_angle += tp->deltaX / 5.0f;
         rot_x_angle += tp->deltaY / 5.0f;
-        rot_x_angle = fmax(MIN_ROT_X_ANGLE, fmin(rot_x_angle, MAX_ROT_X_ANGLE));
+        rot_x_angle = fmaxf(MIN_ROT_X_ANGLE, fminf(rot_x_angle, MAX_ROT_X_ANGLE));
     }
     else if (is_playing)
     {

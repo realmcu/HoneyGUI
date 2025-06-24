@@ -148,10 +148,10 @@ static void update_flower_animation()
                 {
                     petals[i].target_dx = tp->deltaX;
 
-                    float dist = fabs(new_x - petals[i].driftX);
+                    float dist = fabsf(new_x - petals[i].driftX);
                     petals[i].move_speed =  fmaxf(1.0f, dist / 20.0f); // Adjust the speed based on the distance
 
-                    if (fabs(petals[i].driftX - petals[i].target_dx) > 5.0f)
+                    if (fabsf(petals[i].driftX - petals[i].target_dx) > 5.0f)
                     {
                         int direction = (petals[i].target_dx > 0) ? 1 : -1;
                         petals[i].driftX += direction * petals[i].move_speed;
@@ -168,7 +168,7 @@ static void update_flower_animation()
                 petal_oscillation += 0.1f;
                 for (int i = 0; i < NUM_PETALS; i++)
                 {
-                    petals[i].driftX += (4.0f + i * 0.2f) * sin(petal_oscillation + i * 0.3f);
+                    petals[i].driftX += (4.0f + i * 0.2f) * sinf(petal_oscillation + i * 0.3f);
                 }
             }
         }

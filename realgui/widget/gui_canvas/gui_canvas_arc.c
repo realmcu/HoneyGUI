@@ -197,9 +197,9 @@ static void gui_canvas_circle_prepare(gui_canvas_arc_t *this)
                 data[offset + j] = this->color.color.argb_full;
             }
         }
-        float portion = ceil(boundary[k]) - boundary[k];
+        float portion = ceilf(boundary[k]) - boundary[k];
         gui_color_t color = this->color;
-        color.color.rgba.a = round(portion * color.color.rgba.a);
+        color.color.rgba.a = roundf(portion * color.color.rgba.a);
         data[offset + right] = color.color.argb_full;
         data[offset + img_w - right - 1] = color.color.argb_full;
         if (k > radius / 2 - 1)
@@ -234,13 +234,14 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
     }
 
     float img_angle = ((degree + 2) / 2) / 180.0f * 3.1415926f;
-    int img_h = ceil(2 * (this->r + this->stroke_width / 2) * sin(img_angle)) + 2;
+    int img_h = ceilf(2 * (this->r + this->stroke_width / 2) * sinf(img_angle)) + 2;
     if (img_h % 2)
     {
         img_h += 1;
     }
-    int img_w = ceil(this->stroke_width / 2.0f + this->r - (this->r - this->stroke_width / 2.0f) * cos(
-                         img_angle)) + 2;
+    int img_w = ceilf(this->stroke_width / 2.0f + this->r - (this->r - this->stroke_width / 2.0f) *
+                      cosf(
+                          img_angle)) + 2;
     degree = this->to - this->from;
     if (this->use_external_picture == false)
     {
@@ -266,7 +267,7 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
             float right = r2 - sqrtf(r1 * r1 - y * y);
             if (!exceed)
             {
-                float line_right = line_y * (k + 0.5) + line_c;
+                float line_right = line_y * (k + 0.5f) + line_c;
                 if (line_right > right)
                 {
                     exceed = true;
@@ -294,12 +295,12 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
                     data[offset + j + 1] = this->color.color.argb_full;
                 }
             }
-            float portion = ceil(left_boundary[k]) - left_boundary[k];
+            float portion = ceilf(left_boundary[k]) - left_boundary[k];
             gui_color_t color = this->color;
-            color.color.rgba.a = round(portion * color.color.rgba.a);
+            color.color.rgba.a = roundf(portion * color.color.rgba.a);
             data[offset + left + 1] = color.color.argb_full;
             portion = right_boundary[k] - (int)right_boundary[k];
-            color.color.rgba.a = round(portion * this->color.color.rgba.a);
+            color.color.rgba.a = roundf(portion * this->color.color.rgba.a);
             uint8_t right_a = color.color.rgba.a;
             data[offset + right + 1] = color.color.argb_full;
             if (right_boundary_sub[k] > right + 1 && right_boundary_sub[k] < img_w + 1)
@@ -307,7 +308,7 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
                 int right_sub = (int)right_boundary_sub[k];
                 portion = (right_boundary_sub[k] - right_boundary[k]) / 4 * ((right_boundary_sub[k] - right_sub) /
                                                                              (right_boundary_sub[k] - right_boundary[k]));
-                color.color.rgba.a = round(portion * this->color.color.rgba.a);
+                color.color.rgba.a = roundf(portion * this->color.color.rgba.a);
                 data[offset + right + 1] = color.color.argb_full;
                 if (right_boundary_sub[k] > right + 2)
                 {
@@ -359,7 +360,7 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
 
     }
 
-    int t = ceil(degree / 30);
+    int t = ceilf(degree / 30);
     if (degree > 30)
     {
         for (int i = 0; i < t; i++)
@@ -394,13 +395,14 @@ static void gui_canvas_arc_prepare_ftl(gui_canvas_arc_t *this)
     }
 
     float img_angle = ((degree + 2) / 2) / 180.0f * 3.1415926f;
-    int img_h = ceil(2 * (this->r + this->stroke_width / 2) * sin(img_angle)) + 2;
+    int img_h = ceilf(2 * (this->r + this->stroke_width / 2) * sinf(img_angle)) + 2;
     if (img_h % 2)
     {
         img_h += 1;
     }
-    int img_w = ceil(this->stroke_width / 2.0f + this->r - (this->r - this->stroke_width / 2.0f) * cos(
-                         img_angle)) + 2;
+    int img_w = ceilf(this->stroke_width / 2.0f + this->r - (this->r - this->stroke_width / 2.0f) *
+                      cosf(
+                          img_angle)) + 2;
     degree = this->to - this->from;
     if (this->use_external_picture == false)
     {
@@ -426,7 +428,7 @@ static void gui_canvas_arc_prepare_ftl(gui_canvas_arc_t *this)
             float right = r2 - sqrtf(r1 * r1 - y * y);
             if (!exceed)
             {
-                float line_right = line_y * (k + 0.5) + line_c;
+                float line_right = line_y * (k + 0.5f) + line_c;
                 if (line_right > right)
                 {
                     exceed = true;
@@ -454,12 +456,12 @@ static void gui_canvas_arc_prepare_ftl(gui_canvas_arc_t *this)
                     data[offset + j + 1] = this->color.color.argb_full;
                 }
             }
-            float portion = ceil(left_boundary[k]) - left_boundary[k];
+            float portion = ceilf(left_boundary[k]) - left_boundary[k];
             gui_color_t color = this->color;
-            color.color.rgba.a = round(portion * color.color.rgba.a);
+            color.color.rgba.a = roundf(portion * color.color.rgba.a);
             data[offset + left + 1] = color.color.argb_full;
             portion = right_boundary[k] - (int)right_boundary[k];
-            color.color.rgba.a = round(portion * this->color.color.rgba.a);
+            color.color.rgba.a = roundf(portion * this->color.color.rgba.a);
             uint8_t right_a = color.color.rgba.a;
             data[offset + right + 1] = color.color.argb_full;
             if (right_boundary_sub[k] > right + 1 && right_boundary_sub[k] < img_w + 1)
@@ -467,7 +469,7 @@ static void gui_canvas_arc_prepare_ftl(gui_canvas_arc_t *this)
                 int right_sub = (int)right_boundary_sub[k];
                 portion = (right_boundary_sub[k] - right_boundary[k]) / 4 * ((right_boundary_sub[k] - right_sub) /
                                                                              (right_boundary_sub[k] - right_boundary[k]));
-                color.color.rgba.a = round(portion * this->color.color.rgba.a);
+                color.color.rgba.a = roundf(portion * this->color.color.rgba.a);
                 data[offset + right + 1] = color.color.argb_full;
                 if (right_boundary_sub[k] > right + 2)
                 {
@@ -489,7 +491,7 @@ static void gui_canvas_arc_prepare_ftl(gui_canvas_arc_t *this)
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->arc_data;
 
         set_arc_w_and_h(head, img_w, img_h);
-        int t = ceil(degree / 30);
+        int t = ceilf(degree / 30);
         if (degree > 30)
         {
             for (int i = 0; i < t; i++)
@@ -538,7 +540,7 @@ static void gui_canvas_arc_prepare_ftl(gui_canvas_arc_t *this)
         {
             this->arc_data = this->data[5];
         }
-        int t = ceil(degree / 30);
+        int t = ceilf(degree / 30);
         if (degree > 30)
         {
             for (int i = 0; i < t; i++)
@@ -579,7 +581,7 @@ static void gui_canvas_arc_draw(gui_canvas_arc_t *this)
     {
         return;
     }
-    int num = ceil(degree / 30);
+    int num = ceilf(degree / 30);
     for (int i = 0; i < num; i++)
     {
         gui_acc_blit_to_dc(this->arc_img[i], dc, NULL);
@@ -609,7 +611,7 @@ static void gui_canvas_arc_draw_ftl(gui_canvas_arc_t *this)
     {
         return;
     }
-    int num = ceil(degree / 30);
+    int num = ceilf(degree / 30);
     for (int i = 0; i < num; i++)
     {
         if (this->use_external_picture)

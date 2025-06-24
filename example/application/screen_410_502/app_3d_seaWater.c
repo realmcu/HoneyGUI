@@ -186,7 +186,7 @@ static void update_all_bubbles()
 
             int y_offset = (int)(elapsed / 20.0f);
             bubbles[i].img->base.y = bubbles[i].start_y - y_offset;
-            bubbles[i].img->base.x = bubbles[i].start_x + 5 * sin(elapsed / 200.0f);
+            bubbles[i].img->base.x = bubbles[i].start_x + 5 * sinf(elapsed / 200.0f);
             bubbles[i].scale += 0.002f;
             bubbles[i].img->opacity_value = 255 - (elapsed / 10);
 

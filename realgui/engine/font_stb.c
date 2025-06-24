@@ -609,7 +609,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         {
             int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
             int advance, lsb, x0, y0, x1, y1;
-            float x_shift = xpos - (float) floor(xpos);
+            float x_shift = xpos - floorf(xpos);
             stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
             stbtt_GetGlyphBitmapBoxSubpixel(&font, glyph_index, scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
             if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)

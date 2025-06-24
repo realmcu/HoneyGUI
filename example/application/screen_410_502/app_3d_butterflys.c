@@ -134,10 +134,10 @@ void update_butterfly0()
     static float theta0 = 0.0f; // starting angle for butterfly0
 
     // Updating position for each butterfly using the circular path calculation
-    butterfly0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta0);
-    butterfly0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta0);
+    butterfly0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta0);
+    butterfly0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta0);
 
-    butterfly0_rz = theta0 * rotation_factor + sin(theta0 * 5) * 2.0f;;
+    butterfly0_rz = theta0 * rotation_factor + sinf(theta0 * 5) * 2.0f;;
     // gui_log("butterfly0_rz %f\n",butterfly0_rz);
 
     theta0 += angular_velocity;
@@ -152,9 +152,9 @@ void update_butterfly1()
 {
     static float theta1 = 2 * M_PI / 3; // starting angle for butterfly1
 
-    butterfly1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta1);
-    butterfly1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta1);
-    butterfly1_rz = theta1 * rotation_factor + sin(theta1 * 5) * 0.8f;
+    butterfly1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta1);
+    butterfly1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta1);
+    butterfly1_rz = theta1 * rotation_factor + sinf(theta1 * 5) * 0.8f;
 
     theta1 += angular_velocity;
 
@@ -165,9 +165,9 @@ void update_butterfly2()
 {
     static float theta2 = M_PI + M_PI / 3; // starting angle for butterfly2
 
-    butterfly2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cos(theta2);
-    butterfly2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sin(theta2);
-    butterfly2_rz = theta2 * rotation_factor + sin(theta2 * 5) * 0.8f;
+    butterfly2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta2);
+    butterfly2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta2);
+    butterfly2_rz = theta2 * rotation_factor + sinf(theta2 * 5) * 0.8f;
 
     theta2 += angular_velocity;
 
@@ -237,15 +237,15 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
 {
     // Calculate the center of the four vertices
     float centerX = (vertexes[0].position.x + vertexes[1].position.x + vertexes[2].position.x +
-                     vertexes[3].position.x) / 4.0;
+                     vertexes[3].position.x) / 4.0f;
     float centerY = (vertexes[0].position.y + vertexes[1].position.y + vertexes[2].position.y +
-                     vertexes[3].position.y) / 4.0;
+                     vertexes[3].position.y) / 4.0f;
 
     // Calculate width and height of the face
-    float width = sqrt(pow(vertexes[1].position.x - vertexes[0].position.x, 2) +
-                       pow(vertexes[1].position.y - vertexes[0].position.y, 2));
-    float height = sqrt(pow(vertexes[3].position.y - vertexes[0].position.y, 2) +
-                        pow(vertexes[3].position.x - vertexes[0].position.x, 2));
+    float width = sqrtf(powf(vertexes[1].position.x - vertexes[0].position.x, 2) +
+                        powf(vertexes[1].position.y - vertexes[0].position.y, 2));
+    float height = sqrtf(powf(vertexes[3].position.y - vertexes[0].position.y, 2) +
+                         powf(vertexes[3].position.x - vertexes[0].position.x, 2));
 
     // Determine scale factor based on largest dimension
     float scale_factor = 0.0; // Adjust 50.0 based on expected size
@@ -256,17 +256,17 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
         {
             wing->base.x = (int16_t)(centerX - 10); // Adjust by 25 as per your scaling offset requirement
             wing->base.y = (int16_t)(centerY - 10); // Adjust by 25 similarly
-            scale_factor = fmax(width, height) / 45.0;
+            scale_factor = fmaxf(width, height) / 45.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, (-wing->base.w / 2) * 0.3, -wing->base.h / 2 * 0.3);
+            gui_img_translate(wing, (-wing->base.w / 2) * 0.3f, -wing->base.h / 2 * 0.3f);
         }
         else
         {
             wing->base.x = (int16_t)(centerX + 20); // Adjust by 25 as per your scaling offset requirement
             wing->base.y = (int16_t)(centerY + 20); // Adjust by 25 similarly
-            scale_factor = fmax(width, height) / 30.0;
+            scale_factor = fmaxf(width, height) / 30.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, -wing->base.w / 2 * 1.5, -wing->base.h / 2 * 1.6);
+            gui_img_translate(wing, -wing->base.w / 2 * 1.5f, -wing->base.h / 2 * 1.6f);
         }
     }
 

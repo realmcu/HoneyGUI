@@ -273,7 +273,7 @@ void explode()
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> forceDist(-1.0f, 1.0f);
+    std::uniform_real_distribution<float> forceDist(-1.0f, 1.0f);
 
     for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
@@ -307,7 +307,7 @@ void app_box2d_cb(void *obj)
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> scaleDist(0.5f, 1.0f);
+    std::uniform_real_distribution<float> scaleDist(0.5f, 1.0f);
 
     for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {

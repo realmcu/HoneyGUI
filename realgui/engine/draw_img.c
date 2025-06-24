@@ -192,8 +192,8 @@ bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 
     img->img_target_x = (int16_t)x_min;
     img->img_target_y = (int16_t)y_min;
-    img->img_target_w = ceil(x_max) - (int16_t)x_min + 1;
-    img->img_target_h = ceil(y_max) - (int16_t)y_min + 1;
+    img->img_target_w = ceilf(x_max) - (int16_t)x_min + 1;
+    img->img_target_h = ceilf(y_max) - (int16_t)y_min + 1;
     return true;
 }
 

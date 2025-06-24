@@ -67,7 +67,7 @@ static void update_panel_animation(void *param)
 
     int32_t diff = (weather_list->base.w / 2 + weather_list->base.x) - (tab->base.x +
                                                                         weather_list->note_length / 2);
-    float scale = fabs((abs(diff) - dc->screen_width / 2.0f)) / (dc->screen_width / 2.0f);
+    float scale = fabsf((abs(diff) - dc->screen_width / 2.0f)) / (dc->screen_width / 2.0f);
 
     float panel_below_driftY = (1.0f - scale) * 50.0f;
     GUI_WIDGET_POINTER_BY_NAME_ROOT(panel_img, "panel1", tab);

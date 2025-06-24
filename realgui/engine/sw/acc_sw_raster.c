@@ -322,8 +322,8 @@ void do_raster_no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
             float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
             float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = round(X / Z);
-            int y = round(Y / Z);
+            int x = roundf(X / Z);
+            int y = roundf(Y / Z);
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
             if (rect && ((x > rect->x2) || (x < rect->x1) || (y < rect->y1) || (y > rect->y2))) { continue; }
@@ -362,8 +362,8 @@ void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
             float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
             float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = round(X / Z);
-            int y = round(Y / Z);
+            int x = roundf(X / Z);
+            int y = roundf(Y / Z);
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
             if (rect && ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))) { continue; }

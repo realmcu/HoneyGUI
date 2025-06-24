@@ -158,7 +158,7 @@ float gui_img_get_transform_degrees(gui_img_t *img)
 static Point rotate_point(Point p, Point center, float angle)
 {
     /* converting angles to radians */
-    float radians = angle * 2 * 3.14 / 360.0;
+    float radians = angle * 2 * 3.14f / 360.0f;
     float cos_theta = cos(radians);
     float sin_theta = sin(radians);
 
@@ -253,7 +253,7 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
     Point rect_p3 = {rect_min.x + width, rect_min.y}; // right-top
 
 
-    Point center = {(float)(rect_min.x + width / 2.0), (float)(rect_min.y + height / 2.0)}; // calculate center point
+    Point center = {(float)(rect_min.x + width / 2.0f), (float)(rect_min.y + height / 2.0f)}; // calculate center point
 
     /* calculate rectangular's four rotated points */
 

@@ -65,7 +65,7 @@ void gui_wave_draw_graph(gui_canvas_t *canvas)
         float touch_effect = 0;
         if (touch_x >= 0)
         {
-            float distance = fabs(xi - touch_x);
+            float distance = fabsf(xi - touch_x);
             if (distance < 50)
             {
                 float decay_factor = expf(-distance * 0.02f);
@@ -74,7 +74,7 @@ void gui_wave_draw_graph(gui_canvas_t *canvas)
             }
         }
 
-        can_wave_y[i] = y_base - h * fmax(0, fmin(1, base_wave * 0.4f + 0.5f + touch_effect));
+        can_wave_y[i] = y_base - h * fmaxf(0, fminf(1, base_wave * 0.4f + 0.5f + touch_effect));
     }
 
     // Draw wave (optional, can be removed if not needed)

@@ -140,9 +140,9 @@ static void prepare_arc_img(gui_canvas_round_rect_t *this)
                 data[offset + j] = this->color.color.argb_full;
             }
         }
-        float portion = ceil(boundary[k]) - boundary[k];
+        float portion = ceilf(boundary[k]) - boundary[k];
         gui_color_t color = this->color;
-        color.color.rgba.a = round(portion * color.color.rgba.a);
+        color.color.rgba.a = roundf(portion * color.color.rgba.a);
         data[offset + right + 1] = color.color.argb_full;
         if (k > this->r / 2 - 1)
         {

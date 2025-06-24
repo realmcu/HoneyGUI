@@ -123,7 +123,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
         int max_r = row;
         for (int i = row + 1; i < equ; i++)
         {
-            if (fabs(A[i][col]) > fabs(A[max_r][col]))
+            if (fabsf(A[i][col]) > fabsf(A[max_r][col]))
             {
                 max_r = i;
             }
@@ -136,7 +136,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
             }
         }
 
-        if (fabs(A[row][col]) < (1e-6))
+        if (fabsf(A[row][col]) < (1e-6f))
         {
             //row--;
             //continue;
@@ -146,7 +146,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
         for (int i = row + 1; i < equ; i++)
         {
 
-            if (fabs(A[i][col]) < (1e-6))
+            if (fabsf(A[i][col]) < (1e-6f))
             {
                 continue;
             }
@@ -570,7 +570,7 @@ void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rota
     // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
     //
 #if USE_FIX_SIN
-    int frz = round(rz), frx = round(rx), fry = round(ry);
+    int frz = roundf(rz), frx = roundf(rx), fry = roundf(ry);
     float fxcos = fix_cos((int)(frx));
     float fxsin = fix_sin((int)(frx));
     float fycos = fix_cos((int)(fry));
@@ -799,8 +799,8 @@ bool matrix_get_transform_area(gui_matrix_t *matrix, gui_rect_t *input_area,
 
     result_area->x1 = (int16_t)x_min;
     result_area->y1 = (int16_t)y_min;
-    result_area->x2 = ceil(x_max);
-    result_area->y2 = ceil(y_max);
+    result_area->x2 = ceilf(x_max);
+    result_area->y2 = ceilf(y_max);
     return true;
 }
 

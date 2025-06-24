@@ -154,7 +154,7 @@ static gui_vertex_t computeNormal(gui_vertex_t a, gui_vertex_t b, gui_vertex_t c
     gui_vertex_t ac = vectorSubtract(c, a);
     gui_vertex_t normal = crossProduct(ab, ac);
 
-    float length = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+    float length = sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
     if (length != 0)
     {
         normal.x /= length;
@@ -180,7 +180,7 @@ gui_quaternion_t quaternion_multiply(gui_quaternion_t q1, gui_quaternion_t q2)
     return result;
 }
 
-gui_quaternion_t quaternion_from_angle_axis(float angle, float axisX, float axisY, float axisZ)
+gui_quaternion_t quaternion_from_angle_axis(float angle, int axisX, int axisY, int axisZ)
 {
     gui_quaternion_t result;
     float halfAngleRadian = angle * 0.5f;
@@ -224,7 +224,7 @@ void quaternion_to_matrix(gui_quaternion_t *quaternion, gui_matrix_t *matrix)
 
 static float calculate_scale_factor(int x, int y, int center_x, int center_y, float base_scale)
 {
-    float distance = sqrt((x - center_x) * (x - center_x) + (y - center_y) * (y - center_y)) / 100.0f;
+    float distance = sqrtf((x - center_x) * (x - center_x) + (y - center_y) * (y - center_y)) / 100.0f;
     return base_scale / (distance + 1);
 }
 
@@ -248,9 +248,9 @@ static void update_rotation(int new_x, int new_y, touch_info_t *tp, gui_soccer_t
         rotation_x = quaternion_from_angle_axis(delta_angle_x, 1, 0, 0);
     }
 
-    if (fabs(tp->x - this->c_x) > 100 || fabs(tp->y - this->c_y) > 100)
+    if (fabsf(tp->x - this->c_x) > 100 || fabsf(tp->y - this->c_y) > 100)
     {
-        float delta_angle_z = sqrt(delta_angle_x * delta_angle_x + delta_angle_y * delta_angle_y);
+        float delta_angle_z = sqrtf(delta_angle_x * delta_angle_x + delta_angle_y * delta_angle_y);
         if (tp->y >= this->c_y)
         {
             delta_angle_z = tp->deltaX < 0 ? delta_angle_z : -delta_angle_z;
@@ -314,7 +314,7 @@ static void gui_soccer_prepare(gui_obj_t *obj)
         }
         else
         {
-            if (fabs(velocity_x) > 1.0f || fabs(velocity_y) > 1.0f)
+            if (fabsf(velocity_x) > 1.0f || fabsf(velocity_y) > 1.0f)
             {
                 new_x += velocity_x;
                 new_y += velocity_y;

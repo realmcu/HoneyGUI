@@ -451,8 +451,8 @@ static void lotus_leaf_animate_cb(void *parent)
 float wave_scale = 1.0f;
 float wave_opa = 255.0f;
 static bool wave_animating = false;
-float wave_x = 0 ;
-float wave_y = 0 ;
+float wave_x = 0.0f;
+float wave_y = 0.0f;
 static void wave_animate_cb(void *parent)
 {
     touch_info_t *tp = tp_get_info();
@@ -472,7 +472,7 @@ static void wave_animate_cb(void *parent)
             wave_animating = true;
         }
 
-        gui_log("Wave center: (%f, %f)\n", wave_x, wave_x);
+        gui_log("Wave center: (%f, %f)\n", wave_x, wave_y);
         // matrix_translate(wave_x, wave_x, wave_win->base.matrix);
 
     }
@@ -482,7 +482,7 @@ static void wave_animate_cb(void *parent)
         wave_scale += 0.1f;
         wave_opa -= 5.0f;
         gui_img_scale(wave_img, wave_scale, wave_scale);
-        gui_img_set_opacity(wave_img, (uint8_t)fmax(wave_opa, 0));
+        gui_img_set_opacity(wave_img, (uint8_t)fmaxf(wave_opa, 0));
 
         if (wave_opa <= 0)
         {

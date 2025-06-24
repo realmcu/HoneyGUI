@@ -22,9 +22,9 @@
 
 // Function to convert degrees to radians
 #define DEG_TO_RAD(angleInDegrees) ((angleInDegrees) * M_PI / 180.0f)
-#define HOUR_HAND_LENGTH 0.5
-#define MINUTE_HAND_LENGTH 0.6
-#define SECOND_HAND_LENGTH 0.7
+#define HOUR_HAND_LENGTH 0.5f
+#define MINUTE_HAND_LENGTH 0.6f
+#define SECOND_HAND_LENGTH 0.7f
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 gui_win_t *fireworks_win = NULL;
@@ -100,8 +100,8 @@ static void drawHexagon(NVGcontext *vg, float centerX, float centerY, float radi
     for (int i = 0; i < 6; ++i)
     {
         float angle = i * M_PI / 3.0f + rotationAngle;
-        float x = centerX + radius * cos(angle);
-        float y = centerY + radius * sin(angle);
+        float x = centerX + radius * cosf(angle);
+        float y = centerY + radius * sinf(angle);
         if (i == 0)
         {
             nvgMoveTo(vg, x, y);
@@ -232,8 +232,8 @@ static void drawClockHand(NVGcontext *vg, float centerX, float centerY, float le
                           float angleInDegrees, NVGcolor color)
 {
     float angleInRadians = DEG_TO_RAD(angleInDegrees - 90); // Adjust to start from '12' position
-    float xEnd = centerX + cos(angleInRadians) * length;
-    float yEnd = centerY + sin(angleInRadians) * length;
+    float xEnd = centerX + cosf(angleInRadians) * length;
+    float yEnd = centerY + sinf(angleInRadians) * length;
 
     nvgBeginPath(vg);
     nvgMoveTo(vg, centerX, centerY);
@@ -249,9 +249,9 @@ static void drawTaperedLine(NVGcontext *vg, float startX, float startY, float en
 {
     float dirX = endX - startX;
     float dirY = endY - startY;
-    float length = sqrt(dirX * dirX + dirY * dirY);
+    float length = sqrtf(dirX * dirX + dirY * dirY);
 
-    if (length > 0.0001)
+    if (length > 0.0001f)
     {
         dirX /= length;
         dirY /= length;
@@ -309,25 +309,25 @@ static void firework_sim_cb(NVGcontext *vg)
     }
     for (int i = 0; i < 30; i++)
     {
-        float baseAngle = (2 * M_PI * i) / 30;
+        float baseAngle = (2 * M_PI * i) / 30.0f;
 
-        float startX = circleCenterX + cos(baseAngle) * firework_start;
-        float startY = circleCenterY + sin(baseAngle) * firework_start;
+        float startX = circleCenterX + cosf(baseAngle) * firework_start;
+        float startY = circleCenterY + sinf(baseAngle) * firework_start;
 
         float spreadAngle = baseAngle;
 
         //(25-60)
-        float length = 25.0 + ((float)rand() / (float)RAND_MAX) * 30.0;
+        float length = 25.0f + ((float)rand() / (float)RAND_MAX) * 30.0f;
 
-        float endX = startX + cos(spreadAngle) * length;
-        float endY = startY + sin(spreadAngle) * length;
+        float endX = startX + cosf(spreadAngle) * length;
+        float endY = startY + sinf(spreadAngle) * length;
 
         int r = rand() % 255;
         int g = rand() % 255;
         int b = rand() % 255;
         NVGcolor lineColor = nvgRGBA(r, g, b, firework_alpha);
-        float startWidth = 5.0 + ((float)rand() / (float)RAND_MAX) * 2.0;
-        float endWidth = 1.0;
+        float startWidth = 5.0f + ((float)rand() / (float)RAND_MAX) * 2.0f;
+        float endWidth = 1.0f;
 
         drawTaperedLine(vg, endX, endY, startX, startY, startWidth, endWidth, lineColor);
     }

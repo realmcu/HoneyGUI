@@ -91,7 +91,7 @@ static void update_applist_animation()
         rot_y_angle += velocity;   // Update angle
 
         // Stop animation when oscillation is small enough
-        if (fabs(rot_y_angle) < 0.1f && fabs(velocity) < 0.1f)
+        if (fabsf(rot_y_angle) < 0.1f && fabsf(velocity) < 0.1f)
         {
             rot_y_angle = 0.0f;    // Ensure complete stop
             velocity = 0.0f;
