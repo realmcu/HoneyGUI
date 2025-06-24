@@ -472,7 +472,7 @@ static void wave_animate_cb(void *parent)
             wave_animating = true;
         }
 
-        gui_log("Wave center: (%f, %f)\n", wave_x, wave_y);
+        gui_log("Wave center: (%f, %f)\n", (double)wave_x, (double)wave_y);
         // matrix_translate(wave_x, wave_x, wave_win->base.matrix);
 
     }

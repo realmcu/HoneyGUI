@@ -452,30 +452,30 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
 // e.g. #define your own STBTT_ifloor/STBTT_iceil() to avoid math.h
 #ifndef STBTT_ifloor
 #include <math.h>
-#define STBTT_ifloor(x)   ((int) floor(x))
-#define STBTT_iceil(x)    ((int) ceil(x))
+#define STBTT_ifloor(x)   ((int) floorf(x))
+#define STBTT_iceil(x)    ((int) ceilf(x))
 #endif
 
 #ifndef STBTT_sqrt
 #include <math.h>
-#define STBTT_sqrt(x)      sqrt(x)
-#define STBTT_pow(x,y)     pow(x,y)
+#define STBTT_sqrt(x)      sqrtf(x)
+#define STBTT_pow(x,y)     powf(x,y)
 #endif
 
 #ifndef STBTT_fmod
 #include <math.h>
-#define STBTT_fmod(x,y)    fmod(x,y)
+#define STBTT_fmod(x,y)    fmodf(x,y)
 #endif
 
 #ifndef STBTT_cos
 #include <math.h>
-#define STBTT_cos(x)       cos(x)
-#define STBTT_acos(x)      acos(x)
+#define STBTT_cos(x)       cosf(x)
+#define STBTT_acos(x)      acosf(x)
 #endif
 
 #ifndef STBTT_fabs
 #include <math.h>
-#define STBTT_fabs(x)      fabs(x)
+#define STBTT_fabs(x)      fabsf(x)
 #endif
 
 // #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h
@@ -5352,7 +5352,7 @@ static int stbtt__solve_cubic(float a, float b, float c, float *r)
         float v = (float) STBTT_acos(-STBTT_sqrt(-27 / p3) * q / 2) /
                   3; // p3 must be negative, since d is negative
         float m = (float) STBTT_cos(v);
-        float n = (float) STBTT_cos(v - 3.141592 / 2) * 1.732050808f;
+        float n = (float) STBTT_cos(v - 3.141592f / 2) * 1.732050808f;
         r[0] = s + u * 2 * m;
         r[1] = s - u * (m + n);
         r[2] = s - u * (m - n);
