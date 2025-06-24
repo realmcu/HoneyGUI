@@ -368,6 +368,7 @@ static void app_ui_prism_mirror_design(gui_view_t *view)
     gui_3d_set_face_image(prism_3d, 10, PRISM_FACE0_BIN);
     gui_3d_set_face_image(prism_3d, 11, PRISM_FACE5_BIN);
     enter_prism_view_flag = true;
+    prism_position_init();
     gui_prism_mirror3d_enter_animate();
 
     gui_3d_on_click(prism_3d, prism_mirror3d_on_face_click_cb, NULL);
