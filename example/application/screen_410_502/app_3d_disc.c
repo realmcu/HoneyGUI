@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,11 +14,26 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "disc_view"
+#define CUBE_COUNT 22
+#define MAX_ROT_X_ANGLE 65.0f
+#define MIN_ROT_X_ANGLE 0.0f
+#define STEP_HEIGHT 2.0f
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void disc_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void disc_app(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -25,6 +43,20 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = disc_app,
 };
 
+/* Animation Variables */
+static float rot_x_angle = 0.0f;
+static float rot_z_angle = 0.0f;
+
+static float shift_z[CUBE_COUNT] = {0}; // cube shift
+static int step_direction[CUBE_COUNT] = {1};  // cube move direction, 1 rise, -1 fall
+static int active_cube = 0;
+
+/* Music */
+static bool is_playing = false;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,33 +74,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-
-#define CUBE_COUNT 22
-#define MAX_ROT_X_ANGLE 65.0f
-#define MIN_ROT_X_ANGLE 0.0f
-#define STEP_HEIGHT 2.0f
-
-static float rot_x_angle = 0.0f;
-static float rot_z_angle = 0.0f;
-
-static float shift_z[CUBE_COUNT] = {0}; // cube shift
-static int step_direction[CUBE_COUNT] = {1};  // cube move direction, 1 rise, -1 fall
-static int active_cube = 0;
-
-static bool is_playing = false;
 
 static void update_disc_animation(void *param)
 {
@@ -202,10 +207,9 @@ static void switch_to_play_pause_img(void *obj, gui_event_t e, void *param)
 
 }
 
-void disc_app(gui_view_t *view)
+static void disc_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

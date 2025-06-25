@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -10,12 +13,35 @@
 #include "gui_view.h"
 #include "gui_list.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "weather_view"
+#define NUM_LIGHTS_OR_THUNDER 3  // For Sunny/Stormy Tab
+#define NUM_DYNAMIC_ICON 30
 
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+typedef struct
+{
+    float driftX;    // Horizontal drift
+    float driftY;    // Vertical drift
+    float scale;     // Scale factor, size is 32*scale
+    gui_img_t *img;  // image object
+} Dynamic_Icon;
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void weather_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void weather_app(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -24,6 +50,25 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = weather_app,
 };
 
+/* Weather List Management */
+static gui_list_t *weather_list;
+static uint8_t current_list_index = 0;
+static uint8_t last_list_index = 0;
+
+/* Dynamic Icon Management */
+static Dynamic_Icon dynamic[NUM_DYNAMIC_ICON];
+
+/* Sunny/Stormy Tab */
+static gui_img_t *lights_or_thunder[NUM_LIGHTS_OR_THUNDER] = {NULL};
+static int current_light_index = 0;
+
+/* Windy Tab */
+static float leaf_rot_angle = 0.0f;
+
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,23 +87,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-
-static gui_list_t *weather_list;
-static uint8_t current_list_index = 0;
-static uint8_t last_list_index = 0;
-
 static void update_panel_animation(void *param)
 {
     touch_info_t *tp = tp_get_info();
@@ -75,20 +103,16 @@ static void update_panel_animation(void *param)
 
 }
 
-// clear win child
+// Clear win child
 static void clear_weather_icons(gui_win_t *win)
 {
     if (win != NULL)
     {
         gui_obj_child_free((gui_obj_t *)win);
     }
-
 }
 
-// sunny
-#define NUM_LIGHTS_OR_THUNDER 3
-static gui_img_t *lights_or_thunder[NUM_LIGHTS_OR_THUNDER] = {NULL};
-static int current_light_index = 0;
+// Sunny
 static void update_light_animation()
 {
     for (int i = 0; i < NUM_LIGHTS_OR_THUNDER; i++)
@@ -109,16 +133,7 @@ static void update_light_animation()
     }
 }
 
-// rainy
-#define NUM_DYNAMIC_ICON 30
-typedef struct
-{
-    float driftX;    // Horizontal drift
-    float driftY;    // Vertical drift
-    float scale;     // Scale factor, size is 32*scale
-    gui_img_t *img;  // image object
-} Dynamic_Icon;
-static Dynamic_Icon dynamic[NUM_DYNAMIC_ICON];
+// Rainy
 static void update_raindrop_animation()
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -141,7 +156,7 @@ static void update_raindrop_animation()
     }
 }
 
-// snowy
+// Snowy
 static void update_snow_animation()
 {
     for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
@@ -162,7 +177,7 @@ static void update_snow_animation()
     }
 }
 
-// stormy
+// Stormy
 static void update_thunder_animation()
 {
     for (int i = 0; i < NUM_LIGHTS_OR_THUNDER; i++)
@@ -183,7 +198,7 @@ static void update_thunder_animation()
     }
 }
 
-static float leaf_rot_angle = 0.0f;
+// Windy
 static void update_leaf_animation()
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -372,18 +387,14 @@ static void add_panel(gui_list_note_t *tab)
 
 }
 
-void weather_app(gui_view_t *view)
+static void weather_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    int length = 160;
-    uint8_t space = 20;
-
-    weather_list = gui_list_create(obj, "list", 0, 0, 0, 0, length, space, HORIZONTAL);
+    weather_list = gui_list_create(obj, "list", 0, 0, 0, 0, 160, 20, HORIZONTAL);
     gui_list_set_offset(weather_list, -55);
 
     gui_list_add_note(weather_list, false);

@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,11 +14,22 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "digital_clock_view"
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void digital_clock_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void digital_clock_app(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -25,6 +39,27 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = digital_clock_app,
 };
 
+/* 3D Digital Clock */
+static uint8_t *clock_fig_bin[10] =
+{
+    FIG0_BIN, FIG1_BIN, FIG2_BIN, FIG3_BIN, FIG4_BIN,
+    FIG5_BIN, FIG6_BIN, FIG7_BIN, FIG8_BIN, FIG9_BIN
+};
+static uint8_t current_hour0 = 0;    // Face 0
+static uint8_t current_hour1 = 1;    // Face 1
+static uint8_t current_minute0 = 0;  // Face 2
+static uint8_t current_minute1 = 0;  // Face 3
+static uint8_t current_second0 = 0;  // Face 4
+static uint8_t current_second1 = 4;  // Face 5
+
+/* Animation Variables */
+static float rot_x = 0.0f;
+static float rot_y = 0.0f;
+static float angle = 0.0f;
+static float last_time = 0.0f;
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,35 +77,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-static float rot_x = 0.0f;
-static float rot_y = 0.0f;
-static float angle = 0.0f;
-static float last_time = 0.0f;
-
-static uint8_t *clock_fig_bin[10] =
-{
-    FIG0_BIN, FIG1_BIN, FIG2_BIN, FIG3_BIN, FIG4_BIN,
-    FIG5_BIN, FIG6_BIN, FIG7_BIN, FIG8_BIN, FIG9_BIN
-};
-static uint8_t current_hour0 = 0;    // Face 0
-static uint8_t current_hour1 = 1;    // Face 1
-static uint8_t current_minute0 = 0;  // Face 2
-static uint8_t current_minute1 = 0;  // Face 3
-static uint8_t current_second0 = 0;  // Face 4
-static uint8_t current_second1 = 4;  // Face 5
 
 static void update_digital_clock_animation(void *param)
 {
@@ -131,9 +137,7 @@ static void update_digital_clock_animation(void *param)
 
         gui_3d_set_face_image(this, 0, clock_fig_bin[current_hour0]);
         gui_3d_set_face_image(this, 1, clock_fig_bin[current_hour1]);
-
     }
-
 }
 
 static void digital_clock_global_cb(gui_3d_t *this)
@@ -146,11 +150,9 @@ static void digital_clock_global_cb(gui_3d_t *this)
 }
 
 
-
-void digital_clock_app(gui_view_t *view)
+static void digital_clock_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

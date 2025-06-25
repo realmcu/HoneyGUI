@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,74 +14,20 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "rainbow_digital_view"
+#define DOT_NUM 15
 
-static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-void rainbow_digital_app(gui_view_t *view);
-
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = rainbow_digital_app,
-};
-
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-
-
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
 typedef struct
 {
     float dx;  // X-axis offset
     float dy;  // Y-axis offset
 } LayerOffset;
-
-static LayerOffset DEFAULT_LAYER_OFFSETS[5] =
-{
-    {0.0f,  0.0f},   // layer[0] Main layer fixed
-    {0.0f,  -3.0f},  // layer[1]
-    {-3.0f, 0.0f},   // layer[2]
-    {3.0f,  3.0f},   // layer[3]
-    {0.0f,  0.0f}    // layer[4]
-};
-static const LayerOffset MAX_OFFSET_LIMITS[5] =
-{
-    {0.0f,  0.0f},   // layer[0] Placeholder unused
-    {10.0f, 10.0f},  // layer[1] Maximum offset limit
-    {20.0f, 20.0f},  // layer[2]
-    {30.0f, 30.0f},  // layer[3]
-    {40.0f, 40.0f}   // layer[4]
-};
 
 typedef struct
 {
@@ -104,6 +53,44 @@ typedef struct
     bool is_opacity_increase;
 } Dot;
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void rainbow_digital_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .on_switch_in = rainbow_digital_app,
+};
+
+/* Digit Layer Offsets */
+static const LayerOffset DEFAULT_LAYER_OFFSETS[5] =
+{
+    {0.0f,  0.0f},   // layer[0] Main layer fixed
+    {0.0f,  -3.0f},  // layer[1]
+    {-3.0f, 0.0f},   // layer[2]
+    {3.0f,  3.0f},   // layer[3]
+    {0.0f,  0.0f}    // layer[4]
+};
+static const LayerOffset MAX_OFFSET_LIMITS[5] =
+{
+    {0.0f,  0.0f},   // layer[0] Placeholder unused
+    {10.0f, 10.0f},  // layer[1] Maximum offset limit
+    {20.0f, 20.0f},  // layer[2]
+    {30.0f, 30.0f},  // layer[3]
+    {40.0f, 40.0f}   // layer[4]
+};
+
+/* Dot Image Binaries */
 static void *dot_img_bin[5] =
 {
     RAINBOWDCLOCK_DOT_0_BIN,
@@ -113,14 +100,36 @@ static void *dot_img_bin[5] =
     RAINBOWDCLOCK_DOT_4_BIN
 };
 
-#define DOT_NUM 15
+/* Create Digits and Dots */
 static RainbowDigit digits[4];
 static SharedAnimationState shared_state;
 static Dot dots[DOT_NUM];
 
-static float damping = 0.1f;      // Damping coefficient
+/* Animation Variables */
+static const float damping = 0.1f;      // Damping coefficient
 static bool is_animating = false; // Animation state
 static int reached_target_count = 0; // Counter for layers reaching the target
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
 
 // Initialize a single digit
 static void init_digit(RainbowDigit *digit, gui_win_t *win, uint8_t *img_bin[5], int x_base,
@@ -240,6 +249,7 @@ static void number_animation_cb(void *param)
     {
         update_shared_offsets(tp->deltaX, tp->deltaY);
         apply_four_layer_offsets();
+        is_animating = false;
     }
     else if (tp->released)
     {
@@ -290,11 +300,10 @@ static void dot_animation_cb()
     }
 }
 
-void rainbow_digital_app(gui_view_t *view)
+static void rainbow_digital_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

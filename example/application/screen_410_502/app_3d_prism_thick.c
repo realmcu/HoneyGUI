@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,12 +14,39 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "prism_thick_view"
 
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+typedef struct
+{
+    float pos_x;
+    float pos_y;
+    float pos_z;
+} Position;
+
+typedef struct
+{
+    float rot_x;
+    float rot_y;
+    float rot_z;
+} Rotation;
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void prism_thick_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void prism_thick_app(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -25,6 +55,26 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = prism_thick_app,
 };
 
+/* Animation Variables */
+static Position camera_pos_raw = {0.0f, 6.0f, 15.0f};
+static Position world_pos_raw = {0.0f, 13.0f, 45.0f};
+static Rotation world_rot_raw = {0.0f, 0.0f, 0.0f};
+
+static Position camera_pos_target = {0.0f, 0.0f, 15.0f};
+static Position world_pos_target = {0.0f, 0.0f, 32.5f};
+static Rotation world_rot_target = {0.0f, 0.0f, 0.0f};
+
+static Position camera_pos_temp = {0.0f, 0.0f, 0.0f};
+static Position world_pos_temp = {0.0f, 0.0f, 0.0f};
+static Rotation world_rot_temp = {0.0f, 0.0f, 0.0f};
+
+static float corrected_angle;
+static float progress_percent = 0.0f;
+static int enter_face_index = 0;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,50 +92,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-typedef struct
-{
-    float pos_x;
-    float pos_y;
-    float pos_z;
-} Position;
-
-typedef struct
-{
-    float rot_x;
-    float rot_y;
-    float rot_z;
-} Rotation;
-
-
-static Position camera_pos_raw = {0.0f, 6.0f, 15.0f};
-static Position world_pos_raw = {0.0f, 13.0f, 45.0f};
-static Rotation world_rot_raw = {0.0f, 0.0f, 0.0f};
-
-static Position camera_pos_target = {0.0f, 0.0f, 15.0f};
-static Position world_pos_target = {0.0f, 0.0f, 32.5f};
-static Rotation world_rot_target = {0.0f, 0.0f, 0.0f};
-
-static Position camera_pos_temp = {0.0f, 0.0f, 0.0f};
-static Position world_pos_temp = {0.0f, 0.0f, 0.0f};
-static Rotation world_rot_temp = {0.0f, 0.0f, 0.0f};
-
-
-static float corrected_angle;
-static float progress_percent = 0.0f;
-static int enter_face_index = 0;
 
 static void update_prism_thick_angle()
 {
@@ -199,10 +205,9 @@ static void prism_thick_on_face_click_cb(void *obj, gui_event_t e, void *param)
 
 }
 
-void prism_thick_app(gui_view_t *view)
+static void prism_thick_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

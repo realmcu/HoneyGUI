@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,12 +14,34 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "windmill_view"
+#define NUM_BUBBLES 30
 
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+typedef struct
+{
+    float driftX;    // Horizontal drift
+    float driftY;    // Vertical drift
+    float scale;     // Scale factor, size is 96*scale
+    gui_img_t *img;  // Bubble's image object
+} Bubble;
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void windmill_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void windmill_app(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -25,6 +50,18 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = windmill_app,
 };
 
+/* Bubbles Management */
+static Bubble bubbles[NUM_BUBBLES];
+
+/* Animation Variables */
+static float rot_y_angle = 0.0f;
+static float rot_z_angle = 0.0f;
+static bool touch_started = false;
+static int pressing_time = 1;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,35 +79,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-#define NUM_BUBBLES 30
-
-typedef struct
-{
-    float driftX;    // Horizontal drift
-    float driftY;    // Vertical drift
-    float scale;     // Scale factor, size is 96*scale
-    gui_img_t *img;  // Bubble's image object
-} Bubble;
-
-Bubble bubbles[NUM_BUBBLES];
-static float rot_y_angle = 0.0f;
-static float rot_z_angle = 0.0f;
-
-bool touch_started = false;
-static int pressing_time = 1;
 
 static void update_bubbles()
 {
@@ -175,11 +183,10 @@ static gui_3d_matrix_t windmill_face_cb(gui_3d_t *this, size_t face_index)
 
 }
 
-void windmill_app(gui_view_t *view)
+static void windmill_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

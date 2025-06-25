@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,11 +14,23 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "applist_view"
+#define MAX_APPS 10  // Maximum number of 3D objects stored
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void applist_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void applist_app(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -25,6 +40,26 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = applist_app,
 };
 
+/* 3D Applications List */
+static gui_3d_t *app_3d_list[MAX_APPS];  // Static array
+static size_t app_count = 0;             // Current number of stored objects
+
+/* Animation Variables */
+static float rot_y_angle = 0.0f;   // Current angle
+static float velocity = 0.0f;       // Angular velocity
+static bool isAnimating = false;    // Whether animation is ongoing
+static const float amplitude = 30.0f;     // Initial amplitude
+static const float damping =
+    0.95f;        // Damping coefficient (between 0.9~0.99, higher values result in longer oscillation)
+static const float frequency =
+    0.2f;      // Oscillation frequency (higher values result in faster oscillation)
+
+static float click_on_rot_y = 0.0f;
+static float click_on_shift_z = 0.0f;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,33 +77,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-
-#define MAX_APPS 10  // Maximum number of 3D objects stored
-
-gui_3d_t *app_3d_list[MAX_APPS];  // Static array
-static size_t app_count = 0;             // Current number of stored objects
-
-static float rot_y_angle = 0.0f;   // Current angle
-static float velocity = 0.0f;       // Angular velocity
-static bool isAnimating = false;    // Whether animation is ongoing
-static float amplitude = 30.0f;     // Initial amplitude
-static float damping =
-    0.95f;        // Damping coefficient (between 0.9~0.99, higher values result in longer oscillation)
-static float frequency =
-    0.2f;      // Oscillation frequency (higher values result in faster oscillation)
 
 static void update_applist_animation()
 {
@@ -99,6 +107,7 @@ static void update_applist_animation()
         }
     }
 }
+
 static void applist_global_cb(gui_3d_t *this)
 {
     gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 5), gui_point_4d(0, 0, 0), 1, 32767,
@@ -129,8 +138,6 @@ static void add_to_applist(gui_3d_t *app)
     }
 }
 
-static float click_on_rot_y = 0.0f;
-static float click_on_shift_z = 0.0f;
 static void app_click_on_cb(gui_3d_t *this)
 {
     if (click_on_rot_y < 720.f)
@@ -149,8 +156,8 @@ static void app_click_on_cb(gui_3d_t *this)
                                  90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, 0, 0, 20 - click_on_shift_z, 0, click_on_rot_y, 0, 5);
-
 }
+
 static void gui_app_switch(gui_3d_t *this)
 {
     gui_log("clicked app: %s\n", this->base.name);
@@ -168,12 +175,10 @@ static void gui_app_switch(gui_3d_t *this)
     click_on_rot_y = 0.0f;
     click_on_shift_z = 0.0f;
     gui_3d_set_global_transform_cb(this, (gui_3d_global_transform_cb)app_click_on_cb);
-
-
 }
 
 
-void applist_app(gui_view_t *view)
+static void applist_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);

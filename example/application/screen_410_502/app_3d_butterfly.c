@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,11 +14,22 @@
 #include "gui_list.h"
 #include "gui_3d.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "butterfly_view"
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void butterfly_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void butterfly_app(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -25,6 +39,26 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = butterfly_app,
 };
 
+/* Animation Variables */
+static float wing_angle = 0.0f;
+static float butterfly_x = 0.0f;
+static float butterfly_y = 0.0f;
+static float butterfly_z = 0.0f;
+static float butterfly_rz = 0.0f;
+
+bool is_moving_to_target = false;
+static float target_dx = 0.0f;
+static float target_dy = 0.0f;
+static float source_dx = 0.0f;
+static float source_dy = 0.0f;
+static const float move_speed = 0.02f;
+static float wing_time = 0.0f;
+static float total_flight_distance = 0.0f;
+static float flight_progress = 1.0f;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,35 +76,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-
-static float wing_angle = 0.0f;
-static float butterfly_x = 0.0f;
-static float butterfly_y = 0.0f;
-static float butterfly_z = 0.0f;
-static float butterfly_rz = 0.0f;
-
-bool is_moving_to_target = false;
-static float target_dx = 0.0f;
-static float target_dy = 0.0f;
-static float source_dx = 0.0f;
-static float source_dy = 0.0f;
-static float move_speed = 0.02f;
-static float wing_time = 0.0f;
-static float total_flight_distance = 0.0f;
-static float flight_progress = 1.0f;
 
 static void update_animation()
 {
@@ -181,12 +186,9 @@ static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face
 
 }
 
-
-
-void butterfly_app(gui_view_t *view)
+static void butterfly_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
@@ -198,7 +200,6 @@ void butterfly_app(gui_view_t *view)
     gui_3d_set_global_transform_cb(butterfly_3d, (gui_3d_global_transform_cb)butterfly_global_cb);
     gui_3d_set_face_transform_cb(butterfly_3d, (gui_3d_face_transform_cb)butterfly_face_cb);
 
-    gui_obj_create_timer(&(butterfly_3d->base), 17, true, update_animation);
-    gui_obj_start_timer(&(butterfly_3d->base));
+    gui_obj_create_timer(&(butterfly_3d->base), 10, true, update_animation);
 
 }

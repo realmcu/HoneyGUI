@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "gui_win.h"
 #include "gui_img.h"
 #include "box2d/box2d.h"
@@ -15,11 +18,18 @@
 #include "root_image_hongkong/ui_resource.h"
 #include <time.h>
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "rainbow_analog_view"
+
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
-    void app_rainbow_analog_ui_design(gui_view_t *view);
+    static void app_rainbow_analog_ui_design(gui_view_t *view);
     static void app_close(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
@@ -48,54 +58,15 @@ extern "C" {
     }
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
+
+/*============================================================================*
+ *                             C++ Namespace
+ *============================================================================*/
 namespace app_rainbow_analog
 {
-const float TIMESTEP = 1.0f / 60.0f; // Timestep
-const int VELOCITY_ITERATIONS = 8; // Velocity iterations
-const int POSITION_ITERATIONS = 3; // Position iterations
-const float PIXELS_PER_METER = 30.0f; // Pixels per meter
-
-gui_obj_t *parent;
-b2World *world = nullptr; // Box2D world
-
-const int SCREEN_WIDTH = 410;
-const int SCREEN_HEIGHT = 502;
-float OUTER_RING_RADIUS = 200;
-
-const uint8_t CAPSULE_COLOR_COUNT = 8;
-const uint8_t CAPSULES_PER_COLOR = 5;
-const uint8_t CAPSULE_IMG_HALF_WIDTH = 20;
-const uint8_t CAPSULE_IMG_HALF_HEIGHT = 7;
-
-const float EXPLOSION_RADIUS = 3.0f;  // Influence radius (meters)
-const float EXPLOSION_POWER = 10.0f;  // Bouncing force
-const float RECOVERY_TIME = 2.0f;     // Recovery time required (seconds)
-const float GLOBAL_ANGULAR_VELOCITY = 0.3f;   // Angular velocity rad/s
-
-static void *Capsule_Img[CAPSULE_COLOR_COUNT] =
-{
-    RAINBOWACLOCK_CAPSULE00_BIN,
-    RAINBOWACLOCK_CAPSULE01_BIN,
-    RAINBOWACLOCK_CAPSULE02_BIN,
-    RAINBOWACLOCK_CAPSULE03_BIN,
-    RAINBOWACLOCK_CAPSULE04_BIN,
-    RAINBOWACLOCK_CAPSULE05_BIN,
-    RAINBOWACLOCK_CAPSULE06_BIN,
-    RAINBOWACLOCK_CAPSULE07_BIN,
-};
-
-static const NVGcolor Capsule_Color[CAPSULE_COLOR_COUNT] =
-{
-    nvgRGB(1, 234, 23),
-    nvgRGB(0, 122, 131),
-    nvgRGB(4, 28, 224),
-    nvgRGB(69, 4, 175),
-    nvgRGB(192, 0, 62),
-    nvgRGB(232, 23, 0),
-    nvgRGB(190, 66, 1),
-    nvgRGB(121, 137, 0),
-};
-
+/*============================================================================*
+*                           Types
+*============================================================================*/
 struct Capsule
 {
     b2Body *body;
@@ -110,34 +81,84 @@ struct Capsule
     float recoveryTimer;
 };
 
-const b2Vec2 CIRCLE_CENTER(SCREEN_WIDTH / 2.0f / PIXELS_PER_METER,
-                           SCREEN_HEIGHT / 2.0f / PIXELS_PER_METER);
-
-std::vector<Capsule> capsules;
-
 struct HandState
 {
     NVGcolor previousColor;
 };
 
+/*============================================================================*
+ *                              Variables
+ *============================================================================*/
+/* GUI */
+gui_obj_t *parent = nullptr;
+const int SCREEN_WIDTH = 410;
+const int SCREEN_HEIGHT = 502;
+
+/* Box2D World */
+const float TIMESTEP = 1.0f / 60.0f; // Timestep
+const int VELOCITY_ITERATIONS = 8; // Velocity iterations
+const int POSITION_ITERATIONS = 3; // Position iterations
+const float PIXELS_PER_METER = 30.0f; // Pixels per meter
+b2World *world = nullptr; // Box2D world
+
+/* Capsules Management*/
+const uint8_t CAPSULE_COLOR_COUNT = 8;
+const uint8_t CAPSULES_PER_COLOR = 5;
+const uint8_t CAPSULE_IMG_HALF_WIDTH = 20;
+const uint8_t CAPSULE_IMG_HALF_HEIGHT = 7;
+void *Capsule_Img[CAPSULE_COLOR_COUNT] =
+{
+    RAINBOWACLOCK_CAPSULE00_BIN,
+    RAINBOWACLOCK_CAPSULE01_BIN,
+    RAINBOWACLOCK_CAPSULE02_BIN,
+    RAINBOWACLOCK_CAPSULE03_BIN,
+    RAINBOWACLOCK_CAPSULE04_BIN,
+    RAINBOWACLOCK_CAPSULE05_BIN,
+    RAINBOWACLOCK_CAPSULE06_BIN,
+    RAINBOWACLOCK_CAPSULE07_BIN,
+};
+
+const NVGcolor Capsule_Color[CAPSULE_COLOR_COUNT] =
+{
+    nvgRGB(1, 234, 23),
+    nvgRGB(0, 122, 131),
+    nvgRGB(4, 28, 224),
+    nvgRGB(69, 4, 175),
+    nvgRGB(192, 0, 62),
+    nvgRGB(232, 23, 0),
+    nvgRGB(190, 66, 1),
+    nvgRGB(121, 137, 0),
+};
+std::vector<Capsule> capsules;
+float OUTER_RING_RADIUS = 200;
+const b2Vec2 CIRCLE_CENTER(SCREEN_WIDTH / 2.0f / PIXELS_PER_METER,
+                           SCREEN_HEIGHT / 2.0f / PIXELS_PER_METER);
+
+/* Clock Management*/
 HandState secondHandState = { nvgRGB(0, 0, 0) };
 HandState minuteHandState = { nvgRGB(0, 0, 0) };
 HandState hourHandState = { nvgRGB(0, 0, 0) };
-
-
 const uint8_t hourLength = 80;
 const uint8_t minuteLength = 100;
 const uint8_t secondLength = 130;
 const float hourWidth = 10.0f;
 const float minuteWidth = 7.0f;
 const float secondWidth = 4.0f;
+size_t buffer_size;
+gui_img_t *clock_img = NULL;
+uint8_t *clock_img_data = NULL;
 
-static size_t buffer_size;
-static gui_img_t *clock_img = NULL;
-static uint8_t *clock_img_data = NULL;
+/* Capsules Animation Variables */
+const float EXPLOSION_RADIUS = 3.0f;  // Influence radius (meters)
+const float EXPLOSION_POWER = 10.0f;  // Bouncing force
+const float RECOVERY_TIME = 2.0f;     // Recovery time required (seconds)
+const float GLOBAL_ANGULAR_VELOCITY = 0.3f;   // Angular velocity rad/s
 
+/*============================================================================*
+*                           Private Functions
+*============================================================================*/
 // Apply centripetal force to ensure capsules move along the ring
-void applyCentripetalForce(Capsule *capsule)
+void apply_centripetal_force(Capsule *capsule)
 {
     b2Vec2 toCenter = CIRCLE_CENTER - capsule->body->GetPosition(); // Vector from capsule to center
     float distance = toCenter.Length();
@@ -245,7 +266,7 @@ void capsule_animation_cb(void *obj)
         else
         {
             capsule.currentPathAngle -= GLOBAL_ANGULAR_VELOCITY * TIMESTEP;
-            applyCentripetalForce(&capsule);
+            apply_centripetal_force(&capsule);
         }
 
         b2Vec2 pos = capsule.body->GetPosition();
@@ -260,7 +281,7 @@ void capsule_animation_cb(void *obj)
 }
 
 
-void createCapsules(b2World *world)
+void create_capsules(b2World *world)
 {
     for (int i = 0; i < CAPSULE_COLOR_COUNT; i++)
     {
@@ -324,7 +345,7 @@ void createCapsules(b2World *world)
 }
 
 
-bool areAnglesEqual(float angle1, float angle2)
+bool angles_equal(float angle1, float angle2)
 {
     angle1 = fmod(angle1, 2 * M_PI);
     angle2 = fmod(angle2, 2 * M_PI);
@@ -333,8 +354,8 @@ bool areAnglesEqual(float angle1, float angle2)
            std::fabs(sin(angle1) - sin(angle2)) < 0.1f;
 }
 
-void drawClockHand(NVGcontext *vg, float length, float width, int angleInDegrees,
-                   HandState &handState)
+void draw_clock_hand(NVGcontext *vg, float length, float width, int angleInDegrees,
+                     HandState &handState)
 {
     float angleInRadians = (angleInDegrees - 90) * M_PI / 180.0f; // Adjust to start from '12' position
     float xEnd = SCREEN_WIDTH / 2 + cos(angleInRadians) * length;
@@ -343,7 +364,7 @@ void drawClockHand(NVGcontext *vg, float length, float width, int angleInDegrees
     NVGcolor draw_color = handState.previousColor;
     for (auto &capsule : capsules)
     {
-        if (areAnglesEqual(capsule.currentPathAngle, angleInRadians))
+        if (angles_equal(capsule.currentPathAngle, angleInRadians))
         {
             draw_color = capsule.color;
             break;
@@ -383,9 +404,9 @@ void nvg_create_clock_cb(NVGcontext *vg)
     int minuteAngle = (minute + second / 60.0f) * 6.0f;    // 360/60 = 6 degrees per minute
     int secondAngle = second * 6.0f;                    // 360/60 = 6 degrees per second
 
-    drawClockHand(vg, hourLength, hourWidth, hourAngle, hourHandState);
-    drawClockHand(vg, minuteLength, minuteWidth, minuteAngle, minuteHandState);
-    drawClockHand(vg, secondLength, secondWidth, secondAngle, secondHandState);
+    draw_clock_hand(vg, hourLength, hourWidth, hourAngle, hourHandState);
+    draw_clock_hand(vg, minuteLength, minuteWidth, minuteAngle, minuteHandState);
+    draw_clock_hand(vg, secondLength, secondWidth, secondAngle, secondHandState);
 
     // Central fixed point
     nvgBeginPath(vg);
@@ -440,7 +461,7 @@ int ui_design(gui_obj_t *obj)
 
     // Create capsules
     gui_win_t *win = gui_win_create(parent, "Rainbow Analog Clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    createCapsules(world);
+    create_capsules(world);
     gui_obj_create_timer(GUI_BASE(win), 10, true, capsule_animation_cb);
     gui_obj_start_timer(GUI_BASE(win));
 
@@ -456,14 +477,16 @@ int ui_design(gui_obj_t *obj)
 }
 }
 
-// C interface
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
     static void app_close(gui_view_t *view)
     {
         app_rainbow_analog::close();
     }
 
-    void app_rainbow_analog_ui_design(gui_view_t *view)
+    static void app_rainbow_analog_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
         gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);

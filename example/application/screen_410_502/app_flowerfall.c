@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -10,12 +13,39 @@
 #include "gui_view.h"
 
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "flower_view"
+#define NUM_PETALS 30
+#define NUM_GHOST 2
 
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+typedef struct
+{
+    float driftX;    // Horizontal drift
+    float driftY;    // Vertical drift
+    float scale;     // Scale factor, size is 64*scale
+    gui_img_t *img;  // Petal's image object
+    gui_img_t *ghosts[NUM_GHOST]; // ghost images
+
+    float target_dx; // gather target X position
+    float move_speed;
+} Petal;
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void flower_app(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void flower_app(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -24,6 +54,24 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = flower_app,
 };
 
+/* Branch Management*/
+static gui_img_t *branch1;
+static gui_img_t *branch2;
+
+/* Petals Management*/
+static Petal petals[NUM_PETALS];
+
+/* Branch Animation Variables */
+static float branch_rot_angle = 0.0f;
+static int branch_direction = 1;
+
+/* Petals Animation Variables */
+static float petal_rot_angle = 0.0f;
+static float petal_oscillation = 0.0f; // petals oscillation effect
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -41,42 +89,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-#define NUM_PETALS 30
-#define NUM_GHOST 2
-
-typedef struct
-{
-    float driftX;    // Horizontal drift
-    float driftY;    // Vertical drift
-    float scale;     // Scale factor, size is 64*scale
-    gui_img_t *img;  // Petal's image object
-    gui_img_t *ghosts[NUM_GHOST]; // ghost images
-
-    float target_dx; // gather target X position
-    float move_speed;
-} Petal;
-
-static Petal petals[NUM_PETALS];
-static gui_img_t *branch1;
-static gui_img_t *branch2;
-
-static float branch_rot_angle = 0.0f;
-static int branch_direction = 1;
-static float petal_rot_angle = 0.0f;
-static float petal_oscillation = 0.0f; // petals oscillation effect
 
 static void update_branch_rotation()
 {
@@ -241,12 +253,10 @@ static void single_petal_init(Petal *single_petal, gui_obj_t *obj, gui_dispdev_t
     single_petal->ghosts[1]->opacity_value = 150;
 }
 
-void flower_app(gui_view_t *view)
+static void flower_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
     gui_dispdev_t *dc = gui_get_dc();
-
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
