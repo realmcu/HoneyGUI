@@ -1,33 +1,44 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <time.h>
+#include "cJSON.h"
 #include "root_image_hongkong/ui_resource.h"
 #include "app_hongkong.h"
 #include "gui_canvas.h"
 #include "gui_text.h"
-#include <time.h>
 #include "gui_win.h"
 #include "gui_canvas_img.h"
 #include "gui_img.h"
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
-#include "cJSON.h"
 #include "gui_list.h"
 #include "tp_algo.h"
 
-
-#define __WIN_NAME    "win_timecard"
-#define __IMG_NAME    "timecard"
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-
 #define CURRENT_VIEW_NAME "app_bottom_view"
+#define __WIN_NAME    "win_timecard"
+#define __IMG_NAME    "timecard"
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void bottom_view_design(gui_view_t *view);
+static void clear_bottom_view(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *fruit_ninja_view = NULL;
 const static gui_view_descriptor_t *heartrate_view = NULL;
 const static gui_view_descriptor_t *box2d_ring_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void bottom_view_design(gui_view_t *view);
-static void clear_bottom_view(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -36,27 +47,6 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = bottom_view_design,
     .on_switch_out = clear_bottom_view,
 };
-
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    fruit_ninja_view = gui_view_descriptor_get("fruit_ninja_view");
-    heartrate_view = gui_view_descriptor_get("heartrate_view");
-    box2d_ring_view = gui_view_descriptor_get("box2d_ring_view");
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 const char *month[12] =
 {
@@ -86,19 +76,42 @@ const char *day[7] =
 
 extern void *text_num_array[];
 extern struct tm *timeinfo;
-static char time_content[10] = "00:00", date_content[20] = "January0\nSUN";
-static char time_timecard_content[10] =  "00:00", date_timecard_content[10] = "SUN 0";
-static gui_text_t *timecard_date_text, *timecard_time_text, *date_text;
+static char time_content[10] = "00:00";
+static char date_content[20] = "January0\nSun";
+static char time_timecard_content[10] =  "00:00";
+static char date_timecard_content[10] = "Sun 0";
 
-static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
-
-static gui_list_t *list;
-
-static uint8_t *img_data_activity;
-static char *move_content, *ex_content, *stand_content;
+static uint8_t *img_data_activity = NULL;
 static uint8_t *img_data_bg = NULL;
-
 static size_t buffer_size = 0;
+static char *move_content = NULL;
+static char *ex_content = NULL;
+static char *stand_content = NULL;
+
+static gui_list_t *list = NULL;
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+static int gui_view_descriptor_register_init(void)
+{
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    fruit_ninja_view = gui_view_descriptor_get("fruit_ninja_view");
+    heartrate_view = gui_view_descriptor_get("heartrate_view");
+    box2d_ring_view = gui_view_descriptor_get("box2d_ring_view");
+    menu_view = gui_view_descriptor_get("menu_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_bottom_view(gui_view_t *view)
 {
@@ -112,9 +125,18 @@ static void clear_bottom_view(gui_view_t *view)
         gui_lower_free(img_data_activity);
         img_data_activity = NULL;
     }
+    if (move_content)
+    {
+        gui_free(move_content);
+        gui_free(ex_content);
+        gui_free(stand_content);
+        move_content = NULL;
+        ex_content = NULL;
+        stand_content = NULL;
+    }
 }
 
-static void display_time(void)
+static void time_update_cb(void)
 {
     if (!timeinfo)
     {
@@ -122,16 +144,22 @@ static void display_time(void)
     }
     else
     {
-        sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-        gui_text_content_set(timecard_time_text, time_timecard_content, strlen(time_timecard_content));
-
-        sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
-        gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
-
-        sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
-                day[timeinfo->tm_wday]);
-        gui_text_content_set(date_text, date_content, strlen(date_content));
-        // gui_text_convert_to_img(date_text, RGB565);
+        {
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_time", current_view);
+            sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+            gui_text_content_set((gui_text_t *)obj, time_timecard_content, strlen(time_timecard_content));
+        }
+        {
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_date_1", current_view);
+            sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+            gui_text_content_set((gui_text_t *)obj, date_timecard_content, strlen(date_timecard_content));
+        }
+        {
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_date_2", current_view);
+            sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
+                    day[timeinfo->tm_wday]);
+            gui_text_content_set((gui_text_t *)obj, date_content, strlen(date_content));
+        }
 
         GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "circle_hour_decimal",
                                         current_view);
@@ -165,19 +193,19 @@ static void draw_timecard(void *parent)
                                                                             35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
 
     // text
-    timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
+    gui_text_t *timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
     gui_text_set(timecard_date_text, (void *)date_timecard_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_timecard_content),
                  32);
-    gui_text_type_set(timecard_date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(timecard_date_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
-    timecard_time_text = gui_text_create(canvas_timecard, "timecard_time",  -10, 20, 0,
-                                         0);
+    gui_text_t *timecard_time_text = gui_text_create(canvas_timecard, "timecard_time",  -10, 20, 0,
+                                                     0);
     gui_text_set(timecard_time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(time_content),
                  32);
-    gui_text_type_set(timecard_time_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(timecard_time_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_time_text, RIGHT);
     GUI_BASE(canvas_timecard)->not_show = 1;
 }
@@ -188,7 +216,7 @@ static void timer_cb(void *obj)
     count++;
     if (count >= 300)
     {
-        display_time();
+        time_update_cb();
         count = 0;
     }
 
@@ -314,19 +342,16 @@ static void arc_activity_cb(NVGcontext *vg)
                 GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", current_view);
                 sprintf(move_content, "Move: %d/20000 steps", move->valueint);
                 gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
-                // gui_text_convert_to_img((gui_text_t *)move_text, RGB565);
             }
             {
                 GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", current_view);
                 sprintf(ex_content, "Exercise: %d/60 min", ex->valueint);
                 gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
-                // gui_text_convert_to_img(ex_text, RGB565);
             }
             {
                 GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", current_view);
                 sprintf(stand_content, "Stand: %d/30 times", stand->valueint);
                 gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
-                // gui_text_convert_to_img(stand_text, RGB565);
             }
         }
     }
@@ -334,16 +359,7 @@ static void arc_activity_cb(NVGcontext *vg)
     cJSON_Delete(root);
 }
 
-static void activity_timer_cb(void *obj)
-{
-    gui_img_t *img = (gui_img_t *)obj;
-    uint8_t *img_data = (void *)gui_img_get_image_data(img);
-    memset(img_data, 0, buffer_size);
-    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
-    gui_img_set_image_data(img, img_data);
-}
-
-void bottom_view_design(gui_view_t *view)
+static void bottom_view_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
@@ -351,11 +367,10 @@ void bottom_view_design(gui_view_t *view)
 
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
-    gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(parent, "background", 0, 0, SCREEN_WIDTH,
-                                                          SCREEN_HEIGHT, gui_rgb(0, 0,
-                                                                                 0));
+    gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
+                                                          SCREEN_HEIGHT, gui_rgb(0, 0, 0));
     gui_obj_create_timer(GUI_BASE(canvas_bg), 100, true, timer_cb);
-    // gui_obj_start_timer(GUI_BASE(canvas_bg));
+
     //clock circle
     gui_img_t *img_clock = gui_img_create_from_mem(parent, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN,
                                                    38, 30,
@@ -384,15 +399,14 @@ void bottom_view_design(gui_view_t *view)
         gui_img_scale(img, 0.7, 0.7);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
-    date_text = gui_text_create(img_clock, "timecard_date_2",  0, 42, 0, 0);
+    gui_text_t *date_text = gui_text_create(img_clock, "timecard_date_2",  0, 42, 0, 0);
     gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_content),
                  32);
-    gui_text_type_set(date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_type_set(date_text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, MULTI_LEFT);
 
-    // gui_text_convert_to_img(date_text, RGB565);
-
+    // Card list
     int space = 10;
     int length = 157;
     list = gui_list_create(parent, "list", 0, 0, 0, 0, length, space, VERTICAL);
@@ -439,9 +453,9 @@ void bottom_view_design(gui_view_t *view)
 
         if (move_content == NULL)
         {
-            move_content = (char *)gui_lower_malloc(30);
-            ex_content = (char *)gui_lower_malloc(30);
-            stand_content = (char *)gui_lower_malloc(30);
+            move_content = (char *)gui_malloc(30);
+            ex_content = (char *)gui_malloc(30);
+            stand_content = (char *)gui_malloc(30);
         }
         sprintf(move_content, "Move: 0/20000 steps");
         gui_text_t *move_text = gui_text_create(canvas, "ac_move", 134, 20, 0, 0);
@@ -484,7 +498,6 @@ void bottom_view_design(gui_view_t *view)
         }
     }
 
-
     // note_app
     {
         gui_img_t *canvas_app = gui_img_create_from_mem(note_app, "note_ac", (void *)img_data_bg, offset_X,
@@ -517,6 +530,5 @@ void bottom_view_design(gui_view_t *view)
         gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
 
-
-    display_time();
+    time_update_cb();
 }

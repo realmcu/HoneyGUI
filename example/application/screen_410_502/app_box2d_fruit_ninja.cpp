@@ -1,10 +1,12 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
 #include <math.h>
 #include <stdint.h>
 #include <vector>
-
 #include "root_image_hongkong/ui_resource.h"
 #include "app_hongkong.h"
 #include "gui_win.h"
@@ -16,45 +18,16 @@
 #include "gui_api.h"
 #include "gui_view.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define HEIGHT_OFFSET 100
-
 #define CURRENT_VIEW_NAME "fruit_ninja_view"
 
-extern "C" {
-    static gui_view_t *current_view = NULL;
-    const static gui_view_descriptor_t *menu_view = NULL;
-    void app_fruit_ninja_design(gui_view_t *view);
-    void close_FN(gui_view_t *view);
-
-    static gui_view_descriptor_t const descriptor =
-    {
-        /* change Here for current view */
-        .name = (const char *)CURRENT_VIEW_NAME,
-        .pView = &current_view,
-        .on_switch_in = app_fruit_ninja_design,
-        .on_switch_out = close_FN,
-    };
-
-    static int gui_view_descriptor_register_init(void)
-    {
-        gui_view_descriptor_register(&descriptor);
-        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-        return 0;
-    }
-    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-    static int gui_view_get_other_view_descriptor_init(void)
-    {
-        /* you can get other view descriptor point here */
-        menu_view = gui_view_descriptor_get("menu_view");
-        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-        return 0;
-    }
-    static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-}
 #ifndef __WIN32
+/* overload new & delete */
 void *lx_platform_malloc(size_t size)
 {
     void *ptr = NULL;
@@ -103,10 +76,42 @@ void operator delete[](void *ptr) noexcept
 }
 #endif
 
+extern "C" {
+    static gui_view_t *current_view = NULL;
+    const static gui_view_descriptor_t *menu_view = NULL;
+    void app_fruit_ninja_design(gui_view_t *view);
+    void close_FN(gui_view_t *view);
+
+    static gui_view_descriptor_t const descriptor =
+    {
+        /* change Here for current view */
+        .name = (const char *)CURRENT_VIEW_NAME,
+        .pView = &current_view,
+        .on_switch_in = app_fruit_ninja_design,
+        .on_switch_out = close_FN,
+    };
+
+    static int gui_view_descriptor_register_init(void)
+    {
+        gui_view_descriptor_register(&descriptor);
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+    static int gui_view_get_other_view_descriptor_init(void)
+    {
+        /* you can get other view descriptor point here */
+        menu_view = gui_view_descriptor_get("menu_view");
+        gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+        return 0;
+    }
+    static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+}
+
 void app_fruit_ninja_design(gui_view_t *view);
 namespace app_fruit_ninja
 {
-static void *mem = NULL;
 static const float M2P =
     20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
 static const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
@@ -121,21 +126,29 @@ static uint8_t fruit_cut_cnt = 0;
 static bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
 
 static b2World *world = nullptr; // Box2D world
-static b2Body *body_st, *body_ba, *body_pe, *body_wm,
-       *body_bomb; // entities that simulate motion trajectories
+static b2Body *body_st; // entities that simulate motion trajectories
+static b2Body *body_ba;
+static b2Body *body_pe;
+static b2Body *body_wm;
+static b2Body *body_bomb;
 
-static gui_img_t *img_strawberry, *img_banana,
-       *img_peach, *img_watermelon,
-       *img_gameover, *img_bg, *img_bomb;
-static gui_text_t *score_board, *time_counter;
-static void *time_counter_content = NULL;
-static uint8_t game_time;
+static gui_img_t *img_strawberry;
+static gui_img_t *img_banana;
+static gui_img_t *img_peach;
+static gui_img_t *img_watermelon;
+static gui_img_t *img_bomb;
 static gui_img_t
 *img_cut_array[4]; // img_strawberry_cut, *img_banana_cut, *img_peach_cut, *img_watermelon_cut;
 /* Define a point structure */
+
+static gui_text_t *score_board;
+static gui_text_t *time_counter;
+static char time_counter_content[10] = "Time: 60";
+static uint8_t game_time;
 typedef struct
 {
-    float x, y;
+    float x;
+    float y;
 } Point;
 
 void clear_world()
@@ -143,9 +156,8 @@ void clear_world()
     if (world)
     {
         world->~b2World();
-        gui_free(mem);
+        gui_free(world);
         world = nullptr;
-        gui_log("close world done\n");
     }
 }
 
@@ -154,11 +166,11 @@ float gui_img_get_transform_degrees(gui_img_t *img)
     GUI_ASSERT(GUI_BASE(img)->type == IMAGE_FROM_MEM)
     return img->degrees;
 }
-/* rotate to get rectangular's four points */
+/* Rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)
 {
     /* converting angles to radians */
-    float radians = angle * 2 * 3.14f / 360.0f;
+    float radians = angle * 2 * 3.14 / 360.0;
     float cos_theta = cos(radians);
     float sin_theta = sin(radians);
 
@@ -380,7 +392,6 @@ static bool cut_judgment(gui_img_t *img, uint8_t index, void *pic_cut)
     return false;
 }
 
-
 // scoring, cutting pictures. if cut bomb, gameover
 static bool score_judgment()
 {
@@ -396,9 +407,8 @@ static bool score_judgment()
 static void app_design_core(void *parent)
 {
     // Create a Box2D world with gravity
-    mem = gui_malloc(sizeof(b2World));
     b2Vec2 gravity(0.0f, 9.8f);
-    world = new (mem) b2World(gravity);
+    world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
 
     // Add dynamic bodys
     b2BodyDef ballBodyDef;
@@ -439,8 +449,7 @@ static void app_design_core(void *parent)
     body_bomb->CreateFixture(&FixtureDef);
 
     // Create bg and whole fruits for displaying on the window
-    img_bg = gui_img_create_from_mem(parent, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,
-                                     0);
+    gui_img_create_from_mem(parent, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0, 0);
     img_strawberry = gui_img_create_from_mem(parent, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN, 0,
                                              0, 0, 0);
     gui_img_translate(img_strawberry, -200, 0);
@@ -500,18 +509,15 @@ static void app_design_core(void *parent)
     score_board = gui_text_create(parent, "score_board",  30, 30, 150, 50);
     gui_text_set(score_board, (void *)"SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"),
                  32);
-    void *addr1 = SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN;
-    gui_text_type_set(score_board, addr1, FONT_SRC_MEMADDR);
+    gui_text_type_set(score_board, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(score_board, LEFT);
 
     // Set time counter
-    time_counter_content = gui_malloc(10);
-    sprintf((char *)time_counter_content, "TIME: 60");
-    time_counter = gui_text_create(parent, "0", 280, 30, 150, 50);
+    time_counter = gui_text_create(parent, 0, 280, 30, 150, 50);
     gui_text_set(time_counter, time_counter_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 strlen((char *)time_counter_content),
+                 strlen(time_counter_content),
                  32);
-    gui_text_type_set(time_counter, addr1, FONT_SRC_MEMADDR);
+    gui_text_type_set(time_counter, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(time_counter, LEFT);
 
 }
@@ -536,12 +542,13 @@ static void fruit_ninja_cb(void *p)
     }
     if (world != NULL)
     {
-        sprintf((char *)time_counter_content, "TIME: %d", game_time);
+        sprintf(time_counter_content, "Time: %d", game_time);
         gui_text_content_set(time_counter, time_counter_content, strlen((char *)time_counter_content));
         if (game_time == 0)
         {
-            img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
-                                                   0);
+            gui_img_t *img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45,
+                                                              203, 0,
+                                                              0);
             gui_obj_add_event_cb(img_gameover, (gui_event_cb_t)restart_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
             gui_obj_stop_timer(obj);
             return;
@@ -634,8 +641,9 @@ static void fruit_ninja_cb(void *p)
             bool bomb_flag = score_judgment();
             if (bomb_flag)
             {
-                img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45, 203, 0,
-                                                       0);
+                gui_img_t *img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45,
+                                                                  203, 0,
+                                                                  0);
                 gui_obj_add_event_cb(img_gameover, (gui_event_cb_t)restart_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
                 gui_obj_stop_timer(GUI_BASE(obj));
             }

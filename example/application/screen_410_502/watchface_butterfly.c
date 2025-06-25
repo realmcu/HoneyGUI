@@ -216,7 +216,7 @@ void watchface_butterfly_app(gui_view_t *view)
                                      0); // 246 + 3(mask_h)
     m_hand = gui_img_create_from_mem(win, "m_hand", W1UNION_BIN, 200 + 6, 249, 0, 0);
     s_hand = gui_img_create_from_mem(win, "s_hand", W1VECTOR7_BIN, 206, 249, 0, 0);
-    gui_img_set_focus(h_hand, m_hand->base.w / 2, 249 - 165); // img target x is 165
+    gui_img_set_focus(h_hand, m_hand->base.w / 2, 249 - 165); // img target y is 165
     gui_img_set_focus(m_hand, m_hand->base.w / 2, 249 - 84);
     gui_img_set_focus(s_hand, 0, 249 - 120);
 

@@ -70,8 +70,6 @@ static gui_view_descriptor_t const descriptor =
 };
 
 bool menu_style = 0;
-// char watchface_path[100];
-// uint8_t watchface_index = 1;
 char *cjson_content = NULL;
 uint8_t canvas_update_flag = 0;
 struct tm *timeinfo;
@@ -228,6 +226,7 @@ static void json_refreash()
     // gui_log("!cjson_content: %x %x %x %x %x\n", cjson_content[0], cjson_content[1], cjson_content[2], cjson_content[3], cjson_content[4]);
 
     cJSON *root = cJSON_Parse(cjson_content);
+
     if (!root)
     {
         gui_log("json_refreash Error parsing JSON!\r\n");
@@ -286,7 +285,7 @@ static void data_generate_task_entry()
         {
             json_refreash();
         }
-        gui_thread_mdelay(4000);
+        gui_thread_mdelay(2000);
     }
 }
 #endif
@@ -314,16 +313,14 @@ static void win_cb()
     }
     // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
-    // extern struct tm watch_clock_get(void);
-    // watch_time = watch_clock_get();
+    extern struct tm watch_clock_get(void);
+    watch_time = watch_clock_get();
     timeinfo = &watch_time;
 #endif
 }
 
 static void watchface_design(gui_view_t *view)
 {
-    win_cb();
-
     gui_view_switch_on_event(view, app_bottom_view, SWITCH_INIT_STATE,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
@@ -402,10 +399,19 @@ static void app_hongkong_ui_design(void)
     memcpy(cjson_content, TUYA_CJSON_BIN, 700);
     canvas_update_flag = 0b1111;
 #endif
+    cJSON_Hooks hooks =
+    {
+        .malloc_fn = gui_lower_malloc,
+        .free_fn = gui_lower_free
+    };
+
+    cJSON_InitHooks(&hooks);
+
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0);
     fps_create(gui_obj_get_root());
-    gui_obj_create_timer(GUI_BASE(win), 2000, true, win_cb);
+    gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
+    win_cb();
 }
 
 static int app_init(void)

@@ -1,3 +1,7 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <time.h>
 #include "gui_win.h"
 #include "gui_api.h"
 #include "root_image_hongkong/ui_resource.h"
@@ -5,47 +9,35 @@
 #include "gui_img.h"
 #include "gui_video.h"
 #include "gui_text.h"
-#include <time.h>
 #include "app_hongkong.h"
 #include "tp_algo.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define SCREEN_WIDTH  (int16_t)gui_get_width_height()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-
 #define CURRENT_VIEW_NAME "labubu_digital_view"
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void create_watchface_labubu(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
-
-static void create_watchface_labubu(gui_view_t *view);
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-
     .on_switch_in = create_watchface_labubu,
-
     .keep = false,
 };
-
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    menu_view = gui_view_descriptor_get("menu_view");
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 void *text_num_black_array[] =
 {
@@ -64,11 +56,34 @@ void *text_num_black_array[] =
 
 static gui_video_t *video = NULL;
 
-static void return_to_menu()
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+
+
+static int gui_view_descriptor_register_init(void)
 {
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
 }
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    menu_view = gui_view_descriptor_get("menu_view");
+    watchface_view = gui_view_descriptor_get("watchface_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+// static void return_to_menu()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
@@ -144,5 +159,8 @@ static void create_watchface_labubu(gui_view_t *view)
         gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_TOUCH_CLICKED);
+        gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+                                 SWITCH_IN_ANIMATION_FADE,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
     }
 }

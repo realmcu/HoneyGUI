@@ -1,14 +1,17 @@
-#include "gui_win.h"
-#include "gui_img.h"
-#include "box2d/box2d.h"
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <iostream>
 #include <cstdio>
 #include <cmath>
 #include <box2d/box2d.h>
 #include <vector>
+#include <random>  // For secure random numbers
 #include "gui_canvas.h"
 #include "tp_algo.h"
-#include <random>  // For secure random numbers
+#include "gui_win.h"
+#include "gui_img.h"
+#include "box2d/box2d.h"
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
 #include "app_hongkong.h"
@@ -48,7 +51,6 @@ extern "C" {
 }
 namespace app_box2d_ring
 {
-void *world_mem = NULL;
 const float TIMESTEP = 1.0f / 60.0f; // Timestep
 const int VELOCITY_ITERATIONS = 8; // Velocity iterations
 const int POSITION_ITERATIONS = 3; // Position iterations
@@ -211,7 +213,7 @@ void close()
         balls.clear();
         win_release_callback();
         world->~b2World();
-        gui_free(world_mem);
+        gui_free(world);
         world = nullptr;
         gui_log("close world done\n");
     }
@@ -355,8 +357,7 @@ int ui_design(gui_obj_t *obj)
 
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
 
-    world_mem = gui_malloc(sizeof(b2World));
-    world = new (world_mem) b2World(gravity);
+    world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
@@ -375,11 +376,11 @@ int ui_design(gui_obj_t *obj)
 
 // C interface
 extern "C" {
-    static void return_cb()
-    {
-        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                               SWITCH_IN_ANIMATION_FADE);
-    }
+    // static void return_cb()
+    // {
+    //     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    //                            SWITCH_IN_ANIMATION_FADE);
+    // }
     // static void return_timer_cb(void *obj)
     // {
     //     touch_info_t *tp = tp_get_info();

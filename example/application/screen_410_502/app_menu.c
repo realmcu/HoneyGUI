@@ -1,6 +1,8 @@
-#include <gui_obj.h>
-#include <gui_win.h>
-#include <gui_text.h>
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include "gui_win.h"
+#include "gui_text.h"
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_win.h"
 #include "gui_server.h"
@@ -14,9 +16,20 @@
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
-
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define MENU_GAP 125
 #define CURRENT_VIEW_NAME "menu_view"
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void app_menu_design(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
@@ -48,7 +61,6 @@ const static gui_view_descriptor_t *earth_clock_view = NULL;
 const static gui_view_descriptor_t *labubu_digital_view = NULL;
 const static gui_view_descriptor_t *flower_clock_view = NULL;
 const static gui_view_descriptor_t *rainbow_analog_view = NULL;
-void app_menu_design(gui_view_t *view);
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -57,6 +69,15 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = app_menu_design,
 };
 
+extern uint8_t menu_style;
+static int16_t list_offset_his = 0;
+static gui_menu_cellular_t *menu_cellular = NULL;
+static int16_t cellular_offset_x = -200;
+static int16_t cellular_offset_y = 0;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -104,89 +125,73 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-extern uint8_t menu_style;
-static int16_t list_offset_his = 0;
-static gui_menu_cellular_t *menu_cellular = NULL;
-static int16_t cellular_offset_x = -200;
-static int16_t cellular_offset_y = 0;
-// bool sidebar_flag = 0;
-
-// extern void sidebar_app_array_fill(void *img_addr, gui_event_cb_t callback_function);
-
 static void canvas_timer_cb(void *p)
 {
     gui_obj_t *obj = (gui_obj_t *)p;
     matrix_translate((float)menu_cellular->hor_offset, (float)menu_cellular->ver_offset, obj->matrix);
 }
 
-void switch_APP_BOX2D_RING(void *obj, gui_event_t e, void *param)
+static void switch_app_box2d_ring(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, box2d_ring_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_FRUIT_NINJA(void *obj, gui_event_t e, void *param)
+static void switch_app_fruit_ninja(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, fruit_ninja_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_HEART_RATE(void *obj, gui_event_t e, void *param)
+static void switch_app_heart_rate(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, heartrate_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_ACTIVITY(void *obj, gui_event_t e, void *param)
+static void switch_app_activity(void *obj, gui_event_t e, void *param)
 {
-
     gui_view_switch_direct(current_view, activity_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void app_back2watchface_cb(void)
-{
-    gui_view_switch_direct(current_view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
-
-void switch_APP_SOCCER(void *obj, gui_event_t e, void *param)
+static void switch_app_soccer(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, soccer_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_FLOWER(void *obj, gui_event_t e, void *param)
+static void switch_app_flower(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, flower_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_WEATHER(void *obj, gui_event_t e, void *param)
+static void switch_app_weather(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, weather_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_BUTTERFLY(void *obj, gui_event_t e, void *param)
+static void switch_app_butterfly(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, butterfly_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_APPLIST(void *obj, gui_event_t e, void *param)
+static void switch_app_applist(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, applist_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_DISC(void *obj, gui_event_t e, void *param)
+static void switch_app_disc(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, disc_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_FACE(void *obj, gui_event_t e, void *param)
+static void switch_app_face(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, face_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
@@ -194,104 +199,104 @@ void switch_APP_FACE(void *obj, gui_event_t e, void *param)
     gui_obj_hidden(GUI_BASE(current_view), true);
 }
 
-void switch_APP_PRISM_THICK(void *obj, gui_event_t e, void *param)
+static void switch_app_prism_thick(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, prism_thick_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_PRISM_MIRROR(void *obj, gui_event_t e, void *param)
+static void switch_app_prism_mirror(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, prism3d_mirror_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-void switch_APP_WINDMILL(void *obj, gui_event_t e, void *param)
+static void switch_app_windmill(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, windmill_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_PANDKOI(void *obj, gui_event_t e, void *param)
+static void switch_app_pandkoi(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, pandkoi_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_SEAWATER(void *obj, gui_event_t e, void *param)
+static void switch_app_seawater(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, seawater_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_FIREFLY(void *obj, gui_event_t e, void *param)
+static void switch_app_firefly(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, firefly_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_RAINBOW_DIGITAL(void *obj, gui_event_t e, void *param)
+static void switch_app_rainbow_digital(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, rainbow_digital_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_KOICLOCK(void *obj, gui_event_t e, void *param)
+static void switch_app_koiclock(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, koiclock_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_DIGITAL_CLOCK(void *obj, gui_event_t e, void *param)
+static void switch_app_digital_clock(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, digital_clock_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_COUNTDOWN(void *obj, gui_event_t e, void *param)
+static void switch_app_countdown(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, box2d_countdown_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_FIREWORK(void *obj, gui_event_t e, void *param)
+static void switch_app_firework(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, fireworks_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_HEART_PARTICLE(void *obj, gui_event_t e, void *param)
+static void switch_app_heart_particle(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, heart_particle_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_BUTTERFLY_PARTICLE(void *obj, gui_event_t e, void *param)
+static void switch_app_butterfly_particle(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, butterfly_particle_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
-void switch_APP_BUTTERFLYS(void *obj, gui_event_t e, void *param)
+static void switch_app_butterflys(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, butterflys_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_APP_EARTH_CLOCK(void *obj, gui_event_t e, void *param)
+static void switch_app_earth_clock(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, earth_clock_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-static void switch_APP_LABUBU_DIGITAL(void *obj, gui_event_t e, void *param)
+static void switch_app_labubu_digital(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, labubu_digital_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
-static void switch_APP_FLOWER_CLOCK(void *obj, gui_event_t e, void *param)
+static void switch_app_flower_clock(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, flower_clock_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
-void switch_APP_RAINBOW_ANALOG(void *obj, gui_event_t e, void *param)
+static void switch_app_rainbow_analog(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, rainbow_analog_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
@@ -306,6 +311,12 @@ static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
     menu_style = (menu_style + 1) % 2;
     gui_view_create(parent, &descriptor, 0, 0, 0, 0);
 }
+
+// static void app_back2watchface_cb(void)
+// {
+//     gui_view_switch_direct(current_view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
@@ -324,7 +335,7 @@ static void cellular_timer_cb(void *obj)
     cellular_offset_y = ((gui_menu_cellular_t *)obj)->ver_offset;
 }
 
-void app_menu_design(gui_view_t *view)
+static void app_menu_design(gui_view_t *view)
 {
     gui_win_t *win = gui_win_create(view, "win_app_menu", 0, 0, 0, 0);
     // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
@@ -437,78 +448,78 @@ void app_menu_design(gui_view_t *view)
             gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
             gui_text_rendermode_set(t, 2);
         }
-        gui_obj_add_event_cb(tab_array[0], (gui_event_cb_t)switch_APP_HEART_RATE,  GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[0], (gui_event_cb_t)switch_app_heart_rate,  GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[1], (gui_event_cb_t)switch_APP_FRUIT_NINJA, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[1], (gui_event_cb_t)switch_app_fruit_ninja, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[2], (gui_event_cb_t)switch_APP_BOX2D_RING,  GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[2], (gui_event_cb_t)switch_app_box2d_ring,  GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[3], (gui_event_cb_t)switch_APP_ACTIVITY,    GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[3], (gui_event_cb_t)switch_app_activity,    GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[4], (gui_event_cb_t)switch_APP_SOCCER,      GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[4], (gui_event_cb_t)switch_app_soccer,      GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[5], (gui_event_cb_t)switch_APP_FLOWER,      GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[5], (gui_event_cb_t)switch_app_flower,      GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[6], (gui_event_cb_t)switch_APP_WEATHER,     GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[6], (gui_event_cb_t)switch_app_weather,     GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[7], (gui_event_cb_t)switch_APP_BUTTERFLY,   GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[7], (gui_event_cb_t)switch_app_butterfly,   GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[8], (gui_event_cb_t)switch_APP_APPLIST,     GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[8], (gui_event_cb_t)switch_app_applist,     GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[9], (gui_event_cb_t)switch_APP_DISC,       GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[9], (gui_event_cb_t)switch_app_disc,       GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[10], (gui_event_cb_t)switch_APP_FACE,       GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[10], (gui_event_cb_t)switch_app_face,       GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[11], (gui_event_cb_t)switch_APP_PRISM_THICK, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[11], (gui_event_cb_t)switch_app_prism_thick, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[12], (gui_event_cb_t)switch_APP_PRISM_MIRROR,
+        gui_obj_add_event_cb(tab_array[12], (gui_event_cb_t)switch_app_prism_mirror,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_APP_WINDMILL, GUI_EVENT_TOUCH_CLICKED,
+        gui_obj_add_event_cb(tab_array[13], (gui_event_cb_t)switch_app_windmill, GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_APP_PANDKOI,
+        gui_obj_add_event_cb(tab_array[14], (gui_event_cb_t)switch_app_pandkoi,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_APP_SEAWATER,
+        gui_obj_add_event_cb(tab_array[15], (gui_event_cb_t)switch_app_seawater,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_APP_FIREFLY,
+        gui_obj_add_event_cb(tab_array[16], (gui_event_cb_t)switch_app_firefly,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[17], (gui_event_cb_t)switch_APP_RAINBOW_DIGITAL,
+        gui_obj_add_event_cb(tab_array[17], (gui_event_cb_t)switch_app_rainbow_digital,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[18], (gui_event_cb_t)switch_APP_KOICLOCK,
+        gui_obj_add_event_cb(tab_array[18], (gui_event_cb_t)switch_app_koiclock,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[19], (gui_event_cb_t)switch_APP_DIGITAL_CLOCK,
+        gui_obj_add_event_cb(tab_array[19], (gui_event_cb_t)switch_app_digital_clock,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[20], (gui_event_cb_t)switch_APP_COUNTDOWN,
+        gui_obj_add_event_cb(tab_array[20], (gui_event_cb_t)switch_app_countdown,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[21], (gui_event_cb_t)switch_APP_FIREWORK,
+        gui_obj_add_event_cb(tab_array[21], (gui_event_cb_t)switch_app_firework,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[22], (gui_event_cb_t)switch_APP_HEART_PARTICLE,
+        gui_obj_add_event_cb(tab_array[22], (gui_event_cb_t)switch_app_heart_particle,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[23], (gui_event_cb_t)switch_APP_BUTTERFLY_PARTICLE,
+        gui_obj_add_event_cb(tab_array[23], (gui_event_cb_t)switch_app_butterfly_particle,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[24], (gui_event_cb_t)switch_APP_BUTTERFLYS,
+        gui_obj_add_event_cb(tab_array[24], (gui_event_cb_t)switch_app_butterflys,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[25], (gui_event_cb_t)switch_APP_EARTH_CLOCK,
+        gui_obj_add_event_cb(tab_array[25], (gui_event_cb_t)switch_app_earth_clock,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[26], (gui_event_cb_t)switch_APP_LABUBU_DIGITAL,
+        gui_obj_add_event_cb(tab_array[26], (gui_event_cb_t)switch_app_labubu_digital,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[27], (gui_event_cb_t)switch_APP_FLOWER_CLOCK,
+        gui_obj_add_event_cb(tab_array[27], (gui_event_cb_t)switch_app_flower_clock,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
-        gui_obj_add_event_cb(tab_array[28], (gui_event_cb_t)switch_APP_RAINBOW_ANALOG,
+        gui_obj_add_event_cb(tab_array[28], (gui_event_cb_t)switch_app_rainbow_analog,
                              GUI_EVENT_TOUCH_CLICKED,
                              NULL);
         {
@@ -539,23 +550,16 @@ void app_menu_design(gui_view_t *view)
         {
             struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
             {
-                {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
-                {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
-                {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL}, {switch_APP_PRISM_THICK, NULL},
-                {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL},
-                {switch_APP_FIREFLY, NULL}, {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
-                {switch_APP_COUNTDOWN, NULL}, {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL},
-                {switch_APP_BUTTERFLYS, NULL}, {switch_APP_EARTH_CLOCK, NULL}, {switch_APP_LABUBU_DIGITAL, NULL}, {switch_APP_FLOWER_CLOCK, NULL},
-                {switch_APP_RAINBOW_ANALOG, NULL},
+                {switch_app_heart_rate, NULL}, {switch_app_fruit_ninja, NULL}, {switch_app_box2d_ring, NULL}, {switch_app_activity, NULL},
+                {switch_app_soccer, NULL}, {switch_app_flower, NULL}, {switch_app_weather, NULL}, {switch_app_butterfly, NULL},
+                {switch_app_applist, NULL}, {switch_app_disc, NULL}, {switch_app_face, NULL}, {switch_app_prism_thick, NULL},
+                {switch_app_prism_mirror, NULL}, {switch_app_windmill, NULL}, {switch_app_pandkoi, NULL}, {switch_app_seawater, NULL},
+                {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL}, {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL},
+                {switch_app_countdown, NULL}, {switch_app_firework, NULL}, {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL},
+                {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL}, {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL},
+                {switch_app_rainbow_analog, NULL},
 
-                {switch_APP_HEART_RATE, NULL}, {switch_APP_FRUIT_NINJA, NULL}, {switch_APP_BOX2D_RING, NULL}, {switch_APP_ACTIVITY, NULL},
-                {switch_APP_SOCCER, NULL}, {switch_APP_FLOWER, NULL}, {switch_APP_WEATHER, NULL}, {switch_APP_BUTTERFLY, NULL},
-                {switch_APP_APPLIST, NULL}, {switch_APP_DISC, NULL}, {switch_APP_FACE, NULL}, {switch_APP_PRISM_THICK, NULL},
-                {switch_APP_PRISM_MIRROR, NULL}, {switch_APP_WINDMILL, NULL}, {switch_APP_PANDKOI, NULL}, {switch_APP_SEAWATER, NULL},
-                {switch_APP_FIREFLY, NULL}, {switch_APP_RAINBOW_DIGITAL, NULL}, {switch_APP_KOICLOCK, NULL}, {switch_APP_DIGITAL_CLOCK, NULL},
-                {switch_APP_COUNTDOWN, NULL}, {switch_APP_FIREWORK, NULL}, {switch_APP_HEART_PARTICLE, NULL}, {switch_APP_BUTTERFLY_PARTICLE, NULL},
-                {switch_APP_BUTTERFLYS, NULL}, {switch_APP_EARTH_CLOCK, NULL}, {switch_APP_LABUBU_DIGITAL, NULL}, {switch_APP_FLOWER_CLOCK, NULL},
-                {switch_APP_RAINBOW_ANALOG, NULL},
+                {switch_app_heart_rate, NULL}, {switch_app_fruit_ninja, NULL}, {switch_app_box2d_ring, NULL}, {switch_app_activity, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

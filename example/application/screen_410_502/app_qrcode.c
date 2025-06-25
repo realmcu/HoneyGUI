@@ -1,30 +1,39 @@
-#include "root_image_hongkong/ui_resource.h"
-#include "gui_img.h"
-#include "gui_win.h"
-#include "gui_text.h"
-#include "time.h"
-#include "tp_algo.h"
-#include <math.h>
-#include "cJSON.h"
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "app_hongkong.h"
 #include "gui_view.h"
 #include "gui_qbcode.h"
 
-
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "qrcode_view"
+#define QRCODE_WIDTH     360
+#define QRCODE_HEIGHT    360
+#define DISPLAY_TYPE     QRCODE_DISPLAY_IMAGE
+#define ENCODED_TYPE     QRCODE_ENCODE_TEXT
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void app_qrcode_design(gui_view_t *view);
 
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *heartrate_view = NULL;
-void qrcode_app(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .on_switch_in = qrcode_app,
+    .on_switch_in = app_qrcode_design,
 };
 
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -42,12 +51,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-#define QRCODE_WIDTH     360
-#define QRCODE_HEIGHT    360
-#define DISPLAY_TYPE     QRCODE_DISPLAY_IMAGE //QRCODE_DISPLAY_SECTION
-#define ENCODED_TYPE     QRCODE_ENCODE_TEXT   // QRCODE_ENCODE_BINARY
-
-void qrcode_app(gui_view_t *view)
+static void app_qrcode_design(gui_view_t *view)
 {
 
     gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
@@ -66,6 +70,5 @@ void qrcode_app(gui_view_t *view)
                                              ENCODED_TYPE);
 
     gui_qbcode_config(qrcode, (uint8_t *)str, strlen(str), 3);
-
     gui_img_set_quality(qrcode->qbcode_img, true);
 }

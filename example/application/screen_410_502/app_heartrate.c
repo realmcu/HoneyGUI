@@ -1,3 +1,6 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -11,32 +14,51 @@
 #include "app_hongkong.h"
 #include "gui_view.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define COLOR_RED gui_rgb(255,0,0)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
-
 #define CURRENT_VIEW_NAME "heartrate_view"
 
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void heartrate_design(gui_view_t *view);
+static void clear_heartrate_cache(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *qrcode_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
 const static gui_view_descriptor_t *pre_view = NULL;
-static void heart_rate_app(gui_view_t *view);
-static void clear_heart_rate_cache(gui_view_t *view);
-
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .on_switch_in = heart_rate_app,
-    .on_switch_out = clear_heart_rate_cache,
+    .on_switch_in = heartrate_design,
+    .on_switch_out = clear_heartrate_cache,
 };
 
+static gui_win_t *win_hb = NULL;
+static uint8_t *img_data = NULL;
+size_t buffer_size = 0;
+
+extern void *text_num_array[];
+extern char *cjson_content;
+extern uint8_t canvas_update_flag;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -57,20 +79,11 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static gui_win_t *win_hb;
-static uint8_t *img_data = NULL;
-size_t buffer_size = 0;
-
-extern void *text_num_array[];
-extern char *cjson_content;
-extern uint8_t canvas_update_flag;
-
-static void return_cb()
-{
-    gui_view_switch_direct(current_view, pre_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+// static void return_cb()
+// {
+//     gui_view_switch_direct(current_view, pre_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void timer_cb(void *p)
 // {
@@ -78,7 +91,7 @@ static void return_cb()
 //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
 // }
 
-static void heartrate_graph(NVGcontext *vg)
+static void draw_heartrate_graph(NVGcontext *vg)
 {
     // draw split line
     {
@@ -113,16 +126,7 @@ static void heartrate_graph(NVGcontext *vg)
         nvgFill(vg);
     }
 
-    float x = 36.0f;
-    float y = 78.0f;
-    float w = 344.0f;
-    float h = 210.0f;
-
     float samples[4] = {0};
-    float sx[4], sy[4];
-    float dx = w / 4.0f;
-    int i;
-
     cJSON *root;
     if (!cjson_content)
     {
@@ -184,6 +188,14 @@ static void heartrate_graph(NVGcontext *vg)
                               img_single->x, img_single->y);
     }
 
+    float x = 36.0f;
+    float y = 78.0f;
+    float w = 344.0f;
+    float h = 210.0f;
+
+    float sx[4], sy[4];
+    float dx = w / 4.0f;
+    uint8_t i = 0;
     for (i = 0; i < 4; i++)
     {
         sx[i] = x + i * dx;
@@ -255,12 +267,13 @@ static void hr_timer_cb(void *obj)
         canvas_update_flag &= 0b1110;
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300, heartrate_graph,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300,
+                                          draw_heartrate_graph,
                                           img_data);
         gui_img_set_image_data(img, img_data);
     }
 }
-static void clear_heart_rate_cache(gui_view_t *view)
+static void clear_heartrate_cache(gui_view_t *view)
 {
     if (img_data)
     {
@@ -269,7 +282,7 @@ static void clear_heart_rate_cache(gui_view_t *view)
     }
 }
 
-static void heart_rate_app(gui_view_t *view)
+static void heartrate_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
 
@@ -322,7 +335,7 @@ static void heart_rate_app(gui_view_t *view)
             img_data = gui_lower_malloc(buffer_size);
         }
         memset(img_data, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, heartrate_graph,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_heartrate_graph,
                                           img_data);
         gui_img_t *img = gui_img_create_from_mem(win_hb, 0, (void *)img_data, 0, 0, SCREEN_WIDTH,
                                                  SCREEN_HEIGHT);
@@ -401,6 +414,8 @@ static void heart_rate_app(gui_view_t *view)
         gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_rendermode_set(t, 2);
     }
+
+    // view layout
     const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "activity_view") == 0 || strcmp(name, "qrcode_view") == 0)
     {

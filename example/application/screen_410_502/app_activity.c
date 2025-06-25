@@ -1,12 +1,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include <math.h>
+#include <time.h>
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "time.h"
-#include <math.h>
 #include "cJSON.h"
 #include "gui_canvas_img.h"
 #include "gui_canvas_rect.h"
@@ -49,12 +49,12 @@ static gui_view_descriptor_t const descriptor =
 extern char *cjson_content;
 static uint8_t *img_data = NULL;
 static gui_img_t *img;
-static uint16_t count = COUNT_MAX;
-static bool draw_flag = 0;
+static uint16_t count = COUNT_MAX; //for timer
+static bool draw_flag = 0; //0: get new json data
 static size_t buffer_size = 0;
-static char move_content[30], ex_content[30], stand_content[30];
-
-static gui_text_t *move_text, *ex_text, *stand_text;
+static char move_content[30] = {0};
+static char ex_content[30] = {0};
+static char stand_content[30] = {0};
 
 /*============================================================================*
  *                           Private Functions
@@ -131,19 +131,19 @@ static void arc_activity_cb(NVGcontext *vg)
                 stand_val = stand->valueint;
 
                 {
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "move_text", current_view);
                     sprintf(move_content, "Move:%d/20000steps", move_val);
-                    gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
-                    // gui_text_convert_to_img((gui_text_t *)move_text, RGB565);
+                    gui_text_content_set((gui_text_t *)obj, move_content, strlen(move_content));
                 }
                 {
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "ex_text", current_view);
                     sprintf(ex_content, "Exercise:%d/60min", ex_val);
-                    gui_text_content_set(ex_text, ex_content, strlen(ex_content));
-                    // gui_text_convert_to_img(ex_text, RGB565);
+                    gui_text_content_set((gui_text_t *)obj, ex_content, strlen(ex_content));
                 }
                 {
+                    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "stand_text", current_view);
                     sprintf(stand_content, "Stand:%d/30times", stand_val);
-                    gui_text_content_set(stand_text, stand_content, strlen(stand_content));
-                    // gui_text_convert_to_img(stand_text, RGB565);
+                    gui_text_content_set((gui_text_t *)obj, stand_content, strlen(stand_content));
                 }
             }
         }
@@ -222,11 +222,11 @@ static void activity_timer_cb(void *obj)
     }
 }
 
-static void back2menu_cb()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+// static void back2menu_cb()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
@@ -252,20 +252,20 @@ static void activity_design(gui_view_t *view)
 
     // text
     {
-        move_text = gui_text_create(obj, "move_text", 150, 400, 0, 0);
+        gui_text_t *move_text = gui_text_create(obj, "move_text", 150, 400, 0, 0);
         gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_TTF, gui_rgb(230, 67, 79),
                      strlen(move_content), 32);
         gui_text_type_set(move_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(move_text, LEFT);
         gui_text_rendermode_set(move_text, 2);
 
-        ex_text = gui_text_create(obj, "ex_text", 150, 430, 0, 0);
+        gui_text_t *ex_text = gui_text_create(obj, "ex_text", 150, 430, 0, 0);
         gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_TTF, gui_rgb(186, 253, 79),
                      strlen(ex_content), 32);
         gui_text_type_set(ex_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(ex_text, LEFT);
         gui_text_rendermode_set(ex_text, 2);
-        stand_text = gui_text_create(obj, "stand_text", 150, 460, 0, 0);
+        gui_text_t *stand_text = gui_text_create(obj, "stand_text", 150, 460, 0, 0);
         gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_TTF, gui_rgb(117, 230, 229),
                      strlen(stand_content), 32);
         gui_text_type_set(stand_text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
