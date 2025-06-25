@@ -313,8 +313,8 @@ static void win_cb()
     }
     // gui_log("canvas_update_flag %x\n", canvas_update_flag);
 #else
-    extern struct tm watch_clock_get(void);
-    watch_time = watch_clock_get();
+    // extern struct tm watch_clock_get(void);
+    // watch_time = watch_clock_get();
     timeinfo = &watch_time;
 #endif
 }
