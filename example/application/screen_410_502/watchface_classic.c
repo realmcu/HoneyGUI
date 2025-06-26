@@ -56,7 +56,7 @@ static uint8_t *img_data_activity = NULL;
 static size_t buffer_size = 0;
 
 extern char *cjson_content;
-extern uint8_t canvas_update_flag;
+extern uint8_t json_refeash_flag;
 
 /*Define watch_text_num_array*/
 void *text_num_array[] =
@@ -228,7 +228,7 @@ static void arc_activity_cb(NVGcontext *vg)
 
 static void weather_cb()
 {
-    if (!(canvas_update_flag & 0x01))
+    if (!(json_refeash_flag & 0x01))
     {
         return;
     }
@@ -311,7 +311,7 @@ static void weather_cb()
         }
     }
     cJSON_Delete(root);
-    canvas_update_flag &= 0b1110;
+    json_refeash_flag &= 0b1110;
 }
 
 static void arc_temperature_cb(NVGcontext *vg)
@@ -487,7 +487,7 @@ static void arc_temperature_cb(NVGcontext *vg)
 
 static void compass_cb()
 {
-    if (!(canvas_update_flag & 0x08))
+    if (!(json_refeash_flag & 0x08))
     {
         return;
     }
@@ -581,34 +581,34 @@ static void compass_cb()
     }
     // clear
     cJSON_Delete(root);
-    canvas_update_flag &= 0b0111;
+    json_refeash_flag &= 0b0111;
 }
 
 static void activity_timer_cb(void *obj)
 {
     gui_img_t *img = (gui_img_t *)obj;
-    if (canvas_update_flag & 0x04)
+    if (json_refeash_flag & 0x04)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
         gui_img_set_image_data(img, img_data);
 
-        canvas_update_flag &= 0b1011;
+        json_refeash_flag &= 0b1011;
     }
 }
 
 static void temp_timer_cb(void *obj)
 {
     gui_img_t *img = (gui_img_t *)obj;
-    if (canvas_update_flag & 0x02)
+    if (json_refeash_flag & 0x02)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
                                           img_data);
         gui_img_set_image_data(img, img_data);
-        canvas_update_flag &= 0b1101;
+        json_refeash_flag &= 0b1101;
     }
 }
 

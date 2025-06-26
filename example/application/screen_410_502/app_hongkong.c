@@ -71,7 +71,7 @@ static gui_view_descriptor_t const descriptor =
 
 bool menu_style = 0;
 char *cjson_content = NULL;
-uint8_t canvas_update_flag = 0;
+uint8_t json_refeash_flag = 0;
 struct tm *timeinfo;
 static struct tm watch_time;
 
@@ -273,20 +273,9 @@ static void json_refreash()
     sprintf(cjson_content, "%s", temp);
     gui_free(temp);
     cJSON_Delete(root);
-    canvas_update_flag = 0b1111;
-    // gui_log("canvas_update_flag %x, line: %d\n", canvas_update_flag, __LINE__);
+    json_refeash_flag = 0b1111;
+    // gui_log("json_refeash_flag %x, line: %d\n", json_refeash_flag, __LINE__);
     // gui_log("cjson_content: %s\n", cjson_content);
-}
-static void data_generate_task_entry()
-{
-    while (true)
-    {
-        if (gui_view_get_next() == NULL)
-        {
-            json_refreash();
-        }
-        gui_thread_mdelay(2000);
-    }
 }
 #endif
 
@@ -309,10 +298,14 @@ static void win_cb()
     }
     if (gui_view_get_next() == NULL)
     {
-        canvas_update_flag = 0b1111;
+        json_refeash_flag = 0b1111;
     }
-    // gui_log("canvas_update_flag %x\n", canvas_update_flag);
+    // gui_log("json_refeash_flag %x\n", json_refeash_flag);
 #else
+    if (!json_refeash_flag)
+    {
+        json_refreash();
+    }
     // extern struct tm watch_clock_get(void);
     // watch_time = watch_clock_get();
     timeinfo = &watch_time;
@@ -397,16 +390,8 @@ static void app_hongkong_ui_design(void)
 #else
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, TUYA_CJSON_BIN, 700);
-    canvas_update_flag = 0b1111;
+    json_refeash_flag = 0b1111;
 #endif
-    cJSON_Hooks hooks =
-    {
-        .malloc_fn = gui_lower_malloc,
-        .free_fn = gui_lower_free
-    };
-
-    cJSON_InitHooks(&hooks);
-
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0);
     fps_create(gui_obj_get_root());
@@ -435,8 +420,6 @@ static int app_init(void)
         printf("open root(0x704AC000).bin Fail!\n");
         return 0;
     }
-#else
-    gui_thread_create("data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
 #endif
     gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     app_hongkong_ui_design();
