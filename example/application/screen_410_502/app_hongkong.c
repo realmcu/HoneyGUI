@@ -389,7 +389,7 @@ static void app_hongkong_ui_design(void)
     }
 #else
     cjson_content = gui_malloc(700);
-    memcpy(cjson_content, TUYA_CJSON_BIN, 700);
+    memcpy(cjson_content, CJSON_DATA_BIN, 700);
     json_refeash_flag = 0b1111;
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
@@ -407,17 +407,17 @@ static int app_init(void)
     extern int close(int fd);
     defaultPath = "example\\application\\screen_410_502\\root_image_hongkong\\root\\";
     int fd;
-    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x704AC000).bin", 0);
+    fd = open("./example/application/screen_410_502/root_image_hongkong/root(0x704D1000).bin", 0);
     if (fd > 0)
     {
-        printf("open root(0x704AC000).bin Successful!\n");
+        printf("open root(0x704D1000).bin Successful!\n");
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
-        printf("open root(0x704AC000).bin Fail!\n");
-        printf("open root(0x704AC000).bin Fail!\n");
-        printf("open root(0x704AC000).bin Fail!\n");
+        printf("open root(0x704D1000).bin Fail!\n");
+        printf("open root(0x704D1000).bin Fail!\n");
+        printf("open root(0x704D1000).bin Fail!\n");
         return 0;
     }
 #endif
