@@ -62,6 +62,21 @@ static void gui_obj_destroy_cb(gui_obj_t *obj)
     {
         obj->obj_cb(obj, OBJ_DESTROY);
     }
+
+    if (obj->event_dsc != NULL)
+    {
+        gui_free(obj->event_dsc);
+    }
+
+    if (obj->suppress_conflict_obj_list != NULL)
+    {
+        gui_free(obj->suppress_conflict_obj_list);
+    }
+
+    if (obj->timer != NULL)
+    {
+        gui_free(obj->timer);
+    }
 }
 
 static void gui_obj_tree_child_free(gui_obj_t *object)
@@ -81,11 +96,6 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
 
         gui_obj_tree_child_free(obj);
         gui_obj_destroy_cb(obj);
-
-        if (obj->event_dsc != NULL)
-        {
-            gui_free(obj->event_dsc);
-        }
 
         gui_free(obj);
     }
@@ -275,11 +285,6 @@ void gui_obj_tree_free(void *obj)
         gui_list_remove(&object->brother_list);
         gui_obj_destroy_cb(obj);
 
-        if (object->event_dsc != NULL)
-        {
-            gui_free(object->event_dsc);
-        }
-
         gui_free(obj);
     }
     else
@@ -294,6 +299,16 @@ void gui_obj_tree_free(void *obj)
         {
             gui_free(object->event_dsc);
             object->event_dsc = NULL;
+        }
+        if (object->suppress_conflict_obj_list != NULL)
+        {
+            gui_free(object->suppress_conflict_obj_list);
+            object->suppress_conflict_obj_list = NULL;
+        }
+        if (object->timer != NULL)
+        {
+            gui_free(object->timer);
+            object->timer = NULL;
         }
         gui_list_init(&object->child_list);
     }

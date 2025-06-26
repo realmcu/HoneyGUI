@@ -511,6 +511,11 @@ static void gui_view_destroy(gui_obj_t *obj)
         _this->on_event[i] = NULL;
     }
 
+    if (_this->on_event != NULL)
+    {
+        gui_free(_this->on_event);
+    }
+
     if (_this->descriptor->on_switch_out != NULL)
     {
         _this->descriptor->on_switch_out(_this);

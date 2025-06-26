@@ -305,6 +305,8 @@ static void switch_app_rainbow_analog(void *obj, gui_event_t e, void *param)
 
 static void switch_menu_style_cb(void *obj, gui_event_t e, void *param)
 {
+    if (gui_view_get_next() != NULL) { return; }
+
     gui_obj_t *parent = GUI_BASE(current_view)->parent;
     gui_obj_tree_free(GUI_BASE(current_view));
 
