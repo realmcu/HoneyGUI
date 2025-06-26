@@ -769,10 +769,11 @@ private:
         {
             return INT_MIN;
         }
-
-        // Convert result to int since it's within range
-        return static_cast<int>(totalSeconds);
-
+        else
+        {
+            // Convert result to int since it's within range
+            return static_cast<int>(totalSeconds);
+        }
     }
 
 // Function to get metadata

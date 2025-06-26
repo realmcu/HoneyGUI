@@ -50,9 +50,9 @@ extern "C" {
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
 
+
+
 extern "C" {
-
-
 #include "guidef.h"
     /**
      * @brief Play the specified music file.
@@ -188,14 +188,6 @@ extern "C" {
 #include <cstring>
 #include <iomanip> // for std::setw and std::setfill
 
-namespace std
-{
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-}
 namespace gui_music_app
 {
 constexpr int SWITCH_W = 28;
@@ -214,11 +206,14 @@ gui_canvas_rect_t *current_time_bar;
 gui_pagelist_new_t *pl;
 int page_list_item_space;
 int lyrics_array_length;
+char **cArray_line = nullptr;
+char **cArray_lyric = nullptr;
 
 bool startsWith(const std::string &str, const std::string &prefix)
 {
     return str.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), str.begin());
 }
+static void clear();
 class MusicPlayer
 {
 public:
@@ -227,14 +222,19 @@ public:
           SCREEN_H(static_cast<int>(gui_get_screen_height())),
           SWITCH_X(SCREEN_W / 2 - SWITCH_W / 2),
           COVER_X(SCREEN_W / 2 - COVER_W / 2),
-          playing_flag(),
-          item_text_array()
+          playing_flag()
+          //   item_text_array()
     {
         setupUI(parent);
     }
+    friend void gui_music_app::clear();
     void win_cover_animation(void *p, void *this_widget, gui_animate_t *animate)
     {
         touch_info_t *touch = tp_get_info();
+        if (touch->type == TOUCH_HOLD_X)
+        {
+            return;
+        }
         gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
         gui_obj_t *obj = GUI_BASE(this_widget);
         //std::cout << "win_cover_gesture:" << win_cover_gesture << std::endl;
@@ -421,7 +421,7 @@ public:
                 {
                     gui_obj_hidden(GUI_BASE(lrc_win), 0);
                 }
-                GUI_BASE(pl)->gesture = win_lrc_gesture;
+                // GUI_BASE(pl)->gesture = win_lrc_gesture;
 
             }
 
@@ -430,6 +430,11 @@ public:
     }
     void win_list_animation(void *p, void *this_widget, gui_animate_t *animate)
     {
+        touch_info_t *touch = tp_get_info();
+        if (touch->type == TOUCH_HOLD_X)
+        {
+            return;
+        }
         // std::cout << win_list_gesture_page_y << ";" << GUI_BASE(list_page)->y << std::endl;
         GUI_BASE(list_page)->gesture = win_cover_gesture;
 
@@ -472,7 +477,7 @@ public:
     }
     void win_cover_head_cb(void *obj, gui_event_t e, void *param)
     {
-        //gui_win_start_animation(win_cover);
+        gui_win_start_animation(win_cover);
     }
 
 private:
@@ -531,7 +536,7 @@ private:
 //     ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
 //     ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
 // };
-    const char *item_text_array;
+    // const char *item_text_array;
 // Example LRC content
     std::string lrcContent = R"(
 [ti:Sample Song]
@@ -662,14 +667,15 @@ private:
     {
         // This function is to create text GUI element
         const char *text = text_string;
-        int font_size = 16;
+        int font_size = 24;
         gui_text_t *t = gui_text_create(parent, 0,  x, y,
                                         gui_get_screen_width(),
                                         font_size);
-        gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
-        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_set(t, (void *)text, GUI_FONT_SRC_TTF, color, strlen(text), font_size);
+        void *addr1 = SOURCEHANSANSSC_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MULTI_LEFT);
+        gui_text_rendermode_set(t, 2);
         return t;
     }
 
@@ -718,12 +724,12 @@ private:
         page_list_item_space = 40;
 
         // std::cout << "Lyrics from 0 to 60 seconds:" << std::endl;
-        for (int i = 0; allLyricsArray[i] != nullptr; ++i)
-        {
-            // std::cout << lyricsArray[i] << std::endl;
-            // gui_log("%s\n", allLyricsArray[i]);
-            //delete[] lyricsArray[i];  // Free each string
-        }
+        // for (int i = 0; allLyricsArray[i] != nullptr; ++i)
+        // {
+        // std::cout << lyricsArray[i] << std::endl;
+        // gui_log("%s\n", allLyricsArray[i]);
+        //delete[] lyricsArray[i];  // Free each string
+        // }
 
 
 
@@ -785,7 +791,7 @@ private:
         current_time = displayText(parent, "0:00", COVER_X, COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
         displayText(parent, gui_strdup(length_string.c_str()), COVER_X + COVER_W - 30,
                     COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
-        gui_img_scale(img_cover, 0.5, 0.5);
+        // gui_img_scale(img_cover, 0.5, 0.5);
 
         gui_win_set_animate(win_cover, 1000, -1, cover_animation, win_cover);
         GUI_API(gui_switch_t).animate(sw, 1000, -1, (void *)onCompletion, nullptr);
@@ -898,22 +904,6 @@ private:
         return lyricsInRange;
     }
 
-// Convert std::vector<std::string> to C-Style Array of Strings
-    char **vectorToCStringArray(const std::vector<std::string> &vec)
-    {
-        char **cArray = new char *[vec.size() + 1]; // One extra for the NULL terminator
-
-        for (size_t i = 0; i < vec.size(); ++i)
-        {
-            cArray[i] = new char[vec[i].length() + 1];  // Allocate memory for each string
-            std::strcpy(cArray[i], vec[i].c_str());
-        }
-
-        cArray[vec.size()] = nullptr;  // NULL terminator for the array
-
-        return cArray;
-    }
-
 // New function to get lyrics around a specific time and at a range size
     char **getLyricAtTime(const std::string &content, int currentTime, int rangeSize, bool null)
     {
@@ -974,17 +964,19 @@ private:
         }
 
         // Convert vector to C-style array
-        char **cArray = new char *[rangeLyrics.size() + 1]; // One extra for the NULL terminator
-
+        cArray_lyric = (char **)gui_lower_malloc(sizeof(char *) * (rangeLyrics.size() +
+                                                                   1)); // One extra for the NULL terminator
+        memset(cArray_line, 0, sizeof(char *) * (rangeLyrics.size() + 1));
         for (size_t i = 0; i < rangeLyrics.size(); ++i)
         {
-            cArray[i] = new char[rangeLyrics[i].length() + 1];  // Allocate memory for each string
-            std::strcpy(cArray[i], rangeLyrics[i].c_str());
+            cArray_lyric[i] = (char *)gui_lower_malloc(rangeLyrics[i].length() +
+                                                       1); // Allocate memory for each string
+            std::strcpy(cArray_lyric[i], rangeLyrics[i].c_str());
         }
 
-        cArray[rangeLyrics.size()] = nullptr;  // NULL terminator for the array
+        cArray_lyric[rangeLyrics.size()] = nullptr;  // NULL terminator for the array
 
-        return cArray;
+        return cArray_lyric;
     }
 // Function to strip time prefix from a line
     std::string stripTimePrefix(const std::string &line)
@@ -997,6 +989,7 @@ private:
         return line;
     }
 // New function to convert the entire lyrics to C-style array
+
     char **getLyricAtTime(int &arrayLength, const std::string &content)
     {
         std::istringstream stream(content);
@@ -1016,17 +1009,18 @@ private:
         arrayLength = lines.size();
 
         // Convert vector to C-style array
-        char **cArray = new char *[lines.size() + 1]; // One extra for the NULL terminator
-
+        cArray_line = (char **)gui_lower_malloc(sizeof(char *) * (arrayLength +
+                                                                  1)); // One extra for the NULL terminator
+        memset(cArray_line, 0, sizeof(char *) * (arrayLength + 1));
         for (size_t i = 0; i < lines.size(); ++i)
         {
-            cArray[i] = new char[lines[i].length() + 1];  // Allocate memory for each string
-            std::strcpy(cArray[i], lines[i].c_str());
+            cArray_line[i] = (char *)gui_lower_malloc(lines[i].length() + 1); // Allocate memory for each string
+            std::strcpy(cArray_line[i], lines[i].c_str());
         }
 
-        cArray[lines.size()] = nullptr;  // NULL terminator for the array
+        cArray_line[lines.size()] = nullptr;  // NULL terminator for the array
 
-        return cArray;
+        return cArray_line;
     }
     static std::string formatTime(double seconds)
     {
@@ -1038,7 +1032,7 @@ private:
         return oss.str();
     }
 };
-std::unique_ptr<MusicPlayer> player = nullptr;
+static MusicPlayer *player = nullptr;
 void MusicPlayer::cover_animation(void *p, void *this_widget, gui_animate_t *animate)
 {
     player->win_cover_animation(p, this_widget, animate);
@@ -1051,9 +1045,45 @@ void MusicPlayer::win_cover_head_callback(void *obj, gui_event_t e, void *param)
 {
     player->win_cover_head_cb(obj, e, param);
 }
+
+static void clear()
+{
+    if (player)
+    {
+        delete player;
+        player = nullptr;
+        gui_log("mem clear done!!!\n");
+    }
+    if (cArray_lyric)
+    {
+        uint8_t index = 0;
+        while (cArray_lyric[index])
+        {
+            gui_lower_free(cArray_lyric[index]);
+            cArray_lyric[index] = nullptr;
+            index++;
+        }
+        gui_lower_free(cArray_lyric);
+        cArray_lyric = nullptr;
+        gui_log("cArray_lyric clear done!!!\n");
+    }
+    if (cArray_line)
+    {
+        uint8_t index = 0;
+        while (cArray_line[index])
+        {
+            gui_lower_free(cArray_line[index]);
+            cArray_line[index] = nullptr;
+            index++;
+        }
+        gui_lower_free(cArray_line);
+        cArray_line = nullptr;
+        gui_log("cArray_line clear done!!!\n");
+    }
+}
 void appMusicUIDesign(gui_obj_t *parent)
 {
-    player = std::make_unique<MusicPlayer>(parent);
+    player = new MusicPlayer(parent);
 }
 }
 
@@ -1062,6 +1092,11 @@ extern "C" {
     static void return_cb()
     {
         gui_view_switch_direct(current_view, menu_view, VIEW_ANIMATION_8, VIEW_ANIMATION_5);
+    }
+
+    void clear_music()
+    {
+        gui_music_app::clear();
     }
 
     void app_music_ui_design(gui_view_t *view)

@@ -22,6 +22,7 @@
 #include "gui_page.h"
 #include "gui_image_array.h"
 #include "math.h"
+
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -50,13 +51,14 @@ static void **get_image_pointers(const char *input, size_t *num_pointers,
                                  int16_t text_image_map_length, const struct gui_text_image_map *text_image_map);
 static int get_index(gui_scroll_wheel_new_t *this)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
+    //GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
     return this->index_offset;
 }
 static int set_index(gui_scroll_wheel_new_t *this, int index)
 {
-    GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
+    //GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
     this->index_offset = index;
+    this->take_over = true;
     return this->index_offset;
 }
 static void ctor(struct gui_scroll_wheel_new *this,
@@ -176,7 +178,7 @@ static void render(const char *text, gui_obj_t *obj, unsigned char render_mode,
     case GUI_SCROLL_WHEEL_NEW_RENDER_TEXT:
         {
             gui_text_content_set((void *)obj, (void *)text, strlen(text));
-            gui_text_convert_to_img((void *)obj, RGB565);
+            gui_text_convert_to_img((void *)obj, ARGB8565);
         }
         break;
     case GUI_SCROLL_WHEEL_NEW_RENDER_IMAGE_ARRAY:
@@ -185,10 +187,23 @@ static void render(const char *text, gui_obj_t *obj, unsigned char render_mode,
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers, text_image_map_length,
                                                        text_image_map);
-            gui_image_array_write((void *)obj, image_pointers, num_pointers);
-            // Free allocated memory
-            gui_free(image_pointers);
-            GUI_TYPE(gui_image_array_t, obj)->text = text;
+            if (num_pointers == 0)
+            {
+                if (image_pointers)
+                {
+                    gui_free(image_pointers);
+                }
+                break;
+
+            }
+            else
+            {
+                gui_image_array_write((void *)obj, image_pointers, num_pointers);
+                // Free allocated memory
+                gui_free(image_pointers);
+                GUI_TYPE(gui_image_array_t, obj)->text = text;
+            }
+
         }
         break;
     default:
@@ -207,7 +222,7 @@ static void override(gui_obj_t *win)
     IMPORT_GUI_TOUCHPAD
     IMPORT_GUI_WHEEL
     bool wheel_take_over = this->wheel_take_over;
-    char time_array_offset = this->time_array_offset;
+    int16_t time_array_offset = this->time_array_offset;
     int time_array_size = this->string_array_size;
     if (wheel->pressed)
     {
@@ -277,11 +292,7 @@ static void override(gui_obj_t *win)
             time_array_offset = -(this->touch_y / this->gap % time_array_size);
             int widget_offset = this->touch_y % this->gap;
             GUI_BASE(win)->y = widget_offset;
-            if (this->alien && widget_offset == 0 && this->speed <= this->end_speed &&
-                this->speed >= -this->end_speed)
-            {
-                this->render = 0;
-            }
+
             if (this->alien && widget_offset != 0)
             {
                 if (this->speed > 0 && this->speed <= this->end_speed)
@@ -357,7 +368,7 @@ static void override(gui_obj_t *win)
                         index += time_array_size;
                     }
                     const char *text = this->string_array[index];
-                    if (i == (this->count + 2) / 2)
+                    if (i == (this->count + 2) / 2 && !this->take_over)
                     {
                         this->index_offset = index;
                     }
@@ -376,6 +387,11 @@ static void override(gui_obj_t *win)
                 }
             }
 
+            if (this->alien && widget_offset == 0 && this->speed <= this->end_speed &&
+                this->speed >= -this->end_speed)
+            {
+                this->render = 0;
+            }
         }
         else
         {
@@ -464,7 +480,7 @@ static void override(gui_obj_t *win)
                         index += time_array_size;
                     }
                     const char *text = this->string_array[index];
-                    if (i == (this->count + 2) / 2)
+                    if (i == (this->count + 2) / 2 && !this->take_over)
                     {
                         this->index_offset = index;
                     }
@@ -483,6 +499,50 @@ static void override(gui_obj_t *win)
             }
         }
     }
+    if (this->take_over)
+    {
+        this->take_over = false;
+        this->history_y = -(this->index_offset - (this->count + 2) / 2) * this->gap;
+        this->touch_y = this->history_y;
+        gui_obj_t *text_widget_array[this->count + 2];
+        text_widget_array_foreach(this, text_widget_array, this->count + 2);
+        time_array_offset = -(this->touch_y / this->gap % time_array_size);
+        for (size_t i = 0; i < this->count + 2; i++)
+        {
+
+            int index = time_array_offset + i;
+
+            if (index >= time_array_size)
+            {
+                index -= time_array_size;
+            }
+            if (index < 0)
+            {
+                index += time_array_size;
+            }
+
+            const char *text = this->string_array[index];
+            // if (i == (this->count + 2) / 2)
+            // {
+            //     this->index_offset = index;
+            // }
+            if (win->y + this->win2->base.y + i * this->gap <= this->gap * this->count / 2 &&
+                win->y + this->win2->base.y + i * this->gap + this->gap > this->gap * this->count / 2)
+            {
+                GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color_highlight;
+            }
+            else
+            {
+                GUI_TYPE(gui_text_t, text_widget_array[i])->color = this->font_color;
+            }
+            render(text, (void *)text_widget_array[i], this->render_mode, this->text_image_map_length,
+                   this->text_image_map);
+        }
+
+    }
+
+
+
 }
 // Function to retrieve image data based on text input
 static void *get_image_data(const char *text, int16_t text_image_map_length,
@@ -613,7 +673,7 @@ void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
                 const void *addr1 = font_file_pointer;
                 gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
                 gui_text_mode_set(t, mode);
-                gui_text_convert_to_img(t, RGB565);
+                gui_text_convert_to_img(t, ARGB8565);
 
             }
         }
@@ -640,6 +700,15 @@ void gui_scroll_wheel_new_render_image_array(gui_scroll_wheel_new_t *widget,
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers, widget->text_image_map_length,
                                                        widget->text_image_map);
+            if (num_pointers == 0)
+            {
+                gui_log("No image pointers found for input \"%s\"\n", input);
+                if (image_pointers)
+                {
+                    gui_free(image_pointers);
+                }
+                continue;
+            }
 
             // Print results
             gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
@@ -670,6 +739,15 @@ void gui_scroll_wheel_new_render_image_array_ftl(gui_scroll_wheel_new_t *widget,
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers, widget->text_image_map_length,
                                                        widget->text_image_map);
+            if (num_pointers == 0)
+            {
+                gui_log("No image pointers found for input \"%s\"\n", input);
+                if (image_pointers)
+                {
+                    gui_free(image_pointers);
+                }
+                continue;
+            }
 
             // Print results
             gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
@@ -725,7 +803,9 @@ void gui_scroll_wheel_new_render(const char *text, gui_obj_t *obj, unsigned char
 {
     render(text, obj, render_mode, text_image_map_length, text_image_map);
 }
-_GUI_API_ASSIGN(gui_scroll_wheel_new_t)
-.get_index = get_index,
- .set_index = set_index,
+//_GUI_API_ASSIGN(gui_scroll_wheel_new_t)
+_gui_api_gui_scroll_wheel_new_t _gui_api_for_gui_scroll_wheel_new_t =
+{
+    .get_index = get_index,
+    .set_index = set_index,
 };

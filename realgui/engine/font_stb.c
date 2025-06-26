@@ -339,10 +339,16 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 outgv = vaddq_u16(outgv, color_backg);
                 outbv = vaddq_u16(outbv, color_backb);
 
-                uint16x8_t resultv = vdupq_n_u16(0);
-                resultv = vsriq_n_u16(outbv, resultv, 5);
-                resultv = vsriq_n_u16(outgv, resultv, 6);
-                resultv = vsriq_n_u16(outrv, resultv, 5);
+                /*vsriq, 6 instructions*/
+                // uint16x8_t resultv = vsriq_n_u16(outgv, outbv, 6);
+                // resultv = vsriq_n_u16(outrv, resultv, 5);
+
+                /*work around, 10 instructions*/
+                uint16x8_t resultv = vshrq_n_u16(outbv, 11);
+                outrv = vandq_u16(outrv, vdupq_n_u16(0xF800));
+                outgv = vshlq_n_u16(vshrq_n_u16(outgv, 10), 5);
+                resultv = vorrq_u16(resultv, outrv);
+                resultv = vorrq_u16(resultv, outgv);
 
                 vst1q_u16(&writebuf[write_off + js - dc->section.x1], resultv);
             }

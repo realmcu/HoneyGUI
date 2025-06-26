@@ -78,11 +78,13 @@ static void prepare_touch_process(gui_view_t *this)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
                     this->event = 1;
+                    this->moveback = 0;
                 }
                 else if (this->view_switch_ready && this->view_right && this->release_x > 0)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
                     this->event = 1;
+                    this->moveback = 0;
                 }
             }
             break;
@@ -116,11 +118,13 @@ static void prepare_touch_process(gui_view_t *this)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_UP);
                     this->event = 1;
+                    this->moveback = 0;
                 }
                 else if (this->view_switch_ready && this->view_down && this->release_y > 0)
                 {
                     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_DOWN);
                     this->event = 1;
+                    this->moveback = 0;
                 }
             }
             break;

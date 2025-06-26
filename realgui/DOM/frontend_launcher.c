@@ -5,15 +5,15 @@
 #include <gui_obj.h>
 #include <gui_curtain.h>
 #include <gui_button.h>
-#include "gui_canvas.h"
+
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
 #include <gui_app.h>
-#include "gui_tab.h"
+
 #include "gui_grid.h"
-#include "gui_return.h"
+
 #include "gui_components_init.h"
 #include "gui_api.h"
 
@@ -129,7 +129,10 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
 #endif
                     button->data = gui_strdup(path);
-
+                    {
+                        gui_app_t *app = get_app_xml();
+                        app->xml = button->data;
+                    }
 
                     gui_button_text_move(button, -70, 73);
                     {
@@ -142,6 +145,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         gui_text_mode_set(button->text, CENTER);
                         GUI_BASE(button->text)->w = 70 * 3;
                     }
+                    gui_log("APP found.\n");
                 }
 
             }
@@ -151,6 +155,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
 
     }
     gui_fs_closedir(dir);
+    gui_log("APP list init done.\n");
 }
 void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
 {

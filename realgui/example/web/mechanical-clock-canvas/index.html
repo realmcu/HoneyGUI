@@ -1,46 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>MCC</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-        #clock-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-        }
-        #digital-clock {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            font-weight: bold;
-            color: #f5cc17;
-        }
-        #logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px; 
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menger Sponge</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #000;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div id="clock-container">
-        <canvas id="clockCanvas" width="400" height="400"></canvas>
-        <div id="digital-clock">00:00:00</div>
-        <img id="logo" src="resources/logo.png" alt="logo">
-    </div>
-    <script src="scripts/script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <script>
+    let initial_size, level;
+    let rotSpeedX, rotSpeedY, rotSpeedZ;
+    let sponge = [];
+
+    function setup() {
+      createCanvas(800, 600, WEBGL);
+      angleMode(DEGREES);
+      initial_size = 240;
+      level = 2;
+      rotSpeedX = random(-0.03, 0.03);
+      rotSpeedY = random(-0.03, 0.03);
+      rotSpeedZ = random(-0.03, 0.03);
+      generateSponge(level, createVector(0, 0, 0), initial_size);
+      camera(0, 0, 500, 0, 0, 0, 0, 1, 0);
+    }
+
+    function draw() {
+      background(0);
+      ambientLight(50);
+      let theta = millis() / 1000 * 50;
+      let r = 350;
+      let lightPos = createVector(r * cos(theta), r * sin(theta) * 0.5, r * sin(theta));
+      pointLight(255, 255, 255, lightPos);
+
+
+      let oscillation = sin(millis() / 1000 * 150) * 15;
+
+      push();
+      rotateY(oscillation); 
+      rotateX(millis() / 1000 * rotSpeedX);
+      rotateY(millis() / 1000 * rotSpeedY); 
+      rotateZ(millis() / 1000 * rotSpeedZ);
+
+
+      for (let cube of sponge) {
+        fill(150, 150, 150);
+        specularMaterial(200, 200, 200);
+        shininess(64);
+        push();
+        translate(cube.pos.x, cube.pos.y, cube.pos.z);
+        box(cube.size);
+        pop();
+      }
+
+
+      let h = hour();
+      let m = minute();
+      let s = second();
+
+   
+      let hourAngle = ((h % 12) + m / 60 + s / 3600) * 30;
+      let minuteAngle = (m + s / 60) * 6;
+      let secondAngle = s * 6;
+
+     
+      push();
+      translate(0, 0, 150);
+      rotateZ(hourAngle-180); 
+      translate(0, 25, 0);
+      fill(255);
+      box(10, 50, 5);
+      pop();
+
+
+      push();
+      translate(0, 0, 150);
+      rotateZ(minuteAngle-180);
+      translate(0, 40, 0);
+      fill(255);
+      box(6, 80, 4);
+      pop();
+
+   
+      push();
+      translate(0, 0, 150);
+      rotateZ(secondAngle-180);
+      translate(0, 50, 0);
+      fill(255);
+      box(2, 100, 3);
+      pop();
+
+ 
+      push();
+      translate(0, 0, 150);
+      fill(255);
+      sphere(5);
+      pop();
+
+      pop(); 
+    }
+
+    function generateSponge(level, pos, size) {
+      if (level === 0) {
+        let sizeVariation = size * random(0.9, 1.1);
+        let jitter = createVector(
+          random(-size * 0.1, size * 0.1),
+          random(-size * 0.1, size * 0.1),
+          random(-size * 0.1, size * 0.1)
+        );
+        let finalPos = p5.Vector.add(pos, jitter);
+        sponge.push({ pos: finalPos, size: sizeVariation });
+      } else {
+        let new_size = size / 3;
+        for (let i = -1; i <= 1; i++) {
+          for (let j = -1; j <= 1; j++) {
+            for (let k = -1; k <= 1; k++) {
+              let nonZeros = (i !== 0) + (j !== 0) + (k !== 0);
+              if (nonZeros >= 2) {
+                let offset = createVector(i * new_size, j * new_size, k * new_size);
+                generateSponge(level - 1, p5.Vector.add(pos, offset), new_size);
+              }
+            }
+          }
+        }
+      }
+    }
+  </script>
 </body>
 </html>

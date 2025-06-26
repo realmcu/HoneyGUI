@@ -77,6 +77,11 @@ static void gui_view_destroy(gui_obj_t *obj)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
+    if (current_view == this)
+    {
+        current_view = NULL;
+    }
+
     if (this->animate)
     {
         gui_free(this->animate);
@@ -219,6 +224,7 @@ gui_view_t *gui_view_create(void       *parent,
     if ((GET_BASE(this)->parent)->child_list.next == (GET_BASE(this)->parent)->child_list.prev)
     {
         this->view_switch_ready = true;
+        current_view = this;
     }
     else
     {

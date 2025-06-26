@@ -356,6 +356,7 @@ static void gui_text_prepare(gui_obj_t *obj)
     }
 
     last = this->checksum;
+    this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
 
     if (last != this->checksum || this->content_refresh)
@@ -724,4 +725,32 @@ gui_text_t *gui_text_create(void       *parent,
     GET_BASE(text)->create_done = true;
 
     return text;
+}
+void gui_text_input_prepare_global(gui_obj_t *obj)
+{
+    gui_text_input_prepare(obj);
+}
+void gui_text_prepare_global(gui_obj_t *obj)
+{
+    gui_text_prepare(obj);
+}
+void gui_text_end_global(gui_obj_t *obj)
+{
+    gui_text_end(obj);
+}
+void gui_text_destroy_global(gui_obj_t *obj)
+{
+    gui_text_destroy(obj);
+}
+void gui_text_font_load_global(gui_text_t *text, gui_text_rect_t *rect)
+{
+    gui_text_font_load(text, rect);
+}
+void gui_text_font_draw_global(gui_text_t *text, gui_text_rect_t *rect)
+{
+    gui_text_font_draw(text, rect);
+}
+void gui_text_font_unload_global(gui_text_t *text)
+{
+    gui_text_font_unload(text);
 }

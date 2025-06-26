@@ -333,8 +333,11 @@ void clear_mem(void)
     }
     if (strcmp(name, "box2d_ring_view"))
     {
-        extern void close_box2d_ring(void);
-        close_box2d_ring();
+        if (watchface_index != 3 && strcmp(name, "watchface_view"))
+        {
+            extern void close_box2d_ring(void);
+            close_box2d_ring();
+        }
     }
     if (strcmp(name, "fruit_ninja_view"))
     {

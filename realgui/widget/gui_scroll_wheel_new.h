@@ -51,49 +51,53 @@ typedef struct gui_scroll_wheel_new
     int16_t string_array_size;
     int16_t gap;
     int16_t count;
-    int16_t touch_y, touch_y_old, speed, text_image_map_length, col_offset, index_offset;
+    int16_t touch_y, touch_y_old, speed, text_image_map_length, col_offset, index_offset, blank_count,
+            time_array_offset;
     gui_win_t *win;
     gui_win_t *win2;
     int16_t recode[5];
     const struct gui_text_image_map *text_image_map;
     bool wheel_take_over;
+    bool take_over;
     bool loop;
-    char time_array_offset;
-    char blank_count;
     int history_y;
     gui_color_t font_color;
     gui_color_t font_color_highlight;
 } gui_scroll_wheel_new_t;
 
-_GUI_API_DEFINE(gui_scroll_wheel_new_t)
-/**
- * @brief Get the current index of the scroll wheel widget.
- *
- * This function pointer should point to a function that returns the current index
- * of the scroll wheel widget. The index typically represents the currently
- * selected item in the scroll wheel.
- *
- * @param widget Pointer to the scroll wheel widget.
- *
- * @return The current index of the scroll wheel widget.
- */
-int (*get_index)(gui_scroll_wheel_new_t *widget);
 
-/**
- * @brief Set the current index for the scroll wheel widget.
- *
- * This function pointer should point to a function that sets the current index
- * of the scroll wheel widget. The index typically represents the item to be
- * selected in the scroll wheel.
- *
- * @param this Pointer to the scroll wheel widget.
- * @param index Index to be set as the current index.
- *
- * @return Status code indicating success or failure.
- */
-int (*set_index)(gui_scroll_wheel_new_t *this, int index);
-_GUI_API_DECLARE(gui_scroll_wheel_new_t)
+//_GUI_API_DEFINE(gui_scroll_wheel_new_t)
+typedef struct __gui_api_gui_scroll_wheel_new_t
+{
+    /**
+     * @brief Get the current index of the scroll wheel widget.
+     *
+     * This function pointer should point to a function that returns the current index
+     * of the scroll wheel widget. The index typically represents the currently
+     * selected item in the scroll wheel.
+     *
+     * @param widget Pointer to the scroll wheel widget.
+     *
+     * @return The current index of the scroll wheel widget.
+     */
+    int (*get_index)(gui_scroll_wheel_new_t *widget);
 
+    /**
+     * @brief Set the current index for the scroll wheel widget.
+     *
+     * This function pointer should point to a function that sets the current index
+     * of the scroll wheel widget. The index typically represents the item to be
+     * selected in the scroll wheel.
+     *
+     * @param this Pointer to the scroll wheel widget.
+     * @param index Index to be set as the current index.
+     *
+     * @return Status code indicating success or failure.
+     */
+    int (*set_index)(gui_scroll_wheel_new_t *this, int index);
+//_GUI_API_DECLARE(gui_scroll_wheel_new_t)
+} _gui_api_gui_scroll_wheel_new_t;
+extern _gui_api_gui_scroll_wheel_new_t _gui_api_for_gui_scroll_wheel_new_t;
 
 /*============================================================================*
  *                         Constants

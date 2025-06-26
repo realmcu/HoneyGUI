@@ -29,7 +29,7 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 软件架构
 ----------
 
-.. image:: https://foruda.gitee.com/images/1720700131929539160/ec0dbbb9_1860080.png
+.. image:: https://foruda.gitee.com/images/1744004732309092748/20ca09c7_1860080.png
    :align: center
    :width: 800
 

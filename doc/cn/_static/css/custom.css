@@ -21,6 +21,10 @@ p {
 
 
 /* ======== Render Main Content Style ========= */
+.wy-grid-for-nav.prevent-manipulation {
+    overflow: hidden;
+    touch-action: none;
+}
 .wy-nav-content-wrap {
     overflow-x: auto;
 }
@@ -36,7 +40,11 @@ p {
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+.rst-content .line-block {
+    margin-bottom: 0;
+}
 
+/* 解决 iOS 设备对完全透明（不可见）元素的交互行为设计为无响应的问题 */
 .rst-content .code-block-caption .headerlink, 
 .rst-content .eqno .headerlink, 
 .rst-content .toctree-wrapper>p.caption .headerlink, 
@@ -53,8 +61,6 @@ p {
 .rst-content table>caption .headerlink {
     opacity: 0.02;
 }
-
-
 /* --------- Render sm-screen Style --------- */
 @media screen and (min-width: 769px) {
     /* ----- left sider ----- */
@@ -172,6 +178,10 @@ div.wy-menu-vertical {
 li[class*="toctree-"] * {
     font-size: 14px !important;
 }
+.always-expand-toc button::before {
+    content: "\f147" !important;
+}
+
 .wy-menu-vertical li[class*="toctree-"].current,
 .wy-menu-vertical li[class*="toctree-"].current > a,
 .wy-menu-vertical li[class*="toctree-"].current li[class*="toctree-"]>a {
@@ -255,11 +265,19 @@ h6::before {
 
 /* ========= Render Image Style ========= */
 figcaption, figcaption p{
+    font: italic 14px arial,sans-serif;
+    text-align: center !important;
+}
+figcaption p{
+    margin-top: 0;
+    padding: .5em 0;
     text-align: center !important;
 }
 .rst-content img{
     height: auto !important;
     cursor: pointer;
+    margin-top: 10px;
+    -webkit-tap-highlight-color: transparent;
 }
 .img-border {
     border: 1px solid #000;
@@ -267,6 +285,10 @@ figcaption, figcaption p{
 /* ========= Render Image Style ========= */
 
 /* ======= Render List Style ======== */
+.rst-content section ol li>* {
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
 .rst-content section ol li>p,
 .rst-content section ol li>p:last-child,
 .rst-content section ul li>p,
@@ -274,11 +296,77 @@ figcaption, figcaption p{
     margin-top: 2px;
     margin-bottom: 2px;
 }
-.rst-content ol ol li {
+
+/* ---------- Ordered Lists ---------- */
+/* 一级有序列表 */
+.rst-content section ol li,
+.rst-content section ol.arabic li,
+.rst-content section ul li ol li,
+.rst-content section ul li ol.arabic li {
+    list-style-type: decimal;
+}
+.rst-content .admonition ol li {
+    list-style-type: decimal !important;
+}
+/* 二级有序列表 */
+.rst-content section ol li ol li,
+.rst-content section ol.arabic li ol li,
+.rst-content section ul li ol li ol li,
+.rst-content section ul li ol.arabic li ol li {
+    list-style-type: lower-latin;
+}
+.rst-content .admonition ol li ol li {
     list-style-type: lower-latin !important;
 }
-.rst-content ol ol ol li {
+/* 三级有序列表 */
+.rst-content section ol li ol li ol li,
+.rst-content section ol.arabic li ol li ol li {
+    list-style-type: lower-roman;
+}
+.rst-content .admonition ol li ol li ol li {
     list-style-type: lower-roman !important;
+}
+/* 四级有序列表 */
+.rst-content section ol li ol li ol li ol li,
+.rst-content section ol.arabic li ol li ol li ol li {
+    list-style-type: lower-greek;
+}
+.rst-content .admonition ol li ol li ol li ol li{
+    list-style-type: lower-greek !important;
+}
+
+/* ---------- Unordered Lists ---------- */
+/* 一级无序列表 */
+.rst-content section ul li,
+.rst-content section ol li ul li,
+.rst-content section ol.arabic li ul li {
+    list-style-type: disc;
+}
+/* 二级无序列表 */
+.rst-content section ul li ul li,
+.rst-content section ol ul li ul li,
+.rst-content section ol.arabic ul li ul li {
+    list-style-type: circle;
+}
+/* 三级无序列表 */
+.rst-content section ul li ul li ul li {
+    list-style-type: square;
+}
+/* 四级无序列表 */
+.rst-content section ul li ul li ul li ul li,
+.rst-content section ul li ul li ul li ul li,
+.rst-content section ul li ul li ul li ul li {
+    list-style-type: none;
+    position: relative;
+    margin-left: 0;
+    padding-left: 1em;
+}
+.rst-content section ul li ul li ul li ul li::before,
+.rst-content section ul li ul li ul li ul li::before,
+.rst-content section ul li ul li ul li ul li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
 }
 
 .rst-content section ol,
@@ -302,31 +390,11 @@ html.writer-html5 .rst-content dl.field-list dd {
 html.writer-html5 .rst-content dl.field-list>dt {
     padding-top: 7px;
 }
+
 /* ======= Render List Style ======== */
 
 
 /* ========= Render Code Block Style ========= */
-.rst-content .guilabel {
-    line-height: 1.3rem
-}
-.rst-content p>kbd.kbd {   /* 解决在平板微信中不显示kbd指令渲染效果的问题 */
-    color: inherit;
-    font-size: 80%;
-    background-color: #fff;
-    border: 1px solid #a6a6a6;
-    border-radius: 4px;
-    box-shadow: 0 2px grey;
-    padding: 2.4px 6px;
-    margin: auto 0;
-}
-
-/* code copy button style */
-button.copybtn {
-    opacity: 1;
-}
-button.copybtn.o-tooltip--left:after {
-    display: none;
-}
 .highlight {
     background:rgba(223, 233, 243,0.4);
 }
@@ -354,10 +422,6 @@ button.copybtn.o-tooltip--left:after {
 .rst-content dl dd {
     margin-right: 12px;
 }
-.rst-content div[itemprop="articleBody"] dl.c > dd, 
-.rst-content div[itemprop="articleBody"] dl.cpp  > dd {
-    margin: 0 0 12px 24px;
-}
 .rst-content div[itemprop="articleBody"] section > dl > dd {
     margin-left: 0;
 }
@@ -380,13 +444,45 @@ dl.c.unexpanded dd, dl.cpp.unexpanded dd {
 .unexpanded .rtk-api-expansion-button::before {
     content: "\f0da \00a0";
 }
+.rst-content .guilabel {   /* 解决guilabel重叠的问题 */
+    line-height: 1.3rem
+}
+.rst-content p>kbd.kbd {   /* 解决在平板微信中不显示kbd指令渲染效果的问题 */
+    color: inherit;
+    font-size: 80%;
+    background-color: #fff;
+    border: 1px solid #a6a6a6;
+    border-radius: 4px;
+    box-shadow: 0 2px grey;
+    padding: 2.4px 6px;
+    margin: auto 0;
+}
+/* code copy button style */
+button.copybtn {
+    opacity: 1;
+}
+button.copybtn.o-tooltip--left:after {  /* 隐藏代码复制按钮组件自带的文字提示 */
+    display: none;
+}
+html.writer-html4 .rst-content dl:not(.docutils)>dt, 
+html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)>dt {
+    color: inherit;
+}
 /* ========= Render Code Block Style ========= */
 
+/* =========== Render Math Style =========== */
+.math {
+    font-size: 14px;
+}
+/* =========== Render Math Style =========== */
 
 /* ============ Render Table Style ============ */
 .wy-table-responsive {
     /* width: 100%;
   	overflow: auto; */
+}
+.full-width-table {
+    width: 100%;       /* 指定:class: full-width-table的表格宽度为全屏*/
 }
 table, th, td {
     border: 1px solid #e1e4e5;
@@ -399,6 +495,9 @@ table {
 	margin-top: 4px;
     margin-bottom: 10px;
 }
+.rst-content table.docutils caption {
+    line-height: 17px;       /* 修正表格标题换行时行间距过小*/
+}
 .wy-table-responsive table td, 
 .wy-table-responsive table th {
     /* 设置单元格中的文字自动换行 */
@@ -410,10 +509,16 @@ table th {
 .rst-content table ul {
     margin-bottom: 0;
 }
-/* ============ Render Table Style ============ */
+.rst-content table.docutils caption {
+    padding: .5em 0;
+    font-size: 14px;
+    color: #404040;
+}
 table code {
     line-height: 22px; /* 修正表格中代码块换行重叠 */
 }
+/* ============ Render Table Style ============ */
+
 
 /* ========= Render Quote Block Style ========= */
 /*
@@ -458,7 +563,9 @@ html.writer-html5 .rst-content dl.field-list dd {
 
 
 /* ========= Render added-api & deprecared-api Style ========= */
-
+section:not(#glossary) > dl > dt {
+    display: none;
+}
 /*
 section[id*="added-api"] dd dl,
 section[id*="deprecated-api"] dd dl {
@@ -476,15 +583,23 @@ section[id*="deprecated-api"] dd dl {
 
 
 /* ========= Render text color ========= */
+/* 需同步在conf.py中添加 */
 .red-text {
     color: red;
 }
-.glossary-highlighted {
-    background: #f1c40f;
+.dt-highlighted {
+    background: #f1c40f !important;
 }
 /* ========= Render text color ========= */
 
 /* ========= Render text style ========= */
+/* 需同步在conf.py中添加 */
+.bold {
+    font-weight: bold;
+}
+.italic {
+    font-style: italic;
+}
 .bolditalic {
     font-style: italic;
     font-weight: bold;
@@ -522,14 +637,11 @@ section[id*="deprecated-api"] dd dl {
 a.no-cursor-link {
     cursor: default;
 }
- 
 .img-modal {
     position: fixed;
     left: 0;
     top: 0;
     display: none;
-    justify-content: center;
-    align-items: center;
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.6);
@@ -537,16 +649,13 @@ a.no-cursor-link {
     overflow: auto;
     touch-action: pan-x pan-y;
 }
-@keyframes imgzoom {
-    from {transform: scale(0)}
-    to {transform: scale(1)}
-}
 .img-in-modal {
+    max-width: 100vmin;
+    max-height: 100vmin;
     object-fit: contain;
-    transform-origin: center center; /* 设置 transform 原点 */
-    transition: transform 0.75s ease;
-    animation-name: imgzoom;
-    animation-duration: 0.75s;
+    transform: translate(0, 0) scale(1);
+    transform-origin: top left;
+    /* transition: transform 0.5s ease-in-out; */
 }
 .img-modal-close {
     position: fixed;
@@ -564,5 +673,5 @@ a.no-cursor-link {
     text-decoration: none;
     cursor: pointer;
 }
- 
+
 /* ====== Render image modal style ====== */

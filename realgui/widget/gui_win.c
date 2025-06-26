@@ -68,6 +68,11 @@ static void gui_win_input_prepare(gui_obj_t *obj)
 
 static void prepare(gui_obj_t *obj)
 {
+    if (obj->not_show)
+    {
+        return;
+    }
+
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
     gui_win_t *this = (void *)obj;
@@ -180,8 +185,23 @@ static void prepare(gui_obj_t *obj)
     {
         gui_obj_enable_event(obj, GUI_EVENT_5);
     }
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()))
+    {
+        if (this->load == 0)
+        {
+            gui_obj_enable_event(obj, (gui_event_t)GUI_EVENT_WIN_LOAD);
+            this->load = 1;
+        }
+    }
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_win_t));
 
-
+    if (last != this->checksum || this->enter_auto_scale)
+    {
+        gui_fb_change();
+        this->enter_auto_scale = 0;
+    }
 }
 
 static void gui_win_destroy(gui_obj_t *obj)

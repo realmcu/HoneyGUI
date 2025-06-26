@@ -10,6 +10,14 @@
 
 #define USE_FIX_SIN 1
 
+#if __ARM_FEATURE_MVE
+#define USE_MVE   0
+#if USE_MVE
+#include <arm_mve.h>
+#include <arm_math_types.h>
+#endif
+#endif
+
 #if USE_FIX_SIN
 // Set the intial cube rotation degree and step.
 static const int16_t sin_table[] =
@@ -424,7 +432,60 @@ void matrix_multiply_normal(struct gui_matrix *matrix, gui_vertex_t *normal)
 void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 {
     //int row, column;
+#if USE_MVE
+    float32_t   *pInA0, *pInA1, *pInA2, *pOut;
+    f32x4_t    vecMac0, vecMac1, vecMac2;
+    f32x4_t    vecInB;
+    float32_t const *pSrBVec;
 
+    pSrBVec = (float32_t const *) mult->m;
+
+    pInA0 = (float *)matrix->m;
+    pInA1 = pInA0 + 3;
+    pInA2 = pInA1 + 3;
+    pOut = pInA0;
+
+    /* enable predication to disable last (4th) vector element */
+    mve_pred16_t p0 = vctp32q(3);
+
+    /*
+     * load {b0,0, b0,1, b0,2, 0}
+     */
+    vecInB = vldrwq_z_f32(pSrBVec, p0);
+    pSrBVec += 3;
+
+    vecMac0 = vmulq_n_f32(vecInB, *pInA0++);
+    vecMac1 = vmulq_n_f32(vecInB, *pInA1++);
+    vecMac2 = vmulq_n_f32(vecInB, *pInA2++);
+    /*
+     * load {b1,0, b1,1, b1,2, 0}
+     */
+    vecInB = vldrwq_z_f32(pSrBVec, p0);
+    pSrBVec += 3;
+
+    vecMac0 = vfmaq_n_f32(vecMac0, vecInB, *pInA0++);
+    vecMac1 = vfmaq_n_f32(vecMac1, vecInB, *pInA1++);
+    vecMac2 = vfmaq_n_f32(vecMac2, vecInB, *pInA2++);
+
+    /*
+     * load {b2,0, b2,1 , b2,2, 0}
+     */
+    vecInB = vldrwq_z_f32(pSrBVec, p0);
+    pSrBVec += 3;
+
+    vecMac0 = vfmaq_n_f32(vecMac0, vecInB, *pInA0++);
+    vecMac1 = vfmaq_n_f32(vecMac1, vecInB, *pInA1++);
+    vecMac2 = vfmaq_n_f32(vecMac2, vecInB, *pInA2++);
+
+    /* partial vector stores */
+    vstrwq_f32(pOut, vecMac0);
+    pOut += 3;
+    vstrwq_f32(pOut, vecMac1);
+    pOut += 3;
+    *pOut++ = vecMac2[0];
+    *pOut++ = vecMac2[1];
+    *pOut++ = vecMac2[2];
+#else
     float m00, m01, m02, m10, m11, m12, m20, m21, m22;
     m00 = matrix->m[0][0];
     m01 = matrix->m[0][1];
@@ -463,11 +524,37 @@ void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
     matrix->m[2][0] = (m20 * t00) + (m21 * t10) + (m22 * t20);
     matrix->m[2][1] = (m20 * t01) + (m21 * t11) + (m22 * t21);
     matrix->m[2][2] = (m20 * t02) + (m21 * t12) + (m22 * t22);
+#endif
 }
 void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point3f *pox)
 {
-    //struct gui_point3f_t temp;
-    //int row;
+#if USE_MVE
+    const float32_t *pInA0 = (const float32_t *)matrix->m;
+    float32_t *pOut = (float32_t *)pox->p;
+    f32x4_t    vecMac0, vecMac1, vecMac2;
+    f32x4_t    vecOut0, vecOut1, vecOut2;
+    f32x4_t    vecInB;
+    vecMac0[0] = matrix->m[0][0];
+    vecMac0[1] = matrix->m[1][0];
+    vecMac0[2] = matrix->m[2][0];
+    vecMac1[0] = matrix->m[0][1];
+    vecMac1[1] = matrix->m[1][1];
+    vecMac1[2] = matrix->m[2][1];
+    vecMac2[0] = matrix->m[0][2];
+    vecMac2[1] = matrix->m[1][2];
+    vecMac2[2] = matrix->m[2][2];
+
+    vecOut0 = vmulq_n_f32(vecMac0, pox->p[0]);
+    vecOut1 = vmulq_n_f32(vecMac1, pox->p[1]);
+    vecOut2 = vmulq_n_f32(vecMac2, pox->p[2]);
+    vecMac0 = vaddq_f32(vecOut1, vecOut2);
+    vecMac1 = vaddq_f32(vecOut0, vecMac0);
+
+    pox->p[0] = vecMac1[0] / vecMac1[2];
+    pox->p[1] = vecMac1[1] / vecMac1[2];
+    pox->p[2] = 1;
+
+#else
     float m_row0, m_row1, m_row2;
 
     float a = pox->p[0];
@@ -493,7 +580,7 @@ void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point3f *pox)
     pox->p[0] = pox->p[0] / pox->p[2];
     pox->p[1] = pox->p[1] / pox->p[2];
     pox->p[2] = 1;
-
+#endif
     //memcpy(pox, &temp, sizeof(temp));
 }
 void matrix_inverse(struct gui_matrix *matrix)

@@ -786,7 +786,9 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
             }
             else
             {
-                memcpy(&draw_img.matrix, chr[i].buf, sizeof(gui_matrix_t) * 2);
+                gui_matrix_t *font_matrix = (gui_matrix_t *)chr[i].buf;
+                memcpy(&draw_img.matrix, &font_matrix[0], sizeof(gui_matrix_t));
+                memcpy(&draw_img.inverse, &font_matrix[1], sizeof(gui_matrix_t));
             }
 
             draw_img.img_h = head->h;
@@ -801,7 +803,7 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
                 draw_img_acc_end_cb(&draw_img);
             }
 
-            memset(font_buf, 0x00, head->h * head->w * buffer_bytes);
+            memset(font_buf, 0x00, size);
         }
         gui_free(img_buf);
     }

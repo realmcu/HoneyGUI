@@ -13,6 +13,10 @@
 #include "lv_ppe_rtl8773e_utils.h"
 #include "section.h"
 #include "math.h"
+#include "dma_channel.h"
+#include "rtl876x_gdma.h"
+#include "rtl_idu_int.h"
+#include "string.h"
 
 SHM_DATA_SECTION uint8_t cache_buffer[40 * 1024];
 /*********************
@@ -30,6 +34,8 @@ SHM_DATA_SECTION uint8_t cache_buffer[40 * 1024];
 /**********************
  *  STATIC VARIABLES
  **********************/
+static uint8_t high_speed_channel = 0xA5;
+static uint8_t low_speed_channel = 0xA5;
 
 /**********************
  *      MACROS
@@ -183,7 +189,7 @@ static void pos_transfer(ppe_matrix_t *matrix, pox_t *pox)
 
 bool lv_ppe_get_area(ppe_rect_t *result_rect, ppe_rect_t *source_rect, ppe_matrix_t *matrix)
 {
-    ppe_pox_t pox = {0.0f};
+    pox_t pox = {0.0f};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;
@@ -272,6 +278,218 @@ bool lv_ppe_get_area(ppe_rect_t *result_rect, ppe_rect_t *source_rect, ppe_matri
         return false;
     }
     return true;
+}
+
+void lv_acc_dma_channel_init(void)
+{
+    GDMA_channel_request(&high_speed_channel, NULL, true);
+    GDMA_channel_request(&low_speed_channel, NULL, false);
+    if (high_speed_channel == 0xA5 || low_speed_channel == 0xA5)
+    {
+        LV_LOG_ERROR("No dma channel valid");
+        LV_ASSERT(NULL != NULL);
+    }
+}
+
+uint8_t lv_acc_get_high_speed_channel(void)
+{
+    return high_speed_channel;
+}
+
+uint8_t lv_acc_get_low_speed_channel(void)
+{
+    return low_speed_channel;
+}
+
+void lv_acc_dma_copy(uint32_t length, uint32_t height, uint32_t src_stride,
+                     uint32_t dst_stride, uint8_t *src, uint8_t *dst)
+{
+    bool use_LLI = true;
+    if ((length == src_stride && length == dst_stride) || height == 1)
+    {
+        use_LLI = false;
+    }
+    uint32_t dma_height = height;
+    uint32_t buffer_size = 0;
+    uint32_t total_size_in_byte = length * height;
+    uint32_t total_size = total_size_in_byte / 4;
+    uint8_t m_size = 0, data_size = 0;
+    uint8_t dma_depth = rtl_idu_get_dma_depth(high_speed_channel);
+    if (length % 4 == 0)
+    {
+        data_size = GDMA_DataSize_Word;
+        if (dma_depth == 4)
+        {
+            m_size = GDMA_Msize_4;
+        }
+        else if (dma_depth == 8)
+        {
+            m_size = GDMA_Msize_8;
+        }
+        else if (dma_depth == 16)
+        {
+            m_size = GDMA_Msize_16;
+        }
+        else
+        {
+            return;
+        }
+        buffer_size = length / 4;
+        if (!use_LLI)
+        {
+            if (buffer_size > 65535)
+            {
+                use_LLI = true;
+                dma_height = buffer_size / 65535;
+                if (buffer_size % 65535)
+                {
+                    dma_height += 1;
+                }
+                buffer_size = 65535;
+            }
+            else
+            {
+                buffer_size = total_size;
+            }
+        }
+    }
+    else if (length % 2 == 0)
+    {
+        if (dma_depth == 4)
+        {
+            m_size = GDMA_Msize_8;
+        }
+        else if (dma_depth == 8)
+        {
+            m_size = GDMA_Msize_16;
+        }
+        else if (dma_depth == 16)
+        {
+            m_size = GDMA_Msize_32;
+        }
+        else
+        {
+            return;
+        }
+        data_size = GDMA_DataSize_HalfWord;
+        buffer_size = length / 2;
+        total_size = 0;
+    }
+    else
+    {
+        data_size = GDMA_DataSize_Byte;
+        if (dma_depth == 4)
+        {
+            m_size = GDMA_Msize_16;
+        }
+        else if (dma_depth == 8)
+        {
+            m_size = GDMA_Msize_32;
+        }
+        else if (dma_depth == 16)
+        {
+            m_size = GDMA_Msize_64;
+        }
+        else
+        {
+            return;
+        }
+        buffer_size = length;
+        total_size = 0;
+    }
+
+    GDMA_LLIDef *GDMA_LLIStruct;
+    if (use_LLI)
+    {
+        GDMA_LLIStruct = (GDMA_LLIDef *)lv_malloc(dma_height * sizeof(GDMA_LLIDef));
+        if (GDMA_LLIStruct == NULL)
+        {
+            assert_param(GDMA_LLIStruct != NULL);
+        }
+        else
+        {
+            memset(GDMA_LLIStruct, 0, dma_height * sizeof(GDMA_LLIDef));
+        }
+    }
+    uint32_t start_address = (uint32_t)src;
+    uint32_t dest_address = (uint32_t)dst;
+    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
+    GDMA_ChannelTypeDef *dma_channel = rtl_idu_get_dma_channel_int(high_speed_channel);
+    GDMA_InitTypeDef RX_GDMA_InitStruct;
+    /*--------------GDMA init-----------------------------*/
+    GDMA_StructInit(&RX_GDMA_InitStruct);
+    RX_GDMA_InitStruct.GDMA_ChannelNum          = high_speed_channel;
+    RX_GDMA_InitStruct.GDMA_BufferSize          = buffer_size;
+    RX_GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToMemory;
+    RX_GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+    RX_GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Inc;
+    RX_GDMA_InitStruct.GDMA_SourceMsize         =
+        m_size;                         // 8 msize for source msize
+    RX_GDMA_InitStruct.GDMA_DestinationMsize    =
+        m_size;                         // 8 msize for destiantion msize
+    RX_GDMA_InitStruct.GDMA_DestinationDataSize =
+        data_size;                   // 32 bit width for destination transaction
+    RX_GDMA_InitStruct.GDMA_SourceDataSize      =
+        data_size;                   // 32 bit width for source transaction
+    RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_address;
+    RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)dest_address;
+
+    if (use_LLI)
+    {
+        RX_GDMA_InitStruct.GDMA_Multi_Block_Mode = LLI_TRANSFER;
+        RX_GDMA_InitStruct.GDMA_Multi_Block_En = 1;
+        RX_GDMA_InitStruct.GDMA_Multi_Block_Struct = (uint32_t)GDMA_LLIStruct;
+    }
+
+    GDMA_Init(dma_channel, &RX_GDMA_InitStruct);
+    if (use_LLI && GDMA_LLIStruct != NULL)
+    {
+        for (int i = 0; i < dma_height; i++)
+        {
+            if (i == dma_height - 1)
+            {
+                GDMA_LLIStruct[i].SAR = start_address + src_stride * i;
+                GDMA_LLIStruct[i].DAR = (uint32_t)dest_address + dst_stride * i;
+                GDMA_LLIStruct[i].LLP = 0;
+                /* configure low 32 bit of CTL register */
+                GDMA_LLIStruct[i].CTL_LOW = (BIT(0)
+                                             | (RX_GDMA_InitStruct.GDMA_DestinationDataSize << 1)
+                                             | (data_size << 4)
+                                             | (RX_GDMA_InitStruct.GDMA_DestinationInc << 7)
+                                             | (RX_GDMA_InitStruct.GDMA_SourceInc << 9)
+                                             | (RX_GDMA_InitStruct.GDMA_DestinationMsize << 11)
+                                             | (RX_GDMA_InitStruct.GDMA_SourceMsize << 14)
+                                             | (RX_GDMA_InitStruct.GDMA_DIR << 20));
+                /* configure high 32 bit of CTL register */
+                if (total_size == 0)
+                {
+                    GDMA_LLIStruct[i].CTL_HIGH = buffer_size;
+                }
+                else
+                {
+                    GDMA_LLIStruct[i].CTL_HIGH = total_size - i * buffer_size;
+                }
+            }
+            else
+            {
+                GDMA_LLIStruct[i].SAR = start_address + src_stride * i;
+                GDMA_LLIStruct[i].DAR = (uint32_t)dest_address + dst_stride * i;
+                GDMA_LLIStruct[i].LLP = (uint32_t)&GDMA_LLIStruct[i + 1];
+                /* configure low 32 bit of CTL register */
+                GDMA_LLIStruct[i].CTL_LOW = rtl_idu_get_dma_ctl_low_int(dma_channel);
+                /* configure high 32 bit of CTL register */
+                GDMA_LLIStruct[i].CTL_HIGH = buffer_size;
+            }
+        }
+    }
+    GDMA_INTConfig(high_speed_channel, GDMA_INT_Transfer, ENABLE);
+    GDMA_Cmd(high_speed_channel, ENABLE);
+    while (GDMA_GetTransferINTStatus(high_speed_channel) != SET);
+    GDMA_ClearINTPendingBit(high_speed_channel, GDMA_INT_Transfer);
+    if (use_LLI && GDMA_LLIStruct != NULL)
+    {
+        lv_free(GDMA_LLIStruct);
+    }
 }
 
 #endif /*LV_USE_PPE*/
