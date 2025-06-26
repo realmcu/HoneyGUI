@@ -95,6 +95,14 @@ typedef struct gui_img_file
 
 } gui_img_file_t;
 
+typedef struct gui_jpeg_file_head
+{
+    gui_rgb_data_head_t img_header;
+    uint32_t size;
+    uint8_t jpeg[1024];
+
+} gui_jpeg_file_head_t;
+
 #pragma pack(1)
 
 typedef struct imdc_rgb565_node

@@ -8,7 +8,7 @@ src = Split("""
 """)
 
 
-src += ['acc_init.c']
+src += ['acc_api.c']
 src += ['draw_img.c']
 src += ['gui_matrix.c']
 src += ['draw_font.c']

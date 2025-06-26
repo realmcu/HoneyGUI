@@ -25,6 +25,7 @@ extern "C" {
 
 #include "def_type.h"
 #include "def_color.h"
+#include "def_fb.h"
 
 
 
@@ -64,6 +65,9 @@ typedef struct acc_engine
     //todo
     void (*draw_circle)(draw_circle_t *circle, gui_dispdev_t *dc, gui_rect_t *rect);
     void (*blur)(gui_dispdev_t *dc, gui_rect_t *rect, uint8_t blur_degree, void *cache_mem);
+
+    void *(* jpeg_load)(void *input, int len, int *w, int *h, int *channel);
+    void (* jpeg_free)(void *);
     // void (*draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
     // void (*draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
     // void (*draw_line)(canvas_line_t *l, struct gui_dispdev *dc);

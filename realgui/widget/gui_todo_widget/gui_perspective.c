@@ -23,7 +23,7 @@
 #include "tp_algo.h"
 #include "wheel_algo.h"
 #include "draw_img.h"
-#include "acc_init.h"
+#include "acc_api.h"
 #include "gui_matrix.h"
 #include "gui_perspective.h"
 #include "gui_fb.h"

@@ -19,8 +19,7 @@
 extern "C" {
 #endif
 
-void no_rle(draw_img_t *image, gui_dispdev_t *dc,
-            gui_rect_t *rect);
+void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
 
 #ifdef __cplusplus
 }

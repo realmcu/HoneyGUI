@@ -1,6 +1,7 @@
 #include <draw_img.h>
 #include <string.h>
 #include <math.h>
+#include "acc_api.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
 void (* draw_img_acc_end_cb)(struct draw_img *image) = NULL;
@@ -248,6 +249,19 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
+
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
+        gui_jpeg_file_head_t *jpeg = image->data;
+
+        if (head->type == JPEG)
+        {
+            int w = 0;
+            int h = 0;
+            int channel = 0;
+            image->data = gui_acc_jpeg_load(jpeg->jpeg, jpeg->size, &w, &h, &channel);
+            gui_log("JPEG image caching is not supported.\n");
+            return;
+        }
         return;
     }
 
@@ -263,6 +277,14 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
     if ((src_mode == IMG_SRC_FILESYS) || (src_mode == IMG_SRC_FTL))
     {
         gui_free(img->data);
+    }
+    if (src_mode == IMG_SRC_MEMADDR)
+    {
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
+        if (head->type == JPEG)
+        {
+            gui_acc_jpeg_free(img->data);
+        }
     }
 }
 

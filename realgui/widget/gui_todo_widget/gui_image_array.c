@@ -21,7 +21,7 @@
 #include <string.h>
 #include <gui_obj.h>
 #include <draw_img.h>
-#include <acc_init.h>
+#include <acc_api.h>
 #include <gui_matrix.h>
 #include "gui_image_array.h"
 #include <math.h>

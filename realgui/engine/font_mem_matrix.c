@@ -2,7 +2,7 @@
 #include "draw_font.h"
 #include "font_mem.h"
 #include "font_mem_matrix.h"
-#include "acc_init.h"
+#include "acc_api.h"
 #include "font_rendering_utils.h"
 
 static void rtk_draw_unicode_matrix(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,

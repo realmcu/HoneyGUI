@@ -25,7 +25,7 @@
 #include "tp_algo.h"
 #include "def_3d_rect.h"
 #include "draw_img.h"
-#include "acc_init.h"
+#include "acc_api.h"
 #include "gui_fb.h"
 #include <guidef.h>
 

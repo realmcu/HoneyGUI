@@ -22,7 +22,7 @@
 #include <string.h>
 #include <gui_obj.h>
 #include <draw_img.h>
-#include "acc_init.h"
+#include "acc_api.h"
 #include <tp_algo.h>
 
 

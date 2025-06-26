@@ -20,7 +20,7 @@
 #include <string.h>
 #include "gui_img.h"
 #include "gui_obj.h"
-#include "acc_init.h"
+#include "acc_api.h"
 #include "tp_algo.h"
 #include "gui_fb.h"
 
@@ -102,7 +102,7 @@ static void gui_img_prepare(gui_obj_t *obj)
     memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&_this->draw_img->inverse);
-    draw_img_load_scale(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->src_mode);
+    draw_img_load_scale(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
 
 
     draw_img_new_area(_this->draw_img, NULL);
@@ -137,7 +137,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
     // cache img to buffer
 
-    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->src_mode);
+    draw_img_cache(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
 
     if (_this->need_clip)
     {
@@ -155,7 +155,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
 
     // release img if cached
-    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->src_mode);
+    draw_img_free(_this->draw_img, (IMG_SOURCE_MODE_TYPE)_this->storage_type);
 
 }
 /**
@@ -210,7 +210,7 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
 {
     struct gui_rgb_data_head head = {0};
 
-    if (_this->src_mode == IMG_SRC_FILESYS)
+    if (_this->storage_type == IMG_SRC_FILESYS)
     {
         int fd = gui_fs_open(_this->data,  0);
 
@@ -222,12 +222,12 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *_this)
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
     }
-    else if (_this->src_mode == IMG_SRC_FTL)
+    else if (_this->storage_type == IMG_SRC_FTL)
     {
         uint32_t base = (uint32_t)(uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
     }
-    else if (_this->src_mode == IMG_SRC_MEMADDR)
+    else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
         memcpy(&head, _this->data, sizeof(head));
     }
@@ -274,7 +274,7 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 static void gui_img_ctor(gui_img_t            *_this,
                          gui_obj_t            *parent,
                          const char           *name,
-                         IMG_SOURCE_MODE_TYPE  src_mode,
+                         IMG_SOURCE_MODE_TYPE  storage_type,
                          void                 *path,
                          int16_t               x,
                          int16_t               y,
@@ -283,7 +283,7 @@ static void gui_img_ctor(gui_img_t            *_this,
 {
     gui_obj_t *obj = (gui_obj_t *)_this;
 
-    _this->src_mode = src_mode;
+    _this->storage_type = storage_type;
     _this->f_x = 0;
     _this->f_y = 0;
     _this->t_x = 0;
@@ -304,7 +304,7 @@ static void gui_img_ctor(gui_img_t            *_this,
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
-    if (src_mode == IMG_SRC_FILESYS)
+    if (storage_type == IMG_SRC_FILESYS)
     {
 #ifdef _WIN32
         path = gui_filepath_transforming(path);
@@ -312,11 +312,11 @@ static void gui_img_ctor(gui_img_t            *_this,
         _this->data = (void *)path;
         _this->filename = (void *)path;
     }
-    else if (src_mode == IMG_SRC_MEMADDR)
+    else if (storage_type == IMG_SRC_MEMADDR)
     {
         _this->data = (void *)path;
     }
-    else if (src_mode == IMG_SRC_FTL)
+    else if (storage_type == IMG_SRC_FTL)
     {
         _this->data = (void *)path;
         _this->ftl = (void *)path;
@@ -352,7 +352,6 @@ static void gui_img_ctor(gui_img_t            *_this,
     }
 
 }
-
 
 
 /*============================================================================*
@@ -436,7 +435,7 @@ gui_img_t *gui_img_create_from_fs(void       *parent,
 
 uint16_t gui_img_get_width(gui_img_t *_this)
 {
-    if (_this->src_mode == IMG_SRC_FILESYS)
+    if (_this->storage_type == IMG_SRC_FILESYS)
     {
         struct gui_rgb_data_head head;
         head.w = 0;
@@ -451,14 +450,14 @@ uint16_t gui_img_get_width(gui_img_t *_this)
         gui_fs_close(fd);
         return head.w;
     }
-    else if (_this->src_mode == IMG_SRC_FTL)
+    else if (_this->storage_type == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
         uint32_t base = (uint32_t)(uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.w;
     }
-    else if (_this->src_mode == IMG_SRC_MEMADDR)
+    else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->data;
         return head->w;
@@ -469,7 +468,7 @@ uint16_t gui_img_get_width(gui_img_t *_this)
 
 uint16_t gui_img_get_height(gui_img_t *_this)
 {
-    if (_this->src_mode == IMG_SRC_FILESYS)
+    if (_this->storage_type == IMG_SRC_FILESYS)
     {
         struct gui_rgb_data_head head;
         head.h = 0;
@@ -484,14 +483,14 @@ uint16_t gui_img_get_height(gui_img_t *_this)
         gui_fs_close(fd);
         return head.h;
     }
-    else if (_this->src_mode == IMG_SRC_FTL)
+    else if (_this->storage_type == IMG_SRC_FTL)
     {
         struct gui_rgb_data_head head;
         uint32_t base = (uint32_t)(uintptr_t)_this->data;
         gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
         return head.h;
     }
-    else if (_this->src_mode == IMG_SRC_MEMADDR)
+    else if (_this->storage_type == IMG_SRC_MEMADDR)
     {
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_this->data;
         return head->h;

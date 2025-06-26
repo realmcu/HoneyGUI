@@ -24,7 +24,7 @@
 #include "gui_3d_tria.h"
 #include "tp_algo.h"
 #include "draw_img.h"
-#include "acc_init.h"
+#include "acc_api.h"
 #include "gui_fb.h"
 #include <guidef.h>
 

@@ -65,10 +65,8 @@ typedef struct gui_img
 
     uint32_t opacity_value : 8;        /* Opacity value (0-255) */
     uint32_t blend_mode    : 3;        /* Blend mode */
-    uint32_t src_mode      : 3;        /* Source mode */
+    uint32_t storage_type  : 3;        /* Storage type: e.g., file system, flash, etc. */
     uint32_t high_quality  : 1;        /* High quality rendering flag */
-    // uint32_t press_flag    : 1;        /* Press to change picture flag */
-    // uint32_t release_flag  : 1;        /* Release flag */
     uint32_t need_clip     : 1;        /* Clipping flag */
     uint8_t checksum;                  /* Checksum for change detection */
     uint8_t animate_array_length;      /* Animation array length */
