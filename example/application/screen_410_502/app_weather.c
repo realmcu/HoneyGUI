@@ -394,7 +394,7 @@ static void weather_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    weather_list = gui_list_create(obj, "list", 0, 0, 0, 0, 160, 20, HORIZONTAL);
+    weather_list = gui_list_create(obj, "list", 0, 0, 0, 0, 160, 20, HORIZONTAL, 0);
     gui_list_set_offset(weather_list, -55);
 
     gui_list_add_note(weather_list, false);

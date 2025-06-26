@@ -421,9 +421,10 @@ static void app_menu_design(gui_view_t *view)
 
         int length = 100;
         gui_list_t *list = gui_list_create(win, "list", 0, 0, 0, 0, length, space,
-                                           VERTICAL);
+                                           VERTICAL, 1);
         gui_list_set_style(list, LIST_HELIX);
         gui_list_set_offset(list, list_offset_his);
+        gui_list_set_bar_color(list, APP_COLOR_SILVER);
         gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
 
         gui_color_t color_t[] =

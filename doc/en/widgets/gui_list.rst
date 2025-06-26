@@ -20,7 +20,7 @@ Usage
 --------
 Create List Widget
 ~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_list_create` function can be used to create a list widget, the next level of the list widget can only be a table widget. The total length of the list widget is determined by the number of table added, the length of the table, and the space between the tables; as more tables are added, the length increases.
+The :cpp:any:`gui_list_create` function can be used to create a list widget, in which the scroll bar is optional, and the next level of the list widget can only be a table widget. The total length of the list widget is determined by the number of table added, the length of the table, and the space between the tables; as more tables are added, the length increases.
 
 
 Create List Table Widget
@@ -48,6 +48,11 @@ Set List Widget Offset
 ~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_list_set_offset` function can be used to set list offset of position.
 
+
+Set List Widget Scroll Bar Color
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_bar_color` function can be used to set scroll bar color of list widget.
+
 Example
 ---------
 
@@ -66,7 +71,7 @@ Example
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CIRCLE STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745829566941521625/3f80e640_10737458.gif" style="width: 100%;">
+         <img src="https://foruda.gitee.com/images/1750920685777460993/280f951c_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CARD STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
@@ -80,7 +85,7 @@ Example
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL FAN STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745819920755179437/13b09db2_10737458.gif" style="width: 100%;">
+         <img src="https://foruda.gitee.com/images/1750916286131886532/8af671b7_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL HELIX STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">

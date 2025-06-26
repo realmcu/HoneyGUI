@@ -20,7 +20,7 @@
 -----
 创建列表控件
 ~~~~~~~~~~~~~~~~~~
-使用 :cpp:any:`gui_list_create` 函数来创建一个列表控件，列表控件的下一级只能是表格控件。列表控件的总长度由添加的表格数量、表格长度以及表格间隔决定，当添加的表格越多时，其长度也越大。
+使用 :cpp:any:`gui_list_create` 函数来创建一个列表控件（可选滚动条），列表控件的下一级只能是表格控件。列表控件的总长度由添加的表格数量、表格长度以及表格间隔决定，当添加的表格越多时，其长度也越大。
 
 
 创建表格控件
@@ -48,6 +48,11 @@
 ~~~~~~~~~~~~~~~~~~~~~
 使用 :cpp:any:`gui_list_set_offset` 函数设置列表控件的偏移位置。
 
+
+设置列表控件滚动条颜色
+~~~~~~~~~~~~~~~~~~~~~
+使用 :cpp:any:`gui_list_set_bar_color` 函数设置列表控件的滚动条颜色。
+
 示例
 -----
 
@@ -66,7 +71,7 @@
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CIRCLE STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745829566941521625/3f80e640_10737458.gif" style="width: 100%;">
+         <img src="https://foruda.gitee.com/images/1750920685777460993/280f951c_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CARD STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
@@ -80,7 +85,7 @@
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL FAN STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">
-         <img src="https://foruda.gitee.com/images/1745819920755179437/13b09db2_10737458.gif" style="width: 100%;">
+         <img src="https://foruda.gitee.com/images/1750916286131886532/8af671b7_10737458.gif" style="width: 100%;">
          <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL HELIX STYLE</p>
       </div>
       <div style="width: 30%; text-align: center;">

@@ -26,6 +26,7 @@
 #include "tp_algo.h"
 #include "gui_list.h"
 #include "gui_view.h"
+#include "gui_canvas.h"
 
 
 /*============================================================================*
@@ -37,6 +38,9 @@
  *                            Variables
  *============================================================================*/
 static bool g_Limit = false;
+static int16_t g_Bar_Width = 0;
+static int16_t g_Bar_Height = 0;
+static gui_color_t g_Bar_Color = {0};
 
 /*============================================================================*
  *                           Private Functions
@@ -87,6 +91,15 @@ static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
     }
 }
 
+static void update_bar_data_cb(NVGcontext *vg)
+{
+    nvgRoundedRect(vg, 0, 0, g_Bar_Width, g_Bar_Height, 2);
+    nvgFillColor(vg, nvgRGBA(g_Bar_Color.color.rgba.r,
+                             g_Bar_Color.color.rgba.g,
+                             g_Bar_Color.color.rgba.b,
+                             g_Bar_Color.color.rgba.a));
+    nvgFill(vg);
+}
 
 static void gui_list_input_prepare(gui_obj_t *obj)
 {
@@ -173,6 +186,50 @@ static void gui_list_prepare(gui_obj_t *obj)
     }
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
 
+    if (_this->need_update_bar)
+    {
+        _this->need_update_bar = false;
+        if (_this->dir == HORIZONTAL)
+        {
+            g_Bar_Width = obj->w * obj->w / _this->total_length;
+            g_Bar_Height = LIST_BAR_WIDTH;
+            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == obj->w));
+        }
+        else
+        {
+            g_Bar_Width = LIST_BAR_WIDTH;
+            g_Bar_Height = obj->h * obj->h / _this->total_length;
+            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == obj->h));
+        }
+        g_Bar_Color = _this->bar_color;
+        memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, _this->bar->base.w, _this->bar->base.h,
+                                          update_bar_data_cb,
+                                          _this->bar_data);
+
+    }
+
+    if (_this->bar)
+    {
+        float t_x = 0;
+        float t_y = 0;
+        float offset = (float)(_this->offset);
+        offset = (offset > 0) ? 0 : offset;
+        if (_this->dir == HORIZONTAL && _this->total_length > obj->w)
+        {
+            float range = (float)(obj->w - g_Bar_Width);
+            t_x = fabsf(offset) * range / (_this->total_length - obj->w);
+            t_x = (t_x > range) ? range : t_x;
+        }
+        else if (_this->dir == VERTICAL && _this->total_length > obj->h)
+        {
+            float range = (float)(obj->h - g_Bar_Height);
+            t_y = fabsf(offset) * range / (_this->total_length - obj->h);
+            t_y = (t_y > range) ? range : t_y;
+        }
+        gui_img_translate(_this->bar, t_x, t_y);
+    }
+
     uint8_t last = _this->checksum;
     _this->checksum = 0;
     _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, (uint8_t)sizeof(gui_list_t));
@@ -192,6 +249,11 @@ static void gui_list_destroy(gui_obj_t *obj)
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
+
+    if (_this->bar_data)
+    {
+        gui_free(_this->bar_data);
+    }
 }
 
 static void gui_list_end(gui_obj_t *obj)
@@ -547,6 +609,40 @@ static void gui_list_released_cb(void *obj, gui_event_t e, void *param)
     memset(_this->record, 0, sizeof(_this->record));
 }
 
+static void gui_list_create_bar(gui_list_t *_this,
+                                int16_t     x,
+                                int16_t     y,
+                                int16_t     w,
+                                int16_t     h)
+{
+    int bar_x = 0;
+    int bar_y = 0;
+    int bar_w = 0;
+    int bar_h = 0;
+    if (_this->dir == HORIZONTAL)
+    {
+        bar_y = y;
+        bar_w = w;
+        bar_h = LIST_BAR_WIDTH;
+    }
+    else
+    {
+        bar_x = w - LIST_BAR_WIDTH;
+        bar_w = LIST_BAR_WIDTH;
+        bar_h = h;
+    }
+    int pixel_bytes = 4;
+    size_t buffer_size = bar_h * bar_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    _this->bar_data = gui_lower_malloc(buffer_size);
+    memset(_this->bar_data, 0, buffer_size);
+    _this->bar = gui_img_create_from_mem(_this->base.parent, "list_bar", _this->bar_data, bar_x, bar_y,
+                                         bar_w, bar_h);
+    gui_img_set_mode(_this->bar, IMG_SRC_OVER_MODE);
+    _this->bar->base.w = bar_w;
+    _this->bar->base.h = bar_h;
+    _this->need_update_bar = true;
+    _this->bar_color = APP_COLOR_WHITE;
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -558,7 +654,8 @@ gui_list_t *gui_list_create(void       *parent,
                             int16_t     h,
                             uint16_t    note_length,
                             uint8_t     space,
-                            LIST_DIR    dir)
+                            LIST_DIR    dir,
+                            bool        create_bar)
 {
     gui_list_t *_this = gui_malloc(sizeof(gui_list_t));
     gui_dispdev_t *dc = gui_get_dc();
@@ -609,6 +706,11 @@ gui_list_t *gui_list_create(void       *parent,
         gui_obj_add_event_cb(_this, gui_list_pressing_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
     }
     gui_obj_add_event_cb(_this, gui_list_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
+
+    if (create_bar)
+    {
+        gui_list_create_bar(_this, x, y, w, h);
+    }
     return _this;
 }
 
@@ -683,6 +785,11 @@ gui_list_note_t *gui_list_add_note(gui_list_t *list, bool add_at_top)
                             &(GET_BASE(_this)->brother_list));
         }
     }
+    if (list->bar)
+    {
+        list->need_update_bar = true;
+    }
+
     return _this;
 }
 
@@ -699,4 +806,9 @@ void gui_list_set_factor(gui_list_t *list, float factor)
 void gui_list_set_offset(gui_list_t *list, int16_t offset)
 {
     list->offset = offset;
+}
+
+void gui_list_set_bar_color(gui_list_t *list, gui_color_t color)
+{
+    list->bar_color = color;
 }

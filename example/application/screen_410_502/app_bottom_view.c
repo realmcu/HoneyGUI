@@ -409,7 +409,7 @@ static void bottom_view_design(gui_view_t *view)
     // Card list
     int space = 10;
     int length = 157;
-    list = gui_list_create(parent, "list", 0, 0, 0, 0, length, space, VERTICAL);
+    list = gui_list_create(parent, "list", 0, 0, 0, 0, length, space, VERTICAL, 0);
     gui_list_set_style(list, LIST_CARD);
     gui_list_set_offset(list, 215);
 

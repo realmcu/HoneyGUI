@@ -31,6 +31,7 @@ extern "C" {
 #include "gui_fb.h"
 #include "gui_obj.h"
 #include "gui_matrix.h"
+#include "gui_img.h"
 
 /*============================================================================*
  *                         Types
@@ -73,6 +74,11 @@ typedef struct gui_list
     int hold;
     int total_length;
 
+    gui_img_t *bar;
+    void *bar_data;
+    gui_color_t bar_color;
+    bool need_update_bar;
+
     uint8_t checksum;
 } gui_list_t;
 
@@ -102,6 +108,7 @@ typedef struct gui_list_note
 #define GUI_MAX_SPEED 50
 #define GUI_MIN_SPEED 7
 #define LIST_TAB_ANIMATE_MAX 15
+#define LIST_BAR_WIDTH 5
 /*============================================================================*
  *                         Variables
  *============================================================================*/
@@ -132,7 +139,8 @@ gui_list_t *gui_list_create(void       *parent,
                             int16_t     h,
                             uint16_t    note_length,
                             uint8_t     space,
-                            LIST_DIR    dir);
+                            LIST_DIR    dir,
+                            bool        create_bar);
 
 /**
  * @brief Add list note.
@@ -163,6 +171,12 @@ void gui_list_set_factor(gui_list_t *list, float factor);
  */
 void gui_list_set_offset(gui_list_t *list, int16_t offset);
 
+/**
+ * @brief Set list bar color.
+ * @param list Pointer to the list widget.
+ * @param color The list bar color.
+ */
+void gui_list_set_bar_color(gui_list_t *list, gui_color_t color);
 
 #ifdef __cplusplus
 }

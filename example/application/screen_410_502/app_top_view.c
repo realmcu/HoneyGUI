@@ -39,7 +39,7 @@ typedef struct information
 #define NOTE_HEIGHT 220
 #define NOTE_INTERVAL 20
 #define NOTE_START 140
-#define INFOR_NUM_MAX 3
+#define INFOR_NUM_MAX 4
 #define CURRENT_VIEW_NAME "app_top_view"
 
 /*============================================================================*
@@ -269,12 +269,14 @@ static void clear_list_note(gui_list_note_t *note)
     list->total_length -= (list->note_length + list->space);
     list->total_length = list->total_length < SCREEN_HEIGHT ? SCREEN_HEIGHT : list->total_length;
     list->widget_num--;
+    list->need_update_bar = true;
     index = infor_num - 1 - index;
     gui_free(infor_rec[index]);
     // gui_log("free infor_rec[%d]\n", index);
     while (index < infor_num - 1)
     {
         infor_rec[index] = infor_rec[index + 1];
+        infor_rec[index + 1] = NULL;
         index++;
     }
     infor_num--;
@@ -471,11 +473,14 @@ static void clear_all_timer_cb(void *widget)
 
         list->total_length = gui_get_dc()->screen_height;
         list->widget_num = 0;
+        list->need_update_bar = true;
         while (infor_num)
         {
             infor_num--;
             gui_free(infor_rec[infor_num]);
+            infor_rec[infor_num] = NULL;
         }
+        infor_need_update_num = 0;
         gui_obj_stop_timer(GUI_BASE(widget));
         clear_flag = false;
     }
@@ -518,8 +523,9 @@ static void top_view_design(gui_view_t *view)
                                                           SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
 
     list = gui_list_create(view, "list", 0, NOTE_START, SCREEN_WIDTH, SCREEN_HEIGHT, NOTE_HEIGHT,
-                           NOTE_INTERVAL, VERTICAL);
+                           NOTE_INTERVAL, VERTICAL, 1);
     gui_list_set_style(list, LIST_CLASSIC);
+    gui_list_set_bar_color(list, APP_COLOR_GRAY);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
     gui_obj_start_timer(GUI_BASE(list));
 
