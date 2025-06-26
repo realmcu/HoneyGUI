@@ -43,8 +43,7 @@ extensions = ["breathe",
               "sphinx_copybutton",
               "sphinx_rtd_theme",
               "sphinx.ext.intersphinx",
-              "sphinxcontrib.mermaid",
-              "ai_ask.generate_ai_ask_src",]
+              "sphinxcontrib.mermaid",]
 
 myst_enable_extensions = [
     # "amsmath",
@@ -248,6 +247,6 @@ def setup(app):
     try:
         from ai_ask.generate_ai_ask_src import setup as ai_ask_src_setup
         ai_ask_src_setup(app)
-    except Exception as e:
-        print(f"Import ai_ask_src_setup error: {e}")
+    except:
+        print(f"Import ai_ask_src_setup error")
     add_google_analytics(app, html_theme_options)
