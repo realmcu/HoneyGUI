@@ -318,20 +318,15 @@ static void gui_3d_rect_draw_front_prepare(gui_3d_t *this)
 
     gui_3d_camera_build_UVN_matrix(&this->camera);
 
-    for (size_t i = 0; i < this->desc->num_shapes; i++)
+    for (size_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
+        // local transform
+        if (this->face_transform_cb != NULL)
         {
-            size_t face_offset = this->desc->shapes[i].face_offset + j;
-
-            // local transform
-            if (this->face_transform_cb != NULL)
-            {
-                transform_matrix = this->face_transform_cb(this, face_offset);
-            }
-
-            gui_3d_rect_face_transfrom(this, face_offset, &transform_matrix, &this->camera);
+            transform_matrix = this->face_transform_cb(this, i);
         }
+
+        gui_3d_rect_face_transfrom(this, i, &transform_matrix, &this->camera);
     }
 
     if (tp->type == TOUCH_SHORT)
@@ -393,23 +388,17 @@ static void gui_3d_rect_draw_front_sort_prepare(gui_3d_t *this)
 
     gui_3d_camera_build_UVN_matrix(&this->camera);
 
-    for (size_t i = 0; i < this->desc->num_shapes; i++)
+    for (size_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
-        for (size_t j = 0; j < this->desc->shapes[i].length /*number of face*/; j++)
+        // local transform
+        if (this->face_transform_cb != NULL)
         {
-            size_t face_offset = this->desc->shapes[i].face_offset + j;
-
-            // local transform
-            if (this->face_transform_cb != NULL)
-            {
-                transform_matrix = this->face_transform_cb(this, face_offset);
-            }
-
-            gui_3d_rect_scene(this->face.rect_face + face_offset, face_offset, &this->desc->attrib,
-                              &transform_matrix, &this->camera);
-
-
+            transform_matrix = this->face_transform_cb(this, i);
         }
+
+        gui_3d_rect_scene(this->face.rect_face + i, i, &this->desc->attrib,
+                          &transform_matrix, &this->camera);
+
     }
 
     gui_3d_generate_rect_img(this, this->camera.viewport_width, this->camera.viewport_height);

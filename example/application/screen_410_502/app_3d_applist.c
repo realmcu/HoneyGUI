@@ -110,10 +110,10 @@ static void update_applist_animation()
 
 static void applist_global_cb(gui_3d_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 5), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 15), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 20, 0, 0, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, 0, 15, 0, 0, 0, 5);
 
 }
 
@@ -152,10 +152,11 @@ static void app_click_on_cb(gui_3d_t *this)
     this->base.y = 46;
     this->base.w = 410;
     this->base.h = 410;
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 5), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, -15), gui_point_4d(0, 0, 0), 1,
+                                 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 20 - click_on_shift_z, 0, click_on_rot_y, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, 0, -click_on_shift_z, 0, click_on_rot_y, 0, 5);
 }
 
 static void gui_app_switch(gui_3d_t *this)
@@ -181,7 +182,6 @@ static void gui_app_switch(gui_3d_t *this)
 static void applist_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
@@ -192,23 +192,23 @@ static void applist_app(gui_view_t *view)
 
     gui_3d_t *app2_3d = gui_3d_create(obj, "app2", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 100, 50, 200, 200);
-    gui_3d_set_face_image(app2_3d, 0, ALIPAY_BIN);
+    gui_3d_set_face_image(app2_3d, 5, ALIPAY_BIN);
 
     gui_3d_t *app3_3d = gui_3d_create(obj, "app3", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 200, 50, 200, 200);
-    gui_3d_set_face_image(app3_3d, 0, MUSIC_BIN);
+    gui_3d_set_face_image(app3_3d, 5, MUSIC_BIN);
 
     gui_3d_t *app4_3d = gui_3d_create(obj, "app4", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 0, 200, 200, 200);
-    gui_3d_set_face_image(app4_3d, 0, QQ_BIN);
+    gui_3d_set_face_image(app4_3d, 5, QQ_BIN);
 
     gui_3d_t *app5_3d = gui_3d_create(obj, "app5", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 100, 200, 200, 200);
-    gui_3d_set_face_image(app5_3d, 0, VOICE_BIN);
+    gui_3d_set_face_image(app5_3d, 5, VOICE_BIN);
 
     gui_3d_t *app6_3d = gui_3d_create(obj, "app6", DESC_APP_BIN,
                                       GUI_3D_DRAW_FRONT_ONLY, 200, 200, 200, 200);
-    gui_3d_set_face_image(app6_3d, 0, WECHAT_BIN);
+    gui_3d_set_face_image(app6_3d, 5, WECHAT_BIN);
 
 
     add_to_applist(app1_3d);

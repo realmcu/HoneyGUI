@@ -147,10 +147,10 @@ static void fish0_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish0_x, fish0_y, 0, 0, 0, fish0_rz,
+    gui_3d_world_inititalize(&this->world, -fish0_x, -fish0_y, 80, 0, 0, fish0_rz,
                              4);
 
 }
@@ -158,10 +158,10 @@ static void fish0_shadow_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish0_x - 4, fish0_y - 5, 0, 0, 0, fish0_rz,
+    gui_3d_world_inititalize(&this->world, 4.0f - fish0_x, 5.0f - fish0_y, 80, 0, 0, fish0_rz,
                              4);
 
 }
@@ -169,10 +169,10 @@ static void fish1_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish1_x, fish1_y, 0, 0, 0, fish1_rz,
+    gui_3d_world_inititalize(&this->world, -fish1_x, -fish1_y, 80, 0, 0, fish1_rz,
                              4);
 
 }
@@ -180,10 +180,10 @@ static void fish1_shadow_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish1_x - 4, fish1_y - 5, 0, 0, 0, fish1_rz,
+    gui_3d_world_inititalize(&this->world, 4.0f - fish1_x, 5.0f - fish1_y, 80, 0, 0, fish1_rz,
                              4);
 
 }
@@ -191,10 +191,10 @@ static void fish2_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish2_x, fish2_y, 0, 0, 0, fish2_rz,
+    gui_3d_world_inititalize(&this->world, -fish2_x, -fish2_y, 80, 0, 0, fish2_rz,
                              4);
 
 }
@@ -202,10 +202,10 @@ static void fish2_shadow_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish2_x - 4, fish2_y - 5, 0, 0, 0, fish2_rz,
+    gui_3d_world_inititalize(&this->world, 4.0f - fish2_x, 5.0f - fish2_y, 80, 0, 0, fish2_rz,
                              4);
 
 }

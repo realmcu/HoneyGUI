@@ -80,10 +80,10 @@ static void face_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 70), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 50), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 0, 25, 120, 0, rot_angle, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, 22, 50, 0, rot_angle, 0, 5);
 }
 
 static void face_app(gui_view_t *view)

@@ -583,7 +583,7 @@ bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t camera
     }
     else
     {
-        camera->d = (0.5f) * (camera->viewplane_width) * tanf(fov);
+        camera->d = (0.5f) * (camera->viewplane_width) * tanf(fov * M_PI / 180.0f);
     }
     //camera->zbuffer=(float *)malloc(sizeof(float)*camera->viewport_height*camera->viewport_width);
     //return camera->zbuffer!=NULL;
@@ -608,8 +608,8 @@ void gui_3d_camera_build_UVN_matrix(gui_3d_camera_t *camera)
     n.w = 1;
 
     n = gui_point_4d_unit(n);
-    v = gui_point_4d(0, 1, 0);
-    u = gui_point_4d_cross(v, n);
+    v = gui_point_4d(0, -1, 0);  // up is -y
+    u = gui_point_4d_cross(n, v);  // Right handed system U = N x V
     v = gui_point_4d_cross(n, u);
     gui_3d_matrix_zero(&mt_uvn);
     mt_uvn._11 = u.x;
@@ -791,9 +791,7 @@ static void gui_3d_fill_image_rgb565(int y, float xleft, float xright, float one
             int pixelIdx = ix + rowOffset;
             uint16_t originalColor = src_pixels[srcX + srcY * src_head_w];
 
-            bool depthTestPassed = (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ);
-
-            if (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ)
+            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
             {
                 // Completely opaque pixel processing
                 zbuffer[pixelIdx] = originalZ;
@@ -844,9 +842,7 @@ static void gui_3d_fill_image_argb8888(int y, float xleft, float xright, float o
             uint8_t alpha = (originalColor >> 24) & 0xFF;
             alpha = (alpha * opacity_value) / 255;
 
-            bool depthTestPassed = (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ);
-
-            if (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ)
+            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
             {
                 // Completely opaque pixel processing
                 if (alpha == 255)
@@ -906,7 +902,8 @@ static void gui_3d_fill_color_rgb565(float y, float xleft, float xright, float o
     {
         int pixelIdx = ix + rowOffset;
         const float originalZ = 1.0f / oneoverz;
-        if (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ)
+
+        if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
         {
             zbuffer[pixelIdx] = originalZ;
             pixelData[pixelIdx] = color;
@@ -939,7 +936,7 @@ static void gui_3d_fill_color_argb8888(float y, float xleft, float xright, float
         {
             int pixelIdx = ix + rowOffset;
             const float originalZ = 1.0f / oneoverz;
-            if (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ)
+            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
             {
                 zbuffer[pixelIdx] = originalZ;
                 pixelData[pixelIdx] = color;
@@ -957,8 +954,9 @@ static void gui_3d_fill_color_argb8888(float y, float xleft, float xright, float
         {
             int pixelIdx = ix + rowOffset;
             const float originalZ = 1.0f / oneoverz;
-            if (zbuffer[pixelIdx] == 0 || zbuffer[pixelIdx] < originalZ)
+            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
             {
+                zbuffer[pixelIdx] = originalZ;
                 const uint32_t dstColor = pixelData[pixelIdx];
 
                 const uint16_t dstR = (dstColor >> 16) & 0xFF;

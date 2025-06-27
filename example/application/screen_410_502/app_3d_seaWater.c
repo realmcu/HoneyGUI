@@ -50,14 +50,14 @@ static bool wave_active = false;
 static uint32_t wave_start_time = 0;
 static const uint32_t WAVE_DURATION_MS = 5000;
 
-int fish0_x = 70;
-int fish0_y = -50;
-int fish1_x = -70;
-int fish1_y = -40;
-int fish2_x = 50;
-int fish2_y = -60;
-int fish3_x = 45;
-int fish3_y = -45;
+int fish0_x = -70;
+int fish0_y = 50;
+int fish1_x = 70;
+int fish1_y = 40;
+int fish2_x = -50;
+int fish2_y = 60;
+int fish3_x = -45;
+int fish3_y = 45;
 static void *display_time_resource_def[] =
 {
     NUM0_BIN,
@@ -243,22 +243,22 @@ static void fish_animate_cb(void *parent)
             float pos = rand() % 161;;
             fish_pos_x[i] = pos;
         }
-        if (fish0_x < -90)
+        if (fish0_x > 90)
         {
             // uint16_t i = rand() % 161; //-90~70
             fish0_x = 70 - fish_pos_x[0]; // -90~70
             // -50~-30
         }
-        if (fish1_x > 80)
+        if (fish1_x < -80)
         {
             // uint16_t i = rand() % 161; //-90~70
             fish1_x = fish_pos_x[1] - 70; // -90~70
         }
-        if (fish2_x < -90)
+        if (fish2_x > 90)
         {
             fish2_x = 70 - fish_pos_x[2]; // -90~70
         }
-        if (fish3_x < -90)
+        if (fish3_x > 90)
         {
             fish3_x = 70 - fish_pos_x[3]; // -90~70
         }
@@ -269,48 +269,48 @@ static void fish_animate_cb(void *parent)
         uint32_t current_time = gui_ms_get();
         if ((current_time - fish_last_bubble_time[0] > 200) && (fish0_x < 70))
         {
-            create_bubble(fish_x_to_screen(fish0_x), -(fish0_y - 80));
+            create_bubble(fish_x_to_screen(fish0_x), (fish0_y + 80));
             fish_last_bubble_time[0] = current_time;
         }
 
         if (current_time - fish_last_bubble_time[1] > 400)
         {
-            create_bubble(fish_x_to_screen(fish1_x), -(fish1_y - 80));
+            create_bubble(fish_x_to_screen(fish1_x), (fish1_y + 80));
             fish_last_bubble_time[1] = current_time;
         }
 
         if (current_time - fish_last_bubble_time[2] > 600)
         {
-            create_bubble(fish_x_to_screen(fish2_x), -(fish2_y - 80));
+            create_bubble(fish_x_to_screen(fish2_x), (fish2_y + 80));
             fish_last_bubble_time[2] = current_time;
         }
 
         if (current_time - fish_last_bubble_time[3] > 800)
         {
-            create_bubble(fish_x_to_screen(fish3_x), -(fish3_y - 80));
+            create_bubble(fish_x_to_screen(fish3_x), (fish3_y + 80));
             fish_last_bubble_time[3] = current_time;
         }
         if (fish0)
         {
-            fish0_x -= 1;
+            fish0_x += 1;
             fish_time += 0.1f;
             fish_angle = 10.0f * sinf(fish_time);
         }
         if (fish1)
         {
-            fish1_x += 1;
+            fish1_x -= 1;
             fish_time += 0.1f;
             fish_angle = 10.0f * sinf(fish_time);
         }
         if (fish2)
         {
-            fish2_x -= 1.2f;
+            fish2_x += 1.2f;
             fish_time += 0.1f;
             fish_angle = 10.0f * sinf(fish_time);
         }
         if (fish3)
         {
-            fish3_x -= 1;
+            fish3_x += 1;
             fish_time += 0.1f;
             fish_angle = 10.0f * sinf(fish_time);
         }
@@ -323,10 +323,10 @@ static void fish0_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish0_x, fish0_y, 0, 0, 0, 0,
+    gui_3d_world_inititalize(&this->world, -fish0_x, fish0_y, 80, 0, 0, 0,
                              5);
 
 }
@@ -334,10 +334,10 @@ static void fish1_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish1_x, fish1_y, 0, 0, 0, 0,
+    gui_3d_world_inititalize(&this->world, fish1_x, fish1_y, 80, 0, 0, 0,
                              5);
 
 }
@@ -345,10 +345,10 @@ static void fish2_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish2_x, fish2_y, 0, 0, 0, 0,
+    gui_3d_world_inititalize(&this->world, -fish2_x, fish2_y, 80, 0, 0, 0,
                              5);
 
 }
@@ -356,10 +356,10 @@ static void fish3_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, fish3_x, fish3_y, 0, 0, 0, 0,
+    gui_3d_world_inititalize(&this->world, -fish3_x, fish3_y, 80, 0, 0, 0,
                              5);
 }
 static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)

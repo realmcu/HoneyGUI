@@ -37,18 +37,10 @@ typedef struct
 } gui_prism_mirror3d_t;
 
 static Position_pos_t prism_world_pos_temp = {0.0f, 0.0f, 0.0f};
-static Position_pos_t prism_camera_pos_temp = {0.0f, 0.0f, 0.0f};
 static Position_rot_t prism_world_rot_temp = {0.0f, 0.0f, 0.0f};
 
-
-
 static Position_pos_t prism_world_pos_raw = {0.0f, 0.0f, 0.0f};
-static Position_pos_t prism_camera_pos_raw = {0.0f, 0.0f, 0.0f};
-static Position_rot_t prism_world_rot_raw = {0.0f, 0.0f, 0.0f};
-
 static Position_pos_t prism_world_pos_target = {0.0f, 0.0f, 0.0f};
-static Position_pos_t prism_camera_pos_target = {0.0f, 0.0f, 0.0f};
-static Position_rot_t prism_world_rot_target = {0.0f, 0.0f, 0.0f};
 
 static gui_prism_mirror3d_t *prism_mirror3d = NULL;
 static gui_3d_t *prism_3d = NULL;
@@ -162,9 +154,8 @@ static void prism_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(prism_camera_pos_temp.pos_x,
-                                                             prism_camera_pos_temp.pos_y, prism_camera_pos_temp.pos_z),
-                                 gui_point_4d(0, 0, 0), 0, 0,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0),
+                                 gui_point_4d(0, 0, prism_world_pos_temp.pos_z), 0, 0,
                                  90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, prism_world_pos_temp.pos_x, prism_world_pos_temp.pos_y,
@@ -211,18 +202,6 @@ static void prism_mirror3d_render_animate_cb()
                                  (prism_world_pos_target.pos_y - prism_world_pos_raw.pos_y) * progress_percent;
     prism_world_pos_temp.pos_z = prism_world_pos_raw.pos_z +
                                  (prism_world_pos_target.pos_z - prism_world_pos_raw.pos_z) * progress_percent;
-    prism_world_rot_temp.rot_x = prism_world_rot_raw.rot_x +
-                                 (prism_world_rot_target.rot_x - prism_world_rot_raw.rot_x) * progress_percent;
-    // prism_world_rot_temp.rot_y = prism_world_rot_raw.rot_y +
-    //     (prism_world_rot_target.rot_y - prism_world_rot_raw.rot_y) * progress_percent;
-    prism_world_rot_temp.rot_z = prism_world_rot_raw.rot_z +
-                                 (prism_world_rot_target.rot_z - prism_world_rot_raw.rot_z) * progress_percent;
-    prism_camera_pos_temp.pos_x = prism_camera_pos_raw.pos_x +
-                                  (prism_camera_pos_target.pos_x - prism_camera_pos_raw.pos_x) * progress_percent;
-    prism_camera_pos_temp.pos_y = prism_camera_pos_raw.pos_y +
-                                  (prism_camera_pos_target.pos_y - prism_camera_pos_raw.pos_y) * progress_percent;
-    prism_camera_pos_temp.pos_z = prism_camera_pos_raw.pos_z +
-                                  (prism_camera_pos_target.pos_z - prism_camera_pos_raw.pos_z) * progress_percent;
 
     gui_3d_set_global_transform_cb(prism_3d, (gui_3d_global_transform_cb)prism_global_cb);
     if (progress_percent == 1)
@@ -291,9 +270,6 @@ static void gui_prism_mirror3d_swap_states()
     prism_world_pos_raw = prism_world_pos_target;
     prism_world_pos_target = temp;
 
-    Position_pos_t temp1 = prism_camera_pos_raw;
-    prism_camera_pos_raw = prism_camera_pos_target;
-    prism_camera_pos_target = temp1;
     progress_percent = 0.0f;
 }
 static void gui_prism_mirror3d_enter_animate()
@@ -320,28 +296,12 @@ static void prism_view_switch_to_other_view()
 static void prism_position_init()
 {
     prism_world_pos_raw.pos_x = 0.0f;
-    prism_world_pos_raw.pos_y = 10.0f;
-    prism_world_pos_raw.pos_z = 95.0f;
-
-    prism_camera_pos_raw.pos_x = 0.0f;
-    prism_camera_pos_raw.pos_y = 3.0f;
-    prism_camera_pos_raw.pos_z = 55.0f;
-
-    prism_world_rot_raw.rot_x = 0.0f;
-    prism_world_rot_raw.rot_y = 0.0f;
-    prism_world_rot_raw.rot_z = 0.0f;
+    prism_world_pos_raw.pos_y = 7.0f;
+    prism_world_pos_raw.pos_z = 40.0f;
 
     prism_world_pos_target.pos_x = 0.0f;
     prism_world_pos_target.pos_y = 11.3f;
-    prism_world_pos_target.pos_z = 109.0f;
-
-    prism_camera_pos_target.pos_x = 0.0f;
-    prism_camera_pos_target.pos_y = 0.0f;
-    prism_camera_pos_target.pos_z = 80.0f;
-
-    prism_world_rot_target.rot_x = 0.0f;
-    prism_world_rot_target.rot_y = 0.0f;
-    prism_world_rot_target.rot_z = 0.0f;
+    prism_world_pos_target.pos_z = 29.0f;
 }
 static void app_ui_prism_mirror_design(gui_view_t *view)
 {

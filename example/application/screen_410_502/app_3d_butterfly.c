@@ -128,8 +128,8 @@ static void update_animation()
             wing_time += 0.2f + (1.0f - flight_progress) * 0.2f;
             wing_angle = 60.0f * sinf(wing_time);
 
-            butterfly_x = -source_dx;
-            butterfly_y = -source_dy;
+            butterfly_x = source_dx;
+            butterfly_y = source_dy;
 
             butterfly_z = 30.0f * (4.0f * flight_progress * (0.8f - flight_progress));
         }
@@ -151,10 +151,11 @@ static void butterfly_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 40), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 40), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, butterfly_z, 0, 0, butterfly_rz,
+    gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, 40.0f - butterfly_z, 0, 0,
+                             butterfly_rz,
                              5);
 
 }

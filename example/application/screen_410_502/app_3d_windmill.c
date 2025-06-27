@@ -163,10 +163,10 @@ static void update_windmill_animation()
 
 static void windmill_global_cb(gui_3d_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 40), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 40), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 80, 0, rot_y_angle, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, 0, 40, 0, rot_y_angle, 0, 5);
 
 }
 static gui_3d_matrix_t windmill_face_cb(gui_3d_t *this, size_t face_index)

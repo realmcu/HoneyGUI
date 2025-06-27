@@ -56,15 +56,9 @@ static gui_view_descriptor_t const descriptor =
 };
 
 /* Animation Variables */
-static Position camera_pos_raw = {0.0f, 6.0f, 15.0f};
-static Position world_pos_raw = {0.0f, 13.0f, 45.0f};
-static Rotation world_rot_raw = {0.0f, 0.0f, 0.0f};
+static Position world_pos_raw = {0.0f, 7.0f, 30.0f};
+static Position world_pos_target = {0.0f, 0.0f, 17.5f};
 
-static Position camera_pos_target = {0.0f, 0.0f, 15.0f};
-static Position world_pos_target = {0.0f, 0.0f, 32.5f};
-static Rotation world_rot_target = {0.0f, 0.0f, 0.0f};
-
-static Position camera_pos_temp = {0.0f, 0.0f, 0.0f};
 static Position world_pos_temp = {0.0f, 0.0f, 0.0f};
 static Rotation world_rot_temp = {0.0f, 0.0f, 0.0f};
 
@@ -122,12 +116,13 @@ static void update_prism_thick_angle()
 
 static void prism_thick_global_cb(gui_3d_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(camera_pos_temp.pos_x,
-                                                             camera_pos_temp.pos_y, camera_pos_temp.pos_z),
-                                 gui_point_4d(0, 0, 0), 1, 32767, 90, this->base.w, this->base.h);
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0),
+                                 gui_point_4d(world_pos_temp.pos_x, world_pos_temp.pos_y, world_pos_temp.pos_z),
+                                 1, 32767, 90, this->base.w, this->base.h);
 
     gui_3d_world_inititalize(&this->world, world_pos_temp.pos_x, world_pos_temp.pos_y,
-                             world_pos_temp.pos_z, 0, world_rot_temp.rot_y, 0, 5);
+                             world_pos_temp.pos_z,
+                             0, world_rot_temp.rot_y, 0, 5);
 
 }
 
@@ -137,9 +132,6 @@ static void gui_prism_thick_swap_states()
     world_pos_raw = world_pos_target;
     world_pos_target = temp;
 
-    Position temp1 = camera_pos_raw;
-    camera_pos_raw = camera_pos_target;
-    camera_pos_target = temp1;
     progress_percent = 0.0f;
 }
 
@@ -161,13 +153,6 @@ static void prism_thick_render_animate_cb(void *param)
                            (world_pos_target.pos_y - world_pos_raw.pos_y) * progress_percent;
     world_pos_temp.pos_z = world_pos_raw.pos_z +
                            (world_pos_target.pos_z - world_pos_raw.pos_z) * progress_percent;
-
-    camera_pos_temp.pos_x = camera_pos_raw.pos_x +
-                            (camera_pos_target.pos_x - camera_pos_raw.pos_x) * progress_percent;
-    camera_pos_temp.pos_y = camera_pos_raw.pos_y +
-                            (camera_pos_target.pos_y - camera_pos_raw.pos_y) * progress_percent;
-    camera_pos_temp.pos_z = camera_pos_raw.pos_z +
-                            (camera_pos_target.pos_z - camera_pos_raw.pos_z) * progress_percent;
 
 
     if (progress_percent == 1)
@@ -205,6 +190,17 @@ static void prism_thick_on_face_click_cb(void *obj, gui_event_t e, void *param)
 
 }
 
+static void prism_thick_position_init()
+{
+    world_pos_raw.pos_x = 0.0f;
+    world_pos_raw.pos_y = 7.0f;
+    world_pos_raw.pos_z = 30.0f;
+
+    world_pos_target.pos_x = 0.0f;
+    world_pos_target.pos_y = 0.0f;
+    world_pos_target.pos_z = 17.5f;
+}
+
 static void prism_thick_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
@@ -218,6 +214,7 @@ static void prism_thick_app(gui_view_t *view)
                                              410, 502);
 
     gui_3d_set_global_transform_cb(prism_thick_3d, (gui_3d_global_transform_cb)prism_thick_global_cb);
+    prism_thick_position_init();
 
     gui_prism_thick_enter_animate(prism_thick_3d);
     gui_3d_on_click(prism_thick_3d, prism_thick_on_face_click_cb, NULL);

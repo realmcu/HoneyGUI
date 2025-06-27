@@ -119,10 +119,10 @@ static void disc_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 40), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 50), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 0, -5, 90, -65 + rot_x_angle, 0, 0, 5);
+    gui_3d_world_inititalize(&this->world, 0, -5, 50, -65 + rot_x_angle, 0, 0, 5);
 
 }
 

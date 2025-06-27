@@ -137,7 +137,7 @@ void update_butterfly0()
     butterfly0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta0);
     butterfly0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta0);
 
-    butterfly0_rz = theta0 * rotation_factor + sinf(theta0 * 5) * 2.0f;;
+    butterfly0_rz = theta0 * rotation_factor + sinf(theta0 * 5) * 2.0f;
     // gui_log("butterfly0_rz %f\n",butterfly0_rz);
 
     theta0 += angular_velocity;
@@ -179,20 +179,20 @@ static void butterfly0_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, butterfly0_x, butterfly0_y, 0, 0, 0, butterfly0_rz,
+    gui_3d_world_inititalize(&this->world, -butterfly0_x, -butterfly0_y, 80, 0, 0, butterfly0_rz,
                              4);
 }
 static void butterfly1_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, butterfly1_x, butterfly1_y, 0, 0, 0, butterfly1_rz,
+    gui_3d_world_inititalize(&this->world, -butterfly1_x, -butterfly1_y, 80, 0, 0, butterfly1_rz,
                              4);
 }
 
@@ -200,10 +200,10 @@ static void butterfly2_global_cb(gui_3d_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 80), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, butterfly2_x, butterfly2_y, 0, 0, 0, butterfly2_rz,
+    gui_3d_world_inititalize(&this->world, -butterfly2_x, -butterfly2_y, 80, 0, 0, butterfly2_rz,
                              4);
 }
 
@@ -811,19 +811,12 @@ static void app_ui_butterflys_design(gui_view_t *view)
     init_butterfly_bg(butterfly2);
 
     gui_obj_create_timer(&(butterfly0->base), 17, true, update_butterfly0);
-    gui_obj_start_timer(&(butterfly0->base));
-
     gui_obj_create_timer(&(butterfly1->base), 17, true, update_butterfly1);
-    gui_obj_start_timer(&(butterfly1->base));
-
     gui_obj_create_timer(&(butterfly2->base), 17, true, update_butterfly2);
-    gui_obj_start_timer(&(butterfly2->base));
 
     gui_obj_create_timer(&(butterfly0_wing_win->base), 17, true, update_particles);
-    gui_obj_start_timer(&(butterfly0_wing_win->base));
     gui_obj_create_timer(&(butterfly1_wing_win->base), 17, true, update_particles1);
-    gui_obj_start_timer(&(butterfly1_wing_win->base));
     gui_obj_create_timer(&(butterfly2_wing_win->base), 17, true, update_particles2);
-    gui_obj_start_timer(&(butterfly2_wing_win->base));
+
 
 }

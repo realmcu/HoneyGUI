@@ -142,10 +142,10 @@ static void update_digital_clock_animation(void *param)
 
 static void digital_clock_global_cb(gui_3d_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 20), gui_point_4d(0, 0, 0), 1, 32767,
+    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 10), 1, 32767,
                                  90, this->base.w, this->base.h);
 
-    gui_3d_world_inititalize(&this->world, 2, 2.5, 45, 20.0f + rot_x, rot_y, 0, 5);
+    gui_3d_world_inititalize(&this->world, 2, 2.5, 25, 20.0f + rot_x, rot_y, 0, 5);
 
 }
 
