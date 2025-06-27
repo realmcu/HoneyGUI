@@ -9,7 +9,7 @@ if(1) #set to 1 to enable or variable to for depnedency
 
     file(GLOB HEADERS "*.h" "*.hpp")
 	set(SOURCES
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_init.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_api.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/draw_img.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/gui_matrix.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/draw_font.c"

@@ -99,6 +99,7 @@ typedef struct gui_jpeg_file_head
 {
     gui_rgb_data_head_t img_header;
     uint32_t size;
+    uint32_t dummy;
     uint8_t jpeg[1024];
 
 } gui_jpeg_file_head_t;
