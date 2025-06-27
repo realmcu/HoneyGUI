@@ -301,7 +301,7 @@ void close()
 {
     if (world)
     {
-        Heart_Particles.clear();
+        std::vector<Heart>().swap(Heart_Particles);
 
         world->~b2World();
         gui_free(world);

@@ -160,7 +160,7 @@ void win_release_callback()
     {
         world->DestroyBody(body);
     }
-    temporaryBodies.clear();
+    std::vector<b2Body *>().swap(temporaryBodies);
 }
 // Maintain minimum linear velocity to avoid stopping
 // Maintain minimum linear velocity to avoid stopping
@@ -210,7 +210,8 @@ void close()
         {
             gui_free((void *)gui_img_get_image_data(ball.img));
         }
-        balls.clear();
+        std::vector<Ball>().swap(balls);
+
         win_release_callback();
         world->~b2World();
         gui_free(world);

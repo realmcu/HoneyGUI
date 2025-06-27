@@ -443,7 +443,7 @@ void close()
 
     if (world)
     {
-        capsules.clear();
+        std::vector<Capsule>().swap(capsules);
         world->~b2World();
         gui_free(world);
         world = nullptr;

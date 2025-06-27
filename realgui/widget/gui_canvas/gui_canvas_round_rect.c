@@ -527,6 +527,7 @@ static void gui_canvas_round_rect_end(gui_canvas_round_rect_t *this)
     if (this->use_external_picture == false) {if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}}
     if (draw_img_acc_end_cb != NULL)
     {
+        IMG_DATA_FREE(this->rect_0);
         IMG_DATA_FREE(this->rect_1);
         IMG_DATA_FREE(this->rect_2);
         IMG_DATA_FREE(this->circle_00);
