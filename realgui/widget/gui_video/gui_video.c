@@ -336,6 +336,7 @@ static void gui_video_draw(gui_obj_t *obj)
 
         gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
         pheader->type = this->header.type;
+        pheader->jpeg = false;
 
         // gui_log("this frame_buff  0x%x\n", this->frame_buff);
 
