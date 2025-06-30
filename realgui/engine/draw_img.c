@@ -259,6 +259,8 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
             int h = 0;
             int channel = 0;
             image->data = gui_acc_jpeg_load(jpeg->jpeg, jpeg->size, &w, &h, &channel);
+            image->img_w = w;
+            image->img_h = h;
             gui_log("JPEG image caching is not supported.\n");
             return;
         }
@@ -281,7 +283,7 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
     if (src_mode == IMG_SRC_MEMADDR)
     {
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
-        if (head->type == JPEG)
+        if (head->jpeg)
         {
             gui_acc_jpeg_free(img->data);
         }

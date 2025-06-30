@@ -38,7 +38,8 @@ typedef struct gui_rgb_data_head
     unsigned char align : 1;
     unsigned char resize: 2; //0-no resize;1-50%(x&y);2-70%;3-80%
     unsigned char compress: 1;
-    unsigned char rsvd : 3;
+    unsigned char jpeg: 1;
+    unsigned char rsvd : 2;
     char type;
     short w;
     short h;

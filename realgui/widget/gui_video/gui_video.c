@@ -21,36 +21,8 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "gui_video.h"
+#include "acc_api.h"
 
-
-
-
-#ifdef __arm__
-
-// #define USE_JPU
-
-#ifdef USE_JPU
-#include "rtl_hal_jpu.h"
-#include "rtl_jpu.h"
-#endif
-#endif
-
-#ifndef USE_JPU
-#define GUI_STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_JPEG
-#define STBI_NO_PNG
-#define STBI_NO_HDR
-#define STBI_NO_LINEAR
-#define STBI_NO_GIF
-#define STBI_NO_PIC
-#define STBI_NO_THREAD_LOCALS
-
-#include "gui_api.h"
-#define STBI_MALLOC(sz)           gui_malloc(sz)
-#define STBI_REALLOC(p,newsz)     gui_realloc(p, newsz)
-#define STBI_FREE(p)              gui_free(p)
-#include "gui_stb_image.h"
-#endif
 
 /*============================================================================*
  *                           Types
@@ -128,35 +100,37 @@ static int get_jpeg_size(const unsigned char *jpeg_data, size_t jpeg_size, uint1
             uint8_t comp = jpeg_data[i + 4];
             uint8_t subsample = jpeg_data[i + 6];
             gui_log("w %d h %d comp %d subsample 0x%x\n", *width, *height, comp, subsample);
-#ifdef USE_JPU
-            if (comp == 4 || ((subsample != YUV_SAMPLE_420) && (subsample != YUV_SAMPLE_422) &&
-                              (subsample != YUV_SAMPLE_444) && (subsample != YUV_SAMPLE_400)))
-            {
-                gui_log("unknown sample! %d 0x%x", comp, subsample);
-                return -1;
-            }
-            else
-            {
-                if (subsample == YUV_SAMPLE_420 || subsample == YUV_SAMPLE_422)
-                {
-                    *width = ((*width + 15) >> 4) << 4;
-                }
-                else
-                {
-                    *width = ((*width + 7) >> 3) << 3;
-                }
-                if (subsample == YUV_SAMPLE_420)
-                {
-                    *height = ((*height + 15) >> 4) << 4;
-                }
-                else
-                {
-                    *height = ((*height + 7) >> 3) << 3;
-                }
-            }
 
-            gui_log("align w %d h %d ", *width, *height);
-#endif
+            if (gui_get_acc()->jpeg_load)
+            {
+                if (comp == 4 || ((subsample != YUV_SAMPLE_420) && (subsample != YUV_SAMPLE_422) &&
+                                  (subsample != YUV_SAMPLE_444) && (subsample != YUV_SAMPLE_400)))
+                {
+                    gui_log("unknown sample! %d 0x%x", comp, subsample);
+                    return -1;
+                }
+                else
+                {
+                    if (subsample == YUV_SAMPLE_420 || subsample == YUV_SAMPLE_422)
+                    {
+                        *width = ((*width + 15) >> 4) << 4;
+                    }
+                    else
+                    {
+                        *width = ((*width + 7) >> 3) << 3;
+                    }
+                    if (subsample == YUV_SAMPLE_420)
+                    {
+                        *height = ((*height + 15) >> 4) << 4;
+                    }
+                    else
+                    {
+                        *height = ((*height + 7) >> 3) << 3;
+                    }
+                }
+
+                gui_log("align w %d h %d ", *width, *height);
+            }
             return 0; // Success
         }
         else if (marker == SOS || marker == EOI)
@@ -268,8 +242,12 @@ static void gui_video_play_cb(void *p)
 
 
 
-    // this->frame_cur = animate->progress_percent * this->num_frame;
     // gui_log("Cur frame %d \n", this->frame_cur);
+    if (this->frame_cur != this->frame_last)
+    {
+        gui_fb_change();
+    }
+
 }
 
 
@@ -280,7 +258,7 @@ static void gui_video_draw(gui_obj_t *obj)
     uint32_t img_sz = 0;
     uint8_t *frame_buff = NULL;
 
-    // gui_log("gui_video_draw\n");
+    // gui_log("gui_video_draw  %d %d", this->frame_cur, this->frame_last);
     if (this->frame_cur == this->frame_last && this->frame_buff)
     {
         // gui_log("draw from cache %d 0x%x\n", this->frame_cur, this->frame_buff);
@@ -290,15 +268,11 @@ static void gui_video_draw(gui_obj_t *obj)
     }
     else
     {
-#ifdef USE_JPU
-        hal_jpu_free_cache(this->frame_buff_raw);
-#else
-        extern void gui_stbi_image_free(void *retval_from_stbi_load);
         if (this->frame_buff_raw)
         {
-            gui_stbi_image_free(this->frame_buff_raw);
+            gui_acc_jpeg_free(this->frame_buff_raw);
         }
-#endif
+
         this->frame_buff = NULL;
         this->frame_buff_raw = NULL;
     }
@@ -347,76 +321,22 @@ static void gui_video_draw(gui_obj_t *obj)
         }
 
 
-
-
-
-#ifdef USE_JPU
-        // JPU
-        JPU_DEC_PARAM dec_param;
-        uint8_t *output = NULL;
-        uint32_t dec_size = 0;
-
-        JPU_ERROR err;
-
-        memset(&dec_param, 0, sizeof(JPU_DEC_PARAM));
-        dec_param.data = img_data;
-        dec_param.size = img_sz;
-        dec_param.packedFormat = PACKED_FORMAT_422_YUYV;
-        dec_param.useWrapper = 1;
-        dec_param.rgbType = JPU_RGB565;
-
-        // gui_log("img 0x%x, sz %d", dec_param.data, dec_param.size);
-
-        hal_jpu_mem_init(gui_malloc, gui_free);
-        hal_jpu_add_dec_header(sizeof(gui_rgb_data_head_t));
-        err = hal_jpu_decode(&dec_param, &output, &dec_size);
-        if (err != JPU_SUCCESS)
-        {
-            gui_log("img 0x%x, sz %d", dec_param.data, dec_param.size);
-            gui_log("decode jpeg file failed, err: %d", err);
-            return ;
-        }
-        frame_buff = output;
-        // gui_log("frame_buff  0x%x\n", frame_buff);
-
-        JPU_OUTPUT_INFO *info = NULL;
-        info = hal_jpu_get_output();
-
-        this->frame_buff = frame_buff;
-        this->frame_buff_raw = info->fb_raw;
-
-#else
-        // stb decode
-        int x = 0, y = 0, n = 0;
-        typedef unsigned char stbi_uc;
-        extern stbi_uc *gui_stbi_load_from_memory(stbi_uc const * buffer, int len, int *x, int *y,
-                                                  int *channels_in_file, int desired_channels);
-
-        frame_buff = (void *)gui_stbi_load_from_memory(img_data, img_sz, &x, &y, &n,
-                                                       0);
+        int w = 0;
+        int h = 0;
+        int channel = 0;
+        frame_buff = gui_acc_jpeg_load(img_data, img_sz, &w, &h, &channel);
         if (!frame_buff)
         {
-            gui_log("decode jpeg file failed");
+            gui_log("decode video file failed");
             return ;
         }
 
-        // dec_size = x * y * 3; // RGB888
         this->frame_buff = frame_buff;
         this->frame_buff_raw = frame_buff;
 
-#endif
-
-        // gui_log("x %d y %d n %d\n", x, y, n);
-        // size_t frame_sz = dec_size; // RGB888
         gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
-        memcpy(pheader, &(this->header), sizeof(gui_rgb_data_head_t));
-#ifdef USE_JPU
-        pheader->type = 0x00; //  RGB565
-        pheader->w = info->alignedWidth;
-        pheader->h = info->alignedHeight;
-#else
-        pheader->type = 0x03; //RGB888
-#endif
+        pheader->type = this->header.type;
+
         // gui_log("this frame_buff  0x%x\n", this->frame_buff);
 
         if (this->src_mode == IMG_SRC_FILESYS)
@@ -480,11 +400,7 @@ static void gui_video_destory(gui_obj_t *obj)
     gui_free(this->array);
     if (this->frame_buff_raw)
     {
-#ifdef USE_JPU
-        hal_jpu_free_cache(this->frame_buff_raw);
-#else
-        gui_stbi_image_free(this->frame_buff_raw);
-#endif
+        gui_acc_jpeg_free(this->frame_buff_raw);
         this->frame_buff_raw = NULL;
         this->frame_buff = NULL;
     }
@@ -498,11 +414,10 @@ static void gui_video_prepare(gui_obj_t *obj)
     // TODO: tp event cb
     // click play once
 
-    // gui_log("gui_video_prepare");
+    // gui_log("gui_video_prepare  %d %d", this->frame_cur, this->frame_last);
     gui_img_set_image_data(this->img, (const uint8_t *) & (this->header));
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
-    gui_fb_change();
 }
 
 
@@ -796,11 +711,14 @@ static void gui_img_video_ctor(gui_video_t  *this,
         memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
         this->header.w = root->w;
         this->header.h = root->h;
-#ifdef USE_JPU
-        this->header.type = 0x00; // RGB565
-#else
-        this->header.type = 0x03; // RGB888
-#endif
+        if (gui_get_acc()->jpeg_load)
+        {
+            this->header.type = 0x00; // RGB565
+        }
+        else
+        {
+            this->header.type = 0x03; // RGB888
+        }
     }
     else
     {
