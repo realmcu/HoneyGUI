@@ -80,7 +80,7 @@ struct Particle
 } Particle_t;
 
 #define MAX_PARTICLES_IMG 140
-static Particle particles_img[MAX_PARTICLES_IMG];
+static Particle *particles_img = NULL;
 static int active_particle_count = 0;
 
 int currentNumber = COUNTDOWN_START;
@@ -111,6 +111,12 @@ void particle_canvas_callback(NVGcontext *vg)
 
 void initParticlesPool()
 {
+    particles_img = (Particle *)gui_malloc(MAX_PARTICLES_IMG * sizeof(Particle));
+    if (!particles_img)
+    {
+        gui_log("Failed to allocate memory for particles_img!\n");
+        return;
+    }
     size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * GUI_CANVAS_OUTPUT_RGBA * 4 + sizeof(
                              gui_rgb_data_head_t);
 
@@ -411,6 +417,11 @@ void close()
                 }
             }
             active_particle_count = 0;
+        }
+        if (particles_img)
+        {
+            gui_free(particles_img);
+            particles_img = NULL;
         }
 
         world->~b2World();

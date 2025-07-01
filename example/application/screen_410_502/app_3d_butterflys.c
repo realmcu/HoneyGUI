@@ -60,6 +60,7 @@ static void update_butterfly_wing_bg(gui_3d_t *butterfly);
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 static void app_ui_butterflys_design(gui_view_t *view);
+static void free_particles_resources(gui_view_t *view);
 
 static const gui_view_descriptor_t descriptor =
 {
@@ -68,7 +69,7 @@ static const gui_view_descriptor_t descriptor =
     .pView = &current_view,
 
     .on_switch_in = app_ui_butterflys_design,
-    .on_switch_out = NULL,
+    .on_switch_out = free_particles_resources,
 
     .keep = false,
 };
@@ -347,9 +348,9 @@ typedef struct
 } Particle;
 
 #define MAX_PARTICLES 20
-static Particle particles[MAX_PARTICLES];
-static Particle particles1[MAX_PARTICLES];
-static Particle particles2[MAX_PARTICLES];
+static Particle *particles = NULL;
+static Particle *particles1 = NULL;
+static Particle *particles2 = NULL;
 static uint32_t last_particle_spawn = 0;
 static uint32_t last_particle_spawn1 = 0;
 static uint32_t last_particle_spawn2 = 0;
@@ -681,6 +682,24 @@ static void update_particles2()
 }
 static void init_butterfly_bg(gui_3d_t *butterfly)
 {
+    particles = (Particle *)gui_malloc(MAX_PARTICLES * sizeof(Particle));
+    if (!particles)
+    {
+        gui_log("Failed to allocate memory for particles!\n");
+        return;
+    }
+    particles1 = (Particle *)gui_malloc(MAX_PARTICLES * sizeof(Particle));
+    if (!particles1)
+    {
+        gui_log("Failed to allocate memory for particles1!\n");
+        return;
+    }
+    particles2 = (Particle *)gui_malloc(MAX_PARTICLES * sizeof(Particle));
+    if (!particles2)
+    {
+        gui_log("Failed to allocate memory for particles2!\n");
+        return;
+    }
     for (int i = 0; i < MAX_PARTICLES; i++)
     {
         particles[i].life = 0.0f;
@@ -819,4 +838,23 @@ static void app_ui_butterflys_design(gui_view_t *view)
     gui_obj_create_timer(&(butterfly2_wing_win->base), 17, true, update_particles2);
 
 
+}
+
+static void free_particles_resources(gui_view_t *view)
+{
+    if (particles)
+    {
+        gui_free(particles);
+        particles = NULL;
+    }
+    if (particles1)
+    {
+        gui_free(particles1);
+        particles1 = NULL;
+    }
+    if (particles2)
+    {
+        gui_free(particles2);
+        particles2 = NULL;
+    }
 }

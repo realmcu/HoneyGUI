@@ -16,7 +16,8 @@
 
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-void butterfly_particle_app(gui_view_t *view);
+static void butterfly_particle_app(gui_view_t *view);
+static void free_particles_resources(gui_view_t *view);
 
 static gui_view_descriptor_t const descriptor =
 {
@@ -24,6 +25,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = butterfly_particle_app,
+    .on_switch_out = free_particles_resources,
 };
 
 static int gui_view_descriptor_register_init(void)
@@ -296,7 +298,7 @@ typedef struct
 } Particle;
 
 #define MAX_PARTICLES 100
-static Particle particles[MAX_PARTICLES];
+static Particle *particles = NULL;
 static gui_win_t *particle_win = NULL;
 static uint32_t last_particle_spawn = 0;
 
@@ -541,7 +543,7 @@ static void data_create(void *p)
     }
     gui_obj_create_timer(&(data_win->base), 3000, true, time_update_cb);
 }
-void butterfly_particle_app(gui_view_t *view)
+static void butterfly_particle_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
@@ -580,6 +582,12 @@ void butterfly_particle_app(gui_view_t *view)
 
     gui_obj_create_timer(&(butterfly_particle_3d->base), 17, true, update_butterfly);
 
+    particles = (Particle *)gui_malloc(MAX_PARTICLES * sizeof(Particle));
+    if (!particles)
+    {
+        gui_log("Failed to allocate memory for particles!\n");
+        return;
+    }
     for (int i = 0; i < MAX_PARTICLES; i++)
     {
         particles[i].life = 0.0f;
@@ -592,4 +600,12 @@ void butterfly_particle_app(gui_view_t *view)
     gui_obj_hidden(GUI_BASE(butterfly_wing4), true);
 
     gui_obj_create_timer(&(particle_win->base), 17, true, update_particles);
+}
+static void free_particles_resources(gui_view_t *view)
+{
+    if (particles)
+    {
+        gui_free(particles);
+        particles = NULL;
+    }
 }
