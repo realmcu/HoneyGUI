@@ -164,7 +164,7 @@ void fish0_animate_cb()
             source_dy += dy * move_speed * speed_factor;
 
             // Caculate new rotate angle
-            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI) + 90;
+            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI_F) + 90;
             float angle_difference = desired_angle - fish0_rz;
 
             if (angle_difference > 180.0f)
@@ -243,7 +243,7 @@ void fish1_animate_cb()
             source1_dy += dy * move_speed * speed_factor;
 
             // Caculate new rotate angle
-            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI) + 90;
+            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI_F) + 90;
             float angle_difference = desired_angle - fish1_rz;
 
             if (angle_difference > 180.0f)
@@ -320,7 +320,7 @@ void fish2_animate_cb()
             source2_dy += dy * move_speed * speed_factor;
 
             // Caculate new rotate angle
-            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI) + 90;
+            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI_F) + 90;
             float angle_difference = desired_angle - fish2_rz;
 
             if (angle_difference > 180.0f)
@@ -398,7 +398,7 @@ void fish3_animate_cb()
             source3_dy += dy * move_speed * speed_factor;
 
             // Caculate new rotate angle
-            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI) + 90;
+            float desired_angle = atan2f(dy, dx) * (180.0f / M_PI_F) + 90;
             float angle_difference = desired_angle - fish3_rz;
 
             if (angle_difference > 180.0f)
@@ -439,7 +439,7 @@ static void lotus_leaf_animate_cb(void *parent)
     gui_win_t *window = (gui_win_t *)parent;
 
     swing_phase += SWING_SPEED;
-    if (swing_phase > 2 * M_PI) { swing_phase -= 2 * M_PI; }
+    if (swing_phase > 2 * M_PI_F) { swing_phase -= 2 * M_PI_F; }
 
     float offset_x = sinf(swing_phase) * MAX_OFFSET * 0.8f;
     float offset_y = cosf(swing_phase * 0.6f) * MAX_OFFSET * 0.3f;

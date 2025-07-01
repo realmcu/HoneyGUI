@@ -182,7 +182,7 @@ void apply_centripetal_force(Capsule *capsule)
     capsule->body->ApplyForceToCenter(forceMagnitude * toCenter, true); // Apply force to capsule center
 
     // Adjust rotation to face the center
-    float selfRot = atan2(toCenter.y, toCenter.x) * 180 / M_PI + 90;
+    float selfRot = atan2(toCenter.y, toCenter.x) * 180 / M_PI_F + 90;
     gui_img_rotation(capsule->img, selfRot + capsule->selfRandomRot);
 }
 
@@ -243,14 +243,14 @@ void capsule_animation_cb(void *obj)
 
             // Recovering centripetal angle
             b2Vec2 toCenter = CIRCLE_CENTER - targetPos;
-            float currentAngle = capsule.body->GetAngle() * 180 / M_PI;
-            float targetRotAngle = atan2(toCenter.y, toCenter.x) * 180 / M_PI + 90 + capsule.selfRandomRot;
+            float currentAngle = capsule.body->GetAngle() * 180 / M_PI_F;
+            float targetRotAngle = atan2(toCenter.y, toCenter.x) * 180 / M_PI_F + 90 + capsule.selfRandomRot;
             // Normalize angle difference (ensuring it's in the range [-180, 180])
             float angleDiff = targetRotAngle - currentAngle;
             angleDiff = fmod(angleDiff + 180, 360) - 180;
             float newAngle = currentAngle + angleDiff * progress;
 
-            capsule.body->SetTransform(newPos, newAngle * M_PI / 180.0f);
+            capsule.body->SetTransform(newPos, newAngle * M_PI_F / 180.0f);
             gui_img_rotation(capsule.img, newAngle);
 
             if (progress >= 0.95f)
@@ -258,7 +258,7 @@ void capsule_animation_cb(void *obj)
                 capsule.need_recovery = false;
                 capsule.body->SetLinearVelocity(b2Vec2_zero);
                 capsule.currentPathAngle -= missedAngle;
-                capsule.body->SetTransform(targetPos, targetRotAngle * M_PI / 180.0f);
+                capsule.body->SetTransform(targetPos, targetRotAngle * M_PI_F / 180.0f);
                 gui_img_rotation(capsule.img, targetRotAngle);
             }
 
@@ -286,7 +286,7 @@ void create_capsules(b2World *world)
     for (int i = 0; i < CAPSULE_COLOR_COUNT; i++)
     {
         // Calculate the reference angle (radians) for the current color group
-        float baseAngle = 2 * M_PI * i / CAPSULE_COLOR_COUNT;
+        float baseAngle = 2 * M_PI_F * i / CAPSULE_COLOR_COUNT;
 
         for (int j = 0; j < CAPSULES_PER_COLOR; j++)
         {
@@ -316,11 +316,11 @@ void create_capsules(b2World *world)
 
             // Calculate the rotation angle of oneself (pointing to the center of the circle+random offset)
             b2Vec2 toCenter(SCREEN_WIDTH / 2 - capsuleX, SCREEN_HEIGHT / 2 - capsuleY);
-            float selfRot = atan2(toCenter.y, toCenter.x) * 180 / M_PI + 90;
+            float selfRot = atan2(toCenter.y, toCenter.x) * 180 / M_PI_F + 90;
             capsule.selfRandomRot = rand() % 60 - 30; // ± 30 degree random offset
             gui_img_set_focus(capsule.img, CAPSULE_IMG_HALF_WIDTH, CAPSULE_IMG_HALF_HEIGHT);
             gui_img_rotation(capsule.img, selfRot + capsule.selfRandomRot);
-            BodyDef.angle = (selfRot + capsule.selfRandomRot) * M_PI / 180.0f;
+            BodyDef.angle = (selfRot + capsule.selfRandomRot) * M_PI_F / 180.0f;
             capsule.body = world->CreateBody(&BodyDef);
 
             b2PolygonShape rectangleShape;
@@ -347,8 +347,8 @@ void create_capsules(b2World *world)
 
 bool angles_equal(float angle1, float angle2)
 {
-    angle1 = fmod(angle1, 2 * M_PI);
-    angle2 = fmod(angle2, 2 * M_PI);
+    angle1 = fmod(angle1, 2 * M_PI_F);
+    angle2 = fmod(angle2, 2 * M_PI_F);
 
     return std::fabs(cos(angle1) - cos(angle2)) < 0.1f &&
            std::fabs(sin(angle1) - sin(angle2)) < 0.1f;
@@ -357,7 +357,8 @@ bool angles_equal(float angle1, float angle2)
 void draw_clock_hand(NVGcontext *vg, float length, float width, int angleInDegrees,
                      HandState &handState)
 {
-    float angleInRadians = (angleInDegrees - 90) * M_PI / 180.0f; // Adjust to start from '12' position
+    float angleInRadians = (angleInDegrees - 90) * M_PI_F /
+                           180.0f; // Adjust to start from '12' position
     float xEnd = SCREEN_WIDTH / 2 + cos(angleInRadians) * length;
     float yEnd = SCREEN_HEIGHT / 2 + sin(angleInRadians) * length;
 

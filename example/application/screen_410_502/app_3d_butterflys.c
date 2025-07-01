@@ -142,7 +142,7 @@ void update_butterfly0()
 
     theta0 += angular_velocity;
 
-    if (theta0 >= 2 * M_PI) { theta0 -= 2 * M_PI; }
+    if (theta0 >= 2 * M_PI_F) { theta0 -= 2 * M_PI_F; }
 
     butterfly_time += 1.2f;
     butterfly_angle = 30 * sinf(butterfly_time);
@@ -150,7 +150,7 @@ void update_butterfly0()
 }
 void update_butterfly1()
 {
-    static float theta1 = 2 * M_PI / 3; // starting angle for butterfly1
+    static float theta1 = 2 * M_PI_F / 3; // starting angle for butterfly1
 
     butterfly1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta1);
     butterfly1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta1);
@@ -158,12 +158,12 @@ void update_butterfly1()
 
     theta1 += angular_velocity;
 
-    if (theta1 >= 2 * M_PI) { theta1 -= 2 * M_PI; }
+    if (theta1 >= 2 * M_PI_F) { theta1 -= 2 * M_PI_F; }
     update_butterfly_wing_bg(butterfly1);
 }
 void update_butterfly2()
 {
-    static float theta2 = M_PI + M_PI / 3; // starting angle for butterfly2
+    static float theta2 = M_PI_F + M_PI_F / 3; // starting angle for butterfly2
 
     butterfly2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta2);
     butterfly2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta2);
@@ -171,7 +171,7 @@ void update_butterfly2()
 
     theta2 += angular_velocity;
 
-    if (theta2 >= 2 * M_PI) { theta2 -= 2 * M_PI; }
+    if (theta2 >= 2 * M_PI_F) { theta2 -= 2 * M_PI_F; }
     update_butterfly_wing_bg(butterfly2);
 }
 
@@ -375,7 +375,7 @@ static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, floa
         screen_y = y_to_screen_h(butterfly2_y);
     }
 
-    float angle_rad = (butterfly0_rz - 90) * M_PI / 180.0f;
+    float angle_rad = (butterfly0_rz - 90) * M_PI_F / 180.0f;
     float offset_x = cosf(angle_rad) * 10.0f;
     float offset_y = sinf(angle_rad) * 10.0f;
 
@@ -418,7 +418,7 @@ static void spawn_particle()
             particles[i].life = 1.0f; // Full life
 
             {
-                float angle_rad = (butterfly0_rz - 90) * M_PI / 180.0f;
+                float angle_rad = (butterfly0_rz - 90) * M_PI_F / 180.0f;
                 particles[i].direction_x = cosf(angle_rad) * -0.5f;
                 particles[i].direction_y = sinf(angle_rad) * -0.5f;
                 particles[i].direction_x += (rand() % 100 - 100) * 0.001f;
@@ -471,7 +471,7 @@ static void spawn_particle1()
             particles1[i].life = 1.0f; // Full life
 
             {
-                float angle_rad = (butterfly0_rz - 90) * M_PI / 180.0f;
+                float angle_rad = (butterfly0_rz - 90) * M_PI_F / 180.0f;
                 particles1[i].direction_x = cosf(angle_rad) * -0.5f;
                 particles1[i].direction_y = sinf(angle_rad) * -0.5f;
                 particles1[i].direction_x += (rand() % 100 - 100) * 0.001f;
@@ -524,7 +524,7 @@ static void spawn_particle2()
             particles2[i].life = 1.0f; // Full life
 
             {
-                float angle_rad = (butterfly0_rz - 90) * M_PI / 180.0f;
+                float angle_rad = (butterfly0_rz - 90) * M_PI_F / 180.0f;
                 particles2[i].direction_x = cosf(angle_rad) * -0.5f;
                 particles2[i].direction_y = sinf(angle_rad) * -0.5f;
                 particles2[i].direction_x += (rand() % 100 - 100) * 0.001f;

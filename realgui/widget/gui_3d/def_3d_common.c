@@ -583,7 +583,7 @@ bool gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t camera
     }
     else
     {
-        camera->d = (0.5f) * (camera->viewplane_width) * tanf(fov * M_PI / 180.0f);
+        camera->d = (0.5f) * (camera->viewplane_width) * tanf(fov * M_PI_F / 180.0f);
     }
     //camera->zbuffer=(float *)malloc(sizeof(float)*camera->viewport_height*camera->viewport_width);
     //return camera->zbuffer!=NULL;

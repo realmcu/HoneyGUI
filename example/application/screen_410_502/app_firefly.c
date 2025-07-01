@@ -102,7 +102,7 @@ static void update_all_fireflys()
     {
         if (current_time - fireflys[i].last_change > 1000 + rand() % 2000)
         {
-            fireflys[i].angle = (rand() % 360) * M_PI / 180.0f;
+            fireflys[i].angle = (rand() % 360) * M_PI_F / 180.0f;
             fireflys[i].speed = 0.5f + (rand() % 20) / 20.0f;
             fireflys[i].last_change = current_time;
         }
@@ -135,7 +135,7 @@ static void create_firefly()
         fireflys[i].x = rand() % dc->screen_width;
         fireflys[i].y = rand() % dc->screen_height;
         fireflys[i].speed = 0.5f + (rand() % 20) / 20.0f;
-        fireflys[i].angle = (rand() % 360) * M_PI / 180.0f;
+        fireflys[i].angle = (rand() % 360) * M_PI_F / 180.0f;
         fireflys[i].scale = 0.5f + (rand() % 8) / 10.0f;
         fireflys[i].last_change = gui_ms_get();
 

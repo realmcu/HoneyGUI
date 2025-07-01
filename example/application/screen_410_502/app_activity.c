@@ -157,40 +157,40 @@ static void arc_activity_cb(NVGcontext *vg)
     float progress = count / (float)COUNT_MAX;
 
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI / 2,
-           M_PI * 3.5f, NVG_CW);
+    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI_F / 2,
+           M_PI_F * 3.5f, NVG_CW);
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(58, 23, 29));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI / 2,
-           M_PI * (1.5f + 2.0f * move_val * progress / 20000.0f), NVG_CW);  // cap 20000 steps
+    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI_F / 2,
+           M_PI_F * (1.5f + 2.0f * move_val * progress / 20000.0f), NVG_CW);  // cap 20000 steps
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(230, 67, 79));
     nvgStroke(vg);
 
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI / 2,
-           M_PI * 3.5f, NVG_CW);
+    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI_F / 2,
+           M_PI_F * 3.5f, NVG_CW);
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(30, 55, 25));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI / 2,
-           M_PI * (1.5f + 2.0f * ex_val * progress / 60.0f), NVG_CW);  // cap 60 min.
+    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI_F / 2,
+           M_PI_F * (1.5f + 2.0f * ex_val * progress / 60.0f), NVG_CW);  // cap 60 min.
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(186, 253, 79));
     nvgStroke(vg);
 
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI / 2,
-           M_PI * 3.5f, NVG_CW);
+    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI_F / 2,
+           M_PI_F * 3.5f, NVG_CW);
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(22, 50, 47));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI / 2,
-           M_PI * (1.5f + 2.0f * stand_val * progress / 30.0f), NVG_CW); // cap 30 times
+    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI_F / 2,
+           M_PI_F * (1.5f + 2.0f * stand_val * progress / 30.0f), NVG_CW); // cap 30 times
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(117, 230, 229));
     nvgStroke(vg);

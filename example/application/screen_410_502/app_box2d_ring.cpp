@@ -227,7 +227,7 @@ void createRing(b2World *world, float radius, float restitution)
                              SCREEN_HEIGHT / 2.0f / PIXELS_PER_METER);
     b2Body *ringBody = world->CreateBody(&ringBodyDef);
 
-    float angleStep = 2 * M_PI / RING_SEGMENTS; // Calculate angle step for each segment
+    float angleStep = 2 * M_PI_F / RING_SEGMENTS; // Calculate angle step for each segment
     for (int i = 0; i < RING_SEGMENTS; ++i)
     {
         float angle1 = i * angleStep;
@@ -251,7 +251,7 @@ void createBalls(b2World *world)
 {
     for (int i = 0; i < BALL_COUNT; ++i)
     {
-        float angle = 2 * i * M_PI / BALL_COUNT;
+        float angle = 2 * i * M_PI_F / BALL_COUNT;
         float ballX = (SCREEN_WIDTH / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * cos(
                            angle)); // Position the ball between two rings
         float ballY = (SCREEN_HEIGHT / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * sin(angle));

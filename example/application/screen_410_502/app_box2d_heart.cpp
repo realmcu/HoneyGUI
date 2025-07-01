@@ -174,7 +174,7 @@ void bounce_animation_cb(void *obj)
     for (auto &heart : Heart_Particles)
     {
         // Adjust the phase of the animation based on distance
-        float phase_offset = heart.distance_to_center / 160.0f * 2 * M_PI;
+        float phase_offset = heart.distance_to_center / 160.0f * 2 * M_PI_F;
         heart.breathe_phase += 0.05f;
         heart.breathe_scale = 1.0f + 0.25f * sin(heart.breathe_phase - phase_offset);
 

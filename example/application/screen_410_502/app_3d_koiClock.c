@@ -111,14 +111,14 @@ void update_koi0()
 
     theta0 += angular_velocity;
 
-    if (theta0 >= 2 * M_PI) { theta0 -= 2 * M_PI; }
+    if (theta0 >= 2 * M_PI_F) { theta0 -= 2 * M_PI_F; }
 
     fish_time += 1.2f;
     fish_angle = 3 * sinf(fish_time);
 }
 void update_koi1()
 {
-    static float theta1 = M_PI / 4; // starting angle for fish1
+    static float theta1 = M_PI_F / 4; // starting angle for fish1
     float angular_velocity = 0.02f; // Adjust as needed for speed
 
     fish1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta1);
@@ -127,11 +127,11 @@ void update_koi1()
 
     theta1 += angular_velocity;
 
-    if (theta1 >= 2 * M_PI) { theta1 -= 2 * M_PI; }
+    if (theta1 >= 2 * M_PI_F) { theta1 -= 2 * M_PI_F; }
 }
 void update_koi2()
 {
-    static float theta2 = 2 * M_PI / 3; // starting angle for fish2
+    static float theta2 = 2 * M_PI_F / 3; // starting angle for fish2
     float angular_velocity = 0.02f; // Adjust as needed for speed
 
     fish2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta2);
@@ -140,7 +140,7 @@ void update_koi2()
 
     theta2 += angular_velocity;
 
-    if (theta2 >= 2 * M_PI) { theta2 -= 2 * M_PI; }
+    if (theta2 >= 2 * M_PI_F) { theta2 -= 2 * M_PI_F; }
 }
 
 static void fish0_global_cb(gui_3d_t *this)

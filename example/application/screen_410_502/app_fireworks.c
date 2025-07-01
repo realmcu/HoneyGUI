@@ -21,7 +21,7 @@
 #include <time.h>
 
 // Function to convert degrees to radians
-#define DEG_TO_RAD(angleInDegrees) ((angleInDegrees) * M_PI / 180.0f)
+#define DEG_TO_RAD(angleInDegrees) ((angleInDegrees) * M_PI_F / 180.0f)
 #define HOUR_HAND_LENGTH 0.5f
 #define MINUTE_HAND_LENGTH 0.6f
 #define SECOND_HAND_LENGTH 0.7f
@@ -99,7 +99,7 @@ static void drawHexagon(NVGcontext *vg, float centerX, float centerY, float radi
     nvgBeginPath(vg);
     for (int i = 0; i < 6; ++i)
     {
-        float angle = i * M_PI / 3.0f + rotationAngle;
+        float angle = i * M_PI_F / 3.0f + rotationAngle;
         float x = centerX + radius * cosf(angle);
         float y = centerY + radius * sinf(angle);
         if (i == 0)
@@ -131,8 +131,8 @@ static void drawBackgroundRing(NVGcontext *vg, float centerX, float centerY, flo
                                        nvgRGBA(0, 0, 0, 0));
 
     nvgBeginPath(vg);
-    nvgArc(vg, centerX, centerY, radius, 0, 2 * M_PI, NVG_CW);
-    nvgArc(vg, centerX, centerY, radius * 0.85f, 0, 2 * M_PI, NVG_CCW);
+    nvgArc(vg, centerX, centerY, radius, 0, 2 * M_PI_F, NVG_CW);
+    nvgArc(vg, centerX, centerY, radius * 0.85f, 0, 2 * M_PI_F, NVG_CCW);
     nvgPathWinding(vg, NVG_HOLE);
 
     nvgFillPaint(vg, paint);
@@ -169,7 +169,7 @@ static void create_firework_clock_cb(NVGcontext *vg)
     NVGcolor mainHexColor = nvgRGB(255, 255, 255);
     drawHexagon(vg, centerX, centerY, hexagonRadius, 0, mainHexColor);
     NVGcolor offsetHexColor = nvgRGB(255, 255, 255);
-    drawHexagon(vg, centerX, centerY, hexagonRadius, M_PI / 6, offsetHexColor);
+    drawHexagon(vg, centerX, centerY, hexagonRadius, M_PI_F / 6, offsetHexColor);
 //clock
     extern struct tm *timeinfo;
 
@@ -309,7 +309,7 @@ static void firework_sim_cb(NVGcontext *vg)
     }
     for (int i = 0; i < 30; i++)
     {
-        float baseAngle = (2 * M_PI * i) / 30.0f;
+        float baseAngle = (2 * M_PI_F * i) / 30.0f;
 
         float startX = circleCenterX + cosf(baseAngle) * firework_start;
         float startY = circleCenterY + sinf(baseAngle) * firework_start;

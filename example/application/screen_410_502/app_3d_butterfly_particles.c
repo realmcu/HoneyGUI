@@ -231,7 +231,7 @@ static void update_butterfly()
             fly_state = FLY_STOP;
         }
 
-        float ease_progress = 1.0f - cosf(progress * M_PI / 2.0f);
+        float ease_progress = 1.0f - cosf(progress * M_PI_F / 2.0f);
         butterfly_rz = 90.0f * (1.0f - ease_progress);
 
         wing_time += 0.1f + 0.15f * (1.0f - ease_progress);
@@ -329,7 +329,7 @@ void update_virtual_position(uint32_t current_time)
 static void get_butterfly_tail_position(float *tail_x, float *tail_y)
 {
     // Convert angle to radians
-    float angle_rad = (butterfly_rz - 90) * M_PI / 180.0f;
+    float angle_rad = (butterfly_rz - 90) * M_PI_F / 180.0f;
 
     // Tail is behind the butterfly (offset by -20 pixels in the direction it's facing)
     switch (fly_state)

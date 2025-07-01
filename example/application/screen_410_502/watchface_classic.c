@@ -136,21 +136,21 @@ static void arc_activity_cb(NVGcontext *vg)
         //     progress_activity = 0;
         // }
         // nvgBeginPath(canvas->vg);
-        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2, M_PI * (progress_activity + 3 / 2),
+        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI_F / 2, M_PI_F * (progress_activity + 3 / 2),
         //     NVG_CW);
         // nvgStrokeWidth(canvas->vg, 8);
         // nvgStrokeColor(canvas->vg, nvgRGB(230, 67, 79));
         // nvgStroke(canvas->vg);
 
         // nvgBeginPath(canvas->vg);
-        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2, M_PI * (progress_activity + 3 / 2),
+        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI_F / 2, M_PI_F * (progress_activity + 3 / 2),
         //     NVG_CW);
         // nvgStrokeWidth(canvas->vg, 8);
         // nvgStrokeColor(canvas->vg, nvgRGB(186, 253, 79));
         // nvgStroke(canvas->vg);
 
         // nvgBeginPath(canvas->vg);
-        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2, M_PI * (progress_activity + 3 / 2),
+        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI_F / 2, M_PI_F * (progress_activity + 3 / 2),
         //     NVG_CW);
         // nvgStrokeWidth(canvas->vg, 8);
         // nvgStrokeColor(canvas->vg, nvgRGB(117, 230, 229));
@@ -183,40 +183,40 @@ static void arc_activity_cb(NVGcontext *vg)
             cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
 
             nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
-                   M_PI * 3.5f, NVG_CW);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI_F / 2,
+                   M_PI_F * 3.5f, NVG_CW);
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(58, 23, 29));
             nvgStroke(vg);
             nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
-                   M_PI * (1.5f + 2.0f * move->valueint / 20000.0f), NVG_CW);  // cap 20000 steps
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 8, 3 * M_PI_F / 2,
+                   M_PI_F * (1.5f + 2.0f * move->valueint / 20000.0f), NVG_CW);  // cap 20000 steps
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(230, 67, 79));
             nvgStroke(vg);
 
             nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
-                   M_PI * 3.5f, NVG_CW);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI_F / 2,
+                   M_PI_F * 3.5f, NVG_CW);
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(30, 55, 25));
             nvgStroke(vg);
             nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
-                   M_PI * (1.5f + 2.0f * ex->valueint / 60.0f), NVG_CW);  // cap 60 min.
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 21, 3 * M_PI_F / 2,
+                   M_PI_F * (1.5f + 2.0f * ex->valueint / 60.0f), NVG_CW);  // cap 60 min.
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(186, 253, 79));
             nvgStroke(vg);
 
             nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
-                   M_PI * 3.5f, NVG_CW);
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI_F / 2,
+                   M_PI_F * 3.5f, NVG_CW);
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(22, 50, 47));
             nvgStroke(vg);
             nvgBeginPath(vg);
-            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
-                   M_PI * (1.5f + 2.0f * stand->valueint / 30.0f), NVG_CW); // cap 30 times
+            nvgArc(vg, 100 / 2, 100 / 2, 50 - 33, 3 * M_PI_F / 2,
+                   M_PI_F * (1.5f + 2.0f * stand->valueint / 30.0f), NVG_CW); // cap 30 times
             nvgStrokeWidth(vg, 8);
             nvgStrokeColor(vg, nvgRGB(117, 230, 229));
             nvgStroke(vg);
@@ -323,7 +323,7 @@ static void arc_temperature_cb(NVGcontext *vg)
         // float x = 100 / 2;
         // float y = 100 / 2;
         // float r = 50 - 8; // radius
-        // float r0 = M_PI * 5 / 6, r1 = M_PI * 13 / 6; // 5/6pi ~ 13/6pi CW
+        // float r0 = M_PI_F * 5 / 6, r1 = M_PI_F * 13 / 6; // 5/6pi ~ 13/6pi CW
         // NVGpaint paint = nvgLinearGradient(vg, x + cosf(r0) * r, y + sinf(r0) * r, x + cosf(r1) * r,
         //                                    y + sinf(r1) * r, nvgRGB(191, 220, 48), nvgRGB(250, 17, 79));
         // nvgMoveTo(vg, x, y);
@@ -334,24 +334,24 @@ static void arc_temperature_cb(NVGcontext *vg)
         // nvgFill(vg);
 
         // nvgBeginPath(vg);
-        // nvgArc(vg, x, y, r - 8.0f, 0, M_PI * 2.0f, NVG_CW);
+        // nvgArc(vg, x, y, r - 8.0f, 0, M_PI_F * 2.0f, NVG_CW);
         // nvgFillColor(vg, nvgRGB(0, 0, 0));
         // nvgFill(vg);
 
         // r -= 4;
         // nvgBeginPath(vg);
-        // nvgArc(vg, x + cosf(r0 + 0.02f) * r, y + sinf(r0 + 0.02f) * r, 4.0f, r0, r0 + M_PI, NVG_CCW);
+        // nvgArc(vg, x + cosf(r0 + 0.02f) * r, y + sinf(r0 + 0.02f) * r, 4.0f, r0, r0 + M_PI_F, NVG_CCW);
         // nvgFillColor(vg, nvgRGB(191, 220, 48));
         // nvgFill(vg);
 
         // nvgBeginPath(vg);
-        // nvgArc(vg, x + cosf(r1 - 0.02f) * r, y + sinf(r1 - 0.02f) * r, 4.0f, r1, r1 - M_PI, NVG_CW);
+        // nvgArc(vg, x + cosf(r1 - 0.02f) * r, y + sinf(r1 - 0.02f) * r, 4.0f, r1, r1 - M_PI_F, NVG_CW);
         // nvgFillColor(vg, nvgRGB(250, 17, 79));
         // nvgFill(vg);
 
         // // moving dot
-        // static float a0 = M_PI * 5 / 6; // 5/6pi ~ 13/6pi CW
-        // float temp = (a0 - M_PI * 5 / 6) / (M_PI * 4 / 3);
+        // static float a0 = M_PI_F * 5 / 6; // 5/6pi ~ 13/6pi CW
+        // float temp = (a0 - M_PI_F * 5 / 6) / (M_PI_F * 4 / 3);
         // float ax, ay;
         // nvgBeginPath(vg);
         // ax = x + cosf(a0) * r;
@@ -404,8 +404,8 @@ static void arc_temperature_cb(NVGcontext *vg)
             float y = 100 / 2; // y coordinate
             float r = 50 - 4; // radius 50 - 8
             // 5/6pi ~ 13/6pi CW -->temperature range: 10 ~ 37
-            float r0 = M_PI * 5.0f / 6.0f;
-            float r1 = M_PI * 13.0f / 6.0f;
+            float r0 = M_PI_F * 5.0f / 6.0f;
+            float r1 = M_PI_F * 13.0f / 6.0f;
 
             // nvgArc(vg, x, y, r, r0, r1, NVG_CW);
             // nvgStrokeWidth(vg, 8);
@@ -431,25 +431,25 @@ static void arc_temperature_cb(NVGcontext *vg)
 
             // draw black circle to formate arc
             nvgBeginPath(vg);
-            nvgArc(vg, x, y, r - 8.0f, 0, M_PI * 2.0f, NVG_CW);
+            nvgArc(vg, x, y, r - 8.0f, 0, M_PI_F * 2.0f, NVG_CW);
             nvgFillColor(vg, nvgRGB(0, 0, 0));
             nvgFill(vg);
 
             // draw edge semi_circle
             r -= 4;
             nvgBeginPath(vg);
-            nvgArc(vg, x + cosf(r0 + 0.02f) * r, y + sinf(r0 + 0.02f) * r, 4.0f, r0, r0 + M_PI, NVG_CCW);
+            nvgArc(vg, x + cosf(r0 + 0.02f) * r, y + sinf(r0 + 0.02f) * r, 4.0f, r0, r0 + M_PI_F, NVG_CCW);
             nvgFillColor(vg, nvgRGB(start_r, start_g, start_b));
             nvgFill(vg);
 
             nvgBeginPath(vg);
-            nvgArc(vg, x + cosf(r1 - 0.02f) * r, y + sinf(r1 - 0.02f) * r, 4.0f, r1, r1 - M_PI, NVG_CW);
+            nvgArc(vg, x + cosf(r1 - 0.02f) * r, y + sinf(r1 - 0.02f) * r, 4.0f, r1, r1 - M_PI_F, NVG_CW);
             nvgFillColor(vg, nvgRGB(stop_r, stop_g, stop_b));
             nvgFill(vg);
 
             // draw dot
             float temp = ((float)cur_val - (float)low_val) / ((float)high_val - (float)low_val);
-            float a0 = M_PI * 5.0f / 6.0f + temp * 4.0f / 3.0f * M_PI; // 5/6pi ~ 13/6pi CW
+            float a0 = M_PI_F * 5.0f / 6.0f + temp * 4.0f / 3.0f * M_PI_F; // 5/6pi ~ 13/6pi CW
             float ax, ay;
             nvgBeginPath(vg);
             ax = x + cosf(a0) * r;
@@ -500,10 +500,10 @@ static void compass_cb()
         // float r = 35; // radius
         // // moving triangle
         // static uint16_t progress_compass = 0;
-        // float a0 = M_PI * (float)progress_compass / 360 * 2; // 0 ~ 2pi CW
+        // float a0 = M_PI_F * (float)progress_compass / 360 * 2; // 0 ~ 2pi CW
         // float ax, ay;
-        // ax = x + cosf(a0 + M_PI * 3 / 2) * r;
-        // ay = y + sinf(a0 + M_PI * 3 / 2) * r;
+        // ax = x + cosf(a0 + M_PI_F * 3 / 2) * r;
+        // ay = y + sinf(a0 + M_PI_F * 3 / 2) * r;
 
         // compass_pointer->base.x = (uint16_t)ax;
         // compass_pointer->base.y = (uint16_t)ay;
@@ -553,10 +553,10 @@ static void compass_cb()
             float y = 100 / 2;
             float r = 35; // radius
             // moving triangle
-            float a0 = M_PI * degree_val / 360 * 2; // 0 ~ 2pi CW
+            float a0 = M_PI_F * degree_val / 360 * 2; // 0 ~ 2pi CW
             float ax, ay;
-            ax = x + cosf(a0 + M_PI * 3 / 2) * r + sinf(a0 + M_PI * 3 / 2) * compass_pointer->base.w / 2;
-            ay = y + sinf(a0 + M_PI * 3 / 2) * r + cosf(a0 + M_PI * 1 / 2) * compass_pointer->base.w / 2;
+            ax = x + cosf(a0 + M_PI_F * 3 / 2) * r + sinf(a0 + M_PI_F * 3 / 2) * compass_pointer->base.w / 2;
+            ay = y + sinf(a0 + M_PI_F * 3 / 2) * r + cosf(a0 + M_PI_F * 1 / 2) * compass_pointer->base.w / 2;
 
             compass_pointer->base.x = (uint16_t)ax;
             compass_pointer->base.y = (uint16_t)ay;

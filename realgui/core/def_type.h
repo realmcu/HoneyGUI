@@ -50,8 +50,8 @@ typedef int gui_error_t;
                                                                 (((uint32_t)(x) & (uint32_t)0xff000000) >> 24)            \
                                  ))
 
-#ifndef M_PI
-#define M_PI    3.14159265358979323846f
+#ifndef M_PI_F
+#define M_PI_F    3.1415926f
 #endif
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))

@@ -111,7 +111,7 @@ static void update_animation()
             source_dy += current_dy * move_speed * (1.0f - flight_progress);
 
             // Caculate new rotate angle
-            float desired_angle = atan2f(current_dy, current_dx) * (180.0f / M_PI) + 90;
+            float desired_angle = atan2f(current_dy, current_dx) * (180.0f / M_PI_F) + 90;
             float angle_difference = desired_angle - butterfly_rz;
 
             if (angle_difference > 180.0f)
