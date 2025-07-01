@@ -51,7 +51,7 @@ typedef int gui_error_t;
                                  ))
 
 #ifndef M_PI
-#define M_PI    ((float)3.14159265358979323846)
+#define M_PI    3.14159265358979323846f
 #endif
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))

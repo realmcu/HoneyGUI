@@ -73,42 +73,6 @@ static void gui_3d_rect_face_transform_camera(gui_3d_rect_face_t *face, gui_3d_c
 }
 
 
-// static void gui_3d_rect_face_cull_region(gui_3d_rect_face_t *face, gui_3d_camera_t *camera)
-// {
-//     bool outside = false;
-//     int beyondCount = 0;
-
-//     for (int j = 0; j < 4; j++)
-//     {
-//         float z = face->transform_vertex[j].position.z;
-//         // Check if the vertex is behind the near plane
-//         if (z <= camera->near_z)
-//         {
-//             outside = true;
-//             break;
-//         }
-
-//         // Count vertices beyond the far plane
-//         if (z > camera->far_z)
-//         {
-//             beyondCount++;
-//         }
-//     }
-//     // If all vertices are beyond the far plane
-//     if (beyondCount == 4)
-//     {
-//         outside = true;
-//     }
-//     if (outside)
-//     {
-//         face->state |= GUI_3D_FACESTATE_CLIPPED;
-//     }
-//     else
-//     {
-//         face->state &= ~GUI_3D_FACESTATE_CLIPPED;
-//     }
-
-// }
 
 static void gui_3d_rect_face_calculate_normal(gui_3d_rect_face_t *face)
 {
@@ -182,46 +146,6 @@ static void gui_3d_rect_face_transform_perspective(gui_3d_rect_face_t *face,
 }
 
 
-// static void gui_3d_rect_face_cull_out_side(gui_3d_rect_face_t *face, const gui_3d_camera_t *camera)
-// {
-//     float half_viewplane_height = camera->viewplane_height / 2;
-//     float half_viewplane_width = camera->viewplane_width / 2;
-
-//     if (face->transform_vertex[0].position.y > half_viewplane_height && \
-//         face->transform_vertex[1].position.y > half_viewplane_height && \
-//         face->transform_vertex[2].position.y > half_viewplane_height)
-//     {
-//         //up
-//         face->state |= GUI_3D_FACESTATE_CLIPPED;
-//         return;
-//     }
-//     else if (face->transform_vertex[0].position.y < -half_viewplane_height && \
-//              face->transform_vertex[1].position.y < -half_viewplane_height && \
-//              face->transform_vertex[2].position.y < -half_viewplane_height)
-//     {
-//         //down
-//         face->state |= GUI_3D_FACESTATE_CLIPPED;
-//         return;
-//     }
-//     else if (face->transform_vertex[0].position.x < -half_viewplane_width && \
-//              face->transform_vertex[1].position.x < -half_viewplane_width && \
-//              face->transform_vertex[2].position.x < -half_viewplane_width)
-//     {
-//         //left
-//         face->state |= GUI_3D_FACESTATE_CLIPPED;
-//         return;
-//     }
-//     else if (face->transform_vertex[0].position.x > half_viewplane_width && \
-//              face->transform_vertex[1].position.x > half_viewplane_width && \
-//              face->transform_vertex[2].position.x > half_viewplane_width)
-//     {
-//         //right
-//         face->state |= GUI_3D_FACESTATE_CLIPPED;
-//         return;
-//     }
-
-//     face->state &= ~GUI_3D_FACESTATE_CLIPPED;
-// }
 
 static void gui_3d_rect_face_transform_screen(gui_3d_rect_face_t *face, gui_3d_camera_t *camera)
 {
@@ -233,10 +157,6 @@ static void gui_3d_rect_face_transform_screen(gui_3d_rect_face_t *face, gui_3d_c
         // Transform to screen space
         face->transform_vertex[i].position.x = alpha + alpha * face->transform_vertex[i].position.x;
         face->transform_vertex[i].position.y = beta + beta * face->transform_vertex[i].position.y;
-
-        // // Invert y-axis
-        // face->transform_vertex[i].position.y = camera->viewport_height -
-        //                                        face->transform_vertex[i].position.y;
     }
 
 }
