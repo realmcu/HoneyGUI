@@ -1,18 +1,19 @@
 # Apply the flags to C and C++ compiler settings
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -xc \
-	-std=c11 \
+	-std=gnu11 \
     --target=arm-arm-none-eabi \
-    -march=armv8.1-m.main+dsp+mve.fp+fp \
+    -mcpu=cortex-m55 \
     -mfloat-abi=hard \
     -fno-rtti \
     -flto \
+    -fno-exceptions \
     -funsigned-char \
     -fshort-enums \
     -fshort-wchar \
     -mlittle-endian \
     -gdwarf-4 \
-    -O2 \
+    -O3 \
     -fno-function-sections \
     -Wno-packed \
     -Wno-missing-variable-declarations \
@@ -29,17 +30,18 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wno-implicit-function-declaration ")
 	
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-	-std=c++98 \
+	-std=c++14 \
     --target=arm-arm-none-eabi \
-    -march=armv8.1-m.main+dsp+mve.fp+fp \
+    -mcpu=cortex-m55 \
     -mfloat-abi=hard \
     -flto \
+    -fno-exceptions \
     -funsigned-char \
     -fshort-enums \
     -fshort-wchar \
     -mlittle-endian \
     -gdwarf-4 \
-    -O2 \
+    -O3 \
     -fno-function-sections \
     -Wno-packed \
     -Wno-missing-variable-declarations \
