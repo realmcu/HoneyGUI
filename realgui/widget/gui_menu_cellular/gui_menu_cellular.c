@@ -111,17 +111,17 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
         float dis = sqrtf(offset_X * offset_X + offset_Y * offset_Y);
         float ratio = dis / dis_max;
         float scale;
-        float radius = (float)obj->w * 2.0f;
+        float radius = (SCREEN_H + SCREEN_W) / 4.0f;
 
         if (dis > radius)
         {
             // concave  function, f'(x) increase
-            scale = 0.8 * pow((1.0f - ratio) / (1.0f - (radius / dis_max)), 0.5f);
+            scale = 0.7 * pow((1.0f - ratio) / (1.0f - (radius / dis_max)), 0.5f);
         }
         else
         {
             // convex function, f'(x) decrease
-            float a = (float)log(0.8) / (radius / dis_max);
+            float a = (float)log(0.7) / (radius / dis_max);
             scale = exp(a * ratio);
         }
 
@@ -131,17 +131,15 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
         }
         else if ((SCREEN_W / 2.0f) - fabsf(offset_X) < 20.0f)
         {
-            scale /= 2.0f;
+            scale /= 1.5f;
         }
 
         gui_img_scale(img, scale, scale);
         float t_x = (float)this->hor_offset - (1 - scale) * (offset_X / (SCREEN_W / 2.0f)) *
-                    (this->icon_size / (1.8f * SCREEN_H / SCREEN_W));
+                    (this->icon_size / (1.5f * SCREEN_H / SCREEN_W));
         float t_y = (float)this->ver_offset - (1 - scale) * (offset_Y / (SCREEN_H / 2.0f)) *
-                    (this->icon_size / 1.8f);
+                    (this->icon_size / 1.5f);
         gui_img_translate(img, t_x, t_y);
-        // gui_log("%s dis = %f, dis_max = %f, scale = %f\n",
-        //         obj->name, dis, dis_max, img->scale_x);
     }
 }
 

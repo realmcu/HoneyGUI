@@ -28,7 +28,7 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1751440027368524794/1f2c80e7_10737458.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1751456456790100801/2b635428_10737458.gif" width= "400" /></div>
    <br>
 
 API
