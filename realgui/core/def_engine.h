@@ -68,6 +68,7 @@ typedef struct acc_engine
 
     void *(* jpeg_load)(void *input, int len, int *w, int *h, int *channel);
     void (* jpeg_free)(void *);
+    bool enable_async;
     // void (*draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
     // void (*draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
     // void (*draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
