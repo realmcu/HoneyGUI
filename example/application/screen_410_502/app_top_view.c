@@ -527,7 +527,6 @@ static void top_view_design(gui_view_t *view)
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
-    gui_obj_start_timer(GUI_BASE(list));
 
     create_clear_note(view);
     for (int8_t i = infor_num - 1; i >= 0; i--)

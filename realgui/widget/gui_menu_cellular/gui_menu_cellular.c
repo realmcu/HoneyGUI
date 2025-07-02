@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_curtain.c
-  * @brief create a curtain effect widget,which should be nested in a curtainview.
-  * @details Slide to extend and retract curtains
-  * @author triton_yu@realsil.com.cn
-  * @date 2023/10/24
+  * @file gui_menu_cellular.h
+  * @brief honeygui menu effect.
+  * @details Slide to extend and retract menu_cellulars
+  * @author shel_deng@realsil.com.cn
+  * @date 2025/7/2
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -115,10 +115,12 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
 
         if (dis > radius)
         {
+            // concave  function, f'(x) increase
             scale = 0.8 * pow((1.0f - ratio) / (1.0f - (radius / dis_max)), 0.5f);
         }
         else
         {
+            // convex function, f'(x) decrease
             float a = (float)log(0.8) / (radius / dis_max);
             scale = exp(a * ratio);
         }
@@ -127,12 +129,16 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
         {
             scale = 0.01f;
         }
+        else if ((SCREEN_W / 2.0f) - fabsf(offset_X) < 20.0f)
+        {
+            scale /= 2.0f;
+        }
 
         gui_img_scale(img, scale, scale);
-        float t_x = (float)this->hor_offset - (1 - scale) * (offset_X / (SCREEN_W / 2.0f)) * ((
-                        float)this->icon_size / (1.65f * SCREEN_H / SCREEN_W));
-        float t_y = (float)this->ver_offset - (1 - scale) * (offset_Y / (SCREEN_H / 2.0f)) * ((
-                        float)this->icon_size / 1.65f);
+        float t_x = (float)this->hor_offset - (1 - scale) * (offset_X / (SCREEN_W / 2.0f)) *
+                    (this->icon_size / (1.8f * SCREEN_H / SCREEN_W));
+        float t_y = (float)this->ver_offset - (1 - scale) * (offset_Y / (SCREEN_H / 2.0f)) *
+                    (this->icon_size / 1.8f);
         gui_img_translate(img, t_x, t_y);
         // gui_log("%s dis = %f, dis_max = %f, scale = %f\n",
         //         obj->name, dis, dis_max, img->scale_x);
@@ -164,22 +170,15 @@ static void gui_menu_cellular_prepare(gui_obj_t *obj)
 
     if (tp->pressing)
     {
+        this->hor_offset = this->hor_hold + tp->deltaX;
         this->ver_offset = this->ver_hold + tp->deltaY;
         gui_menu_cellular_update_speed(this->ver_record, &this->ver_speed, tp->deltaY);
-        // if (abs(tp->deltaX) > this->icon_size / 5)
-        {
-            this->hor_offset = this->hor_hold + tp->deltaX;
-        }
         gui_menu_cellular_adjust_image(obj);
     }
     else if (tp->released)
     {
         memset(this->ver_record, 0, sizeof(this->ver_record));
         this->ver_hold = this->ver_offset;
-        if (abs(this->hor_offset) <= this->icon_size / 5)
-        {
-            this->hor_offset = 0;
-        }
         this->hor_hold = this->hor_offset;
     }
     else if (this->ver_speed != 0)
@@ -241,7 +240,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
     GET_BASE(this)->create_done = true;
 
 #define ICON_SIZE (icon_size)
-#define WIDTH_GAP (ICON_SIZE + 5)
+#define WIDTH_GAP (ICON_SIZE + ICON_SIZE / 20)
 #define HEIGHT_GAP (ICON_SIZE)
 #define INIT_OFFSET_X (icon_size / 2)
 #define INIT_OFFSET_Y (0)
@@ -256,20 +255,20 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
         int16_t start_y = 0;
         if (index < 3)
         {
-            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2);
+            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2) + FOUCUS_OFFSET;
             img = gui_img_create_from_mem(this, 0, icon_array[i],
-                                          WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOUCUS_OFFSET, start_y + FOUCUS_OFFSET, 0, 0);
+                                          WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOUCUS_OFFSET, start_y, 0, 0);
         }
         else
         {
-            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2 + 1);
+            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2 + 1) + FOUCUS_OFFSET;
             img = gui_img_create_from_mem(this, 0, icon_array[i],
-                                          WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOUCUS_OFFSET, start_y + FOUCUS_OFFSET, 0, 0);
+                                          WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOUCUS_OFFSET, start_y, 0, 0);
         }
         gui_img_set_focus(img, FOUCUS_OFFSET, FOUCUS_OFFSET);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
-        this->ver_offset_min = -(start_y + HEIGHT_GAP * 2 - SCREEN_H);
+        this->ver_offset_min = -(start_y + HEIGHT_GAP - SCREEN_H);
     }
     this->icon_size = icon_size;
 

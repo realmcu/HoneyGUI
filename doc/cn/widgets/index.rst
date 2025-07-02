@@ -57,6 +57,7 @@
     视图 (View) <gui_view>
     列表 (List) <gui_list>
     画布 (Canvas) <gui_canvas>
+    蜂窝菜单 (Menu Celllar) <gui_menu_cellular>
 
 
 .. 窗口 (Window) <gui_window>
@@ -80,7 +81,6 @@
 .. 可缩放矢量图形 (SVG) <gui_svg>
 .. 监视点渐变 (Watch Gradient Spot) <gui_watch_gradient_spot>
 .. 表盘渐变 (Watchface Gradient) <gui_watchface_gradient>
-.. 蜂窝菜单 (Menu Celllar) <gui_menu_cellular>
 .. 返回 (Return) <gui_return>
 .. 二维码或条形码 (Qbcode) <gui_qbcode>
 .. 多级菜单 (Multi Level) <gui_multi_level>
