@@ -10,7 +10,6 @@
 #include "gui_view.h"
 #include "gui_list.h"
 #include "gui_3d.h"
-#include <math.h>
 
 #define CURRENT_VIEW_NAME "butterfly_particle_view"
 

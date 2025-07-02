@@ -40,15 +40,13 @@ typedef struct gui_menu_cellular
 {
     gui_obj_t base;
     int16_t ver_speed;
-    int16_t hor_speed;
     int16_t ver_record[5];
-    int16_t hor_record[5];
     int16_t ver_hold;
     int16_t hor_hold;
     int16_t ver_offset;     //!< vertical offset
     int16_t hor_offset;     //!< horizontal offset
-    int16_t ver_offset_min; //!< minimum horizontal offset
-    int16_t hor_offset_min; //!< minimum horizontal offset
+    int16_t ver_offset_min; //!< minimum vertical offset
+    int16_t icon_size;
 } gui_menu_cellular_t;
 
 struct gui_menu_cellular_gesture_parameter

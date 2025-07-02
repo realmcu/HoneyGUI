@@ -72,7 +72,7 @@ static gui_view_descriptor_t const descriptor =
 extern uint8_t menu_style;
 static int16_t list_offset_his = 0;
 static gui_menu_cellular_t *menu_cellular = NULL;
-static int16_t cellular_offset_x = -200;
+static int16_t cellular_offset_x = 0;
 static int16_t cellular_offset_y = 0;
 
 /*============================================================================*
@@ -124,12 +124,6 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-static void canvas_timer_cb(void *p)
-{
-    gui_obj_t *obj = (gui_obj_t *)p;
-    matrix_translate((float)menu_cellular->hor_offset, (float)menu_cellular->ver_offset, obj->matrix);
-}
 
 static void switch_app_box2d_ring(void *obj, gui_event_t e, void *param)
 {
@@ -331,10 +325,18 @@ static void list_timer_cb(void *obj)
     list_offset_his = ((gui_list_t *)obj)->offset;
 }
 
-static void cellular_timer_cb(void *obj)
+static void cellular_timer_cb()
 {
-    cellular_offset_x = ((gui_menu_cellular_t *)obj)->hor_offset;
-    cellular_offset_y = ((gui_menu_cellular_t *)obj)->ver_offset;
+    cellular_offset_x = menu_cellular->hor_offset;
+    cellular_offset_y = menu_cellular->ver_offset;
+}
+
+static void canvas_timer_cb(void *p)
+{
+    gui_obj_t *obj = (gui_obj_t *)p;
+    matrix_translate((float)menu_cellular->hor_offset, (float)menu_cellular->ver_offset, obj->matrix);
+
+    cellular_timer_cb();
 }
 
 static void app_menu_design(gui_view_t *view)
@@ -381,7 +383,35 @@ static void app_menu_design(gui_view_t *view)
 
         UI_CLOCK_HEARTRATE_ICON_BIN,
         UI_CLOCK_FRUIT_NINJA_ICON_BIN,
+        UI_CLOCK_BOX2D_RING_ICON_BIN,
+        UI_CLOCK_ACTIVITY_ICON_BIN,
+        SOCCER_ICON_BIN,
+        FLOWER_ICON_BIN,
+        WEATHER_ICON_BIN,
+        BUTTERFLY_ICON_BIN,
+        APPLIST_ICON_BIN,
+        DISC_ICON_BIN,
+        FACE_ICON_BIN,
+        PRISM_THICK_ICON_BIN,
+        PRISM3D_ICON_BIN,
+        WINDMILL_ICON_BIN,
+        PANDKOI_ICON_BIN,
+        SEAWATER_ICON_BIN,
+        FIREFLY_ICON_BIN,
+        RAINBOW_DIGITAL_ICON_BIN,
+        KOI_CLOCK_ICON_BIN,
+        DIGITAL_CLOCK_ICON_BIN,
+        COUNT_DOWN_TIME_ICON_BIN,
+        FIREWORKS_CLOCK_ICON_BIN,
+        HEART_PARTICLE_ICON_BIN,
+        BUTTERFLY_PARTICLE_ICON_BIN,
+        BUTTERFLYS_ICON_BIN,
+        EARTH_DIGITAL_ICON_BIN,
+        LABUBU_DIGITAL_ICON_BIN,
+        FLOWER_CLOCK_ICON_BIN,
+        RAINBOW_ANALOG_ICON_BIN,
     };
+
     if (menu_style == 0)
     {
         char *text_array[] =
@@ -543,13 +573,13 @@ static void app_menu_design(gui_view_t *view)
     }
     else
     {
+        int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
+        int16_t icon_size = 100;
         gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), "background", 0, 0,
                                                               SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
-        gui_menu_cellular_t *menu = gui_menu_cellular_create(win, 100, img_data_array,
-                                                             sizeof(img_data_array) / sizeof(uint32_t *));
+        gui_menu_cellular_t *menu = gui_menu_cellular_create(win, icon_size, img_data_array, array_size);
         menu_cellular = menu;
         gui_menu_cellular_offset(menu, cellular_offset_x, cellular_offset_y);
-        gui_obj_create_timer(GUI_BASE(menu), 10, true, cellular_timer_cb);
         {
             struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
             {
@@ -563,12 +593,20 @@ static void app_menu_design(gui_view_t *view)
                 {switch_app_rainbow_analog, NULL},
 
                 {switch_app_heart_rate, NULL}, {switch_app_fruit_ninja, NULL}, {switch_app_box2d_ring, NULL}, {switch_app_activity, NULL},
+                {switch_app_soccer, NULL}, {switch_app_flower, NULL}, {switch_app_weather, NULL}, {switch_app_butterfly, NULL},
+                {switch_app_applist, NULL}, {switch_app_disc, NULL}, {switch_app_face, NULL}, {switch_app_prism_thick, NULL},
+                {switch_app_prism_mirror, NULL}, {switch_app_windmill, NULL}, {switch_app_pandkoi, NULL}, {switch_app_seawater, NULL},
+                {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL}, {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL},
+                {switch_app_countdown, NULL}, {switch_app_firework, NULL}, {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL},
+                {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL}, {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL},
+                {switch_app_rainbow_analog, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));
         }
         {
-            gui_win_t *win_canvas = gui_win_create(view, "win_canvas", 230, 700, 200, 100);
+            int h = array_size / 7 * 100 * 2 + (array_size % 7) / 3 * 100 + 100;
+            gui_win_t *win_canvas = gui_win_create(view, "win_canvas", 125, h, 200, 100);
             // gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(win_canvas), 0, 0, 0, 170,
             //                                                                56, 30, gui_rgb(100, 100, 100));
             // gui_img_t *img = gui_img_create_from_mem(canvas, 0, APP_MENU_ICON_BIN, 33, 10, 0, 0);

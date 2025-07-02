@@ -133,6 +133,7 @@ static void gui_fps_cb(void *p)
 
 }
 
+// Show the FPS, widget count, memory usage, and low memory usage
 static void fps_create(void *parent)
 {
     char *text;
@@ -158,6 +159,7 @@ static void fps_create(void *parent)
     gui_text_type_set(low_mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
 }
 
+// Enter menu and change menu style by button
 static void kb_button_cb()
 {
     extern gui_kb_port_data_t *kb_get_data(void);
@@ -174,7 +176,7 @@ static void kb_button_cb()
             uint32_t time = kb->timestamp_ms_release - time_press;
             if (time <= 150)
             {
-                // gui_log("pressing time = %d\n", time);
+                // Press twice quickly to change menu style
                 if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
                 {
                     gui_log("change menu style\n");
@@ -186,20 +188,21 @@ static void kb_button_cb()
             }
             else
             {
-                gui_log("pressing time = %d\n", time);
+                // Press once to enter menu
                 press_his = 0;
                 gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
                                        SWITCH_IN_ANIMATION_FADE);
             }
         }
     }
-    if (kb->event == GUI_KB_EVENT_DOWN)
+    else if (kb->event == GUI_KB_EVENT_DOWN)
     {
         time_press = kb->timestamp_ms_press;
         hold = 1;
     }
 }
 
+// Generate a pseudo-random number
 static uint16_t xorshift16()
 {
     static uint16_t seed = 12345;
@@ -279,6 +282,7 @@ static void json_refreash()
 }
 #endif
 
+// Update the watch time and the JSON data
 static void win_cb()
 {
 #if defined __WIN32
@@ -314,6 +318,7 @@ static void win_cb()
 
 static void watchface_design(gui_view_t *view)
 {
+    /* view layout */
     gui_view_switch_on_event(view, app_bottom_view, SWITCH_INIT_STATE,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
@@ -338,6 +343,7 @@ static void watchface_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
 }
 
+// Send information to the GUI server, which will be displayed in the top view
 static void inform_generate_task_entry()
 {
     static char *content = NULL;
@@ -375,7 +381,6 @@ static void inform_generate_task_entry()
         gui_send_msg_to_server(&msg);
     }
 }
-
 
 static void app_hongkong_ui_design(void)
 {
@@ -431,7 +436,7 @@ static int app_init(void)
  *                           Public Functions
  *============================================================================*/
 #if defined __WIN32
-/* read CJSON to string */
+// Read CJSON to string
 char *read_file(const char *file_path)
 {
     const char *path = NULL;

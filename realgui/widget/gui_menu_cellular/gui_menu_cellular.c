@@ -42,9 +42,8 @@
 
 #define SCREEN_W        ((float)gui_get_screen_width())
 #define SCREEN_H        ((float)gui_get_screen_height())
-#define GUI_MAX_SPEED 30
-#define GUI_MIN_SPEED 7
-#define IMG_NUM_MAX 30
+#define GUI_MAX_SPEED 50
+#define GUI_MIN_SPEED 10
 
 /*============================================================================*
  *                            Variables
@@ -92,13 +91,14 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
 {
     gui_menu_cellular_t *this = GUI_TYPE(gui_menu_cellular_t, obj);
 
-    this->hor_offset = this->hor_offset > SCREEN_W / 5 ? SCREEN_W / 5 : this->hor_offset;
-    this->ver_offset = this->ver_offset > SCREEN_H / 5 ? SCREEN_H / 5 : this->ver_offset;
-    this->hor_offset = this->hor_offset < this->hor_offset_min ? this->hor_offset_min :
+    this->hor_offset = this->hor_offset > this->icon_size / 2 ? this->icon_size / 2 : this->hor_offset;
+    this->ver_offset = this->ver_offset > this->icon_size / 10 ? this->icon_size / 10 :
+                       this->ver_offset;
+    this->hor_offset = this->hor_offset < -this->icon_size / 2 ? -this->icon_size / 2 :
                        this->hor_offset;
     this->ver_offset = this->ver_offset < this->ver_offset_min ? this->ver_offset_min :
                        this->ver_offset;
-
+    // gui_log("this->hor_offset: %d\n", this->hor_offset);
     float dis_max = (sqrtf(SCREEN_W * SCREEN_W + SCREEN_H * SCREEN_H) / 2.0f);
     gui_node_list_t *node = NULL;
     gui_list_for_each(node, &obj->child_list)
@@ -106,20 +106,21 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
 
-        float offset_X = SCREEN_W / 2.0f - (float)(obj->x + this->hor_offset);
-        float offset_Y = SCREEN_H / 2.0f - (float)(obj->y + this->ver_offset);
+        float offset_X = (float)(obj->x + this->hor_offset) - SCREEN_W / 2.0f;
+        float offset_Y = (float)(obj->y + this->ver_offset) - SCREEN_H / 2.0f;
         float dis = sqrtf(offset_X * offset_X + offset_Y * offset_Y);
         float ratio = dis / dis_max;
         float scale;
-        float w = (float)obj->w;
+        float radius = (float)obj->w * 2.0f;
 
-        if (dis > w * 2)
+        if (dis > radius)
         {
-            scale = 0.8f + 8 * w * 2 / dis_max - ratio * 8;
+            scale = 0.8 * pow((1.0f - ratio) / (1.0f - (radius / dis_max)), 0.5f);
         }
         else
         {
-            scale = 1.f - 0.2f * (w * 2 / dis_max) * ratio;
+            float a = (float)log(0.8) / (radius / dis_max);
+            scale = exp(a * ratio);
         }
 
         if (scale <= 0)
@@ -128,10 +129,32 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
         }
 
         gui_img_scale(img, scale, scale);
-        gui_img_translate(img, (float)this->hor_offset, (float)this->ver_offset);
+        float t_x = (float)this->hor_offset - (1 - scale) * (offset_X / (SCREEN_W / 2.0f)) * ((
+                        float)this->icon_size / (1.65f * SCREEN_H / SCREEN_W));
+        float t_y = (float)this->ver_offset - (1 - scale) * (offset_Y / (SCREEN_H / 2.0f)) * ((
+                        float)this->icon_size / 1.65f);
+        gui_img_translate(img, t_x, t_y);
         // gui_log("%s dis = %f, dis_max = %f, scale = %f\n",
         //         obj->name, dis, dis_max, img->scale_x);
     }
+}
+
+static void _restore_cellular_timer_cb(void *p)
+{
+    gui_obj_t *obj = (gui_obj_t *)p;
+    gui_menu_cellular_t *this = (gui_menu_cellular_t *)obj;
+
+    float factor = 0.4f;
+    int16_t distance = - this->hor_offset;
+    int delta = (int16_t)(distance * factor); //exponential decay
+    this->hor_offset += delta;
+    if (delta == 0)
+    {
+        this->hor_offset = 0;
+        gui_obj_delete_timer(obj);
+    }
+    this->hor_hold = this->hor_offset;
+    gui_menu_cellular_adjust_image(obj);
 }
 
 static void gui_menu_cellular_prepare(gui_obj_t *obj)
@@ -142,29 +165,34 @@ static void gui_menu_cellular_prepare(gui_obj_t *obj)
     if (tp->pressing)
     {
         this->ver_offset = this->ver_hold + tp->deltaY;
-        this->hor_offset = this->hor_hold + tp->deltaX;
-        gui_menu_cellular_adjust_image(obj);
         gui_menu_cellular_update_speed(this->ver_record, &this->ver_speed, tp->deltaY);
-        gui_menu_cellular_update_speed(this->hor_record, &this->hor_speed, tp->deltaX);
-        // gui_log("ver_s = %d, hor_s = %d\n", this->ver_speed, this->hor_speed);
+        // if (abs(tp->deltaX) > this->icon_size / 5)
+        {
+            this->hor_offset = this->hor_hold + tp->deltaX;
+        }
+        gui_menu_cellular_adjust_image(obj);
     }
     else if (tp->released)
     {
         memset(this->ver_record, 0, sizeof(this->ver_record));
-        memset(this->hor_record, 0, sizeof(this->hor_record));
         this->ver_hold = this->ver_offset;
+        if (abs(this->hor_offset) <= this->icon_size / 5)
+        {
+            this->hor_offset = 0;
+        }
         this->hor_hold = this->hor_offset;
     }
-    else if (this->ver_speed != 0 || this->hor_speed != 0)
+    else if (this->ver_speed != 0)
     {
         this->ver_hold += this->ver_speed;
-        this->hor_hold += this->hor_speed;
         this->ver_offset = this->ver_hold;
-        this->hor_offset = this->hor_hold;
         this->ver_speed = (int16_t)((1 - 0.05) * this->ver_speed);
-        this->hor_speed = (int16_t)((1 - 0.05) * this->hor_speed);
         gui_menu_cellular_adjust_image(obj);
-        // gui_log("!!!ver_s = %d, hor_s = %d\n", this->ver_speed, this->hor_speed);
+    }
+
+    if (!tp->pressing && this->hor_offset != 0 && obj->timer == NULL)
+    {
+        gui_obj_create_timer(obj, 10, true, _restore_cellular_timer_cb);
     }
 }
 
@@ -216,61 +244,34 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 #define WIDTH_GAP (ICON_SIZE + 5)
 #define HEIGHT_GAP (ICON_SIZE)
 #define INIT_OFFSET_X (icon_size / 2)
-#define INIT_OFFSET_Y (icon_size / 2)
-    if (array_size > IMG_NUM_MAX)
-    {
-        array_size = IMG_NUM_MAX;
-    }
+#define INIT_OFFSET_Y (0)
+#define FOUCUS_OFFSET (icon_size / 2)
+    uint8_t index = 0;
+    uint8_t index_offset = 0;
     for (size_t i = 0; i < array_size; i++)
     {
+        if (index >= 6) {index_offset += 7;}
+        index = i - index_offset;
         gui_img_t *img = NULL;
-        if (i < 3)
+        int16_t start_y = 0;
+        if (index < 3)
         {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i + 1) + (WIDTH_GAP / 2) * 1, INIT_OFFSET_Y,
-                                          0, 0);
+            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2);
+            img = gui_img_create_from_mem(this, 0, icon_array[i],
+                                          WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOUCUS_OFFSET, start_y + FOUCUS_OFFSET, 0, 0);
         }
-        else if (i < 7)
+        else
         {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i - 3 + 1) + (WIDTH_GAP / 2) * 0,
-                                          INIT_OFFSET_Y + HEIGHT_GAP, 0, 0);
+            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2 + 1);
+            img = gui_img_create_from_mem(this, 0, icon_array[i],
+                                          WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOUCUS_OFFSET, start_y + FOUCUS_OFFSET, 0, 0);
         }
-        else if (i < 12)
-        {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i - 7) + (WIDTH_GAP / 2) * 1,
-                                          INIT_OFFSET_Y + HEIGHT_GAP * 2, 0, 0);
-        }
-        else if (i < 18)
-        {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i - 12) + (WIDTH_GAP / 2) * 0,
-                                          INIT_OFFSET_Y + HEIGHT_GAP * 3, 0, 0);
-        }
-        else if (i < 23)
-        {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i - 18) + (WIDTH_GAP / 2) * 1,
-                                          INIT_OFFSET_Y + HEIGHT_GAP * 4, 0, 0);
-        }
-        else if (i < 27)
-        {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i - 23 + 1) + (WIDTH_GAP / 2) * 0,
-                                          INIT_OFFSET_Y + HEIGHT_GAP * 5, 0, 0);
-        }
-        else if (i < 30)
-        {
-            img = gui_img_create_from_mem(this, "img", icon_array[i],
-                                          INIT_OFFSET_X + WIDTH_GAP * (i - 27 + 1) + (WIDTH_GAP / 2) * 1,
-                                          INIT_OFFSET_Y + HEIGHT_GAP * 6, 0, 0);
-        }
-        gui_img_set_focus(img, ICON_SIZE / 2, ICON_SIZE / 2);
+        gui_img_set_focus(img, FOUCUS_OFFSET, FOUCUS_OFFSET);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        this->hor_offset_min = -(INIT_OFFSET_X + WIDTH_GAP * 6 - SCREEN_W);
-        this->ver_offset_min = -(INIT_OFFSET_Y + HEIGHT_GAP * 7 - SCREEN_H);
+        gui_img_set_quality(img, true);
+        this->ver_offset_min = -(start_y + HEIGHT_GAP * 2 - SCREEN_H);
     }
+    this->icon_size = icon_size;
 
     gui_menu_cellular_adjust_image(&this->base);
     return this;
@@ -294,10 +295,10 @@ void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
     int index = 0;
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
         if (para_array && para_array[index].callback_function)
         {
-            gui_obj_add_event_cb(obj, para_array[index].callback_function, GUI_EVENT_TOUCH_CLICKED,
+            gui_obj_add_event_cb(o, para_array[index].callback_function, GUI_EVENT_TOUCH_CLICKED,
                                  para_array[index].parameter);
         }
         index++;

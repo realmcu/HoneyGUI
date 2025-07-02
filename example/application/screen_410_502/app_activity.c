@@ -18,6 +18,13 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#ifdef M_PI
+#undef M_PI
+#define M_PI 3.1415926f
+#else
+#define M_PI 3.1415926f
+#endif
+
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define CURRENT_VIEW_NAME "activity_view"
@@ -51,6 +58,7 @@ static uint8_t *img_data = NULL;
 static gui_img_t *img;
 static uint16_t count = COUNT_MAX; //for timer
 static bool draw_flag = 0; //0: get new json data
+static bool has_draw_bg = 0; // only draw background once
 static size_t buffer_size = 0;
 static char move_content[30] = {0};
 static char ex_content[30] = {0};
@@ -156,41 +164,48 @@ static void arc_activity_cb(NVGcontext *vg)
     uint8_t interval = 6;
     float progress = count / (float)COUNT_MAX;
 
+    if (!has_draw_bg)
+    {
+        has_draw_bg = true;
+        nvgBeginPath(vg);
+        nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI / 2,
+               M_PI * 3.5f, NVG_CW);
+        nvgStrokeWidth(vg, line_width);
+        nvgStrokeColor(vg, nvgRGB(58, 23, 29));
+        nvgStroke(vg);
+
+        nvgBeginPath(vg);
+        nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI / 2,
+               M_PI * 3.5f, NVG_CW);
+        nvgStrokeWidth(vg, line_width);
+        nvgStrokeColor(vg, nvgRGB(30, 55, 25));
+        nvgStroke(vg);
+
+        nvgBeginPath(vg);
+        nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI / 2,
+               M_PI * 3.5f, NVG_CW);
+        nvgStrokeWidth(vg, line_width);
+        nvgStrokeColor(vg, nvgRGB(22, 50, 47));
+        nvgStroke(vg);
+    }
+
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI_F / 2,
-           M_PI_F * 3.5f, NVG_CW);
-    nvgStrokeWidth(vg, line_width);
-    nvgStrokeColor(vg, nvgRGB(58, 23, 29));
-    nvgStroke(vg);
-    nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI_F / 2,
-           M_PI_F * (1.5f + 2.0f * move_val * progress / 20000.0f), NVG_CW);  // cap 20000 steps
+    nvgArc(vg, RADIUS, RADIUS, radius_max, 3 * M_PI / 2,
+           M_PI * (1.5f + 2.0f * move_val * progress / 20000.0f), NVG_CW);  // cap 20000 steps
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(230, 67, 79));
     nvgStroke(vg);
 
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI_F / 2,
-           M_PI_F * 3.5f, NVG_CW);
-    nvgStrokeWidth(vg, line_width);
-    nvgStrokeColor(vg, nvgRGB(30, 55, 25));
-    nvgStroke(vg);
-    nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI_F / 2,
-           M_PI_F * (1.5f + 2.0f * ex_val * progress / 60.0f), NVG_CW);  // cap 60 min.
+    nvgArc(vg, RADIUS, RADIUS, radius_max - (line_width + interval), 3 * M_PI / 2,
+           M_PI * (1.5f + 2.0f * ex_val * progress / 60.0f), NVG_CW);  // cap 60 min.
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(186, 253, 79));
     nvgStroke(vg);
 
     nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI_F / 2,
-           M_PI_F * 3.5f, NVG_CW);
-    nvgStrokeWidth(vg, line_width);
-    nvgStrokeColor(vg, nvgRGB(22, 50, 47));
-    nvgStroke(vg);
-    nvgBeginPath(vg);
-    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI_F / 2,
-           M_PI_F * (1.5f + 2.0f * stand_val * progress / 30.0f), NVG_CW); // cap 30 times
+    nvgArc(vg, RADIUS, RADIUS, radius_max - 2 * (line_width + interval), 3 * M_PI / 2,
+           M_PI * (1.5f + 2.0f * stand_val * progress / 30.0f), NVG_CW); // cap 30 times
     nvgStrokeWidth(vg, line_width);
     nvgStrokeColor(vg, nvgRGB(117, 230, 229));
     nvgStroke(vg);
@@ -210,7 +225,6 @@ static void activity_timer_cb(void *obj)
 
     count += timer->interval_ms;
     uint8_t *img_data = (void *)gui_img_get_image_data(img);
-    memset(img_data, 0, buffer_size);
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, RADIUS * 2, RADIUS * 2,
                                       arc_activity_cb, img_data);
     gui_img_set_image_data(img, img_data);
@@ -222,25 +236,16 @@ static void activity_timer_cb(void *obj)
     }
 }
 
-// static void back2menu_cb()
-// {
-//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, SCREEN_WIDTH, back2menu_cb)
-// }
-
 static void enter_timer_cb(void *obj)
 {
     gui_view_t *view = gui_view_get_current();
     if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) == 0)
     {
         count = 0;
-        gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
+        has_draw_bg = false;
+        uint8_t *img_data = (void *)gui_img_get_image_data(img);
+        memset(img_data, 0, buffer_size);
+        gui_obj_create_timer(GUI_BASE(img), 10, true, activity_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
         gui_obj_stop_timer(GUI_BASE(obj));
     }
@@ -249,6 +254,7 @@ static void enter_timer_cb(void *obj)
 static void activity_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
+    has_draw_bg = false;
 
     // text
     {
@@ -284,6 +290,7 @@ static void activity_design(gui_view_t *view)
     memset(img_data, 0, buffer_size);
     img = gui_img_create_from_mem(obj, 0, (void *)img_data, SCREEN_WIDTH / 2 - RADIUS, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img, true);
     draw_flag = 0;
 
     // view layout
@@ -304,9 +311,8 @@ static void activity_design(gui_view_t *view)
     else
     {
         count = 0;
-        gui_obj_create_timer(GUI_BASE(img), 17, true, activity_timer_cb);
+        gui_obj_create_timer(GUI_BASE(img), 10, true, activity_timer_cb);
 
-        // gui_obj_create_timer(obj, 17, true, return_timer_cb);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);

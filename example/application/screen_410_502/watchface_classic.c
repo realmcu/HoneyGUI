@@ -128,7 +128,7 @@ static void arc_activity_cb(NVGcontext *vg)
     cJSON *root;
     if (!cjson_content)
     {
-        // automation
+        /* automatic update data if no json data*/
         // static float progress_activity = 0;
         // progress_activity += 0.001;
         // if (progress_activity >= 2)
@@ -319,7 +319,7 @@ static void arc_temperature_cb(NVGcontext *vg)
     cJSON *root;
     if (!cjson_content)
     {
-        // automation
+        /* automatic update data if no json data*/
         // float x = 100 / 2;
         // float y = 100 / 2;
         // float r = 50 - 8; // radius
@@ -494,7 +494,7 @@ static void compass_cb()
     cJSON *root;
     if (!cjson_content)
     {
-        // automation
+        /* automatic update data if no json data*/
         // float x = 100 / 2;
         // float y = 100 / 2;
         // float r = 35; // radius
@@ -736,7 +736,6 @@ void create_watchface_classic(gui_view_t *view)
         gui_text_rendermode_set(weather_range, 2);
         gui_obj_create_timer(GUI_BASE(img_weather), 2000, true, weather_cb);
     }
-// #endif
 
     // date & time text
     sprintf(date_text_content, "%s", day[0]);
