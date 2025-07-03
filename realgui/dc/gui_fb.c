@@ -333,6 +333,30 @@ static void gui_fb_draw(gui_obj_t *root)
         }
         dc->lcd_update(dc);
     }
+    else if (dc->type == DC_DOUBLE)
+    {
+        if (dc->frame_buf == NULL)
+        {
+            dc->frame_buf = dc->disp_buf_1;
+        }
+        else if (dc->frame_buf == dc->disp_buf_2)
+        {
+            dc->frame_buf = dc->disp_buf_1;
+        }
+        else
+        {
+            dc->frame_buf = dc->disp_buf_2;
+        }
+        memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+        dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
+        obj_draw_scan(root);
+        post_process_handle();
+        if (dc->lcd_draw_sync != NULL)
+        {
+            dc->lcd_draw_sync();
+        }
+        dc->lcd_update(dc);
+    }
     post_process_end();
 }
 
