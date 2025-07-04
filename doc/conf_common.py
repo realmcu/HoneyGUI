@@ -204,6 +204,22 @@ breathe_show_include = False
 # breathe_debug_trace_directives = True
 # breathe_debug_trace_qualification = True
 
+# rst merge release note config
+rst_merge_config = {
+    "enabled": False,
+    "primary_file": '',
+    "source_path": ''
+}
+
+# en/cn url check config
+skip_check_link_paths = []
+keyword_map = {'cn': 'en'}
+
+# ai ask data config
+ai_ask_lang_skip_paths_cn = [] # skip upload data path
+ai_ask_global_skip_paths = []
+ai_ask_split_exclude_patterns = [] # skip split by anchor path
+
 numfig = False
 
 GA_ID_MAPPING = {
