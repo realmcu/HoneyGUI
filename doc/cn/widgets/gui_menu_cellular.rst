@@ -32,6 +32,6 @@
    <br>
 
 API
----
+-----
 
 .. doxygenfile:: gui_menu_cellular.h

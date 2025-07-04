@@ -349,7 +349,6 @@ static void create_inform_note(information_t *inform)
     gui_obj_add_event_cb(GUI_BASE(note), (gui_event_cb_t)create_view_more, GUI_EVENT_TOUCH_CLICKED,
                          (void *)inform);
     // message
-    gui_text_t *text_informer, *text_content, *text_time;
     void *img_path = NULL;
     switch (app)
     {
@@ -369,21 +368,21 @@ static void create_inform_note(information_t *inform)
     gui_img_create_from_mem(canvas, "message icon", img_path, 10, 0, 0, 0);
 
     // text
-    text_time = gui_text_create(canvas, "time",  -15, 15, 0, 0);
+    gui_text_t *text_time = gui_text_create(canvas, "time",  -15, 15, 0, 0);
     gui_text_set(text_time, (void *)time, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(time),
                  24);
     gui_text_type_set(text_time, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_time, RIGHT);
 
-    text_informer = gui_text_create(canvas, "informer",  10, 50, 0, 0);
+    gui_text_t *text_informer = gui_text_create(canvas, "informer",  10, 50, 0, 0);
     gui_text_set(text_informer, (void *)informer, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(informer),
                  32);
     gui_text_type_set(text_informer, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_informer, LEFT);
 
-    text_content = gui_text_create(canvas, "content",  10, 75, 340, 0);
+    gui_text_t *text_content = gui_text_create(canvas, "content",  10, 75, 340, 0);
     uint8_t content_len = strlen(content);
     if (content_len > 100)
     {
@@ -465,11 +464,6 @@ static void clear_all_timer_cb(void *widget)
     if (abs(note->start_x - note->t_x) >= SCREEN_WIDTH)
     {
         gui_obj_child_free(GUI_BASE(list));
-        // gui_list_for_each(node, &(list->base.child_list))
-        // {
-        //     gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        //     gui_obj_tree_free_async(obj);
-        // }
 
         list->total_length = gui_get_dc()->screen_height;
         list->widget_num = 0;
@@ -522,13 +516,14 @@ static void top_view_design(gui_view_t *view)
     gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(parent), "background", 0, 0,
                                                           SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
 
+    create_clear_note(view);
+
     list = gui_list_create(view, "list", 0, NOTE_START, SCREEN_WIDTH, SCREEN_HEIGHT, NOTE_HEIGHT,
                            NOTE_INTERVAL, VERTICAL, 1);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
 
-    create_clear_note(view);
     for (int8_t i = infor_num - 1; i >= 0; i--)
     {
         create_inform_note(infor_rec[i]);
@@ -539,7 +534,7 @@ static void top_view_design(gui_view_t *view)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void add_information(gui_msg_t *msg)
+void add_information(information_t *payload)
 {
     if (infor_num == INFOR_NUM_MAX)
     {
@@ -554,9 +549,8 @@ void add_information(gui_msg_t *msg)
     }
     infor_num++;
     infor_need_update_num++;
-    infor_rec[0] = gui_malloc(sizeof(information_t));
-    memcpy(infor_rec[0], msg->payload, sizeof(information_t));
+    infor_rec[0] = gui_lower_malloc(sizeof(information_t));
+    memcpy(infor_rec[0], payload, sizeof(information_t));
     gui_log("add new information\r\n");
-    // gui_log("msg->payload: 0x%x\n", msg->payload);
 }
 

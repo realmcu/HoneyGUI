@@ -1,5 +1,5 @@
 /**
-\internal
+ \internal
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
@@ -13,7 +13,7 @@
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
-\endinternal
+ \endinternal
   */
 
 /*============================================================================*
@@ -74,31 +74,28 @@ struct gui_menu_cellular_gesture_parameter
  *============================================================================*/
 
 /**
- * @brief Create a honeycomb effect widget,
- *
- * @param parent the father widget nested in
- * @param icon_size icon's width(px)
- * @param icon_array icons set's file address array
- * @param array_size the array's size
- * @return gui_menu_cellular_t*
+ * @brief Create a menu_cellular widget.
+ * @param parent The father widget it nested in.
+ * @param icon_size Size of icon.
+ * @param icon_array The icons' image data address array.
+ * @param array_size Size of array.
+ * @return The menu_cellular pointer.
  */
 gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
                                               int       icon_size,
                                               uint32_t *icon_array[],
                                               int       array_size);
 /**
- * @brief config offset
- *
- * @param menu_cellular the menu_cellular pointer
- * @param offset_x  offset_x
- * @param offset_y  offset_y
+ * @brief Config offset.
+ * @param menu_cellular The menu_cellular pointer.
+ * @param offset_x The X-axis offset.
+ * @param offset_y The Y-axis offset.
  */
 void gui_menu_cellular_offset(gui_menu_cellular_t *menu_cellular, int offset_x, int offset_y);
 
 /**
  * @brief Add click events on images based on the cellular menu.
- *
- * @param menu_cellular Pointer to the cellular menu structure.
+ * @param menu_cellular The menu_cellular pointer.
  * @param para_array Array of gesture parameters corresponding to the click event.
  * @param array_length Length of the gesture parameters array.
  */

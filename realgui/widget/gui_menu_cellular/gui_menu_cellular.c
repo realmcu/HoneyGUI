@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_menu_cellular.h
+  * @file gui_menu_cellular.c
   * @brief honeygui menu effect.
   * @details Slide to extend and retract menu_cellulars
   * @author shel_deng@realsil.com.cn

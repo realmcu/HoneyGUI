@@ -178,7 +178,7 @@ typedef struct gui_view_on_event
  * @param y The Y-axis coordinate relative to parent widget
  * @param w Width
  * @param h Height
- * @return return the widget object pointer.
+ * @return Return the widget object pointer.
  *
  */
 gui_view_t *gui_view_create(void       *parent,
@@ -257,14 +257,14 @@ void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity);
 /**
  * @brief Get current view pointer.
  *
- * @return return current view pointer.
+ * @return Return current view pointer.
  */
 gui_view_t *gui_view_get_current(void);
 
 /**
  * @brief Get next view pointer.
  *
- * @return return next view pointer.
+ * @return Return next view pointer.
  */
 gui_view_t *gui_view_get_next(void);
 

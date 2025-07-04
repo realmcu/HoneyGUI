@@ -3,7 +3,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_list.c
+  * @file gui_list.h
   * @brief the list widget is a container for any number of list notele, and each notele can have other widgets added to it.
   * @author shel_deng@realsil.com.cn
   * @date 2025/04/23
@@ -129,7 +129,7 @@ typedef struct gui_list_note
  * @param note_length The length of each note.
  * @param space The space of each note.
  * @param dir The direction of the list.
- * @return return the widget object pointer.
+ * @return Return the widget object pointer.
  */
 gui_list_t *gui_list_create(void       *parent,
                             const char *name,
@@ -146,7 +146,7 @@ gui_list_t *gui_list_create(void       *parent,
  * @brief Add list note.
  * @param list The list widget it nested in.
  * @param add_at_top True: Add note at top of the list.
- * @return return the note object pointer.
+ * @return Return the note object pointer.
  */
 gui_list_note_t *gui_list_add_note(gui_list_t *list, bool add_at_top);
 

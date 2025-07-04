@@ -57,7 +57,7 @@
     视图 (View) <gui_view>
     列表 (List) <gui_list>
     画布 (Canvas) <gui_canvas>
-    蜂窝菜单 (Menu Celllar) <gui_menu_cellular>
+    蜂窝菜单 (Menu Cellular) <gui_menu_cellular>
 
 
 .. 窗口 (Window) <gui_window>

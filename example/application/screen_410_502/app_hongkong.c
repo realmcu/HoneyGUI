@@ -45,7 +45,7 @@ static void watchface_design(gui_view_t *view);
 #ifdef __WIN32
 char *read_file(const char *file_path);
 #endif
-
+static void inform_generate_cb();
 extern void clear_watchface_classic(gui_view_t *view);
 
 /*============================================================================*
@@ -76,12 +76,9 @@ struct tm *timeinfo;
 static struct tm watch_time;
 
 /* FPS */
-static gui_text_t *t_fps;
-static gui_text_t *widget_count;
+static gui_canvas_rect_t *fps_rect;
 static char fps[10];
 static char widget_count_string[20];
-static gui_text_t *mem;
-static gui_text_t *low_mem;
 static char mem_string[20];
 static char low_mem_string[20];
 
@@ -120,17 +117,20 @@ static void gui_fps_cb(void *p)
 {
     int fps_num = gui_fps();
     sprintf(fps, "FPS:%d", fps_num);
-    gui_text_content_set(t_fps, fps, strlen(fps));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(t_fps, "t_fps", fps_rect);
+    gui_text_content_set((gui_text_t *)t_fps, fps, strlen(fps));
     int widget_count_number = gui_get_obj_count();
     sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
-    gui_text_content_set(widget_count, widget_count_string, strlen(widget_count_string));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(widget_count, "widget_count", fps_rect);
+    gui_text_content_set((gui_text_t *)widget_count, widget_count_string, strlen(widget_count_string));
     uint32_t mem_number =  gui_mem_used();
     uint32_t low_mem_number =  gui_low_mem_used();
     sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
-    gui_text_content_set(mem, mem_string, strlen(mem_string));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(mem, "mem", fps_rect);
+    gui_text_content_set((gui_text_t *)mem, mem_string, strlen(mem_string));
     sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
-    gui_text_content_set(low_mem, low_mem_string, strlen(low_mem_string));
-
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(low_mem, "low_mem", fps_rect);
+    gui_text_content_set((gui_text_t *)low_mem, low_mem_string, strlen(low_mem_string));
 }
 
 // Show the FPS, widget count, memory usage, and low memory usage
@@ -138,23 +138,23 @@ static void fps_create(void *parent)
 {
     char *text;
     int font_size = 24;
-    gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
-                                                     gui_get_screen_width() / 2 - 140 / 2, 0, 140, 70, APP_COLOR_GRAY_OPACITY(150));
-    gui_obj_create_timer(GUI_BASE(rect), 17, true, gui_fps_cb);
+    fps_rect = gui_canvas_rect_create(parent, 0, gui_get_screen_width() / 2 - 140 / 2, 0, 140, 70,
+                                      APP_COLOR_GRAY_OPACITY(150));
+    gui_obj_create_timer(GUI_BASE(fps_rect), 17, true, gui_fps_cb);
     sprintf(fps, "FPS:%d", gui_fps());
     text = fps;
-    t_fps = gui_text_create(rect, "WIDGET gui_fps_text", 10, 0, gui_get_screen_width(), font_size);
+    gui_text_t *t_fps = gui_text_create(fps_rect, "t_fps", 10, 0, gui_get_screen_width(), font_size);
     gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_text_type_set(t_fps, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-    widget_count = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16, gui_get_screen_width(),
-                                   font_size);
+    gui_text_t *widget_count = gui_text_create(fps_rect, "widget_count", 10, 16, gui_get_screen_width(),
+                                               font_size);
     gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_text_type_set(widget_count, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-    mem = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16 * 2, gui_get_screen_width(), font_size);
+    gui_text_t *mem = gui_text_create(fps_rect, "mem", 10, 16 * 2, gui_get_screen_width(), font_size);
     gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_text_type_set(mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-    low_mem = gui_text_create(rect, "WIDGET gui_fps_text", 10, 16 * 3, gui_get_screen_width(),
-                              font_size);
+    gui_text_t *low_mem = gui_text_create(fps_rect, "low_mem", 10, 16 * 3, gui_get_screen_width(),
+                                          font_size);
     gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_text_type_set(low_mem, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
 }
@@ -317,6 +317,7 @@ static void win_cb()
     // watch_time = watch_clock_get();
     timeinfo = &watch_time;
 #endif
+    inform_generate_cb();
 }
 
 static void watchface_design(gui_view_t *view)
@@ -340,45 +341,46 @@ static void watchface_design(gui_view_t *view)
 
     gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
+
+    gui_obj_start_timer(GUI_BASE(fps_rect)); //reset timer
+    gui_obj_start_timer(GUI_BASE(view->base.parent)); //reset timer
 }
 
-// Send information to the GUI server, which will be displayed in the top view
-static void inform_generate_task_entry()
+// Send information to the top view
+static void inform_generate_cb()
 {
     static char *content = NULL;
-    while (true)
+    static char *time = NULL;
+    static uint8_t count = 0;
+
+    if (count < 5)
     {
-        gui_thread_mdelay(4000);
-
-        if (!content)
-        {
-            content = gui_malloc(60);
-            sprintf(content, "Watch will attempt to install this update later tonight.");
-        }
-        extern struct tm *timeinfo;
-        char time[10];
-        if (timeinfo)
-        {
-            sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-        }
-
-        information_t payload =
-        {
-            "watchOS 10.3.1",
-            content,
-            time,
-            OS
-        };
-        extern void add_information(information_t *payload);
-        gui_msg_t msg =
-        {
-            .event = GUI_EVENT_USER_DEFINE,
-            .payload = &payload,
-            .cb = (gui_msg_cb)add_information,
-        };
-
-        gui_send_msg_to_server(&msg);
+        count++;
+        return;
     }
+    count = 0;
+
+    if (!content)
+    {
+        content = gui_malloc(60);
+        sprintf(content, "Watch will attempt to install this update later tonight.");
+
+        time = gui_malloc(10);
+    }
+    if (timeinfo)
+    {
+        sprintf(time, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    }
+
+    information_t payload =
+    {
+        "watchOS 10.3.1",
+        content,
+        time,
+        OS
+    };
+    extern void add_information(information_t *payload);
+    add_information(&payload);
 }
 
 static void app_hongkong_ui_design(void)
@@ -425,7 +427,6 @@ static int app_init(void)
         return 0;
     }
 #endif
-    gui_thread_create("inform_generate_task_entry", inform_generate_task_entry, 0, 1024 * 2, 2);
     app_hongkong_ui_design();
 
     return 0;
