@@ -1,5 +1,18 @@
 {% extends "!layout.html" %}
+
+
+{% block extrahead %}
 {{ super() }}
+
+<!-- <script type="text/javascript">
+    window.sdktype = "{{ SDK | e }}";
+</script> -->
+<script type="text/javascript">
+    window.isMultilingual = "{{ is_multilingual | e }}";
+    window.leftNavWidth = "{{ left_nav_width | e }}";
+    window.chatAIBase = "{{ chat_aibase | e }}";
+</script>
+{% endblock %}
 
 
 {%- block extrabody %}
@@ -10,6 +23,7 @@
 
     <div id="back-to-top" onclick="backToTop()">↑</div>
 {% endblock %}
+
 
 {% block sidebartitle %}
     {%- set _logo_url = logo_url|default(pathto('_static/' + (logo or ""), 1)) %}
@@ -28,6 +42,6 @@
         </select>
     </div>
     {%- endif %}
-  
+
     {%- include "searchbox.html" %}
 {% endblock %}

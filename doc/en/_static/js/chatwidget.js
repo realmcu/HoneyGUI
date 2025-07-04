@@ -133,10 +133,12 @@
                     display: block;
                     padding: 8px 12px;
                     border-radius: 5px;
+                    line-height: 24px;
                 }
                 chat-widget .userText p, 
                 chat-widget .chatResp p {
                     margin: 3px 0;
+                    line-height: 24px;
                 }
                 chat-widget .userText {
                     white-space: pre-wrap;
@@ -148,6 +150,20 @@
                     margin-right: 40px;
                     background-color: #F1F5FF;
                 }
+                chat-widget .chatResp ol { list-style-type: decimal; }
+                chat-widget .chatResp ol ol { list-style-type: lower-alpha; }
+                chat-widget .chatResp ol ol ol { list-style-type: lower-roman; }
+                chat-widget .chatResp ol ol ol ol { list-style-type: lower-greek }
+                chat-widget .chatResp ul { list-style-type: disc; }
+                chat-widget .chatResp ul ul { list-style-type: circle; }
+                chat-widget .chatResp ul ul ul { list-style-type: square; }
+                chat-widget .chatResp ul ol ul ul { list-style-type: disclosure-closed }
+                chat-widget .chatResp li {
+                    list-style: inherit;
+                    list-style-position: outside;
+                    margin-left: 16px;
+                }
+                
                 .chat-loading {
                     width: 10px;
                     height: 10px;
@@ -271,64 +287,65 @@
         document.body.insertAdjacentHTML('beforeend', chatWidgetHTML);
     }
 
-    function textAreaResize(ele) {
-        ele.style.height = 'auto';
-        ele.style.height = ele.scrollHeight + 'px';
+    function textAreaResize(element) {
+        element.style.height = 'auto';
+        element.style.height = element.scrollHeight + 'px';
     }
 
     function chatWidgetInit(config) {
-        const fetchChatAPI = config.makeRequest;
         const chatTitle = config.chatWidgetTitle || '智能小客服';
         const chatPlaceholder = config.chatWidgetPlaceholder || 'Type your question';
+        const chatAIBase = config.chatAIBase;
 
         inserChatWidgetHTML(chatTitle, chatPlaceholder);
 
-        const userInput = document.querySelector('.chat-input textarea');
-        const chatModal = document.getElementById('ChatModal');
+        const userInputNode = document.querySelector('.chat-input textarea');
+        const chatModalNode = document.getElementById('ChatModal');
 
         /* ============== update chat-note font-size ============== */
-        const chatNote = chatModal.querySelector('.chat-note');
+        const chatNoteNode = chatModalNode.querySelector('.chat-note');
         function updateChatNoteFont() {
-            if(chatModal.offsetWidth < 520) {
-                chatNote.classList.add("font-small");
+            if(chatModalNode.offsetWidth < 520) {
+                chatNoteNode.classList.add("font-small");
             }
             else {
-                chatNote.classList.remove("font-small");
+                chatNoteNode.classList.remove("font-small");
             }
         }
 
-        const chatModalMask = document.getElementById('ChatModalMask');
+        const chatModalMaskNode = document.getElementById('ChatModalMask');
         /* ============= show or hide ai chat modal ============= */
         const toggleChatModalButton = document.getElementById('ToggleChatModal');
         const wyGridContainer = document.querySelector('.wy-grid-for-nav');
         toggleChatModalButton.onclick = function() {
-            if(chatModalMask.style.display === 'none' || chatModalMask.style.display === '') {
-                chatModalMask.style.display = 'block';
+            if(chatModalMaskNode.style.display === 'none' || chatModalMaskNode.style.display === '') {
+                chatModalMaskNode.style.display = 'block';
                 wyGridContainer.classList.add("prevent-manipulation");
                 updateChatNoteFont();
             }
             else {
-                chatModalMask.style.display = 'none';
+                chatModalMaskNode.style.display = 'none';
             }
         };
 
         /* =========== close modal button click handler =========== */
         const closeChatModalButton = document.getElementById('CloseChatModal');
         closeChatModalButton.onclick = function() {
-            chatModalMask.style.display = 'none';
+            chatModalMaskNode.style.display = 'none';
             wyGridContainer.classList.remove("prevent-manipulation");
         };
 
         /* ====== update textarea height accrording to input ====== */
-        userInput.addEventListener('input', function() {
-            textAreaResize(userInput);
+        userInputNode.addEventListener('input', function() {
+            textAreaResize(userInputNode);
         });
-        textAreaResize(userInput);
+        textAreaResize(userInputNode);
 
         /* ================ save ai chat hiatory ================ */
         let chatHistoryList = [{"role": "assistant", "content": "Hi there! How can I help?"}];
         function addChatHistory(role, text) {
-            let forwardText = text.replace(/(\\n|\n)+/g, '').trim();
+            // let forwardText = text.replace(/(\\n|\n)+/g, '').trim();
+            let forwardText = text;
             let newChat = {
                 "role":role,
                 "content": forwardText
@@ -339,106 +356,235 @@
             }
         }
 
-        const chatContent = document.querySelector('.chat-content');
+        const chatContentNode = document.querySelector('.chat-content');
         /* ================= clear all ai content ================= */
         const chatRefreshButton = document.getElementById('ChatRefresh');
         chatRefreshButton.addEventListener('click', () => {
-            if (chatContent) {
-                chatContent.innerHTML = '';
+            if (chatContentNode) {
+                chatContentNode.innerHTML = '';
             }
             chatHistoryList = [];
         });
 
         /* =============== handle chat message send =============== */
-        function linkListToHTML(linkList) {
-            if(!linkList || linkList.length==0) {
+        function linkListToHTML(list) {
+            if (!list || list.length === 0) {
                 return `<p class="chatRefDocs"></p>`;
             }
-            const linksHtml = linkList.map(link => {
-                return `<a href="${link.url}" target="_blank">${link.title}</a>`
-            }).join('<br>');
+
+            const linkSet = new Set();
+            let linksHtml = '';
+
+            list.forEach(link => {
+                const lowerTitle = link.title.toLowerCase().trim();
+                if (!linkSet.has(lowerTitle)) {
+                    linkSet.add(lowerTitle);
+                    linksHtml += `<a href="${link.url}" target="_blank">${link.title}</a><br>`;
+                }
+            });
+
             return `
             <div class="chatRefDocs">
                 <p class="chat-based-refs">Answer based on the following sources: </p>
                 ${linksHtml}
             </div>`;
         }
-
-        function handleChatResponse(response, element) {
-            if(response) {
-                if (response.status === "success") {
-                    // console.time("executionTime");
-                    let md2html = marked.parse(response.content);
-                    // console.timeEnd("executionTime");
-                    let linksHtml = linkListToHTML(response.docs);
-                    element.innerHTML = `
-                    <div class="chatResp">
-                        ${md2html}
-                        ${linksHtml}
-                    </div>
-                    `;
-                    addChatHistory("assistant", response.content);
-                } else if(response.status === "error") {
-                    let msg = `${response.error.error_type}: ${response.error.message}`;
-                    element.innerHTML = `
-                    <div class="chatResp">${msg}</div>
-                    `;
-                    addChatHistory("assistant", `${msg}`);
-                }
-                else {
-                    let msg = "Invalid AI chat response!";
-                    element.innerHTML = `
-                    <div class="chatResp">${msg}</div>
-                    `;
-                    addChatHistory("assistant", `${msg}`);
-                }
-            }
+        function onChatSuccess(mdContent, refs, element) {
+            let refsHtml = linkListToHTML(refs);
+            element.insertAdjacentHTML('beforeend', refsHtml);
+            addChatHistory("assistant", mdContent);
         }
-        function handleChatError(error, element) {
+        function onChatError(error, element) {
             element.innerHTML = `
             <div class="chatResp">${error}</div>
             `;
             addChatHistory("assistant", error);
         }
+
+        // Configure marked
+        marked.setOptions({
+            renderer: new marked.Renderer(),
+            pedantic: false, //尽可能遵循原始 Markdown 语法，而不是 GitHub Flavored Markdown。如果设置为 true，则偏向于更严格的解析
+            gfm: true, //启用 GitHub Flavored Markdown，如果需要 GFM 功能（如表格、任务列表等）可将其启用
+            breaks: true, //启用 GFM 换行符解析。设置为 true 时，Markdown 文本中的新行符被视为 <br>
+            smartypants: true, //使用智能排版标记替换引号和破折号为直观形式
+            headerIds: false,
+            mangle: true //对嵌入的电子邮件地址进行加密处理（防止抓取），实现简单的防邮件爬虫
+        });
+        async function fetchChatAnwser(fetchConfig, messageNode) {
+            const { url, options } = fetchConfig;
+            const abortCtrl = new AbortController();
+            let hasError = false;
+            let mdChatText = "";
+            let refList = [];
+
+            const appendErrorMsg = (error, element) => {
+                if (hasError) return;
+                element.innerHTML += `<div>${error}</div>`;
+                hasError = true;
+                abortCtrl.abort();
+            }
+
+            try {
+                // Init AI chat request and add abort controller
+                const response = await fetch(url, { 
+                    ...options, 
+                    signal: abortCtrl.signal 
+                });
+                if (!response.ok) {
+                    return onChatError(`Http error with status: ${response.status}, please refresh and try again!`, messageNode);
+                }
+
+                // Init massage container
+                messageNode.innerHTML = `<div class="chatResp"></div>`;
+                const asstNode = messageNode.querySelector(".chatResp");
+                if (!asstNode) {
+                    console.error("Assistant feedback element not found, please refresh and try again!");
+                    return;
+                }
+
+                /* ===============================
+                    parsed data chunk example:
+                    {
+                        "role": "assistant",
+                        "content": "xxxxxx",
+                        "docs": [{"url": "xxxx", "title": "xxxx"}],
+                        "status": "success",    // success or error
+                        "error": null           // null or {"error_type": "xxxx", "error_message": "xxxx"}
+                    }
+                  ===============================*/
+                const processChunk = (lineChunk) => {
+                    try {
+                        const parsedChunk = JSON.parse(lineChunk);
+                        if (parsedChunk.status === "success") {
+                            mdChatText = parsedChunk.content;
+                            refList = parsedChunk.docs;
+                            // replace asstNode html content
+                            // asstNode.innerHTML = marked.parse(mdChatText);
+                            const rawHtml = marked.parse(mdChatText);
+                            const sanitizedHtml = DOMPurify.sanitize(rawHtml);
+                            asstNode.innerHTML = marked.parse(sanitizedHtml);
+                        } else if (parsedChunk.status === "error") {
+                            // append html content in asstNode
+                            appendErrorMsg(`${parsedChunk.error.error_type}: ${parsedChunk.error.message}`, asstNode);
+                        }
+                    } catch (error) {
+                        appendErrorMsg(`JSON Parsing Error: ${error.message}`, asstNode);
+                    }
+                };
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let pendingBuffer = '';
+
+                // Continuously read data from the stream
+                while (true) {
+                    const { done, value } = await reader.read().catch(error => {
+                        appendErrorMsg(`Read data from the stream error: ${error}, please refresh and try again!`, asstNode);
+                        return { done: true };
+                    });
+                    if (done || hasError) break;
+    
+                    // Decode the current chunk
+                    const newChunk = decoder.decode(value, { stream: true });
+                    pendingBuffer += newChunk;
+                    let lineEnd;
+                    while ((lineEnd = pendingBuffer.indexOf('\n')) >= 0) {
+                        // const lineChunk = pendingBuffer.slice(0, lineEnd).trim();
+                        const lineChunk = pendingBuffer.slice(0, lineEnd);
+                        pendingBuffer = pendingBuffer.slice(lineEnd + 1);
+        
+                        if (!lineChunk) continue;
+        
+                        processChunk(lineChunk);
+                    }
+                }
+
+                // Handle final remaining buffer content
+                // if (pendingBuffer.trim() && !hasError) {
+                //     processChunk(pendingBuffer.trim());
+                // }
+                if (pendingBuffer && !hasError) {
+                    processChunk(pendingBuffer);
+                }
+
+                reader.releaseLock();
+                if (!hasError) {
+                    onChatSuccess(mdChatText, refList, asstNode);
+                }
+            } catch (error) {
+                onChatError(`An error occured with the ai chat fetch operation: ${error}. Please refresh and try again!`, messageNode)
+            }
+        }
+
+        function AIChatFetchConfig(question, histories) {
+            // // get current doc version value
+            // let curVersion = (document.querySelector("#version-selector")?.value) || "latest";
+            // // If the current version is "latest", check and update it from LatestVersion
+            // if (curVersion === "latest") {
+            //     const versionNode = document.querySelector('#LatestVersion');
+            //     if (versionNode && versionNode.value) {
+            //         curVersion = versionNode.value;
+            //     }
+            // }
+
+            let curVersion = "";
+            const rawBody = {
+                aiEnv: "PROD",          // aiEnv is PROD or QA
+                rawData: question,      // required, 要詢問 AI 的問句
+                docBase: chatAIBase,    // required, 知識庫id(測試區請使用 2039)
+                docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答
+                // optional, 過去的對話紀錄，請符合範例的格式，
+                // 目前可以輸入長度最多為 6 (三組 user-assistant 組合).若無對話紀錄則不需輸入
+                historyMsg: histories,
+            };
+        
+            const method = "POST";
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            };
+            const body = JSON.stringify(rawBody);
+        
+            // return fetch config
+            return {
+                url: 'https://wwwdev.realmcu.com/docs/aichatstream',
+                options: {
+                    method,
+                    headers,
+                    body
+                }
+            };
+        }
         
         function sendChatMessage() {
-            const inputText = userInput.value;
-            if (inputText.trim() === '') return;
-            userInput.value = '';
+            const userInputValue = userInputNode.value;
+            if (userInputValue.trim() === '') return;
+            userInputNode.value = '';
 
-            const userMessage = document.createElement('div');
-            userMessage.className = 'chat-message flex-justify-end';
-            userMessage.innerHTML = `
-            <div class="userText">${inputText}</div>
+            const userMessageNode = document.createElement('div');
+            userMessageNode.className = 'chat-message flex-justify-end';
+            userMessageNode.innerHTML = `
+            <div class="userText">${userInputValue}</div>
             `;
-            chatContent.appendChild(userMessage);
+            chatContentNode.appendChild(userMessageNode);
             const chatHistoryCopy = [...chatHistoryList];
-            addChatHistory("user", inputText);
+            addChatHistory("user", userInputValue);
 
-            const chatMessage = document.createElement('div');
-            chatMessage.className = 'chat-message';
-			chatContent.appendChild(chatMessage);
+            const chatMessageNode = document.createElement('div');
+            chatMessageNode.className = 'chat-message';
+            chatContentNode.appendChild(chatMessageNode);
             // Use the passed fetchChatAPI function
-            if (typeof fetchChatAPI === 'function') {
-                chatMessage.innerHTML = `
-                <div class="chatResp"><p class="chat-loading"></p></div>
-                `;
-                fetchChatAPI(inputText.trim(), chatHistoryCopy)
-                    .then(response => handleChatResponse(response, chatMessage))
-                    .catch(error => handleChatError(error, chatMessage));
-            }
-            else {
-                chatMessage.innerHTML = `
-                <div class="chatResp">Invalid AI chat fetch function!</div>
-                `;
-                addChatHistory("assistant", "Invalid AI chat fetch function!");
-            }
-            chatMessage.scrollIntoView({ behavior: 'smooth' });
+            chatMessageNode.innerHTML = `<div class="chatResp"><p class="chat-loading"></p></div>`;
+            
+            const fetchConfig = AIChatFetchConfig(userInputValue, chatHistoryCopy);
+            fetchChatAnwser(fetchConfig, chatMessageNode);
+
+            chatMessageNode.scrollIntoView({ behavior: 'smooth' });
         }
         /* =============== triggle chat message send =============== */
         const sendButton = document.querySelector('.chat-input button');
         sendButton.onclick = sendChatMessage;
-        userInput.addEventListener('keydown', function(event) {
+        userInputNode.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault(); // Prevents newline in textarea
                 sendChatMessage();
@@ -446,15 +592,15 @@
         });
 
         /* ============== handle chat modal draggle ============= */
-        const dragBar = chatModal.querySelector('.chat-title');
+        const dragBar = chatModalNode.querySelector('.chat-title');
         let isDragging = false;
         let dragX, dragY;
 
         dragBar.addEventListener('mousedown', (e) => {
             e.preventDefault(); // 阻止默认行为，防止文本选择
             isDragging = true;
-            dragX = e.clientX - chatModal.offsetLeft;
-            dragY = e.clientY - chatModal.offsetTop;
+            dragX = e.clientX - chatModalNode.offsetLeft;
+            dragY = e.clientY - chatModalNode.offsetTop;
 
             document.addEventListener('mousemove', startDrag);
             document.addEventListener('mouseup', stopDrag);
@@ -462,8 +608,8 @@
 
         function startDrag(e) {
             if (!isDragging) return;
-            chatModal.style.left = e.clientX - dragX + 'px';
-            chatModal.style.top = e.clientY - dragY + 'px';
+            chatModalNode.style.left = e.clientX - dragX + 'px';
+            chatModalNode.style.top = e.clientY - dragY + 'px';
         }
 
         function stopDrag() {
@@ -473,16 +619,16 @@
         }
 
         /* ============= handle chat modal full screen ============= */
-        const fullScreenControl = document.getElementById('FullScreenControl');
-        fullScreenControl.addEventListener('click', function() {
-            chatModal.style.top = '';
-            chatModal.style.left = '';
-            chatModal.classList.toggle('fullscreen-chat-modal');
+        const fullScreenCtrlNode = document.getElementById('FullScreenControl');
+        fullScreenCtrlNode.addEventListener('click', function() {
+            chatModalNode.style.top = '';
+            chatModalNode.style.left = '';
+            chatModalNode.classList.toggle('fullscreen-chat-modal');
             updateChatNoteFont();
         });
 
         /* =============== handle chat modal resize =============== */
-        const resizeModalHandle = chatModal.querySelector('.resize-modal');
+        const resizeModalCtrlNode = chatModalNode.querySelector('.resize-modal');
         let isResizing = false;
         let resizeX;
         let resizeY;
@@ -492,8 +638,8 @@
         function startResize(e) {
             if (!isResizing) return;
             $('body').css('user-select', 'none');
-            chatModal.style.width = startWidth + (e.clientX - resizeX) + 'px';
-            chatModal.style.height = startHeight + (e.clientY - resizeY) + 'px';
+            chatModalNode.style.width = startWidth + (e.clientX - resizeX) + 'px';
+            chatModalNode.style.height = startHeight + (e.clientY - resizeY) + 'px';
         }
         function stopResize() {
             isResizing = false;
@@ -502,12 +648,12 @@
             document.removeEventListener('mousemove', startResize);
             document.removeEventListener('mouseup', stopResize);
         }
-        resizeModalHandle.addEventListener('mousedown', function(e) {
+        resizeModalCtrlNode.addEventListener('mousedown', function(e) {
             isResizing = true;
             resizeX = e.clientX;
             resizeY = e.clientY;
-            startWidth = parseInt(window.getComputedStyle(chatModal).width, 10);
-            startHeight = parseInt(window.getComputedStyle(chatModal).height, 10);
+            startWidth = parseInt(window.getComputedStyle(chatModalNode).width, 10);
+            startHeight = parseInt(window.getComputedStyle(chatModalNode).height, 10);
             document.addEventListener('mousemove', startResize);
             document.addEventListener('mouseup', stopResize);
         });
@@ -516,3 +662,13 @@
     // Expose the init function
     window.chatWidgetInit = chatWidgetInit;
 })();
+
+/* ============== Init AI ASK Component ============== */
+// $(document).ready(function () {
+//     const chatAIBase = window.chatAIBase;
+//     chatWidgetInit({
+//         chatWidgetTitle: "Real AI",
+//         chatWidgetPlaceholder: "Please type your question",
+//         chatAIBase: chatAIBase
+//     });
+// })
