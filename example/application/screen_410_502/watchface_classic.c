@@ -612,18 +612,21 @@ static void temp_timer_cb(void *obj)
     }
 }
 
-void switch_heartrate()
+static void switch_heartrate()
 {
     gui_view_switch_direct(gui_view_get_current(), heartrate_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-void switch_menu()
+static void switch_menu()
 {
     gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void create_watchface_classic(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
@@ -822,9 +825,6 @@ void create_watchface_classic(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(win_watch), 30000, true, time_update_cb);
 }
 
-/*============================================================================*
- *                           Public Functions
- *============================================================================*/
 void clear_watchface_classic(gui_view_t *view)
 {
     if (img_data_temperature)

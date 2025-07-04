@@ -59,7 +59,6 @@ static gui_img_t *img;
 static uint16_t count = COUNT_MAX; //for timer
 static bool draw_flag = 0; //0: get new json data
 static bool has_draw_bg = 0; // only draw background once
-static size_t buffer_size = 0;
 static char move_content[30] = {0};
 static char ex_content[30] = {0};
 static char stand_content[30] = {0};
@@ -244,6 +243,11 @@ static void enter_timer_cb(void *obj)
         count = 0;
         has_draw_bg = false;
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
+
+        int image_h = RADIUS * 2;
+        int image_w = RADIUS * 2;
+        int pixel_bytes = 4;
+        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         memset(img_data, 0, buffer_size);
         gui_obj_create_timer(GUI_BASE(img), 10, true, activity_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
@@ -282,7 +286,7 @@ static void activity_design(gui_view_t *view)
     int image_h = RADIUS * 2;
     int image_w = RADIUS * 2;
     int pixel_bytes = 4;
-    buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+    size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
     if (img_data == NULL)
     {
         img_data = gui_lower_malloc(buffer_size);

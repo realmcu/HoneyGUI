@@ -113,10 +113,14 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
         float scale;
         float radius = (SCREEN_H + SCREEN_W) / 4.0f;
 
-        if (dis > radius)
+        if (dis >= dis_max)
+        {
+            scale = 0.01f;
+        }
+        else if (dis > radius)
         {
             // concave  function, f'(x) increase
-            scale = 0.7 * pow((1.0f - ratio) / (1.0f - (radius / dis_max)), 0.5f);
+            scale = 0.7 * pow((1.0f - ratio) / (1.0f - (radius / dis_max)), 0.7f);
         }
         else
         {
@@ -125,11 +129,7 @@ static void gui_menu_cellular_adjust_image(gui_obj_t *obj)
             scale = exp(a * ratio);
         }
 
-        if (scale <= 0)
-        {
-            scale = 0.01f;
-        }
-        else if ((SCREEN_W / 2.0f) - fabsf(offset_X) < 20.0f)
+        if ((SCREEN_W / 2.0f) - fabsf(offset_X) < 20.0f)
         {
             scale /= 1.5f;
         }

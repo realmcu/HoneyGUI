@@ -161,6 +161,11 @@ static void control_board_design(gui_view_t *view)
                                                  100 + 125 * 2, 182, 121);
     gui_img_t *sw_nobother = gui_img_create_from_mem(view, "sw_nobother", CONTROL_NOBOTHER_OFF_BIN, 207,
                                                      100 + 125 * 2, 182, 121);
+    gui_img_set_quality(sw_lte, true);
+    gui_img_set_quality(sw_wifi, true);
+    gui_img_set_quality(sw_phone, true);
+    gui_img_set_quality(sw_mute, true);
+    gui_img_set_quality(sw_nobother, true);
     gui_obj_add_event_cb(sw_lte, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(sw_wifi, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(sw_phone, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -173,12 +178,15 @@ static void control_board_design(gui_view_t *view)
     img_capsule_phone = gui_img_create_from_mem(capsule, "capsule_phone", PHONE_OFF_ICON_BIN, 15, 9, 0,
                                                 0);
     gui_img_set_mode(img_capsule_phone, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img_capsule_phone, true);
     img_capsule_nobother = gui_img_create_from_mem(capsule, "capsule_nobother", NOBOTHER_OFF_ICON_BIN,
                                                    56, 9, 0,
                                                    0);
     gui_img_set_mode(img_capsule_nobother, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img_capsule_nobother, true);
     img_capsule_mute = gui_img_create_from_mem(capsule, "capsule_mute", MUTE_OFF_ICON_BIN, 98, 9, 0, 0);
     gui_img_set_mode(img_capsule_mute, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img_capsule_mute, true);
 
     if (sw_state.sw_1)
     {
@@ -209,10 +217,13 @@ static void control_board_design(gui_view_t *view)
     gui_img_t *img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_9_BIN, 35, 40, 0, 0);
     gui_img_scale(img_num, 0.8, 0.8);
     gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img_num, true);
     img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_6_BIN, 65, 40, 0, 0);
     gui_img_scale(img_num, 0.8, 0.8);
     gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img_num, true);
     img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_PERCENT_BIN, 95, 40, 0, 0);
     gui_img_scale(img_num, 0.8, 0.8);
     gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
+    gui_img_set_quality(img_num, true);
 }

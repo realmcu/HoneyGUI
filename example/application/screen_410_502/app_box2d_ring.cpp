@@ -16,12 +16,19 @@
 #include "gui_view.h"
 #include "app_hongkong.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "box2d_ring_view"
+
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
-    void app_box2d_ring_ui_design(gui_view_t *view);
-    void close_box2d_ring(gui_view_t *view);
+    static void app_box2d_ring_ui_design(gui_view_t *view);
+    static void close_box2d_ring(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
     {
@@ -49,8 +56,38 @@ extern "C" {
     }
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
+/*============================================================================*
+ *                             C++ Namespace
+ *============================================================================*/
 namespace app_box2d_ring
 {
+/*============================================================================*
+*                           Types
+*============================================================================*/
+struct Ball
+{
+    b2Body *body;
+    NVGcolor color;
+    gui_img_t *img;
+};
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define SCREEN_WIDTH  (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void applyCentripetalForce(b2Body *ball);
+static void render();
+static void maintainMinimumVelocity(b2Body *ball);
+static void limitMaxAngularVelocity(b2Body *ball);
+
+/*============================================================================*
+*                              Variables
+*============================================================================*/
 const float TIMESTEP = 1.0f / 60.0f; // Timestep
 const int VELOCITY_ITERATIONS = 8; // Velocity iterations
 const int POSITION_ITERATIONS = 3; // Position iterations
@@ -66,46 +103,31 @@ const NVGcolor BACKGROUND_COLOR = nvgRGB(255, 255, 255);
 const float EFFECT_RADIUS = 20.0f; // Effect radius of the finger
 constexpr float MINIMUM_LINEAR_VELOCITY = 5.0f; // Minimum linear velocity to avoid stopping
 constexpr float MAX_ANGULAR_VELOCITY = 15.0f; // Maximum angular velocity for balls
-gui_obj_t *parent;
-b2World *world = nullptr; // Box2D world
-float OUTER_RING_RADIUS; // Outer ring radius
-float INNER_RING_RADIUS; // Inner ring radius
-int SCREEN_WIDTH; // Screen width
-int SCREEN_HEIGHT; // Screen height
 
-struct Ball
-{
-    b2Body *body;
-    NVGcolor color;
-    gui_img_t *img;
-};
+b2World *world = nullptr; // Box2D world
+float outer_ring_radius = 0; // Outer ring radius
+float inner_ring_radius = 0; // Inner ring radius
+static uint16_t count = 0;
 
 std::vector<Ball> balls; // Vector to store balls and their colors
 std::vector<b2Body *> temporaryBodies; // Vector to store temporary bodies
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(0, 255);
-bool init();
-void close();
-void createRing(b2World *world, float radius, float restitution);
-void createBalls(b2World *world);
-void applyCentripetalForce(b2Body *ball);
-void render();
-void maintainMinimumVelocity(b2Body *ball);
-void limitMaxAngularVelocity(b2Body *ball);
 
-static uint16_t seed = 12345;
-
+/*============================================================================*
+*                           Private Functions
+*============================================================================*/
 static uint16_t xorshift16()
 {
+    static uint16_t seed = 12345;
     seed ^= seed << 6;
     seed ^= seed >> 9;
     seed ^= seed << 2;
     return seed;
 }
 
-// App callback function
-void app_box2d_cb(void *obj)
+static void app_box2d_cb(void *obj)
 {
     for (const Ball &ball : balls)
     {
@@ -123,7 +145,8 @@ void app_box2d_cb(void *obj)
         world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS); // Update the physics world
     }
 }
-void win_press_callback(void *obj, gui_event_t e, void *param)
+
+static void win_press_callback(void *obj, gui_event_t e, void *param)
 {
     touch_info_t *touch = tp_get_info();
     int mouseX = touch->x;
@@ -147,13 +170,15 @@ void win_press_callback(void *obj, gui_event_t e, void *param)
     fixtureDef.restitution = BALL_RESTITUTION * 10; // Set restitution
     fixtureDef.friction = 0.0f; // Set friction to zero to minimize stopping
     ballBody->CreateFixture(&fixtureDef);
-// Apply initial tangential velocity to the ball
+
+    // Apply initial tangential velocity to the ball
     float vx = INITIAL_SPEED ;  // Tangential velocity x component
     float vy = INITIAL_SPEED ;   // Tangential velocity y component
     ballBody->SetLinearVelocity(b2Vec2(vx, vy));
     temporaryBodies.push_back(ballBody); // Store the temporary body
 }
-void win_release_callback()
+
+static void win_release_callback()
 {
     // Destroy temporary bodies after a short period
     for (b2Body *body : temporaryBodies)
@@ -162,9 +187,9 @@ void win_release_callback()
     }
     std::vector<b2Body *>().swap(temporaryBodies);
 }
+
 // Maintain minimum linear velocity to avoid stopping
-// Maintain minimum linear velocity to avoid stopping
-void maintainMinimumVelocity(b2Body *ball)
+static void maintainMinimumVelocity(b2Body *ball)
 {
     if (ball->GetLinearVelocity().Length() < MINIMUM_LINEAR_VELOCITY)
     {
@@ -175,8 +200,9 @@ void maintainMinimumVelocity(b2Body *ball)
         ball->ApplyLinearImpulseToCenter(impulse, true);
     }
 }
+
 // Limit the maximum angular velocity to prevent unrealistic speeds
-void limitMaxAngularVelocity(b2Body *ball)
+static void limitMaxAngularVelocity(b2Body *ball)
 {
     float currentSpeed = ball->GetLinearVelocity().Length();
     if (currentSpeed > MAX_ANGULAR_VELOCITY)
@@ -186,7 +212,8 @@ void limitMaxAngularVelocity(b2Body *ball)
         ball->SetLinearVelocity(scaledVelocity);
     }
 }
-bool init()
+
+bool init(gui_obj_t *parent)
 {
     GUI_WIDGET_TRY_EXCEPT(parent)
 
@@ -202,7 +229,7 @@ bool init()
     return true;
 }
 
-void close()
+static void clear_mem()
 {
     if (world)
     {
@@ -220,7 +247,7 @@ void close()
     }
 }
 
-void createRing(b2World *world, float radius, float restitution)
+static void createRing(b2World *world, float radius, float restitution)
 {
     b2BodyDef ringBodyDef;
     ringBodyDef.position.Set(SCREEN_WIDTH / 2.0f / PIXELS_PER_METER,
@@ -247,14 +274,14 @@ void createRing(b2World *world, float radius, float restitution)
     }
 }
 
-void createBalls(b2World *world)
+static void createBalls(b2World *world)
 {
     for (int i = 0; i < BALL_COUNT; ++i)
     {
         float angle = 2 * i * M_PI_F / BALL_COUNT;
-        float ballX = (SCREEN_WIDTH / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * cos(
+        float ballX = (SCREEN_WIDTH / 2.0f + (outer_ring_radius - BALL_RADIUS - 10) * cos(
                            angle)); // Position the ball between two rings
-        float ballY = (SCREEN_HEIGHT / 2.0f + (OUTER_RING_RADIUS - BALL_RADIUS - 10) * sin(angle));
+        float ballY = (SCREEN_HEIGHT / 2.0f + (outer_ring_radius - BALL_RADIUS - 10) * sin(angle));
         // gui_log("ball_%d %f,%f\n", i, ballX, ballY);
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody; // Set as dynamic body
@@ -283,7 +310,7 @@ void createBalls(b2World *world)
 }
 
 // Apply centripetal force to ensure balls move along the ring
-void applyCentripetalForce(b2Body *ball)
+static void applyCentripetalForce(b2Body *ball)
 {
     b2Vec2 center(SCREEN_WIDTH / 2.0f / PIXELS_PER_METER,
                   SCREEN_HEIGHT / 2.0f / PIXELS_PER_METER); // Center of the ring
@@ -295,14 +322,8 @@ void applyCentripetalForce(b2Body *ball)
     b2Vec2 force = forceMagnitude * toCenter; // Centripetal force vector
     ball->ApplyForceToCenter(force, true); // Apply force to ball center
 }
-// Define custom comparison operator for NVGcolor
-bool operator!=(const NVGcolor &c1, const NVGcolor &c2)
-{
-    return !(c1.r == c2.r && c1.g == c2.g && c1.b == c2.b && c1.a == c2.a);
-}
-static int count;
-// Render function
-void canvas_callback(NVGcontext *vg)
+
+static void canvas_callback(NVGcontext *vg)
 {
     // Draw ball
     const Ball &ball = balls.at(count++);
@@ -318,16 +339,13 @@ void canvas_callback(NVGcontext *vg)
         nvgFill(vg);
     }
 }
+
 // Render function
-void render()
+static void render()
 {
     count = 0;
-    if (BACKGROUND_COLOR != nvgRGB(0, 0, 0))
-    {
-        gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(255, 255, 255, 255));
-        // gui_log("r = %f, g = %f, b = %f, a = %f\n", BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
-        // gui_canvas_rect_create(parent, 0, 0,0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(BACKGROUND_COLOR.r*255, BACKGROUND_COLOR.g*255, BACKGROUND_COLOR.b*255, BACKGROUND_COLOR.a*255));
-    }
+    gui_canvas_rect_create((gui_obj_t *)current_view, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                           gui_rgba(255, 255, 255, 255));
 
     // Draw balls
     for (Ball &ball : balls)
@@ -343,30 +361,26 @@ void render()
 
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, BALL_RADIUS * 2,
                                           BALL_RADIUS * 2, canvas_callback, img_data);
-        gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)img_data, ballX - BALL_RADIUS,
+        gui_img_t *img = gui_img_create_from_mem((gui_obj_t *)current_view, 0, (void *)img_data,
+                                                 ballX - BALL_RADIUS,
                                                  ballY - BALL_RADIUS, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         ball.img = img;
     }
-    // gui_log("count: %d\n", count);
 }
 
 // Main function
-int ui_design(gui_obj_t *obj)
+static int ui_design(gui_obj_t *obj)
 {
-    parent = obj;
-
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
 
     world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
-    SCREEN_WIDTH = gui_get_screen_width(); // Screen width
-    SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
-    OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
-    INNER_RING_RADIUS = OUTER_RING_RADIUS - RING_GAP; // Inner ring radius
-    createRing(world, OUTER_RING_RADIUS, BALL_RESTITUTION); // Create outer ring with restitution of 0.3
-    createRing(world, INNER_RING_RADIUS, BALL_RESTITUTION); // Create inner ring with restitution of 0.3
+    outer_ring_radius = SCREEN_WIDTH / 2.0f; // Outer ring radius
+    inner_ring_radius = outer_ring_radius - RING_GAP; // Inner ring radius
+    createRing(world, outer_ring_radius, BALL_RESTITUTION); // Create outer ring with restitution of 0.3
+    createRing(world, inner_ring_radius, BALL_RESTITUTION); // Create inner ring with restitution of 0.3
     createBalls(world); // Create balls
-    if (!init())
+    if (!init(obj))
     {
         std::cout << "Initialization failed!" << std::endl;
         return 1;
@@ -375,31 +389,21 @@ int ui_design(gui_obj_t *obj)
 }
 }
 
-// C interface
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
-    // static void return_cb()
-    // {
-    //     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-    //                            SWITCH_IN_ANIMATION_FADE);
-    // }
-    // static void return_timer_cb(void *obj)
-    // {
-    //     touch_info_t *tp = tp_get_info();
-    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    // }
-
-    void app_box2d_ring_ui_design(gui_view_t *view)
+    static void app_box2d_ring_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
         gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
-        // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
         app_box2d_ring::ui_design(obj);
     }
-    void close_box2d_ring(gui_view_t *view)
+    static void close_box2d_ring(gui_view_t *view)
     {
-        app_box2d_ring::close();
+        app_box2d_ring::clear_mem();
     }
 }

@@ -26,6 +26,9 @@
 #define HEIGHT_OFFSET 100
 #define CURRENT_VIEW_NAME "fruit_ninja_view"
 
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 #ifndef __WIN32
 /* overload new & delete */
 void *lx_platform_malloc(size_t size)
@@ -79,8 +82,8 @@ void operator delete[](void *ptr) noexcept
 extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
-    void app_fruit_ninja_design(gui_view_t *view);
-    void close_FN(gui_view_t *view);
+    static void app_fruit_ninja_design(gui_view_t *view);
+    static void close_FN(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
     {
@@ -109,22 +112,36 @@ extern "C" {
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
 
-void app_fruit_ninja_design(gui_view_t *view);
+/*============================================================================*
+ *                             C++ Namespace
+ *============================================================================*/
 namespace app_fruit_ninja
 {
-static const float M2P =
-    20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
-static const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
-static const int RADIUS_ST = 72 / 2;   // st: 68*72  pixels
-static const int RADIUS_BA = 126 / 2;  // ba: 126*50 pixels
-static const int RADIUS_PE = 62 / 2;   // pe: 62*59  pixels
-static const int RADIUS_WM = 98 / 2;   // wm: 98*85  pixels
-static const int RADIUS_BB = 50 / 2;   // wm: 50*51  pixels
+/*============================================================================*
+*                           Types
+*============================================================================*/
+/* Define a point structure */
+typedef struct
+{
+    float x;
+    float y;
+} Point;
 
-static int16_t fruit_score = 0;
-static uint8_t fruit_cut_cnt = 0;
-static bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define M2P 20 // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
+#define P2M 1 / M2P // A pixel corresponds to a physical unit
+#define RADIUS_ST 36   // st: 68*72  pixels
+#define RADIUS_BA 63   // ba: 126*50 pixels
+#define RADIUS_PE 31   // pe: 62*59  pixels
+#define RADIUS_WM 49   // wm: 98*85  pixels
+#define RADIUS_BB 25   // wm: 50*51  pixels
 
+/*============================================================================*
+*                              Variables
+*============================================================================*/
+/* Box2D world */
 static b2World *world = nullptr; // Box2D world
 static b2Body *body_st; // entities that simulate motion trajectories
 static b2Body *body_ba;
@@ -132,6 +149,7 @@ static b2Body *body_pe;
 static b2Body *body_wm;
 static b2Body *body_bomb;
 
+/* Fruit images */
 static gui_img_t *img_strawberry;
 static gui_img_t *img_banana;
 static gui_img_t *img_peach;
@@ -139,19 +157,21 @@ static gui_img_t *img_watermelon;
 static gui_img_t *img_bomb;
 static gui_img_t
 *img_cut_array[4]; // img_strawberry_cut, *img_banana_cut, *img_peach_cut, *img_watermelon_cut;
-/* Define a point structure */
 
+
+/* Score */
+static int16_t fruit_score = 0;
+static uint8_t fruit_cut_cnt = 0;
+static bool fruit_cut_flag[4] = {0}; // record whether fruits are cut
 static gui_text_t *score_board;
 static gui_text_t *time_counter;
 static char time_counter_content[10] = "Time: 60";
 static uint8_t game_time;
-typedef struct
-{
-    float x;
-    float y;
-} Point;
 
-void clear_world()
+/*============================================================================*
+*                           Private Functions
+*============================================================================*/
+static void clear_world()
 {
     if (world)
     {
@@ -161,11 +181,12 @@ void clear_world()
     }
 }
 
-float gui_img_get_transform_degrees(gui_img_t *img)
+static float gui_img_get_transform_degrees(gui_img_t *img)
 {
     GUI_ASSERT(GUI_BASE(img)->type == IMAGE_FROM_MEM)
     return img->degrees;
 }
+
 /* Rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)
 {
@@ -304,17 +325,17 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
     return 0;
 }
 
-static uint16_t seed = 12345;
-
+/* Generate a pseudo-random number */
 static uint16_t xorshift16()
 {
+    static uint16_t seed = 12345;
     seed ^= seed << 6;
     seed ^= seed >> 9;
     seed ^= seed << 2;
     return seed;
 }
 
-// Image refresh
+/* Refresh image */
 static bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
 {
     if (y < -70 || y > 550 || x < -70 || x > SCREEN_WIDTH + 70)
@@ -522,6 +543,7 @@ static void app_design_core(void *parent)
 
 }
 
+/* Click 'GAME OVER' to restart*/
 static void restart_cb(void)
 {
     gui_obj_child_free(GUI_BASE(current_view));
@@ -529,7 +551,6 @@ static void restart_cb(void)
     app_fruit_ninja_design(current_view);
 }
 
-// App callback function
 static void fruit_ninja_cb(void *p)
 {
     gui_obj_t *obj = GUI_BASE(p);
@@ -661,13 +682,9 @@ static void fruit_ninja_cb(void *p)
     }
 }
 
-// GUI design function
+/* GUI design function */
 static void fruit_ninja_design(gui_obj_t *obj)
 {
-    // gui_win_t *win = gui_win_create(obj,
-    //                                 "FRUIT_NINJA_BOX2D", 0, 0, 410, 502);
-
-    // Set the animation function of the window
     gui_obj_create_timer(obj, 17, true, fruit_ninja_cb);
     gui_obj_start_timer(obj);
 
@@ -681,28 +698,24 @@ static void fruit_ninja_design(gui_obj_t *obj)
 }
 }
 
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
     static void return_cb()
     {
         gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
-    // static void return_timer_cb(void *obj)
-    // {
-    //     touch_info_t *tp = tp_get_info();
-    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    // }
-    void app_fruit_ninja_design(gui_view_t *view)
+    static void app_fruit_ninja_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
-        gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
-        // gui_obj_create_timer(GUI_BASE(win), 17, true, return_timer_cb);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
         app_fruit_ninja::fruit_ninja_design(obj);
     }
-    void close_FN(gui_view_t *view)
+    static void close_FN(gui_view_t *view)
     {
         app_fruit_ninja::clear_world();
     }

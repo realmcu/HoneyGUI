@@ -202,7 +202,7 @@ static void kb_button_cb()
     }
 }
 
-// Generate a pseudo-random number
+/* Generate a pseudo-random number */
 static uint16_t xorshift16()
 {
     static uint16_t seed = 12345;
@@ -306,8 +306,11 @@ static void win_cb()
     }
     // gui_log("json_refeash_flag %x\n", json_refeash_flag);
 #else
-    if (!json_refeash_flag)
+    static uint8_t count = 0;
+    count++;
+    if (count >= 5)
     {
+        count = 0;
         json_refreash();
     }
     // extern struct tm watch_clock_get(void);
@@ -331,10 +334,6 @@ static void watchface_design(gui_view_t *view)
     gui_view_switch_on_event(view, app_control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    // gui_view_switch_on_event(view, watchface_select_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
-    //                          GUI_EVENT_TOUCH_LONG);
-    // gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE,
-    //                          GUI_EVENT_KB_SHORT_CLICKED);
 
     extern void create_watchface_classic(gui_view_t *view);
     create_watchface_classic(view);
@@ -398,7 +397,7 @@ static void app_hongkong_ui_design(void)
     json_refeash_flag = 0b1111;
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
-    gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0);
+    gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0); // watch turn on animation
     fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     win_cb();

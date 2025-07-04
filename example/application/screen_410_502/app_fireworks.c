@@ -131,8 +131,8 @@ static void drawBackgroundRing(NVGcontext *vg, float centerX, float centerY, flo
                                        nvgRGBA(0, 0, 0, 0));
 
     nvgBeginPath(vg);
-    nvgArc(vg, centerX, centerY, radius, 0, 2 * M_PI_F, NVG_CW);
-    nvgArc(vg, centerX, centerY, radius * 0.85f, 0, 2 * M_PI_F, NVG_CCW);
+    nvgArc(vg, centerX, centerY, radius, 0, 2 * NVG_PI, NVG_CW);
+    nvgArc(vg, centerX, centerY, radius * 0.85f, 0, 2 * NVG_PI, NVG_CCW);
     nvgPathWinding(vg, NVG_HOLE);
 
     nvgFillPaint(vg, paint);
