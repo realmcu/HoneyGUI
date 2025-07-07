@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_3d.h
-  * @brief 3D widget
-  * @details 3D widget
+  * @brief 3D widget.
+  * @details 3D widget.
   * @author sienna_shen@realsil.com.cn
   * @date 2025/3/7
   * @version 1.0
@@ -58,9 +58,9 @@ typedef struct gui_3d
 
     GUI_3D_DRAW_TYPE draw_type;
 
-    draw_img_t *img;          // material image
-    draw_img_t *mask_img;     // mask image for light
-    draw_img_t *combined_img; // full frame buffer
+    draw_img_t *img;          // Material image.
+    draw_img_t *mask_img;     // Mask image for light.
+    draw_img_t *combined_img; // Full frame buffer.
 
     gui_3d_world_t world;
     gui_3d_camera_t camera;
@@ -95,7 +95,7 @@ typedef void (*gui_3d_face_transform_cb)(gui_3d_t *this, size_t face_index/*face
 
 
 /**
- * @brief Create 3d widget.
+ * @brief Create 3D widget.
  *
  * @param parent Parent widget.
  * @param name Widget name.
@@ -127,7 +127,7 @@ void gui_3d_set_face_image(gui_3d_t *this, uint8_t face_index, void *image_addr)
 /**
  * @brief Set global transform callback.
  *
- * @param this The 3d widget pointer.
+ * @param this The 3D widget pointer.
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
  *           and light source for all faces.
  */
@@ -136,7 +136,7 @@ void gui_3d_set_global_transform_cb(gui_3d_t *this, gui_3d_global_transform_cb c
 /**
  * @brief Set face transform callback.
  *
- * @param this The 3d widget pointer.
+ * @param this The 3D widget pointer.
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
  *           and light source for the specified face.
  */

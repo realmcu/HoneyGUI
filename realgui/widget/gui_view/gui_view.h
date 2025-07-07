@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_view.c
-  * @brief the view widget is a kind of container that makes switching more convenient and effectively reduces memory consumption.
-  * @details switch the current view by sliding or clicking
+  * @brief The view widget is a kind of container that makes switching more convenient and effectively reduces memory consumption.
+  * @details Switch the current view by sliding or clicking.
   * @author shel_deng@realsil.com.cn
   * @date 2025/02/18
   * @version 1.0
@@ -40,61 +40,57 @@ extern "C" {
 /* VIEW_SWITCH_STYLE enum start*/
 typedef enum
 {
-    SWITCH_INIT_STATE = 0x0000, ///< Switch out to left
-    SWITCH_IN_STILL_USE_BLUR,   ///< Switch in still with gauss blur
-    SWITCH_OUT_STILL_USE_BLUR,  ///< Switch out still with gauss blur
+    SWITCH_INIT_STATE = 0x0000, ///< Switch out to left.
+    SWITCH_IN_STILL_USE_BLUR,   ///< Switch in still with gauss blur.
+    SWITCH_OUT_STILL_USE_BLUR,  ///< Switch out still with gauss blur.
 
+    SWITCH_OUT_TO_LEFT_USE_TRANSLATION = 0x0100, ///< Switch out to left with transition effect.
+    SWITCH_OUT_TO_RIGHT_USE_TRANSLATION, ///< Switch out to right with transition effect.
+    SWITCH_OUT_TO_TOP_USE_TRANSLATION, ///< Switch out to top with transition effect.
+    SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION, ///< Switch out to bottom with transition effect.
 
-    SWITCH_OUT_TO_LEFT_USE_TRANSLATION = 0x0100, ///< Switch out to left with transition effect
-    SWITCH_OUT_TO_RIGHT_USE_TRANSLATION, ///< Switch out to right with transition effect
-    SWITCH_OUT_TO_TOP_USE_TRANSLATION, ///< Switch out to top with transition effect
-    SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION, ///< Switch out to bottom with transition effect
-
-    SWITCH_IN_FROM_LEFT_USE_TRANSLATION, ///< Switch in from left with transition effect
-    SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, ///< Switch in from right with transition effect
-    SWITCH_IN_FROM_TOP_USE_TRANSLATION, ///< Switch in from top with transition effect
-    SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION, ///< Switch in from bottom with transition effect
+    SWITCH_IN_FROM_LEFT_USE_TRANSLATION, ///< Switch in from left with transition effect.
+    SWITCH_IN_FROM_RIGHT_USE_TRANSLATION, ///< Switch in from right with transition effect.
+    SWITCH_IN_FROM_TOP_USE_TRANSLATION, ///< Switch in from top with transition effect.
+    SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION, ///< Switch in from bottom with transition effect.
     SWITCH_IN_FROM_TOP_RIGHT_USE_TRANSLATION,
     SWITCH_IN_CENTER_ZOOM_FADE,
 
+    SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0200, ///< Switch in from left with cube effect.
+    SWITCH_IN_FROM_RIGHT_USE_CUBE, ///< Switch in from right with cube effect.
+    SWITCH_IN_FROM_TOP_USE_CUBE, ///< Switch in from top with cube effect.
+    SWITCH_IN_FROM_BOTTOM_USE_CUBE, ///< Switch in from bottom with cube effect.
 
-    SWITCH_IN_FROM_LEFT_USE_CUBE = 0x0200, ///< Switch in from left with cube effect
-    SWITCH_IN_FROM_RIGHT_USE_CUBE, ///< Switch in from right with cube effect
-    SWITCH_IN_FROM_TOP_USE_CUBE, ///< Switch in from top with cube effect
-    SWITCH_IN_FROM_BOTTOM_USE_CUBE, ///< Switch in from bottom with cube effect
+    SWITCH_OUT_TO_LEFT_USE_CUBE, ///< Switch out to left with cube effect.
+    SWITCH_OUT_TO_RIGHT_USE_CUBE, ///< Switch out to right with cube effect.
+    SWITCH_OUT_TO_TOP_USE_CUBE, ///< Switch out to top with cube effect.
+    SWITCH_OUT_TO_BOTTOM_USE_CUBE, ///< Switch out to bottom with cube effect.
 
-    SWITCH_OUT_TO_LEFT_USE_CUBE, ///< Switch out to left with cube effect
-    SWITCH_OUT_TO_RIGHT_USE_CUBE, ///< Switch out to right with cube effect
-    SWITCH_OUT_TO_TOP_USE_CUBE, ///< Switch out to top with cube effect
-    SWITCH_OUT_TO_BOTTOM_USE_CUBE, ///< Switch out to bottom with cube effect
+    SWITCH_IN_FROM_LEFT_USE_ROTATE = 0x0300, ///< Switch in from left with rotate effect.
+    SWITCH_IN_FROM_RIGHT_USE_ROTATE, ///< Switch in from right with rotate effect.
+    SWITCH_IN_FROM_TOP_USE_ROTATE, ///< Switch in from top with rotate effect.
+    SWITCH_IN_FROM_BOTTOM_USE_ROTATE, ///< Switch in from bottom with rotate effect.
 
+    SWITCH_OUT_TO_LEFT_USE_ROTATE, ///< Switch out to left with rotate effect.
+    SWITCH_OUT_TO_RIGHT_USE_ROTATE, ///< Switch out to right with rotate effect.
+    SWITCH_OUT_TO_TOP_USE_ROTATE, ///< Switch out to top with rotate effect.
+    SWITCH_OUT_TO_BOTTOM_USE_ROTATE, ///< Switch out to bottom with rotate effect.
 
-    SWITCH_IN_FROM_LEFT_USE_ROTATE = 0x0300, ///< Switch in from left with rotate effect
-    SWITCH_IN_FROM_RIGHT_USE_ROTATE, ///< Switch in from right with rotate effect
-    SWITCH_IN_FROM_TOP_USE_ROTATE, ///< Switch in from top with rotate effect
-    SWITCH_IN_FROM_BOTTOM_USE_ROTATE, ///< Switch in from bottom with rotate effect
+    SWITCH_IN_FROM_LEFT_USE_REDUCTION = 0x0400, ///< Switch in from left with reduction effect.
+    SWITCH_IN_FROM_RIGHT_USE_REDUCTION, ///< Switch in from right with reduction effect.
+    SWITCH_IN_FROM_TOP_USE_REDUCTION, ///< Switch in from top with reduction effect.
+    SWITCH_IN_FROM_BOTTOM_USE_REDUCTION, ///< Switch in from bottom with reduction effect.
 
-    SWITCH_OUT_TO_LEFT_USE_ROTATE, ///< Switch out to left with rotate effect
-    SWITCH_OUT_TO_RIGHT_USE_ROTATE, ///< Switch out to right with rotate effect
-    SWITCH_OUT_TO_TOP_USE_ROTATE, ///< Switch out to top with rotate effect
-    SWITCH_OUT_TO_BOTTOM_USE_ROTATE, ///< Switch out to bottom with rotate effect
+    SWITCH_OUT_TO_LEFT_USE_REDUCTION, ///< Switch out to left with reduction effect.
+    SWITCH_OUT_TO_RIGHT_USE_REDUCTION, ///< Switch out to right with reduction effect.
+    SWITCH_OUT_TO_TOP_USE_REDUCTION, ///< Switch out to top with reduction effect.
+    SWITCH_OUT_TO_BOTTOM_USE_REDUCTION, ///< Switch out to bottom with reduction effect.
 
-    SWITCH_IN_FROM_LEFT_USE_REDUCTION = 0x0400, ///< Switch in from left with reduction effect
-    SWITCH_IN_FROM_RIGHT_USE_REDUCTION, ///< Switch in from right with reduction effect
-    SWITCH_IN_FROM_TOP_USE_REDUCTION, ///< Switch in from top with reduction effect
-    SWITCH_IN_FROM_BOTTOM_USE_REDUCTION, ///< Switch in from bottom with reduction effect
-
-    SWITCH_OUT_TO_LEFT_USE_REDUCTION, ///< Switch out to left with reduction effect
-    SWITCH_OUT_TO_RIGHT_USE_REDUCTION, ///< Switch out to right with reduction effect
-    SWITCH_OUT_TO_TOP_USE_REDUCTION, ///< Switch out to top with reduction effect
-    SWITCH_OUT_TO_BOTTOM_USE_REDUCTION, ///< Switch out to bottom with reduction effect
-
-
-    SWITCH_OUT_NONE_ANIMATION = 0x0500, ///< No animation
+    SWITCH_OUT_NONE_ANIMATION = 0x0500, ///< No animation.
     SWITCH_OUT_ANIMATION_ZOOM,
     SWITCH_OUT_ANIMATION_FADE,
     SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
-    SWITCH_IN_NONE_ANIMATION,           ///< No animation
+    SWITCH_IN_NONE_ANIMATION,           ///< No animation.
     SWITCH_IN_ANIMATION_ZOOM,
     SWITCH_IN_ANIMATION_FADE,
     SWITCH_IN_ANIMATION_MOVE_FADE,
@@ -108,8 +104,7 @@ typedef enum
 
 #define EVENT_NUM_MAX 15
 
-/** @brief  view structure */
-
+/** @brief View structure. */
 struct gui_view_descriptor;
 struct gui_view_on_event;
 typedef struct gui_view
@@ -135,12 +130,12 @@ typedef struct gui_view_descriptor
     const char *name;
     gui_view_t **pView;
 
-    void (* on_switch_in)(gui_view_t *view);  // callback function when view is switched in and created
+    void (* on_switch_in)(gui_view_t *view);  // Callback function when view is switched in and created.
     void (* on_switch_out)(gui_view_t
-                           *view); // callback function when view is switched out and destroyed
+                           *view); // Callback function when view is switched out and destroyed.
 
     uint8_t keep       : 1;
-} gui_view_descriptor_t; // if keep is true, the view will not be destroyed when switch to other view and will be created when register view
+} gui_view_descriptor_t; // If keep is true, the view will not be destroyed when switch to other view and will be created when register view
 /* gui_view_descriptor end*/
 
 typedef struct gui_view_on_event
@@ -174,12 +169,11 @@ typedef struct gui_view_on_event
  * @brief Create a view widget.
  * @param parent The father widget it nested in.
  * @param descriptor Pointer to a descriptor that defines the new view to switch to.
- * @param x The X-axis coordinate relative to parent widget
- * @param y The Y-axis coordinate relative to parent widget
- * @param w Width
- * @param h Height
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Width.
+ * @param h Height.
  * @return Return the widget object pointer.
- *
  */
 gui_view_t *gui_view_create(void       *parent,
                             const gui_view_descriptor_t *descriptor,
@@ -187,7 +181,6 @@ gui_view_t *gui_view_create(void       *parent,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h);
-
 
 /**
  * @brief Register view's descriptor.
@@ -197,10 +190,9 @@ void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor);
 
 /**
  * @brief Get target view's descriptor by name.
- * @param name View descriptor's name that can used to find target view.
+ * @param name View descriptor's name that can be used to find the target view.
  */
 const gui_view_descriptor_t *gui_view_descriptor_get(const char *name);
-
 
 /**
  * @brief Switches the current GUI view to a new view based on the specified event.
@@ -249,10 +241,9 @@ void gui_view_set_animate_step(gui_view_t *_this, uint16_t step);
 /**
  * @brief Set view opacity.
  * @param _this Pointer to view.
- * @param opacity 0 is tatolly transparent, 255 is opaque.
+ * @param opacity 0 is totally transparent, 255 is opaque.
  */
 void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity);
-
 
 /**
  * @brief Get current view pointer.

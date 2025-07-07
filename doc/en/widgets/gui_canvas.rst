@@ -105,7 +105,7 @@ Enable macro ``CONFIG_REALTEK_BUILD_CANVAS`` in :file:`menu_config.h` to run thi
    :start-after: /* canvas example start */
    :end-before: /* canvas example end */
 
-API Reference
+API
 --------------
 
 .. doxygenfile:: gui_canvas.h

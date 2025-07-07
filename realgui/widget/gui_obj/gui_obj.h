@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_obj.h
-  * @brief  object widget
-  * @details create a object
+  * @brief  The object widget.
+  * @details Create a object.
   * @author luke_sun@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0

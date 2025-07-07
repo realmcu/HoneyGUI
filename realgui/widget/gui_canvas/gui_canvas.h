@@ -38,7 +38,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  Canvas structure */
+/** @brief Canvas structure. */
 typedef struct gui_canvas
 {
     gui_obj_t base;
@@ -69,16 +69,16 @@ typedef struct gui_canvas
  *============================================================================*/
 
 /**
- * @brief Create a canvas widget used to drawing graphics in nanovg.
+ * @brief Create a canvas widget used to draw graphics in nanovg.
  *
- * @param parent the father widget nested in.
- * @param name this_widget canvas widget's name.
- * @param addr
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
- * @return gui_canvas_t*
+ * @param parent The father widget nested in.
+ * @param name This widget canvas widget's name.
+ * @param addr Address of the canvas.
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Width of the canvas.
+ * @param h Height of the canvas.
+ * @return gui_canvas_t* Pointer to the created canvas widget.
  */
 gui_canvas_t *gui_canvas_create(void       *parent,
                                 const char *name,
@@ -91,8 +91,8 @@ gui_canvas_t *gui_canvas_create(void       *parent,
 /**
  * @brief Set the callback function for drawing specific shapes.
  *
- * @param this_widget this_widget widget pointer
- * @param cb the callback function for drawing specific shapes
+ * @param this_widget This widget pointer.
+ * @param cb The callback function for drawing specific shapes.
  */
 void gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t *this_widget));
 #define GUI_CANVAS_OUTPUT_PNG 1
@@ -109,17 +109,17 @@ typedef void (*gui_canvas_render_function)(NVGcontext *vg);
  * a canvas, subsequently outputting the rendered image into the designated target buffer
  * in accordance with the specified format. Optional compression is available based on the format.
  *
- * @param format        The format of the output image. It should be specified as one of the following options:
- *                      - GUI_CANVAS_OUTPUT_PNG for PNG format
- *                      - GUI_CANVAS_OUTPUT_JPG for JPG format
- *                      - GUI_CANVAS_OUTPUT_RGBA for RGBA format
- *                      - GUI_CANVAS_OUTPUT_RGB565 for RGB565 format
- * @param compression   A boolean flag indicating whether to compress the output image data.
- *                      Note: Compression is only applicable for RGBA/RGB565 formats.
- * @param image_width   The width of the output image, specified in pixels.
- * @param image_height  The height of the output image, specified in pixels.
- * @param renderer      Function pointer to the rendering callback function, responsible for executing
- *                      drawing operations within the rendering context (NVGcontext).
+ * @param format The format of the output image. It should be specified as one of the following options:
+ *               - GUI_CANVAS_OUTPUT_PNG for PNG format.
+ *               - GUI_CANVAS_OUTPUT_JPG for JPG format.
+ *               - GUI_CANVAS_OUTPUT_RGBA for RGBA format.
+ *               - GUI_CANVAS_OUTPUT_RGB565 for RGB565 format.
+ * @param compression A boolean flag indicating whether to compress the output image data.
+ *                    Note: Compression is only applicable for RGBA/RGB565 formats.
+ * @param image_width The width of the output image, specified in pixels.
+ * @param image_height The height of the output image, specified in pixels.
+ * @param renderer Function pointer to the rendering callback function, responsible for executing
+ *                 drawing operations within the rendering context (NVGcontext).
  * @param target_buffer A pointer to the pre-allocated buffer designated for storing the rendered image data.
  *                      Ensure the buffer size is adequate to hold the image data in the specified format.
  *

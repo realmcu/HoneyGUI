@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_img.h
-  * @brief image widget header file
-  * @details image widget is used to show image on the screen
+  * @brief Image widget header file.
+  * @details Image widget is used to show image on the screen
   * @author howie_wang@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0
@@ -38,38 +38,38 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  image widget structure */
+/** @brief  Image widget structure. */
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
 
 typedef struct gui_img
 {
-    gui_obj_t base;                    /* Base object structure */
-    draw_img_t *draw_img;              /* Drawing image structure */
-    float degrees;                     /* Rotation angle in degrees */
-    float scale_x;                     /* Scale factor in X direction */
-    float scale_y;                     /* Scale factor in Y direction */
-    float f_x;                         /* focus of image X coordinate */
-    float f_y;                         /* focus of image Y coordinate */
+    gui_obj_t base;                    /* Base object structure. */
+    draw_img_t *draw_img;              /* Drawing image structure. */
+    float degrees;                     /* Rotation angle in degrees. */
+    float scale_x;                     /* Scale factor in X direction. */
+    float scale_y;                     /* Scale factor in Y direction. */
+    float f_x;                         /* Focus of image X coordinate. */
+    float f_y;                         /* Focus of image Y coordinate. */
 
-    float t_x;                         /* Translation in X direction */
-    float t_y;                         /* Translation in Y direction */
+    float t_x;                         /* Translation in X direction. */
+    float t_y;                         /* Translation in Y direction. */
 
-    void *data;                        /* Image data (address or filesystem path) */
+    void *data;                        /* Image data (address or filesystem path). */
     union
     {
-        void *filename;               /* Filepath for partial draw */
-        void *ftl;                    /* FTL address */
+        void *filename;               /* Filepath for partial draw. */
+        void *ftl;                    /* FTL address. */
     };
 
-    uint32_t opacity_value : 8;        /* Opacity value (0-255) */
-    uint32_t blend_mode    : 3;        /* Blend mode */
+    uint32_t opacity_value : 8;        /* Opacity value (0-255). */
+    uint32_t blend_mode    : 3;        /* Blend mode. */
     uint32_t storage_type  : 3;        /* Storage type: e.g., file system, flash, etc. */
-    uint32_t high_quality  : 1;        /* High quality rendering flag */
-    uint32_t need_clip     : 1;        /* Clipping flag */
-    uint8_t checksum;                  /* Checksum for change detection */
-    uint8_t animate_array_length;      /* Animation array length */
+    uint32_t high_quality  : 1;        /* High quality rendering flag. */
+    uint32_t need_clip     : 1;        /* Clipping flag. */
+    uint8_t checksum;                  /* Checksum for change detection. */
+    uint8_t animate_array_length;      /* Animation array length. */
 } gui_img_t;
 
 
@@ -200,16 +200,16 @@ void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value);
 void gui_img_set_focus(gui_img_t *_this, float c_x, float c_y);
 
 /**
- * @brief creat an image widget from memory address.
- * @note creat an image widget and set attribute.
- * @param parent the father widget it nested in.
- * @param name widget name.
- * @param addr bin file address.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @return return the widget object pointer.
+ * @brief Create an image widget from memory address.
+ * @note Create an image widget and set attribute.
+ * @param parent The father widget it nested in.
+ * @param name Widget name.
+ * @param addr The bin file address.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @return The widget object pointer.
  */
 gui_img_t *gui_img_create_from_mem(void       *parent,
                                    const char *name,
@@ -220,16 +220,16 @@ gui_img_t *gui_img_create_from_mem(void       *parent,
                                    int16_t     h);
 
 /**
- * @brief creat an image widget from memory address.
- * @note creat an image widget and set attribute.
- * @param parent the father widget it nested in.
- * @param name widget name.
- * @param ftl not xip address, use ftl address.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
- * @return return the widget object pointer.
+ * @brief Create an image widget from memory address.
+ * @note Create an image widget and set attribute.
+ * @param parent The father widget it nested in.
+ * @param name Widget name.
+ * @param ftl Not xip address, use ftl address.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
+ * @return Return the widget object pointer.
  */
 gui_img_t *gui_img_create_from_ftl(void       *parent,
                                    const char *name,
@@ -240,15 +240,15 @@ gui_img_t *gui_img_create_from_ftl(void       *parent,
                                    int16_t     h);
 
 /**
- * @brief creat an image widget from filesystem.
+ * @brief Create an image widget from filesystem.
  *
- * @param parent the father widget it nested in.
- * @param name image widget name.
- * @param file image file path.
- * @param x the X-axis coordinate of the widget.
- * @param y the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param parent The father widget it nested in.
+ * @param name Image widget name.
+ * @param file Image file path.
+ * @param x The X-axis coordinate of the widget.
+ * @param y The Y-axis coordinate of the widget.
+ * @param w The width of the widget.
+ * @param h The height of the widget.
  * @return gui_img_t*.
  */
 gui_img_t *gui_img_create_from_fs(void       *parent,
@@ -268,10 +268,10 @@ gui_img_t *gui_img_create_from_fs(void       *parent,
 void gui_img_set_quality(gui_img_t *_this, bool high_quality);
 
 /**
- * @brief convert a tree to a image data.
+ * @brief Convert a tree to an image data.
  *
- * @param obj tree root.
- * @param matrix null if no need to transform.
+ * @param obj Tree root.
+ * @param matrix Null if no need to transform.
  * @param shot_buf Buffer for the screenshot.
  */
 void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);

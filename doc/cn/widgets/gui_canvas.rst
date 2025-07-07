@@ -107,7 +107,7 @@ GUI Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
    :start-after: /* canvas example start */
    :end-before: /* canvas example end */
 
-API参考
+API
 -------
 
 .. doxygenfile:: gui_canvas.h

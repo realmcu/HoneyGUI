@@ -4,7 +4,7 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_list.h
-  * @brief the list widget is a container for any number of list notele, and each notele can have other widgets added to it.
+  * @brief The list widget is a container for any number of list note, and each note can have other widgets added to it.
   * @author shel_deng@realsil.com.cn
   * @date 2025/04/23
   * @version 1.0
@@ -39,13 +39,13 @@ extern "C" {
 /* LIST_STYLE enum start*/
 typedef enum
 {
-    LIST_CLASSIC = 0x0000, ///< Classic list
-    LIST_CIRCLE,           ///< Circle list
-    LIST_ZOOM,             ///< Zoom center list
-    LIST_CARD,             ///< Stack like card
-    LIST_FAN,              ///< Rotate like fan
-    LIST_HELIX,            ///< Rotate like helix
-    LIST_CURL,             ///< Rotate curly
+    LIST_CLASSIC = 0x0000, ///< Classic list.
+    LIST_CIRCLE,           ///< Circle list.
+    LIST_ZOOM,             ///< Zoom center list.
+    LIST_CARD,             ///< Stack like card.
+    LIST_FAN,              ///< Rotate like fan.
+    LIST_HELIX,            ///< Rotate like helix.
+    LIST_CURL,             ///< Rotate curly.
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/
@@ -56,21 +56,20 @@ typedef enum
     HORIZONTAL  = 0x0001,
 } LIST_DIR;
 
-/** @brief  List Structure */
-
+/** @brief List Structure. */
 typedef struct gui_list
 {
     gui_obj_t base;
     LIST_STYLE style;
-    LIST_DIR dir;        // 0:vertical, 1:horizontal
+    LIST_DIR dir;        // 0:vertical, 1:horizontal.
     uint8_t widget_num;
     uint8_t space;
-    uint16_t note_length; // list note length
+    uint16_t note_length; // List note length.
     int16_t speed;
     int16_t record[5];
-    float factor;        // (0~1.0] deceleration factor, defaults to 0.05
+    float factor;        // (0~1.0] Deceleration factor, defaults to 0.05.
 
-    int offset;          // offset = hold + tp_delta, when sliding
+    int offset;          // offset = hold + tp_delta, when sliding.
     int hold;
     int total_length;
 
@@ -82,7 +81,7 @@ typedef struct gui_list
     uint8_t checksum;
 } gui_list_t;
 
-/** @brief  List_note Structure */
+/** @brief List Note Structure. */
 typedef struct gui_list_note
 {
     gui_obj_t base;
@@ -91,7 +90,7 @@ typedef struct gui_list_note
     int t_x;
     int t_y;
     uint16_t animate_cnt;
-    bool is_speed_positive;    // to judge move direction
+    bool is_speed_positive;    // To judge move direction.
 
     uint8_t checksum;
 } gui_list_note_t;
@@ -104,7 +103,7 @@ typedef struct gui_list_note
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-#define OUT_SCOPE 0 // out scope of list
+#define OUT_SCOPE 0 // Out scope of list.
 #define GUI_MAX_SPEED 50
 #define GUI_MIN_SPEED 7
 #define LIST_TAB_ANIMATE_MAX 15
@@ -122,10 +121,10 @@ typedef struct gui_list_note
  * @brief Create a list widget.
  * @param parent The father widget it nested in.
  * @param name The name of the widget.
- * @param x The X-axis coordinate relative to parent widget
- * @param y The Y-axis coordinate relative to parent widget
- * @param w Width
- * @param h Height
+ * @param x The X-axis coordinate relative to parent widget.
+ * @param y The Y-axis coordinate relative to parent widget.
+ * @param w Width.
+ * @param h Height.
  * @param note_length The length of each note.
  * @param space The space of each note.
  * @param dir The direction of the list.

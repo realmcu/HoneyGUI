@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_menu_cellular.h
-  * @brief honeygui menu effect.
-  * @details Slide to extend and retract menu_cellulars
+  * @brief Honeygui menu effect.
+  * @details Slide to extend and retract menu_cellulars.
   * @author shel_deng@realsil.com.cn
   * @date 2025/7/2
   * @version 1.0
@@ -35,7 +35,7 @@ extern "C" {
  *                         Types
  *============================================================================*/
 
-/** @brief  menu_cellular structure */
+/** @brief  Menu_cellular structure. */
 typedef struct gui_menu_cellular
 {
     gui_obj_t base;
@@ -43,9 +43,9 @@ typedef struct gui_menu_cellular
     int16_t ver_record[5];
     int16_t ver_hold;
     int16_t hor_hold;
-    int16_t ver_offset;     //!< vertical offset
-    int16_t hor_offset;     //!< horizontal offset
-    int16_t ver_offset_min; //!< minimum vertical offset
+    int16_t ver_offset;     //!< Vertical offset.
+    int16_t hor_offset;     //!< Horizontal offset.
+    int16_t ver_offset_min; //!< Minimum vertical offset.
     int16_t icon_size;
 } gui_menu_cellular_t;
 
