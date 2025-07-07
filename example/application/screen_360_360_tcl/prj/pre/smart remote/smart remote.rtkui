@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui version="1.0">
+  <widget class="Screen" name="screen0" layer="0" isLocked="False">
+    <property name="geometry">
+      <width>360</width>
+      <height>360</height>
+      <x>0</x>
+      <y>0</y>
+    </property>
+    <widget class="TabView" name="tabview0" layer="1" isLocked="False">
+      <property name="geometry">
+        <width>360</width>
+        <height>360</height>
+        <x>0</x>
+        <y>0</y>
+      </property>
+      <property name="tabviewData">
+        <transition>normal</transition>
+        <isSupportGesture>True</isSupportGesture>
+      </property>
+      <widget class="Tab" name="tab0" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>0</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image0" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/1.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab1" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>1</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image1" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/2.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab2" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>2</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image2" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/3.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab3" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>3</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image3" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/4.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab4" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>4</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image4" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/5.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab5" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>5</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image5" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>461</width>
+            <height>433</height>
+            <x>-40</x>
+            <y>-61</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/43_3.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab6" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>6</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image6" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>461</width>
+            <height>433</height>
+            <x>-30</x>
+            <y>-51</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/46.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab7" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>7</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image7" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/cfbf.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab8" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>8</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image8" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>481</width>
+            <height>449</height>
+            <x>-50</x>
+            <y>-58</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/Game Room.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab9" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>9</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="image9" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>360</width>
+            <height>360</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData" isMovie="false">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/main/hs.png</image>
+            <duration>20</duration>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+  </widget>
+  <ImageConvertXmlData>
+  <ImageConfigData ImageSettingName="GlobalSetting">
+    <ImageConvertSetting>
+      <colorHeadFlag>true</colorHeadFlag>
+      <bigEndianFlag>false</bigEndianFlag>
+      <mixAlphaChannelFlag>false</mixAlphaChannelFlag>
+      <compressFlag>true</compressFlag>
+      <scanMode>Horizontal</scanMode>
+      <colorMode>RGB</colorMode>
+      <compressSetting>
+        <compressMode>RLE</compressMode>
+        <rleLevel>Level1</rleLevel>
+        <rleRunLength1>Byte_1</rleRunLength1>
+        <rleRunLength2>Byte_1</rleRunLength2>
+        <yuvSampleMode>Yuv444</yuvSampleMode>
+        <blurMode>Bit0</blurMode>
+      </compressSetting>
+    </ImageConvertSetting>
+  </ImageConfigData>
+  <ImageConvertSettingInfo ImagePath="main\1.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\2.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\3.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\4.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\5.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\43_3.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\46.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\cfbf.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\Game Room.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\hs.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\Living Room3.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\ybf.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="main\yq.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\all_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\all_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain_bg.jpeg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\cutain_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_pause.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_pause_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_start.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_start_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\g_curtain_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\g_curtain_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\off_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\on_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00000.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00001.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00002.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00003.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00004.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00005.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00006.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00007.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00008.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00009.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00010.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00011.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00012.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00013.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00014.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00015.png" ImageSettingName="GlobalSetting" />
+</ImageConvertXmlData>
+  <AnimationConfigXmlData>
+    <AnimationConfigXmlData />
+  </AnimationConfigXmlData>
+</ui>

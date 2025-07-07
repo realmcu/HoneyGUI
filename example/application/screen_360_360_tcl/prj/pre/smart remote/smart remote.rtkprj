@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<GUIProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ToolVersion="1.0.11.0" MinimumToolVersion="1.0.9.0" CopyRight="Realtek" PartNumber="5">
+  <IsNoXmlMode>false</IsNoXmlMode>
+  <UIGroup>
+    <UIItem>smart remote.rtkui</UIItem>
+  </UIGroup>
+</GUIProject>
