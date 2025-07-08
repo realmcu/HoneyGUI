@@ -24,7 +24,7 @@
 // <h> HoneyGUI Demo Select
 
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+#define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 // </c>
 
 // <c> RTK GUI Base Demo
@@ -101,7 +101,7 @@
 // </c>
 
 // <c> RTK GUI Demo 410 502
-#define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
 // </c>
 
 // <c> RTK GUI Demo 410 502 Lvgl
@@ -150,18 +150,6 @@
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
 // </c>
 
-// <c> RTK GUI Enable VGLITE GPU
-// #define CONFIG_REALTEK_BUILD_VG_LITE
-// </c>
-
-// <c> RTK GUI Enable PPE1.0
-// #define CONFIG_REALTEK_BUILD_PPE
-// </c>
-
-// <c> RTK GUI Enable PPE2.0
-// #define CONFIG_REALTEK_BUILD_PPEV2
-// </c>
-
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
@@ -199,9 +187,6 @@
 // #define CONFIG_REALTEK_BUILD_GUI_XML_DOM
 // </c>
 
-// <c> RTK GUI Enable SasA
-// #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
-// </c>
 
 #endif
 // </h>

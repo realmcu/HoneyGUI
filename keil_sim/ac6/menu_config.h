@@ -99,18 +99,6 @@
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
 // </c>
 
-// <c> RTK GUI Enable VGLITE GPU
-// #define CONFIG_REALTEK_BUILD_VG_LITE
-// </c>
-
-// <c> RTK GUI Enable PPE1.0
-// #define CONFIG_REALTEK_BUILD_PPE
-// </c>
-
-// <c> RTK GUI Enable PPE2.0
-// #define CONFIG_REALTEK_BUILD_PPEV2
-// </c>
-
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
@@ -145,10 +133,6 @@
 //#define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 
-
-// <c> RTK GUI Enable SasA
-// #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
-// </c>
 
 #endif
 // </h>

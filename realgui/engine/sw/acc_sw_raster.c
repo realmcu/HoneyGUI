@@ -32,11 +32,15 @@ typedef struct
     uint8_t dc_bytes_per_pixel;
     uint8_t opacity_value;
     uint32_t blend_mode;
+
+    uint8_t *palette_data;
+    uint8_t *palette_index;
 } gui_raster_params_t;
 
 static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                                  uint8_t *source_alpha,
-                                 uint32_t image_base, uint32_t image_off, char input_type)
+                                 uint32_t image_base, uint32_t image_off, char input_type, uint8_t *palette_data,
+                                 uint8_t *palette_index)
 {
     switch (input_type)
     {
@@ -75,6 +79,21 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
             *source_green = pixel->g;
             *source_blue = pixel->b;
             break;
+        }
+    case PALETTE:
+        {
+            uint8_t index = palette_index[image_off];
+            uint8_t *color = palette_data + index * 3; // Assuming palette_data is RGB triplets
+            *source_alpha = 0xff;
+            *source_red = color[0];
+            // *source_red = 0xFF;
+            *source_green = color[1];
+            *source_blue = color[2];
+            break;
+        }
+    default:
+        {
+            GUI_ASSERT(NULL != NULL); // Ensure an error is noticed
         }
     }
 }
@@ -212,7 +231,8 @@ static void do_raster_pixel(const gui_raster_params_t *params)
     uint8_t target_red, target_green, target_blue, target_alpha;
 
     gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
-                         params->image_base, params->image_off, params->input_type);
+                         params->image_base, params->image_off, params->input_type, params->palette_data,
+                         params->palette_index);
 
     gui_get_target_color(&target_red, &target_green, &target_blue, &target_alpha,
                          params->writebuf, params->write_off, params->dc_bytes_per_pixel);
@@ -314,6 +334,8 @@ void do_raster_no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     gui_matrix_t *inverse = &image->inverse;
 
     gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
+    params.palette_index = ((gui_palette_file_t *)head)->palette_index;
+    params.palette_data = ((gui_palette_file_t *)head)->palette_data;
 
     for (uint32_t i = y_start; i <= y_end; i++)
     {

@@ -14,15 +14,6 @@ src += [cwd + '/agge/vector_rasterizer.cpp']
 src += [cwd + '/agge/nanovg_agge.cpp']
 src += [cwd + '/agge/nanovg_vertex.cpp']
 
-if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
-    src += [cwd + '/vglite/nanovg_vglite.c']
-    SrcRemove(src,cwd + '/agge/math.cpp')
-    SrcRemove(src,cwd + '/agge/stroke.cpp')
-    SrcRemove(src,cwd + '/agge/stroke_features.cpp')
-    SrcRemove(src,cwd + '/agge/vector_rasterizer.cpp')
-    SrcRemove(src,cwd + '/agge/nanovg_agge.cpp')
-    SrcRemove(src,cwd + '/agge/nanovg_vertex.cpp')
-
 path = [cwd,
         cwd + '/agge', 
         cwd + '/base', 

@@ -12,6 +12,7 @@
 #include "../../assets/tiger_blue_compressed.txt"
 #include "jpeg.c"
 #include "green.c"
+#include "gif_demo.c"
 
 
 /* gui image widget example start*/
@@ -26,11 +27,13 @@ void test_timer_cb(void *param)
     gui_log("timer cb test!\n");
 }
 
-
+#include "gifdec.h"
 static int app_init(void)
 {
+
     // void *addr = (void *)_actiger_blue_compressed;
-    void *addr = (void *)_acgreen;
+    // void *addr = (void *)_acgreen;
+    void *addr = (void *)_acgif_demo;
 
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
 
@@ -40,11 +43,11 @@ static int app_init(void)
 
     gui_img_translate(img, 50, 50);
 
-    gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    // gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
 
-    gui_obj_create_timer(&(img->base), 1000, true, test_timer_cb);
-    gui_obj_start_timer(&(img->base));
+    // gui_obj_create_timer(&(img->base), 1000, true, test_timer_cb);
+    // gui_obj_start_timer(&(img->base));
 
     return 0;
 }

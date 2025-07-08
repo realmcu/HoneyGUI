@@ -32,6 +32,7 @@ typedef enum
     XRGB8888 = 5, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[24:31] for (255 - Alpha)
     BINARY = 6,
     ALPHAMASK = 9,
+    PALETTE = 10,
     BMP = 11,
     JPEG = 12,
     PNG = 13,
