@@ -111,7 +111,7 @@ void gui_obj_ctor(gui_obj_t  *_this,
 #endif
 
 /**
- * @brief creat an obj widget.
+ * @brief Creat an obj widget.
  *
  * @param parent the father widget it nested in.
  * @param filename the obj widget name.
@@ -129,7 +129,7 @@ gui_obj_t *gui_obj_create(void       *parent,
                           int16_t     h);
 
 /**
-  * @brief set object show or not.
+  * @brief Set object show or not.
   * @param obj the root of the widget tree.
   * @param enable true for show, false for hide.
   * * <b>Example usage</b>
@@ -148,7 +148,7 @@ void gui_obj_show(void *obj, bool enable);
 
 
 /**
- * @brief judge the obj if out of screen.
+ * @brief Judge the obj if out of screen.
  */
 bool gui_obj_out_screen(gui_obj_t *obj);
 
@@ -161,7 +161,7 @@ bool gui_obj_out_screen(gui_obj_t *obj);
 void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect);
 
 /**
- * @brief judge the obj if in range of this_widget rect.
+ * @brief Judge the obj if in range of this_widget rect.
  *
  * @param obj pointer to the GUI object.
  * @param x the X-axis coordinate of the widget.
@@ -178,21 +178,21 @@ bool gui_obj_in_rect(gui_obj_t *obj,
                      int16_t    h);
 
 /**
- * @brief enable all short click actions from parent object to the root object.
+ * @brief Enable all short click actions from parent object to the root object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_enable_this_parent_short(gui_obj_t *obj);
 
 /**
- * @brief enable all long press actions from parent object to the root object.
+ * @brief Enable all long press actions from parent object to the root object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_enable_this_parent_short(gui_obj_t *obj);
 
 /**
- * @brief get the area of this_widget obj.
+ * @brief Get the area of this_widget obj.
  *
  * @param obj pointer to the GUI object.
  * @param x the X-axis coordinate of the widget.
@@ -207,7 +207,7 @@ void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *h);
 
 /**
- * @brief judge the point if in range of this_widget obj rect.
+ * @brief Judge the point if in range of this_widget obj rect.
  *
  * @param obj widget object pointer.
  * @param x the X-axis coordinate.
@@ -218,7 +218,7 @@ void gui_obj_get_area(gui_obj_t *obj,
 bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
 
 /**
- * @brief judge the point if in range of this_widget obj circle.
+ * @brief Judge the point if in range of this_widget obj circle.
  *
  * @param obj widget object pointer.
  * @param x the X-axis coordinate.
@@ -229,7 +229,7 @@ bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
 bool gui_obj_point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
 
 /**
- * @brief do crc check.
+ * @brief Do crc check.
  *
  * @param seed the initial value to start the checksum calculation.
  * @param data pointer to the array of bytes for which the checksum is to be calculated.
@@ -240,7 +240,7 @@ uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len);
 
 
 /**
- * @brief print name by bfs order.
+ * @brief Print name by bfs order.
  *
  * @param object widget pointer.
  * @return gui_obj_t * root.
@@ -248,7 +248,7 @@ uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len);
 gui_obj_t *gui_get_root(gui_obj_t *object);
 
 /**
- * @brief calculate the absolute coordinates of a GUI object.
+ * @brief Calculate the absolute coordinates of a GUI object.
  *
  * This function calculates the absolute (global) X and Y coordinates
  * of a given GUI object based on its local position within the parent hierarchy.
@@ -263,7 +263,7 @@ gui_obj_t *gui_get_root(gui_obj_t *object);
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
 
 /**
- * @brief set the visibility of a GUI object.
+ * @brief Set the visibility of a GUI object.
  *
  * This function sets the visibility of a given GUI object by adjusting its hidden state.
  *
@@ -273,7 +273,7 @@ void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
 void gui_obj_hidden(gui_obj_t *obj, bool hidden);
 
 /**
- * @brief set or retrieve the name of a GUI widget.
+ * @brief Set or retrieve the name of a GUI widget.
  *
  * This function sets the name of a given GUI widget if the provided name is valid.
  * It returns the current name of the widget.
@@ -286,7 +286,7 @@ void gui_obj_hidden(gui_obj_t *obj, bool hidden);
 const char *gui_widget_name(gui_obj_t *widget, const char *name);
 
 /**
- * @brief update touch pad speed vertical.
+ * @brief Update touch pad speed vertical.
  *
  * This function updates the current speed and records the speed change history.
  *
@@ -296,7 +296,7 @@ const char *gui_widget_name(gui_obj_t *widget, const char *name);
 void gui_update_speed(int *speed, int speed_recode[]);
 
 /**
- * @brief inertial calculation.
+ * @brief Inertial calculation.
  *
  * This function performs inertial calculations based on the current speed, end speed, and offset.
  *
@@ -307,7 +307,7 @@ void gui_update_speed(int *speed, int speed_recode[]);
 void gui_inertial(int *speed, int end_speed, int *offset);
 
 /**
- * @brief get widget count.
+ * @brief Get widget count.
  */
 uint32_t gui_get_obj_count(void);
 /**

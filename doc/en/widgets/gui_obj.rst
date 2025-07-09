@@ -45,21 +45,6 @@ Usage
    +--------------------------------------------------------------------------------+---------------------------------------------------+
    |Judge the object if in range of the rect                                        | :cpp:any:`gui_obj_in_rect`                        |
    +--------------------------------------------------------------------------------+---------------------------------------------------+
-   | Skip all actions of the parent object(left/right/down/up slide hold actions)   | + :cpp:any:`gui_obj_skip_all_parent_left_hold`    |
-   |                                                                                | + :cpp:any:`gui_obj_skip_all_parent_right_hold`   |
-   |                                                                                | + :cpp:any:`gui_obj_skip_all_parent_down_hold`    |
-   |                                                                                | + :cpp:any:`gui_obj_skip_all_parent_up_hold`      |
-   +--------------------------------------------------------------------------------+---------------------------------------------------+
-   | Skip all actions of the child object(left/right/down/up slide hold actions)    | + :cpp:any:`gui_obj_skip_all_child_left_hold`     |
-   |                                                                                | + :cpp:any:`gui_obj_skip_all_child_right_hold`    |
-   |                                                                                | + :cpp:any:`gui_obj_skip_all_child_down_hold`     |
-   |                                                                                | + :cpp:any:`gui_obj_skip_all_child_up_hold`       |
-   +--------------------------------------------------------------------------------+---------------------------------------------------+
-   | Skip actions of the other object(left/right/down/up slide hold actions)        | + :cpp:any:`gui_obj_skip_other_left_hold`         |
-   |                                                                                | + :cpp:any:`gui_obj_skip_other_right_hold`        |
-   |                                                                                | + :cpp:any:`gui_obj_skip_other_down_hold`         |
-   |                                                                                | + :cpp:any:`gui_obj_skip_other_up_hold`           |
-   +--------------------------------------------------------------------------------+---------------------------------------------------+
    | Get area of the object                                                         | :cpp:any:`gui_obj_get_area`                       |
    +--------------------------------------------------------------------------------+---------------------------------------------------+
    | Point-in-Rectangle Range Check                                                 | :cpp:any:`gui_obj_point_in_obj_rect`              |
@@ -70,8 +55,6 @@ Usage
    +--------------------------------------------------------------------------------+---------------------------------------------------+
    | Get widget in tree by type                                                     | :cpp:any:`gui_obj_tree_get_widget_by_type`        |
    +--------------------------------------------------------------------------------+---------------------------------------------------+
-   | Update animate                                                                 | :cpp:any:`animate_frame_update`                   |
-   +--------------------------------------------------------------------------------+---------------------------------------------------+
    | Print the tree in a breadth-first search manner                                | :cpp:any:`gui_obj_tree_print_bfs`                 |
    +--------------------------------------------------------------------------------+---------------------------------------------------+
 
@@ -79,3 +62,5 @@ API
 ---
 
 .. doxygenfile:: gui_obj.h
+.. doxygenfile:: gui_obj_event.h
+.. doxygenfile:: gui_obj_tree.h
