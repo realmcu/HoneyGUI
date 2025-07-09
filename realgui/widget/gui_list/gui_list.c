@@ -45,6 +45,8 @@ static gui_color_t g_Bar_Color = {0};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index);
+
 static void gui_list_note_animate_timer_cb(void *obj)
 {
     gui_list_note_t *_this = (gui_list_note_t *)obj;
@@ -91,7 +93,7 @@ static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
     }
 }
 
-static void update_bar_data_cb(NVGcontext *vg)
+static void gui_list_update_bar_data_cb(NVGcontext *vg)
 {
     nvgRoundedRect(vg, 0, 0, g_Bar_Width, g_Bar_Height, 2);
     nvgFillColor(vg, nvgRGBA(g_Bar_Color.color.rgba.r,
@@ -107,6 +109,12 @@ static void gui_list_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_list_t *_this = (gui_list_t *)obj;
     GUI_UNUSED(dc);
+
+    if (_this->note_num == 0)
+    {
+        g_Limit = true;
+        return;
+    }
 
     if (!tp->pressing)
     {
@@ -158,6 +166,107 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         }
         _this->hold = _this->offset;
     }
+
+    // free notes
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &(_this->base.child_list))
+    {
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        gui_list_note_t *note = (gui_list_note_t *)o;
+        int16_t pos = 0;
+        int16_t range = 0;
+        if (_this->dir == HORIZONTAL)
+        {
+            pos = note->start_x + _this->offset;
+            range = obj->w;
+        }
+        else
+        {
+            pos = note->start_y + _this->offset;
+            range = obj->h;
+        }
+        if (_this->style == LIST_CARD)
+        {
+            range += (1.1 * _this->note_length); // scale_1 = 0.9f;
+        }
+
+        if (pos + _this->note_length < 0)
+        {
+            gui_obj_tree_free(o);
+            // gui_log("free note %d\n", index);
+        }
+        else if (pos > range)
+        {
+            gui_obj_tree_free(o);
+            _this->created_note_index -= 1;
+            // gui_log("free note %d\n", index);
+        }
+    }
+    // create the first note when the list is empty
+    if (obj->child_list.next == &obj->child_list)
+    {
+        gui_list_add_note(_this, abs(_this->offset) / (_this->note_length + _this->space));
+    }
+
+    // create note from the last note
+    {
+        gui_obj_t *o = gui_list_entry((&(_this->base.child_list))->next, gui_obj_t, brother_list);
+        gui_list_note_t *note = (gui_list_note_t *)o;
+        int16_t index = note->index;
+        _this->created_note_index = index;
+        int16_t pos = 0;
+        int16_t range = 0;
+        if (_this->dir == HORIZONTAL)
+        {
+            pos = note->start_x + _this->offset + _this->note_length;
+            range = obj->w;
+        }
+        else
+        {
+            pos = note->start_y + _this->offset + _this->note_length;
+            range = obj->h;
+        }
+        if (_this->style == LIST_CARD)
+        {
+            range += (1.1 * _this->note_length); // scale_1 = 0.9f;
+        }
+        while (pos < range - _this->space)
+        {
+            if (++index >= _this->note_num) {break;}
+            gui_list_add_note(_this, index);
+            pos += (_this->note_length + _this->space);
+        }
+    }
+    // create note from the first note
+    {
+        gui_obj_t *o = gui_list_entry((&(_this->base.child_list))->prev, gui_obj_t, brother_list);
+        gui_list_note_t *note = (gui_list_note_t *)o;
+        int16_t index = note->index;
+        int16_t pos = 0;
+        if (_this->dir == HORIZONTAL)
+        {
+            pos = note->start_x + _this->offset;
+        }
+        else
+        {
+            pos = note->start_y + _this->offset;
+        }
+        while (pos > _this->space)
+        {
+            if (--index < 0) {break;}
+            gui_list_note_t *note = gui_list_add_note(_this, index);
+            if (_this->dir == HORIZONTAL)
+            {
+                note->base.x = -_this->note_length * 2; // for judgement of creating entrance animation
+            }
+            else
+            {
+                note->base.y = -_this->note_length * 2; // for judgement of creating entrance animation
+            }
+            pos -= (_this->note_length + _this->space);
+        }
+    }
 }
 
 static void gui_list_prepare(gui_obj_t *obj)
@@ -167,6 +276,7 @@ static void gui_list_prepare(gui_obj_t *obj)
     gui_list_t *_this = (gui_list_t *)obj;
     GUI_UNUSED(dc);
 
+    // ensure slide back when list moves to the limit position
     if (tp->left_moved || tp->right_moved ||
         tp->up_moved || tp->down_moved)
     {
@@ -204,7 +314,7 @@ static void gui_list_prepare(gui_obj_t *obj)
         g_Bar_Color = _this->bar_color;
         memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, _this->bar->base.w, _this->bar->base.h,
-                                          update_bar_data_cb,
+                                          gui_list_update_bar_data_cb,
                                           _this->bar_data);
 
     }
@@ -643,6 +753,70 @@ static void gui_list_create_bar(gui_list_t *_this,
     _this->need_update_bar = true;
     _this->bar_color = APP_COLOR_WHITE;
 }
+
+static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
+{
+    GUI_ASSERT(index < list->note_num);
+
+    gui_list_note_t *_this = gui_malloc(sizeof(gui_list_note_t));
+    memset(_this, 0, sizeof(gui_list_note_t));
+
+    bool add_at_head = 0;
+    if (list->created_note_index < index)
+    {
+        add_at_head = true;
+        list->created_note_index = index;
+    }
+
+    int16_t x, y, w, h;
+    if (list->dir == HORIZONTAL)
+    {
+        x = list->base.x + index * (list->note_length + list->space);
+        y = 0;
+        w = list->note_length;
+        h = list->base.h;
+    }
+    else
+    {
+        x = 0;
+        y = list->base.y + index * (list->note_length + list->space);
+        w = list->base.w;
+        h = list->note_length;
+    }
+    _this->start_x = x;
+    _this->start_y = y;
+    _this->index = index;
+
+    gui_obj_ctor(&_this->base, &list->base, "list_note", x, y, w, h);
+    GET_BASE(_this)->obj_cb = gui_list_note_cb;
+    GET_BASE(_this)->has_input_prepare_cb = true;
+    GET_BASE(_this)->has_prepare_cb = true;
+    GET_BASE(_this)->has_end_cb = false;
+    GET_BASE(_this)->has_destroy_cb  = false;
+    GET_BASE(_this)->type = LIST_NOTE;
+    GET_BASE(_this)->create_done = true;
+    gui_list_init(&(GET_BASE(_this)->child_list));
+
+    if (add_at_head == false)
+    {
+        // insert to the end of the list
+        gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list),
+                               &(GET_BASE(_this)->brother_list));
+    }
+    else
+    {
+        // insert to the begin of the list
+        gui_list_insert(&((GET_BASE(_this)->parent)->child_list),
+                        &(GET_BASE(_this)->brother_list));
+    }
+    // gui_log("create note %d\n", index);
+
+    if (list->note_design != NULL)
+    {
+        list->note_design(GUI_BASE(_this), list->design_param);
+    }
+    return _this;
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -655,6 +829,8 @@ gui_list_t *gui_list_create(void       *parent,
                             uint16_t    note_length,
                             uint8_t     space,
                             LIST_DIR    dir,
+                            void (* note_design)(gui_obj_t *obj, void *param),
+                            void        *design_param,
                             bool        create_bar)
 {
     gui_list_t *_this = gui_malloc(sizeof(gui_list_t));
@@ -675,6 +851,8 @@ gui_list_t *gui_list_create(void       *parent,
     _this->space = space;
     _this->dir = dir;
     _this->factor = 0.05;
+    _this->note_design = note_design;
+    _this->design_param = design_param;
     if (dir == HORIZONTAL)
     {
         _this->total_length = w;
@@ -683,6 +861,7 @@ gui_list_t *gui_list_create(void       *parent,
     {
         _this->total_length = h;
     }
+    _this->keep_note_num = _this->total_length / (note_length + space) + 1; //
     GET_BASE(_this)->obj_cb = gui_list_cb;
     GET_BASE(_this)->has_input_prepare_cb = true;
     GET_BASE(_this)->has_prepare_cb = true;
@@ -714,83 +893,33 @@ gui_list_t *gui_list_create(void       *parent,
     return _this;
 }
 
-gui_list_note_t *gui_list_add_note(gui_list_t *list, bool add_at_top)
+void gui_list_set_note_num(gui_list_t *list, uint16_t num)
 {
-    gui_list_note_t *_this = gui_malloc(sizeof(gui_list_note_t));
-    memset(_this, 0, sizeof(gui_list_note_t));
+    list->note_num = num;
+    list->created_note_index = 0;
+    if (list->style == LIST_CARD &&
+        num > list->keep_note_num) //if LIST_CARD style, must set style before set note num
+    {
+        list->keep_note_num += 1;
+    }
 
-    int16_t x, y, w, h;
-    int total_length = 0;
-    uint8_t widget_num = add_at_top ? 0 : list->widget_num;
-    list->widget_num++;
     if (list->dir == HORIZONTAL)
     {
-        x = list->base.x + widget_num * (list->note_length + list->space);
-        y = 0;
-        w = list->note_length;
-        h = list->base.h;
-        total_length = list->base.x + list->widget_num * (list->note_length + list->space) - list->space;
+        list->total_length = list->base.x + list->note_num * (list->note_length + list->space) -
+                             list->space;
+        list->total_length = (list->total_length < list->base.w) ? list->base.w : list->total_length;
     }
     else
     {
-        x = 0;
-        y = list->base.y + widget_num * (list->note_length + list->space);
-        w = list->base.w;
-        h = list->note_length;
-        total_length = list->base.y + list->widget_num * (list->note_length + list->space) - list->space;
+        list->total_length = list->base.y + list->note_num * (list->note_length + list->space) -
+                             list->space;
+        list->total_length = (list->total_length < list->base.h) ? list->base.h : list->total_length;
     }
-    _this->start_x = x;
-    _this->start_y = y;
-    list->total_length = list->total_length < total_length ? total_length : list->total_length;
 
-    gui_obj_ctor(&_this->base, &list->base, "list_note", x, y, w, h);
-    GET_BASE(_this)->obj_cb = gui_list_note_cb;
-    GET_BASE(_this)->has_input_prepare_cb = true;
-    GET_BASE(_this)->has_prepare_cb = true;
-    GET_BASE(_this)->has_end_cb = false;
-    GET_BASE(_this)->has_destroy_cb  = false;
-    GET_BASE(_this)->type = LIST_TAB;
-    GET_BASE(_this)->create_done = true;
-    gui_list_init(&(GET_BASE(_this)->child_list));
-
-    if ((GET_BASE(_this)->parent) != NULL)
-    {
-        if (add_at_top)
-        {
-            // adjust existed notes position
-            gui_node_list_t *node = NULL;
-            gui_list_for_each(node, &(list->base.child_list))
-            {
-                gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-                gui_list_note_t *note = (gui_list_note_t *)obj;
-                if (list->dir == HORIZONTAL)
-                {
-                    note->start_x += (list->note_length + list->space);
-                }
-                else
-                {
-                    note->start_y += (list->note_length + list->space);
-                }
-                gui_obj_move(obj, note->start_x, note->start_y);
-            }
-
-            // insert to the end of the list
-            gui_list_insert_before(&((GET_BASE(_this)->parent)->child_list),
-                                   &(GET_BASE(_this)->brother_list));
-        }
-        else
-        {
-            // insert to the begin of the list
-            gui_list_insert(&((GET_BASE(_this)->parent)->child_list),
-                            &(GET_BASE(_this)->brother_list));
-        }
-    }
     if (list->bar)
     {
         list->need_update_bar = true;
     }
-
-    return _this;
 }
 
 void gui_list_set_style(gui_list_t *list, LIST_STYLE style)

@@ -21,8 +21,8 @@
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define CURRENT_VIEW_NAME "app_bottom_view"
-#define __WIN_NAME    "win_timecard"
-#define __IMG_NAME    "timecard"
+#define __WIN1_NAME    "win_timecard"
+#define __WIN0_NAME    "win_timecircle"
 
 /*============================================================================*
  *                           Function Declaration
@@ -81,9 +81,10 @@ static char date_content[20] = "January0\nSun";
 static char time_timecard_content[10] =  "00:00";
 static char date_timecard_content[10] = "Sun 0";
 
+static char calendar_name[10] = "Calendar";
+static char calendar_content[30] = "No proximity schedules.";
+
 static uint8_t *img_data_activity = NULL;
-static uint8_t *img_data_bg = NULL;
-static size_t buffer_size = 0;
 static char *move_content = NULL;
 static char *ex_content = NULL;
 static char *stand_content = NULL;
@@ -115,11 +116,6 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_bottom_view(gui_view_t *view)
 {
-    if (img_data_bg)
-    {
-        gui_lower_free(img_data_bg);
-        img_data_bg = NULL;
-    }
     if (img_data_activity)
     {
         gui_lower_free(img_data_activity);
@@ -187,9 +183,9 @@ static void time_update_cb(void)
 // draw timecard and not display
 static void draw_timecard(void *parent)
 {
-    // gui_win_t *win = gui_win_create(parent, __WIN_NAME, 0, 0, SCREEN_WIDTH, 60);
+    // gui_win_t *win = gui_win_create(parent, __WIN1_NAME, 0, 0, SCREEN_WIDTH, 60);
     gui_canvas_round_rect_t *canvas_timecard = gui_canvas_round_rect_create(GUI_BASE(parent),
-                                                                            __WIN_NAME,
+                                                                            __WIN1_NAME,
                                                                             35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
 
     // text
@@ -221,8 +217,8 @@ static void timer_cb(void *obj)
     }
 
     // control timecard display
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_timecard, __IMG_NAME, current_view);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas_timecard, __WIN_NAME, current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(img_timecard, __WIN0_NAME, current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(canvas_timecard, __WIN1_NAME, current_view);
     if (list->offset < 93)
     {
         img_timecard->not_show = 1;
@@ -358,7 +354,130 @@ static void arc_activity_cb(NVGcontext *vg)
     // clear
     cJSON_Delete(root);
 }
+static void note_design(gui_obj_t *obj, void *p)
+{
+    uint16_t index = ((gui_list_note_t *)obj)->index;
+    int16_t offset_X = 29;
 
+    if (index == 0)
+    {
+        // note_calendar
+        gui_img_t *img = gui_img_create_from_mem(obj, "calendar", UI_CARD_WHITE_BG_BIN, offset_X,
+                                                 0, 0, 0);
+        gui_text_t *text = gui_text_create(img, 0, 15, 15, 0, 0);
+        gui_text_set(text, (void *)calendar_name, GUI_FONT_SRC_BMP, gui_rgb(0, 0, 0),
+                     strlen(calendar_name), 48);
+        gui_text_type_set(text, SOURCEHANSANSSC_SIZE48_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(text, LEFT);
+        // gui_text_rendermode_set(text, 2);
+
+        text = gui_text_create(img, 0, 15, 65, 0, 0);
+        gui_text_set(text, (void *)calendar_content, GUI_FONT_SRC_BMP, gui_rgb(40, 40, 40),
+                     strlen(calendar_content), 32);
+        gui_text_type_set(text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(text, LEFT);
+        // gui_text_rendermode_set(text, 2);
+
+    }
+    else if (index == 1)
+    {
+        // note_weather
+        gui_img_t *img = gui_img_create_from_mem(obj, "weather", UI_CARD_WEATHER_BIN, offset_X, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    else if (index == 2)
+    {
+        // note_activity
+        {
+            gui_img_t *canvas = gui_img_create_from_mem(obj, "note_ac", UI_CARD_GREY_BG_BIN, offset_X,
+                                                        0, 0, 0);
+            gui_img_set_mode(canvas, IMG_SRC_OVER_MODE);
+            gui_img_t *img = gui_img_create_from_mem(canvas, "ac_bg", UI_BG_ICON_BIN, 22, 33, 0, 0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_img_scale(img, 0.9f, 0.9f);
+
+            if (move_content == NULL)
+            {
+                move_content = (char *)gui_malloc(30);
+                ex_content = (char *)gui_malloc(30);
+                stand_content = (char *)gui_malloc(30);
+            }
+            sprintf(move_content, "Move: 0/20000 steps");
+            gui_text_t *move_text = gui_text_create(canvas, "ac_move", 134, 20, 0, 0);
+            gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_BMP, gui_rgb(230, 67, 79),
+                         strlen(move_content), 24);
+            gui_text_type_set(move_text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(move_text, LEFT);
+
+            sprintf(ex_content, "Exercise: 0/60 min");
+            gui_text_t *ex_text = gui_text_create(canvas, "ac_ex", 134, 57, 0, 0);
+            gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_BMP, gui_rgb(186, 253, 79),
+                         strlen(ex_content), 24);
+            gui_text_type_set(ex_text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(ex_text, LEFT);
+
+
+            sprintf(stand_content, "Stand: 0/30 times");
+            gui_text_t *stand_text = gui_text_create(canvas, "ac_stand", 134, 94, 0, 0);
+            gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_BMP, gui_rgb(117, 230, 229),
+                         strlen(stand_content), 24);
+            gui_text_type_set(stand_text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(stand_text, LEFT);
+            // activity icon
+            {
+                int image_h = 100;
+                int image_w = 100;
+                int pixel_bytes = 4;
+                size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+                if (!img_data_activity)
+                {
+                    img_data_activity = gui_lower_malloc(buffer_size);
+                }
+                memset(img_data_activity, 0, buffer_size);
+                img = gui_img_create_from_mem(canvas, "activity", img_data_activity, 17, 28, 0, 0);
+                img->base.w = image_w;
+                img->base.h = image_h;
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb,
+                                                  img_data_activity);
+            }
+        }
+    }
+    else if (index == 3)
+    {
+        // note_app
+        gui_img_t *canvas_app = gui_img_create_from_mem(obj, "note_ac", UI_CARD_GREY_BG_BIN, offset_X,
+                                                        0, 0, 0);
+        gui_img_t *img = gui_img_create_from_mem(canvas_app, "RING", UI_CLOCK_BOX2D_RING_ICON_BIN, 17, 28,
+                                                 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        img = gui_img_create_from_mem(canvas_app, "FJ", UI_CLOCK_FRUIT_NINJA_ICON_BIN, 17 + 109, 28, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        img = gui_img_create_from_mem(canvas_app, "HR", UI_CLOCK_HEARTRATE_ICON_BIN, 17 + 109 * 2, 28, 0,
+                                      0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    }
+    else if (index == 4)
+    {
+        // note_app_menu
+        // gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note_appview), "app_menu",
+        //                                                                57, 0, 292, 76, 40, gui_rgb(100, 100, 100));
+        // img = gui_img_create_from_mem(canvas, 0, APP_MENU_ICON_BIN, 38, 20, 0, 0);
+        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+        // gui_text_t *text = gui_text_create(canvas, 0, 90, 20, 0, 0);
+        // gui_text_set(text, (void *)"ALL APP", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 7, 32);
+        // gui_text_type_set(text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        // gui_text_mode_set(text, LEFT);
+
+        gui_img_t *img = gui_img_create_from_mem(obj, "app_menu", UI_APPVIEW_CARD_BIN, 76, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    }
+}
 static void bottom_view_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
@@ -372,34 +491,33 @@ static void bottom_view_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(canvas_bg), 100, true, timer_cb);
 
     //clock circle
-    gui_img_t *img_clock = gui_img_create_from_mem(parent, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN,
-                                                   38, 30,
-                                                   0, 0);
+    gui_win_t *win = gui_win_create(parent, __WIN0_NAME, 38, 30, 335, 180);
+    gui_img_t *img_clock = gui_img_create_from_mem(win, 0, UI_CARD_CLOCKCIRCLE_BIN, 157, 0, 0, 0);
     gui_img_set_mode(img_clock, IMG_SRC_OVER_MODE);
     {
         int text_w = 26;
-        gui_img_t *img = gui_img_create_from_mem(img_clock, "circle_hour_decimal", text_num_array[0], 185,
+        gui_img_t *img = gui_img_create_from_mem(win, "circle_hour_decimal", text_num_array[0], 185,
                                                  67, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(img_clock, "circle_hour_single", text_num_array[0], 185 + text_w, 67,
+        img = gui_img_create_from_mem(win, "circle_hour_single", text_num_array[0], 185 + text_w, 67,
                                       0, 0);
         gui_img_scale(img, 0.7, 0.7);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(img_clock, "colon", text_num_array[10], 185 + text_w * 2 + 5, 67 + 5,
+        img = gui_img_create_from_mem(win, "colon", text_num_array[10], 185 + text_w * 2 + 5, 67 + 5,
                                       0, 0);
         gui_img_scale(img, 0.7, 0.7);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(img_clock, "circle_minute_decimal", text_num_array[0],
+        img = gui_img_create_from_mem(win, "circle_minute_decimal", text_num_array[0],
                                       185 + text_w * 2 + 17, 67, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(img_clock, "circle_minute_single", text_num_array[0],
+        img = gui_img_create_from_mem(win, "circle_minute_single", text_num_array[0],
                                       185 + text_w * 3 + 17, 67, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
-    gui_text_t *date_text = gui_text_create(img_clock, "timecard_date_2",  0, 42, 0, 0);
+    gui_text_t *date_text = gui_text_create(win, "timecard_date_2",  0, 42, 0, 0);
     gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_content),
                  32);
@@ -409,126 +527,13 @@ static void bottom_view_design(gui_view_t *view)
     // Card list
     int space = 10;
     int length = 157;
-    list = gui_list_create(parent, "list", 0, 0, 0, 0, length, space, VERTICAL, 0);
+    list = gui_list_create(parent, "list", 0, 0, 0, 0, length, space, VERTICAL, note_design, NULL,
+                           false);
     gui_list_set_style(list, LIST_CARD);
+    gui_list_set_note_num(list, 5);
     gui_list_set_offset(list, 215);
 
     draw_timecard(parent);
-
-    int16_t offset_X = 29;
-    gui_list_note_t *note_calendar = gui_list_add_note(list, false);
-    gui_list_note_t *note_weather = gui_list_add_note(list, false);
-    gui_list_note_t *note_activity = gui_list_add_note(list, false);
-    gui_list_note_t *note_app = gui_list_add_note(list, false);
-    gui_list_note_t *note_appview = gui_list_add_note(list, false);
-
-    gui_img_t *img = gui_img_create_from_mem(note_calendar, "calendar", UI_CARD_CALENDAR_BIN, offset_X,
-                                             0, 0, 0);
-    gui_img_set_mode(img, IMG_BYPASS_MODE);
-    img = gui_img_create_from_mem(note_weather, "weather", UI_CARD_WEATHER_BIN, offset_X, 0, 0, 0);
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-
-    {
-        int image_h = 157;
-        int image_w = 352;
-        int pixel_bytes = 4;
-        size_t bg_buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        if (!img_data_bg)
-        {
-            img_data_bg = gui_lower_malloc(bg_buffer_size);
-        }
-        memset(img_data_bg, 0, bg_buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, img_bg_cb,
-                                          img_data_bg);
-    }
-
-    // note_activity
-    {
-        gui_img_t *canvas = gui_img_create_from_mem(note_activity, "note_ac", (void *)img_data_bg, offset_X,
-                                                    0, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(canvas, "ac_bg", UI_BG_ICON_BIN, 22, 33, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_scale(img, 0.9f, 0.9f);
-
-        if (move_content == NULL)
-        {
-            move_content = (char *)gui_malloc(30);
-            ex_content = (char *)gui_malloc(30);
-            stand_content = (char *)gui_malloc(30);
-        }
-        sprintf(move_content, "Move: 0/20000 steps");
-        gui_text_t *move_text = gui_text_create(canvas, "ac_move", 134, 20, 0, 0);
-        gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_BMP, gui_rgb(230, 67, 79),
-                     strlen(move_content), 24);
-        gui_text_type_set(move_text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-        gui_text_mode_set(move_text, LEFT);
-
-        sprintf(ex_content, "Exercise: 0/60 min");
-        gui_text_t *ex_text = gui_text_create(canvas, "ac_ex", 134, 57, 0, 0);
-        gui_text_set(ex_text, (void *)ex_content, GUI_FONT_SRC_BMP, gui_rgb(186, 253, 79),
-                     strlen(ex_content), 24);
-        gui_text_type_set(ex_text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-        gui_text_mode_set(ex_text, LEFT);
-
-
-        sprintf(stand_content, "Stand: 0/30 times");
-        gui_text_t *stand_text = gui_text_create(canvas, "ac_stand", 134, 94, 0, 0);
-        gui_text_set(stand_text, (void *)stand_content, GUI_FONT_SRC_BMP, gui_rgb(117, 230, 229),
-                     strlen(stand_content), 24);
-        gui_text_type_set(stand_text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-        gui_text_mode_set(stand_text, LEFT);
-        // activity icon
-        {
-            int image_h = 100;
-            int image_w = 100;
-            int pixel_bytes = 4;
-            buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-            if (!img_data_activity)
-            {
-                img_data_activity = gui_lower_malloc(buffer_size);
-            }
-            memset(img_data_activity, 0, buffer_size);
-            img = gui_img_create_from_mem(canvas, "activity", img_data_activity, 17, 28, 0, 0);
-            img->base.w = image_w;
-            img->base.h = image_h;
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-            gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb,
-                                              img_data_activity);
-        }
-    }
-
-    // note_app
-    {
-        gui_img_t *canvas_app = gui_img_create_from_mem(note_app, "note_ac", (void *)img_data_bg, offset_X,
-                                                        0, 0, 0);
-        img = gui_img_create_from_mem(canvas_app, "RING", UI_CLOCK_BOX2D_RING_ICON_BIN, 17, 28, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-        img = gui_img_create_from_mem(canvas_app, "FJ", UI_CLOCK_FRUIT_NINJA_ICON_BIN, 17 + 109, 28, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-        img = gui_img_create_from_mem(canvas_app, "HR", UI_CLOCK_HEARTRATE_ICON_BIN, 17 + 109 * 2, 28, 0,
-                                      0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-    }
-
-    {
-        // gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note_appview), "app_menu",
-        //                                                                57, 0, 292, 76, 40, gui_rgb(100, 100, 100));
-        // img = gui_img_create_from_mem(canvas, 0, APP_MENU_ICON_BIN, 38, 20, 0, 0);
-        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-
-        // gui_text_t *text = gui_text_create(canvas, 0, 90, 20, 0, 0);
-        // gui_text_set(text, (void *)"ALL APP", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 7, 32);
-        // gui_text_type_set(text, SOURCEHANSANSSC_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-        // gui_text_mode_set(text, LEFT);
-
-        img = gui_img_create_from_mem(note_appview, "app_menu", UI_APPVIEW_CARD_BIN, 76, 0, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-    }
 
     time_update_cb();
 }

@@ -17,7 +17,11 @@
 // #define RUN_VERTICAL_HELIX_STYLE
 // #define RUN_VERTICAL_CURL_STYLE
 
-static int app_init(void)
+#define NOTE_NUM 20
+
+int length = 100;
+
+static void note_design(gui_obj_t *obj, void *p)
 {
     gui_color_t color[] =
     {
@@ -30,20 +34,57 @@ static int app_init(void)
         APP_COLOR_GREEN,
         APP_COLOR_BLUE,
     };
+    uint16_t index = ((gui_list_note_t *)obj)->index % (sizeof(color) / sizeof(gui_color_t));
+#ifdef RUN_VERTICAL_CIRCLE_STYLE
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 480, 100, color[index]);
+#endif
 
-    uint8_t space = 5;
+#ifdef RUN_HORIZONTAL_ZOOM_STYLE
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 100, 480, color[index]);
+#endif
+
+#ifdef RUN_VERTICAL_CARD_STYLE
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 50, 0, 380, 150, color[index]);
+#endif
+
+#ifdef RUN_VERTICAL_FAN_STYLE
+    gui_color_t color2[] =
+    {
+        APP_COLOR_SILVER_OPACITY(150),
+        APP_COLOR_WHITE_OPACITY,
+    };
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 50, 0, 380, 100, color2[index % 2]);
+#endif
+
+#ifdef RUN_VERTICAL_HELIX_STYLE
+    gui_color_t color2[] =
+    {
+        APP_COLOR_SILVER_OPACITY(150),
+        APP_COLOR_WHITE_OPACITY,
+    };
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 50, 0, 380, 100, color2[index % 2]);
+#endif
+
+#ifdef RUN_VERTICAL_CURL_STYLE
+    gui_color_t color2[] =
+    {
+        APP_COLOR_SILVER_OPACITY(150),
+        APP_COLOR_WHITE_OPACITY,
+    };
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 0, 100, color2[index % 2]);
+#endif
+}
+
+static int app_init(void)
+{
+    uint16_t space = 5;
 
     /* VERTICAL CIRCLE STYLE */
 #ifdef RUN_VERTICAL_CIRCLE_STYLE
-    int length = 100;
-    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space,
-                                       VERTICAL, false);
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, 480, length,
-                                                           color[i]);
-    }
+
+    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
+                                       note_design, NULL, false);
+    gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_CIRCLE);
     return 0;
 #endif
@@ -53,79 +94,49 @@ static int app_init(void)
 #ifdef RUN_VERTICAL_CARD_STYLE
     int length = 150;
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
+                                       note_design, NULL,
                                        false);
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length,
-                                                           color[i]);
-    }
-    gui_list_set_style(list, LIST_CARD);
+    gui_list_set_style(list, LIST_CARD); //if LIST_CARD style, must set style before set note num
+    gui_list_set_note_num(list, NOTE_NUM);
     return 0;
 #endif
 
     /* HORIZONTAL ZOOM STYLE */
 #ifdef RUN_HORIZONTAL_ZOOM_STYLE
-    int length = 100;
+
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space,
-                                       HORIZONTAL, false);
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, length, 480,
-                                                           color[i]);
-    }
+                                       HORIZONTAL, note_design, NULL, false);
+    gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_ZOOM);
     return 0;
 #endif
 
     /* VERTICAL FAN STYLE */
 #ifdef RUN_VERTICAL_FAN_STYLE
-    int length = 100;
+
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
-                                       false);
-    for (uint8_t i = 0; i < 20; i++)
-    {
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length,
-                                                           APP_COLOR_SILVER_OPACITY(150));
-    }
+                                       note_design, NULL, false);
+    gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_FAN);
     return 0;
 #endif
 
     /* VERTICAL HELIX STYLE */
 #ifdef RUN_VERTICAL_HELIX_STYLE
-    int length = 100;
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
-                                       true);
-    for (uint8_t i = 0; i < 20; i++)
-    {
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 50, 0, 380, length,
-                                                           APP_COLOR_SILVER_OPACITY(150));
-    }
+                                       note_design, NULL, true);
+    gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_HELIX);
     return 0;
 #endif
 
     /* VERTICAL CURL STYLE */
 #ifdef RUN_VERTICAL_CURL_STYLE
-    int length = 100;
     space = 0;
-    gui_color_t color_t[] =
-    {
-        APP_COLOR_SILVER_OPACITY(150),
-        APP_COLOR_WHITE_OPACITY,
-    };
+
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
-                                       false);
-    for (uint8_t i = 0; i < 20; i++)
-    {
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        gui_canvas_rect_t *canvas = gui_canvas_rect_create(GUI_BASE(tab), "tab", 0, 0, 0, length,
-                                                           color_t[i % 2]);
-    }
+                                       note_design, NULL, false);
+    gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_CURL);
     return 0;
 #endif

@@ -4,7 +4,7 @@
 List
 =====================
 
-The list widget is a container for any number of list table, horizontally or vertically, and each table can have other widgets added to it, such as text widgets, image widgets, etc. Users can swipe up, down, left, or right to access other widgets added to the list table.
+The list widget is a container for any number of list note, horizontally or vertically. And each note, which is dynamic created for saving memory and CPU usage, can have other widgets added to it, such as text widgets, image widgets, etc. Users can swipe up, down, left, or right to access other widgets added to the list note.
 
 .. raw:: html
 
@@ -20,12 +20,7 @@ Usage
 --------
 Create List Widget
 ~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_list_create` function can be used to create a list widget, in which the scroll bar is optional, and the next level of the list widget can only be a table widget. The total length of the list widget is determined by the number of table added, the length of the table, and the space between the tables; as more tables are added, the length increases.
-
-
-Create List Table Widget
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_list_add_note` function can be used to create a list table widget. Users can add other widgets to the table.
+The :cpp:any:`gui_list_create` function can be used to create a list widget, in which the scroll bar is optional, and the next level of the list widget can only be a note widget. In ``note_design``, the corresponding child widget could be designed according to the ``index`` of the list widget to dynamically create the note widget. The total length of the list widget is determined by the number of note added, the length of the note, and the space between the tables; as more tables are added, the length increases.
 
 
 Set List Widget Style
@@ -52,6 +47,11 @@ The :cpp:any:`gui_list_set_offset` function can be used to set list offset of po
 Set List Widget Scroll Bar Color
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_list_set_bar_color` function can be used to set scroll bar color of list widget.
+
+
+Set List Widget Note Number
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_note_num` function can be used to set note number of list widget。
 
 Example
 ---------

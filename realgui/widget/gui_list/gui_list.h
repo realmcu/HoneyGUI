@@ -61,17 +61,22 @@ typedef struct gui_list
 {
     gui_obj_t base;
     LIST_STYLE style;
-    LIST_DIR dir;        // 0:vertical, 1:horizontal.
-    uint8_t widget_num;
+    LIST_DIR dir;                // 0:vertical, 1:horizontal.
+    uint8_t note_num;            // number of whole notes.
     uint8_t space;
-    uint16_t note_length; // List note length.
+    uint16_t note_length;        // List note length.
     int16_t speed;
     int16_t record[5];
-    float factor;        // (0~1.0] Deceleration factor, defaults to 0.05.
+    float factor;                // (0~1.0] Deceleration factor, defaults to 0.05.
 
-    int offset;          // offset = hold + tp_delta, when sliding.
+    int offset;                  // offset = hold + tp_delta, when sliding.
     int hold;
     int total_length;
+
+    uint16_t created_note_index; // Index of the last created note.
+    uint8_t keep_note_num;       // Number of created notes.
+    void (* note_design)(gui_obj_t *obj, void *param);
+    void *design_param;
 
     gui_img_t *bar;
     void *bar_data;
@@ -90,7 +95,9 @@ typedef struct gui_list_note
     int t_x;
     int t_y;
     uint16_t animate_cnt;
-    bool is_speed_positive;    // To judge move direction.
+    bool is_speed_positive;   // To judge move direction.
+
+    int16_t index;            // Index of the note in the list.
 
     uint8_t checksum;
 } gui_list_note_t;
@@ -139,15 +146,9 @@ gui_list_t *gui_list_create(void       *parent,
                             uint16_t    note_length,
                             uint8_t     space,
                             LIST_DIR    dir,
+                            void (* note_design)(gui_obj_t *obj, void *param),
+                            void        *design_param,
                             bool        create_bar);
-
-/**
- * @brief Add list note.
- * @param list The list widget it nested in.
- * @param add_at_top True: Add note at top of the list.
- * @return Return the note object pointer.
- */
-gui_list_note_t *gui_list_add_note(gui_list_t *list, bool add_at_top);
 
 /**
  * @brief Set list moving style.
@@ -176,6 +177,13 @@ void gui_list_set_offset(gui_list_t *list, int16_t offset);
  * @param color The list bar color.
  */
 void gui_list_set_bar_color(gui_list_t *list, gui_color_t color);
+
+/**
+ * @brief Set note number of list.
+ * @param list Pointer to the list widget.
+ * @param num The spacific number, must be a nonnegative number.
+ */
+void gui_list_set_note_num(gui_list_t *list, uint16_t num);
 
 #ifdef __cplusplus
 }

@@ -65,7 +65,6 @@ static gui_list_t *list;
 static gui_canvas_round_rect_t *canvas_clear;
 static information_t *infor_rec[INFOR_NUM_MAX];
 static uint8_t infor_num = 0;
-static uint8_t infor_need_update_num = 0;
 static bool clear_flag = false; // 1: not create new information note
 static bool in_view_more = false; // 1: not create new information note
 static bool note_dur_animation = false; // 1: not create new information note
@@ -262,14 +261,11 @@ static void clear_list_note(gui_list_note_t *note)
         if (list_note == note) {break;}
 
         list_note->start_y -= (list->note_length + list->space);
+        list_note->index -= 1;
         gui_obj_move(obj, 0, list_note->start_y);
         index++;
     }
     gui_obj_tree_free_async(GUI_BASE(note));
-    list->total_length -= (list->note_length + list->space);
-    list->total_length = list->total_length < SCREEN_HEIGHT ? SCREEN_HEIGHT : list->total_length;
-    list->widget_num--;
-    list->need_update_bar = true;
     index = infor_num - 1 - index;
     gui_free(infor_rec[index]);
     // gui_log("free infor_rec[%d]\n", index);
@@ -280,6 +276,7 @@ static void clear_list_note(gui_list_note_t *note)
         index++;
     }
     infor_num--;
+    gui_list_set_note_num(list, infor_num);
     clear_flag = false;
 }
 
@@ -334,19 +331,20 @@ static void note_released_cb(void *widget)
     gui_obj_start_timer(obj);
 }
 
-static void create_inform_note(information_t *inform)
+static void create_inform_note(gui_obj_t *obj, void *param)
 {
     gui_log("create_inform_note\n");
+    uint16_t index = ((gui_list_note_t *)obj)->index;
+    information_t *inform = ((information_t **)param)[index];
     const char *informer = inform->informer;
     const char *content = inform->content;
     const char *time = inform->time;
     app_name app = inform->app;
 
-    gui_list_note_t *note = gui_list_add_note(list, true);
-    gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note), "bg", 30, 0, 350,
+    gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(obj, "bg", 30, 0, 350,
                                                                    220,
                                                                    35, gui_rgb(39, 43, 44));
-    gui_obj_add_event_cb(GUI_BASE(note), (gui_event_cb_t)create_view_more, GUI_EVENT_TOUCH_CLICKED,
+    gui_obj_add_event_cb(obj, (gui_event_cb_t)create_view_more, GUI_EVENT_TOUCH_CLICKED,
                          (void *)inform);
     // message
     void *img_path = NULL;
@@ -403,26 +401,20 @@ static void create_inform_note(information_t *inform)
     gui_text_mode_set(text_content, MULTI_LEFT);
     gui_text_wordwrap_set(text_content, true);
 
-    gui_obj_add_event_cb(note, (gui_event_cb_t)note_pressing_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL,
+    gui_obj_add_event_cb(obj, (gui_event_cb_t)note_pressing_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL,
                          NULL);
-    gui_obj_add_event_cb(note, (gui_event_cb_t)note_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
-    gui_obj_add_event_cb(note, (gui_event_cb_t)create_view_more, GUI_EVENT_TOUCH_CLICKED, note);
+    gui_obj_add_event_cb(obj, (gui_event_cb_t)note_released_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_add_event_cb(obj, (gui_event_cb_t)create_view_more, GUI_EVENT_TOUCH_CLICKED, obj);
 }
 
 static void list_timer_cb(void *param)
 {
-    if (!note_dur_animation && !clear_flag && (list->total_length == SCREEN_HEIGHT ||
-                                               list->offset != (SCREEN_HEIGHT - list->total_length)))
+    gui_view_t *next_view = gui_view_get_next();
+    if (!note_dur_animation && !clear_flag &&
+        (next_view == current_view || next_view == NULL))
     {
-        while (infor_need_update_num)
-        {
-            infor_need_update_num--;
-            create_inform_note(infor_rec[0]);
-        }
+        gui_list_set_note_num(list, infor_num);
     }
-
-    gui_obj_t *obj = GUI_BASE(canvas_clear);
-    gui_obj_move(obj, obj->x, 40 + list->offset); // move with list
 
     if (current_view != gui_view_get_current())
     {
@@ -464,17 +456,13 @@ static void clear_all_timer_cb(void *widget)
     if (abs(note->start_x - note->t_x) >= SCREEN_WIDTH)
     {
         gui_obj_child_free(GUI_BASE(list));
-
-        list->total_length = gui_get_dc()->screen_height;
-        list->widget_num = 0;
-        list->need_update_bar = true;
         while (infor_num)
         {
             infor_num--;
             gui_free(infor_rec[infor_num]);
             infor_rec[infor_num] = NULL;
         }
-        infor_need_update_num = 0;
+        gui_list_set_note_num(list, infor_num);
         gui_obj_stop_timer(GUI_BASE(widget));
         clear_flag = false;
     }
@@ -482,10 +470,16 @@ static void clear_all_timer_cb(void *widget)
 
 static void clear_all_note_cb(void *obj, gui_event_t e, void *param)
 {
-    if (in_view_more || list->widget_num == 0) {return;}
+    if (in_view_more || list->note_num == 0) {return;}
     gui_obj_create_timer(GUI_BASE(obj), 10, true, clear_all_timer_cb);
     gui_obj_start_timer(GUI_BASE(obj));
     clear_flag = true;
+}
+
+static void canvas_clear_update_pos_cb(void *widget)
+{
+    gui_obj_t *obj = GUI_BASE(canvas_clear);
+    gui_obj_move(obj, obj->x, 40 + list->offset); // move with list
 }
 
 static void create_clear_note(void *parent)
@@ -514,21 +508,16 @@ static void top_view_design(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
     gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(parent), "background", 0, 0,
-                                                          SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgba(76, 76, 76, 255));
+                                                          SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(76, 76, 76));
+    gui_obj_create_timer(GUI_BASE(canvas_bg), 20, true, canvas_clear_update_pos_cb);
 
     create_clear_note(view);
 
     list = gui_list_create(view, "list", 0, NOTE_START, SCREEN_WIDTH, SCREEN_HEIGHT, NOTE_HEIGHT,
-                           NOTE_INTERVAL, VERTICAL, 1);
+                           NOTE_INTERVAL, VERTICAL, create_inform_note, infor_rec, true);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
-
-    for (int8_t i = infor_num - 1; i >= 0; i--)
-    {
-        create_inform_note(infor_rec[i]);
-    }
-    infor_need_update_num = 0;
 }
 
 /*============================================================================*
@@ -548,7 +537,6 @@ void add_information(information_t *payload)
         index--;
     }
     infor_num++;
-    infor_need_update_num++;
     infor_rec[0] = gui_lower_malloc(sizeof(information_t));
     memcpy(infor_rec[0], payload, sizeof(information_t));
     gui_log("add new information\r\n");

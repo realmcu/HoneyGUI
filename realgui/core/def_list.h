@@ -86,6 +86,8 @@ gui_inline void gui_list_insert_before(gui_node_list_t *l, gui_node_list_t *n)
 gui_inline void gui_list_insert(gui_node_list_t *l, gui_node_list_t *n)
 {
     n->next = l->next;
+    n->prev = l;
+    l->next->prev = n;
     l->next = n;
 }
 

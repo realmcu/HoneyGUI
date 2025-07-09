@@ -91,14 +91,14 @@ static void update_panel_animation(void *param)
 {
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
-    gui_list_note_t *tab = (gui_list_note_t *)param;
+    gui_list_note_t *note = (gui_list_note_t *)param;
 
-    int32_t diff = (weather_list->base.w / 2 + weather_list->base.x) - (tab->base.x +
+    int32_t diff = (weather_list->base.w / 2 + weather_list->base.x) - (note->base.x +
                                                                         weather_list->note_length / 2);
     float scale = fabsf((abs(diff) - dc->screen_width / 2.0f)) / (dc->screen_width / 2.0f);
 
     float panel_below_driftY = (1.0f - scale) * 50.0f;
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(panel_img, "panel1", tab);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(panel_img, "panel1", note);
     gui_img_translate((gui_img_t *)panel_img, 0, panel_below_driftY);
 
 }
@@ -233,27 +233,27 @@ static void update_weather_animation(void *param)
 
     if (weather_list->offset > -145) // center offset: -55
     {
-        current_list_index = 1; //sunny tab
+        current_list_index = 1; //sunny note
     }
     else if (weather_list->offset > -325) // center offset: -235
     {
-        current_list_index = 2; //cloudy tab
+        current_list_index = 2; //cloudy note
     }
     else if (weather_list->offset > -505) // center offset: -415
     {
-        current_list_index = 3; //rainy tab
+        current_list_index = 3; //rainy note
     }
     else if (weather_list->offset > -685) // center offset: -595
     {
-        current_list_index = 4; //snowy tab
+        current_list_index = 4; //snowy note
     }
     else if (weather_list->offset > -865) // center offset: -775
     {
-        current_list_index = 5; //stormy tab
+        current_list_index = 5; //stormy note
     }
     else if (weather_list->offset > -1045) // center offset: -955
     {
-        current_list_index = 6; //windy tab
+        current_list_index = 6; //windy note
     }
 
 
@@ -261,7 +261,7 @@ static void update_weather_animation(void *param)
     {
         clear_weather_icons(win);
 
-        if (current_list_index == 1) //sunny tab
+        if (current_list_index == 1) //sunny note
         {
             lights_or_thunder[0] = gui_img_create_from_mem(win, 0, LIGHT0_BIN, 0, 0, 0, 0);
             gui_img_scale(lights_or_thunder[0], 1.5f, 1.5f);
@@ -283,7 +283,7 @@ static void update_weather_animation(void *param)
             gui_img_translate(sun, 77, -128);
 
         }
-        else if (current_list_index == 2) // cloudy tab
+        else if (current_list_index == 2) // cloudy note
         {
             gui_img_t *sun = gui_img_create_from_mem(win, 0, SUN0_BIN, 0, 0, 0, 0);
             gui_img_scale(sun, 2.0f, 2.0f);
@@ -292,7 +292,7 @@ static void update_weather_animation(void *param)
             gui_img_scale(cloud, 2.0f, 2.0f);
             gui_img_translate(cloud, 77, -60);
         }
-        else if (current_list_index == 3) // rainy tab
+        else if (current_list_index == 3) // rainy note
         {
             for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
             {
@@ -312,7 +312,7 @@ static void update_weather_animation(void *param)
             gui_obj_create_timer(GUI_BASE(cloud), 10, true, update_raindrop_animation);
 
         }
-        else if (current_list_index == 4) // snowy tab
+        else if (current_list_index == 4) // snowy note
         {
             for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
             {
@@ -332,7 +332,7 @@ static void update_weather_animation(void *param)
             gui_obj_create_timer(GUI_BASE(cloud), 10, true, update_snow_animation);
 
         }
-        else if (current_list_index == 5) // stormy tab
+        else if (current_list_index == 5) // stormy note
         {
             lights_or_thunder[0] = gui_img_create_from_mem(win, 0, THUNDER00_BIN, 0, 0, 0, 0);
             gui_img_translate(lights_or_thunder[0], 173, 40);
@@ -350,7 +350,7 @@ static void update_weather_animation(void *param)
             gui_img_translate(cloud, 77, -60);
 
         }
-        else if (current_list_index == 6) // windy tab
+        else if (current_list_index == 6) // windy note
         {
             for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
             {
@@ -376,15 +376,26 @@ static void update_weather_animation(void *param)
     }
 }
 
-static void add_panel(gui_list_note_t *tab)
+static void add_panel(gui_list_note_t *note)
 {
-    gui_img_create_from_mem(tab, "panel0", PANEL00_BIN, 0, 44, 0, 0);
+    gui_img_create_from_mem(note, "panel0", PANEL00_BIN, 0, 44, 0, 0);
 
-    gui_img_t *panel_down = gui_img_create_from_mem(tab, "panel1", PANEL00_BIN, 0, 200, 0, 0);
+    gui_img_t *panel_down = gui_img_create_from_mem(note, "panel1", PANEL00_BIN, 0, 200, 0, 0);
     gui_img_set_focus(panel_down, 0, 400);
     gui_img_scale(panel_down, 1.0f, -1.0f);
     gui_img_set_opacity(panel_down, 125);
 
+}
+
+static void note_design(gui_obj_t *obj, void *p)
+{
+    gui_list_note_t *note = (gui_list_note_t *)obj;
+    uint16_t index = note->index;
+    if (index != 0 && index != 7)
+    {
+        add_panel(note);
+        gui_obj_create_timer(obj, 10, true, update_panel_animation);
+    }
 }
 
 static void weather_app(gui_view_t *view)
@@ -394,34 +405,11 @@ static void weather_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    weather_list = gui_list_create(obj, "list", 0, 0, 0, 0, 160, 20, HORIZONTAL, 0);
+    weather_list = gui_list_create(obj, "list", 0, 0, 0, 0, 160, 20, HORIZONTAL, note_design, NULL,
+                                   false);
     gui_list_set_offset(weather_list, -55);
-
-    gui_list_add_note(weather_list, false);
-    gui_list_note_t *sunny_tab = gui_list_add_note(weather_list, false);
-    add_panel(sunny_tab);
-    gui_list_note_t *cloudy_tab = gui_list_add_note(weather_list, false);
-    add_panel(cloudy_tab);
-    gui_list_note_t *rainy_tab = gui_list_add_note(weather_list, false);
-    add_panel(rainy_tab);
-    gui_list_note_t *snowy_tab = gui_list_add_note(weather_list, false);
-    add_panel(snowy_tab);
-    gui_list_note_t *stormy_tab = gui_list_add_note(weather_list, false);
-    add_panel(stormy_tab);
-    gui_list_note_t *windy_tab = gui_list_add_note(weather_list, false);
-    add_panel(windy_tab);
-
-    gui_list_add_note(weather_list, false);
+    gui_list_set_note_num(weather_list, 8);
     gui_list_set_style(weather_list, LIST_ZOOM);
-
-    gui_obj_create_timer(GUI_BASE(sunny_tab), 10, true, update_panel_animation);
-    gui_obj_create_timer(GUI_BASE(cloudy_tab), 10, true, update_panel_animation);
-    gui_obj_create_timer(GUI_BASE(rainy_tab), 10, true, update_panel_animation);
-    gui_obj_create_timer(GUI_BASE(snowy_tab), 10, true, update_panel_animation);
-    gui_obj_create_timer(GUI_BASE(stormy_tab), 10, true, update_panel_animation);
-    gui_obj_create_timer(GUI_BASE(windy_tab), 10, true, update_panel_animation);
-
     gui_win_t *weather_win = gui_win_create(current_view, "weather_win", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(weather_win), 10, true, update_weather_animation);
-
 }
