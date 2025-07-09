@@ -37,7 +37,6 @@
 static struct gui_fs *fs = NULL;
 char *defaultPath = _GUI_FS_ROOT_DIR;
 static char *buffer;
-static int defaultPathIsDynamic = 0;
 
 /*============================================================================*
  *                           Private Functions
@@ -64,12 +63,11 @@ void gui_change_default_path(int argc, char **argv)
             }
             sprintf(path, "%s%s", argv[count + 1], "\\");
 
-            if (defaultPathIsDynamic)
+            if (defaultPath != NULL)
             {
-                free(defaultPath);
+                // free(defaultPath);
             }
             defaultPath = path;
-            defaultPathIsDynamic = 1;
         }
     }
     GUI_UNUSED(buffer);

@@ -8,15 +8,10 @@
 #include <gui_matrix.h>
 #include <math.h>
 
-#define USE_FIX_SIN 1
+#define MAX(a,b) (a > b ? a : b)
+#define MIN(a,b) (a < b ? a : b)
 
-#if __ARM_FEATURE_MVE
-#define USE_MVE   0
-#if USE_MVE
-#include <arm_mve.h>
-#include <arm_math_types.h>
-#endif
-#endif
+#define USE_FIX_SIN 1
 
 #if USE_FIX_SIN
 // Set the intial cube rotation degree and step.
@@ -29,6 +24,30 @@ static const int16_t sin_table[] =
     29451, 29697, 29934, 30162, 30381, 30591, 30791, 30982, 31163, 31335, 31498, 31650, 31794, 31927, 32051, 32165,
     32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767
 };
+
+bool rect_intersect(gui_rect_t *result_rect, gui_rect_t *rect1, gui_rect_t *rect2)
+{
+    int16_t x1, x2, y1, y2;
+    x1 = MAX(rect1->x1, rect2->x1);
+    y1 = MAX(rect1->y1, rect2->y1);
+    x2 = MIN(rect1->x2, rect2->x2);
+    y2 = MIN(rect1->y2, rect2->y2);
+    if (x1 > x2 || y1 > y2)
+    {
+        return false;
+    }
+    else
+    {
+        if (result_rect != NULL)
+        {
+            result_rect->x1 = x1;
+            result_rect->x2 = x2;
+            result_rect->y1 = y1;
+            result_rect->y2 = y2;
+        }
+        return true;
+    }
+}
 
 float fix_sin(int angle)
 {
@@ -104,7 +123,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
         int max_r = row;
         for (int i = row + 1; i < equ; i++)
         {
-            if (fabs(A[i][col]) > fabs(A[max_r][col]))
+            if (fabsf(A[i][col]) > fabsf(A[max_r][col]))
             {
                 max_r = i;
             }
@@ -117,7 +136,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
             }
         }
 
-        if (fabs(A[row][col]) < (1e-6))
+        if (fabsf(A[row][col]) < (1e-6f))
         {
             //row--;
             //continue;
@@ -127,7 +146,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
         for (int i = row + 1; i < equ; i++)
         {
 
-            if (fabs(A[i][col]) < (1e-6))
+            if (fabsf(A[i][col]) < (1e-6f))
             {
                 continue;
             }
@@ -432,60 +451,7 @@ void matrix_multiply_normal(struct gui_matrix *matrix, gui_vertex_t *normal)
 void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 {
     //int row, column;
-#if USE_MVE
-    float32_t   *pInA0, *pInA1, *pInA2, *pOut;
-    f32x4_t    vecMac0, vecMac1, vecMac2;
-    f32x4_t    vecInB;
-    float32_t const *pSrBVec;
 
-    pSrBVec = (float32_t const *) mult->m;
-
-    pInA0 = (float *)matrix->m;
-    pInA1 = pInA0 + 3;
-    pInA2 = pInA1 + 3;
-    pOut = pInA0;
-
-    /* enable predication to disable last (4th) vector element */
-    mve_pred16_t p0 = vctp32q(3);
-
-    /*
-     * load {b0,0, b0,1, b0,2, 0}
-     */
-    vecInB = vldrwq_z_f32(pSrBVec, p0);
-    pSrBVec += 3;
-
-    vecMac0 = vmulq_n_f32(vecInB, *pInA0++);
-    vecMac1 = vmulq_n_f32(vecInB, *pInA1++);
-    vecMac2 = vmulq_n_f32(vecInB, *pInA2++);
-    /*
-     * load {b1,0, b1,1, b1,2, 0}
-     */
-    vecInB = vldrwq_z_f32(pSrBVec, p0);
-    pSrBVec += 3;
-
-    vecMac0 = vfmaq_n_f32(vecMac0, vecInB, *pInA0++);
-    vecMac1 = vfmaq_n_f32(vecMac1, vecInB, *pInA1++);
-    vecMac2 = vfmaq_n_f32(vecMac2, vecInB, *pInA2++);
-
-    /*
-     * load {b2,0, b2,1 , b2,2, 0}
-     */
-    vecInB = vldrwq_z_f32(pSrBVec, p0);
-    pSrBVec += 3;
-
-    vecMac0 = vfmaq_n_f32(vecMac0, vecInB, *pInA0++);
-    vecMac1 = vfmaq_n_f32(vecMac1, vecInB, *pInA1++);
-    vecMac2 = vfmaq_n_f32(vecMac2, vecInB, *pInA2++);
-
-    /* partial vector stores */
-    vstrwq_f32(pOut, vecMac0);
-    pOut += 3;
-    vstrwq_f32(pOut, vecMac1);
-    pOut += 3;
-    *pOut++ = vecMac2[0];
-    *pOut++ = vecMac2[1];
-    *pOut++ = vecMac2[2];
-#else
     float m00, m01, m02, m10, m11, m12, m20, m21, m22;
     m00 = matrix->m[0][0];
     m01 = matrix->m[0][1];
@@ -524,37 +490,11 @@ void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
     matrix->m[2][0] = (m20 * t00) + (m21 * t10) + (m22 * t20);
     matrix->m[2][1] = (m20 * t01) + (m21 * t11) + (m22 * t21);
     matrix->m[2][2] = (m20 * t02) + (m21 * t12) + (m22 * t22);
-#endif
 }
 void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point3f *pox)
 {
-#if USE_MVE
-    const float32_t *pInA0 = (const float32_t *)matrix->m;
-    float32_t *pOut = (float32_t *)pox->p;
-    f32x4_t    vecMac0, vecMac1, vecMac2;
-    f32x4_t    vecOut0, vecOut1, vecOut2;
-    f32x4_t    vecInB;
-    vecMac0[0] = matrix->m[0][0];
-    vecMac0[1] = matrix->m[1][0];
-    vecMac0[2] = matrix->m[2][0];
-    vecMac1[0] = matrix->m[0][1];
-    vecMac1[1] = matrix->m[1][1];
-    vecMac1[2] = matrix->m[2][1];
-    vecMac2[0] = matrix->m[0][2];
-    vecMac2[1] = matrix->m[1][2];
-    vecMac2[2] = matrix->m[2][2];
-
-    vecOut0 = vmulq_n_f32(vecMac0, pox->p[0]);
-    vecOut1 = vmulq_n_f32(vecMac1, pox->p[1]);
-    vecOut2 = vmulq_n_f32(vecMac2, pox->p[2]);
-    vecMac0 = vaddq_f32(vecOut1, vecOut2);
-    vecMac1 = vaddq_f32(vecOut0, vecMac0);
-
-    pox->p[0] = vecMac1[0] / vecMac1[2];
-    pox->p[1] = vecMac1[1] / vecMac1[2];
-    pox->p[2] = 1;
-
-#else
+    //struct gui_point3f_t temp;
+    //int row;
     float m_row0, m_row1, m_row2;
 
     float a = pox->p[0];
@@ -580,7 +520,7 @@ void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point3f *pox)
     pox->p[0] = pox->p[0] / pox->p[2];
     pox->p[1] = pox->p[1] / pox->p[2];
     pox->p[2] = 1;
-#endif
+
     //memcpy(pox, &temp, sizeof(temp));
 }
 void matrix_inverse(struct gui_matrix *matrix)
@@ -630,7 +570,7 @@ void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rota
     // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
     //
 #if USE_FIX_SIN
-    int frz = round(rz), frx = round(rx), fry = round(ry);
+    int frz = roundf(rz), frx = roundf(rx), fry = roundf(ry);
     float fxcos = fix_cos((int)(frx));
     float fxsin = fix_sin((int)(frx));
     float fycos = fix_cos((int)(fry));
@@ -771,5 +711,96 @@ bool matrix_is_full_rank(struct gui_matrix *m)
     return true;
 }
 
+bool matrix_get_transform_area(gui_matrix_t *matrix, gui_rect_t *input_area,
+                               gui_rect_t *result_area)
+{
+    gui_point3f_t pox = {0.0f};
+    float x_min = 0.0f;
+    float x_max = 0.0f;
+    float y_min = 0.0f;
+    float y_max = 0.0f;
 
+    float x1 = input_area->x1;
+    float y1 = input_area->y1;
+    float x2 = input_area->x2;
+    float y2 = input_area->y2;
+
+    pox.p[0] = x1;
+    pox.p[1] = y1;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    x_min = pox.p[0];
+    x_max = pox.p[0];
+    y_min = pox.p[1];
+    y_max = pox.p[1];
+
+    pox.p[0] = x2;
+    pox.p[1] = y1;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = x2;
+    pox.p[1] = y2;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = x1;
+    pox.p[1] = y2;
+    pox.p[2] = 1.0f;
+    matrix_multiply_point(matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    result_area->x1 = (int16_t)x_min;
+    result_area->y1 = (int16_t)y_min;
+    result_area->x2 = ceilf(x_max);
+    result_area->y2 = ceilf(y_max);
+    return true;
+}
 

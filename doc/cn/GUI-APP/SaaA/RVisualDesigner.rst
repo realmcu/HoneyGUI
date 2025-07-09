@@ -76,7 +76,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 打开 :term:`RVD` 工具后，可看到此页面。
    - 点击黄色文件夹图标创建项目。
 
-   .. figure:: https://foruda.gitee.com/images/1747378412350640924/277f6f75_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745738269558331190/7495790a_10088396.png
       :align: center
       :width: 400px
       :name: 创建新的 RVD 项目
@@ -87,7 +87,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    - 根据图片所示步骤添加图片资源。
 
-   .. figure:: https://foruda.gitee.com/images/1747378313556720434/f4258ac9_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745738540104414413/e31300d8_10088396.png
       :align: center
       :width: 400px
       :name: 添加图片资源
@@ -96,7 +96,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    - 添加图片资源后，界面显示类似于下图。
 
-   .. figure:: https://foruda.gitee.com/images/1747378404746671020/fc1601aa_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745738620568950463/af89cae9_10088396.png
       :align: center
       :width: 400px
       :name: 图片添加完成
@@ -108,7 +108,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 将 :guilabel:`RadioButton` 控件拖动到中央画布。
    - 为单选按钮设置背景图片（:guilabel:`BG Image`），按下时显示高亮图片。
 
-   .. figure:: https://foruda.gitee.com/images/1747378421712716016/725aa16e_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745808568359598574/8232c321_10088396.png
       :align: center
       :width: 400px
       :name: 单选按钮设置
@@ -118,7 +118,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 调整三个单选按钮的位置和大小，使其在左侧对齐。
    - 右键单击单选按钮，将其大小设置为与背景图片一致。
 
-   .. figure:: https://foruda.gitee.com/images/1747378123869707204/e4806247_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745808941071192592/f29f7f07_10088396.png
       :align: center
       :width: 400px
       :name: 调整位置和大小
@@ -131,7 +131,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 点击画布右侧的蓝色箭头创建第二个选项卡。
    - 选择 :guilabel:`tab0` 和 :guilabel:`tab1`，分别为每个选项卡添加一张图片。
 
-   .. figure:: https://foruda.gitee.com/images/1747378145157577091/8371fd7f_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745809454174368310/c380f8ca_10088396.png
       :align: center
       :width: 400px
       :name: 添加新选项卡
@@ -145,7 +145,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 在 :menuselection:`Property` 面板的黄色闪电 :guilabel:`Event Setting` 界面中，设置触发条件为 :guilabel:`OnSelect`，动作设置为跳转到 :guilabel:`tab1`。
    - 类似地，设置 :guilabel:`radiobutton1` 跳转到 :guilabel:`tab0`，:guilabel:`radiobutton2` 跳转到启动器。
 
-   .. figure:: https://foruda.gitee.com/images/1747378997502705601/ad728298_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745809610213583909/3d0065d2_10088396.png
       :align: center
       :width: 400px
       :name: 单选按钮选择事件
@@ -161,7 +161,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 设置 :guilabel:`key1` 跳转到 :guilabel:`tab0`。
    - 在 :menuselection:`Property` 面板的 :menuselection:`Property Setting` 界面中，将 :guilabel:`key0` 的 ID 设置为 49，:guilabel:`key1` 的 ID 设置为 50（对应 PC 环境中的键盘按键 1 和 2）。
 
-   .. figure:: https://foruda.gitee.com/images/1747379132608162798/d3df98b2_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745809853776415161/ac8f0d54_10088396.png
       :align: center
       :width: 400px
       :name: 按键点击事件
@@ -194,7 +194,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 打开 RVD 工具后，可看到此页面。
    - 点击黄色文件夹图标创建项目。
 
-   .. figure:: https://foruda.gitee.com/images/1747379190065350353/f0562096_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745739395361023371/1dfd00b4_10088396.png
       :align: center
       :width: 400px
       :name: 创建示例2的新 RVD 项目
@@ -219,7 +219,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 前往 :menuselection:`Setting --> Image Convert --> Create` 创建新的转换设置。
    - 配置选项，如 :guilabel:`Color Space`、:guilabel:`Compress` 和 :guilabel:`Mix Alpha Channel`。
 
-   .. figure:: https://foruda.gitee.com/images/1747379273900269382/dd482c1a_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745740074880329292/510c8669_10088396.png
       :align: center
       :width: 400px
       :name: 设置图片导出格式
@@ -228,7 +228,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
 
    - 关闭对话框后，在 :guilabel:`Images` 窗口中选择图片资源，并在 :menuselection:`Image Convert Setting` 部分应用新创建的转换设置。
 
-   .. figure:: https://foruda.gitee.com/images/1747379389473127316/bb924260_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745740381172650681/cbbdb633_10088396.png
       :align: center
       :width: 400px
       :name: 应用转换设置
@@ -244,14 +244,14 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 将图片转换格式的 :guilabel:`Color Space` 设置为 :guilabel:`ARGB8565` 或 :guilabel:`ARGB`。
      - 将图片控件的 :guilabel:`Blending Mode` 设置为 :guilabel:`SrcOverMode`。
 
-   .. figure:: https://foruda.gitee.com/images/1747379445252796715/d7d295af_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745745800531690844/7ea2f80b_10088396.png
       :align: center
       :width: 400px
       :name: 透明效果设置
 
       透明效果设置
 
-   .. figure:: https://foruda.gitee.com/images/1747378376255549129/ce73da02_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745745582092188954/316866ba_10088396.png
       :align: center
       :width: 400px
       :name: 混合模式设置
@@ -265,7 +265,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 勾选 :guilabel:`Mix Alpha Channel`。
      - 将图片控件的 :guilabel:`Blending Mode` 设置为 :guilabel:`BypassMode`。
 
-   .. figure:: https://foruda.gitee.com/images/1747379511002344906/f2923d90_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745745835243226253/ecb3a5c0_10088396.png
       :align: center
       :width: 400px
       :name: 黑色背景效果设置
@@ -275,7 +275,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 对 :guilabel:`image3` 应用透明效果，对 :guilabel:`image2` 应用预混合黑色背景效果。
    - 下图中，效果1为预混合黑色背景效果，效果2为透明效果。
 
-   .. figure:: https://foruda.gitee.com/images/1747378164677646804/e4251487_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745741856777234666/786ff313_10088396.png
       :align: center
       :width: 400px
       :name: 两种图片效果
@@ -293,7 +293,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 设置 :guilabel:`Values` 为 :kbd:`0,0;0,300;0,0` （三组 2D 平移：无水平移动，垂直向下移动 300 像素，然后返回）。
      - 设置 :guilabel:`Duration` 为动画循环持续时间（以毫秒为单位）。将 :guilabel:`Repeat` 设置为 :kbd:`0` 表示无限循环。
 
-   .. figure:: https://foruda.gitee.com/images/1747379593093999226/cf76bb23_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745747629263669367/c7c911d5_10088396.png
       :align: center
       :width: 400px
       :name: 创建动画
@@ -306,7 +306,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 在黄色闪电 :guilabel:`Event Setting` 界面中，将触发条件设置为 :guilabel:`OnLoad` （当图片控件显示时触发）。
      - 点击 :guilabel:`Add Event`，将 :guilabel:`Action` 设置为 :guilabel:`Animation`，并选择新创建的动画（:guilabel:`animate0`）。
 
-   .. figure:: https://foruda.gitee.com/images/1747379675460127538/5650fafb_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745753304113520373/abcbabfa_10088396.png
       :align: center
       :width: 400px
       :name: 将动画应用于图片
@@ -319,7 +319,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    - 在 :menuselection:`Property` 面板的 :menuselection:`Content --> Text` 字段中设置文本内容。
    - 在 :menuselection:`Appearance --> Font` 中配置字体。默认情况下未设置字体。
 
-   .. figure:: https://foruda.gitee.com/images/1747378331412795283/48cd6c5f_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745754152945794898/312ceea5_10088396.png
       :align: center
       :width: 400px
       :name: 文本设置
@@ -334,7 +334,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 对于 :guilabel:`Text type` 设置为 :guilabel:`Range`，指定 :guilabel:`Unicode Range`。:guilabel:`Code Page` 为可选，若设置，则同时生效。
      - 可用字体包括 PC 系统字体和用户添加的字体。
 
-      .. figure:: https://foruda.gitee.com/images/1747378366891668382/4748d6ea_10088396.png
+      .. figure:: https://foruda.gitee.com/images/1745754869649440065/606a2221_10088396.png
          :align: center
          :width: 400px
          :name: 字体设置
@@ -344,7 +344,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 如果字体较大且需要显示的字符较少，使用 Range 方法是一种有效的优化策略，可减小导出资源文件的大小。
      - 例如下图中的配置用于仅需显示数字和冒号的文本控件，Unicode 范围为 :kbd:`0x0030-0x003A` 和 :kbd:`0x003A-0x003B` （起始 Unicode 到结束 Unicode + 1）。
 
-      .. figure:: https://foruda.gitee.com/images/1747378388312263422/024273e4_10088396.png
+      .. figure:: https://foruda.gitee.com/images/1745756420938128273/7afd8a6c_10088396.png
          :align: center
          :width: 400px
          :name: 字体设置优化
@@ -356,7 +356,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
      - 在 :menuselection:`Fonts` 部分，点击加号添加 TTF 字体文件。
      - 添加的字体将出现在字体设置的 :guilabel:`Font` 下拉菜单顶部。
 
-      .. figure:: https://foruda.gitee.com/images/1747378282217091861/9d242fcc_10088396.png
+      .. figure:: https://foruda.gitee.com/images/1745756985069687194/c26b25cf_10088396.png
          :align: center
          :width: 400px
          :name: 添加自定义字体
@@ -876,7 +876,7 @@ Realtek Visual Designer 可视化设计工具支持以下功能：
    * - Row Space
      - 单行高度。
    * - Font
-     - 字体设置，请参阅 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Font_Convert_Setting_CN`。
+     - 字体设置，请参阅 :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Font_Convert_Setting`。
    * - Font Color (RGBA)
      - 字体颜色设置，使用 RGBA 格式。
    * - Highlight Font Color
@@ -1447,9 +1447,9 @@ Text - OnTime - Set Time
 .. figure:: https://foruda.gitee.com/images/1746534115101519614/2a71cc0b_10088396.png
    :align: center
    :width: 400px
-   :name: 00:00 格式
+   :name: "00:00" 格式
 
-   00:00 格式
+   "00:00" 格式
 
 Text - OnPeripheral - Set Peripheral
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1825,7 +1825,7 @@ Key - OnClick - Jump
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 图片向右下角移动。
-- :guilabel:`Start X` 为 :kbd:`0`，:guilabel:`End X` 为 :kbd:`800`，:guilabel:`Start Y` 为 :kbd:`0`，:guilabel:`End Y` 为 :kbd:`480`，表示图片从其原始位置 (:kbd:`0,0`) 开始，相对于初始位置向右移动 :kbd:`800` 像素，向下移动 :kbd:`480` 像素，到达右下角。
+- :guilabel:`Start X` 为 :kbd:`0`，:guilabel:`End X` 为 :kbd:`800`，:guilabel:`Start Y` 为 :kbd:`0`，:guilabel:`End Y` 为 :kbd:`480`，表示图片从其原始位置 (:kbd:`0,0`) 开始，相对于初始位置向右移动 800 像素，向下移动 480 像素，到达右下角。
 - 配置图片的 :guilabel:`OnLoad` 事件，以在其出现时立即触发动画播放。
 
 .. figure:: https://foruda.gitee.com/images/1746687959723538000/85b82b79_10088396.png
@@ -2322,7 +2322,7 @@ Key - OnClick - Jump
    +-------------------+----------------------------------------------------------------------------------------------------------------------------------+
    | Render Mode       | 渲染模式，用于表示在转换的 ``.bin`` 文件中像素的位数                                                                             |
    +-------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | Scan Mode         | 扫描模式，保存 ``.bin`` 时有两种扫描方式                                                                                             |
+   | Scan Mode         | 扫描模式，保存 .bin 时有两种扫描方式                                                                                             |
    |                   |                                                                                                                                  |
    |                   | H: 水平扫描                                                                                                                      |
    |                   |                                                                                                                                  |
@@ -2377,7 +2377,7 @@ Key - OnClick - Jump
 
 .. note:: 当您第一次模拟项目时，请先点击 :guilabel:`导出`，然后再点击 :guilabel:`模拟`。如果您没有修改任何图像或字体设置，则无需再次点击 :guilabel:`导出`。
 
-
+下图显示为模拟器运行效果。
 
 .. figure:: https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png
    :width: 400px

@@ -1,9 +1,12 @@
 {% extends "!breadcrumbs.html" %}
 
 {% block breadcrumbs_aside %}
-<li class="wy-breadcrumbs-aside">
-   <a a href="#" id="toEN">EN</a>/<a a href="#" id="toCN">中文</a>
-</li>
+    {% if is_multilingual %}
+        <li class="wy-breadcrumbs-aside">
+            <a href="#" id="toEN">EN</a>/<a href="#" id="toCN">中文</a>
+        </li>
+    {% endif %}
 
- {{ super() }}
+    {{ super() }}
+    
 {% endblock %}

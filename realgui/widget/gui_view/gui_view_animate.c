@@ -17,8 +17,13 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include <string.h>
+#include "guidef.h"
+#include "gui_server.h"
 #include "gui_obj.h"
+#include "tp_algo.h"
 #include "gui_view.h"
+#include "gui_view_transition.h"
 
 
 /*============================================================================*
@@ -226,54 +231,52 @@ static void view_transition_animation_collapse_to_center(float pro, gui_view_t *
 static void animation_case(gui_view_t *this, float pro)
 {
     gui_obj_t *obj = GUI_BASE(this);
-    VIEW_SWITCH_STYLE style = this->style;
+    VIEW_SWITCH_STYLE style = this->current_transition_style;
     float scale_x = 0;
     float scale_y = 0;
 
     switch (style)
     {
-    case VIEW_ANIMATION_NULL:
-        // {
-        //     GUI_BASE(this)->not_show = 1;
-        // }
+    case SWITCH_OUT_NONE_ANIMATION:
         break;
-    case VIEW_ANIMATION_1:
+    case SWITCH_IN_NONE_ANIMATION:
+        break;
+    case SWITCH_IN_ANIMATION_ZOOM:
         {
             view_transition_animation_zoom_center(ease_in_out(pro), this, &scale_x, &scale_y);
         }
         break;
-    case VIEW_ANIMATION_2:
+    case SWITCH_IN_ANIMATION_MOVE_FADE:
         {
             view_transition_animation_fade_in(ease_in_out(pro), this, &scale_x, &scale_y);
         }
         break;
-    case VIEW_ANIMATION_3:
+    case SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT:
         {
             view_transition_animation_from_right(ease_in_out(pro), this, &scale_x, &scale_y);
         }
         break;
-    case VIEW_ANIMATION_4:
+    case SWITCH_IN_ANIMATION_BOUNCE_FROM_RIGHT:
         {
             view_transition_animation_from_right(bounce_ease_out(pro), this, &scale_x, &scale_y);
         }
         break;
-    case VIEW_ANIMATION_5:
+    case SWITCH_IN_ANIMATION_FADE:
         {
             view_transition_animation_from_opacity0(ease_in_out(pro), this);
-
         }
         break;
-    case VIEW_ANIMATION_6:
+    case SWITCH_OUT_ANIMATION_ZOOM:
         {
             view_transition_animation_collapse_to_center(ease_in_out(pro), this, &scale_x, &scale_y);
         }
         break;
-    case VIEW_ANIMATION_7:
+    case SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT:
         {
             view_transition_animation_to_right(ease_in_out(pro), this, &scale_x, &scale_y);
         }
         break;
-    case VIEW_ANIMATION_8:
+    case SWITCH_OUT_ANIMATION_FADE:
         {
             view_transition_animation_to_opacity0(ease_in_out(pro), this);
         }
@@ -300,50 +303,10 @@ static void animation_case(gui_view_t *this, float pro)
     }
 }
 
-static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(view_transition_animation_function)
-{
-    gui_view_t *this = this_widget;
-    this->event = 1;
-
-    float pro = animate->progress_percent;
-    animation_case(this, pro);
-    if (animate->end_frame)
-    {
-        if (this->view_switch_ready)
-        {
-            gui_obj_enable_event(GUI_BASE(this), VIEW_FREE_EVENT);
-        }
-        else
-        {
-            GUI_BASE(this)->opacity_value = UINT8_MAX;
-            GUI_BASE(this)->x = 0;
-            GUI_BASE(this)->y = 0;
-            this->view_switch_ready = true;
-            this->event = 0;
-            this->style = VIEW_STILL;
-        }
-    }
-}
-
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_view_set_animate(gui_view_t *this)
+void view_transition_animation(void *obj, float pro)
 {
-    gui_animate_t *animate = this->animate;
-    if (!animate)
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-        if (!animate)
-        {
-            gui_log("[VIEW] animate malloc failed!\n");
-            return;
-        }
-    }
-    memset(animate, 0, sizeof(gui_animate_t));
-    animate->animate = 1;
-    animate->dur = VIEW_TRANSITION_DURATION_MS;
-    animate->callback = (gui_animate_callback_t)view_transition_animation_function;
-    animate->repeat_count = 0;
-    this->animate = animate;
+    animation_case((gui_view_t *)obj, pro);
 }

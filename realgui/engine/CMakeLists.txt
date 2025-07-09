@@ -9,25 +9,18 @@ if(1) #set to 1 to enable or variable to for depnedency
 
     file(GLOB HEADERS "*.h" "*.hpp")
 	set(SOURCES
+			"${CMAKE_CURRENT_SOURCE_DIR}/acc_api.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/draw_img.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/gui_matrix.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/draw_font.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/font_rendering_utils.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_img.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_mem_matrix.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_stb.c"
 			"${CMAKE_CURRENT_SOURCE_DIR}/font_ttf.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_raster.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_init.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_blend.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_cover.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_bypass.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_filter.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_bypass.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_cover.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_sw_rle_filter.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/engine_gray.c"
+			"${CMAKE_CURRENT_SOURCE_DIR}/gui_post_process.c"
 	)
 
 

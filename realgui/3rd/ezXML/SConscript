@@ -7,12 +7,12 @@ src = Split("""
 """)
 
 
-if GetDepend(['CONFIG_REALTEK_BUILD_GUI']):
+if GetDepend(['CONFIG_REALTEK_HONEYGUI']):
     src += ['ezxml.c']
 
 
 CPPPATH = [cwd]
 
-group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 Return('group')

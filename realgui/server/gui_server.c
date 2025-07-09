@@ -17,13 +17,14 @@
 #include <kb_algo.h>
 #include <wheel_algo.h>
 #include <string.h>
-#include <gui_app.h>
 #include "gui_win.h"
 #include "gui_components_init.h"
 #include "gui_version.h"
 #include "gui_server.h"
 
 
+
+extern void gui_components_init(void);
 
 /**
  * @brief External execution hook for GUI task
@@ -40,9 +41,6 @@ void gui_task_ext_execution_sethook(void (*hook)(void))
     gui_task_ext_execution_hook = hook;
 }
 
-static void handle_binary_app_transition(gui_app_t **app, gui_app_t *app_next, gui_obj_t **screen,
-                                         bool next_app_layer);
-static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool next_app_layer);
 /**
  * @brief Entry point for the GUI server.
  *
@@ -53,21 +51,11 @@ static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool 
  */
 static void gui_server_entry(void *parameter)
 {
+    GUI_UNUSED(parameter);
     gui_server_msg_init();
     gui_components_init();
     while (1)
     {
-        gui_app_t *app_current = gui_current_app();
-        gui_app_t *app_next = gui_next_app();
-        while (app_current == NULL)
-        {
-            gui_thread_mdelay(1000);
-            app_current = gui_current_app();
-            gui_log("!!! GUI APP NOT READY! \n");
-        }
-
-        gui_obj_t *screen = &app_current->screen;
-        GUI_ASSERT(screen != NULL);
 
         /*exe some app action, like kick watchdog*/
         if (gui_task_ext_execution_hook != NULL)
@@ -90,22 +78,8 @@ static void gui_server_entry(void *parameter)
             gui_send_msg_to_server(&msg);
         }
 
-        if ((app_current->lvgl == true) || (app_current->arm2d == true))
-        {
-            continue;
-        }
 
-        if (app_current->server_hook)
-        {
-            app_current->server_hook(app_current);
-        }
-
-        bool next_app_top_layer = gui_app_get_layer();
-
-        handle_binary_app_transition(&app_current, app_next, &screen, next_app_top_layer);
-        gui_fb_disp(screen, true);
-        handle_binary_app_delete(&app_next, app_current, next_app_top_layer);
-
+        gui_fb_disp(gui_obj_get_root(), true);
 
 #ifdef _WIN32
         gui_thread_mdelay(17);
@@ -113,121 +87,7 @@ static void gui_server_entry(void *parameter)
         gui_recv_msg_to_server();
     }
 }
-static void handle_binary_app_transition(gui_app_t **app, gui_app_t *app_next, gui_obj_t **screen,
-                                         bool next_app_layer)
-{
 
-    if (next_app_layer)
-    {
-        if (app_next && (&(app_next->screen)))
-        {
-            if ((*app)->close)
-            {
-                extern gui_app_t *next_app;
-                extern gui_app_t *current_app;
-                if (current_app != NULL)
-                {
-                    if (current_app->dtor != NULL)
-                    {
-                        current_app->dtor(current_app);
-                    }
-
-                    if (current_app->thread_entry != NULL)
-                    {
-                        gui_thread_delete(current_app->thread_id);
-                    }
-
-                    current_app->close = false;
-                }
-                else
-                {
-                    gui_log("!!! current_app is null");
-                    return;
-                }
-                if (next_app != NULL)
-                {
-                    gui_list_remove(&(next_app->screen.brother_list));
-                    next_app->screen.parent = 0;
-                    gui_obj_tree_free(&((gui_app_t *)(*app))->screen);
-                    current_app = next_app;
-                    next_app = NULL;
-                }
-                else
-                {
-                    gui_log("!!! next_app is null");
-                    return;
-                }
-                (*app) = current_app;
-            }
-            else
-            {
-                gui_list_insert_before(&((*screen)->child_list), &(app_next->screen.brother_list));
-                app_next->screen.parent = *screen;
-            }
-        }
-        *screen = &((*app)->screen);
-    }
-    else
-    {
-        if (app_next && (&(app_next->screen)))
-        {
-            if ((*app)->close)
-            {
-                extern gui_app_t *next_app;
-                extern gui_app_t *current_app;
-                if (current_app == NULL)
-                {
-                    gui_log("Error: current_app is NULL\n");
-                    return;
-                }
-                if (current_app->dtor != NULL)
-                {
-                    current_app->dtor(current_app);
-                }
-                if (current_app->thread_entry != NULL)
-                {
-                    gui_thread_delete(current_app->thread_id);
-                }
-                current_app->close = false;
-                gui_list_remove(&((*app)->screen.brother_list));
-                (*app)->screen.parent = 0;
-                gui_obj_tree_free(&((gui_app_t *)(*app))->screen);
-                current_app = next_app;
-                next_app = 0;
-                (*app) = current_app;
-            }
-            else
-            {
-
-                gui_list_insert_before(&((app_next->screen).child_list), &((*screen)->brother_list));
-                (*screen)->parent = &(app_next->screen);
-                *screen = &(app_next->screen);
-            }
-        }
-
-    }
-}
-static void handle_binary_app_delete(gui_app_t **app_next, gui_app_t *app, bool next_app_layer)
-{
-    (*app_next) = gui_next_app();
-    if (next_app_layer)
-    {
-        if ((*app_next) && (&((*app_next)->screen)))
-        {
-            gui_list_remove(&((*app_next)->screen.brother_list));
-        }
-    }
-    else
-    {
-        if ((*app_next) && (&((*app_next)->screen)))
-        {
-            if (&(app->screen.brother_list) != NULL)
-            {
-                gui_list_remove(&(app->screen.brother_list));
-            }
-        }
-    }
-}
 
 /**
  * @brief Initializes the GUI server.

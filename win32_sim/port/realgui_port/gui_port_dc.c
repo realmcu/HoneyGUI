@@ -56,21 +56,86 @@ int32_t sim_get_hight(void)
 static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, uint16_t yStart,
                               uint16_t w, uint16_t h)
 {
+    uint32_t x1 = xStart;
+    uint32_t y1 = yStart;
+    uint32_t x2 = xStart + w;
+    uint32_t y2 = yStart + h;
 #if (DRV_PIXEL_BITS == 32)
     uint32_t *read = (uint32_t *)input;
     uint32_t *write = (uint32_t *)output;
-#else
-    uint16_t *read = (uint16_t *)input;
-    uint16_t *write = (uint16_t *)output;
-#endif
-    for (uint32_t i = yStart; i < (h + yStart); i++)
+    for (uint32_t i = y1; i < y2; i++)
     {
-        for (uint32_t j = xStart; j < (w + xStart); j++)
+        for (uint32_t j = x1; j < x2; j++)
         {
             write[i * sim_get_width() + j] = *read;
             read++;
         }
     }
+#elif (DRV_PIXEL_BITS == 16)
+    uint16_t *read = (uint16_t *)input;
+    uint16_t *write = (uint16_t *)output;
+    for (uint32_t i = y1; i < y2; i++)
+    {
+        for (uint32_t j = x1; j < x2; j++)
+        {
+            write[i * sim_get_width() + j] = *read;
+            read++;
+        }
+    }
+#elif (DRV_PIXEL_BITS == 8)
+    uint8_t *read = (uint8_t *)input;
+    uint8_t *write = (uint8_t *)output;
+    for (uint32_t i = y1; i < y2; i++)
+    {
+        for (uint32_t j = x1; j < x2; j++)
+        {
+            write[i * sim_get_width() + j] = *read;
+            read++;
+        }
+    }
+#elif (DRV_PIXEL_BITS == 4)
+    uint8_t *read = (uint8_t *)input;
+    uint8_t *write = (uint8_t *)output;
+
+    uint16_t byte_x_start = xStart / 2;
+    uint16_t byte_x_end = (xStart + w + 1) / 2;
+    uint16_t x_offset = xStart % 2;
+
+    for (uint32_t y = yStart; y < yStart + h; y++)
+    {
+        uint32_t src_row_offset = (y - yStart) * w / 2;
+        uint32_t dst_row_offset = y * (sim_get_width() / 2);
+
+        if (x_offset)
+        {
+            uint8_t src_byte = read[src_row_offset];
+            uint8_t dst_byte = write[dst_row_offset + byte_x_start];
+
+            write[dst_row_offset + byte_x_start] = (dst_byte & 0x0F) | (src_byte << 4);
+            byte_x_start++;
+            src_row_offset++;
+        }
+
+        if (byte_x_start < byte_x_end)
+        {
+            uint32_t byte_count = byte_x_end - byte_x_start;
+            memcpy(&write[dst_row_offset + byte_x_start],
+                   &read[src_row_offset],
+                   byte_count);
+        }
+    }
+#else
+    uint32_t *read = (uint32_t *)input;
+    uint32_t *write = (uint32_t *)output;
+    for (uint32_t i = y1; i < y2; i++)
+    {
+        for (uint32_t j = x1; j < x2; j++)
+        {
+            write[i * sim_get_width() + j] = *read;
+            read++;
+        }
+    }
+#endif
 }
 
 void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t height,
@@ -165,17 +230,7 @@ static void *sdl_flush(void *arg)
         SDL_DestroyTexture(texture);
     }
 }
-#ifdef REALTEK_BUILD_GUI_XML_DOM
-static void key_gui_msg_cb(void *p)
-{
 
-    extern gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
-    gui_msg_t *msg = p;
-
-    gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
-
-}
-#endif
 void *rtk_gui_sdl(void *arg)
 {
     int quit = 0;
@@ -205,14 +260,81 @@ void *rtk_gui_sdl(void *arg)
     if (DRV_PIXEL_BITS == 16)
     {
         SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_RGB565, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
     }
     else if (DRV_PIXEL_BITS == 32)
     {
         SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ARGB8888, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
+    }
+    else if (DRV_PIXEL_BITS == 4)
+    {
+        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_INDEX4LSB, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
+
+        // SDL_Color palette[16] = {
+        //     {0, 0, 0, 255},       // Black
+        //     {255, 0, 0, 255},     // Red
+        //     {0, 255, 0, 255},     // Green
+        //     {0, 0, 255, 255},     // Blue
+        //     {255, 255, 0, 255},   // Yellow
+        //     {255, 0, 255, 255},   // Magenta
+        //     {0, 255, 255, 255},   // Cyan
+        //     {255, 255, 255, 255}, // White
+        //     {128, 128, 128, 255}, // Gray
+        //     {128, 0, 0, 255},     // Dark Red
+        //     {0, 128, 0, 255},     // Dark Green
+        //     {0, 0, 128, 255},     // Dark Blue
+        //     {128, 128, 0, 255},   // Olive
+        //     {128, 0, 128, 255},   // Purple
+        //     {0, 128, 128, 255},   // Teal
+        //     {192, 192, 192, 255}  // Silver
+        // };
+        SDL_Color greenPalette[16] =
+        {
+            {0,   0,   0, 255},  // Level 0: Black (no green)
+            {0,  17,   0, 255},  // Level 1
+            {0,  34,   0, 255},  // Level 2
+            {0,  51,   0, 255},  // Level 3
+            {0,  68,   0, 255},  // Level 4
+            {0,  85,   0, 255},  // Level 5
+            {0, 102,   0, 255},  // Level 6
+            {0, 119,   0, 255},  // Level 7
+            {0, 136,   0, 255},  // Level 8
+            {0, 153,   0, 255},  // Level 9
+            {0, 170,   0, 255},  // Level 10
+            {0, 187,   0, 255},  // Level 11
+            {0, 204,   0, 255},  // Level 12
+            {0, 221,   0, 255},  // Level 13
+            {0, 238,   0, 255},  // Level 14
+            {0, 255,   0, 255}   // Level 15: Full Green
+        };
+
+        SDL_SetPaletteColors(surface->format->palette, greenPalette, 0, 16);
+    }
+    else if (DRV_PIXEL_BITS == 8)
+    {
+        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_INDEX8, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+
+        surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                       Amask);
+
+        SDL_Color greenPalette[256];
+        for (uint32_t i = 0; i < 256; i++)
+        {
+            greenPalette[i].a = 255;
+            greenPalette[i].r = 0;
+            greenPalette[i].g = i;
+            greenPalette[i].b = 0;
+        }
+        SDL_SetPaletteColors(surface->format->palette, greenPalette, 0, 256);
     }
 
-    surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
-                                   Amask);
+
     SDL_RenderPresent(renderer);
 
     pthread_cond_signal(&sdl_ok_event);
@@ -299,16 +421,6 @@ void *rtk_gui_sdl(void *arg)
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
                 strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
                 kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
-#ifdef REALTEK_BUILD_GUI_XML_DOM
-                gui_msg_t msg =
-                {
-                    .event = GUI_EVENT_USER_DEFINE,
-                    .payload = (void *)(size_t)event.key.keysym.sym,
-                    .cb = (gui_msg_cb)key_gui_msg_cb,
-                };
-                extern bool gui_send_msg_to_server(gui_msg_t *msg);
-                gui_send_msg_to_server(&msg);
-#endif
             }
             break;
         case SDL_QUIT:
@@ -326,24 +438,6 @@ void *rtk_gui_sdl(void *arg)
 
 void gui_port_dc_init(void)
 {
-#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    char *apppath = "app";
-    char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);
-    sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);
-
-    extern void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight);
-    extern int sim_screen_width;
-    extern int sim_screen_hight;
-    xml_get_screen(path, 0, &sim_screen_width, &sim_screen_hight);
-    _rect.w = sim_screen_width;
-    _rect.h = sim_screen_hight;
-    dc.fb_width = sim_screen_width;
-    dc.screen_width = sim_screen_width;
-    dc.screen_height = sim_screen_hight;
-#ifndef USE_DC_PFB
-    dc.fb_height = sim_screen_hight;
-#endif
-#endif
     pthread_mutex_init(&sdl_ok_mutex, NULL);
     pthread_cond_init(&sdl_ok_event, NULL);
 

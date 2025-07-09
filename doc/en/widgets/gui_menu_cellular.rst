@@ -8,12 +8,15 @@ Usage
 
 Create Menu Cellular Widget
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Creating function is :cpp:any:`gui_menu_cellular_create`. Users need to enter the icons set's image file array.
+The :cpp:any:`gui_menu_cellular_create` function can be used to create a menu cellular widget. Users need to enter the icons set's image file array.
 
+Add Click Callback Event
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_menu_cellular_on_click` function can be used to add click callback event.
 
-Config Offset
+Set Offset
 ~~~~~~~~~~~~~
-Function is :cpp:any:`gui_menu_cellular_offset`. Users are able to adjust horizontal and vertical offset for better display.
+The :cpp:any:`gui_menu_cellular_offset` function can be used to adjust horizontal and vertical offset for better display.
 
 
 
@@ -21,16 +24,16 @@ Example
 -------
 
 
-.. literalinclude:: ../../../realgui/example/screen_454_454/gui_menu/apps_in_menu.c
+.. literalinclude:: ../../../example/widget/menu_cellular/example_gui_menu_cellular.c
    :language: c
-   :start-after: /*Define APP_MENU's entry func */
-   :end-before: /*Define APP_MENU's entry func end*/
+   :start-after: /* gui menu cellular widget example start*/
+   :end-before: /* gui menu cellular widget example end*/
 
 
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/menu_cellular.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1751456456790100801/2b635428_10737458.gif" width= "400" /></div>
    <br>
 
 API

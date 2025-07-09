@@ -11,6 +11,6 @@ src += ['tlsf/tlsf.c']
 
 CPPPATH = [cwd,cwd + '/tlsf']
 
-group = DefineGroup('realgui/misc', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/misc', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 Return('group')

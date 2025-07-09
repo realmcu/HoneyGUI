@@ -35,7 +35,6 @@ def create_pdsc(vendor, name, version, description, release_date, url, license_n
         # conditions = SubElement(package, "conditions")
         # # Define conditions corresponding to the configuration options
         # condition_lvgl = SubElement(conditions, "condition", id="CONFIG_REALTEK_BUILD_LVGL_GUI")
-        # condition_painter = SubElement(conditions, "condition", id="CONFIG_REALTEK_BUILD_PAINTER_ENGINE")
         # condition_u8g2 = SubElement(conditions, "condition", id="CONFIG_REALTEK_BUILD_U8G2")
 
         exclude_files = {"SConscript", "acc_arm_2d.c", "acc_sw_ppe_sim.c"}
@@ -85,10 +84,6 @@ def create_pdsc(vendor, name, version, description, release_date, url, license_n
                         # # Apply conditions to specific GUI related files, representing the conditional logic
                         # if file == 'gui_lvgl.c':
                         #     file_sub.set('condition', 'CONFIG_REALTEK_BUILD_LVGL_GUI')
-                        # elif file == 'gui_px.c':
-                        #     file_sub.set('condition', 'CONFIG_REALTEK_BUILD_PAINTER_ENGINE')
-                        # elif file == 'gui_u8g2.c':
-                        #     file_sub.set('condition', 'CONFIG_REALTEK_BUILD_U8G2')
 
         xml_str = tostring(package, 'utf-8')
         pretty_xml_str = minidom.parseString(xml_str).toprettyxml(indent="  ")

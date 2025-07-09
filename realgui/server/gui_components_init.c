@@ -9,7 +9,7 @@
  *
  */
 
-
+#include <stdbool.h>
 #include "gui_components_init.h"
 
 
@@ -35,11 +35,17 @@ static int rti_end(void)
 {
     return 0;
 }
-GUI_APP_INIT_EXPORT(rti_end, "6.end");
+GUI_APP_INIT_EXPORT(rti_end, "7.end");
 
 
 void gui_components_init(void)
 {
+    static bool inited = false;
+    if (inited)
+    {
+        return;
+    }
+    inited = true;
     volatile const gui_init_fn_t *fn_ptr;
 
     // cppcheck-suppress comparePointers

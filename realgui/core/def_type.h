@@ -22,6 +22,16 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
+
+/**
+ * @brief gui error code definition
+ */
+typedef int gui_error_t;
+#define GUI_ERROR (gui_error_t)1
+#define GUI_ERROR_NULL (gui_error_t)2
+#define GUI_ERROR_FORMAT (gui_error_t)3
+#define GUI_SUCCESS (gui_error_t)0
+
 /**
  * @brief Swap the bytes of a 16-bit value
  */
@@ -40,12 +50,14 @@ extern "C" {
                                                                 (((uint32_t)(x) & (uint32_t)0xff000000) >> 24)            \
                                  ))
 
-#ifndef M_PI
-#define M_PI    ((float)3.14159265358979323846)
+#ifndef M_PI_F
+#define M_PI_F    3.1415926f
 #endif
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
+#define _UI_MIN3(x, y, z)       ((x) < (y) ? ((x) < (z) ? (x) : (z)) : ((y) < (z) ? (y) : (z)))
+#define _UI_MAX3(x, y, z)       ((x) > (y) ? ((x) > (z) ? (x) : (z)) : ((y) > (z) ? (y) : (z)))
 #define _UI_BITBYTES(bits)      ((bits + 7)/8)
 #define _UI_ABS(x)              ((x)>=0? (x):-(x))
 

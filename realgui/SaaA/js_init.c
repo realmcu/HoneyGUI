@@ -1,7 +1,6 @@
 
 #include "js_user.h"
 #include "jcontext.h"
-#include "gui_components_init.h"
 
 extern int js_console_init(void);
 extern void jerry_port_set_default_context(jerry_context_t *context);
@@ -17,14 +16,14 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #ifdef RTL8763EP
     return malloc(size);
 #elif defined RTL87x2G
-    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 32) * 1024);
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
 #elif defined CONFIG_SOC_SERIES_RTL8773E
-    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 32) * 1024);
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
 #elif defined RTL8762D
     js_buffer = (void *)(0x6900000);
 
 #elif defined __WIN32
-    static uint8_t buffer[(PKG_JMEM_HEAP_SIZE + 32) * 1024] = {0};
+    static uint8_t buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
     js_buffer = buffer;
 #else
     js_buffer = malloc(size);
@@ -36,7 +35,7 @@ static void *context_alloc(size_t size, void *cb_data_p)
 // Only for js script loading !
 static void *script_malloc(void)
 {
-#define JS_SCRIPT_BUFF_SIZE (50 * 1024)
+#define JS_SCRIPT_BUFF_SIZE (100 * 1024)
     void *scipt_buff = NULL;
 
 #ifdef RTL8763EP
@@ -113,7 +112,7 @@ void js_run_file(const char *file, gui_app_t  *app)
         script_free(script);
     }
 }
-static int js_init(void)
+void js_init(void)
 {
     /* JERRY_ENABLE_EXTERNAL_CONTEXT */
     jerry_port_set_default_context(jerry_create_context(PKG_JMEM_HEAP_SIZE * 1024, context_alloc,
@@ -134,7 +133,6 @@ static int js_init(void)
     js_smarthome_init();
     js_matter_init();
     js_mesh_init();
-    return 0;
+    extern gui_app_t *get_app_launcher_frontend(void);
+    gui_app_startup(get_app_launcher_frontend());
 }
-
-GUI_INIT_DEVICE_EXPORT(js_init);

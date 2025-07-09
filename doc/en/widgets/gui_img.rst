@@ -72,7 +72,7 @@ The image's quality can be set using :cpp:any:`gui_img_set_quality`.
 Screenshot
 ~~~~~~~~~~
 
-The :cpp:any:`gui_img_tree_convert_to_img` can be used to save a fullscreen screenshot. Additionally, the :cpp:any:`gui_img_tree_convert_to_img_root_size` can be used to save a screenshot of the current widget's size. The saved image will be in RGB format.
+The :cpp:any:`gui_img_tree_convert_to_img` can be used to save a fullscreen screenshot. The saved image will be in RGB format.
 
 Example
 -------

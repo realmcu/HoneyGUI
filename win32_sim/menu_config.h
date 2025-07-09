@@ -17,21 +17,26 @@
 
 
 // <e> HoneyGUI Enable RTK Real GUI
-#define CONFIG_REALTEK_BUILD_GUI     1
+#define CONFIG_REALTEK_HONEYGUI     1
 
-#if (CONFIG_REALTEK_BUILD_GUI == 1)
+#if (CONFIG_REALTEK_HONEYGUI == 1)
 
 // <h> HoneyGUI Demo Select
+
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_REAL_BASE
+#define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 // </c>
 
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_MULTI_APP
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
+// </c>
+
+// <c> RTK GUI Base Demo
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_GRAY_WIDGET
 // </c>
 
 // <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_3D
+// #define CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D
 // </c>
 
 // <c> RTK GUI 3D Demo
@@ -46,8 +51,29 @@
 // #define CONFIG_REALTEK_BUILD_REAL_DOG_3D
 // </c>
 
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_DISC_3D
+// </c>
+
+// <c> RTK GUI 3D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_SEAWATER_3D
+// </c>
+
 // <c> RTK GUI View Demo
 // #define CONFIG_REALTEK_BUILD_REAL_VIEW
+// </c>
+
+// <c> RTK GUI List Demo
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_LIST_WIDGET
+// </c>
+
+// <c> RTK GUI Menu Cellular Demo
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_MENU_CELLULAR_WIDGET
+// </c>
+
+
+// <c> RTK GUI Canvas Demo
+// #define CONFIG_REALTEK_BUILD_REAL_CANCAS
 // </c>
 
 // <c> RTK GUI Paint Engine Demo
@@ -71,7 +97,7 @@
 // </c>
 
 // <c> RTK GUI Demo 454 454
-#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
 
 // <c> RTK GUI Demo 410 502
@@ -120,33 +146,8 @@
 
 // <h> HoneyGUI Config Function
 
-
-// <c> RTK GUI Font Enable STB
-#define CONFIG_REALTEK_BUILD_GUI_FONT_STB
-// </c>
-
 // <c> RTK GUI Font Enable FREETYPE
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
-// </c>
-
-// <c> RTK GUI Font Enable RTK MEM
-#define CONFIG_REALTEK_BUILD_GUI_FONT_RTK_MEM
-// </c>
-
-// <c> RTK GUI Font Enable TTF SVG
-// #define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
-// </c>
-
-// <c> RTK GUI Enable VGLITE GPU
-// #define CONFIG_REALTEK_BUILD_VG_LITE
-// </c>
-
-// <c> RTK GUI Enable PPE1.0
-// #define CONFIG_REALTEK_BUILD_PPE
-// </c>
-
-// <c> RTK GUI Enable PPE2.0
-// #define CONFIG_REALTEK_BUILD_PPEV2
 // </c>
 
 // <c> RTK GUI Enable SasA
@@ -156,17 +157,15 @@
 // <c> RTK GUI Enable cJSON
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
-
+// <c> RTK GUI Enable web
+// #define CONFIG_REALTEK_BUILD_WEB
+// </c>
 // <c> RTK GUI Enable KeyBoard And Pinyin
 #define CONFIG_REALTEK_BUILD_PINYIN
 // </c>
 
 // <c> RTK GUI Enable u8g2
 // #define CONFIG_REALTEK_BUILD_U8G2
-// </c>
-
-// <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 // <c> RTK GUI Enable LiteGFX
@@ -185,60 +184,15 @@
 #define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 // <c> RTK GUI XML_DOM
-#define CONFIG_REALTEK_BUILD_GUI_XML_DOM
+// #define CONFIG_REALTEK_BUILD_GUI_XML_DOM
 // </c>
 
-// <c> RTK GUI Enable SasA
-// #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
-// </c>
 
 #endif
 // </h>
 
 // </e>
 
-// <e> HoneyGUI Enable LVGL
-#define CONFIG_REALTEK_BUILD_LVGL_V8     0
-#define CONFIG_REALTEK_BUILD_LVGL_V9      0
-
-#if (CONFIG_REALTEK_BUILD_LVGL_V8 == 1) || (CONFIG_REALTEK_BUILD_LVGL_V9 == 1)
-
-// <c> HoneyGUI Enalbe LVGL APP
-#define CONFIG_REALTEK_BUILD_LVGL_DEMO_APP
-// </c>
-
-// <c> HoneyGUI Enable LVGL EXAMPLES
-#define CONFIG_REALTEK_BUILD_LVGL_EXAMPLES
-// </c>
-
-// <c> HoneyGUI Enable LVGL RLOTTIE
-#define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
-// </c>
-
-#endif
-
-// </e>
-
-// <e> HoneyGUI Enable Arm-2D
-#define CONFIG_REALTEK_BUILD_ARM_2D     0
-
-#if (CONFIG_REALTEK_BUILD_ARM_2D == 1)
-
-// <c> HoneyGUI Enalbe ARM2D APP
-#define CONFIG_REALTEK_BUILD_ARM2D_DEMO_APP
-// </c>
-
-#endif
-
-// </e>
-
-// <e> HoneyGUI Enable Legacy RTK GUI
-#define CONFIG_REALTEK_BUILD_LEGACY_RTK_GUI     0
-
-#if (CONFIG_REALTEK_BUILD_LEGACY_RTK_GUI == 1)
-#endif
-
-// </e>
 
 
 // <e> h.264 decoder

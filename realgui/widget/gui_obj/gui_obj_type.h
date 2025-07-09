@@ -110,15 +110,27 @@ typedef enum t_obj_type
     MACRO_ONCOMPLETE,
     MACRO_KEY,
     MACRO_ONSELECT,
+    LIST,
+    LIST_NOTE,
+    MENU_CELLULAR,
 } T_OBJ_TYPE;
 typedef enum
 {
     OBJ_INPUT_PREPARE,
     OBJ_PREPARE,
+    OBJ_PREPROCESS,
     OBJ_DRAW,
     OBJ_END,
     OBJ_DESTROY,
 } T_OBJ_CB_TYPE;
+
+typedef struct gui_obj_timer
+{
+    uint32_t interval_ms;
+    bool reload;
+    void (*p_timer_callback)(void *);
+    uint32_t expire_time;
+} gui_obj_timer_t;
 
 typedef struct _gui_obj_t
 {
@@ -130,37 +142,32 @@ typedef struct _gui_obj_t
     int16_t w;
     int16_t h;
 
-    gui_list_t  child_list;
-    gui_list_t  brother_list;
+    gui_node_list_t  child_list;
+    gui_node_list_t  brother_list;
 
     //start of run time
     void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
     //end of run time
-    T_OBJ_TYPE type;                      //no need this , only use name
-    uint32_t active               : 1;    // this_widget flag means obj location in screen
-    uint32_t not_show             : 1;
+    T_OBJ_TYPE type;                            //no need this , only use name
+    uint32_t active                     : 1;    // this_widget flag means obj location in screen
+    uint32_t not_show                   : 1;
 
-    uint32_t skip_tp_left_hold    : 1;
-    uint32_t skip_tp_right_hold   : 1;
-    uint32_t skip_tp_up_hold      : 1;
-    uint32_t skip_tp_down_hold    : 1;
-    uint32_t skip_tp_short        : 1;
-    uint32_t skip_tp_long         : 1;
-    uint32_t skip_tp_pressed      : 1;
-    uint32_t gesture              : 1;
-
-    uint32_t create_done          : 1;
-    uint32_t event_dsc_cnt        : 5;
-    uint32_t opacity_value        : 8;
-    uint32_t has_input_prepare_cb : 1;
-    uint32_t has_prepare_cb       : 1;
-    uint32_t has_draw_cb          : 1;
-    uint32_t has_end_cb           : 1;
-    uint32_t has_destroy_cb       : 1;
-    uint32_t magic                : 4;
-    gui_event_dsc_t *event_dsc;
+    uint32_t suppress_conflict_obj_cnt  : 6;
+    uint32_t opacity_value              : 8;
+    uint32_t event_dsc_cnt              : 5;
+    uint32_t create_done                : 1;
+    uint32_t has_input_prepare_cb       : 1;
+    uint32_t has_prepare_cb             : 1;
+    uint32_t has_draw_cb                : 1;
+    uint32_t has_end_cb                 : 1;
+    uint32_t has_destroy_cb             : 1;
+    uint32_t need_preprocess            : 1;
+    uint32_t magic                      : 4;
+    gui_event_dsc_t   *event_dsc;
+    struct _gui_obj_t **suppress_conflict_obj_list; //chrild obj list that has the same event
 
     gui_matrix_t *matrix;
+    gui_obj_timer_t *timer;
 
 } gui_obj_t;
 

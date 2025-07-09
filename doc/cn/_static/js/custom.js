@@ -1,8 +1,9 @@
 /* ================ Add left-sider draggable component ================ */
-function addLefTocSlider() {
+
+function addLefTocSlider(local_left_nav_width) {
     const initLeftTocSliderWidth = function() {
         if (window.matchMedia('(min-width: 768px)').matches) {
-            let leftSiderBarWidth = localStorage.getItem('docs.bee4.siderbar.width');
+            let leftSiderBarWidth = localStorage.getItem(local_left_nav_width);
             if (leftSiderBarWidth) {
                 $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
                 $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
@@ -47,7 +48,7 @@ function addLefTocSlider() {
 
             // Store width in localStorage
             var newWidth = $('.wy-nav-side').width();
-            localStorage.setItem('docs.bee4.siderbar.width', newWidth);
+            localStorage.setItem(local_left_nav_width, newWidth);
         }
     });
 
@@ -196,8 +197,23 @@ function highlightAPI() {
     }
 }
 
+/* ============= Toggle Languages ============= */
+function toggleLanguage() {
+    let currentUrl = window.location.href;
+    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
+    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
+
+    document.getElementById('toEN').href = newEnUrl;
+    document.getElementById('toCN').href = newCnUrl;
+}
+
 $(document).ready(function () {
-    addLefTocSlider();
+    const isMultilingual = window.isMultilingual == "True";
+    if(isMultilingual) {
+        toggleLanguage();
+    }
+    const leftNavWidth = window.leftNavWidth || "docs.siderbar.width";
+    addLefTocSlider(leftNavWidth);
     addCollapseForAPI();
     initSampleListToc();
     highlightAPI();
@@ -213,13 +229,3 @@ function backToTop() {
     //     scrollTop: 0
     // }, 300);
 }
-
-/* ============= Toggle Languages ============= */
-document.addEventListener("DOMContentLoaded", function () {
-    let currentUrl = window.location.href;
-    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
-    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
-
-    document.getElementById('toEN').href = newEnUrl;
-    document.getElementById('toCN').href = newCnUrl;
-})

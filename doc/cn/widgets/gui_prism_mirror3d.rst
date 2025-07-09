@@ -54,7 +54,7 @@ GUI加载棱镜模型
 
 3. GUI加载描述子
 
-   将包含obj解析数据、mtl解析数据和图片数据的 :file:`desc.txt` 文件放入工程目录下，并调用 ``gui_get_3d_desc()`` 函数加载。
+   将包含obj解析数据、mtl解析数据和图片数据的 :file:`desc.txt` 文件放入工程目录下，并在 :cpp:any:`gui_prism_mirror3d_create` 中加载。
 
 
 棱镜控件用法

@@ -19,12 +19,8 @@ typedef struct
 
 
 
-
 void gui_3d_tria_scene(gui_3d_tria_face_t *face, size_t face_index, gui_obj_attrib_t *attrib,
                        gui_3d_world_t *world, gui_3d_camera_t *camera);
-
-void gui_3d_tria_face_transform_local_to_global(gui_3d_tria_face_t *face, size_t face_index,
-                                                gui_obj_attrib_t *attrib, gui_3d_world_t *world);
 
 
 

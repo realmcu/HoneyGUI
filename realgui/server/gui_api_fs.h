@@ -42,7 +42,6 @@ extern "C" {
  *                         Functions
  *============================================================================*/
 
-void gui_change_default_path(int argc, char **argv);
 int gui_fs_open(const char *file, int flags);
 int gui_fs_close(int d);
 int gui_fs_read(int fd, void *buf, size_t len);

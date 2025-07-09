@@ -17,9 +17,9 @@
 
 
 // <e> HoneyGUI Enable RTK Real GUI
-#define CONFIG_REALTEK_BUILD_GUI     1
+#define CONFIG_REALTEK_HONEYGUI     1
 
-#if (CONFIG_REALTEK_BUILD_GUI == 1)
+#if (CONFIG_REALTEK_HONEYGUI == 1)
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
@@ -91,32 +91,8 @@
 
 // <h> HoneyGUI Config Function
 
-// <c> RTK GUI Font Enable STB
-#define CONFIG_REALTEK_BUILD_GUI_FONT_STB
-// </c>
-
 // <c> RTK GUI Font Enable FREETYPE
 // #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
-// </c>
-
-// <c> RTK GUI Font Enable RTK MEM
-#define CONFIG_REALTEK_BUILD_GUI_FONT_RTK_MEM
-// </c>
-
-// <c> RTK GUI Font Enable TTF SVG
-// #define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
-// </c>
-
-// <c> RTK GUI Enable VGLITE GPU
-// #define CONFIG_REALTEK_BUILD_VG_LITE
-// </c>
-
-// <c> RTK GUI Enable PPE1.0
-// #define CONFIG_REALTEK_BUILD_PPE
-// </c>
-
-// <c> RTK GUI Enable PPE2.0
-// #define CONFIG_REALTEK_BUILD_PPEV2
 // </c>
 
 // <c> RTK GUI Enable SasA
@@ -126,17 +102,15 @@
 // <c> RTK GUI Enable cJSON
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
-
+// <c> RTK GUI Enable web
+// #define CONFIG_REALTEK_BUILD_WEB
+// </c>
 // <c> RTK GUI Enable KeyBoard And Pinyin
 #define CONFIG_REALTEK_BUILD_PINYIN
 // </c>
 
 // <c> RTK GUI Enable u8g2
 // #define CONFIG_REALTEK_BUILD_U8G2
-// </c>
-
-// <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 // <c> RTK GUI Enable LiteGFX
@@ -155,10 +129,6 @@
 //#define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 
-
-// <c> RTK GUI Enable SasA
-// #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
-// </c>
 
 #endif
 // </h>

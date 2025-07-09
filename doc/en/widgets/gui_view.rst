@@ -9,7 +9,13 @@ The view widget is a kind of container that makes switching more convenient. Any
 .. raw:: html
 
    <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1748934358553458872/76fc7506_10737458.jpeg" width= "1000" /></div>
+   <p style="margin: 5px 0 0 0; text-align: center;">VIEW FLOWCHART</p>
+   <br>
+
+   <br>
    <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif" width= "400" /></div>
+   <p style="margin: 5px 0 0 0; text-align: center;">VIWE SWITCHING DIAGRAM</p>
    <br>
 
 
@@ -49,38 +55,61 @@ Switch View Directly
 ~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_view_switch_direct` function can be used to switch view directly, which can be used in conjunction with events or animations of the child widgets based on view. Note that the switching style is limited to the animation style and cannot be set to the sliding style.
 
+
+Set Animation Step Length
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_set_animate_step` function can be used to set switching animation step length.
+
+
+Set Opacity
+~~~~~~~~~~~~~
+The :cpp:any:`gui_view_set_opacity` function can be used to set opacity of widget, then the overlapping display effect of view can be achieved.
+
+
 Get Current View Pointer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_view_get_current_view` function can be used to get current view pointer, and can be used with :cpp:any:`gui_view_switch_direct` to switch the current view.
+The :cpp:any:`gui_view_get_current` function can be used to get current view pointer, and can be used with :cpp:any:`gui_view_switch_direct` to switch the current view.
+
+
+Get Next View Pointer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_view_get_next` function can be used to get next view pointer during switching.
+
 
 Example
 ---------
 View
 ~~~~~~~~~~
-Below are three separate C files, each containing a descriptor for the view and the design function.
+Below are four separate C files, each containing a descriptor for the view and the design function.
 
-.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_blue.c
+.. literalinclude:: ../../../example/widget/view/app_ui_view_blue.c
    :language: c
    :start-after: /* view blue start*/
    :end-before: /* view blue end*/
 
 
-.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_white.c
+.. literalinclude:: ../../../example/widget/view/app_ui_view_white.c
    :language: c
    :start-after: /* view white start*/
    :end-before: /* view white end*/
 
 
-.. literalinclude:: ../../../realgui/example/demo/view_demo/app_ui_view_yellow.c
+.. literalinclude:: ../../../example/widget/view/app_ui_view_yellow.c
    :language: c
    :start-after: /* view yellow start*/
    :end-before: /* view yellow end*/
 
 
+.. literalinclude:: ../../../example/widget/view/app_ui_view_lime.c
+   :language: c
+   :start-after: /* view lime start*/
+   :end-before: /* view lime end*/
+
+
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739865862383021432/c0d24c3a_10737458.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747296823504521615/c45fc393_10737458.gif" width= "400" /></div>
    <br>
 
 API

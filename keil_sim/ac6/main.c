@@ -24,7 +24,6 @@
 #endif
 #include "Board_GLCD.h"
 #include "gui_server.h"
-#include "gui_components_init.h"
 #include "cmsis_os2.h"                  // ARM::CMSIS:RTOS2:Keil RTX5
 
 
@@ -44,7 +43,7 @@ void app_main(void *argument)
 //    //GLCD_SetBackgroundColor(GLCD_COLOR_BLUE);
 //    GLCD_SetForegroundColor(GLCD_COLOR_GREEN);
 
-    gui_components_init();
+    gui_server_init();
 
 
     while (1)

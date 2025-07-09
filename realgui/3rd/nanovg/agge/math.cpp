@@ -21,7 +21,7 @@ float sqrt(float x)
 {   return nvg__sqrtf(x);   }
 
 double sqrt(double x)
-{   return nvg__sqrtf(x);   }
+{   return std::sqrt(x);   }
 
 float sin(float a)
 {   return nvg__sinf(a);    }

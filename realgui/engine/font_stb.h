@@ -32,6 +32,7 @@ extern "C" {
 #include <gui_api.h>
 #include <draw_font.h>
 #include "gui_text.h"
+#include "font_rendering_utils.h"
 
 /*============================================================================*
  *                         Types

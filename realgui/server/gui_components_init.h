@@ -64,8 +64,10 @@ typedef int (*gui_init_fn_t)(void);
 #define GUI_INIT_VIEW_DESCRIPTOR_REGISTER(fn)         GUI_APP_INIT_EXPORT(fn, "4")
 /* environment initialization (mount disk, ...) */
 #define GUI_INIT_VIEW_DESCRIPTOR_GET(fn)            GUI_APP_INIT_EXPORT(fn, "5")
+
+#define GUI_INIT_VIEW_CREATE(fn)            GUI_APP_INIT_EXPORT(fn, "6")
 /* appliation initialization (rtgui application etc ...) */
-#define GUI_INIT_APP_EXPORT(fn)             GUI_APP_INIT_EXPORT(fn, "6")
+#define GUI_INIT_APP_EXPORT(fn)             GUI_APP_INIT_EXPORT(fn, "7")
 
 
 /*============================================================================*
@@ -76,12 +78,6 @@ typedef int (*gui_init_fn_t)(void);
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-
-/**
- * @brief
- *
- */
-void gui_components_init(void);
 
 
 #ifdef __cplusplus

@@ -2,43 +2,9 @@
 #include "draw_font.h"
 #include "font_mem.h"
 #include "font_mem_matrix.h"
-#include "acc_init.h"
+#include "acc_api.h"
+#include "font_rendering_utils.h"
 
-gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
-{
-    alpha = (alpha + 4) >> 3;
-    bg = (bg | (bg << 16)) & 0x7e0f81f;
-    fg = (fg | (fg << 16)) & 0x7e0f81f;
-    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
-    result >>= 5;
-    result += bg;
-    result &= 0x7e0f81f;
-    return (uint16_t)((result >> 16) | result); // contract result
-}
-gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
-{
-    uint32_t mix;
-    uint8_t back_a = 0xff - alpha;
-#if defined(_WIN32)
-    mix = 0xff000000;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
-    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
-#else
-    mix = 0x000000ff;
-    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
-#endif
-    return mix;
-}
-gui_inline uint16_t rgba2565(gui_color_t rgba)
-{
-    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
-    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
-    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
-    return red + gre + blu;
-}
 static void rtk_draw_unicode_matrix(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
                                     gui_text_rect_t *rect, float scale)
 {
@@ -333,7 +299,7 @@ static void rtk_draw_unicode_matrix(mem_char_t *chr, gui_color_t color, uint8_t 
         {
             uint32_t *writebuf = (uint32_t *)dc->frame_buf;
             uint32_t color_back;
-            gui_log("font scale %f , x %d %d , y %d %d \n", scale, x_start, x_end, y_start, y_end);
+            gui_log("font scale %f , x %d %d , y %d %d \n", (double)scale, x_start, x_end, y_start, y_end);
             gui_log(" \n");
             for (uint32_t i = y_start; i < y_end; i++)
             {
@@ -429,36 +395,23 @@ static void rtk_draw_unicode_matrix(mem_char_t *chr, gui_color_t color, uint8_t 
 static bool rtk_draw_unicode_matrix_by_img(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
                                            gui_text_rect_t *rect, uint8_t *img_buf, draw_img_t *draw_img)
 {
-    if (chr->dot_addr == NULL)
-    {
-        return false;
-    }
-    uint8_t *dots = chr->dot_addr;
-    gui_dispdev_t *dc = gui_get_dc();
+    if (chr->dot_addr == NULL) { return false; }
 
-    int font_x = chr->x;
-    int font_y = chr->y + chr->char_y;
-    int font_w = chr->w;
+    const int font_x1 = chr->x;
+    const int font_y1 = chr->y + chr->char_y;
+    const int font_x2 = chr->x + chr->char_w - 1;
+    const int font_y2 = chr->y + chr->char_y + chr->char_h - 1;
 
-    int x_start = _UI_MAX(font_x, rect->xboundleft);
-    int x_end = font_x + chr->char_w;
-    if (rect->xboundright != 0)
-    {
-        x_end = _UI_MIN(font_x + chr->char_w, rect->xboundright);
-    }
-    int y_start = _UI_MAX(font_y, rect->yboundtop);
-    int y_end = font_y + chr->char_h;
-    if (rect->yboundbottom != 0)
-    {
-        y_end = _UI_MIN(font_y + chr->char_h, rect->yboundbottom);
-    }
-    if ((x_start >= x_end) || (y_start >= y_end))
-    {
-        return false;
-    }
+    const int x_start = _UI_MAX3(font_x1, rect->xboundleft, 0);
+    const int x_end = rect->xboundright ? _UI_MIN(font_x2, rect->xboundright) : font_x2;
 
-    uint16_t img_w = x_end - x_start;
-    uint16_t img_h = y_end - y_start;
+    const int y_start = _UI_MAX3(font_y1, rect->yboundtop, 0);
+    const int y_end = rect->yboundbottom ? _UI_MIN(font_y2, rect->yboundbottom) : font_y2;
+
+    if (x_start >= x_end || y_start >= y_end) { return false; }
+
+    uint16_t img_w = x_end - x_start + 1;
+    uint16_t img_h = y_end - y_start + 1;
 
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img_buf;
     head->w = img_w;
@@ -469,150 +422,40 @@ static bool rtk_draw_unicode_matrix_by_img(mem_char_t *chr, gui_color_t color, u
 
     uint8_t *font_buf = img_buf + sizeof(gui_rgb_data_head_t);
 
-    switch (rendor_mode)
+    uint8_t target_bit_depth = font_get_bitdepth_by_cf((GUI_FormatType)head->type);
+
+    draw_font_t df =
     {
-    case 1:
-        {
-            uint16_t *writebuf = (uint16_t *)font_buf;
-            uint16_t color_output = rgba2565(color);
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - y_start) * img_w;
-                int dots_off = (i - font_y) * (font_w / 8);
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
-                    {
-                        writebuf[j - x_start + write_off] = color_output;
-                    }
-                }
-            }
+        .color = color,
+        .render_mode = rendor_mode,
+        .target_buf = font_buf,
+        .target_buf_stride = img_w * target_bit_depth / 8,
+        .target_format = (GUI_FormatType)head->type,
+        .clip_rect = {
+            .x1 = x_start,
+            .y1 = y_start,
+            .x2 = x_end,
+            .y2 = y_end,
+        },
+        .target_rect = {
+            .x1 = x_start,
+            .y1 = y_start,
+            .x2 = x_end,
+            .y2 = y_end,
         }
-        break;
-    case 2:
-#if 1 /* 1 : High Speed. 0 : Stable. */
-        {
-            uint8_t *writebuf = font_buf;
+    };
 
-            uint16_t color_output = rgba2565(color);
-            uint8_t color_outputh = color_output >> 8;
-            uint8_t color_outputl = color_output & 0xff;
+    font_glyph_t glyph =
+    {
+        .data = chr->dot_addr,
+        .pos_x = chr->x,
+        .pos_y = chr->y + chr->char_y,
+        .width = chr->char_w,
+        .height = chr->char_h,
+        .stride = chr->w,
+    };
 
-            uint8_t alpha_list[4] = {0x00, 0x55, 0xAA, 0xFF};
-
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - y_start) * img_w * 3;
-                int dots_off = (i - font_y) * (font_w / 4);
-
-                uint32_t aligned_start = font_x + ((x_start - font_x + 3) & ~0x03);
-
-                for (uint32_t j = x_start; j < aligned_start && j < x_end; j++)
-                {
-                    uint32_t rel_x = j - font_x;
-                    uint8_t alpha = dots[dots_off + rel_x / 4] >> ((rel_x % 4) * 2);
-                    if (alpha)
-                    {
-                        uint32_t write_idx = (j - x_start) * 3 + write_off;
-                        writebuf[write_idx + 2] = alpha_list[alpha & 0x03];
-                        writebuf[write_idx + 1] = color_outputh;
-                        writebuf[write_idx + 0] = color_outputl;
-                    }
-                }
-
-                for (uint32_t j = aligned_start; j + 3 < x_end; j += 4)
-                {
-                    uint32_t rel_x_base = j - font_x;
-                    uint8_t dot_byte = dots[dots_off + rel_x_base / 4];
-
-                    if (dot_byte == 0) { continue; }
-
-                    for (int k = 0; k < 4; k++)
-                    {
-                        uint8_t alpha = (dot_byte >> (k * 2)) & 0x03;
-                        if (alpha)
-                        {
-                            uint32_t write_idx = (j + k - x_start) * 3 + write_off;
-                            writebuf[write_idx + 2] = alpha_list[alpha];
-                            writebuf[write_idx + 1] = color_outputh;
-                            writebuf[write_idx + 0] = color_outputl;
-                        }
-                    }
-                }
-
-                for (uint32_t j = aligned_start + ((x_end - aligned_start) & ~0x03); j < x_end; j++)
-                {
-                    uint32_t rel_x = j - font_x;
-                    uint8_t alpha = dots[dots_off + rel_x / 4] >> ((rel_x % 4) * 2);
-                    if (alpha)
-                    {
-                        uint32_t write_idx = (j - x_start) * 3 + write_off;
-                        writebuf[write_idx + 2] = alpha_list[alpha & 0x03];
-                        writebuf[write_idx + 1] = color_outputh;
-                        writebuf[write_idx + 0] = color_outputl;
-                    }
-                }
-            }
-        }
-        break;
-#else
-        {
-            uint8_t *writebuf = font_buf;
-
-            uint16_t color_output = rgba2565(color);
-            uint8_t color_outputh = color_output >> 8;
-            uint8_t color_outputl = color_output & 0xff;
-
-            uint8_t alpha_list[4] = {0x00, 0x55, 0xAA, 0xFF};
-
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - y_start) * img_w * 3;
-                int dots_off = (i - font_y) * (font_w / 4);
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[dots_off + (j - font_x) / 4] >> ((j - font_x) % 4 * 2);
-                    if (alpha != 0)
-                    {
-                        writebuf[(j - x_start) * 3 + write_off + 2] = alpha_list[alpha & 0x03];
-                        writebuf[(j - x_start) * 3 + write_off + 1] = color_outputh;
-                        writebuf[(j - x_start) * 3 + write_off + 0] = color_outputl;
-                    }
-                }
-            }
-        }
-        break;
-#endif
-    case 4:
-        {
-            uint8_t *writebuf = font_buf;
-
-            uint16_t color_output = rgba2565(color);
-            uint8_t color_outputh = color_output >> 8;
-            uint8_t color_outputl = color_output & 0xff;
-            uint8_t alpha_list[16] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                      0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
-                                     };
-
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - y_start) * img_w * 3;
-                int dots_off = (i - font_y) * (font_w / 2);
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
-                    if (alpha != 0)
-                    {
-                        writebuf[(j - x_start) * 3 + write_off + 2] = alpha_list[alpha & 0x0F];
-                        writebuf[(j - x_start) * 3 + write_off + 1] = color_outputh;
-                        writebuf[(j - x_start) * 3 + write_off + 0] = color_outputl;
-                    }
-                }
-            }
-        }
-    default:
-        break;
-    }
+    font_glyph_render(&df, &glyph);
     return true;
 }
 
@@ -755,6 +598,9 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
         case ARGB8565:
             draw_img.blend_mode = IMG_SRC_OVER_MODE;
             break;
+        case ARGB8888:
+            draw_img.blend_mode = IMG_SRC_OVER_MODE;
+            break;
         default:
             break;
         }
@@ -814,11 +660,4 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
             rtk_draw_unicode_matrix(chr + i, text->color, rendor_mode, rect, text->base.matrix->m[0][0]);
         }
     }
-
 }
-
-
-
-
-
-

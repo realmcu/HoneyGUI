@@ -88,7 +88,7 @@ Example1
    - After opening the :term:`RVD` tool, you can see this page.
    - Click the yellow folder icon to create a project.
 
-   .. figure:: https://foruda.gitee.com/images/1747378412350640924/277f6f75_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745738269558331190/7495790a_10088396.png
       :align: center
       :width: 400px
       :name: Create a New RVD Project
@@ -99,7 +99,7 @@ Example1
 
    - Add image resources based on the steps shown in the image.
 
-   .. figure:: https://foruda.gitee.com/images/1747378313556720434/f4258ac9_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745738540104414413/e31300d8_10088396.png
       :align: center
       :width: 400px
       :name: Add Image Resources
@@ -108,12 +108,12 @@ Example1
 
    - After adding the image resources, the interface displays similarly to the figure below.
 
-   .. figure:: https://foruda.gitee.com/images/1747378404746671020/fc1601aa_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745738620568950463/af89cae9_10088396.png
       :align: center
       :width: 400px
-      :name: Add Images Done
+      :name: add images done
 
-      Add Images Done
+      Add images done
 
 3. **Add Three Radio Buttons**:
 
@@ -121,7 +121,7 @@ Example1
    - Set the background image (:guilabel:`BG Image`) for the radio buttons, with the highlighted image displayed when pressed.
 
 
-   .. figure:: https://foruda.gitee.com/images/1747378421712716016/725aa16e_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745808568359598574/8232c321_10088396.png
       :align: center
       :width: 400px
       :name: Radio Buttons Setting
@@ -132,12 +132,12 @@ Example1
    - Right-click a radio button to set its size to match the background image.
 
 
-   .. figure:: https://foruda.gitee.com/images/1747378123869707204/e4806247_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745808941071192592/f29f7f07_10088396.png
       :align: center
       :width: 400px
-      :name: Adjust the Position and Size
+      :name: Adjust the position and size
 
-      Adjust the Position and Size
+      Adjust the position and size
 
 4. **Add Two Image Pages**:
 
@@ -145,7 +145,7 @@ Example1
    - Click the blue arrow on the right side of the canvas to create a second tab.
    - Select :guilabel:`tab0` and :guilabel:`tab1`, and add an image to each tab.
 
-   .. figure:: https://foruda.gitee.com/images/1747378145157577091/8371fd7f_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745809454174368310/c380f8ca_10088396.png
       :align: center
       :width: 400px
       :name: Add New Tab
@@ -161,7 +161,7 @@ Example1
    - In the :menuselection:`Property` panel's yellow lightning :guilabel:`Event Setting` interface, set the trigger to :guilabel:`OnSelect` and the action to jump to :guilabel:`tab1`.
    - Similarly, set :guilabel:`radiobutton1` to jump to :guilabel:`tab0` and :guilabel:`radiobutton2` to jump to the launcher.
 
-   .. figure:: https://foruda.gitee.com/images/1747378997502705601/ad728298_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745809610213583909/3d0065d2_10088396.png
       :align: center
       :width: 400px
       :name: Radio Button Selection Events
@@ -177,7 +177,7 @@ Example1
    - Set :guilabel:`key1` to jump to :guilabel:`tab0`.
    - In the :menuselection:`Property` panel's :menuselection:`Property Setting` interface, set :guilabel:`key0`'s ID to 49 and :guilabel:`key1`'s ID to 50 (corresponding to keyboard keys 1 and 2 in the PC environment).
 
-   .. figure:: https://foruda.gitee.com/images/1747379132608162798/d3df98b2_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745809853776415161/ac8f0d54_10088396.png
       :align: center
       :width: 400px
       :name: Key Click Events
@@ -214,12 +214,12 @@ Example2
    - After opening the RVD tool, you can see this page.
    - Click the yellow folder icon to create a project.
 
-   .. figure:: https://foruda.gitee.com/images/1747379190065350353/f0562096_10088396.png
-      :align: center
-      :width: 400px
-      :name: Create a New RVD Project for Example2
+.. figure:: https://foruda.gitee.com/images/1745739395361023371/1dfd00b4_10088396.png
+   :align: center
+   :width: 400px
+   :name: Create a New RVD Project for Example2
 
-      Create a New RVD Project
+   Create a New RVD Project
 
 2. **Add Image Resources**
 
@@ -239,7 +239,7 @@ Example2
    - Go to :menuselection:`Setting --> Image Convert --> Create` to create a new conversion setting.
    - Configure options such as :guilabel:`Color Space`, :guilabel:`Compress`, and :guilabel:`Mix Alpha Channel`.
 
-   .. figure:: https://foruda.gitee.com/images/1747379273900269382/dd482c1a_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745740074880329292/510c8669_10088396.png
       :align: center
       :width: 400px
       :name: Set Image Export Format
@@ -248,7 +248,7 @@ Example2
 
    - Close the dialog, then in the :guilabel:`Images` window, select the image resource and apply the newly created conversion setting in the :menuselection:`Image Convert Setting` section.
    
-   .. figure:: https://foruda.gitee.com/images/1747379389473127316/bb924260_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745740381172650681/cbbdb633_10088396.png
       :align: center
       :width: 400px
       :name: Apply the conversion setting
@@ -264,14 +264,14 @@ Example2
      - Set the image conversion format's :guilabel:`Color Space` to :guilabel:`ARGB8565` or :guilabel:`ARGB`.
      - Set the image widget's :guilabel:`Blending Mode` to :guilabel:`SrcOverMode`.
 
-   .. figure:: https://foruda.gitee.com/images/1747379445252796715/d7d295af_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745745800531690844/7ea2f80b_10088396.png
       :align: center
       :width: 400px
       :name: Transparent Effect Setting
 
       Transparent Effect Setting
 
-   .. figure:: https://foruda.gitee.com/images/1747378376255549129/ce73da02_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745745582092188954/316866ba_10088396.png
       :align: center
       :width: 400px
       :name: Blending Mode Setting
@@ -285,7 +285,7 @@ Example2
      - Check :guilabel:`Mix Alpha Channel`.
      - Set the image widget's :guilabel:`Blending Mode` to :guilabel:`BypassMode`.
 
-   .. figure:: https://foruda.gitee.com/images/1747379511002344906/f2923d90_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745745835243226253/ecb3a5c0_10088396.png
       :align: center
       :width: 400px
       :name: Black Background Effect Setting
@@ -295,7 +295,7 @@ Example2
    - Apply transparent effect to :guilabel:`image3` and pre-mixed black background to :guilabel:`image2`.
    - In the figure below, Effect 1 is the pre-mixed black background effect, and Effect 2 is the transparent effect.
 
-   .. figure:: https://foruda.gitee.com/images/1747378164677646804/e4251487_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745741856777234666/786ff313_10088396.png
       :align: center
       :width: 400px
       :name: 2 Effects
@@ -314,7 +314,7 @@ Example2
      - Set :guilabel:`Values` to :kbd:`0,0;0,300;0,0` (three sets of 2D translations: no horizontal movement, vertical movement of 300 pixels down, then back up).
      - Set :guilabel:`Duration` to the animation cycle duration (in milliseconds). Set :guilabel:`Repeat` to :kbd:`0` for infinite looping.
    
-   .. figure:: https://foruda.gitee.com/images/1747379593093999226/cf76bb23_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745747629263669367/c7c911d5_10088396.png
       :align: center
       :width: 400px
       :name: Create an Animation
@@ -327,7 +327,7 @@ Example2
      - In the yellow lightning :guilabel:`Event Setting` interface, set the trigger to :guilabel:`OnLoad` (triggered when the image widget is displayed).
      - Click :guilabel:`Add Event`, set the :guilabel:`Action` to :guilabel:`Animation`, and select the newly created animation (:guilabel:`animate0`).
 
-   .. figure:: https://foruda.gitee.com/images/1747379675460127538/5650fafb_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745753304113520373/abcbabfa_10088396.png
       :align: center
       :width: 400px
       :name: Apply Animation to Image
@@ -340,10 +340,10 @@ Example2
    - Set the text content in the :menuselection:`Property` panel's :menuselection:`Content --> Text` field.
    - Configure the font in :menuselection:`Appearance --> Font`. By default, no font is set.
 
-   .. figure:: https://foruda.gitee.com/images/1747378331412795283/48cd6c5f_10088396.png
+   .. figure:: https://foruda.gitee.com/images/1745754152945794898/312ceea5_10088396.png
       :align: center
       :width: 400px
-      :name: Text Setting
+      :name: Text setting
 
       Text Setting
    
@@ -355,7 +355,7 @@ Example2
      - For :guilabel:`Text type` set to :guilabel:`Range`, specify the :guilabel:`Unicode Range`. :guilabel:`Code Page` is optional and, if set, combines with the range.
      - Available fonts include PC system fonts and user-added fonts.
      
-      .. figure:: https://foruda.gitee.com/images/1747378366891668382/4748d6ea_10088396.png
+      .. figure:: https://foruda.gitee.com/images/1745754869649440065/606a2221_10088396.png
          :align: center
          :width: 400px
          :name: Font Setting
@@ -363,21 +363,21 @@ Example2
          Font Setting     
      
      - If your font size is large and the number of characters to display is small, using the Range method is an effective optimization strategy for reducing the size of exported resource files.
-     - For example, the configuration in the figure below is used for a text widget that only needs to display digits and a colon, with Unicode ranges of :kbd:`0x0030-0x003A` and :kbd:`0x003A-0x003B` (Start Unicode to End Unicode + 1).
+     - For example, the configuration in the figure below is used for a text widget that only needs to display digits and a colon, with Unicode ranges of 0x0030-0x003A and 0x003A-0x003B (Start Unicode to End Unicode + 1).
 
-      .. figure:: https://foruda.gitee.com/images/1747378388312263422/024273e4_10088396.png
+      .. figure:: https://foruda.gitee.com/images/1745756420938128273/7afd8a6c_10088396.png
          :align: center
          :width: 400px
-         :name: Font Setting Optimization
+         :name: Font Setting optimization
 
-         Font Setting Optimization 
+         Font Setting optimization 
 
    - **Add a Custom Font**:
 
      - In the :menuselection:`Fonts` section, click the plus sign to add a TTF font file.
      - The added font appears at the top of the :guilabel:`Font` dropdown in the font settings.
 
-      .. figure:: https://foruda.gitee.com/images/1747378282217091861/9d242fcc_10088396.png
+      .. figure:: https://foruda.gitee.com/images/1745756985069687194/c26b25cf_10088396.png
          :align: center
          :width: 400px
          :name: Add a Custom Font
@@ -412,9 +412,9 @@ To view the UI effects on the EVB, the RVD export pack need to be flashed.
 .. figure:: https://foruda.gitee.com/images/1745833726498330826/59e236a8_10088396.jpeg
    :align: center
    :width: 400px
-   :name: Screen Display Effect
+   :name: screen display effect
 
-   Screen Display Effect
+   screen display effect
 
 
 
@@ -602,32 +602,32 @@ Image
    :align: center
    :width: 100%
 
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Property             | Description                                                                                                        |
-   +======================+====================================================================================================================+
-   | Name                 | Widget name.                                                                                                       |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Size (Height)        | Widget height.                                                                                                     |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Size (Width)         | Widget width.                                                                                                      |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | X                    | Horizontal coordinate relative to the parent widget.                                                               |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Y                    | Vertical coordinate relative to the parent widget.                                                                 |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Image                | Image Path                                                                                                         |
-   |                      |                                                                                                                    |
-   |                      | Note: The image must be pre-imported into the project.                                                             |
-   |                      | Please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Resource_Management` for details.               |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Image Rotation Angle | Image rotation angle.                                                                                              |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Image Scale X        | Image horizontal scaling degree, is a multiplier/percentage.                                                       |
-   |                      |                                                                                                                    |
-   |                      | For example, set scale x 0.5 means that the actual display width of the image is half of the original image width. |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
-   | Image Scale Y        | Image vertical scaling degree, is a multiplier/percentage.                                                         |
-   +----------------------+--------------------------------------------------------------------------------------------------------------------+
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Property             | Description                                                                                                        | 8762D/8763E | 8762G/8772G | TBD |
+   +======================+====================================================================================================================+=============+=============+=====+
+   | Name                 | Widget name.                                                                                                       |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Size (Height)        | Widget height.                                                                                                     |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Size (Width)         | Widget width.                                                                                                      |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | X                    | Horizontal coordinate relative to the parent widget.                                                               |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Y                    | Vertical coordinate relative to the parent widget.                                                                 |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Image                | Image Path                                                                                                         |      Y      |      Y      |  Y  |
+   |                      |                                                                                                                    |             |             |     |
+   |                      | Note: The image must be pre-imported into the project.                                                             |             |             |     |
+   |                      | Please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Resource_Management` for details.               |             |             |     |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Image Rotation Angle | Image rotation angle.                                                                                              |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Image Scale X        | Image horizontal scaling degree, is a multiplier/percentage.                                                       |      Y      |      Y      |  Y  |
+   |                      |                                                                                                                    |             |             |     |
+   |                      | For example, set scale x 0.5 means that the actual display width of the image is half of the original image width. |             |             |     |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
+   | Image Scale Y        | Image vertical scaling degree, is a multiplier/percentage.                                                         |      Y      |      Y      |  Y  |
+   +----------------------+--------------------------------------------------------------------------------------------------------------------+-------------+-------------+-----+
    | Blend Mode           |  how the pixels of a UI element combine with the pixels of the underlying layers or background.                    |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
    | Opacity              |  Transparency level 0~255                                                                                          |
@@ -1016,7 +1016,7 @@ Menu
 
    Navigating Through Menus
 
-- Setting RadioButton :guilabel:`OnSelect` event for navigating.
+- Setting RadioButton OnSelect event for navigating.
 
 .. figure:: https://foruda.gitee.com/images/1747020682739326978/3585cd1e_10088396.png
    :align: center
@@ -1097,7 +1097,7 @@ table below.
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
    | X              | Horizontal coordinate relative to the parent widget.                                |      Y      |      Y      |  N  |
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
-   | Y              | Vertical coordinate relative to the parent widget.                                  |      Y      |      Y      |  N  |
+   | Y              | Vertical coordinate relative to the parent widget.                                 |      Y      |      Y      |  N  |
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
    | Central X      | Horizontal coordinate of the center of the arc relative to the parent widget.       |      N      |      Y      |  N  |
    +----------------+-------------------------------------------------------------------------------------+-------------+-------------+-----+
@@ -1541,9 +1541,9 @@ Text - OnTime - Set Time
 .. figure:: https://foruda.gitee.com/images/1746534115101519614/2a71cc0b_10088396.png
    :align: center
    :width: 400px
-   :name: 00:00 Format
+   :name: "00:00" Format
 
-   00:00 Format
+   "00:00" Format
 
 
 Text - OnPeripheral - Set Peripheral
@@ -1741,7 +1741,7 @@ Animation Setting
 - And value control methods such as **from-to** or **key-frames**, along with interpolation options.
 - The **from-to** method involves specifying the start and end values of a property within a single duration. 
 - **Key-frames** build on this by allowing you to define a sequence of percentage-based progress nodes within that duration, with each node tied to a specific property value. 
-- Events as :guilabel:`OnClick` :guilabel:`OnLoad` :guilabel:`OnOff` :guilabel:`OnOn` are able to trigger animation start or pause.
+- Events as OnClick, OnLoad, OnOff, OnOn are able to trigger animation start or pause.
 
 Animation Type Brief
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1804,7 +1804,7 @@ Rotation
    Rotating around It's Center
 
 - Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
-- Choose :guilabel:`animate2` which is the :guilabel:`Rotation` as :guilabel:`Animation`.
+- Choose :guilabel:`animate2` which is the Rotation as :guilabel:`Animation`.
 - Choose :guilabel:`image0` which is the Image itself as :guilabel:`Target Widget`.
 
 .. figure:: https://foruda.gitee.com/images/1746626898865085480/4a10b3d2_10088396.png
@@ -1834,12 +1834,12 @@ Opacity
 .. figure:: https://foruda.gitee.com/images/1746626034581611764/af8a8a36_10088396.gif
    :align: center
    :width: 400px
-   :name: Changes the Transparency Level
+   :name: Changes the transparency level
 
-   Changes the Transparency Level
+   Changes the transparency level
 
 - Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
-- Choose :guilabel:`animate1` which is the :guilabel:`Opacity` as  :guilabel:`Animation`.
+- Choose :guilabel:`animate1` which is the :guilabel:`Opacity` as Animation.
 - Choose :guilabel:`image0` which is the Image itself as :guilabel:`Target Widget`.
 
 .. figure:: https://foruda.gitee.com/images/1746626159340482410/e8bee870_10088396.png
@@ -1854,9 +1854,9 @@ AdvancedTranslate
 
 - Moves the image along a rectangle path.
 - Path is relative 2D coordinate: :kbd:`0,0;0,150;400,150;400,0;0,0`, means down 150, then right 400, then up 150, then left 400.
-- Key Times are :kbd:`0;0.2;0.5;0.7;1`, means at these progress node within a duration, reaching the corresponding coordinate.
+- Key Times are :guilabel:`0;0.2;0.5;0.7;1`, means at these progress node within a duration, reaching the corresponding coordinate.
 - Coordinate unit is pixel.
-- :guilabel:`Repeat 0` means indefinite.
+- Repeat 0 means indefinite.
 - Calc Mode is :guilabel:`Linear` means linear moving.
 - Configure the :guilabel:`OnLoad` event of Image to trigger the animation playback immediately upon its appearance.
 
@@ -1874,7 +1874,7 @@ AdvancedTranslate
 
    Rectangle Path
 
-- Calc Mode :guilabel:`Discrete` effect.
+- Calc Mode Discrete effect.
 
 .. figure:: https://foruda.gitee.com/images/1746628523731815603/e8632d15_10088396.gif
    :align: center
@@ -2159,7 +2159,7 @@ Save all the UI changes of the project, the shortcut is :kbd:`Ctrl + S` .
 Exit Save
 ^^^^^^^^^
 
-A prompt window will pop up when closing the project, as shown below. Please click :guilabel:`Yes` to save, or the changes will be abandoned.
+A prompt window will pop up when closing the project, as shown below. Please click :guilabel:`OK` to save, or the changes will be abandoned.
 
 .. figure:: https://foruda.gitee.com/images/1721629849823263224/4adf7819_12407535.png
    :align: center
@@ -2572,7 +2572,7 @@ There are two ways to open a project.
    :align: center
    :width: 750px
 
-   Open Project via Selecting ``.rtkprj``
+   Open Project via Selecting .rtkprj
 
 2. Select a ``.rtkprj`` in the Recent Project area.
 
@@ -2651,7 +2651,7 @@ Please follow the steps to demo the project.
    :align: center
    :width: 400px
 
-   Output ``.bin``
+   Output .bin
 
 Program the output ``.bin`` into your IC.
 

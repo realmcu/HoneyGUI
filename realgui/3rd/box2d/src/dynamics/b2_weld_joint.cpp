@@ -335,10 +335,10 @@ void b2WeldJoint::Dump()
     b2Dump("  jd.bodyA = bodies[%d];\n", indexA);
     b2Dump("  jd.bodyB = bodies[%d];\n", indexB);
     b2Dump("  jd.collideConnected = bool(%d);\n", m_collideConnected);
-    b2Dump("  jd.localAnchorA.Set(%.9g, %.9g);\n", m_localAnchorA.x, m_localAnchorA.y);
-    b2Dump("  jd.localAnchorB.Set(%.9g, %.9g);\n", m_localAnchorB.x, m_localAnchorB.y);
-    b2Dump("  jd.referenceAngle = %.9g;\n", m_referenceAngle);
-    b2Dump("  jd.stiffness = %.9g;\n", m_stiffness);
-    b2Dump("  jd.damping = %.9g;\n", m_damping);
+    b2Dump("  jd.localAnchorA.Set(%.9g, %.9g);\n", (double)m_localAnchorA.x, (double)m_localAnchorA.y);
+    b2Dump("  jd.localAnchorB.Set(%.9g, %.9g);\n", (double)m_localAnchorB.x, (double)m_localAnchorB.y);
+    b2Dump("  jd.referenceAngle = %.9g;\n", (double)m_referenceAngle);
+    b2Dump("  jd.stiffness = %.9g;\n", (double)m_stiffness);
+    b2Dump("  jd.damping = %.9g;\n", (double)m_damping);
     b2Dump("  joints[%d] = m_world->CreateJoint(&jd);\n", m_index);
 }

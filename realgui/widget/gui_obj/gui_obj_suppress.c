@@ -24,6 +24,7 @@
 #include "gui_obj.h"
 #include "gui_obj_suppress.h"
 #include "gui_api.h"
+#include "tp_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -48,321 +49,76 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-
+static void gui_obj_suppress_child_event(gui_obj_t *obj, gui_event_t filter)
+{
+    gui_node_list_t *node = NULL;
+    gui_node_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        for (uint8_t i = 0; i < o->event_dsc_cnt; i++)
+        {
+            gui_event_dsc_t *event_dsc = o->event_dsc + i;
+            if (event_dsc->filter == filter)
+            {
+                obj->suppress_conflict_obj_list = gui_realloc(o->suppress_conflict_obj_list,
+                                                              sizeof(gui_obj_t *) * (obj->suppress_conflict_obj_cnt + 1));
+                obj->suppress_conflict_obj_list[obj->suppress_conflict_obj_cnt] = o;
+                obj->suppress_conflict_obj_cnt++;
+                break;
+            }
+        }
+        gui_obj_suppress_child_event(o, filter);
+    }
+}
 
 /*============================================================================*
 *                           Public Functions
 *============================================================================*/
 
-void gui_obj_skip_all_parent_left_hold(gui_obj_t *obj)
+void gui_obj_suppress_set(gui_obj_t *object, gui_event_t filter)
 {
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
+    /**
+     * This object is added to the suppression list of the parent object that has the same event.
+     */
+    for (gui_obj_t *o = object->parent; o->parent != NULL; o = o->parent)
     {
-        o->skip_tp_left_hold = true;
-    }
-}
-
-void gui_obj_skip_all_child_left_hold(gui_obj_t *obj)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
-    {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
+        for (uint8_t i = 0; i < o->event_dsc_cnt; i++)
         {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
+            gui_event_dsc_t *event_dsc = o->event_dsc + i;
+            if (event_dsc->filter == filter)
+            {
+                o->suppress_conflict_obj_list = gui_realloc(o->suppress_conflict_obj_list,
+                                                            sizeof(gui_obj_t *) * (o->suppress_conflict_obj_cnt + 1));
+                o->suppress_conflict_obj_list[o->suppress_conflict_obj_cnt] = object;
+                o->suppress_conflict_obj_cnt++;
+                break;
+            }
         }
-        o->skip_tp_left_hold = true;
-        gui_obj_skip_all_child_left_hold(o);
     }
+    /**
+     * This child object is added to the suppression list that has the same event.
+     */
+    gui_obj_suppress_child_event(object, filter);
 }
 
-void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj)
-{
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
-    {
-        o->skip_tp_right_hold = true;
-    }
-}
 
-void gui_obj_skip_all_child_right_hold(gui_obj_t *obj)
+bool gui_obj_event_is_suppressed(gui_obj_t *object, gui_event_t event)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    touch_info_t *tp = tp_get_info();
+    for (uint8_t i = 0; i < object->suppress_conflict_obj_cnt; i++)
     {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
+        gui_obj_t *o = object->suppress_conflict_obj_list[i];
+        for (uint8_t j = 0; j < o->event_dsc_cnt; j++)
         {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
+            gui_event_dsc_t *event_dsc = o->event_dsc + j;
+            if ((event_dsc->filter == event) && (gui_obj_point_in_obj_rect(o, tp->x, tp->y) == true))
+            {
+                return true;
+            }
         }
-        o->skip_tp_right_hold = true;
-        gui_obj_skip_all_child_right_hold(o);
     }
-}
-
-void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj)
-{
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
-    {
-        o->skip_tp_up_hold = true;
-    }
-}
-
-void gui_obj_skip_all_child_up_hold(gui_obj_t *obj)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
-    {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
-        {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
-        }
-        o->skip_tp_up_hold = true;
-        gui_obj_skip_all_child_up_hold(o);
-    }
-}
-
-void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj)
-{
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
-    {
-        o->skip_tp_down_hold = true;
-    }
-}
-
-void gui_obj_skip_all_child_down_hold(gui_obj_t *obj)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
-    {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
-        {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
-        }
-        o->skip_tp_down_hold = true;
-        gui_obj_skip_all_child_down_hold(o);
-    }
-}
-
-void gui_obj_skip_other_up_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_up_hold(o);
-    obj->skip_tp_up_hold = false;
-}
-
-void gui_obj_skip_other_down_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_down_hold(o);
-    obj->skip_tp_down_hold = false;
-}
-
-void gui_obj_skip_other_left_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_left_hold(o);
-    obj->skip_tp_left_hold = false;
-}
-
-void gui_obj_skip_other_right_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_right_hold(o);
-    obj->skip_tp_right_hold = false;
+    return false;
 }
 
 
-void gui_obj_skip_all_child_short(gui_obj_t *obj)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
-    {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
-        {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
-        }
-        o->skip_tp_short = true;
-        gui_obj_skip_all_child_short(o);
-    }
-}
-
-void gui_obj_skip_other_short(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_short(o);
-    obj->skip_tp_short = false;
-}
-
-void gui_obj_enable_this_parent_short(gui_obj_t *obj)
-{
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
-    {
-        o->skip_tp_short = false;
-    }
-}
-
-void gui_obj_skip_other_parent_short(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_short(o);
-    gui_obj_enable_this_parent_short(obj);
-}
-
-void gui_obj_skip_all_child_long(gui_obj_t *obj)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
-    {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
-        {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
-        }
-        o->skip_tp_long = true;
-        gui_obj_skip_all_child_long(o);
-    }
-}
-
-void gui_obj_skip_other_long(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_long(o);
-    obj->skip_tp_long = false;
-}
-
-void gui_obj_enable_this_parent_long(gui_obj_t *obj)
-{
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
-    {
-        o->skip_tp_long = false;
-    }
-}
-
-void gui_obj_skip_other_parent_long(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_long(o);
-    gui_obj_enable_this_parent_long(obj);
-}
-
-void gui_obj_skip_all_child_pressed(gui_obj_t *obj)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &obj->child_list)
-    {
-        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o->magic != GUI_MAGIC_NUMBER)
-        {
-            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
-            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
-            return;
-        }
-        o->skip_tp_pressed = true;
-        gui_obj_skip_all_child_pressed(o);
-    }
-}
-
-void gui_obj_skip_other_pressed(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_pressed(o);
-    obj->skip_tp_pressed = false;
-}
-
-void gui_obj_enable_this_parent_pressed(gui_obj_t *obj)
-{
-    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
-    {
-        o->skip_tp_pressed = false;
-    }
-}
-
-void gui_obj_skip_other_parent_pressed(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-
-    gui_obj_skip_all_child_pressed(o);
-    gui_obj_enable_this_parent_pressed(obj);
-}

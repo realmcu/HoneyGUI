@@ -1,6 +1,7 @@
 #include <draw_img.h>
 #include <string.h>
 #include <math.h>
+#include "acc_api.h"
 
 void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
 void (* draw_img_acc_end_cb)(struct draw_img *image) = NULL;
@@ -192,8 +193,8 @@ bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 
     img->img_target_x = (int16_t)x_min;
     img->img_target_y = (int16_t)y_min;
-    img->img_target_w = ceil(x_max) - (int16_t)x_min + 1;
-    img->img_target_h = ceil(y_max) - (int16_t)y_min + 1;
+    img->img_target_w = ceilf(x_max) - (int16_t)x_min + 1;
+    img->img_target_h = ceilf(y_max) - (int16_t)y_min + 1;
     return true;
 }
 
@@ -248,6 +249,21 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
+
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
+        gui_jpeg_file_head_t *jpeg = image->data;
+
+        if (head->type == JPEG)
+        {
+            int w = 0;
+            int h = 0;
+            int channel = 0;
+            image->data = gui_acc_jpeg_load(jpeg->jpeg, jpeg->size, &w, &h, &channel);
+            image->img_w = w;
+            image->img_h = h;
+            gui_log("JPEG image caching is not supported.\n");
+            return;
+        }
         return;
     }
 
@@ -263,6 +279,14 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
     if ((src_mode == IMG_SRC_FILESYS) || (src_mode == IMG_SRC_FTL))
     {
         gui_free(img->data);
+    }
+    if (src_mode == IMG_SRC_MEMADDR)
+    {
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
+        if (head->jpeg)
+        {
+            gui_acc_jpeg_free(img->data);
+        }
     }
 }
 

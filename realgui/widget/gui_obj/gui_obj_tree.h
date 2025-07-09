@@ -59,6 +59,22 @@ extern "C" {
   */
 void gui_obj_tree_free(void *obj);
 
+
+/**
+  * @brief free the widget tree asynchronously.
+  * @param obj the root of the widget tree.
+  * <b>Example usage</b>
+  * \code{.c}
+  * static void app_main_task(gui_app_t *app)
+  * {
+  *    gui_obj_tree_free_async(&app->screen);
+  *
+  * }
+  *
+  * \endcode
+  */
+void gui_obj_tree_free_async(void *obj);
+
 /**
   * @brief free the widget tree recursively, without the root. Preorder traversal.
   * @param obj the root of the widget tree.
@@ -143,37 +159,7 @@ void gui_obj_tree_print_bfs(gui_obj_t *root);
  */
 void gui_obj_tree_print_mmd(gui_obj_t *obj);
 
-/**
- * @brief Retrieve a widget from the GUI object tree by type and index.
- *
- * This function searches the GUI object tree starting from the root and retrieves
- * a widget of the specified type and index.
- *
- * @param root Pointer to the root of the GUI object tree.
- * @param type The type of the object to find.
- * @param output Pointer to where the found object should be stored.
- * @param index The index of the object to retrieve.
- */
-void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
-                                               int index);
 
-/**
- * @brief Get an array of widget objects from the GUI object tree by type.
- *
- * This function searches the GUI object tree starting from the root and
- * retrieves an array of widget objects of the specified type.
- *
- * @param root Pointer to the root of the GUI object tree.
- * @param type The type of the object to find.
- * @param output_array Pointer to an array where the found objects should be stored.
- * @param length Pointer to an integer where the length of the array should be stored.
- *
- * @return 0 if successful, -1 if not successful.
- */
-int gui_obj_tree_get_widget_array_by_type(gui_obj_t *root,
-                                          T_OBJ_TYPE type,
-                                          gui_obj_t ***output_array,
-                                          int *length);
 
 #ifdef __cplusplus
 }

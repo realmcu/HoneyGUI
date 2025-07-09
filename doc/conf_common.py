@@ -22,8 +22,33 @@ sys.path.append(JenkinsBuild_doc_Dir)
 ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
  
 html_context = {
-    'current_year': datetime.now().year,
-    "EnvType": os.getenv("EnvType", None)
+    'current_year': datetime.now().year, # Set the Copyright year of footer
+    "show_sphinx": False, # remove 'Powered by Sphinx' at the bottom
+    "SDK": os.getenv("SDK", None),
+    "EnvType": os.getenv("EnvType", None),
+    # 如果是多语言文档，is_multilingual设置为 True
+    "is_multilingual": True,
+    # 左侧目录栏的拖拽宽度，不同的文档项目使用不同的名称，如：
+    # docs.honeycomb.siderbar.width
+    # docs.bee4.siderbar.width
+    # docs.honeygui.siderbar.width
+    # docs.matter.siderbar.width
+    # docs.bee3plus.siderbar.width
+    # docs.watch.siderbar.width
+    # ...
+    # RD 自行配置
+    "left_nav_width": "docs.honeygui.siderbar.width",
+    # 文档的AI 知识库名称，不同的文档项目使用不同的名称，如：
+    # RS_sdk-rtl87x3e-common
+    # RS_sdk-rtl87x3e-headset
+    # RS_sdk-rtl87x3e-watch
+    # RS_sdk-rtl87x2g-common
+    # RS_sdk-rtl8752h-common
+    # RS_gui
+    # RS_matter
+    # ...
+    # RD 自行配置（Note：）
+    "chat_aibase": "RS_gui",
 }
 
 project = 'RTKIOT GUI'
@@ -102,6 +127,11 @@ html_js_files = [
     'js/custom.js',
     'js/versions.js',
     'js/imgmodal.js',
+    'js/aisummary.js',
+    'js/chatwidget.js',
+    'js/marked.min.js',
+    'js/typed.umd.js',
+    'js/purify.min.js'
 ]
 
 html_logo = './_static/image/logo.png'
@@ -201,6 +231,7 @@ breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
 
 breathe_default_members = ('inner', 'members', 'protected-members', 'private-members', 'undoc-members')
 breathe_show_include = False
+breathe_show_define_initializer=True
 # breathe_debug_trace_directives = True
 # breathe_debug_trace_qualification = True
 

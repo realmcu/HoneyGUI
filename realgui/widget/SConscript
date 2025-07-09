@@ -6,23 +6,10 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-src = Glob('*.c')
-src += Glob('*.cpp')
-SrcRemove(src,'gui_scroll_wheel.c')
-SrcRemove(src,'gui_bitmap.c')
-
-if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
-    SrcRemove(src,'gui_lvgl.c')
-
-if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
-    SrcRemove(src,'gui_px.c')
-
-if not GetDepend(['CONFIG_REALTEK_BUILD_U8G2']):
-    SrcRemove(src,'gui_u8g2.c')
 
 CPPPATH = [cwd]
 
-objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+objs = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 list = os.listdir(cwd)
 for d in list:

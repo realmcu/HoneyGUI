@@ -3,38 +3,37 @@
 from building import *
 
 cwd = GetCurrentDir()
+list = os.listdir(cwd)
 src = Split("""
 """)
 
 
+src += ['acc_api.c']
 src += ['draw_img.c']
 src += ['gui_matrix.c']
 src += ['draw_font.c']
 src += ['font_mem.c']
 src += ['font_mem_img.c']
 src += ['font_mem_matrix.c']
+src += ['font_rendering_utils.c']
 src += ['font_stb.c']
 src += ['font_ttf.c']
-src += ['acc_sw.c']
-src += ['acc_sw_raster.c']
-src += ['acc_init.c']
-src += ['acc_sw_blend.c']
-src += ['acc_sw_rle.c']
-src += ['acc_sw_cover.c']
-src += ['acc_sw_bypass.c']
-src += ['acc_sw_filter.c']
-src += ['acc_sw_rle_bypass.c']
-src += ['acc_sw_rle_cover.c']
-src += ['acc_sw_rle_filter.c']
-
-if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
-    src += ['acc_vg_lite.c']
+src += ['engine_gray.c']
+src += ['gui_post_process.c']
+src += ['acc_arm2d.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE']):
     src += ['font_freetype.c']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
+
+if GetDepend('CONFIG_REALTEK_HONEYGUI'):
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            if not os.path.isfile(os.path.join(path, 'SConstruct')):
+                group = group + SConscript(os.path.join(d, 'SConscript'))
 
 Return('group')

@@ -33,47 +33,52 @@ extern "C" {
 typedef enum
 {
     TOUCH_INIT                  = 0x100,
-    TOUCH_HOLD_X                = 0x101,
-    TOUCH_HOLD_Y                = 0x102,
-    TOUCH_SHORT                 = 0x103,
-    TOUCH_LONG                  = 0x104,
-    TOUCH_ORIGIN_FROM_X         = 0x105,
-    TOUCH_ORIGIN_FROM_Y         = 0x106,
-    TOUCH_LEFT_SLIDE            = 0x107,
-    TOUCH_RIGHT_SLIDE           = 0x108,
-    TOUCH_UP_SLIDE              = 0x109,
-    TOUCH_DOWN_SLIDE            = 0x10A,
-    TOUCH_SHORT_BUTTON          = 0x10B,
-    TOUCH_LONG_BUTTON           = 0x10C,
-    TOUCH_UP_SLIDE_TWO_PAGE     = 0x10D,
-    TOUCH_DOWN_SLIDE_TWO_PAGE   = 0x10E,
-    TOUCH_INVALIDE              = 0x10F,
+    TOUCH_HOLD_X,
+    TOUCH_HOLD_Y,
+    TOUCH_SHORT,
+    TOUCH_LONG,
+    TOUCH_DOUBLE,
+    TOUCH_ORIGIN_FROM_X,
+    TOUCH_ORIGIN_FROM_Y,
+    TOUCH_LEFT_SLIDE,
+    TOUCH_RIGHT_SLIDE,
+    TOUCH_UP_SLIDE,
+    TOUCH_DOWN_SLIDE,
+    TOUCH_SHORT_BUTTON,
+    TOUCH_LONG_BUTTON,
+    TOUCH_UP_SLIDE_TWO_PAGE,
+    TOUCH_DOWN_SLIDE_TWO_PAGE,
+    TOUCH_INVALIDE              = 0x1FF,
 
     KB_INIT                     = 0x200,
     KB_SHORT                    = 0x201,
     KB_LONG                     = 0x202,
-    KB_INVALIDE                 = 0x203,
+    KB_INVALIDE                 = 0x2FF,
 
     WHEEL_INIT                  = 0x300,
-    WHEEL_ING                   = 0x301,
-    WHEEL_FINISHED              = 0x302,
-    WHEEL_INVALIDE              = 0x303,
+    WHEEL_ING,
+    WHEEL_FINISHED,
+    WHEEL_INVALIDE              = 0x3FF,
 } T_GUI_INPUT_TYPE;
 /* T_GUI_INPUT_TYPE enum end*/
 
 
 typedef struct touch_info
 {
+    T_GUI_INPUT_TYPE type;
     int16_t deltaX;
     int16_t deltaY;
     int16_t x;
     int16_t y;
     int16_t history_x;
     int16_t history_y;
-    uint32_t type;
     uint8_t pressed  : 1;
     uint8_t released : 1;
     uint8_t pressing : 1;
+    uint8_t left_moved : 1;
+    uint8_t right_moved : 1;
+    uint8_t up_moved : 1;
+    uint8_t down_moved : 1;
     uint8_t button_down  : 1;
     uint8_t button_up  : 1;
     uint8_t button_hold  : 1;
@@ -81,7 +86,7 @@ typedef struct touch_info
 
 typedef struct kb_info
 {
-    uint32_t type;
+    T_GUI_INPUT_TYPE type;
     char *string[20];
     uint8_t pressed             : 1;
     uint8_t released            : 1;
@@ -91,7 +96,7 @@ typedef struct kb_info
 
 typedef struct wheel_info
 {
-    uint32_t type;
+    T_GUI_INPUT_TYPE type;
     int16_t delta;
 } wheel_info_t;
 

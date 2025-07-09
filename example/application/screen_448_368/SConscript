@@ -1,0 +1,29 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+SrcRemove(src,'app_calculator.c')
+
+if not GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
+    SrcRemove(src,'app_lvgl.c')
+
+CPPPATH = [cwd]
+CPPPATH += [cwd + '\\root_image_hongkong']
+
+CPPDEFINES = []
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_448_368_DEMO'):
+    CPPDEFINES += ['ENABLE_RTK_GUI_448_368_DEMO']
+    CPPDEFINES += ['DRV_LCD_WIDTH=368']
+    CPPDEFINES += ['DRV_LCD_HIGHT=448']
+    CPPDEFINES += ['DRV_PIXEL_BITS=32']
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_BOX2D'):
+    src += Glob('./*.cpp') 
+    CPPDEFINES += ['ENABLE_RTK_GUI_BOX2D']
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_448_368_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('group')

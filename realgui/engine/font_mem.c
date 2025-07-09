@@ -1,6 +1,7 @@
 #include <string.h>
 #include "draw_font.h"
 #include "font_mem.h"
+#include "font_rendering_utils.h"
 
 MEM_FONT_LIB font_lib_tab[10];
 uint8_t get_fontlib_by_size(uint8_t font_size)
@@ -867,654 +868,74 @@ void gui_font_mem_obj_destroy(gui_text_t *text)
     return;
 }
 
-// Fast RGB565 pixel blending
-// Found in a pull request for the Adafruit framebuffer library. Clever!
-// https://github.com/tricorderproject/arducordermini/pull/1/files#diff-d22a481ade4dbb4e41acc4d7c77f683d
-gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
-{
-    // Alpha converted from [0..255] to [0..31]
-    alpha = (alpha + 4) >> 3;
-    // Converts  0000000000000000rrrrrggggggbbbbb
-    //     into  00000gggggg00000rrrrr000000bbbbb
-    // with mask 00000111111000001111100000011111
-    // This is useful because it makes space for a parallel fixed-point multiply
-    // bg = (bg | (bg << 16)) & 0b00000111111000001111100000011111;
-    // fg = (fg | (fg << 16)) & 0b00000111111000001111100000011111;
-    bg = (bg | (bg << 16)) & 0x7e0f81f;
-    fg = (fg | (fg << 16)) & 0x7e0f81f;
-    // This implements the linear interpolation formula: result = bg * (1.0 - alpha) + fg * alpha
-    // This can be factorized into: result = bg + (fg - bg) * alpha
-    // alpha is in Q1.5 format, so 0.0 is represented by 0, and 1.0 is represented by 32
-    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
-    result >>= 5;
-    result += bg;
-    // result &= 0b00000111111000001111100000011111; // mask out fractional parts
-    result &= 0x7e0f81f;
-    return (uint16_t)((result >> 16) | result); // contract result
-}
-gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
-{
-    uint32_t mix;
-    uint8_t back_a = 0xff - alpha;
-    mix = 0xff000000;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
-    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
-    return mix;
-}
-gui_inline uint16_t rgba2565(gui_color_t rgba)
-{
-    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
-    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
-    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
-    return red + gre + blu;
-}
 static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
                              gui_text_rect_t *rect, bool crop)
 {
-    if (chr->dot_addr == NULL)
-    {
-        //gui_log("%s chr0x%x", __FUNCTION__, chr);
-        return;
-    }
-    uint8_t *dots = chr->dot_addr;
+    if (chr->dot_addr == NULL) { return; }
     gui_dispdev_t *dc = gui_get_dc();
-    int font_x = chr->x;
-    int font_y = chr->y + chr->char_y;
-    int font_w = chr->w;
-    int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), dc->section.x1);
-    int x_end;
-    if (rect->xboundright != 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(font_x + chr->char_w, dc->section.x2 + 1), rect->xboundright);
-    }
-    else
-    {
-        x_end = _UI_MIN(font_x + chr->char_w, dc->section.x2 + 1);
-    }
-    int y_start = _UI_MAX(dc->section.y1, _UI_MAX(font_y, rect->yboundtop));
-    int y_end;
-    if (rect->yboundbottom != 0)
-    {
-        y_end = _UI_MIN(_UI_MIN(dc->section.y2 + 1, font_y + chr->char_h), rect->yboundbottom);
-    }
-    else
-    {
-        y_end = _UI_MIN(dc->section.y2 + 1, font_y + chr->char_h);
-    }
-    if ((x_start >= x_end) || (y_start >= y_end))
-    {
-        //gui_log("x_start %d x_end %d y start %d yend %d", x_start, x_end, y_start, y_end);
-        return;
-    }
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    switch (rendor_mode)
-    {
-    case 2:
-        if (dc_bytes_per_pixel == 2)
-        {
-#if 1 //0 - Stable slow processing , 1 - Fast processing in tests
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_output = rgba2565(color);
-            uint8_t ppb = 4;//pixel_per_byte = 8 / rendor_mode
-            int write_off = (y_start - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
-            int dots_off = (y_start - font_y) * (font_w / ppb);
-            int left_offset = 0, right_offset = 0, byte = 0;
-            uint16_t color_back;
-            uint8_t alpha_2bit;
-            if (font_x + chr->char_w > x_end)
-            {
-                while (font_x + ppb * byte < x_end)
-                {
-                    byte++;
-                }
-                right_offset = x_end - font_x - ppb * byte + ppb;
-                byte = 0;
-            }
-            if (font_x < x_start)
-            {
-                byte = 0;
-                while (font_x + ppb * byte < x_start)
-                {
-                    byte++;
-                }
-                left_offset = font_x + ppb * byte - x_start;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                uint8_t *temp_p = &dots[dots_off + byte];
 
-                for (uint32_t j = x_start; j < x_start + left_offset; j++)
-                {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                    ((j - font_x) % ppb * 2);
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x03;
-                        alpha = alpha * 85;
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                    }
-                }
-                for (uint32_t j = x_start + left_offset; j < x_end - right_offset;)
-                {
-                    uint8_t alpha = *temp_p;
-                    if (alpha != 0)
-                    {
-                        if (alpha & 0x03)
-                        {
-                            alpha_2bit = alpha & 0x03;
-                            if (alpha_2bit == 0x03)
-                            {
-                                writebuf[write_off + j - dc->section.x1] = color_output;
-                            }
-                            else
-                            {
-                                alpha_2bit *= 85;
-//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
-                                color_back = writebuf[write_off + j - dc->section.x1];
-                                writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
-                            }
-                        }
-                        if (alpha & 0x0C)
-                        {
-                            alpha_2bit = (alpha >> 2) & 0x03;
-                            if (alpha_2bit == 0x03)
-                            {
-                                writebuf[write_off + j + 1 - dc->section.x1] = color_output;
-                            }
-                            else
-                            {
-                                alpha_2bit *= 85;
-//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
-                                color_back = writebuf[write_off + j + 1 - dc->section.x1];
-                                writebuf[write_off + j + 1 - dc->section.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                                alpha_2bit);
-                            }
-                        }
-                        if (alpha & 0x30)
-                        {
-                            alpha_2bit = (alpha >> ppb) & 0x03;
-                            if (alpha_2bit == 0x03)
-                            {
-                                writebuf[write_off + j + 2 - dc->section.x1] = color_output;
-                            }
-                            else
-                            {
-                                alpha_2bit *= 85;
-//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
-                                color_back = writebuf[write_off + j + 2 - dc->section.x1];
-                                writebuf[write_off + j + 2 - dc->section.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                                alpha_2bit);
-                            }
-                        }
-                        if (alpha & 0xC0)
-                        {
-                            alpha_2bit = (alpha >> 6) & 0x03;
-                            if (alpha_2bit == 0x03)
-                            {
-                                writebuf[write_off + j + 3 - dc->section.x1] = color_output;
-                            }
-                            else
-                            {
-                                alpha_2bit *= 85;
-//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
-                                color_back = writebuf[write_off + j + 3 - dc->section.x1];
-                                writebuf[write_off + j + 3 - dc->section.x1] = alphaBlendRGB565(color_output, color_back,
-                                                                                                alpha_2bit);
-                            }
-                        }
-                    }
-                    temp_p++;
-                    j += ppb;
-                }
-                for (uint32_t j = x_end - right_offset; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                    ((j - font_x) % ppb * 2);
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x03;
-                        alpha = alpha * 85;
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                    }
-                }
-                write_off += dc->section.x2 - dc->section.x1 + 1;
-                dots_off += (font_w / ppb);
-            }
-#else
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_output = rgba2565(color);
-            uint16_t color_back;
-            uint8_t alpha_list[1 << rendor_mode];
-            uint8_t ppb = 4;//pixel_per_byte = 8 / rendor_mode
-            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-            for (int i = 0; i < 1 << rendor_mode; i++)
-            {
-                alpha_list[i] = i * pre_alpha;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                    ((j - font_x) % ppb * 2);
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x03;
-                        alpha = alpha_list[alpha];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                    }
-                }
-            }
-#endif
+    const int x_start = _UI_MAX3(chr->x, rect->xboundleft, dc->section.x1);
+    const int x_end = _UI_MIN3(
+                          chr->x + chr->char_w - 1,
+                          rect->xboundright ? rect->xboundright : dc->section.x2,
+                          dc->section.x2
+                      );
+
+    const int y_start = _UI_MAX3(chr->y + chr->char_y, rect->yboundtop, dc->section.y1);
+    const int y_end = _UI_MIN3(
+                          chr->y + chr->char_y + chr->char_h - 1,
+                          rect->yboundbottom ? rect->yboundbottom : dc->section.y2,
+                          dc->section.y2
+                      );
+    if (x_start >= x_end || y_start >= y_end) { return; }
+
+    draw_font_t df =
+    {
+        .color = color,
+        .render_mode = rendor_mode,
+        .target_buf = dc->frame_buf,
+        .target_buf_stride = dc->fb_width * dc->bit_depth / 8,
+        .clip_rect = {
+            .x1 = x_start,
+            .y1 = y_start,
+            .x2 = x_end,
+            .y2 = y_end,
+        },
+        .target_rect = {
+            .x1 = dc->section.x1,
+            .y1 = dc->section.y1,
+            .x2 = dc->section.x2,
+            .y2 = dc->section.y2,
         }
-        else if (dc_bytes_per_pixel == 3)
-        {
-            uint8_t *writebuf = (uint8_t *)dc->frame_buf;
-            uint8_t color_back[3];
-            uint8_t alpha_list[1 << rendor_mode];
-            uint8_t ppb = 4;//pixel_per_byte = 8 / rendor_mode
-            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-            for (int i = 0; i < 1 << rendor_mode; i++)
-            {
-                alpha_list[i] = i * pre_alpha;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                    ((j - font_x) % ppb * 2);
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x03;
-                        alpha = alpha_list[alpha];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back[0] = writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1];
-                        color_back[1] = writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1];
-                        color_back[2] = writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1];
-                        writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1] = (color.color.rgba.b * alpha + color_back[2] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1] = (color.color.rgba.g * alpha + color_back[1] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1] = (color.color.rgba.r * alpha + color_back[0] *
-                                                                                (0xff - alpha)) / 0xff;
-                    }
-                }
-            }
-        }
-        else if (dc_bytes_per_pixel == 4)
-        {
-            uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-            uint32_t color_back;
-            uint8_t alpha_list[1 << rendor_mode];
-            uint8_t ppb = 4;//pixel_per_byte = 8 / rendor_mode
-            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-            for (int i = 0; i < 1 << rendor_mode; i++)
-            {
-                alpha_list[i] = i * pre_alpha;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                    ((j - font_x) % ppb * 2);
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x03;
-                        alpha = alpha_list[alpha];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGBA(color, color_back, alpha);
-                    }
-                }
-            }
-        }
+
+    };
+
+    switch (dc->bit_depth)
+    {
+    case 16:
+        df.target_format = RGB565;
         break;
-    case 4:
-        if (dc_bytes_per_pixel == 2)
-        {
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_back;
-            uint16_t color_output = rgba2565(color);
-            uint8_t alpha_list[1 << rendor_mode];
-            uint8_t ppb = 2;//pixel_per_byte = 8 / rendor_mode
-            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-            for (int i = 0; i < 1 << rendor_mode; i++)
-            {
-                alpha_list[i] = i * pre_alpha;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                    ((j - font_x) % ppb * 4);
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x0f;
-                        alpha = alpha_list[alpha];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                    }
-                }
-            }
-        }
-        else if (dc_bytes_per_pixel == 3)
-        {
-            uint8_t *writebuf = (uint8_t *)dc->frame_buf;
-            uint8_t color_back[3];
-            uint8_t alpha_list[1 << rendor_mode];
-            uint8_t ppb = 2;//pixel_per_byte = 8 / rendor_mode
-            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-            for (int i = 0; i < 1 << rendor_mode; i++)
-            {
-                alpha_list[i] = i * pre_alpha;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = (dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                     ((j - font_x) % ppb * 4));
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x0f;
-                        alpha = alpha_list[alpha];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back[0] = writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1];
-                        color_back[1] = writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1];
-                        color_back[2] = writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1];
-                        writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1] = (color.color.rgba.b * alpha + color_back[2] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1] = (color.color.rgba.g * alpha + color_back[1] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1] = (color.color.rgba.r * alpha + color_back[0] *
-                                                                                (0xff - alpha)) / 0xff;
-                    }
-                }
-            }
-        }
-        else if (dc_bytes_per_pixel == 4)
-        {
-            uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-            uint32_t color_back;
-            uint8_t alpha_list[1 << rendor_mode];
-            uint8_t ppb = 2;//pixel_per_byte = 8 / rendor_mode
-            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-            for (int i = 0; i < 1 << rendor_mode; i++)
-            {
-                alpha_list[i] = i * pre_alpha;
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = (dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
-                                     ((j - font_x) % ppb * 4));
-                    if (alpha != 0)
-                    {
-                        alpha = alpha & 0x0f;
-                        alpha = alpha_list[alpha];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGBA(color, color_back, alpha);
-                    }
-                }
-            }
-        }
+    case 32:
+        df.target_format = ARGB8888;
         break;
     case 8:
-        if (dc_bytes_per_pixel == 2)
-        {
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_back;
-            uint16_t color_output = rgba2565(color);
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
-                int dots_off = (i - font_y) * font_w - font_x;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[dots_off + j];
-                    if (alpha != 0)
-                    {
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                    }
-                }
-            }
-        }
-        else if (dc_bytes_per_pixel == 3)
-        {
-            uint8_t *writebuf = (uint8_t *)dc->frame_buf;
-            uint8_t color_back[3];
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                int dots_off = (i - font_y) * font_w - font_x;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[dots_off + j];
-                    if (alpha != 0)
-                    {
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back[0] = writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1];
-                        color_back[1] = writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1];
-                        color_back[2] = writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1];
-                        writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1] = (color.color.rgba.b * alpha + color_back[2] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1] = (color.color.rgba.g * alpha + color_back[1] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1] = (color.color.rgba.r * alpha + color_back[0] *
-                                                                                (0xff - alpha)) / 0xff;
-                    }
-                }
-            }
-        }
-        else if (dc_bytes_per_pixel == 4)
-        {
-            uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-            uint32_t color_back;
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                int dots_off = (i - font_y) * font_w - font_x;
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    uint8_t alpha = dots[dots_off + j];
-                    if (alpha != 0)
-                    {
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        alpha = color.color.rgba.a * alpha / 0xff;
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGBA(color, color_back, alpha);
-                    }
-                }
-            }
-        }
-        break;
-    case 1:
-        if (dc_bytes_per_pixel == 2)
-        {
-#if 1 //0 - Stable slow processing , 1 - Fast processing in tests
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_output = rgba2565(color);
-            uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
-            int write_off = (y_start - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
-            int dots_off = (y_start - font_y) * (font_w / ppb);
-            int left_offset = 0, right_offset = 0, byte = 0;
-            uint32_t x_start_right = x_start;
-            //gui_log("%s dots_off %d", __FUNCTION__, dots_off);
-            if (font_x + chr->char_w > x_end)
-            {
-                while (font_x + ppb * byte < x_end)
-                {
-                    byte++;
-                }
-                right_offset = x_end - font_x - ppb * byte + ppb;
-                byte = 0;
-            }
-            if (font_x < x_start)
-            {
-                while (font_x + ppb * byte < x_start)
-                {
-                    byte++;
-                }
-                left_offset = font_x + ppb * byte - x_start;
-                x_start_right = _UI_MIN((x_start + left_offset), x_end);
-            }
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                uint8_t *temp_p = &dots[dots_off + byte];
-
-                for (uint32_t j = x_start; j < x_start_right; j++)
-                {
-                    if ((dots[dots_off + (j - font_x) / ppb] >> ((j - font_x) % ppb)) & 0x01)
-                    {
-                        writebuf[write_off + j - dc->section.x1] = color_output;
-                    }
-                }
-                for (int j = x_start + left_offset; j < x_end - right_offset;)
-                {
-                    uint8_t temp = *temp_p;
-                    if (temp)
-                    {
-                        uint32_t offset = write_off - dc->section.x1 + font_x + (j - font_x) / ppb * ppb;
-                        if (temp & 0x0F)
-                        {
-                            if (temp & 0x01)
-                            {
-                                writebuf[offset + 0] = color_output;
-                            }
-                            if (temp & 0x02)
-                            {
-                                writebuf[offset + 1] = color_output;
-                            }
-                            if (temp & 0x04)
-                            {
-                                writebuf[offset + 2] = color_output;
-                            }
-                            if (temp & 0x08)
-                            {
-                                writebuf[offset + 3] = color_output;
-                            }
-                        }
-                        if (temp & 0xF0)
-                        {
-                            if (temp & 0x10)
-                            {
-                                writebuf[offset + 4] = color_output;
-                            }
-                            if (temp & 0x20)
-                            {
-                                writebuf[offset + 5] = color_output;
-                            }
-                            if (temp & 0x40)
-                            {
-                                writebuf[offset + 6] = color_output;
-                            }
-                            if (temp & 0x80)
-                            {
-                                writebuf[offset + 7] = color_output;
-                            }
-                        }
-                    }
-                    temp_p++;
-                    j += ppb;
-                }
-                for (uint32_t j = x_end - right_offset; j < x_end; j++)
-                {
-                    if ((dots[dots_off + (j - font_x) / ppb] >> ((j - font_x) % ppb)) & 0x01)
-                    {
-                        writebuf[write_off + j - dc->section.x1] = color_output;
-                    }
-                }
-                write_off += dc->section.x2 - dc->section.x1 + 1;
-                dots_off += (font_w / ppb);
-            }
-#else
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_output = rgba2565(color);
-            uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
-                int dots_off = (i - font_y) * (font_w / ppb);
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    if ((dots[dots_off + (j - font_x) / ppb] >> ((j - font_x) % ppb)) & 0x01)
-                    {
-                        writebuf[write_off + j - dc->section.x1] = color_output;
-                    }
-                }
-            }
-#endif
-        }
-        else if (dc_bytes_per_pixel == 3)
-        {
-            uint8_t *writebuf = (uint8_t *)dc->frame_buf;
-            uint8_t color_back[3];
-            uint8_t alpha = color.color.rgba.a;
-            uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                int dots_off = (i - font_y) * (font_w / ppb);
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    if ((dots[dots_off + (j - font_x) / ppb] >> ((j - font_x) % ppb)) & 0x01)
-                    {
-                        color_back[0] = writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1];
-                        color_back[1] = writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1];
-                        color_back[2] = writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1];
-                        writebuf[write_off * 3 + j * 3 + 0 - dc->section.x1] = (color.color.rgba.b * alpha + color_back[2] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 1 - dc->section.x1] = (color.color.rgba.g * alpha + color_back[1] *
-                                                                                (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 2 - dc->section.x1] = (color.color.rgba.r * alpha + color_back[0] *
-                                                                                (0xff - alpha)) / 0xff;
-                    }
-                }
-            }
-        }
-        else if (dc_bytes_per_pixel == 4)
-        {
-            uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-            uint32_t color_back;
-            uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
-            for (uint32_t i = y_start; i < y_end; i++)
-            {
-                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-                int dots_off = (i - font_y) * (font_w / ppb);
-                for (uint32_t j = x_start; j < x_end; j++)
-                {
-                    if ((dots[dots_off + (j - font_x) / ppb] >> ((j - font_x) % ppb)) & 0x01)
-                    {
-                        color_back = writebuf[write_off + j - dc->section.x1];
-                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGBA(color, color_back, color.color.rgba.a);
-                    }
-                }
-            }
-        }
+        df.target_format = ALPHA8BIT;
         break;
     default:
         break;
     }
+
+    font_glyph_t glyph =
+    {
+        .data = chr->dot_addr,
+        .pos_x = chr->x,
+        .pos_y = chr->y + chr->char_y,
+        .width = chr->char_w,
+        .height = chr->char_h,
+        .stride = chr->w,
+    };
+
+    font_glyph_render(&df, &glyph);
 }
 void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data, int16_t x, int16_t y)
 {

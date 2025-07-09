@@ -303,10 +303,10 @@ void b2MotorJoint::Dump()
     b2Dump("  jd.bodyA = bodies[%d];\n", indexA);
     b2Dump("  jd.bodyB = bodies[%d];\n", indexB);
     b2Dump("  jd.collideConnected = bool(%d);\n", m_collideConnected);
-    b2Dump("  jd.linearOffset.Set(%.9g, %.9g);\n", m_linearOffset.x, m_linearOffset.y);
-    b2Dump("  jd.angularOffset = %.9g;\n", m_angularOffset);
-    b2Dump("  jd.maxForce = %.9g;\n", m_maxForce);
-    b2Dump("  jd.maxTorque = %.9g;\n", m_maxTorque);
-    b2Dump("  jd.correctionFactor = %.9g;\n", m_correctionFactor);
+    b2Dump("  jd.linearOffset.Set(%.9g, %.9g);\n", (double)m_linearOffset.x, (double)m_linearOffset.y);
+    b2Dump("  jd.angularOffset = %.9g;\n", (double)m_angularOffset);
+    b2Dump("  jd.maxForce = %.9g;\n", (double)m_maxForce);
+    b2Dump("  jd.maxTorque = %.9g;\n", (double)m_maxTorque);
+    b2Dump("  jd.correctionFactor = %.9g;\n", (double)m_correctionFactor);
     b2Dump("  joints[%d] = m_world->CreateJoint(&jd);\n", m_index);
 }

@@ -1,0 +1,16 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+src += Glob('*.cpp')
+
+
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
+
+Return('group')

@@ -34,38 +34,44 @@ extern "C" {
 typedef enum
 {
     GUI_EVENT_INVALIDE                = 0x0000,
-    /** Input device events*/
-    GUI_EVENT_TOUCH_PRESSED           = 0x0001,
-    GUI_EVENT_TOUCH_PRESSING          = 0x0002,
-    GUI_EVENT_TOUCH_CLICKED           = 0x0003,
-    GUI_EVENT_TOUCH_LONG              = 0x0004,
-    GUI_EVENT_TOUCH_RELEASED          = 0x0005,
-    GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE = 0x0006,
-    GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE  = 0x0007,
-    GUI_EVENT_TOUCH_MOVE_LEFT         = 0x0008,
-    GUI_EVENT_TOUCH_MOVE_RIGHT        = 0x0009,
-    GUI_EVENT_TOUCH_MOVE_UP           = 0x000A,
-    GUI_EVENT_TOUCH_MOVE_DOWN         = 0x000B,
+    GUI_EVENT_SYSTEM_RESET,
+    GUI_EVENT_SYSTEM_FREE,
+    GUI_EVENT_SYSTEM_SLEEP,
+    GUI_EVENT_SYSTEM_WAKEUP,
+    GUI_EVENT_SYSTEM_REBOOT,
+    GUI_EVENT_SYSTEM_POWER_OFF,
+    GUI_EVENT_SYSTEM_UPDATE,
+    /** touch device events*/
+    GUI_EVENT_TOUCH_CLICKED          = 0x0100,
+    GUI_EVENT_TOUCH_DOUBLE_CLICKED,
+    GUI_EVENT_TOUCH_LONG,
+    GUI_EVENT_TOUCH_PRESSED,
+    GUI_EVENT_TOUCH_PRESSING, // GUI_EVENT_TOUCH_HOLD,
+    GUI_EVENT_TOUCH_RELEASED,
 
-    GUI_EVENT_KB_UP_PRESSED           = 0x000C,
-    GUI_EVENT_KB_UP_RELEASED          = 0x000D,
-    GUI_EVENT_KB_DOWN_PRESSED         = 0x000E,
-    GUI_EVENT_KB_DOWN_RELEASED        = 0x000F,
+    // GUI_EVENT_TOUCH_MOVE,
+    GUI_EVENT_TOUCH_MOVE_LEFT,
+    GUI_EVENT_TOUCH_MOVE_RIGHT,
+    GUI_EVENT_TOUCH_MOVE_UP,
+    GUI_EVENT_TOUCH_MOVE_DOWN,
 
-    GUI_EVENT_KB_SHORT_CLICKED        = 0x0010,
-    GUI_EVENT_KB_LONG_CLICKED         = 0x0011,
-    /** Special events*/
-    GUI_EVENT_VIEW_SWITCH_DIRECT      = 0x0012,
-    /** Other events*/
-    GUI_EVENT_1                       = 0x0013,
-    GUI_EVENT_2                       = 0x0014,
-    GUI_EVENT_3                       = 0x0015,
-    GUI_EVENT_4                       = 0x0016,
-    GUI_EVENT_5                       = 0x0017,
-    GUI_EVENT_6                       = 0x0018,
-    GUI_EVENT_7                       = 0x0019,
-    GUI_EVENT_8                       = 0x001A,
+    GUI_EVENT_TOUCH_SCROLL_HORIZONTAL,
+    GUI_EVENT_TOUCH_SCROLL_VERTICAL,
 
+    GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE,
+    GUI_EVENT_TOUCH_TOUCH_LEFT_SLIDE,
+
+
+    /** keyboard device events*/
+    GUI_EVENT_KB_UP_PRESSED          = 0x0200,
+    GUI_EVENT_KB_UP_RELEASED,
+    GUI_EVENT_KB_DOWN_PRESSED,
+    GUI_EVENT_KB_DOWN_RELEASED,
+    GUI_EVENT_KB_SHORT_CLICKED,
+    GUI_EVENT_KB_LONG_CLICKED,
+
+    GUI_EVENT_VIEW_SWITCH_DIRECT,
+    /** wheel device events*/
 
 } gui_event_t;
 
@@ -98,7 +104,6 @@ typedef struct _gui_event_dsc_t
     gui_event_cb_t event_cb;
     void *user_data;
     gui_event_t filter;
-    gui_event_t event_code;
 } gui_event_dsc_t;
 
 #ifdef __cplusplus

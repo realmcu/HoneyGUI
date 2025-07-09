@@ -28,7 +28,7 @@ LPATH = ''
 
 CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc'
 
-CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11'
+CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion'
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
 
 LFLAGS = ' -T default.ld'

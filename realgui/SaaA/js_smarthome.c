@@ -26,15 +26,23 @@ DECLARE_HANDLER(test)
     // memcpy(&(msg.payload), data, sizeof(data));
     // gui_extern_event_js_handler(&msg);
 
+
+
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS};
+    uint8_t extern_event_type = EXTERN_EVENT_SMARTHOME;  // 0x01
+    uint8_t sub_event_type = SH_EVENT_IOT_SWITCH;       // 0x01
     uint8_t id = 5;     // device ID (count from 0)
     uint8_t state = val;  // device Status (0:off, 1:on, 2:offline, 3:online)
-    uint32_t data = 0;
-    uint8_t *pdata = (uint8_t *)&data;
+    uint8_t data[] = {0x00, 0x00, 0x00, 0x00};
 
-    pdata[0] = id;
-    pdata[1] = state;
+    data[0] = extern_event_type;
+    data[1] = sub_event_type;
+    data[2] = id;
+    data[3] = state;
 
-    gui_send_msg_to_js(EXTERN_EVENT_SMARTHOME, SH_EVENT_IOT_SWITCH, (void *)data);
+    memcpy(&(msg.cb), data, sizeof(data));
+    // gui_extern_event_js_handler(&msg);
+    gui_send_msg_to_server(&msg);
 
     return jerry_create_undefined();
 }
@@ -81,7 +89,6 @@ typedef struct
     // uint8_t type;    // widget type
     uint8_t index;   // widget index
     uint8_t act;     // widget action
-    uint8_t data[2];
 } msg_sh_base_t;
 
 
@@ -116,17 +123,45 @@ void gui_sh_event_sw_handler(msg_sh_base_t *msg_sw)
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
+// typedef struct gui_msg
+// {
+//     uint16_t event;
+//     gui_msg_cb cb;  // typedef void (*gui_msg_cb)(void *);
+//     void *payload;
+// } gui_msg_t;
+
+typedef struct
+{
+    /* user field of event */
+    union
+    {
+        struct
+        {
+            uint8_t extern_event_type;
+            uint8_t sh_event_type;
+            uint8_t data[2];
+        };
+        gui_msg_cb cb;    // gui_msg
+    };
+    union
+    {
+        uint8_t data_rsv[4];   // reserve
+        void *payload;   // gui_msg
+    };
+} gui_msg_sh_t;
 
 
 // smarthome event
 void gui_extern_event_sh_handler(gui_msg_js_t *js_msg)
 {
-    gui_log("sh_event_type: %d", js_msg->js_subevent);
-    switch (js_msg->js_subevent)
+    gui_msg_sh_t *sh_msg = (gui_msg_sh_t *)js_msg;
+
+    gui_log("sh_event_type: %d", sh_msg->sh_event_type);
+    switch (sh_msg->sh_event_type)
     {
     case SH_EVENT_IOT_SWITCH:
         {
-            gui_sh_event_sw_handler((msg_sh_base_t *)(js_msg->data));
+            gui_sh_event_sw_handler((msg_sh_base_t *)(sh_msg->data));
             break;
         }
 

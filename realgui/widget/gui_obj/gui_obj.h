@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_obj.h
-  * @brief  object widget
-  * @details create a object
+  * @brief  The object widget.
+  * @details Create a object.
   * @author luke_sun@realsil.com.cn
   * @date 2023/10/25
   * @version 1.0
@@ -64,7 +64,26 @@ extern "C" {
  *============================================================================*/
 
 /**
-  * @param this_widget pointer to the GUI image object.
+ * @brief Get the root GUI object.
+ *
+ * This function returns a pointer to the root GUI object in the widget tree.
+ *
+ * @return A pointer to the root GUI object.
+ */
+gui_obj_t *gui_obj_get_root(void);
+
+/**
+ * @brief Get the fake_root GUI object, which would not be drawn.
+ *
+ * This function returns a pointer to the fake_root GUI object in the widget tree.
+ *
+ * @return A pointer to the fake_root GUI object.
+ */
+gui_obj_t *gui_obj_get_fake_root(void);
+
+#ifndef DOXYGEN
+/**
+  * @param _this pointer to the GUI image object.
   * @param parent the father widget it nested in.
   * @param filename the obj widget name.
   * @param x the X-axis coordinate of the widget.
@@ -82,13 +101,14 @@ extern "C" {
   * }
   * \endcode
   */
-void gui_obj_ctor(gui_obj_t  *this_widget,
+void gui_obj_ctor(gui_obj_t  *_this,
                   gui_obj_t  *parent,
                   const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
                   int16_t     h);
+#endif
 
 /**
  * @brief creat an obj widget.
@@ -126,6 +146,19 @@ gui_obj_t *gui_obj_create(void       *parent,
   */
 void gui_obj_show(void *obj, bool enable);
 
+
+/**
+ * @brief judge the obj if out of screen.
+ */
+bool gui_obj_out_screen(gui_obj_t *obj);
+
+/**
+ * @brief Calculate the clipping rectangle of a GUI object relative to its top-level ancestor.
+ *
+ * @param obj The GUI object for which the clipping rectangle is calculated.
+ * @param rect The output rectangle that will contain the calculated clipping area.
+ */
+void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect);
 
 /**
  * @brief judge the obj if in range of this_widget rect.
@@ -332,6 +365,27 @@ void gui_update_speed_by_displacement(int *speed, int speed_recode[], int displa
  * @param y   The new y-coordinate for the widget object.
  */
 void gui_obj_move(gui_obj_t *obj, int x, int y);
+
+/**
+ * @brief Set a timer for a GUI object.
+ *
+ * This function sets a timer for the specified GUI object with a given interval.
+ * The timer can be configured to reload automatically or run only once.
+ * When the timer expires, the provided callback function is called.
+ *
+ * @param obj Pointer to the GUI object to set the timer for.
+ * @param interval The interval in milliseconds for the timer.
+ * @param reload Boolean flag indicating whether the timer should reload automatically (true) or run only once (false).
+ * @param callback Pointer to the callback function to be called when the timer expires.
+ */
+void gui_obj_create_timer(gui_obj_t *obj, uint32_t interval, bool reload, void (*callback)(void *));
+
+void gui_obj_delete_timer(gui_obj_t *obj);
+
+void gui_obj_start_timer(gui_obj_t *obj);
+
+void gui_obj_stop_timer(gui_obj_t *obj);
+
 
 #ifdef __cplusplus
 }

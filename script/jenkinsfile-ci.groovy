@@ -11,7 +11,7 @@ SDK_PATH_RELATIVE_TO_WORKSPACE = ''
 SDK_BRANCH = ''
 
 HONEYGUI_BRANCH_CUT_MAP = [
-    "master":[
+    "-dev":[
         "cutThrottle" : "BB2CCutTest",
     ]
 ]

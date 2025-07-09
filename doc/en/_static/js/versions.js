@@ -3,7 +3,7 @@ const  versionArr = [];
 
 function fetch_versions()
 {
-    var fetchURL = "https://docs.realmcu.com/gui/versionlist.txt";
+    var fetchURL = "https://docs.realmcu.com/versionlist.txt";
     return fetch(fetchURL)
         .then(res => res.text())
         .then(text => {
@@ -45,6 +45,7 @@ function change_version()
     window.location.href = location.href.replace(cur_ver, next_ver);
 }
 
+/* ============= Init version selector ============= */
 document.addEventListener('DOMContentLoaded', (event) => {
     fetch_versions().then(() => {
         gen_version_selector();

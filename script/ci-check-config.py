@@ -30,13 +30,15 @@ ci_check_config = {
         r"realgui/3rd/",
         r"lvgl_v8/",
         r"lvgl_v9/",
-        r"realgui/example/screen_454_454",
-        r"realgui/example/screen_320_385",
+        r"example/application/screen_454_454",
+        r"example/application/screen_320_385",
         r"doc/cn",
         r"doc/en/_templates/",
         r"menu_config_win.py",
         r"README.md",
-        r"README_zh.md"
+        r"README_zh.md",
+        r"example/widget/text/test_font_vector_rendering_benchmark.c",
+        r"example/widget/text/test_font_bitmap_rendering_benchmark.c",
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",
@@ -102,6 +104,18 @@ ci_check_config = {
                 "fail-fast": True,
                 "gerrit-label": True,
                 "ignore-if-set": True # if this label is already set, then ignore this step, only take effect when funciton is None
+            },
+            "Reviewer-Check": {
+                "function": None,
+                "label-value": '+1',
+                "fail-fast": True,
+                "gerrit-label": True
+            },
+            "SDK-API-Review": {
+                "function": None,
+                "label-value": '+2',
+                "fail-fast": True,
+                "gerrit-label": True
             },
             #"repo-custom-check": {
             #    "function": None,

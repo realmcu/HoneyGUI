@@ -50,35 +50,38 @@ Widgets
     :maxdepth: 2
 
     Obj <gui_obj>
-    Window <gui_window>
     Img <gui_img>
-    Simple Img <gui_simple_img>
-    STB Img <gui_img_stb>
     Text <gui_text>
-    Tabview <gui_tabview>
-    Tab <gui_tab>
-    Curtainview <gui_curtainview>
-    Curtain <gui_curtain>
-    Cardview <gui_cardview>
-    Card <gui_card>
-    Page <gui_page>
-    Page List <gui_pagelist>
-    Switch <gui_switch>
-    Grid <gui_grid>
-    Progressbar <gui_progressbar>
-    Canvas <gui_canvas>
-    Cube <gui_cube>
-    Wheel List <gui_wheel_list>
-    Perspective <gui_perspective>
-    SVG <gui_svg>
-    Watch Gradient Spot <gui_watch_gradient_spot>
-    Watchface Gradient <gui_watchface_gradient>
-    Menu Cellular <gui_menu_cellular>
-    Return <gui_return>
-	Qbcode <gui_qbcode>
-    Multi Level <gui_multi_level>
-    LiteGFX <gui_widget_litegfx>
-    2.5D Soccer <gui_soccer>
     3D Model <gui_3D>
-    Prism Mirror 3D Model <gui_prism_mirror3d>
     View <gui_view>
+    List <gui_list>
+    Canvas <gui_canvas>
+    Menu Cellular <gui_menu_cellular>
+
+.. Window <gui_window>
+.. Simple Img <gui_simple_img>
+.. STB Img <gui_img_stb>
+.. Tabview <gui_tabview>
+.. Tab <gui_tab>
+.. Curtainview <gui_curtainview>
+.. Curtain <gui_curtain>
+.. Cardview <gui_cardview>
+.. Card <gui_card>
+.. Page <gui_page>
+.. Page List <gui_pagelist>
+.. Switch <gui_switch>
+.. Grid <gui_grid>
+.. Progressbar <gui_progressbar>
+.. Canvas <gui_canvas>
+.. Cube <gui_cube>
+.. Wheel List <gui_wheel_list>
+.. Perspective <gui_perspective>
+.. SVG <gui_svg>
+.. Watch Gradient Spot <gui_watch_gradient_spot>
+.. Watchface Gradient <gui_watchface_gradient>
+.. Return <gui_return>
+.. Qbcode <gui_qbcode>
+.. Multi Level <gui_multi_level>
+.. LiteGFX <gui_widget_litegfx>
+.. 2.5D Soccer <gui_soccer>
+.. Prism Mirror 3D Model <gui_prism_mirror3d>

@@ -22,6 +22,7 @@
 #include "font_mem.h"
 #include <stddef.h>
 #include <math.h>
+#include "font_rendering_utils.h"
 
 
 /*============================================================================*
@@ -85,7 +86,7 @@ static const uint8_t lookup_table_4b[16] =
     and it only needs to be enabled when the compiler's auto-vectorization feature is turned on.
     It will reduce rendering speed and increase memory overhead.
 */
-#define FIX_AUTO_VECTORIZE   0
+#define FIX_AUTO_VECTORIZE   1
 
 #define ALIGN_TO(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
 #define ROUNDING_OFFSET 0.5f
@@ -241,55 +242,6 @@ void add_point_to_line(LINE_T *line, ttf_point p1, ttf_point p2)
     }
 }
 
-gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
-{
-    uint32_t mix;
-    uint8_t back_a = 0xff - alpha;
-#if defined(_WIN32)
-    mix = 0xff000000;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
-    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
-#else
-    mix = 0x000000ff;
-    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
-    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
-    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
-#endif
-    return mix;
-}
-gui_inline uint16_t rgba2565(gui_color_t rgba)
-{
-    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
-    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
-    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
-    return red + gre + blu;
-}
-
-gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
-{
-    // Alpha converted from [0..255] to [0..31]
-    alpha = (alpha + 4) >> 3;
-
-    // Converts  0000000000000000rrrrrggggggbbbbb
-    //     into  00000gggggg00000rrrrr000000bbbbb
-    // with mask 00000111111000001111100000011111
-    // This is useful because it makes space for a parallel fixed-point multiply
-    // bg = (bg | (bg << 16)) & 0b00000111111000001111100000011111;
-    // fg = (fg | (fg << 16)) & 0b00000111111000001111100000011111;
-    bg = (bg | (bg << 16)) & 0x7e0f81f;
-    fg = (fg | (fg << 16)) & 0x7e0f81f;
-
-    // This implements the linear interpolation formula: result = bg * (1.0 - alpha) + fg * alpha
-    // This can be factorized into: result = bg + (fg - bg) * alpha
-    // alpha is in Q1.5 format, so 0.0 is represented by 0, and 1.0 is represented by 32
-    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
-    result >>= 5;
-    result += bg;
-    // result &= 0b00000111111000001111100000011111; // mask out fractional parts
-    result &= 0x7e0f81f;
-    return (uint16_t)((result >> 16) | result); // contract result
-}
 
 void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
                                   gui_text_rect_t *rect,
@@ -297,166 +249,50 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
                                   int w, int h)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    uint8_t *dots = buf;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 
-    int font_x = x;
-    int font_y = y;
-    int font_w = w;
-    int font_h = h;
-    int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), dc->section.x1);
-    int x_end;
-    if (rect->xboundright != 0)
+    int x_start = _UI_MAX3(x, rect->xboundleft, dc->section.x1);
+    int x_end = rect->xboundright ? _UI_MIN(x + w - 1, rect->xboundright)
+                : _UI_MIN(x + w - 1, dc->section.x2);
+
+    int y_start = _UI_MAX3(dc->section.y1, y, rect->yboundtop);
+    int y_end = rect->yboundbottom ? _UI_MIN(dc->section.y2, y + h - 1)
+                : _UI_MIN(dc->section.y2, y + h - 1);
+    if (x_start >= x_end || y_start >= y_end) { return; }
+
+    draw_font_t render_font =
     {
-        x_end = _UI_MIN(_UI_MIN(font_x + font_w, dc->section.x2 + 1), rect->xboundright);
-    }
-    else
+        .target_buf = dc->frame_buf,
+        .target_buf_stride = dc->fb_width * (dc->bit_depth >> 3),
+        .color = text->color,
+        .target_rect = {
+            .x1 = dc->section.x1,
+            .y1 = dc->section.y1,
+            .x2 = dc->section.x2,
+            .y2 = dc->section.y2,
+        },
+        .clip_rect = {
+            .x1 = x_start,
+            .y1 = y_start,
+            .x2 = x_end,
+            .y2 = y_end
+        },
+        .render_mode = 8,
+        .target_format = (dc->bit_depth == 32) ? ARGB8888 :
+        (dc->bit_depth == 24) ? RGB888 :
+        (dc->bit_depth == 16) ? RGB565 : RGB565
+    };
+
+    font_glyph_t glyph =
     {
-        x_end = _UI_MIN(font_x + font_w, dc->section.x2 + 1);
-    }
-    int y_start = _UI_MAX(dc->section.y1, _UI_MAX(font_y, rect->yboundtop));
-    int y_end;
-    if (rect->yboundbottom != 0)
-    {
-        y_end = _UI_MIN(_UI_MIN(dc->section.y2 + 1, font_y + font_h), rect->yboundbottom);
-    }
-    else
-    {
-        y_end = _UI_MIN(dc->section.y2 + 1, font_y + font_h);
-    }
-    if ((x_start >= x_end) || (y_start >= y_end))
-    {
-        return;
-    }
+        .data = buf,
+        .pos_x = x,
+        .pos_y = y,
+        .width = w,
+        .height = h,
+        .stride = w
+    };
 
-    if (dc_bytes_per_pixel == 4)
-    {
-        uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-        uint32_t color_back;
-        for (uint32_t i = y_start; i < y_end; i++)
-        {
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-            for (uint32_t j = x_start; j < x_end; j++)
-            {
-                uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
-                if (alpha != 0)
-                {
-                    color_back = writebuf[write_off + j - dc->section.x1];
-                    alpha = text->color.color.rgba.a * alpha / 0xff;
-                    writebuf[write_off + j - dc->section.x1] = alphaBlendRGBA(text->color, color_back, alpha);
-                }
-            }
-        }
-    }
-    else if (dc_bytes_per_pixel == 2)
-    {
-#ifdef FONT_TTF_USE_MVE
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-        uint16_t color_output = rgba2565(text->color);
-        uint16_t color_back;
-        uint32_t section_width = dc->section.x2 - dc->section.x1 + 1;
-        uint32_t loopCount = (x_end - x_start) / 8;
-        uint32_t loopsLeft = (x_end - x_start) % 8;
-        bool max_opacity = false;
-        if (text->color.color.rgba.a == 0xff)
-        {
-            max_opacity = true;
-        }
-        for (uint32_t i = y_start; i < y_end; i++)
-        {
-            int write_off = (i - dc->section.y1) * section_width;
-            int dots_off = (i - font_y) * font_w - font_x;
-
-            /*helium code start*/
-            for (uint32_t loopc = 0; loopc < loopCount; loopc ++)
-            {
-                uint16_t js = x_start + 8 * loopc;
-                uint16x8_t alphav = vldrbq_u16(&dots[dots_off + js]);
-
-                if (vaddvq_u16(alphav) == 0)
-                {
-                    continue;
-                }
-                if (!max_opacity)
-                {
-                    alphav = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.a);
-                    alphav = vrshrq_n_u16(alphav, 8);
-                }
-
-                uint16x8_t outrv = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.r);
-                uint16x8_t outgv = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.g);
-                uint16x8_t outbv = vmulq_n_u16(alphav, (uint16_t)text->color.color.rgba.b);
-
-                //read back color
-                uint16x8_t color_backv = vld1q(&writebuf[write_off + js - dc->section.x1]);
-
-                uint16x8_t color_backr = vbicq_n_u16(color_backv, 0x0700);
-                color_backr = vshrq_n_u16(color_backr, 8);
-                uint16x8_t color_backg = vbicq_n_u16(color_backv, 0xF800);
-                color_backg = vbicq_n_u16(color_backg, 0x001F);
-                color_backg = vshrq_n_u16(color_backg, 3);
-                uint16x8_t color_backb = vbicq_n_u16(color_backv, 0xFF00);
-                color_backb = vbicq_n_u16(color_backb, 0x00E0);
-                color_backb = vshlq_n_u16(color_backb, 3);
-
-                uint16x8_t alphabv = vdupq_n_u16(0xff);
-                alphabv = vsubq_u16(alphabv, alphav);
-
-                color_backr = vmulq_u16(color_backr, alphabv);
-                color_backg = vmulq_u16(color_backg, alphabv);
-                color_backb = vmulq_u16(color_backb, alphabv);
-
-                outrv = vaddq_u16(outrv, color_backr);
-                outgv = vaddq_u16(outgv, color_backg);
-                outbv = vaddq_u16(outbv, color_backb);
-
-                /*vsriq, 6 instructions*/
-                // uint16x8_t resultv = vsriq_n_u16(outgv, outbv, 6);
-                // resultv = vsriq_n_u16(outrv, resultv, 5);
-
-                /*work around, 10 instructions*/
-                uint16x8_t resultv = vshrq_n_u16(outbv, 11);
-                outrv = vandq_u16(outrv, vdupq_n_u16(0xF800));
-                outgv = vshlq_n_u16(vshrq_n_u16(outgv, 10), 5);
-                resultv = vorrq_u16(resultv, outrv);
-                resultv = vorrq_u16(resultv, outgv);
-
-                vst1q_u16(&writebuf[write_off + js - dc->section.x1], resultv);
-            }
-            /*helium code end*/
-            for (uint32_t j = x_end - loopsLeft; j < x_end; j++)
-            {
-                uint8_t alpha = dots[dots_off + j];
-                if (alpha != 0)
-                {
-                    alpha = text->color.color.rgba.a * alpha / 0xff;
-                    color_back = writebuf[write_off + j - dc->section.x1];
-                    writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                }
-            }
-        }
-#else
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-        uint16_t color_output = rgba2565(text->color);
-        uint16_t color_back;
-        uint32_t section_width = dc->section.x2 - dc->section.x1 + 1;
-        for (uint32_t i = y_start; i < y_end; i++)
-        {
-            int write_off = (i - dc->section.y1) * section_width;
-            int dots_off = (i - font_y) * font_w - font_x;
-            for (uint32_t j = x_start; j < x_end; j++)
-            {
-                uint8_t alpha = dots[dots_off + j];
-                if (alpha != 0)
-                {
-                    alpha = text->color.color.rgba.a * alpha / 0xff;
-                    color_back = writebuf[write_off + j - dc->section.x1];
-                    writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
-                }
-            }
-        }
-#endif
-    }
+    font_glyph_render(&render_font, &glyph);
 }
 
 uint32_t getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
@@ -1078,6 +914,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
                     windingsf[i].x = windingsfm[i].x * raster_prec - glyph_x0m;
                     windingsf[i].y = windingsfm[i].y * raster_prec - glyph_y0m;
                 }
+                gui_free(windingsfm);
                 gui_free(windingsd);
 #else
                 windingsfm = gui_malloc(line_count * sizeof(ttf_point));
@@ -1360,4 +1197,3 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
     }
 }
-

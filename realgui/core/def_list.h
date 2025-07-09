@@ -42,21 +42,21 @@ extern "C" {
 #error not supported tool chain
 #endif
 
-struct gui_list_node
+struct gui_node_list
 {
-    struct gui_list_node *next;                          /**< point to next node. */
-    struct gui_list_node *prev;                          /**< point to prev node. */
+    struct gui_node_list *next;                          /**< point to next node. */
+    struct gui_node_list *prev;                          /**< point to prev node. */
 };
-typedef struct gui_list_node gui_list_t;                 /**< Type for lists. */
+typedef struct gui_node_list gui_node_list_t;                 /**< Type for lists. */
 
-gui_inline void gui_list_init(gui_list_t *l)
+gui_inline void gui_list_init(gui_node_list_t *l)
 {
     l->next = l->prev = l;
 }
 
-gui_inline void gui_list_append(gui_list_t *l, gui_list_t *n)
+gui_inline void gui_list_append(gui_node_list_t *l, gui_node_list_t *n)
 {
-    gui_list_t *node = l;
+    gui_node_list_t *node = l;
 
     while (node->next != l)
     {
@@ -74,7 +74,7 @@ gui_inline void gui_list_append(gui_list_t *l, gui_list_t *n)
  * @param n new node to be inserted
  * @param l list to insert it
  */
-gui_inline void gui_list_insert_before(gui_list_t *l, gui_list_t *n)
+gui_inline void gui_list_insert_before(gui_node_list_t *l, gui_node_list_t *n)
 {
     l->prev->next = n;
     n->prev = l->prev;
@@ -83,9 +83,11 @@ gui_inline void gui_list_insert_before(gui_list_t *l, gui_list_t *n)
     n->next = l;
 }
 
-gui_inline void gui_list_insert(gui_list_t *l, gui_list_t *n)
+gui_inline void gui_list_insert(gui_node_list_t *l, gui_node_list_t *n)
 {
     n->next = l->next;
+    n->prev = l;
+    l->next->prev = n;
     l->next = n;
 }
 
@@ -93,7 +95,7 @@ gui_inline void gui_list_insert(gui_list_t *l, gui_list_t *n)
  * @brief remove node from list.
  * @param n the node to remove from the list.
  */
-gui_inline void gui_list_remove(gui_list_t *n)
+gui_inline void gui_list_remove(gui_node_list_t *n)
 {
     n->next->prev = n->prev;
     n->prev->next = n->next;

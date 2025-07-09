@@ -1,11 +1,11 @@
 #ifndef __DRAW_FONT_H__
 #define __DRAW_FONT_H__
-
-#include <guidef.h>
-#include <gui_api.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <guidef.h>
+#include <gui_api.h>
 
 /** @brief  text rect struct start */
 typedef struct gui_text_rect

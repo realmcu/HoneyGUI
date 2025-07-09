@@ -1,1 +1,0 @@
-mklittlefs.exe -c root/  root.bin  -b 4096  -s 512000 -p 16

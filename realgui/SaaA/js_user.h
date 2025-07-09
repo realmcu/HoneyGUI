@@ -34,7 +34,6 @@
 #include "guidef.h"
 #include "gui_page.h"
 #include "gui_server.h"
-#include "gui_message.h"
 
 #ifdef RTL87x2G
 #include "wdt.h"

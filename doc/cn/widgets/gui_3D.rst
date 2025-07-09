@@ -2,72 +2,147 @@
 3D模型 (3D Model)
 =================
 
-该控件支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的3D模型，并支持添加动画特效。
+该控件支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的3D模型，能够处理模型的几何形状和材质信息，并支持为模型添加丰富的动画特效以增强视觉表现力。
 
-GUI加载3D模型
--------------
-1. 3D模型组成部分
+该控件支持两种基础几何面类型的3D模型绘制：矩形面和三角形面。矩形面适用于简单的几何体，如立方体、平面等，而三角形面则适用于更复杂的模型，如人脸、动物等。用户可以根据需要选择合适的面类型来创建3D模型。
 
-   + :file:`.obj` 文件：存储3D模型的几何数据，包括顶点、法线、纹理坐标、面等。
-   + :file:`.mtl` 文件：描述3D模型材质的属性，包括颜色、光泽度、透明度和纹理映射等。
-   + 图片文件：模型中使用到的贴图。
 
-   .. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
-      :width: 800px
-      :align: center
+3D模型组成要素
+---------------
 
-      3D模型组成示例
+完整的3D模型包含三个核心组件：
 
-2. 3D模型解析并生成3D信息描述子
+1. **.obj文件**
 
-   + 调用脚本处理 :file:`.obj` 文件。
+   - 存储几何数据，包括：
 
+     - 顶点坐标
+     - 法线向量
+     - 纹理坐标（UV映射）
+     - 面定义
+   - 需引用 :file:`.mtl` 文件中的材质信息。
+
+2. **.mtl文件（材质库）**
+
+   - 定义表面属性，包括：
+
+     - 环境光/漫反射/镜面反射颜色
+     - 折射率
+     - 透明度
+     - 光照模型
+     - 纹理贴图引用
+
+3. **纹理图片**
+
+   - 通常为PNG格式，用于：
+
+     - 漫反射贴图
+     - 法线贴图
+     - 高光贴图
+     - 透明贴图
+
+.. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
+   :width: 800px
+   :align: center
+   
+   3D模型组成示例
+
+3D模型处理流程
+---------------
+
+在HoneyGUI中使用3D模型前，需要将其转换为二进制格式。以下是处理流程：
+
+1. **定位转换工具**
+   
+   - 在HoneyGUI安装目录下找到以下工具：
+
+     - ``your_HoneyGUI_dir/tool/3D-tool/png2c.py``
+     - ``your_HoneyGUI_dir/tool/3D-tool/extract_desc.exe``
+
+2. **准备模型目录**
+   
+   - 将上述工具复制到模型目录。
+
+   - 该模型目录确保包含：
+
+     - :file:`.obj` 文件
+     - :file:`.mtl` 文件
+     - 所有引用的纹理图片
+
+3. **生成描述文件**
+   
+   - 使用提取器处理模型: ``extract_desc.exe xxx.obj``，该可执行文件会自动调用 :file:`png2c.py` 将所有的PNG纹理转换为二进制数组。
+   
    .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
       :width: 800px
       :align: center
 
       脚本处理
    
-   + 生成3D信息描述子，该文件包含obj解析数据、mtl解析数据以及纹理贴图。
+   - 生成的 :file:`desc.txt` 文件包含以下内容：
 
+     - obj解析数据
+     - mtl解析数据
+     - 内嵌纹理数据
+   
    .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
       :width: 800px
       :align: center
 
       生成二进制数组
 
-3. GUI加载描述子
+.. note::
+   三角形面组成的模型暂不支持纹理贴图。
 
-   将该desc文件放入工程目录下，并调用 ``gui_get_3d_desc()`` 函数加载到 ``gui_3d_description_t`` 结构体中。
 
-   **示例:**
+在HoneyGUI中的集成
+-------------------
+
+1. **添加描述文件到项目**
+
+   - 将生成的 :file:`desc.txt` 文件放入项目目录。
+
+2. **创建3D控件**
+
+   - 使用 :cpp:any:`gui_3d_create` 函数创建：
 
    .. code-block:: c
 
-      gui_3d_description_t *desc = gui_get_3d_desc((void *)_acdesc);
+      gui_3d_t *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
 
-   ``gui_3d_description_t`` 结构体定义如下：
 
-   .. literalinclude:: ../../../realgui/widget/gui_3d/def_3d_common.h
-      :language: c
-      :start-after: /* gui_3d_description_t start*/
-      :end-before: /* gui_3d_description_t end*/
-   
-   其中 ``GUI_3D_FACE_TYPE`` 表示3D对象的面类型，现支持 ``GUI_3D_FACE_RECTANGLE`` （矩形）或 ``GUI_3D_FACE_TRIANGLE`` （三角形）组成的3D模型。
-
-3D控件用法
+用法
 -------------
+
 创建控件
 ~~~~~~~~
-使用 :cpp:any:`gui_3d_create` 创建3D模型，传入的 ``desc`` 即为脚本中提取的解析数据。
+使用 :cpp:any:`gui_3d_create` 创建3D模型，导入的 ``desc_addr`` 文件即为脚本中提取的解析数据。
 
-全局形状变换
-~~~~~~~~~~~~
-使用 :cpp:any:`gui_3d_set_global_shape_transform_cb` 对3D模型进行整体变换，其中 ``cb`` 为物体的所有面设置相同的形状变换。该函数中的 ``world`` 和 ``camera`` 代表了3D对象的世界坐标变换和相机视角投影，矩形面还支持设置 ``light`` 光照信息。
+变换控制
+~~~~~~~~
 
-局部形状变换
-~~~~~~~~~~~~
-使用 :cpp:any:`gui_3d_set_local_shape_transform_cb` 对3D模型进行局部变换，其中 ``cb`` 可以为物体的每个面设置不同的形状变换， ``face`` 为指定变换的面。该函数中的 ``world`` 和 ``camera`` 代表了3D对象的世界坐标变换和相机视角投影，矩形面还支持设置 ``light`` 光照信息。
+全局变换
+^^^^^^^^
+使用 :cpp:any:`gui_3d_set_global_transform_cb` 对3D模型进行整体变换，其中 ``gui_3d_global_transform_cb`` 类型的回调函数可以为物体的所有面设置相同的形状变换。例如 ``world`` 世界坐标变换和 ``camera`` 相机视角投影，矩形面还支持设置 ``light`` 光照信息。具体配置可参考 :ref:`坐标变换和光照系统` 章节。
+
+典型应用场景：
+
++ 模型整体旋转/平移
++ 场景视角切换
+
+面变换
+^^^^^^^^
+使用 :cpp:any:`gui_3d_set_face_transform_cb` 对3D模型进行局部变换，其中 ``gui_3d_global_transform_cb`` 类型的回调函数可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。
+
+功能特点：
+
++ 支持局部动画
++ 支持按面片索引独立控制
+
+.. _坐标变换和光照系统:
+
+坐标变换和光照系统
+~~~~~~~~~~~~~~~~~~
 
 世界变换
 ^^^^^^^^
@@ -164,17 +239,20 @@ GUI加载3D模型
 
 设置动画
 ~~~~~~~~~~
-:cpp:any:`gui_3d_set_animate` 函数用于为3D对象设置动画属性，其中 ``callback`` 为动画更新的回调函数，当动画每一帧更新时将调用这个函数。
+:cpp:any:`gui_obj_create_timer` 函数可以为3D对象设置动画属性，其中 ``callback`` 为动画更新的回调函数。
 
 
 示例
 ----
+
+.. _3D蝴蝶:
+
 3D蝴蝶
 ~~~~~~~~
 
-该模型全部由矩形面组成，调用 :cpp:any:`gui_3d_set_local_shape_transform_cb()` 为不同面设置局部变换可以制作动画效果。
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D`` 来运行此示例。该模型由 8 个矩形面构成，每个面都有相应的纹理贴图。通过调用 :cpp:any:`gui_3d_set_face_transform_cb()` 函数，可以为不同的面设置局部变换，从而实现动画效果。
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d.c
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_butterfly.c
    :language: c
    :start-after: /* 3d butterfly demo start*/
    :end-before: /* 3d butterfly demo end*/
@@ -182,72 +260,17 @@ GUI加载3D模型
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1734070660330786955/61e4ff9d_13408154.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/butterfly.gif" width= "400" /></div>
    <br>
 
-
-3D棱镜
-~~~~~~~~
-
-该模型全部由矩形面组成，调用 ``gui_3d_light_inititalize()`` 可以添加光照效果。
-
-.. code-block:: c
-
-   #include "math.h"
-   #include "cube3D/desc.txt"
-
-   static float rot_angle = 0.0f;
-   void update_cube_animation()
-   {
-      rot_angle++;
-   }
-
-   static void cube_cb(gui_3d_t *this, size_t face/*face offset*/, gui_3d_world_t *world,
-                  gui_3d_camera_t *camera, gui_3d_light_t *light)
-   {
-      gui_dispdev_t *dc = gui_get_dc();
-      gui_3d_matrix_t face_matrix;
-      gui_3d_matrix_t object_matrix;
-
-      gui_3d_camera_UVN_initialize(camera, gui_point_4d(0, 6, 15), gui_point_4d(0, 0, 0), 1, 32767, 90,
-                                    dc->screen_width, dc->screen_height);
-
-      gui_3d_world_inititalize(&object_matrix, 0, 22, 40, 90, 0, 0,
-                              10);
-
-      gui_3d_light_inititalize(light, gui_point_4d(0, 22, 45), gui_point_4d(0, 22, 40), 60, 0.6, (gui_3d_RGBAcolor_t){255, 215, 0, 255});
-
-      gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1), rot_angle,
-                                    1);
-      
-      *world = gui_3d_matrix_multiply(face_matrix, object_matrix);
-
-   }
-   static void app_ui_design(gui_app_t *app)
-   {
-
-      gui_3d_t *test_3d = gui_3d_create(&(app->screen), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
-
-      gui_3d_set_shape_transform_cb(test_3d, 0, cube_cb);
-
-      gui_3d_set_animate(test_3d, 10000, -1, update_cube_animation, NULL);
-
-      return;
-
-   }
-
-.. raw:: html
-
-   <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube3d.gif" width= "400" /></div>
-   <br>
+.. _3D人脸:
 
 3D人脸
 ~~~~~~~~
 
-该模型由1454个三角形面组成。
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_FACE_3D`` 来运行此示例。该模型由 1454 个三角形面构成，使用默认材质基础色进行填充。
 
-.. literalinclude:: ../../../realgui/example/demo/app_ui_realgui_3d_face.c
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_face.c
    :language: c
    :start-after: /* 3d face demo start*/
    :end-before: /* 3d face demo end*/
@@ -257,6 +280,58 @@ GUI加载3D模型
    <br>
    <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/face.gif" width= "400" /></div>
    <br>
+
+
+.. _3D小狗:
+
+3D小狗
+~~~~~~~~
+
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_DOG_3D`` 来运行此示例。该模型由 774 个三角形面组成，支持自定义材质基础色的填充。
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_dog.c
+   :language: c
+   :start-after: /* 3d dog demo start*/
+   :end-before: /* 3d dog demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/dog.gif" width= "400" /></div>
+   <br>
+
+
+.. _3D圆盘:
+
+3D圆盘
+~~~~~~~~
+
+在 :file:`menu_config.h` 中开启宏定义 ``CONFIG_REALTEK_BUILD_REAL_DISC_3D`` 来运行此示例。该模型由 133 个矩形面构成，其中圆盘部分使用纹理贴图，而矩形部分采用颜色填充。
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_disc.c
+   :language: c
+   :start-after: /* 3d disc demo start*/
+   :end-before: /* 3d disc demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/disc.gif" width= "400" /></div>
+   <br>
+
+
+帧率测试
+--------
+
+以下表格展示了不同芯片平台上，各个示例的帧率表现。编译环境采用 ``ARMCLANG V6.22``，编译选项为 ``-O3 LTO``。
+
+.. csv-table:: 帧率测试结果
+   :header: 芯片型号,处理器主频,分辨率,:ref:`3D蝴蝶`,:ref:`3D人脸`,:ref:`3D小狗`,:ref:`3D圆盘`
+   :align: center
+   :name: 帧率测试结果
+
+   RTL8773E,100MHz,410 x 502,40 FPS,13 FPS,20 FPS,10 FPS
+
 
 API
 ---

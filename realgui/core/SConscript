@@ -6,6 +6,6 @@ src = Split("""
 
 CPPPATH = [cwd]
 
-group = DefineGroup('', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
 
 Return('group')

@@ -1,316 +1,57 @@
 #include <string.h>
 #include "font_mem_img.h"
+#include "font_rendering_utils.h"
 
 extern MEM_FONT_LIB font_lib_tab[10];
-gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
-{
-    alpha = (alpha + 4) >> 3;
-    bg = (bg | (bg << 16)) & 0x7e0f81f;
-    fg = (fg | (fg << 16)) & 0x7e0f81f;
-    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
-    result >>= 5;
-    result += bg;
-    result &= 0x7e0f81f;
-    return (uint16_t)((result >> 16) | result); // contract result
-}
-//gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
-//{
-//    uint32_t mix;
-//    uint8_t back_a = 0xff - alpha;
-//#if defined(_WIN32)
-//    mix = 0xff000000;
-//    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
-//    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
-//    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
-//#else
-//    mix = 0x000000ff;
-//    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
-//    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
-//    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
-//#endif
-//    return mix;
-//}
-gui_inline uint16_t rgba2565(gui_color_t rgba)
-{
-    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
-    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
-    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
-    return red + gre + blu;
-}
 
 static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                                      gui_text_rect_t *rect, uint8_t *buffer, int buf_width, uint8_t buffer_bytes, uint8_t crop)
+                                      gui_text_rect_t *rect, uint8_t *buffer, int buf_width, GUI_FormatType type)
 {
-    if (chr->dot_addr == NULL || buffer == NULL)
-    {
-        return;
-    }
-    uint8_t *dots = chr->dot_addr;
-    gui_dispdev_t *dc = gui_get_dc();
+    if (chr->dot_addr == NULL || buffer == NULL) { return; }
 
     int font_x = chr->x;
     int font_y = chr->y + chr->char_y;
-    int font_w = chr->w;
-    // int font_h = chr->h;
     int x_start = font_x;
-    int x_end = _UI_MIN(font_x + chr->char_w, rect->x2);
+    int x_end = _UI_MIN(font_x + chr->char_w - 1, rect->x2);
     int y_start = font_y;
-    int y_end = _UI_MIN((font_y + chr->char_h), rect->y2);
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int y_end = _UI_MIN(font_y + chr->char_h - 1, rect->y2);
+
+    if ((x_start >= x_end) || (y_start >= y_end)) { return; }
+
+    uint8_t target_bit_depth = font_get_bitdepth_by_cf(type);
+
+    draw_font_t df =
     {
-        return;
-    }
+        .color = color,
+        .render_mode = rendor_mode,
+        .target_buf = buffer,
+        .target_buf_stride = buf_width * target_bit_depth / 8,
+        .target_format = type,
+        .clip_rect = {
+            .x1 = x_start,
+            .y1 = y_start,
+            .x2 = x_end,
+            .y2 = y_end,
+        },
+        .target_rect = {
+            .x1 = rect->x1,
+            .y1 = rect->y1,
+            .x2 = rect->x2,
+            .y2 = rect->y2,
+        }
+    };
 
-    switch (rendor_mode)
+    font_glyph_t glyph =
     {
-    case 2:
-        {
-            if (buffer_bytes == 2)
-            {
-                uint16_t *writebuf = (uint16_t *)buffer + chr->x;
+        .data = chr->dot_addr,
+        .pos_x = font_x,
+        .pos_y = font_y,
+        .width = chr->char_w,
+        .height = chr->char_h,
+        .stride = chr->w,
+    };
 
-                uint16_t color_output[4];
-                //Normal is 0x00,0x40,0x80,0xFF, modify to 0x00,0x40,0xA0,0xFF.By Luke
-                color_output[3] = rgba2565(color);
-                color_output[2] = alphaBlendRGB565(color_output[3], 0x0, 0xA0);
-                color_output[1] = alphaBlendRGB565(color_output[3], 0x0, 0x40);
-                color_output[0] = 0;
-
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i;
-                    int dots_off = (i - font_y) * (font_w / 4);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 4] >> ((j - font_x) % 4 * 2);
-                        if (alpha != 0)
-                        {
-                            writebuf[write_off + j - x_start] = color_output[alpha & 0x03];
-                        }
-                    }
-                }
-            }
-            else if (buffer_bytes == 3)
-            {
-                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
-
-                uint16_t write_color = rgba2565(color);
-                //Normal is 0x00,0x40,0x80,0xFF, modify to 0x00,0x40,0xA0,0xFF.By Luke
-                uint8_t alpha_output[4];
-                alpha_output[3] = 0xFF;
-                alpha_output[2] = 0xA0;
-                alpha_output[1] = 0x40;
-                alpha_output[0] = 0x00;
-
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i * 3;
-                    int dots_off = (i - font_y) * (font_w / 4);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 4] >> ((j - font_x) % 4 * 2);
-                        if (alpha != 0)
-                        {
-                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
-                            writebuf[write_off + (j - x_start) * 3 + 2] = alpha_output[alpha & 0x03];
-                        }
-                    }
-                }
-            }
-            else if (buffer_bytes == 4)
-            {
-                uint32_t *writebuf = (uint32_t *)buffer + chr->x;
-
-                uint32_t color_output[4];
-                gui_color_t write_color = color;
-                int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-                for (int i = 0; i < 1 << rendor_mode; i++)
-                {
-                    write_color.color.rgba.a = pre_alpha * i;
-                    color_output[i] = write_color.color.argb_full;
-                }
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i;
-                    int dots_off = (i - font_y) * (font_w / 4);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 4] >> ((j - font_x) % 4 * 2);
-                        if (alpha != 0)
-                        {
-                            writebuf[write_off + j - x_start] = color_output[alpha & 0x03];
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    case 4:
-        {
-            if (buffer_bytes == 2)
-            {
-                uint16_t *writebuf = (uint16_t *)buffer + chr->x;
-
-                uint16_t color_output[16];
-                int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
-
-                color_output[0] = 0 ;
-                color_output[15] = rgba2565(color);
-                for (int i = 1; i + 1 < 1 << rendor_mode; i++)
-                {
-                    color_output[i] = alphaBlendRGB565(color_output[15], 0x0, pre_alpha * i);
-                }
-
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i ;
-                    int dots_off = (i - font_y) * (font_w / 2);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
-                        if (alpha != 0)
-                        {
-                            writebuf[write_off + j - x_start] = color_output[alpha & 0x0f];
-                        }
-                    }
-                }
-            }
-            else if (buffer_bytes == 3)
-            {
-                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
-
-                uint16_t write_color = rgba2565(color);
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i * 3;
-                    int dots_off = (i - font_y) * (font_w / 2);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
-                        if (alpha != 0)
-                        {
-                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
-                            writebuf[write_off + (j - x_start) * 3 + 2] = (alpha & 0x0f) * 17;
-                        }
-                    }
-                }
-            }
-            else if (buffer_bytes == 4)
-            {
-                uint32_t *writebuf = (uint32_t *)buffer + chr->x;
-                gui_color_t write_color = color;
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i;
-                    int dots_off = (i - font_y) * (font_w / 2);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
-                        if (alpha != 0)
-                        {
-                            write_color.color.rgba.a = (alpha & 0x0f) * 17;
-                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    case 8:
-        {
-            if (buffer_bytes == 2)
-            {
-                gui_log("this type font scale no support !!! \n");
-                GUI_ASSERT(NULL != NULL);
-            }
-            else if (buffer_bytes == 3)
-            {
-                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
-
-                uint16_t write_color = rgba2565(color);
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i * 3;
-                    int dots_off = (i - font_y) * font_w;
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + j - font_x];
-                        if (alpha != 0)
-                        {
-                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
-                            writebuf[write_off + (j - x_start) * 3 + 2] = alpha;
-                        }
-                    }
-                }
-            }
-            else if (buffer_bytes == 4)
-            {
-                uint32_t *writebuf = (uint32_t *)buffer + chr->x;
-                gui_color_t write_color = color;
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i;
-                    int dots_off = (i - font_y) * font_w;
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        uint8_t alpha = dots[dots_off + j - font_x];
-                        if (alpha != 0)
-                        {
-                            write_color.color.rgba.a = alpha;
-                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    case 1:
-        {
-            if (buffer_bytes == 2)
-            {
-                uint16_t *writebuf = (uint16_t *)buffer + chr->x;
-                uint16_t color_output = rgba2565(color);
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i;
-                    int dots_off = (i - font_y) * (font_w / 8);
-
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
-                        {
-                            writebuf[write_off + j - x_start] = color_output;
-                        }
-                    }
-                }
-            }
-            else if (buffer_bytes == 3)
-            {
-                gui_log("this type font scale no support now!!! \n");
-                GUI_ASSERT(NULL != NULL);
-            }
-            else if (buffer_bytes == 4)
-            {
-                uint32_t *writebuf = (uint32_t *)buffer + chr->x;
-                gui_color_t write_color = color;
-                for (uint32_t i = y_start; i < y_end; i++)
-                {
-                    int write_off = buf_width * i ;
-                    int dots_off = (i - font_y) * (font_w / 8);
-                    for (uint32_t j = x_start; j < x_end; j++)
-                    {
-                        if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
-                        {
-                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
+    font_glyph_render(&df, &glyph);
 }
 
 void gui_font_scale_destroy(gui_text_t *text)
@@ -334,8 +75,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     gui_text_rect_t rect = {0};
     rect.x1 = 0;
     rect.y1 = 0;
-    rect.x2 = rect.x1 + text->base.w;
-    rect.y2 = rect.y1 + text->base.h;
+    rect.x2 = rect.x1 + text->base.w - 1;
+    rect.y2 = rect.y1 + text->base.h - 1;
     TEXT_MODE mode = text->mode;
     if (text->mode == CENTER || text->mode == RIGHT)
     {
@@ -343,22 +84,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     }
     gui_font_mem_load(text, &rect);
     text->mode = mode;
-    switch (font_img_type)
-    {
-    case RGB565:
-        font_img_pixel_bytes = 2;
-        break;
-    case ARGB8565:
-        // case RGB888:
-        font_img_pixel_bytes = 3;
-        break;
-    case ARGB8888:
-        font_img_pixel_bytes = 4;
-        break;
-    default:
-        font_img_pixel_bytes = 0;
-        break;
-    }
+    font_img_pixel_bytes = font_get_bitdepth_by_cf(font_img_type) / 8;
+
     if (font_img_pixel_bytes == 0)
     {
         return NULL;
@@ -413,12 +140,12 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     }
     uint8_t rendor_mode = font->rendor_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
-    rect.x2 = rect.x1 + buf_width;
-    rect.y2 = rect.y1 + buf_height;
+    rect.x2 = rect.x1 + buf_width - 1;
+    rect.y2 = rect.y1 + buf_height - 1;
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
-                                  font_img_pixel_bytes, font->crop);
+                                  font_img_type);
     }
     gui_font_mem_unload(text);
     return img_buf;

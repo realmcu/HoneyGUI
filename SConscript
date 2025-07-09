@@ -7,8 +7,6 @@ objs = []
 cwd  = GetCurrentDir()
 
 objs = objs + SConscript(cwd + '/realgui/SConscript')
-objs = objs + SConscript(cwd + '/lvgl_v8/SConscript')
-objs = objs + SConscript(cwd + '/lvgl_v9/SConscript')
-
+objs += SConscript(cwd + '/example/SConscript')
 
 Return('objs')
