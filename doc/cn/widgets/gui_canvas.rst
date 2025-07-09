@@ -34,7 +34,7 @@ GUI Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
 
 1. 使用 ``gui_canvas_create`` 函数创建画布控件
 
-   此函数用于创建一个基于NanoVG的画布控件，返回画布对象指针。
+   此函数用于创建一个基于 NanoVG 的画布控件，返回画布对象指针。
 
    .. code-block:: c
    
