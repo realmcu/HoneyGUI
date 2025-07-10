@@ -59,11 +59,6 @@
 
 图像控件的不透明度值是可调整的，开发者可以调用 :cpp:any:`gui_img_set_opacity` 来调整。
 
-动画效果
-~~~~~~~~
-
-开发者可以通过 :cpp:any:`gui_img_set_animate` 来设定图像控件的动画效果。
-
 质量
 ~~~~
 
