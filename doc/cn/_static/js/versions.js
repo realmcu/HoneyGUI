@@ -3,7 +3,7 @@ const  versionArr = [];
 
 function fetch_versions()
 {
-    var fetchURL = "";
+    var fetchURL = "https://docs.realmcu.com/versionlist.txt";
     return fetch(fetchURL)
         .then(res => res.text())
         .then(text => {

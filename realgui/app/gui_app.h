@@ -88,17 +88,12 @@ struct gui_app
                                        { \
                                          .screen = \
                                                    { \
-                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
-                                                     .type = SCREEN,    /**< The screen type is initialized to SCREEN. */ \
+                                                     .name = #APP_NAME, /**< Screen name set to application name. */ \
+                                                     .type = SCREEN,    /**< Screen type initialized to SCREEN. */ \
                                                    }, \
-                                         .ui_design = UI_DESIGN,   /**< The UI design function is assigned. */ \
-                                         .active_ms = 1000000,     /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                         .ui_design = UI_DESIGN,   /**< UI design function assigned. */ \
+                                         .active_ms = 1000000,     /**< Active duration set to 1,000,000 ms. */ \
                                        }; \
-    /**
-     * @brief Function to get the handle of the application.
-     *
-     * @return A pointer to the application instance.
-     */ \
     gui_app_t *_get_app_##APP_NAME##_handle(void) \
     { \
         return &_app_##APP_NAME; \
@@ -182,15 +177,11 @@ struct gui_app
                                          .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
                                          .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
                                        }; \
-    /**
-     * @brief Function to get the handle of the application.
-     *
-     * @return A pointer to the application instance.
-     */ \
     gui_app_t *_get_app_##APP_NAME##_handle(void) \
     { \
         return &_app_##APP_NAME; \
     }
+
 /**
  * @brief Defines a GUI application with a startup and shutdown animation.
  *
@@ -205,27 +196,21 @@ struct gui_app
  */
 #define GUI_APP_DEFINE_NAME_ANIMATION(APP_NAME, STARTUP_ANIMATION, SHUTDOWM_ANIMATION) \
     static void _##APP_NAME##_ui_design(gui_app_t*); \
-    static gui_app_t _app_##APP_NAME = \
-                                       { \
-                                         .screen = \
-                                                   { \
-                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
-                                                     .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
+    static gui_app_t _app_##APP_NAME = { \
+                                         .screen = { \
+                                                     .name = #APP_NAME,          /**< The screen name is set to the application name. */ \
+                                                     .magic = GUI_MAGIC_NUMBER,   /**< check number. */ \
                                                    }, \
                                          .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
-                                         .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
-                                         .startup_animation_flag = STARTUP_ANIMATION,\
-                                         .shutdown_animation_flag = SHUTDOWM_ANIMATION,\
+                                         .active_ms = 1000000,            /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                         .startup_animation_flag = STARTUP_ANIMATION, \
+                                         .shutdown_animation_flag = SHUTDOWM_ANIMATION, \
                                        }; \
-    /**
-     * @brief Function to get the handle of the application.
-     *
-     * @return A pointer to the application instance.
-     */ \
     gui_app_t *_get_app_##APP_NAME##_handle(void) \
     { \
         return &_app_##APP_NAME; \
     }
+
 #define GUI_APP_DEFINE_NAME_ANIMATION_FUNC_CUSTOM(APP_NAME, STARTUP_ANIMATION_FUNC, SHUTDOWM_ANIMATION_FUNC) \
     static void _##APP_NAME##_ui_design(gui_app_t*); \
     static gui_app_t _app_##APP_NAME = \
@@ -237,14 +222,9 @@ struct gui_app
                                                    }, \
                                          .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
                                          .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
-                                         .startup_animation = STARTUP_ANIMATION_FUNC,\
-                                         .shutdown_animation = SHUTDOWM_ANIMATION_FUNC,\
+                                         .startup_animation = STARTUP_ANIMATION_FUNC, \
+                                         .shutdown_animation = SHUTDOWM_ANIMATION_FUNC, \
                                        }; \
-    /**
-     * @brief Function to get the handle of the application.
-     *
-     * @return A pointer to the application instance.
-     */ \
     gui_app_t *_get_app_##APP_NAME##_handle(void) \
     { \
         return &_app_##APP_NAME; \

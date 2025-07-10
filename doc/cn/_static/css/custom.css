@@ -412,6 +412,26 @@ html.writer-html5 .rst-content dl.field-list dd {
 html.writer-html5 .rst-content dl.field-list>dt {
     padding-top: 7px;
 }
+
+/* ---------- See-Also Lists ---------- */
+#doxygen-group-list-section ul li,
+#doxygen-group-list-section ~ ul li {
+    background-color: #f0f2f4;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+#doxygen-group-list-section ul li a::after,
+#doxygen-group-list-section ~ ul li a::after {
+    content: 'Doxygen';
+    display: inline-block;
+    background-color: #6ab0de;
+    color: #fff;
+    padding: 0 8px;
+    border-radius: 16px;
+    margin-left: 10px;
+    font-size: 0.875em;
+    font-weight: bold;
+}
 /* ======= Render List Style ======== */
 
 
@@ -634,6 +654,10 @@ section[id*="deprecated-api"] dd dl {
     border: 1px solid #b4c2de;
     border-bottom-right-radius: 6px;
     border-bottom-left-radius: 6px;
+}
+section[id*="added-api"] dd dl > dt.sig.sig-object.cpp:not([id]),
+section[id*="deprecated-api"] dd dl > dt.sig.sig-object.cpp:not([id]) {
+    display: block;
 }
 
 .highlight-eval_rst,

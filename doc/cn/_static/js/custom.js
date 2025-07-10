@@ -1,8 +1,9 @@
 /* ================ Add left-sider draggable component ================ */
-function addLefTocSlider() {
+
+function addLefTocSlider(local_left_nav_width) {
     const initLeftTocSliderWidth = function() {
         if (window.matchMedia('(min-width: 768px)').matches) {
-            let leftSiderBarWidth = localStorage.getItem('docs.bee4.siderbar.width');
+            let leftSiderBarWidth = localStorage.getItem(local_left_nav_width);
             if (leftSiderBarWidth) {
                 $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
                 $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
@@ -47,7 +48,7 @@ function addLefTocSlider() {
 
             // Store width in localStorage
             var newWidth = $('.wy-nav-side').width();
-            localStorage.setItem('docs.bee4.siderbar.width', newWidth);
+            localStorage.setItem(local_left_nav_width, newWidth);
         }
     });
 
@@ -196,8 +197,23 @@ function highlightAPI() {
     }
 }
 
+/* ============= Toggle Languages ============= */
+function toggleLanguage() {
+    let currentUrl = window.location.href;
+    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
+    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
+
+    document.getElementById('toEN').href = newEnUrl;
+    document.getElementById('toCN').href = newCnUrl;
+}
+
 $(document).ready(function () {
-    addLefTocSlider();
+    const isMultilingual = window.isMultilingual == "True";
+    if(isMultilingual) {
+        toggleLanguage();
+    }
+    const leftNavWidth = window.leftNavWidth || "docs.siderbar.width";
+    addLefTocSlider(leftNavWidth);
     addCollapseForAPI();
     initSampleListToc();
     highlightAPI();
@@ -213,61 +229,3 @@ function backToTop() {
     //     scrollTop: 0
     // }, 300);
 }
-
-/* ============= Toggle Languages ============= */
-document.addEventListener("DOMContentLoaded", function () {
-    let currentUrl = window.location.href;
-    let newEnUrl = currentUrl.replace(/(\/|_)cn\//gi, '$1en/');
-    let newCnUrl = currentUrl.replace(/(\/|_)en\//gi, '$1cn/');
-
-    document.getElementById('toEN').href = newEnUrl;
-    document.getElementById('toCN').href = newCnUrl;
-})
-
-/* ================= Add AI ASK Fetch request ================= */
-document.addEventListener('DOMContentLoaded', function () {
-    function fetchChatAnwser(chatInputText, chatHistory) {
-        let curVersion = (document.querySelector("#version-selector")?.value) || "latest";
-        // If the current version is "latest", check and update it from LatestVersion
-        if (curVersion === "latest") {
-            const latestEle = document.querySelector('#LatestVersion');
-            if (latestEle && latestEle.value) {
-                curVersion = latestEle.value;
-            }
-        }
-        return new Promise((resolve, reject) => {
-            const rawBody = {
-                rawData: chatInputText, // required, 要詢問 AI 的問句
-                docBase: "2039", // required, 知識庫id(測試區請使用 2039)
-                docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答
-                // optional, 過去的對話紀錄，請符合範例的格式，目前可以輸入長度最多為 6 (三組 user-assistant 組合)，若無對話紀錄則不需輸入
-                historyMsg: chatHistory,
-            };
-            $.ajax({
-                url: 'https://wwwdev.realmcu.com/docs/aichat',
-                type: 'POST',
-                dataType: "json",
-                contentType: "application/x-www-form-urlencoded",
-                async: true,
-                data: JSON.stringify(rawBody),
-                success: function (resp) {
-                    resolve(resp);
-                },
-                error: function (err) {
-                    if(err) {
-                        reject(err);
-                    }
-                    else {
-                        reject("Realmcu Server Network Error!");
-                    }
-                }
-            });
-        });
-    }
-
-    chatWidgetInit({
-        makeRequest: fetchChatAnwser,
-        chatWidgetTitle: "AI Ask",
-        chatWidgetPlaceholder: "Please type your question"
-    });
-});

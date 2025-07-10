@@ -17,7 +17,6 @@ HoneyGUI
   Design Spec<Design/index>
   3rd Party Support<3rd-party-support/index>
   FAQ <FAQ/index>
-  Get PDF <get-pdf/index>
   Glossary <Glossary>
   Release Notes <release_notes/index>
 
