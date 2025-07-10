@@ -188,6 +188,10 @@
 // </c>
 
 
+// <c> RTK GUI Enable Lite3D library
+#define CONFIG_REALTEK_LITE3D_GCC_LIB
+// </c>
+
 #endif
 // </h>
 

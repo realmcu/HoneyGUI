@@ -13,6 +13,7 @@
 #include "gui_view.h"
 #include "gui_list.h"
 #include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -147,41 +148,39 @@ static void update_animation()
 
 }
 
-static void butterfly_global_cb(gui_3d_t *this)
+static void butterfly_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 45), 1,
+                             32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 40), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, 40.0f - butterfly_z, 0, 0,
-                             butterfly_rz,
-                             5);
+    l3_world_initialize(&this->world, butterfly_x, butterfly_y, 45.0f - butterfly_z, 0, 0, butterfly_rz,
+                        5);
 
 }
 
-static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t butterfly_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
     if (face_index == 0 || face_index == 2)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
     else if (face_index == 1 || face_index == 3)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  -wing_angle, 1);
     }
     else
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0), 0,
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0), 0,
                                  1);
     }
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&face_matrix, &this->world, &transform_matrix);
 
     return transform_matrix;
 
@@ -194,13 +193,14 @@ static void butterfly_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_3d_t *butterfly_3d = gui_3d_create(obj, "3d-widget", DESC_BUTTERFLY_BIN,
-                                           GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                                           410, 410);
 
-    gui_3d_set_global_transform_cb(butterfly_3d, (gui_3d_global_transform_cb)butterfly_global_cb);
-    gui_3d_set_face_transform_cb(butterfly_3d, (gui_3d_face_transform_cb)butterfly_face_cb);
+    l3_model_t *butterfly_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 410, 502);
 
-    gui_obj_create_timer(&(butterfly_3d->base), 10, true, update_animation);
+    l3_set_global_transform(butterfly_3d, (l3_global_transform_cb)butterfly_global_cb);
+    l3_set_face_transform(butterfly_3d, (l3_face_transform_cb)butterfly_face_cb);
 
+    gui_lite3d_t *lite3d_butterfly = gui_lite3d_create(obj, "lite3d-widget", butterfly_3d,
+                                                       0, 0, 410, 502);
+
+    gui_obj_create_timer(GUI_BASE(lite3d_butterfly), 10, true, update_animation);
 }

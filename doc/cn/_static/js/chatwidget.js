@@ -367,19 +367,21 @@
         });
 
         /* =============== handle chat message send =============== */
+        const docDomain = "https://docs.realmcu.com/";
+        let docRefsList = [];
         function linkListToHTML(list) {
+            docRefsList = [];
             if (!list || list.length === 0) {
                 return `<p class="chatRefDocs"></p>`;
             }
 
-            const linkSet = new Set();
             let linksHtml = '';
-
             list.forEach(link => {
                 const lowerTitle = link.title.toLowerCase().trim();
-                if (!linkSet.has(lowerTitle)) {
-                    linkSet.add(lowerTitle);
-                    linksHtml += `<a href="${link.url}" target="_blank">${link.title}</a><br>`;
+                const itemExists = docRefsList.some(obj => obj.title.toLowerCase().trim() === lowerTitle);
+                if (!itemExists) {
+                    docRefsList.push({"title": link.title, "url": link.url});
+                    linksHtml += `<a href="${docDomain}${link.url}" target="_blank">${link.title}</a><br>`;
                 }
             });
 
@@ -466,10 +468,10 @@
                             asstNode.innerHTML = marked.parse(sanitizedHtml);
                         } else if (parsedChunk.status === "error") {
                             // append html content in asstNode
-                            appendErrorMsg(`${parsedChunk.error.error_type}: ${parsedChunk.error.message}`, asstNode);
+                            appendErrorMsg(`Internal server error: ${parsedChunk.error.error_type}, ${parsedChunk.error.message}, please refresh and try again!`, asstNode);
                         }
                     } catch (error) {
-                        appendErrorMsg(`JSON Parsing Error: ${error.message}`, asstNode);
+                        // appendErrorMsg(`Internal server error: ${error.message}, please refresh and try again!`, asstNode);
                     }
                 };
 
@@ -487,6 +489,8 @@
     
                     // Decode the current chunk
                     const newChunk = decoder.decode(value, { stream: true });
+                    processChunk(newChunk);
+
                     pendingBuffer += newChunk;
                     let lineEnd;
                     while ((lineEnd = pendingBuffer.indexOf('\n')) >= 0) {
@@ -500,10 +504,6 @@
                     }
                 }
 
-                // Handle final remaining buffer content
-                // if (pendingBuffer.trim() && !hasError) {
-                //     processChunk(pendingBuffer.trim());
-                // }
                 if (pendingBuffer && !hasError) {
                     processChunk(pendingBuffer);
                 }
@@ -530,13 +530,15 @@
 
             let curVersion = "";
             const rawBody = {
-                aiEnv: "PROD",          // aiEnv is PROD or QA
+                aiEnv: "QA",          // aiEnv is PROD or QA
                 rawData: question,      // required, 要詢問 AI 的問句
                 docBase: chatAIBase,    // required, 知識庫id(測試區請使用 2039)
                 docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答
                 // optional, 過去的對話紀錄，請符合範例的格式，
                 // 目前可以輸入長度最多為 6 (三組 user-assistant 組合).若無對話紀錄則不需輸入
                 historyMsg: histories,
+                // previous reference doc links list
+                docRefs: JSON.stringify(docRefsList).replace(/"/g, "'"),
             };
         
             const method = "POST";
