@@ -21,7 +21,7 @@ If it is necessary to update the location of an image widget, use :cpp:any:`gui_
 Set Attribute
 ~~~~~~~~~~~~~
 
-It is possible to use :cpp:any:`gui_img_set_attribute` to set the attribute of an image widget, replace it with a new image, and set a new coordinate.
+The default focus position of the image widget is at the top-left corner of the image (0,0). Developers can use :cpp:any:`gui_img_set_focus` to set a new focus point for the image widget. After setting a new focus, all transformations, rotations, and translations of the image widget will be performed based on the new focus point.
 
 Get Height/Width
 ~~~~~~~~~~~~~~~~

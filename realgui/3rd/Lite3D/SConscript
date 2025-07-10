@@ -1,0 +1,26 @@
+
+import menu_config
+import os
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Split("""
+""")
+src +=Glob('*.c')
+src +=Glob('*.cpp')
+
+inc = ['']
+inc += [cwd + '/include']
+libs = ['']
+libs += ['Lite3D']
+libpath = [cwd + '/lib']
+
+CPPDEFINES = ['']
+
+
+
+group = DefineGroup('lite3d', src, depend=['CONFIG_REALTEK_LITE3D_GCC_LIB'], CPPPATH=inc, LIBS=libs, LIBPATH=libpath, CPPDEFINES = CPPDEFINES)
+
+Return('group')
+

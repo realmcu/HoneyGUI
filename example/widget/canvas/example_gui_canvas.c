@@ -1,4 +1,5 @@
 /* canvas example start */
+#include <math.h>
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_obj.h"
@@ -56,8 +57,8 @@ void test_rect_drawing()
 static void arc_cb(gui_canvas_t *canvas)
 {
     static float  progress;
-    progress += 0.01;
-    nvgArc(canvas->vg, 480 / 2, 480 / 2, 150, 0, 3.14 * (sinf(progress) + 1), NVG_CCW);
+    progress += 0.01f;
+    nvgArc(canvas->vg, 480 / 2, 480 / 2, 150, 0, 3.14f * (sinf(progress) + 1), NVG_CCW);
     nvgStrokeWidth(canvas->vg, 20);
     nvgStrokeColor(canvas->vg, nvgRGB(178, 34, 34));
     nvgStroke(canvas->vg);

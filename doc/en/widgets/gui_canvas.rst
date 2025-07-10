@@ -34,7 +34,7 @@ Creation & Initialization
 
 1. Using ``gui_canvas_create`` function
 
-   Creates a NanoVG-based canvas widget and returns a pointer to the canvas object.
+   Creates a NanoVG canvas widget and returns a pointer to the canvas object.
 
    .. code-block:: c
    

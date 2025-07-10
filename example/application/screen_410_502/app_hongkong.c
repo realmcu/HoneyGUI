@@ -342,7 +342,10 @@ static void watchface_design(gui_view_t *view)
     gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
 
-    gui_obj_start_timer(GUI_BASE(fps_rect)); //reset timer
+    if (fps_rect)
+    {
+        gui_obj_start_timer(GUI_BASE(fps_rect)); //reset timer
+    }
     gui_obj_start_timer(GUI_BASE(view->base.parent)); //reset timer
 }
 

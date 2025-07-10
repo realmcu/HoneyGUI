@@ -13,6 +13,7 @@
 #include "gui_view.h"
 #include "gui_list.h"
 #include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -39,7 +40,7 @@ static gui_view_descriptor_t const descriptor =
 };
 
 /* Animation Variables */
-static float rot_angle = 0.0f;
+static float rot_angle = 5.0f;
 
 /*============================================================================*
  *                           Private Functions
@@ -76,14 +77,14 @@ static void update_face_animation()
     }
 }
 
-static void face_global_cb(gui_3d_t *this)
+static void face_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 65), 1,
+                             32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 50), 1, 32767,
-                                 90, this->base.w, this->base.h);
+    l3_world_initialize(&this->world, 0, 22, 65, 0, rot_angle, 0, 5);
 
-    gui_3d_world_inititalize(&this->world, 0, 22, 50, 0, rot_angle, 0, 5);
 }
 
 static void face_app(gui_view_t *view)
@@ -93,11 +94,13 @@ static void face_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_3d_t *face_3d = gui_3d_create(obj, "3d-widget", DESC_FACE_BIN,
-                                      GUI_3D_DRAW_FRONT_AND_SORT, 15, 60,
-                                      380, 380);
-    gui_3d_set_global_transform_cb(face_3d, (gui_3d_global_transform_cb)face_global_cb);
+    l3_model_t *face_3d = l3_create_model(DESC_FACE_BIN, L3_DRAW_FRONT_AND_SORT, 410, 502);
+    l3_set_global_transform(face_3d, (l3_global_transform_cb)face_global_cb);
 
-    gui_obj_create_timer(&(face_3d->base), 10, true, update_face_animation);
+    gui_lite3d_t *lite3d_face = gui_lite3d_create(obj, "lite3d-widget", face_3d,
+                                                  0, 0, 410, 502);
+
+    gui_obj_create_timer(GUI_BASE(lite3d_face), 10, true, update_face_animation);
+
 
 }
