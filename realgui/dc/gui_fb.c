@@ -406,8 +406,8 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         dc->lcd_frame_monitor->draw_prepare_cb();
     }
 
-    static int one_second;
-    int tick = gui_ms_get();
+    static uint32_t one_second = 0;
+    uint32_t tick = gui_ms_get();
     static int frame_count;
     if (tick - one_second >= 1000)
     {
