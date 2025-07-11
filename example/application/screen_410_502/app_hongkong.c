@@ -399,7 +399,7 @@ static void app_hongkong_ui_design(void)
 #else
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, CJSON_DATA_BIN, 700);
-    json_refeash_flag = 0b1111;
+    json_refreash();
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_hongkong_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0); // watch turn on animation
