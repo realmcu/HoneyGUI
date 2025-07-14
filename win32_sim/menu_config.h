@@ -24,7 +24,7 @@
 // <h> HoneyGUI Demo Select
 
 // <c> RTK GUI Base Demo
-#define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 // </c>
 
 // <c> RTK GUI Base Demo
@@ -101,7 +101,7 @@
 // </c>
 
 // <c> RTK GUI Demo 410 502
-// #define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
+#define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
 // </c>
 
 // <c> RTK GUI Demo 410 502 Lvgl
@@ -183,10 +183,14 @@
 // <c> RTK GUI BOX2D
 #define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
+
 // <c> RTK GUI XML_DOM
 // #define CONFIG_REALTEK_BUILD_GUI_XML_DOM
 // </c>
 
+// <c> RTK GUI Enable Lite3D library
+#define CONFIG_REALTEK_LITE3D_GCC_LIB
+// </c>
 
 #endif
 // </h>

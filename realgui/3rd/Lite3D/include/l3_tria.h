@@ -3,9 +3,9 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_3d_rect.h
-  * @brief 3D widget for objects composed of rectangle mesh
-  * @details 3D widget for objects composed of rectangle mesh
+  * @file l3_tria.h
+  * @brief 3D widget for objects composed of triangle mesh
+  * @details 3D widget for objects composed of triangle mesh
   * @author sienna_shen@realsil.com.cn
   * @date 2025/3/7
   * @version 1.0

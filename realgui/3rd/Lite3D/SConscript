@@ -7,20 +7,33 @@ cwd = GetCurrentDir()
 
 src = Split("""
 """)
-src +=Glob('*.c')
-src +=Glob('*.cpp')
-
-inc = ['']
-inc += [cwd + '/include']
-libs = ['']
-libs += ['Lite3D']
-libpath = [cwd + '/lib']
-
+inc = []
 CPPDEFINES = ['']
 
+if GetDepend('CONFIG_REALTEK_LITE3D_GCC_LIB') or GetDepend('CONFIG_REALTEK_LITE3D_8773E_ARMCL_LIB') or GetDepend('CONFIG_REALTEK_LITE3D_8773G_ARMCL_LIB') or GetDepend('CONFIG_REALTEK_LITE3D_8773G_ZEPHYR_LIB'):
+    src +=Glob('*.c')
+    src +=Glob('*.cpp')
+
+    inc = [cwd]
+    inc += [cwd + '/include']
+
+    if GetDepend('CONFIG_REALTEK_LITE3D_GCC_LIB'):
+        src += [cwd + '/lib/Lite3D_GCC.a']
+    elif GetDepend('CONFIG_REALTEK_LITE3D_8773E_ARMCL_LIB'):
+        src += [cwd + '/lib/Lite3D_RTL8773E_ARMCLANG.lib']
+        CPPDEFINES = ['LITE3D_PORT_GUI']
+    elif GetDepend('CONFIG_REALTEK_LITE3D_8773G_ARMCL_LIB'):
+        src += [cwd + '/lib/Lite3D_RTL8773G_ARMCLANG.lib']
+        CPPDEFINES = ['LITE3D_PORT_GUI']
+    elif GetDepend('CONFIG_REALTEK_LITE3D_8773G_ZEPHYR_LIB'):
+        src += [cwd + '/lib/Lite3D_RTL8773G_ZEPHYR.a']
+        CPPDEFINES = ['LITE3D_PORT_GUI']
+        
 
 
-group = DefineGroup('lite3d', src, depend=['CONFIG_REALTEK_LITE3D_GCC_LIB'], CPPPATH=inc, LIBS=libs, LIBPATH=libpath, CPPDEFINES = CPPDEFINES)
+
+group = DefineGroup('lite3d', src, depend=[], CPPPATH=inc, CPPDEFINES=CPPDEFINES)
+
 
 Return('group')
 

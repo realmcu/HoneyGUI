@@ -31,7 +31,7 @@ extern "C" {
 #include "guidef.h"
 #include "gui_api.h"
 #include "gui_obj.h"
-#include "include/l3.h"
+#include "l3.h"
 
 /*============================================================================*
  *                         Types
