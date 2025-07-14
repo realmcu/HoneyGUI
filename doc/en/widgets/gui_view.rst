@@ -10,12 +10,12 @@ The view widget is a kind of container that makes switching more convenient. Any
 
    <br>
    <div style="text-align: center"><img src="https://foruda.gitee.com/images/1748934358553458872/76fc7506_10737458.jpeg" width= "1000" /></div>
-   <p style="margin: 5px 0 0 0; text-align: center;">VIEW FLOWCHART</p>
+   <p style="margin: 5px 0 0 0; text-align: center;">View Flowchart</p>
    <br>
 
    <br>
    <div style="text-align: center"><img src="https://foruda.gitee.com/images/1739867379534372641/4058df7c_10737458.gif" width= "400" /></div>
-   <p style="margin: 5px 0 0 0; text-align: center;">VIWE SWITCHING DIAGRAM</p>
+   <p style="margin: 5px 0 0 0; text-align: center;">View Switching Diagram</p>
    <br>
 
 

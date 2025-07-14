@@ -11,7 +11,7 @@ The list widget is a container for any number of list note, horizontally or vert
    <br>
    <div style="text-align: center">
       <img src="https://foruda.gitee.com/images/1745465574757113257/5e8ee605_10737458.gif" width= "400" />
-      <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CLASSIC LIST</p>
+      <p style="margin: 5px 0 0 0; text-align: center;">Vertical Classic List</p>
    </div>
    <br>
 
@@ -68,29 +68,29 @@ Example
    <div style="display: flex; justify-content: space-between;">
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745398396237626690/156a4565_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CIRCLE STYLE</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Circle Style</p>
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1750920685777460993/280f951c_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CARD STYLE</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Card Style</p>
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">HORIZONTAL ZOOM STYLE</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">HORIZONTAL Zoom Style</p>
       </div>
    </div>
    <div style="display: flex; justify-content: space-between;">
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745819904731135543/290c9d96_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL FAN STYLE</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Fan Style</p>
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1750916286131886532/8af671b7_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL HELIX STYLE</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Helix Style</p>
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745890329636631265/cef196cd_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">VERTICAL CRUL STYLE</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">Vertical Curl Style</p>
       </div>
    </div>
    <br>
