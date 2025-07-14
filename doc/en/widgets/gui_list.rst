@@ -76,7 +76,7 @@ Example
       </div>
       <div style="width: 30%; text-align: center;">
          <img src="https://foruda.gitee.com/images/1745398410976550394/fb4282a5_10737458.gif" style="width: 100%;">
-         <p style="margin: 5px 0 0 0; text-align: center;">HORIZONTAL Zoom Style</p>
+         <p style="margin: 5px 0 0 0; text-align: center;">Horizontal Zoom Style</p>
       </div>
    </div>
    <div style="display: flex; justify-content: space-between;">
