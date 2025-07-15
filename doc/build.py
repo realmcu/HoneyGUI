@@ -17,7 +17,7 @@ gui_path = os.path.join(doc_path, "..")
 jenkinsBuild_home = os.environ.get("jenkinsScript_abspath", "")
 JenkinsBuild_doc_Dir = os.path.join(jenkinsBuild_home, "release/doc")
 
-version = os.getenv("Release_Version")
+version = os.getenv("Release_Version", "").strip()
 
 def cmd(s):
   print("")
