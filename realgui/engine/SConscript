@@ -20,7 +20,6 @@ src += ['font_stb.c']
 src += ['font_ttf.c']
 src += ['engine_gray.c']
 src += ['gui_post_process.c']
-src += ['acc_arm2d.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE']):
     src += ['font_freetype.c']
