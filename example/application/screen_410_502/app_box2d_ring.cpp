@@ -14,7 +14,7 @@
 #include "box2d/box2d.h"
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 
 /*============================================================================*
  *                            Macros
@@ -80,29 +80,29 @@ struct Ball
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
-static void applyCentripetalForce(b2Body *ball);
+static void apply_centripetal_force(b2Body *ball);
 static void render();
-static void maintainMinimumVelocity(b2Body *ball);
-static void limitMaxAngularVelocity(b2Body *ball);
+static void maintain_minimum_velocity(b2Body *ball);
+static void limit_max_angular_velocity(b2Body *ball);
 
 /*============================================================================*
 *                              Variables
 *============================================================================*/
-const float TIMESTEP = 1.0f / 60.0f; // Timestep
-const int VELOCITY_ITERATIONS = 8; // Velocity iterations
-const int POSITION_ITERATIONS = 3; // Position iterations
-const int RING_SEGMENTS = 100; // Number of ring segments
-const int BALL_COUNT = 40; // Number of balls
-const float BALL_RADIUS = 10.0f; // Ball radius
-const float PIXELS_PER_METER = 30.0f; // Pixels per meter
-const float INITIAL_SPEED = 20.0f; // Initial speed
-const float RING_GAP = 70.0f; // RING_GAP
-const float BALL_DENSITY = 0.1f; // BALL_DENSITY
-const float BALL_RESTITUTION = 0.3f; // BALL_RESTITUTION
-const NVGcolor BACKGROUND_COLOR = nvgRGB(255, 255, 255);
-const float EFFECT_RADIUS = 20.0f; // Effect radius of the finger
-constexpr float MINIMUM_LINEAR_VELOCITY = 5.0f; // Minimum linear velocity to avoid stopping
-constexpr float MAX_ANGULAR_VELOCITY = 15.0f; // Maximum angular velocity for balls
+static const float TIMESTEP = 1.0f / 60.0f; // Timestep
+static const int VELOCITY_ITERATIONS = 8; // Velocity iterations
+static const int POSITION_ITERATIONS = 3; // Position iterations
+static const int RING_SEGMENTS = 100; // Number of ring segments
+static const int BALL_COUNT = 40; // Number of balls
+static const float BALL_RADIUS = 10.0f; // Ball radius
+static const float PIXELS_PER_METER = 30.0f; // Pixels per meter
+static const float INITIAL_SPEED = 20.0f; // Initial speed
+static const float RING_GAP = 70.0f; // RING_GAP
+static const float BALL_DENSITY = 0.1f; // BALL_DENSITY
+static const float BALL_RESTITUTION = 0.3f; // BALL_RESTITUTION
+static const NVGcolor BACKGROUND_COLOR = nvgRGB(255, 255, 255);
+static const float EFFECT_RADIUS = 20.0f; // Effect radius of the finger
+static constexpr float MINIMUM_LINEAR_VELOCITY = 5.0f; // Minimum linear velocity to avoid stopping
+static constexpr float MAX_ANGULAR_VELOCITY = 15.0f; // Maximum angular velocity for balls
 
 b2World *world = nullptr; // Box2D world
 float outer_ring_radius = 0; // Outer ring radius
@@ -131,9 +131,9 @@ static void app_box2d_cb(void *obj)
 {
     for (const Ball &ball : balls)
     {
-        applyCentripetalForce(ball.body); // Apply centripetal force
-        limitMaxAngularVelocity(ball.body); // Limit the maximum angular velocity
-        maintainMinimumVelocity(ball.body); // Ensure minimum motion
+        apply_centripetal_force(ball.body); // Apply centripetal force
+        limit_max_angular_velocity(ball.body); // Limit the maximum angular velocity
+        maintain_minimum_velocity(ball.body); // Ensure minimum motion
         float ballX = ball.body->GetPosition().x * PIXELS_PER_METER;
         float ballY = ball.body->GetPosition().y * PIXELS_PER_METER;
         GUI_BASE(ball.img)->x = ballX - BALL_RADIUS;
@@ -189,7 +189,7 @@ static void win_release_callback()
 }
 
 // Maintain minimum linear velocity to avoid stopping
-static void maintainMinimumVelocity(b2Body *ball)
+static void maintain_minimum_velocity(b2Body *ball)
 {
     if (ball->GetLinearVelocity().Length() < MINIMUM_LINEAR_VELOCITY)
     {
@@ -202,7 +202,7 @@ static void maintainMinimumVelocity(b2Body *ball)
 }
 
 // Limit the maximum angular velocity to prevent unrealistic speeds
-static void limitMaxAngularVelocity(b2Body *ball)
+static void limit_max_angular_velocity(b2Body *ball)
 {
     float currentSpeed = ball->GetLinearVelocity().Length();
     if (currentSpeed > MAX_ANGULAR_VELOCITY)
@@ -247,7 +247,7 @@ static void clear_mem()
     }
 }
 
-static void createRing(b2World *world, float radius, float restitution)
+static void create_ring(b2World *world, float radius, float restitution)
 {
     b2BodyDef ringBodyDef;
     ringBodyDef.position.Set(SCREEN_WIDTH / 2.0f / PIXELS_PER_METER,
@@ -274,7 +274,7 @@ static void createRing(b2World *world, float radius, float restitution)
     }
 }
 
-static void createBalls(b2World *world)
+static void create_balls(b2World *world)
 {
     for (int i = 0; i < BALL_COUNT; ++i)
     {
@@ -310,7 +310,7 @@ static void createBalls(b2World *world)
 }
 
 // Apply centripetal force to ensure balls move along the ring
-static void applyCentripetalForce(b2Body *ball)
+static void apply_centripetal_force(b2Body *ball)
 {
     b2Vec2 center(SCREEN_WIDTH / 2.0f / PIXELS_PER_METER,
                   SCREEN_HEIGHT / 2.0f / PIXELS_PER_METER); // Center of the ring
@@ -377,9 +377,11 @@ static int ui_design(gui_obj_t *obj)
     world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
     outer_ring_radius = SCREEN_WIDTH / 2.0f; // Outer ring radius
     inner_ring_radius = outer_ring_radius - RING_GAP; // Inner ring radius
-    createRing(world, outer_ring_radius, BALL_RESTITUTION); // Create outer ring with restitution of 0.3
-    createRing(world, inner_ring_radius, BALL_RESTITUTION); // Create inner ring with restitution of 0.3
-    createBalls(world); // Create balls
+    create_ring(world, outer_ring_radius,
+                BALL_RESTITUTION); // Create outer ring with restitution of 0.3
+    create_ring(world, inner_ring_radius,
+                BALL_RESTITUTION); // Create inner ring with restitution of 0.3
+    create_balls(world); // Create balls
     if (!init(obj))
     {
         std::cout << "Initialization failed!" << std::endl;

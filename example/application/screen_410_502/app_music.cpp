@@ -14,7 +14,7 @@
   */
 #include "gui_view.h"
 #include "gui_list.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #define CURRENT_VIEW_NAME "music_view"
 #if 0
 extern "C" {
@@ -172,7 +172,7 @@ extern "C" {
     }
 }
 #include <memory>
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "gui_canvas_rect.h"
 #include "gui_img.h"
 #include "gui_win.h"

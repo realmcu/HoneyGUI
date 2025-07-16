@@ -1,10 +1,10 @@
 
 #if 0
 #include "gui_win.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "gui_api.h"
 #include "gui_img.h"
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "guidef.h"
 
 const static gui_view_descriptor_t *watchface_view = NULL;

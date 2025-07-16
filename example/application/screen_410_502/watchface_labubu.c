@@ -4,12 +4,12 @@
 #include <time.h>
 #include "gui_win.h"
 #include "gui_api.h"
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_video.h"
 #include "gui_text.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "tp_algo.h"
 
 /*============================================================================*

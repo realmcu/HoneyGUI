@@ -1,24 +1,41 @@
-/* view prism_image start*/
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_obj.h"
-#include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
-#include <tp_algo.h>
-#include "root_image_hongkong/ui_resource.h"
+#include "tp_algo.h"
+#include "root_image/ui_resource.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "image_view"
 
+/*============================================================================*
+*                             Types
+*============================================================================*/
+
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void app_ui_view_image_design(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 static const gui_view_descriptor_t *prism_view = NULL;
-static void app_ui_view_image_design(gui_view_t *view);
-
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -31,6 +48,11 @@ static const gui_view_descriptor_t descriptor =
     .keep = false,
 };
 
+extern int16_t face_flags_rotation;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -50,18 +72,19 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+
+// static void return_to_menu()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
 //     touch_info_t *tp = tp_get_info();
 //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
 // }
-extern int16_t face_flags_rotation;
+
 static void app_ui_view_image_design(gui_view_t *view)
 {
     touch_info_t *tp = tp_get_info();
@@ -114,7 +137,4 @@ static void app_ui_view_image_design(gui_view_t *view)
     gui_view_switch_on_event(view, prism_view, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_OUT_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
-
 }
-
-/* view prism_image end*/

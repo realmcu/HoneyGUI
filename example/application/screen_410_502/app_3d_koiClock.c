@@ -1,3 +1,9 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -5,28 +11,52 @@
 #include "gui_gray.h"
 #include "gui_obj.h"
 #include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
 #include "gui_server.h"
 #include "gui_view.h"
 #include "gui_3d.h"
-
-#include <tp_algo.h>
-#include <math.h>
+#include "tp_algo.h"
 #include "gui_components_init.h"
-#include "root_image_hongkong/ui_resource.h"
-#include "app_hongkong.h"
+#include "root_image/ui_resource.h"
+#include "app_main_watch.h"
 
-gui_win_t *fish0_window = NULL;
-gui_win_t *fish1_window = NULL;
-gui_win_t *fish2_window = NULL;
-static gui_3d_t *fish0 = NULL;
-static gui_3d_t *fish0_shadow = NULL;
-static gui_3d_t *fish1 = NULL;
-static gui_3d_t *fish1_shadow = NULL;
-static gui_3d_t *fish2 = NULL;
-static gui_3d_t *fish2_shadow = NULL;
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define CURRENT_VIEW_NAME "koiclock_view"
+#define CLOCK_RADIUS_X 60
+#define CLOCK_RADIUS_Y 55
+#define CLOCK_CENTER_X 0
+#define CLOCK_CENTER_Y 17
 
+/*============================================================================*
+*                             Types
+*============================================================================*/
+
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void app_ui_koiclock_design(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+static const gui_view_descriptor_t descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+
+    .on_switch_in = app_ui_koiclock_design,
+    .on_switch_out = NULL,
+
+    .keep = false,
+};
+
+/* Fish Movement */
 //x:80 ~ -80,y:110 ~ -80
 static float fish_angle = 0.0f;
 
@@ -43,24 +73,11 @@ static float fish0_rz = 0.0f;
 static float fish1_rz = 0.0f;
 static float fish2_rz = 0.0f;
 
-#define CURRENT_VIEW_NAME "koiclock_view"
-
-static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-static void app_ui_koiclock_design(gui_view_t *view);
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_koiclock_design,
-    .on_switch_out = NULL,
-
-    .keep = false,
-};
-
+static float fish_time = 0.0f;
+const static float rotation_factor = 60.0f;
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -76,11 +93,12 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+
+// static void return_to_menu()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
@@ -88,14 +106,7 @@ static void return_to_menu()
 //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
 // }
 
-#define CLOCK_RADIUS_X 60
-#define CLOCK_RADIUS_Y 55
-#define CLOCK_CENTER_X 0
-#define CLOCK_CENTER_Y 17
-
-static float fish_time = 0.0f;
-float rotation_factor = 60.0f;
-void update_koi0()
+static void update_koi0()
 {
     static float theta0 = 0.0f; // starting angle for fish0
     float angular_velocity = 0.03f; // Adjust as needed for speed
@@ -116,7 +127,8 @@ void update_koi0()
     fish_time += 1.2f;
     fish_angle = 3 * sinf(fish_time);
 }
-void update_koi1()
+
+static void update_koi1()
 {
     static float theta1 = M_PI_F / 4; // starting angle for fish1
     float angular_velocity = 0.02f; // Adjust as needed for speed
@@ -129,7 +141,8 @@ void update_koi1()
 
     if (theta1 >= 2 * M_PI_F) { theta1 -= 2 * M_PI_F; }
 }
-void update_koi2()
+
+static void update_koi2()
 {
     static float theta2 = 2 * M_PI_F / 3; // starting angle for fish2
     float angular_velocity = 0.02f; // Adjust as needed for speed
@@ -244,6 +257,7 @@ static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offs
 
     return transform_matrix;
 }
+
 static void app_ui_koiclock_design(gui_view_t *view)
 {
     srand((uint32_t)gui_ms_get());
@@ -253,33 +267,35 @@ static void app_ui_koiclock_design(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_img_create_from_mem(view, "koiclock_bg", LOTUS_BG_BIN, 0, 0, dc->screen_width,
-                            dc->screen_height);
-    // gui_img_t *clock_bg = gui_img_create_from_mem(view, "koiclock_bg", CLOCK_BG_BIN, 0, 46,
-    //                                               dc->screen_width, dc->screen_height);
-    // gui_img_set_mode(clock_bg, IMG_SRC_OVER_MODE);
-    // gui_img_set_opacity(clock_bg, 230);
-    fish0_window = gui_win_create(obj, "fish0_window", 0, 46, 48, 100);
-    fish1_window = gui_win_create(obj, "fish1_window", 0, 46, 48, 100);
-    fish2_window = gui_win_create(obj, "fish2_window", 0, 46, 48, 100);
+    gui_img_create_from_mem(view, "koiclock_bg", LOTUS_BG_BIN, 0, 0, gui_get_screen_width(),
+                            gui_get_screen_height());
 
-    fish0_shadow = gui_3d_create(fish0_window, "3d-fish0", DESC_KOI_SHADOW_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                 0, 0,
-                                 410, 502);
-    fish1_shadow = gui_3d_create(fish1_window, "3d-fish1", DESC_KOI_SHADOW_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                 0, 0,
-                                 410, 502);
-    fish2_shadow = gui_3d_create(fish2_window, "3d-fish2", DESC_KOI_SHADOW_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                 0, 0,
-                                 410, 502);
+    gui_win_t *fish0_window = gui_win_create(obj, "fish0_window", 0, 46, 48, 100);
+    gui_win_t *fish1_window = gui_win_create(obj, "fish1_window", 0, 46, 48, 100);
+    gui_win_t *fish2_window = gui_win_create(obj, "fish2_window", 0, 46, 48, 100);
 
-    fish0 = gui_3d_create(fish0_window, "3d-fish0", DESC_KOI0_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                          0, 0);
-    fish1 = gui_3d_create(fish1_window, "3d-fish1", DESC_KOI1_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                          0, 0);
-    fish2 = gui_3d_create(fish2_window, "3d-fish2", DESC_KOI2_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                          0, 0);
+    gui_3d_t *fish0_shadow = gui_3d_create(fish0_window, "3d-fish0", DESC_KOI_SHADOW_BIN,
+                                           GUI_3D_DRAW_FRONT_ONLY,
+                                           0, 0,
+                                           410, 502);
+    gui_3d_t *fish1_shadow = gui_3d_create(fish1_window, "3d-fish1", DESC_KOI_SHADOW_BIN,
+                                           GUI_3D_DRAW_FRONT_ONLY,
+                                           0, 0,
+                                           410, 502);
+    gui_3d_t *fish2_shadow = gui_3d_create(fish2_window, "3d-fish2", DESC_KOI_SHADOW_BIN,
+                                           GUI_3D_DRAW_FRONT_ONLY,
+                                           0, 0,
+                                           410, 502);
+
+    gui_3d_t *fish0 = gui_3d_create(fish0_window, "3d-fish0", DESC_KOI0_BIN, GUI_3D_DRAW_FRONT_ONLY, 0,
+                                    0,
+                                    0, 0);
+    gui_3d_t *fish1 = gui_3d_create(fish1_window, "3d-fish1", DESC_KOI1_BIN, GUI_3D_DRAW_FRONT_ONLY, 0,
+                                    0,
+                                    0, 0);
+    gui_3d_t *fish2 = gui_3d_create(fish2_window, "3d-fish2", DESC_KOI2_BIN, GUI_3D_DRAW_FRONT_ONLY, 0,
+                                    0,
+                                    0, 0);
 
     gui_3d_set_global_transform_cb(fish0, (gui_3d_global_transform_cb)fish0_global_cb);
     gui_3d_set_face_transform_cb(fish0, (gui_3d_face_transform_cb)fish_face_cb);

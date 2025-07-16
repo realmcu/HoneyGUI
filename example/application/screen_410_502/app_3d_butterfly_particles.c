@@ -1,23 +1,61 @@
-#include "root_image_hongkong/ui_resource.h"
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <math.h>
+#include <time.h>
+#include "root_image/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "time.h"
 #include "tp_algo.h"
-#include <math.h>
 #include "cJSON.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
 #include "gui_3d.h"
 
-#define CURRENT_VIEW_NAME "butterfly_particle_view"
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define CURRENT_VIEW_NAME   "butterfly_particle_view"
+#define MAX_PARTICLES       100
+#define VIRTUAL_PATH_LENGTH 10
+#define RETURN_DELAY        500.0f   //ms
+#define RETURN_DURATION     1000.0f
+#define MIN_RIGHT_FLY_TIME  5000.0f  //Shortest right flight time ms
+/*============================================================================*
+*                             Types
+*============================================================================*/
+typedef enum
+{
+    FLY_STOP,
+    FLY_DOING,
+    FLY_RETURNING
+} FlyState;
 
-static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+typedef struct
+{
+    float x;          // Current x position of the particle
+    float y;          // Current y position of the particle
+    float direction_x ;
+    float direction_y ;
+    float life;       // Life time of the particle (0.0-1.0)
+    float scale;      // Scale of the particle
+    gui_img_t *img;   // Image object
+    uint32_t spawn_time; // Time when particle was spawned
+} Particle;
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
 static void butterfly_particle_app(gui_view_t *view);
 static void free_particles_resources(gui_view_t *view);
 
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -27,6 +65,47 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_out = free_particles_resources,
 };
 
+/* Butterfly Design */
+gui_img_t *butterfly_wing1 = NULL;
+gui_img_t *butterfly_wing2 = NULL;
+gui_img_t *butterfly_wing3 = NULL;
+gui_img_t *butterfly_wing4 = NULL;
+gui_3d_t *butterfly_particle_3d = NULL;
+
+static float wing_angle = 0.0f;
+static float wing_time = 0.0f;
+static float butterfly_x = 0.0f;
+static float butterfly_y = 0.0f;
+static float butterfly_z = 0.0f;
+static float butterfly_rz = 0.0f;
+
+static FlyState fly_state = FLY_STOP;
+static uint32_t touch_end_time = 0;
+static uint32_t return_start_time = 0;
+static uint32_t fly_right_start_time = 0;
+
+static gui_point2f_t virtual_path[VIRTUAL_PATH_LENGTH] =
+{
+    {200.0f, 250.0f}, {190.0f, 270.0f}, {185.0f, 250.0f}, {180.0f, 280.0f}, {200.0f, 250.0f},
+    {190.0f, 280.0f}, {200.0f, 250.0f}, {200.0f, 270.0f}, {200.0f, 250.0f}, {200.0f, 270.0f}
+};
+
+static int current_virtual_index = 0;
+static uint32_t last_virtual_update_time = 0;
+static float virtual_butterfly_x = 0.0f;
+static float virtual_butterfly_y = 0.0f;
+
+/* Particle Design */
+static Particle *particles = NULL;
+static uint32_t last_particle_spawn = 0;
+
+/* Time & Date */
+extern void *text_num_array[];
+extern const char *day[];
+static char date_text_content[10];
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -44,12 +123,11 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+// static void return_to_menu()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
@@ -57,41 +135,7 @@ static void return_to_menu()
 //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
 // }
 
-//buterrfly_shadow app demo
-static gui_win_t *butterfly_win = NULL;
-gui_img_t *butterfly_wing1 = NULL;
-gui_img_t *butterfly_wing2 = NULL;
-gui_img_t *butterfly_wing3 = NULL;
-gui_img_t *butterfly_wing4 = NULL;
-gui_3d_t *butterfly_particle_3d = NULL;
-
-static float wing_angle = 0.0f;
-static float wing_time = 0.0f;
-static float butterfly_x = 0.0f;
-static float butterfly_y = 0.0f;
-static float butterfly_z = 0.0f;
-static float butterfly_rz = 0.0f;
-
-
-typedef enum
-{
-    FLY_STOP,
-    FLY_DOING,
-    FLY_RETURNING
-} FlyState;
-
-
-static const float RETURN_DELAY = 500.0f;    //ms
-static const float RETURN_DURATION = 1000.0f;
-
-static FlyState fly_state = FLY_STOP;
-static uint32_t touch_end_time = 0;
-static uint32_t return_start_time = 0;
-static const float MIN_RIGHT_FLY_TIME = 5000.0f; //Shortest right flight time ms
-
-static uint32_t fly_right_start_time = 0;
-
-int x_to_screen_w(float butterfly_x)
+static int x_to_screen_w(float butterfly_x)
 {
     float a = 30.0f;   //left fish's max x (most left)
     float b = -40.0f;  //right fish's min x (most right)
@@ -101,11 +145,11 @@ int x_to_screen_w(float butterfly_x)
     float screen_x = c + ((butterfly_x - a) / (b - a)) * (d - c);
 
     if (screen_x < 0) { screen_x = 0; }
-    if (screen_x > 410) { screen_x = 410; }
+    else if (screen_x > 410) { screen_x = 410; }
 
     return (int)screen_x;
 }
-int y_to_screen_h(float butterfly_y)
+static int y_to_screen_h(float butterfly_y)
 {
     float a = 40.0f;
     float b = -50.0f;
@@ -115,12 +159,12 @@ int y_to_screen_h(float butterfly_y)
     float screen_y = c + ((butterfly_y - a) / (b - a)) * (d - c);
 
     if (screen_y < 0) { screen_y = 0; }
-    if (screen_y > 502) { screen_y = 502; }
+    else if (screen_y > 502) { screen_y = 502; }
 
     return (int)screen_y;
 }
-void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
-                                    uint8_t face_index)
+static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
+                                           uint8_t face_index)
 {
     // Calculate the center of the four vertices
     float centerX = (vertexes[0].position.x + vertexes[1].position.x + vertexes[2].position.x +
@@ -155,20 +199,15 @@ void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
             gui_img_translate(wing, -wing->base.w / 2 * 1.8, -wing->base.h / 2 * 1.8);
         }
     }
-
-
-
     gui_img_set_opacity(wing, 180);
 }
 
-void update_butterfly_wing_bg()
+static void update_butterfly_wing_bg()
 {
     gui_obj_hidden(GUI_BASE(butterfly_wing1), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing2), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing3), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing4), false);
-
-    // Define a reasonable base scale factor
 
     // Update each wing with calculated position and scale
     update_wing_position_and_scale(butterfly_wing1,
@@ -254,7 +293,6 @@ static void butterfly_particle_global_cb(gui_3d_t *this)
     gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, 40.0f - butterfly_z, 0, 0,
                              butterfly_rz,
                              4.5);
-
 }
 
 static gui_3d_matrix_t butterfly_particle_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
@@ -284,36 +322,7 @@ static gui_3d_matrix_t butterfly_particle_face_cb(gui_3d_t *this, size_t face_in
 
 }
 
-typedef struct
-{
-    float x;          // Current x position of the particle
-    float y;          // Current y position of the particle
-    float direction_x ;
-    float direction_y ;
-    float life;       // Life time of the particle (0.0-1.0)
-    float scale;      // Scale of the particle
-    gui_img_t *img;   // Image object
-    uint32_t spawn_time; // Time when particle was spawned
-} Particle;
-
-#define MAX_PARTICLES 100
-static Particle *particles = NULL;
-static gui_win_t *particle_win = NULL;
-static uint32_t last_particle_spawn = 0;
-
-#define VIRTUAL_PATH_LENGTH 10
-static gui_point2f_t virtual_path[VIRTUAL_PATH_LENGTH] =
-{
-    {200.0f, 250.0f}, {190.0f, 270.0f}, {185.0f, 250.0f}, {180.0f, 280.0f}, {200.0f, 250.0f},
-    {190.0f, 280.0f}, {200.0f, 250.0f}, {200.0f, 270.0f}, {200.0f, 250.0f}, {200.0f, 270.0f}
-};
-
-static int current_virtual_index = 0;
-static uint32_t last_virtual_update_time = 0;
-static float virtual_butterfly_x = 0.0f;
-static float virtual_butterfly_y = 0.0f;
-
-void update_virtual_position(uint32_t current_time)
+static void update_virtual_position(uint32_t current_time)
 {
     // Update every 100 ms or adjust as needed
     if (current_time - last_virtual_update_time > 100)
@@ -326,6 +335,7 @@ void update_virtual_position(uint32_t current_time)
         virtual_butterfly_y = virtual_path[current_virtual_index].y;
     }
 }
+
 // Calculate butterfly tail position based on current position and rotation
 static void get_butterfly_tail_position(float *tail_x, float *tail_y)
 {
@@ -349,7 +359,7 @@ static void get_butterfly_tail_position(float *tail_x, float *tail_y)
 
 }
 
-static void spawn_particle()
+static void spawn_particle(gui_obj_t *parent)
 {
     uint32_t current_time = gui_ms_get();
 
@@ -403,7 +413,7 @@ static void spawn_particle()
             // Create image if not already created
             if (particles[i].img == NULL)
             {
-                particles[i].img = gui_img_create_from_mem(particle_win, "particle",
+                particles[i].img = gui_img_create_from_mem(parent, "particle",
                                                            FIREFLY_14_BIN, 0, 0, 0, 0);
                 gui_img_scale(particles[i].img, particles[i].scale, particles[i].scale);
                 gui_img_set_mode(particles[i].img, IMG_SRC_OVER_MODE);
@@ -416,8 +426,10 @@ static void spawn_particle()
         }
     }
 }
-static void update_particles()
+
+static void update_particles(void *p)
 {
+    gui_obj_t *obj = GUI_BASE(p);
     uint32_t current_time = gui_ms_get();
     update_virtual_position(current_time);
     float gravity = 0.1f;
@@ -425,14 +437,12 @@ static void update_particles()
     // Spawn new particles when butterfly is moving
     if (fly_state == FLY_DOING || fly_state == FLY_RETURNING)
     {
-        // stop_up_particles();
-        spawn_particle();
+        spawn_particle(obj);
         gravity = 0.0f;
     }
     if (fly_state == FLY_STOP)
     {
-        // stop_up_particles();
-        spawn_particle();
+        spawn_particle(obj);
         gravity = 0.0f;
     }
     // Update all particles
@@ -470,9 +480,7 @@ static void update_particles()
         }
     }
 }
-extern void *text_num_array[];
-extern const char *day[];
-static char date_text_content[10];
+
 static void time_update_cb(void *p)
 {
     int millisecond = 0;
@@ -510,12 +518,12 @@ static void time_update_cb(void *p)
     GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "watch_minute_single", current_view);
     gui_img_set_image_data((gui_img_t *)img_minute_single, text_num_array[timeinfo->tm_min % 10]);
 }
+
 static void data_create(void *p)
 {
     gui_obj_t *obj = GUI_BASE(p);
-    gui_win_t *data_win = gui_win_create(obj, "particle_win", 0, 0, 410, 502);
     sprintf(date_text_content, "FRI 16");
-    gui_text_t *text = gui_text_create(data_win, "date_text", -40, 33, 0, 0);
+    gui_text_t *text = gui_text_create(obj, "date_text", -40, 33, 0, 0);
     gui_text_set(text, (void *)date_text_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_text_content),
                  48);
@@ -524,24 +532,34 @@ static void data_create(void *p)
     gui_text_rendermode_set(text, 2);
     {
         int text_w = 35;
-        gui_img_t *img = gui_img_create_from_mem(data_win, "watch_hour_decimal", text_num_array[0],
+        gui_img_t *img = gui_img_create_from_mem(obj, "watch_hour_decimal", text_num_array[0],
                                                  211, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(data_win, "watch_hour_single", text_num_array[0],
+        img = gui_img_create_from_mem(obj, "watch_hour_single", text_num_array[0],
                                       211 + text_w, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(data_win, "colon", text_num_array[10],
+        img = gui_img_create_from_mem(obj, "colon", text_num_array[10],
                                       211 + text_w * 2 + 5, 88 + 5, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(data_win, "watch_minute_decimal", text_num_array[0],
+        img = gui_img_create_from_mem(obj, "watch_minute_decimal", text_num_array[0],
                                       211 + text_w * 2 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        img = gui_img_create_from_mem(data_win, "watch_minute_single", text_num_array[0],
+        img = gui_img_create_from_mem(obj, "watch_minute_single", text_num_array[0],
                                       211 + text_w * 3 + 17, 88, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
-    gui_obj_create_timer(&(data_win->base), 3000, true, time_update_cb);
+    gui_obj_create_timer(obj, 3000, true, time_update_cb);
 }
+
+static void free_particles_resources(gui_view_t *view)
+{
+    if (particles)
+    {
+        gui_free(particles);
+        particles = NULL;
+    }
+}
+
 static void butterfly_particle_app(gui_view_t *view)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -553,32 +571,25 @@ static void butterfly_particle_app(gui_view_t *view)
     // date & time text
     data_create(obj);
 
-    butterfly_win = gui_win_create(obj, "butterfly_win", 0, 0, dc->screen_width, dc->screen_height);
-
-
-    butterfly_wing3 = gui_img_create_from_mem(butterfly_win, "particle",
-                                              FIREFLY_14_BIN, x_to_screen_w(0), y_to_screen_h(0), 0, 0);
-    butterfly_wing4 = gui_img_create_from_mem(butterfly_win, "particle",
-                                              FIREFLY_14_BIN, x_to_screen_w(0), y_to_screen_h(0), 0, 0);
-    butterfly_wing1 = gui_img_create_from_mem(butterfly_win, "particle",
-                                              FIREFLY_14_BIN, x_to_screen_w(0), y_to_screen_h(0), 0, 0);
-    butterfly_wing2 = gui_img_create_from_mem(butterfly_win, "particle",
-                                              FIREFLY_14_BIN, x_to_screen_w(0), y_to_screen_h(0), 0, 0);
+    butterfly_wing3 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+                                              y_to_screen_h(0), 0, 0);
+    butterfly_wing4 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+                                              y_to_screen_h(0), 0, 0);
+    butterfly_wing1 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+                                              y_to_screen_h(0), 0, 0);
+    butterfly_wing2 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+                                              y_to_screen_h(0), 0, 0);
     gui_img_set_mode(butterfly_wing1, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing2, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing3, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing4, IMG_SRC_OVER_MODE);
-    butterfly_particle_3d = gui_3d_create(butterfly_win, "3d-widget", DESC_BUTTERFLY_BIN,
+    butterfly_particle_3d = gui_3d_create(obj, "3d-widget", DESC_BUTTERFLY_BIN,
                                           GUI_3D_DRAW_FRONT_ONLY, 0, 0,
                                           410, 502);
-    particle_win = gui_win_create(obj, "particle_win", 0, 0, dc->screen_width, dc->screen_height);
-
-
     gui_3d_set_global_transform_cb(butterfly_particle_3d,
                                    (gui_3d_global_transform_cb)butterfly_particle_global_cb);
     gui_3d_set_face_transform_cb(butterfly_particle_3d,
                                  (gui_3d_face_transform_cb)butterfly_particle_face_cb);
-
     gui_obj_create_timer(&(butterfly_particle_3d->base), 17, true, update_butterfly);
 
     particles = (Particle *)gui_malloc(MAX_PARTICLES * sizeof(Particle));
@@ -598,13 +609,6 @@ static void butterfly_particle_app(gui_view_t *view)
     gui_obj_hidden(GUI_BASE(butterfly_wing3), true);
     gui_obj_hidden(GUI_BASE(butterfly_wing4), true);
 
+    gui_win_t *particle_win = gui_win_create(obj, 0, 0, 0, dc->screen_width, dc->screen_height);
     gui_obj_create_timer(&(particle_win->base), 17, true, update_particles);
-}
-static void free_particles_resources(gui_view_t *view)
-{
-    if (particles)
-    {
-        gui_free(particles);
-        particles = NULL;
-    }
 }

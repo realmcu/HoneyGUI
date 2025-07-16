@@ -11,7 +11,7 @@ src += Glob('./*.cpp')
 
 
 CPPPATH = [cwd]
-CPPPATH += [cwd + '\\root_image_hongkong']
+CPPPATH += [cwd + '\\root_image']
 
 CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_410_502_DEMO'):

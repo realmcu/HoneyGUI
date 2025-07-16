@@ -6,7 +6,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "gui_cube.h"
 
 #define CURRENT_VIEW_NAME "watchface_select_view"

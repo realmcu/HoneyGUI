@@ -7,8 +7,8 @@
 #include <math.h>
 #include <stdint.h>
 #include <vector>
-#include "root_image_hongkong/ui_resource.h"
-#include "app_hongkong.h"
+#include "root_image/ui_resource.h"
+#include "app_main_watch.h"
 #include "gui_win.h"
 #include "gui_img.h"
 #include "box2d/box2d.h"

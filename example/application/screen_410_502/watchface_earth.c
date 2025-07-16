@@ -4,12 +4,12 @@
 #include <time.h>
 #include "gui_win.h"
 #include "gui_api.h"
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_video.h"
 #include "gui_text.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "tp_algo.h"
 
 /*============================================================================*
@@ -28,7 +28,7 @@
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
-void create_watchface_earth(gui_view_t *view);
+static void create_watchface_earth(gui_view_t *view);
 
 /*============================================================================*
  *                            Variables
@@ -129,7 +129,7 @@ static void enter_cb(void *p)
     }
 }
 
-void create_watchface_earth(gui_view_t *view)
+static void create_watchface_earth(gui_view_t *view)
 {
     gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);

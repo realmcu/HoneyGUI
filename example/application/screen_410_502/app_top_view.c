@@ -1,8 +1,8 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "root_image_hongkong/ui_resource.h"
-#include "app_hongkong.h"
+#include "root_image/ui_resource.h"
+#include "app_main_watch.h"
 #include "gui_img.h"
 #include "gui_view.h"
 #include "gui_canvas.h"
@@ -17,19 +17,6 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
-typedef enum
-{
-    MESSAGE = 0,
-    OS,
-} app_name;
-
-typedef struct information
-{
-    const char *informer;
-    const char *content;
-    const char *time;
-    app_name app;
-} information_t;
 
 /*============================================================================*
  *                            Macros
@@ -158,7 +145,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     const char *time = inform->time;
     app_name app = inform->app;
 
-    gui_win_t *win = gui_win_create(gui_obj_get_root(), "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
+    gui_win_t *win = gui_win_create(current_view, "win_view_more", -SCREEN_WIDTH, 0, SCREEN_WIDTH,
                                     SCREEN_HEIGHT);
     gui_obj_create_timer(GUI_BASE(win), 20, true, view_more_cb);
     gui_obj_add_event_cb(GUI_BASE(win), (gui_event_cb_t)view_more_event_cb,

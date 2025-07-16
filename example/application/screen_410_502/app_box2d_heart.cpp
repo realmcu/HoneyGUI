@@ -12,9 +12,9 @@
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include <random>  // For secure random numbers
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "gui_view.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 
 /*============================================================================*
  *                            Macros

@@ -1,7 +1,7 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
@@ -11,7 +11,7 @@
 #include "cJSON.h"
 #include "gui_canvas_img.h"
 #include "gui_canvas_rect.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "gui_view.h"
 
 /*============================================================================*

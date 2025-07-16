@@ -1,16 +1,26 @@
-#include "gui_win.h"
-#include "gui_img.h"
-#include "box2d/box2d.h"
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <vector>
 #include <random>
 #include <chrono>
+#include "gui_win.h"
+#include "gui_img.h"
+#include "box2d/box2d.h"
 #include "gui_canvas.h"
 #include "tp_algo.h"
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
 #define CURRENT_VIEW_NAME "box2d_countdown_view"
+
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
@@ -44,30 +54,19 @@ extern "C" {
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
 
-
+/*============================================================================*
+ *                             C++ Namespace
+ *============================================================================*/
 namespace app_box2d_countdown
 {
-const float TIMESTEP = 1.0f / 60.0f;
-const int VELOCITY_ITERATIONS = 6;
-const int POSITION_ITERATIONS = 2;
-const float PIXELS_PER_METER = 30.0f;
-const float PARTICLE_RADIUS = 6.0f;
-const float PARTICLE_DENSITY = 0.3f;
-const float PARTICLE_RESTITUTION = 0.3f;
-const NVGcolor BACKGROUND_COLOR = nvgRGB(30, 30, 30);
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define MAX_PARTICLES_IMG 140
 
-const int COUNTDOWN_START = 30; // Countdown from 30
-const float COUNTDOWN_INTERVAL = 1.0f; // Updated every second
-
-// Explosion effect parameters
-const float EXPLOSION_FORCE = 100.0f;
-const float EXPLOSION_RADIUS = 2.0f;
-
-gui_obj_t *parent;
-b2World *world = nullptr;
-int SCREEN_WIDTH;
-int SCREEN_HEIGHT;
-
+/*============================================================================*
+*                           Types
+*============================================================================*/
 struct Particle
 {
     b2Body *body;
@@ -77,30 +76,48 @@ struct Particle
     float opacity;
     float scaleFactor;
     bool isActive;
-} Particle_t;
+};
 
-#define MAX_PARTICLES_IMG 140
+/*============================================================================*
+*                              Variables
+*============================================================================*/
+/* Particle Parameters */
+static const float TIMESTEP = 1.0f / 60.0f;
+static const int VELOCITY_ITERATIONS = 6;
+static const int POSITION_ITERATIONS = 2;
+static const float PIXELS_PER_METER = 30.0f;
+static const float PARTICLE_RADIUS = 6.0f;
+static const float PARTICLE_DENSITY = 0.3f;
+static const float PARTICLE_RESTITUTION = 0.3f;
+static const uint8_t COUNTDOWN_START = 30; // Countdown from 30
+static const float COUNTDOWN_INTERVAL = 1.0f; // Updated every second
 static Particle *particles_img = NULL;
 static int active_particle_count = 0;
-
-int currentNumber = COUNTDOWN_START;
+static uint32_t screen_w = 0;
+static uint32_t screen_h = 0;
+static uint8_t currentNumber = COUNTDOWN_START;
 float countdownTimer = COUNTDOWN_INTERVAL;
+
+static b2World *world = nullptr;
+/* Explosion Effect Parameters */
+static const float EXPLOSION_FORCE = 100.0f;
+static const float EXPLOSION_RADIUS = 2.0f;
 bool isExploding = false;
 float explosionTimer = 0.0f;
 
-static uint16_t xorshift16_state = 1;
-
-uint16_t xorshift16()
+/*============================================================================*
+*                           Private Functions
+*============================================================================*/
+static uint16_t xorshift16()
 {
-    uint16_t x = xorshift16_state;
+    static uint16_t x = 1; // Initial state
     x ^= x << 7;
     x ^= x >> 9;
     x ^= x << 8;
-    xorshift16_state = x;
     return x;
 }
 
-void particle_canvas_callback(NVGcontext *vg)
+static void particle_canvas_callback(NVGcontext *vg)
 {
     NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
     nvgBeginPath(vg);
@@ -109,7 +126,7 @@ void particle_canvas_callback(NVGcontext *vg)
     nvgFill(vg);
 }
 
-void initParticlesPool()
+static void initParticlesPool()
 {
     particles_img = (Particle *)gui_malloc(MAX_PARTICLES_IMG * sizeof(Particle));
     if (!particles_img)
@@ -117,20 +134,20 @@ void initParticlesPool()
         gui_log("Failed to allocate memory for particles_img!\n");
         return;
     }
-    size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * GUI_CANVAS_OUTPUT_RGBA * 4 + sizeof(
+    size_t buffer_size = PARTICLE_RADIUS * PARTICLE_RADIUS * 4 * 2 + sizeof(
                              gui_rgb_data_head_t);
 
     for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
         particles_img[i].img_data = (uint8_t *)gui_lower_malloc(buffer_size);
         memset(particles_img[i].img_data, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, PARTICLE_RADIUS * 2,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, PARTICLE_RADIUS * 2,
                                           PARTICLE_RADIUS * 2, particle_canvas_callback, (uint8_t *)particles_img[i].img_data);
         particles_img[i].isActive = false;
     }
 }
 
-void resetParticles()
+static void resetParticles()
 {
     for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
@@ -152,7 +169,7 @@ void resetParticles()
     active_particle_count = 0;
 }
 
-Particle *getAvailableParticle()
+static Particle *getAvailableParticle()
 {
     for (int i = 0; i < MAX_PARTICLES_IMG; i++)
     {
@@ -166,12 +183,12 @@ Particle *getAvailableParticle()
     return nullptr;
 }
 
-std::vector<b2Vec2> getNumberShape(int number)
+static std::vector<b2Vec2> getNumberShape(int number)
 {
     std::vector<b2Vec2> shape;
-    float scale = std::min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.3f;
-    float centerX = SCREEN_WIDTH / 2.0f;
-    float centerY = SCREEN_HEIGHT / 2.0f;
+    float scale = std::min(screen_w, screen_h) * 0.3f;
+    float centerX = screen_w / 2.0f;
+    float centerY = screen_h / 2.0f;
 
     const float segLen = scale * 0.8f;
     const float hOffset = segLen * 0.5f;
@@ -234,7 +251,7 @@ std::vector<b2Vec2> getNumberShape(int number)
     return shape;
 }
 
-void createNumber(int number)
+static void createNumber(int number)
 {
     resetParticles();
 
@@ -265,7 +282,7 @@ void createNumber(int number)
         fixtureDef.restitution = PARTICLE_RESTITUTION;
         p->body->CreateFixture(&fixtureDef);
 
-        p->img = gui_img_create_from_mem(parent, 0, p->img_data,
+        p->img = gui_img_create_from_mem(current_view, 0, p->img_data,
                                          (int)(pos.x - PARTICLE_RADIUS),
                                          (int)(pos.y - PARTICLE_RADIUS),
                                          0, 0);
@@ -275,7 +292,7 @@ void createNumber(int number)
     }
 }
 
-void explode()
+static void number_explode()
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -299,14 +316,14 @@ void explode()
     explosionTimer = 0.5f; // explosion hold time
 }
 
-void resetToNumber(int number)
+static void resetToNumber(int number)
 {
     createNumber(number);
     currentNumber = number;
     countdownTimer = 0.1;
 }
 
-void app_box2d_cb(void *obj)
+static void app_box2d_cb(void *obj)
 {
     // update world
     world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
@@ -350,7 +367,7 @@ void app_box2d_cb(void *obj)
         {
             if (currentNumber > 0)
             {
-                explode();
+                number_explode();
             }
         }
     }
@@ -376,17 +393,15 @@ void app_box2d_cb(void *obj)
     }
 }
 
-bool init()
+static bool init()
 {
-    GUI_WIDGET_TRY_EXCEPT(parent)
+    GUI_WIDGET_TRY_EXCEPT(current_view)
 
-    gui_win_t *win = gui_win_create(parent, "Countdown", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gui_win_t *win = gui_win_create(current_view, "Countdown", 0, 0, screen_w, screen_h);
     if (!win) { return false; }
 
     // background
-    gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                           gui_rgba(BACKGROUND_COLOR.r * 255, BACKGROUND_COLOR.g * 255,
-                                    BACKGROUND_COLOR.b * 255, 255));
+    gui_canvas_rect_create((gui_obj_t *)current_view, 0, 0, 0, screen_w, screen_h, gui_rgb(30, 30, 30));
 
     gui_obj_create_timer(GUI_BASE(win), 16, true, app_box2d_cb);
     gui_obj_start_timer(GUI_BASE(win));
@@ -394,7 +409,7 @@ bool init()
     return true;
 }
 
-void close()
+static void close()
 {
     if (world)
     {
@@ -430,11 +445,10 @@ void close()
     }
 }
 
-int ui_design(gui_obj_t *obj)
+static int ui_design(gui_obj_t *obj)
 {
-    parent = obj;
-    SCREEN_WIDTH = gui_get_screen_width();
-    SCREEN_HEIGHT = gui_get_screen_height();
+    screen_w = gui_get_screen_width();
+    screen_h = gui_get_screen_height();
     isExploding = false;
 
 
@@ -453,12 +467,15 @@ int ui_design(gui_obj_t *obj)
 }
 }
 
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
-    static void return_cb()
-    {
-        gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                               SWITCH_IN_ANIMATION_FADE);
-    }
+    // static void return_cb()
+    // {
+    //     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    //                            SWITCH_IN_ANIMATION_FADE);
+    // }
     // static void return_timer_cb(void *obj)
     // {
     //     touch_info_t *tp = tp_get_info();

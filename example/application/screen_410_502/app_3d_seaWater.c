@@ -1,7 +1,13 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_win.h"
-#include "gui_img.h"
 #include "gui_gray.h"
 #include "gui_obj.h"
 #include "string.h"
@@ -12,13 +18,14 @@
 #include "gui_canvas.h"
 #include "gui_3d.h"
 #include "gui_matrix.h"
+#include "tp_algo.h"
+#include "root_image/ui_resource.h"
+#include "app_main_watch.h"
 
-#include <tp_algo.h>
-#include <math.h>
-#include "gui_components_init.h"
-#include "root_image_hongkong/ui_resource.h"
-#include "app_hongkong.h"
-
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define CURRENT_VIEW_NAME "seawater_view"
 #define ROTATION_INCREMENT 0.5f
 #define POSITION_INCREMENT 2.0f
 #define CAN_COUNT 4
@@ -26,6 +33,43 @@
 #define WAVE_DURATION_MS 5000
 #define MAX_BUBBLES 20
 
+/*============================================================================*
+*                             Types
+*============================================================================*/
+typedef struct
+{
+    gui_img_t *img;
+    float scale;
+    int start_x;
+    int start_y;
+    uint32_t create_time;
+} Bubble;
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+static void app_ui_wave_nums_design(gui_view_t *view);
+static void cleanup_resources(gui_view_t *view);
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
+static const gui_view_descriptor_t descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+
+    .on_switch_in = app_ui_wave_nums_design,
+    .on_switch_out = cleanup_resources,
+
+    .keep = false,
+};
+
+/* Gui Obj */
 static gui_canvas_t *canvas_wave = NULL;
 static gui_win_t *can0_window = NULL;
 static gui_win_t *can1_window = NULL;
@@ -33,6 +77,7 @@ static gui_win_t *can2_window = NULL;
 static gui_win_t *can3_window = NULL;
 static gui_win_t *bubble_window = NULL;
 
+/* Animate Param */
 static float fish_angle = 0.0f;
 static float fish_time = 0.0f;
 static bool wave_active = false;
@@ -50,7 +95,7 @@ static float can_current_rotation[NUM_CAN_TIME_PAIRS] = {0};
 static int16_t fish_x[4] = {-70, 70, -50, -45};
 static int16_t fish_y[4] = {50, 40, 60, 45};
 
-static void *display_time_resource_def[] =
+static const void *display_time_resource_def[] =
 {
     NUM0_BIN,
     NUM1_BIN,
@@ -64,25 +109,13 @@ static void *display_time_resource_def[] =
     NUM9_BIN,
 };
 
-#define CURRENT_VIEW_NAME "seawater_view"
-
-static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
-static void app_ui_wave_nums_design(gui_view_t *view);
-static void cleanup_resources(gui_view_t *view);
-
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_wave_nums_design,
-    .on_switch_out = cleanup_resources,
-
-    .keep = false,
-};
-
+/* Bubble */
+static Bubble *bubbles = NULL;
+static int active_bubble_count = 0;
+static uint32_t fish_last_bubble_time[4] = {0};
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -90,6 +123,7 @@ static int gui_view_descriptor_register_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
@@ -104,19 +138,7 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-typedef struct
-{
-    gui_img_t *img;
-    float scale;
-    int start_x;
-    int start_y;
-    uint32_t create_time;
-} Bubble;
-
-static Bubble *bubbles = NULL;
-static int active_bubble_count = 0;
-
-void gui_wave_draw_graph(gui_canvas_t *canvas)
+static void gui_wave_draw_graph(gui_canvas_t *canvas)
 {
     NVGcontext *vg = canvas->vg;
     float y_base = 245;
@@ -209,7 +231,7 @@ static void wave_animate_cb()
     }
 }
 
-void animate_cans_based_on_wave()
+static void animate_cans_based_on_wave()
 {
     float y_base = 230;
 
@@ -242,7 +264,7 @@ void animate_cans_based_on_wave()
     }
 }
 
-void can_update_param_cb()
+static void can_update_param_cb()
 {
     touch_info_t *tp = tp_get_info();
     static uint32_t last_bubble_time = 0;
@@ -360,7 +382,7 @@ static void cleanup_resources(gui_view_t *view)
     active_bubble_count = 0;
 }
 
-int fish_x_to_screen(float fish_x)
+static int fish_x_to_screen(float fish_x)
 {
     float a = 80.0f;   //left fish's max x (most left)
     float b = -90.0f;  //right fish's min x (most right)
@@ -374,7 +396,7 @@ int fish_x_to_screen(float fish_x)
 
     return (int)screen_x;
 }
-static uint32_t fish_last_bubble_time[4] = {0};
+
 static void fish_animate_cb()
 {
     touch_info_t *tp = tp_get_info();
@@ -539,23 +561,27 @@ static void app_ui_wave_nums_design(gui_view_t *view)
 
     can0_window = gui_win_create(view, "can_window", 70, 190, 64, 116);
     gui_img_t *can0 = gui_img_create_from_mem(can0_window, "can0", CANSKIN_PURPLE_BIN, 0, 0, 0, 0);
-    gui_img_t *time0 = gui_img_create_from_mem(can0_window, "time0", display_time_resource_def[2], 16,
+    gui_img_t *time0 = gui_img_create_from_mem(can0_window, "time0",
+                                               (void *)display_time_resource_def[2], 16,
                                                32, 0, 0);
 
 
     can1_window = gui_win_create(view, "can_window", 155, 190, 64, 116);
     gui_img_t *can1 = gui_img_create_from_mem(can1_window, "can1", CANSKIN_YELLOW_BIN, 0, 0, 0, 0);
-    gui_img_t *time1 = gui_img_create_from_mem(can1_window, "can1", display_time_resource_def[0], 16,
+    gui_img_t *time1 = gui_img_create_from_mem(can1_window, "can1",
+                                               (void *)display_time_resource_def[0], 16,
                                                32, 0, 0);
 
     can2_window = gui_win_create(view, "can_window", 240, 190, 64, 116);
     gui_img_t *can2 = gui_img_create_from_mem(can2_window, "can2", CANSKIN_GREEN_BIN, 0, 0, 0, 0);
-    gui_img_t *time2 = gui_img_create_from_mem(can2_window, "can2", display_time_resource_def[2], 16,
+    gui_img_t *time2 = gui_img_create_from_mem(can2_window, "can2",
+                                               (void *)display_time_resource_def[2], 16,
                                                32, 0, 0);
 
     can3_window = gui_win_create(view, "can_window", 330, 190, 64, 116);
     gui_img_t *can3 = gui_img_create_from_mem(can3_window, "can3", CANSKIN_RED_BIN, 0, 0, 0, 0);
-    gui_img_t *time3 = gui_img_create_from_mem(can3_window, "can3", display_time_resource_def[5], 16,
+    gui_img_t *time3 = gui_img_create_from_mem(can3_window, "can3",
+                                               (void *)display_time_resource_def[5], 16,
                                                32, 0, 0);
 
     wave_active = false;

@@ -3,10 +3,10 @@
  *============================================================================*/
 #include "gui_win.h"
 #include "gui_text.h"
-#include "root_image_hongkong/ui_resource.h"
+#include "root_image/ui_resource.h"
 #include "gui_win.h"
 #include "gui_server.h"
-#include "app_hongkong.h"
+#include "app_main_watch.h"
 #include "gui_menu_cellular.h"
 #include "math.h"
 #include "guidef.h"
@@ -92,7 +92,7 @@ const static gui_view_descriptor_t *rainbow_digital_view = NULL;
 const static gui_view_descriptor_t *koiclock_view = NULL;
 const static gui_view_descriptor_t *digital_clock_view = NULL;
 const static gui_view_descriptor_t *box2d_countdown_view = NULL;
-const static gui_view_descriptor_t *fireworks_view = NULL;
+const static gui_view_descriptor_t *fireworks_clock_view = NULL;
 const static gui_view_descriptor_t *heart_particle_view = NULL;
 const static gui_view_descriptor_t *butterfly_particle_view = NULL;
 const static gui_view_descriptor_t *butterflys_view = NULL;
@@ -189,7 +189,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     koiclock_view = gui_view_descriptor_get("koiclock_view");
     digital_clock_view = gui_view_descriptor_get("digital_clock_view");
     box2d_countdown_view = gui_view_descriptor_get("box2d_countdown_view");
-    fireworks_view = gui_view_descriptor_get("fireworks_view");
+    fireworks_clock_view = gui_view_descriptor_get("fireworks_clock_view");
     heart_particle_view = gui_view_descriptor_get("heart_particle_view");
     butterfly_particle_view = gui_view_descriptor_get("butterfly_particle_view");
     butterflys_view = gui_view_descriptor_get("butterflys_view");
@@ -327,7 +327,7 @@ static void switch_app_countdown(void *obj, gui_event_t e, void *param)
 }
 static void switch_app_firework(void *obj, gui_event_t e, void *param)
 {
-    gui_view_switch_direct(current_view, fireworks_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_direct(current_view, fireworks_clock_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 

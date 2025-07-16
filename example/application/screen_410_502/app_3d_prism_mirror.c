@@ -1,21 +1,29 @@
-
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_obj.h"
-#include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
 #include "gui_server.h"
 #include "gui_canvas.h"
 #include "gui_3d.h"
-#include "math.h"
-#include <gui_view.h>
-#include <tp_algo.h>
+#include "tp_algo.h"
 #include "gui_components_init.h"
-#include "root_image_hongkong/ui_resource.h"
-#include "app_hongkong.h"
+#include "root_image/ui_resource.h"
+#include "app_main_watch.h"
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define CURRENT_VIEW_NAME "prism3d_mirror_view"
 
+/*============================================================================*
+*                             Types
+*============================================================================*/
 typedef struct
 {
     float pos_x;
@@ -36,29 +44,19 @@ typedef struct
     gui_animate_t animate;
 } gui_prism_mirror3d_t;
 
-static Position_pos_t prism_world_pos_temp = {0.0f, 0.0f, 0.0f};
-static Position_rot_t prism_world_rot_temp = {0.0f, 0.0f, 0.0f};
-
-static Position_pos_t prism_world_pos_raw = {0.0f, 0.0f, 0.0f};
-static Position_pos_t prism_world_pos_target = {0.0f, 0.0f, 0.0f};
-
-static gui_prism_mirror3d_t *prism_mirror3d = NULL;
-static gui_3d_t *prism_3d = NULL;
-static uint8_t face_nums = 6;
-int16_t face_flags_rotation = 1;
-static float progress_percent = 0.0f;
-static int16_t enter_face_flags = 1;
-bool enter_prism_view_flag = true;
-
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
 static void gui_prism_mirror3d_swap_states();
 static void prism_mirror3d_render_animate_cb();
 static void gui_prism_mirror3d_enter_animate();
 static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param);
 static void prism_mirror3d_update_angle_cb();
 static void prism_view_switch_to_other_view();
-
-#define CURRENT_VIEW_NAME "prism3d_mirror_view"
-
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* View Management */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *image_view = NULL;
@@ -72,6 +70,22 @@ static const gui_view_descriptor_t descriptor =
     .keep = false,
 };
 
+/* Prism Animate */
+static Position_pos_t prism_world_pos_temp = {0.0f, 0.0f, 0.0f};
+static Position_rot_t prism_world_rot_temp = {0.0f, 0.0f, 0.0f};
+static Position_pos_t prism_world_pos_raw = {0.0f, 0.0f, 0.0f};
+static Position_pos_t prism_world_pos_target = {0.0f, 0.0f, 0.0f};
+static gui_prism_mirror3d_t *prism_mirror3d = NULL;
+static gui_3d_t *prism_3d = NULL;
+static uint8_t face_nums = 6;
+int16_t face_flags_rotation = 1;
+static float progress_percent = 0.0f;
+static int16_t enter_face_flags = 1;
+static bool enter_prism_view_flag = true;
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
 static int gui_view_descriptor_register_init(void)
 {
     gui_view_descriptor_register(&descriptor);
@@ -89,23 +103,18 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-static void return_to_menu()
-{
-    gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                           SWITCH_IN_ANIMATION_FADE);
-}
+
+// static void return_to_menu()
+// {
+//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+//                            SWITCH_IN_ANIMATION_FADE);
+// }
 
 // static void return_timer_cb()
 // {
 //     touch_info_t *tp = tp_get_info();
 //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
 // }
-
-/*
-    * @brief  Initialize the 3D prism mirror view
-    * @param  view: The view to initialize
-*/
-
 
 static void prism_mirror3d_update_angle_cb()
 {
@@ -264,6 +273,7 @@ static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *para
     gui_obj_start_timer(&(prism_3d->base));
 
 }
+
 static void gui_prism_mirror3d_swap_states()
 {
     Position_pos_t temp = prism_world_pos_raw;
@@ -272,6 +282,7 @@ static void gui_prism_mirror3d_swap_states()
 
     progress_percent = 0.0f;
 }
+
 static void gui_prism_mirror3d_enter_animate()
 {
     gui_prism_mirror3d_swap_states();
@@ -293,6 +304,7 @@ static void prism_view_switch_to_other_view()
                                SWITCH_OUT_NONE_ANIMATION);
     }
 }
+
 static void prism_position_init()
 {
     prism_world_pos_raw.pos_x = 0.0f;
@@ -303,6 +315,7 @@ static void prism_position_init()
     prism_world_pos_target.pos_y = 11.3f;
     prism_world_pos_target.pos_z = 29.0f;
 }
+
 static void app_ui_prism_mirror_design(gui_view_t *view)
 {
 
@@ -334,6 +347,5 @@ static void app_ui_prism_mirror_design(gui_view_t *view)
     gui_3d_on_click(prism_3d, prism_mirror3d_on_face_click_cb, NULL);
 
     gui_view_set_animate_step(view, 1000);
-
 }
 
