@@ -1655,6 +1655,18 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
     return i;
 }
 
+void gui_font_refresh_font_size(gui_text_t *text)
+{
+    if (text->font_mode == FONT_SRC_FTL)
+    {
+        text->font_height = font_lib_tab[get_fontlib_by_name(text->path)].font_size;
+    }
+    else
+    {
+        text->font_height = ((GUI_FONT_HEAD_BMP *)text->path)->font_size;
+    }
+}
+
 uint8_t gui_font_mem_destroy(uint8_t *font_bin_addr)
 {
     if (!font_bin_addr)

@@ -193,6 +193,13 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect);
  */
 void gui_font_get_dot_info(gui_text_t *text);
 
+/**
+ * @brief refresh font size
+ *
+ * @param text Widget pointer
+ */
+void gui_font_refresh_font_size(gui_text_t *text);
+
 #ifdef __cplusplus
 }
 #endif
