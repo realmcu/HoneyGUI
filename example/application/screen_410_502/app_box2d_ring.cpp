@@ -118,15 +118,6 @@ std::uniform_int_distribution<> dis(0, 255);
 /*============================================================================*
 *                           Private Functions
 *============================================================================*/
-static uint16_t xorshift16()
-{
-    static uint16_t seed = 12345;
-    seed ^= seed << 6;
-    seed ^= seed >> 9;
-    seed ^= seed << 2;
-    return seed;
-}
-
 static void app_box2d_cb(void *obj)
 {
     for (const Ball &ball : balls)

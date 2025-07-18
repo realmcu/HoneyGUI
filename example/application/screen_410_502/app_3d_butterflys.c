@@ -340,8 +340,8 @@ static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, floa
     float offset_x = cosf(angle_rad) * 10.0f;
     float offset_y = sinf(angle_rad) * 10.0f;
 
-    float random_offset_x = (rand() % 10 - 5) * 0.5f; // -2.5 ~ +2.5
-    float random_offset_y = (rand() % 10 - 5) * 0.5f;
+    float random_offset_x = (xorshift16() % 10 - 5) * 0.5f; // -2.5 ~ +2.5
+    float random_offset_y = (xorshift16() % 10 - 5) * 0.5f;
 
     *tail_x = screen_x + offset_x + random_offset_x;
     *tail_y = screen_y + offset_y + random_offset_y;
@@ -374,11 +374,11 @@ static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *but
                 float angle_rad = (butterfly_rz - 90) * M_PI_F / 180.0f;
                 particles[i].direction_x = cosf(angle_rad) * -0.5f;
                 particles[i].direction_y = sinf(angle_rad) * -0.5f;
-                particles[i].direction_x += (rand() % 100 - 100) * 0.001f;
-                particles[i].direction_y += (rand() % 100 - 100) * 0.001f;
+                particles[i].direction_x += (xorshift16() % 100 - 100) * 0.001f;
+                particles[i].direction_y += (xorshift16() % 100 - 100) * 0.001f;
             }
 
-            particles[i].scale = 0.1f + (rand() % 5) / 10.0f;
+            particles[i].scale = 0.1f + (xorshift16() % 5) / 10.0f;
             particles[i].spawn_time = current_time;
 
             // Create image if not already created

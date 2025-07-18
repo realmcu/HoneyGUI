@@ -1,13 +1,14 @@
+#if 0
 #include "root_image/ui_resource.h"
-#include <gui_img.h>
+#include "gui_img.h"
+#include "gui_canvas.h"
 #include "gui_win.h"
-#include "gui_obj.h"
+#include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
 
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 #define APP_NUM 4
-#if 0
 typedef struct gui_sidebar_app
 {
     void *img_addr;

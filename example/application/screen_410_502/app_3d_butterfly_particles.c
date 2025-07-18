@@ -344,8 +344,8 @@ static void get_butterfly_tail_position(float *tail_x, float *tail_y)
     switch (fly_state)
     {
     case FLY_STOP:
-        *tail_x = x_to_screen_w(butterfly_x) + cosf(angle_rad) * (rand() % 20 - 5);
-        *tail_y = y_to_screen_h(butterfly_y) + sinf(angle_rad) * (rand() % 20 - 10);
+        *tail_x = x_to_screen_w(butterfly_x) + cosf(angle_rad) * (xorshift16() % 20 - 5);
+        *tail_y = y_to_screen_h(butterfly_y) + sinf(angle_rad) * (xorshift16() % 20 - 10);
         break;
     case FLY_RETURNING:
     case FLY_DOING:
@@ -396,16 +396,16 @@ static void spawn_particle(gui_obj_t *parent)
             if (fly_state == FLY_DOING || fly_state == FLY_RETURNING)
             {
                 //In flight, particles have initial upward and leftward velocities
-                particles[i].direction_x = -(rand() % 30 + 15) * 0.1f;
-                particles[i].direction_y = -(rand() % 20 + 5) * 0.1f;
+                particles[i].direction_x = -(xorshift16() % 30 + 15) * 0.1f;
+                particles[i].direction_y = -(xorshift16() % 20 + 5) * 0.1f;
             }
             else
             {
-                particles[i].direction_x = (rand() % 200 - 100) * 0.01f;
-                particles[i].direction_y = (rand() % 200 - 100) * 0.01f;
+                particles[i].direction_x = (xorshift16() % 200 - 100) * 0.01f;
+                particles[i].direction_y = (xorshift16() % 200 - 100) * 0.01f;
             }
 
-            particles[i].scale = 0.1f + (rand() % 5) / 10.0f;
+            particles[i].scale = 0.1f + (xorshift16() % 5) / 10.0f;
             particles[i].spawn_time = current_time;
 
             // Create image if not already created

@@ -204,9 +204,9 @@ static void update_flower_animation()
 
         if (petals[i].driftY > dc->screen_height + 100)
         {
-            petals[i].driftX = rand() % dc->screen_width;
-            petals[i].driftY = -rand() % dc->screen_height;
-            petals[i].scale = (rand() % 41) / 100.0f + 0.1f;
+            petals[i].driftX = xorshift16() % dc->screen_width;
+            petals[i].driftY = -xorshift16() % dc->screen_height;
+            petals[i].scale = (xorshift16() % 41) / 100.0f + 0.1f;
             gui_img_scale(petals[i].img, petals[i].scale, petals[i].scale);
         }
         if (petals[i].driftX < -dc->screen_width)
@@ -223,11 +223,11 @@ static void update_flower_animation()
 
 static void single_petal_init(Petal *single_petal, gui_obj_t *obj, gui_dispdev_t *dc, float scale)
 {
-    single_petal->driftX = rand() % dc->screen_width;
-    single_petal->driftY = -rand() % dc->screen_height;
+    single_petal->driftX = xorshift16() % dc->screen_width;
+    single_petal->driftY = -xorshift16() % dc->screen_height;
     single_petal->scale = scale;
 
-    int random_image_index = rand() % 6;
+    int random_image_index = xorshift16() % 6;
     void *images[6] = {(void *)LEAF01_BIN, (void *)LEAF02_BIN, (void *)LEAF03_BIN,
                        (void *)LEAF04_BIN, (void *)LEAF05_BIN, (void *)LEAF06_BIN
                       };
@@ -266,7 +266,7 @@ static void flower_app(gui_view_t *view)
 
     for (int i = 0; i < NUM_PETALS / 2; i++)
     {
-        float scale = (rand() % 21) / 100.0f + 0.1f;
+        float scale = (xorshift16() % 21) / 100.0f + 0.1f;
         single_petal_init(&petals[i], obj, dc, scale);
     }
 
@@ -276,7 +276,7 @@ static void flower_app(gui_view_t *view)
 
     for (int i = NUM_PETALS / 2; i < NUM_PETALS; i++)
     {
-        float scale = (rand() % 21) / 100.0f + 0.3f;
+        float scale = (xorshift16() % 21) / 100.0f + 0.3f;
         single_petal_init(&petals[i], obj, dc, scale);
     }
 

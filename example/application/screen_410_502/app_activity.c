@@ -8,7 +8,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "cJSON.h"
-#include "gui_canvas_img.h"
+#include "gui_canvas.h"
 #include "guidef.h"
 #include "gui_view.h"
 #include "app_main_watch.h"

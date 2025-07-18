@@ -5,16 +5,12 @@
 #include "gui_text.h"
 #include "root_image/ui_resource.h"
 #include "gui_win.h"
-#include "gui_server.h"
 #include "app_main_watch.h"
 #include "gui_menu_cellular.h"
-#include "math.h"
 #include "guidef.h"
 #include "gui_list.h"
-#include "tp_algo.h"
 #include "gui_canvas_rect.h"
-#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
-#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
+
 
 /*============================================================================*
  *                           Types
@@ -28,8 +24,9 @@ typedef struct note_design_param
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define MENU_GAP 125
 #define CURRENT_VIEW_NAME "menu_view"
+#define SCREEN_WIDTH (int16_t)gui_get_screen_width()
+#define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
 
 /*============================================================================*
  *                           Function Declaration
@@ -469,7 +466,7 @@ static void app_menu_design(gui_view_t *view)
 
     if (menu_style == 0)
     {
-        static void *click_cb[] =
+        void *click_cb[] =
         {
             switch_app_heart_rate,
             switch_app_fruit_ninja,

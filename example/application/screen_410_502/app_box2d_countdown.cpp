@@ -108,15 +108,6 @@ float explosionTimer = 0.0f;
 /*============================================================================*
 *                           Private Functions
 *============================================================================*/
-static uint16_t xorshift16()
-{
-    static uint16_t x = 1; // Initial state
-    x ^= x << 7;
-    x ^= x >> 9;
-    x ^= x << 8;
-    return x;
-}
-
 static void particle_canvas_callback(NVGcontext *vg)
 {
     NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);

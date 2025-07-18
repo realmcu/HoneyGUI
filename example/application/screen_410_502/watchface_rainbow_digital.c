@@ -292,8 +292,8 @@ static void dot_animation_cb()
         {
             dots[i].img->opacity_value = 0; // Reset opacity
             dots[i].is_opacity_increase = true;
-            dots[i].drift_x = rand() % gui_get_dc()->screen_width;
-            dots[i].drift_y = rand() % gui_get_dc()->screen_height;
+            dots[i].drift_x = xorshift16() % gui_get_dc()->screen_width;
+            dots[i].drift_y = xorshift16() % gui_get_dc()->screen_height;
         }
 
         gui_img_translate(dots[i].img, dots[i].drift_x, dots[i].drift_y);
@@ -348,10 +348,10 @@ static void rainbow_digital_app(gui_view_t *view)
     for (int i = 0; i < DOT_NUM; i++)
     {
         dots[i].img = gui_img_create_from_mem(dot_win, "dot", dot_img_bin[i % 5], 0, 0, 0, 0);
-        dots[i].drift_x = rand() % dc->screen_width;
-        dots[i].drift_y = rand() % dc->screen_height;
-        dots[i].direction_x = (rand() % 2 == 0) ? 1 : -1;
-        dots[i].direction_y = (rand() % 2 == 0) ? 1 : -1;
+        dots[i].drift_x = xorshift16() % dc->screen_width;
+        dots[i].drift_y = xorshift16() % dc->screen_height;
+        dots[i].direction_x = (xorshift16() % 2 == 0) ? 1 : -1;
+        dots[i].direction_y = (xorshift16() % 2 == 0) ? 1 : -1;
         dots[i].is_opacity_increase = true;
 
         gui_img_translate(dots[i].img, dots[i].drift_x, dots[i].drift_y);

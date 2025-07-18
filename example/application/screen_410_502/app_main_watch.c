@@ -10,10 +10,8 @@
 #include "gui_win.h"
 #include "guidef.h"
 #include "kb_algo.h"
-#include "wheel_algo.h"
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
-#include "gui_server.h"
 #include "app_main_watch.h"
 
 /*============================================================================*
@@ -192,7 +190,7 @@ static void kb_button_cb()
 }
 
 /* Generate a pseudo-random number */
-static uint16_t xorshift16()
+uint16_t xorshift16()
 {
     static uint16_t seed = 12345;
     seed ^= seed << 6;
@@ -392,7 +390,7 @@ static void app_main_watch_ui_design(void)
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_main_watch_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0); // watch turn on animation
-    fps_create(gui_obj_get_root());
+    // fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     win_cb();
 }
@@ -406,21 +404,25 @@ static int app_init(void)
     defaultPath = "example\\application\\screen_410_502\\root_image\\root\\";
     int fd;
     fd = open("./example/application/screen_410_502/root_image/root(0x704D1000).bin", 0);
-    if (fd > 0)
-    {
-        printf("open root(0x704D1000).bin Successful!\n");
-        read(fd, resource_root, 1024 * 1024 * 20);
-    }
-    else
+    if (fd < 0)
     {
         printf("open root(0x704D1000).bin Fail!\n");
         printf("open root(0x704D1000).bin Fail!\n");
         printf("open root(0x704D1000).bin Fail!\n");
         return 0;
     }
+
+    printf("open root(0x704D1000).bin Successful!\n");
+    ssize_t bytes_read = read(fd, resource_root, 1024 * 1024 * 20);
+    if (bytes_read < 0)
+    {
+        printf("read bin file failed!\n");
+        close(fd);
+        return 0;
+    }
+    close(fd);
 #endif
     app_main_watch_ui_design();
-
     return 0;
 }
 

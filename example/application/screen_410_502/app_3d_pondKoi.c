@@ -16,6 +16,7 @@
 #include "tp_algo.h"
 #include "gui_components_init.h"
 #include "root_image/ui_resource.h"
+#include "app_main_watch.h"
 
 /*============================================================================*
  *                            Macros
@@ -165,8 +166,8 @@ static void fish0_animate_cb()
     // }
     if (now - last_update > interval)
     {
-        target_dx = rand() % 160 - 80;
-        target_dy = rand() % 190 - 80;
+        target_dx = xorshift16() % 160 - 80;
+        target_dy = xorshift16() % 190 - 80;
         last_update = now;
 
         koi_moving_to_target = true;
@@ -235,16 +236,16 @@ static void fish1_animate_cb()
 
     if (now - last_update > interval)
     {
-        target1_dx = rand() % 160 - 80;
-        target1_dy = rand() % 190 - 80;
+        target1_dx = xorshift16() % 160 - 80;
+        target1_dy = xorshift16() % 190 - 80;
         last_update = now;
 
         koi1_moving_to_target = true;
     }
     if (tp->pressed)
     {
-        target1_dx = rand() % 160 - 80;
-        target1_dy = rand() % 190 - 80;
+        target1_dx = xorshift16() % 160 - 80;
+        target1_dy = xorshift16() % 190 - 80;
         koi1_moving_to_target = true;
     }
 
@@ -307,16 +308,16 @@ void fish2_animate_cb()
 
     if (now - last_update > interval)
     {
-        target2_dx = rand() % 160 - 80;
-        target2_dy = rand() % 190 - 80;
+        target2_dx = xorshift16() % 160 - 80;
+        target2_dy = xorshift16() % 190 - 80;
         last_update = now;
 
         koi2_moving_to_target = true;
     }
     if (tp->pressed)
     {
-        target2_dx = rand() % 160 - 80;
-        target2_dy = rand() % 190 - 80;
+        target2_dx = xorshift16() % 160 - 80;
+        target2_dy = xorshift16() % 190 - 80;
         koi2_moving_to_target = true;
     }
 
@@ -380,16 +381,16 @@ void fish3_animate_cb()
 
     if (now - last_update > interval)
     {
-        target3_dx = rand() % 160 - 80;
-        target3_dy = rand() % 190 - 80;
+        target3_dx = xorshift16() % 160 - 80;
+        target3_dy = xorshift16() % 190 - 80;
         last_update = now;
 
         koi3_moving_to_target = true;
     }
     if (tp->pressed)
     {
-        target3_dx = rand() % 160 - 80;
-        target3_dy = rand() % 190 - 80;
+        target3_dx = xorshift16() % 160 - 80;
+        target3_dy = xorshift16() % 190 - 80;
         koi3_moving_to_target = true;
     }
 
@@ -638,14 +639,14 @@ static void app_ui_pond_koi_design(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    fish0_y = (float)(rand() % 191 - 80);
-    fish0_x = (float)(rand() % 161 - 80);
-    fish1_x = (float)(rand() % 161 - 80);
-    fish1_y = (float)(rand() % 191 - 80);
-    fish2_x = (float)(rand() % 161 - 80);
-    fish2_y = (float)(rand() % 191 - 80);
-    fish3_x = (float)(rand() % 161 - 80);
-    fish3_y = (float)(rand() % 191 - 80);
+    fish0_y = (float)(xorshift16() % 191 - 80);
+    fish0_x = (float)(xorshift16() % 161 - 80);
+    fish1_x = (float)(xorshift16() % 161 - 80);
+    fish1_y = (float)(xorshift16() % 191 - 80);
+    fish2_x = (float)(xorshift16() % 161 - 80);
+    fish2_y = (float)(xorshift16() % 191 - 80);
+    fish3_x = (float)(xorshift16() % 161 - 80);
+    fish3_y = (float)(xorshift16() % 191 - 80);
     gui_img_create_from_mem(view, "img_1_test", PONDGROUND_BIN, 0, 0, 0, 0);
 
     gui_win_t *fish0_window = gui_win_create(view, "fish_window", 0, 0, 48, 100);

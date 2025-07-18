@@ -271,7 +271,7 @@ static void can_update_param_cb()
     {
         for (int i = 0; i < NUM_CAN_TIME_PAIRS; i++)
         {
-            float rotation = ((rand() % 11) - 5) / 1.0f;
+            float rotation = ((xorshift16() % 11) - 5) / 1.0f;
             can_rotation_targets[i] = rotation;
         }
     }
@@ -329,8 +329,8 @@ static void create_bubble(int x, int y)
                 bubble->img->base.not_show = false;
             }
 
-            bubble->scale = 0.3f + (rand() % 7) / 20.0f;
-            bubble->img->opacity_value = 150 + rand() % 105;
+            bubble->scale = 0.3f + (xorshift16() % 7) / 20.0f;
+            bubble->img->opacity_value = 150 + xorshift16() % 105;
             bubble->start_x = x;
             bubble->start_y = y;
             bubble->create_time = gui_ms_get();
@@ -405,18 +405,18 @@ static void fish_animate_cb()
     {
         for (int i = 0; i < 4; i++)
         {
-            float pos = rand() % 161;;
+            float pos = xorshift16() % 161;;
             fish_pos_x[i] = pos;
         }
         if (fish_x[0] > 90)
         {
-            // uint16_t i = rand() % 161; //-90~70
+            // uint16_t i = xorshift16() % 161; //-90~70
             fish_x[0] = 70 - fish_pos_x[0]; // -90~70
             // -50~-30
         }
         if (fish_x[1] < -80)
         {
-            // uint16_t i = rand() % 161; //-90~70
+            // uint16_t i = xorshift16() % 161; //-90~70
             fish_x[1] = fish_pos_x[1] - 70; // -90~70
         }
         if (fish_x[2] > 90)

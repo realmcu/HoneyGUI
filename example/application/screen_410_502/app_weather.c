@@ -148,7 +148,7 @@ static void update_raindrop_animation()
 
         if (dynamic[i].driftY > dc->screen_height)
         {
-            dynamic[i].driftX =  70 + rand() % 256;
+            dynamic[i].driftX =  70 + xorshift16() % 256;
             dynamic[i].driftY = -50;
         }
 
@@ -169,8 +169,8 @@ static void update_snow_animation()
 
         if (dynamic[i].driftY > 300)
         {
-            dynamic[i].driftX =  70 + rand() % 256;
-            dynamic[i].driftY = -rand() % 300;
+            dynamic[i].driftX =  70 + xorshift16() % 256;
+            dynamic[i].driftY = -xorshift16() % 300;
         }
 
         gui_img_translate(dynamic[i].img, dynamic[i].driftX, dynamic[i].driftY);
@@ -214,8 +214,8 @@ static void update_leaf_animation()
 
         if (dynamic[i].driftX > dc->screen_width)
         {
-            dynamic[i].driftX =  -rand() % 300;
-            dynamic[i].driftY = 100 + rand() % 300;
+            dynamic[i].driftX =  -xorshift16() % 300;
+            dynamic[i].driftY = 100 + xorshift16() % 300;
             dynamic[i].img->opacity_value = 255;
         }
 
@@ -296,9 +296,9 @@ static void update_weather_animation(void *param)
         {
             for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
             {
-                dynamic[i].driftX = 70 + rand() % 256;
+                dynamic[i].driftX = 70 + xorshift16() % 256;
                 dynamic[i].driftY = -(i % 50) * 15;
-                dynamic[i].scale = (rand() % 71) / 100.0f + 0.2f;
+                dynamic[i].scale = (xorshift16() % 71) / 100.0f + 0.2f;
 
                 dynamic[i].img = gui_img_create_from_mem(win, "rain", RAIN0_BIN, 0, 0, 0, 0);
                 gui_img_scale(dynamic[i].img, dynamic[i].scale, dynamic[i].scale);
@@ -316,9 +316,9 @@ static void update_weather_animation(void *param)
         {
             for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
             {
-                dynamic[i].driftX = 70 + rand() % 256;
-                dynamic[i].driftY = -rand() % 300;
-                dynamic[i].scale = (rand() % 31) / 100.0f + 0.1f;
+                dynamic[i].driftX = 70 + xorshift16() % 256;
+                dynamic[i].driftY = -xorshift16() % 300;
+                dynamic[i].scale = (xorshift16() % 31) / 100.0f + 0.1f;
 
                 dynamic[i].img = gui_img_create_from_mem(win, "snow", SNOW0_BIN, 0, 0, 0, 0);
                 gui_img_scale(dynamic[i].img, dynamic[i].scale, dynamic[i].scale);
@@ -354,11 +354,11 @@ static void update_weather_animation(void *param)
         {
             for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
             {
-                dynamic[i].driftX = -rand() % 300;
-                dynamic[i].driftY = 100 + rand() % 300;
-                dynamic[i].scale = (rand() % 71) / 100.0f + 0.2f;
+                dynamic[i].driftX = -xorshift16() % 300;
+                dynamic[i].driftY = 100 + xorshift16() % 300;
+                dynamic[i].scale = (xorshift16() % 71) / 100.0f + 0.2f;
 
-                int random_image_index = rand() % 3;
+                int random_image_index = xorshift16() % 3;
                 void *images[3] = {(void *)WINDLEAF00_BIN, (void *)WINDLEAF01_BIN, (void *)WINDLEAF02_BIN};
 
                 dynamic[i].img = gui_img_create_from_mem(win, "leaf", images[random_image_index], 0, 0,

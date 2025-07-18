@@ -283,7 +283,7 @@ static void gui_fb_draw(gui_obj_t *root)
                 }
                 else
                 {
-                    memset(dc->frame_buf, 0x0, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+                    memset(dc->frame_buf, 0x0, ((size_t)dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
                 }
             }
             dc->section_count = i;
@@ -323,7 +323,7 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     else if (dc->type == DC_SINGLE)
     {
-        memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+        memset(dc->frame_buf, 0x00, ((size_t)dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
         dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
         post_process_handle();
@@ -347,7 +347,7 @@ static void gui_fb_draw(gui_obj_t *root)
         {
             dc->frame_buf = dc->disp_buf_2;
         }
-        memset(dc->frame_buf, 0x00, (dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+        memset(dc->frame_buf, 0x00, ((size_t)dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
         dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
         post_process_handle();

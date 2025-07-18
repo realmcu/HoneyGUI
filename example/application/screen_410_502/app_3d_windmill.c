@@ -93,9 +93,9 @@ static void update_bubbles()
         // Reset bubble position if it drifts off-screen vertically
         if (bubbles[i].driftY < -100)
         {
-            bubbles[i].driftX = rand() % dc->screen_width;
-            bubbles[i].driftY = rand() % dc->screen_height + dc->screen_height;
-            bubbles[i].scale = (rand() % 701) / 1000.0f + 0.1f;
+            bubbles[i].driftX = xorshift16() % dc->screen_width;
+            bubbles[i].driftY = xorshift16() % dc->screen_height + dc->screen_height;
+            bubbles[i].scale = (xorshift16() % 701) / 1000.0f + 0.1f;
             gui_img_scale(bubbles[i].img, bubbles[i].scale, bubbles[i].scale);
         }
         // Wrap around horizontally if bubble goes beyond screen borders
@@ -202,9 +202,9 @@ static void windmill_app(gui_view_t *view)
 
     for (int i = 0; i < NUM_BUBBLES; i++)
     {
-        bubbles[i].driftX = rand() % dc->screen_width;
-        bubbles[i].driftY = rand() % dc->screen_height + dc->screen_height;
-        bubbles[i].scale = (rand() % 701) / 1000.0f + 0.1f;
+        bubbles[i].driftX = xorshift16() % dc->screen_width;
+        bubbles[i].driftY = xorshift16() % dc->screen_height + dc->screen_height;
+        bubbles[i].scale = (xorshift16() % 701) / 1000.0f + 0.1f;
         bubbles[i].img = gui_img_create_from_mem(obj, "bubble", BUBBLE_BIN, 0, 0, 0,
                                                  0);
 

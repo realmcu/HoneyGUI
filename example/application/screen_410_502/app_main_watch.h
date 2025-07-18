@@ -62,6 +62,9 @@ typedef struct information
         return_cb();\
     }\
 
+// Generate a pseudo-random number
+uint16_t xorshift16();
+
 #ifdef __cplusplus
 }
 #endif

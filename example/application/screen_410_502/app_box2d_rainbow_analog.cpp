@@ -296,8 +296,8 @@ void create_capsules(b2World *world)
             capsule.color = Capsule_Color[i];
 
             // Random angle and radius offset
-            float angleOffset = rand() % 800 / 1000.0f;
-            float radiusRandom = OUTER_RING_RADIUS * (0.8f + rand() % 201 / 1000.0f);
+            float angleOffset = xorshift16() % 800 / 1000.0f;
+            float radiusRandom = OUTER_RING_RADIUS * (0.8f + xorshift16() % 201 / 1000.0f);
             float rotAngle = baseAngle + angleOffset;
 
             // Calculate initial position
@@ -317,7 +317,7 @@ void create_capsules(b2World *world)
             // Calculate the rotation angle of oneself (pointing to the center of the circle+random offset)
             b2Vec2 toCenter(SCREEN_WIDTH / 2 - capsuleX, SCREEN_HEIGHT / 2 - capsuleY);
             float selfRot = atan2(toCenter.y, toCenter.x) * 180 / M_PI_F + 90;
-            capsule.selfRandomRot = rand() % 60 - 30; // ± 30 degree random offset
+            capsule.selfRandomRot = xorshift16() % 60 - 30; // ± 30 degree random offset
             gui_img_set_focus(capsule.img, CAPSULE_IMG_HALF_WIDTH, CAPSULE_IMG_HALF_HEIGHT);
             gui_img_rotation(capsule.img, selfRot + capsule.selfRandomRot);
             BodyDef.angle = (selfRot + capsule.selfRandomRot) * M_PI_F / 180.0f;

@@ -103,10 +103,10 @@ static void update_all_fireflys()
 
     for (int i = 0; i < MAX_FIREFLY; i++)
     {
-        if (current_time - fireflys[i].last_change > 1000 + rand() % 2000)
+        if (current_time - fireflys[i].last_change > 1000 + xorshift16() % 2000)
         {
-            fireflys[i].angle = (rand() % 360) * M_PI_F / 180.0f;
-            fireflys[i].speed = 0.5f + (rand() % 20) / 20.0f;
+            fireflys[i].angle = (xorshift16() % 360) * M_PI_F / 180.0f;
+            fireflys[i].speed = 0.5f + (xorshift16() % 20) / 20.0f;
             fireflys[i].last_change = current_time;
         }
 
@@ -121,9 +121,9 @@ static void update_all_fireflys()
         gui_img_translate(fireflys[i].img, fireflys[i].x, fireflys[i].y);
         gui_img_translate(fireflys[i].fill, fireflys[i].x, fireflys[i].y);
 
-        if (rand() % 100 < 5)
+        if (xorshift16() % 100 < 5)
         {
-            uint8_t opacity = 150 + rand() % 105;
+            uint8_t opacity = 150 + xorshift16() % 105;
             gui_img_set_opacity(fireflys[i].img, opacity);
             gui_img_set_opacity(fireflys[i].fill, opacity);
         }
@@ -151,11 +151,11 @@ static void create_firefly(gui_win_t *firefly_win)
     gui_dispdev_t *dc = gui_get_dc();
     for (int i = 0; i < MAX_FIREFLY; i++)
     {
-        fireflys[i].x = rand() % dc->screen_width;
-        fireflys[i].y = rand() % dc->screen_height;
-        fireflys[i].speed = 0.5f + (rand() % 20) / 20.0f;
-        fireflys[i].angle = (rand() % 360) * M_PI_F / 180.0f;
-        fireflys[i].scale = 0.5f + (rand() % 8) / 10.0f;
+        fireflys[i].x = xorshift16() % dc->screen_width;
+        fireflys[i].y = xorshift16() % dc->screen_height;
+        fireflys[i].speed = 0.5f + (xorshift16() % 20) / 20.0f;
+        fireflys[i].angle = (xorshift16() % 360) * M_PI_F / 180.0f;
+        fireflys[i].scale = 0.5f + (xorshift16() % 8) / 10.0f;
         fireflys[i].last_change = gui_ms_get();
 
         fireflys[i].fill = gui_img_create_from_mem(firefly_win, "fire_fly_fill",
@@ -167,7 +167,7 @@ static void create_firefly(gui_win_t *firefly_win)
         gui_img_scale(fireflys[i].img, fireflys[i].scale, fireflys[i].scale);
         gui_img_scale(fireflys[i].fill, fireflys[i].scale, fireflys[i].scale);
 
-        uint8_t opacity = 200 + rand() % 55;
+        uint8_t opacity = 200 + xorshift16() % 55;
         gui_img_set_opacity(fireflys[i].img, opacity);
         gui_img_set_opacity(fireflys[i].fill, opacity);
     }

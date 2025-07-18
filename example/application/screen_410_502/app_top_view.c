@@ -4,8 +4,6 @@
 #include "root_image/ui_resource.h"
 #include "app_main_watch.h"
 #include "gui_img.h"
-#include "gui_view.h"
-#include "gui_canvas.h"
 #include "gui_win.h"
 #include "gui_text.h"
 #include "tp_algo.h"
@@ -13,6 +11,7 @@
 #include "gui_canvas_round_rect.h"
 #include "guidef.h"
 #include "gui_list.h"
+#include "app_main_watch.h"
 
 /*============================================================================*
  *                           Types

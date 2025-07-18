@@ -325,33 +325,23 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
     return 0;
 }
 
-/* Generate a pseudo-random number */
-static uint16_t xorshift16()
-{
-    static uint16_t seed = 12345;
-    seed ^= seed << 6;
-    seed ^= seed >> 9;
-    seed ^= seed << 2;
-    return seed;
-}
-
 /* Refresh image */
 static bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
 {
     if (y < -70 || y > 550 || x < -70 || x > SCREEN_WIDTH + 70)
     {
-        b2Vec2 position((100 + xorshift16() % (354 - 100 + 1)) * P2M, 550.0f * P2M);
+        b2Vec2 position((float)(100 + xorshift16() % (354 - 100 + 1)) * P2M, 550.f * P2M);
         // gui_log("x=%f,y=%f\r\n", position.x, position.y);
         b2Vec2 lv; //speed
         body->SetTransform(position, xorshift16() % (360 + 1));
         if (position.x * M2P > 227) // if position left, velocity right
         {
-            lv.Set(-(10 + xorshift16() % (15 - 10 + 1)),
-                   -(22 + xorshift16() % (22 - 20 + 1))); // velocity x:10~15; y: 18~20
+            lv.Set(-(float)(10 + xorshift16() % (15 - 10 + 1)),
+                   -(float)(22 + xorshift16() % (22 - 20 + 1))); // velocity x:10~15; y: 18~20
         }
         else
         {
-            lv.Set((10 + xorshift16() % (15 - 10 + 1)), -(22 + xorshift16() % (22 - 20 + 1)));
+            lv.Set((float)(10 + xorshift16() % (15 - 10 + 1)), -(float)(22 + xorshift16() % (22 - 20 + 1)));
         }
         body->SetLinearVelocity(lv);
         body->SetAngularVelocity(-314);
