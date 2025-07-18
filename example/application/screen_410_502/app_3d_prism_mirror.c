@@ -8,7 +8,6 @@
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_obj.h"
-#include "gui_server.h"
 #include "gui_canvas.h"
 #include "gui_3d.h"
 #include "tp_algo.h"

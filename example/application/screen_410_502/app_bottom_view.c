@@ -8,12 +8,10 @@
 #include "gui_canvas.h"
 #include "gui_text.h"
 #include "gui_win.h"
-#include "gui_canvas_img.h"
 #include "gui_img.h"
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
 #include "gui_list.h"
-#include "tp_algo.h"
 
 /*============================================================================*
  *                            Macros

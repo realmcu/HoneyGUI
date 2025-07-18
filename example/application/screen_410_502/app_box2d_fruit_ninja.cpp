@@ -340,7 +340,7 @@ static bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
 {
     if (y < -70 || y > 550 || x < -70 || x > SCREEN_WIDTH + 70)
     {
-        b2Vec2 position((100 + xorshift16() % (354 - 100 + 1)) * P2M, 550 * P2M);
+        b2Vec2 position((100 + xorshift16() % (354 - 100 + 1)) * P2M, 550.0f * P2M);
         // gui_log("x=%f,y=%f\r\n", position.x, position.y);
         b2Vec2 lv; //speed
         body->SetTransform(position, xorshift16() % (360 + 1));

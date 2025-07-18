@@ -8,10 +8,8 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "tp_algo.h"
-#include "cJSON.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_list.h"
 #include "gui_3d.h"
 
 /*============================================================================*
@@ -190,13 +188,13 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
         {
             scale_factor = fmaxf(width, height) / 40.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, (-wing->base.w / 2) * 0.4, -wing->base.h / 2 * 0.4);
+            gui_img_translate(wing, (-wing->base.w / 2.0f) * 0.4f, (-wing->base.h / 2.0f) * 0.4f);
         }
         else
         {
             scale_factor = fmaxf(width, height) / 20.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, -wing->base.w / 2 * 1.8, -wing->base.h / 2 * 1.8);
+            gui_img_translate(wing, (-wing->base.w / 2.0f) * 1.8f, (-wing->base.h / 2.0f) * 1.8f);
         }
     }
     gui_img_set_opacity(wing, 180);

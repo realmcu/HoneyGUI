@@ -8,10 +8,8 @@
 #include "time.h"
 #include "tp_algo.h"
 #include <math.h>
-#include "cJSON.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_list.h"
 #include "gui_3d.h"
 #include "gui_lite3d.h"
 

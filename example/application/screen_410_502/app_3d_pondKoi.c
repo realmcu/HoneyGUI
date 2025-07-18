@@ -11,13 +11,11 @@
 #include "gui_gray.h"
 #include "gui_obj.h"
 #include "string.h"
-#include "gui_server.h"
 #include "gui_view.h"
 #include "gui_3d.h"
 #include "tp_algo.h"
 #include "gui_components_init.h"
 #include "root_image/ui_resource.h"
-#include "app_main_watch.h"
 
 /*============================================================================*
  *                            Macros
