@@ -620,7 +620,7 @@ A widget to display a image.
    | Image                | Image Path                                                                                                         |
    |                      |                                                                                                                    |
    |                      | Note: The image must be pre-imported into the project.                                                             |
-   |                      | Please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Image_Resource_Management` for details.               |
+   |                      | Please refer to :ref:`{9B9FF45D-F6CE-434E-80EE-5B233D4AA1FB}_Resource_Management` for details.                     |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+
    | Image Rotation Angle | Image rotation angle.                                                                                              |
    +----------------------+--------------------------------------------------------------------------------------------------------------------+

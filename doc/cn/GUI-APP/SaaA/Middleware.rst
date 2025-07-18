@@ -39,7 +39,7 @@ XML
 ===
 * APP包中的XML文件描述了控件的初始嵌套树结构和特定参数。
 * 使用 ``realgui\3rd\ezXML`` 将XML转换为C语言数据格式。详细信息请参考 `ezXML SourceForge <https://ezxml.sourceforge.net/>`_ 。
-* XML解析器的实现在该文件 ``realgui\DOM\XML_DOM.c``中。您可以在 ``XML syntax`` 页面上阅读语法说明。
+* XML解析器的实现在该文件 ``realgui\DOM\XML_DOM.c`` 中。您可以在 ``XML syntax`` 页面上阅读语法说明。
 * 根据语法规定，函数 ``foreach_create`` 使用递归策略遍历XML的每个标签，并将标签映射到控件，将标签的属性配置给控件。
 * XML遍历完成后，在固件中实际上创建了一个C-APP，与直接使用C-APP API的结果没有区别。
 * 然后将执行XML中提到的JavaScript文件。
@@ -96,7 +96,7 @@ JavaScript
 ------------------
 
 * ``progress`` 函数用于设置和读取进度条的进度。
-* 输入形式参数在数组 ``args``中，其中第一个是进度数值。如果该参数存在，则表示需要设置进度。使用 ``jerry_get_number_value()`` 将 Javascript 参数转换为 C 语言变量。
+* 输入形式参数在数组 ``args`` 中，其中第一个是进度数值。如果该参数存在，则表示需要设置进度。使用 ``jerry_get_number_value()`` 将 Javascript 参数转换为 C 语言变量。
 * 返回值是要获取的进度，使用 ``jerry_create_number`` 将 C 语言变量转换为 Javascript变量。需要注意的是，这些 JavaScript 变量在 C 语言中的形式是无符号整数的索引。
 
 .. code-block:: c

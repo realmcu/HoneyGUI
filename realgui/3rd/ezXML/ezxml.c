@@ -53,7 +53,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "guidef.h"
-
+extern void gui_log(const char *format, ...);
 extern void *gui_lower_malloc(size_t n);
 extern void *gui_lower_realloc(void *ptr_old, size_t n);
 extern void gui_lower_free(void *rmem);
@@ -795,8 +795,13 @@ ezxml_t ezxml_parse_fd(int fd)
     else   // mmap failed, read file into memory
     {
 #endif // EZXML_NOMMAP
+        gui_log("xml file copy:");
         l = gui_fs_read(fd, m = xml_malloc(st.st_size), st.st_size);
+        extern uint32_t gui_low_mem_used(void); gui_low_mem_used();
+        extern uint32_t gui_mem_used(void); gui_mem_used(); gui_log("xml file parse:");
         root = (ezxml_root_t)ezxml_parse_str(m, l);
+        gui_low_mem_used();
+        gui_mem_used();
         root->len = -1; // so we know to xml_free s in ezxml_free()
 #ifndef EZXML_NOMMAP
     }
@@ -813,7 +818,7 @@ ezxml_t ezxml_parse_file(const char *file)
     if (fd >= 0) { gui_fs_close(fd); }
     else
     {
-        extern void gui_log(const char *format, ...);
+
         gui_log("ERROR: ezxml open %s failed!\n", file);
     }
 

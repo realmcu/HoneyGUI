@@ -259,11 +259,11 @@ typedef unsigned char gui_app_animation_t;
  *============================================================================*/
 
 /**
- * @brief get current app pointer
+ * @brief Get current app pointer
 */
 gui_app_t *gui_current_app(void);
 /**
- * @brief get nect app pointer if there are two apps exist.
+ * @brief Get nect app pointer if there are two apps exist.
 */
 gui_app_t *gui_next_app(void);
 
@@ -276,7 +276,7 @@ void gui_app_shutdown(gui_app_t *app);
 gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_entry);
 
 /**
- * @brief switch app from A to B
+ * @brief Switch app from A to B
  *
  * @param from A pointer
  * @param to B pointer
@@ -293,14 +293,14 @@ void gui_app_layer_top(void);
  */
 void gui_app_layer_buttom(void);
 /**
- * @brief get next app layer
+ * @brief Get next app layer
  *
  * @return true top layer
  * @return false button layer
  */
 bool gui_app_get_layer(void);
 /**
- * @brief set app active ms time
+ * @brief Set app active ms time
  *
  * @param app app set
  * @param active_ms active ms times

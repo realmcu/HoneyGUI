@@ -19,7 +19,7 @@
 #include "time.h"
 #include "gui_components_init.h"
 #include "rvd.h"
-#define RVD_APP_STARTUP
+//#define RVD_APP_STARTUP
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
 #define PROJECT_NAME                   "HoneyGUI Simulator"
@@ -48,6 +48,7 @@ int main(int argc, char **argv)
     gui_app_startup(get_app_launcher_frontend());
 #endif
 #endif
+//gui_update_screen_force(true);
     while (1)
     {
         time_t now;

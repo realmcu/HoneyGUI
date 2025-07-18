@@ -51,6 +51,11 @@
 
 static void gui_tabview_input_prepare(gui_obj_t *obj)
 {
+    if (((gui_tabview_t *)obj)->tp_disable)
+    {
+        return;
+    }
+
     touch_info_t *tp = tp_get_info();
     gui_tabview_t *this = (gui_tabview_t *)obj;
     GUI_UNUSED(tp);
@@ -96,10 +101,6 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         tabview->cur_id.y = tabview->jump.jump_id.y;
         tabview->cur_id.x = tabview->jump.jump_id.x;
         tabview->jump.jump_flag = false;
-        this->checksum = 0;
-        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
-
-        if (last != this->checksum)
         {
             gui_fb_change();
         }
@@ -433,14 +434,15 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     }
 
     if (((this->tab_change_ready == true) && (this->release_x == 0) && (this->release_y == 0)) ||
-        (dc->frame_count == 1) || this->initial)
+        this->initial)
     {
         gui_obj_enable_event(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
         this->tab_change_ready = false;
         this->initial = false;
         this->tab_need_pre_load = true;
 
-        gui_log("do cache right and left \n");
+        gui_log("cur_id.x, cur_id.y, last_id.x, last_id.y %d,%d, %d,%d \n", this->cur_id.x, this->cur_id.y,
+                this->last_id.x, this->last_id.y);
     }
     else
     {
@@ -593,9 +595,13 @@ gui_tabview_t *gui_tabview_create(void       *parent,
     gui_obj_ctor(&this->base, parent, name, x, y, w, h);
 
     GET_BASE(this)->obj_cb = gui_tabview_cb;
-    GET_BASE(this)->has_input_prepare_cb = true;
+
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
+    if (!this->tp_disable)
+    {
+        GET_BASE(this)->has_destroy_cb = true;
+        GET_BASE(this)->has_input_prepare_cb = true;
+    }
     GET_BASE(this)->type = TABVIEW;
     this->initial = true;
     gui_list_init(&(GET_BASE(this)->child_list));
@@ -608,12 +614,55 @@ gui_tabview_t *gui_tabview_create(void       *parent,
     GET_BASE(this)->create_done = true;
     return this;
 }
-
+#include "gui_tab.h"
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
 {
     parent_tabview->jump.jump_flag = true;
     parent_tabview->jump.jump_id.x = idx;
     parent_tabview->jump.jump_id.y = idy;
+    if (parent_tabview->tp_disable)
+    {
+
+
+        gui_obj_t *object = GUI_BASE(parent_tabview);
+        gui_list_t *node = NULL;
+        gui_list_t *tmp = NULL;
+        parent_tabview->last_id.x = parent_tabview->cur_id.x;
+        parent_tabview->last_id.y = parent_tabview->cur_id.y;
+
+        gui_list_for_each_safe(node, tmp, &object->child_list)
+        {
+            gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+            if (obj->magic != GUI_MAGIC_NUMBER)
+            {
+                gui_log("list NULL @line:%d, @%p", __LINE__, object);
+                gui_log("@name:%s, @type:%d\n", object->name, object->type);
+                return;
+            }
+            if (obj->type == TAB)
+            {
+                gui_tab_t *tab = (void *)obj;
+                if (tab->id.x == idx && tab->id.y == idy)
+                {
+                    gui_obj_hidden(obj, 0);
+                }
+                else
+                {
+                    gui_obj_hidden(obj, 1);
+                }
+
+            }
+
+        }
+        parent_tabview->cur_id.y = parent_tabview->jump.jump_id.y;
+        parent_tabview->cur_id.x = parent_tabview->jump.jump_id.x;
+        {
+            gui_obj_enable_event(object, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+            gui_log("cur_id.x, cur_id.y, last_id.x, last_id.y %d,%d, %d,%d \n", parent_tabview->cur_id.x,
+                    parent_tabview->cur_id.y, parent_tabview->last_id.x, parent_tabview->last_id.y);
+        }
+
+    }
 }
 
 void gui_tabview_loop_x(gui_tabview_t *tabview, bool loop)

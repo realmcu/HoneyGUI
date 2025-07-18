@@ -93,6 +93,10 @@ static void gui_img_update_att(gui_obj_t *o)
  */
 void gui_img_input_prepare(gui_obj_t *obj)
 {
+    if (((gui_img_t *)obj)->simple)
+    {
+        return;
+    }
     touch_info_t *tp = tp_get_info();
     gui_img_t *this = (gui_img_t *)obj;
     GUI_UNUSED(tp);
@@ -153,39 +157,42 @@ void gui_img_prepare(gui_obj_t *obj)
 
     this = (gui_img_t *)obj;
     tp = tp_get_info();
-    gui_img_reset_translate(this);
-    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
-    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
-    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
-    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
-
-    float m00 = obj->matrix->m[0][0];
-    float m01 = obj->matrix->m[0][1];
-    float m02 = obj->matrix->m[0][2];
-    float m10 = obj->matrix->m[1][0];
-    float m11 = obj->matrix->m[1][1];
-    float m12 = obj->matrix->m[1][2];
-    float m20 = obj->matrix->m[2][0];
-    float m21 = obj->matrix->m[2][1];
-    float m22 = obj->matrix->m[2][2];
-
-    if ((m01 == 0)
-        && (m10 == 0)
-        && (m20 == 0)
-        && (m21 == 0)
-        && (m22 == 1)) //scale and translate, no rotate
+    if (!(((gui_img_t *)obj)->simple))
     {
-        float x_min = m02;
-        float x_max = m02 + m00 * obj->w;
-        float y_min = m12;
-        float y_max = m12 + m11 * obj->h;
+        gui_img_reset_translate(this);
+        matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
+        matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
+        matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
+        matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
 
-        if ((x_min > (int)gui_get_screen_width())
-            || (x_max < 0)
-            || (y_min > (int)gui_get_screen_height())
-            || (y_max < 0))
+        float m00 = obj->matrix->m[0][0];
+        float m01 = obj->matrix->m[0][1];
+        float m02 = obj->matrix->m[0][2];
+        float m10 = obj->matrix->m[1][0];
+        float m11 = obj->matrix->m[1][1];
+        float m12 = obj->matrix->m[1][2];
+        float m20 = obj->matrix->m[2][0];
+        float m21 = obj->matrix->m[2][1];
+        float m22 = obj->matrix->m[2][2];
+
+        if ((m01 == 0)
+            && (m10 == 0)
+            && (m20 == 0)
+            && (m21 == 0)
+            && (m22 == 1)) //scale and translate, no rotate
         {
-            return;
+            float x_min = m02;
+            float x_max = m02 + m00 * obj->w;
+            float y_min = m12;
+            float y_max = m12 + m11 * obj->h;
+
+            if ((x_min > (int)gui_get_screen_width())
+                || (x_max < 0)
+                || (y_min > (int)gui_get_screen_height())
+                || (y_max < 0))
+            {
+                return;
+            }
         }
     }
 
@@ -198,30 +205,32 @@ void gui_img_prepare(gui_obj_t *obj)
     this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
     gui_img_update_att(obj);
-
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    if (!(((gui_img_t *)obj)->simple))
     {
-        gui_img_t *b = (void *)obj;
-
-        if (tp->pressed)
+        if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
         {
-            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            gui_img_t *b = (void *)obj;
+
+            if (tp->pressed)
             {
-                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-                b->press_flag = true;
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+                    b->press_flag = true;
+                }
             }
-        }
 
-        if (b->release_flag)
-        {
-            b->press_flag = false;
-            b->release_flag = false;
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-        }
+            if (b->release_flag)
+            {
+                b->press_flag = false;
+                b->release_flag = false;
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+            }
 
-        if (tp->released && b->press_flag)
-        {
-            b->release_flag = true;
+            if (tp->released && b->press_flag)
+            {
+                b->release_flag = true;
+            }
         }
     }
 
@@ -230,109 +239,113 @@ void gui_img_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     draw_img_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
-
+    if (!(((gui_img_t *)obj)->simple))
     {
-        this->scope = 0;
-        gui_obj_t *o = obj;
-        while (o->parent != NULL)
         {
-            o = o->parent;
-            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope && !this->scope_flag)
-            {
-                this->scope = 1;
-                break;
-            }
-        }
-    }
-    if (this->scope)
-    {
-        gui_obj_t *o = obj;
-        gui_win_t *win_scope = 0;
-        GUI_TYPE(gui_img_t, obj)->ax = obj->x;
-        GUI_TYPE(gui_img_t, obj)->ay = obj->y;
-        while (o->parent != NULL)
-        {
-            o = o->parent;
-            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
-            {
-                win_scope = (void *)o;
-                break;
-            }
-        }
-        o = obj;
-        while (o->parent != NULL)
-        {
-            o = o->parent;
-            GUI_TYPE(gui_img_t, obj)->ax += o->x;
-            GUI_TYPE(gui_img_t, obj)->ay += o->y;
-        }
-        if (win_scope)
-        {
-            int ax = win_scope->base.x ;
-            int ay = win_scope->base.y;
-            o = GUI_BASE(win_scope);
+            this->scope = 0;
+            gui_obj_t *o = obj;
             while (o->parent != NULL)
             {
                 o = o->parent;
-                ax += o->x;
-                ay += o->y;
+                if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope && !this->scope_flag)
+                {
+                    this->scope = 1;
+                    break;
+                }
             }
-            int w_w = win_scope->base.w;
-            int w_h = win_scope->base.h;
-            int img_x = GUI_TYPE(gui_img_t, obj)->ax;
-            int img_y = GUI_TYPE(gui_img_t, obj)->ay;
-            int img_w = this->draw_img->img_w;
-            int img_h = this->draw_img->img_h;
-            //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
-            GUI_TYPE(gui_img_t, obj)->scope_x1 = 0;
-            GUI_TYPE(gui_img_t, obj)->scope_x2 = img_w;
-            GUI_TYPE(gui_img_t, obj)->scope_y1 = 0;
-            GUI_TYPE(gui_img_t, obj)->scope_y2 = img_h;
-            obj->not_show = 0;
-            if (ax > img_x)
+        }
+        if (this->scope)
+        {
+            gui_obj_t *o = obj;
+            gui_win_t *win_scope = 0;
+            GUI_TYPE(gui_img_t, obj)->ax = obj->x;
+            GUI_TYPE(gui_img_t, obj)->ay = obj->y;
+            while (o->parent != NULL)
             {
-                GUI_TYPE(gui_img_t, obj)->scope_x1 = ax - img_x;
+                o = o->parent;
+                if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+                {
+                    win_scope = (void *)o;
+                    break;
+                }
             }
-            if (ay > img_y)
+            o = obj;
+            while (o->parent != NULL)
             {
-                GUI_TYPE(gui_img_t, obj)->scope_y1 = ay - img_y;
+                o = o->parent;
+                GUI_TYPE(gui_img_t, obj)->ax += o->x;
+                GUI_TYPE(gui_img_t, obj)->ay += o->y;
             }
-            if (ax + w_w < img_x + img_w)
+            if (win_scope)
             {
-                GUI_TYPE(gui_img_t, obj)->scope_x2 = -(img_x - (ax + w_w));
-            }
-            if (ay + w_h < img_y + img_h)
-            {
-                GUI_TYPE(gui_img_t, obj)->scope_y2 = -(img_y - (ay + w_h));
-            }
-            if (ay + w_h < img_y)
-            {
-                //obj->not_show = 1;
-                GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
-            }
-            if (ay > img_y + img_h * gui_img_get_transform_scale_y(this))
-            {
-                //obj->not_show = 1;
-                GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
+                int ax = win_scope->base.x ;
+                int ay = win_scope->base.y;
+                o = GUI_BASE(win_scope);
+                while (o->parent != NULL)
+                {
+                    o = o->parent;
+                    ax += o->x;
+                    ay += o->y;
+                }
+                int w_w = win_scope->base.w;
+                int w_h = win_scope->base.h;
+                int img_x = GUI_TYPE(gui_img_t, obj)->ax;
+                int img_y = GUI_TYPE(gui_img_t, obj)->ay;
+                int img_w = this->draw_img->img_w;
+                int img_h = this->draw_img->img_h;
+                //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
+                GUI_TYPE(gui_img_t, obj)->scope_x1 = 0;
+                GUI_TYPE(gui_img_t, obj)->scope_x2 = img_w;
+                GUI_TYPE(gui_img_t, obj)->scope_y1 = 0;
+                GUI_TYPE(gui_img_t, obj)->scope_y2 = img_h;
+                obj->not_show = 0;
+                if (ax > img_x)
+                {
+                    GUI_TYPE(gui_img_t, obj)->scope_x1 = ax - img_x;
+                }
+                if (ay > img_y)
+                {
+                    GUI_TYPE(gui_img_t, obj)->scope_y1 = ay - img_y;
+                }
+                if (ax + w_w < img_x + img_w)
+                {
+                    GUI_TYPE(gui_img_t, obj)->scope_x2 = -(img_x - (ax + w_w));
+                }
+                if (ay + w_h < img_y + img_h)
+                {
+                    GUI_TYPE(gui_img_t, obj)->scope_y2 = -(img_y - (ay + w_h));
+                }
+                if (ay + w_h < img_y)
+                {
+                    //obj->not_show = 1;
+                    GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
+                }
+                if (ay > img_y + img_h * gui_img_get_transform_scale_y(this))
+                {
+                    //obj->not_show = 1;
+                    GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
+                }
             }
         }
     }
-
     draw_img_new_area(this->draw_img, NULL);
     bool honeycomb_click = false;
-    if (gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
+    if (!(((gui_img_t *)obj)->simple))
     {
-        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+        if (gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_1);
-            honeycomb_click = true;
+            if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_1);
+                honeycomb_click = true;
+            }
         }
-    }
-    if (!honeycomb_click && gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
-    {
-        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+        if (!honeycomb_click && gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
         {
-            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+            if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+            }
         }
     }
     last = this->checksum;
@@ -365,28 +378,38 @@ void gui_img_draw_cb(gui_obj_t *obj)
     gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
-    // cache img to buffer
 
-    draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 
-    if (this->scope || this->scope_flag)
+    if (!(((gui_img_t *)obj)->simple))
     {
-        gui_rect_t rect =
+        // cache img to buffer
+        draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+        if (this->scope || this->scope_flag)
         {
-            .x1 = this->scope_x1,
-            .x2 = this->scope_x2,
-            .y1 = this->scope_y1,
-            .y2 = this->scope_y2,
-        };
-        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+            gui_rect_t rect =
+            {
+                .x1 = this->scope_x1,
+                .x2 = this->scope_x2,
+                .y1 = this->scope_y1,
+                .y2 = this->scope_y2,
+            };
+            gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+        }
+        else
+        {
+            gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+        }
+        // release img if cached
+        draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
     }
     else
     {
         gui_acc_blit_to_dc(this->draw_img, dc, NULL);
     }
 
-    // release img if cached
-    draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+
+
+
     if (this->load == 0)
     {
         gui_obj_enable_event(obj, GUI_EVENT_2);

@@ -89,4 +89,30 @@ typedef struct
     char *animate_type;
     gui_img_t *img;
 } image_animate_params_t;
+typedef struct radio
+{
+    const uint8_t *pic;
+    const uint8_t *pic_hl;
+    char *radio_name;
+    gui_img_t *img;
+    bool check;
+    bool hover;
+    bool click;
+} radio_t;
+
+int rvd_get_button_hover_index();
+void rvd_set_button_hover_index(int index);
+gui_app_t *get_current_rvd_app(void);
+int rvd_click_button();
+int rvd_hover_button(int index, int button_count);
+int rvd_hover_down_button();
+int rvd_hover_up_button();
+
+
+
+int rvd_get_button_count();
+void gui_update_screen_force(bool if_change);
+void rvd_click_back();
+void rvd_hover_left();
+void rvd_hover_right();
 #endif /* _RVD_H_ */

@@ -220,6 +220,11 @@ static void internal_gui_obj_tree_print_mmd(FILE *file, gui_obj_t *obj)
 static void obj_tree_get_widget_by_type_and_index(gui_obj_t *root,
                                                   T_OBJ_TYPE type, gui_obj_t **output, int index, int *count, int *flag)
 {
+    if (!root)
+    {
+        return;
+    }
+
     if (*flag)
     {
         return;

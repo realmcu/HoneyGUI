@@ -123,8 +123,14 @@ void obj_pave_shot_cb(void *p, void *this_widget, gui_animate_t *animate)
 
 static void gui_tab_input_prepare(gui_obj_t *obj)
 {
-    gui_tab_t *this = (gui_tab_t *)obj;
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    if (parent->tp_disable)
+    {
+        return;
+    }
+
+    gui_tab_t *this = (gui_tab_t *)obj;
+
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
     int16_t tab_gap[2] = {tab_x_gap, tab_y_gap};
@@ -400,22 +406,43 @@ static void gui_tab_ctor(gui_tab_t  *this,
 {
 
     gui_obj_ctor(&this->base, parent, name, x, y, w, h);
-
-    GET_BASE(this)->obj_cb = gui_tab_cb;
-    GET_BASE(this)->has_input_prepare_cb = true;
-    GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;
-    this->style = parent_ext->style;
+    if (parent->type != TABVIEW)
+    {
+        return;
+    }
+
+    if (!parent_ext->tp_disable)
+    {
+        GET_BASE(this)->obj_cb = gui_tab_cb;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
+        this->style = parent_ext->style;
+        this->normal.x = 0;
+        this->normal.y = 0;
+        this->normal.z = -1.0f;
+    }
+    else
+    {
+        if (!(idx == 0 && idy == 0))
+        {
+            GET_BASE(this)->not_show = 1;
+        }
+    }
+
+
+
+
+
     this->id.x = idx;
     this->id.y = idy;
     this->id.z = idy;
 
-    this->normal.x = 0;
-    this->normal.y = 0;
-    this->normal.z = -1.0f;
+
+
     if (!(idx != 0 && idy != 0))
     {
         parent_ext->tab_cnt++;
@@ -547,9 +574,14 @@ gui_tab_t *gui_tab_create(void       *parent,
                                &(GET_BASE(this)->brother_list));
     }
     GET_BASE(this)->create_done = true;
-    this->rte_obj = gui_obj_create(this, "tab_rte", this->base.x, this->base.y, this->base.w,
-                                   this->base.h);
-    this->rte_obj->type = IMAGE_FROM_MEM;
+    if (GUI_BASE(parent)->type == TABVIEW && ! GUI_TYPE(gui_tabview_t, parent)->tp_disable)
+    {
+        this->rte_obj = gui_obj_create(this, "tab_rte", this->base.x, this->base.y, this->base.w,
+                                       this->base.h);
+        this->rte_obj->type = IMAGE_FROM_MEM;
+    }
+
+
     return this;
 }
 

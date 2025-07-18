@@ -14,9 +14,9 @@ Win
 Hide A Window
 -------------
 
-- This ``win`` variable is assigned the ``win`` tag ``'heat_win'``'s handle.
+- This ``win`` variable is assigned the ``win`` tag ``heat_win`` 's handle.
 - The variable ``hid`` is assigned the handle of the ``hidden`` attribute of the ``win`` tag.
-- The value of the ``hidden`` attribute is set to ``'hidden'`` to achieve hiding.
+- The value of the ``hidden`` attribute is set to ``hidden`` to achieve hiding.
 
 .. code-block:: javascript
 
@@ -30,8 +30,8 @@ Hide A Window
 Listen to Gestures
 ------------------
 
-- The ``win.onPress`` function enables the win widget to monitor the event of the finger touching the screen. If the finger touches the screen within the area of the window, the parameter function will be executed.
-- The ``win.onRelease`` function enables the win widget to monitor the event of the finger leaving the screen.
+- The ``win.onPress`` function enables the ``win`` widget to monitor the event of the finger touching the screen. If the finger touches the screen within the area of the window, the parameter function will be executed.
+- The ``win.onRelease`` function enables the ``win`` widget to monitor the event of the finger leaving the screen.
 - This ``winNromalOnPressFunc`` function will be executed when the finger touches the screen.
 - This ``winNromalOnReleaseFunc`` function will be executed when the finger leaves the screen.
 
@@ -53,9 +53,9 @@ Swap Windows
 
 * The implementation logic is that clicking the current window will hide the current window and display another window.
 * Click to swap windows between ``'cool_win'`` and ``'heat_win'``.
-* The ``win.onClick`` function enables the win widget to monitor the event of the finger clicking the screen.
-* This function ``win.removeAttribute`` is used to remove an attribute of the win tag. When the ``hidden`` attribute is removed, the widget corresponding to the ``win`` tag will be displayed.
-* On a touch device, a click event is typically triggered when a user touches an element and then lifts their finger in a short time within the win area.
+* The ``win.onClick`` function enables the ``win`` widget to monitor the event of the finger clicking the screen.
+* This function ``win.removeAttribute`` is used to remove an attribute of the ``win`` tag. When the ``hidden`` attribute is removed, the widget corresponding to the ``win`` tag will be displayed.
+* On a touch device, a click event is typically triggered when a user touches an element and then lifts their finger in a short time within the ``win`` area.
 
 .. code-block:: javascript
 

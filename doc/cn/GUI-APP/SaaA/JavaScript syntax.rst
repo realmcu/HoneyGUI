@@ -15,7 +15,7 @@ JavaScript 语法
 ---------
 
 - 这个变量 ``win`` 被赋值为 ``win`` 标签 ``heat_win`` 的句柄。
-- 变量 ``hid``被赋值为 ``win`` 标签的 ``hidden`` 属性的句柄。
+- 变量 ``hid`` 被赋值为 ``win`` 标签的 ``hidden`` 属性的句柄。
 - 将 ``hidden`` 属性的值设置为 ``hidden`` 来实现隐藏。
 .. code-block:: javascript
 
@@ -275,7 +275,7 @@ API
 
 - 这个是 ``writeSync`` 函数控制 gpio led 在RTL87X2G上的实现。
 - 首先获取GPIO值和方向，然后使用特定的驱动操作GPIO LED。
-- 参考 [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage)。
+- 参考 `onoff npm package usage <https://www.npmjs.com/package/onoff#usage>`_ 。
 
 .. code-block:: c
 

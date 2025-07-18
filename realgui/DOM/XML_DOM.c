@@ -39,6 +39,7 @@
 #include "gui_multi_level.h"
 #include "gui_pagelist_new.h"
 #include "gui_canvas_rect.h"
+#include "rvd.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
 struct widget_create
 {
@@ -81,6 +82,7 @@ static xml_dom_wifi_t wifi_array[XML_DOM_WIFI_COUINT] =
 #define MACRO_FPS 9007
 
 #define GUI_EVENT_WIN_FRAME_PARAM (0XFF-2)
+#define GUI_EVENT_WIN_RADIO_HOVER (0XFF-3)
 static struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -136,34 +138,7 @@ static struct widget_create widget[] =
     {"fps", MACRO_FPS},
 };
 
-typedef struct
-{
-    int x;
-    int y;
-    int translate_from_x;
-    int translate_from_y;
-    int translate_to_x;
-    int translate_to_y;
-    int rotate_x;
-    int rotate_y;
-    int rotate_from;
-    int rotate_to;
-    float textContent_from;
-    float textContent_to;
-    float scale_x;
-    float scale_y;
-    float scale_x_from;
-    float scale_y_from;
-    int scale_x_center;
-    int scale_y_center;
-    uint8_t opacity;
-    uint8_t opacity_from;
-    void **image_arr;
-    int image_count;
-    char *img_name;
-    char *animate_type;
-    gui_img_t *img;
-} image_animate_params_t;
+
 typedef struct
 {
     float values[10];
@@ -715,6 +690,7 @@ static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
                      animate->progress_percent,
                      animate_params->rotate_x,
                      animate_params->rotate_y);
+    ((gui_img_t *)animate_params->img)->simple = 0;
 }
 
 static void img_translate_cb(image_animate_params_t *animate_params, void *null,
@@ -728,6 +704,7 @@ static void img_translate_cb(image_animate_params_t *animate_params, void *null,
                  animate_params->translate_from_y);
 
     gui_img_translate(animate_params->img, t_x, t_y);
+    ((gui_img_t *)animate_params->img)->simple = 0;
 }
 
 static void img_scale_cb(image_animate_params_t *animate_params, void *null, gui_animate_t *animate)
@@ -743,6 +720,7 @@ static void img_scale_cb(image_animate_params_t *animate_params, void *null, gui
 
     gui_img_rotation(animate_params->img, 0, animate_params->scale_x_center,
                      animate_params->scale_y_center);
+    ((gui_img_t *)animate_params->img)->simple = 0;
 }
 
 
@@ -913,6 +891,7 @@ static void img_translate_key_times_cb(image_animate_key_times_params_t *animate
 
 
     gui_img_translate(animate_params->img, t_x, t_y);
+    ((gui_img_t *)animate_params->img)->simple = 0;
     // Optional: debug logging
 //gui_log("img_opacity_cb: opacity set to %d\n", (int)(opacity * 255));
 }
@@ -1607,6 +1586,7 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     if (button->style == WIDGET_SCALE || button->style == WIDGET_SCALE_FADE)
     {
         gui_img_scale((void *)button->img, scale,  scale);
+        ((gui_img_t *)(void *)button->img)->simple = 0;
         //gui_img_translate((void *)button->img, 25.0f * (from - scale),  25.0f * (from - scale));
     }
 
@@ -1679,6 +1659,7 @@ static void sport_button_release_ani_cb(gui_button_t *button)
     if (button->style == WIDGET_SCALE || button->style == WIDGET_SCALE_FADE)
     {
         gui_img_scale((void *)button->img, scale,  scale);
+        ((gui_img_t *)(void *)button->img)->simple = 0;
     }
 }
 static void sport_button_press(gui_button_t *b)
@@ -2060,12 +2041,14 @@ static void on_click_jump_cb_tabview(void *obj, gui_event_t e, struct on_click_j
     if (param->to_widget_name)
     {
         GUI_WIDGET_POINTER_BY_NAME(tabview, param->to_widget_name);
-        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2); gui_log("on_click_jump_cb_tabview1");
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+        gui_log("on_click_jump_cb_tabview%d\n", param->id1);
     }
     else
     {
         GUI_WIDGET_POINTER_BY_TYPE(tabview, TABVIEW, &(gui_current_app()->screen));
-        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2); gui_log("on_click_jump_cb_tabview2");
+        gui_tabview_jump_tab((void *)tabview, param->id1, param->id2);
+        gui_log("on_click_jump_cb_tabview%d\n", param->id1);
     }
 
 
@@ -3649,12 +3632,14 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         if (scalex != 1 || scaley != 1)
         {
             gui_img_scale((void *)GUI_TYPE(gui_button_t, parent)->img, scalex, scaley);
+            ((gui_img_t *)(void *)GUI_TYPE(gui_button_t, parent)->img)->simple = 0;
         }
         if (angle != 0)
         {
             gui_img_get_height((void *)GUI_TYPE(gui_button_t, parent)->img);
             gui_img_rotation((void *)GUI_TYPE(gui_button_t, parent)->img, angle, GUI_BASE(GUI_TYPE(gui_button_t,
                                                                                           parent)->img)->w / 2, GUI_BASE(GUI_TYPE(gui_button_t, parent)->img)->h / 2);
+            ((gui_img_t *)(void *)GUI_TYPE(gui_button_t, parent)->img)->simple = 0;
         }
         if (text && GUI_TYPE(gui_button_t, parent)->text)
         {
@@ -3813,14 +3798,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
 
     return parent;
 }
-typedef struct radio
-{
-    const uint8_t *pic;
-    const uint8_t *pic_hl;
-    char *radio_name;
-    bool check;
-    gui_img_t *img;
-} radio_t;
+
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_cb)
 {
     radio_t *param = p;
@@ -3828,6 +3806,16 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_cb)
     {
         gui_obj_enable_event(this_widget, GUI_EVENT_6);
         param->check = 0;
+    }
+    else if (param->hover)
+    {
+        gui_obj_enable_event(this_widget, GUI_EVENT_WIN_RADIO_HOVER);
+        param->hover = 0;
+    }
+    else if (param->click)
+    {
+        gui_obj_enable_event(this_widget, GUI_EVENT_TOUCH_PRESSED);
+        param->click = 0;
     }
     else
     {
@@ -4037,6 +4025,73 @@ static void radio_win_destory(gui_obj_t *obj)
         this->animate_array_length = 0;
     }
 }
+static void radio_group_fill_widgets(gui_obj_t *node, T_OBJ_TYPE target_type,
+                                     gui_obj_t **array, int *index, const char *group_name)
+{
+    gui_list_t *node_ptr = NULL;
+    gui_list_t *tmp = NULL;
+
+    gui_list_for_each_safe(node_ptr, tmp, &node->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node_ptr, gui_obj_t, brother_list);
+
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            continue;
+        }
+        if (target_type == obj->type &&
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name))
+        {
+            array[*index] = obj;
+            (*index)++;
+        }
+
+        radio_group_fill_widgets(obj, target_type, array, index, group_name);
+    }
+}
+static int radio_group_get_array(gui_obj_t *root,
+                                 T_OBJ_TYPE type,
+                                 gui_obj_t ***output_array,
+                                 int *length, const char *group_name)
+{
+    // Check input parameters
+    if (root == NULL || output_array == NULL || length == NULL || group_name == NULL)
+    {
+        gui_log("Invalid input parameters\n");
+        return -1;
+    }
+#define MAX_RADIO_GROUP_COUNT 30
+    // Step 1: Count the total number of matching widgets
+    int total_count = MAX_RADIO_GROUP_COUNT;
+
+    // If no matches are found, return immediately
+    if (total_count == 0)
+    {
+        *output_array = NULL;
+        *length = 0;
+        return 0;
+    }
+    static gui_obj_t *radio_array[MAX_RADIO_GROUP_COUNT];
+    // Step 2: Allocate memory for the array in one go
+    gui_obj_t **new_array = radio_array;
+    // if (new_array == NULL)
+    {
+        gui_log("Memory allocation failed for %d widgets\n", total_count);
+        *output_array = NULL;
+        *length = 0;
+        return -1;
+    }
+    memset(new_array, 0, sizeof(gui_obj_t *) * total_count);
+    // Step 3: Fill the array with widget pointers
+    int index = 0;
+    radio_group_fill_widgets(root, type, new_array, &index, group_name);
+
+    // Set output parameters
+    *output_array = new_array;
+    *length = index;
+
+    return 0;
+}
 
 static void radio_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
@@ -4068,24 +4123,53 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_press)
     gui_obj_t **widgets = NULL;
     int count = 0;
 
-
-    gui_obj_tree_get_widget_array_by_type(
-        (gui_obj_t *)gui_current_app(), RADIO, &widgets, &count);
-
-    for (int i = 0; i < count; i++)
-    {
-
-        gui_win_t *win = GUI_TYPE(gui_win_t, widgets[i]);
-        radio_t *param = win->animate->p;
-        param->img->data = (void *)param->pic;
-        param->check = 0;
-    }
-    gui_free(widgets);
     {
         gui_win_t *win = GUI_TYPE(gui_win_t, obj);
         radio_t *param = win->animate->p;
-        param->img->data = (void *)param->pic_hl;
-        param->check = 1;
+        radio_group_get_array(
+            (gui_obj_t *)gui_current_app(), RADIO, &widgets, &count, param->radio_name);
+
+        for (int i = 0; i < count; i++)
+        {
+
+            gui_win_t *win = GUI_TYPE(gui_win_t, widgets[i]);
+            radio_t *param = win->animate->p;
+            param->img->data = (void *)param->pic;
+            param->check = 0;
+        }
+        //gui_free(widgets);
+        {
+
+            param->img->data = (void *)param->pic_hl;
+            param->check = 1;
+        }
+    }
+
+}
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_hover)
+{
+    gui_obj_t **widgets = NULL;
+    int count = 0;
+
+    {
+        gui_win_t *win = GUI_TYPE(gui_win_t, obj);
+        radio_t *param = win->animate->p;
+        radio_group_get_array(
+            (gui_obj_t *)gui_current_app(), RADIO, &widgets, &count, param->radio_name);
+
+        for (int i = 0; i < count; i++)
+        {
+
+            gui_win_t *win = GUI_TYPE(gui_win_t, widgets[i]);
+            radio_t *param = win->animate->p;
+            param->img->data = (void *)param->pic;
+        }
+        //gui_free(widgets);
+        {
+            gui_win_t *win = GUI_TYPE(gui_win_t, obj);
+            radio_t *param = win->animate->p;
+            param->img->data = (void *)param->pic_hl;
+        }
     }
 
 }
@@ -4185,7 +4269,7 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     parent->obj_cb = radio_win_cb;
     GUI_TYPE(gui_obj_t, parent)->type = RADIO;
     gui_win_press((void *)parent, win_radio_press, param);
-
+    gui_obj_add_event_cb((void *)parent, win_radio_hover, GUI_EVENT_WIN_RADIO_HOVER, param);
     gui_win_set_animate((void *)parent, 10000, -1, win_radio_cb, param);
     gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)gui_get_image_file_address(picture), 0,
                                              0, 0, 0);
@@ -4193,6 +4277,14 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     param->pic_hl = gui_get_image_file_address(hl_picture);
     param->pic = gui_get_image_file_address(picture);
     param->radio_name = radio_name;
+    static char *last_radio_name;
+    if (last_radio_name && !GUI_STRINGS_EQUAL(last_radio_name, radio_name) || !last_radio_name)
+    {
+        img->data = (void *)param->pic_hl;
+    }
+
+
+    last_radio_name = radio_name;
     img->blend_mode = blendMode;
 
 
@@ -11683,6 +11775,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                 gui_fs_closedir(dir);
             }
             parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, image_array[0], x, y);
+            ((gui_img_t *)parent)->simple = 1;
 
             image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
             params->image_arr = image_array;
@@ -11698,6 +11791,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                 gui_img_get_height((void *)parent);
                 gui_img_translate((void *)parent, parent->w / 2, parent->h / 2);
                 gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
+                ((gui_img_t *)parent)->simple = 0;
             }
             parent->obj_cb = img_render;
         }
@@ -11706,15 +11800,18 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             void *imgbuf = (void *)gui_get_image_file_address(file);
             gui_free(file);
             parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
+            ((gui_img_t *)parent)->simple = 1;
             if (scalex != 1 || scaley != 1)
             {
                 gui_img_scale((void *)parent, scalex, scaley);
+                ((gui_img_t *)parent)->simple = 0;
             }
             if (angle != 0)
             {
                 gui_img_get_height((void *)parent);
                 gui_img_translate((void *)parent, parent->w / 2, parent->h / 2);
                 gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
+                ((gui_img_t *)parent)->simple = 0;
             }
             gui_img_set_mode((gui_img_t *)parent, blendMode);
             gui_img_set_opacity((gui_img_t *)parent, opacity);
@@ -11726,90 +11823,76 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     return parent;
 }
 
-typedef struct xml_widget_create
+typedef struct xml_widget_create_new
 {
-    T_OBJ_TYPE widget_type;
+    char *name;
     gui_obj_t *(* widget_create)(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type);
-} xml_widget_create_t;
-static xml_widget_create_t xml_widget_create_array[] =
+} xml_widget_create_new_t;
+
+static xml_widget_create_new_t xml_widget_create_new_array[] =
 {
-    {TEXTBOX, widget_create_textbox},
-    {IMAGE, widget_create_image},
-    {WINDOW, widget_create_window},
-    {PROGRESSBAR, widget_create_progressbar},
-    {SEEKBAR, widget_create_seekbar},
-    {TABVIEW, widget_create_tabview},
-    {TAB, widget_create_tab},
-    {CURTAINVIEW, widget_create_curtainview},
-    {CURTAIN, widget_create_curtain},
-    {ICON, widget_create_icon},
-    {JAVASCRIPT, widget_create_javascript},
-    {CLICKSWITCH, widget_create_clickswitch},
-    {PAGE, widget_create_page},
-    {SCREEN, widget_create_screen},
-    {GRID, widget_create_grid},
-    {GALLERY, widget_create_gallery},
-    {RADIO, widget_create_radio},
-    {MACRO_CANVAS_ARC, widget_create_macro_canvas_arc},
-    {MACRO_MOTORIZED_CURTAIN, widget_create_macro_motorized_curtain},
-    {KEYBOARD, widget_create_keyboard},
-    {MULTI_LEVEL, widget_create_multi_level},
-    {MACRO_ONCLICK, widget_create_macro_onclick},
-    {MACRO_BACKICON, widget_create_macro_backicon},
-    {SLIDER, widget_create_slider},
-    {MACRO_ONCHANGE, widget_create_macro_onchange},
-    {MACRO_ONON, widget_create_macro_onon},
-    {MACRO_ONOFF, widget_create_macro_onoff},
-    {MACRO_ONLOAD, widget_create_macro_onload},
-    {TYPE_SCROLL_WHEEL_NEW, widget_create_type_scroll_wheel_new},
-    {MACRO_CALENDAR, widget_create_macro_calendar},
-    {MACRO_ONTIME, widget_create_macro_ontime},
-    {MACRO_COMBO, widget_create_macro_combo},
-    {MACRO_ON_PERIPHERAL, widget_create_macro_on_peripheral},
-    {MACRO_CHART, widget_create_macro_chart},
-    {MACRO_PAGE_LIST_NEW, widget_create_macro_page_list_new},
-    {MACRO_ONCOMPLETE, widget_create_macro_oncomplete},
-    {MACRO_KEY, widget_create_macro_key},
-    {MACRO_ONSELECT, widget_create_macro_on_select},
-    {RECTANGLE, widget_create_rectangle},
-    {MACRO_WIFI, widget_create_macro_wifi},
-    {MACRO_CONNECTED, widget_create_macro_on_connected},
-    {MACRO_DISCONNECTED, widget_create_macro_on_disconnected},
-    {MACRO_CONNECTING, widget_create_macro_on_connecting},
-    {MACRO_FRAME, widget_create_macro_frame},
-    {MACRO_INTERACTION, widget_create_macro_interaction},
-    {MACRO_FPS, widget_create_macro_fps},
+    { "textbox", widget_create_textbox },
+    { "img", widget_create_image },
+    { "win", widget_create_window },
+    { "progressbar", widget_create_progressbar },
+    { "seekbar", widget_create_seekbar },
+    { "tabview", widget_create_tabview },
+    { "tab", widget_create_tab },
+    { "curtainview", widget_create_curtainview },
+    { "curtain", widget_create_curtain },
+    { "icon", widget_create_icon },
+    { "script", widget_create_javascript },
+    { "switch", widget_create_clickswitch },
+    { "page", widget_create_page },
+    { "screen", widget_create_screen },
+    { "grid", widget_create_grid },
+    { "gallery", widget_create_gallery },
+    { "radio", widget_create_radio },
+    { "arc", widget_create_macro_canvas_arc },
+    { "motorizedCurtain", widget_create_macro_motorized_curtain },
+    { "keyboard", widget_create_keyboard },
+    { "multiLevel", widget_create_multi_level },
+    { "onClick", widget_create_macro_onclick },
+    { "backIcon", widget_create_macro_backicon },
+    { "slider", widget_create_slider },
+    { "onChange", widget_create_macro_onchange },
+    { "onOn", widget_create_macro_onon },
+    { "onOff", widget_create_macro_onoff },
+    { "onLoad", widget_create_macro_onload },
+    { "roller", widget_create_type_scroll_wheel_new },
+    { "calendar", widget_create_macro_calendar },
+    { "onTime", widget_create_macro_ontime },
+    { "combo", widget_create_macro_combo },
+    { "onPeripheral", widget_create_macro_on_peripheral },
+    { "chart", widget_create_macro_chart },
+    { "listview", widget_create_macro_page_list_new },
+    { "onComplete", widget_create_macro_oncomplete },
+    { "key", widget_create_macro_key },
+    { "onSelect", widget_create_macro_on_select },
+    { "rect", widget_create_rectangle },
+    { "wifi", widget_create_macro_wifi },
+    { "onConnected", widget_create_macro_on_connected },
+    { "onDisconnected", widget_create_macro_on_disconnected },
+    { "onConnecting", widget_create_macro_on_connecting },
+    { "frame", widget_create_macro_frame },
+    { "interaction", widget_create_macro_interaction },
+    { "fps", widget_create_macro_fps },
 };
 
-static gui_obj_t *widget_create_interface(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
-{
-    int array_size = sizeof(xml_widget_create_array) / sizeof(xml_widget_create_array[0]);
-    for (int i = 0; i < array_size; i++)
-    {
-        if (xml_widget_create_array[i].widget_type == widget_type)
-        {
-            // Call the creation function
-            parent = xml_widget_create_array[i].widget_create(p, parent, widget_type);
-            return parent;
-        }
-    }
-    printf("Unknown widget type%d\n", widget_type);
-    return parent;
-}
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
     //gui_log("widget_create_handle:%s: %s", name, p->txt);
-    for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
+    for (size_t i = 0; i < sizeof(xml_widget_create_new_array) / sizeof(xml_widget_create_new_array[0]);
+         i++)
     {
-        if (!strcmp(widget[i].name, name))
+        if (!strcmp(xml_widget_create_new_array[i].name, name))
         {
-            parent = widget_create_interface(p, parent, widget[i].type);
+            return xml_widget_create_new_array[i].widget_create(p, parent, 0);
         }
     }
+    gui_log("Unknown widget %s\n", name);
     return parent;
-
-
 }
 // Define various formats
 #define MON_FORMAT     0         // "MON"
@@ -12049,6 +12132,7 @@ static void img_animate_watchface_callback(void *p, void *this_widget, gui_anima
             gui_img_translate(hand, hand->base.w / 2, gui_get_screen_height() / 2 - hand->base.y);
             gui_img_rotation(hand, angle_hour * 180 / M_PI,  hand->base.w / 2,
                              gui_get_screen_height() / 2 - hand->base.y);
+            ((gui_img_t *)hand)->simple = 0;
         }
         break;
     case MINUTE_ANIMATION:
@@ -12057,6 +12141,7 @@ static void img_animate_watchface_callback(void *p, void *this_widget, gui_anima
             gui_img_translate(hand, hand->base.w / 2, gui_get_screen_height() / 2 - hand->base.y);
             gui_img_rotation(hand, angle_min * 180 / M_PI, hand->base.w / 2,
                              gui_get_screen_height() / 2 - hand->base.y);
+            ((gui_img_t *)hand)->simple = 0;
         }
         break;
     case SECOND_ANIMATION:
@@ -12065,6 +12150,7 @@ static void img_animate_watchface_callback(void *p, void *this_widget, gui_anima
             gui_img_translate(hand, hand->base.w / 2, gui_get_screen_height() / 2 - hand->base.y);
             gui_img_rotation(hand, angle_sec,  hand->base.w / 2,
                              gui_get_screen_height() / 2 - hand->base.y);
+            ((gui_img_t *)hand)->simple = 0;
         }
         break;
     default:
@@ -12081,6 +12167,7 @@ static void img_animate_watchface_callback_hour(void *p, void *this_widget, gui_
         float angle_hour = (hour % 12) * M_PI / 6 + minute * M_PI / 360;
         gui_img_translate(hand, cxcy->num1, cxcy->num2);
         gui_img_rotation(hand, angle_hour * 180 / M_PI,  cxcy->num1, cxcy->num2);
+        ((gui_img_t *)hand)->simple = 0;
     }
 }
 static void img_animate_watchface_callback_minute(void *p, void *this_widget,
@@ -12094,6 +12181,7 @@ static void img_animate_watchface_callback_minute(void *p, void *this_widget,
         float angle_min  = minute * M_PI / 30 + seconds * M_PI / 1800;
         gui_img_translate(hand, cxcy->num1, cxcy->num2);
         gui_img_rotation(hand, angle_min * 180 / M_PI, cxcy->num1, cxcy->num2);
+        ((gui_img_t *)hand)->simple = 0;
     }
 }
 static void img_animate_watchface_callback_second(void *p, void *this_widget,
@@ -12107,6 +12195,7 @@ static void img_animate_watchface_callback_second(void *p, void *this_widget,
         float angle_sec = (seconds + millisecond / 1000.0f) * angle_per_second;
         gui_img_translate(hand, cxcy->num1, cxcy->num2);
         gui_img_rotation(hand, angle_sec,  cxcy->num1, cxcy->num2);
+        ((gui_img_t *)hand)->simple = 0;
     }
 }
 gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniamte_name)
@@ -12116,20 +12205,18 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
         return 0;
     }
     char *name = p->name;
-
-    for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
-        if (!strcmp(widget[i].name, name))
+        if (!strcmp("animateTransform", name))
         {
-            switch (widget[i].type)
+
             {
-            case MACRO_ANIMATETRANSFORM:
+
                 {
                     char *ptxt = get_space_string_head(p->txt);
                     if (strcmp(aniamte_name, ptxt))
                     {
                         gui_lower_free(ptxt);
-                        continue;
+                        return parent;
                     }
                     gui_lower_free(ptxt);
                     //gui_log("animate_create_handle:%s: %s", name, p->txt);
@@ -12537,10 +12624,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                                 }
 
 // Debug print to verify parsing
-                                for (int i = 0; i < values_length; i++)
-                                {
-                                    printf("Point %d: (%f, %f)\n", i, values_num_f[i], values2_num_f[i]);
-                                }
+
                                 //gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                             {
@@ -12680,8 +12764,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     return 0;
                 }
 
-            default:
-                break;
+
             }
         }
     }
@@ -13018,8 +13101,9 @@ void create_tree(gui_app_t *app)
     f1 = ezxml_parse_file(app->xml);
     js = NULL;
     foreach_create(f1, &app->screen);
-    ezxml_free(f1);
-    f1 = 0;
+    rvd_set_button_hover_index(0);
+    // ezxml_free(f1);
+    // f1 = 0;
 #ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_run_file(const char *file, gui_app_t  *app);
     extern void js_isReady(void);
@@ -13062,7 +13146,6 @@ static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent
 }
 const char *get_child_ele_attr(char *xml, char *ele, char *txt, char *chile_ele, char *attr)
 {
-    ezxml_t f1 = ezxml_parse_file(xml);
     ezxml_t t;
     foreach_scan_with_content(f1, ele, &t, txt);
     ezxml_t title = ezxml_get(t, chile_ele, -1);
@@ -13070,7 +13153,6 @@ const char *get_child_ele_attr(char *xml, char *ele, char *txt, char *chile_ele,
 }
 ezxml_t get_child_ele(char *xml, char *ele, char *txt, char *chile_ele)
 {
-    ezxml_t f1 = ezxml_parse_file(xml);
     ezxml_t t;
     foreach_scan_with_content(f1, ele, &t, txt);
     ezxml_t title = ezxml_get(t, chile_ele, -1);
@@ -13569,7 +13651,7 @@ void gui_get_json_value(const char *path, const char *parent_key, const char *ke
                         if (cJSON_IsNumber(array_item))
                         {
                             ((int *)value)[i] = array_item->valueint;
-                            //printf("array[%d] = %d\n", i, array_item->valueint);
+                            //gui_log("array[%d] = %d\n", i, array_item->valueint);
                         }
                     }
                 }
@@ -13651,7 +13733,7 @@ float *gui_get_json_array(const char *path, const char *parent_key, const char *
                         if (cJSON_IsNumber(array_item))
                         {
                             array[i] = array_item->valuedouble;
-                            //printf("array[%d] = %d,%f\n", i, array_item->valueint, array_item->valuedouble);
+                            //gui_log("array[%d] = %d,%f\n", i, array_item->valueint, array_item->valuedouble);
                         }
                     }
                     *array_length = array_size;
@@ -14915,7 +14997,625 @@ scan_code get_scan_code_by_keyboard_string(const char *keyboard)
     return SCANCODE_UNKNOWN;
 }
 
+static int button_hover_index;
+static char *button_hover_group_name;
+static void gui_obj_tree_count_by_type_and_group(gui_obj_t *obj, T_OBJ_TYPE type, int *count,
+                                                 const char *group_name);
+static void get_first_active_radio(gui_obj_t *obj, gui_obj_t **rst);
+int rvd_get_button_hover_index()
+{
+    return button_hover_index;
+}
+void rvd_set_button_hover_index(int index)
+{
+    button_hover_index = index;
+}
+gui_app_t *get_current_rvd_app(void)
+{
+    extern void *get_app_xml(void);
+    gui_app_t *app = get_app_xml();
+    // Verify if app matches current GUI context
+    if (app != gui_current_app())
+    {
+        return 0;
+    }
+    else
+    {
+        return app;
+    }
+}
+static void obj_tree_get_widget_by_type_and_index(gui_obj_t *root,
+                                                  T_OBJ_TYPE type, gui_obj_t **output, int index, int *count, int *flag, const char *group_name)
+{
+    if (!root)
+    {
+        return;
+    }
 
+    if (*flag)
+    {
+        return;
+    }
+
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &root->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, root);
+            gui_log("@name:%s, @type:%d\n", root->name, root->type);
+            return;
+        }
+        if (obj->not_show == 1)
+        {
+            continue;
+        }
+        if (type == obj->type &&
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name))
+        {
+            if (index == *count)
+            {
+                *output = obj;
+                *flag = 1;
+                return;
+            }
+            (*count)++;
+            //gui_log("%d,%d\n", *count, index);
+        }
+
+        obj_tree_get_widget_by_type_and_index(obj, type, output, index, count, flag, group_name);
+    }
+}
+static void radio_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
+                                               int index, const char *group_name)
+{
+    int count = 0;
+    int flag = 0;
+    obj_tree_get_widget_by_type_and_index(root, type, output, index, &count, &flag, group_name);
+}
+int rvd_click_button()
+{
+    gui_log("rvd_click_button%d\n", button_hover_index);
+    gui_win_t *win = 0;
+    gui_app_t *app = get_current_rvd_app();
+    if (!app)
+    {
+        return GUI_ERROR_NULL;
+    }
+    // Get root screen object
+    gui_obj_t *screen = &(app->screen);
+    gui_obj_t *rst = 0;
+    get_first_active_radio(screen, &rst);
+    if (rst == 0)
+    {
+        /* code */
+        return GUI_ERROR_NULL;
+    }
+    radio_get_widget_by_type_and_index((gui_obj_t *)get_current_rvd_app(), RADIO, (void *)&win,
+                                       button_hover_index, button_hover_group_name);
+    if (!win)
+    {
+        return GUI_ERROR_NULL;
+    }
+    radio_t *param = win->animate->p;
+    //param->img->data = (void *)param->pic;
+    param->click = 1;
+    return GUI_SUCCESS;
+}
+int rvd_hover_button(int index, int button_count)
+{
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    if (0 > index)
+    {
+        index = button_count - 1;
+    }
+    if (button_count <= index)
+    {
+        index = 0;
+    }
+    gui_log("rvd_hover_button%d\n", index);
+    gui_win_t *win = 0;
+    radio_get_widget_by_type_and_index((gui_obj_t *)get_current_rvd_app(), RADIO, (void *)&win,
+                                       button_hover_index, button_hover_group_name);
+    if (!win)
+    {
+        return GUI_ERROR_NULL;
+    }
+
+    radio_t *param = win->animate->p;
+    //param->img->data = (void *)param->pic;
+    param->hover = 1;
+    return GUI_SUCCESS;
+}
+static int rvd_hover_down_default()
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index++;
+    if (button_count <= button_hover_index)
+    {
+        button_hover_index = 0;
+        GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+        if (obj)
+        {
+            gui_tabview_t *tabview = (void *)obj;
+            if (tabview->cur_id.x == 0 && tabview->cur_id.y == 0)
+            {
+                gui_tabview_jump_tab(tabview, 0, 1);
+            }
+
+        }
+    }
+    gui_log("rvd_hover_down_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+#define INVALID_INDEX UINT8_MAX
+static unsigned char  digit_tab_grid[4][3] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {INVALID_INDEX, 9, 10}};
+static unsigned char  play_tab_grid[3][3] = {{0, 1, 2}, {3, 4, INVALID_INDEX}, {5, 5, 5}};
+static int rvd_hover_down_grid(unsigned char grid_index[][3], unsigned char grid_row,
+                               unsigned char grid_col)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+
+    //search the hover index in grid
+    int grid_x = 0, grid_y = 0;
+    for (int i = 0; i < grid_row; i++)
+    {
+        for (int j = 0; j < grid_col; j++)
+        {
+            if (grid_index[i][j] == button_hover_index)
+            {
+                grid_x = i;
+                grid_y = j;
+                break;
+            }
+        }
+    }
+    for (size_t i = 0; i < grid_row; i++)
+    {
+        grid_x++;
+        if (grid_row <= grid_x)
+        {
+            grid_x = 0;
+        }
+        int button_hover_index_temp = grid_index[grid_x][grid_y];
+        if (button_hover_index_temp != INVALID_INDEX)
+        {
+            button_hover_index = button_hover_index_temp;
+            break;
+        }
+
+    }
+    gui_log("rvd_hover_down_grid_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+static int rvd_hover_up_grid(unsigned char grid_index[][3], unsigned char grid_row,
+                             unsigned char grid_col)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+
+    //search the hover index in grid
+    int grid_x = 0, grid_y = 0;
+    for (int i = 0; i < grid_row; i++)
+    {
+        for (int j = 0; j < grid_col; j++)
+        {
+            if (grid_index[i][j] == button_hover_index)
+            {
+                grid_x = i;
+                grid_y = j;
+                break;
+            }
+        }
+    }
+
+    int button_hover_index_temp  = INVALID_INDEX;
+    for (size_t i = 0; i < grid_row; i++)
+    {
+        grid_x--;
+        if (grid_row <= grid_x)
+        {
+            grid_x = 0;
+        }
+        else if (grid_x < 0)
+        {
+            grid_x = grid_row - 1;
+        }
+
+        int button_hover_index_temp = grid_index[grid_x][grid_y];
+        if (button_hover_index_temp != INVALID_INDEX)
+        {
+            button_hover_index = button_hover_index_temp;
+            break;
+        }
+
+    }
+    gui_log("rvd_hover_down_grid_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+int rvd_hover_down_button()
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    gui_tabview_t *tabview = (void *)obj;
+
+    if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    {
+        return rvd_hover_down_grid(digit_tab_grid, 4, 3);
+    }
+    else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    {
+        return rvd_hover_down_grid(play_tab_grid, 3, 3);
+    }
+    else
+    {
+        return rvd_hover_down_default();
+    }
+}
+
+int rvd_hover_button_by_index(int index)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index = index;
+    if (button_count <= button_hover_index)
+    {
+        button_hover_index = 0;
+        GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+        if (obj)
+        {
+            gui_tabview_t *tabview = (void *)obj;
+            if (tabview->cur_id.x == 0 && tabview->cur_id.y == 0)
+            {
+                gui_tabview_jump_tab(tabview, 0, 1);
+            }
+
+        }
+    }
+    gui_log("rvd_hover_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+int rvd_hover_button_by_range_ahead(int start, int end)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    if (start < 0 || end < 0 || start > end || end > button_count || start > button_count)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index++;
+    if (button_hover_index < start)
+    {
+        button_hover_index = start;
+    }
+    if (button_hover_index > end)
+    {
+        button_hover_index = end;
+    }
+
+
+
+
+    gui_log("rvd_hover_button%d\n", button_hover_index);
+    int ret = rvd_hover_button(button_hover_index, button_count);
+
+    return ret;
+}
+int rvd_hover_button_by_range_back(int start, int end)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    if (start < 0 || end < 0 || start > end || end > button_count || start > button_count)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index--;
+    if (button_hover_index < start)
+    {
+        button_hover_index = start;
+    }
+    if (button_hover_index > end)
+    {
+        button_hover_index = end;
+    }
+
+
+
+
+    gui_log("rvd_hover_button%d\n", button_hover_index);
+    int ret = rvd_hover_button(button_hover_index, button_count);
+
+    return ret;
+}
+//add default hover up func
+static int rvd_hover_up_default()
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index--;
+    if (0 > button_hover_index)
+    {
+        button_hover_index = button_count - 1;
+        GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+        if (obj)
+        {
+            gui_tabview_t *tabview = (void *)obj;
+            if (tabview->cur_id.x == 0 && tabview->cur_id.y == 1)
+            {
+                gui_tabview_jump_tab(tabview, 0, 0);
+            }
+
+        }
+    }
+    gui_log("rvd_hover_up_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+int rvd_hover_up_button()
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    gui_tabview_t *tabview = (void *)obj;
+    if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    {
+        return rvd_hover_up_grid(digit_tab_grid, 4, 3);
+    }
+    else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    {
+        return rvd_hover_up_grid(play_tab_grid, 3, 3);
+    }
+    else
+    {
+        return rvd_hover_up_default();
+    }
+}
+static
+void rvd_click_back_sync()
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+    if (obj)
+    {
+        gui_tabview_t *tabview = (void *)obj;
+        if (!(tabview->cur_id.x == 2 && tabview->cur_id.y == 0))
+        {
+            gui_tabview_jump_tab(tabview, 2, 0);
+            gui_log("rvd_click_back%d, %d\n", tabview->last_id.x, tabview->last_id.y);
+            rvd_hover_button_by_index(0);
+
+
+        }
+
+
+    }
+}
+
+void rvd_click_back()
+{
+    //  gui_msg_t msg =
+    // {
+    //     .event = GUI_EVENT_USER_DEFINE,
+    //     .payload = 0,
+    //     .cb = rvd_click_back_sync,
+    // };
+    // // Send message to GUI server
+    // extern bool gui_send_msg_to_server(gui_msg_t *msg);
+    // gui_send_msg_to_server(&msg);
+    rvd_click_back_sync();
+
+}
+
+void rvd_hover_right()
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    gui_tabview_t *tabview = (void *)obj;
+
+    if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    {
+        int index = rvd_get_button_hover_index();
+        gui_log("rvd_click_right%d\n", index);
+        if (index < 0)
+        {
+            return;
+        }
+        if (index >= 0 && index <= 2)
+        {
+            rvd_hover_button_by_range_ahead(0, 2);
+        }
+        else if (index >= 3 && index <= 5)
+        {
+            rvd_hover_button_by_range_ahead(3, 5);
+        }
+        else if (index >= 6 && index <= 8)
+        {
+            rvd_hover_button_by_range_ahead(6, 8);
+        }
+        else if (index >= 9 && index <= 10)
+        {
+            rvd_hover_button_by_range_ahead(9, 10);
+        }
+
+    }
+    else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    {
+        int index = rvd_get_button_hover_index();
+        gui_log("rvd_click_right%d\n", index);
+        if (index < 0)
+        {
+            return;
+        }
+        if (index >= 0 && index <= 2)
+        {
+            rvd_hover_button_by_range_ahead(0, 2);
+        }
+        else if (index >= 3 && index <= 4)
+        {
+            rvd_hover_button_by_range_ahead(3, 4);
+        }
+        else if (index >= 6 && index <= 6)
+        {
+            rvd_hover_button_by_range_ahead(6, 6);
+        }
+
+
+    }
+
+}
+void rvd_hover_left()
+{
+    GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    gui_tabview_t *tabview = (void *)obj;
+
+    if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    {
+        int index = rvd_get_button_hover_index();
+        gui_log("rvd_click_right%d\n", index);
+        if (index < 0)
+        {
+            return;
+        }
+        if (index >= 0 && index <= 2)
+        {
+            rvd_hover_button_by_range_back(0, 2);
+        }
+        else if (index >= 3 && index <= 5)
+        {
+            rvd_hover_button_by_range_back(3, 5);
+        }
+        else if (index >= 6 && index <= 8)
+        {
+            rvd_hover_button_by_range_back(6, 8);
+        }
+        else if (index >= 9 && index <= 10)
+        {
+            rvd_hover_button_by_range_back(9, 10);
+        }
+
+    }
+    else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    {
+        int index = rvd_get_button_hover_index();
+        gui_log("rvd_click_right%d\n", index);
+        if (index < 0)
+        {
+            return;
+        }
+        if (index >= 0 && index <= 2)
+        {
+            rvd_hover_button_by_range_back(0, 2);
+        }
+        else if (index >= 3 && index <= 4)
+        {
+            rvd_hover_button_by_range_back(3, 4);
+        }
+        else if (index >= 6 && index <= 6)
+        {
+            rvd_hover_button_by_range_back(6, 6);
+        }
+
+
+    }
+}
+static void gui_obj_tree_count_by_type_and_group(gui_obj_t *obj, T_OBJ_TYPE type, int *count,
+                                                 const char *group_name)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
+        if (obj->not_show == 1)
+        {
+            continue;
+        }
+
+        if (obj->type == type &&
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name))
+        {
+            (*count)++;
+        }
+
+        gui_obj_tree_count_by_type_and_group(obj, type, count, group_name);
+    }
+}
+static void get_first_active_radio(gui_obj_t *obj, gui_obj_t **rst)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *child = gui_list_entry(node, gui_obj_t, brother_list);
+        if (child->magic != GUI_MAGIC_NUMBER || child->not_show == 1)
+        {
+            continue;
+        }
+        if (child->type == RADIO)
+        {
+            *rst = child;
+            button_hover_group_name = ((radio_t *)(GUI_TYPE(gui_win_t, child)->animate->p))->radio_name;
+            return;
+        }
+        get_first_active_radio(child, rst);
+    }
+}
+int rvd_get_button_count()
+{
+    int button_count = 0;
+    // Get current application handle
+    extern void *get_app_xml(void);
+    gui_app_t *app = get_app_xml();
+    // Verify if app matches current GUI context
+    if (app != gui_current_app())
+    {
+        return 0;
+    }
+    // Get root screen object
+    gui_obj_t *screen = &(app->screen);
+    gui_obj_t *rst = 0;
+    get_first_active_radio(screen, &rst);
+    if (rst == 0)
+    {
+        /* code */
+        return 0;
+    }
+
+    gui_obj_tree_count_by_type_and_group(screen, RADIO, &button_count, ((radio_t *)(GUI_TYPE(gui_win_t,
+                                                                                    rst)->animate->p))->radio_name);
+    gui_log("rvd_get_button_count%d\n", button_count);
+    return button_count;
+}
 
 
 

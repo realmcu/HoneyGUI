@@ -18,7 +18,7 @@
 #define DRV_PIXEL_BITS   16
 #endif
 
-// #define USE_DC_PFB
+#define USE_DC_PFB
 
 #ifdef USE_DC_PFB
 #define LCD_SECTION_HEIGHT 20
@@ -165,7 +165,9 @@ static void *sdl_flush(void *arg)
         SDL_DestroyTexture(texture);
     }
 }
-#ifdef REALTEK_BUILD_GUI_XML_DOM
+#if 1
+#include "rvd.h"
+
 static void key_gui_msg_cb(void *p)
 {
 
@@ -173,6 +175,50 @@ static void key_gui_msg_cb(void *p)
     gui_msg_t *msg = p;
 
     gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
+    gui_log("key %d\n", (int)(size_t)msg->payload);
+
+    switch ((int)(size_t)msg->payload)
+    {
+    case 13:
+        /* PC KEY Enter */
+        {
+            rvd_click_button();
+        }
+        break;
+    case 1073741905:
+        /* PC KEY Down */
+        {
+            rvd_hover_down_button();
+        }
+        break;
+    case 1073741906:
+        /* PC KEY Up */
+        {
+            rvd_hover_up_button();
+        }
+        break;
+    case 27:
+        /* PC KEY ESC */
+        {
+            rvd_click_back();
+        }
+        break;
+    case /*PC KEY LEFT */ 1073741904:
+        {
+            rvd_hover_left();
+        }
+        break;
+    case /*PC KEY RIGHT */ 1073741903:
+        {
+            rvd_hover_right();
+        }
+        break;
+    default:
+        break;
+    }
+
+
+
 
 }
 #endif
@@ -291,7 +337,7 @@ void *rtk_gui_sdl(void *arg)
             break;
         case SDL_KEYUP:
             {
-                // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
+                gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
                 kb_port_data.timestamp_ms_release = gui_ms_get();
                 memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
