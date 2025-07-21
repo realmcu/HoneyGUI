@@ -82,7 +82,14 @@ gui_lite3d_t *gui_lite3d_create(void                  *parent,
                                 int16_t                w,
                                 int16_t                h);
 
-
+/**
+ * @brief Lite3D Widget On Click.
+ *
+ * @param this Widget object pointer.
+ * @param callback Callback function.
+ * @param parameter Parameter.
+ */
+void gui_lite3d_on_click(gui_lite3d_t *this, void *callback, void *parameter);
 
 #ifdef __cplusplus
 }

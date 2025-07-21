@@ -33,7 +33,7 @@ void l3_custom_free(void *ptr)
     gui_free(ptr);
 }
 
-void l3_draw_rect_img_to_canvas(l3_draw_img_t *image, l3_canvas_t *dc,
+void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
                                 l3_rect_t *rect)
 {
     extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev * dc, struct gui_rect * rect);

@@ -10,7 +10,6 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
 #include "gui_lite3d.h"
 
 /*============================================================================*
@@ -178,7 +177,7 @@ static l3_4x4_matrix_t butterfly_face_cb(l3_model_t *this, size_t face_index/*fa
                                  1);
     }
 
-    l3_4x4_matrix_mul(&face_matrix, &this->world, &transform_matrix);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 

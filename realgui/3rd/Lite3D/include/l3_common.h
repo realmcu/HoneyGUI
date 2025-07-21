@@ -32,7 +32,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "l3_color.h"
+
 
 /*============================================================================*
  *                            Macros
@@ -96,6 +96,55 @@ typedef enum
 } L3_DRAW_TYPE;
 
 
+/** @brief
+  * @{
+  * The color used in the GUI:
+  *
+  *         bit        bit
+  * L3_RGB565  15 R,G,B   0
+  * BGR565  15 B,G,R   0
+  * L3_RGB888  23 R,G,B   0
+  * ARGB888 31 A,R,G,B 0
+  * RGBA888 31 R,G,B,A 0
+  * ABGR888 31 A,B,G,R 0
+  *
+  * The gui_color is defined as ARGB888.
+  *        bit31 A,R,G,B bit0
+  */
+
+#pragma pack(1)
+typedef struct _l3_color_rgb888
+{
+    uint8_t b;
+    uint8_t g;
+    uint8_t r;
+} l3_color_rgb888_t;
+
+typedef struct _l3_color_rgb565
+{
+    uint16_t b : 5;
+    uint16_t g : 6;
+    uint16_t r : 5;
+} l3_color_rgb565_t;
+
+typedef struct _l3_color_argb8565
+{
+    uint16_t b : 5;
+    uint16_t g : 6;
+    uint16_t r : 5;
+    uint8_t a;
+} l3_color_argb8565_t;
+
+typedef struct _l3_color_argb8888
+{
+    uint8_t b; ///< Blue color component, at the lowest address
+    uint8_t g; ///< Green color component
+    uint8_t r; ///< Red color component
+    uint8_t a; ///< Alpha channel for transparency, at the highest address
+} l3_color_argb8888_t;
+#pragma pack()
+
+
 typedef struct l3_2d_point
 {
     float x;
@@ -128,7 +177,7 @@ typedef struct l3_4d_vector
 typedef struct l3_vertex
 {
     l3_4d_point_t  position;
-    l3_4d_point_t  normal;
+    l3_4d_vector_t  normal;
     float    u, v;
 } l3_vertex_t;
 
@@ -222,7 +271,13 @@ typedef struct
     // l3_4d_vector_t   normal; //face normal
 } l3_tria_face_t;
 
+#ifdef  __CC_ARM
+#pragma push
+#endif
 
+#ifdef  __CC_ARM
+#pragma anon_unions
+#endif
 
 typedef struct l3_3x3_matrix
 {
@@ -252,6 +307,10 @@ typedef struct l3_4x4_matrix
         float m[4][4];
     };
 } l3_4x4_matrix_t;
+
+#ifdef  __CC_ARM
+#pragma pop
+#endif
 
 typedef l3_4x4_matrix_t l3_world_t;
 
@@ -301,7 +360,7 @@ typedef struct l3_img_head
 } l3_img_head_t;
 
 
-typedef struct l3_draw_img
+typedef struct l3_draw_rect_img
 {
     uint16_t img_w;
     uint16_t img_h;
@@ -318,7 +377,17 @@ typedef struct l3_draw_img
     uint32_t high_quality : 1;
     //uint32_t color_mix; //todo for QuDai
     void *acc_user;
-} l3_draw_img_t;
+} l3_draw_rect_img_t;
+
+typedef struct l3_draw_tria_img
+{
+    l3_vertex_t p0;
+    l3_vertex_t p1;
+    l3_vertex_t p2;
+
+    void *fill_data;
+    L3_FILL_TYPE fill_type;
+} l3_draw_tria_img_t;
 
 typedef struct l3_rect
 {
@@ -349,9 +418,9 @@ typedef struct l3_model
         l3_tria_face_t *tria_face;
     } face;
 
-    l3_draw_img_t *img;          // material image
+    l3_draw_rect_img_t *img;          // material image
     // l3_img_head_t *mask_img;     // mask image for light
-    l3_draw_img_t *combined_img;  // sort image buffer
+    l3_draw_rect_img_t *combined_img;  // sort image buffer
 
     l3_canvas_t canvas;
 
@@ -375,9 +444,10 @@ typedef struct l3_model
 l3_4d_point_t l3_4d_point(float x, float y, float z);
 l3_4d_vector_t l3_4d_vector(float ux, float uy, float uz);
 float l3_4d_point_dot(l3_4d_point_t p1, l3_4d_point_t p2);
-l3_4d_point_t l3_4d_point_unit(l3_4d_point_t p);
-l3_4d_point_t l3_4d_point_cross(l3_4d_point_t p1, l3_4d_point_t p2);
-l3_4d_point_t l3_4d_point_sub(l3_4d_point_t p1, l3_4d_point_t p2);
+
+l3_4d_vector_t l3_4d_vector_unit(l3_4d_vector_t v);
+l3_4d_vector_t l3_4d_vector_cross(l3_4d_vector_t v1, l3_4d_vector_t v2);
+l3_4d_vector_t l3_4d_point_sub(l3_4d_point_t p1, l3_4d_point_t p2);
 
 bool l3_generate_3x3_matrix(l3_2d_point_t *src, l3_2d_point_t *dst, float *ret);
 void l3_3x3_matrix_identity(l3_3x3_matrix_t *m);
@@ -395,7 +465,7 @@ void l3_4x4_matrix_scale(l3_4x4_matrix_t *m, float scale_x, float scale_y, float
 l3_4d_point_t l3_4x4_matrix_mul_4d_point(l3_4x4_matrix_t *mat, l3_4d_point_t p);
 bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right,
                        l3_4x4_matrix_t *output);
-bool l3_calulate_draw_img_target_area(l3_draw_img_t *img, l3_rect_t *rect);
+bool l3_calulate_draw_img_target_area(l3_draw_rect_img_t *img, l3_rect_t *rect);
 
 l3_description_t *l3_load_description(void *desc_addr);
 void l3_camera_build_UVN_matrix(l3_camera_t *camera);
@@ -470,23 +540,16 @@ void l3_custom_free(void *ptr);
  * @param dc Pointer to the canvas where the image will be drawn.
  * @param rect Pointer to the rectangle specifying the target area on the canvas.
  */
-void l3_draw_rect_img_to_canvas(l3_draw_img_t *image, l3_canvas_t *dc, l3_rect_t *rect);
+void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect_t *rect);
 
 /**
  * @brief Draws a triangle onto a canvas using the specified vertices.
- * @param p0 First vertex of the triangle.
- * @param p1 Second vertex of the triangle.
- * @param p2 Third vertex of the triangle.
- * @param fill_data Pointer to the fill data for the triangle.
- * @param writebuf Pointer to the write buffer for the canvas.
- * @param width Width of the canvas.
- * @param height Height of the canvas.
+ * @param image Pointer to the triangle data to draw.
+ * @param combined_image Pointer to the combined image data.
  * @param zbuffer Pointer to the z-buffer for depth testing.
- * @param fill_type Type of fill to apply to the triangle.
  */
-void l3_draw_tria_to_canvas(l3_vertex_t p0, l3_vertex_t p1, l3_vertex_t p2,  \
-                            void *fill_data, uint8_t *writebuf, uint32_t width, uint32_t height, \
-                            float *zbuffer, L3_FILL_TYPE fill_type);
+void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combined_image,
+                            float *zbuffer);
 
 
 #ifdef __cplusplus

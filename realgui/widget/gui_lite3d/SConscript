@@ -1,0 +1,15 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+
+CPPPATH = [cwd]
+
+group = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = CPPPATH)
+
+Return('group')

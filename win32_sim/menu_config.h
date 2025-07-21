@@ -189,7 +189,10 @@
 // </c>
 
 // <c> RTK GUI Enable Lite3D library
-#define CONFIG_REALTEK_LITE3D_GCC_LIB
+#define CONFIG_REALTEK_BUILD_LITE3D  1
+#if (CONFIG_REALTEK_BUILD_LITE3D == 1)
+#define CONFIG_REALTEK_BUILD_LITE3D_GCC_LIB
+#endif
 // </c>
 
 #endif

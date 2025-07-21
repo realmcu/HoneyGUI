@@ -10,7 +10,6 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
 #include "gui_lite3d.h"
 
 /*============================================================================*

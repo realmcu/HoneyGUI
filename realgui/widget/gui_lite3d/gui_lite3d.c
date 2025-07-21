@@ -25,11 +25,56 @@
 #include "gui_lite3d.h"
 #include "draw_img.h"
 #include "acc_api.h"
+#include "tp_algo.h"
 
 static void gui_lite3d_prepare(gui_obj_t *obj)
 {
     gui_lite3d_t *this = (gui_lite3d_t *)obj;
     l3_push(this->model);
+
+    touch_info_t *tp = tp_get_info();
+    if (tp->type == TOUCH_SHORT)
+    {
+        if (this->model->draw_type == L3_DRAW_FRONT_AND_SORT)
+        {
+            const int target_x = this->model->combined_img->img_target_x;
+            const int target_y = this->model->combined_img->img_target_y;
+            const int target_w = this->model->combined_img->img_target_w;
+            const int target_h = this->model->combined_img->img_target_h;
+
+            if (tp->x >= target_x &&
+                tp->x <= (target_x + target_w) &&
+                tp->y >= target_y &&
+                tp->y <= (target_y + target_h))
+            {
+                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+            }
+        }
+        else
+        {
+            // Cache the num_face_num_verts
+            const int num_face_vertices = this->model->desc->attrib.num_face_num_verts;
+
+            for (int i = 0; i < num_face_vertices; ++i)
+            {
+                // Cache the img_target and face attributes
+                const int target_x = this->model->img[i].img_target_x;
+                const int target_y = this->model->img[i].img_target_y;
+                const int target_w = this->model->img[i].img_target_w;
+                const int target_h = this->model->img[i].img_target_h;
+
+                if (tp->x >= target_x &&
+                    tp->x <= (target_x + target_w) &&
+                    tp->y >= target_y &&
+                    tp->y <= (target_y + target_h))
+                {
+                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+                    break;
+                }
+            }
+        }
+
+    }
 
     gui_fb_change();
 }
@@ -54,7 +99,7 @@ static void gui_lite3d_end(gui_obj_t *obj)
         {
             if (draw_img_acc_end_cb != NULL)
             {
-                l3_draw_img_t *img = &this->model->img[i];
+                l3_draw_rect_img_t *img = &this->model->img[i];
                 draw_img_acc_end_cb((draw_img_t *)img);
             }
         }
@@ -155,5 +200,10 @@ gui_lite3d_t *gui_lite3d_create(void                  *parent,
 
     GET_BASE(this)->create_done = true;
     return this;
+}
+
+void gui_lite3d_on_click(gui_lite3d_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 

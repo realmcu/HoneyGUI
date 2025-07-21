@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 
 # Define a variable for the library name
-if(CONFIG_REALTEK_LITE3D_8773G_ZEPHYR_LIB) #set to 1 to enable or variable to for depnedency
+if(1) #set to 1 to enable or variable to for depnedency
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
@@ -14,7 +14,7 @@ if(CONFIG_REALTEK_LITE3D_8773G_ZEPHYR_LIB) #set to 1 to enable or variable to fo
     # Determine if we should create a library
     if((NOT HEADERS) AND (NOT SOURCES))
         message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
-		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
     if(HEADERS AND (NOT SOURCES))
