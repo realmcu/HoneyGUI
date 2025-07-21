@@ -224,6 +224,45 @@ static void arc_activity_cb(NVGcontext *vg)
     cJSON_Delete(root);
 }
 
+static void update_weather_image(cJSON *weather, uint8_t i)
+{
+    char key[15];
+    sprintf(key, "condition_%d", i);
+    // gui_log("%s\r\n", key);
+    // GUI_WIDGET_POINTER_BY_NAME(obj, key);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, key, win_watch);
+    cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
+    if (strcmp(condition->valuestring, "Sunny") == 0)
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_SUNNY_BIN);
+    }
+    else if (strcmp(condition->valuestring, "Light rain") == 0)
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN);
+    }
+    else if (strcmp(condition->valuestring, "Showers") == 0)
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN);
+    }
+    else if (strcmp(condition->valuestring, "Moderate rain") == 0)
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_M_BIN);
+    }
+    else if (strcmp(condition->valuestring, "Heavy rain") == 0)
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_L_BIN);
+    }
+    else if (strcmp(condition->valuestring, "Cloudy") == 0)
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN);
+    }
+    else // need to add more weather icon
+    {
+        gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN);
+    }
+    gui_img_refresh_size((gui_img_t *)obj);
+}
+
 static void weather_cb()
 {
     if (!(json_refeash_flag & 0x01))
@@ -249,64 +288,20 @@ static void weather_cb()
     weather_syn_flag = true;
     // parse weather array
     cJSON *weather_array = cJSON_GetObjectItemCaseSensitive(root, "weather");
-    if (cJSON_IsArray(weather_array))
-    {
-        cJSON *weather = cJSON_GetArrayItem(weather_array, 0);
-        if (!weather)
-        {
-            gui_log("get weather_array unsuccessful\n");
-        }
-        else
-        {
-            cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
-            cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
-            cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "current");
+    cJSON *weather = cJSON_GetArrayItem(weather_array, 0);
+    cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
+    cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
+    cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "current");
 
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(weather_cur, "weather_cur", win_watch);
-            sprintf(content_cur, "%d°", cur->valueint);
-            gui_text_content_set((gui_text_t *)weather_cur, content_cur, strlen(content_cur));
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(weather_range, "weather_range", win_watch);
-            sprintf(content_range, "H:%d° L:%d°", high->valueint, low->valueint);
-            gui_text_content_set((gui_text_t *)weather_range, content_range, strlen(content_range));
-            for (uint8_t i = 1; i <= 5; i++)
-            {
-                char key[15];
-                sprintf(key, "condition_%d", i);
-                // gui_log("%s\r\n", key);
-                // GUI_WIDGET_POINTER_BY_NAME(obj, key);
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, key, win_watch);
-                cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
-                if (strcmp(condition->valuestring, "Sunny") == 0)
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_SUNNY_BIN);
-                }
-                else if (strcmp(condition->valuestring, "Light rain") == 0)
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN);
-                }
-                else if (strcmp(condition->valuestring, "Showers") == 0)
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_S_BIN);
-                }
-                else if (strcmp(condition->valuestring, "Moderate rain") == 0)
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_M_BIN);
-                }
-                else if (strcmp(condition->valuestring, "Heavy rain") == 0)
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_RAIN_L_BIN);
-                }
-                else if (strcmp(condition->valuestring, "Cloudy") == 0)
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN);
-                }
-                else // need to add more weather icon
-                {
-                    gui_img_set_image_data((gui_img_t *)obj, UI_WEATHER_CLOUDY_BIN);
-                }
-                gui_img_refresh_size((gui_img_t *)obj);
-            }
-        }
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(weather_cur, "weather_cur", win_watch);
+    sprintf(content_cur, "%d°", cur->valueint);
+    gui_text_content_set((gui_text_t *)weather_cur, content_cur, strlen(content_cur));
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(weather_range, "weather_range", win_watch);
+    sprintf(content_range, "H:%d° L:%d°", high->valueint, low->valueint);
+    gui_text_content_set((gui_text_t *)weather_range, content_range, strlen(content_range));
+    for (uint8_t i = 1; i <= 5; i++)
+    {
+        update_weather_image(weather, i);
     }
     cJSON_Delete(root);
     json_refeash_flag &= 0b1110;
@@ -490,42 +485,42 @@ static void compass_cb()
         return;
     }
     cJSON *root;
-    if (!cjson_content)
-    {
-        /* automatic update data if no json data*/
-        // float x = 100 / 2;
-        // float y = 100 / 2;
-        // float r = 35; // radius
-        // // moving triangle
-        // static uint16_t progress_compass = 0;
-        // float a0 = M_PI_F * (float)progress_compass / 360 * 2; // 0 ~ 2pi CW
-        // float ax, ay;
-        // ax = x + cosf(a0 + M_PI_F * 3 / 2) * r;
-        // ay = y + sinf(a0 + M_PI_F * 3 / 2) * r;
+    // if (!cjson_content)
+    // {
+    /* automatic update data if no json data*/
+    // float x = 100 / 2;
+    // float y = 100 / 2;
+    // float r = 35; // radius
+    // // moving triangle
+    // static uint16_t progress_compass = 0;
+    // float a0 = M_PI_F * (float)progress_compass / 360 * 2; // 0 ~ 2pi CW
+    // float ax, ay;
+    // ax = x + cosf(a0 + M_PI_F * 3 / 2) * r;
+    // ay = y + sinf(a0 + M_PI_F * 3 / 2) * r;
 
-        // compass_pointer->base.x = (uint16_t)ax;
-        // compass_pointer->base.y = (uint16_t)ay;
-        // gui_img_rotation(compass_pointer, (float)progress_compass);
-        // sprintf(degree_content, "%d°", progress_compass);
-        // gui_text_content_set(compass_degree, degree_content, strlen(degree_content));
+    // compass_pointer->base.x = (uint16_t)ax;
+    // compass_pointer->base.y = (uint16_t)ay;
+    // gui_img_rotation(compass_pointer, (float)progress_compass);
+    // sprintf(degree_content, "%d°", progress_compass);
+    // gui_text_content_set(compass_degree, degree_content, strlen(degree_content));
 
-        // if (progress_compass == 0)                                 {sprintf(orien_content, "N");}
-        // else if (progress_compass > 0 && progress_compass < 90)    {sprintf(orien_content, "NE");}
-        // else if (progress_compass == 90)                           {sprintf(orien_content, "E");}
-        // else if (progress_compass > 90 && progress_compass < 180)  {sprintf(orien_content, "SE");}
-        // else if (progress_compass == 180)                          {sprintf(orien_content, "S");}
-        // else if (progress_compass > 180 && progress_compass < 270) {sprintf(orien_content, "SW");}
-        // else if (progress_compass == 270)                          {sprintf(orien_content, "W");}
-        // else if (progress_compass > 270 && progress_compass < 360) {sprintf(orien_content, "NW");}
-        // gui_text_content_set(compass_orien, orien_content, strlen(orien_content));
-        // progress_compass += 1;
-        // if (progress_compass >= 360)
-        // {
-        //     progress_compass = 0;
-        // }
-        return;
-    }
-    else
+    // if (progress_compass == 0)                                 {sprintf(orien_content, "N");}
+    // else if (progress_compass > 0 && progress_compass < 90)    {sprintf(orien_content, "NE");}
+    // else if (progress_compass == 90)                           {sprintf(orien_content, "E");}
+    // else if (progress_compass > 90 && progress_compass < 180)  {sprintf(orien_content, "SE");}
+    // else if (progress_compass == 180)                          {sprintf(orien_content, "S");}
+    // else if (progress_compass > 180 && progress_compass < 270) {sprintf(orien_content, "SW");}
+    // else if (progress_compass == 270)                          {sprintf(orien_content, "W");}
+    // else if (progress_compass > 270 && progress_compass < 360) {sprintf(orien_content, "NW");}
+    // gui_text_content_set(compass_orien, orien_content, strlen(orien_content));
+    // progress_compass += 1;
+    // if (progress_compass >= 360)
+    // {
+    //     progress_compass = 0;
+    // }
+    //     return;
+    // }
+    // else
     {
         root = cJSON_Parse(cjson_content);
         if (!root)
@@ -536,47 +531,37 @@ static void compass_cb()
     }
     // parse compass array
     cJSON *compass_array = cJSON_GetObjectItemCaseSensitive(root, "compass");
-    if (cJSON_IsArray(compass_array))
-    {
-        cJSON *comp = cJSON_GetArrayItem(compass_array, 0);
-        if (!comp)
-        {
-            gui_log("get compass_array unsuccessful\n");
-        }
-        else
-        {
-            cJSON *degree = cJSON_GetObjectItemCaseSensitive(comp, "degree");
-            uint16_t degree_val = degree->valueint;
-            float x = 100 / 2;
-            float y = 100 / 2;
-            float r = 35; // radius
-            // moving triangle
-            float a0 = M_PI_F * degree_val / 360 * 2; // 0 ~ 2pi CW
-            float ax, ay;
-            ax = x + cosf(a0 + M_PI_F * 3 / 2) * r + sinf(a0 + M_PI_F * 3 / 2) * compass_pointer->base.w / 2;
-            ay = y + sinf(a0 + M_PI_F * 3 / 2) * r + cosf(a0 + M_PI_F * 1 / 2) * compass_pointer->base.w / 2;
+    cJSON *comp = cJSON_GetArrayItem(compass_array, 0);
+    cJSON *degree = cJSON_GetObjectItemCaseSensitive(comp, "degree");
+    uint16_t degree_val = degree->valueint;
+    float x = 100 / 2;
+    float y = 100 / 2;
+    float r = 35; // radius
+    // moving triangle
+    float a0 = M_PI_F * degree_val / 360 * 2; // 0 ~ 2pi CW
+    float ax, ay;
+    ax = x + cosf(a0 + M_PI_F * 3 / 2) * r + sinf(a0 + M_PI_F * 3 / 2) * compass_pointer->base.w / 2;
+    ay = y + sinf(a0 + M_PI_F * 3 / 2) * r + cosf(a0 + M_PI_F * 1 / 2) * compass_pointer->base.w / 2;
 
-            compass_pointer->base.x = (uint16_t)ax;
-            compass_pointer->base.y = (uint16_t)ay;
-            // gui_img_translate (compass_pointer, ax, ay);
-            gui_img_rotation(compass_pointer, (float)degree_val);
+    compass_pointer->base.x = (uint16_t)ax;
+    compass_pointer->base.y = (uint16_t)ay;
+    // gui_img_translate (compass_pointer, ax, ay);
+    gui_img_rotation(compass_pointer, (float)degree_val);
 
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(compass_degree, "compass_degree", win_watch);
-            sprintf(degree_content, "%d°", degree_val);
-            gui_text_content_set((gui_text_t *)compass_degree, degree_content, strlen(degree_content));
-            uint16_t progress_compass = degree_val;
-            if (progress_compass == 0)                                 {sprintf(orien_content, "N");}
-            else if (progress_compass > 0 && progress_compass < 90)    {sprintf(orien_content, "NE");}
-            else if (progress_compass == 90)                           {sprintf(orien_content, "E");}
-            else if (progress_compass > 90 && progress_compass < 180)  {sprintf(orien_content, "SE");}
-            else if (progress_compass == 180)                          {sprintf(orien_content, "S");}
-            else if (progress_compass > 180 && progress_compass < 270) {sprintf(orien_content, "SW");}
-            else if (progress_compass == 270)                          {sprintf(orien_content, "W");}
-            else if (progress_compass > 270 && progress_compass < 360) {sprintf(orien_content, "NW");}
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(compass_orien, "compass_orien", win_watch);
-            gui_text_content_set((gui_text_t *)compass_orien, orien_content, strlen(orien_content));
-        }
-    }
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(compass_degree, "compass_degree", win_watch);
+    sprintf(degree_content, "%d°", degree_val);
+    gui_text_content_set((gui_text_t *)compass_degree, degree_content, strlen(degree_content));
+    uint16_t progress_compass = degree_val;
+    if (progress_compass == 0)        {sprintf(orien_content, "N");}
+    else if (progress_compass < 90)   {sprintf(orien_content, "NE");}
+    else if (progress_compass == 90)  {sprintf(orien_content, "E");}
+    else if (progress_compass < 180)  {sprintf(orien_content, "SE");}
+    else if (progress_compass == 180) {sprintf(orien_content, "S");}
+    else if (progress_compass < 270)  {sprintf(orien_content, "SW");}
+    else if (progress_compass == 270) {sprintf(orien_content, "W");}
+    else if (progress_compass < 360)  {sprintf(orien_content, "NW");}
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(compass_orien, "compass_orien", win_watch);
+    gui_text_content_set((gui_text_t *)compass_orien, orien_content, strlen(orien_content));
     // clear
     cJSON_Delete(root);
     json_refeash_flag &= 0b0111;

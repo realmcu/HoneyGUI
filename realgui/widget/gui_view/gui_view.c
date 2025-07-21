@@ -411,11 +411,40 @@ static void gui_view_adjust_list(gui_obj_t *old, gui_obj_t *new)
     list1->next = list2;
 }
 
+static void gui_view_scroll_offset(void)
+{
+    touch_info_t *tp = tp_get_info();
+    if (tp->left_moved || tp->right_moved ||
+        tp->up_moved || tp->down_moved)
+    {
+        g_Offset = 0;
+        g_Release = 0;
+    }
+
+    if (g_TriggerMove)
+    {
+        if (g_OffsetNeedUpdate)
+        {
+            if (tp->type == TOUCH_HOLD_X)      {g_Offset = tp->deltaX;}
+            else if (tp->type == TOUCH_HOLD_Y) {g_Offset = tp->deltaY;}
+        }
+        else
+        {
+            g_OffsetNeedUpdate = true;
+        }
+    }
+}
+
 static void gui_view_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
+
+    GUI_UNUSED(dc);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(kb);
+
     gui_view_t *_this = (gui_view_t *)obj;
     obj->opacity_value = _this->opacity;
     _this->base.need_preprocess = false;
@@ -435,30 +464,10 @@ static void gui_view_prepare(gui_obj_t *obj)
 
     if (!g_SurpressTP && _this == g_CurrentView)
     {
-        // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
-
-        if (tp->left_moved || tp->right_moved ||
-            tp->up_moved || tp->down_moved)
-        {
-            g_Offset = 0;
-            g_Release = 0;
-        }
-
-        if (g_TriggerMove)
-        {
-            if (g_OffsetNeedUpdate)
-            {
-                if (tp->type == TOUCH_HOLD_X)      {g_Offset = tp->deltaX;}
-                else if (tp->type == TOUCH_HOLD_Y) {g_Offset = tp->deltaY;}
-            }
-            else
-            {
-                g_OffsetNeedUpdate = true;
-            }
-        }
+        gui_view_scroll_offset();
     }
 
     if (_this->current_transition_style == SWITCH_INIT_STATE) {}
@@ -471,13 +480,6 @@ static void gui_view_prepare(gui_obj_t *obj)
         view_transition_animation(obj, g_Release / (float)g_Target);
     }
 
-    uint8_t last = _this->checksum;
-    _this->checksum = 0;
-    _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, (uint8_t)sizeof(gui_view_t));
-    if (last != _this->checksum)
-    {
-        gui_fb_change();
-    }
     if (g_Release != g_Target)
     {
         gui_fb_change();

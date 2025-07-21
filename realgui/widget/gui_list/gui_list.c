@@ -103,71 +103,102 @@ static void gui_list_update_bar_data_cb(NVGcontext *vg)
     nvgFill(vg);
 }
 
-static void gui_list_input_prepare(gui_obj_t *obj)
+static void gui_list_update_bar(gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
     gui_list_t *_this = (gui_list_t *)obj;
-    GUI_UNUSED(dc);
-
-    if (_this->note_num == 0)
+    if (_this->need_update_bar)
     {
-        g_Limit = true;
-        return;
-    }
-
-    if (!tp->pressing)
-    {
-        g_Limit = false;
-        int temp = _this->dir == HORIZONTAL ? obj->w : obj->h;
-
-        // restore list offset
-        if (_this->speed == 0)
+        _this->need_update_bar = false;
+        if (_this->dir == HORIZONTAL)
         {
-            int offset_min = temp - _this->total_length;
-            int offset_max = 0;
-            if (_this->style == LIST_CARD)
-            {
-                offset_max = temp - _this->note_length * 1.8f;
-                offset_min -= temp / 3;
-            }
-            if (_this->offset > offset_max || _this->offset < offset_min)
-            {
-                float e_factor = 0.2f;
-                int16_t target = _this->offset >= 0 ? offset_max : offset_min;
-                int16_t distance = target - _this->offset;
-                int delta = (int16_t)(distance * e_factor); //exponential decay
-                if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
-                _this->offset += delta;
-            }
+            g_Bar_Width = obj->w * obj->w / _this->total_length;
+            g_Bar_Height = LIST_BAR_WIDTH;
+            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == obj->w));
         }
         else
         {
-            int offset_min = temp - _this->total_length;
-            int offset_max = OUT_SCOPE;
-            if (_this->style == LIST_CARD)
-            {
-                offset_max = temp - _this->note_length * 1.8f;
-                offset_min -= temp / 3;
-            }
-
-            _this->offset += _this->speed;
-            _this->speed = (int16_t)((1 - _this->factor) * _this->speed);
-            if (_this->offset > offset_max)
-            {
-                _this->offset = offset_max;
-                _this->speed = 0;
-            }
-            else if (_this->offset < offset_min - OUT_SCOPE)
-            {
-                _this->offset = offset_min - OUT_SCOPE;
-                _this->speed = 0;
-            }
+            g_Bar_Width = LIST_BAR_WIDTH;
+            g_Bar_Height = obj->h * obj->h / _this->total_length;
+            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == obj->h));
         }
-        _this->hold = _this->offset;
+        g_Bar_Color = _this->bar_color;
+        memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, _this->bar->base.w, _this->bar->base.h,
+                                          gui_list_update_bar_data_cb,
+                                          _this->bar_data);
     }
 
-    // free notes
+    if (_this->bar)
+    {
+        float t_x = 0;
+        float t_y = 0;
+        float offset = (float)(_this->offset);
+        offset = (offset > 0) ? 0 : offset;
+        if (_this->dir == HORIZONTAL && _this->total_length > obj->w)
+        {
+            float range = (float)(obj->w - g_Bar_Width);
+            t_x = fabsf(offset) * range / (_this->total_length - obj->w);
+            t_x = (t_x > range) ? range : t_x;
+        }
+        else if (_this->dir == VERTICAL && _this->total_length > obj->h)
+        {
+            float range = (float)(obj->h - g_Bar_Height);
+            t_y = fabsf(offset) * range / (_this->total_length - obj->h);
+            t_y = (t_y > range) ? range : t_y;
+        }
+        gui_img_translate(_this->bar, t_x, t_y);
+    }
+}
+
+// Add inertia effect while tp released
+static void gui_list_inertia_motion(gui_obj_t *obj)
+{
+    gui_list_t *_this = (gui_list_t *)obj;
+
+    g_Limit = false;
+    int temp = _this->dir == HORIZONTAL ? obj->w : obj->h;
+    int offset_min = temp - _this->total_length;
+    int offset_max = OUT_SCOPE;
+    if (_this->style == LIST_CARD)
+    {
+        offset_max = temp - _this->note_length * 1.8f;
+        offset_min -= temp / 3;
+    }
+
+    if (_this->speed == 0)
+    {
+        if (_this->offset > offset_max || _this->offset < offset_min)
+        {
+            float e_factor = 0.2f;
+            int16_t target = _this->offset >= 0 ? offset_max : offset_min;
+            int16_t distance = target - _this->offset;
+            int delta = (int16_t)(distance * e_factor); //exponential decay
+            if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
+            _this->offset += delta;
+        }
+    }
+    else
+    {
+        _this->offset += _this->speed;
+        _this->speed = (int16_t)((1 - _this->factor) * _this->speed);
+        if (_this->offset > offset_max)
+        {
+            _this->offset = offset_max;
+            _this->speed = 0;
+        }
+        else if (_this->offset < offset_min - OUT_SCOPE)
+        {
+            _this->offset = offset_min - OUT_SCOPE;
+            _this->speed = 0;
+        }
+    }
+    _this->hold = _this->offset;
+}
+
+// Free notes that are out of the list
+static void gui_list_free_notes(gui_obj_t *obj)
+{
+    gui_list_t *_this = (gui_list_t *)obj;
     gui_node_list_t *node = NULL;
     gui_node_list_t *tmp = NULL;
     gui_list_for_each_safe(node, tmp, &(_this->base.child_list))
@@ -203,6 +234,28 @@ static void gui_list_input_prepare(gui_obj_t *obj)
             // gui_log("free note %d\n", index);
         }
     }
+}
+
+static void gui_list_input_prepare(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_list_t *_this = (gui_list_t *)obj;
+    GUI_UNUSED(dc);
+
+    if (_this->note_num == 0)
+    {
+        g_Limit = true;
+        return;
+    }
+
+    if (!tp->pressing)
+    {
+        gui_list_inertia_motion(obj);
+    }
+
+    gui_list_free_notes(obj);
+
     // create the first note when the list is empty
     if (obj->child_list.next == &obj->child_list)
     {
@@ -296,49 +349,7 @@ static void gui_list_prepare(gui_obj_t *obj)
     }
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
 
-    if (_this->need_update_bar)
-    {
-        _this->need_update_bar = false;
-        if (_this->dir == HORIZONTAL)
-        {
-            g_Bar_Width = obj->w * obj->w / _this->total_length;
-            g_Bar_Height = LIST_BAR_WIDTH;
-            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == obj->w));
-        }
-        else
-        {
-            g_Bar_Width = LIST_BAR_WIDTH;
-            g_Bar_Height = obj->h * obj->h / _this->total_length;
-            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == obj->h));
-        }
-        g_Bar_Color = _this->bar_color;
-        memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, _this->bar->base.w, _this->bar->base.h,
-                                          gui_list_update_bar_data_cb,
-                                          _this->bar_data);
-
-    }
-
-    if (_this->bar)
-    {
-        float t_x = 0;
-        float t_y = 0;
-        float offset = (float)(_this->offset);
-        offset = (offset > 0) ? 0 : offset;
-        if (_this->dir == HORIZONTAL && _this->total_length > obj->w)
-        {
-            float range = (float)(obj->w - g_Bar_Width);
-            t_x = fabsf(offset) * range / (_this->total_length - obj->w);
-            t_x = (t_x > range) ? range : t_x;
-        }
-        else if (_this->dir == VERTICAL && _this->total_length > obj->h)
-        {
-            float range = (float)(obj->h - g_Bar_Height);
-            t_y = fabsf(offset) * range / (_this->total_length - obj->h);
-            t_y = (t_y > range) ? range : t_y;
-        }
-        gui_img_translate(_this->bar, t_x, t_y);
-    }
+    gui_list_update_bar(obj); // Update the scrollbar
 
     uint8_t last = _this->checksum;
     _this->checksum = 0;
@@ -465,6 +476,165 @@ static void gui_list_note_input_prepare(gui_obj_t *obj)
     }
 }
 
+static void gui_list_note_circle(gui_obj_t *obj)
+{
+    gui_list_t *list = (gui_list_t *)obj->parent;
+    matrix_translate(-obj->x, -obj->y, obj->matrix);
+
+    int32_t r = (list->dir == HORIZONTAL) ? list->base.h : list->base.w;
+    int32_t diff = (list->dir == HORIZONTAL)
+                   ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
+                   : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
+    int32_t coord = diff >= r ? r : r - (int)sqrt(r * r - diff * diff);
+    if (list->dir == HORIZONTAL)
+    {
+        obj->y = coord;
+    }
+    else
+    {
+        obj->x = coord;
+    }
+    matrix_translate(obj->x, obj->y, obj->matrix);
+}
+
+static void gui_list_note_zoom(gui_obj_t *obj)
+{
+    gui_list_t *list = (gui_list_t *)obj->parent;
+    float scale_range = 0.5f;
+    int32_t scope = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
+
+    int32_t diff = (list->dir == HORIZONTAL)
+                   ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
+                   : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
+    diff = abs(diff);
+    if (diff > scope / 2) { diff = scope / 2;}
+    float scale = 1.0f - scale_range * diff / (scope / 2.0f);
+
+    matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
+    matrix_scale(scale, scale, obj->matrix);
+    matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
+}
+
+static void gui_list_note_card(gui_obj_t *obj)
+{
+    gui_list_t *list = (gui_list_t *)obj->parent;
+    matrix_translate(-obj->x, -obj->y, obj->matrix);
+
+    float scale_0 = 1.0f;
+    float scale_1 = 0.9f;
+    int obj_location, list_length, list_location;
+    if (list->dir == HORIZONTAL)
+    {
+        int16_t limit = (int16_t)(list->base.x + list->base.w - (int16_t)(list->note_length * scale_1));
+        if (obj->x > limit)
+        {
+            obj->x = limit;
+        }
+        obj_location = obj->x;
+        list_length = list->base.w;
+        list_location = list->base.x;
+    }
+    else
+    {
+        int16_t limit = (int16_t)(list->base.y + list->base.h - (int16_t)(list->note_length * scale_1));
+        if (obj->y > limit)
+        {
+            obj->y = limit;
+        }
+        obj_location = obj->y;
+        list_length = list->base.h;
+        list_location = list->base.y;
+    }
+    int location_1 = list_location + list_length - (int16_t)(list->note_length * scale_1);
+    int location_0 = location_1 - list->note_length / 3;
+
+    if (obj_location >= location_0 && obj_location <= location_1)
+    {
+        float scale = scale_0 - (scale_0 - scale_1) * (obj_location - location_0) /
+                      (location_1 - location_0);
+        matrix_translate(obj->x, obj->y, obj->matrix); //prevent bottom space of screen
+
+        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
+        matrix_scale(scale, scale, obj->matrix);
+        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
+    }
+    else
+    {
+        matrix_translate(obj->x, obj->y, obj->matrix);
+    }
+}
+
+static void gui_list_note_fan(gui_obj_t *obj)
+{
+    gui_list_t *list = (gui_list_t *)obj->parent;
+    gui_list_note_t *_this = (gui_list_note_t *)obj;
+    if (obj->timer)
+    {
+        float start;
+        if (list->dir == HORIZONTAL)
+        {
+            start = _this->is_speed_positive ? 30.0f : -30.0f;
+        }
+        else
+        {
+            start = _this->is_speed_positive ? -30.0f : 30.0f;
+        }
+        float angle = start * (1.0f - (float)_this->animate_cnt / LIST_TAB_ANIMATE_MAX);
+        matrix_rotate(angle, obj->matrix);
+    }
+}
+
+static void gui_list_note_helix(gui_obj_t *obj)
+{
+    gui_list_note_t *_this = (gui_list_note_t *)obj;
+    extern void gui_list_rotate_helix(gui_list_note_t *_this, float degree);
+    if (obj->timer)
+    {
+        float start = _this->is_speed_positive ? -180.0f : 180.0f;
+        float degree = start * (1.0f - (float)_this->animate_cnt / LIST_TAB_ANIMATE_MAX);
+        gui_list_rotate_helix(_this, degree);
+    }
+}
+
+static void gui_list_note_curl(gui_obj_t *obj)
+{
+    gui_list_note_t *_this = (gui_list_note_t *)obj;
+    extern void gui_list_rotate_curl(gui_list_note_t *_this, float degree);
+    if (obj->timer)
+    {
+        float degree = 90.0f * (1.0f - (float)_this->animate_cnt / LIST_TAB_ANIMATE_MAX);
+        gui_list_rotate_curl(_this, degree);
+    }
+}
+
+static void gui_list_note_transform(gui_obj_t *obj)
+{
+    gui_list_t *list = (gui_list_t *)obj->parent;
+    switch (list->style)
+    {
+    case LIST_CIRCLE:
+        gui_list_note_circle(obj);
+        break;
+    case LIST_ZOOM:
+        gui_list_note_zoom(obj);
+        break;
+    case LIST_CARD:
+        gui_list_note_card(obj);
+        break;
+    case LIST_FAN:
+        gui_list_note_fan(obj);
+        break;
+    case LIST_HELIX:
+        gui_list_note_helix(obj);
+        break;
+    case LIST_CURL:
+        gui_list_note_curl(obj);
+        break;
+    default:
+        break;
+    }
+}
+
 static void gui_list_note_prepare(gui_obj_t *obj)
 {
     gui_list_note_t *_this = (gui_list_note_t *)obj;
@@ -485,127 +655,8 @@ static void gui_list_note_prepare(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
     }
 
-    if (list->style == LIST_CIRCLE)
-    {
-        matrix_translate(-obj->x, -obj->y, obj->matrix);
+    gui_list_note_transform(obj);
 
-        int32_t r = (list->dir == HORIZONTAL) ? list->base.h : list->base.w;
-        int32_t diff = (list->dir == HORIZONTAL)
-                       ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
-                       : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
-
-        int32_t coord = diff >= r ? r : r - (int)sqrt(r * r - diff * diff);
-
-        if (list->dir == HORIZONTAL)
-        {
-            obj->y = coord;
-        }
-        else
-        {
-            obj->x = coord;
-        }
-
-        matrix_translate(obj->x, obj->y, obj->matrix);
-    }
-    else if (list->style == LIST_ZOOM)
-    {
-        float scale_range = 0.5f;
-        int32_t scope = (list->dir == HORIZONTAL) ? list->base.w : list->base.h;
-
-        int32_t diff = (list->dir == HORIZONTAL)
-                       ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
-                       : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
-        diff = abs(diff);
-        if (diff > scope / 2) { diff = scope / 2;}
-        float scale = 1.0f - scale_range * diff / (scope / 2.0f);
-
-        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-        matrix_scale(scale, scale, obj->matrix);
-        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
-    }
-    else if (list->style == LIST_CARD)
-    {
-        matrix_translate(-obj->x, -obj->y, obj->matrix);
-
-        float scale_0 = 1.0f;
-        float scale_1 = 0.9f;
-        int obj_location, list_length, list_location;
-        if (list->dir == HORIZONTAL)
-        {
-            int16_t limit = (int16_t)(list->base.x + list->base.w - (int16_t)(list->note_length * scale_1));
-            if (obj->x > limit)
-            {
-                obj->x = limit;
-            }
-            obj_location = obj->x;
-            list_length = list->base.w;
-            list_location = list->base.x;
-        }
-        else
-        {
-            int16_t limit = (int16_t)(list->base.y + list->base.h - (int16_t)(list->note_length * scale_1));
-            if (obj->y > limit)
-            {
-                obj->y = limit;
-            }
-            obj_location = obj->y;
-            list_length = list->base.h;
-            list_location = list->base.y;
-        }
-        int location_1 = list_location + list_length - (int16_t)(list->note_length * scale_1);
-        int location_0 = location_1 - list->note_length / 3;
-
-        if (obj_location >= location_0 && obj_location <= location_1)
-        {
-            float scale = scale_0 - (scale_0 - scale_1) * (obj_location - location_0) /
-                          (location_1 - location_0);
-            matrix_translate(obj->x, obj->y, obj->matrix); //prevent bottom space of screen
-
-            matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-            matrix_scale(scale, scale, obj->matrix);
-            matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
-        }
-        else
-        {
-            matrix_translate(obj->x, obj->y, obj->matrix);
-        }
-    }
-    else if (list->style == LIST_FAN)
-    {
-        if (obj->timer)
-        {
-            float start;
-            if (list->dir == HORIZONTAL)
-            {
-                start = _this->is_speed_positive ? 30.0f : -30.0f;
-            }
-            else
-            {
-                start = _this->is_speed_positive ? -30.0f : 30.0f;
-            }
-            float angle = start * (1.0f - (float)_this->animate_cnt / LIST_TAB_ANIMATE_MAX);
-            matrix_rotate(angle, obj->matrix);
-        }
-    }
-    else if (list->style == LIST_HELIX)
-    {
-        extern void gui_list_rotate_helix(gui_list_note_t *_this, float degree);
-        if (obj->timer)
-        {
-            float start = _this->is_speed_positive ? -180.0f : 180.0f;
-            float degree = start * (1.0f - (float)_this->animate_cnt / LIST_TAB_ANIMATE_MAX);
-            gui_list_rotate_helix(_this, degree);
-        }
-    }
-    else if (list->style == LIST_CURL)
-    {
-        extern void gui_list_rotate_curl(gui_list_note_t *_this, float degree);
-        if (obj->timer)
-        {
-            float degree = 90.0f * (1.0f - (float)_this->animate_cnt / LIST_TAB_ANIMATE_MAX);
-            gui_list_rotate_curl(_this, degree);
-        }
-    }
     matrix_translate(_this->t_x, _this->t_y,
                      obj->matrix); //_this way to move note in order not to lose tp
 

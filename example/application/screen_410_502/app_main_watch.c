@@ -390,7 +390,7 @@ static void app_main_watch_ui_design(void)
 #endif
     gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_main_watch_win", 0, 0, 0, 0);
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0); // watch turn on animation
-    // fps_create(gui_obj_get_root());
+    fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     win_cb();
 }

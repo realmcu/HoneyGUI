@@ -30,7 +30,46 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static void prepare_blur_param(gui_view_t *this, gui_rect_t new_rect, float blur_ratio,
+                               BLUR_DIRECTION dir)
+{
+    uint8_t blur_degree;
+    if (blur_ratio >= 0.5f)
+    {
+        blur_degree = 225;
+    }
+    else if (blur_ratio <= 0.1f)
+    {
+        blur_degree = 0;
+    }
+    else
+    {
+        blur_degree = (uint8_t)(562.5f * blur_ratio - 56.25f);
+    }
+    uint8_t *blur_param = this->blur_param;
+    if (blur_param == NULL)
+    {
+        blur_param = gui_malloc(sizeof(post_process_event));
+        this->blur_param = blur_param;
+        memset(blur_param, 0, sizeof(post_process_event));
+        post_process_event *event = (post_process_event *)blur_param;
+        event->param = gui_malloc(sizeof(post_process_blur_param));
+        memset(event->param, 0, sizeof(post_process_blur_param));
+        post_process_blur_param *param = (post_process_blur_param *)event->param;
+        param->area = new_rect;
+        param->blur_degree = blur_degree;
+        param->dir = dir;
+        event->type = POST_PROCESS_BLUR;
+        if (param->cache_mem == NULL)
+        {
+            blur_prepare(&param->area, &param->cache_mem);
+        }
+    }
+}
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void gui_view_blur(gui_view_t *this, int16_t release)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -115,39 +154,7 @@ void gui_view_blur(gui_view_t *this, int16_t release)
     //     return;
     // }
     gui_rect_t new_rect = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
-
-    uint8_t blur_degree;
-    if (blur_ratio >= 0.5f)
-    {
-        blur_degree = 225;
-    }
-    else if (blur_ratio <= 0.1f)
-    {
-        blur_degree = 0;
-    }
-    else
-    {
-        blur_degree = (uint8_t)(562.5f * blur_ratio - 56.25f);
-    }
-    uint8_t *blur_param = this->blur_param;
-    if (blur_param == NULL)
-    {
-        blur_param = gui_malloc(sizeof(post_process_event));
-        this->blur_param = blur_param;
-        memset(blur_param, 0, sizeof(post_process_event));
-        post_process_event *event = (post_process_event *)blur_param;
-        event->param = gui_malloc(sizeof(post_process_blur_param));
-        memset(event->param, 0, sizeof(post_process_blur_param));
-        post_process_blur_param *param = (post_process_blur_param *)event->param;
-        param->area = new_rect;
-        param->blur_degree = blur_degree;
-        param->dir = dir;
-        event->type = POST_PROCESS_BLUR;
-        if (param->cache_mem == NULL)
-        {
-            blur_prepare(&param->area, &param->cache_mem);
-        }
-    }
+    prepare_blur_param(this, new_rect, blur_ratio, dir);
 }
 
 

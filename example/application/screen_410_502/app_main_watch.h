@@ -43,8 +43,7 @@ typedef struct information
 */
 #define GUI_WIDGET_POINTER_BY_NAME_ROOT(pointer, name, root_widget) gui_obj_t *pointer = 0;\
     extern void gui_obj_tree_get_widget_by_name(gui_obj_t *, const char *, gui_obj_t **);\
-    gui_obj_tree_get_widget_by_name((void *)root_widget, name, &pointer);\
-    GUI_WIDGET_TRY_EXCEPT(pointer)
+    gui_obj_tree_get_widget_by_name((void *)root_widget, name, &pointer);
 
 /**
 * @brief Macro to set return function.

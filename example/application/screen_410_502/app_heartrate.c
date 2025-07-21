@@ -91,6 +91,79 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
 // }
 
+static void draw_line_chart(NVGcontext *vg, float *samples)
+{
+    float x = 36.0f;
+    float y = 78.0f;
+    float w = 344.0f;
+    float h = 210.0f;
+
+    float sx[4], sy[4];
+    float dx = w / 4.0f;
+    uint8_t i = 0;
+    for (i = 0; i < 4; i++)
+    {
+        sx[i] = x + i * dx;
+        // sy[i] = y + h * samples[i] * 0.7f;
+        sy[i] = y + h * (1 - (samples[i] - 40.0f) / 120.0f);
+    }
+    // Graph background
+    NVGpaint bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(255, 0, 0, 0), nvgRGBA(255, 0, 0, 150));
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    for (i = 1; i < 4; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+    }
+
+    nvgLineTo(vg, x + w - dx, y + h);
+    nvgLineTo(vg, x, y + h);
+    nvgFillPaint(vg, bg);
+    nvgFill(vg);
+    // Graph line
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0] + 2);
+    for (i = 1; i < 4; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1] + 2, sx[i] - dx * 0.5f, sy[i] + 2, sx[i],
+                    sy[i] + 2);
+    }
+    nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 255));
+    nvgStrokeWidth(vg, 3.0f);
+    nvgStroke(vg);
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    for (i = 1; i < 4; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+    }
+
+    nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 255));
+    nvgStrokeWidth(vg, 3.0f);
+    nvgStroke(vg);
+
+    // Graph sample pos
+    nvgBeginPath(vg);
+    for (i = 0; i < 4; i++)
+    {
+        nvgCircle(vg, sx[i], sy[i], 4.0f);
+    }
+
+    nvgFillColor(vg, nvgRGBA(255, 0, 0, 255));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    for (i = 0; i < 4; i++)
+    {
+        nvgCircle(vg, sx[i], sy[i], 2.0f);
+    }
+
+    nvgFillColor(vg, nvgRGBA(220, 220, 220, 255));
+    nvgFill(vg);
+
+    nvgStrokeWidth(vg, 1.0f);
+}
+
 static void draw_heartrate_graph(NVGcontext *vg)
 {
     // draw split line
@@ -188,75 +261,7 @@ static void draw_heartrate_graph(NVGcontext *vg)
                               img_single->x, img_single->y);
     }
 
-    float x = 36.0f;
-    float y = 78.0f;
-    float w = 344.0f;
-    float h = 210.0f;
-
-    float sx[4], sy[4];
-    float dx = w / 4.0f;
-    uint8_t i = 0;
-    for (i = 0; i < 4; i++)
-    {
-        sx[i] = x + i * dx;
-        // sy[i] = y + h * samples[i] * 0.7f;
-        sy[i] = y + h * (1 - (samples[i] - 40.0f) / 120.0f);
-    }
-    // Graph background
-    NVGpaint bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(255, 0, 0, 0), nvgRGBA(255, 0, 0, 150));
-    nvgBeginPath(vg);
-    nvgMoveTo(vg, sx[0], sy[0]);
-    for (i = 1; i < 4; i++)
-    {
-        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
-    }
-
-    nvgLineTo(vg, x + w - dx, y + h);
-    nvgLineTo(vg, x, y + h);
-    nvgFillPaint(vg, bg);
-    nvgFill(vg);
-    // Graph line
-    nvgBeginPath(vg);
-    nvgMoveTo(vg, sx[0], sy[0] + 2);
-    for (i = 1; i < 4; i++)
-    {
-        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1] + 2, sx[i] - dx * 0.5f, sy[i] + 2, sx[i],
-                    sy[i] + 2);
-    }
-    nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 255));
-    nvgStrokeWidth(vg, 3.0f);
-    nvgStroke(vg);
-
-    nvgBeginPath(vg);
-    nvgMoveTo(vg, sx[0], sy[0]);
-    for (i = 1; i < 4; i++)
-    {
-        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
-    }
-
-    nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 255));
-    nvgStrokeWidth(vg, 3.0f);
-    nvgStroke(vg);
-
-    // Graph sample pos
-    nvgBeginPath(vg);
-    for (i = 0; i < 4; i++)
-    {
-        nvgCircle(vg, sx[i], sy[i], 4.0f);
-    }
-
-    nvgFillColor(vg, nvgRGBA(255, 0, 0, 255));
-    nvgFill(vg);
-    nvgBeginPath(vg);
-    for (i = 0; i < 4; i++)
-    {
-        nvgCircle(vg, sx[i], sy[i], 2.0f);
-    }
-
-    nvgFillColor(vg, nvgRGBA(220, 220, 220, 255));
-    nvgFill(vg);
-
-    nvgStrokeWidth(vg, 1.0f);
+    draw_line_chart(vg, samples);
 }
 
 static void hr_timer_cb(void *obj)
