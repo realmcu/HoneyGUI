@@ -179,14 +179,14 @@ Display
 
 Once the developers have completed the debugging of the display device driver, and the device can communicate properly with the display device and show colors. This section explains how to interface the driver with LVGL's display interface to render LVGL's UI.”
 
-The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function :func:`void lv_port_disp_init(void)`, such as screen size and frame buffer configuration. The display refresh function is defined as :func:`void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)`.
+The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function ``void lv_port_disp_init(void)``, such as screen size and frame buffer configuration. The display refresh function is defined as ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``.
 
 The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure :c:macro:`DISPLAY_FLUSH_TYPE` to switch modes, where :c:macro:`RAMLESS_XXX` is suitable for display ICs without RAM, :c:macro:`RAM_XXX` is suitable for display ICs with RAM, :c:macro:`XXX_FULL_SCREEN_XXX` indicates pushing the entire screen each time, and :c:macro:`XXX_TWO_SEC` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by :c:macro:`SECTION_HEIGHT`.
 
 For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display IC without RAM:
 
 - When using a display IC without RAM, a frame buffer that covers the entire screen size needs to be allocated. Therefore, two frame buffers with a size equal to the screen size are allocated on the PSRAM for display. The macro definitions for display parameters are defined in the file :file:`lv_conf.h`.
-- If the display IC used has RAM, the size of the frame buffer does not need to be the same as the screen size. Due to different screen update methods, the :c:macro:`LVGL_USE_EDPI` in :file:`lv_port_disp.c` needs to be configured as not enabled (0) to switch the :func:`disp_flush` function for screen update adaptation.
+- If the display IC used has RAM, the size of the frame buffer does not need to be the same as the screen size. Due to different screen update methods, the :c:macro:`LVGL_USE_EDPI` in :file:`lv_port_disp.c` needs to be configured as not enabled (0) to switch the ``disp_flush`` function for screen update adaptation.
 
 .. code-block:: c
 
@@ -317,17 +317,17 @@ For detailed display device porting methods and considerations, please refer to 
 Input Device
 -----------------------------
 
-- Documentation: `LVGL Porting Input devices <https://docs.lvgl.io/8.3/porting/indev.html>`_
+- Documentation: `LVGL Porting Input Devices <https://docs.lvgl.io/8.3/porting/indev.html>`_
 
 Once the developers have completed the debugging of the input device driver, and the device can communicate properly with the input device. This section explains how to interface the driver with LVGL's input interface to interact with LVGL's UI.
 
-The input interface of LVGL is implemented in the file :file:`lv_port_indev.c`. Input device parameters are configured in the initialization function :func:`void lv_port_indev_init(void)`, including selecting the device type, etc. The input data acquisition function is configured in the function pointer :func:`indev_drv.read_cb`, which depends on the type of input device and is integrated in :file:`lv_port_indev.c`.
+The input interface of LVGL is implemented in the file :file:`lv_port_indev.c`. Input device parameters are configured in the initialization function ``void lv_port_indev_init(void)``, including selecting the device type, etc. The input data acquisition function is configured in the function pointer ``indev_drv.read_cb``, which depends on the type of input device and is integrated in :file:`lv_port_indev.c`.
 
-For detailed input device porting methods and considerations, please refer to the documentation `LVGL Porting Input devices <https://docs.lvgl.io/8.3/porting/indev.html>`_. The following code snippet demonstrates porting a touch IC:
+For detailed input device porting methods and considerations, please refer to the documentation `LVGL Porting Input Devices <https://docs.lvgl.io/8.3/porting/indev.html>`_. The following code snippet demonstrates porting a touch IC:
 
-- In the initialization function :func:`void lv_port_indev_init(void)`, select and register the corresponding type of input device. For example, for a touchpad device, select **Touchpad**.
+- In the initialization function ``void lv_port_indev_init(void)``, select and register the corresponding type of input device. For example, for a touchpad device, select **Touchpad**.
 
-- LVGL will retrieve the input data through the function pointer :func:`indev_drv.read_cb`. Developers need to provide the input data in the function it points to. For a touch screen device, it would be the function :func:`void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)`. For a touch screen input device, you only need to provide the coordinates of the touch point and the touch state.
+- LVGL will retrieve the input data through the function pointer ``indev_drv.read_cb``. Developers need to provide the input data in the function it points to. For a touch screen device, it would be the function ``void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)``. For a touch screen input device, you only need to provide the coordinates of the touch point and the touch state.
 
 .. code-block:: c
 
@@ -428,13 +428,13 @@ For detailed input device porting methods and considerations, please refer to th
 
 File System
 ----------------------------
-- Documentation: `LVGL Overview File system <https://docs.lvgl.io/8.3/overview/file-system.html>`_
+- Documentation: `LVGL Overview File System <https://docs.lvgl.io/8.3/overview/file-system.html>`_
 
 Using a file system to manage storage media makes data more organized and easier to maintain. It can improve compatibility and cross-platform support for external storage devices. Through the file system interface, developers can easily manipulate file data, making it more flexible and efficient. Integrating the file system with LVGL allows resource data to be stored separately from project code, reducing compilation time, improving development efficiency, and enhancing the flexibility of UI design.
 
-The file system interface of LVGL is implemented in the file :file:`lv_port_fs.c`. The file system is configured in the initialization function :func:`void lv_port_fs_init(void)`, which includes initializing the file system and mounting drive letters. Developers need to integrate the interfaces of various file system functions into the corresponding LVGL fs porting functions, ensuring that the input and output data formats are consistent with the interface definitions.
+The file system interface of LVGL is implemented in the file :file:`lv_port_fs.c`. The file system is configured in the initialization function ``void lv_port_fs_init(void)``, which includes initializing the file system and mounting drive letters. Developers need to integrate the interfaces of various file system functions into the corresponding LVGL fs porting functions, ensuring that the input and output data formats are consistent with the interface definitions.
 
-For detailed file system porting methods and considerations, please refer to the documentation `LVGL Overview File system <https://docs.lvgl.io/8.3/overview/file-system.html>`_. The following example demonstrates the porting of **ROMFS**. 
+For detailed file system porting methods and considerations, please refer to the documentation `LVGL Overview File System <https://docs.lvgl.io/8.3/overview/file-system.html>`_. The following example demonstrates the porting of **ROMFS**. 
 
 .. note::
   ROMFS is a read-only file system, thus it does not support file writing.
@@ -677,13 +677,13 @@ Start with Demo
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_
 
-It is recommended for developers to read and understand the `LVGL Overview <https://docs.lvgl.io/8.3/overview/index.html>`_ and `LVGL Widgets - Base object <https://docs.lvgl.io/8.3/widgets/obj.html>`_ sections before starting development. This will help them grasp the design concepts and logic of LVGL.
+It is recommended for developers to read and understand the `LVGL Overview <https://docs.lvgl.io/8.3/overview/index.html>`_ and `LVGL Widgets - Base Object <https://docs.lvgl.io/8.3/widgets/obj.html>`_ sections before starting development. This will help them grasp the design concepts and logic of LVGL.
 
 LVGL provides a rich set of demos and examples to help developers understand and familiarize themselves with the usage of various widgets and features.
 
-- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/demo`. Developers can directly invoke the corresponding :func:`lv_demo_xxx()` function to explore and understand them.
+- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/demo`. Developers can directly invoke the corresponding ``lv_demo_xxx()`` function to explore and understand them.
 
-- The online documentation `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ demonstrates the running effects of various examples, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/example`. Developers can directly call the corresponding :func:`lv_example_xxx()` function to familiarize themselves with widgets and understand their features.
+- The online documentation `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ demonstrates the running effects of various examples, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/example`. Developers can directly call the corresponding ``lv_example_xxx()`` function to familiarize themselves with widgets and understand their features.
 
 Resource Converter
 ==========================
@@ -709,14 +709,14 @@ Please refer to the following steps for usage in `LVGL Overview Images - Online 
 2. Choose the image file.
 3. Select the color format for the output file. 
 
-   For color format details, please refer to  `LVGL Overview Images - color format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_.
+   For color format details, please refer to  `LVGL Overview Images - Color Format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_.
 4. Choose the type of output image (C array/binary file).
 5. Click :guilabel:`Convert` to obtain the output file.
 
 
 The `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
 
-It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of :c:var:`4 Byte header + data`. The :c:type:`lv_img_header_t` contains information such as :c:var:`color format`, :c:var:`width`, and :c:var:`height`. To construct a complete :c:type:`lv_img_dsc_t` to describe the image, you can calculate the :c:var:`data_size` using the information from the :c:type:`lv_img_header_t`.
+It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of ``4 Byte header + data``. The ``lv_img_header_t`` contains information such as ``color format``, ``width``, and ``height``. To construct a complete ``lv_img_dsc_t`` to describe the image, you can calculate the ``data_size`` using the information from the `:`lv_img_header_t``.
 
 .. code-block:: c
 
@@ -788,7 +788,7 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
   **Note1: The storage path of the converted file:** Place the converted C file in the following reference path: :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets` 
 
-  **Note2: Modify the color format (cf) in the image descriptor:** The exported C file, for example :file:`logo_lvgl_rle.c`, needs to be modified to ensure :c:var:cf: :c:macro:`LV_IMG_CF_RAW`:
+  **Note2: Modify the color format (cf) in the image descriptor:** The exported C file, for example :file:`logo_lvgl_rle.c`, needs to be modified to ensure ``cf: LV_IMG_CF_RAW``:
     
     .. code-block:: c
 
@@ -820,7 +820,7 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
 3. If importing as a file, accessing image resources using file addresses
 
- - a. Construct the LVGL image header :c:type:`lv_img_dsc_t`, for example:
+ - a. Construct the LVGL image header ``lv_img_dsc_t``, for example:
 
     .. code-block:: c
 
@@ -891,7 +891,7 @@ Font Converter
 - Online conversion tool: `LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 - Documentation: `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_
 
-Please refer to the following steps for usage in `LVGL Overview Font - Add a new font <https://docs.lvgl.io/8.3/overview/font.html#add-a-new-font>`_ :
+Please refer to the following steps for usage in `LVGL Overview Font - Add a New Font <https://docs.lvgl.io/8.3/overview/font.html#add-a-new-font>`_ :
 
 1. Set the name of the output font.
 2. Set the height of the font in pixels.
@@ -902,7 +902,7 @@ Please refer to the following steps for usage in `LVGL Overview Font - Add a new
 5. Select the font file (TTF/WOFF).
 6. Set the Unicode range of characters to convert, or directly list the characters that need to be converted.
 
-The `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, :func:`lv_example_label_3()` demonstrates how to configure a specific font for a label widget. To automatically build font resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
+The `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, ``lv_example_label_3()`` demonstrates how to configure a specific font for a label widget. To automatically build font resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
 
 LVGL provides built-in fonts, which are saved as arrays in the directory :file:`your HoneyGUI dir/lvgl/src/font/`. Each font file specifies the included characters at the beginning of the file. The built-in fonts include a Chinese font, :file:`lv_font_simsun_16_cjk.c`, which is a CJK (Chinese, Japanese, and Korean) 16px font, but it is a single font size with a limited character set.
 
@@ -977,6 +977,7 @@ Forum
 The official LVGL forum is a developer community dedicated to discussing and sharing topics and resources related to the LVGL graphics library. It provides a platform for developers to exchange ideas, seek help, and share their experiences and projects.
 
 Some features and functionalities of the LVGL forum include:
+
 - Questions and answers: Developers can ask questions about their LVGL usage on the forum and receive help and answers from other developers. This makes the forum a valuable knowledge base, providing experience and tips for problem-solving.
 
 - Tutorials and examples: The forum contains many useful tutorials and example code, demonstrating how to use different features and functionalities of LVGL. These resources are helpful for novice developers to learn and master LVGL.
@@ -998,6 +999,7 @@ Blog
 The official LVGL blog is a regularly updated platform that provides the latest information, tutorials, case studies, and developer insights about the LVGL graphics library. The LVGL development team and community members frequently publish various content related to LVGL on the blog, helping developers better understand and use LVGL.
 
 The LVGL blog covers the following content:
+
 - Updates and new feature introductions: The blog publishes articles on the latest version of LVGL, highlighting new features, bug fixes, and performance improvements. This allows developers to stay up-to-date and leverage the latest LVGL capabilities.
 
 - Tutorials and guides: The blog provides practical tutorials and guides on LVGL, covering various topics ranging from beginner to advanced. These tutorials often include example code and detailed explanations, helping developers master the usage of LVGL and best practices.

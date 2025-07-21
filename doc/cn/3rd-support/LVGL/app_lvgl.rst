@@ -194,7 +194,7 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 在开发者完成显示设备的驱动功能调试后，设备能够与显示设备正常通信并显示色彩。本小节介绍如何将驱动与 LVGL 的显示接口进行对接以展现 LVGL 的 UI 界面。
 
-LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 :func:`void lv_port_disp_init(void)` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 :func:`void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)`。
+LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 ``void lv_port_disp_init(void)`` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``。
 
 文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 :c:macro:`DISPLAY_FLUSH_TYPE` 以切换模式，其中 :c:macro:`RAMLESS_XXX` 适用于不带有 RAM 的 display IC， :c:macro:`RAM_XXX` 适用于带有 RAM 的 display IC，:c:macro:`XXX_FULL_SCREEN_XXX` 表示为每次整屏推出，:c:macro:`XXX_TWO_SEC` 表示为只绘制变化的显示内容，单位为两个 buffer 大小，buffer 的像素高度由 :c:macro:`SECTION_HEIGHT` 定义。
 
@@ -202,7 +202,7 @@ LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在
 详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 RAM 的 display IC：
 
 - 使用不带有 RAM 的 display IC 时，必须为其分配整屏尺寸的 frame buffer，因此在 PSRAM 上分配了两个整屏尺寸的 frame buffer 用于显示。显示的参数宏定义已定义在文件 :file:`lv_conf.h` 中。
-- 若使用的 display IC 带有 RAM，则 frame buffer 的大小不必为整屏尺寸。由于刷屏方式的不同，需要配置 :file:`lv_port_disp.c` 中的 :c:macro:`LVGL_USE_EDPI` 为不启用(0)，以切换 :func:`disp_flush` 函数适配刷屏。
+- 若使用的 display IC 带有 RAM，则 frame buffer 的大小不必为整屏尺寸。由于刷屏方式的不同，需要配置 :file:`lv_port_disp.c` 中的 :c:macro:`LVGL_USE_EDPI` 为不启用(0)，以切换 ``disp_flush`` 函数适配刷屏。
 
 
 .. code-block:: c
@@ -331,16 +331,16 @@ LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在
 
 输入设备
 -----------------------------
-- 文档说明： `LVGL Porting Input devices <https://docs.lvgl.io/8.3/porting/indev.html>`_
+- 文档说明： `LVGL Porting Input Devices <https://docs.lvgl.io/8.3/porting/indev.html>`_
 
 在开发者完成输入设备的驱动功能调试后，设备能够与输入设备正常通信。本小节介绍如何将驱动与 LVGL 的输入接口进行对接以与 LVGL 的 UI 界面进行交互。
 
-LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备参数在初始化函数 :func:`void lv_port_indev_init(void)` 中进行配置，如选择设备类型等，输入数据获取函数配置在函数指针 :func:`indev_drv.read_cb`，取决于输入设备类型，均在 :file:`lv_port_indev.c` 中对接。
+LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备参数在初始化函数 ``void lv_port_indev_init(void)`` 中进行配置，如选择设备类型等，输入数据获取函数配置在函数指针 ``indev_drv.read_cb``，取决于输入设备类型，均在 :file:`lv_port_indev.c` 中对接。
 
-详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Porting Input devices <https://docs.lvgl.io/8.3/porting/indev.html>`_，以下代码段示例了 porting 触屏 IC：
+详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Porting Input Devices <https://docs.lvgl.io/8.3/porting/indev.html>`_，以下代码段示例了 porting 触屏 IC：
 
-- 在初始化函数 :func:`void lv_port_indev_init(void)` 中选择注册对应类型的输入设备，如触屏设备则选择 **Touchpad**
-- LVGL 将通过函数指针 :func:`indev_drv.read_cb` 获取输入的数据，开发者需要在其指向的函数中提供输入数据，如触屏设备则为函数 :func:`void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)`。触屏输入设备仅需提供触点的坐标及触摸状态即可。
+- 在初始化函数 ``void lv_port_indev_init(void)`` 中选择注册对应类型的输入设备，如触屏设备则选择 **Touchpad**
+- LVGL 将通过函数指针 ``indev_drv.read_cb`` 获取输入的数据，开发者需要在其指向的函数中提供输入数据，如触屏设备则为函数 ``void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)``。触屏输入设备仅需提供触点的坐标及触摸状态即可。
 
 
 .. code-block:: c
@@ -442,14 +442,14 @@ LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备�
 
 文件系统
 -----------------------------
-- 文档说明： `LVGL Overview File system <https://docs.lvgl.io/8.3/overview/file-system.html>`_
+- 文档说明： `LVGL Overview File System <https://docs.lvgl.io/8.3/overview/file-system.html>`_
 
 使用文件系统来管理存储介质使数据更加有条理和易于维护，可以提高外部存储设备的兼容性和跨平台性，通过文件系统接口，开发者可以方便地操作文件数据，更加灵活和高效。开发者对接文件系统到 LVGL 的文件系统接口，使资源数据与工程代码得以分开存储，缩短编译时间，提高开发效率，也增强了 UI 设计的灵活性。
 
-LVGL 的文件系统接口在文件 :file:`lv_port_fs.c` 中实现，文件系统在初始化函数 :func:`void lv_port_fs_init(void)` 中进行配置，包括文件系统的初始化、挂载盘符等，开发者需要将文件系统各功能的接口对接到对应的 LVGL fs porting 函数中，保证输入输出数据格式与接口定义的相一致。
+LVGL 的文件系统接口在文件 :file:`lv_port_fs.c` 中实现，文件系统在初始化函数 ``void lv_port_fs_init(void)`` 中进行配置，包括文件系统的初始化、挂载盘符等，开发者需要将文件系统各功能的接口对接到对应的 LVGL fs porting 函数中，保证输入输出数据格式与接口定义的相一致。
 
 
-详尽的文件系统移植方法和注意事项请参阅文档 `LVGL Overview File system <https://docs.lvgl.io/8.3/overview/file-system.html>`_，以下示例了 **ROMFS** porting 的部分接口。
+详尽的文件系统移植方法和注意事项请参阅文档 `LVGL Overview File System <https://docs.lvgl.io/8.3/overview/file-system.html>`_，以下示例了 **ROMFS** porting 的部分接口。
 
 .. note::
     ROMFS 是一个只读文件系统，故不支持文件写入。
@@ -703,13 +703,13 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/bench
 .. - 需要掌握的基本概念
 .. - 如何从 demo 和 example 开始开发 -->
 
-建议开发者开发前先行阅读理解 `LVGL Overview <https://docs.lvgl.io/8.3/overview/index.html>`_ 和 `LVGL Widgets - Base object <https://docs.lvgl.io/8.3/widgets/obj.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
+建议开发者开发前先行阅读理解 `LVGL Overview <https://docs.lvgl.io/8.3/overview/index.html>`_ 和 `LVGL Widgets - Base Object <https://docs.lvgl.io/8.3/widgets/obj.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
 
 LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控件和特性的使用。
 
-- `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/demo` 下，开发者可直接调用对应的 :func:`lv_demo_xxx()` 函数来熟悉了解。
+- `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/demo` 下，开发者可直接调用对应的 ``lv_demo_xxx()`` 函数来熟悉了解。
 
-- 在线文档 `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/example` 下，开发者可直接调用对应的 :func:`lv_example_xxx()` 函数来熟悉控件和理解特性。
+- 在线文档 `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
 
 
 资源转换器
@@ -737,13 +737,13 @@ LVGL 在线转换工具
 2. 选取图片文件
 3. 选择输出文件的颜色格式
    
-   颜色格式的说明请参考 `LVGL Overview Images - color format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_
+   颜色格式的说明请参考 `LVGL Overview Images - Color Format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_
 4. 选择输出图片的类型 (C array/binary file)
 5. 点击 :guilabel:`Convert` 获取输出文件
 
 在文档 `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 
-值得一提的是，使用 bin 文件的图片资源时，bin 文件中数据的格式为 :c:var:`4 Byte lv_img_header_t + data`, 其中 :c:type:`lv_img_header_t` 中包含有 :c:var:`Color format`, :c:var:`width` 和 :c:var:`height`，此时利用 :c:type:`lv_img_header_t` 信息来计算出 :c:var:`data_size` 即可构建一个完整的 :c:type:`lv_img_dsc_t` 来描述图片。
+值得一提的是，使用 bin 文件的图片资源时，bin 文件中数据的格式为 ``4 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height``，此时利用 ``lv_img_header_t`` 信息来计算出 ``data_size`` 即可构建一个完整的 ``lv_img_dsc_t`` 来描述图片。
 
 .. code-block:: c
 
@@ -849,7 +849,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
 3. 若作为文件导入,以文件地址的方式访问图片资源
 
- - a. 构建 :c:type:`lv_img_dsc_t` ，例如：
+ - a. 构建 ``lv_img_dsc_t`` ，例如：
    
    .. code-block:: c
     
@@ -887,7 +887,7 @@ LVGL 启用 RLE 解码器
 
 为了在 LVGL 中解码 RLE 压缩的图片资源，需要配置启用 RLE 解码器，并为其分配缓存空间。
 
-1. 启用 RLE 解码器：在配置文件 :file:`lv_conf.h` 中找到 :c:macro:`LV_USE_RTK_IDU` 宏定义，并将其设置为启用(1)
+1. 启用 RLE 解码器：在配置文件 :file:`lv_conf.h` 中找到 :c:macro:`LV_USE_RTK_IDU` 宏定义，并将其设置为启用 ``#define LV_USE_RTK_IDU 1``
 
 2. 分配解码缓存：在 :file:`lv_conf.h` 文件中配置以下参数：
     - :c:macro:`LV_PSRAM_START`：缓存的起始地址
@@ -923,7 +923,7 @@ LVGL 启用 RLE 解码器
 - 在线转换工具：`LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 - 文档说明：`LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_
 
-使用步骤请参考  `LVGL Overview Font - Add a new font <https://docs.lvgl.io/8.3/overview/font.html#add-a-new-font>`_ ：
+使用步骤请参考  `LVGL Overview Font - Add a New Font <https://docs.lvgl.io/8.3/overview/font.html#add-a-new-font>`_ ：
 
 1. 设定输出字库的名字
 2. 设定字体的高度 height，像素单位
@@ -935,7 +935,7 @@ LVGL 启用 RLE 解码器
 6. 设定需要转换的字符 Unicode 范围，也可直接列出需要转换的字符
 
 
-在文档 `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 :func:`lv_example_label_3()` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
+在文档 `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 ``lv_example_label_3()`` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 
 在 LVGL 中提供了内置的字库，以数组的形式保存在目录 :file:`your HoneyGUI dir/lvgl/src/font/` 下，每份字库所包含的字符均注明在文件开头。内置字库中包含有一份汉字字库 :file:`lv_font_simsun_16_cjk.c` cjk 16 号字库，但为单一字号，字符数有限。
 
@@ -948,6 +948,7 @@ LVGL 启用 RLE 解码器
 - `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
 
 LVGL 的 `在线文档 <https://docs.lvgl.io/master/intro/index.html>`_ 提供了全面的技术文档和教程，帮助开发者更好地了解和使用 LVGL 图形库。该文档包含以下内容：
+
 - 概述和特性：文档介绍了 LVGL 的基本概念和特性，包括图形对象、屏幕管理、事件处理、主题样式等。用户可以通过阅读文档了解 LVGL 的核心功能和优势。
 
 - 应用开发指南：文档提供了详细的应用开发指南，包括如何初始化和配置 LVGL 、如何创建和管理图形对象、如何处理用户输入和事件、如何添加主题和样式等。这些指南可以帮助用户快速上手使用LVGL并开发自己的应用程序。
@@ -1088,7 +1089,7 @@ GRAM 屏幕 (280x456)SRAM 分块绘制
 PSRAM 整帧 buffer 绘制（800x480）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-背景：RTL8772G 平台，rgb565，图片尺寸 315x316，非压缩图片，RGB 屏幕，测试单张图片的显示绘制性能。
+背景：RTL8772G 平台，RGB565，图片尺寸 315x316，非压缩图片，RGB 屏幕，测试单张图片的显示绘制性能。
 
 
 .. csv-table:: PSRAM 整帧 buffer 绘制
