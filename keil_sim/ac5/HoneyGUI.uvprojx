@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>ENABLE_HONEYGUI GUI_KEIL_SIM</Define>
+              <Define> ENABLE_HONEYGUI GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\Arm2D;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\sw;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_card;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win</IncludePath>
+              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\sw;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_card;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -431,16 +431,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/3rd/Arm2d</GroupName>
-          <Files>
-            <File>
-              <FileName>__arm_2d_filter_iir_blur.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\3rd\Arm2D\__arm_2d_filter_iir_blur.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>realgui/3rd</GroupName>
           <Files>
             <File>
@@ -502,6 +492,156 @@
               <FileName>tjpgd.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\3rd\tjpgd\tjpgd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/3rd/h264bsd</GroupName>
+          <Files>
+            <File>
+              <FileName>YUV2RGB.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\YUV2RGB.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_h264bsd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\gui_h264bsd.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsdTest.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsdTest.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_byte_stream.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_byte_stream.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_cavlc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_cavlc.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_conceal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_conceal.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_deblocking.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_deblocking.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_decoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_decoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_dpb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_dpb.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_image.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_image.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_inter_prediction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_inter_prediction.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_intra_prediction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_intra_prediction.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_macroblock_layer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_macroblock_layer.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_nal_unit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_nal_unit.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_neighbour.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_neighbour.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_pic_order_cnt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_pic_order_cnt.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_pic_param_set.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_pic_param_set.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_reconstruct.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_reconstruct.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_sei.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_sei.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_seq_param_set.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_seq_param_set.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_slice_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_slice_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_slice_group_map.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_slice_group_map.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_slice_header.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_slice_header.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_storage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_storage.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_stream.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_stream.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_transform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_transform.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_util.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_vlc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_vlc.c</FilePath>
+            </File>
+            <File>
+              <FileName>h264bsd_vui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\h264bsd\src\h264bsd_vui.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -579,14 +719,14 @@
               <FilePath>..\..\realgui\engine\gui_post_process.c</FilePath>
             </File>
             <File>
-              <FileName>acc_arm2d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\engine\acc_arm2d.c</FilePath>
-            </File>
-            <File>
               <FileName>acc_sw.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\engine\sw\acc_sw.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_arm2d_blur.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\engine\sw\acc_sw_arm2d_blur.c</FilePath>
             </File>
             <File>
               <FileName>acc_sw_blend.c</FileName>

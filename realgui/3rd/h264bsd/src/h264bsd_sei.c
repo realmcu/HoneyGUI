@@ -1139,7 +1139,7 @@ static u32 DecodeDecRefPicMarkingRepetition(
     //  &pDecRefPicMarkingRepetition->decRefPicMarking, NAL_SEI, numRefFrames);
     return (HANTRO_NOK);
 
-    return (tmp);
+    // return (tmp);
 
 }
 

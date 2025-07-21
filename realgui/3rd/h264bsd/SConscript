@@ -20,17 +20,12 @@ libpath = ['']
 
 if GetDepend(['CONFIG_REALTEK_H264BSD']) :
     src += Glob(cwd + '/src/*.c')
-
-include_path += [cwd,
-        cwd + '/inc',]
-
+    include_path += [cwd,
+            cwd + '/inc',]
 
 
-group = DefineGroup('h264bsd', src, depend = ['CONFIG_REALTEK_H264BSD'], CPPPATH = include_path,LIBS = libs, DEFINE = ['H264_BSD_ENABLE'])
 
-for d in list:
-    path = os.path.join(cwd, d)
-    if os.path.isfile(os.path.join(path, 'SConscript')):
-        group = group + SConscript(os.path.join(d, 'SConscript'))
+group = DefineGroup('realgui/3rd/h264bsd', src, depend = ['CONFIG_REALTEK_H264BSD'], CPPPATH = include_path, DEFINE = ['H264_BSD_ENABLE'])
+
 
 Return('group')

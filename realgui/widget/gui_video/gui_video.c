@@ -22,7 +22,8 @@
 #include "gui_obj.h"
 #include "gui_video.h"
 #include "acc_api.h"
-
+#include "math.h"
+#include "gui_h264bsd.h"
 
 /*============================================================================*
  *                           Types
@@ -66,8 +67,11 @@ static bool is_mjpeg(void *pdata)
 }
 static bool is_h264(void *pdata)
 {
-    // TODO
-    return (true);
+#define VIDEO_H264_SYMBOL "H264"
+    char symbol[16];
+    memset((void *)symbol, 0, sizeof(symbol));
+    memcpy((void *)symbol, pdata, strlen(VIDEO_H264_SYMBOL));
+    return (strcmp(symbol, VIDEO_H264_SYMBOL) == 0);
 }
 
 static int get_jpeg_size(const unsigned char *jpeg_data, size_t jpeg_size, uint16_t *width,
@@ -208,8 +212,8 @@ static uint8_t **mjpeg2jpeg_slicer(uint8_t *mjpeg, uint32_t *slice_cnt)
 
 static void gui_video_reset(gui_video_t *this)
 {
-    this->frame_cur = 0;
-    this->frame_last = 0;
+    this->frame_cur = -1;
+    this->frame_last = -1;
     this->frame_buff = 0;
 }
 
@@ -259,6 +263,7 @@ static void gui_video_draw(gui_obj_t *obj)
     uint8_t *frame_buff = NULL;
 
     // gui_log("gui_video_draw  %d %d", this->frame_cur, this->frame_last);
+    this->frame_cur = (this->frame_cur < 0) ? 0 : this->frame_cur;
     if (this->frame_cur == this->frame_last && this->frame_buff)
     {
         // gui_log("draw from cache %d 0x%x\n", this->frame_cur, this->frame_buff);
@@ -270,9 +275,15 @@ static void gui_video_draw(gui_obj_t *obj)
     {
         if (this->frame_buff_raw)
         {
-            gui_acc_jpeg_free(this->frame_buff_raw);
+            if (this->img_type == VIDEO_TYPE_MJPEG)
+            {
+                gui_acc_jpeg_free(this->frame_buff_raw);
+            }
+            else if (this->img_type == VIDEO_TYPE_H264)
+            {
+                gui_free(this->frame_buff_raw);
+            }
         }
-
         this->frame_buff = NULL;
         this->frame_buff_raw = NULL;
     }
@@ -351,6 +362,40 @@ static void gui_video_draw(gui_obj_t *obj)
     }
     else if (this->img_type == VIDEO_TYPE_H264)
     {
+        if (this->src_mode == IMG_SRC_FILESYS)
+        {
+        }
+        else if (this->src_mode == IMG_SRC_MEMADDR)
+        {
+            gui_h264_header_t *header = (gui_h264_header_t *)this->data;
+
+            if (!this->decoder)
+            {
+                this->decoder = gui_h264bsd_create_decoder((uint8_t *)this->array, header->size);
+            }
+            if (this->frame_cur == 0)
+            {
+                // reload
+                memcpy((void *)this->array, (void *)((uint8_t *)this->data + sizeof(gui_h264_header_t)),
+                       header->size);
+                gui_h264bsd_rewind(this->decoder);
+            }
+
+            this->frame_buff_raw = gui_malloc(sizeof(gui_rgb_data_head_t) + header->w * header->h * 2);
+
+            if (!this->frame_buff_raw)
+            {
+                gui_log("gui_video_draw malloc h264 fb error! \n");
+            }
+            this->frame_buff = this->frame_buff_raw;
+            int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
+                                            header->w * header->h * 2);
+            if (ret) { gui_log("dec h264 %d\n", ret); }
+
+            gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
+            memcpy(pheader, &(this->header), sizeof(gui_rgb_data_head_t));
+        }
+
 
     }
 
@@ -390,8 +435,7 @@ static void gui_video_destory(gui_obj_t *obj)
 
     if (this->src_mode == IMG_SRC_FILESYS)
     {
-        // TODO: need free mjpeg
-        gui_free(*(this->array));
+
     }
     else
     {
@@ -401,9 +445,25 @@ static void gui_video_destory(gui_obj_t *obj)
     gui_free(this->array);
     if (this->frame_buff_raw)
     {
-        gui_acc_jpeg_free(this->frame_buff_raw);
+        if (this->img_type == VIDEO_TYPE_MJPEG)
+        {
+            gui_acc_jpeg_free(this->frame_buff_raw);
+        }
+        else if (this->img_type == VIDEO_TYPE_H264)
+        {
+
+        }
+
         this->frame_buff_raw = NULL;
         this->frame_buff = NULL;
+    }
+
+    if (this->decoder)
+    {
+        if (this->img_type == VIDEO_TYPE_H264)
+        {
+            gui_h264bsd_destroy_decoder(this->decoder);
+        }
     }
 }
 
@@ -425,18 +485,21 @@ static void gui_video_prepare(gui_obj_t *obj)
 // load into mem
 static int video_src_init_h264(gui_video_t  *this)
 {
-#if 0
-    void *img_data = NULL;
-    size_t sz_file = 0;
+    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_h264_header_t *header = NULL;
+
     if (this->src_mode == IMG_SRC_FILESYS)
     {
+#if 0
+        void *img_data = NULL;
+        size_t sz_file = 0;
         char *file = this->data;
         FILE *fp = fopen(file, "rb");
         int rdlen = 0;
         GUI_UNUSED(rdlen);
         if (!fp)
         {
-            gui_log("Error: open mjpeg failed\n");
+            gui_log("Error: open h264 failed\n");
             return -1;
         }
         fseek(fp, 0, SEEK_END);
@@ -445,7 +508,7 @@ static int video_src_init_h264(gui_video_t  *this)
 
         if (sz_file <= 0)
         {
-            gui_log("Error: sz_mjpeg cannot be negative.\n");
+            gui_log("Error: h264 cannot be negative.\n");
             fclose(fp);
             return -1;
         }
@@ -460,12 +523,30 @@ static int video_src_init_h264(gui_video_t  *this)
         memset(img_data, 0, sz_file);
         rdlen = fread(img_data, 1, sz_file, fp);
         fclose(fp);
+#endif
     }
     else if (this->src_mode == IMG_SRC_MEMADDR)
     {
-        // TODO: file size unknown
+        header = this->data;
+        obj->w = header->w;
+        obj->h = header->h;
+        this->num_frame = header->frame_num;
+        this->frame_time = header->frame_time;
+        this->array = (uint8_t **)gui_malloc(header->size);
+
+        if (!this->array)
+        {
+            gui_log("load h264 failed, malloc size %d\n", header->size);
+            return -1;
+        }
+        // load video to mem
+        memcpy((void *)this->array, (void *)((uint8_t *)this->data + sizeof(gui_h264_header_t)),
+               header->size);
+        gui_log("h264 w %d h %d size %d n %d frame_time %d\n", obj->w, obj->h, header->size,
+                this->num_frame,
+                this->frame_time);
     }
-#endif
+
     return 0;
 }
 
@@ -680,7 +761,6 @@ static void gui_img_video_ctor(gui_video_t  *this,
 {
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
-    uint32_t frame_time_ms = 0;
     // uint32_t live_time = 0;
     // gui_rgb_data_head_t *img_header = NULL;
 
@@ -694,10 +774,10 @@ static void gui_img_video_ctor(gui_video_t  *this,
     root->has_destroy_cb = true;
 
     //for self
-    // this->fps = IMG_LIVE_FPS;
-    this->fps = 24; //SET FPS
+    this->frame_time = 42; // 24fps, 42 ms
+    this->frame_cur = -1;
+    this->frame_last = -1;
     this->data = addr;
-    frame_time_ms = 1000.f / this->fps;
 
 
     // get img data from file, and img type
@@ -705,7 +785,6 @@ static void gui_img_video_ctor(gui_video_t  *this,
     {
         gui_log("video src err\n");
     }
-    // live_time = this->num_frame * frame_time_ms;
     // prepare a temp header for image(child widget)
     if (this->img_type == VIDEO_TYPE_MJPEG)
     {
@@ -723,7 +802,10 @@ static void gui_img_video_ctor(gui_video_t  *this,
     }
     else
     {
-
+        memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
+        this->header.w = root->w;
+        this->header.h = root->h;
+        this->header.type = 0x00; // RGB565
     }
 
 
@@ -741,7 +823,7 @@ static void gui_img_video_ctor(gui_video_t  *this,
     gui_img_set_mode(this->img, IMG_BYPASS_MODE);
     gui_img_set_image_data(this->img, (const uint8_t *) & (this->header));
     gui_img_refresh_size(this->img);
-    gui_obj_create_timer((gui_obj_t *)this, frame_time_ms, true, gui_video_play_cb);
+    gui_obj_create_timer((gui_obj_t *)this, this->frame_time, true, gui_video_play_cb);
 }
 
 /*============================================================================*
@@ -750,15 +832,17 @@ static void gui_img_video_ctor(gui_video_t  *this,
 
 void gui_video_set_frame_rate(gui_video_t *this, float fps)
 {
-    uint32_t frame_time_ms = 0;
-
-    this->fps = fps;
-    frame_time_ms = 1000.f / this->fps;
-    // gui_img_set_animate(this->img, frame_time_ms * this->num_frame, -1, gui_video_play_cb, this);
-    gui_obj_create_timer((gui_obj_t *)this, frame_time_ms, true, gui_video_play_cb);
+    if (fps > 0)
+    {
+        this->frame_time = round(1000.f / fps);
+        gui_obj_create_timer((gui_obj_t *)this, this->frame_time, true, gui_video_play_cb);
+    }
 }
 
-
+void gui_video_set_scale(gui_video_t *this, float scale_x, float scale_y)
+{
+    gui_img_scale(this->img, scale_x, scale_y);
+}
 
 void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state)
 {

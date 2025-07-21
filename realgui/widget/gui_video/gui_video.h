@@ -74,7 +74,17 @@ typedef enum
 
 } GUI_VIDEO_TYPE;
 
-
+#pragma pack(1)
+typedef struct
+{
+    char symbol[4]; // "H264"
+    uint32_t w;
+    uint32_t h;
+    uint32_t frame_num;
+    uint32_t frame_time;
+    uint32_t size;
+} gui_h264_header_t;
+#pragma pack()
 
 /** @brief  stb img widget information structure */
 typedef struct
@@ -89,19 +99,18 @@ typedef struct
 
     uint8_t *frame_buff;
     uint8_t *frame_buff_raw;
-    float fps;
-    uint32_t frame_cur;
-    uint32_t frame_last;
+    void *decoder;
+    uint32_t frame_time;
+    int32_t frame_cur;
+    int32_t frame_last;        // for cache management
+    int32_t repeat_cnt;
     uint8_t img_type;
     uint8_t src_mode;
 
     uint8_t state;
-    int32_t repeat_cnt;
 
 
     uint8_t rgb_type;           // to define RGB type of decoded img (not used yet)
-    uint32_t frame_ready: 1;
-
 } gui_video_t;
 
 /*============================================================================*
@@ -128,6 +137,8 @@ typedef struct
  *============================================================================*/
 
 void gui_video_set_frame_rate(gui_video_t *this, float fps);
+
+void gui_video_set_scale(gui_video_t *this, float scale_x, float scale_y);
 
 void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state);
 

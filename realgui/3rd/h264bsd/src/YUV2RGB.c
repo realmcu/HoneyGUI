@@ -3,7 +3,7 @@
 #include "arm_mve.h"
 #endif
 
-#ifndef _WIN32
+#if defined(__ARMCLANG__)
 
 
 #ifndef _WIN32
@@ -28,8 +28,8 @@ B = CLIP(Y + (58064 * CB * 2 >> 16) - 226)
 planer
 */
 
-static const int ycbcr_h = 368;
-static const int ycbcr_w = 640;
+//static const int ycbcr_h = 368;
+//static const int ycbcr_w = 640;
 static void mve_yuv420_to_rgb(const uint8_t *inputy, const uint8_t *inputcb, const uint8_t *inputcr,
                               uint8_t *outputrgb, GUI_FormatType colorformat,
                               uint32_t raw_w, uint32_t raw_h)
@@ -69,7 +69,7 @@ static void mve_yuv420_to_rgb(const uint8_t *inputy, const uint8_t *inputcb, con
                 rgb565 = vsriq_n_u16(vshlq_n_u16(resultb, 8), rgb565, 5);
                 rgb565 = vsriq_n_u16(vshlq_n_u16(resultg, 8), rgb565, 6);
                 rgb565 = vsriq_n_u16(vshlq_n_u16(resultr, 8), rgb565, 5);
-                vst1q_u16(&outputrgb[(i * raw_w + j) * 2], rgb565);
+                vst1q_u16((uint16_t *)&outputrgb[(i * raw_w + j) * 2], rgb565);
             }
         }
     }
@@ -100,7 +100,7 @@ static void mve_yuv420_to_rgb(const uint8_t *inputy, const uint8_t *inputcb, con
                 uint16x8x2_t rgba;
                 rgba.val[0] = vmlaq_n_u16(resultr, resultg, 0x100);
                 rgba.val[1] = vmlaq_n_u16(resultb, resulta, 0x100);
-                vst2q_u16(&outputrgb[(i * raw_w + j) * 4], rgba);
+                vst2q_u16((uint16_t *)&outputrgb[(i * raw_w + j) * 4], rgba);
             }
         }
     }

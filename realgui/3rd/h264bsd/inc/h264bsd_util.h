@@ -152,14 +152,14 @@
     { \
         (ptr) = gui_lower_malloc((count) * sizeof(type));\
     }
-// (ptr) = malloc((count) * sizeof(type)); \
+// (ptr) = malloc((count) * sizeof(type));
 
 /* macro to free allocated memory */
 #define FREE(ptr) \
     { \
         if(ptr){gui_lower_free((ptr)); (ptr) = NULL;} \
     }
-// free((ptr)); (ptr) = NULL; \
+// free((ptr)); (ptr) = NULL;
 
 #define ALIGN(ptr, bytePos) \
     (ptr + ( ((bytePos - (uintptr_t)ptr) & (bytePos - 1)) / sizeof(*ptr) ))

@@ -1,6 +1,6 @@
 // h264bsdTest.cpp : Defines the entry point for the console application.
 //
-
+#if 0
 #include <stdio.h>
 
 #ifdef __WIN32
@@ -15,23 +15,23 @@
 
 
 #ifdef __arm__
-#include "rtl_pinmux.h"
-#include "rtl_gpio.h"
+//#include "rtl_pinmux.h"
+//#include "rtl_gpio.h"
 #endif
 
 #if 1
-static u8 isFirst = 1;
+static uint8_t isFirst = 1;
 static long fileSize_totla;
-u8 *frame_buf_dc;
-int h264bsd_test(u8 *fileData, long fileSize, u8 *frame_buf)
+uint8_t *frame_buf_dc;
+int h264bsd_test(uint8_t *fileData, long fileSize, uint8_t *frame_buf)
 {
     static storage_t *decoder = NULL;
-    static u32 len = 0;
-    u32 *picData = 0;
-    static u8 *byteStrm;
+    static uint32_t len = 0;
+    uint32_t *picData = 0;
+    static uint8_t *byteStrm;
     static double numFrames = 0;
-    static u32 bytesRead = 0;
-    static u32 status = H264BSD_RDY;
+    static uint32_t bytesRead = 0;
+    static uint32_t status = H264BSD_RDY;
 
 #ifdef __WIN32
     static LARGE_INTEGER frequency_li;
@@ -67,7 +67,7 @@ int h264bsd_test(u8 *fileData, long fileSize, u8 *frame_buf)
 
     // while(1) {
     // fseek(input, 0L, SEEK_SET);
-    // size_t inputRead = fread(fileData, sizeof(u8), fileSize, input);
+    // size_t inputRead = fread(fileData, sizeof(uint8_t), fileSize, input);
 
 
     while (len > 0)
@@ -77,9 +77,9 @@ int h264bsd_test(u8 *fileData, long fileSize, u8 *frame_buf)
         if (status == H264BSD_PIC_RDY)
         {
             ++numFrames;
-            u32 picId, isIdrPic, numErrMbs;
+            uint32_t picId, isIdrPic, numErrMbs;
             // gui_log("h264 frame %f \n", numFrames);
-            // u8* picData = h264bsdNextOutputPicture(decoder, &picId, &isIdrPic, &numErrMbs);
+            // uint8_t* picData = h264bsdNextOutputPicture(decoder, &picId, &isIdrPic, &numErrMbs);
             // picData = h264bsdNextOutputPictureBGRA(decoder, &picId, &isIdrPic, &numErrMbs);
 // #ifdef __arm__
 //             Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
@@ -148,5 +148,5 @@ int h264bsd_test(u8 *fileData, long fileSize, u8 *frame_buf)
 
     return 0;
 }
-
+#endif
 #endif

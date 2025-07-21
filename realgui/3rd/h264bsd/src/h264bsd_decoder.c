@@ -584,7 +584,10 @@ void h264bsdShutdown(storage_t *pStorage)
     FREE(pStorage->mb);
     FREE(pStorage->sliceGroupMap);
 
-    if (pStorage->conversionBuffer != NULL) { FREE(pStorage->conversionBuffer); }
+    if (pStorage->conversionBuffer != NULL)
+    {
+        FREE(pStorage->conversionBuffer);
+    }
 
     h264bsdFreeDpb(pStorage->dpb);
 
@@ -770,20 +773,24 @@ u32 *h264bsdNextOutputPictureBGR565(storage_t *pStorage, u32 *picId, u32 *isIdrP
         if (pStorage->conversionBuffer != NULL) { FREE(pStorage->conversionBuffer); }
         pStorage->conversionBufferSize = rgbSize;
         // pStorage->conversionBuffer = (u32*)malloc(rgbSize);
-        ALLOCATE(pStorage->conversionBuffer, rgbSize, uint8_t);
+        // ALLOCATE(pStorage->conversionBuffer, rgbSize, uint8_t);
+        pStorage->conversionBuffer = NULL;
     }
 
-    extern u8 *frame_buf_dc;
+
 #ifdef __WIN32
-    // h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
-    h264bsdConvertToBGR565(width, height, data, frame_buf_dc);
+    h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
 #else
-    // h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
-    // h264bsdConvertToBGR565(width, height, data, frame_buf_dc);
+#if defined(__CC_ARM)
+    // ===== Arm Compiler 5 (armcc) =====
+    h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
+#elif defined(__ARMCLANG__)
+    // ===== Arm Compiler 6 (armclang) =====
     extern void mve_yuv420_to_rgb565(uint8_t *data, uint8_t *pOutput,
                                      uint32_t width, uint32_t height);
-    // mve_yuv420_to_rgb565(data, pStorage->conversionBuffer, width, height);
-    mve_yuv420_to_rgb565(data, frame_buf_dc, width, height);
+    mve_yuv420_to_rgb565(data, (uint8_t *)pStorage->conversionBuffer, width, height);
+#endif
+
 #endif
     return pStorage->conversionBuffer;
 }

@@ -177,6 +177,14 @@
 
 // </e>
 
+// <e> h.264 decoder
+#define CONFIG_REALTEK_H264_DECODER     1
+#if (CONFIG_REALTEK_H264_DECODER == 1)
+
+#define CONFIG_REALTEK_H264BSD
+
+#endif
+// </e>
 
 // </h>
 
