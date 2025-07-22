@@ -164,6 +164,29 @@ p {
 /* ======== Render Main Content Style ========= */
 
 /* =========== Render Sider Style ============ */
+#rtd-search-form {
+    position: relative;
+}
+#rtd-search-form .rtd-search-btn, #rtd-search-form .rtd-clear-btn {
+    border: none;
+    background-color: transparent;
+    position: absolute;
+    top: 4px;
+}
+#rtd-search-form .rtd-search-btn {
+    right: 10px;
+    margin-top: 0 !important;
+}
+#rtd-search-form .rtd-clear-btn {
+    display: none;
+    right: 32px;
+}
+#rtd-search-form input[name="q"] {
+    padding-right: 62px;
+}
+#rtd-search-form input[name="q"]:not(:placeholder-shown) ~ .rtd-clear-btn {
+    display: inline-block;
+}
 /* div[role="search"] style */
 /*
 .wy-side-nav-search > div[role="search"] {

@@ -1,5 +1,5 @@
 ===============================
-Use LVGL Design An Application
+Use LVGL V8 to Design
 ===============================
 
 LVGL introduction
