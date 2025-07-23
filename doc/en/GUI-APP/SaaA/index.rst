@@ -1,11 +1,4 @@
 Use RVD Tool Design An Application
 ************************************
 
-
-.. toctree::
-    :maxdepth: 2
-
-    RVisualDesigner <RVisualDesigner>
-    JavaScript Syntax <JavaScript syntax>
-    XML Syntax <XML syntax>
-    Middleware <Middleware>
+Please refer to: `Use RVD Tool Design An Application <https://docs.realmcu.com/gui/en/v1.0.12.0.rvd/GUI-APP/SaaA/index.html>`_.

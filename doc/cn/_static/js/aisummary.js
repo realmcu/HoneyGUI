@@ -155,9 +155,9 @@ function handleAISummaryButtonClick() {
     });
 }
 
-// $(document).ready(function () {
-//     let initAIWidgetFlag = initAISummaryWidget("AI summary");
-//     if(initAIWidgetFlag) {
-//         handleAISummaryButtonClick();
-//     }
-// })
+$(document).ready(function () {
+    let initAIWidgetFlag = initAISummaryWidget("AI summary");
+    if(initAIWidgetFlag) {
+        handleAISummaryButtonClick();
+    }
+})

@@ -666,11 +666,11 @@
 })();
 
 /* ============== Init AI ASK Component ============== */
-// $(document).ready(function () {
-//     const chatAIBase = window.chatAIBase;
-//     chatWidgetInit({
-//         chatWidgetTitle: "Real AI",
-//         chatWidgetPlaceholder: "Please type your question",
-//         chatAIBase: chatAIBase
-//     });
-// })
+$(document).ready(function () {
+    const chatAIBase = window.chatAIBase;
+    chatWidgetInit({
+        chatWidgetTitle: "Real AI",
+        chatWidgetPlaceholder: "Please type your question",
+        chatAIBase: chatAIBase
+    });
+})
