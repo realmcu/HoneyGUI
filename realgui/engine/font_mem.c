@@ -915,6 +915,10 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
     case 16:
         df.target_format = RGB565;
         break;
+    case 24:
+        df.target_format = RGB888;
+        // df.target_format = ARGB8565;
+        break;
     case 32:
         df.target_format = ARGB8888;
         break;
