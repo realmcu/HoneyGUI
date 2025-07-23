@@ -906,8 +906,9 @@ read_image(gd_GIF *gif)
 static void
 render_frame_rect(gd_GIF *gif, uint8_t *buffer)
 {
-
-#if 1 // wanghao comment: this is not used in honeygui
+#if ENABLE_HONEYGUI // wanghao comment: this is not used in honeygui
+    return;
+#else
     int j, k;
     uint8_t index, *color;
     for (j = gif->fy; j < gif->fh + gif->fy; j++)
@@ -922,8 +923,6 @@ render_frame_rect(gd_GIF *gif, uint8_t *buffer)
             }
         }
     }
-#else
-    return;
 #endif
 }
 
