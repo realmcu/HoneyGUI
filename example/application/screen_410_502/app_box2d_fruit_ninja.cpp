@@ -16,7 +16,6 @@
 #include "tp_algo.h"
 #include "guidef.h"
 #include "gui_api.h"
-#include "gui_view.h"
 
 /*============================================================================*
  *                            Macros
@@ -459,8 +458,7 @@ static void app_design_core(void *parent)
 
     body_bomb->CreateFixture(&FixtureDef);
 
-    // Create bg and whole fruits for displaying on the window
-    gui_img_create_from_mem(parent, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0, 0);
+    // Create whole fruits for displaying on the window
     img_strawberry = gui_img_create_from_mem(parent, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN, 0,
                                              0, 0, 0);
     gui_img_translate(img_strawberry, -200, 0);
@@ -557,7 +555,7 @@ static void fruit_ninja_cb(void *p)
         gui_text_content_set(time_counter, time_counter_content, strlen((char *)time_counter_content));
         if (game_time == 0)
         {
-            gui_img_t *img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45,
+            gui_img_t *img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 35,
                                                               203, 0,
                                                               0);
             gui_obj_add_event_cb(img_gameover, (gui_event_cb_t)restart_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -652,7 +650,7 @@ static void fruit_ninja_cb(void *p)
             bool bomb_flag = score_judgment();
             if (bomb_flag)
             {
-                gui_img_t *img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 45,
+                gui_img_t *img_gameover = gui_img_create_from_mem(obj, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 35,
                                                                   203, 0,
                                                                   0);
                 gui_obj_add_event_cb(img_gameover, (gui_event_cb_t)restart_cb, GUI_EVENT_TOUCH_CLICKED, NULL);

@@ -93,19 +93,7 @@ static float can_current_rotation[NUM_CAN_TIME_PAIRS] = {0};
 static int16_t fish_x[4] = {-70, 70, -50, -45};
 static int16_t fish_y[4] = {50, 40, 60, 45};
 
-static const void *display_time_resource_def[] =
-{
-    NUM0_BIN,
-    NUM1_BIN,
-    NUM2_BIN,
-    NUM3_BIN,
-    NUM4_BIN,
-    NUM5_BIN,
-    NUM6_BIN,
-    NUM7_BIN,
-    NUM8_BIN,
-    NUM9_BIN,
-};
+extern void *text_num_array[];
 
 /* Bubble */
 static Bubble *bubbles = NULL;
@@ -560,27 +548,27 @@ static void app_ui_wave_nums_design(gui_view_t *view)
     can0_window = gui_win_create(view, "can_window", 70, 190, 64, 116);
     gui_img_t *can0 = gui_img_create_from_mem(can0_window, "can0", CANSKIN_PURPLE_BIN, 0, 0, 0, 0);
     gui_img_t *time0 = gui_img_create_from_mem(can0_window, "time0",
-                                               (void *)display_time_resource_def[2], 16,
-                                               32, 0, 0);
+                                               (void *)text_num_array[2], 16,
+                                               35, 0, 0);
 
 
     can1_window = gui_win_create(view, "can_window", 155, 190, 64, 116);
     gui_img_t *can1 = gui_img_create_from_mem(can1_window, "can1", CANSKIN_YELLOW_BIN, 0, 0, 0, 0);
     gui_img_t *time1 = gui_img_create_from_mem(can1_window, "can1",
-                                               (void *)display_time_resource_def[0], 16,
-                                               32, 0, 0);
+                                               (void *)text_num_array[0], 16,
+                                               35, 0, 0);
 
     can2_window = gui_win_create(view, "can_window", 240, 190, 64, 116);
     gui_img_t *can2 = gui_img_create_from_mem(can2_window, "can2", CANSKIN_GREEN_BIN, 0, 0, 0, 0);
     gui_img_t *time2 = gui_img_create_from_mem(can2_window, "can2",
-                                               (void *)display_time_resource_def[2], 16,
-                                               32, 0, 0);
+                                               (void *)text_num_array[2], 16,
+                                               35, 0, 0);
 
     can3_window = gui_win_create(view, "can_window", 330, 190, 64, 116);
     gui_img_t *can3 = gui_img_create_from_mem(can3_window, "can3", CANSKIN_RED_BIN, 0, 0, 0, 0);
     gui_img_t *time3 = gui_img_create_from_mem(can3_window, "can3",
-                                               (void *)display_time_resource_def[5], 16,
-                                               32, 0, 0);
+                                               (void *)text_num_array[5], 16,
+                                               35, 0, 0);
 
     wave_active = false;
     gui_img_t *waterface_bg = gui_img_create_from_mem(view, "waterface", WATERFACTOR_BG_BIN, 0, 240, 0,

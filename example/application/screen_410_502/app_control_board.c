@@ -172,8 +172,9 @@ static void control_board_design(gui_view_t *view)
     gui_obj_add_event_cb(sw_nobother, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     // capsule on top
-    gui_canvas_round_rect_t *capsule = gui_canvas_round_rect_create(GUI_BASE(view), NULL,
-                                                                    136, 20, 138, 47, 20, gui_rgb(196, 196, 196));
+    // gui_canvas_round_rect_t *capsule = gui_canvas_round_rect_create(GUI_BASE(view), NULL,
+    //                                                                 136, 20, 138, 47, 20, gui_rgb(196, 196, 196));
+    gui_img_t *capsule = gui_img_create_from_mem(view, 0, CONTROL_CAPSULE_BIN, 136, 20, 0, 0);
     img_capsule_phone = gui_img_create_from_mem(capsule, "capsule_phone", PHONE_OFF_ICON_BIN, 15, 9, 0,
                                                 0);
     gui_img_set_mode(img_capsule_phone, IMG_SRC_OVER_MODE);

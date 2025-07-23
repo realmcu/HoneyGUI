@@ -194,7 +194,8 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
                          24);
             gui_text_type_set(text, SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(text, LEFT);
-            gui_img_create_from_mem(win, 0, UI_IWATCH_32_ICON_BIN, 360, 40, 0, 0);
+            gui_img_t *img = gui_img_create_from_mem(win, 0, UI_IWATCH_ICON_BIN, 360, 40, 0, 0);
+            gui_img_scale(img, 0.75f, 0.75f);
         }
         break;
     default:

@@ -261,8 +261,8 @@ static void flower_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
-                                                    0);
+    // gui_img_t *background = gui_img_create_from_mem(obj, "flower_background", BACKGROUND_BIN, 0, 0, 0,
+    //                                                 0);
 
     for (int i = 0; i < NUM_PETALS / 2; i++)
     {
@@ -282,6 +282,6 @@ static void flower_app(gui_view_t *view)
 
     branch2 = gui_img_create_from_mem(obj, "branch2", BRANCH02_BIN, 0, 300, 0, 0);
 
-    gui_obj_create_timer(GUI_BASE(background), 10, true, update_flower_animation);
+    gui_obj_create_timer(GUI_BASE(view), 10, true, update_flower_animation);
 
 }

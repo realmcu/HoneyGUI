@@ -222,7 +222,7 @@ static void activity_timer_cb(void *obj)
 
     count += timer->interval_ms;
     uint8_t *img_data = (void *)gui_img_get_image_data(img);
-    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, RADIUS * 2, RADIUS * 2,
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, RADIUS * 2, RADIUS * 2,
                                       arc_activity_cb, img_data);
     gui_img_set_image_data(img, img_data);
     gui_img_refresh_size(img);
@@ -244,7 +244,7 @@ static void enter_timer_cb(void *obj)
 
         int image_h = RADIUS * 2;
         int image_w = RADIUS * 2;
-        int pixel_bytes = 4;
+        int pixel_bytes = 2;
         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         memset(img_data, 0, buffer_size);
         gui_obj_create_timer(GUI_BASE(img), 10, true, activity_timer_cb);
@@ -283,7 +283,7 @@ static void activity_design(gui_view_t *view)
     // img
     int image_h = RADIUS * 2;
     int image_w = RADIUS * 2;
-    int pixel_bytes = 4;
+    int pixel_bytes = 2;
     size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
     if (img_data == NULL)
     {
@@ -299,7 +299,7 @@ static void activity_design(gui_view_t *view)
     const char *name = GUI_BASE(gui_view_get_current())->name;
     if (strcmp(name, "watchface_view") == 0 || strcmp(name, "heartrate_view") == 0)
     {
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, arc_activity_cb,
                                           img_data);
         gui_img_refresh_size(img);
         gui_obj_create_timer(obj, 10, true, enter_timer_cb);

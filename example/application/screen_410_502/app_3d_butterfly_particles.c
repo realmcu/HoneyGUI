@@ -412,7 +412,7 @@ static void spawn_particle(gui_obj_t *parent)
             if (particles[i].img == NULL)
             {
                 particles[i].img = gui_img_create_from_mem(parent, "particle",
-                                                           FIREFLY_14_BIN, 0, 0, 0, 0);
+                                                           FIREFLY_19_BIN, 0, 0, 0, 0);
                 gui_img_scale(particles[i].img, particles[i].scale, particles[i].scale);
                 gui_img_set_mode(particles[i].img, IMG_SRC_OVER_MODE);
             }
@@ -532,19 +532,14 @@ static void data_create(void *p)
         int text_w = 35;
         gui_img_t *img = gui_img_create_from_mem(obj, "watch_hour_decimal", text_num_array[0],
                                                  211, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(obj, "watch_hour_single", text_num_array[0],
                                       211 + text_w, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(obj, "colon", text_num_array[10],
                                       211 + text_w * 2 + 5, 88 + 5, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(obj, "watch_minute_decimal", text_num_array[0],
                                       211 + text_w * 2 + 17, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(obj, "watch_minute_single", text_num_array[0],
                                       211 + text_w * 3 + 17, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     gui_obj_create_timer(obj, 3000, true, time_update_cb);
 }
@@ -569,13 +564,13 @@ static void butterfly_particle_app(gui_view_t *view)
     // date & time text
     data_create(obj);
 
-    butterfly_wing3 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+    butterfly_wing3 = gui_img_create_from_mem(obj, 0, FIREFLY_19_BIN, x_to_screen_w(0),
                                               y_to_screen_h(0), 0, 0);
-    butterfly_wing4 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+    butterfly_wing4 = gui_img_create_from_mem(obj, 0, FIREFLY_19_BIN, x_to_screen_w(0),
                                               y_to_screen_h(0), 0, 0);
-    butterfly_wing1 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+    butterfly_wing1 = gui_img_create_from_mem(obj, 0, FIREFLY_19_BIN, x_to_screen_w(0),
                                               y_to_screen_h(0), 0, 0);
-    butterfly_wing2 = gui_img_create_from_mem(obj, 0, FIREFLY_14_BIN, x_to_screen_w(0),
+    butterfly_wing2 = gui_img_create_from_mem(obj, 0, FIREFLY_19_BIN, x_to_screen_w(0),
                                               y_to_screen_h(0), 0, 0);
     gui_img_set_mode(butterfly_wing1, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing2, IMG_SRC_OVER_MODE);

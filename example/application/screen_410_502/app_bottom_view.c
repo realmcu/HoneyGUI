@@ -498,23 +498,18 @@ static void bottom_view_design(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win, "circle_hour_decimal", text_num_array[0], 185,
                                                  67, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "circle_hour_single", text_num_array[0], 185 + text_w, 67,
                                       0, 0);
         gui_img_scale(img, 0.7, 0.7);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "colon", text_num_array[10], 185 + text_w * 2 + 5, 67 + 5,
                                       0, 0);
         gui_img_scale(img, 0.7, 0.7);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "circle_minute_decimal", text_num_array[0],
                                       185 + text_w * 2 + 17, 67, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "circle_minute_single", text_num_array[0],
                                       185 + text_w * 3 + 17, 67, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     gui_text_t *date_text = gui_text_create(win, "timecard_date_2",  0, 42, 0, 0);
     gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,

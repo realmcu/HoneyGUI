@@ -353,8 +353,9 @@ static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, floa
 }
 
 static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *butterfly,
-                           float butterfly_rz, uint32_t current_time)
+                           float butterfly_rz)
 {
+    uint32_t current_time = gui_ms_get();
     for (int i = 0; i < MAX_PARTICLES; i++)
     {
         // Find an available particle slot
@@ -385,7 +386,7 @@ static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *but
             if (particles[i].img == NULL)
             {
                 particles[i].img = gui_img_create_from_mem(parent, 0,
-                                                           FIREFLY_14_BIN, 0, 0, 0, 0);
+                                                           FIREFLY_19_BIN, 0, 0, 0, 0);
                 gui_img_scale(particles[i].img, particles[i].scale, particles[i].scale);
                 gui_img_set_mode(particles[i].img, IMG_SRC_OVER_MODE);
             }
@@ -441,9 +442,9 @@ static void update_particles(void *p)
     }
     last_particle_spawn = current_time;
     // Spawn new particles when butterfly is moving
-    spawn_particle(obj, particles0, butterfly0, butterfly0_rz, current_time);
-    spawn_particle(obj, particles1, butterfly1, butterfly1_rz, current_time);
-    spawn_particle(obj, particles2, butterfly2, butterfly2_rz, current_time);
+    spawn_particle(obj, particles0, butterfly0, butterfly0_rz);
+    spawn_particle(obj, particles1, butterfly1, butterfly1_rz);
+    spawn_particle(obj, particles2, butterfly2, butterfly2_rz);
 }
 
 static void init_butterfly_bg(gui_win_t *parent, Particle **particles)
@@ -459,13 +460,13 @@ static void init_butterfly_bg(gui_win_t *parent, Particle **particles)
         memset(*particles, 0, MAX_PARTICLES * sizeof(Particle));
     }
     gui_img_t *butterfly_wing1 = gui_img_create_from_mem(parent, "wing1",
-                                                         FIREFLY_14_BIN, 0, 0, 0, 0);
+                                                         FIREFLY_19_BIN, 0, 0, 0, 0);
     gui_img_t *butterfly_wing2 = gui_img_create_from_mem(parent, "wing2",
-                                                         FIREFLY_14_BIN, 0, 0, 0, 0);
+                                                         FIREFLY_19_BIN, 0, 0, 0, 0);
     gui_img_t *butterfly_wing3 = gui_img_create_from_mem(parent, "wing3",
-                                                         FIREFLY_14_BIN, 0, 0, 0, 0);
+                                                         FIREFLY_19_BIN, 0, 0, 0, 0);
     gui_img_t *butterfly_wing4 = gui_img_create_from_mem(parent, "wing4",
-                                                         FIREFLY_14_BIN, 0, 0, 0, 0);
+                                                         FIREFLY_19_BIN, 0, 0, 0, 0);
     gui_img_set_mode(butterfly_wing1, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing2, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing3, IMG_SRC_OVER_MODE);

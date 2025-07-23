@@ -130,6 +130,7 @@ static void enter_cb(void *p)
 
 static void create_watchface_earth(gui_view_t *view)
 {
+#ifdef EARTH_420_336_416_MJPG
     gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
     video = gui_video_create_from_mem(win, "earth", (void *)EARTH_420_336_416_MJPG, 0, 0, 410,
@@ -154,21 +155,17 @@ static void create_watchface_earth(gui_view_t *view)
         int text_w = 35;
         gui_img_t *img = gui_img_create_from_mem(win, "watch_hour_decimal", text_num_array[0],
                                                  211, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "watch_hour_single", text_num_array[0],
                                       211 + text_w, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "colon", text_num_array[10],
                                       211 + text_w * 2 + 5, 88 + 5, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "watch_minute_decimal", text_num_array[0],
                                       211 + text_w * 2 + 17, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         img = gui_img_create_from_mem(win, "watch_minute_single", text_num_array[0],
                                       211 + text_w * 3 + 17, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     time_update_cb(NULL);
+#endif
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

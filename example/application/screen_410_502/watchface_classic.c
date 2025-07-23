@@ -574,7 +574,7 @@ static void activity_timer_cb(void *obj)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb, img_data);
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_activity_cb, img_data);
         gui_img_set_image_data(img, img_data);
 
         json_refeash_flag &= 0b1011;
@@ -588,7 +588,7 @@ static void temp_timer_cb(void *obj)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_temperature_cb,
                                           img_data);
         gui_img_set_image_data(img, img_data);
         json_refeash_flag &= 0b1101;
@@ -622,7 +622,7 @@ void create_watchface_classic(gui_view_t *view)
     {
         int image_h = 100;
         int image_w = 100;
-        int pixel_bytes = 4;
+        int pixel_bytes = 2;
         buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
         if (!img_data_temperature)
         {
@@ -632,7 +632,7 @@ void create_watchface_classic(gui_view_t *view)
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_temperature,
                                                  37,
                                                  348, 100, 100);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         gui_obj_create_timer(GUI_BASE(img), 2000, true, temp_timer_cb);
         //text
@@ -661,7 +661,7 @@ void create_watchface_classic(gui_view_t *view)
         gui_text_mode_set(temp_high, LEFT);
         gui_text_rendermode_set(temp_high, 2);
 
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_temperature_cb,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_temperature_cb,
                                           img_data_temperature);
         gui_img_refresh_size(img);
     }
@@ -736,23 +736,18 @@ void create_watchface_classic(gui_view_t *view)
         int text_w = 35;
         gui_img_t *img = gui_img_create_from_mem(win_watch, "watch_hour_decimal", text_num_array[0],
                                                  211, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "watch_hour_single", text_num_array[0],
                                       211 + text_w, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "colon", text_num_array[10],
                                       211 + text_w * 2 + 5, 88 + 5, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "watch_minute_decimal", text_num_array[0],
                                       211 + text_w * 2 + 17, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         img = gui_img_create_from_mem(win_watch, "watch_minute_single", text_num_array[0],
                                       211 + text_w * 3 + 17, 88, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
     }
 
@@ -763,11 +758,11 @@ void create_watchface_classic(gui_view_t *view)
             img_data_activity = gui_lower_malloc(buffer_size);
         }
         memset(img_data_activity, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb,
+        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_activity_cb,
                                           img_data_activity);
         gui_img_t *img = gui_img_create_from_mem(win_watch, 0, (void *)img_data_activity, 37,
                                                  68, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         gui_obj_create_timer(GUI_BASE(img), 2000, true, activity_timer_cb);
     }
