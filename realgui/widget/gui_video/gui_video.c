@@ -61,17 +61,37 @@
  *                           Private Functions
  *============================================================================*/
 
-static bool is_mjpeg(void *pdata)
+static bool is_mjpeg(uint8_t *pdata)
 {
     return ((*((uint16_t *)(pdata)) == MGPEG_SEG_SOI));
 }
-static bool is_h264(void *pdata)
+static bool is_h264(uint8_t *pdata)
 {
 #define VIDEO_H264_SYMBOL "H264"
     char symbol[16];
     memset((void *)symbol, 0, sizeof(symbol));
     memcpy((void *)symbol, pdata, strlen(VIDEO_H264_SYMBOL));
     return (strcmp(symbol, VIDEO_H264_SYMBOL) == 0);
+}
+static bool is_avi(uint8_t *pdata)
+{
+#define VIDEO_AVI_SYMBOL_0 "RIFF"
+#define VIDEO_AVI_SYMBOL_1 "AVI "
+    char symbol[5];
+
+    /* RIFF Header */
+    memset((void *)symbol, 0, sizeof(symbol));
+    memcpy((void *)symbol, pdata, strlen(VIDEO_AVI_SYMBOL_0));
+
+    if (memcmp(symbol, VIDEO_AVI_SYMBOL_0, 4))
+    {
+        return false;
+    }
+    /* Format */
+    memset((void *)symbol, 0, sizeof(symbol));
+    memcpy((void *)symbol, pdata + 4 + 4, strlen(VIDEO_AVI_SYMBOL_1));
+
+    return (memcmp(symbol, VIDEO_AVI_SYMBOL_1, 4) == 0);
 }
 
 static int get_jpeg_size(const unsigned char *jpeg_data, size_t jpeg_size, uint16_t *width,
@@ -275,7 +295,7 @@ static void gui_video_draw(gui_obj_t *obj)
     {
         if (this->frame_buff_raw)
         {
-            if (this->img_type == VIDEO_TYPE_MJPEG)
+            if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
             {
                 gui_acc_jpeg_free(this->frame_buff_raw);
             }
@@ -289,7 +309,7 @@ static void gui_video_draw(gui_obj_t *obj)
     }
 
 
-    if (this->img_type == VIDEO_TYPE_MJPEG)
+    if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
     {
         if (this->src_mode == IMG_SRC_FILESYS)
         {
@@ -330,7 +350,7 @@ static void gui_video_draw(gui_obj_t *obj)
             img_data = this->array[this->frame_cur];
             img_sz = this->array[this->frame_cur + 1] - this->array[this->frame_cur];
         }
-
+        // gui_log("%d off 0x%x, %d\n", this->frame_cur, img_data - (uint8_t *)this->data, img_sz);
 
         int w = 0;
         int h = 0;
@@ -482,6 +502,128 @@ static void gui_video_prepare(gui_obj_t *obj)
 }
 
 
+static int video_src_init_avi(gui_video_t  *this)
+{
+
+    if (this->src_mode == IMG_SRC_FILESYS)
+    {
+    }
+    else if (this->src_mode == IMG_SRC_MEMADDR)
+    {
+        uint8_t *img_data = (uint8_t *)this->data;
+        gui_obj_t *obj = (gui_obj_t *)this;
+
+        uint16_t w = 0, h = 0;
+
+        /* find movi & idx1 */
+        uint32_t movi_size = 0;
+        uint8_t *movi_data = NULL;
+        uint32_t idx1_size = 0;
+        uint8_t *idx1_data = NULL;
+        // avi_find_movi_idx(img_data, &movi_data, &movi_size, &idx1_data, &idx1_size);
+        {
+            uint8_t sig[5];
+            uint8_t list_type[5];
+            uint32_t file_size;
+            uint32_t pos = 0;
+            MainAVIHeader_t main_hdr;
+
+            memset(sig, 0, sizeof(sig));
+            memset(list_type, 0, sizeof(list_type));
+            pos = 4;
+            file_size = *(uint32_t *)(img_data + pos);
+            pos += 4;
+            /* Format AVI */
+            pos += 4;
+
+            while (pos < file_size)
+            {
+                uint32_t size = 0;
+                memcpy(sig, (img_data + pos), 4);
+                pos += 4;
+                size = *(uint32_t *)(img_data + pos);
+                pos += 4;
+                if (memcmp(sig, "JUNK", 4) == 0)
+                {
+                    pos += size;
+                }
+                else if (memcmp(sig, "LIST", 4) == 0)
+                {
+                    memcpy(list_type, (img_data + pos), 4);
+                    pos += 4;
+                    if (memcmp(list_type, "hdrl", 4) == 0)
+                    {
+                        uint8_t id[5];
+                        memset(id, 0, sizeof(id));
+                        memcpy(id, (img_data + pos), 4);
+                        pos += 4;
+                        if (memcmp(id, "avih", 4) == 0)
+                        {
+                            memcpy(&main_hdr, img_data + pos + 4, sizeof(MainAVIHeader_t));
+                        }
+                        pos += size - 8;
+                    }
+                    else if (memcmp(list_type, "movi", 4) == 0)
+                    {
+                        movi_size = size;
+                        movi_data = img_data + pos - 4;
+                        break;
+                    }
+                    else
+                    {
+                        pos += size - 4;
+                    }
+                }
+            }
+            if (pos >= file_size)
+            {
+                return -1;
+            }
+
+
+            pos += movi_size - 4;
+            /* idx1 */
+            memcpy(sig, (img_data + pos), 4);
+            pos += 4;
+            if (memcmp(sig, "idx1", 4) != 0)
+            {
+                return -1;
+            }
+            idx1_size = *(uint32_t *)(img_data + pos);
+            pos += 4;
+            idx1_data = img_data + pos;
+
+
+            this->frame_time = main_hdr.usec_per_frame / 1000;
+            this->num_frame = main_hdr.total_frame;
+        }
+
+        this->array = (uint8_t **)gui_malloc(this->num_frame * sizeof(uint8_t *) + 1);
+        IndexItem_t *idx = (IndexItem_t *)idx1_data;
+        uint32_t chunk_num = idx1_size / sizeof(IndexItem_t);
+        uint32_t frame_cnt = 0;
+        for (uint32_t i = 0; i < chunk_num; i++)
+        {
+            if (idx->chunk_ID == 0x63643030) // "00dc"
+            {
+                this->array[frame_cnt] = movi_data + idx->offset + 8;
+                gui_log("frame %d, offset 0x%x, size %d\n", frame_cnt, idx->offset, idx->size);
+                frame_cnt++;
+                if (frame_cnt == this->num_frame)
+                {
+                    this->array[frame_cnt] = movi_data + idx->offset + 8 + idx->size;
+                }
+            }
+            idx ++;
+        }
+
+        get_jpeg_size(this->array[0], 2 * 1024, &w, &h);
+        obj->w = w;
+        obj->h = h;
+    }
+    return 0;
+}
+
 // load into mem
 static int video_src_init_h264(gui_video_t  *this)
 {
@@ -490,40 +632,6 @@ static int video_src_init_h264(gui_video_t  *this)
 
     if (this->src_mode == IMG_SRC_FILESYS)
     {
-#if 0
-        void *img_data = NULL;
-        size_t sz_file = 0;
-        char *file = this->data;
-        FILE *fp = fopen(file, "rb");
-        int rdlen = 0;
-        GUI_UNUSED(rdlen);
-        if (!fp)
-        {
-            gui_log("Error: open h264 failed\n");
-            return -1;
-        }
-        fseek(fp, 0, SEEK_END);
-        sz_file = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-
-        if (sz_file <= 0)
-        {
-            gui_log("Error: h264 cannot be negative.\n");
-            fclose(fp);
-            return -1;
-        }
-
-        img_data = gui_malloc(sz_file);
-        if (!img_data)
-        {
-            gui_log("Error: Memory allocation failed\n");
-            fclose(fp);
-            return -1;
-        }
-        memset(img_data, 0, sz_file);
-        rdlen = fread(img_data, 1, sz_file, fp);
-        fclose(fp);
-#endif
     }
     else if (this->src_mode == IMG_SRC_MEMADDR)
     {
@@ -708,6 +816,11 @@ static int gui_video_src_init(gui_video_t  *this)
         this->img_type = VIDEO_TYPE_H264;
         res = video_src_init_h264(this);
     }
+    else if (is_avi(header))
+    {
+        this->img_type = VIDEO_TYPE_AVI;
+        res = video_src_init_avi(this);
+    }
     else
     {
         res = -1;
@@ -786,7 +899,7 @@ static void gui_img_video_ctor(gui_video_t  *this,
         gui_log("video src err\n");
     }
     // prepare a temp header for image(child widget)
-    if (this->img_type == VIDEO_TYPE_MJPEG)
+    if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
     {
         memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
         this->header.w = root->w;
@@ -800,12 +913,16 @@ static void gui_img_video_ctor(gui_video_t  *this,
             this->header.type = 0x03; // RGB888
         }
     }
-    else
+    else if (this->img_type == VIDEO_TYPE_H264)
     {
         memset(&(this->header), 0, sizeof(gui_rgb_data_head_t));
         this->header.w = root->w;
         this->header.h = root->h;
         this->header.type = 0x00; // RGB565
+    }
+    else
+    {
+        gui_log("video unknown RGB type\n");
     }
 
 

@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define> GUI_KEIL_SIM ENABLE_HONEYGUI</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;platform;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\sw;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_card;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win</IncludePath>
+              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;platform;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\sw;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -944,16 +944,6 @@
               <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas_round_rect.c</FilePath>
             </File>
             <File>
-              <FileName>gui_card.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_card\gui_card.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_cardview.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_card\gui_cardview.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_gray.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_gray\gui_gray.c</FilePath>
@@ -1131,6 +1121,11 @@
           <targetInfo name="gui_sim" versionMatchMode="fixed"/>
         </targetInfos>
       </package>
+      <package name="CMSIS" schemaVersion="1.7.36" url="https://www.keil.com/pack/" vendor="ARM" version="6.1.0">
+        <targetInfos>
+          <targetInfo name="gui_sim" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
       <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.7.28" url="http://www.keil.com/pack/" vendor="ARM" version="1.5.0">
         <targetInfos>
           <targetInfo name="gui_sim" versionMatchMode="fixed"/>
@@ -1156,8 +1151,8 @@
       </api>
     </apis>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.5.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.8.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.1.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.7.36" url="https://www.keil.com/pack/" vendor="ARM" version="6.1.0"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>

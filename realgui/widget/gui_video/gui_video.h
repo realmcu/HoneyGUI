@@ -71,6 +71,7 @@ typedef enum
     VIDEO_TYPE_NULL,
     VIDEO_TYPE_MJPEG,
     VIDEO_TYPE_H264,
+    VIDEO_TYPE_AVI,
 
 } GUI_VIDEO_TYPE;
 
@@ -84,6 +85,37 @@ typedef struct
     uint32_t frame_time;
     uint32_t size;
 } gui_h264_header_t;
+
+/* AVI main header */
+typedef struct
+{
+    uint32_t usec_per_frame;
+    uint32_t max_byte_rate;
+    uint32_t reserved_0;
+    uint32_t flags;
+    uint32_t total_frame;
+    uint32_t initial_frame;
+    uint32_t streams;
+    uint32_t buffer_size;
+    uint32_t width;
+    uint32_t height;
+} MainAVIHeader_t;
+
+/* AVI idx1 */
+typedef struct
+{
+    uint32_t indexID;              /*  */
+    uint32_t index_size;           /*  */
+} IndexList_t;
+
+typedef struct
+{
+    uint32_t chunk_ID;         /*  */
+    uint32_t flags;            /*  */
+    uint32_t offset;           /*  */
+    uint32_t size;             /*  */
+} IndexItem_t;
+
 #pragma pack()
 
 /** @brief  stb img widget information structure */
