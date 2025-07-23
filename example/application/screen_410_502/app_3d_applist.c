@@ -8,11 +8,10 @@
 #include "time.h"
 #include "tp_algo.h"
 #include <math.h>
-#include "cJSON.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -50,7 +49,7 @@ static gui_view_descriptor_t const descriptor =
 };
 
 /* 3D Applications List */
-static gui_3d_t *app_3d_list[APP_NUM];  // Static array
+static gui_lite3d_t *app_3d_list[APP_NUM];  // Static array
 static const Position app_positions[APP_NUM] =
 {
     {0, 50},
@@ -126,29 +125,29 @@ static void update_applist_animation()
     }
 }
 
-static void applist_global_cb(gui_3d_t *this)
+static void applist_global_cb(l3_model_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 15), 1, 32767,
-                                 90, this->base.w, this->base.h);
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 15), 1,
+                             32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 15, 0, 0, 0, 5);
-
+    l3_world_initialize(&this->world, 0, 0, 15, 0, 0, 0, 5);
 }
 
-static gui_3d_matrix_t applist_face_cb(gui_3d_t *this, size_t face_index)
+static l3_4x4_matrix_t applist_face_cb(l3_model_t *this, size_t face_index)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
-    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+    l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                              rot_y_angle, 1);
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 }
 
-static void app_click_on_cb(gui_3d_t *this)
+static void app_click_on_cb(l3_model_t *this)
 {
     if (click_on_rot_y < 720.f)
     {
@@ -158,18 +157,18 @@ static void app_click_on_cb(gui_3d_t *this)
     {
         click_on_shift_z += 0.2f;
     }
-    this->base.x = 0;
-    this->base.y = 46;
-    this->base.w = 410;
-    this->base.h = 410;
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 15), 1,
-                                 32767,
-                                 90, this->base.w, this->base.h);
+    this->x = 0;
+    this->y = 46;
+    this->viewPortWidth = 410;
+    this->viewPortHeight = 410;
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 15), 1,
+                             32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 15.0f - click_on_shift_z, 0, click_on_rot_y, 0, 5);
+    l3_world_initialize(&this->world, 0, 0, 15.0f - click_on_shift_z, 0, click_on_rot_y, 0, 5);
 }
 
-static int get_app_index(gui_3d_t *target)
+static int get_app_index(gui_lite3d_t *target)
 {
     for (int i = 0; i < APP_NUM; i++)
     {
@@ -181,7 +180,7 @@ static int get_app_index(gui_3d_t *target)
     return -1;
 }
 
-static void gui_app_switch(gui_3d_t *this)
+static void gui_app_switch(gui_lite3d_t *this)
 {
     gui_log("clicked app: %s\n", this->base.name);
 
@@ -190,7 +189,7 @@ static void gui_app_switch(gui_3d_t *this)
         click_amplify = true;
         for (int i = 0; i < APP_NUM; i++)
         {
-            gui_3d_t *app = app_3d_list[i];
+            gui_lite3d_t *app = app_3d_list[i];
 
             if (app != this)
             {
@@ -200,18 +199,18 @@ static void gui_app_switch(gui_3d_t *this)
 
         click_on_rot_y = 0.0f;
         click_on_shift_z = 0.0f;
-        gui_3d_set_global_transform_cb(this, (gui_3d_global_transform_cb)app_click_on_cb);
+        l3_set_global_transform(this->model, (l3_global_transform_cb)app_click_on_cb);
     }
     else
     {
         click_amplify = false;
 
         int clicked_index = get_app_index(this);
-        this->base.x = app_positions[clicked_index].pos_x;
-        this->base.y = app_positions[clicked_index].pos_y;
-        this->base.w = 200;
-        this->base.h = 200;
-        gui_3d_set_global_transform_cb(this, (gui_3d_global_transform_cb)applist_global_cb);
+        this->model->x = app_positions[clicked_index].pos_x;
+        this->model->y = app_positions[clicked_index].pos_y;
+        this->model->viewPortWidth = 200;
+        this->model->viewPortHeight = 200;
+        l3_set_global_transform(this->model, (l3_global_transform_cb)applist_global_cb);
 
         for (int i = 0; i < APP_NUM; i++)
         {
@@ -221,7 +220,6 @@ static void gui_app_switch(gui_3d_t *this)
 
 }
 
-
 static void applist_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
@@ -230,38 +228,51 @@ static void applist_app(gui_view_t *view)
                              GUI_EVENT_KB_SHORT_CLICKED);
 
     click_amplify = false;
-    app_3d_list[0] = gui_3d_create(obj, "app1", DESC_APP_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                   app_positions[0].pos_x, app_positions[0].pos_y, 200, 200);
 
-    app_3d_list[1] = gui_3d_create(obj, "app2", DESC_APP_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                   app_positions[1].pos_x, app_positions[1].pos_y, 200, 200);
-    gui_3d_set_face_image(app_3d_list[1], 5, ALIPAY_BIN);
+    // App0
+    l3_model_t *app0 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
+                                       app_positions[0].pos_x, app_positions[0].pos_y, 200, 200);
+    app_3d_list[0] = gui_lite3d_create(obj, "app0", app0, 0, 0, 0, 0);
 
-    app_3d_list[2] = gui_3d_create(obj, "app3", DESC_APP_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                   app_positions[2].pos_x, app_positions[2].pos_y, 200, 200);
-    gui_3d_set_face_image(app_3d_list[2], 5, MUSIC_BIN);
+    // App1
+    l3_model_t *app1 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
+                                       app_positions[1].pos_x, app_positions[1].pos_y, 200, 200);
+    l3_set_face_image(app1, 5, ALIPAY_BIN);
+    app_3d_list[1] = gui_lite3d_create(obj, "app1", app1, 0, 0, 0, 0);
 
-    app_3d_list[3] = gui_3d_create(obj, "app4", DESC_APP_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                   app_positions[3].pos_x, app_positions[3].pos_y, 200, 200);
-    gui_3d_set_face_image(app_3d_list[3], 5, QQ_BIN);
+    // App2
+    l3_model_t *app2 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
+                                       app_positions[2].pos_x, app_positions[2].pos_y, 200, 200);
+    l3_set_face_image(app2, 5, MUSIC_BIN);
+    app_3d_list[2] = gui_lite3d_create(obj, "app2", app2, 0, 0, 0, 0);
 
-    app_3d_list[4] = gui_3d_create(obj, "app5", DESC_APP_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                   app_positions[4].pos_x, app_positions[4].pos_y, 200, 200);
-    gui_3d_set_face_image(app_3d_list[4], 5, VOICE_BIN);
+    // App3
+    l3_model_t *app3 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
+                                       app_positions[3].pos_x, app_positions[3].pos_y, 200, 200);
+    l3_set_face_image(app3, 5, QQ_BIN);
+    app_3d_list[3] = gui_lite3d_create(obj, "app3", app3, 0, 0, 0, 0);
 
-    app_3d_list[5] = gui_3d_create(obj, "app6", DESC_APP_BIN, GUI_3D_DRAW_FRONT_ONLY,
-                                   app_positions[5].pos_x, app_positions[5].pos_y, 200, 200);
-    gui_3d_set_face_image(app_3d_list[5], 5, WECHAT_BIN);
+    // App4
+    l3_model_t *app4 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
+                                       app_positions[4].pos_x, app_positions[4].pos_y, 200, 200);
+    l3_set_face_image(app4, 5, VOICE_BIN);
+    app_3d_list[4] = gui_lite3d_create(obj, "app4", app4, 0, 0, 0, 0);
 
+    // App5
+    l3_model_t *app5 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
+                                       app_positions[5].pos_x, app_positions[5].pos_y, 200, 200);
+    l3_set_face_image(app5, 5, WECHAT_BIN);
+    app_3d_list[5] = gui_lite3d_create(obj, "app5", app5, 0, 0, 0, 0);
 
     for (int i = 0; i < APP_NUM; i++)
     {
-        gui_3d_set_global_transform_cb(app_3d_list[i], (gui_3d_global_transform_cb)applist_global_cb);
-        gui_3d_set_face_transform_cb(app_3d_list[i], (gui_3d_face_transform_cb)applist_face_cb);
+        l3_set_global_transform(app_3d_list[i]->model, (l3_global_transform_cb)applist_global_cb);
+        l3_set_face_transform(app_3d_list[i]->model, (l3_face_transform_cb)applist_face_cb);
 
-        gui_3d_on_click(app_3d_list[i], (gui_event_cb_t)gui_app_switch, app_3d_list[i]);
+        gui_lite3d_on_click(app_3d_list[i], (gui_event_cb_t)gui_app_switch, app_3d_list[i]);
     }
 
-    gui_obj_create_timer(&(app_3d_list[0]->base), 10, true, update_applist_animation);
+
+    gui_obj_create_timer(GUI_BASE(app_3d_list[0]), 10, true, update_applist_animation);
 
 }

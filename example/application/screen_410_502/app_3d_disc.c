@@ -10,7 +10,7 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -84,13 +84,13 @@ static void update_disc_animation(void *param)
 
     if ((tp->pressed || tp->pressing) && tp->y < (win_3d->base.y + win_3d->base.h))
     {
-        rot_z_angle += tp->deltaX / 5.0f;
+        rot_z_angle -= tp->deltaX / 5.0f;
         rot_x_angle += tp->deltaY / 5.0f;
         rot_x_angle = fmaxf(MIN_ROT_X_ANGLE, fminf(rot_x_angle, MAX_ROT_X_ANGLE));
     }
     else if (is_playing)
     {
-        rot_z_angle ++;
+        rot_z_angle --;
 
         // update all cube states
         for (int i = 0; i < CUBE_COUNT; i++)
@@ -117,48 +117,46 @@ static void update_disc_animation(void *param)
     }
 }
 
-static void disc_global_cb(gui_3d_t *this)
+static void disc_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 50), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 50), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, 0, -5, 50, -65 + rot_x_angle, 0, 0, 5);
+    l3_world_initialize(&this->world, 0, -5, 50, -65 + rot_x_angle, 0, 0, 5);
 
 }
 
-static gui_3d_matrix_t disc_face_cb(gui_3d_t *this, size_t face_index)
+static l3_4x4_matrix_t disc_face_cb(l3_model_t *this, size_t face_index)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
-    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
+    l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 0, 1),
                              rot_z_angle, 1);
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 
 }
 
-static gui_3d_matrix_t disc_cube_face_cb(gui_3d_t *this, size_t face_index)
+static l3_4x4_matrix_t disc_cube_face_cb(l3_model_t *this, size_t face_index)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
-    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
+    l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 0, 1),
                              rot_z_angle, 1);
 
     uint8_t cube_index = face_index / 6;
     if (cube_index < CUBE_COUNT)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, -shift_z[cube_index], gui_3d_point(0, 0, 0),
-                                 gui_3d_vector(0, 0, 1),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, -shift_z[cube_index], l3_4d_point(0, 0, 0),
+                                 l3_4d_vector(0, 0, 1),
                                  rot_z_angle, 1);
     }
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 
@@ -236,23 +234,22 @@ static void disc_app(gui_view_t *view)
     }
     step_direction[0] = 1;
 
-    gui_win_t *win_3d = gui_win_create(obj, "win_3d", 15, 0, 380, 380);
-    gui_3d_t *disc_3d = gui_3d_create(win_3d, "3d-widget", DESC_DISC_BIN,
-                                      GUI_3D_DRAW_FRONT_ONLY, 0, 0, 380,
-                                      380);
-    gui_3d_set_global_transform_cb(disc_3d, (gui_3d_global_transform_cb)disc_global_cb);
-    gui_3d_set_face_transform_cb(disc_3d, (gui_3d_face_transform_cb)disc_face_cb);
+    // Disc
+    l3_model_t *disc_3d = l3_create_model(DESC_DISC_BIN, L3_DRAW_FRONT_ONLY, 15, 0, 380, 380);
+    l3_set_global_transform(disc_3d, (l3_global_transform_cb)disc_global_cb);
+    l3_set_face_transform(disc_3d, (l3_face_transform_cb)disc_face_cb);
+    gui_lite3d_t *lite3d_disc = gui_lite3d_create(obj, "lite3d_disc", disc_3d, 0, 0, 0, 0);
 
-    gui_3d_t *disc_cube = gui_3d_create(win_3d, "3d-widget", DESC_DISC_CUBE_BIN,
-                                        GUI_3D_DRAW_FRONT_AND_SORT, 0, 0, 380,
-                                        380);
+    // Cube
+    l3_model_t *disc_cube = l3_create_model(DESC_DISC_CUBE_BIN, L3_DRAW_FRONT_AND_SORT, 15, 0, 380,
+                                            380);
+    l3_set_global_transform(disc_cube, (l3_global_transform_cb)disc_global_cb);
+    l3_set_face_transform(disc_cube, (l3_face_transform_cb)disc_cube_face_cb);
+    gui_lite3d_t *lite3d_disc_cube = gui_lite3d_create(obj, "lite3d_disc_cube", disc_cube, 0, 0, 0, 0);
 
-    gui_3d_set_global_transform_cb(disc_cube, (gui_3d_global_transform_cb)disc_global_cb);
-    gui_3d_set_face_transform_cb(disc_cube, (gui_3d_face_transform_cb)disc_cube_face_cb);
+    gui_obj_create_timer(GUI_BASE(lite3d_disc), 10, true, update_disc_animation);
 
-    gui_obj_create_timer(GUI_BASE(win_3d), 10, true, update_disc_animation);
-
-
+    // Music control
     gui_win_t *win_music = gui_win_create(obj, "win_music", 0, 380, 0, 0);
 
     gui_img_t *backward_img = gui_img_create_from_mem(win_music, "music_backward", MUSIC_BACKWARD_BIN,

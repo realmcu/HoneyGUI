@@ -191,7 +191,7 @@ static void butterfly_app(gui_view_t *view)
                              GUI_EVENT_KB_SHORT_CLICKED);
 
 
-    l3_model_t *butterfly_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 410, 502);
+    l3_model_t *butterfly_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
     l3_set_global_transform(butterfly_3d, (l3_global_transform_cb)butterfly_global_cb);
     l3_set_face_transform(butterfly_3d, (l3_face_transform_cb)butterfly_face_cb);

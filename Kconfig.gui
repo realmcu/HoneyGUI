@@ -7,6 +7,16 @@ menuconfig REALTEK_HONEYGUI
 
     if REALTEK_HONEYGUI
 
+        config REALTEK_BUILD_LITE3D
+            bool "Enable Lite3D Library"
+            default n
+
+        if REALTEK_BUILD_LITE3D
+            config REALTEK_LITE3D_8773G_ZEPHYR_LIB
+                bool "Use 8773G Zephyr Library"
+                default y
+        endif
+
         config REALTEK_BUILD_GUI_BOX2D
         bool "Enable Box2D"
         default n

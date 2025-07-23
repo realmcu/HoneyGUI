@@ -62,12 +62,14 @@ typedef void (*l3_face_transform_cb)(l3_model_t *__this, size_t face_index/*face
  *
  * @param desc_addr Address of the model descriptor.
  * @param draw_type Drawing type for the model.
+ * @param x X-coordinate of the model.
+ * @param y Y-coordinate of the model.
  * @param view_w Width of the view.
  * @param view_h Height of the view.
  * @return Pointer to the created 3D model.
  */
-l3_model_t *l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t view_w,
-                            int16_t view_h);
+l3_model_t *l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x,
+                            int16_t y, int16_t view_w, int16_t view_h);
 
 /**
  * @brief Set the target canvas for rendering.

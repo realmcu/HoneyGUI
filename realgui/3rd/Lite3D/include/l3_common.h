@@ -426,6 +426,8 @@ typedef struct l3_model
 
     L3_DRAW_TYPE draw_type;
 
+    int16_t x;
+    int16_t y;
     float viewPortWidth;
     float viewPortHeight;
     l3_world_t world;
@@ -451,6 +453,7 @@ l3_4d_vector_t l3_4d_point_sub(l3_4d_point_t p1, l3_4d_point_t p2);
 
 bool l3_generate_3x3_matrix(l3_2d_point_t *src, l3_2d_point_t *dst, float *ret);
 void l3_3x3_matrix_identity(l3_3x3_matrix_t *m);
+void l3_3x3_matrix_translate(l3_3x3_matrix_t *m, float t_x, float t_y);
 void l3_3x3_matrix_inverse(l3_3x3_matrix_t *m);
 void l3_3x3_matrix_mul_3d_point(l3_3x3_matrix_t *m, l3_3d_point_t *p);
 
