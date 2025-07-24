@@ -9,7 +9,7 @@ The view widget is a kind of container that makes switching more convenient. Any
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1748934358553458872/76fc7506_10737458.jpeg" width= "1000" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407375843378492/f91f9615_10737458.jpeg" width= "1000" /></div>
    <p style="margin: 5px 0 0 0; text-align: center;">View Flowchart</p>
    <br>
 
@@ -109,7 +109,7 @@ Below are four separate C files, each containing a descriptor for the view and t
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747296823504521615/c45fc393_10737458.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407801497338482/48e631cd_10737458.gif" width= "400" /></div>
    <br>
 
 API

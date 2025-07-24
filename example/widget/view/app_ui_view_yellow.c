@@ -58,6 +58,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void app_ui_view_yellow_design(gui_view_t *view)
 {
+    gui_view_set_animate_step(view, 20);
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_yellow, 0, 0, 0,
                                              0);
 

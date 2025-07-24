@@ -9,7 +9,7 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1748934340615345297/cd6f8678_10737458.jpeg" width= "1000" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407359429529327/73931f5b_10737458.jpeg" width= "1000" /></div>
    <p style="margin: 5px 0 0 0; text-align: center;">View流程图</p>
    <br>
 
@@ -109,7 +109,7 @@
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1747296823504521615/c45fc393_10737458.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753407801497338482/48e631cd_10737458.gif" width= "400" /></div>
    <br>
 
 API

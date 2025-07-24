@@ -56,9 +56,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-/* view demo end*/
-
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, white_view_descriptor, SWITCH_OUT_NONE_ANIMATION,
@@ -72,6 +69,7 @@ static void switch_out_cb(gui_view_t *view)
 
 static void switch_in_cb(gui_view_t *view)
 {
+    gui_view_set_animate_step(view, 20);
     gui_img_t *img = gui_img_create_from_mem(view, "img", (void *)_actiger_blue, 200, 200, 0, 0);
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 

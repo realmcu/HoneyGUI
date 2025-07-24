@@ -5,17 +5,16 @@ GUI Application
 The GUI framework diagram is shown in the figure below:
   
   
-.. figure:: https://foruda.gitee.com/images/1721199084691160190/537fa787_13408154.png
+.. figure:: https://foruda.gitee.com/images/1753344638505538859/b08edaa1_10737458.png
    :align: center
    :width: 800px
 
    HoneyGUI Framework
 
-+ In each project, multiple applications can exist simultaneously, but only one application can be in a running state at any given time, while the other applications will be in a suspended state.
-+ When using different rendering engines, the upper-layer implementation of the application will vary.
-+ Each :term:`APP` can create its own dedicated thread, or it may choose not to.
-+ The APP can be installed, opened, closed, uninstalled, and switched.
-+ The GUI_SERVER performs operations such as traversing widgets according to refresh instructions, rendering the frame buffer, executing trigger callbacks, and scheduling apps.
++ Multiple views can be predefined in each project, generally only one view will be displayed, and a new view will be created in real time when switching views.
++ Each view can set multiple switching methods and switching objects to achieve various typesettings.
++ Adapt to a variety of third-party libraries to support the development of various display effects.
++ The GUI_SERVER performs operations such as traversing widgets according to refresh instructions, rendering the frame buffer, executing trigger callbacks, and so on.
 
 
 .. toctree::

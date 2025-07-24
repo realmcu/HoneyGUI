@@ -29,7 +29,7 @@ The :term:`GUI` framework has good portability, which can run on a variety of ch
 Software Architecture
 -----------------------
 
-.. image:: https://foruda.gitee.com/images/1744004732309092748/20ca09c7_1860080.png
+.. image:: https://foruda.gitee.com/images/1753340174900062921/e20848cb_10737458.png
    :align: center
    :width: 800
 
@@ -158,10 +158,10 @@ Display
 Watch Project
 """""""""""""""
 
-The watchface is displayed in the window, and you can interact with it by swiping and long pressing.
+The watchface is displayed in the window, and you can interact with it by swiping and clicking.
 
 
-.. image:: https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png
+.. image:: https://foruda.gitee.com/images/1753340570827728922/610cb752_10737458.png
    :align: center
    :width: 400
 
@@ -170,6 +170,6 @@ Dashboard Project
 
 The dashboard is displayed in the window.
 
-.. image:: https://foruda.gitee.com/images/1731649605724335535/042f1dcf_10088396.png
+.. image:: https://foruda.gitee.com/images/1753340204000227545/39228f04_10737458.png
    :align: center
    :width: 400
