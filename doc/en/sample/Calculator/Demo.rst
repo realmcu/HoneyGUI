@@ -14,7 +14,7 @@ The "Calculator" works just like a traditional calculator, using button widget f
 
 Source File
 ==========================
-To help learn and be familiar with the development, you can find all source files you may need in path :file:`realgui\example\screen_448_368`. The source file for this demostration is :file:`app_calculator.c`, you can find it in the path mentioned for more details.
+To help learn and be familiar with the development, you can find all source files you may need in path :file:`realgui\\example\\screen_448_368\\`. The source file for this demostration is :file:`app_calculator.c`, you can find it in the path mentioned for more details.
 
 
 Two Steps 
@@ -48,7 +48,7 @@ The app structure saves all the information of ui. Developers should initialize 
     }
 
 
-2. Declare the app ui design function
+2. Declare the app :func:`ui_design`  function
 --------------------------------------
 
 The app ui design function adds all the widgets required to form a complex ui. In this example, we add a window widgets and draw the calculator ui. 

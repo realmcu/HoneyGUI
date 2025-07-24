@@ -13,7 +13,7 @@
 
 源文件
 ==========================
-为了帮助学习和熟悉基本的开发流程，开发者可以在路径 :file:`realgui\example\screen_448_368` 下获取该示例的源文件 :file:`app_calculator.c`。
+为了帮助学习和熟悉基本的开发流程，开发者可以在路径 :file:`realgui\\example\\screen_448_368\\` 下获取该示例的源文件 :file:`app_calculator.c`。
 
 
 操作步骤
@@ -49,7 +49,7 @@ APP 结构体保存了 UI 的所有信息，开发者应该使用 APP 名称和 
 
 
 
-2. 定义 APP :func:ui_design 函数
+2. 定义 APP :func:`ui_design` 函数
 ------------------------------------
 
 APP :func:`void ui_design(gui_app_t *app)` 函数包含了复杂 UI 的所有控件创建及其配置。在本示例 APP 中加入一个 "window" 控件，并将所有的 "button" 控件和 "text" 控件都其作为子控件完成整个 APP UI 设计。
