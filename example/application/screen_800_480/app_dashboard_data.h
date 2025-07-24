@@ -8,20 +8,15 @@
 extern "C" {
 #endif
 
-#include <gui_tabview.h>
 #include <gui_img.h>
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_obj.h>
-#include <gui_curtain.h>
-#include <gui_seekbar.h>
-#include <gui_page.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
 #include "root_image_800_480/ui_resource.h"
-#include <gui_app.h>
 #include <stdlib.h>
 #ifndef _WIN32
 #include "communicate_parse_navigation.h"

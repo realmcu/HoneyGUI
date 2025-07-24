@@ -1,6 +1,5 @@
 
 #include "app_dashboard_data.h"
-#include <gui_api.h>
 #include "app_dashboard_main_display.h"
 #include "app_dashboard_connected_display.h"
 #ifndef _WIN32

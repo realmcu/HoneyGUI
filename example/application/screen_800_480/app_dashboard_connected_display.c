@@ -1,73 +1,116 @@
-#include <gui_tabview.h>
-#include <gui_win.h>
-#include <gui_text.h>
-#include <gui_curtain.h>
-#include <gui_app.h>
-#include "gui_tab.h"
-#include "draw_font.h"
-#include "gui_img.h"
-#include "time.h"
-#include "gui_button.h"
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include "app_dashboard_connected_display.h"
 #include "app_dashboard_data.h"
+#include "gui_components_init.h"
 #ifndef _WIN32
 #include "trace.h"
 #endif
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define CURRENT_VIEW_NAME "connect_view"
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+static gui_view_t *current_view = NULL;
+const static gui_view_descriptor_t *main_view = NULL;
+static gui_view_descriptor_t const descriptor =
+{
+    /* change Here for current view */
+    .name = (const char *)CURRENT_VIEW_NAME,
+    .pView = &current_view,
+    .on_switch_in = app_dashboard_create_connected_display,
+    .on_switch_out = NULL,
+    .keep = false,
+};
 uint8_t show_c_navigation_msg[40];
 uint8_t show_c_navigation_unit[40];
 uint8_t show_c_road_names[40];
 uint8_t show_c_message_data[40];
 uint8_t show_c_tel_number[11];
 
-void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+static int gui_view_descriptor_register_init(void)
 {
+    gui_view_descriptor_register(&descriptor);
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    main_view = gui_view_descriptor_get("main_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+void app_dashboard_create_connected_display(gui_view_t *view)
+{
+    gui_view_set_animate_step(view, 1000);
+    gui_view_switch_on_event(view, main_view, SWITCH_OUT_NONE_ANIMATION,
+                             SWITCH_OUT_NONE_ANIMATION, GUI_EVENT_KB_SHORT_CLICKED); //switch test
     /* set update callback */
-    gui_win_set_animate(target_connected_display, 1000, -1, paint_connected_display_cb,
-                        target_connected_display);
+    gui_obj_create_timer(GUI_BASE(view), 25, true, paint_connected_display_cb);
 
     /* set Image data */
-    dashboard_c_background = gui_img_create_from_mem(target_connected_display, "dashboard_c_background",
+    dashboard_c_background = gui_img_create_from_mem(view, "dashboard_c_background",
                                                      BACKGROUND_C_BIN, 0, 0, 800, 480);
     gui_img_set_mode(dashboard_c_background, IMG_COVER_MODE);
-    speed_high_c_digital = gui_img_create_from_mem(target_connected_display, "speed_high_c_digital",
+    speed_high_c_digital = gui_img_create_from_mem(view, "speed_high_c_digital",
                                                    SPED_C0_BIN, 214, 232, 27, 40);
-    speed_low_c_digital = gui_img_create_from_mem(target_connected_display, "speed_low_c_digital",
+    speed_low_c_digital = gui_img_create_from_mem(view, "speed_low_c_digital",
                                                   SPED_C0_BIN, 251, 232, 27, 40);
-    hour_high_c_digital = gui_img_create_from_mem(target_connected_display, "hour_high_digital",
+    hour_high_c_digital = gui_img_create_from_mem(view, "hour_high_digital",
                                                   TIMER0_BIN, 355, 12, 9, 16);
-    hour_low_c_digital = gui_img_create_from_mem(target_connected_display, "hour_low_digital",
+    hour_low_c_digital = gui_img_create_from_mem(view, "hour_low_digital",
                                                  TIMER0_BIN, 366, 12, 9, 16);
-    min_high_c_digital = gui_img_create_from_mem(target_connected_display, "min_high_digital",
+    min_high_c_digital = gui_img_create_from_mem(view, "min_high_digital",
                                                  TIMER0_BIN, 387, 12, 9, 18);
-    min_low_c_digital = gui_img_create_from_mem(target_connected_display, "min_low_digital", TIMER0_BIN,
+    min_low_c_digital = gui_img_create_from_mem(view, "min_low_digital", TIMER0_BIN,
                                                 399, 12, 9, 18);
-    tense_high_c_digital = gui_img_create_from_mem(target_connected_display, "tense_high_c_digital",
+    tense_high_c_digital = gui_img_create_from_mem(view, "tense_high_c_digital",
                                                    APM_CA_BIN, 417, 12, 9, 18);
-    tense_low_c_digital = gui_img_create_from_mem(target_connected_display, "tense_low_c_digital",
+    tense_low_c_digital = gui_img_create_from_mem(view, "tense_low_c_digital",
                                                   APM_CM_BIN,
                                                   432, 12, 9, 18);
-    bat_high_c_digital = gui_img_create_from_mem(target_connected_display, "bat_high_c_digital",
+    bat_high_c_digital = gui_img_create_from_mem(view, "bat_high_c_digital",
                                                  TIMER0_BIN, 238, 371, 9, 18);
-    bat_low_c_digital = gui_img_create_from_mem(target_connected_display, "bat_low_c_digital",
+    bat_low_c_digital = gui_img_create_from_mem(view, "bat_low_c_digital",
                                                 TIMER0_BIN, 250, 371, 9, 18);
-    left_turn_light_c_status = gui_img_create_from_mem(target_connected_display,
+    left_turn_light_c_status = gui_img_create_from_mem(view,
                                                        "left_turn_light_c_status", TL_OF_C_BIN, 110, 10, 42, 40);
-    right_turn_light_c_status = gui_img_create_from_mem(target_connected_display,
+    right_turn_light_c_status = gui_img_create_from_mem(view,
                                                         "right_turn_light_c_status", TR_OF_C_BIN, 665, 10, 42, 40);
-    navi_c_status = gui_img_create_from_mem(target_connected_display, "navi_c_status", NAVI_C1_BIN, 505,
+    navi_c_status = gui_img_create_from_mem(view, "navi_c_status", NAVI_C1_BIN, 505,
                                             170, 268, 218);
-    refuse_c_button = gui_img_create_from_mem(target_connected_display, "refuse_c_button", REFUS_BIN,
+    refuse_c_button = gui_img_create_from_mem(view, "refuse_c_button", REFUS_BIN,
                                               502, 410, 36, 36);
-    ans_c_button = gui_img_create_from_mem(target_connected_display, "ans_c_button", ANS_BIN, 740, 410,
+    ans_c_button = gui_img_create_from_mem(view, "ans_c_button", ANS_BIN, 740, 410,
                                            36, 36);
-    tel_box_left_c_button = gui_img_create_from_mem(target_connected_display, "tel_box_left_c_button",
+    tel_box_left_c_button = gui_img_create_from_mem(view, "tel_box_left_c_button",
                                                     SYMB1_BIN, 554, 414, 36, 36);
-    tel_box_right_c_button = gui_img_create_from_mem(target_connected_display, "tel_box_right_c_button",
+    tel_box_right_c_button = gui_img_create_from_mem(view, "tel_box_right_c_button",
                                                      SYMB2_BIN, 718, 414, 36, 36);
-    dashboard_Cpointer = gui_img_create_from_mem(target_connected_display, "dashboard_Cpointer",
+    dashboard_Cpointer = gui_img_create_from_mem(view, "dashboard_Cpointer",
                                                  DASHBOARD_C2_BIN, 110, 133, 9, 18);
-    short_c_message = gui_img_create_from_mem(target_connected_display, "short_c_message",
+    short_c_message = gui_img_create_from_mem(view, "short_c_message",
                                               MESSAGE_BIN, 221, 0, 359, 80);
 
     /* set font data */
@@ -76,7 +119,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 
     memcpy(&show_c_navigation_msg[0], &current_navi_data.navigation_msg[0],
            current_navi_data.navigation_num_len);
-    short_c_navi_message_1 = gui_text_create(target_connected_display,  "short_c_navi_message_1", 490,
+    short_c_navi_message_1 = gui_text_create(view,  "short_c_navi_message_1", 490,
                                              88, 150,
                                              60);
     gui_text_set(short_c_navi_message_1, (char *)show_c_navigation_msg, GUI_FONT_SRC_BMP,
@@ -85,7 +128,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 
     memcpy(&show_c_navigation_unit[0], &current_navi_data.navigation_unit[0],
            current_navi_data.navigation_unit_len);
-    short_c_navi_message_3 = gui_text_create(target_connected_display,  "short_c_navi_message_3", 640,
+    short_c_navi_message_3 = gui_text_create(view,  "short_c_navi_message_3", 640,
                                              108, 150,
                                              40);
     gui_text_set(short_c_navi_message_3, (char *)show_c_navigation_unit, GUI_FONT_SRC_BMP,
@@ -95,7 +138,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 
     memcpy(&show_c_road_names[0], &current_navi_data.road_names[0],
            current_navi_data.road_num_len);
-    short_c_navi_message_2 = gui_text_create(target_connected_display,  "short_c_navi_message_2", 490,
+    short_c_navi_message_2 = gui_text_create(view,  "short_c_navi_message_2", 490,
                                              148, 300,
                                              40);
     gui_text_set(short_c_navi_message_2, (char *)show_c_road_names, GUI_FONT_SRC_BMP, gui_rgb(0xcc,
@@ -105,14 +148,14 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 
     app_phone_data current_phone_status;
     app_dashboard_data_get_phone_status(&current_phone_status);
-    short_c_tel_number = gui_text_create(target_connected_display,  "short_c_tel_number",  560, 410,
+    short_c_tel_number = gui_text_create(view,  "short_c_tel_number",  560, 410,
                                          158, 30);
     memcpy(&show_c_tel_number[0], &current_phone_status.current_phone_number[0],
            current_phone_status.current_phone_number_len);
     gui_text_set(short_c_tel_number, (char *)show_c_tel_number, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), current_phone_status.current_phone_number_len, 28);
     gui_text_mode_set(short_c_tel_number, CENTER);
-    short_c_tel_accept = gui_text_create(target_connected_display,  "short_c_tel_accept",  600, 410,
+    short_c_tel_accept = gui_text_create(view,  "short_c_tel_accept",  600, 410,
                                          800, 30);
     gui_text_set(short_c_tel_accept, "calling", GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                           UINT8_MAX), 7, 28);
@@ -120,7 +163,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     app_dashboard_data_get_message_data_update(&current_message_status);
     memcpy(&show_c_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
-    short_c_message_data = gui_text_create(target_connected_display,  "short_c_message_data",  300, 10,
+    short_c_message_data = gui_text_create(view,  "short_c_message_data",  300, 10,
                                            240, 64);
     gui_text_set(short_c_message_data, (char *)show_c_message_data, GUI_FONT_SRC_BMP,
                  gui_rgb(UINT8_MAX,
@@ -138,16 +181,13 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 }
 
 extern gui_win_t *win_main_display;
-void paint_connected_display_cb(void *param1, void *param2, struct gui_animate *anim)
+void paint_connected_display_cb(void *p)
 {
-    gui_win_t *win = (gui_win_t *)param1;
+    gui_win_t *win = (gui_win_t *)p;
     if (app_dashboard_data_get_show_main_display() == true)
     {
-        win->base.not_show = app_dashboard_data_get_show_main_display();
-        if (win_main_display->base.not_show)
-        {
-            win_main_display->base.not_show = false;
-        }
+        gui_view_switch_direct(current_view, main_view, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_OUT_NONE_ANIMATION);
         return;
     }
 

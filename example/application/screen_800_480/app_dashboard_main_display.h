@@ -9,22 +9,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <gui_tabview.h>
 #include <gui_img.h>
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_obj.h>
-#include <gui_curtain.h>
-#include <gui_seekbar.h>
-#include <gui_page.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
 #include "root_image_800_480/ui_resource.h"
-#include <gui_app.h>
 #include <stdlib.h>
 #include "app_dashboard_data.h"
+#include "gui_view.h"
 
 static gui_img_t *dashboard_background = NULL;
 static gui_img_t *speed_high_digital = NULL;
@@ -107,7 +103,7 @@ static void *main_display_speed_resource_def[] =
 };
 
 /* Create function */
-void app_dashboard_create_main_display(gui_win_t *target_main_display);
+void app_dashboard_create_main_display(gui_view_t *view);
 
 /* Update timer information */
 void app_dashboard_update_main_display_time_info(void);
@@ -138,7 +134,7 @@ void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_info
 void app_dashboard_update_main_display_message_infor(app_message_data *app_message_information);
 
 /* Update main_display every frame */
-void paint_main_display_cb(void *param1, void *param2, struct gui_animate *anim) ;
+void paint_main_display_cb(void *p);
 
 #ifdef __cplusplus
 }
