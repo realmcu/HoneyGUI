@@ -19,10 +19,11 @@
 #include "l3.h"
 
 
-#if LITE3D_PORT_GUI == 1
+
 #include "gui_api.h"
 #include "def_file.h"
 #include "draw_img.h"
+#include "acc_api.h"
 
 void *l3_custom_malloc(size_t size)
 {
@@ -39,8 +40,7 @@ void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
     extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev * dc, struct gui_rect * rect);
     gui_dispdev_t *gui_dc = gui_get_dc();
     draw_img_t *draw_image = (draw_img_t *)image;
-    hw_acc_blit(draw_image, gui_dc, (gui_rect_t *)rect);
+    gui_acc_blit_to_dc(draw_image, gui_dc, (gui_rect_t *)rect);
 }
 
 
-#endif

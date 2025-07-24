@@ -32,7 +32,7 @@ CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-prom
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
 
 LFLAGS = ' -T default.ld'
-LFLAGS += ' -flto' #for arm2d
+# LFLAGS += ' -flto' #for arm2d
 LFLAGS += ' -pthread'
 LFLAGS += ' -Wl,-Map=gui.map'
 

@@ -13,12 +13,6 @@ libs = []
 libpath = []
 
 
-src +=Glob('*.c')
-src +=Glob('*.cpp')
-
-inc = [cwd]
-inc += [cwd + '/include']
-
 if GetDepend('CONFIG_REALTEK_BUILD_LITE3D'):
     src +=Glob('*.c')
     src +=Glob('*.cpp')
@@ -26,18 +20,18 @@ if GetDepend('CONFIG_REALTEK_BUILD_LITE3D'):
     inc = [cwd]
     inc += [cwd + '/include']
 
-    if GetDepend('CONFIG_REALTEK_BUILD_LITE3D_GCC_LIB'):
+    if GetDepend('CONFIG_REALTEK_BUILD_LITE3D_FOR_WIN32_GCC_LIB'):
         libs = ['Lite3D_GCC']
         libpath = [cwd + '/lib']
     elif GetDepend('CONFIG_REALTEK_BUILD_LITE3D_8773E_ARMCC_LIB'):
         src += [cwd + '/lib/Lite3D_RTL8773E_ARMCC.lib']
-        CPPDEFINES = ['LITE3D_PORT_GUI']
+        CPPDEFINES = ['HONEYGUI_ENABLE_LITE3D']
     elif GetDepend('CONFIG_REALTEK_BUILD_LITE3D_8773E_ARMCL_LIB'):
         src += [cwd + '/lib/Lite3D_RTL8773E_ARMCLANG.lib']
-        CPPDEFINES = ['LITE3D_PORT_GUI']
+        CPPDEFINES = ['HONEYGUI_ENABLE_LITE3D']
     elif GetDepend('CONFIG_REALTEK_BUILD_LITE3D_8773G_ARMCL_LIB'):
         src += [cwd + '/lib/Lite3D_RTL8773G_ARMCLANG.lib']
-        CPPDEFINES = ['LITE3D_PORT_GUI']
+        CPPDEFINES = ['HONEYGUI_ENABLE_LITE3D']
         
 
 
