@@ -2,6 +2,294 @@
 使用 LVGL V9 设计
 ==========================
 
+LVGL 简介
+==========================
+- `LVGL 官网 <https://lvgl.io/>`_
+- `LVGL 在线文档 <https://docs.lvgl.io/9.1/>`_
+- `LVGL 简介 <https://docs.lvgl.io/9.1/intro/index.html>`_
+
+LVGL(Light and Versatile Graphics Library)是一个免费且开源的C语言图形库，提供了一切所需的工具，以创建嵌入式GUI，具有易于使用的图形元素、美观的视觉效果和低内存占用。
+
+LVGL提供了“GUI引擎”，处理应用程序与最终用户的所有交互，不仅包括绘制显示内容、接受用户输入并将其转化为应用程序可捕获的事件，还提供了30多个内置小部件、100多个样式属性、滚动、动画、先进的软件渲染、从MCU到OpenGL的内置GPU支持等等。这些功能的结合使您能够高效地开发用户界面，而无需重新发明轮子。
+
+LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解LVGL的功能和特性。
+
+- `LVGL Demo <https://lvgl.io/demos>`_
+- `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
+
+
+.. 点击直接查看 demo 和 example 效果
+
+LVGL 模拟器
+==========================
+..  PC 模拟器运行 lvgl demo（脱离EVB开发）
+
+模拟器是开发 UI 时使用的一个强大的工具，用于在计算机上模拟嵌入式设备的UI界面。它可以模拟真实硬件平台的行为和外观，提供给开发人员一个便捷的环境来快速创建、调试和测试UI设计。
+
+模拟器的主要作用是实时展示和交互测试设计的UI界面，从而减少在实际硬件上进行反复测试的时间和成本。通过使用模拟器，开发人员可以快速迭代设计，实时查看效果，并进行调试和验证。这大大加快了UI的开发速度和质量，并提高了工作效率。
+
+使用模拟器有以下优点：
+
+- 实时预览：模拟器可以即时显示UI界面的效果，使开发人员能够快速看到设计的外观和功能效果，方便进行调整和修改。
+
+- 跨平台支持：模拟器可以在计算机上运行，开发人员不需要依赖具体的硬件平台。
+
+- 节省时间和资源：使用模拟器可以避免在实际硬件上频繁烧录和测试 UI，减少了额外的时间和成本开销。
+
+- 调试和测试：模拟器提供了丰富的调试和测试功能，可以检查 UI 元素的交互、事件处理和布局效果，有助于解决问题和优化性能。
+
+
+在模拟器中运行 LVGL
+-----------------------------
+LVGL 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南`  章节。
+
+完成模拟器的环境安装后，启动运行将看到模拟器默认的 LVGL 工程。修改模拟器配置文件以运行不同的 LVGL 的工程，在路径 :file:`your lvgl dir/rtk/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，可以通过修改 :c:macro:`LVGL_DEMO_APP` 的数值来选择模拟器运行的示例工程。在 VScode 中再次启动运行，构建编译通过后即可看到模拟器运行选定的示例工程。
+
+.. image:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
+   :align: center
+   :width: 408
+
+当需要修改屏幕尺寸时，修改文件 :file:`your lvgl dir/rtk/demos/xxxxxx/` 下的 :file:`SConscript`
+文件，修改其中的屏幕宽度 :c:macro:`DRV_LCD_WIDTH` 和 屏幕高度 :c:macro:`DRV_LCD_HIGHT`，均为像素单位。
+
+.. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
+   :align: center
+   :width: 408
+
+
+.. .. <!-- - 运行流程，结构 -->
+
+
+LVGL 结构
+----------------
+
+以下为 LVGL 相关的目录及文件：
+
+::
+
+    LVGL Dir
+    |-- demos
+    |-- docs
+    |-- env_support
+    |-- examples
+    |-- libs
+    |-- rtk
+    |  |--demos
+    |  |  |-- benchmark
+    |  |  |__ screen_410_502_lvgl
+    |  |     |--fonts
+    |  |     |--images
+    |  |     :
+    |  |     :
+    |  |     |__root_image_lvgl
+    |  |        |-- root                         // 文件系统根目录
+    |  |        |-- _bin_mkromfs.py
+    |  |        |-- mkromfs_0x704D1000.bat       // User Data 打包脚本
+    |  |        |-- root(0x704D1000).bin         // 打包的 User Data
+    |  |        :
+    |  |        |__ ui_resource.h                // 打包的文件资源地址映射
+    |  |--tool
+    |  |__win32_sim
+    |     :
+    |     |__ port
+    |        |__ lvgl_port                       // 模拟器 LVGL porting
+    |           |-- lv_conf.h                    // 模拟器 LVGL 配置定义
+    |           |-- lv_port_disp.c
+    |           |-- lv_port_disp.h
+    |           |-- lv_port_fs.c
+    |           |-- lv_port_fs.h
+    |           |-- lv_port_indev.c
+    |           |__ lv_port_indev.h
+    |-- scripts
+    |-- src
+    |-- tests
+    :
+    :
+    |__ zephyr
+
+
+1. RTK SDK 中 LVGL 的文件结构与 LVGLV9.1 正式版本相同
+
+- demos：存放 LVGL 一些综合的内置示例，部分示例可以在 `LVGL Demo <https://lvgl.io/demos>`_ 中体验。
+
+- docs：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：`LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ 。
+
+- env_support：一些环境或者平台的支持。
+
+- examples：存放 LVGL 的内置示例，可在 `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ 中体验。
+
+- libs：存放 LVGL 使用到的的库文件。
+
+- rtk：存放 RTK SDK 中 LVGL 相关的文件，包括模拟器相关文件以及示例工程。
+
+- scripts：存放一些 LVGL 的处理脚本。
+
+- src：存放 LVGL 实际的源码，使用 LVGL 进行开发时，都是使用这里面的代码文件。RTK 对 LVGL 源码有微量的改动，改动内容全部记录在 :file:`your lvgl dir/rtk/` 下的 :file:`LVGL_SourceCode_Changelog.md` 文件中。
+
+- tests：存放 LVGL 测试文件。
+
+- zephyr：存放 Zephyr 相关的配置文件。
+
+2. 模拟器运行 LVGL 时，LVGL 将从目录 :file:`your lvgl dir/rtk/demos/xxxxxx/` 下的 :file:`app_sim_port.c` 开始运行。
+
+3. 模拟器运行 LVGL 时，调用的 LVGL 文件系统接口所指向的根目录为 :file:`your lvgl dir/rtk/demos/xxxxxx/root/`。
+
+实机移植
+==========================
+- 文档说明： `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_
+
+LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 GPU 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_。
+
+
+
+.. note::
+    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 api 框架下来完成驱动功能，以对接到 driver 层接口，往上则可复用示例工程的 porting 接口。
+
+
+显示
+-----------------------------
+- 文档说明： `LVGL Porting Display <https://docs.lvgl.io/9.1/porting/display.html>`_, `LVGL Overview Display <https://docs.lvgl.io/9.1/overview/display.html>`_
+
+在开发者完成显示设备的驱动功能调试后，设备能够与显示设备正常通信并显示色彩。本小节介绍如何将驱动与 LVGL 的显示接口进行对接以展现 LVGL 的 UI 界面。
+
+LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 ``void lv_port_disp_init(void)`` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 ``static void disp_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *px_map)``。
+
+LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的内存与性能需求：
+
+- LV_DISPLAY_RENDER_MODE_PARTIAL （分块渲染）
+
+  - 利用较小的缓冲区将屏幕分为若干小部分逐步渲染。
+  - 推荐缓冲区大小至少为屏幕的 1/10。
+  - 优点：节省 RAM ，适合内存有限的场景。
+
+- LV_DISPLAY_RENDER_MODE_DIRECT （直写渲染）
+
+  - 缓冲区尺寸与屏幕相同， LVGL 直接渲染到对应的缓冲区位置。
+  - 缓冲区始终包含完整的画面，仅更新发生变化的区域。
+  - 如有两个缓冲区，内容会自动同步，刷新时仅需切换缓冲区地址。
+
+- LV_DISPLAY_RENDER_MODE_FULL （全屏重绘）
+
+  - 每次刷新都会重绘整个屏幕，即使只更改了一个像素。
+  - 使用双缓冲时，刷新同样只需切换缓冲区地址。
+  - 优点：实现简单，适合对刷新速度或兼容性有特殊要求的场合。
+
+根据实际开发需求，根据不同的内存资源以及渲染方式，SDK 中的文件 :file:`lv_port_disp.c` 已配置好了四种推荐的渲染方案供参考，配置 :c:macro:`ACTIVE_DISPLAY_SCHEME` 以切换模式：
+
+- :c:macro:`SCHEME_RAM_PARTIAL` 区域绘制方案
+
+  - 使用分块渲染方案
+  - 配置两块 RAM 区域缓存
+  - 适用于没有 PSRAM 的 MCU
+  - 该方案仅支持带有 RAM 的 display IC
+
+- :c:macro:`SCHEME_RAM_PSRAM_PARTIAL` 带有整屏缓存的区域绘制方案
+
+  - 使用分块渲染方案
+  - 配置两块 RAM 区域缓存以及两块 PSRAM 整屏缓存
+  - 该方案仅支持带有 PSRAM 的 MCU
+  - 对 display IC 无特殊要求
+
+- :c:macro:`SCHEME_PSRAM_DIRECT` 整屏直写方案
+
+  - 使用直写渲染方案
+  - 配置两块 PSRAM 区域缓存
+  - 该方案仅支持带有 PSRAM 的 MCU
+  - 对 display IC 无特殊要求
+
+- :c:macro:`SCHEME_PSRAM_FULL` 整屏重绘方案
+
+  - 使用全屏重绘方案
+  - 配置两块 PSRAM 区域缓存
+  - 该方案仅支持带有 PSRAM 的 MCU
+  - 对 display IC 无特殊要求
+
+
+输入设备
+-----------------------------
+- 文档说明： `LVGL Porting Input Devices <https://docs.lvgl.io/9.1/porting/indev.html>`_
+
+在开发者完成输入设备的驱动功能调试后，设备能够与输入设备正常通信。本小节介绍如何将驱动与 LVGL 的输入接口进行对接以与 LVGL 的 UI 界面进行交互。
+
+LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备参数在初始化函数 ``void lv_port_indev_init(void)`` 中进行配置，如选择设备类型，配置数据读取回调函数，以及指针绑定等。
+
+详尽的输入设备移植方法和注意事项请参阅文档 `LVGL Porting Input Devices <https://docs.lvgl.io/9.1/porting/indev.html>`_。
+
+- 在初始化函数 ``void lv_port_indev_init(void)`` 中选择注册对应类型的输入设备，如触屏设备则选择 **Touchpad** ， 并选择对应的接口进行实现。
+
+- LVGL 会定期通过回调函数指针 ``indev_drv.read_cb`` 获取当前输入设备的数据，如触屏设备则为函数 ``static void touchpad_read(lv_indev_t *indev_drv, lv_indev_data_t *data)``,该函数不需要修改。
+
+- 开发者需要填充``static bool touchpad_is_pressed(void)`` 函数以及``static void touchpad_get_xy(int32_t *x, int32_t *y)``函数，从触摸板获取当前的状态信息，包括触点的坐标及触摸状态。
+
+.. code-block:: c
+   :emphasize-lines: 4,7,8,9,22,52,59,60
+
+    void lv_port_indev_init(void)
+    {
+      /*Initialize your touchpad if you have*/
+      touchpad_init();
+
+      /*Register a touchpad input device*/
+      indev_touchpad = lv_indev_create();
+      lv_indev_set_type(indev_touchpad, LV_INDEV_TYPE_POINTER);
+      lv_indev_set_read_cb(indev_touchpad, touchpad_read);
+    }
+
+   /*------------------
+   * Touchpad
+   * -----------------*/
+   static uint16_t touch_x = 0;
+   static uint16_t touch_y = 0;
+   static bool touch_pressing = 0;
+
+   /*Initialize your touchpad*/
+   static void touchpad_init(void)
+   {
+      touch_driver_init();
+      /*Your code comes here*/
+   }
+
+   /*Will be called by the library to read the touchpad*/
+   static void touchpad_read(lv_indev_t *indev_drv, lv_indev_data_t *data)
+   {
+      static int32_t last_x = 0;
+      static int32_t last_y = 0;
+
+      /*Save the pressed coordinates and the state*/
+      if (touchpad_is_pressed())
+      {
+         touchpad_get_xy(&last_x, &last_y);
+         data->state = LV_INDEV_STATE_PRESSED;
+      }
+      else
+      {
+         data->state = LV_INDEV_STATE_RELEASED;
+      }
+
+      /*Set the last pressed coordinates*/
+      data->point.x = last_x;
+      data->point.y = last_y;
+   }
+
+   /*Return true is the touchpad is pressed*/
+   static bool touchpad_is_pressed(void)
+   {
+      /*Your code comes here*/
+      return get_raw_touch_data().is_press;
+   }
+
+   /*Get the x and y coordinates if the touchpad is pressed*/
+   static void touchpad_get_xy(int32_t *x, int32_t *y)
+   {
+      /*Your code comes here*/
+      (*x) = get_raw_touch_data().x;
+      (*y) = get_raw_touch_data().y;
+   }
+
+
+文件系统
+-----------------------------
+
 
 LVGL Benchmark 测试
 ==========================
@@ -14,7 +302,7 @@ LVGL Benchmark 测试
 LVGL 的 Benchmark 是一个性能测试工具，用于评估 LVGL 库在各种硬件和软件环境下的图形显示性能。通过运行 Benchmark，用户可以获取帧率、渲染速度和内存使用情况等数据，从而帮助优化显示配置和调试性能问题。Benchmark 包括多种测试场景，如图形绘制、动画和文本渲染，每个场景模拟实际应用中的常见操作。用户可以通过这些测试来比较不同配置和平台的性能表现，从而做出针对性的优化调整。
 LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/README.md`。
 
-参考 Benchmark 
+参考 Benchmark
 -----------------------------
 平台背景，8773G平台，200MHz主频，QSPI410*502屏幕，96KB RAM搭配3M PSRAM，双buffer模式，推屏方式direct。
 编译环境：armclang6.22版本，优化方式-Ofast 开启LTO；gcc 12.2版本，优化方式-Ofast。
@@ -45,7 +333,7 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/READM
 .. csv-table:: Benchmark 不同编译环境测试结果
   :header: 场景, 加速方式, FreeRTOS, Zephyr
   :align: center
-  
+
     empty screen, SW+MVE+PPE, 5, 5
     moving wallpaper, SW+MVE+PPE, 16, 16
     single rectangle, SW+MVE+PPE, 0, 0
@@ -67,7 +355,7 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/READM
 .. csv-table:: 不同平台渲染加速
   :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, RLE 解码, 字符, 线条
   :align: center
-  
+
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
   RTL8773E, 100MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
   RTL8773G, 200MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
@@ -76,3 +364,146 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/READM
 .. note::
   1. 涉及 LVGL Mask 的效果均需要 SW 处理
   2. RTL8772G 支持 Helium 硬件加速器
+
+
+从 Demo 入门开发
+==========================
+- `LVGL Demo <https://lvgl.io/demos>`_
+- `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
+
+.. <!-- 控件API，按照demo (简单修改+引导到示例+文档)
+
+.. - 需要掌握的基本概念
+.. - 如何从 demo 和 example 开始开发 -->
+
+建议开发者开发前先行阅读理解 `LVGL Overview <https://docs.lvgl.io/9.1/overview/index.html>`_ 和 `LVGL Widgets - Base Object <https://docs.lvgl.io/9.1/widgets/obj.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
+
+LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控件和特性的使用。
+
+- `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/demo` 下，开发者可直接调用对应的 ``lv_demo_xxx()`` 函数来熟悉了解。
+
+- 在线文档 `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your lvgl dir/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
+
+
+资源转换器
+==========================
+.. <!-- （Img + font，介绍和演示） -->
+
+
+图片转换器
+-----------------------------
+
+
+字体转换器
+-----------------------------
+
+
+开发资源支持
+==========================
+
+在线文档
+---------
+- `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
+
+LVGL 的 `在线文档 <https://docs.lvgl.io/master/intro/index.html>`_ 提供了全面的技术文档和教程，帮助开发者更好地了解和使用 LVGL 图形库。该文档包含以下内容：
+
+- 概述和特性：文档介绍了 LVGL 的基本概念和特性，包括图形对象、屏幕管理、事件处理、主题样式等。用户可以通过阅读文档了解 LVGL 的核心功能和优势。
+
+- 应用开发指南：文档提供了详细的应用开发指南，包括如何初始化和配置 LVGL 、如何创建和管理图形对象、如何处理用户输入和事件、如何添加主题和样式等。这些指南可以帮助用户快速上手使用LVGL并开发自己的应用程序。
+
+- API 文档：文档详细列举了 LVGL 的 API 接口和函数，以及它们的参数和用法。用户可以根据需要查阅API文档来了解具体的函数和接口的功能和用法，以便进行更高级的自定义和扩展。
+
+- 示例代码：文档中提供了众多的示例代码，涵盖了常见的应用场景和功能。用户可以借鉴这些示例代码，加快开发速度，并快速实现特定功能的需求。
+
+使用 LVGL 的在线文档可以帮助用户更好地理解和掌握 LVGL 的使用方法和技巧，提高开发效率。用户可以通过逐步学习文档中的内容，从简单的界面构建到复杂的应用开发，逐步掌握 LVGL 的各种功能和特性。同时，文档还提供了示例和代码片段，方便用户更快地开发出具有丰富界面和功能的应用程序。
+
+用户可以通过在网页浏览器中打开 LVGL 的在线文档，并浏览各个章节和内容，根据自己的需要查找和学习相关的知识。另外，用户还可以通过搜索功能来快速查找文档中的具体信息。总之，LVGL 的在线文档是用户理解和使用 LVGL 图形库的重要资源，可以提供全面而详细的指导，帮助用户快速上手和开发出更好的应用程序。
+
+
+基于文档开发能够完成大部分的 UI 效果，值得注意的是，文档内容并不一定齐全，当文档内容存在疏漏时，最终还是以代码为准。
+
+
+Github 仓库
+-----------------------------
+- `Github LVGL <https://github.com/lvgl/lvgl>`_
+
+LVGL 的 GitHub 仓库是开发者使用和贡献 LVGL 的重要平台：
+
+- 获取最新版本：LVGL 的 GitHub 仓库可以获得最新的 LVGL 版本和更新。开发者可以及时获取最新的功能更新、修复和改进，保持应用程序与 LVGL 的同步。
+
+- 参与社区和贡献代码：通过 GitHub 仓库，开发者可以积极参与 LVGL 社区的讨论和交流，了解其他开发者的问题和解决方案。同时，开发者也可以贡献自己的代码和改进，让 LVGL 更加完善和强大。
+
+- 提交问题和 bug 报告：GitHub 仓库提供了问题和bug报告的平台，开发者可以提交他们在使用 LVGL 过程中遇到的问题和 bug。这有助于 LVGL 开发团队及时发现和解决问题，提高 LVGL 的稳定性和可靠性。
+
+- 学习示例和文档：GitHub 仓库中还包含示例代码和文档，帮助开发者更好地理解和学习 LVGL 的使用。开发者可以通过浏览仓库中的示例代码和文档，学习 LVGL 的各个功能和特性，提高开发技能。
+
+
+设计器
+-----------------------------
+.. <!-- - 什么是设计器（演示，放图）
+.. 辅助开发，是否需要付费，移植，限制 -->
+
+Squareline
+~~~~~~~~~~
+
+`Squareline Studio <https://squareline.io/>`_ 是一款新一代可视化 UI 编辑器，专为嵌入式和桌面应用快速开发美观界面，支持个人免费使用，企业灵活付费。它集设计、原型和开发于一体，通过拖拽方式生成适用于 LVGL 的平台无关 C 或 MicroPython 代码，可在任意设备和系统上运行。支持即点即试的像素级预览、自定义组件、动画和事件，极大提升开发效率。适合个人、初创及大型企业多种场景。
+
+
+LVGL Editor
+~~~~~~~~~~~~~
+
+`LVGL Editor <https://lvgl.io/editor/>`_ 是一款基于免费开源 LVGL 库的专业 GUI 开发工具，支持 Windows、Linux 和 macOS。通过 XML 定义界面，支持自动补全、版本控制、实时预览及 Figma 深度集成，可在线共享和测试 UI。编辑器支持导出为 C 代码、运行时 XML 加载及多种高级组件，并具备CLI集成、自动同步样式、数据绑定和事件处理等功能，大大提升了嵌入式UI开发效率。
+
+
+EEZ Studio
+~~~~~~~~~~
+
+`EEZ Studio <https://www.envox.eu/studio/studio-introduction/>`_ 支持 LVGL 8.x 和 9.x 版本，允许用户通过拖放和流程图可视化编程，快速设计响应式桌面和嵌入式 GUI。平台内置丰富模板和示例，适合原型与最终应用开发，支持多平台和多语言。配合 EEZ Flow，无需编程即可完成复杂逻辑，提升开发效率, 是一个开发 LVGL 项目的高效、开源工具。
+
+
+GUI Guider
+~~~~~~~~~~~~~~~~~
+.. <!-- - GUI Guider: `NXP GUI Guider <https://www.nxp.com/design/design-center/software/development-software/gui-guider:GUI-GUIDER>`_ -->
+
+
+论坛
+-----------------------------
+- `LVGL Forum <https://forum.lvgl.io/>`_
+
+.. <!-- 开放提问，LVGL 开发者会回复。 -->
+
+LVGL 的官方论坛是一个开发者社区，致力于讨论和分享有关 LVGL 图形库的话题和资源。它提供了一个平台，供开发者之间交流、寻求帮助和分享他们的经验和项目。
+
+LVGL 论坛的一些特点和功能包括：
+
+- 提问和回答：开发者可以在论坛上提出他们在使用 LVGL 时遇到的问题，并获得其他开发者的帮助和回答。这使得论坛成为一个宝贵的知识库，提供了解决问题的经验和技巧。
+
+- 教程和示例：论坛上有许多有用的教程和示例代码，展示了如何使用 LVGL 的不同功能和特性。这些资源对于新手开发者学习和掌握 LVGL 非常有帮助。
+
+- 开发者贡献和项目展示：论坛上的开发者可以分享他们的项目和定制的 LVGL 界面，以及其他开发者可以共享、讨论和参考的贡献。
+
+- 更新和发布通告：LVGL 的开发团队在论坛上发布关于新版本发布和更新的通告和说明。这使得开发者可以及时了解最新功能和改进。
+
+- 社区互动：论坛提供了一个社区互动的平台，开发者可以互相交流、分享和建立联系，加强 LVGL 开发社区的合作和发展。
+
+LVGL 论坛对于使用 LVGL 的开发者来说，是获取支持、解决问题、学习和分享经验的重要资源。
+
+
+博客
+-----------------------------
+- `LVGL Blog <https://blog.lvgl.io/>`_
+
+LVGL 的官方博客是一个定期更新的平台，提供关于 LVGL 图形库的最新信息、教程、案例研究和开发者见解。LVGL 的开发团队和社区成员经常在博客上发布有关 LVGL 的各种内容，这些内容可以使开发者更好地了解和使用 LVGL。
+
+LVGL 的博客包含以下内容：
+
+- 更新和新功能介绍：博客上会发布关于 LVGL 最新版本的更新和改进的文章，这些文章介绍了新功能、修复了的问题和性能提升，使开发者可以了解和利用最新的 LVGL 特性。
+
+- 教程和使用指南：博客会提供有关 LVGL 的实用教程和使用指南，涵盖从入门到高级的各种主题。这些教程通常包括示例代码和详细说明，帮助开发者掌握 LVGL 的使用和最佳实践。
+
+- 案例研究和项目展示：博客上会分享一些使用 LVGL 实现的案例研究和项目展示。这些文章介绍了如何使用 LVGL 构建实际应用程序和界面，让开发者从实践中获取灵感和经验。
+
+- 技术深入解析和开发者见解：博客还会涵盖对LVGL的深入分析和开发者的见解。这些文章可能探讨 LVGL 的内部工作原理、性能优化技巧、优秀设计实践等方面的主题，给开发者提供更深入的了解和思考。
+
+LVGL 的博客是一个重要的资源，对于 LVGL 的开发者来说是了解和掌握 LVGL 的宝贵来源。通过阅读博客，开发者可以获取到关于 LVGL 最新动态、学习材料和技术见解，帮助他们更好地使用 LVGL 构建出优秀的图形界面。
+
