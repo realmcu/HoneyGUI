@@ -20,7 +20,7 @@ LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。�
 
 .. 点击直接查看 demo 和 example 效果
 
-LVGL 模拟器
+模拟器
 ==========================
 ..  PC 模拟器运行 lvgl demo（脱离EVB开发）
 
@@ -38,7 +38,7 @@ LVGL 模拟器
 
 - 调试和测试：模拟器提供了丰富的调试和测试功能，可以检查 UI 元素的交互、事件处理和布局效果，有助于解决问题和优化性能。
 
-
+.. _在模拟器中运行 LVGL:
 在模拟器中运行 LVGL
 -----------------------------
 LVGL 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南`  章节。
@@ -174,6 +174,7 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
   - 使用双缓冲时，刷新同样只需切换缓冲区地址。
   - 优点：实现简单，适合对刷新速度或兼容性有特殊要求的场合。
 
+
 根据实际开发需求，根据不同的内存资源以及渲染方式，SDK 中的文件 :file:`lv_port_disp.c` 已配置好了四种推荐的渲染方案供参考，配置 :c:macro:`ACTIVE_DISPLAY_SCHEME` 以切换模式：
 
 - :c:macro:`SCHEME_RAM_PARTIAL` 区域绘制方案
@@ -186,7 +187,7 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
 - :c:macro:`SCHEME_RAM_PSRAM_PARTIAL` 带有整屏缓存的区域绘制方案
 
   - 使用分块渲染方案
-  - 配置两块 RAM 区域缓存以及两块 PSRAM 整屏缓存
+  - 配置两块 RAM 区域缓存以及一块 PSRAM 整屏缓存
   - 该方案仅支持带有 PSRAM 的 MCU
   - 对 display IC 无特殊要求
 
@@ -219,7 +220,7 @@ LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备�
 
 - LVGL 会定期通过回调函数指针 ``indev_drv.read_cb`` 获取当前输入设备的数据，如触屏设备则为函数 ``static void touchpad_read(lv_indev_t *indev_drv, lv_indev_data_t *data)``,该函数不需要修改。
 
-- 开发者需要填充``static bool touchpad_is_pressed(void)`` 函数以及``static void touchpad_get_xy(int32_t *x, int32_t *y)``函数，从触摸板获取当前的状态信息，包括触点的坐标及触摸状态。
+- 开发者需要填充 ``static bool touchpad_is_pressed(void)`` 函数以及 ``static void touchpad_get_xy(int32_t *x, int32_t *y)`` 函数，从触摸板获取当前的状态信息，包括触点的坐标及触摸状态。
 
 .. code-block:: c
    :emphasize-lines: 4,7,8,9,22,52,59,60
@@ -385,6 +386,7 @@ LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控
 - 在线文档 `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your lvgl dir/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
 
 
+.. _资源转换器:
 资源转换器
 ==========================
 .. <!-- （Img + font，介绍和演示） -->
@@ -443,11 +445,99 @@ LVGL 的 GitHub 仓库是开发者使用和贡献 LVGL 的重要平台：
 .. <!-- - 什么是设计器（演示，放图）
 .. 辅助开发，是否需要付费，移植，限制 -->
 
-Squareline
-~~~~~~~~~~
+Squareline Studio
+~~~~~~~~~~~~~~~~~~~~~~~
 
 `Squareline Studio <https://squareline.io/>`_ 是一款新一代可视化 UI 编辑器，专为嵌入式和桌面应用快速开发美观界面，支持个人免费使用，企业灵活付费。它集设计、原型和开发于一体，通过拖拽方式生成适用于 LVGL 的平台无关 C 或 MicroPython 代码，可在任意设备和系统上运行。支持即点即试的像素级预览、自定义组件、动画和事件，极大提升开发效率。适合个人、初创及大型企业多种场景。
 
+UI设计
+^^^^^^^^^
+
+使用 Squareline Studio 进行 LVGL 界面设计，可以参考设计工具的 `官方文档 <https://docs.squareline.io/docs/squareline/>`_ 与软件内的开源示例。
+
+RTK 有对 Squareline Studio 做过完整支持，基于 RTK 平台的软硬件性能以及 LVGL 库的设计特性，总结了以下几点设计优化原则：
+
+- 减少不必要的圆角设计，例如矩形阴影绘制效率远高于圆角矩形阴影绘制
+
+- 在保证显示内容一致时，减少冗余的图层叠加和背景色填充
+
+- RTK 平台支持硬件图像解压（ IDU 以及 JPU ），相比于图形绘制，优先使用图像进行UI设计，会提高显示帧率
+
+- 为了适配 RTK 平台的硬件规则，需要使用 RTK 的资源转换器对资源进行转换，为了便于移植，建议将所有图像和字体设计文件放到单一主目录下，并确保文件名格式的规范性
+
+
+资源转换
+^^^^^^^^^
+Squareline Studio 内置了标准的 LVGL 资源转换器，可以生成符合 LVGL 格式的资源文件，并且可以在模拟器以及开发板上编译运行。
+
+由于 Squaremline Studio 使用的 LVGL 资源转换器并不包括 RTK 平台的图像压缩算法，以及字体转换功能，所以如果客户需要使用 RTK 平台的硬件解压功能以及 GPU 字体渲染功能，需要使用 RTK 资源转换器进行转换，然后替换原始文件。
+
+.. note::
+   RTK 资源转换器的使用方法可以参考 :ref:`资源转换器`。
+
+.. note::
+   RTK 资源转换器输出的文件遵守 LVGL 的格式标准，保证直接使用，因此开发者可以直接将 RTK 资源转换器生成的文件替换 Squareline Studio 生成的资源文件。
+
+Squareline Studio 在导出 UI 设计文件时，可能会修改输出的资源名称，例如：
+
+ - 会强制给图像资源增加前后缀，前缀为原始图像相对路径以及类型名，后缀为原始图像格式
+
+ - 当原始图像名包含非法字符时，会使用随机数字字符串替换原始文件名
+
+ - 当原始字体文件为中文时，会使用对应的拼音或者缩写来生成字体名称
+
+图像资源替换过程中，绝大部分的命名差异可以通过查找替换方式进行调整，当出现异常文件名时，需要手动进行调整。
+
+字体资源替换过程中，由于字体设置的复杂性和多样性，需要手动进行文件匹配。
+
+
+工程移植
+^^^^^^^^^
+
+Squareline Studio 设计的 UI 界面可以直接导出为 RTK 平台的 C 代码，开发者可以直接将代码导入 RTK 平台进行编译和调试。
+
+如何在模拟器中运行 Squareline Studio 设计的 UI 界面？
+
+- 首先需要配置好模拟器环境并成功运行 LVGL 的 示例工程，参考 :ref:`在模拟器中运行 LVGL`
+
+- 然后需要将 Squareline Studio 设计的 UI 界面导出为 C 代码以及资源包，并拷贝至 :file:`your lvgl dir/rtk/demos/benchmark`
+
+  常见的 Squareline Studio 导出的文件包括：
+
+  ::
+
+    UI
+    |-- components             // 组件设计
+    |-- fonts                  // 字体资源
+    |-- images                 // 图像资源
+    |-- screens                // 页面设计
+    |-- CMakeLists.txt
+    |-- filelist.txt
+    |-- ui.c                   // 入口文件
+    |-- ui.h
+    |-- ui_events.h
+    |-- ui_helpers.c           // 辅助函数
+    |-- ui_helpers.h
+    |-- ui_theme_manager.c     // 主题管理
+    |-- ui_theme_manager.h
+    |-- ui_themes.c            // 主题资源
+    |-- ui_themes.h
+
+- 如果需要使用图像压缩功能或者 GPU 字体渲染功能，需要使用 RTK 资源转换器进行转换，然后替换原始文件，并替换 UI 设计文件中的图像和字体名称
+
+- 在原始示例工程的 LVGL 入口文件中通过 :code:`lv_init()` 初始化 LVGL 之后启动 Squareline Studio 工程的 UI 加载函数 :code:`ui_init();`
+
+ - 调整示例工程中的 :file:`sconscript` 文件，添加对 Squareline Studio 工程的构建支持
+
+ - 使用资源打包工具，将 Squareline Studio 工程的资源文件打包为二进制文件
+
+ - 编译运行模拟器，构建编译通过后即可看到模拟器运行 Squareline Studio 示例工程
+
+
+功能扩展
+^^^^^^^^^
+
+Squareline Studio 支持 LVGL 大部分的基础功能，例如 UI 设计、组件设计、动画设计、事件设计等，但欠缺对部分高级功能的支持，例如页面切换的转场机制、外设的逻辑交互、蜂窝表盘等等，因此如果需要使用这些功能，需要手动进行代码编写。
 
 LVGL Editor
 ~~~~~~~~~~~~~
