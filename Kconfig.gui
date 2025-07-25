@@ -12,9 +12,26 @@ menuconfig REALTEK_HONEYGUI
             default n
 
         if REALTEK_BUILD_LITE3D
-            config REALTEK_LITE3D_8773G_ZEPHYR_LIB
-                bool "Use 8773G Zephyr Library"
-                default y
+            choice
+                prompt "Select Lite3D Library Version"
+                default REALTEK_LITE3D_BUILD_8773G_ZEPHYR_LIB
+
+                config REALTEK_BUILD_LITE3D_FOR_WIN32_GCC_LIB
+                    bool "Windows GCC Library"
+
+                config REALTEK_BUILD_LITE3D_8773E_ARMCC_LIB
+                    bool "8773E (ARMCC)"
+
+                config REALTEK_BUILD_LITE3D_8773E_ARMCL_LIB
+                    bool "8773E (ARMCLANG)"
+
+                config REALTEK_BUILD_LITE3D_8773G_ARMCL_LIB
+                    bool "8773G (ARMCLANG)"
+
+                config REALTEK_BUILD_LITE3D_8773G_ZEPHYR_LIB
+                    bool "8773G (Zephyr)"
+
+            endchoice
         endif
 
         config REALTEK_BUILD_GUI_BOX2D

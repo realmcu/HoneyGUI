@@ -79,10 +79,10 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_disc_animation(void *param)
 {
-    gui_win_t *win_3d = (gui_win_t *)param;
+    gui_lite3d_t *lite3d_disc = (gui_lite3d_t *)param;
     touch_info_t *tp = tp_get_info();
 
-    if ((tp->pressed || tp->pressing) && tp->y < (win_3d->base.y + win_3d->base.h))
+    if ((tp->pressed || tp->pressing) && tp->y < (lite3d_disc->base.y + lite3d_disc->base.h))
     {
         rot_z_angle -= tp->deltaX / 5.0f;
         rot_x_angle += tp->deltaY / 5.0f;
@@ -238,7 +238,7 @@ static void disc_app(gui_view_t *view)
     l3_model_t *disc_3d = l3_create_model(DESC_DISC_BIN, L3_DRAW_FRONT_ONLY, 15, 0, 380, 380);
     l3_set_global_transform(disc_3d, (l3_global_transform_cb)disc_global_cb);
     l3_set_face_transform(disc_3d, (l3_face_transform_cb)disc_face_cb);
-    gui_lite3d_t *lite3d_disc = gui_lite3d_create(obj, "lite3d_disc", disc_3d, 0, 0, 0, 0);
+    gui_lite3d_t *lite3d_disc = gui_lite3d_create(obj, "lite3d_disc", disc_3d, 15, 0, 380, 380);
 
     // Cube
     l3_model_t *disc_cube = l3_create_model(DESC_DISC_CUBE_BIN, L3_DRAW_FRONT_AND_SORT, 15, 0, 380,

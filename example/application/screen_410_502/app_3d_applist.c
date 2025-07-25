@@ -10,7 +10,6 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_list.h"
 #include "gui_lite3d.h"
 
 /*============================================================================*
@@ -206,6 +205,11 @@ static void gui_app_switch(gui_lite3d_t *this)
         click_amplify = false;
 
         int clicked_index = get_app_index(this);
+        if (clicked_index == -1)
+        {
+            gui_log("Error: Target app not found!");
+            return;
+        }
         this->model->x = app_positions[clicked_index].pos_x;
         this->model->y = app_positions[clicked_index].pos_y;
         this->model->viewPortWidth = 200;

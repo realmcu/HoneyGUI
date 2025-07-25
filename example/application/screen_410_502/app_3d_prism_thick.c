@@ -10,7 +10,7 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -54,13 +54,13 @@ static gui_view_descriptor_t const descriptor =
 };
 
 /* Animation Variables */
-static Position world_pos_raw = {0.0f, 7.0f, 30.0f};
-static Position world_pos_target = {0.0f, 0.0f, 17.5f};
+static Position world_pos_raw = {0.0f, 0.0f, 0.0f};
+static Position world_pos_target = {0.0f, 0.0f, 0.0f};
 
 static Position world_pos_temp = {0.0f, 0.0f, 0.0f};
 static Rotation world_rot_temp = {0.0f, 0.0f, 0.0f};
 
-static float corrected_angle;
+static float corrected_angle = 0.0f;
 static float progress_percent = 0.0f;
 static int enter_face_index = 0;
 
@@ -112,15 +112,15 @@ static void update_prism_thick_angle()
 }
 
 
-static void prism_thick_global_cb(gui_3d_t *this)
+static void prism_thick_global_cb(l3_model_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0),
-                                 gui_point_4d(world_pos_temp.pos_x, world_pos_temp.pos_y, world_pos_temp.pos_z),
-                                 1, 32767, 90, this->base.w, this->base.h);
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0),
+                             l3_4d_point(world_pos_temp.pos_x, world_pos_temp.pos_y, world_pos_temp.pos_z),
+                             1, 32767, 90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_world_inititalize(&this->world, world_pos_temp.pos_x, world_pos_temp.pos_y,
-                             world_pos_temp.pos_z,
-                             0, world_rot_temp.rot_y, 0, 5);
+    l3_world_initialize(&this->world, world_pos_temp.pos_x, world_pos_temp.pos_y,
+                        world_pos_temp.pos_z,
+                        0, world_rot_temp.rot_y, 0, 5);
 
 }
 
@@ -135,7 +135,7 @@ static void gui_prism_thick_swap_states()
 
 static void prism_thick_render_animate_cb(void *param)
 {
-    gui_3d_t *prism_thick_3d = (gui_3d_t *)param;
+    gui_lite3d_t *lite3d_prism_thick = (gui_lite3d_t *)param;
 
     if (progress_percent < 1.0f)
     {
@@ -163,40 +163,40 @@ static void prism_thick_render_animate_cb(void *param)
             enter_face_index += 6;
         }
 
-        gui_obj_delete_timer(&(prism_thick_3d->base));
-        gui_obj_create_timer(&(prism_thick_3d->base), 10, true, update_prism_thick_angle);
-        gui_obj_start_timer(&(prism_thick_3d->base));
+        gui_obj_delete_timer(&(lite3d_prism_thick->base));
+        gui_obj_create_timer(&(lite3d_prism_thick->base), 10, true, update_prism_thick_angle);
+        gui_obj_start_timer(&(lite3d_prism_thick->base));
     }
 }
 
-static void gui_prism_thick_enter_animate(gui_3d_t *prism_thick_3d)
+static void gui_prism_thick_enter_animate(gui_lite3d_t *lite3d_prism_thick)
 {
     gui_prism_thick_swap_states();
 
-    gui_obj_create_timer(&(prism_thick_3d->base), 10, true, prism_thick_render_animate_cb);
-    gui_obj_start_timer(&(prism_thick_3d->base));
+    gui_obj_create_timer(&(lite3d_prism_thick->base), 10, true, prism_thick_render_animate_cb);
+    gui_obj_start_timer(&(lite3d_prism_thick->base));
 
 }
 
 static void prism_thick_on_face_click_cb(void *obj, gui_event_t e, void *param)
 {
     GUI_ASSERT(obj != NULL);
-    gui_3d_t *prism_thick = (gui_3d_t *)obj;
+    gui_lite3d_t *lite3d_prism_thick = (gui_lite3d_t *)obj;
 
-    gui_obj_create_timer(&(prism_thick->base), 10, true, prism_thick_render_animate_cb);
-    gui_obj_start_timer(&(prism_thick->base));
+    gui_obj_create_timer(&(lite3d_prism_thick->base), 10, true, prism_thick_render_animate_cb);
+    gui_obj_start_timer(&(lite3d_prism_thick->base));
 
 }
 
 static void prism_thick_position_init()
 {
     world_pos_raw.pos_x = 0.0f;
-    world_pos_raw.pos_y = 7.0f;
-    world_pos_raw.pos_z = 30.0f;
+    world_pos_raw.pos_y = 8.0f;
+    world_pos_raw.pos_z = 32.0f;
 
     world_pos_target.pos_x = 0.0f;
     world_pos_target.pos_y = 0.0f;
-    world_pos_target.pos_z = 17.5f;
+    world_pos_target.pos_z = 19.0f;
 }
 
 static void prism_thick_app(gui_view_t *view)
@@ -207,14 +207,15 @@ static void prism_thick_app(gui_view_t *view)
                              GUI_EVENT_KB_SHORT_CLICKED);
     gui_view_set_animate_step(view, 1000);
 
-    gui_3d_t *prism_thick_3d = gui_3d_create(obj, "3d-widget", DESC_PRISM_THICK_BIN,
-                                             GUI_3D_DRAW_FRONT_AND_SORT, 0, 0,
-                                             410, 502);
+    l3_model_t *prism_thick_3d = l3_create_model(DESC_PRISM_THICK_BIN, L3_DRAW_FRONT_AND_SORT, 0, 0,
+                                                 410, 502);
+    l3_set_global_transform(prism_thick_3d, (l3_global_transform_cb)prism_thick_global_cb);
+    gui_lite3d_t *lite3d_prism_thick = gui_lite3d_create(obj, "lite3d_prism_thick", prism_thick_3d, 0,
+                                                         0, 0, 0);
 
-    gui_3d_set_global_transform_cb(prism_thick_3d, (gui_3d_global_transform_cb)prism_thick_global_cb);
     prism_thick_position_init();
 
-    gui_prism_thick_enter_animate(prism_thick_3d);
-    gui_3d_on_click(prism_thick_3d, prism_thick_on_face_click_cb, NULL);
+    gui_prism_thick_enter_animate(lite3d_prism_thick);
+    gui_lite3d_on_click(lite3d_prism_thick, prism_thick_on_face_click_cb, NULL);
 
 }
