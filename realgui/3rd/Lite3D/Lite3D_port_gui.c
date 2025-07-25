@@ -25,19 +25,18 @@
 #include "draw_img.h"
 #include "acc_api.h"
 
-void *l3_custom_malloc(size_t size)
+void *l3_port_malloc(size_t size)
 {
     return gui_malloc(size);
 }
-void l3_custom_free(void *ptr)
+void l3_port_free(void *ptr)
 {
     gui_free(ptr);
 }
 
-void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
-                                l3_rect_t *rect)
+void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
+                                     l3_rect_t *rect)
 {
-    extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev * dc, struct gui_rect * rect);
     gui_dispdev_t *gui_dc = gui_get_dc();
     draw_img_t *draw_image = (draw_img_t *)image;
     gui_acc_blit_to_dc(draw_image, gui_dc, (gui_rect_t *)rect);

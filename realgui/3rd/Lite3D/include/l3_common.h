@@ -520,31 +520,6 @@ void l3_calculator_4x4_matrix(l3_4x4_matrix_t *matrix, \
                               float scale);
 
 
-/*============================================================================*
- *                            Custom Define
- *============================================================================*/
-
-/**
- * @brief Allocates memory of the specified size using a custom allocator.
- * @param size The size of memory to allocate in bytes.
- * @return Pointer to the allocated memory block.
- */
-void *l3_custom_malloc(size_t size);
-
-/**
- * @brief Frees memory allocated by l3_custom_malloc.
- * @param ptr Pointer to the memory block to free.
- */
-void l3_custom_free(void *ptr);
-
-/**
- * @brief Draws a rectangular image onto a canvas within the specified rectangle area.
- * @param image Pointer to the image data to draw.
- * @param dc Pointer to the canvas where the image will be drawn.
- * @param rect Pointer to the rectangle specifying the target area on the canvas.
- */
-void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect_t *rect);
-
 /**
  * @brief Draws a triangle onto a canvas using the specified vertices.
  * @param image Pointer to the triangle data to draw.

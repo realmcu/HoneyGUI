@@ -9,6 +9,8 @@ if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for depnedenc
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
+	
+	target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
     target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
