@@ -108,7 +108,7 @@ LVGL 结构
     |__ zephyr
 
 
-1. RTK SDK 中 LVGL 的文件结构与 LVGLV9.1 正式版本相同
+1. Realtek SDK 中 LVGL 的文件结构与 LVGLV9.1 正式版本相同
 
 - demos：存放 LVGL 一些综合的内置示例，部分示例可以在 `LVGL Demo <https://lvgl.io/demos>`_ 中体验。
 
@@ -120,7 +120,7 @@ LVGL 结构
 
 - libs：存放 LVGL 使用到的的库文件。
 
-- rtk：存放 RTK SDK 中 LVGL 相关的文件，包括模拟器相关文件以及示例工程。
+- rtk：存放 Realtek SDK 中 LVGL 相关的文件，包括模拟器相关文件以及示例工程。
 
 - scripts：存放一些 LVGL 的处理脚本。
 
@@ -399,6 +399,79 @@ LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控
 字体转换器
 -----------------------------
 
+LVGL 在线转换工具
+~~~~~~~~~~~~~~~~~~~~~~~
+
+- 在线转换工具：`LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
+
+- 文档说明：`LVGL Overview Fonts <https://docs.lvgl.io/9.1/overview/font.html>`_
+
+使用步骤请参考  `LVGL Overview Font - Add a New Font <https://docs.lvgl.io/9.1/overview/font.html#add-a-new-font>`_ ：
+
+1. 设定输出字库的名字
+
+2. 设定字号 Size ， 单位是像素高度
+
+3. 设定字体的 bpp(bit-per-piel)
+
+   - 表示采用多少个 bit 来描述一个像素，当数值越大时，字符的抗锯齿效果越好，边缘越平滑，字库占用空间越大
+
+4. 填写字体回调，当字体文件中不包含所需字符时，调用回调字体进行渲染，可以置空
+
+5. 选择输出字库的类型 (C file / Binary)
+
+6. 选择字体文件 (TTF/WOFF)
+
+7. 设定需要转换的字符 Unicode 范围，也可直接列出需要转换的字符
+
+
+Realtek 字体转换器
+~~~~~~~~~~~~~~~~~
+
+Realtek 在封装和扩展 LVGL 字体转换工具的基础上，推出了全新升级的 Realtek 字体转换器。相较于原版工具，Realtek 字体转换器具备以下显著优势：
+
+1. 可视化操作界面，让字体转换过程一目了然，操作便捷高效
+
+2. 支持多字体、多字号及配置标签化设计，大幅提升工程开发的灵活性与效率
+
+3. 新增对 Realtek 平台 GPU 渲染的特性支持，充分发挥硬件加速能力
+
+4. 支持字体数据与描述信息的分离，更好地适配嵌入式平台的存储管理模式
+
+5. 支持配置方案的导入与导出，便于项目移植与团队协作
+
+下图为 Realtek 字体转换器的界面图：
+
+.. image:: https://foruda.gitee.com/images/1753432503991458121/2c546aae_9325830.png
+   :align: center
+   :width: 983
+
+字体转换步骤：
+
+1. 打开 Realtek 字体转换器界面
+
+2. 点击 "Add new setting" 按钮，新增一个配置标签页
+
+3. 点击 "Add Fonts" 按钮，添加字体文件，可添加多个
+
+4. 填写bpp、字号、字符集等配置项，其中字号可以填写多个，使用英文逗号隔开
+
+  - bpp 为3时，生成的字体文件无法使用 GPU 加速渲染
+  - 选择压缩选项后，生成的字体文件会进行压缩，占用空间更小，但是无法使用 GPU 加速渲染
+
+5. 点击 "Generate Font" 按钮，选择路径并生成当前配置标签页的字体文件
+
+6. 如果存在多个标签页，点击 "Brouse" 按钮，选择字体文件输出路径，点击 "Generate All" 按钮，生成所有配置标签页的字体文件到指定路径
+
+附加功能：
+
+- 支持批量生成字体文件，每个标签页的字体文件名称为 "字体名称_字号_配置项"
+
+- 支持配置标签页的复制、删除、重命名
+
+- 支持导出当前配置标签页的配置信息，导出为 JSON 格式
+
+- 支持导入配置信息，导入 JSON 格式的配置文件
 
 开发资源支持
 ==========================
@@ -455,28 +528,28 @@ UI设计
 
 使用 Squareline Studio 进行 LVGL 界面设计，可以参考设计工具的 `官方文档 <https://docs.squareline.io/docs/squareline/>`_ 与软件内的开源示例。
 
-RTK 有对 Squareline Studio 做过完整支持，基于 RTK 平台的软硬件性能以及 LVGL 库的设计特性，总结了以下几点设计优化原则：
+Realtek 有对 Squareline Studio 做过完整支持，基于 Realtek 平台的软硬件性能以及 LVGL 库的设计特性，总结了以下几点设计优化原则：
 
 - 减少不必要的圆角设计，例如矩形阴影绘制效率远高于圆角矩形阴影绘制
 
 - 在保证显示内容一致时，减少冗余的图层叠加和背景色填充
 
-- RTK 平台支持硬件图像解压（ IDU 以及 JPU ），相比于图形绘制，优先使用图像进行UI设计，会提高显示帧率
+- Realtek 平台支持硬件图像解压（ IDU 以及 JPU ），相比于图形绘制，优先使用图像进行UI设计，会提高显示帧率
 
-- 为了适配 RTK 平台的硬件规则，需要使用 RTK 的资源转换器对资源进行转换，为了便于移植，建议将所有图像和字体设计文件放到单一主目录下，并确保文件名格式的规范性
+- 为了适配 Realtek 平台的硬件规则，需要使用 Realtek 的资源转换器对资源进行转换，为了便于移植，建议将所有图像和字体设计文件放到单一主目录下，并确保文件名格式的规范性
 
 
 资源转换
 ^^^^^^^^^
 Squareline Studio 内置了标准的 LVGL 资源转换器，可以生成符合 LVGL 格式的资源文件，并且可以在模拟器以及开发板上编译运行。
 
-由于 Squaremline Studio 使用的 LVGL 资源转换器并不包括 RTK 平台的图像压缩算法，以及字体转换功能，所以如果客户需要使用 RTK 平台的硬件解压功能以及 GPU 字体渲染功能，需要使用 RTK 资源转换器进行转换，然后替换原始文件。
+由于 Squaremline Studio 使用的 LVGL 资源转换器并不包括 Realtek 平台的图像压缩算法，以及字体转换功能，所以如果客户需要使用 Realtek 平台的硬件解压功能以及 GPU 字体渲染功能，需要使用 Realtek 资源转换器进行转换，然后替换原始文件。
 
 .. note::
-   RTK 资源转换器的使用方法可以参考 :ref:`资源转换器`。
+   Realtek 资源转换器的使用方法可以参考 :ref:`资源转换器`。
 
 .. note::
-   RTK 资源转换器输出的文件遵守 LVGL 的格式标准，保证直接使用，因此开发者可以直接将 RTK 资源转换器生成的文件替换 Squareline Studio 生成的资源文件。
+   Realtek 资源转换器输出的文件遵守 LVGL 的格式标准，保证直接使用，因此开发者可以直接将 Realtek 资源转换器生成的文件替换 Squareline Studio 生成的资源文件。
 
 Squareline Studio 在导出 UI 设计文件时，可能会修改输出的资源名称，例如：
 
@@ -494,7 +567,7 @@ Squareline Studio 在导出 UI 设计文件时，可能会修改输出的资源�
 工程移植
 ^^^^^^^^^
 
-Squareline Studio 设计的 UI 界面可以直接导出为 RTK 平台的 C 代码，开发者可以直接将代码导入 RTK 平台进行编译和调试。
+Squareline Studio 设计的 UI 界面可以直接导出为 Realtek 平台的 C 代码，开发者可以直接将代码导入 Realtek 平台进行编译和调试。
 
 如何在模拟器中运行 Squareline Studio 设计的 UI 界面？
 
@@ -523,15 +596,15 @@ Squareline Studio 设计的 UI 界面可以直接导出为 RTK 平台的 C 代�
     |-- ui_themes.c            // 主题资源
     |-- ui_themes.h
 
-- 如果需要使用图像压缩功能或者 GPU 字体渲染功能，需要使用 RTK 资源转换器进行转换，然后替换原始文件，并替换 UI 设计文件中的图像和字体名称
+- 如果需要使用图像压缩功能或者 GPU 字体渲染功能，需要使用 Realtek 资源转换器进行转换，然后替换原始文件，并替换 UI 设计文件中的图像和字体名称
 
 - 在原始示例工程的 LVGL 入口文件中通过 :code:`lv_init()` 初始化 LVGL 之后启动 Squareline Studio 工程的 UI 加载函数 :code:`ui_init();`
 
- - 调整示例工程中的 :file:`sconscript` 文件，添加对 Squareline Studio 工程的构建支持
+- 调整示例工程中的 :file:`sconscript` 文件，添加对 Squareline Studio 工程的构建支持
 
- - 使用资源打包工具，将 Squareline Studio 工程的资源文件打包为二进制文件
+- 使用资源打包工具，将 Squareline Studio 工程的资源文件打包为二进制文件
 
- - 编译运行模拟器，构建编译通过后即可看到模拟器运行 Squareline Studio 示例工程
+- 编译运行模拟器，构建编译通过后即可看到模拟器运行 Squareline Studio 示例工程
 
 
 功能扩展
