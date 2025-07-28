@@ -9,8 +9,6 @@ if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for depnedenc
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
-	
-	target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
     target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -30,35 +28,4 @@ if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for depnedenc
         target_link_libraries(${GUI_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib/Lite3D_RTL8773G_ZEPHYR.a)
     endif()
 
-    # Determine if we should create a library
-    if((NOT HEADERS) AND (NOT SOURCES))
-        message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-
-    if(HEADERS AND (NOT SOURCES))
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-
-    if(SOURCES AND (NOT HEADERS))
-        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
-    endif()
-
-    if(SOURCES AND HEADERS)
-        target_sources(${GUI_TARGET_NAME} PRIVATE ${SOURCES})
-        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-
-    # Process subdirectories regardless
-    file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
-
-    foreach(subdir ${SUBDIRS})
-        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${subdir})
-            if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/CMakeLists.txt)
-                add_subdirectory(${subdir})
-            else()
-                message(STATUS "Skipping directory ${subdir} as it does not contain a CMakeLists.txt file.")
-            endif()
-        endif()
-    endforeach()
 endif()

@@ -14,7 +14,7 @@ menuconfig REALTEK_HONEYGUI
         if REALTEK_BUILD_LITE3D
             choice
                 prompt "Select Lite3D Library Version"
-                default REALTEK_LITE3D_BUILD_8773G_ZEPHYR_LIB
+                default REALTEK_BUILD_LITE3D_8773G_ZEPHYR_LIB
 
                 config REALTEK_BUILD_LITE3D_FOR_WIN32_GCC_LIB
                     bool "Windows GCC Library"
