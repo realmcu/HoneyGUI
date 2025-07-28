@@ -22,7 +22,7 @@ p {
 
 /* ======== Render Main Content Style ========= */
 .wy-grid-for-nav.prevent-manipulation {
-    overflow: hidden;
+    /* overflow: hidden; */
     touch-action: none;
 }
 .wy-nav-content-wrap {

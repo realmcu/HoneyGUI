@@ -132,7 +132,7 @@
    +---------------------+----------------+--------------------+--------------------+-----------------------+
 
 
-.. literalinclude:: ../../../realgui/widget/gui_text.h
+.. literalinclude:: ../../../realgui/widget/gui_text/gui_text.h
    :language: c
    :start-after: /* TEXT_MODE start */
    :end-before: /* TEXT_MODE end */

@@ -49,7 +49,7 @@ The app structure saves all the information of ui. Developers should initialize 
 
 
 2. Declare the app :func:`ui_design`  function
---------------------------------------
+------------------------------------------------
 
 The app ui design function adds all the widgets required to form a complex ui. In this example, we add a window widgets and draw the calculator ui. 
 

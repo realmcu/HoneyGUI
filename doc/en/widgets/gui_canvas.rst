@@ -27,10 +27,10 @@ GUI Canvas is a 2D drawing component based on NanoVG, providing:
 - Blank buffer initialization support
 
 Core Features
-------------
+----------------
 
 Creation & Initialization
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Using ``gui_canvas_create`` function
 

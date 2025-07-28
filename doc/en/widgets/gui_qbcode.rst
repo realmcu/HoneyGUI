@@ -11,7 +11,7 @@ Create Widget
 To create a qbcode widget, you can use the function :cpp:any:`gui_qbcode_create`. Whether a qrcode or barcode is created depends on the ``encodeType`` parameter. The ``encodeType`` enumeration types are as follows:
 
 
-.. literalinclude:: ../../../realgui/widget/gui_qbcode.h
+.. literalinclude:: ../../../realgui/widget/gui_qbcode/gui_qbcode.h
    :language: c
    :start-after: /** @brief  T_QBCODE_ENCODE_TYPE structure */
    :end-before: /** @brief  T_QBCODE_DISPLAY_TYPE structure */

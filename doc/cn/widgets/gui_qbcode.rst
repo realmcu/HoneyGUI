@@ -11,7 +11,7 @@
 使用 :cpp:any:`gui_qbcode_create` 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数 ``encodeType`` 决定。``encodeType`` 枚举类型如下：
 
 
-.. literalinclude:: ../../../realgui/widget/gui_qbcode.h
+.. literalinclude:: ../../../realgui/widget/gui_qbcode/gui_qbcode.h
    :language: c
    :start-after: /** @brief  T_QBCODE_ENCODE_TYPE structure */
    :end-before: /** @brief  T_QBCODE_DISPLAY_TYPE structure */

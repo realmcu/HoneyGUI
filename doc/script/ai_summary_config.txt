@@ -1,4 +1,6 @@
 ../en/Glossary.rst
 ../cn/Glossary.rst
-../en/FAQ/*
-../cn/FAQ/*
+../en/get-pdf/index.rst
+../cn/get-pdf/index.rst
+../en/release_notes/*
+../cn/release_notes/*
