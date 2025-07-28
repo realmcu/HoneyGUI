@@ -264,6 +264,13 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
             gui_log("JPEG image caching is not supported.\n");
             return;
         }
+        else if (head->compress)
+        {
+            if (gui_get_acc()->idu_load != NULL)
+            {
+                image->data = gui_get_acc()->idu_load(image->data);
+            }
+        }
         return;
     }
 
@@ -286,6 +293,13 @@ void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
         if (head->jpeg)
         {
             gui_acc_jpeg_free(img->data);
+        }
+        else if (head->idu)
+        {
+            if (gui_get_acc()->idu_free != NULL)
+            {
+                gui_get_acc()->idu_free(img->data);
+            }
         }
     }
 }

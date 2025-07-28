@@ -68,6 +68,8 @@ typedef struct acc_engine
 
     void *(* jpeg_load)(void *input, int len, int *w, int *h, int *channel);
     void (* jpeg_free)(void *);
+    void *(* idu_load)(void *input);
+    void (* idu_free)(void *);
     bool enable_async;
     void *hw_acc_cache_mem; //for hardware acceleration cache memory
     uint32_t hw_acc_cache_size; //for hardware acceleration cache memory size
