@@ -71,9 +71,12 @@
 // #define CONFIG_REALTEK_BUILD_EXAMPLE_MENU_CELLULAR_WIDGET
 // </c>
 
-
 // <c> RTK GUI Canvas Demo
 // #define CONFIG_REALTEK_BUILD_REAL_CANCAS
+// </c>
+
+// <c> RTK GUI Menu Cellular Demo
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET
 // </c>
 
 // <c> RTK GUI Paint Engine Demo

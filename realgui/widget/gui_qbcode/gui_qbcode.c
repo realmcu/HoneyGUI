@@ -63,17 +63,6 @@ static void gui_qrcode_draw(gui_qbcode_t *qbcode, gui_rect_t *rect)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    if ((rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1)
-        || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
-    {
-        return;
-    }
-
-    if (qbcode->data == NULL)
-    {
-        return;
-    }
-
     uint8_t *qbcode_data = qbcode->data;
     int qbcode_x = rect->x1 ;
     int qbcode_y = rect->y1 ;
@@ -81,7 +70,6 @@ static void gui_qrcode_draw(gui_qbcode_t *qbcode, gui_rect_t *rect)
     int qbcode_h = (rect->y2 - rect->y1);
     int x_start = _UI_MAX(qbcode_x, 0);
     int x_end = _UI_MIN(qbcode_x + qbcode_w, dc->fb_width);
-
     int y_start = _UI_MAX(dc->section.y1, qbcode_y);
     int y_end = _UI_MIN(dc->section.y2, qbcode_y + qbcode_h) + 1;
 
@@ -135,17 +123,6 @@ static void gui_barcode_draw(gui_qbcode_t *barcode, gui_rect_t *rect)
 {
     gui_dispdev_t *dc = gui_get_dc();
     uint32_t offset_record = 0;
-
-    if ((rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1)
-        || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
-    {
-        return;
-    }
-
-    if (barcode->data == NULL)
-    {
-        return;
-    }
 
     int qbcode_x = rect->x1 ;
     int qbcode_y = rect->y1 ;
@@ -207,18 +184,30 @@ static void gui_barcode_draw(gui_qbcode_t *barcode, gui_rect_t *rect)
 
 static void gui_qbcode_draw(gui_obj_t *obj)
 {
+    gui_dispdev_t *dc = gui_get_dc();
+
     if (obj == NULL)
     {
         return;
     }
-
     gui_qbcode_t *qbcode = (gui_qbcode_t *)obj;
+    if (qbcode->data == NULL)
+    {
+        return;
+    }
 
     gui_rect_t draw_rect = {0};
     draw_rect.x1 = qbcode->offset_x;
     draw_rect.y1 = qbcode->offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w * qbcode->scale_x;
     draw_rect.y2 = draw_rect.y1 + (obj->h) * qbcode->scale_y ;
+
+    if ((draw_rect.x2 < dc->section.x1) || (draw_rect.y2 < dc->section.y1)
+        || (draw_rect.x1 >= dc->section.x1 + dc->fb_width) ||
+        (draw_rect.y1 >= dc->section.y1 + dc->fb_height))
+    {
+        return;
+    }
 
     if (qbcode->type == QRCODE_DISPLAY_SECTION)
     {
@@ -322,6 +311,51 @@ void gui_qbcode_ctor(gui_qbcode_t *this, gui_obj_t *parent, const char *name, in
     }
 }
 
+static void __config_qrcode_img(gui_qbcode_t *qbcode, uint8_t *img_data, uint8_t border_size)
+{
+    uint16_t qbcode_size = gui_qrcode_gen_get_size(qbcode->data);
+    uint16_t image_wsize = qbcode->base.w;
+    uint16_t image_hsize = qbcode->base.h;
+    uint16_t *write_buf = (uint16_t *)(img_data + 8);
+    for (uint32_t i = 0; i < image_hsize; i ++)
+    {
+        int16_t findey = (i) * (qbcode_size + border_size + border_size) / image_hsize - border_size;
+        int write_off = (i) * image_wsize ;
+
+        for (uint32_t j = 0; j < image_wsize; j++)
+        {
+            int16_t findex = (j) * (qbcode_size + border_size + border_size) / image_wsize - border_size;
+            write_buf[write_off + j] = gui_qrcode_gen_get_module((uint8_t *)qbcode->data, findex,
+                                                                 findey) ? 1 : 0xffff;
+        }
+    }
+}
+
+static void __config_barcode_img(gui_qbcode_t *qbcode, uint8_t *img_data, uint8_t border_size)
+{
+    uint16_t image_wsize = qbcode->base.w;
+    uint16_t image_hsize = qbcode->base.h;
+    uint16_t *write_buf = (uint16_t *)(img_data + 8);
+    barcode_symbol_t *p_barcode = (barcode_symbol_t *)qbcode->data;
+
+    for (int32_t i = 0; i < image_hsize; i ++)
+    {
+        int write_off = (i) * image_wsize ;
+        if ((i < border_size) || (i >= (image_hsize - border_size)))
+        {
+            memset(write_buf + write_off, 0xff, image_wsize * 2);
+            continue;
+        }
+
+        for (uint32_t j = 0; j < image_wsize; j++)
+        {
+
+            int16_t findex = (j) * (p_barcode->width + border_size + border_size) / image_wsize - border_size;
+            write_buf[write_off + j] = ((p_barcode->encoded_data[0][findex / 8]) & (0x01 <<
+                                                                                    (findex) % 8)) ? 1 : 0xffff;
+        }
+    }
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -358,25 +392,10 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
         uint8_t *img_data = gui_realloc(qbcode->image_data, qbcode->base.w * qbcode->base.h * 2 + 8);
         GUI_ASSERT(img_data);
         memset(img_data, 0, qbcode->base.w * qbcode->base.h * 2 + 8);
+        __config_qrcode_img(qbcode, img_data, border_size);
 
-        uint16_t qbcode_size = gui_qrcode_gen_get_size(qbcode->data);
         uint16_t image_wsize = qbcode->base.w;
         uint16_t image_hsize = qbcode->base.h;
-        uint16_t *write_buf = (uint16_t *)(img_data + 8);
-
-        for (uint32_t i = 0; i < image_hsize; i ++)
-        {
-            int16_t findey = (i) * (qbcode_size + border_size + border_size) / image_hsize - border_size;
-            int write_off = (i) * image_wsize ;
-
-            for (uint32_t j = 0; j < image_wsize; j++)
-            {
-                int16_t findex = (j) * (qbcode_size + border_size + border_size) / image_wsize - border_size;
-                write_buf[write_off + j] = gui_qrcode_gen_get_module((uint8_t *)qbcode->data, findex,
-                                                                     findey) ? 1 : 0xffff;
-            }
-        }
-
         gui_rgb_data_head_t *p_data = (gui_rgb_data_head_t *)img_data;
         p_data->scan = 0;
         p_data->align = 0;
@@ -401,29 +420,9 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
         GUI_ASSERT(img_data);
         memset(img_data, 0, qbcode->base.w * qbcode->base.h * 2 + 8);
 
+        __config_barcode_img(qbcode, img_data, border_size);
         uint16_t image_wsize = qbcode->base.w;
         uint16_t image_hsize = qbcode->base.h;
-        uint16_t *write_buf = (uint16_t *)(img_data + 8);
-        barcode_symbol_t *p_barcode = (barcode_symbol_t *)qbcode->data;
-
-        for (int32_t i = 0; i < image_hsize; i ++)
-        {
-            int write_off = (i) * image_wsize ;
-            if ((i < border_size) || (i >= (image_hsize - border_size)))
-            {
-                memset(write_buf + write_off, 0xff, image_wsize * 2);
-                continue;
-            }
-
-            for (uint32_t j = 0; j < image_wsize; j++)
-            {
-
-                int16_t findex = (j) * (p_barcode->width + border_size + border_size) / image_wsize - border_size;
-                write_buf[write_off + j] = ((p_barcode->encoded_data[0][findex / 8]) & (0x01 <<
-                                                                                        (findex) % 8)) ? 1 : 0xffff;
-            }
-        }
-
         gui_rgb_data_head_t *p_data = (gui_rgb_data_head_t *)img_data;
         p_data->scan = 0;
         p_data->align = 0;

@@ -634,6 +634,170 @@ static void gui_barcode_gen_c128_grwp(int list[2][C128_MAX], int *p_indexliste)
     }
 }
 
+static void __first_block_gen_c128(int list[2][C128_MAX],
+                                   int *current_src,
+                                   const int length,
+                                   const char *manual_set,
+                                   const int indexliste,
+                                   const int next)
+{
+    int current = *current_src;
+    int i = 0;
+    if (current == C128_ABORC)
+    {
+        if (manual_set && manual_set[i])
+        {
+            list[1][i] = manual_set[i];
+            current = manual_set[i];
+        }
+        else if ((indexliste == 1) && (length == 2))
+        {
+            /* Rule 1a */
+            list[1][i] = C128_LATCHC;
+            current = C128_LATCHC;
+        }
+        else if (length >= 4)
+        {
+            /* Rule 1b */
+            list[1][i] = C128_LATCHC;
+            current = C128_LATCHC;
+        }
+        else
+        {
+            current = C128_AORB; /* Determine below */
+        }
+    }
+
+    if (current == C128_AORB)
+    {
+        if (manual_set && (manual_set[i] == 'A' || manual_set[i] == 'B'))
+        {
+            list[1][i] = manual_set[i];
+        }
+        else if (next == C128_SHIFTA)
+        {
+            /* Rule 1c */
+            list[1][i] = C128_LATCHA;
+        }
+        else
+        {
+            /* Rule 1d */
+            list[1][i] = C128_LATCHB;
+        }
+    }
+    else if (current == C128_SHIFTA)
+    {
+        /* Rule 1c */
+        list[1][i] = C128_LATCHA;
+    }
+    else if (current == C128_SHIFTB)
+    {
+        /* Unless C128_LATCHX set above, can only be C128_SHIFTB */
+        /* Rule 1d */
+        list[1][i] = C128_LATCHB;
+    }
+    *current_src = current;
+}
+
+static void __other_block_gen_c128(int list[2][C128_MAX],
+                                   int *current_src,
+                                   const int length,
+                                   const char *manual_set,
+                                   const int next,
+                                   const int last,
+                                   const int i)
+{
+    int current = *current_src;
+    if (current == C128_ABORC)
+    {
+        if (manual_set && manual_set[i])
+        {
+            list[1][i] = manual_set[i];
+            current = manual_set[i];
+        }
+        else if (length >= 4)
+        {
+            /* Rule 3 - note Rule 3b (odd C blocks) dealt with later */
+            list[1][i] = C128_LATCHC;
+            current = C128_LATCHC;
+        }
+        else
+        {
+            current = C128_AORB; /* Determine below */
+        }
+    }
+
+    if (current == C128_AORB)
+    {
+        if (manual_set && (manual_set[i] == 'A' || manual_set[i] == 'B'))
+        {
+            list[1][i] = manual_set[i];
+        }
+        else if (last == C128_LATCHA || last == C128_SHIFTB)
+        {
+            /* Maintain state */
+            list[1][i] = C128_LATCHA;
+        }
+        else if (last == C128_LATCHB || last == C128_SHIFTA)
+        {
+            /* Maintain state */
+            list[1][i] = C128_LATCHB;
+        }
+        else if (next == C128_SHIFTA)
+        {
+            list[1][i] = C128_LATCHA;
+        }
+        else
+        {
+            list[1][i] = C128_LATCHB;
+        }
+    }
+    else if (current == C128_SHIFTA)
+    {
+        if (manual_set && manual_set[i] == 'A')
+        {
+            list[1][i] = C128_LATCHA;
+        }
+        else if (length > 1)
+        {
+            /* Rule 4 */
+            list[1][i] = C128_LATCHA;
+        }
+        else if (last == C128_LATCHA || last == C128_SHIFTB)
+        {
+            /* Maintain state */
+            list[1][i] = C128_LATCHA;
+        }
+        else if (last == C128_LATCHC)
+        {
+            list[1][i] = C128_LATCHA;
+        }
+    }
+    else if (current == C128_SHIFTB)
+    {
+        /* Unless C128_LATCHX set above, can only be C128_SHIFTB */
+        if (manual_set && manual_set[i] == 'B')
+        {
+            list[1][i] = C128_LATCHB;
+        }
+        else if (length > 1)
+        {
+            /* Rule 5 */
+            list[1][i] = C128_LATCHB;
+        }
+        else if (last == C128_LATCHB || last == C128_SHIFTA)
+        {
+            /* Maintain state */
+            list[1][i] = C128_LATCHB;
+        }
+        else if (last == C128_LATCHC)
+        {
+            list[1][i] = C128_LATCHB;
+        }
+    }
+    *current_src = current;
+}
+
 /**
  * Implements rules from ISO 15417 Annex E
  */
@@ -648,170 +812,25 @@ INTERNAL void gui_barcode_gen_c128_dxsmooth(int list[2][C128_MAX], int *p_indexl
         int current = list[1][i]; /* Either C128_ABORC, C128_AORB, C128_SHIFTA or C128_SHIFTB */
         int length = list[0][i];
 
+        last = next = 0;
         if (i != 0)
         {
             last = list[1][i - 1];
-        }
-        else
-        {
-            last = 0;
         }
 
         if (i != indexliste - 1)
         {
             next = list[1][i + 1];
         }
-        else
-        {
-            next = 0;
-        }
 
         if (i == 0)
         {
             /* first block */
-            if (current == C128_ABORC)
-            {
-                if (manual_set && manual_set[i])
-                {
-                    list[1][i] = manual_set[i];
-                    current = manual_set[i];
-                }
-                else if ((indexliste == 1) && (length == 2))
-                {
-                    /* Rule 1a */
-                    list[1][i] = C128_LATCHC;
-                    current = C128_LATCHC;
-                }
-                else if (length >= 4)
-                {
-                    /* Rule 1b */
-                    list[1][i] = C128_LATCHC;
-                    current = C128_LATCHC;
-                }
-                else
-                {
-                    current = C128_AORB; /* Determine below */
-                }
-            }
-
-            if (current == C128_AORB)
-            {
-                if (manual_set && (manual_set[i] == 'A' || manual_set[i] == 'B'))
-                {
-                    list[1][i] = manual_set[i];
-                }
-                else if (next == C128_SHIFTA)
-                {
-                    /* Rule 1c */
-                    list[1][i] = C128_LATCHA;
-                }
-                else
-                {
-                    /* Rule 1d */
-                    list[1][i] = C128_LATCHB;
-                }
-            }
-            else if (current == C128_SHIFTA)
-            {
-                /* Rule 1c */
-                list[1][i] = C128_LATCHA;
-            }
-            else if (current == C128_SHIFTB)
-            {
-                /* Unless C128_LATCHX set above, can only be C128_SHIFTB */
-                /* Rule 1d */
-                list[1][i] = C128_LATCHB;
-            }
+            __first_block_gen_c128(list, &current, length, manual_set, indexliste, next);
         }
         else
         {
-            if (current == C128_ABORC)
-            {
-                if (manual_set && manual_set[i])
-                {
-                    list[1][i] = manual_set[i];
-                    current = manual_set[i];
-                }
-                else if (length >= 4)
-                {
-                    /* Rule 3 - note Rule 3b (odd C blocks) dealt with later */
-                    list[1][i] = C128_LATCHC;
-                    current = C128_LATCHC;
-                }
-                else
-                {
-                    current = C128_AORB; /* Determine below */
-                }
-            }
-
-            if (current == C128_AORB)
-            {
-                if (manual_set && (manual_set[i] == 'A' || manual_set[i] == 'B'))
-                {
-                    list[1][i] = manual_set[i];
-                }
-                else if (last == C128_LATCHA || last == C128_SHIFTB)
-                {
-                    /* Maintain state */
-                    list[1][i] = C128_LATCHA;
-                }
-                else if (last == C128_LATCHB || last == C128_SHIFTA)
-                {
-                    /* Maintain state */
-                    list[1][i] = C128_LATCHB;
-                }
-                else if (next == C128_SHIFTA)
-                {
-                    list[1][i] = C128_LATCHA;
-                }
-                else
-                {
-                    list[1][i] = C128_LATCHB;
-                }
-            }
-            else if (current == C128_SHIFTA)
-            {
-                if (manual_set && manual_set[i] == 'A')
-                {
-                    list[1][i] = C128_LATCHA;
-                }
-                else if (length > 1)
-                {
-                    /* Rule 4 */
-                    list[1][i] = C128_LATCHA;
-                }
-                else if (last == C128_LATCHA || last == C128_SHIFTB)
-                {
-                    /* Maintain state */
-                    list[1][i] = C128_LATCHA;
-                }
-                else if (last == C128_LATCHC)
-                {
-                    list[1][i] = C128_LATCHA;
-                }
-            }
-            else if (current == C128_SHIFTB)
-            {
-                /* Unless C128_LATCHX set above, can only be C128_SHIFTB */
-                if (manual_set && manual_set[i] == 'B')
-                {
-                    list[1][i] = C128_LATCHB;
-                }
-                else if (length > 1)
-                {
-                    /* Rule 5 */
-                    list[1][i] = C128_LATCHB;
-                }
-                else if (last == C128_LATCHB || last == C128_SHIFTA)
-                {
-                    /* Maintain state */
-                    list[1][i] = C128_LATCHB;
-                }
-                else if (last == C128_LATCHC)
-                {
-                    list[1][i] = C128_LATCHB;
-                }
-            }
+            __other_block_gen_c128(list, &current, length, manual_set, next, last, i);
         } /* Rule 2 is implemented elsewhere, Rule 6 is implied */
     }
 
@@ -974,47 +993,18 @@ INTERNAL void c128_put_in_set(int list[2][C128_MAX], const int indexliste, char 
     }
 }
 
-/*============================================================================*
- *                           Public Functions
- *============================================================================*/
-
-/* Handle Code 128, 128B and HIBC 128 */
-barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int length)
+static bool __detect_special_code(struct barcode_symbol *symbol,
+                                  unsigned char *src,
+                                  unsigned char source[],
+                                  unsigned char src_buf[],
+                                  char *manual_set,
+                                  int length)
 {
-    int i, j, k, values[C128_MAX] = {0}, bar_characters = 0, read, total_sum;
-    //int error_number = 0;
-    int indexchaine, indexliste, f_state = 0;
-    unsigned char src_buf[C128_MAX + 1];
-    unsigned char *src = source;
-    char manual_set[C128_MAX] = {0};
-    int list[2][C128_MAX] = {{0}};
-    char set[C128_MAX] = {0}, fset[C128_MAX], mode, last_set, current_set = ' ';
-    int glyph_count = 0; /* Codeword estimate times 2 */
-    char dest[200];
-    char *d = dest;
-
-    struct barcode_symbol *symbol = gui_malloc(sizeof(barcode_symbol_t));
-    GUI_ASSERT(symbol != NULL);
-    memset(symbol, 0, sizeof(barcode_symbol_t));//note
-
-    /* Suppresses clang-analyzer-core.UndefinedBinaryOperatorResult warning on fset which is fully set */
-    assert(length > 0);
-
-    if (length > C128_MAX)
-    {
-        /* This only blocks ridiculously long input - the actual length of the
-           resulting barcode depends on the type of data, so this is trapped later */
-        sprintf(symbol->errtxt, "340: Input too long (%d character maximum)", C128_MAX);
-        gui_free(symbol);
-        return NULL;//BARCODE_ERROR_TOO_LONG;
-    }
-
-    /* Detect special Code Set escapes for Code 128 in extra escape mode only */
+    int j = 0;
     if ((symbol->input_mode & EXTRA_ESCAPE_MODE) && symbol->symbology == BARCODE_CODE128)
     {
         char manual_ch = '\0';
-        j = 0;
-        for (i = 0; i < length; i++)
+        for (int i = 0; i < length; i++)
         {
             if (source[i] == '\\' && i + 2 < length && source[i + 1] == '^' && ((source[i + 2] >= 'A' &&
                                                                                  source[i + 2] <= 'C') || source[i + 2] == '^'))
@@ -1048,22 +1038,18 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             {
                 strcpy(symbol->errtxt, "842: No input data");
                 gui_free(symbol);
-                return NULL;//BARCODE_ERROR_INVALID_DATA;
+                return false;//BARCODE_ERROR_INVALID_DATA;
             }
             src = src_buf;
             src[length] = '\0';
         }
     }
+    return true;
+}
 
-    /* Detect extended ASCII characters */
-    for (i = 0; i < length; i++)
-    {
-        fset[i] = src[i] >= 128 ? 'f' : ' ';
-    }
-
-    /* Decide when to latch to extended mode - Annex E note 3 */
-    j = 0;
-    for (i = 0; i < length; i++)
+static void __latch_to_extended_mode(char *fset, int length)
+{
+    for (int i = 0, j = 0, k = 0; i < length; i++)
     {
         if (fset[i] == 'f')
         {
@@ -1090,8 +1076,11 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             }
         }
     }
+}
 
-    /* Decide if it is worth reverting to 646 encodation for a few characters as described in 4.3.4.2 (d) */
+static void __revert_to_646(char *fset, int length)
+{
+    int i, j, k;
     for (i = 1; i < length; i++)
     {
         if ((fset[i - 1] == 'F') && (fset[i] == ' '))
@@ -1119,12 +1108,21 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             }
         }
     }
+}
 
-    /* Decide on mode using same system as PDF417 and rules of ISO 15417 Annex E */
-    indexliste = 0;
-    indexchaine = 0;
+static void __decide_mode(struct barcode_symbol *symbol,
+                          unsigned char *src,
+                          unsigned char src_buf[],
+                          char *manual_set,
+                          int list[2][C128_MAX],
+                          int *indexliste_src,
+                          int *indexchaine_src,
+                          int length)
+{
+    int indexliste = 0;
+    int indexchaine = 0;
 
-    mode = gui_barcode_gen_c128_parunmodd(src[indexchaine]);
+    int mode = gui_barcode_gen_c128_parunmodd(src[indexchaine]);
     if (mode == C128_ABORC && (symbol->symbology == BARCODE_CODE128AB ||
                                (manual_set[indexchaine] == 'A' || manual_set[indexchaine] == 'B')))
     {
@@ -1162,17 +1160,20 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
     if (src == src_buf)
     {
         /* Need to re-index `manual_set` to have sames indexes as `list` blocks for `gui_barcode_gen_c128_dxsmooth()` */
-        j = 0;
-        for (i = 1; i < indexliste; i++)
+        int j = 0;
+        for (int i = 1; i < indexliste; i++)
         {
             j += list[0][i - 1];
             manual_set[i] = manual_set[j];
         }
     }
 
-    gui_barcode_gen_c128_dxsmooth(list, &indexliste, src == src_buf ? manual_set : NULL);
+    *indexliste_src = indexliste;
+    *indexchaine_src = indexchaine;
+}
 
-    /* Resolve odd length C128_LATCHC blocks */
+static void __resolve_odd_length(int list[2][C128_MAX], int indexliste)
+{
     if ((list[1][0] == C128_LATCHC) && (list[0][0] & 1))
     {
         /* Rule 2 */
@@ -1188,7 +1189,7 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
 
     if (indexliste > 1)
     {
-        for (i = 1; i < indexliste; i++)
+        for (int i = 1; i < indexliste; i++)
         {
             if ((list[1][i] == C128_LATCHC) && (list[0][i] & 1))
             {
@@ -1198,21 +1199,15 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             }
         }
     }
+}
 
-    /* Put set data into set[]. Giving NULL as source as used to resolve odd C blocks which has been done above */
-    c128_put_in_set(list, indexliste, set, NULL /*source*/);
-
-    if (symbol->debug & BARCODE_DEBUG_PRINT)
-    {
-        // printf("Data: %.*s (%d)\n", length, src, length);
-        // printf(" Set: %.*s\n", length, set);
-        // printf("FSet: %.*s\n", length, fset);
-    }
-
-    /* Now we can calculate how long the barcode is going to be - and stop it from
-       being too long */
-    last_set = set[0];
-    for (i = 0; i < length; i++)
+static void __calculate_glyph_count(char set[],
+                                    char fset[],
+                                    int length,
+                                    int *glyph_count)
+{
+    char last_set = set[0];
+    for (int i = 0; i < length; i++)
     {
         if ((set[i] == 'a') || (set[i] == 'b'))
         {
@@ -1261,16 +1256,18 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             glyph_count += 2;
         }
     }
+}
 
-    if (glyph_count > 120)
-    {
-        /* 60 * 2 */
-        strcpy(symbol->errtxt, "341: Input too long (60 symbol character maximum)");
-        gui_free(symbol);
-        return NULL;//BARCODE_ERROR_TOO_LONG;
-    }
-
-    /* So now we know what start character to use - we can get on with it! */
+static void __prepapre_encoede(struct barcode_symbol *symbol,
+                               const char set[],
+                               const char fset[],
+                               int values[],
+                               int *bar_characters_src,
+                               char *current_set_src,
+                               int *f_state)
+{
+    int bar_characters = *bar_characters_src;
+    char current_set = *current_set_src;
     if (symbol->output_options & READER_INIT)
     {
         /* Reader Initialisation mode */
@@ -1344,7 +1341,7 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             {
                 values[bar_characters++] = 101;
                 values[bar_characters++] = 101;
-                f_state = 1;
+                *f_state = 1;
             }
             break;
 
@@ -1352,7 +1349,7 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             {
                 values[bar_characters++] = 100;
                 values[bar_characters++] = 100;
-                f_state = 1;
+                *f_state = 1;
             }
             break;
 
@@ -1360,12 +1357,25 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
             break;
         }
     }
+    *bar_characters_src = bar_characters;
+    *current_set_src = current_set;
+}
 
-    /* Encode the data */
-    read = 0;
+static void __encode_data(const char set[],
+                          const char fset[],
+                          unsigned char *src,
+                          int values[],
+                          int *bar_characters_src,
+                          char *current_set_src,
+                          int *f_state_src,
+                          int length)
+{
+    char current_set = *current_set_src;
+    int bar_characters = *bar_characters_src;
+    int f_state = *f_state_src;
+    int read = 0;
     do
     {
-
         if ((read != 0) && (set[read] != current_set))
         {
             /* Latch different code set */
@@ -1511,6 +1521,98 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
         }
     }
     while (read < length);
+
+    *bar_characters_src = bar_characters;
+    *current_set_src = current_set;
+    *f_state_src = f_state;
+}
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+/* Handle Code 128, 128B and HIBC 128 */
+barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int length)
+{
+    int i, values[C128_MAX] = {0}, bar_characters = 0, total_sum;
+    //int error_number = 0;
+    int indexchaine, indexliste, f_state = 0;
+    unsigned char src_buf[C128_MAX + 1];
+    unsigned char *src = source;
+    char manual_set[C128_MAX] = {0};
+    int list[2][C128_MAX] = {{0}};
+    char set[C128_MAX] = {0}, fset[C128_MAX], current_set = ' ';
+    int glyph_count = 0; /* Codeword estimate times 2 */
+    char dest[200];
+    char *d = dest;
+
+    struct barcode_symbol *symbol = gui_malloc(sizeof(barcode_symbol_t));
+    GUI_ASSERT(symbol != NULL);
+    memset(symbol, 0, sizeof(barcode_symbol_t));//note
+
+    /* Suppresses clang-analyzer-core.UndefinedBinaryOperatorResult warning on fset which is fully set */
+    assert(length > 0);
+
+    if (length > C128_MAX)
+    {
+        /* This only blocks ridiculously long input - the actual length of the
+           resulting barcode depends on the type of data, so this is trapped later */
+        sprintf(symbol->errtxt, "340: Input too long (%d character maximum)", C128_MAX);
+        gui_free(symbol);
+        return NULL;//BARCODE_ERROR_TOO_LONG;
+    }
+
+    /* Detect special Code Set escapes for Code 128 in extra escape mode only */
+    if (!__detect_special_code(symbol, src, source, src_buf, manual_set, length))
+    {
+        return NULL;
+    }
+
+    /* Detect extended ASCII characters */
+    for (i = 0; i < length; i++)
+    {
+        fset[i] = src[i] >= 128 ? 'f' : ' ';
+    }
+
+    /* Decide when to latch to extended mode - Annex E note 3 */
+    __latch_to_extended_mode(fset, length);
+
+    /* Decide if it is worth reverting to 646 encodation for a few characters as described in 4.3.4.2 (d) */
+    __revert_to_646(fset, length);
+
+    /* Decide on mode using same system as PDF417 and rules of ISO 15417 Annex E */
+    __decide_mode(symbol, src, src_buf, manual_set, list, &indexliste, &indexchaine, length);
+    gui_barcode_gen_c128_dxsmooth(list, &indexliste, src == src_buf ? manual_set : NULL);
+
+    /* Resolve odd length C128_LATCHC blocks */
+    __resolve_odd_length(list, indexliste);
+
+    /* Put set data into set[]. Giving NULL as source as used to resolve odd C blocks which has been done above */
+    c128_put_in_set(list, indexliste, set, NULL /*source*/);
+
+    // if (symbol->debug & BARCODE_DEBUG_PRINT)
+    // {
+    //     gui_log("Data: %.*s (%d)\n", length, src, length);
+    //     gui_log(" Set: %.*s\n", length, set);
+    //     gui_log("FSet: %.*s\n", length, fset);
+    // }
+
+    /* Now we can calculate how long the barcode is going to be - and stop it from
+       being too long */
+    __calculate_glyph_count(set, fset, length, &glyph_count);
+
+    if (glyph_count > 120)
+    {
+        /* 60 * 2 */
+        strcpy(symbol->errtxt, "341: Input too long (60 symbol character maximum)");
+        gui_free(symbol);
+        return NULL;//BARCODE_ERROR_TOO_LONG;
+    }
+
+    /* So now we know what start character to use - we can get on with it! */
+    __prepapre_encoede(symbol, set, fset, values, &bar_characters, &current_set, &f_state);
+
+    /* Encode the data */
+    __encode_data(set, fset, src, values, &bar_characters, &current_set, &f_state, length);
 
     /* Destination setting and check digit calculation */
     memcpy(d, C128Table[values[0]], 6);

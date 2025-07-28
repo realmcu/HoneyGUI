@@ -923,6 +923,55 @@ testable void gui_qrcode_gen_initialize_function_modules(int version, uint8_t *q
     }
 }
 
+static void __draw_numerous_alignment_patterns(uint8_t *qrcode, const uint8_t align_pat_pos[7],
+                                               const int num_align)
+{
+    for (int i = 0; i < num_align; i++)
+    {
+        for (int j = 0; j < num_align; j++)
+        {
+            if ((i == 0 && j == 0) || (i == 0 && j == num_align - 1) || (i == num_align - 1 && j == 0))
+            {
+                continue;    // Don't draw on the three finder corners
+            }
+
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    gui_qrcode_gen_set_module_bounded(qrcode, align_pat_pos[i] + dx, align_pat_pos[j] + dy, dx == 0 &&
+                                                      dy == 0);
+                }
+            }
+        }
+    }
+}
+
+static void __draw_version_blocks(uint8_t *qrcode, const int qrsize, const int version)
+{
+    // Calculate error correction code and pack bits
+    int rem = version;  // version is uint6, in the range [7, 40]
+
+    for (int i = 0; i < 12; i++)
+    {
+        rem = (rem << 1) ^ ((rem >> 11) * 0x1F25);
+    }
+
+    long bits = (long)version << 12 | rem;  // uint18
+    //assert(bits >> 18 == 0);
+
+    // Draw two copies
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            int k = qrsize - 11 + j;
+            gui_qrcode_gen_set_module_bounded(qrcode, k, i, (bits & 1) != 0);
+            gui_qrcode_gen_set_module_bounded(qrcode, i, k, (bits & 1) != 0);
+            bits >>= 1;
+        }
+    }
+}
 // Draws light function modules and possibly some dark modules onto the given QR Code, without changing
 // non-function modules. This does not draw the format bits. This requires all function modules to be previously
 // marked dark (namely by gui_qrcode_gen_initialize_function_modules()), because this may skip redrawing dark function modules.
@@ -933,7 +982,6 @@ static void gui_qrcode_gen_draw_light_function_modules(uint8_t *qrcode, int vers
     uint8_t align_pat_pos[7];
     int num_align;
     int dist;
-    int rem;
 
     for (int i = 7; i < qrsize - 7; i += 2)
     {
@@ -964,52 +1012,12 @@ static void gui_qrcode_gen_draw_light_function_modules(uint8_t *qrcode, int vers
 
     // Draw numerous alignment patterns
     num_align = gui_qrcode_gen_get_alignment_pattern_positions(version, align_pat_pos);
-
-    for (int i = 0; i < num_align; i++)
-    {
-        for (int j = 0; j < num_align; j++)
-        {
-            if ((i == 0 && j == 0) || (i == 0 && j == num_align - 1) || (i == num_align - 1 && j == 0))
-            {
-                continue;    // Don't draw on the three finder corners
-            }
-
-            for (int dy = -1; dy <= 1; dy++)
-            {
-                for (int dx = -1; dx <= 1; dx++)
-                {
-                    gui_qrcode_gen_set_module_bounded(qrcode, align_pat_pos[i] + dx, align_pat_pos[j] + dy, dx == 0 &&
-                                                      dy == 0);
-                }
-            }
-        }
-    }
+    __draw_numerous_alignment_patterns(qrcode, align_pat_pos, num_align);
 
     // Draw version blocks
     if (version >= 7)
     {
-        // Calculate error correction code and pack bits
-        rem = version;  // version is uint6, in the range [7, 40]
-
-        for (int i = 0; i < 12; i++)
-        {
-            rem = (rem << 1) ^ ((rem >> 11) * 0x1F25);
-        }
-
-        long bits = (long)version << 12 | rem;  // uint18
-        //assert(bits >> 18 == 0);
-
-        // Draw two copies
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                int k = qrsize - 11 + j;
-                gui_qrcode_gen_set_module_bounded(qrcode, k, i, (bits & 1) != 0);
-                gui_qrcode_gen_set_module_bounded(qrcode, i, k, (bits & 1) != 0);
-                bits >>= 1;
-            }
-        }
+        __draw_version_blocks(qrcode, qrsize, version);
     }
 }
 
@@ -1233,25 +1241,13 @@ static void gui_qrcode_gen_apply_mask(const uint8_t      function_modules[],
     }
 }
 
-// Calculates and returns the penalty score based on state of the given QR Code's current modules.
-// This is used by the automatic mask choice algorithm to find the mask pattern that yields the lowest score.
-static long gui_qrcode_gen_get_penalty_score(const uint8_t *qrcode)
+static void __calculate_penalty_rows(const uint8_t *qrcode, const int qrsize, long *result)
 {
-    int qrsize = gui_qrcode_gen_get_size(qrcode);
-    long result = 0;
-    bool run_color;
-    bool color;
-    int run_x, run_y;
-    int total;
-    int dark;
-    int k;
     int run_history[7] = {0};
-
-    // Adjacent modules in row having same color, and finder-like patterns
     for (int y = 0; y < qrsize; y++)
     {
-        run_color = false;
-        run_x = 0;
+        bool run_color = false;
+        int run_x = 0;
 
         memset(run_history, 0, sizeof(run_history));
 
@@ -1287,11 +1283,15 @@ static long gui_qrcode_gen_get_penalty_score(const uint8_t *qrcode)
         result += gui_qrcode_gen_finder_penalty_terminate_and_count(run_color, run_x, run_history,
                                                                     qrsize) * PENALTY_N3;
     }
-    // Adjacent modules in column having same color, and finder-like patterns
+}
+
+static void __calculate_penalty_cols(const uint8_t *qrcode, const int qrsize, long *result)
+{
+    int run_history[7] = {0};
     for (int x = 0; x < qrsize; x++)
     {
-        run_color = false;
-        run_y = 0;
+        bool run_color = false;
+        int run_y = 0;
 
         memset(run_history, 0, sizeof(run_history));
 
@@ -1327,6 +1327,22 @@ static long gui_qrcode_gen_get_penalty_score(const uint8_t *qrcode)
         result += gui_qrcode_gen_finder_penalty_terminate_and_count(run_color, run_y, run_history,
                                                                     qrsize) * PENALTY_N3;
     }
+}
+
+// Calculates and returns the penalty score based on state of the given QR Code's current modules.
+// This is used by the automatic mask choice algorithm to find the mask pattern that yields the lowest score.
+static long gui_qrcode_gen_get_penalty_score(const uint8_t *qrcode)
+{
+    int qrsize = gui_qrcode_gen_get_size(qrcode);
+    long result = 0;
+    bool color;
+    int total;
+    int dark;
+    int k;
+
+    // Adjacent modules in row&column having same color, and finder-like patterns
+    __calculate_penalty_rows(qrcode, qrsize, &result);
+    __calculate_penalty_cols(qrcode, qrsize, &result);
 
     // 2*2 blocks of modules having same color
     for (int y = 0; y < qrsize - 1; y++)

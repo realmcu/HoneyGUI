@@ -23,67 +23,31 @@ Use the function :cpp:any:`gui_qbcode_config` to set the size and border of qbco
 
 Qrcode Encode Notes
 ~~~~~~~~~~~~~~~~~~~~
-The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15. You can modify the version according to the document: https://www.qrcode.com/zh/about/version.html
+The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15. You can modify the version according to the `document <https://www.qrcode.com/zh/about/version.html>`_ .
 
 Example
 --------
-Qrcode
-~~~~~~~
 
-.. code-block:: c
-
-   #include "gui_qbcode.h"
-   #define QRCODE_WIDTH     320
-   #define QRCODE_HEIGHT    320
-   #define DISPLAY_TYPE     QRCODE_DISPLAY_IMAGE //QRCODE_DISPLAY_SECTION
-   #define ENCODED_TYPE     QRCODE_ENCODE_TEXT   // QRCODE_ENCODE_BINARY
-
-   char* str = "123455678901234567890123455678901234567890123455678901234567890123455678901234567890123455678901234567890";
-
-   gui_qbcode_t * qrcode = gui_qbcode_create(parent,
-                                             "qrcode",
-                                             454/2 - QRCODE_WIDTH/2,
-                                             454/2 - QRCODE_HEIGHT/2,
-                                             QRCODE_WIDTH,
-                                             QRCODE_HEIGHT,
-                                             DISPLAY_TYPE,
-                                             ENCODED_TYPE);
-
-   gui_qbcode_config(qrcode, str, strlen(str), 3);
+.. literalinclude:: ../../../example/widget/qbcode/example_gui_qbcode.c
+   :language: c
+   :start-after: /* gui qbcode widget example start*/
+   :end-before: /* gui qbcode widget example end*/
 
 
-.. figure:: https://foruda.gitee.com/images/1735625417520694131/22cd8acc_13408154.jpeg
-   :align: center
-   :width: 300px
+.. raw:: html
 
-
-Barcode
-~~~~~~~~
-
-.. code-block:: c
-
-   #define BARCODE_WIDTH     (143 * 3)
-   #define BARCODE_HEIGHT    143
-   #define DISPLAY_TYPE     BARCODE_DISPLAY_IMAGE //BARCODE_DISPLAY_SECTION
-   #define ENCODED_TYPE     BARCODE_ENCODE_TEXT
-
-   char* str = "1234567890";
-
-   gui_qbcode_t * barcode = gui_qbcode_create(parent,
-                                             "qrcode",
-                                             454/2 - BARCODE_WIDTH/2,
-                                             454/2 - BARCODE_HEIGHT/2,
-                                             BARCODE_WIDTH,
-                                             BARCODE_HEIGHT,
-                                             DISPLAY_TYPE,
-                                             ENCODED_TYPE);
-
-   gui_qbcode_config(qrcode, str, strlen(str) + 1, 10);
-
-
-.. figure:: https://foruda.gitee.com/images/1735625432077099404/d426bd63_13408154.jpeg
-   :align: center
-   :width: 300px
+   <br>
+   <div style="display: flex; justify-content: space-between;">
+      <div style="width: 40%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1753435459893270800/0b7b33c4_10737458.png" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">Qrcode</p>
+      </div>
+      <div style="width: 40%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">Barcode</p>
+      </div>
+   </div>
+   <br>
 
 
 

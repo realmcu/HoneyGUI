@@ -57,6 +57,7 @@ Widgets
     List <gui_list>
     Canvas <gui_canvas>
     Menu Cellular <gui_menu_cellular>
+    Qbcode <gui_qbcode>
 
 .. Window <gui_window>
 .. Simple Img <gui_simple_img>
@@ -80,7 +81,6 @@ Widgets
 .. Watch Gradient Spot <gui_watch_gradient_spot>
 .. Watchface Gradient <gui_watchface_gradient>
 .. Return <gui_return>
-.. Qbcode <gui_qbcode>
 .. Multi Level <gui_multi_level>
 .. LiteGFX <gui_widget_litegfx>
 .. 2.5D Soccer <gui_soccer>

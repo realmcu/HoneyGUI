@@ -23,69 +23,31 @@
 
 二维码编码注释
 ~~~~~~~~~~~~~~
-二维码的编码数据默认情况下可以超过最大字节数，这时可以将最大版本修改为15，版本的修改可以参照以下文档：https://www.qrcode.com/zh/about/version.html
+二维码的编码数据默认情况下可以超过最大字节数，这时可以将最大版本修改为15，版本的修改可以参照 `文档 <https://www.qrcode.com/zh/about/version.html>`_ 。
 
 示例
 -----
-二维码
-~~~~~~~
 
-.. code-block:: c
-
-   #include "gui_qbcode.h"
-   #define QRCODE_WIDTH     320
-   #define QRCODE_HEIGHT    320
-   #define DISPLAY_TYPE     QRCODE_DISPLAY_IMAGE //QRCODE_DISPLAY_SECTION
-   #define ENCODED_TYPE     QRCODE_ENCODE_TEXT   // QRCODE_ENCODE_BINARY
-
-   char* str = "123455678901234567890123455678901234567890123455678901234567890123455678901234567890123455678901234567890";
-
-   gui_qbcode_t * qrcode = gui_qbcode_create(parent,
-                                             "qrcode",
-                                             454/2 - QRCODE_WIDTH/2,
-                                             454/2 - QRCODE_HEIGHT/2,
-                                             QRCODE_WIDTH,
-                                             QRCODE_HEIGHT,
-                                             DISPLAY_TYPE,
-                                             ENCODED_TYPE);
-
-   gui_qbcode_config(qrcode, str, strlen(str), 3);
+.. literalinclude:: ../../../example/widget/qbcode/example_gui_qbcode.c
+   :language: c
+   :start-after: /* gui qbcode widget example start*/
+   :end-before: /* gui qbcode widget example end*/
 
 
-.. figure:: https://foruda.gitee.com/images/1735625417520694131/22cd8acc_13408154.jpeg
-   :align: center
-   :width: 300px
+.. raw:: html
 
-
-
-条形码
-~~~~~~
-
-.. code-block:: c
-
-   #define BARCODE_WIDTH     (143 * 3)
-   #define BARCODE_HEIGHT    143
-   #define DISPLAY_TYPE     BARCODE_DISPLAY_IMAGE //BARCODE_DISPLAY_SECTION
-   #define ENCODED_TYPE     BARCODE_ENCODE_TEXT
-
-   char* str = "1234567890";
-
-   gui_qbcode_t * barcode = gui_qbcode_create(parent,
-                                             "qrcode",
-                                             454/2 - BARCODE_WIDTH/2,
-                                             454/2 - BARCODE_HEIGHT/2,
-                                             BARCODE_WIDTH,
-                                             BARCODE_HEIGHT,
-                                             DISPLAY_TYPE,
-                                             ENCODED_TYPE);
-
-   gui_qbcode_config(qrcode, str, strlen(str) + 1, 10);
-
-
-
-.. figure:: https://foruda.gitee.com/images/1735625432077099404/d426bd63_13408154.jpeg
-   :align: center
-   :width: 300px
+   <br>
+   <div style="display: flex; justify-content: space-between;">
+      <div style="width: 40%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1753435459893270800/0b7b33c4_10737458.png" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">二维码</p>
+      </div>
+      <div style="width: 40%; text-align: center;">
+         <img src="https://foruda.gitee.com/images/1753435473847626594/f6192e1b_10737458.png" style="width: 100%;">
+         <p style="margin: 5px 0 0 0; text-align: center;">条形码</p>
+      </div>
+   </div>
+   <br>
 
 
 API

@@ -251,28 +251,8 @@ void gui_win_set_scope(gui_win_t *win, bool enable)
 }
 void gui_win_move(gui_win_t *win, int x, int y)
 {
-    //GUI_WIDGET_TYPE_TRY_EXCEPT(win, WINDOW)
-    {
-        {
-            if (!(win != ((void *)0)))
-            {
-                gui_assert_handler("win != NULL", __FUNCTION__, 389);
-            };
-            if (!((((gui_obj_t *)win)->magic == 0x0b)))
-            {
-                gui_assert_handler("(GUI_BASE(win)->magic == GUI_MAGIC_NUMBER)", __FUNCTION__, 389);
-            }
-        }
-        if ((((gui_obj_t *)win)->type != WINDOW))
-        {
-            extern void gui_log(const char *format, ...);
-            gui_log("GUI_WIDGET_TYPE_TRY_EXCEPT: type is %d ;", ((gui_obj_t *)win)->type);
-        }
-        {
-            if (!((((gui_obj_t *)win)->type == WINDOW)))
-            { gui_assert_handler("(GUI_BASE(win)->type == WINDOW)", __FUNCTION__, 389); }
-        }
-    }
+    GUI_ASSERT(win != NULL);
+    GUI_ASSERT(GUI_BASE(win)->type == WINDOW);
     GUI_BASE(win)->x = x;
     GUI_BASE(win)->y = y;
 }
