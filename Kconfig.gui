@@ -49,6 +49,18 @@ menuconfig REALTEK_HONEYGUI
         config REALTEK_HONEYGUI_HW_ACC
         bool "Enable HoneyGUI HW ACC"
         default n
+
+        config REALTEK_H264_DECODER
+            bool "Enable REALTEK_H264_DECODER support"
+            default n
+
+        if REALTEK_H264_DECODER
+
+            config REALTEK_H264BSD
+                bool "Enable REALTEK H264BSD"
+
+        endif
+
         
         if REALTEK_HONEYGUI_HW_ACC
             choice
