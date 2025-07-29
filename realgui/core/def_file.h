@@ -38,7 +38,8 @@ typedef struct gui_rgb_data_head
     unsigned char align : 1;
     unsigned char resize: 2; //0-no resize;1-50%(x&y);2-70%;3-80%
     unsigned char compress: 1;
-    unsigned char rsvd : 3;
+    unsigned char jpeg: 1;
+    unsigned char rsvd : 2;
     char type;
     short w;
     short h;
@@ -94,6 +95,31 @@ typedef struct gui_img_file
     } data;
 
 } gui_img_file_t;
+
+typedef struct gui_jpeg_file_head
+{
+    gui_rgb_data_head_t img_header;
+    uint32_t size;
+    uint32_t dummy; // for alignment issue
+    uint8_t jpeg[1024];
+
+} gui_jpeg_file_head_t;
+
+typedef struct gui_gif_file_head
+{
+    gui_rgb_data_head_t img_header;
+    uint32_t size;
+    uint32_t dummy; // for alignment issue
+    uint8_t gif[1024];
+
+} gui_gif_file_head_t;
+typedef struct gui_palette_file
+{
+    gui_rgb_data_head_t img_header;
+    uint8_t *palette_index;
+    uint8_t *palette_data;
+
+} gui_palette_file_t;
 
 #pragma pack(1)
 
