@@ -353,9 +353,8 @@ static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, floa
 }
 
 static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *butterfly,
-                           float butterfly_rz)
+                           float butterfly_rz, uint32_t current_time)
 {
-    uint32_t current_time = gui_ms_get();
     for (int i = 0; i < MAX_PARTICLES; i++)
     {
         // Find an available particle slot
@@ -396,38 +395,39 @@ static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *but
 
             break;
         }
-        // Update all particles
-        else
+    }
+    // Update all particles
+    for (int i = 0; i < MAX_PARTICLES; i++)
+    {
+        if (particles[i].img == NULL) { break; }
+        float gravity = 0.0f;
+        // Calculate age (0.0-1.0)
+        float age = (current_time - particles[i].spawn_time) / 800.0f; // 1 second lifespan
+        particles[i].life = 1.0f - age;
+
+        if (particles[i].life <= 0.0f)
         {
-            float gravity = 0.0f;
-            // Calculate age (0.0-1.0)
-            float age = (current_time - particles[i].spawn_time) / 800.0f; // 1 second lifespan
-            particles[i].life = 1.0f - age;
-
-            if (particles[i].life <= 0.0f)
-            {
-                // Particle is dead, hide it
-                gui_obj_hidden(GUI_BASE(particles[i].img), true);
-                continue;
-            }
-
-            particles[i].direction_y += gravity;
-
-            // Apply air resistance - slow down horizontal movement
-            particles[i].direction_x *= 0.98f;
-
-            particles[i].x += particles[i].direction_x;
-            particles[i].y += particles[i].direction_y;
-
-            gui_obj_hidden(GUI_BASE(particles[i].img), false);
-
-            // Scale down as particle ages
-            float current_scale = particles[i].scale * (0.5f + 0.5f * particles[i].life);
-            gui_img_scale(particles[i].img, current_scale, current_scale);
-
-            // Update position
-            gui_img_translate(particles[i].img, particles[i].x, particles[i].y);
+            // Particle is dead, hide it
+            gui_obj_hidden(GUI_BASE(particles[i].img), true);
+            continue;
         }
+
+        particles[i].direction_y += gravity;
+
+        // Apply air resistance - slow down horizontal movement
+        particles[i].direction_x *= 0.98f;
+
+        particles[i].x += particles[i].direction_x;
+        particles[i].y += particles[i].direction_y;
+
+        gui_obj_hidden(GUI_BASE(particles[i].img), false);
+
+        // Scale down as particle ages
+        float current_scale = particles[i].scale * (0.5f + 0.5f * particles[i].life);
+        gui_img_scale(particles[i].img, current_scale, current_scale);
+
+        // Update position
+        gui_img_translate(particles[i].img, particles[i].x, particles[i].y);
     }
 }
 
@@ -436,15 +436,15 @@ static void update_particles(void *p)
     gui_obj_t *obj = (gui_obj_t *)p;
     uint32_t current_time = gui_ms_get();
     // Only spawn new particles every 50ms (adjust as needed)
-    if (current_time - last_particle_spawn < 50)
+    if (current_time - last_particle_spawn < 100)
     {
         return;
     }
     last_particle_spawn = current_time;
     // Spawn new particles when butterfly is moving
-    spawn_particle(obj, particles0, butterfly0, butterfly0_rz);
-    spawn_particle(obj, particles1, butterfly1, butterfly1_rz);
-    spawn_particle(obj, particles2, butterfly2, butterfly2_rz);
+    spawn_particle(obj, particles0, butterfly0, butterfly0_rz, current_time);
+    spawn_particle(obj, particles1, butterfly1, butterfly1_rz, current_time);
+    spawn_particle(obj, particles2, butterfly2, butterfly2_rz, current_time);
 }
 
 static void init_butterfly_bg(gui_win_t *parent, Particle **particles)

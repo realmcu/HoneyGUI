@@ -454,7 +454,14 @@ char *read_file(const char *file_path)
     char *content = (char *)gui_malloc(length + 1);
     if (content)
     {
-        fread(content, 1, length, file);
+        size_t ret_size = fread(content, 1, length, file);
+        if (ret_size < length)
+        {
+            if (!feof(file))
+            {
+                perror("fread error");
+            }
+        }
         content[length] = '\0';
     }
     fclose(file);
