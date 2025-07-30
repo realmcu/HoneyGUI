@@ -449,6 +449,20 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
     }
 }
 
+static void gui_font_update_space(gui_text_t *text)
+{
+    if (text == NULL || text->data == NULL || text->font_len == 0)
+    {
+        return;
+    }
+    mem_char_t *chr = text->data;
+    for (uint16_t i = 0; i < text->font_len; i++)
+    {
+        int8_t space = chr[i].char_w + text->extra_letter_spacing;
+        chr[i].char_w = space > 0 ? space : 0;
+    }
+}
+
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
     if (text == NULL || text->data == NULL)
@@ -458,6 +472,11 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
     int rect_w = rect->x2 - rect->x1 + 1;
     int rect_h = rect->y2 - rect->y1 + 1;
+    if (text->need_extra_letter_spacing)
+    {
+        gui_font_update_space(text);
+        text->need_extra_letter_spacing = false;
+    }
     switch (text->mode)
     {
     case LEFT:
@@ -1727,7 +1746,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 uint16_t char_w = 0;
                 if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
                 {
-                    char_w = font->font_size / 2;
+                    char_w = font->font_size / 4;
                 }
                 else if (unicode_buffer[i] == 0x0A)
                 {

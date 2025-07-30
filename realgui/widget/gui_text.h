@@ -119,10 +119,12 @@ typedef struct gui_text
     uint8_t font_height;
     uint8_t emoji_size;
     uint8_t checksum;
+    int8_t extra_letter_spacing;
 
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
     bool use_img_blit     : 1;
+    bool need_extra_letter_spacing : 1;
     uint8_t inputable     : 1;
     uint8_t ispasswd      : 1;
     uint8_t wordwrap      : 1;
@@ -280,6 +282,13 @@ void gui_text_size_set(gui_text_t *this_widget, uint8_t height, uint8_t width);
  * @param font_mode Font source mode.
  */
 void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
+
+/**
+ * @brief Set extra letter spacing.
+ * @param this_widget The text widget pointer.
+ * @param extra_letter_spacing Extra letter spacing.
+ */
+void gui_text_set_extra_letter_spacing(gui_text_t *this_widget, int8_t extra_letter_spacing);
 
 /**
  * @brief Set font type.
