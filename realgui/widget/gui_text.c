@@ -521,7 +521,6 @@ void gui_text_ctor(gui_text_t *this,
     this->layout_refresh = false;
     this->rendermode = 2;
     this->use_img_blit = true;
-    this->need_extra_letter_spacing = false;
 }
 
 /*============================================================================*
@@ -618,6 +617,7 @@ void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
     this->base.x = x;
     this->base.y = y;
     this->layout_refresh = true;
+
 }
 
 void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
@@ -636,7 +636,7 @@ void gui_text_set_extra_letter_spacing(gui_text_t *text, int8_t extra_letter_spa
 {
     text->extra_letter_spacing = extra_letter_spacing;
     text->layout_refresh = true;
-    text->need_extra_letter_spacing = true;
+    text->content_refresh = true;
 }
 
 void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_mode)

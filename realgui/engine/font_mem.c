@@ -41,6 +41,16 @@ uint8_t get_fontlib_by_name(uint8_t *font_file)
     return 0;
 }
 
+static void charw_space_helper(uint8_t *char_w, int8_t extra_letter_spacing)
+{
+    if (*char_w == 0)
+    {
+        return;
+    }
+    int8_t space = *char_w + extra_letter_spacing;
+    *char_w = space > 0 ? space : 0;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD_BMP *font;
@@ -230,6 +240,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].dot_addr = dot_buf;
                     }
                 }
+                charw_space_helper(&chr[chr_i].char_w, text->extra_letter_spacing);
                 all_char_w += chr[chr_i].char_w;
                 chr_i ++;
             }
@@ -322,6 +333,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].dot_addr = dot_buf;
                     }
                 }
+                charw_space_helper(&chr[chr_i].char_w, text->extra_letter_spacing);
                 all_char_w += chr[chr_i].char_w;
                 all_char_h = all_char_h + chr[chr_i].char_h + 2;
                 chr_i ++;
@@ -405,6 +417,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                             }
                         }
                     }
+                    charw_space_helper(&chr[chr_i].char_w, text->extra_letter_spacing);
                     all_char_w += chr[chr_i].char_w;
                     chr_i ++;
                 }
@@ -449,20 +462,6 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
     }
 }
 
-static void gui_font_update_space(gui_text_t *text)
-{
-    if (text == NULL || text->data == NULL || text->font_len == 0)
-    {
-        return;
-    }
-    mem_char_t *chr = text->data;
-    for (uint16_t i = 0; i < text->font_len; i++)
-    {
-        int8_t space = chr[i].char_w + text->extra_letter_spacing;
-        chr[i].char_w = space > 0 ? space : 0;
-    }
-}
-
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
     if (text == NULL || text->data == NULL)
@@ -472,11 +471,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
     int rect_w = rect->x2 - rect->x1 + 1;
     int rect_h = rect->y2 - rect->y1 + 1;
-    if (text->need_extra_letter_spacing)
-    {
-        gui_font_update_space(text);
-        text->need_extra_letter_spacing = false;
-    }
+
     switch (text->mode)
     {
     case LEFT:
@@ -941,15 +936,16 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
     int font_x = chr->x;
     int font_y = chr->y + chr->char_y;
     int font_w = chr->w;
+    int char_w = _UI_MIN(chr->char_w, chr->w);
     int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), dc->section.x1);
     int x_end;
     if (rect->xboundright != 0)
     {
-        x_end = _UI_MIN(_UI_MIN(font_x + chr->char_w, dc->section.x2 + 1), rect->xboundright);
+        x_end = _UI_MIN(_UI_MIN(font_x + char_w, dc->section.x2 + 1), rect->xboundright);
     }
     else
     {
-        x_end = _UI_MIN(font_x + chr->char_w, dc->section.x2 + 1);
+        x_end = _UI_MIN(font_x + char_w, dc->section.x2 + 1);
     }
     int y_start = _UI_MAX(dc->section.y1, _UI_MAX(font_y, rect->yboundtop));
     int y_end;
@@ -981,7 +977,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             int left_offset = 0, right_offset = 0, byte = 0;
             uint16_t color_back;
             uint8_t alpha_2bit;
-            if (font_x + chr->char_w > x_end)
+            if (font_x + char_w > x_end)
             {
                 while (font_x + ppb * byte < x_end)
                 {
@@ -1379,7 +1375,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             int left_offset = 0, right_offset = 0, byte = 0;
             uint32_t x_start_right = x_start;
             //gui_log("%s dots_off %d", __FUNCTION__, dots_off);
-            if (font_x + chr->char_w > x_end)
+            if (font_x + char_w > x_end)
             {
                 while (font_x + ppb * byte < x_end)
                 {

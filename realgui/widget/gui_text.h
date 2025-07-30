@@ -124,7 +124,6 @@ typedef struct gui_text
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
     bool use_img_blit     : 1;
-    bool need_extra_letter_spacing : 1;
     uint8_t inputable     : 1;
     uint8_t ispasswd      : 1;
     uint8_t wordwrap      : 1;
