@@ -193,7 +193,7 @@ for l, p in en_cn_build:
     html_out_path = os.path.join(doc_path, html_out, cn_html_out)
     exclude_patterns_ins.append('en')
   print("exclude_patterns_ins:",exclude_patterns_ins)
-  ep = ",".join(exclude_patterns_ins)
+  ep = ",".join(f'"{p}"' for p in exclude_patterns_ins)
   if os.path.exists(html_out_path):
     shutil.rmtree(html_out_path)
   os.makedirs(html_out_path)

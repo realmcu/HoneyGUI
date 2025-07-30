@@ -206,9 +206,9 @@ breathe_show_include = False
 
 # rst merge release note config
 rst_merge_config = {
-    "enabled": False,
-    "primary_file": '',
-    "source_path": ''
+    "enabled": True,
+    "primary_file": 'release_notes/index.rst',
+    "source_path": 'release_notes/'
 }
 
 # en/cn url check config
