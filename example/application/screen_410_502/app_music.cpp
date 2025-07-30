@@ -12,17 +12,45 @@
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
   */
-#if 0
+
+/*============================================================================*
+*                        Header Files
+*============================================================================*/
 #include "gui_view.h"
 #include "gui_list.h"
 #include "app_main_watch.h"
-#define CURRENT_VIEW_NAME "music_view"
+#include "guidef.h"
+#include "root_image/ui_resource.h"
+#include "gui_canvas_rect.h"
+#include "gui_img.h"
+#include "gui_win.h"
+#include "tp_algo.h"
+#include "gui_text.h"
+#include <memory>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <cstring>
+#include <iomanip> // for std::setw and std::setfill
 
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+#define CURRENT_VIEW_NAME "music_view"
+#define SCREEN_W (int16_t)gui_get_screen_width()
+#define SCREEN_H (int16_t)gui_get_screen_height()
+#define COLOR_ARTISTNAME  gui_rgb(230, 230, 230)
+#define COLOR_LIST gui_rgb(100, 100, 100)
+#define COLOR_THEME gui_color_css("#892FE0")
+
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C" {
     static gui_view_t *current_view = NULL;
     const static gui_view_descriptor_t *menu_view = NULL;
-    const static gui_view_descriptor_t *heartrate_view = NULL;
-    void app_music_ui_design(gui_view_t *view);
+    static void app_music_ui_design(gui_view_t *view);
+    static void clear_music(gui_view_t *view);
 
     static gui_view_descriptor_t const descriptor =
     {
@@ -30,6 +58,7 @@ extern "C" {
         .name = (const char *)CURRENT_VIEW_NAME,
         .pView = &current_view,
         .on_switch_in = app_music_ui_design,
+        .on_switch_out = clear_music,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -44,17 +73,16 @@ extern "C" {
     {
         /* you can get other view descriptor point here */
         menu_view = gui_view_descriptor_get("menu_view");
-        heartrate_view = gui_view_descriptor_get("heartrate_view");
         gui_log("File: %s, Function: %s\n", __FILE__, __func__);
         return 0;
     }
     static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 }
 
+/*============================================================================*
+ *                             C++ Namespace
+ *============================================================================*/
 extern "C" {
-
-
-#include "guidef.h"
     /**
      * @brief Play the specified music file.
      *
@@ -118,7 +146,7 @@ extern "C" {
     gui_error_t gui_music_load(const char *music_file);
     gui_error_t gui_music_play(const char *music_file)
     {
-#if _WIN32
+#if __WIN32
         extern int win32_play_music(const char *music_file);
         win32_play_music(music_file);
 #endif
@@ -126,7 +154,7 @@ extern "C" {
     }
     gui_error_t gui_music_stop()
     {
-#if _WIN32
+#if __WIN32
         extern int win32_stop_music(void);
         win32_stop_music();
 #endif
@@ -134,7 +162,7 @@ extern "C" {
     }
     bool gui_music_completion_status()
     {
-#if _WIN32
+#if __WIN32
         extern bool win32_music_completion_status(void);
         return win32_music_completion_status();
 #endif
@@ -143,7 +171,7 @@ extern "C" {
     float gui_music_length()
     {
         float length = 0;
-#if _WIN32
+#if __WIN32
         extern double win32_music_get_music_length();
         length = (float)win32_music_get_music_length();
 #endif
@@ -152,7 +180,7 @@ extern "C" {
     float gui_music_current_time()
     {
         float time = 0;
-#if _WIN32
+#if __WIN32
         extern  double win32_music_get_music_current_time();
         time = (float)win32_music_get_music_current_time();
 #endif
@@ -161,7 +189,7 @@ extern "C" {
     gui_error_t gui_music_load(const char *music_file)
     {
         gui_error_t e = GUI_ERROR;
-#if _WIN32
+#if __WIN32
         extern int win32_load_music(const char *music_file);
         int rst = win32_load_music(music_file);
         if (rst == 0)
@@ -172,308 +200,175 @@ extern "C" {
         return e;
     }
 }
-#include <memory>
-#include "root_image/ui_resource.h"
-#include "gui_canvas_rect.h"
-#include "gui_img.h"
-#include "gui_win.h"
-#include "tp_algo.h"
-#include "gui_text.h"
-#include <vector>
-#include <string>
-#include <sstream>
-#include <cstring>
-#include <iomanip> // for std::setw and std::setfill
 
-namespace std
-{
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-}
+/*============================================================================*
+ *                             C++ Namespace
+ *============================================================================*/
 namespace gui_music_app
 {
-constexpr int SWITCH_W = 28;
-constexpr int SWITCH_H = 28;
-constexpr int BUTTON_Y = 400;
-constexpr int COVER_Y = 10;
+/*============================================================================*
+*                              Variables
+*============================================================================*/
+constexpr int SWITCH_W = 30;
+constexpr int SWITCH_H = 30;
+constexpr int BUTTON_Y = 440;
+constexpr int COVER_Y = 50;
 constexpr int COVER_W = 300;
 constexpr int MINIMIZE_WINDOW_HEIGHT = 60;
 constexpr int MINIMIZE_COVER_HEIGHT = 50;
 constexpr int LIST_COVER_H = 120;
-constexpr int LIST_SONG_H = 65;
-std::string mp3_file =
-    "realgui\\example\\screen_454_454\\root_image\\SDCARD\\music\\Free_Test_Data_5MB_MP3.mp3";
-gui_text_t *current_time;
-gui_canvas_rect_t *current_time_bar;
-int page_list_item_space;
-int lyrics_array_length;
+constexpr int LIST_SONG_H = 64;
+constexpr char MP3_FILE[] =
+    "C:\\wokspace\\GitLoadHouse\\HoneyComb\\sdk\\src\\sample\\gui\\example\\application\\screen_410_502\\root_image\\source\\music\\Free_Test_Data_5MB_MP3.mp3";
+gui_text_t *current_time = nullptr;
+gui_canvas_rect_t *current_time_bar = nullptr;
+gui_list_t *lrc_list = nullptr;
+gui_img_t *play_button = nullptr;
+int page_list_item_space = 0;
+int lyrics_array_length = 0;
+char **all_lyrics_array = nullptr;
 
-bool startsWith(const std::string &str, const std::string &prefix)
+/*============================================================================*
+*                            Functions
+*============================================================================*/
+bool starts_with(const std::string &str, const std::string &prefix)
 {
     return str.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), str.begin());
 }
-#if 0
-class MusicPlayer
+class MUSIC_PLAYER
 {
 public:
-    MusicPlayer(gui_obj_t *parent)
-        : SCREEN_W(static_cast<int>(gui_get_screen_width())),
-          SCREEN_H(static_cast<int>(gui_get_screen_height())),
-          SWITCH_X(SCREEN_W / 2 - SWITCH_W / 2),
+    MUSIC_PLAYER(gui_obj_t *parent)
+        : SWITCH_X(SCREEN_W / 2 - SWITCH_W / 2),
           COVER_X(SCREEN_W / 2 - COVER_W / 2),
-          playing_flag(),
-          item_text_array()
+          playing_flag()
     {
-        setupUI(parent);
+        setup_ui(parent);
     }
-    void win_cover_animation(void *p)
+
+    void win_cover_transform(void)
     {
-        touch_info_t *touch = tp_get_info();
-        gui_win_t *win = GUI_TYPE(gui_win_t, p);
-        gui_obj_t *obj = GUI_BASE(p);
-        //std::cout << "win_cover_gesture:" << win_cover_gesture << std::endl;
-        if (!win_cover_gesture)
-        {
-            //std::cout << "1:" << std::endl;
-            if (touch->pressed && touch->y > SCREEN_H - MINIMIZE_WINDOW_HEIGHT)
-            {
-                win_cover_gesture = true; //std::cout << "2:" << std::endl;
-            }
-            else
-            {
-                //std::cout << "3:" << std::endl;
-                return;
-            }
-
-        }
-        if (!win_lrc_gesture)
-        {
-            //std::cout << "1:" << std::endl;
-            if (touch->pressed && touch->y < MINIMIZE_WINDOW_HEIGHT)
-            {
-                win_lrc_gesture = true; //std::cout << "2:" << std::endl;
-            }
-            else
-            {
-                //std::cout << "3:" << std::endl;
-                return;
-            }
-
-        }
-
-        if (touch->pressed)
-        {
-            win_cover_y_history = win_cover_y;
-        }
-
-        if (touch->pressing)
-        {
-            win_cover_y = touch->deltaY + win_cover_y_history;
-        }
-
-
-
         if (win_cover_y >= 0)
         {
-            if (touch->released)
+            GUI_WIDGET_TRY_EXCEPT(img_cover)
+            float progress = ((float)win_cover_y / (float)(SCREEN_H - MINIMIZE_WINDOW_HEIGHT));
+
+            int cover_w = lerp(COVER_W, MINIMIZE_COVER_HEIGHT, progress);
+            int cover_x = calculate_center(WINDOW_WIGTH, cover_w);
+            int cover_y = lerp(COVER_Y, MINIMIZE_COVER_TAREGT_Y, progress);
+            float scale = (float)cover_w / (float)COVER_W;
+            gui_set_location(GUI_BASE(img_cover), cover_x, cover_y);
+            gui_img_scale(img_cover, scale, scale);
+            float progress3 = progress * 3;
+            if (progress3 > 1)
             {
-                inertia = true;
-                release_win_cover_y = win_cover_y;
-                offset = 0;
-                speed = 30;
-                if (win_cover_y <= threshold)
-                {
-                    speed = -speed;
-                }
+                progress3 = 1;
             }
+            int sw_x = MINIMIZE_SWITCH_TARGT_X;
+            int sw_y = lerp(BUTTON_Y, MINIMIZE_SWITCH_TARGT_Y, progress3);
+            if (sw_y < cover_y + calculate_center(cover_w, SWITCH_W))
             {
-
-
-                if (inertia)
-                {
-                    gui_inertial(&speed, 0, &offset);
-                    win_cover_y = offset + release_win_cover_y;
-                    if (win_cover_y >= SCREEN_H - MINIMIZE_WINDOW_HEIGHT)
-                    {
-                        win_cover_y = SCREEN_H - MINIMIZE_WINDOW_HEIGHT;
-                        inertia = false;
-                        threshold = SCREEN_H * 2 / 3;
-                        win_cover_gesture = false;
-                    }
-                    else if (win_cover_y <= 0)
-                    {
-                        win_cover_y = 0;
-                        inertia = false;
-                        threshold = SCREEN_H / 3;
-                    }
-
-                    // gui_log("gui_inertial:%d\n", offset);
-
-                }
-
-                if (win_cover_y > SCREEN_H - MINIMIZE_WINDOW_HEIGHT)
-                {
-                    win_cover_y = SCREEN_H - MINIMIZE_WINDOW_HEIGHT;
-                }
-                obj->y = win_cover_y;
-                GUI_WIDGET_TRY_EXCEPT(img_cover)
-                float progress = ((float)win_cover_y / (float)(SCREEN_H - MINIMIZE_WINDOW_HEIGHT));
-
-                int cover_w = lerp(COVER_W, MINIMIZE_COVER_HEIGHT, progress);
-                int cover_x = calculate_center(WINDOW_WIGTH, cover_w);
-                int cover_y = lerp(COVER_Y, MINIMIZE_COVER_TAREGT_Y, progress);
-                float scale = (float)cover_w / (float)COVER_W;
-                gui_set_location(GUI_BASE(img_cover), cover_x, cover_y);
-                gui_img_scale(img_cover, scale, scale);
-                float progress3 = progress * 3;
-                if (progress3 > 1)
-                {
-                    progress3 = 1;
-                }
-                int sw_x = MINIMIZE_SWITCH_TARGT_X;
-                int sw_y = lerp(BUTTON_Y, MINIMIZE_SWITCH_TARGT_Y, progress3);
-                if (sw_y < cover_y + calculate_center(cover_w, SWITCH_W))
-                {
-                    sw_y = cover_y + calculate_center(cover_w, SWITCH_W);
-                }
-                gui_set_location(GUI_BASE(sw), sw_x, sw_y);
-                // gui_log("y:%d\n", win_cover_y);
-
+                sw_y = cover_y + calculate_center(cover_w, SWITCH_W);
             }
-
+            gui_set_location(GUI_BASE(play_button), sw_x, sw_y);
+            // gui_log("y:%d\n", win_cover_y);
         }
         if (win_cover_y <= 0)
         {
-            if (touch->released)
+            GUI_WIDGET_TRY_EXCEPT(img_cover)
+            float progress = (-(float)win_cover_y / (float)(SCREEN_H - MINIMIZE_WINDOW_HEIGHT));
+
+            int cover_w = lerp(COVER_W, MINIMIZE_COVER_HEIGHT, progress);
+            int cover_x = calculate_center(WINDOW_WIGTH, cover_w);
+            int cover_y = lerp(COVER_Y, MINIMIZE_COVER_TAREGT_Y_LRC, progress);
+            float scale = (float)cover_w / (float)COVER_W;
+            gui_set_location(GUI_BASE(img_cover), cover_x, cover_y);
+            gui_img_scale(img_cover, scale, scale);
+            float progress3 = progress * 3;
+            if (progress3 > 1)
             {
-                inertia = true;
-                release_win_cover_y = win_cover_y;
-                offset = 0;
-                speed = 30;
-                if (!(-win_cover_y <= threshold))
-                {
-                    speed = -speed;
-                }
+                progress3 = 1;
             }
+            int sw_x = MINIMIZE_SWITCH_TARGT_X;
+            int sw_y = lerp(BUTTON_Y, MINIMIZE_SWITCH_TARGT_Y_LRC, progress3);
+            if (sw_y < cover_y + calculate_center(cover_w, SWITCH_W))
             {
-
-
-                if (inertia)
-                {
-                    gui_inertial(&speed, 0, &offset);
-                    win_cover_y = offset + release_win_cover_y;
-                    if (-win_cover_y >= SCREEN_H - MINIMIZE_WINDOW_HEIGHT)
-                    {
-                        win_cover_y = -(SCREEN_H - MINIMIZE_WINDOW_HEIGHT);
-                        inertia = false;
-                        threshold = SCREEN_H * 2 / 3;
-                        win_lrc_gesture = false;
-                    }
-                    else if (win_cover_y >= 0)
-                    {
-                        win_cover_y = 0;
-                        inertia = false;
-                        threshold = SCREEN_H / 3;
-                    }
-
-                    // gui_log("gui_inertial:%d\n", offset);
-
-                }
-
-                if (-win_cover_y > SCREEN_H - MINIMIZE_WINDOW_HEIGHT)
-                {
-                    win_cover_y = -(SCREEN_H - MINIMIZE_WINDOW_HEIGHT);
-                }
-                obj->y = win_cover_y;
-                GUI_WIDGET_TRY_EXCEPT(img_cover)
-                float progress = (-(float)win_cover_y / (float)(SCREEN_H - MINIMIZE_WINDOW_HEIGHT));
-
-                int cover_w = lerp(COVER_W, MINIMIZE_COVER_HEIGHT, progress);
-                int cover_x = calculate_center(WINDOW_WIGTH, cover_w);
-                int cover_y = lerp(COVER_Y, MINIMIZE_COVER_TAREGT_Y_LRC, progress);
-                float scale = (float)cover_w / (float)COVER_W;
-                gui_set_location(GUI_BASE(img_cover), cover_x, cover_y);
-                gui_img_scale(img_cover, scale, scale);
-                float progress3 = progress * 3;
-                if (progress3 > 1)
-                {
-                    progress3 = 1;
-                }
-                int sw_x = MINIMIZE_SWITCH_TARGT_X;
-                int sw_y = lerp(BUTTON_Y, MINIMIZE_SWITCH_TARGT_Y_LRC, progress3);
-                if (sw_y < cover_y + calculate_center(cover_w, SWITCH_W))
-                {
-                    sw_y = cover_y + calculate_center(cover_w, SWITCH_W);
-                }
-                gui_set_location(GUI_BASE(sw), sw_x, sw_y);
-                // gui_log("y:%d,%d,%d\n", win_cover_y, sw_x, sw_y);
-                if (win_cover_y == 0)
-                {
-                    gui_obj_hidden(GUI_BASE(lrc_win), 1);
-                }
-                else
-                {
-                    gui_obj_hidden(GUI_BASE(lrc_win), 0);
-                }
-
+                sw_y = cover_y + calculate_center(cover_w, SWITCH_W);
             }
-
+            gui_set_location(GUI_BASE(play_button), sw_x, sw_y);
+            gui_set_location(GUI_BASE(skip_back), GUI_BASE(skip_back)->x, sw_y);
+            gui_set_location(GUI_BASE(skip_fwd), GUI_BASE(skip_fwd)->x, sw_y);
+            // gui_log("y:%d,%d,%d\n", win_cover_y, sw_x, sw_y);
         }
-
-    }
-    void win_list_animation(void *p)
-    {
-        // std::cout << win_list_gesture_page_y << ";" << GUI_BASE(list_page)->y << std::endl;
-        GUI_BASE(list_page)->gesture = win_cover_gesture;
-
-
-        if (GUI_BASE(list_page)->y > win_list_gesture_page_y && !win_list_gesture)
-        {
-            win_list_gesture = true;
-        }
-
-        if (!win_list_gesture)
-        {
-            return;
-        }
-
         if (win_cover_y > 0)
         {
-            gui_obj_hidden(GUI_BASE(list_win), false);
-            win_list_cover_y = GUI_BASE(list_page)->y;
-            if (win_list_cover_y > 0)
-            {
-                win_list_cover_y = 0;
-            }
-            else if (win_list_cover_y < -LIST_COVER_H)
-            {
-                win_list_cover_y = -LIST_COVER_H;
-                win_list_gesture = false;
-                win_list_gesture_page_y = GUI_BASE(list_page)->y;
-            }
-
-            gui_set_location(GUI_BASE(list_cover_win), GUI_BASE(list_cover_win)->x, win_list_cover_y);
+            gui_obj_hidden(GUI_BASE(music_list_win), false);
+            gui_obj_hidden(GUI_BASE(lrc_win), true);
+        }
+        else if (win_cover_y < 0)
+        {
+            gui_obj_hidden(GUI_BASE(music_list_win), true);
+            gui_obj_hidden(GUI_BASE(lrc_win), false);
         }
         else
         {
-            gui_obj_hidden(GUI_BASE(list_win), true);
+            gui_obj_hidden(GUI_BASE(music_list_win), false);
+            gui_obj_hidden(GUI_BASE(lrc_win), false);
         }
-        // gui_log("GUI_BASE(list_cover_win)->not_show:%d,%d\n", win_cover_y, GUI_BASE(list_win)->not_show);
-
-
-
     }
-    void win_cover_head_cb(void *obj, gui_event_t e, void *param)
+
+    void win_cover_animation(void *p)
     {
-        //gui_win_start_animation(win_cover);
+        touch_info_t *tp = tp_get_info();
+        gui_obj_t *obj = GUI_BASE(p);
+        int16_t screen_h = SCREEN_H;
+        if (tp->pressing != 0 || win_cover_y == MINIMIZE_WINDOW_HEIGHT - screen_h
+            || win_cover_y == screen_h - MINIMIZE_WINDOW_HEIGHT || win_cover_y == 0) { return; }
+        gui_win_compensate((gui_win_t *)obj, 0, 0);
+
+        if (win_cover_y < MINIMIZE_WINDOW_HEIGHT - screen_h + speed)
+        {
+            win_cover_y = MINIMIZE_WINDOW_HEIGHT - screen_h;
+        }
+        else if (win_cover_y < -screen_h / 2)
+        {
+            win_cover_y -= speed;
+        }
+        else if (win_cover_y < -speed)
+        {
+            win_cover_y += speed;
+        }
+        else if (win_cover_y < speed)
+        {
+            win_cover_y = 0;
+        }
+        else if (win_cover_y < screen_h / 2)
+        {
+            win_cover_y -= speed;
+        }
+        else if (win_cover_y < screen_h - MINIMIZE_WINDOW_HEIGHT - speed)
+        {
+            win_cover_y += speed;
+        }
+        else
+        {
+            win_cover_y = screen_h - MINIMIZE_WINDOW_HEIGHT;
+        }
+        win_cover_y_history = win_cover_y;
+        obj->y = win_cover_y;
+        win_cover_transform();
     }
 
+    void music_win_cover_scroll_vertical_cb(void *o)
+    {
+        gui_obj_t *obj = GUI_TYPE(gui_obj_t, o);
+        touch_info_t *tp = tp_get_info();
+        win_cover_y = tp->deltaY + win_cover_y_history;
+        obj->y = win_cover_y;
+        gui_win_compensate((gui_win_t *)obj, 0, win_cover_y);
+        win_cover_transform();
+    }
 private:
-    const int SCREEN_W;
-    const int SCREEN_H;
     const int SWITCH_X;
     const int COVER_X;
     const int WINDOW_WIGTH = SCREEN_W;
@@ -487,42 +382,25 @@ private:
                                                          MINIMIZE_COVER_HEIGHT) / 2 + MINIMIZE_COVER_HEIGHT);
     const int MINIMIZE_SWITCH_TARGT_Y_LRC = MINIMIZE_COVER_TAREGT_Y_LRC + calculate_center(
                                                 MINIMIZE_COVER_HEIGHT, SWITCH_H);
-    gui_switch_t *sw;
-    gui_button_t *skipBack;
-    gui_button_t *skipFwd;
+    gui_img_t *skip_back;
+    gui_img_t *skip_fwd;
     gui_img_t *img_cover;
     gui_win_t *win_cover;
-    std::string artistName;
-    std::string songName;
-    std::string albumName;
-    gui_color_t color = APP_COLOR_WHITE;
-    gui_color_t color_artistName = gui_rgb(230, 230, 230);
-    const gui_color_t color_list = gui_rgb(100, 100, 100);
-    const gui_color_t color_theme = gui_color_css("#892FE0");
-    int progressbar_width = 50;
+    std::string artist_name;
+    std::string music_name;
+    std::string album_name;
+    std::string music_time;
     int win_cover_y = 0;
-    int win_list_cover_y = 0;
     int win_cover_y_history = 0;
-    int win_list_cover_y_history = 0;
-    bool inertia = false;
     int release_win_cover_y = 0;;
     int speed = 30;
     int offset = 0;
-    int threshold = SCREEN_H / 3;
-    gui_win_t *list_win;
-    gui_win_t *list_cover_win;
+    gui_win_t *music_list_win;
     gui_win_t *lrc_win;
-    bool win_cover_gesture = true;
-    bool win_lrc_gesture = true;
-    bool win_list_gesture = true;
-    int win_list_gesture_page_y = 0;
     bool playing_flag;
-    gui_page_t *list_page;
-    int value;
-
-    const char *item_text_array;
+    int value = 0;
 // Example LRC content
-    std::string lrcContent = R"(
+    std::string LRC_CONTENT = R"(
 [ti:Sample Song]
 [ar:Sample Artist]
 [al:Sample Album]
@@ -590,13 +468,6 @@ private:
 [03:56.00]60xxxxABCDEFG
     )";
 
-
-    static void switchOnCallback(void *param)
-    {
-        //gui_music_play("realgui\\example\\screen_454_454\\root_image\\root\\music_player\\sample_3s.mp3");
-        gui_music_play(mp3_file.c_str());
-
-    }
     template<typename T>
     T lerp(T start, T end, float progress) const
     {
@@ -609,11 +480,7 @@ private:
         static_assert(std::is_arithmetic<T>::value, "T must be an arithmetic type");
         return (container_width - item_width) / 2;
     }
-    static void switchOffCallback(void *param)
-    {
-        gui_music_stop();
-    }
-    static void onCompletion(void *p, void *this_widget, gui_animate_t *animate)
+    static void on_playing(void *p)
     {
         static char current_time_array[6];
         memset(current_time_array, 0, 6);
@@ -626,155 +493,201 @@ private:
         //gui_log("current_time_array:%s\n", current_time_array);
         gui_text_content_set(current_time, current_time_array, 5);
         gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
-        // pl->app_y = -(time / duration * (page_list_item_space * lyrics_array_length -
-        //                                  gui_get_screen_height() / 2));
-        // pl->app_take_over = true;
+        int16_t offset = -(time / duration * (page_list_item_space * lyrics_array_length -
+                                              SCREEN_H / 2));
+        gui_list_set_offset(lrc_list, offset);
         if (gui_music_completion_status())
         {
-            GUI_API(gui_switch_t).turn_off_no_event(static_cast<gui_switch_t *>(this_widget));
+            gui_img_t *img = GUI_TYPE(gui_img_t, p);
+            img->data = PLAY_BIN;
         }
     }
-    static void song_win_press(void *obj, gui_event_t e, void *param)
+    static void music_clicked_timer_cb(void *p)
+    {
+        gui_obj_hidden(GUI_BASE(p), true);
+    }
+    static void music_clicked(void *obj, gui_event_t e, void *param)
     {
         gui_obj_hidden(GUI_BASE(param), false);
+        gui_obj_create_timer(GUI_BASE(param), 20, false, music_clicked_timer_cb);
+        gui_obj_start_timer(GUI_BASE(param));
+
+        if (play_button->data == PLAY_BIN) //play this music
+        {
+            gui_music_play(MP3_FILE);
+            play_button->data = PAUSE_BIN;
+            gui_img_set_mode(play_button, IMG_SRC_OVER_MODE);
+            gui_obj_start_timer(GUI_BASE(play_button));
+        }
     }
-    static void song_win_release(void *obj, gui_event_t e, void *param)
-    {
-        gui_obj_hidden(GUI_BASE(param), true);
-    }
-    static void song_win_click(void *obj, gui_event_t e, void *param)
-    {
-        //gui_obj_hidden(param, false);
-    }
-    gui_text_t *displayText(gui_obj_t *parent,  const char *text_string, int x, int y,
-                            gui_color_t &color) const
+    gui_text_t *dispaly_text(gui_obj_t *parent, const char *text_string, int x, int y,
+                             gui_color_t color)
     {
         // This function is to create text GUI element
         const char *text = text_string;
-        int font_size = 16;
+        int font_size = 24;
         gui_text_t *t = gui_text_create(parent, 0,  x, y,
                                         gui_get_screen_width(),
                                         font_size);
         gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
-        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        void *addr1 = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MULTI_LEFT);
         return t;
     }
+    static void music_list_design(gui_obj_t *obj, void *p)
+    {
+        gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
+        uint8_t index = note->index;
+        void *img_file[] =
+        {
+            GROUP1000000744_BIN,
+            GROUP1000000745_BIN,
+            GROUP1000000746_BIN,
+            GROUP1000000747_BIN,
+            GROUP1000000748_BIN,
+        };
+        gui_canvas_rect_t *rect = gui_canvas_rect_create(GUI_BASE(note), 0, 0, 0, SCREEN_W, LIST_SONG_H,
+                                                         COLOR_THEME);
+        gui_obj_hidden(GUI_BASE(rect), true);
+        gui_img_t *img = gui_img_create_from_mem(obj, 0, img_file[index % 5], 30, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, music_clicked, GUI_EVENT_TOUCH_CLICKED, rect);
+    }
+    static void lrc_list_design(gui_obj_t *obj, void *p)
+    {
+        gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
+        uint8_t index = note->index;
+        char **all_lyrics_array = (char **)p;
+        const char *text = all_lyrics_array[index];
+        gui_text_t *t = gui_text_create(obj, 0, 0, 35, 0, 0);
+        gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_RED, strlen(text), 24);
+        gui_text_type_set(t, (void *)SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MID_CENTER);
+    }
 
+    static void play_button_cb(void *obj, gui_event_t e, void *param)
+    {
+        gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+        if (img->data == PLAY_BIN)
+        {
+            gui_music_play(MP3_FILE);
+            img->data = PAUSE_BIN;
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_obj_start_timer(GUI_BASE(obj));
+        }
+        else
+        {
+            gui_music_stop();
+            img->data = PLAY_BIN;
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_obj_stop_timer(GUI_BASE(obj));
+        }
+    }
+    static void skip_back_timer_cb(void *p)
+    {
+        gui_img_t *img = GUI_TYPE(gui_img_t, p);
+        gui_img_set_image_data(img, (const uint8_t *)SKIPBACK_BIN);
+    }
+    static void skip_back_button_cb(void *obj, gui_event_t e, void *param)
+    {
+        gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+        gui_img_set_image_data(img, (const uint8_t *)SKIPBACKHL_BIN);
+        gui_obj_create_timer(GUI_BASE(img), 10, false, skip_back_timer_cb);
+        gui_obj_start_timer(GUI_BASE(img));
+    }
+
+    static void skip_fwd_timer_cb(void *p)
+    {
+        gui_img_t *img = GUI_TYPE(gui_img_t, p);
+        gui_img_set_image_data(img, (const uint8_t *)SKIPFWD_BIN);
+    }
+    static void skip_fwd_button_cb(void *obj, gui_event_t e, void *param)
+    {
+        gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+        gui_img_set_image_data(img, (const uint8_t *)SKIPFWDHL_BIN);
+        gui_obj_create_timer(GUI_BASE(img), 10, false, skip_fwd_timer_cb);
+        gui_obj_start_timer(GUI_BASE(img));
+    }
+    static void win_clicked_cb(void *obj, gui_event_t e, void *param)
+    {
+        // stop music list clicked event
+    }
+
+    static void win_cover_scroll_vertical_cb(void *p);
     static void cover_animation(void *p);
-    static void list_animation(void *p);
-    static void win_cover_head_callback(void *obj, gui_event_t e, void *param);
-    void setupUI(gui_obj_t *parent)
+    void setup_ui(gui_obj_t *parent)
     {
         /*LIST WINDOW*/
-        list_win = gui_win_create(parent, "win list", 0, 0, SCREEN_W, SCREEN_H);
+        music_list_win = gui_win_create(parent, "win list", 0, 0, SCREEN_W, SCREEN_H);
+        gui_canvas_rect_create(GUI_BASE(music_list_win), 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_LIST);
+        gui_list_t *music_list = gui_list_create(music_list_win, "music_list", 0, 0, SCREEN_W, SCREEN_H,
+                                                 LIST_SONG_H, 0, VERTICAL, music_list_design, NULL, false);
+        gui_list_set_note_num(music_list, 20);
+        gui_list_set_style(music_list, LIST_CLASSIC);
+        gui_obj_hidden(GUI_BASE(music_list_win), true);
 
-        gui_canvas_rect_create(GUI_BASE(list_win), 0, 0, 0, SCREEN_W, SCREEN_H, color_list);
-        list_page = gui_page_create(list_win, "list_page", 0, 0, SCREEN_W, 0);
-        std::vector<void *> img_file_vec = {GROUP1000000745_BIN, GROUP1000000744_BIN, GROUP1000000746_BIN, GROUP1000000747_BIN, GROUP1000000748_BIN, GROUP1000000749_BIN};
-        int list_count = 20;
-        for (size_t i = 0; i < list_count; i++)
-        {
-            gui_win_t *win = gui_win_create(list_page, 0, 0, 65 * i + LIST_COVER_H + 50, SCREEN_W, LIST_SONG_H);
-            gui_canvas_rect_t *rect = gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0, SCREEN_W, LIST_SONG_H,
-                                                             color_theme);
-            gui_obj_hidden(GUI_BASE(rect), true);
-            gui_img_t *img = gui_img_create_from_mem(GUI_BASE(win), 0, img_file_vec[i % img_file_vec.size()],
-                                                     calculate_center(SCREEN_W, 342), 0, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-            gui_win_press(win, song_win_press, rect);
-            gui_win_release(win, song_win_release, rect);
-            gui_win_click(win, song_win_click, rect);
-        }
-        gui_win_create(list_page, 0, 0, LIST_SONG_H * list_count + LIST_COVER_H + 50, SCREEN_W,
-                       MINIMIZE_WINDOW_HEIGHT);
-        list_cover_win = gui_win_create(list_win, "win list cover", 0, 0, SCREEN_W, SCREEN_H);
-        gui_obj_hidden(GUI_BASE(list_win), true);
-        {
-            gui_img_t *img = gui_img_create_from_mem(list_cover_win, "list", LISTCOVER_BIN, 0, 0, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-            gui_img_scale(img, 0.89f, 1.0f);
-        }
-        displayText(GUI_BASE(list_cover_win), "Playlist", calculate_center(SCREEN_W, 80), LIST_COVER_H,
-                    color);
         /*LYRIC WINDOW*/
         lrc_win = gui_win_create(parent, "LYRIC", 0, 0, SCREEN_W, SCREEN_H);
         gui_canvas_rect_create(GUI_BASE(lrc_win), 0, 0, 0, SCREEN_W, SCREEN_H, gui_color_css("GhostWhite"));
         int arrayLength = 0;
-        char **allLyricsArray = getLyricAtTime(arrayLength, lrcContent);
+        all_lyrics_array = get_lyric_at_time(arrayLength,
+                                             LRC_CONTENT); // If use other overload functions, notice mem management
         lyrics_array_length = arrayLength;
         page_list_item_space = 40;
-
-        gui_list_t *list = gui_list_create(lrc_win, "list", 0, 0, SCREEN_W, SCREEN_H, SCREEN_H * 2,
-                                           0, VERTICAL);
-        gui_list_note_t *tab = gui_list_add_note(list, false);
-        for (size_t i = 0; i < lyrics_array_length; i++)
-        {
-            const char *text = pagelist_new->item_text_array[i];
-            gui_text_t *t = gui_text_create(tab, 0, 0, page_list_item_space * i, 0, 0);
-            gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_RED, strlen(text), 16);
-            gui_text_type_set(t, (void *)ARIALBD_SIZE16_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
-            gui_text_mode_set(t, MID_CENTER);
-        }
-
-
-
+        // for (int i = 0; all_lyrics_array[i] != nullptr; ++i)
+        // {
+        //     gui_log("%s\n", all_lyrics_array[i]);
+        // }
+        lrc_list = gui_list_create(lrc_win, "lrc_list", 0, 0, 0, 0, 30, 5, VERTICAL, lrc_list_design,
+                                   all_lyrics_array, false);
+        gui_list_set_note_num(lrc_list, lyrics_array_length);
+        gui_list_set_style(lrc_list, LIST_CLASSIC);
+        gui_obj_hidden(GUI_BASE(lrc_win), true);
         /*COVER WINDOW*/
         win_cover = gui_win_create(parent, "win cover", 0, 0, SCREEN_W, SCREEN_H);
+        gui_obj_add_event_cb(GUI_BASE(win_cover), (gui_event_cb_t)win_cover_scroll_vertical_cb,
+                             GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL);
+        gui_obj_create_timer(GUI_BASE(win_cover), 10, true, cover_animation);
+        gui_obj_add_event_cb(GUI_BASE(win_cover), (gui_event_cb_t)win_clicked_cb, GUI_EVENT_TOUCH_CLICKED,
+                             NULL);
 
         parent = GUI_BASE(win_cover);
         gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H, APP_COLOR_SILVER);
-        img_cover = (gui_img_create_from_mem(parent, "cover", RECTANGLE86_BIN, COVER_X, COVER_Y, 0, 0));
-        gui_img_set_mode(img_cover, IMG_SRC_OVER_MODE);
-        sw = (gui_switch_create(parent, SWITCH_X,
-                                BUTTON_Y, SWITCH_W, SWITCH_H, PLAY_BIN, PAUSE_BIN));
+        img_cover = gui_img_create_from_mem(parent, 0, RECTANGLE86_BIN, COVER_X, COVER_Y, 0, 0);
+        play_button = gui_img_create_from_mem(parent, 0, PLAY_BIN, MINIMIZE_SWITCH_TARGT_X, BUTTON_Y, 0, 0);
+        gui_obj_add_event_cb(play_button, play_button_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
+        gui_obj_create_timer(GUI_BASE(play_button), 50, true, on_playing);
+        gui_obj_stop_timer(GUI_BASE(play_button));
+        skip_back = gui_img_create_from_mem(parent, 0, SKIPBACK_BIN, SWITCH_X - SCREEN_W / 3, BUTTON_Y, 0,
+                                            0);
+        gui_obj_add_event_cb(skip_back, skip_back_button_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        skip_fwd = gui_img_create_from_mem(parent, 0, SKIPFWD_BIN, SWITCH_X + SCREEN_W / 3, BUTTON_Y, 0, 0);
+        gui_obj_add_event_cb(skip_fwd, skip_fwd_button_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
 
-        gui_switch_set_turn_on_cb(sw, switchOnCallback);
-        gui_switch_set_turn_off_cb(sw, switchOffCallback);
-        gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
-
-
-        // skipBack = (gui_button_create(parent, SWITCH_X - SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPBACK_BIN,
-        //                               SKIPBACKHL_BIN, nullptr,
-        //                               BUTTON_BG_ICON, 0));
-        // skipFwd = (gui_button_create(parent, SWITCH_X + SCREEN_W / 4, BUTTON_Y, 28, 28, SKIPFWD_BIN,
-        //                              SKIPFWDHL_BIN, nullptr,
-        //                              BUTTON_BG_ICON, 0));
-        gui_win_t *win_cover_head = gui_win_create(parent, "win_cover_head", 0, 0, SCREEN_W,
-                                                   MINIMIZE_WINDOW_HEIGHT);
-        gui_win_press(win_cover_head, win_cover_head_callback, win_cover_head);
-        // Display artist, song, and album name
-        gui_music_load(mp3_file.c_str());
+        // Display artist, music, and album name
+        gui_music_load(MP3_FILE);
         float length = gui_music_length();
-        artistName = "FreeTestData.com";
-        albumName = "Sample Audio";
-        songName = "Free_Test_Data_5MB_MP3";
-        std::string length_string = formatTime(length);
-        displayText(parent, songName.c_str(), COVER_X, COVER_Y + COVER_W, color);
-        displayText(parent, artistName.c_str(), COVER_X, COVER_Y + COVER_W + 18, color_artistName);
-        displayText(parent, albumName.c_str(), COVER_X + 180, COVER_Y + COVER_W + 18, color_artistName);
+        artist_name = "FreeTestData.com";
+        album_name = "Sample Audio";
+        music_name = "Free_Test_Data_5MB_MP3";
+        music_time = formatTime(length);
+        dispaly_text(parent, music_name.c_str(), COVER_X, COVER_Y + COVER_W, APP_COLOR_WHITE);
+        dispaly_text(parent, artist_name.c_str(), COVER_X, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME);
+        dispaly_text(parent, album_name.c_str(), COVER_X + 180, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME);
         gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, COVER_W, 3,
-                               color_artistName);
+                               COLOR_ARTISTNAME);
         current_time_bar = gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16,
-                                                  progressbar_width, 3,
-                                                  color);
-        current_time = displayText(parent, "0:00", COVER_X, COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
-        displayText(parent, gui_strdup(length_string.c_str()), COVER_X + COVER_W - 30,
-                    COVER_Y + COVER_W + 18 + 15 + 16 + 4, color);
-        gui_img_scale(img_cover, 0.5, 0.5);
-
-        gui_obj_create_timer(GUI_BASE(win_cover), 20, true, cover_animation);
-        gui_obj_start_timer(GUI_BASE(win_cover));
-        gui_obj_create_timer(GUI_BASE(list_win), 20, true, list_animation);
-        gui_obj_start_timer(GUI_BASE(list_win));
-
-        GUI_API(gui_switch_t).animate(sw, 1000, -1, (void *)onCompletion, nullptr);
+                                                  1, 3, APP_COLOR_WHITE);
+        current_time = dispaly_text(parent, "0:00", COVER_X, COVER_Y + COVER_W + 18 + 15 + 16 + 4,
+                                    APP_COLOR_WHITE);
+        dispaly_text(parent, music_time.c_str(), COVER_X + COVER_W - 30,
+                     COVER_Y + COVER_W + 18 + 15 + 16 + 4, APP_COLOR_WHITE);
     }
 
 
 // Helper function to convert time string to seconds
-    int convertTimeToSeconds(const std::string &timePart)
+    int convert_time_to_seconds(const std::string &timePart)
     {
         int minutes = 0, seconds = 0;
         char dummy = ':';
@@ -793,7 +706,7 @@ private:
     }
 
 // Function to get metadata
-    std::string getLyricAtTime(const std::string &content, const std::string &type)
+    std::string get_lyric_at_time(const std::string &content, const std::string &type)
     {
         std::istringstream stream(content);
         std::string line;
@@ -801,9 +714,9 @@ private:
 
         while (std::getline(stream, line))
         {
-            if (startsWith(line, prefix)) //if (line.find(prefix) == 0)
+            if (starts_with(line, prefix)) //if (line.find(prefix) == 0)
             {
-                size_t endBracket = startsWith(line, "]");//line.find(']');
+                size_t endBracket = starts_with(line, "]");//line.find(']');
                 if (endBracket != std::string::npos)
                 {
                     return line.substr(prefix.size(), endBracket - prefix.size());
@@ -815,7 +728,7 @@ private:
     }
 
 // Function to get lyrics at a specific time
-    std::string getLyricAtTime(const std::string &content, int currentTime)
+    std::string get_lyric_at_time(const std::string &content, int currentTime)
     {
         std::istringstream stream(content);
         std::string line;
@@ -834,7 +747,7 @@ private:
             if (timePart.find(':') == std::string::npos) { continue; }
 
             std::string textPart = line.substr(endBracket + 1);
-            int lineTime = convertTimeToSeconds(timePart);
+            int lineTime = convert_time_to_seconds(timePart);
 
             if (lineTime > currentTime)
             {
@@ -848,7 +761,7 @@ private:
     }
 
 // Function to get lyrics between a time range
-    std::vector<std::string> getLyricAtTime(const std::string &content, int startTime, int endTime)
+    std::vector<std::string> get_lyric_at_time(const std::string &content, int startTime, int endTime)
     {
         std::istringstream stream(content);
         std::string line;
@@ -867,7 +780,7 @@ private:
             if (timePart.find(':') == std::string::npos) { continue; }
 
             std::string textPart = line.substr(endBracket + 1);
-            int lineTime = convertTimeToSeconds(timePart);
+            int lineTime = convert_time_to_seconds(timePart);
 
             if (lineTime >= startTime && lineTime <= endTime)
             {
@@ -895,7 +808,7 @@ private:
     }
 
 // New function to get lyrics around a specific time and at a range size
-    char **getLyricAtTime(const std::string &content, int currentTime, int rangeSize, bool null)
+    char **get_lyric_at_time(const std::string &content, int currentTime, int rangeSize, bool null)
     {
         std::istringstream stream(content);
         std::string line;
@@ -927,7 +840,7 @@ private:
             }
 
             std::string textPart = line.substr(endBracket + 1);
-            int lineTime = convertTimeToSeconds(timePart);
+            int lineTime = convert_time_to_seconds(timePart);
 
             allLines.push_back(textPart);
             if (currentTimeIndex == -1 && lineTime >= currentTime)
@@ -977,7 +890,7 @@ private:
         return line;
     }
 // New function to convert the entire lyrics to C-style array
-    char **getLyricAtTime(int &arrayLength, const std::string &content)
+    char **get_lyric_at_time(int &arrayLength, const std::string &content)
     {
         std::istringstream stream(content);
         std::string line;
@@ -991,7 +904,6 @@ private:
             // Strip the time prefix if present
             lines.push_back(stripTimePrefix(line));
         }
-
         // Set the array length
         arrayLength = lines.size();
 
@@ -1005,7 +917,6 @@ private:
         }
 
         cArray[lines.size()] = nullptr;  // NULL terminator for the array
-
         return cArray;
     }
     static std::string formatTime(double seconds)
@@ -1018,27 +929,52 @@ private:
         return oss.str();
     }
 };
-std::unique_ptr<MusicPlayer> player = nullptr;
-void MusicPlayer::cover_animation(void *p)
+
+MUSIC_PLAYER *player = nullptr;
+void MUSIC_PLAYER::cover_animation(void *p)
 {
     player->win_cover_animation(p);
 }
-void MusicPlayer::list_animation(void *p)
+
+void MUSIC_PLAYER::win_cover_scroll_vertical_cb(void *o)
 {
-    player->win_list_animation(p);
-}
-void MusicPlayer::win_cover_head_callback(void *obj, gui_event_t e, void *param)
-{
-    player->win_cover_head_cb(obj, e, param);
-}
-void appMusicUIDesign(gui_obj_t *parent)
-{
-    player = std::make_unique<MusicPlayer>(parent);
-}
-#endif
+    player->music_win_cover_scroll_vertical_cb(o);
 }
 
+void music_design(gui_obj_t *parent)
+{
+    player = new MUSIC_PLAYER(parent);
+}
 
+void free_music_app(void)
+{
+    if (player)
+    {
+        delete player;
+        player = nullptr;
+    }
+    uint16_t i = 0;
+    while (1)
+    {
+        if (all_lyrics_array[i])
+        {
+            delete[] all_lyrics_array[i];
+            all_lyrics_array[i] = nullptr;
+            i++;
+        }
+        else
+        {
+            delete all_lyrics_array;
+            all_lyrics_array = nullptr;
+            break;
+        }
+    }
+}
+}
+
+/*============================================================================*
+ *                                  C Interface
+ *============================================================================*/
 extern "C"
 {
     static void return_cb()
@@ -1047,30 +983,20 @@ extern "C"
                                SWITCH_IN_ANIMATION_FADE);
     }
 
-    // static void return_timer_cb(void *obj)
-    // {
-    //     touch_info_t *tp = tp_get_info();
-    //     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-    // }
+    static void clear_music(gui_view_t *view)
+    {
+        gui_music_app::free_music_app();
+    }
 
-    void app_music_ui_design(gui_view_t *view)
+    static void app_music_ui_design(gui_view_t *view)
     {
         gui_obj_t *parent = GUI_BASE(view);
         gui_log("app_music_ui_design\n");
-        // gui_music_app::appMusicUIDesign(parent);
+        gui_music_app::music_design(parent);
 
-        const char *name = GUI_BASE(gui_view_get_current())->name;
-        if (strcmp(name, "heartrate_view") == 0)
-        {
-            gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
-                                     SWITCH_IN_FROM_LEFT_USE_CUBE,
-                                     GUI_EVENT_TOUCH_MOVE_RIGHT);
-        }
-        else
-        {
-            gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
-            // gui_obj_create_timer(GUI_BASE(win), 10, true, return_timer_cb);
-        }
+
+        gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                                 SWITCH_IN_ANIMATION_FADE,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
     }
 }
-#endif

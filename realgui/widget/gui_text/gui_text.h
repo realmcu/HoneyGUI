@@ -87,7 +87,6 @@ typedef struct gui_text
 {
     gui_obj_t base;
     gui_color_t color;
-    gui_animate_t *animate;
     gui_img_t *scale_img;
     uint8_t *emoji_path;
     float min_scale;

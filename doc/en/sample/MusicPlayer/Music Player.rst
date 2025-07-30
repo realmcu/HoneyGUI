@@ -13,7 +13,7 @@ Music Player
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1732871582054056041/61fa89a6_10088396.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1753858248785874706/6b965e7d_10737458.gif" width= "400" /></div>
    <br>
 
 
@@ -23,11 +23,11 @@ Implementation
 
 Code
 ~~~~
-Function ``void app_music_ui_design(gui_obj_t *obj)`` is located in file ``realgui/example/screen_454_454/gui_menu/app_music.cpp``.
+Function ``static void app_music_ui_design(gui_view_t *view)`` is located in file ``example/application/screen_410_502/app_music.cpp``.
 
 Widgets Tree Design
 ~~~~~~~~~~~~~~~~~~~
-.. figure:: https://foruda.gitee.com/images/1737429147962828506/953bab9f_13408154.png
+.. figure:: https://foruda.gitee.com/images/1753858294236683166/2d6d6fc0_10737458.jpeg
    :width: 600px
    :align: center
    :name: Widgets Tree Design

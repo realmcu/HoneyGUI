@@ -166,12 +166,6 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
     }
 }
 
-static void gui_scroll_text_update_att(gui_obj_t *obj)
-{
-    gui_scroll_text_t *_this = (void *)obj;
-    animate_frame_update(_this->base.animate, obj);
-}
-
 static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 {
     text->scope = 0;
@@ -245,7 +239,6 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     //         _this->scale_img->base.matrix->m[0][0],_this->scale_img->base.matrix->m[1][1]);
 #endif
     _this->color.color.rgba.a = (_this->color.color.rgba.a * _this->base.parent->opacity_value) / 255;
-    gui_scroll_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
 
     _this->offset_x = point.p[0];

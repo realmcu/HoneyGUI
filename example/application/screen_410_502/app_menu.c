@@ -72,6 +72,7 @@ const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *box2d_ring_view = NULL;
 const static gui_view_descriptor_t *fruit_ninja_view = NULL;
 const static gui_view_descriptor_t *heartrate_view = NULL;
+const static gui_view_descriptor_t *music_view = NULL;
 const static gui_view_descriptor_t *soccer_view = NULL;
 const static gui_view_descriptor_t *weather_view = NULL;
 const static gui_view_descriptor_t *flower_view = NULL;
@@ -147,6 +148,7 @@ static const char *text_array[] =
     "Labubu Digital",
     "Flower Clock ",
     "Rainbow Analog",
+    "Music",
     "",
 };
 
@@ -169,6 +171,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     box2d_ring_view = gui_view_descriptor_get("box2d_ring_view");
     fruit_ninja_view = gui_view_descriptor_get("fruit_ninja_view");
     heartrate_view = gui_view_descriptor_get("heartrate_view");
+    music_view = gui_view_descriptor_get("music_view");
     soccer_view = gui_view_descriptor_get("soccer_view");
     weather_view = gui_view_descriptor_get("weather_view");
     flower_view = gui_view_descriptor_get("flower_view");
@@ -215,6 +218,12 @@ static void switch_app_fruit_ninja(void *obj, gui_event_t e, void *param)
 static void switch_app_heart_rate(void *obj, gui_event_t e, void *param)
 {
     gui_view_switch_direct(current_view, heartrate_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
+static void switch_app_music(void *obj, gui_event_t e, void *param)
+{
+    gui_view_switch_direct(current_view, music_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
@@ -497,6 +506,7 @@ static void app_menu_design(gui_view_t *view)
             switch_app_labubu_digital,
             switch_app_flower_clock,
             switch_app_rainbow_analog,
+            switch_app_music,
 
             switch_menu_style_cb, //must last
         };
@@ -532,6 +542,7 @@ static void app_menu_design(gui_view_t *view)
             LABUBU_DIGITAL_ICON_BIN,
             FLOWER_CLOCK_ICON_BIN,
             RAINBOW_ANALOG_ICON_BIN,
+            MUSIC_ICON_BIN,
 
             CELLULAR_MENU_CARD_BIN, //must last
         };
@@ -591,6 +602,7 @@ static void app_menu_design(gui_view_t *view)
             LABUBU_DIGITAL_ICON_BIN,
             FLOWER_CLOCK_ICON_BIN,
             RAINBOW_ANALOG_ICON_BIN,
+            MUSIC_ICON_BIN,
 
             UI_CLOCK_HEARTRATE_ICON_BIN,
             UI_CLOCK_FRUIT_NINJA_ICON_BIN,
@@ -621,6 +633,7 @@ static void app_menu_design(gui_view_t *view)
             LABUBU_DIGITAL_ICON_BIN,
             FLOWER_CLOCK_ICON_BIN,
             RAINBOW_ANALOG_ICON_BIN,
+            MUSIC_ICON_BIN,
         };
         int array_size = sizeof(cellilar_img_data_array) / sizeof(cellilar_img_data_array[0]);
         int16_t icon_size = 100;
@@ -640,7 +653,7 @@ static void app_menu_design(gui_view_t *view)
                 {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL}, {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL},
                 {switch_app_countdown, NULL}, {switch_app_firework, NULL}, {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL},
                 {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL}, {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL},
-                {switch_app_rainbow_analog, NULL},
+                {switch_app_rainbow_analog, NULL}, {switch_app_music, NULL},
 
                 {switch_app_heart_rate, NULL}, {switch_app_fruit_ninja, NULL}, {switch_app_box2d_ring, NULL}, {switch_app_activity, NULL},
                 {switch_app_soccer, NULL}, {switch_app_flower, NULL}, {switch_app_weather, NULL}, {switch_app_butterfly, NULL},
@@ -649,7 +662,7 @@ static void app_menu_design(gui_view_t *view)
                 {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL}, {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL},
                 {switch_app_countdown, NULL}, {switch_app_firework, NULL}, {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL},
                 {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL}, {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL},
-                {switch_app_rainbow_analog, NULL},
+                {switch_app_rainbow_analog, NULL}, {switch_app_music, NULL},
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

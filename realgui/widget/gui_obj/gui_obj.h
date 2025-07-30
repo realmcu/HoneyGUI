@@ -34,7 +34,6 @@ extern "C" {
 #include "guidef.h"
 #include "gui_obj_type.h"
 #include "gui_obj_event.h"
-#include "gui_obj_animate.h"
 #include "gui_obj_tree.h"
 #include "gui_obj_suppress.h"
 

@@ -10,7 +10,6 @@
 #define MINIMP3_IMPLEMENTATION
 #include "minimp3.h"
 #include "minimp3_ex.h"
-#if 0
 using namespace std;
 
 // Custom exception class for MP3 player errors
@@ -289,6 +288,4 @@ extern "C" {
     }
 
 }
-#endif
-
 #endif

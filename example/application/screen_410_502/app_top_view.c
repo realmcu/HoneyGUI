@@ -491,7 +491,7 @@ static void top_view_design(gui_view_t *view)
     gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_STILL_USE_BLUR,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    // gui_view_set_opacity(view, 200);
+    gui_view_set_opacity(view, 200);
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
     gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(parent), "background", 0, 0,

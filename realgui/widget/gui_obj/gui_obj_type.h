@@ -168,7 +168,7 @@ typedef struct _gui_obj_t
 
     gui_matrix_t *matrix;
     gui_obj_timer_t *timer;
-
+    void *user_data;
 } gui_obj_t;
 
 

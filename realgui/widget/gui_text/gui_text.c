@@ -230,10 +230,6 @@ static void gui_text_font_unload(gui_text_t *text)
 
 static void gui_text_font_destroy(gui_text_t *text)
 {
-    if (text->animate)
-    {
-        gui_free(text->animate);
-    }
     if (text->matrix)
     {
         gui_free(text->matrix);
@@ -280,11 +276,6 @@ static void gui_text_font_destroy(gui_text_t *text)
     default:
         break;
     }
-}
-static void gui_text_update_att(gui_obj_t *obj)
-{
-    gui_text_t *this = (void *)obj;
-    animate_frame_update(this->animate, obj);
 }
 
 static void gui_text_input_prepare(gui_obj_t *obj)
@@ -334,8 +325,6 @@ static void gui_text_prepare(gui_obj_t *obj)
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
-
-    gui_text_update_att(obj);
 
     if (this->mode == LEFT ||
         this->mode == CENTER ||

@@ -39,15 +39,14 @@ extern "C" {
 typedef struct gui_win
 {
     gui_obj_t base;
-    gui_animate_t *animate;
-    gui_animate_t **animate_array;
+    float compensate_x;              /* Compensate in X direction for tp event judgment. */
+    float compensate_y;              /* Compensate in Y direction for tp event judgment. */
     float scale;
     float scale_y;
     bool press_flag;
     bool long_flag;
     bool release_flag;
     bool enter_auto_scale;
-    bool event5_flag;
     uint8_t checksum;
     bool scope;
     bool hold_tp;
@@ -87,21 +86,6 @@ gui_win_t *gui_win_create(void       *parent,
                           int16_t     y,
                           int16_t     w,
                           int16_t     h);
-
-/**
- * @brief set animate.
- *
- * @param _this widget object pointer.
- * @param dur animation duration.
- * @param repeat_count repeat play times, -1 means play on repeat forever.
- * @param callback animate frame callback.
- * @param p parameter.
- */
-void gui_win_set_animate(gui_win_t *_this,
-                         uint32_t   dur,
-                         int        repeat_count,
-                         gui_animate_callback_t callback,
-                         void      *p);
 
 /**
  * @brief register a callback function for the left slide event of the win widget.
@@ -217,30 +201,6 @@ void gui_win_set_scope(gui_win_t *win, bool enable);
 void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value);
 
 /**
- * @brief check if the animation is at its end frame.
- *
- * @param win pointer to the window structure that contains the animation.
- * @return true if the end_frame is not 0, false otherwise.
- */
-bool gui_win_is_animation_end_frame(gui_win_t *win);
-
-/**
- * @brief start the animation by setting the animate field to 1.
- *
- * @param win pointer to the window structure that contains the animation.
- * If win or win->animate is NULL, the function will log an error message.
- */
-void gui_win_start_animation(gui_win_t *win);
-
-/**
- * @brief stop the animation by setting the animate field to 0.
- *
- * @param win pointer to the window structure that contains the animation.
- * If win or win->animate is NULL, the function will log an error message.
- */
-void gui_win_stop_animation(gui_win_t *win);
-
-/**
  * @brief window widget prepare.
  *
  * @param obj pointer.
@@ -301,6 +261,14 @@ int gui_win_get_x(gui_win_t *win);
  * @return The current y-coordinate of the window.
  */
 int gui_win_get_y(gui_win_t *win);
+
+/**
+ * @brief Compensate the GUI window's touch event coordinates
+ * @param win Pointer to the GUI window.
+ * @param x The x-coordinate to compensate.
+ * @param y The y-coordinate to compensate.
+ */
+void gui_win_compensate(gui_win_t *win, int x, int y);
 
 #ifdef __cplusplus
 }

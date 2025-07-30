@@ -49,19 +49,6 @@
  *                           Private Functions
  *============================================================================*/
 
-static void gui_win_update_att(gui_obj_t *obj)
-{
-    gui_win_t *this = (void *)obj;
-    animate_frame_update(this->animate, obj);
-    {
-        for (size_t i = 0; i < this->animate_array_length; i++)
-        {
-            animate_frame_update(this->animate_array[i], obj);
-        }
-
-    }
-
-}
 static void gui_win_input_prepare(gui_obj_t *obj)
 {
 }
@@ -73,35 +60,18 @@ static void prepare(gui_obj_t *obj)
     gui_win_t *this = (void *)obj;
     GUI_UNUSED(this);
 
-    gui_win_update_att(obj);
-
+    matrix_translate(-this->compensate_x, -this->compensate_y, obj->matrix);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_SCROLL_VERTICAL);
-
+    matrix_translate(this->compensate_x, this->compensate_y, obj->matrix);
 }
 
 static void gui_win_destroy(gui_obj_t *obj)
 {
-    gui_win_t *this = (void *)obj;
-    if (this->animate)
-    {
-        gui_free(this->animate);
-        this->animate = NULL;
-    }
-    if (this->animate_array)
-    {
-        for (size_t i = 0; i < this->animate_array_length; i++)
-        {
-            gui_free(this->animate_array[i]);
-            this->animate_array[i] = NULL;
-        }
-        gui_free(this->animate_array);
-        this->animate_array = 0;
-        this->animate_array_length = 0;
-    }
+
 }
 
 static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -137,9 +107,7 @@ void gui_win_ctor(gui_win_t  *this,
 {
     gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     GET_BASE(this)->obj_cb = gui_win_cb;
-    GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
-    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = WINDOW;
 }
 
@@ -218,16 +186,7 @@ gui_win_t *gui_win_create(void       *parent,
 
     return this;
 }
-float gui_win_get_animation_progress_percent(gui_win_t *win)
-{
-    if (win == NULL || win->animate == NULL)
-    {
-        // Handle error: window or animate structure is NULL
-        gui_log("Cannot get_aniamtion_progress_percent: win or win->animate is NULL\n");
-        return 0;
-    }
-    return win->animate->progress_percent;
-}
+
 void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical)
 {
     if (win == NULL)
@@ -276,39 +235,7 @@ void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)
     }
     GUI_BASE(win)->opacity_value = opacity_value;
 }
-// Function to retrieve the end_frame value from the window's animation structure
-bool gui_win_is_animation_end_frame(gui_win_t *win)
-{
-    if (win == NULL || win->animate == NULL)
-    {
-        // Handle error: window or animate structure is NULL
-        gui_log("Cannot judge animation_end_frame: win or win->animate is NULL\n");
-        return 0;
-    }
-    return win->animate->end_frame != 0;
-}
-// Function to start the animation, sets animate to 1
-void gui_win_start_animation(gui_win_t *win)
-{
-    if (win == NULL || win->animate == NULL)
-    {
-        // Handle error: window or animate structure is NULL
-        gui_log("Cannot start animation: win or win->animate is NULL\n");
-        return;
-    }
-    win->animate->animate = 1;
-}
-// Function to stop the animation, sets animate to 0
-void gui_win_stop_animation(gui_win_t *win)
-{
-    if (win == NULL || win->animate == NULL)
-    {
-        // Handle error: window or animate structure is NULL
-        gui_log("Cannot stop animation: win or win->animate is NULL\n");
-        return;
-    }
-    win->animate->animate = 0;
-}
+
 void gui_win_prepare_globle(gui_obj_t *obj)
 {
     prepare(obj);
@@ -316,5 +243,17 @@ void gui_win_prepare_globle(gui_obj_t *obj)
 void gui_win_prepare(gui_obj_t *obj)
 {
     prepare(obj);
+}
+
+void gui_win_compensate(gui_win_t *win, int x, int y)
+{
+    if (win == NULL)
+    {
+        // Handle error: window structure is NULL
+        gui_log("Cannot compensate: win is NULL\n");
+        return;
+    }
+    win->compensate_x = x;
+    win->compensate_y = y;
 }
 
