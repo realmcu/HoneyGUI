@@ -114,11 +114,13 @@
                 chat-widget .chat-input button {
                     width: 30px;
                     position: absolute;
-                    bottom: 2px;
-                    right: 2px;
-                    cursor: pointer;
+                    bottom: 4px;
+                    right: 8px;
                     border: none;
                     background: none;
+                }
+                chat-widget .btn-hidden {
+                    display: none;
                 }
                 chat-widget .chat-message {
                     display: flex;
@@ -185,18 +187,32 @@
                     white-space: pre-line;
                     border: none;
                 }
-                .chat-based-refs {
+                chat-widget .chat-based-refs {
                     padding: 10px 0 5px;
                     font-weight: 600;
                     font-size: 18px;
                     color: #666;
                 }
-                .chat-note {
+                chat-widget .chat-note {
                     width: 92%;
                     margin: 10px auto 0;
                     font-size: 14px;
                     color: #888;
                     line-height: 18px;
+                }
+                chat-widget .chat-ref-note {
+                    margin-top: 10px;
+                    font-size: 14px;
+                    color: #888;
+                    line-height: 18px;
+                }
+                chat-widget .chat-ref-note::before {
+                    font-family: FontAwesome;
+                    content: "\\f0a4";
+                    display: inline-block;
+                    color: #0068B6;
+                    font-size: 16px;
+                    margin-right: 5px;
                 }
                 .font-small {
                     font-size: 12px;
@@ -258,9 +274,14 @@
                     <div class="chat-input-box">
                         <div class="chat-input">
                             <textarea placeholder="${placeholder}"></textarea>
-                            <button>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="19px" fill="#0068b6">
-                                    <path d="M476.59 227.05l-.16-.07L49.35 49.84A23.56 23.56 0 0027.14 52 24.65 24.65 0 0016 72.59v113.29a24 24 0 0019.52 23.57l232.93 43.07a4 4 0 010 7.86L35.53 303.45A24 24 0 0016 327v113.31A23.57 23.57 0 0026.59 460a23.94 23.94 0 0013.22 4 24.55 24.55 0 009.52-1.93L476.4 285.94l.19-.09a32 32 0 000-58.8z"></path>
+                            <button class="chat-send-btn" id="ChatSendBtn">
+                                <svg t="1752557991558" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="21997" width="24" height="24">
+                                    <path d="M478.4128 491.7248l-202.1376-30.1056a81.92 81.92 0 0 1-64.67584-52.38784L125.52192 178.4832c-7.8848-21.17632 2.49856-44.8512 23.22432-52.92032a39.38304 39.38304 0 0 1 31.90784 1.47456L878.592 475.15648c19.90656 9.9328 28.18048 34.48832 18.432 54.82496-3.8912 8.21248-10.40384 14.848-18.432 18.8416L180.6336 896.96256a39.77216 39.77216 0 0 1-53.6576-18.8416 41.7792 41.7792 0 0 1-1.45408-32.58368l86.07744-230.74816a81.92 81.92 0 0 1 64.67584-52.38784l202.1376-30.1056a20.48 20.48 0 0 0 0-40.5504z" p-id="21998" fill="#0068b6"></path>
+                                </svg>
+                            </button>
+                            <button class="chat-abort-btn btn-hidden" id="ChatAbortBtn">
+                                <svg t="1752485733661" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13243" width="22" height="22">
+                                    <path d="M791.893333 0H232.106667C105.813333 0 0 105.813333 0 232.106667v559.786666C0 918.186667 105.813333 1024 232.106667 1024h559.786666c129.706667 0 232.106667-105.813333 232.106667-232.106667V232.106667C1024 105.813333 918.186667 0 791.893333 0zM716.8 699.733333c0 10.24-6.826667 17.066667-17.066667 17.066667h-375.466666c-10.24 0-17.066667-6.826667-17.066667-17.066667v-375.466666c0-10.24 6.826667-17.066667 17.066667-17.066667h375.466666c10.24 0 17.066667 6.826667 17.066667 17.066667v375.466666z" fill="#c9302c" p-id="13244"></path>
                                 </svg>
                             </button>
                         </div>
@@ -277,8 +298,8 @@
             </div>
             </div>
             <button class="toggle-chat-modal" id="ToggleChatModal">
-                <svg viewBox="0 0 24 24" width="28.8" height="28.8" fill="#2980b9" stroke="white" stroke-width="2">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                <svg t="1753839593628" class="icon" viewBox="0 0 1218 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="17319" width="24" height="24">
+                    <path d="M326.183722 206.500257c19.568414 0 36.788619 9.523295 47.529504 24.177863a41.528523 41.528523 0 0 1 17.394146 18.698707l1.348046 3.391858 249.910392 711.072687c8.088278 22.916787-6.348863 48.529667-32.17917 57.22674-24.525746 8.262219-50.529994-1.652444-60.009803-22.351478l-1.304561-3.348373-64.793194-184.247491H160.460996l-64.706223 184.247491c-8.088278 22.916787-35.527543 34.440409-61.314364 25.699851-24.569231-8.262219-38.788945-31.787802-33.222819-53.791396l1.000164-3.47883L252.08466 252.81217a43.267938 43.267938 0 0 1 30.439756-26.91744A58.574787 58.574787 0 0 1 326.140237 206.500257h0.043485z m459.553336 201.511181c25.960763 0 47.225106 12.958639 49.312404 29.396106l0.130456 2.609122v549.046217c0 17.698544-22.177536 32.005229-49.44286 32.005229-25.960763 0-47.225106-12.915153-49.268918-29.396107l-0.217427-2.609122V440.060152c0-17.698544 22.177536-32.005229 49.486345-32.005229zM322.226554 350.741212l-127.760002 363.494165h255.563489L322.226554 350.697727zM1038.430514 105.52724a14.958966 14.958966 0 0 1 9.697236 9.56678l38.658489 117.801853 120.889315 42.87657a14.958966 14.958966 0 0 1-0.869708 28.482914l-118.410648 33.266304-36.658163 116.018954a14.958966 14.958966 0 0 1-28.439428 0.130456l-38.701975-117.758368-117.323515-37.223473a14.958966 14.958966 0 0 1-0.217426-28.395943l115.975468-39.049858 36.658162-115.975468a14.958966 14.958966 0 0 1 18.742193-9.740721zM772.387051 0.553569a10.436488 10.436488 0 0 1 6.653261 6.827202l22.04708 70.489776 72.490103 24.569232a10.436488 10.436488 0 0 1-0.391368 19.959782l-72.185706 21.48177-23.569067 70.794174a10.436488 10.436488 0 0 1-19.872812-0.173941l-22.04708-70.489777-70.228865-21.220858a10.436488 10.436488 0 0 1-0.434853-19.872811l70.794174-24.873629 23.525582-70.881145a10.436488 10.436488 0 0 1 13.219551-6.609775z" p-id="17320" fill="#ffffff"></path>
                 </svg>
             </button>
         </chat-widget>
@@ -296,6 +317,7 @@
         const chatTitle = config.chatWidgetTitle || '智能小客服';
         const chatPlaceholder = config.chatWidgetPlaceholder || 'Type your question';
         const chatAIBase = config.chatAIBase;
+        const isMultilingual = window.isMultilingual == "True";
 
         inserChatWidgetHTML(chatTitle, chatPlaceholder);
 
@@ -385,10 +407,16 @@
                 }
             });
 
+            let refNoteHtml = "";
+            if(isMultilingual) {
+                refNoteHtml = `<div class="chat-ref-note">Please use the "EN/中文" button (if available) in the upper right corner of the document to switch language.</div>`;
+            }
+
             return `
             <div class="chatRefDocs">
                 <p class="chat-based-refs">Answer based on the following sources: </p>
                 ${linksHtml}
+                ${refNoteHtml}
             </div>`;
         }
         function onChatSuccess(mdContent, refs, element) {
@@ -398,7 +426,7 @@
         }
         function onChatError(error, element) {
             element.innerHTML = `
-            <div class="chatResp">${error}</div>
+            <div class="chatResp wy-text-danger">${error}</div>
             `;
             addChatHistory("assistant", error);
         }
@@ -413,6 +441,7 @@
             headerIds: false,
             mangle: true //对嵌入的电子邮件地址进行加密处理（防止抓取），实现简单的防邮件爬虫
         });
+
         async function fetchChatAnwser(fetchConfig, messageNode) {
             const { url, options } = fetchConfig;
             const abortCtrl = new AbortController();
@@ -420,14 +449,22 @@
             let mdChatText = "";
             let refList = [];
 
+            /* ================ Interrupt chat request ================ */
+            const abortButton = document.getElementById('ChatAbortBtn');
+            abortButton.addEventListener('click', () => {
+                abortCtrl.abort(); // 中止 fetch 请求
+            });
+
             const appendErrorMsg = (error, element) => {
                 if (hasError) return;
-                element.innerHTML += `<div>${error}</div>`;
+                element.innerHTML += `<div class="wy-text-danger">${error}</div>`;
                 hasError = true;
                 abortCtrl.abort();
             }
 
             try {
+                sendButton.classList.add("btn-hidden");
+                abortButton.classList.remove("btn-hidden");
                 // Init AI chat request and add abort controller
                 const response = await fetch(url, { 
                     ...options, 
@@ -482,7 +519,11 @@
                 // Continuously read data from the stream
                 while (true) {
                     const { done, value } = await reader.read().catch(error => {
-                        appendErrorMsg(`Read data from the stream error: ${error}, please refresh and try again!`, asstNode);
+                        if (error.name === 'AbortError') {
+                            appendErrorMsg(`AI fetch request has been aborted!`, asstNode);
+                        } else {
+                            appendErrorMsg(`Read data from the stream error: ${error}, please refresh and try again!`, asstNode);
+                        }
                         return { done: true };
                     });
                     if (done || hasError) break;
@@ -513,7 +554,15 @@
                     onChatSuccess(mdChatText, refList, asstNode);
                 }
             } catch (error) {
-                onChatError(`An error occured with the ai chat fetch operation: ${error}. Please refresh and try again!`, messageNode)
+                if (error.name === 'AbortError') {
+                    onChatError(`AI fetch request has been aborted!`, messageNode);
+                } else {
+                    onChatError(`An error occured with the ai chat fetch operation: ${error}. Please refresh and try again!`, messageNode);
+                }
+            }
+            finally {
+                abortButton.classList.add("btn-hidden");
+                sendButton.classList.remove("btn-hidden");
             }
         }
 
@@ -546,10 +595,13 @@
                 'Content-Type': 'application/x-www-form-urlencoded'
             };
             const body = JSON.stringify(rawBody);
-        
+            let chatUrl = "https://wwwdev.realmcu.com/docs/aichatstream";
+            if (rawBody.aiEnv.toLowerCase() == "prod") {
+                chatUrl = "https://wwwqa.realmcu.com/docs/aichatstream";
+            }
             // return fetch config
             return {
-                url: 'https://wwwdev.realmcu.com/docs/aichatstream',
+                url: chatUrl,
                 options: {
                     method,
                     headers,
@@ -584,7 +636,7 @@
             chatMessageNode.scrollIntoView({ behavior: 'smooth' });
         }
         /* =============== triggle chat message send =============== */
-        const sendButton = document.querySelector('.chat-input button');
+        const sendButton = document.getElementById('ChatSendBtn');
         sendButton.onclick = sendChatMessage;
         userInputNode.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' && !event.shiftKey) {

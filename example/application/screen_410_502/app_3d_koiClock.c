@@ -12,23 +12,29 @@
 #include "gui_obj.h"
 #include "string.h"
 #include "gui_view.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 #include "gui_components_init.h"
 #include "root_image/ui_resource.h"
+#include "tp_algo.h"
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
 #define CURRENT_VIEW_NAME "koiclock_view"
-#define CLOCK_RADIUS_X 60
-#define CLOCK_RADIUS_Y 55
-#define CLOCK_CENTER_X 0
-#define CLOCK_CENTER_Y 17
+#define DEG_TO_RAD(angle) ((angle) * M_PI_F / 180.0f)
+#define RADIUS 55.0f
+#define FISH_COUNT 3
 
 /*============================================================================*
 *                             Types
 *============================================================================*/
-
+typedef struct
+{
+    float x;
+    float y;
+    float angle;      // z angle in degrees
+    float move_speed;
+} Fish_Pos;
 
 /*============================================================================*
  *                           Function Declaration
@@ -53,25 +59,20 @@ static const gui_view_descriptor_t descriptor =
     .keep = false,
 };
 
+/* Fish Position*/
+static Fish_Pos fish_pos[FISH_COUNT];
+static gui_lite3d_t *lite3d_fish[FISH_COUNT] = {NULL};
+
 /* Fish Movement */
-//x:80 ~ -80,y:110 ~ -80
-static float fish_angle = 0.0f;
+static float swing_time = 0.0f;
+static float swing_angle = 0.0f;
+static uint8_t clicked_index = 0;
 
-static float fish0_x = 0.0f;
-static float fish0_y = 0.0f;
+/* Wave Animation */
+static bool wave_animating = false;
+static float wave_scale = 1.0f;
+static float wave_opa = 255.0f;
 
-static float fish1_x = 0;
-static float fish1_y = 0;
-
-static float fish2_x = 0;
-static float fish2_y = 0;
-
-static float fish0_rz = 0.0f;
-static float fish1_rz = 0.0f;
-static float fish2_rz = 0.0f;
-
-static float fish_time = 0.0f;
-const static float rotation_factor = 60.0f;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -91,166 +92,176 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-// static void return_to_menu()
-// {
-//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
 
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
-static void update_koi0()
+static void fish_pos_init()
 {
-    static float theta0 = 0.0f; // starting angle for fish0
-    float angular_velocity = 0.03f; // Adjust as needed for speed
+    const float initial_angles[FISH_COUNT] = {0, 45, 240};
 
-    // Updating position for each fish using the circular path calculation
-    fish0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta0);
-    fish0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta0);
-    // gui_log("fish0_x: %f, fish0_y: %f\n", fish0_x, fish0_y);
-
-    // d +=3;
-    fish0_rz = theta0 * rotation_factor + sinf(theta0 * 5) * 0.8f;;
-    // gui_log("fish0_rz %f\n",fish0_rz);
-
-    theta0 += angular_velocity;
-
-    if (theta0 >= 2 * M_PI_F) { theta0 -= 2 * M_PI_F; }
-
-    fish_time += 1.2f;
-    fish_angle = 3 * sinf(fish_time);
-}
-
-static void update_koi1()
-{
-    static float theta1 = M_PI_F / 4; // starting angle for fish1
-    float angular_velocity = 0.02f; // Adjust as needed for speed
-
-    fish1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta1);
-    fish1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta1);
-    fish1_rz = theta1 * rotation_factor + sinf(theta1 * 5) * 0.8f;
-
-    theta1 += angular_velocity;
-
-    if (theta1 >= 2 * M_PI_F) { theta1 -= 2 * M_PI_F; }
-}
-
-static void update_koi2()
-{
-    static float theta2 = 2 * M_PI_F / 3; // starting angle for fish2
-    float angular_velocity = 0.02f; // Adjust as needed for speed
-
-    fish2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta2);
-    fish2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta2);
-    fish2_rz = theta2 * rotation_factor + sinf(theta2 * 5) * 0.8f;
-
-    theta2 += angular_velocity;
-
-    if (theta2 >= 2 * M_PI_F) { theta2 -= 2 * M_PI_F; }
-}
-
-static void fish0_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, -fish0_x, -fish0_y, 80, 0, 0, fish0_rz,
-                             4);
-
-}
-static void fish0_shadow_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, 4.0f - fish0_x, 5.0f - fish0_y, 80, 0, 0, fish0_rz,
-                             4);
-
-}
-static void fish1_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, -fish1_x, -fish1_y, 80, 0, 0, fish1_rz,
-                             4);
-
-}
-static void fish1_shadow_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, 4.0f - fish1_x, 5.0f - fish1_y, 80, 0, 0, fish1_rz,
-                             4);
-
-}
-static void fish2_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, -fish2_x, -fish2_y, 80, 0, 0, fish2_rz,
-                             4);
-
-}
-static void fish2_shadow_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, 4.0f - fish2_x, 5.0f - fish2_y, 80, 0, 0, fish2_rz,
-                             4);
-
-}
-static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
-{
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
-
-    if (face_index == 0)
+    for (int i = 0; i < FISH_COUNT; i++)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
+        float rad = DEG_TO_RAD(initial_angles[i]);
+        fish_pos[i] = (Fish_Pos)
+        {
+            .x = RADIUS * cosf(rad),
+             .y = RADIUS * sinf(rad),
+              .angle = initial_angles[i],
+               .move_speed = 0.5f,
+        };
+    }
+}
+
+static void update_koi_move()
+{
+    swing_time += 0.4f;
+    swing_angle = 3.0f * sinf(swing_time);
+
+    for (int i = 0; i < FISH_COUNT; i++)
+    {
+        fish_pos[i].angle += fish_pos[i].move_speed;
+        fish_pos[i].move_speed *= 0.95f;
+        // Ensure the speed does not drop below a threshold
+        if (fish_pos[i].move_speed < 0.5f)
+        {
+            fish_pos[i].move_speed = 0.5f;
+        }
+
+        if (fish_pos[i].angle > 360.0f)
+        {
+            fish_pos[i].angle -= 360.0f;
+        }
+        float rad = DEG_TO_RAD(fish_pos[i].angle);
+
+        fish_pos[i].x = RADIUS * cosf(rad);
+        fish_pos[i].y = RADIUS * sinf(rad);
+    }
+}
+
+static void fish_click_cb(void *obj, gui_event_t e, void *param)
+{
+    gui_lite3d_t *this = (gui_lite3d_t *)obj;
+
+    for (int i = 0; i < FISH_COUNT; i++)
+    {
+        if (this == lite3d_fish[i])
+        {
+            clicked_index = i;
+            break;
+        }
+    }
+    fish_pos[clicked_index].move_speed = 2.0f;
+
+}
+
+static void wave_animate_cb(void *param)
+{
+    gui_img_t *wave_img = (gui_img_t *)param;
+    touch_info_t *tp = tp_get_info();
+
+    if (tp->pressed && !wave_animating)
+    {
+        wave_scale = 1.0f;
+        wave_opa = 255.0f;
+        wave_animating = true;
+        gui_img_translate(wave_img, tp->x, tp->y);
+    }
+
+    if (wave_animating)
+    {
+        wave_img->base.not_show = false;
+        wave_scale += 0.1f;
+        wave_opa -= 5.0f;
+        if (wave_opa <= 0)
+        {
+            wave_opa = 0;
+            wave_img->base.not_show = true;
+            wave_animating = false;
+        }
+
+        gui_img_scale(wave_img, wave_scale, wave_scale);
+        gui_img_set_opacity(wave_img, wave_opa);
+    }
+    else
+    {
+        wave_img->base.not_show = true;
+    }
+}
+
+static void fish0_global_cb(l3_model_t *this)
+{
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
+
+    l3_world_initialize(&this->world, fish_pos[0].x, fish_pos[0].y, 80, 0, 0, fish_pos[0].angle + 180,
+                        2);
+
+}
+static void fish0_shadow_global_cb(l3_model_t *this)
+{
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
+
+    l3_world_initialize(&this->world, fish_pos[0].x + 3.0f, fish_pos[0].y + 3.0f, 80, 0, 0,
+                        fish_pos[0].angle + 180, 2);
+
+}
+static void fish1_global_cb(l3_model_t *this)
+{
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
+
+    l3_world_initialize(&this->world, fish_pos[1].x, fish_pos[1].y, 80, 0, 0, fish_pos[1].angle + 180,
+                        2);
+
+}
+static void fish1_shadow_global_cb(l3_model_t *this)
+{
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
+
+    l3_world_initialize(&this->world, fish_pos[1].x + 3.0f, fish_pos[1].y + 3.0f, 80, 0, 0,
+                        fish_pos[1].angle + 180, 2);
+
+}
+static void fish2_global_cb(l3_model_t *this)
+{
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
+
+    l3_world_initialize(&this->world, fish_pos[2].x, fish_pos[2].y, 80, 0, 0, fish_pos[2].angle + 180,
+                        2);
+
+}
+static void fish2_shadow_global_cb(l3_model_t *this)
+{
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
+
+    l3_world_initialize(&this->world, fish_pos[2].x + 3.0f, fish_pos[2].y + 3.0f, 80, 0, 0,
+                        fish_pos[2].angle + 180, 2);
+
+}
+static l3_4x4_matrix_t fish_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
+{
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
+
+    if (face_index == 0 || face_index == 1)// head && body1
+    {
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 0, 1),
+                                 swing_angle, 1);
+    }
+    else if (face_index == 2)// body2
+    {
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 0, 1),
                                  0, 1);
     }
-    if (face_index == 1)
+    else if (face_index == 3 || face_index == 4)// body3 && tail
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
-                                 fish_angle, 1);
-    }
-    if (face_index == 2)//head
-    {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
-                                 0, 1);
-    }
-    if (face_index == 3)
-    {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, -5, 0), gui_3d_vector(0, 0, 1),
-                                 fish_angle, 1);
-    }
-    if (face_index == 4)
-    {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, -8, 0), gui_3d_vector(0, 0, 1),
-                                 fish_angle, 1);
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 0, 1),
+                                 -swing_angle, 1);
     }
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 }
@@ -259,66 +270,61 @@ static void app_ui_koiclock_design(gui_view_t *view)
 {
     srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_img_create_from_mem(view, "koiclock_bg", LOTUS_BG_BIN, 0, 0, gui_get_screen_width(),
+    gui_img_create_from_mem(obj, "koiclock_bg", LOTUS_BG_BIN, 0, 0, gui_get_screen_width(),
                             gui_get_screen_height());
 
-    gui_win_t *fish0_window = gui_win_create(obj, "fish0_window", 0, 46, 48, 100);
-    gui_win_t *fish1_window = gui_win_create(obj, "fish1_window", 0, 46, 48, 100);
-    gui_win_t *fish2_window = gui_win_create(obj, "fish2_window", 0, 46, 48, 100);
+    // Shadow
+    l3_model_t *fish0_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish1_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish2_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    // Fish
+    l3_model_t *fish0 = l3_create_model(DESC_KOI0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish1 = l3_create_model(DESC_KOI1_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish2 = l3_create_model(DESC_KOI2_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
-    gui_3d_t *fish0_shadow = gui_3d_create(fish0_window, "3d-fish0", DESC_KOI_SHADOW_BIN,
-                                           GUI_3D_DRAW_FRONT_ONLY,
-                                           0, 0,
-                                           410, 502);
-    gui_3d_t *fish1_shadow = gui_3d_create(fish1_window, "3d-fish1", DESC_KOI_SHADOW_BIN,
-                                           GUI_3D_DRAW_FRONT_ONLY,
-                                           0, 0,
-                                           410, 502);
-    gui_3d_t *fish2_shadow = gui_3d_create(fish2_window, "3d-fish2", DESC_KOI_SHADOW_BIN,
-                                           GUI_3D_DRAW_FRONT_ONLY,
-                                           0, 0,
-                                           410, 502);
+    fish_pos_init();
 
-    gui_3d_t *fish0 = gui_3d_create(fish0_window, "3d-fish0", DESC_KOI0_BIN, GUI_3D_DRAW_FRONT_ONLY, 0,
-                                    0,
-                                    0, 0);
-    gui_3d_t *fish1 = gui_3d_create(fish1_window, "3d-fish1", DESC_KOI1_BIN, GUI_3D_DRAW_FRONT_ONLY, 0,
-                                    0,
-                                    0, 0);
-    gui_3d_t *fish2 = gui_3d_create(fish2_window, "3d-fish2", DESC_KOI2_BIN, GUI_3D_DRAW_FRONT_ONLY, 0,
-                                    0,
-                                    0, 0);
+    l3_set_global_transform(fish0, (l3_global_transform_cb)fish0_global_cb);
+    l3_set_face_transform(fish0, (l3_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish0_shadow, (l3_global_transform_cb)fish0_shadow_global_cb);
+    l3_set_face_transform(fish0_shadow, (l3_face_transform_cb)fish_face_cb);
 
-    gui_3d_set_global_transform_cb(fish0, (gui_3d_global_transform_cb)fish0_global_cb);
-    gui_3d_set_face_transform_cb(fish0, (gui_3d_face_transform_cb)fish_face_cb);
-    gui_3d_set_global_transform_cb(fish0_shadow, (gui_3d_global_transform_cb)fish0_shadow_global_cb);
-    gui_3d_set_face_transform_cb(fish0_shadow, (gui_3d_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish1, (l3_global_transform_cb)fish1_global_cb);
+    l3_set_face_transform(fish1, (l3_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish1_shadow, (l3_global_transform_cb)fish1_shadow_global_cb);
+    l3_set_face_transform(fish1_shadow, (l3_face_transform_cb)fish_face_cb);
 
-    gui_3d_set_global_transform_cb(fish1, (gui_3d_global_transform_cb)fish1_global_cb);
-    gui_3d_set_face_transform_cb(fish1, (gui_3d_face_transform_cb)fish_face_cb);
-    gui_3d_set_global_transform_cb(fish1_shadow, (gui_3d_global_transform_cb)fish1_shadow_global_cb);
-    gui_3d_set_face_transform_cb(fish1_shadow, (gui_3d_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish2, (l3_global_transform_cb)fish2_global_cb);
+    l3_set_face_transform(fish2, (l3_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish2_shadow, (l3_global_transform_cb)fish2_shadow_global_cb);
+    l3_set_face_transform(fish2_shadow, (l3_face_transform_cb)fish_face_cb);
 
-    gui_3d_set_global_transform_cb(fish2, (gui_3d_global_transform_cb)fish2_global_cb);
-    gui_3d_set_face_transform_cb(fish2, (gui_3d_face_transform_cb)fish_face_cb);
-    gui_3d_set_global_transform_cb(fish2_shadow, (gui_3d_global_transform_cb)fish2_shadow_global_cb);
-    gui_3d_set_face_transform_cb(fish2_shadow, (gui_3d_face_transform_cb)fish_face_cb);
+    gui_lite3d_t *lite3d_fish0_shadow = gui_lite3d_create(obj, "lite3d_fish0_shadow", fish0_shadow, 0,
+                                                          0, 0, 0);
+    gui_lite3d_t *lite3d_fish1_shadow = gui_lite3d_create(obj, "lite3d_fish1_shadow", fish1_shadow, 0,
+                                                          0, 0, 0);
+    gui_lite3d_t *lite3d_fish2_shadow = gui_lite3d_create(obj, "lite3d_fish2_shadow", fish2_shadow, 0,
+                                                          0, 0, 0);
+    lite3d_fish[0] = gui_lite3d_create(obj, "lite3d_fish0", fish0, 0, 0, 0, 0);
+    lite3d_fish[1] = gui_lite3d_create(obj, "lite3d_fish1", fish1, 0, 0, 0, 0);
+    lite3d_fish[2] = gui_lite3d_create(obj, "lite3d_fish2", fish2, 0, 0, 0, 0);
 
-
-    gui_img_t *clock_img = gui_img_create_from_mem(fish0_window, "img_clock", CLOCK_BIN, 26, 56, 0, 0);
+    gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 26, 102, 0, 0);
     gui_img_set_mode(clock_img, IMG_SRC_OVER_MODE);
+    gui_img_t *wave_img = gui_img_create_from_mem(obj, "wave", WAVE_BIN, 0, 0, 0, 0);
+    gui_img_set_mode(wave_img, IMG_SRC_OVER_MODE);
+    gui_img_set_focus(wave_img, 32, 32);
+    wave_img->base.not_show = true;
 
-    gui_obj_create_timer(&(fish0_window->base), 17, true, update_koi0);
-    gui_obj_start_timer(&(fish0_window->base));
 
-    gui_obj_create_timer(&(fish1_window->base), 17, true, update_koi1);
-    gui_obj_start_timer(&(fish1_window->base));
+    gui_lite3d_on_click(lite3d_fish[0], fish_click_cb, NULL);
+    gui_lite3d_on_click(lite3d_fish[1], fish_click_cb, NULL);
+    gui_lite3d_on_click(lite3d_fish[2], fish_click_cb, NULL);
 
-    gui_obj_create_timer(&(fish2_window->base), 17, true, update_koi2);
-    gui_obj_start_timer(&(fish2_window->base));
+    gui_obj_create_timer(GUI_BASE(lite3d_fish[0]), 10, true, update_koi_move);
+    gui_obj_create_timer(GUI_BASE(wave_img), 10, true, wave_animate_cb);
 }
