@@ -19,7 +19,7 @@ HoneyGUI
    示例 <sample/index>
    工具 <tool/index>
    设计说明 <Design/index>
-   第三方支持 <3rd-support/index>
+   第三方支持 <3rd-party-support/index>
    常见问题 <FAQ/index>
    获取PDF <get-pdf/index>
    专业术语 <Glossary>

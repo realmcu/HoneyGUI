@@ -393,9 +393,151 @@ LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控
 ==========================
 .. <!-- （Img + font，介绍和演示） -->
 
+LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 文件的资源：
 
-图片转换器
+1. C 数组格式
+  资源（图片/字库）会被转换为 C 语言数组。这些数组作为代码的一部分，被编译进主应用程序二进制文件。
+
+  - 每当程序逻辑发生变化时，这些资源文件都会随之重新编译。
+  - 所有资源的大小都会计入 APP 镜像，即 APP image，因此整体空间需求更大（OTA 时需要更大空间）。
+
+2. bin 文件格式
+  资源会被保存为独立的二进制文件，不参与编译过程。
+
+  - 这些文件独立存储和访问，通常需要文件系统等支持。
+  - 程序运行时通过文件系统 API 将资源加载到内存中，消耗一定的 RAM 空间。
+
+
+媒体资源转换工具
 -----------------------------
+
+LVGL 在线图片转换工具
+~~~~~~~~~~~~~~~~~~~~~~~
+
+- 在线转换工具： `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
+- 文档说明： `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_
+
+LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持上传本地的图片文件，转换输出标准 C 文件，其中以变量方式描述了图片信息。使用步骤请参考 `LVGL Overview Images - Online Converter <https://docs.lvgl.io/9.1/overview/image.html#online-converter>`_：
+
+1. 选择 LVGL 版本 ``LVGL v9``
+2. 选取本地图片文件，支持多选批量转换
+
+   输出 C 文件将与输入文件同名，图片描述变量也会与输入文件同名，因此输入文件名应避免使用中文或其他非法字符。
+3. 选择输出文件的颜色格式
+   
+   颜色格式的说明请参考 `LVGL Overview Images - Color Format <https://docs.lvgl.io/9.1/overview/image.html#color-formats>`_
+4. 点击 :guilabel:`Convert` 获取输出文件
+
+在文档 `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。 
+
+
+LVGL v9 的在线图片转换工具仅支持输出 C 文件格式和有限的颜色格式输出，如需图片压缩、bin 文件和其他的颜色格式输出，请使用 `python 转换脚本 <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_。
+输出 bin 文件格式的图片资源时，bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。
+
+.. code-block:: c
+
+   typedef struct {
+       uint32_t magic: 8;          /**< Magic number. Must be LV_IMAGE_HEADER_MAGIC*/
+       uint32_t cf : 8;            /**< Color format: See `lv_color_format_t`*/
+       uint32_t flags: 16;         /**< Image flags, see `lv_image_flags_t`*/
+
+       uint32_t w: 16;
+       uint32_t h: 16;
+       uint32_t stride: 16;        /**< Number of bytes in a row*/
+       uint32_t reserved_2: 16;    /**< Reserved to be used later*/
+   } lv_image_header_t;
+
+
+
+Realtek 媒体资源转换工具
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+由 Realtek 开发的资源转换工具 Media Convert Tool：
+   - 集成了 LVGL v9 的 `python 转换脚本 <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_，完整功能引出
+   - 支持 JPEG 格式输出，适配硬件解码器
+   - 支持 RTZIP 压缩格式输出，适配硬件解码
+   - 支持 AVI 视频格式输出，适配硬件解码
+   - 支持对文件夹下批量配置，支持单个文件指定配置
+   - 支持 User Data 打包，支持链接外部文件夹
+
+Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资源描述文件 :file:`ui_resource.c`，其中包含了各图片、视频的描述变量，变量类型为 ``lv_image_dsc_t``。对于支持 flash 直接寻址的平台，如 Nor Flash，资源 bin 文件下载到 flash 后，通过描述变量直接引用图片，跳过文件系统，可提升效率，减少缓存，降低系统复杂度。 
+
+.. code-block:: c
+
+   /**
+    * Struct to describe a constant image resource.
+    * It's similar to lv_draw_buf_t, but the data is constant.
+    */
+    typedef struct {
+       lv_image_header_t header;   /**< A header describing the basics of the image*/
+       uint32_t data_size;         /**< Size of the image in bytes*/
+       const uint8_t * data;       /**< Pointer to the data of the image*/
+       const void * reserved;      /**< A reserved field to make it has same size as lv_draw_buf_t*/
+    } lv_image_dsc_t;
+
+
+.. note::
+   1. 转换工具将使用输入文件名组成变量名，请避免在输入文件名中使用中文等非法字符；
+   2. :file:`ui_resource.c` 的使用依赖于打包过程生成的 :file:`ui_resource.h`
+
+LVGL 
+^^^^^^^^^
+该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 PNG 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时，bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。 
+
+.. image:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
+   :align: center
+   :width: 408
+
+
+
+RTZIP
+^^^^^^^^^
+将图片编码转换为 RTZIP 格式，支持多种压缩算法和自定义压缩编码参数。RTZIP 格式是一种无损压缩，支持对透明图层编码。若输入图片带透明但输出格式不带透明度信息，建议使能 :guilabel:`Mix Alpha Channel`，如输入 PNG 图片，输出 ``RGB565``。
+
+.. image:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
+   :align: center
+   :width: 408
+
+
+JPG
+^^^^^^^^^
+将图片重新编码转换为 JPEG 格式，配置图片采样比和图片质量以压缩图片体积。JPEG 格式是一种能很好地平衡显示画质和文件大小的有损压缩，转换为 JPEG 的图片将丢失透明度信息。
+
+
+.. image:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
+   :align: center
+   :width: 408
+
+
+
+AVI
+^^^^^^^^^
+将图片序列或视频文件转换为 AVI 格式，支持帧率和画质设定，不带音频轨。
+
+- 输入图片序列文件夹时，将转换配置应用于文件夹，务必保证图片序列的命名格式为类 ``xxx_%04d.xxx``，从 0 排序，如 frame_0000.jpg, frame_0001.jpg。
+- 输入视频文件时，对视频文件应用转换配置。
+
+.. image:: https://foruda.gitee.com/images/1753864947902502287/d16f5802_9218678.png
+   :align: center
+   :width: 408
+
+
+以下为使用示例：
+
+.. code-block:: c
+
+   // lv_conf.h
+   /** RTK AVI decoder.
+    *  Dependencies: JPEG decoder. */
+   #define LV_USE_AVI  1
+
+   // example 
+   lv_obj_t * video = lv_avi_create(lv_screen_active(), NULL);
+
+   /* From variable */
+   lv_avi_set_src(video, &my_avi_dsc);
+
+
 
 
 字体转换器
