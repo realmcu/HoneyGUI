@@ -115,4 +115,11 @@ void gui_update_screen_force(bool if_change);
 void rvd_click_back();
 void rvd_hover_left();
 void rvd_hover_right();
+#include "gui_tabview.h"
+#include "gui_page.h"
+#include "gui_text.h"
+gui_obj_t *gui_create_radiobutton(gui_obj_t *parent, const char *name, const char *group_name,
+                                  int x, int y, int w, int h, const unsigned char *pic, const unsigned char *hl_pic,
+                                  BLEND_MODE_TYPE blendMode);
+const unsigned char *rvd_get_image404_address(void);
 #endif /* _RVD_H_ */

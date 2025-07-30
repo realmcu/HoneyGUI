@@ -167,6 +167,8 @@ static void *sdl_flush(void *arg)
 }
 #if 1
 #include "rvd.h"
+static void rvd_update_page_radio_list(gui_page_t *page, const char **device_list,
+                                       int device_list_count) ;
 
 static void key_gui_msg_cb(void *p)
 {
@@ -213,13 +215,112 @@ static void key_gui_msg_cb(void *p)
             rvd_hover_right();
         }
         break;
+    case /*PC KEY R */ 114:
+        {
+            break;
+            GUI_WIDGET_POINTER_BY_NAME(obj1, "tab11")
+            gui_tabview_t *tabview = (void *)obj1;
+            GUI_WIDGET_POINTER_BY_NAME(obj2, "page0")
+            gui_page_t *page1 = (void *)obj2;
+            static const char *device_list[50] = {"SONY", "NOKIA", "SAMSUNG", "APPLE",
+                                                  "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG"
+                                                 };
+            static bool device_update_flag = false;
+            device_update_flag = true;
+            if (device_update_flag)
+            {
+                int device_list_count = 0 ;
+                for (size_t i = 0; i < 50; i++)
+                {
+                    if (device_list[i] == NULL)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        device_list_count++;
+                    }
+
+                }
+
+                rvd_update_page_radio_list(page1, device_list, device_list_count);
+            }
+        }
+        break;
     default:
         break;
     }
+}
+static void rvd_update_page_radio_list(gui_page_t *page, const char **device_list,
+                                       int device_list_count)
+{
+    gui_obj_t *radio_window = 0;
+    gui_obj_tree_get_widget_by_type((void *)page, RADIO, &radio_window);
+    if ((radio_window && radio_window->magic == GUI_MAGIC_NUMBER &&
+         radio_window->type == RADIO) == false)
+    {
+        return;
+    }
+    gui_obj_t *radio_text_obj = 0;
+    gui_obj_tree_get_widget_by_type((void *)page, TEXTBOX, &radio_text_obj);
+    if (radio_text_obj == NULL)
+    {
+        return;
+    }
 
+    gui_text_t *radio_text = (gui_text_t *)radio_text_obj;
+    int text_x = radio_text_obj->x;
+    int text_y = radio_text_obj->y;
+    int text_w = radio_text_obj->w;
+    int text_h = radio_text_obj->h;
+    int radio_x = radio_window->x;
+    int radio_y = radio_window->y;
+    int radio_w = radio_window->w;
+    int radio_h = radio_window->h;
+    gui_color_t color = radio_text->color;
+    int font_size = radio_text->font_height;
+    void *font = radio_text->path;
+    TEXT_MODE style = radio_text->mode;
+    const unsigned char *pic = rvd_get_image404_address();
+    const unsigned char *hl_pic = rvd_get_image404_address();
+    const char *radio_group_name = "radio_group_name";
+    {
+        gui_win_t *win = (gui_win_t *)radio_window;
+        if (win->animate && win->animate->p)
+        {
+            radio_t *param = win->animate->p;
+            pic = param->pic;
+            hl_pic = param->pic_hl;
+            radio_group_name = param->radio_name;
+        }
+    }
 
+    gui_obj_child_free((void *)page);
 
+    for (int i = 0; i < device_list_count; i++)
+    {
+        //gui_img_create_from_mem(page, "radio", gui_get_file_address("app/system/resource/icMenuBird.bin"), 0, i*40, 0, 0);
+        gui_obj_t *win = gui_create_radiobutton(
+                             (void *)page,
+                             "radio",
+                             radio_group_name,
+                             radio_x,
 
+                             i * 60 + 40,
+                             radio_w,
+                             radio_h,
+                             pic,
+                             hl_pic,
+                             IMG_BYPASS_MODE);
+        gui_text_t *t = gui_text_create(win, 0, text_x, text_y, gui_get_screen_width(), text_h);
+        //extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+        // GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
+        gui_text_set(t, (void *)device_list[i], GUI_FONT_SRC_BMP, color, strlen(device_list[i]),
+                     font_size);
+        gui_text_type_set(t, (void *)font, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, style);
+
+    }
 }
 #endif
 void *rtk_gui_sdl(void *arg)

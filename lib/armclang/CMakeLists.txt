@@ -5,8 +5,7 @@ set(CMAKE_SYSTEM_NAME Generic)
 
 
 
-set(CMAKE_C_COMPILER armclang)
-set(CMAKE_CXX_COMPILER armclang)
+
 
 
 set(CMAKE_CXX_STANDARD 11)
@@ -17,6 +16,11 @@ set(CMAKE_C_EXTENSIONS ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 
+
+set(CMAKE_C_COMPILER "armclang.exe")
+set(CMAKE_CXX_COMPILER "armclang.exe")
+set(CMAKE_AR "armar.exe" CACHE FILEPATH "Archiver")
+set(CMAKE_LINKER "armlink.exe" CACHE FILEPATH "Linker")
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 

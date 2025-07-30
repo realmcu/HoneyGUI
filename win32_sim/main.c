@@ -25,7 +25,37 @@
 #define PROJECT_NAME                   "HoneyGUI Simulator"
 #define COMPANY_NAME                   "Realtek Semiconductor Corporation"
 
+extern int rvd_hover_button_by_index(int index);
+extern int rvd_get_main_page_hover_index();
+extern  int rvd_get_tv_main_page_hover_index();
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(on_click_jump_cb_tabview)
+{
 
+
+    GUI_WIDGET_POINTER_BY_NAME(obj_tabview, "tabview0");
+    gui_tabview_t *tabview = (void *)obj_tabview;
+
+    if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    {
+        rvd_hover_button_by_index(4);
+    }
+    else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    {
+        rvd_hover_button_by_index(1);
+    }
+    else if (tabview->cur_id.x == 0 && tabview->cur_id.y == 0)
+    {
+        rvd_hover_button_by_index(0);
+    }
+    else if (tabview->cur_id.x == 2 && tabview->cur_id.y == 0)
+    {
+        rvd_hover_button_by_index(rvd_get_main_page_hover_index());
+    }
+    else
+    {
+        rvd_hover_button_by_index(0);
+    }
+}
 int main(int argc, char **argv)
 {
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", \
@@ -48,7 +78,10 @@ int main(int argc, char **argv)
     gui_app_startup(get_app_launcher_frontend());
 #endif
 #endif
-//gui_update_screen_force(true);
+// gui_update_screen_force(true);
+//     GUI_WIDGET_POINTER_BY_NAME(tabview, "tabview0");
+//     gui_tabview_jump_tab((void *)tabview, 0, 0);
+//     gui_tabview_tab_change((void *)tabview, on_click_jump_cb_tabview, NULL);
     while (1)
     {
         time_t now;
