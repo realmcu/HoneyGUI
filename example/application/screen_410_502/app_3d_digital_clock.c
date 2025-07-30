@@ -10,7 +10,7 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -79,10 +79,10 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void update_digital_clock_animation(void *param)
 {
     touch_info_t *tp = tp_get_info();
-    gui_3d_t *this = (gui_3d_t *)param;
+    gui_lite3d_t *this = (gui_lite3d_t *)param;
 
     angle += 0.1f;
-    rot_x = 10.0f * cosf(0.5f * angle);
+    rot_x = 5.0f * cosf(0.5f * angle);
     rot_y = 5.0f * sinf(0.5f * angle);
 
     if (gui_ms_get() - last_time > 1000)
@@ -127,23 +127,23 @@ static void update_digital_clock_animation(void *param)
             current_hour1 = 0;
         }
 
-        gui_3d_set_face_image(this, 4, clock_fig_bin[current_second0]);
-        gui_3d_set_face_image(this, 5, clock_fig_bin[current_second1]);
+        l3_set_face_image(this->model, 4, clock_fig_bin[current_second0]);
+        l3_set_face_image(this->model, 5, clock_fig_bin[current_second1]);
 
-        gui_3d_set_face_image(this, 2, clock_fig_bin[current_minute0]);
-        gui_3d_set_face_image(this, 3, clock_fig_bin[current_minute1]);
+        l3_set_face_image(this->model, 2, clock_fig_bin[current_minute0]);
+        l3_set_face_image(this->model, 3, clock_fig_bin[current_minute1]);
 
-        gui_3d_set_face_image(this, 0, clock_fig_bin[current_hour0]);
-        gui_3d_set_face_image(this, 1, clock_fig_bin[current_hour1]);
+        l3_set_face_image(this->model, 0, clock_fig_bin[current_hour0]);
+        l3_set_face_image(this->model, 1, clock_fig_bin[current_hour1]);
     }
 }
 
-static void digital_clock_global_cb(gui_3d_t *this)
+static void digital_clock_global_cb(l3_model_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 10), 1, 32767,
-                                 90, this->base.w, this->base.h);
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 10), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_world_inititalize(&this->world, 2, 2.5, 25, 20.0f + rot_x, rot_y, 0, 5);
+    l3_world_initialize(&this->world, 2, 2.5, 25, 20.0f + rot_x, rot_y, 0, 5);
 
 }
 
@@ -155,13 +155,12 @@ static void digital_clock_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_3d_t *digital_clock_3d = gui_3d_create(obj, "3d-widget", DESC_DIGITAL_CLOCK_BIN,
-                                               GUI_3D_DRAW_FRONT_AND_BACK, 0, 0,
-                                               410, 502);
+    l3_model_t *digital_clock_3d = l3_create_model(DESC_DIGITAL_CLOCK_BIN, L3_DRAW_FRONT_AND_BACK, 0, 0,
+                                                   410, 502);
+    l3_set_global_transform(digital_clock_3d, (l3_global_transform_cb)digital_clock_global_cb);
+    gui_lite3d_t *lite3d_clock = gui_lite3d_create(obj, "lite3d_clock", digital_clock_3d, 0, 0, 410,
+                                                   502);
 
-    gui_3d_set_global_transform_cb(digital_clock_3d,
-                                   (gui_3d_global_transform_cb)digital_clock_global_cb);
-
-    gui_obj_create_timer(&(digital_clock_3d->base), 10, true, update_digital_clock_animation);
+    gui_obj_create_timer(&(lite3d_clock->base), 10, true, update_digital_clock_animation);
 
 }

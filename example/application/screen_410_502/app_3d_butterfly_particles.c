@@ -10,7 +10,7 @@
 #include "tp_algo.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -68,7 +68,6 @@ gui_img_t *butterfly_wing1 = NULL;
 gui_img_t *butterfly_wing2 = NULL;
 gui_img_t *butterfly_wing3 = NULL;
 gui_img_t *butterfly_wing4 = NULL;
-gui_3d_t *butterfly_particle_3d = NULL;
 
 static float wing_angle = 0.0f;
 static float wing_time = 0.0f;
@@ -121,17 +120,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-// static void return_to_menu()
-// {
-//     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
-
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
 
 static int x_to_screen_w(float butterfly_x)
 {
@@ -161,7 +149,7 @@ static int y_to_screen_h(float butterfly_y)
 
     return (int)screen_y;
 }
-static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
+static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes[],
                                            uint8_t face_index)
 {
     // Calculate the center of the four vertices
@@ -200,7 +188,7 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
     gui_img_set_opacity(wing, 180);
 }
 
-static void update_butterfly_wing_bg()
+static void update_butterfly_wing_bg(l3_model_t *model)
 {
     gui_obj_hidden(GUI_BASE(butterfly_wing1), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing2), false);
@@ -208,18 +196,15 @@ static void update_butterfly_wing_bg()
     gui_obj_hidden(GUI_BASE(butterfly_wing4), false);
 
     // Update each wing with calculated position and scale
-    update_wing_position_and_scale(butterfly_wing1,
-                                   butterfly_particle_3d->face.rect_face[0].transform_vertex, 0);
-    update_wing_position_and_scale(butterfly_wing2,
-                                   butterfly_particle_3d->face.rect_face[1].transform_vertex, 1);
-    update_wing_position_and_scale(butterfly_wing3,
-                                   butterfly_particle_3d->face.rect_face[2].transform_vertex, 2);
-    update_wing_position_and_scale(butterfly_wing4,
-                                   butterfly_particle_3d->face.rect_face[3].transform_vertex, 3);
+    update_wing_position_and_scale(butterfly_wing1, model->face.rect_face[0].transform_vertex, 0);
+    update_wing_position_and_scale(butterfly_wing2, model->face.rect_face[1].transform_vertex, 1);
+    update_wing_position_and_scale(butterfly_wing3, model->face.rect_face[2].transform_vertex, 2);
+    update_wing_position_and_scale(butterfly_wing4, model->face.rect_face[3].transform_vertex, 3);
 }
 
-static void update_butterfly()
+static void update_butterfly(void *param)
 {
+    gui_lite3d_t *lite3d_butterfly_particle = (gui_lite3d_t *)param;
     touch_info_t *tp = tp_get_info();
     uint32_t current_time = gui_ms_get();
     float progress = 0.0f;
@@ -278,43 +263,41 @@ static void update_butterfly()
         butterfly_z = (-5.0f + 13.0f * (1.0f - ease_progress)) * sinf(wing_time);
         break;
     }
-    update_butterfly_wing_bg();
+    update_butterfly_wing_bg(lite3d_butterfly_particle->model);
 }
 
-static void butterfly_particle_global_cb(gui_3d_t *this)
+static void butterfly_particle_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 40), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 40), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, butterfly_x, butterfly_y, 40.0f - butterfly_z, 0, 0,
-                             butterfly_rz,
-                             4.5);
+    l3_world_initialize(&this->world, butterfly_x, butterfly_y, 40.0f - butterfly_z, 0, 0, butterfly_rz,
+                        4.5f);
 }
 
-static gui_3d_matrix_t butterfly_particle_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t butterfly_particle_face_cb(l3_model_t *this,
+                                                  size_t face_index/*face offset*/)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
     if (face_index == 0 || face_index == 2)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  wing_angle, 1);
     }
     else if (face_index == 1 || face_index == 3)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  -wing_angle, 1);
     }
     else
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0), 0,
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0), 0,
                                  1);
     }
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 
@@ -576,14 +559,15 @@ static void butterfly_particle_app(gui_view_t *view)
     gui_img_set_mode(butterfly_wing2, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing3, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing4, IMG_SRC_OVER_MODE);
-    butterfly_particle_3d = gui_3d_create(obj, "3d-widget", DESC_BUTTERFLY_BIN,
-                                          GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                                          410, 502);
-    gui_3d_set_global_transform_cb(butterfly_particle_3d,
-                                   (gui_3d_global_transform_cb)butterfly_particle_global_cb);
-    gui_3d_set_face_transform_cb(butterfly_particle_3d,
-                                 (gui_3d_face_transform_cb)butterfly_particle_face_cb);
-    gui_obj_create_timer(&(butterfly_particle_3d->base), 17, true, update_butterfly);
+
+    l3_model_t *butterfly_particle_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0,
+                                                        410, 502);
+    l3_set_global_transform(butterfly_particle_3d,
+                            (l3_global_transform_cb)butterfly_particle_global_cb);
+    l3_set_face_transform(butterfly_particle_3d, (l3_face_transform_cb)butterfly_particle_face_cb);
+    gui_lite3d_t *lite3d_butterfly_particle = gui_lite3d_create(obj, "lite3d_butterfly_particle",
+                                                                butterfly_particle_3d, 0, 0, 410, 502);
+    gui_obj_create_timer(&(lite3d_butterfly_particle->base), 17, true, update_butterfly);
 
     particles = (Particle *)gui_malloc(MAX_PARTICLES * sizeof(Particle));
     if (!particles)

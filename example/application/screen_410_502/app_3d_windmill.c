@@ -10,7 +10,7 @@
 #include <math.h>
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 
 /*============================================================================*
  *                            Macros
@@ -159,23 +159,23 @@ static void update_windmill_animation()
 
 }
 
-static void windmill_global_cb(gui_3d_t *this)
+static void windmill_global_cb(l3_model_t *this)
 {
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 40), 1, 32767,
-                                 90, this->base.w, this->base.h);
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 40), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_world_inititalize(&this->world, 0, 0, 40, 0, rot_y_angle, 0, 5);
+    l3_world_initialize(&this->world, 0, 0, 40, 0, rot_y_angle, 0, 5);
 
 }
-static gui_3d_matrix_t windmill_face_cb(gui_3d_t *this, size_t face_index)
+static l3_4x4_matrix_t windmill_face_cb(l3_model_t *this, size_t face_index)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
-    gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 0, 1),
+    l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 0, 1),
                              rot_z_angle, 1);
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 
@@ -193,12 +193,12 @@ static void windmill_app(gui_view_t *view)
 
     gui_img_t *stick = gui_img_create_from_mem(obj, "stick", WINDMILL_STICK_BIN, 202, 246, 0, 0);
 
-    gui_3d_t *windmill_3d = gui_3d_create(obj, "3d-widget", DESC_WINDMILL_BIN,
-                                          GUI_3D_DRAW_FRONT_AND_BACK, 15, 52,
-                                          380, 380);
-
-    gui_3d_set_global_transform_cb(windmill_3d, (gui_3d_global_transform_cb)windmill_global_cb);
-    gui_3d_set_face_transform_cb(windmill_3d, (gui_3d_face_transform_cb)windmill_face_cb);
+    l3_model_t *windmill_3d = l3_create_model(DESC_WINDMILL_BIN, L3_DRAW_FRONT_AND_BACK, 15, 52, 380,
+                                              380);
+    l3_set_global_transform(windmill_3d, (l3_global_transform_cb)windmill_global_cb);
+    l3_set_face_transform(windmill_3d, (l3_face_transform_cb)windmill_face_cb);
+    gui_lite3d_t *lite3d_windmill = gui_lite3d_create(obj, "lite3d_windmill", windmill_3d, 0, 0, 410,
+                                                      502);
 
     for (int i = 0; i < NUM_BUBBLES; i++)
     {
@@ -212,7 +212,7 @@ static void windmill_app(gui_view_t *view)
         gui_img_scale(bubbles[i].img, bubbles[i].scale, bubbles[i].scale);
     }
 
-    gui_obj_create_timer(&(windmill_3d->base), 10, true, update_windmill_animation);
-    gui_obj_start_timer(&(windmill_3d->base));
+    gui_obj_create_timer(&(lite3d_windmill->base), 10, true, update_windmill_animation);
+    gui_obj_start_timer(&(lite3d_windmill->base));
 
 }

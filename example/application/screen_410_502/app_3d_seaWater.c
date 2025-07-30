@@ -14,7 +14,7 @@
 #include "stdlib.h"
 #include "gui_view.h"
 #include "gui_canvas.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 #include "gui_matrix.h"
 #include "tp_algo.h"
 #include "root_image/ui_resource.h"
@@ -488,32 +488,31 @@ static void app_animate_cb(void *p)
     can_update_param_cb();
 }
 
-static void fish_global_cb(gui_3d_t *this)
+static void fish_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
     static uint8_t index = 0;
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_world_inititalize(&this->world, -fish_x[index], fish_y[index], 80, 0, 0, 0,
-                             5);
+    l3_world_initialize(&this->world, -fish_x[index], fish_y[index], 80, 0, 0, 0, 5);
+
     index++;
     index %= 4;
 }
 
-static gui_3d_matrix_t fish_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t fish_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
 {
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
     if (face_index == 0)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  fish_angle, 1);
     }
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 }
@@ -527,23 +526,24 @@ static void app_ui_wave_nums_design(gui_view_t *view)
 
     gui_img_create_from_mem(view, "background", SEABACKGROUND_BIN, 0, 0, 0, 0);
 
-    gui_3d_t *fish0 = gui_3d_create(view, "3d-fish0", DESC_SEAFISH0_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                                    410, 502);
-    gui_3d_t *fish1 = gui_3d_create(view, "3d-fish1", DESC_SEAFISH1_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                                    410, 502);
-    gui_3d_t *fish2 = gui_3d_create(view, "3d-fish2", DESC_SEAFISH2_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                                    410, 502);
-    gui_3d_t *fish3 = gui_3d_create(view, "3d-fish3", DESC_SEAFISH3_BIN, GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                                    410, 502);
+    l3_model_t *fish0 = l3_create_model(DESC_SEAFISH0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish1 = l3_create_model(DESC_SEAFISH1_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish2 = l3_create_model(DESC_SEAFISH2_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *fish3 = l3_create_model(DESC_SEAFISH3_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
-    gui_3d_set_global_transform_cb(fish0, (gui_3d_global_transform_cb)fish_global_cb);
-    gui_3d_set_face_transform_cb(fish0, (gui_3d_face_transform_cb)fish_face_cb);
-    gui_3d_set_global_transform_cb(fish1, (gui_3d_global_transform_cb)fish_global_cb);
-    gui_3d_set_face_transform_cb(fish1, (gui_3d_face_transform_cb)fish_face_cb);
-    gui_3d_set_global_transform_cb(fish2, (gui_3d_global_transform_cb)fish_global_cb);
-    gui_3d_set_face_transform_cb(fish2, (gui_3d_face_transform_cb)fish_face_cb);
-    gui_3d_set_global_transform_cb(fish3, (gui_3d_global_transform_cb)fish_global_cb);
-    gui_3d_set_face_transform_cb(fish3, (gui_3d_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish0, (l3_global_transform_cb)fish_global_cb);
+    l3_set_face_transform(fish0, (l3_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish1, (l3_global_transform_cb)fish_global_cb);
+    l3_set_face_transform(fish1, (l3_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish2, (l3_global_transform_cb)fish_global_cb);
+    l3_set_face_transform(fish2, (l3_face_transform_cb)fish_face_cb);
+    l3_set_global_transform(fish3, (l3_global_transform_cb)fish_global_cb);
+    l3_set_face_transform(fish3, (l3_face_transform_cb)fish_face_cb);
+
+    gui_lite3d_t *lite3d_fish0 = gui_lite3d_create(view, "lite3d_fish0", fish0, 0, 0, 410, 502);
+    gui_lite3d_t *lite3d_fish1 = gui_lite3d_create(view, "lite3d_fish1", fish1, 0, 0, 410, 502);
+    gui_lite3d_t *lite3d_fish2 = gui_lite3d_create(view, "lite3d_fish2", fish2, 0, 0, 410, 502);
+    gui_lite3d_t *lite3d_fish3 = gui_lite3d_create(view, "lite3d_fish3", fish3, 0, 0, 410, 502);
 
     can0_window = gui_win_create(view, "can_window", 70, 190, 64, 116);
     gui_img_t *can0 = gui_img_create_from_mem(can0_window, "can0", CANSKIN_PURPLE_BIN, 0, 0, 0, 0);

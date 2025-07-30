@@ -12,18 +12,17 @@
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 #include "gui_canvas_rect.h"
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
 #define CURRENT_VIEW_NAME "butterflys_view"
-#define CLOCK_RADIUS_X 60
-#define CLOCK_RADIUS_Y 55
-#define CLOCK_CENTER_X 0
-#define CLOCK_CENTER_Y 10
+#define DEG_TO_RAD(angle) ((angle) * M_PI_F / 180.0f)
 #define MAX_PARTICLES 20
+#define BUTTERFLY_COUNT 3
+#define RADIUS 45
 
 /*============================================================================*
 *                             Types
@@ -40,12 +39,19 @@ typedef struct
     uint32_t spawn_time; // Time when particle was spawned
 } Particle;
 
+typedef struct
+{
+    float x;
+    float y;
+    float angle;
+} Butterfly_Pos;
+
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
 static void app_ui_butterflys_design(gui_view_t *view);
 static void free_particles_resources(gui_view_t *view);
-static void update_butterfly_wing_bg(gui_3d_t *butterfly, gui_win_t *win);
+static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *win);
 
 /*============================================================================*
  *                            Variables
@@ -65,32 +71,19 @@ static const gui_view_descriptor_t descriptor =
     .keep = false,
 };
 
+/* Particle Window */
+static gui_win_t *butterfly_win[BUTTERFLY_COUNT] = {NULL};
+
 /* Butterfly */
-static gui_3d_t *butterfly0 = NULL;
-static gui_3d_t *butterfly1 = NULL;
-static gui_3d_t *butterfly2 = NULL;
-static gui_win_t *butterfly0_win = NULL;
-static gui_win_t *butterfly1_win = NULL;
-static gui_win_t *butterfly2_win = NULL;
+static Butterfly_Pos butterfly_pos[BUTTERFLY_COUNT];
+static gui_lite3d_t *lite3d_butterflies[BUTTERFLY_COUNT] = {NULL};
 
 static float butterfly_angle = 0.0f;
-static float butterfly0_x = 0.0f;
-static float butterfly0_y = 0.0f;
-static float butterfly1_x = 0;
-static float butterfly1_y = 0;
-static float butterfly2_x = 0;
-static float butterfly2_y = 0;
-static float butterfly0_rz = 0.0f;
-static float butterfly1_rz = 0.0f;
-static float butterfly2_rz = 0.0f;
 static float butterfly_time = 0.0f;
-const static float rotation_factor = 60.0f;
-const static float angular_velocity = 0.03f; // Adjust as needed for speed
+const static float angular_velocity = 1.3f; // Adjust as needed for speed
 
 /* Particles */
-static Particle *particles0 = NULL;
-static Particle *particles1 = NULL;
-static Particle *particles2 = NULL;
+static Particle *particles[BUTTERFLY_COUNT] = {NULL};
 static uint32_t last_particle_spawn = 0;
 /*============================================================================*
  *                           Private Functions
@@ -116,16 +109,10 @@ static void return_to_menu()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-// static void return_timer_cb()
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_to_menu)
-// }
-
 static int x_to_screen_w(float butterfly_x)
 {
-    float a = 75.0f;
-    float b =  -75.0f;
+    float a = -65.0f;
+    float b = 65.0f;
     float c = 0.0f;
     float d = gui_get_screen_width();
 
@@ -135,8 +122,8 @@ static int x_to_screen_w(float butterfly_x)
 
 static int y_to_screen_h(float butterfly_y)
 {
-    float a = 70.0f;
-    float b = -70.0f;
+    float a = -68.0f;
+    float b = 68.0f;
     float c = 0.0f;
     float d = gui_get_screen_height();
 
@@ -144,113 +131,103 @@ static int y_to_screen_h(float butterfly_y)
     return (int)screen_y;
 }
 
-static void update_butterfly0()
+static void butterfly_pos_init()
 {
-    static float theta0 = 0.0f; // starting angle for butterfly0
+    const float initial_angles[BUTTERFLY_COUNT] = {0, 120, 240};
 
-    // Updating position for each butterfly using the circular path calculation
-    butterfly0_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta0);
-    butterfly0_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta0);
+    for (int i = 0; i < BUTTERFLY_COUNT; i++)
+    {
+        float rad = DEG_TO_RAD(initial_angles[i]);
+        butterfly_pos[i] = (Butterfly_Pos)
+        {
+            .x = RADIUS * cosf(rad),
+             .y = RADIUS * sinf(rad),
+              .angle = initial_angles[i]
+        };
+    }
 
-    butterfly0_rz = theta0 * rotation_factor + sinf(theta0 * 5) * 2.0f;
-    // gui_log("butterfly0_rz %f\n",butterfly0_rz);
+}
 
-    theta0 += angular_velocity;
-
-    if (theta0 >= 2 * M_PI_F) { theta0 -= 2 * M_PI_F; }
-
+static void update_butterfly()
+{
     butterfly_time += 1.2f;
     butterfly_angle = 30 * sinf(butterfly_time);
-    update_butterfly_wing_bg(butterfly0, butterfly0_win);
+
+    for (int i = 0; i < BUTTERFLY_COUNT; i++)
+    {
+        butterfly_pos[i].angle += angular_velocity;
+        if (butterfly_pos[i].angle > 360.0f)
+        {
+            butterfly_pos[i].angle -= 360.0f;
+        }
+        float rad = DEG_TO_RAD(butterfly_pos[i].angle);
+
+        butterfly_pos[i].x = RADIUS * cosf(rad);
+        butterfly_pos[i].y = RADIUS * sinf(rad);
+
+        update_butterfly_wing_bg(lite3d_butterflies[i], butterfly_win[i]);
+    }
+
+
 }
 
-static void update_butterfly1()
+static void butterfly0_global_cb(l3_model_t *this)
 {
-    static float theta1 = 2 * M_PI_F / 3; // starting angle for butterfly1
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 70), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    butterfly1_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta1);
-    butterfly1_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta1);
-    butterfly1_rz = theta1 * rotation_factor + sinf(theta1 * 5) * 0.8f;
-
-    theta1 += angular_velocity;
-
-    if (theta1 >= 2 * M_PI_F) { theta1 -= 2 * M_PI_F; }
-    update_butterfly_wing_bg(butterfly1, butterfly1_win);
+    l3_world_initialize(&this->world, butterfly_pos[0].x, butterfly_pos[0].y, 70, 0, 0,
+                        180 + butterfly_pos[0].angle,
+                        3);
 }
 
-static void update_butterfly2()
+static void butterfly1_global_cb(l3_model_t *this)
 {
-    static float theta2 = M_PI_F + M_PI_F / 3; // starting angle for butterfly2
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 70), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    butterfly2_x = CLOCK_CENTER_X + CLOCK_RADIUS_X * cosf(theta2);
-    butterfly2_y = CLOCK_CENTER_Y + CLOCK_RADIUS_Y * sinf(theta2);
-    butterfly2_rz = theta2 * rotation_factor + sinf(theta2 * 5) * 0.8f;
-
-    theta2 += angular_velocity;
-
-    if (theta2 >= 2 * M_PI_F) { theta2 -= 2 * M_PI_F; }
-    update_butterfly_wing_bg(butterfly2, butterfly2_win);
+    l3_world_initialize(&this->world, butterfly_pos[1].x, butterfly_pos[1].y, 70, 0, 0,
+                        180 + butterfly_pos[1].angle,
+                        3);
 }
 
-static void butterfly0_global_cb(gui_3d_t *this)
+static void butterfly2_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 70), 1, 32767,
+                             90, this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, -butterfly0_x, -butterfly0_y, 80, 0, 0, butterfly0_rz,
-                             4);
-}
-static void butterfly1_global_cb(gui_3d_t *this)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, -butterfly1_x, -butterfly1_y, 80, 0, 0, butterfly1_rz,
-                             4);
+    l3_world_initialize(&this->world, butterfly_pos[2].x, butterfly_pos[2].y, 70, 0, 0,
+                        180 + butterfly_pos[2].angle,
+                        3);
 }
 
-static void butterfly2_global_cb(gui_3d_t *this)
+static l3_4x4_matrix_t butterfly_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 0, 0), gui_point_4d(0, 0, 80), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, -butterfly2_x, -butterfly2_y, 80, 0, 0, butterfly2_rz,
-                             4);
-}
-
-static gui_3d_matrix_t butterfly_face_cb(gui_3d_t *this, size_t face_index/*face offset*/)
-{
-    gui_3d_matrix_t face_matrix;
-    gui_3d_matrix_t transform_matrix;
+    l3_4x4_matrix_t face_matrix;
+    l3_4x4_matrix_t transform_matrix;
 
     if (face_index == 0 || face_index == 2)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  butterfly_angle, 1);
     }
     else if (face_index == 1 || face_index == 3)
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0),
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0),
                                  -butterfly_angle, 1);
     }
     else
     {
-        gui_3d_calculator_matrix(&face_matrix, 0, 0, 0, gui_3d_point(0, 0, 0), gui_3d_vector(0, 1, 0), 0,
+        l3_calculator_4x4_matrix(&face_matrix, 0, 0, 0, l3_4d_point(0, 0, 0), l3_4d_vector(0, 1, 0), 0,
                                  1);
     }
 
-    transform_matrix = gui_3d_matrix_multiply(face_matrix, this->world);
+    l3_4x4_matrix_mul(&this->world, &face_matrix, &transform_matrix);
 
     return transform_matrix;
 }
 
-static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vertexes[],
+static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes[],
                                            uint8_t face_index)
 {
     // Calculate the center of the four vertices
@@ -291,7 +268,7 @@ static void update_wing_position_and_scale(gui_img_t *wing, gui_3d_vertex_t vert
     gui_img_set_opacity(wing, 180);
 }
 
-static void update_butterfly_wing_bg(gui_3d_t *butterfly, gui_win_t *win)
+static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *win)
 {
     GUI_WIDGET_POINTER_BY_NAME_ROOT(wing1, "wing1", GUI_BASE(win))
     GUI_WIDGET_POINTER_BY_NAME_ROOT(wing2, "wing2", GUI_BASE(win))
@@ -306,39 +283,25 @@ static void update_butterfly_wing_bg(gui_3d_t *butterfly, gui_win_t *win)
 
     // Update each wing with calculated position and scale
     update_wing_position_and_scale((gui_img_t *)wing1,
-                                   butterfly->face.rect_face[0].transform_vertex, 0);
+                                   lite3d_butterfly->model->face.rect_face[0].transform_vertex, 0);
     update_wing_position_and_scale((gui_img_t *)wing2,
-                                   butterfly->face.rect_face[1].transform_vertex, 1);
+                                   lite3d_butterfly->model->face.rect_face[1].transform_vertex, 1);
     update_wing_position_and_scale((gui_img_t *)wing3,
-                                   butterfly->face.rect_face[2].transform_vertex, 2);
+                                   lite3d_butterfly->model->face.rect_face[2].transform_vertex, 2);
     update_wing_position_and_scale((gui_img_t *)wing4,
-                                   butterfly->face.rect_face[3].transform_vertex, 3);
+                                   lite3d_butterfly->model->face.rect_face[3].transform_vertex, 3);
 }
 
 // Calculate butterfly tail position based on current position and rotation
-static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, float *tail_y)
+static void get_butterfly_tail_position(gui_lite3d_t *lite3d_butterfly,
+                                        Butterfly_Pos *butterfly_pos, float *tail_x, float *tail_y)
 {
-    float screen_x = 0.0;
-    float screen_y = 0.0;
-    if (butterfly == butterfly0)
-    {
-        screen_x = x_to_screen_w(butterfly0_x);
-        screen_y = y_to_screen_h(butterfly0_y);
-    }
-    else if (butterfly == butterfly1)
-    {
-        screen_x = x_to_screen_w(butterfly1_x);
-        screen_y = y_to_screen_h(butterfly1_y);
-    }
-    else if (butterfly == butterfly2)
-    {
-        screen_x = x_to_screen_w(butterfly2_x);
-        screen_y = y_to_screen_h(butterfly2_y);
-    }
+    float screen_x = x_to_screen_w(butterfly_pos->x);
+    float screen_y = y_to_screen_h(butterfly_pos->y);
 
-    float angle_rad = (butterfly0_rz - 90) * M_PI_F / 180.0f;
-    float offset_x = cosf(angle_rad) * 10.0f;
-    float offset_y = sinf(angle_rad) * 10.0f;
+    float angle_rad = (butterfly_pos->angle) * M_PI_F / 180.0f;
+    float offset_x = sinf(angle_rad) * 20.0f;
+    float offset_y = -cosf(angle_rad) * 20.0f;
 
     float random_offset_x = (xorshift16() % 10 - 5) * 0.5f; // -2.5 ~ +2.5
     float random_offset_y = (xorshift16() % 10 - 5) * 0.5f;
@@ -352,8 +315,8 @@ static void get_butterfly_tail_position(gui_3d_t *butterfly, float *tail_x, floa
     if (*tail_y > gui_get_screen_height()) { *tail_y = gui_get_screen_height(); }
 }
 
-static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *butterfly,
-                           float butterfly_rz, uint32_t current_time)
+static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_lite3d_t *lite3d_butterfly,
+                           Butterfly_Pos *butterfly_pos, uint32_t current_time)
 {
     for (int i = 0; i < MAX_PARTICLES; i++)
     {
@@ -363,7 +326,7 @@ static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *but
             // Get butterfly tail position
             float tail_x;
             float tail_y;
-            get_butterfly_tail_position(butterfly, &tail_x, &tail_y);
+            get_butterfly_tail_position(lite3d_butterfly, butterfly_pos, &tail_x, &tail_y);
 
             // Initialize particle at butterfly tail
             particles[i].x = tail_x;
@@ -371,7 +334,7 @@ static void spawn_particle(gui_obj_t *parent, Particle *particles, gui_3d_t *but
             particles[i].life = 1.0f; // Full life
 
             {
-                float angle_rad = (butterfly_rz - 90) * M_PI_F / 180.0f;
+                float angle_rad = butterfly_pos->angle * M_PI_F / 180.0f;
                 particles[i].direction_x = cosf(angle_rad) * -0.5f;
                 particles[i].direction_y = sinf(angle_rad) * -0.5f;
                 particles[i].direction_x += (xorshift16() % 100 - 100) * 0.001f;
@@ -442,9 +405,10 @@ static void update_particles(void *p)
     }
     last_particle_spawn = current_time;
     // Spawn new particles when butterfly is moving
-    spawn_particle(obj, particles0, butterfly0, butterfly0_rz, current_time);
-    spawn_particle(obj, particles1, butterfly1, butterfly1_rz, current_time);
-    spawn_particle(obj, particles2, butterfly2, butterfly2_rz, current_time);
+    for (int i = 0; i < BUTTERFLY_COUNT; i++)
+    {
+        spawn_particle(obj, particles[i], lite3d_butterflies[i], &butterfly_pos[i], current_time);
+    }
 }
 
 static void init_butterfly_bg(gui_win_t *parent, Particle **particles)
@@ -479,20 +443,13 @@ static void init_butterfly_bg(gui_win_t *parent, Particle **particles)
 
 static void free_particles_resources(gui_view_t *view)
 {
-    if (particles0)
+    for (int i = 0; i < BUTTERFLY_COUNT; i++)
     {
-        gui_free(particles0);
-        particles0 = NULL;
-    }
-    if (particles1)
-    {
-        gui_free(particles1);
-        particles1 = NULL;
-    }
-    if (particles2)
-    {
-        gui_free(particles2);
-        particles2 = NULL;
+        if (particles[i])
+        {
+            gui_free(particles[i]);
+            particles[i] = NULL;
+        }
     }
 }
 
@@ -500,7 +457,6 @@ static void app_ui_butterflys_design(gui_view_t *view)
 {
     srand((uint32_t)gui_ms_get());
     gui_obj_t *obj = GUI_BASE(view);
-    // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
@@ -508,43 +464,42 @@ static void app_ui_butterflys_design(gui_view_t *view)
     gui_dispdev_t *dc = gui_get_dc();
 
     gui_canvas_rect_create(obj, 0, 0, 0, 410, 502, gui_rgba(30, 30, 30, 255));
-    butterfly0_win = gui_win_create(obj, 0, 0, 0, dc->screen_width,
-                                    dc->screen_height);
-    butterfly1_win = gui_win_create(obj, 0, 0, 0, dc->screen_width,
-                                    dc->screen_height);
-    butterfly2_win = gui_win_create(obj, 0, 0, 0, dc->screen_width,
-                                    dc->screen_height);
 
-    butterfly0 = gui_3d_create(obj, "3d-butterfly0", DESC_BUTTERFLY_BIN,
-                               GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                               0, 0);
-    butterfly1 = gui_3d_create(obj, "3d-butterfly1", DESC_BUTTERFLY_BIN,
-                               GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                               0, 0);
-    butterfly2 = gui_3d_create(obj, "3d-butterfly2", DESC_BUTTERFLY_BIN,
-                               GUI_3D_DRAW_FRONT_ONLY, 0, 0,
-                               0, 0);
+    // Particles
+    butterfly_win[0] = gui_win_create(obj, 0, 0, 0, dc->screen_width, dc->screen_height);
+    butterfly_win[1] = gui_win_create(obj, 0, 0, 0, dc->screen_width, dc->screen_height);
+    butterfly_win[2] = gui_win_create(obj, 0, 0, 0, dc->screen_width, dc->screen_height);
 
-    init_butterfly_bg(butterfly0_win, &particles0);
-    init_butterfly_bg(butterfly1_win, &particles1);
-    init_butterfly_bg(butterfly2_win, &particles2);
+    init_butterfly_bg(butterfly_win[0], &particles[0]);
+    init_butterfly_bg(butterfly_win[1], &particles[1]);
+    init_butterfly_bg(butterfly_win[2], &particles[2]);
 
-    gui_3d_set_global_transform_cb(butterfly0, (gui_3d_global_transform_cb)butterfly0_global_cb);
-    gui_3d_set_face_transform_cb(butterfly0, (gui_3d_face_transform_cb)butterfly_face_cb);
+    // Butterflies
+    l3_model_t *butterfly0 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *butterfly1 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_t *butterfly2 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
-    gui_3d_set_global_transform_cb(butterfly1, (gui_3d_global_transform_cb)butterfly1_global_cb);
-    gui_3d_set_face_transform_cb(butterfly1, (gui_3d_face_transform_cb)butterfly_face_cb);
+    butterfly_pos_init();
+    l3_set_global_transform(butterfly0, (l3_global_transform_cb)butterfly0_global_cb);
+    l3_set_face_transform(butterfly0, (l3_face_transform_cb)butterfly_face_cb);
 
-    gui_3d_set_global_transform_cb(butterfly2, (gui_3d_global_transform_cb)butterfly2_global_cb);
-    gui_3d_set_face_transform_cb(butterfly2, (gui_3d_face_transform_cb)butterfly_face_cb);
+    l3_set_global_transform(butterfly1, (l3_global_transform_cb)butterfly1_global_cb);
+    l3_set_face_transform(butterfly1, (l3_face_transform_cb)butterfly_face_cb);
+
+    l3_set_global_transform(butterfly2, (l3_global_transform_cb)butterfly2_global_cb);
+    l3_set_face_transform(butterfly2, (l3_face_transform_cb)butterfly_face_cb);
+
+    lite3d_butterflies[0] = gui_lite3d_create(obj, "lite3d_butterfly0", butterfly0, 0, 0, 410, 502);
+    lite3d_butterflies[1] = gui_lite3d_create(obj, "lite3d_butterfly1", butterfly1, 0, 0, 410, 502);
+    lite3d_butterflies[2] = gui_lite3d_create(obj, "lite3d_butterfly2", butterfly2, 0, 0, 410, 502);
+
+    gui_obj_create_timer(GUI_BASE(lite3d_butterflies[0]), 17, true, update_butterfly);
+
 
     gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 26,
                                                    (gui_get_screen_height() - 189) / 3, 0, 0);
     gui_img_set_mode(clock_img, IMG_SRC_OVER_MODE);
 
-    gui_obj_create_timer(&(butterfly0->base), 17, true, update_butterfly0);
-    gui_obj_create_timer(&(butterfly1->base), 17, true, update_butterfly1);
-    gui_obj_create_timer(&(butterfly2->base), 17, true, update_butterfly2);
 
     gui_win_t *particles_win = gui_win_create(obj, 0, 0, 0, dc->screen_width,
                                               dc->screen_height);
