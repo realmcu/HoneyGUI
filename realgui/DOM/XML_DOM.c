@@ -2087,6 +2087,8 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int fontSize = 0;
         TEXT_MODE style = (TEXT_MODE)0;
         uint8_t inputable = false;
+        int16_t letter_space = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -2174,6 +2176,14 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 inputable = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "letterSpace"))
+            {
+                letter_space = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
@@ -2205,7 +2215,10 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                     gui_text_input_set(t, inputable);
                     gui_text_click(t, gui_keyboard_launch_by_widget, t);
                 }
-
+                if (letter_space != 0)
+                {
+                    gui_text_set_extra_letter_spacing(t, letter_space);
+                }
 
                 {
                     FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
@@ -2265,6 +2278,11 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 t = (void *)scroll_text;
             }
             parent = (void *)t;
+            if (parent)
+            {
+                gui_obj_hidden(parent, hidden);
+            }
+
         }
     }
     return parent;
@@ -2334,6 +2352,7 @@ static gui_obj_t *widget_create_rectangle(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
         int16_t h = 0;
         gui_color_t color = APP_COLOR_WHITE;
         uint8_t opacity = 255;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -2365,6 +2384,10 @@ static gui_obj_t *widget_create_rectangle(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
             {
                 opacity = atof(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -2376,6 +2399,7 @@ static gui_obj_t *widget_create_rectangle(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
             }
 
             parent = (void *)gui_canvas_rect_create(parent, ptxt, x, y, w, h, color);
+            gui_obj_hidden(parent, hidden);
         }
     }
     return parent;
@@ -2391,6 +2415,7 @@ static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t h = 0;
         int style = 0; GUI_UNUSED(style);
         bool gestures = true;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -2448,12 +2473,17 @@ static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 }
 
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
         parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
         gui_tabview_loop_x((void *)parent, true);
         GUI_TYPE(gui_tabview_t, parent)->tp_disable = !gestures;
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -2473,6 +2503,7 @@ static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
         float sd = 0; GUI_UNUSED(sd);
         float ed = 100; GUI_UNUSED(ed);
         int dir = NVG_CW;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -2537,6 +2568,10 @@ static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
                     dir = NVG_CW;
                 }
 
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
             }
             i++;
         }
@@ -2628,6 +2663,7 @@ static gui_obj_t *widget_create_macro_canvas_arc(ezxml_t p, gui_obj_t *parent,
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             parent = (void *)img;
             parent->obj_cb = gui_canvas_img_cb;
+            gui_obj_hidden(parent, hidden);
         }
 
 
@@ -2666,6 +2702,7 @@ static gui_obj_t *widget_create_progressbar(ezxml_t p, gui_obj_t *parent, T_OBJ_
         bool vh = false;
         bool canvas = false;
         char *picture = "app/system/resource/Progress bar_full.bin";
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -2736,6 +2773,10 @@ static gui_obj_t *widget_create_progressbar(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 }
 
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -2767,6 +2808,7 @@ static gui_obj_t *widget_create_progressbar(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 parent = (void *)gui_progressbar_img_h_create(parent, (void *)gui_get_image_file_address(picture),
                                                               x, y);
             }
+            gui_obj_hidden(parent, hidden);
         }
         parent->name = ptxt;
 
@@ -2804,6 +2846,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
         uint8_t opacity = 255;
         bool reverse = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -2934,6 +2977,10 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             else if (!strcmp(p->attr[i], "opacity"))
             {
                 opacity = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
             }
             i++;
         }
@@ -3095,7 +3142,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         }
 
         parent->name = ptxt;
-
+        gui_obj_hidden(parent, hidden);
 
 
     }
@@ -3113,6 +3160,7 @@ static gui_obj_t *widget_create_tab(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wid
         int16_t h = 0;
         int16_t idx = 0;
         int16_t idy = 0;
+        bool hidden = false;
 
         while (true)
         {
@@ -3145,12 +3193,17 @@ static gui_obj_t *widget_create_tab(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wid
             {
                 idy = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
 
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
         parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -3165,6 +3218,7 @@ static gui_obj_t *widget_create_curtainview(ezxml_t p, gui_obj_t *parent, T_OBJ_
         int16_t w = 0;
         int16_t h = 0;
         int style = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -3207,6 +3261,10 @@ static gui_obj_t *widget_create_curtainview(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 {
                     style = WIDGET_SCALE_FADE;
                 }
+                else if (!strcmp(p->attr[i], "hidden"))
+                {
+                    hidden = true;
+                }
                 GUI_UNUSED(style);
             }
             i++;
@@ -3215,6 +3273,7 @@ static gui_obj_t *widget_create_curtainview(ezxml_t p, gui_obj_t *parent, T_OBJ_
         //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
         parent = (void *)gui_curtainview_create(parent, ptxt, x, y, w, h);
         GUI_TYPE(gui_curtainview_t, parent)->style = style;
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -3228,6 +3287,7 @@ static gui_obj_t *widget_create_page(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         int16_t y = 0;
         int16_t w = 0;
         int16_t h = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -3251,6 +3311,10 @@ static gui_obj_t *widget_create_page(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             {
                 h = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -3258,6 +3322,7 @@ static gui_obj_t *widget_create_page(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         parent = (void *)gui_win_create(parent, "_page_scope", x, y, w, h);
         gui_win_set_scope((void *)parent, 1);
         parent = (void *)gui_page_create(parent, ptxt, 0, 0, w, h);
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -3273,6 +3338,7 @@ static gui_obj_t *widget_create_grid(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         int16_t colNumber = 4;
         int16_t rowGap = 100;
         int16_t colGap = 100;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -3304,12 +3370,17 @@ static gui_obj_t *widget_create_grid(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             {
                 colGap = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
         parent = (void *)gui_grid_create(parent, x, y, rowNumber, colNumber, colGap, rowGap);
         parent->name = ptxt;
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -3321,6 +3392,7 @@ static gui_obj_t *widget_create_screen(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
         size_t i = 0;
         int16_t w = 0; GUI_UNUSED(w);
         int16_t h = 0; GUI_UNUSED(h);
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -3335,6 +3407,10 @@ static gui_obj_t *widget_create_screen(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
             else if (!strcmp(p->attr[i], "h"))
             {
                 h = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
             }
             i++;
         }
@@ -3353,6 +3429,7 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t h = 0;
         float scope = 1.0f;
         T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
+        bool hidden = false;
         // int style = 0; GUI_UNUSED(style);
         while (true)
         {
@@ -3405,6 +3482,10 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                     orientation = CURTAIN_RIGHT;
                 }
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             // else if (!strcmp(p->attr[i], "transition"))
             // {
             //     char *s = p->attr[++i];
@@ -3441,7 +3522,7 @@ static gui_obj_t *widget_create_curtain(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             parent = (void *)gui_win_create(parent, 0, (1 - scope) * gui_get_screen_width(), 0, w * scope, h);
         }
 
-
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -3475,6 +3556,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
         float scalex = 1;
         float scaley = 1;
         float angle = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -3601,6 +3683,10 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             {
                 angle = atof(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         void *img1;
@@ -3636,6 +3722,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
 
         //font_size = 32;
         parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, BUTTON_BG_ICON, 0);
+        gui_obj_hidden(parent, hidden);
         GUI_TYPE(gui_button_t, parent)->style = style;
         parent->name = ptxt;
         gui_button_img_move((void *)parent, picture_x, picture_y);
@@ -4230,6 +4317,7 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     // default image blend_mode
     BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
     uint8_t opacity = 255; GUI_UNUSED(opacity);
+    bool hidden = false;
     while (true)
     {
         if (!(p->attr[i]))
@@ -4300,6 +4388,10 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
         {
             opacity = atof(p->attr[++i]);
         }
+        else if (!strcmp(p->attr[i], "hidden"))
+        {
+            hidden = true;
+        }
         i++;
     }
     char *ptxt = get_space_string_head(p->txt);
@@ -4307,6 +4399,7 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     radio_t *param = gui_malloc(sizeof(radio_t));
     memset(param, 0, sizeof(radio_t));
     parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
+    gui_obj_hidden(parent, hidden);
     parent->obj_cb = radio_win_cb;
     GUI_TYPE(gui_obj_t, parent)->type = RADIO;
     gui_win_press((void *)parent, win_radio_press, param);
@@ -4354,6 +4447,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
         BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
         uint8_t opacity = 255;
         int style = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -4438,6 +4532,10 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
             {
                 dur = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         void *img1;
@@ -4471,6 +4569,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
 
         parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
+        gui_obj_hidden(parent, hidden);
         parent->name = get_space_string_head(p->txt);
         if (hl_pictureHl)
         {
@@ -4611,6 +4710,7 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         uint8_t opacity = 255; GUI_UNUSED(opacity);
 
         memset(&config, 0, sizeof(config));
+        bool hidden = false;
         while (true)
         {
             // #define IS_STR(str) (!strcmp(p->attr[i], str))
@@ -4661,6 +4761,10 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             else if (!strcmp(p->attr[i], "opacity"))
             {
                 opacity = atof(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
             }
             i++;
         }
@@ -4725,8 +4829,9 @@ static gui_obj_t *widget_create_gallery(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             config.data_center_bg = (void *)gui_get_image_file_address(config.data_center_bg);
         }
 
-        gui_gallery_create(parent, ptxt, &config,
-                           x, y, w, h);
+        parent = (void *)gui_gallery_create(parent, ptxt, &config,
+                                            x, y, w, h);
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -4738,6 +4843,7 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
         size_t i = 0;
         gui_kb_config_t config = {0};
         char *picture = "app/system/resource/Progress bar_full.bin"; GUI_UNUSED(picture);
+        bool hidden = false;
         // char *folder = NULL;
 
         // default image blend_mode
@@ -4756,6 +4862,10 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
                 {
                     config.ime = KB_METHOD_PINYIN;
                 }
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
             }
             i++;
         }
@@ -4835,8 +4945,9 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
             config.num_pic = file_count;
         }
 
-        gui_keyboard_create(parent, "test", &config,
-                            0, 0, gui_get_screen_width(), gui_get_screen_height());
+        parent = (void *)gui_keyboard_create(parent, "test", &config,
+                                             0, 0, gui_get_screen_width(), gui_get_screen_height());
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -4862,6 +4973,7 @@ static gui_obj_t *widget_create_macro_motorized_curtain(ezxml_t p, gui_obj_t *pa
         int16_t y = 0;
         int16_t w = 0;
         int16_t h = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -4897,11 +5009,16 @@ static gui_obj_t *widget_create_macro_motorized_curtain(ezxml_t p, gui_obj_t *pa
             {
                 pause_switch_name = gui_strdup(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
         parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -4912,6 +5029,7 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
         char *ptxt = get_space_string_head(p->txt);
         static unsigned char ml_count;
         char *group_name = 0;
+        bool hidden = false;
         //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
         size_t i = 0;
         while (true)
@@ -4929,6 +5047,11 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
             // {
             //     pause_switch_name = gui_strdup(p->attr[++i]);
             // }
+
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         if (group_name && strlen(group_name) == 0)
@@ -4955,7 +5078,7 @@ static gui_obj_t *widget_create_multi_level(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
         parent = (void *)gui_multi_level_create_group(parent, ptxt,
                                                       (void(*)(gui_obj_t *))multi_level_ui_design, group_name);
-
+        gui_obj_hidden(parent, hidden);
 
     }
     return parent;
@@ -7119,6 +7242,7 @@ static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_O
         int16_t h = 0;
         char *picture = NULL;
         char *hl_picture = NULL;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -7150,6 +7274,10 @@ static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_O
             {
                 hl_picture = gui_strdup(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         void *img1 = return_image;
@@ -7170,7 +7298,7 @@ static gui_obj_t *widget_create_macro_backicon(ezxml_t p, gui_obj_t *parent, T_O
         gui_button_t *button = (void *)parent;
         button->img->blend_mode = IMG_SRC_OVER_MODE;
         GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
-
+        gui_obj_hidden(parent, hidden);
 
 
     }
@@ -7276,6 +7404,7 @@ static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
     {
         size_t i = 0;
         int id = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -7291,6 +7420,10 @@ static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
             {
 
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         if (id >= 0 && id < sizeof(xml_dom_key_array) / sizeof(xml_dom_key_t))
@@ -7303,6 +7436,7 @@ static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
 
             GUI_BASE(win)->type = MACRO_KEY;
             parent = (void *)win;
+            gui_obj_hidden(parent, hidden);
         }
         else
         {
@@ -7317,14 +7451,33 @@ static gui_obj_t *widget_create_macro_key(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
 #include "gui_fps.h"
 static gui_obj_t *widget_create_macro_fps(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
+    size_t i = 0;
+    bool hidden = false;
 
+    while (true)
+    {
+        if (!(p->attr[i]))
+        {
+            break;
+        }
+        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+        if (!strcmp(p->attr[i], "name"))
+        {
+
+        }
+        else if (!strcmp(p->attr[i], "hidden"))
+        {
+            hidden = true;
+        }
+        i++;
+    }
     {
 
 
 
         char *ptxt = get_space_string_head(p->txt);
-        gui_fps_create(parent);
-
+        parent = gui_fps_create(parent);
+        gui_obj_hidden(parent, hidden);
 
     }
 
@@ -7454,6 +7607,7 @@ static gui_obj_t *widget_create_macro_frame(ezxml_t p, gui_obj_t *parent, T_OBJ_
         char *flow_starting_point = 0;
         bool clip_content = true;
         uint8_t scrollBehavior = FRAME_NO_SCROLLING;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -7504,12 +7658,17 @@ static gui_obj_t *widget_create_macro_frame(ezxml_t p, gui_obj_t *parent, T_OBJ_
                     scrollBehavior = FRAME_SCROLL_BOTH_DIRECTION;
                 }
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
         {
             parent = (void *)gui_win_create(parent, ptxt, 0, 0, w, h);
+            gui_obj_hidden(parent, hidden);
             if (!flow_starting_point)
             {
                 gui_obj_hidden(parent, 1);
@@ -8730,6 +8889,7 @@ static gui_obj_t *widget_create_macro_wifi(ezxml_t p, gui_obj_t *parent, T_OBJ_T
     {
         size_t i = 0;
         int id = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -8745,6 +8905,10 @@ static gui_obj_t *widget_create_macro_wifi(ezxml_t p, gui_obj_t *parent, T_OBJ_T
             {
 
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -8753,6 +8917,7 @@ static gui_obj_t *widget_create_macro_wifi(ezxml_t p, gui_obj_t *parent, T_OBJ_T
 
         GUI_BASE(win)->type = MACRO_WIFI;
         parent = (void *)win;
+        gui_obj_hidden(parent, hidden);
     }
     return parent;
 }
@@ -8771,6 +8936,7 @@ static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
         int16_t maxValue = 0;
         int16_t currentValue = 0;
         int16_t slider_size = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -8818,6 +8984,10 @@ static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
             {
                 slider_size = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         void *bg_buf = 0;
@@ -8833,6 +9003,7 @@ static gui_obj_t *widget_create_slider(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
 
         parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minValue, maxValue, slider_buf,
                                            currentValue, slider_size);
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -10049,6 +10220,7 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
         gui_color_t  item_color_highlight = {0}; GUI_UNUSED(item_color_highlight);
         bool loop = 1;
         TEXT_MODE style = LEFT;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -10161,6 +10333,10 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
                     style = RIGHT;
                 }
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         {
@@ -10261,7 +10437,7 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
         scroll_wheel->loop = loop;
         scroll_wheel->blank_count = blank_count;
         parent = GUI_BASE(scroll_wheel);
-
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -10505,6 +10681,7 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
         char *picture = NULL;
         char *hl_picture = NULL;
         char *st_picture = NULL;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -10632,6 +10809,10 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
                 }
                 GUI_UNUSED(blendMode);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         {
@@ -10699,7 +10880,7 @@ static gui_obj_t *widget_create_macro_page_list_new(ezxml_t p, gui_obj_t *parent
                                                                 font_size,
                                                                 font_color);
         }
-
+        gui_obj_hidden(parent, hidden);
         GUI_TYPE(gui_pagelist_new_t, parent)->text_mode = style;
         gui_event_cb_t *item_click_function_array = gui_malloc(sizeof(gui_event_cb_t) * item_count);
         for (size_t i = 0; i < item_count; i++)
@@ -10741,6 +10922,7 @@ static gui_obj_t *widget_create_macro_calendar(ezxml_t p, gui_obj_t *parent, T_O
         gui_color_t title_background_color = gui_color_css("hsl(203, 92%, 75%)");;
         const char *font = 0;
         int16_t font_size = 0;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -10804,11 +10986,16 @@ static gui_obj_t *widget_create_macro_calendar(ezxml_t p, gui_obj_t *parent, T_O
             {
                 font_size = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
-        gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size, color_p,
-                            font_color_highlight, item_color, item_color_highlight, title_color, title_background_color);
-
+        parent = (void *)gui_calender_create(parent, x, y, w, h, gui_get_file_address(font), font_size,
+                                             color_p,
+                                             font_color_highlight, item_color, item_color_highlight, title_color, title_background_color);
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -10974,6 +11161,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
         gui_color_t  background_color = {0};
         // default image blend_mode
         BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -11088,6 +11276,10 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
                 }
                 GUI_UNUSED(blendMode);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         {
@@ -11135,7 +11327,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
 
         // parent = GUI_BASE(combo);
-
+        gui_obj_hidden((void *)combo, hidden);
     }
 
     return parent;
@@ -11509,6 +11701,7 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
         int16_t min = 0;
         const char *style = "waveform";
         int16_t stroke_width = 4;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -11557,6 +11750,10 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
             else if (!strcmp(p->attr[i], "strokeWidth"))
             {
                 stroke_width = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
             }
             i++;
         }
@@ -11656,6 +11853,7 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
         parent = (void *)img;
         parent->obj_cb = gui_canvas_img_cb;
+        gui_obj_hidden(parent, hidden);
     }
 
     return parent;
@@ -11680,6 +11878,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
         // default image blend_mode
         BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
         uint8_t opacity = 255;
+        bool hidden = false;
         while (true)
         {
             if (!(p->attr[i]))
@@ -11760,6 +11959,10 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             {
                 duration = atoi(p->attr[++i]);
             }
+            else if (!strcmp(p->attr[i], "hidden"))
+            {
+                hidden = true;
+            }
             i++;
         }
         char *ptxt = get_space_string_head(p->txt);
@@ -11816,6 +12019,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
                 gui_fs_closedir(dir);
             }
             parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, image_array[0], x, y);
+            gui_obj_hidden(parent, hidden);
             ((gui_img_t *)parent)->simple = 1;
 
             image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
@@ -11841,6 +12045,7 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             void *imgbuf = (void *)gui_get_image_file_address(file);
             gui_free(file);
             parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
+            gui_obj_hidden(parent, hidden);
             ((gui_img_t *)parent)->simple = 1;
             if (scalex != 1 || scaley != 1)
             {

@@ -95,12 +95,13 @@ typedef struct gui_calendar
  * @param title_color The color of the calendar title text.
  * @param title_background_color The background color of the calendar title.
  */
-void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
-                         int font_size_p, gui_color_t color_p, gui_color_t font_color_highlight,
-                         gui_color_t item_color,
-                         gui_color_t item_color_highlight,
-                         gui_color_t title_color,
-                         gui_color_t title_background_color);
+gui_calendar_t   *gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h,
+                                      void *font_source_p,
+                                      int font_size_p, gui_color_t color_p, gui_color_t font_color_highlight,
+                                      gui_color_t item_color,
+                                      gui_color_t item_color_highlight,
+                                      gui_color_t title_color,
+                                      gui_color_t title_background_color);
 
 
 

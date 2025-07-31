@@ -80,7 +80,7 @@ static void gui_fps_cb(void *p, void *this_widget, gui_animate_t *animate)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_fps_create(void *parent)
+gui_obj_t *gui_fps_create(void *parent)
 {
     static const unsigned char Sans_SC_Regular_size16_bits4_font[12904] =
     {
@@ -897,7 +897,7 @@ void gui_fps_create(void *parent)
     int font_size = 16;
     gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
                                                      gui_get_screen_width() / 2 - 120 / 2, 0, 120, 65, APP_COLOR_GRAY_OPACITY(150));
-    gui_win_t *win = gui_win_create(parent, 0, 0, 0, 454, 454);
+    gui_win_t *win = gui_win_create(rect, 0, 0, 0, 454, 454);
     gui_win_set_animate(win, 500, -1, gui_fps_cb, win);
 
     sprintf(fps, "FPS:%d", 1000 / gui_spf());
@@ -920,5 +920,6 @@ void gui_fps_create(void *parent)
     gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_font_mem_init(addr1);
     gui_text_type_set(low_mem, addr1, FONT_SRC_MEMADDR);
+    return (void *)rect;
 }
 

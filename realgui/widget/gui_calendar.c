@@ -267,16 +267,24 @@ static void ctor(gui_calendar_t *widget, gui_obj_t *parent, int x, int y, int w,
     widget->title_background_color = title_background_color;
 }
 
-void gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h, void *font_source_p,
-                         int font_size_p, gui_color_t color_p,    gui_color_t font_color_highlight,
-                         gui_color_t item_color,
-                         gui_color_t item_color_highlight,
-                         gui_color_t title_color,
-                         gui_color_t title_background_color)
+gui_calendar_t *gui_calender_create(gui_obj_t *parent, int x, int y, int w, int h,
+                                    void *font_source_p,
+                                    int font_size_p, gui_color_t color_p,    gui_color_t font_color_highlight,
+                                    gui_color_t item_color,
+                                    gui_color_t item_color_highlight,
+                                    gui_color_t title_color,
+                                    gui_color_t title_background_color)
 {
 #define _GUI_NEW_GUI_CALENDAR_PARAM this, parent, x, y, w, h, font_source_p, font_size_p, color_p, font_color_highlight, item_color, item_color_highlight, title_color, title_background_color
-    GUI_CREATE_HELPER(gui_calendar_t, ctor, _GUI_NEW_GUI_CALENDAR_PARAM)
+    //GUI_CREATE_HELPER(gui_calendar_t, ctor, _GUI_NEW_GUI_CALENDAR_PARAM)
+    gui_calendar_t *this = gui_malloc(sizeof(gui_calendar_t)); memset(this, 0, sizeof(gui_calendar_t));
+    ctor(this, parent, x, y, w, h, font_source_p, font_size_p, color_p, font_color_highlight,
+         item_color, item_color_highlight, title_color, title_background_color);
+    gui_list_init(&(((gui_obj_t *)this)->child_list));
+    if ((((gui_obj_t *)this)->parent) != ((void *)0)) { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }((
+                gui_obj_t *)this)->create_done = 1;
     get_current_date(&this->currentDay, &this->currentMonth, &this->currentYear);
     setup_ui(GUI_BASE(this), w, h, this->currentMonth, this->currentYear, this);
+    return this;
 }
 
