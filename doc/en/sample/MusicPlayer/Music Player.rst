@@ -28,7 +28,7 @@ Function ``static void app_music_ui_design(gui_view_t *view)`` is located in fil
 Widgets Tree Design
 ~~~~~~~~~~~~~~~~~~~
 .. figure:: https://foruda.gitee.com/images/1753858294236683166/2d6d6fc0_10737458.jpeg
-   :width: 600px
+   :width: 1000px
    :align: center
    :name: Widgets Tree Design
    

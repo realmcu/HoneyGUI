@@ -410,7 +410,7 @@ static void list_timer_cb(void *param)
         {
             gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
             gui_list_note_t *list_note = (gui_list_note_t *)o;
-            if (list_note->base.y + list->note_length > gui_get_dc()->screen_height)
+            if (list->base.y + list_note->base.y + list->note_length > gui_get_dc()->screen_height)
             {
                 gui_obj_hidden(o, true);
             }

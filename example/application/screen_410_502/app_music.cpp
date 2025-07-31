@@ -43,6 +43,9 @@
 #define COLOR_LIST gui_rgb(100, 100, 100)
 #define COLOR_THEME gui_color_css("#892FE0")
 
+#ifndef INT_MAX
+#define INT_MAX 0x7fffffff
+#endif
 /*============================================================================*
  *                                  C Interface
  *============================================================================*/
@@ -312,8 +315,8 @@ public:
         }
         else
         {
-            gui_obj_hidden(GUI_BASE(music_list_win), false);
-            gui_obj_hidden(GUI_BASE(lrc_win), false);
+            gui_obj_hidden(GUI_BASE(music_list_win), true);
+            gui_obj_hidden(GUI_BASE(lrc_win), true);
         }
     }
 

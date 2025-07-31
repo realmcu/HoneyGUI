@@ -209,12 +209,12 @@ static void gui_list_free_notes(gui_obj_t *obj)
         int16_t range = 0;
         if (_this->dir == HORIZONTAL)
         {
-            pos = note->start_x + _this->offset;
+            pos = obj->x + note->start_x + _this->offset;
             range = obj->w;
         }
         else
         {
-            pos = note->start_y + _this->offset;
+            pos = obj->y + note->start_y + _this->offset;
             range = obj->h;
         }
         if (_this->style == LIST_CARD)
@@ -272,12 +272,12 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         int16_t range = 0;
         if (_this->dir == HORIZONTAL)
         {
-            pos = note->start_x + _this->offset + _this->note_length;
+            pos = obj->x + note->start_x + _this->offset + _this->note_length;
             range = obj->w;
         }
         else
         {
-            pos = note->start_y + _this->offset + _this->note_length;
+            pos = obj->y + note->start_y + _this->offset + _this->note_length;
             range = obj->h;
         }
         if (_this->style == LIST_CARD)
@@ -299,11 +299,11 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         int16_t pos = 0;
         if (_this->dir == HORIZONTAL)
         {
-            pos = note->start_x + _this->offset;
+            pos = obj->x + note->start_x + _this->offset;
         }
         else
         {
-            pos = note->start_y + _this->offset;
+            pos = obj->y + note->start_y + _this->offset;
         }
         while (pos > _this->space)
         {
@@ -641,8 +641,8 @@ static void gui_list_note_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_list_t *list = (gui_list_t *)obj->parent;
 
-    matrix_translate(-list->base.x, -list->base.y,
-                     obj->matrix); //eliminate list offsets if x\y is not 0
+    // matrix_translate(-list->base.x, -list->base.y,
+    //                  obj->matrix); //eliminate list offsets if x\y is not 0
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
@@ -822,7 +822,7 @@ static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
     int16_t x, y, w, h;
     if (list->dir == HORIZONTAL)
     {
-        x = list->base.x + index * (list->note_length + list->space);
+        x = index * (list->note_length + list->space);
         y = 0;
         w = list->note_length;
         h = list->base.h;
@@ -830,7 +830,7 @@ static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
     else
     {
         x = 0;
-        y = list->base.y + index * (list->note_length + list->space);
+        y = index * (list->note_length + list->space);
         w = list->base.w;
         h = list->note_length;
     }
