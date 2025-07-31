@@ -11,7 +11,6 @@
 #include "gui_img.h"
 #include "gui_gray.h"
 #include "gui_obj.h"
-#include "gui_server.h"
 #include "gui_view.h"
 #include "root_image/ui_resource.h"
 #include "app_main_watch.h"

@@ -8,7 +8,6 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "app_main_watch.h"
-#include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
 #include "tp_algo.h"
@@ -94,7 +93,7 @@ static void app_ui_view_image_design(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_img_t *image;
+    gui_img_t *image = NULL;
     if (face_flags_rotation == 0)
     {
         image = gui_img_create_from_mem(view, "image0", PRISM_FACE5_BIN, 0, 0,

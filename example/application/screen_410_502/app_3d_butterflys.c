@@ -7,8 +7,6 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "time.h"
-#include "tp_algo.h"
-#include "cJSON.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
@@ -253,7 +251,7 @@ static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes
             wing->base.y = (int16_t)(centerY - 10); // Adjust by 25 similarly
             scale_factor = fmaxf(width, height) / 45.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, (-wing->base.w / 2) * 0.3f, -wing->base.h / 2 * 0.3f);
+            gui_img_translate(wing, (-wing->base.w / 2.0f) * 0.3f, -wing->base.h / 2.0f * 0.3f);
         }
         else
         {
@@ -261,7 +259,7 @@ static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes
             wing->base.y = (int16_t)(centerY + 20); // Adjust by 25 similarly
             scale_factor = fmaxf(width, height) / 30.0f;
             gui_img_scale(wing, scale_factor, scale_factor);
-            gui_img_translate(wing, -wing->base.w / 2 * 1.5f, -wing->base.h / 2 * 1.6f);
+            gui_img_translate(wing, -wing->base.w / 2.0f * 1.5f, -wing->base.h / 2.0f * 1.6f);
         }
     }
 

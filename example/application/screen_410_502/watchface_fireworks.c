@@ -12,13 +12,10 @@
 #include "gui_img.h"
 #include "gui_gray.h"
 #include "gui_obj.h"
-#include "gui_server.h"
 #include "gui_view.h"
 #include "gui_3d.h"
 #include "gui_canvas.h"
-#include "gui_canvas_rect.h"
 #include "tp_algo.h"
-#include "root_image/ui_resource.h"
 #include "app_main_watch.h"
 
 /*============================================================================*
@@ -259,7 +256,7 @@ static void draw_tapered_line(NVGcontext *vg, float startX, float startY, float 
     float endWidthX2 = endX - perpX * halfEndWidth;
     float endWidthY2 = endY - perpY * halfEndWidth;
 
-    // NVGcolor color_circle = color;
+// NVGcolor color_circle = color;
     nvgBeginPath(vg);
     nvgCircle(vg, startX, startY, halfStartWidth + 1);
     nvgFillColor(vg, color);
@@ -272,7 +269,7 @@ static void draw_tapered_line(NVGcontext *vg, float startX, float startY, float 
     nvgLineTo(vg, startWidthX2, startWidthY2);
     nvgClosePath(vg);
 
-    // color.a *= 0.8;
+// color.a *= 0.8;
     nvgFillColor(vg, color);
     nvgFill(vg);
 
