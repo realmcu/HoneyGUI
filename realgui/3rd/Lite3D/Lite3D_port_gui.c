@@ -39,7 +39,9 @@ void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
 {
     gui_dispdev_t *gui_dc = gui_get_dc();
     draw_img_t *draw_image = (draw_img_t *)image;
+    draw_img_cache(draw_image, 0);
     gui_acc_blit_to_dc(draw_image, gui_dc, (gui_rect_t *)rect);
+    draw_img_free(draw_image, 0);
 }
 
 
