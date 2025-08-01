@@ -268,7 +268,11 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
         {
             if (gui_get_acc()->idu_load != NULL)
             {
-                image->data = gui_get_acc()->idu_load(image->data);
+                void *decoded = gui_get_acc()->idu_load(image->data);
+                if (decoded != NULL)
+                {
+                    image->data = decoded;
+                }
             }
         }
         return;
