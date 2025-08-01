@@ -475,7 +475,7 @@ INTERNAL void gui_barcode_gen_expand(struct barcode_symbol *symbol, const char d
 
     // we only use code128AUTO, update encoded data every time at the same row;
     // symbol->rows++;
-    if (row >= 1)
+    if (row != 0)
     {
         gui_log("Row index out of bounds");
         return;
@@ -1080,6 +1080,10 @@ static void __latch_to_extended_mode(char *fset, int length)
 
 static void __revert_to_646(char *fset, int length)
 {
+    if (length > C128_MAX)
+    {
+        return;
+    }
     int i, j, k;
     for (i = 1; i < length; i++)
     {
@@ -1634,17 +1638,17 @@ barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int len
     d += 7;
     values[bar_characters++] = 106;
 
-    if (symbol->debug & BARCODE_DEBUG_PRINT)
-    {
-        fputs("Codewords:", stdout);
-        for (i = 0; i < bar_characters; i++)
-        {
-            printf(" %d", values[i]);
-        }
-        printf(" (%d)\n", bar_characters);
-        printf("Barspaces: %.*s\n", (int)(d - dest), dest);
-        printf("Checksum:  %d\n", total_sum);
-    }
+    // if (symbol->debug & BARCODE_DEBUG_PRINT)
+    // {
+    //     fputs("Codewords:", stdout);
+    //     for (i = 0; i < bar_characters; i++)
+    //     {
+    //         printf(" %d", values[i]);
+    //     }
+    //     printf(" (%d)\n", bar_characters);
+    //     printf("Barspaces: %.*s\n", (int)(d - dest), dest);
+    //     printf("Checksum:  %d\n", total_sum);
+    // }
 
     gui_barcode_gen_expand(symbol, dest, d - dest);
 

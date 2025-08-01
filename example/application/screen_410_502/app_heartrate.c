@@ -1,13 +1,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include <time.h>
+#include <math.h>
 #include "root_image/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "time.h"
-#include "tp_algo.h"
-#include <math.h>
 #include "cJSON.h"
 #include "gui_canvas_img.h"
 #include "gui_canvas_rect.h"
