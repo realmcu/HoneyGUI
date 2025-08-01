@@ -22,8 +22,3 @@ html_search_options = {
     'dict': os.path.join(current_path, 'word_dict.txt')
 }
 
-rst_merge_config = {
-    "enabled": True,
-    "primary_file": "cn/release_notes/README.rst",
-    "source_path": "cn/release_notes",
-}

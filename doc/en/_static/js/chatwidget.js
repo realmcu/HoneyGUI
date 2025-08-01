@@ -428,6 +428,7 @@
             element.innerHTML = `
             <div class="chatResp wy-text-danger">${error}</div>
             `;
+            docRefsList = [];
             addChatHistory("assistant", error);
         }
 
@@ -457,7 +458,9 @@
 
             const appendErrorMsg = (error, element) => {
                 if (hasError) return;
+
                 element.innerHTML += `<div class="wy-text-danger">${error}</div>`;
+                docRefsList = [];
                 hasError = true;
                 abortCtrl.abort();
             }
@@ -508,7 +511,7 @@
                             appendErrorMsg(`Internal server error: ${parsedChunk.error.error_type}, ${parsedChunk.error.message}, please refresh and try again!`, asstNode);
                         }
                     } catch (error) {
-                        // appendErrorMsg(`Internal server error: ${error.message}, please refresh and try again!`, asstNode);
+                        // go on
                     }
                 };
 
