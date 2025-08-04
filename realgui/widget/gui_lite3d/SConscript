@@ -5,11 +5,13 @@ from building import *
 cwd = GetCurrentDir()
 src = Split("""
 """)
+inc = []
 
-src = Glob('*.c')
+if GetDepend('CONFIG_REALTEK_BUILD_LITE3D'):
+    src += Glob('*.c')
+    inc = [cwd]
 
-CPPPATH = [cwd]
 
-group = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = inc)
 
 Return('group')
