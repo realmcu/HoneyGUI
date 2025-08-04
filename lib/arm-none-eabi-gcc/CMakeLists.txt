@@ -77,6 +77,7 @@ install(TARGETS ${GUI_TARGET_NAME}
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/gui_version.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})		
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/widget/*.h")
+list(FILTER NEW_HEADER_FILES EXCLUDE REGEX "/gui_todo_widget/")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/server/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
