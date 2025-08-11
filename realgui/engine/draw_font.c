@@ -308,6 +308,10 @@ uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content,
     {
     case UTF_8:
         unicode_len = utf8_to_unicode_length(content, len);
+        if (unicode_len == 0)
+        {
+            return 0;
+        }
         unicode_buf = (uint32_t *)gui_malloc(unicode_len * sizeof(uint32_t));
         if (unicode_buf == NULL)
         {

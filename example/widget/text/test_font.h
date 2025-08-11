@@ -58,11 +58,19 @@ extern void *font32b4;
 extern void *font32b8;
 extern void *font32vb4;
 
+extern void *fontnoto;
+extern void *fontnotoarabic;
+extern void *fontnotojp;
+extern void *fontnotokr;
+extern void *fontnotothai;
+extern void *fontnotohebrew;
+extern void *fontharmonysc;
 /*============================================================================*
  *                           Functions
  *============================================================================*/
 
 void text_font_test(void);
+void text_multi_language_test(void);
 
 #ifdef __cplusplus
 }

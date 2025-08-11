@@ -41,7 +41,9 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-
+#define FONT_MEM_POOL_SIZE (1024 * 1024 * 100)
+uint8_t s_font_mem_pool[FONT_MEM_POOL_SIZE];
+static size_t s_font_mem_offset = 0;
 
 /*============================================================================*
  *                            Variables
@@ -51,6 +53,14 @@ void *font32b2;
 void *font32b4;
 void *font32b8;
 void *font32vb4;
+
+void *fontnoto;
+void *fontnotoarabic;
+void *fontnotojp;
+void *fontnotokr;
+void *fontnotothai;
+void *fontnotohebrew;
+void *fontharmonysc;
 
 /*============================================================================*
  *                           Private Functions
@@ -81,12 +91,15 @@ static void *load_file_to_memory(const char *path, size_t *out_size)
         return NULL;
     }
 
-    void *buffer = malloc(file_size);
-    if (!buffer)
+    if (s_font_mem_offset + file_size > FONT_MEM_POOL_SIZE)
     {
+        gui_log("Font memory pool overflow!\n");
         fclose(fp);
         return NULL;
     }
+
+    void *buffer = &s_font_mem_pool[s_font_mem_offset];
+    s_font_mem_offset += file_size;
 
     if (fread(buffer, 1, file_size, fp) != (size_t)file_size)
     {
@@ -111,11 +124,24 @@ static void *load_file_to_memory(const char *path, size_t *out_size)
  */
 static void font_file_init(void)
 {
+    s_font_mem_offset = 0;
+
     font32b1 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits1_font.bin", NULL);
     font32b2 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
     font32b4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_font.bin", NULL);
     font32b8 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits8_font.bin", NULL);
     font32vb4 = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits4_vfont.bin", NULL);
+
+    fontnoto = load_file_to_memory("./example/assets/font/NotoSans_size32_bits2_font.bin", NULL);
+    fontnotoarabic = load_file_to_memory("./example/assets/font/NotoSansArabic_size32_bits2_font.bin",
+                                         NULL);
+    fontnotojp = load_file_to_memory("./example/assets/font/NotoSansJP_size32_bits2_font.bin", NULL);
+    fontnotokr = load_file_to_memory("./example/assets/font/NotoSansKR_size32_bits2_font.bin", NULL);
+    fontnotothai = load_file_to_memory("./example/assets/font/NotoSansThai_size32_bits2_font.bin",
+                                       NULL);
+    fontnotohebrew = load_file_to_memory("./example/assets/font/NotoSansHebrew_size32_bits2_font.bin",
+                                         NULL);
+    fontharmonysc = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
 }
 
 
@@ -161,8 +187,15 @@ static void text_widget_example(void)
 static int app_init(void)
 {
     font_file_init();
-    // text_widget_example();
-    text_font_test();
+
+    /* gui text widget example */
+    text_widget_example();
+
+    /* gui text font rendering test */
+    // text_font_test();
+
+    /* gui text multi language test */
+    // text_multi_language_test();
     return 0;
 }
 
@@ -171,4 +204,3 @@ GUI_INIT_APP_EXPORT(app_init);
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-
