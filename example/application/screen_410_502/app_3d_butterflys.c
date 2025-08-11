@@ -9,7 +9,6 @@
 #include "time.h"
 #include "app_main_watch.h"
 #include "gui_view.h"
-#include "gui_list.h"
 #include "gui_lite3d.h"
 #include "gui_canvas_rect.h"
 

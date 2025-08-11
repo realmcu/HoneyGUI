@@ -15,7 +15,6 @@
 #include "gui_view.h"
 #include "gui_3d.h"
 #include "gui_canvas.h"
-#include "tp_algo.h"
 #include "app_main_watch.h"
 
 /*============================================================================*

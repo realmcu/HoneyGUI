@@ -10,7 +10,6 @@
 #include "gui_video.h"
 #include "gui_text.h"
 #include "app_main_watch.h"
-#include "tp_algo.h"
 
 /*============================================================================*
  *                            Macros
@@ -110,6 +109,10 @@ static void time_update_cb(void *p)
 static void flower_change_cb(void *obj, gui_event_t e, void *param)
 {
     {
+        if (!obj)
+        {
+            return;
+        }
         gui_obj_t *p = GUI_BASE(obj)->parent;
         if (obj)
         {
