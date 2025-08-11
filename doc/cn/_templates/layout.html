@@ -9,6 +9,7 @@
 </script> -->
 <script type="text/javascript">
     window.isMultilingual = "{{ is_multilingual | e }}";
+    window.isMultitarget = "{{ is_multitarget | e }}";
     window.leftNavWidth = "{{ left_nav_width | e }}";
     window.chatAIBase = "{{ chat_aibase | e }}";
 </script>
@@ -37,10 +38,16 @@
 
     {# Rewrite versions selector #}
     {% if theme_display_version %}
-    <div class="version-container">
-        <select name="version-selector" id="version-selector" onchange="change_version()">
-        </select>
-    </div>
+        {% if is_multitarget %}
+        <div class="target-container">
+            <select name="target-selector" id="target-selector" onchange="change_target()">
+            </select>
+        </div>
+        {% endif %}
+        <div class="version-container">
+            <select name="version-selector" id="version-selector" onchange="change_version()">
+            </select>
+        </div>
     {%- endif %}
 
     {%- include "searchbox.html" %}

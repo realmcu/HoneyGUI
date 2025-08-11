@@ -216,13 +216,13 @@ li[class*="toctree-"] * {
 /* =========== Render Sider Style ============ */
 
 /* ====== Render version selector style ====== */
-.version-container {
+.target-container, .version-container {
     text-align: center;
 }
-#version-selector {
+#target-selector, #version-selector {
     width: 126px;
     margin: -6px auto 16px;
-    border-radius:2px;
+    border-radius:4px;
 }
 /* ====== Render version selector style ====== */
 

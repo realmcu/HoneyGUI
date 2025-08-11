@@ -26,6 +26,7 @@ html_context = {
     "show_sphinx": False, # remove 'Powered by Sphinx' at the bottom
     "SDK": os.getenv("SDK", None),
     "EnvType": os.getenv("EnvType", None),
+    "is_multitarget": False,
     # 如果是多语言文档，is_multilingual设置为 True
     "is_multilingual": True,
     # 左侧目录栏的拖拽宽度，不同的文档项目使用不同的名称，如：

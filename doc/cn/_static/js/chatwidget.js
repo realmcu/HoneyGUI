@@ -365,6 +365,7 @@
 
         /* ================ save ai chat hiatory ================ */
         let chatHistoryList = [{"role": "assistant", "content": "Hi there! How can I help?"}];
+        let docRefsList = [];
         function addChatHistory(role, text) {
             // let forwardText = text.replace(/(\\n|\n)+/g, '').trim();
             let forwardText = text;
@@ -386,11 +387,11 @@
                 chatContentNode.innerHTML = '';
             }
             chatHistoryList = [];
+            docRefsList = [];
         });
 
         /* =============== handle chat message send =============== */
         const docDomain = "https://docs.realmcu.com/";
-        let docRefsList = [];
         function linkListToHTML(list) {
             docRefsList = [];
             if (!list || list.length === 0) {
