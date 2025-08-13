@@ -17,12 +17,8 @@ LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。�
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
 
-
-.. 点击直接查看 demo 和 example 效果
-
 模拟器
 ==========================
-..  PC 模拟器运行 lvgl demo（脱离EVB开发）
 
 模拟器是开发 UI 时使用的一个强大的工具，用于在计算机上模拟嵌入式设备的UI界面。它可以模拟真实硬件平台的行为和外观，提供给开发人员一个便捷的环境来快速创建、调试和测试UI设计。
 
@@ -56,10 +52,6 @@ LVGL 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行
 .. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
    :align: center
    :width: 408
-
-
-.. .. <!-- - 运行流程，结构 -->
-
 
 LVGL 结构
 ----------------
@@ -140,7 +132,6 @@ LVGL 结构
 - 文档说明： `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_
 
 LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 GPU 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_。
-
 
 
 .. note::
@@ -295,11 +286,6 @@ LVGL 的输入接口在文件 :file:`lv_port_indev.c` 中实现，输入设备�
 
 LVGL Benchmark 测试
 ==========================
-.. <!-- - benchmark 介绍
-.. - 参考指标，意义
-.. - 不同平台上的 benchmark 数据参考
-.. -（介绍、演示、分数统计）(性能对比：对比方式/测项，待定) -->
-
 
 LVGL 的 Benchmark 是一个性能测试工具，用于评估 LVGL 库在各种硬件和软件环境下的图形显示性能。通过运行 Benchmark，用户可以获取帧率、渲染速度和内存使用情况等数据，从而帮助优化显示配置和调试性能问题。Benchmark 包括多种测试场景，如图形绘制、动画和文本渲染，每个场景模拟实际应用中的常见操作。用户可以通过这些测试来比较不同配置和平台的性能表现，从而做出针对性的优化调整。
 LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/README.md`。
@@ -373,11 +359,6 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/READM
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
 
-.. <!-- 控件API，按照demo (简单修改+引导到示例+文档)
-
-.. - 需要掌握的基本概念
-.. - 如何从 demo 和 example 开始开发 -->
-
 建议开发者开发前先行阅读理解 `LVGL Overview <https://docs.lvgl.io/9.1/overview/index.html>`_ 和 `LVGL Widgets - Base Object <https://docs.lvgl.io/9.1/widgets/obj.html>`_ 部分以了解 LVGL 的设计概念和设计逻辑。
 
 LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控件和特性的使用。
@@ -424,11 +405,11 @@ LVGL 在线图片转换工具为 LVGL 开发团队提供的在线网站，支持
 
    输出 C 文件将与输入文件同名，图片描述变量也会与输入文件同名，因此输入文件名应避免使用中文或其他非法字符。
 3. 选择输出文件的颜色格式
-   
+
    颜色格式的说明请参考 `LVGL Overview Images - Color Format <https://docs.lvgl.io/9.1/overview/image.html#color-formats>`_
 4. 点击 :guilabel:`Convert` 获取输出文件
 
-在文档 `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。 
+在文档 `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 
 LVGL v9 的在线图片转换工具仅支持输出 C 文件格式和有限的颜色格式输出，如需图片压缩、bin 文件和其他的颜色格式输出，请使用 `python 转换脚本 <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_。
@@ -460,7 +441,7 @@ Realtek 媒体资源转换工具
    - 支持对文件夹下批量配置，支持单个文件指定配置
    - 支持 User Data 打包，支持链接外部文件夹
 
-Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资源描述文件 :file:`ui_resource.c`，其中包含了各图片、视频的描述变量，变量类型为 ``lv_image_dsc_t``。对于支持 flash 直接寻址的平台，如 Nor Flash，资源 bin 文件下载到 flash 后，通过描述变量直接引用图片，跳过文件系统，可提升效率，减少缓存，降低系统复杂度。 
+Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资源描述文件 :file:`ui_resource.c`，其中包含了各图片、视频的描述变量，变量类型为 ``lv_image_dsc_t``。对于支持 flash 直接寻址的平台，如 Nor Flash，资源 bin 文件下载到 flash 后，通过描述变量直接引用图片，跳过文件系统，可提升效率，减少缓存，降低系统复杂度。
 
 .. code-block:: c
 
@@ -480,9 +461,9 @@ Media Convert Tool 在转换生成 bin 文件的同时，还将生成一份资�
    1. 转换工具将使用输入文件名组成变量名，请避免在输入文件名中使用中文等非法字符；
    2. :file:`ui_resource.c` 的使用依赖于打包过程生成的 :file:`ui_resource.h`
 
-LVGL 
+LVGL
 ^^^^^^^^^
-该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 PNG 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时，bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。 
+该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 PNG 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时，bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
 .. image:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
    :align: center
@@ -531,7 +512,7 @@ AVI
     *  Dependencies: JPEG decoder. */
    #define LV_USE_AVI  1
 
-   // example 
+   // example
    lv_obj_t * video = lv_avi_create(lv_screen_active(), NULL);
 
    /* From variable */

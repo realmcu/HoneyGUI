@@ -2,14 +2,287 @@
 Use LVGL V9 to Design
 ===============================
 
+Introduction to LVGL
+==========================
+- `LVGL Official Website <https://lvgl.io/>`_
+- `LVGL Online Documentation <https://docs.lvgl.io/9.1/>`_
+- `LVGL Introduction <https://docs.lvgl.io/9.1/intro/index.html>`_
+
+LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded GUIs with easy-to-use graphical elements, attractive visual effects, and low memory usage.
+
+LVGL offers a "GUI engine" that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in GPU support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
+
+LVGL showcases demo effects on its official website to demonstrate LVGL's UI building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
+
+- `LVGL Demo <https://lvgl.io/demos>`_
+- `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
+
+Simulator
+==========================
+
+A simulator is a powerful tool used in UI development to simulate the UI interface of embedded devices on a computer. It can mimic the behavior and appearance of real hardware platforms, providing developers with a convenient environment to quickly create, debug, and test UI designs.
+
+The main function of the simulator is to showcase and interactively test the UI interface of a design in real time, thus reducing the time and cost associated with repetitive testing on actual hardware. By using an simulator, developers can quickly iterate designs, view results in real time, and perform debugging and validation. This greatly accelerates the speed and quality of UI development and improves work efficiency.
+
+Advantages of using an simulator include:
+
+- Real-time preview: The simulator can instantly display the effects of the UI interface, allowing developers to quickly see the appearance and functionality of the design, facilitating adjustments and modifications.
+
+- Cross-platform support: The simulator can run on a computer, so developers do not need to rely on specific hardware platforms.
+
+- Time and resource savings: Using an simulator avoids the need for frequent flashing and testing of the UI on actual hardware, reducing extra time and cost expenditures.
+
+- Debugging and testing: The simulator provides rich debugging and testing features, allowing for the inspection of UI element interactions, event handling, and layout effects, helping to solve issues and optimize performance.
+
+.. _Running LVGL in the Simulator:
+
+Running LVGL in the Simulator
+-----------------------------------
+The LVGL simulator is based on the scons tool and the MinGW-w64 toolchain, running and debugging in VScode. For specific environment configuration and startup operations, please refer to the :ref:`Getting Started Guide` section.
+
+After completing the simulator environment installation, starting it will show the simulator's default LVGL project. Modify the simulator configuration file to run different LVGL projects. The configuration file for the simulator is located at :file:`your lvgl dir/rtk/win32_sim/` under :file:`menu_config.h`. You can select the example project for the simulator to run by modifying the value of :c:macro:`LVGL_DEMO_APP`. Start it again in VScode, and after a successful build and compile, you will see the simulator running the selected example project.
+
+.. image:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
+   :align: center
+   :width: 408
+
+When you need to modify the screen size, change the :file:`SConscript` file located under :file:`your lvgl dir/rtk/demos/xxxxxx/`. Modify the screen width :c:macro:`DRV_LCD_WIDTH` and screen height :c:macro:`DRV_LCD_HIGHT`, both in pixel units.
+
+.. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
+   :align: center
+   :width: 408
+
+LVGL Structure
+----------------
+
+Below are the directories and files related to LVGL:
+
+::
+
+    LVGL Dir
+    |-- demos
+    |-- docs
+    |-- env_support
+    |-- examples
+    |-- libs
+    |-- rtk
+    |  |--demos
+    |  |  |-- benchmark
+    |  |  |__ screen_410_502_lvgl
+    |  |     |--fonts
+    |  |     |--images
+    |  |     :
+    |  |     :
+    |  |     |__root_image_lvgl
+    |  |        |-- root                         // File system root directory
+    |  |        |-- _bin_mkromfs.py
+    |  |        |-- mkromfs_0x704D1000.bat       // User Data packaging script
+    |  |        |-- root(0x704D1000).bin         // Packaged User Data
+    |  |        :
+    |  |        |__ ui_resource.h                // Address mapping of packaged file resources
+    |  |--tool
+    |  |__win32_sim
+    |     :
+    |     |__ port
+    |        |__ lvgl_port                       // Simulator LVGL porting
+    |           |-- lv_conf.h                    // Simulator LVGL configuration definitions
+    |           |-- lv_port_disp.c
+    |           |-- lv_port_disp.h
+    |           |-- lv_port_fs.c
+    |           |-- lv_port_fs.h
+    |           |-- lv_port_indev.c
+    |           |__ lv_port_indev.h
+    |-- scripts
+    |-- src
+    |-- tests
+    :
+    :
+    |__ zephyr
+
+
+1. The file structure of LVGL in the Realtek SDK is the same as the official version of LVGL V9.1.
+
+- demos: Contains some comprehensive built-in examples of LVGL, some of which can be experienced at `LVGL Demo <https://lvgl.io/demos>`_ .
+
+- docs: Contains development documents for LVGL, which can be read online at the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ .
+
+- env_support: Support for some environments or platforms.
+
+- examples: Contains built-in examples of LVGL, which can be experienced at `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ .
+
+- libs: Contains library files used by LVGL.
+
+- rtk: Contains files related to LVGL in the Realtek SDK, including simulator-related files and example projects.
+
+- scripts: Contains some processing scripts for LVGL.
+
+- src: Contains the actual source code of LVGL. When developing with LVGL, the code files here are used. Realtek has made slight modifications to the LVGL source code, and all changes are recorded in the :file:`your lvgl dir/rtk/` under the :file:`LVGL_SourceCode_Changelog.md` file.
+
+- tests: Contains LVGL test files.
+
+- zephyr: Contains configuration files related to Zephyr.
+
+2. When running LVGL on the simulator, LVGL will start running from the :file:`your lvgl dir/rtk/demos/xxxxxx/` under the :file:`app_sim_port.c`.
+
+3. When running LVGL on the simulator, the root directory pointed to by the LVGL file system interface is :file:`your lvgl dir/rtk/demos/xxxxxx/root/`.
+
+Actual Device Porting
+==========================
+- Documentation: `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_
+
+LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_.
+
+.. note::
+    The following examples do not include the specific implementation of hardware device drivers, but simply demonstrate how to connect the drivers to LVGL's interfaces. Developers can complete the driver functions within the same API framework as the example driver to connect to the driver layer interface, and then reuse the porting interfaces of the example project.
+
+Display
+-----------------------------
+- Documentation: `LVGL Porting Display <https://docs.lvgl.io/9.1/porting/display.html>`_, `LVGL Overview Display <https://docs.lvgl.io/9.1/overview/display.html>`_
+
+After developers complete the debugging of display device driver functions, the device can communicate normally with the display device and show colors. This section introduces how to connect the driver to LVGL's display interface to display LVGL's UI.
+
+LVGL's display interface is implemented in the file :file:`lv_port_disp.c`, and display parameters are configured in the initialization function ``void lv_port_disp_init(void)``, such as screen size and frame buffer preparation. The display refresh function is ``static void disp_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *px_map)``.
+
+LVGL supports three rendering modes for display buffers, each suitable for different memory and performance needs:
+
+- LV_DISPLAY_RENDER_MODE_PARTIAL (Partial Rendering)
+
+  - Uses a smaller buffer to divide the screen into several small parts for gradual rendering.
+  - Recommended buffer size is at least 1/10 of the screen.
+  - Advantage: Saves RAM, suitable for scenarios with limited memory.
+
+- LV_DISPLAY_RENDER_MODE_DIRECT (Direct Write Rendering)
+
+  - Buffer size is the same as the screen, LVGL directly renders to the corresponding buffer location.
+  - Buffer always contains the complete image, only updating the changed area.
+  - If there are two buffers, contents will automatically synchronize, requiring only buffer address switching during refresh.
+
+- LV_DISPLAY_RENDER_MODE_FULL (Full Screen Redraw)
+
+  - Each refresh redraws the entire screen, even if only one pixel changes.
+  - When using double buffering, refresh also only requires buffer address switching.
+  - Advantage: Simple implementation, suitable for scenarios with special requirements for refresh speed or compatibility.
+
+
+Based on actual development needs, different memory resources, and rendering modes, the SDK file :file:`lv_port_disp.c` has configured four recommended rendering schemes for reference. Configure :c:macro:`ACTIVE_DISPLAY_SCHEME` to switch modes:
+
+- :c:macro:`SCHEME_RAM_PARTIAL` Region Drawing Scheme
+
+  - Uses partial rendering scheme
+  - Configures two RAM area caches
+  - Suitable for MCUs without PSRAM
+  - This scheme only supports display ICs with RAM
+
+- :c:macro:`SCHEME_RAM_PSRAM_PARTIAL` Region Drawing Scheme with Full Screen Cache
+
+  - Uses partial rendering scheme
+  - Configures two RAM area caches and one PSRAM full screen cache
+  - This scheme only supports MCUs with PSRAM
+  - No special requirements for display IC
+
+- :c:macro:`SCHEME_PSRAM_DIRECT` Full Screen Direct Write Scheme
+
+  - Uses direct write rendering scheme
+  - Configures two PSRAM area caches
+  - This scheme only supports MCUs with PSRAM
+  - No special requirements for display IC
+
+- :c:macro:`SCHEME_PSRAM_FULL` Full Screen Redraw Scheme
+
+  - Uses full screen redraw scheme
+  - Configures two PSRAM area caches
+  - This scheme only supports MCUs with PSRAM
+  - No special requirements for display IC
+
+
+Input Devices
+-----------------------------
+- Documentation: `LVGL Porting Input Devices <https://docs.lvgl.io/9.1/porting/indev.html>`_
+
+Once developers have completed the debugging of the input device driver functionality, the device can communicate normally with the input device. This section introduces how to interface the driver with LVGL's input interface to interact with LVGL's UI.
+
+LVGL's input interface is implemented in the file :file:`lv_port_indev.c`, and input device parameters are configured in the initialization function ``void lv_port_indev_init(void)``, such as selecting the device type, configuring the data read callback function, and pointer binding.
+
+For detailed input device porting methods and precautions, please refer to the documentation `LVGL Porting Input Devices <https://docs.lvgl.io/9.1/porting/indev.html>`_ .
+
+- In the initialization function ``void lv_port_indev_init(void)``, select and register the corresponding type of input device, such as **Touchpad** for touch screen devices, and implement the corresponding interface.
+
+- LVGL will periodically obtain the current input device data through the callback function pointer ``indev_drv.read_cb``. For touch screen devices, this would be the function ``static void touchpad_read(lv_indev_t *indev_drv, lv_indev_data_t *data)``, which does not need modification.
+
+- Developers need to fill in the ``static bool touchpad_is_pressed(void)`` function and the ``static void touchpad_get_xy(int32_t *x, int32_t *y)`` function to obtain the current status information from the touchpad, including the coordinates of the touch point and the touch status.
+
+.. code-block:: c
+   :emphasize-lines: 4,7,8,9,22,52,59,60
+
+    void lv_port_indev_init(void)
+    {
+      /*Initialize your touchpad if you have*/
+      touchpad_init();
+
+      /*Register a touchpad input device*/
+      indev_touchpad = lv_indev_create();
+      lv_indev_set_type(indev_touchpad, LV_INDEV_TYPE_POINTER);
+      lv_indev_set_read_cb(indev_touchpad, touchpad_read);
+    }
+
+   /*------------------
+   * Touchpad
+   * -----------------*/
+   static uint16_t touch_x = 0;
+   static uint16_t touch_y = 0;
+   static bool touch_pressing = 0;
+
+   /*Initialize your touchpad*/
+   static void touchpad_init(void)
+   {
+      touch_driver_init();
+      /*Your code comes here*/
+   }
+
+   /*Will be called by the library to read the touchpad*/
+   static void touchpad_read(lv_indev_t *indev_drv, lv_indev_data_t *data)
+   {
+      static int32_t last_x = 0;
+      static int32_t last_y = 0;
+
+      /*Save the pressed coordinates and the state*/
+      if (touchpad_is_pressed())
+      {
+         touchpad_get_xy(&last_x, &last_y);
+         data->state = LV_INDEV_STATE_PRESSED;
+      }
+      else
+      {
+         data->state = LV_INDEV_STATE_RELEASED;
+      }
+
+      /*Set the last pressed coordinates*/
+      data->point.x = last_x;
+      data->point.y = last_y;
+   }
+
+   /*Return true is the touchpad is pressed*/
+   static bool touchpad_is_pressed(void)
+   {
+      /*Your code comes here*/
+      return get_raw_touch_data().is_press;
+   }
+
+   /*Get the x and y coordinates if the touchpad is pressed*/
+   static void touchpad_get_xy(int32_t *x, int32_t *y)
+   {
+      /*Your code comes here*/
+      (*x) = get_raw_touch_data().x;
+      (*y) = get_raw_touch_data().y;
+   }
+
+
+File System
+-----------------------------
+
 
 LVGL Benchmark Test
 ==========================
-.. <!-- - benchmark introduction
-.. - reference metrics, significance
-.. - benchmark data reference on different platforms
-.. - (introduction, demonstration, score statistics) (performance comparison: comparison methods/test items, TBD) -->
-
 
 LVGL Benchmark is a performance testing tool used to evaluate the graphics display performance of the LVGL library across various hardware and software environments. By running the Benchmark, users can obtain data such as frame rates, rendering speeds, and memory usage, which helps optimize display configurations and debug performance issues. The Benchmark includes multiple test scenarios, such as graphics drawing, animations, and text rendering, with each scenario simulating common operations in actual applications. Users can compare performance across different configurations and platforms through these tests to make targeted optimization adjustments.
 The official documentation for LVGL benchmarking can be found at :file:`your HoneyGUI dir/lvgl/demos/README.md`.
@@ -45,7 +318,7 @@ Compilation environment: armclang6.22 version, optimization mode -Ofast to enabl
 .. csv-table:: Benchmark Test Results in Different Compilation Environments
   :header: Scenario, Acceleration Method, FreeRTOS, Zephyr
   :align: center
-  
+
     empty screen, SW+MVE+PPE, 5, 5
     moving wallpaper, SW+MVE+PPE, 16, 16
     single rectangle, SW+MVE+PPE, 0, 0
@@ -67,7 +340,7 @@ Compilation environment: armclang6.22 version, optimization mode -Ofast to enabl
 .. csv-table:: Rendering Acceleration on Different Platforms
   :header: Chip Model, Processor Frequency, Hardware Accelerator, Image Drawing, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Fill, RLE Decoding, Character, Line
   :align: center
-  
+
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
   RTL8773E, 100MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
   RTL8773G, 200MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
@@ -78,7 +351,21 @@ Compilation environment: armclang6.22 version, optimization mode -Ofast to enabl
   2. RTL8772G supports Helium hardware accelerator
 
 
+Getting Started with Demo Development
+=========================================
 
+- `LVGL Demo <https://lvgl.io/demos>`_
+- `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
+
+It is recommended that developers read and understand the `LVGL Overview <https://docs.lvgl.io/9.1/overview/index.html>`_ and `LVGL Widgets - Base Object <https://docs.lvgl.io/9.1/widgets/obj.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
+
+LVGL offers a wealth of demos and examples to help developers become familiar with the use of various controls and features.
+
+- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/demo`. Developers can directly call the corresponding ``lv_demo_xxx()`` functions to familiarize themselves.
+
+- The online documentation `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir/example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
+
+.. _Resource Converter:
 
 Resource Converter
 ==========================
@@ -89,6 +376,7 @@ To use images and fonts in LVGL-based UIs, you must first convert them into LVGL
 
   - Every time you change your application logic, these resource files will be recompiled.
   - The combined resource size is included in the APP image, meaning a larger space is required, particularly during OTA (Over-The-Air) updates.
+
 2. Binary (bin) File Format
   Resources are saved as separate binary files and do not participate in the compilation process.
 
@@ -112,7 +400,7 @@ The LVGL Online Image Converter is a website provided by the LVGL development te
 
    The output C files will have the same name as the input files, and the variable name describing the image will also match the input file name. Therefore, avoid using Chinese characters or any illegal characters in the file names.
 3. Choose Output Color Format:
-   
+
    For an explanation of color formats, refer to  `LVGL Overview Images - Color Format <https://docs.lvgl.io/9.1/overview/image.html#color-formats>`_.
 4. Click :guilabel:`Convert` to obtain the output file
 
@@ -179,11 +467,11 @@ For platforms that support direct flash addressing, such as Nor Flash, the resou
 
 
 
-LVGL 
+LVGL
 ^^^^^^^^^
 This conversion feature is fully supported by the native LVGL conversion script. The tool only accepts PNG images as input files and can output both C files and bin files, supporting multiple color formats.
 When outputting image resources in the bin file format, the data in the bin file is stored as ``12 Byte lv_img_header_t + data``, where the ``lv_img_header_t`` contains information such as the ``color format``, ``width``, and ``height``.
-For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ 
+For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_
 
 
 .. image:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
@@ -236,10 +524,271 @@ Below is the usage example:
     *  Dependencies: JPEG decoder. */
    #define LV_USE_AVI  1
 
-   // example 
+   // example
    lv_obj_t * video = lv_avi_create(lv_screen_active(), NULL);
 
    /* From variable */
    lv_avi_set_src(video, &my_avi_dsc);
 
 
+Font Converter
+-----------------------------
+
+LVGL Online Conversion Tool
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Online Conversion Tool: `LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
+
+- Documentation: `LVGL Overview Fonts <https://docs.lvgl.io/9.1/overview/font.html>`_
+
+Please refer to `LVGL Overview Font - Add a New Font <https://docs.lvgl.io/9.1/overview/font.html#add-a-new-font>`_ for usage steps:
+
+1. Set the name of the output font library
+
+2. Set the font size, measured in pixel height
+
+3. Set the font's bpp (bit-per-pixel)
+
+   - Indicates how many bits are used to describe a pixel; the larger the value, the better the anti-aliasing effect and smoother edges, but the larger the font library space required
+
+4. Fill in the font callback. When the font file does not contain the required characters, the callback font can be called for rendering; it can be left blank
+
+5. Choose the type of output font library (C file / Binary)
+
+6. Select the font file (TTF/WOFF)
+
+7. Set the Unicode range of characters to be converted, or directly list the characters to be converted
+
+
+Realtek Font Converter
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Realtek has launched a newly upgraded Realtek Font Converter based on the packaging and extension of the LVGL font conversion tool. Compared to the original tool, the Realtek Font Converter has the following significant advantages:
+
+1. Visual operation interface makes the font conversion process clear and easy, enhancing operational efficiency
+
+2. Supports multi-font, multi-size, and tag-based configuration design, greatly improving the flexibility and efficiency of engineering development
+
+3. Adds support for Realtek platform GPU rendering features, fully leveraging hardware acceleration capabilities
+
+4. Supports separation of font data and description information, better adapting to the storage management mode of embedded platforms
+
+5. Supports import and export of configuration schemes, facilitating project migration and team collaboration
+
+Below is the interface image of the Realtek Font Converter:
+
+.. image:: https://foruda.gitee.com/images/1753432503991458121/2c546aae_9325830.png
+   :align: center
+   :width: 983
+
+Font Conversion Steps:
+
+1. Open the Realtek Font Converter interface
+
+2. Click the "Add new setting" button to add a new configuration tab
+
+3. Click the "Add Fonts" button to add font files; multiple fonts can be added
+
+4. Fill in configuration items such as bpp, font size, and character set, where multiple font sizes can be entered, separated by commas
+
+  - When bpp is 3, the generated font file cannot use GPU accelerated rendering
+  - After selecting the compression option, the generated font file will be compressed, occupying less space, but cannot use GPU accelerated rendering
+
+5. Click the "Generate Font" button, choose the path, and generate the font file for the current configuration tab
+
+6. If there are multiple tabs, click the "Browse" button, select the font file output path, and click the "Generate All" button to generate all configuration tab font files to the specified path
+
+Additional Features:
+
+- Supports batch generation of font files, with each tab's font file named "Font Name_Size_Configuration Item"
+
+- Supports copying, deleting, and renaming configuration tabs
+
+- Supports exporting configuration information of the current tab, exported in JSON format
+
+- Supports importing configuration information, importing configuration files in JSON format
+
+Development Resources Support
+==========================
+
+Online Documentation
+---------------------
+- `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
+
+The `online documentation <https://docs.lvgl.io/master/intro/index.html>`_ for LVGL provides comprehensive technical documentation and tutorials to help developers better understand and use the LVGL graphics library. The documentation includes the following:
+
+- Overview and Features: The documentation introduces the basic concepts and features of LVGL, including graphical objects, screen management, event handling, theme styling, and more. Users can read the documentation to understand the core functions and advantages of LVGL.
+
+- Application Development Guide: The documentation provides detailed application development guides, including how to initialize and configure LVGL, create and manage graphical objects, handle user input and events, add themes and styles, and more. These guides can help users quickly get started with LVGL and develop their own applications.
+
+- API Documentation: The documentation lists LVGL's API interfaces and functions in detail, along with their parameters and usage. Users can refer to the API documentation as needed to understand the specific functions and interfaces for advanced customization and extension.
+
+- Sample Code: The documentation provides numerous sample codes covering common application scenarios and features. Users can refer to these sample codes to speed up development and quickly implement specific functional requirements.
+
+Using LVGL's online documentation can help users better understand and master the use of LVGL, improving development efficiency. Users can gradually learn the content in the documentation, from simple interface building to complex application development, gradually mastering the various functions and features of LVGL. Additionally, the documentation provides examples and code snippets, making it easier for users to develop applications with rich interfaces and features.
+
+Users can open LVGL's online documentation in a web browser, browse through various sections and content, and search for and learn the relevant knowledge according to their needs. Moreover, users can use the search function to quickly find specific information in the documentation. Overall, LVGL's online documentation is an important resource for users to understand and use the LVGL graphics library, providing comprehensive and detailed guidance to help users quickly get started and develop better applications.
+
+Developing based on the documentation can achieve most of the UI effects. It is worth noting that the documentation content may not be complete, and when there are omissions in the documentation, the code shall prevail.
+
+GitHub Repository
+-----------------------------
+- `GitHub LVGL <https://github.com/lvgl/lvgl>`_
+
+LVGL's GitHub repository is an important platform for developers to use and contribute to LVGL:
+
+- Get the Latest Version: LVGL's GitHub repository provides access to the latest LVGL versions and updates. Developers can timely access the latest feature updates, fixes, and improvements to keep applications in sync with LVGL.
+
+- Participate in the Community and Contribute Code: Through the GitHub repository, developers can actively participate in discussions and exchanges within the LVGL community, learning about other developers' issues and solutions. Developers can also contribute their own code and improvements to make LVGL more complete and powerful.
+
+- Submit Issues and Bug Reports: The GitHub repository provides a platform for submitting issues and bug reports. Developers can submit problems and bugs they encounter while using LVGL, helping the LVGL development team to promptly identify and resolve issues, thereby improving LVGL's stability and reliability.
+
+- Learn from Examples and Documentation: The GitHub repository also contains sample code and documentation to help developers better understand and learn how to use LVGL. Developers can browse the sample code and documentation in the repository to learn about LVGL's various functions and features, improving their development skills.
+
+Designer
+-----------------------------
+
+Squareline Studio
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`Squareline Studio <https://squareline.io/>`_ is a next-generation visual UI editor designed for rapid development of beautiful interfaces for embedded and desktop applications. It supports free personal use and flexible payment for enterprises. It integrates design, prototyping, and development, generating platform-independent C or MicroPython code suitable for LVGL through drag-and-drop, which can run on any device and system. It supports pixel-level preview, custom components, animations, and events, greatly enhancing development efficiency. It is suitable for a variety of scenarios for individuals, startups, and large enterprises.
+
+UI Design
+^^^^^^^^^
+
+When designing LVGL interfaces using Squareline Studio, you can refer to the design tool's `official documentation <https://docs.squareline.io/docs/squareline/>`_ and the open-source examples within the software.
+
+Realtek has provided complete support for Squareline Studio, based on the software and hardware capabilities of the Realtek platform and the design characteristics of the LVGL library. The following design optimization principles have been summarized:
+
+- Reduce unnecessary rounded designs, as rectangular shadow rendering is much more efficient than rounded rectangle shadow rendering.
+
+- Minimize redundant layer stacking and background color filling while ensuring consistent display content.
+
+- The Realtek platform supports hardware image decompression (IDU and JPU). Compared to graphic rendering, prioritizing image use in UI design will improve display frame rates.
+
+- To adapt to the hardware rules of the Realtek platform, use the Realtek resource converter to convert resources. For ease of porting, it is recommended to place all image and font design files in a single main directory and ensure the standardization of file name formats.
+
+Resource Conversion
+^^^^^^^^^^^^^^^^^^^^
+Squareline Studio includes a standard LVGL resource converter that can generate resource files in LVGL format, which can be compiled and run on simulators and development boards.
+
+Since the LVGL resource converter used by Squareline Studio does not include Realtek's image compression algorithms and font conversion features, customers who need to use Realtek's hardware decompression and GPU font rendering functions need to use the Realtek resource converter for conversion and then replace the original files.
+
+.. note::
+   Instructions for using the Realtek resource converter can be found at :ref:`Resource Converter`.
+
+.. note::
+   The files output by the Realtek resource converter comply with LVGL's format standards, ensuring direct use. Therefore, developers can directly replace the resource files generated by Squareline Studio with those generated by the Realtek resource converter.
+
+When exporting UI design files from Squareline Studio, it may modify the output resource names, such as:
+
+ - Adding prefixes and suffixes to image resources, with the prefix being the original image's relative path and type name, and the suffix being the original image format.
+
+ - Replacing original file names containing illegal characters with random numeric strings.
+
+ - Generating font names using corresponding pinyin or abbreviations when the original font file is in Chinese.
+
+During the image resource replacement process, most naming differences can be adjusted using find-and-replace methods. When encountering abnormal file names, manual adjustments are required.
+
+During font resource replacement, due to the complexity and diversity of font settings, manual file matching is necessary.
+
+Project Porting
+^^^^^^^^^^^^^^^^^^^^
+
+UI interfaces designed with Squareline Studio can be directly exported as C code for the Realtek platform, allowing developers to directly import the code into the Realtek platform for compilation and debugging.
+
+How to run the UI interface designed with Squareline Studio in a simulator?
+
+- First, configure the simulator environment and successfully run the LVGL example project, referring to :ref:`Running LVGL in a Simulator`.
+
+- Then export the UI interface designed with Squareline Studio as C code and resource packages, and copy them to :file:`your lvgl dir/rtk/demos/benchmark`.
+
+  Common files exported by Squareline Studio include:
+
+  ::
+
+    UI
+    |-- components             // Component design
+    |-- fonts                  // Font resources
+    |-- images                 // Image resources
+    |-- screens                // Page design
+    |-- CMakeLists.txt
+    |-- filelist.txt
+    |-- ui.c                   // Entry file
+    |-- ui.h
+    |-- ui_events.h
+    |-- ui_helpers.c           // Helper functions
+    |-- ui_helpers.h
+    |-- ui_theme_manager.c     // Theme management
+    |-- ui_theme_manager.h
+    |-- ui_themes.c            // Theme resources
+    |-- ui_themes.h
+
+- If you need to use image compression or GPU font rendering functions, use the Realtek resource converter for conversion, then replace the original files and replace the image and font names in the UI design files.
+
+- After initializing LVGL with :code:`lv_init()` in the original example project's LVGL entry file, start the UI loading function of the Squareline Studio project with :code:`ui_init();`.
+
+- Adjust the :file:`sconscript` file in the example project to add build support for the Squareline Studio project.
+
+- Use the resource packaging tool to package the resource files of the Squareline Studio project into binary files.
+
+- Compile and run the simulator. Once the build and compilation pass, you can see the simulator running the Squareline Studio example project.
+
+Feature Extensions
+^^^^^^^^^^^^^^^^^^^^
+
+Squareline Studio supports most of LVGL's basic features, such as UI design, component design, animation design, and event design. However, it lacks support for some advanced features, such as page transition mechanisms, peripheral logic interaction, and cellular dials. Therefore, if you need to use these features, manual code writing is required.
+
+LVGL Editor
+~~~~~~~~~~~~~
+
+`LVGL Editor <https://lvgl.io/editor/>`_ is a professional GUI development tool based on the free open-source LVGL library, supporting Windows, Linux, and macOS. It defines interfaces through XML, supports auto-completion, version control, real-time preview, and deep integration with Figma, allowing online sharing and testing of UIs. The editor supports exporting to C code, runtime XML loading, and various advanced components, with CLI integration, automatic style synchronization, data binding, and event handling, greatly enhancing embedded UI development efficiency.
+
+EEZ Studio
+~~~~~~~~~~~~~
+
+`EEZ Studio <https://www.envox.eu/studio/studio-introduction/>`_ supports LVGL 8.x and 9.x versions, allowing users to quickly design responsive desktop and embedded GUIs through drag-and-drop and flowchart visualization programming. The platform comes with rich templates and examples, suitable for prototyping and final application development, supporting multiple platforms and languages. With EEZ Flow, complex logic can be completed without programming, improving development efficiency, making it an efficient, open-source tool for developing LVGL projects.
+
+GUI Guider
+~~~~~~~~~~~~~~~~~
+.. <!-- - GUI Guider: `NXP GUI Guider <https://www.nxp.com/design/design-center/software/development-software/gui-guider:GUI-GUIDER>`_ -->
+
+Forum
+-----------------------------
+- `LVGL Forum <https://forum.lvgl.io/>`_
+
+.. <!-- Open for questions, LVGL developers will respond. -->
+
+The official LVGL forum is a developer community dedicated to discussing and sharing topics and resources related to the LVGL graphics library. It provides a platform for developers to communicate, seek help, and share their experiences and projects.
+
+Some features and functions of the LVGL forum include:
+
+- Questions and Answers: Developers can post their issues encountered while using LVGL on the forum and receive assistance and answers from other developers. This makes the forum a valuable knowledge base, offering problem-solving experiences and techniques.
+
+- Tutorials and Examples: The forum contains numerous useful tutorials and example codes, demonstrating how to use various features and functionalities of LVGL. These resources are very helpful for novice developers to learn and master LVGL.
+
+- Developer Contributions and Project Showcases: Developers on the forum can share their projects and customized LVGL interfaces, as well as contributions that other developers can share, discuss, and reference.
+
+- Updates and Release Announcements: The LVGL development team posts announcements and explanations about new version releases and updates on the forum. This allows developers to stay informed about the latest features and improvements.
+
+- Community Interaction: The forum provides a platform for community interaction, where developers can communicate, share, and build connections, enhancing the collaboration and development of the LVGL community.
+
+The LVGL forum is an important resource for developers using LVGL to get support, solve problems, learn, and share experiences.
+
+Blog
+-----------------------------
+- `LVGL Blog <https://blog.lvgl.io/>`_
+
+The official LVGL blog is a regularly updated platform that provides the latest information, tutorials, case studies, and developer insights about the LVGL graphics library. The development team and community members of LVGL frequently publish various content on the blog, allowing developers to better understand and utilize LVGL.
+
+The LVGL blog contains the following content:
+
+- Updates and New Features Introduction: The blog posts articles about updates and improvements in the latest version of LVGL, introducing new features, fixed issues, and performance enhancements, enabling developers to understand and leverage the latest LVGL features.
+
+- Tutorials and Usage Guides: The blog provides practical tutorials and usage guides on LVGL, covering topics from beginner to advanced levels. These tutorials typically include sample code and detailed instructions to help developers master the use of LVGL and best practices.
+
+- Case Studies and Project Showcases: The blog shares case studies and project showcases that implement LVGL. These articles demonstrate how to use LVGL to build actual applications and interfaces, inspiring and providing experience to developers through practice.
+
+- Technical Deep Dives and Developer Insights: The blog also covers in-depth analyses and developer insights on LVGL. These articles may explore topics such as the internal workings of LVGL, performance optimization techniques, and excellent design practices, offering developers a deeper understanding and reflection.
+
+The LVGL blog is an important resource for LVGL developers, serving as a valuable source for understanding and mastering LVGL. By reading the blog, developers can gain access to the latest trends, learning materials, and technical insights about LVGL, aiding them in better utilizing LVGL to create outstanding graphical interfaces.
