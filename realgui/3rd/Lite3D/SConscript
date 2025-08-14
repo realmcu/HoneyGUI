@@ -1,43 +1,17 @@
 
-import menu_config
-import os
 from building import *
 
 cwd = GetCurrentDir()
-
-src = Split("""
-""")
-inc = []
-CPPDEFINES = []
-libs = []
-libpath = []
-
-
-if GetDepend('CONFIG_REALTEK_BUILD_LITE3D'):
-    src +=Glob('*.c')
-    src +=Glob('*.cpp')
-
-    inc = [cwd]
-    inc += [cwd + '/include']
-
-    if GetDepend('CONFIG_REALTEK_BUILD_LITE3D_FOR_WIN32_GCC_LIB'):
-        libs = ['Lite3D_GCC']
-        libpath = [cwd + '/lib']
-    elif GetDepend('CONFIG_REALTEK_BUILD_LITE3D_8773E_ARMCC_LIB'):
-        src += [cwd + '/lib/Lite3D_RTL8773E_ARMCC.lib']
-        CPPDEFINES = ['HONEYGUI_ENABLE_LITE3D']
-    elif GetDepend('CONFIG_REALTEK_BUILD_LITE3D_8773E_ARMCL_LIB'):
-        src += [cwd + '/lib/Lite3D_RTL8773E_ARMCLANG.lib']
-        CPPDEFINES = ['HONEYGUI_ENABLE_LITE3D']
-    elif GetDepend('CONFIG_REALTEK_BUILD_LITE3D_8773G_ARMCL_LIB'):
-        src += [cwd + '/lib/Lite3D_RTL8773G_ARMCLANG.lib']
-        CPPDEFINES = ['HONEYGUI_ENABLE_LITE3D']
-        
+list = os.listdir(cwd)
+objs = []
 
 
 
-group = DefineGroup('lite3d', src, depend=['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH=inc, CPPDEFINES=CPPDEFINES, LIBS = libs, LIBPATH = libpath)
+if GetDepend(['CONFIG_REALTEK_BUILD_LITE3D']):
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
-
-Return('group')
+Return('objs')
 

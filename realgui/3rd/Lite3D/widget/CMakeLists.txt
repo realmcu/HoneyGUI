@@ -2,15 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.10)
-if(POLICY CMP0079)
-  cmake_policy(SET CMP0079 NEW)
-endif()
+
 
 # Define a variable for the library name
 if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for depnedency
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
+
 
     # Determine if we should create a library
     if((NOT HEADERS) AND (NOT SOURCES))
