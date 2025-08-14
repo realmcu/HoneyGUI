@@ -40,6 +40,7 @@ function change_target() {
     if (currentVersion) {
         newUrl = newUrl.replace(new RegExp(currentVersion, 'i'), defaultVersion);
     }
+    newUrl = newUrl.replace(new RegExp(`/${defaultVersion}/.*`, 'i'), `/${defaultVersion}/index.html`);
     window.location.href = newUrl;
 }
 

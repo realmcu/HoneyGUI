@@ -86,6 +86,14 @@
                     background-color: #f8f8f8;
                     overflow-y: auto;
                 }
+                chat-widget .chat-content a,
+                chat-widget .chat-content a:visited {
+                    color: #2980b9;
+                }
+                chat-widget .chat-content a:hover,
+                chat-widget .chat-content a:focus {
+                    color: #3091d1;
+                }
                 chat-widget .chat-input-box {
                     padding: 10px 0 0;
                 }
