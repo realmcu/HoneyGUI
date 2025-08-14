@@ -40,6 +40,7 @@ ci_check_config = {
         r"example/widget/text/test_font_vector_rendering_benchmark.c",
         r"example/widget/text/test_font_bitmap_rendering_benchmark.c",
         r"example/widget/text/test_multi_language.c",
+        r"realgui/engine/draw_font.c",
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",

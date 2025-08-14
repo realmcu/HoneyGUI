@@ -69,6 +69,36 @@ uint32_t get_len_by_char_num(uint8_t *utf8, uint32_t char_num);
 uint32_t generate_emoji_file_path_from_unicode(const uint32_t *unicode_buf, uint32_t len,
                                                char *file_path);
 
+/**
+ * @brief Check if the content has any Arabic or Persian Unicode characters.
+ *
+ * @param unicode_buf Unicode buffer to check.
+ * @param len Length of the Unicode buffer.
+ * @return true If the content has any Arabic or Persian Unicode characters.
+ * @return false If the content does not have any Arabic or Persian Unicode characters.
+ */
+bool content_has_ap_unicode(uint32_t *unicode_buf, uint32_t len);
+
+/**
+ * @brief Check if the content has any Arabic or Persian Unicode characters.
+ *
+ * @param charset_type The charset type of the content.
+ * @param content Input content to be checked.
+ * @param len Length of the input content in bytes.
+ * @return true If the content has any Arabic or Persian Unicode characters.
+ * @return false If the content does not have any Arabic or Persian Unicode characters.
+ */
+bool content_has_ap(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len);
+
+/**
+ * @brief Process Arabic or Persian Unicode characters in the content.
+ *
+ * @param unicode_buf Unicode buffer to process.
+ * @param unicode_len Length of the Unicode buffer.
+ * @return uint32_t The length of the processed Unicode buffer.
+ */
+uint32_t process_ap_unicode(uint32_t *unicode_buf, uint32_t unicode_len);
+
 #ifdef __cplusplus
 }
 #endif

@@ -571,6 +571,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
         text->font_len = 0;
         return;
     }
+    if (text->arabic)
+    {
+        unicode_len = process_ap_unicode(unicode_buf, unicode_len);
+    }
     mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * unicode_len);
     if (chr == NULL)
     {

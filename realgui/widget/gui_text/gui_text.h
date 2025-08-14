@@ -61,6 +61,13 @@ typedef enum
     /* VERTICAL */
     VERTICAL_LEFT      = 0x40,
     VERTICAL_RIGHT     = 0x41,
+    /* RTL */
+    RTL_RIGHT          = 0x50,
+    RTL_CENTER         = 0x51,
+    RTL_LEFT           = 0x52,
+    RTL_MULTI_RIGHT    = 0x53,
+    RTL_MULTI_CENTER   = 0x54,
+    RTL_MULTI_LEFT     = 0x55,
 } TEXT_MODE;
 /* TEXT_MODE end */
 
@@ -115,10 +122,11 @@ typedef struct gui_text
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
     bool use_img_blit     : 1;
-    uint8_t inputable     : 1;
-    uint8_t ispasswd      : 1;
-    uint8_t wordwrap      : 1;
-    uint8_t scope         : 1;
+    bool inputable        : 1;
+    bool ispasswd         : 1;
+    bool wordwrap         : 1;
+    bool scope            : 1;
+    bool arabic           : 1;
     uint8_t rendermode    : 2;
 } gui_text_t;
 

@@ -28,18 +28,20 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
+
 typedef struct
 {
-    const char *localName;
-    const char *chineseName;
-    const char *englishName;
-    const char *isoCode;
+    char *localName;
+    char *chineseName;
+    char *englishName;
+    char *isoCode;
     void *fontfile;
 } LanguageInfo;
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
+
 LanguageInfo languages[] =
 {
     { "English",        "英语",      "English",                "en", NULL },
@@ -64,35 +66,39 @@ LanguageInfo languages[] =
     { "Română",         "罗马尼亚语", "Romanian",               "ro", NULL },
     { "Magyar",         "匈牙利语",   "Hungarian",              "hu", NULL },
     { "Dansk",          "丹麦语",     "Danish",                 "da", NULL },
-    { "Suomi",          "芬兰语",    "Finnish",                "fi", NULL },
+    { "Suomi",          "芬兰语",    "Finnish",                 "fi", NULL },
     { "Українська",     "乌克兰语",   "Ukrainian",              "uk", NULL },
     { "עברית",          "希伯来语",  "Hebrew",                 "he", NULL },
     { "فارسی",          "波斯语",    "Persian",                "fa", NULL },
     { "Gaeilge",        "爱尔兰语",   "Irish",                  "ga", NULL },
-    { "Slovenčina",     "斯洛伐克语", "Slovak",                "sk", NULL },
+    { "Slovenčina",     "斯洛伐克语", "Slovak",                 "sk", NULL },
     { "Norsk",          "挪威语",     "Norwegian",              "no", NULL },
-    { "Hrvatski",       "克罗地亚语", "Croatian",              "hr", NULL },
+    { "Hrvatski",       "克罗地亚语", "Croatian",               "hr", NULL },
     { "Svenska",        "瑞典语",     "Swedish",                "sv", NULL },
     { "हिन्दी",           "印地语",     "Hindi",                  "hi", NULL }
 };
 
-#define FONT_SIZE 32
 /*============================================================================*
  *                            Macros
  *============================================================================*/
 
+#define LANGUAGE_COUNT (sizeof(languages)/sizeof(languages[0]))
+#define FONT_SIZE 32
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-
+gui_text_t *return_text;
+gui_text_t *single_text;
+gui_list_t *list;
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void create_font_list(void)
+
+static void load_font_file_list(void)
 {
-    for (int i = 0; i < sizeof(languages) / sizeof(languages[0]); i++)
+    for (int i = 0; i < LANGUAGE_COUNT; i++)
     {
         if (strcmp(languages[i].isoCode, "zh") == 0)
         {
@@ -125,6 +131,84 @@ static void create_font_list(void)
     }
 }
 
+static void arabic_render_test(void)
+{
+    char *test_text =
+        "لكل شخص الحق في أن يلجأ إلى المحاكم الوطنية لإنصافه عن أعمال فيها اعتداء على الحقوق الأساسية التي يمنحها له القانون. لا يجوز القبض على أي إنسان أو حجزه أو نفيه تعسفاً. لكل إنسان الحق، على قدم المساواة التامة مع الآخرين، في أن تنظر قضيته أمام محكمة مستقلة نزيهة نظراً عادلاً علنياً للفصل في حقوقه والتزاماته وأية تهمة جنائية توجه له.";
+
+    single_text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
+    gui_text_set(single_text, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                 FONT_SIZE);
+    gui_text_type_set(single_text, fontnotoarabic, FONT_SRC_MEMADDR);
+    gui_text_mode_set(single_text, RTL_MULTI_RIGHT);
+}
+static void english_render_test(void)
+{
+    char *test_text =
+        "Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom, either alone or in community with others and in public or private, to manifest his religion or belief in teaching, practice, worship and observance. ";
+
+    single_text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
+    gui_text_set(single_text, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                 FONT_SIZE);
+    gui_text_type_set(single_text, fontnoto, FONT_SRC_MEMADDR);
+    gui_text_mode_set(single_text, MULTI_LEFT);
+    gui_text_wordwrap_set(single_text, true);
+}
+static void chinese_render_test(void)
+{
+    char *test_text =
+        "滕王阁序\n滕王高阁临江渚，佩玉鸣鸾罢歌舞。\n画栋朝飞南浦云，珠帘暮卷西山雨。\n闲云潭影日悠悠，物换星移几度秋。\n阁中帝子今何在？槛外长江空自流。\n滕王閣序\n滕王高閣臨江渚，佩玉鳴鸞罷歌舞。\n畫棟朝飛南浦雲，珠簾暮卷西山雨。\n閑雲潭影日悠悠，物換星移幾度秋。\n閣中帝子今何在？檻外長江空自流。";
+
+    single_text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
+    gui_text_set(single_text, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                 FONT_SIZE);
+    gui_text_type_set(single_text, fontharmonysc, FONT_SRC_MEMADDR);
+    gui_text_mode_set(single_text, MULTI_CENTER);
+}
+static void thai_render_test(void)
+{
+    char *test_text =
+        "โดยที่การยอมรับศักดิ์ศรีแต่กำเนิด และสิทธิที่เท่าเทียมกันและที่ไม่อาจเพิกถอนได้ของสมาชิกทั้งมวลแห่งครอบครัวมนุษยชาติ เป็นพื้นฐานแห่งอิสรภาพ ความยุติธรรม และสันติภาพในโลก การไม่นำพาและการหมิ่นในคุณค่าของสิทธิมนุษยชน ยังผลให้มีการกระทำอันป่าเถื่อน ซึ่งเป็นการขัดอย่างร้ายแรงต่อมโนธรรมของมนุษยชาติ";
+
+    single_text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
+    gui_text_set(single_text, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                 FONT_SIZE);
+    gui_text_type_set(single_text, fontnotothai, FONT_SRC_MEMADDR);
+    gui_text_mode_set(single_text, MULTI_LEFT);
+}
+
+static void return_language_list(void *obj, gui_event_t e, void *param)
+{
+    gui_obj_hidden((gui_obj_t *)return_text, true);
+    gui_obj_hidden((gui_obj_t *)list, false);
+    gui_obj_tree_free((gui_obj_t *)single_text);
+}
+
+static void single_language_test(void *obj, gui_event_t e, void *param)
+{
+    uint16_t index = ((gui_list_note_t *)obj)->index;
+    char *isoCode = languages[index].isoCode;
+    gui_obj_hidden((gui_obj_t *)list, true);
+    gui_obj_hidden((gui_obj_t *)return_text, false);
+
+    if (strcmp(isoCode, "ar") == 0)
+    {
+        arabic_render_test();
+    }
+    else if (strcmp(isoCode, "en") == 0)
+    {
+        english_render_test();
+    }
+    else if (strcmp(isoCode, "zh") == 0)
+    {
+        chinese_render_test();
+    }
+    else if (strcmp(isoCode, "th") == 0)
+    {
+        thai_render_test();
+    }
+}
+
 static void note_design(gui_obj_t *obj, void *p)
 {
     uint16_t index = ((gui_list_note_t *)obj)->index;
@@ -148,16 +232,37 @@ static void note_design(gui_obj_t *obj, void *p)
     gui_text_set(isocode, languages[index].isoCode, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(languages[index].isoCode), FONT_SIZE);
     gui_text_type_set(isocode, fontnoto, FONT_SRC_MEMADDR);
+
+    char *isoCode = languages[index].isoCode;
+    if (strcmp(isoCode, "ar") == 0
+        || strcmp(isoCode, "en") == 0
+        || strcmp(isoCode, "zh") == 0
+        || strcmp(isoCode, "th") == 0)
+    {
+        gui_obj_add_event_cb(obj, single_language_test, GUI_EVENT_TOUCH_CLICKED, NULL);
+    }
+}
+
+static void create_return_text(void)
+{
+    return_text = gui_text_create(gui_obj_get_root(), "text", 0, 430, 0, 48);
+    gui_text_set(return_text, "RETURN", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 6, 48);
+    gui_text_type_set(return_text, font32vb4, FONT_SRC_MEMADDR);
+    gui_text_mode_set(return_text, RIGHT);
+    gui_obj_add_event_cb(return_text, return_language_list, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_hidden((gui_obj_t *)return_text, true);
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
 void text_multi_language_test(void)
 {
-    create_font_list();
+    load_font_file_list();
+    create_return_text();
 
-    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, FONT_SIZE, 5, VERTICAL,
-                                       note_design, NULL, true);
-    gui_list_set_note_num(list, sizeof(languages) / sizeof(languages[0]));
+    list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, FONT_SIZE, 5, VERTICAL, note_design,
+                           NULL, true);
+    gui_list_set_note_num(list, LANGUAGE_COUNT);
 }

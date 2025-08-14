@@ -452,6 +452,10 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
     uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
+    if (text->arabic)
+    {
+        unicode_len = process_ap_unicode(unicode_buf, unicode_len);
+    }
 
     text->font_len = unicode_len;
     float all_char_w = 0;
@@ -520,6 +524,10 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
+    if (text->arabic)
+    {
+        unicode_len = process_ap_unicode(unicode_buf, unicode_len);
+    }
 
 #ifdef RTK_GUI_FONT_ENABLE_TTF_NANOVG
     while (ch < unicode_len)

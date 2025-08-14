@@ -503,14 +503,9 @@ void gui_text_set(gui_text_t    *this,
                   uint8_t        font_size)
 {
     this->font_type = text_type;
-    this->content = (uint8_t *)text;
     this->color = color;
-    this->len = length;
     this->font_height = font_size;
-    this->char_width_sum = 0;
-    this->char_line_sum = 0;
-    this->content_refresh = true;
-    this->layout_refresh = true;
+    gui_text_content_set(this, text, length);
 }
 
 
@@ -619,6 +614,33 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->char_line_sum = 0;
     this->content_refresh = true;
     this->layout_refresh = true;
+    if (content_has_ap(this->charset, this->content, this->len))
+    {
+        this->arabic = true;
+        switch (this->mode)
+        {
+        case LEFT:
+            this->mode = RTL_LEFT;
+            break;
+        case CENTER:
+            this->mode = RTL_CENTER;
+            break;
+        case RIGHT:
+            this->mode = RTL_RIGHT;
+            break;
+        case MULTI_LEFT:
+            this->mode = RTL_MULTI_LEFT;
+            break;
+        case MULTI_RIGHT:
+            this->mode = RTL_MULTI_RIGHT;
+            break;
+        case MULTI_CENTER:
+            this->mode = RTL_MULTI_CENTER;
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
