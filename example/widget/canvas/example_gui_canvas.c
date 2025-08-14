@@ -91,7 +91,7 @@ static int app_init(void)
     test_rect_drawing();
     test_arc_drawing();
     test_circle_drawing();
-
+    return 0;
 }
 
 GUI_INIT_APP_EXPORT(app_init);

@@ -41,6 +41,7 @@ static void prepare_blur_param(gui_view_t *this, gui_rect_t new_rect, float blur
     else if (blur_ratio <= 0.1f)
     {
         blur_degree = 0;
+        return;
     }
     else
     {
@@ -141,18 +142,6 @@ void gui_view_blur(gui_view_t *this, int16_t release)
             dir = BLUR_VERTICAL_REVERSE;
         }
     }
-    // gui_rect_t tab_rect = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
-    // gui_rect_t new_rect;
-    // struct gui_dispdev *dc = gui_get_dc();
-    // matrix_get_transform_area(obj->matrix, &tab_rect, &new_rect);
-    // tab_rect.x1 = 0;
-    // tab_rect.y1 = 0;
-    // tab_rect.y2 = dc->screen_height - 1;
-    // tab_rect.x2 = dc->screen_width - 1;
-    // if (!rect_intersect(&new_rect, &tab_rect, &new_rect))
-    // {
-    //     return;
-    // }
     gui_rect_t new_rect = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
     prepare_blur_param(this, new_rect, blur_ratio, dir);
 }

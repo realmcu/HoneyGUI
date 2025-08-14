@@ -44,4 +44,10 @@ void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
     draw_img_free(draw_image, 0);
 }
 
+/* Please call this function in a source C file when this file in gui.lib to make sure compiler link this file. */
+void l3_port_init(void)
+{
+    gui_log("Lite3D port initialized\n");
+}
+
 

@@ -668,6 +668,10 @@ static void gui_canvas_arc_draw_ftl(gui_canvas_arc_t *this)
     }
 
 }
+
+#define IMG_DATA_FREE(draw_img) \
+    if(draw_img!=NULL)  \
+        draw_img_acc_end_cb(draw_img)
 static void gui_canvas_arc_end(gui_canvas_arc_t *this)
 {
     touch_info_t *tp = tp_get_info();
@@ -680,7 +684,15 @@ static void gui_canvas_arc_end(gui_canvas_arc_t *this)
     GUI_UNUSED(dc);
     if (this->arc_data != NULL && !this->use_external_picture)    {gui_free(this->arc_data); this->arc_data = NULL;}
     if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}
-
+    if (draw_img_acc_end_cb != NULL)
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            IMG_DATA_FREE(this->arc_img[i]);
+        }
+        IMG_DATA_FREE(this->circle_img_01);
+        IMG_DATA_FREE(this->circle_img_02);
+    }
     for (int i = 0; i < 12; i++)
     {
         if (this->arc_img[i] != NULL) {gui_free(this->arc_img[i]); this->arc_img[i] = NULL;}

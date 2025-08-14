@@ -422,6 +422,8 @@ static int app_init(void)
     }
     close(fd);
 #endif
+    extern void l3_port_init(void);
+    l3_port_init(); // make sure compiler link Lite3D_port_gui.o
     app_main_watch_ui_design();
     return 0;
 }
