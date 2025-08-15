@@ -285,38 +285,43 @@ LVGL Benchmark Test
 ==========================
 
 LVGL Benchmark is a performance testing tool used to evaluate the graphics display performance of the LVGL library across various hardware and software environments. By running the Benchmark, users can obtain data such as frame rates, rendering speeds, and memory usage, which helps optimize display configurations and debug performance issues. The Benchmark includes multiple test scenarios, such as graphics drawing, animations, and text rendering, with each scenario simulating common operations in actual applications. Users can compare performance across different configurations and platforms through these tests to make targeted optimization adjustments.
+
 The official documentation for LVGL benchmarking can be found at :file:`your HoneyGUI dir/lvgl/demos/README.md`.
 
 Benchmark Reference
 -----------------------------
+
 Platform background: 8773G platform, 200MHz main frequency, QSPI410*502 screen, 96KB RAM with 3M PSRAM, dual buffer mode, direct screen push mode.
+
 Compilation environment: armclang6.22 version, optimization mode -Ofast to enable LTO; gcc 12.2 version, optimization mode -Ofast.
 
 .. csv-table:: Benchmark Test Results with Different Acceleration Methods
-   :header: Scenario, SW Rendering Time, SW+MVE Rendering Time, SW+MVE+ARM2D Rendering Time, SW+MVE+ARM2D+PPE Rendering Time
+   :header: Scenario, SW Rendering Time, SW+MVE+ARM2D Rendering Time, SW+MVE+ARM2D+PPE Rendering Time
+   :widths: 60 50 50 50
    :align: center
 
-   empty screen, 4, 5, 4, 4
-   moving wallpaper, 16, 16, 16, 11
-   single rectangle, 0, 0, 0, 0
-   multiple rectangles, 4, 5, 4, 2
-   multiple RGB images, 5, 5, 5, 2
-   multiple ARGB images, 10, 10, 9, 2
-   rotated ARGB images, 11, 9, 12, 0
-   multiple labels, 8, 9, 9, 9
-   screen sized text, 32, 42, 31, 30
-   multiple arcs, 6, 7, 6, 5
-   containers, 6, 7, 6, 6
-   containers with overlay, 27, 27, 21, 24
-   containers with opa, 9, 9, 11, 7
-   containers with opa_layer, 15, 18, 11, 10
-   containers with scrolling, 23, 24, 20, 21
-   widget demo, 31, 31, 29, 30
-   all screen, 12, 14, 11, 10
+   empty screen, 4, 4, 4
+   moving wallpaper, 16, 16, 11
+   single rectangle, 0, 0, 0
+   multiple rectangles, 4, 4, 2
+   multiple RGB images, 5, 5, 2
+   multiple ARGB images, 10, 9, 2
+   rotated ARGB images, 11, 12, 0
+   multiple labels, 8, 9, 9
+   screen sized text, 32, 31, 30
+   multiple arcs, 6, 6, 5
+   containers, 6, 6, 6
+   containers with overlay, 27, 21, 24
+   containers with opa, 9, 11, 7
+   containers with opa_layer, 15, 11, 10
+   containers with scrolling, 23, 20, 21
+   widget demo, 31, 29, 30
+   all screen, 12, 11, 10
 
 
 .. csv-table:: Benchmark Test Results in Different Compilation Environments
-  :header: Scenario, Acceleration Method, FreeRTOS, Zephyr
+  :header: Scenario, Acceleration Method, ARMCLANG, GCC
+  :widths: 60 50 50 50
   :align: center
 
     empty screen, SW+MVE+PPE, 5, 5
