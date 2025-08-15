@@ -345,6 +345,20 @@
 
         const chatModalMaskNode = document.getElementById('ChatModalMask');
         /* ============= show or hide ai chat modal ============= */
+        // click mask(not modal) to close
+        let isMouseDownInsideModal = false;
+        chatModalMaskNode.addEventListener('mousedown', function(event) {
+            // 检查鼠标是否在 modal 内按下
+            isMouseDownInsideModal = chatModalNode.contains(event.target);
+        });
+        chatModalMaskNode.addEventListener('mouseup', function(event) {
+            // 在 mask 中释放鼠标，并且鼠标没有在 modal 中按下时关闭
+            if (!isMouseDownInsideModal && event.target === chatModalMaskNode) {
+                chatModalMaskNode.style.display = 'none';
+                wyGridContainer.classList.remove("prevent-manipulation");
+            }
+        });
+
         const toggleChatModalButton = document.getElementById('ToggleChatModal');
         const wyGridContainer = document.querySelector('.wy-grid-for-nav');
         toggleChatModalButton.onclick = function() {
@@ -355,6 +369,7 @@
             }
             else {
                 chatModalMaskNode.style.display = 'none';
+                wyGridContainer.classList.remove("prevent-manipulation");
             }
         };
 
@@ -591,7 +606,8 @@
 
             let curVersion = "";
             const rawBody = {
-                aiEnv: "QA",          // aiEnv is PROD or QA
+                aiEnv: "QA",            // aiEnv is PROD or QA
+                docTarget: "",          // optional, 文档标识，用于文档分类
                 rawData: question,      // required, 要詢問 AI 的問句
                 docBase: chatAIBase,    // required, 知識庫id(測試區請使用 2039)
                 docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答

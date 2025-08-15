@@ -11,6 +11,6 @@ src += ['../Lite3D_port_gui.c']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('realgui/widget', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/3rd/Lite3D', src, depend = ['CONFIG_REALTEK_BUILD_LITE3D'], CPPPATH = CPPPATH)
 
 Return('group')

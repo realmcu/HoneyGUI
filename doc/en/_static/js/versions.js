@@ -34,6 +34,7 @@ function change_target() {
     const defaultVersion = versionsList.length > 0 ? versionsList[0] : "latest";
 
     let newUrl = window.location.href;
+    newUrl = newUrl.replace(/\/(cn|en)\//i, '/en/');
     if (currentTarget) {
         newUrl = newUrl.replace(new RegExp(currentTarget, 'i'), selectedTarget);
     }
