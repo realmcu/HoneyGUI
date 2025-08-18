@@ -1,3 +1,4 @@
+/* 3d butterfly demo start*/
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
@@ -201,3 +202,4 @@ static void butterfly_app(gui_view_t *view)
 
     gui_obj_create_timer(GUI_BASE(lite3d_butterfly), 10, true, update_animation);
 }
+/* 3d butterfly demo end*/

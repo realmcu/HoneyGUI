@@ -8,7 +8,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 
-#include "gui_3d.h"
+#include "gui_lite3d.h"
 #include "tp_algo.h"
 #include "dog3d/desc.txt"
 
@@ -24,26 +24,24 @@ static void update_dog_animation()
     }
 }
 
-static void dog_global_cb(gui_3d_t *this)
+static void dog_global_cb(l3_model_t *this)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 3, 30), 1, 32767,
+                             90,  this->viewPortWidth, this->viewPortHeight);
 
-    gui_3d_camera_UVN_initialize(&this->camera, gui_point_4d(0, 3, 60), gui_point_4d(0, 0, 0), 1, 32767,
-                                 90, this->base.w, this->base.h);
-
-    gui_3d_world_inititalize(&this->world, 0, 15, 90, 0, rot_angle, 0, 5);
+    l3_world_initialize(&this->world, 0, 15, 30, 0, rot_angle, 0, 5);
 }
 
 static int app_init(void)
 {
-    gui_3d_t *dog_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc,
-                                     GUI_3D_DRAW_FRONT_AND_SORT, 50, 50, 380,
-                                     380);
+    l3_model_t *dog_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_AND_SORT, 50, 50, 380, 380);
 
-    gui_3d_set_global_transform_cb(dog_3d, (gui_3d_global_transform_cb)dog_global_cb);
+    l3_set_global_transform(dog_3d, (l3_global_transform_cb)dog_global_cb);
 
-    gui_obj_create_timer(&(dog_3d->base), 17, true, update_dog_animation);
-    gui_obj_start_timer(&(dog_3d->base));
+    gui_lite3d_t *lite3d_dog = gui_lite3d_create(gui_obj_get_root(), "lite3d-widget", dog_3d,
+                                                 0, 0, 480, 480);
+
+    gui_obj_create_timer(GUI_BASE(lite3d_dog), 17, true, update_dog_animation);
 
 
     return 0;

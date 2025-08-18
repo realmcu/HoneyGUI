@@ -48,7 +48,8 @@ static void __l3_push_tria_img(l3_model_t *_this)
         }
 
         memset(tria_img, 0x00, sizeof(l3_draw_tria_img_t));
-        memcpy(tria_img, _this->face.tria_face[i].transform_vertex, 3 * sizeof(l3_vertex_t));
+        l3_vertex_t vertices[3];
+        memcpy(vertices, _this->face.tria_face[i].transform_vertex, sizeof(vertices));
 
         int material_id = _this->desc->attrib.material_ids[i];
         if (material_id >= 0)
@@ -73,10 +74,10 @@ static void __l3_push_tria_img(l3_model_t *_this)
             else // Fill with texture image
             {
                 tria_img->fill_type = L3_FILL_IMAGE_RGB565;
-
-                tria_img->p0.v = 1.0f - tria_img->p0.v; // Inverse v coordinate
-                tria_img->p1.v = 1.0f - tria_img->p1.v;
-                tria_img->p2.v = 1.0f - tria_img->p2.v;
+                for (int j = 0; j < 3; j++)
+                {
+                    vertices[j].v = 1.0f - vertices[j].v; // Inverse v coordinate
+                }
             }
         }
         else
@@ -90,6 +91,9 @@ static void __l3_push_tria_img(l3_model_t *_this)
             tria_img->fill_data = &render_color;
         }
 
+        tria_img->p0 = vertices[0];
+        tria_img->p1 = vertices[1];
+        tria_img->p2 = vertices[2];
         l3_draw_tria_to_canvas(tria_img, _this->combined_img, depthBuffer);
 
     }
@@ -140,9 +144,13 @@ void l3_tria_push(l3_model_t *_this)
         {
             l3_vertex_index_t idx = attrib->faces[vertex_offset + j];
             l3_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
+            l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
             l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
             face->transform_vertex[j].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+
+            face->transform_vertex[j].u = vt->u;
+            face->transform_vertex[j].v = vt->v;
         }
 
         l3_tria_scene(face, &_this->camera);

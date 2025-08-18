@@ -36,27 +36,11 @@
 // </c>
 
 // <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D
-// </c>
-
-// <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_PRISM_MIRROR_3D
-// </c>
-
-// <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_FACE_3D
-// </c>
-
-// <c> RTK GUI 3D Demo
 // #define CONFIG_REALTEK_BUILD_REAL_DOG_3D
 // </c>
 
 // <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_DISC_3D
-// </c>
-
-// <c> RTK GUI 3D Demo
-// #define CONFIG_REALTEK_BUILD_REAL_SEAWATER_3D
+// #define CONFIG_REALTEK_BUILD_REAL_EARTH_3D
 // </c>
 
 // <c> RTK GUI View Demo

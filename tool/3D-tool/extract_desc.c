@@ -365,10 +365,13 @@ int main(int argc, char **argv)
     desc->texture_sizes = (unsigned int *)malloc(desc->num_materials * sizeof(unsigned int));
     memset(desc->texture_sizes, 0x00, desc->num_materials * sizeof(unsigned int));
 
+    bool *material_processed = calloc(desc->num_materials, sizeof(bool));
+
     for (uint32_t i = 0; i < desc->attrib.num_face_num_verts; i++)
     {
         int material_id = desc->attrib.material_ids[i];
-        if (material_id != -1  && desc->materials[material_id].diffuse_texname != NULL)
+        if (material_id != -1  && desc->materials[material_id].diffuse_texname != NULL &&
+            !material_processed[material_id])
         {
             printf("desc->materials[%d].diffuse_texname: %s\n", material_id,
                    desc->materials[material_id].diffuse_texname);
@@ -388,6 +391,7 @@ int main(int argc, char **argv)
                 desc->texture_sizes[material_id] = length;
                 memcpy(desc->textures[material_id], array, length);
                 free(array);
+                material_processed[material_id] = true;
             }
             else
             {
@@ -398,6 +402,7 @@ int main(int argc, char **argv)
         }
     }
 
+    free(material_processed);
 
     save_desc_to_binary_file(desc, "desc.bin");
     binary_to_txt_array("desc.bin", "desc.txt");

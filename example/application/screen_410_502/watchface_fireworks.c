@@ -13,7 +13,6 @@
 #include "gui_gray.h"
 #include "gui_obj.h"
 #include "gui_view.h"
-#include "gui_3d.h"
 #include "gui_canvas.h"
 #include "app_main_watch.h"
 

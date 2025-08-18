@@ -12,7 +12,6 @@
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_list.h"
-#include "gui_3d.h"
 
 /*============================================================================*
  *                            Macros
