@@ -52,10 +52,6 @@ static int active_cube = 0;
 /* Music */
 static bool is_playing = false;
 
-/* Audio */
-void (*disc_audio_play)(void) = NULL;
-void (*disc_audio_backward)(void) = NULL;
-void (*disc_audio_forward)(void) = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -181,18 +177,10 @@ static void switch_to_highlight_img(void *obj, gui_event_t e, void *param)
     if (strcmp(img->base.name, "music_backward") == 0)
     {
         gui_img_set_image_data(img, MUSIC_BACKWARD_HIGHLIGHT_BIN);
-        if (disc_audio_backward)
-        {
-            disc_audio_backward();
-        }
     }
     else
     {
         gui_img_set_image_data(img, MUSIC_FORWARD_HIGHLIGHT_BIN);
-        if (disc_audio_forward)
-        {
-            disc_audio_forward();
-        }
     }
 
     gui_obj_create_timer(GUI_BASE(img), 200, false, switch_to_origin_img);
@@ -211,10 +199,6 @@ static void switch_to_play_pause_img(void *obj, gui_event_t e, void *param)
     else
     {
         gui_img_set_image_data(img, MUSIC_PLAY_BIN);
-    }
-    if (disc_audio_play)
-    {
-        disc_audio_play();
     }
 }
 
@@ -267,16 +251,4 @@ static void disc_app(gui_view_t *view)
     gui_obj_add_event_cb(forward_img, (gui_event_cb_t)switch_to_highlight_img, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
 
-}
-
-/*============================================================================*
- *                           Public Functions
- *============================================================================*/
-void disc_audio_init(void (*audio_play)(void),
-                     void (*audio_backward)(void),
-                     void (*audio_forward)(void))
-{
-    disc_audio_play = audio_play;
-    disc_audio_backward = audio_backward;
-    disc_audio_forward = audio_forward;
 }

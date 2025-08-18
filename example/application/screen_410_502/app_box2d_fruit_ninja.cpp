@@ -190,7 +190,7 @@ static float gui_img_get_transform_degrees(gui_img_t *img)
 static Point rotate_point(Point p, Point center, float angle)
 {
     /* converting angles to radians */
-    float radians = angle * 2 * 3.14 / 360.0;
+    float radians = angle * 2.f * 3.14f / 360.0f;
     float cos_theta = cos(radians);
     float sin_theta = sin(radians);
 

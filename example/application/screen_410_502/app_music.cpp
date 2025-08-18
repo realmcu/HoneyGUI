@@ -26,6 +26,7 @@
 #include "gui_win.h"
 #include "tp_algo.h"
 #include "gui_text.h"
+#include "watch_adapt.h"
 #include <memory>
 #include <vector>
 #include <string>
@@ -42,6 +43,7 @@
 #define COLOR_ARTISTNAME  gui_rgb(230, 230, 230)
 #define COLOR_LIST gui_rgb(100, 100, 100)
 #define COLOR_THEME gui_color_css("#892FE0")
+#define MUSIC_NUM_MAX 20
 
 #ifndef INT_MAX
 #define INT_MAX 0x7fffffff
@@ -83,124 +85,86 @@ extern "C" {
 }
 
 /*============================================================================*
- *                             C++ Namespace
+ *                             C Interface
  *============================================================================*/
 extern "C" {
-    /**
-     * @brief Play the specified music file.
-     *
-     * This function starts playing the music file specified by the path `music_file`.
-     *
-     * @param[in] music_file The path to the music file to play.
-     *
-     * @return #GUI_SUCCESS if the operation was successful.
-     */
-    gui_error_t gui_music_play(const char *music_file);
-
-    /**
-     * @brief Stop the currently playing music.
-     *
-     * This function stops playback of any music currently being played.
-     *
-     * @return #GUI_SUCCESS if the music was successfully stopped.
-     */
-    gui_error_t gui_music_stop(void);
-
-    /**
-     * @brief Check if the music playback has completed.
-     *
-     * This function checks if the currently playing music has finished playing.
-     *
-     * @return true if the music playback has completed.
-     * @return false if the music is still playing.
-     */
-    bool gui_music_completion_status(void);
-    /**
-     * @brief Get the length of the loaded music track.
-     *
-     * This function returns the total length of the currently loaded music track in seconds.
-     *
-     * @return The total length of the music track, in seconds. Returns 0 if no music is loaded.
-     */
-    float gui_music_length(void);
-
-    /**
-     * @brief Get the current playback time of the music track.
-     *
-     * This function returns the current playback position of the loaded music track in seconds.
-     *
-     * @return The current playback position, in seconds. Returns 0 if no music is loaded.
-     */
-    float gui_music_current_time(void);
-
-    /**
-     * @brief Load a music file.
-     *
-     * This function loads a music file for playback. The file specified by `music_file` will
-     * be loaded and can be played using other functions in this module.
-     *
-     * @param music_file The path to the music file to be loaded.
-     * @return A gui_error_t error code.
-     *         - GUI_SUCCESS if the file is loaded successfully.
-     *         - GUI_ERROR_NULL if the `music_file` parameter is null.
-     *         - GUI_ERROR_FORMAT if the file format is unsupported.
-     *         - GUI_ERROR for any other generic error condition.
-     */
-    gui_error_t gui_music_load(const char *music_file);
-    gui_error_t gui_music_play(const char *music_file)
+    struct music_information_t
     {
-#if __WIN32
-        extern int win32_play_music(const char *music_file);
-        win32_play_music(music_file);
-#endif
-        return GUI_SUCCESS;
-    }
-    gui_error_t gui_music_stop()
+        char music_name[20];
+        float music_time;
+        char music_time_str[6];
+    };
+
+    static music_information_t music_infor[MUSIC_NUM_MAX] =
     {
-#if __WIN32
-        extern int win32_stop_music(void);
-        win32_stop_music();
-#endif
-        return GUI_SUCCESS;
-    }
-    bool gui_music_completion_status()
+        {"Feels", 230.f, "03:50"},
+        {"Stay", 210.f, "03:30"},
+        {"Blinding Lights", 250.f, "04:10"},
+        {"Levitating", 240.f, "04:00"},
+        {"Peaches", 270.f, "04:30"},
+        {"Montero", 290.f, "04:50"},
+        {"Watermelon Sugar", 210.f, "03:30"},
+        {"Good 4 U", 230.f, "03:50"},
+        {"Kiss Me More", 240.f, "04:00"},
+        {"Save Your Tears", 250.f, "04:10"},
+        {"Industry Baby", 260.f, "04:20"},
+        {"Heat Waves", 270.f, "04:30"},
+        {"Shivers", 280.f, "04:40"},
+        {"As It Was", 290.f, "04:50"},
+        {"About Damn Time", 300.f, "05:00"},
+        {"Bad Guy", 200.f, "03:20"},
+        {"Despacito", 220.f, "03:40"},
+        {"Shape of You", 230.f, "03:50"},
+        {"Hello", 210.f, "03:30"},
+        {"Attentions", 280.f, "04:40"}
+    };
+    char artist_name[20] = {0};
+    char music_name[20] = {0};
+    char album_name[20] = {0};
+    char music_time_array[6] = {0};
+    char play_time_array[6] = "00:00";
+    uint8_t music_num = 0;
+    uint8_t music_index = 0;
+    float play_time = 0.0f;
+
+
+    bool local_music_completion_status()
     {
-#if __WIN32
-        extern bool win32_music_completion_status(void);
-        return win32_music_completion_status();
-#endif
+        if (play_time >= music_infor[music_index].music_time)
+        {
+            return true;
+        }
         return 0;
     }
-    float gui_music_length()
+    float local_music_length()
     {
-        float length = 0;
-#if __WIN32
-        extern double win32_music_get_music_length();
-        length = (float)win32_music_get_music_length();
-#endif
-        return length;
+        return music_infor[music_index].music_time;
     }
-    float gui_music_current_time()
+    float local_music_current_time()
     {
-        float time = 0;
-#if __WIN32
-        extern  double win32_music_get_music_current_time();
-        time = (float)win32_music_get_music_current_time();
-#endif
-        return time;
+        return play_time;
     }
-    gui_error_t gui_music_load(const char *music_file)
+
+    static void formatTime(float seconds, char *str)
     {
-        gui_error_t e = GUI_ERROR;
-#if __WIN32
-        extern int win32_load_music(const char *music_file);
-        int rst = win32_load_music(music_file);
-        if (rst == 0)
-        {
-            e = GUI_SUCCESS;
-        }
-#endif
-        return e;
+        int minutes = static_cast<int>(seconds) / 60;
+        int sec = static_cast<int>(seconds) % 60;
+        sprintf(str, "%02d:%02d", minutes, sec);
+    }
+
+    static gui_text_t *dispaly_text(gui_obj_t *parent, const char *text_string, int x, int y,
+                                    gui_color_t color, int font_size, TEXT_MODE mode)
+    {
+        // This function is to create text GUI element
+        const char *text = text_string;
+        gui_text_t *t = gui_text_create(parent, 0,  x, y,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, (void *)text, GUI_FONT_SRC_TTF, color, strlen(text), font_size);
+        gui_text_type_set(t, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, mode);
+        gui_text_rendermode_set(t, 2);
+        return t;
     }
 }
 
@@ -222,8 +186,10 @@ constexpr int MINIMIZE_COVER_HEIGHT = 50;
 constexpr int LIST_COVER_H = 120;
 constexpr int LIST_SONG_H = 64;
 constexpr char MP3_FILE[] =
-    "C:\\wokspace\\GitLoadHouse\\HoneyComb\\sdk\\src\\sample\\gui\\example\\application\\screen_410_502\\root_image\\source\\music\\Free_Test_Data_5MB_MP3.mp3";
-gui_text_t *current_time = nullptr;
+    "example\\application\\screen_410_502\\root_image\\source\\music\\Free_Test_Data_5MB_MP3.mp3";
+gui_text_t *play_time_text = nullptr;
+gui_text_t *music_time_text = nullptr;
+gui_text_t *music_name_text = nullptr;
 gui_canvas_rect_t *current_time_bar = nullptr;
 gui_list_t *lrc_list = nullptr;
 gui_img_t *play_button = nullptr;
@@ -389,10 +355,6 @@ private:
     gui_img_t *skip_fwd;
     gui_img_t *img_cover;
     gui_win_t *win_cover;
-    std::string artist_name;
-    std::string music_name;
-    std::string album_name;
-    std::string music_time;
     int win_cover_y = 0;
     int win_cover_y_history = 0;
     int release_win_cover_y = 0;;
@@ -485,26 +447,80 @@ private:
     }
     static void on_playing(void *p)
     {
-        static char current_time_array[6];
-        memset(current_time_array, 0, 6);
-        float time = gui_music_current_time();
-        float duration = gui_music_length();
-        //gui_log("gui_music_current_time():%f\n", time);
-        std::string current_time_string = formatTime(time);
-
-        memcpy(current_time_array, current_time_string.c_str(), 6);
-        //gui_log("current_time_array:%s\n", current_time_array);
-        gui_text_content_set(current_time, current_time_array, 5);
-        gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
-        int16_t offset = -(time / duration * (page_list_item_space * lyrics_array_length -
-                                              SCREEN_H / 2));
-        gui_list_set_offset(lrc_list, offset);
-        if (gui_music_completion_status())
+        play_time += 0.1f; // Simulate time progression
+        gui_audio_t *gui_audio = gui_get_audio();
+        float duration = 0;
+        if (gui_audio->music_length)
         {
-            gui_img_t *img = GUI_TYPE(gui_img_t, p);
-            img->data = PLAY_BIN;
+            duration = gui_audio->music_length();
+        }
+        else
+        {
+            duration = local_music_length();
+        }
+
+        float time = 0;
+        if (gui_audio->music_current_time)
+        {
+            time = gui_audio->music_current_time();
+        }
+        else
+        {
+            time = local_music_current_time();
+        }
+
+        formatTime(time, play_time_array);
+        gui_text_content_set(play_time_text, play_time_array, strlen(play_time_array));
+        gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
+        int16_t offset = -(time / duration * (page_list_item_space * lyrics_array_length));
+        gui_list_set_offset(lrc_list, offset);
+
+        bool completion_status = false;
+        if (gui_audio->music_completion_status)
+        {
+            completion_status = gui_audio->music_completion_status();
+        }
+        else
+        {
+            completion_status = local_music_completion_status();
+        }
+        if (completion_status)
+        {
+            if (music_index < MUSIC_NUM_MAX - 1)
+            {
+                music_index++;
+                music_switch_information();
+            }
+            else
+            {
+                play_button->data = PLAY_BIN;
+                gui_obj_stop_timer(GUI_BASE(play_button));
+            }
         }
     }
+
+    static void music_switch_information(void)
+    {
+        sprintf(music_name, "%s", music_infor[music_index].music_name);
+        gui_text_content_set(music_name_text, music_name, strlen(music_name));
+        gui_audio_t *gui_audio = gui_get_audio();
+        float duration = 0;
+        if (gui_audio->music_length)
+        {
+            duration = gui_audio->music_length();
+        }
+        else
+        {
+            duration = local_music_length();
+        }
+        formatTime(duration, music_time_array);
+        gui_text_content_set(music_time_text, music_time_array, strlen(music_time_array));
+
+        play_time = 0.0f; // Reset play time
+        formatTime(play_time, play_time_array);
+        gui_text_content_set(play_time_text, play_time_array, strlen(play_time_array));
+    }
+
     static void music_clicked_timer_cb(void *p)
     {
         gui_obj_hidden(GUI_BASE(p), true);
@@ -512,50 +528,75 @@ private:
     static void music_clicked(void *obj, gui_event_t e, void *param)
     {
         gui_obj_hidden(GUI_BASE(param), false);
-        gui_obj_create_timer(GUI_BASE(param), 20, false, music_clicked_timer_cb);
+        gui_obj_create_timer(GUI_BASE(param), 300, false, music_clicked_timer_cb);
         gui_obj_start_timer(GUI_BASE(param));
 
-        if (play_button->data == PLAY_BIN) //play this music
+        gui_audio_t *gui_audio = gui_get_audio();
+        gui_list_note_t *note = (gui_list_note_t *)GUI_BASE(obj)->parent;
+        if (music_index != note->index) //play this music
         {
-            gui_music_play(MP3_FILE);
+            music_index = note->index;
+            if (gui_audio->music_play)
+            {
+                gui_audio->music_play((void *)MP3_FILE);
+            }
+            music_switch_information();
             play_button->data = PAUSE_BIN;
-            gui_img_set_mode(play_button, IMG_SRC_OVER_MODE);
             gui_obj_start_timer(GUI_BASE(play_button));
         }
-    }
-    gui_text_t *dispaly_text(gui_obj_t *parent, const char *text_string, int x, int y,
-                             gui_color_t color)
-    {
-        // This function is to create text GUI element
-        const char *text = text_string;
-        int font_size = 24;
-        gui_text_t *t = gui_text_create(parent, 0,  x, y,
-                                        gui_get_screen_width(),
-                                        font_size);
-        gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
-        void *addr1 = SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_mode_set(t, MULTI_LEFT);
-        return t;
+        else
+        {
+            gui_img_t *img = play_button;
+            if (img->data == PLAY_BIN)
+            {
+                if (gui_audio->music_play)
+                {
+                    gui_audio->music_play((void *)MP3_FILE);
+                }
+                img->data = PAUSE_BIN;
+                gui_obj_start_timer(GUI_BASE(img));
+            }
+            else
+            {
+                if (gui_audio->music_stop)
+                {
+                    gui_audio->music_stop();
+                }
+                img->data = PLAY_BIN;
+                gui_obj_stop_timer(GUI_BASE(img));
+            }
+        }
     }
     static void music_list_design(gui_obj_t *obj, void *p)
     {
         gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
         uint8_t index = note->index;
-        void *img_file[] =
-        {
-            GROUP1000000744_BIN,
-            GROUP1000000745_BIN,
-            GROUP1000000746_BIN,
-            GROUP1000000747_BIN,
-            GROUP1000000748_BIN,
-        };
+        if (index == MUSIC_NUM_MAX) { return; }
         gui_canvas_rect_t *rect = gui_canvas_rect_create(GUI_BASE(note), 0, 0, 0, SCREEN_W, LIST_SONG_H,
                                                          COLOR_THEME);
         gui_obj_hidden(GUI_BASE(rect), true);
-        gui_img_t *img = gui_img_create_from_mem(obj, 0, img_file[index % 5], 30, 0, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_obj_add_event_cb(img, music_clicked, GUI_EVENT_TOUCH_CLICKED, rect);
+
+        int font_size = 32;
+        char *text = music_infor[index].music_name;
+        gui_text_t *t = dispaly_text(obj, text, 50, 15, APP_COLOR_WHITE, font_size, LEFT);
+
+        font_size = 24;
+        text = music_infor[index].music_time_str;
+        dispaly_text(obj, text, 320, 20, APP_COLOR_WHITE, font_size, LEFT);
+
+        gui_obj_add_event_cb(t, music_clicked, GUI_EVENT_TOUCH_CLICKED, rect);
+
+        // void *img_file[] =
+        // {
+        //     GROUP1000000744_BIN,
+        //     GROUP1000000745_BIN,
+        //     GROUP1000000746_BIN,
+        //     GROUP1000000747_BIN,
+        //     GROUP1000000748_BIN,
+        // };
+        // gui_img_t *img = gui_img_create_from_mem(obj, 0, img_file[index % 5], 30, 0, 0, 0);
+        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        // gui_obj_add_event_cb(img, music_clicked, GUI_EVENT_TOUCH_CLICKED, rect);
     }
     static void lrc_list_design(gui_obj_t *obj, void *p)
     {
@@ -563,27 +604,32 @@ private:
         uint8_t index = note->index;
         char **all_lyrics_array = (char **)p;
         const char *text = all_lyrics_array[index];
-        gui_text_t *t = gui_text_create(obj, 0, 0, 35, 0, 0);
-        gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_RED, strlen(text), 24);
-        gui_text_type_set(t, (void *)SOURCEHANSANSSC_SIZE24_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
-        gui_text_mode_set(t, MID_CENTER);
+        if ((uint8_t)text[0] != 0)
+        {
+            dispaly_text(obj, text, 0, 35, APP_COLOR_RED, 24, MID_CENTER);
+        }
     }
 
     static void play_button_cb(void *obj, gui_event_t e, void *param)
     {
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+        gui_audio_t *gui_audio = gui_get_audio();
         if (img->data == PLAY_BIN)
         {
-            gui_music_play(MP3_FILE);
+            if (gui_audio->music_play)
+            {
+                gui_audio->music_play((void *)MP3_FILE);
+            }
             img->data = PAUSE_BIN;
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             gui_obj_start_timer(GUI_BASE(obj));
         }
         else
         {
-            gui_music_stop();
+            if (gui_audio->music_stop)
+            {
+                gui_audio->music_stop();
+            }
             img->data = PLAY_BIN;
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             gui_obj_stop_timer(GUI_BASE(obj));
         }
     }
@@ -596,8 +642,22 @@ private:
     {
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_img_set_image_data(img, (const uint8_t *)SKIPBACKHL_BIN);
-        gui_obj_create_timer(GUI_BASE(img), 10, false, skip_back_timer_cb);
+        gui_obj_create_timer(GUI_BASE(img), 100, false, skip_back_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
+
+        if (music_index > 0)
+        {
+            music_index--;
+            gui_obj_start_timer(GUI_BASE(play_button));
+            play_button->data = PAUSE_BIN;
+            music_switch_information();
+
+            gui_audio_t *gui_audio = gui_get_audio();
+            if (gui_audio->music_backward)
+            {
+                gui_audio->music_backward();
+            }
+        }
     }
 
     static void skip_fwd_timer_cb(void *p)
@@ -609,8 +669,22 @@ private:
     {
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_img_set_image_data(img, (const uint8_t *)SKIPFWDHL_BIN);
-        gui_obj_create_timer(GUI_BASE(img), 10, false, skip_fwd_timer_cb);
+        gui_obj_create_timer(GUI_BASE(img), 100, false, skip_fwd_timer_cb);
         gui_obj_start_timer(GUI_BASE(img));
+
+        if (music_index < MUSIC_NUM_MAX - 1)
+        {
+            music_index++;
+            gui_obj_start_timer(GUI_BASE(play_button));
+            play_button->data = PAUSE_BIN;
+            music_switch_information();
+
+            gui_audio_t *gui_audio = gui_get_audio();
+            if (gui_audio->music_backward)
+            {
+                gui_audio->music_backward();
+            }
+        }
     }
     static void win_clicked_cb(void *obj, gui_event_t e, void *param)
     {
@@ -626,7 +700,7 @@ private:
         gui_canvas_rect_create(GUI_BASE(music_list_win), 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_LIST);
         gui_list_t *music_list = gui_list_create(music_list_win, "music_list", 0, 0, SCREEN_W, SCREEN_H,
                                                  LIST_SONG_H, 0, VERTICAL, music_list_design, NULL, false);
-        gui_list_set_note_num(music_list, 20);
+        gui_list_set_note_num(music_list, MUSIC_NUM_MAX + 1);
         gui_list_set_style(music_list, LIST_CLASSIC);
         gui_obj_hidden(GUI_BASE(music_list_win), true);
 
@@ -637,14 +711,14 @@ private:
         all_lyrics_array = get_lyric_at_time(arrayLength,
                                              LRC_CONTENT); // If use other overload functions, notice mem management
         lyrics_array_length = arrayLength;
-        page_list_item_space = 40;
+        page_list_item_space = 35;
         // for (int i = 0; all_lyrics_array[i] != nullptr; ++i)
         // {
         //     gui_log("%s\n", all_lyrics_array[i]);
         // }
         lrc_list = gui_list_create(lrc_win, "lrc_list", 0, 0, 0, 0, 30, 5, VERTICAL, lrc_list_design,
                                    all_lyrics_array, false);
-        gui_list_set_note_num(lrc_list, lyrics_array_length);
+        gui_list_set_note_num(lrc_list, lyrics_array_length); //last one is empty
         gui_list_set_style(lrc_list, LIST_CLASSIC);
         gui_obj_hidden(GUI_BASE(lrc_win), true);
         /*COVER WINDOW*/
@@ -660,7 +734,7 @@ private:
         img_cover = gui_img_create_from_mem(parent, 0, RECTANGLE86_BIN, COVER_X, COVER_Y, 0, 0);
         play_button = gui_img_create_from_mem(parent, 0, PLAY_BIN, MINIMIZE_SWITCH_TARGT_X, BUTTON_Y, 0, 0);
         gui_obj_add_event_cb(play_button, play_button_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
-        gui_obj_create_timer(GUI_BASE(play_button), 50, true, on_playing);
+        gui_obj_create_timer(GUI_BASE(play_button), 100, true, on_playing);
         gui_obj_stop_timer(GUI_BASE(play_button));
         skip_back = gui_img_create_from_mem(parent, 0, SKIPBACK_BIN, SWITCH_X - SCREEN_W / 3, BUTTON_Y, 0,
                                             0);
@@ -669,23 +743,38 @@ private:
         gui_obj_add_event_cb(skip_fwd, skip_fwd_button_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
 
         // Display artist, music, and album name
-        gui_music_load(MP3_FILE);
-        float length = gui_music_length();
-        artist_name = "FreeTestData.com";
-        album_name = "Sample Audio";
-        music_name = "Free_Test_Data_5MB_MP3";
-        music_time = formatTime(length);
-        dispaly_text(parent, music_name.c_str(), COVER_X, COVER_Y + COVER_W, APP_COLOR_WHITE);
-        dispaly_text(parent, artist_name.c_str(), COVER_X, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME);
-        dispaly_text(parent, album_name.c_str(), COVER_X + 180, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME);
+        gui_audio_t *gui_audio = gui_get_audio();
+        if (gui_audio->music_load)
+        {
+            gui_audio->music_load((void *)MP3_FILE);
+        }
+
+        float length = 0;
+        if (gui_audio->music_length)
+        {
+            length = gui_audio->music_length();
+        }
+        else
+        {
+            length = local_music_length();
+        }
+        sprintf(music_name, "%s", music_infor[music_index].music_name);
+        sprintf(artist_name, "%s", "FreeTestData.com");
+        sprintf(album_name, "%s", "Sample Audio");
+        formatTime(length, music_time_array);
+        music_name_text = dispaly_text(parent, music_name, COVER_X, COVER_Y + COVER_W, APP_COLOR_WHITE, 24,
+                                       LEFT);
+        dispaly_text(parent, artist_name, COVER_X, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME, 24, LEFT);
+        dispaly_text(parent, album_name, COVER_X + 180, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME, 24, LEFT);
         gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, COVER_W, 3,
                                COLOR_ARTISTNAME);
         current_time_bar = gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16,
                                                   1, 3, APP_COLOR_WHITE);
-        current_time = dispaly_text(parent, "0:00", COVER_X, COVER_Y + COVER_W + 18 + 15 + 16 + 4,
-                                    APP_COLOR_WHITE);
-        dispaly_text(parent, music_time.c_str(), COVER_X + COVER_W - 30,
-                     COVER_Y + COVER_W + 18 + 15 + 16 + 4, APP_COLOR_WHITE);
+        play_time_text = dispaly_text(parent, play_time_array, COVER_X,
+                                      COVER_Y + COVER_W + 18 + 15 + 16 + 4,
+                                      APP_COLOR_WHITE, 24, LEFT);
+        music_time_text = dispaly_text(parent, music_time_array, COVER_X + COVER_W - 30,
+                                       COVER_Y + COVER_W + 18 + 15 + 16 + 4, APP_COLOR_WHITE, 24, LEFT);
     }
 
 
@@ -921,15 +1010,6 @@ private:
 
         cArray[lines.size()] = nullptr;  // NULL terminator for the array
         return cArray;
-    }
-    static std::string formatTime(double seconds)
-    {
-        int minutes = static_cast<int>(seconds) / 60;
-        int sec = static_cast<int>(seconds) % 60;
-
-        std::ostringstream oss;
-        oss << minutes << ':' << std::setfill('0') << std::setw(2) << sec;
-        return oss.str();
     }
 };
 

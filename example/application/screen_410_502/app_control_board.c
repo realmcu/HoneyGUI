@@ -12,11 +12,12 @@
  *============================================================================*/
 typedef struct switch_state
 {
-    uint8_t sw_1 : 1; //LTE
-    uint8_t sw_2 : 1; //WIFI
-    uint8_t sw_3 : 1; //phone
-    uint8_t sw_4 : 1; //mute
-    uint8_t sw_5 : 1; //nobother
+    uint8_t sw_1 : 1; //BT
+    uint8_t sw_2 : 1; //LOCAL_PLAY
+    uint8_t sw_3 : 1; //PHONE
+    uint8_t sw_4 : 1; //EARPHONE
+    uint8_t sw_5 : 1; //MUTE
+    uint8_t sw_6 : 1; //NOBOTHER
 } switch_state_t;
 
 /*============================================================================*
@@ -69,74 +70,135 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
+/* update switch display state */
+void switch_bt(bool state)
+{
+    sw_state.sw_1 = state;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_bt", current_view);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (sw_state.sw_1)
+    {
+        gui_img_set_image_data(img, CONTROL_BT_ON_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, CONTROL_BT_OFF_BIN);
+    }
+}
+
+void switch_local_play(bool state)
+{
+    sw_state.sw_2 = state;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_local_play", current_view);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (sw_state.sw_2)
+    {
+        gui_img_set_image_data(img, CONTROL_PLAY_ON_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, CONTROL_PLAY_OFF_BIN);
+    }
+}
+
+void switch_phone(bool state)
+{
+    sw_state.sw_3 = state;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_phone", current_view);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (sw_state.sw_3)
+    {
+        gui_img_set_image_data(img, CONTROL_PHONE_ON_BIN);
+        gui_img_set_image_data(img_capsule_phone, PHONE_ON_ICON_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, CONTROL_PHONE_OFF_BIN);
+        gui_img_set_image_data(img_capsule_phone, PHONE_OFF_ICON_BIN);
+    }
+}
+
+void switch_earphone(bool state)
+{
+    sw_state.sw_4 = state;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_earphone", current_view);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (sw_state.sw_4)
+    {
+        gui_img_set_image_data(img, CONTROL_EARPHONE_ON_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, CONTROL_EARPHONE_OFF_BIN);
+    }
+}
+
+void switch_mute(bool state)
+{
+    sw_state.sw_5 = state;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_mute", current_view);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (sw_state.sw_5)
+    {
+        gui_img_set_image_data(img, CONTROL_MUTE_ON_BIN);
+        gui_img_set_image_data(img_capsule_mute, MUTE_ON_ICON_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, CONTROL_MUTE_OFF_BIN);
+        gui_img_set_image_data(img_capsule_mute, MUTE_OFF_ICON_BIN);
+    }
+}
+
+void switch_nobother(bool state)
+{
+    sw_state.sw_6 = state;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "sw_nobother", current_view);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (sw_state.sw_6)
+    {
+        gui_img_set_image_data(img, CONTROL_NOBOTHER_ON_BIN);
+        gui_img_set_image_data(img_capsule_nobother, NOBOTHER_ON_ICON_BIN);
+    }
+    else
+    {
+        gui_img_set_image_data(img, CONTROL_NOBOTHER_OFF_BIN);
+        gui_img_set_image_data(img_capsule_nobother, NOBOTHER_OFF_ICON_BIN);
+    }
+}
+
 static void switch_cb(void *obj, gui_event_t e, void *param)
 {
     gui_img_t *img = (gui_img_t *)obj;
-    if (strcmp(img->base.name, "sw_lte") == 0)
+    if (strcmp(img->base.name, "sw_bt") == 0)
     {
-        sw_state.sw_1 = !sw_state.sw_1;
-        if (sw_state.sw_1)
-        {
-            gui_img_set_image_data(img, CONTROL_LTE_ON_BIN);
-        }
-        else
-        {
-            gui_img_set_image_data(img, CONTROL_LTE_OFF_BIN);
-        }
+        sw_state.sw_1 ^= 1;
+        switch_bt(sw_state.sw_1);
     }
-    else if (strcmp(img->base.name, "sw_wifi") == 0)
+    else if (strcmp(img->base.name, "sw_local_play") == 0)
     {
-        sw_state.sw_2 = !sw_state.sw_2;
-        if (sw_state.sw_2)
-        {
-            gui_img_set_image_data(img, CONTROL_WIFI_ON_BIN);
-        }
-        else
-        {
-            gui_img_set_image_data(img, CONTROL_WIFI_OFF_BIN);
-        }
+        sw_state.sw_2 ^= 1;
+        switch_local_play(sw_state.sw_2);
     }
     else if (strcmp(img->base.name, "sw_phone") == 0)
     {
-        sw_state.sw_3 = !sw_state.sw_3;
-        if (sw_state.sw_3)
-        {
-            gui_img_set_image_data(img, CONTROL_PHONE_ON_BIN);
-            gui_img_set_image_data(img_capsule_phone, PHONE_ON_ICON_BIN);
-        }
-        else
-        {
-            gui_img_set_image_data(img, CONTROL_PHONE_OFF_BIN);
-            gui_img_set_image_data(img_capsule_phone, PHONE_OFF_ICON_BIN);
-        }
+        sw_state.sw_3 ^= 1;
+        switch_phone(sw_state.sw_3);
+    }
+    else if (strcmp(img->base.name, "sw_earphone") == 0)
+    {
+        sw_state.sw_4 ^= 1;
+        switch_earphone(sw_state.sw_4);
     }
     else if (strcmp(img->base.name, "sw_mute") == 0)
     {
-        sw_state.sw_4 = !sw_state.sw_4;
-        if (sw_state.sw_4)
-        {
-            gui_img_set_image_data(img, CONTROL_MUTE_ON_BIN);
-            gui_img_set_image_data(img_capsule_mute, MUTE_ON_ICON_BIN);
-        }
-        else
-        {
-            gui_img_set_image_data(img, CONTROL_MUTE_OFF_BIN);
-            gui_img_set_image_data(img_capsule_mute, MUTE_OFF_ICON_BIN);
-        }
+        sw_state.sw_5 ^= 1;
+        switch_mute(sw_state.sw_5);
     }
     else if (strcmp(img->base.name, "sw_nobother") == 0)
     {
-        sw_state.sw_5 = !sw_state.sw_5;
-        if (sw_state.sw_5)
-        {
-            gui_img_set_image_data(img, CONTROL_NOBOTHER_ON_BIN);
-            gui_img_set_image_data(img_capsule_nobother, NOBOTHER_ON_ICON_BIN);
-        }
-        else
-        {
-            gui_img_set_image_data(img, CONTROL_NOBOTHER_OFF_BIN);
-            gui_img_set_image_data(img_capsule_nobother, NOBOTHER_OFF_ICON_BIN);
-        }
+        sw_state.sw_6 ^= 1;
+        switch_nobother(sw_state.sw_6);
     }
 }
 
@@ -150,29 +212,31 @@ static void control_board_design(gui_view_t *view)
                                                             SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));
 
     // switch
-    gui_img_t *sw_lte = gui_img_create_from_mem(view, "sw_lte", CONTROL_LTE_OFF_BIN, 20, 100, 182, 121);
-    gui_img_t *sw_wifi = gui_img_create_from_mem(view, "sw_wifi", CONTROL_WIFI_OFF_BIN, 207, 100, 182,
-                                                 121);
+    gui_img_t *sw_bt = gui_img_create_from_mem(view, "sw_bt", CONTROL_BT_OFF_BIN, 20, 100, 182, 121);
+    gui_img_t *sw_local_play = gui_img_create_from_mem(view, "sw_local_play", CONTROL_PLAY_OFF_BIN, 207,
+                                                       100, 182,
+                                                       121);
     gui_img_t *sw_phone = gui_img_create_from_mem(view, "sw_phone", CONTROL_PHONE_OFF_BIN, 20,
                                                   100 + 125 * 1, 182, 121);
+    gui_img_t *sw_earphone = gui_img_create_from_mem(view, "sw_earphone", CONTROL_EARPHONE_OFF_BIN, 207,
+                                                     100 + 125 * 1, 182, 121);
     gui_img_t *sw_mute = gui_img_create_from_mem(view, "sw_mute", CONTROL_MUTE_OFF_BIN, 20,
                                                  100 + 125 * 2, 182, 121);
     gui_img_t *sw_nobother = gui_img_create_from_mem(view, "sw_nobother", CONTROL_NOBOTHER_OFF_BIN, 207,
                                                      100 + 125 * 2, 182, 121);
-    gui_img_set_quality(sw_lte, true);
-    gui_img_set_quality(sw_wifi, true);
+    gui_img_set_quality(sw_bt, true);
+    gui_img_set_quality(sw_local_play, true);
     gui_img_set_quality(sw_phone, true);
+    gui_img_set_quality(sw_earphone, true);
     gui_img_set_quality(sw_mute, true);
     gui_img_set_quality(sw_nobother, true);
-    gui_obj_add_event_cb(sw_lte, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_add_event_cb(sw_wifi, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(sw_bt, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(sw_local_play, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(sw_phone, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(sw_earphone, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(sw_mute, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(sw_nobother, (gui_event_cb_t)switch_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    // capsule on top
-    // gui_canvas_round_rect_t *capsule = gui_canvas_round_rect_create(GUI_BASE(view), NULL,
-    //                                                                 136, 20, 138, 47, 20, gui_rgb(196, 196, 196));
     gui_img_t *capsule = gui_img_create_from_mem(view, 0, CONTROL_CAPSULE_BIN, 136, 20, 0, 0);
     img_capsule_phone = gui_img_create_from_mem(capsule, "capsule_phone", PHONE_OFF_ICON_BIN, 15, 9, 0,
                                                 0);
@@ -189,11 +253,11 @@ static void control_board_design(gui_view_t *view)
 
     if (sw_state.sw_1)
     {
-        gui_img_set_image_data(sw_lte, CONTROL_LTE_ON_BIN);
+        gui_img_set_image_data(sw_bt, CONTROL_BT_ON_BIN);
     }
     if (sw_state.sw_2)
     {
-        gui_img_set_image_data(sw_wifi, CONTROL_WIFI_ON_BIN);
+        gui_img_set_image_data(sw_local_play, CONTROL_PLAY_ON_BIN);
     }
     if (sw_state.sw_3)
     {
@@ -202,27 +266,16 @@ static void control_board_design(gui_view_t *view)
     }
     if (sw_state.sw_4)
     {
+        gui_img_set_image_data(sw_earphone, CONTROL_EARPHONE_ON_BIN);
+    }
+    if (sw_state.sw_5)
+    {
         gui_img_set_image_data(sw_mute, CONTROL_MUTE_ON_BIN);
         gui_img_set_image_data(img_capsule_mute, MUTE_ON_ICON_BIN);
     }
-    if (sw_state.sw_5)
+    if (sw_state.sw_6)
     {
         gui_img_set_image_data(sw_nobother, CONTROL_NOBOTHER_ON_BIN);
         gui_img_set_image_data(img_capsule_nobother, NOBOTHER_ON_ICON_BIN);
     }
-
-    gui_img_t *img_charge = gui_img_create_from_mem(view, NULL, CONTROL_PAD_BIN, 207,
-                                                    100 + 125 * 1, 182, 121);
-    gui_img_t *img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_9_BIN, 35, 40, 0, 0);
-    gui_img_scale(img_num, 0.8, 0.8);
-    gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
-    gui_img_set_quality(img_num, true);
-    img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_6_BIN, 65, 40, 0, 0);
-    gui_img_scale(img_num, 0.8, 0.8);
-    gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
-    gui_img_set_quality(img_num, true);
-    img_num = gui_img_create_from_mem(img_charge, NULL, UI_TEXT_PERCENT_BIN, 95, 40, 0, 0);
-    gui_img_scale(img_num, 0.8, 0.8);
-    gui_img_set_mode(img_num, IMG_SRC_OVER_MODE);
-    gui_img_set_quality(img_num, true);
 }

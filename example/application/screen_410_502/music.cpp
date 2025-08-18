@@ -231,59 +231,62 @@ static MP3Player player;
 bool MP3Player::completion;
 extern "C" {
     // C interface function to play music
-    int win32_play_music(const char *music_file)
+    void win32_play_music(void *p)
     {
+        const char *music_file = (const char *)p;
         try
         {
             if (!player.reload(music_file))
             {
-                return -1;  // Return -1 if reloading fails
+                // return -1;  // Return -1 if reloading fails
             }
 
-            return 0;  // Success
+            // return 0;  // Success
+            return;
         }
         catch (const std::exception &ex)
         {
             cerr << "Error playing music: " << ex.what() << endl;
-            return -1;  // Return -1 if exception occurs
+            // return -1;  // Return -1 if exception occurs
         }
     }
 
     // C interface function to stop music
-    int win32_stop_music()
+    void win32_stop_music(void)
     {
         player.stop();  // Stop playback
-        return 0;
+        // return 0;
     }
 
     // C interface function to check music completion status
-    bool win32_music_completion_status()
+    bool win32_music_completion_status(void)
     {
         return player.get_completion();
     }
-    double win32_music_get_music_length()
+    float win32_music_get_music_length(void)
     {
-        return player.getDuration();
+        return (float)player.getDuration();
     }
-    double win32_music_get_music_current_time()
+    float win32_music_get_music_current_time(void)
     {
-        return player.getCurrentTime();
+        return (float)player.getCurrentTime();
     }
-    int win32_load_music(const char *music_file)
+    void win32_load_music(void *p)
     {
+        const char *music_file = (const char *)p;
         try
         {
             if (!player.load(music_file))
             {
-                return -1;  // Return -1 if reloading fails
+                // return -1;  // Return -1 if reloading fails
             }
-
-            return 0;  // Success
+            return;
+            // return 0;  // Success
         }
         catch (const std::exception &ex)
         {
             cerr << "Error playing music: " << ex.what() << endl;
-            return -1;  // Return -1 if exception occurs
+            // return -1;  // Return -1 if exception occurs
         }
     }
 

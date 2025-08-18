@@ -13,6 +13,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
 #include "app_main_watch.h"
+#include "watch_adapt.h"
 
 /*============================================================================*
  *                           Types
@@ -73,6 +74,8 @@ uint8_t resource_root[1024 * 1024 * 20];
 const char *filename =
     "./example/application/screen_410_502/root_image/web/peripheral_simulation/json/simulation_data.json";
 #endif
+
+static gui_audio_t gui_audio_info = {0};
 
 /*============================================================================*
  *                           Private Functions
@@ -424,6 +427,25 @@ static int app_init(void)
 #endif
     extern void l3_port_init(void);
     l3_port_init(); // make sure compiler link Lite3D_port_gui.o
+
+#ifdef _WIN32
+    extern void win32_load_music(void *p);
+    extern void win32_play_music(void *p);
+    extern void win32_stop_music(void);
+    extern bool win32_music_completion_status(void);
+    extern float win32_music_get_music_length(void);
+    extern float win32_music_get_music_current_time(void);
+    gui_audio_info.music_load = win32_load_music;
+    gui_audio_info.music_play = win32_play_music;
+    gui_audio_info.music_stop = win32_stop_music;
+    gui_audio_info.music_completion_status = win32_music_completion_status;
+    gui_audio_info.music_length = win32_music_get_music_length;
+    gui_audio_info.music_current_time = win32_music_get_music_current_time;
+#endif
+    if (gui_get_audio() == NULL)
+    {
+        gui_audio_info_register(&gui_audio_info);
+    }
     app_main_watch_ui_design();
     return 0;
 }

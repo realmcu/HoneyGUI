@@ -158,7 +158,7 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
     g_Limit = false;
     int temp = _this->dir == HORIZONTAL ? obj->w : obj->h;
     int offset_min = temp - _this->total_length;
-    int offset_max = OUT_SCOPE;
+    int offset_max = 0;
     if (_this->style == LIST_CARD)
     {
         offset_max = temp - _this->note_length * 1.8f;
@@ -186,9 +186,9 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
             _this->offset = offset_max;
             _this->speed = 0;
         }
-        else if (_this->offset < offset_min - OUT_SCOPE)
+        else if (_this->offset < offset_min)
         {
-            _this->offset = offset_min - OUT_SCOPE;
+            _this->offset = offset_min;
             _this->speed = 0;
         }
     }
@@ -224,14 +224,14 @@ static void gui_list_free_notes(gui_obj_t *obj)
 
         if (pos + _this->note_length < 0)
         {
+            // gui_log("free note %d\n", note->index);
             gui_obj_tree_free(o);
-            // gui_log("free note %d\n", index);
         }
         else if (pos > range)
         {
+            // gui_log("free note %d\n", note->index);
             gui_obj_tree_free(o);
             _this->created_note_index -= 1;
-            // gui_log("free note %d\n", index);
         }
     }
 }
@@ -708,8 +708,8 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
             gui_list_update_speed(_this, tp->deltaX);
 
             _this->offset = _this->hold + tp->deltaX;
-            int offset_min = obj->w - _this->total_length - OUT_SCOPE;
-            int offset_max = OUT_SCOPE;
+            int offset_min = obj->w - _this->total_length;
+            int offset_max = 0;
             if (_this->style == LIST_CARD)
             {
                 offset_max = obj->w - _this->note_length * 1.8f;
@@ -735,8 +735,8 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
             gui_list_update_speed(_this, tp->deltaY);
 
             _this->offset = _this->hold + tp->deltaY;
-            int offset_min = obj->h - _this->total_length - OUT_SCOPE;
-            int offset_max = OUT_SCOPE;
+            int offset_min = obj->h - _this->total_length;
+            int offset_max = 0;
             if (_this->style == LIST_CARD)
             {
                 offset_max = obj->h - _this->note_length * 1.8f;
@@ -985,6 +985,24 @@ void gui_list_set_factor(gui_list_t *list, float factor)
 
 void gui_list_set_offset(gui_list_t *list, int16_t offset)
 {
+
+    int temp = list->dir == HORIZONTAL ? list->base.w : list->base.h;
+    int offset_min = temp - list->total_length;
+    int offset_max = 0;
+    if (list->style == LIST_CARD)
+    {
+        offset_max = temp - list->note_length * 1.8f;
+        offset_min -= temp / 3;
+    }
+    if (offset > offset_max)
+    {
+        offset = offset_max;
+    }
+    else if (offset < offset_min)
+    {
+        offset = offset_min;
+    }
+
     list->offset = offset;
 }
 
