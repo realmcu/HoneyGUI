@@ -31,3 +31,4 @@
     音乐播放器 <MusicPlayer/Music Player>
     计时器 <Timer/Timer>
     表盘市场 <WatchfaceMarket/WatchfaceMarket>
+    表盘界面 <WatchfaceKoiClock/KoiClock>

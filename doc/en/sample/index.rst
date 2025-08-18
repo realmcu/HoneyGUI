@@ -30,3 +30,5 @@ The entry point for any application is:
     Music Player <MusicPlayer/Music Player>
     Timer <Timer/Timer>
     Watchface Market <WatchfaceMarket/WatchfaceMarket>
+    Watchface <WatchfaceKoiClock/KoiClock>
+    
