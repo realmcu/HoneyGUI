@@ -271,46 +271,39 @@ typedef struct
     // l3_4d_vector_t   normal; //face normal
 } l3_tria_face_t;
 
-#ifdef  __CC_ARM
-#pragma push
-#endif
-
-#ifdef  __CC_ARM
-#pragma anon_unions
-#endif
+typedef union l3_matrix_3x3_union
+{
+    struct
+    {
+        float _11, _12, _13;
+        float _21, _22, _23;
+        float _31, _32, _33;
+    } e;
+    float m[3][3];
+} l3_matrix_3x3_union_t;
 
 typedef struct l3_3x3_matrix
 {
-    union
-    {
-        struct
-        {
-            float        _11, _12, _13;
-            float        _21, _22, _23;
-            float        _31, _32, _33;
-        };
-        float m[3][3];
-    };
+    l3_matrix_3x3_union_t u;
 } l3_3x3_matrix_t;
+
+typedef union l3_matrix_4x4_union
+{
+    struct
+    {
+        float _11, _12, _13, _14;
+        float _21, _22, _23, _24;
+        float _31, _32, _33, _34;
+        float _41, _42, _43, _44;
+    } e;
+    float m[4][4];
+} l3_matrix_4x4_union_t;
 
 typedef struct l3_4x4_matrix
 {
-    union
-    {
-        struct
-        {
-            float        _11, _12, _13, _14;
-            float        _21, _22, _23, _24;
-            float        _31, _32, _33, _34;
-            float        _41, _42, _43, _44;
-        };
-        float m[4][4];
-    };
+    l3_matrix_4x4_union_t u;
 } l3_4x4_matrix_t;
 
-#ifdef  __CC_ARM
-#pragma pop
-#endif
 
 typedef l3_4x4_matrix_t l3_world_t;
 

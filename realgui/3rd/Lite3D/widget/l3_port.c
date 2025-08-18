@@ -56,9 +56,9 @@ __attribute__((weak)) void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *i
         {
             for (uint32_t j = x_start; j <= x_end; j++)
             {
-                float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-                float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-                float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+                float X = inverse->u.m[0][0] * j + inverse->u.m[0][1] * i + inverse->u.m[0][2];
+                float Y = inverse->u.m[1][0] * j + inverse->u.m[1][1] * i + inverse->u.m[1][2];
+                float Z = inverse->u.m[2][0] * j + inverse->u.m[2][1] * i + inverse->u.m[2][2];
                 int x = roundf(X / Z);
                 int y = roundf(Y / Z);
 
@@ -95,9 +95,9 @@ __attribute__((weak)) void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *i
         {
             for (uint32_t j = x_start; j <= x_end; j++)
             {
-                float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-                float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-                float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+                float X = inverse->u.m[0][0] * j + inverse->u.m[0][1] * i + inverse->u.m[0][2];
+                float Y = inverse->u.m[1][0] * j + inverse->u.m[1][1] * i + inverse->u.m[1][2];
+                float Z = inverse->u.m[2][0] * j + inverse->u.m[2][1] * i + inverse->u.m[2][2];
                 int x = round(X / Z);
                 int y = round(Y / Z);
 

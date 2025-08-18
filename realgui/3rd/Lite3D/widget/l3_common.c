@@ -245,7 +245,7 @@ l3_4d_vector_t l3_4d_point_sub(l3_4d_point_t p1, l3_4d_point_t p2)
 
 static l3_3x3_matrix_t identity_3x3_matrix =
 {
-    .m =
+    .u.m =
     {
         {1.0f, 0.0f, 0.0f},
         {0.0f, 1.0f, 0.0f},
@@ -255,7 +255,7 @@ static l3_3x3_matrix_t identity_3x3_matrix =
 
 static l3_4x4_matrix_t identity_4x4_matrix =
 {
-    .m =
+    .u.m =
     {
         {1.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 1.0f, 0.0f, 0.0f},
@@ -266,9 +266,9 @@ static l3_4x4_matrix_t identity_4x4_matrix =
 
 void l3_3x3_matrix_inverse(l3_3x3_matrix_t *m)
 {
-    float det = m->_11 * (m->_22 * m->_33 - m->_23 * m->_32) -
-                m->_12 * (m->_21 * m->_33 - m->_23 * m->_31) +
-                m->_13 * (m->_21 * m->_32 - m->_22 * m->_31);
+    float det = m->u.e._11 * (m->u.e._22 * m->u.e._33 - m->u.e._23 * m->u.e._32) -
+                m->u.e._12 * (m->u.e._21 * m->u.e._33 - m->u.e._23 * m->u.e._31) +
+                m->u.e._13 * (m->u.e._21 * m->u.e._32 - m->u.e._22 * m->u.e._31);
 
     if (det == 0)
     {
@@ -278,15 +278,15 @@ void l3_3x3_matrix_inverse(l3_3x3_matrix_t *m)
     float inv_det = 1.0f / det;
 
     l3_3x3_matrix_t inv;
-    inv._11 = (m->_22 * m->_33 - m->_23 * m->_32) * inv_det;
-    inv._12 = -(m->_12 * m->_33 - m->_13 * m->_32) * inv_det;
-    inv._13 = (m->_12 * m->_23 - m->_13 * m->_22) * inv_det;
-    inv._21 = -(m->_21 * m->_33 - m->_23 * m->_31) * inv_det;
-    inv._22 = (m->_11 * m->_33 - m->_13 * m->_31) * inv_det;
-    inv._23 = -(m->_11 * m->_23 - m->_13 * m->_21) * inv_det;
-    inv._31 = (m->_21 * m->_32 - m->_22 * m->_31) * inv_det;
-    inv._32 = -(m->_11 * m->_32 - m->_12 * m->_31) * inv_det;
-    inv._33 = (m->_11 * m->_22 - m->_12 * m->_21) * inv_det;
+    inv.u.e._11 = (m->u.e._22 * m->u.e._33 - m->u.e._23 * m->u.e._32) * inv_det;
+    inv.u.e._12 = -(m->u.e._12 * m->u.e._33 - m->u.e._13 * m->u.e._32) * inv_det;
+    inv.u.e._13 = (m->u.e._12 * m->u.e._23 - m->u.e._13 * m->u.e._22) * inv_det;
+    inv.u.e._21 = -(m->u.e._21 * m->u.e._33 - m->u.e._23 * m->u.e._31) * inv_det;
+    inv.u.e._22 = (m->u.e._11 * m->u.e._33 - m->u.e._13 * m->u.e._31) * inv_det;
+    inv.u.e._23 = -(m->u.e._11 * m->u.e._23 - m->u.e._13 * m->u.e._21) * inv_det;
+    inv.u.e._31 = (m->u.e._21 * m->u.e._32 - m->u.e._22 * m->u.e._31) * inv_det;
+    inv.u.e._32 = -(m->u.e._11 * m->u.e._32 - m->u.e._12 * m->u.e._31) * inv_det;
+    inv.u.e._33 = (m->u.e._11 * m->u.e._22 - m->u.e._12 * m->u.e._21) * inv_det;
 
     memcpy(m, &inv, sizeof(l3_3x3_matrix_t));
 }
@@ -294,9 +294,9 @@ void l3_3x3_matrix_inverse(l3_3x3_matrix_t *m)
 void l3_3x3_matrix_mul_3d_point(l3_3x3_matrix_t *m, l3_3d_point_t *p)
 {
     l3_3d_point_t pt;
-    pt.x = p->x * m->_11 + p->y * m->_12 + p->z * m->_13;
-    pt.y = p->x * m->_21 + p->y * m->_22 + p->z * m->_23;
-    pt.z = p->x * m->_31 + p->y * m->_32 + p->z * m->_33;
+    pt.x = p->x * m->u.e._11 + p->y * m->u.e._12 + p->z * m->u.e._13;
+    pt.y = p->x * m->u.e._21 + p->y * m->u.e._22 + p->z * m->u.e._23;
+    pt.z = p->x * m->u.e._31 + p->y * m->u.e._32 + p->z * m->u.e._33;
 
     pt.x = pt.x / pt.z;
     pt.y = pt.y / pt.z;
@@ -313,7 +313,8 @@ void l3_3x3_matrix_identity(l3_3x3_matrix_t *m)
 void l3_3x3_matrix_translate(l3_3x3_matrix_t *m, float t_x, float t_y)
 {
     memcpy(m, &identity_3x3_matrix, sizeof(l3_3x3_matrix_t));
-    m->_13 = t_x;   m->_23 = t_y;
+    m->u.e._13 = t_x;   m->u.e._23 = t_y;
+
 }
 
 void l3_4x4_matrix_identity(l3_4x4_matrix_t *m)
@@ -332,8 +333,8 @@ void l3_4x4_matrix_rotateX(l3_4x4_matrix_t *m, float rotX)
     float sinX = l3_sin(rotX);
 
     memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
-    m->_22 = cosX;  m->_32 = sinX;
-    m->_23 = -sinX; m->_33 = cosX;
+    m->u.e._22 = cosX;  m->u.e._32 = sinX;
+    m->u.e._23 = -sinX; m->u.e._33 = cosX;
 }
 
 void l3_4x4_matrix_rotateY(l3_4x4_matrix_t *m, float rotY)
@@ -342,8 +343,8 @@ void l3_4x4_matrix_rotateY(l3_4x4_matrix_t *m, float rotY)
     float sinX = l3_sin(rotY);
 
     memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
-    m->_11 = cosX; m->_31 = sinX;
-    m->_13 = -sinX; m->_33 = cosX;
+    m->u.e._11 = cosX; m->u.e._31 = sinX;
+    m->u.e._13 = -sinX; m->u.e._33 = cosX;
 }
 
 void l3_4x4_matrix_rotateZ(l3_4x4_matrix_t *m, float rotZ)
@@ -352,22 +353,23 @@ void l3_4x4_matrix_rotateZ(l3_4x4_matrix_t *m, float rotZ)
     float sinX = l3_sin(rotZ);
 
     memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
-    m->_11 = cosX;  m->_21 = sinX;
-    m->_12 = -sinX; m->_22 = cosX;
+    m->u.e._11 = cosX;  m->u.e._21 = sinX;
+    m->u.e._12 = -sinX; m->u.e._22 = cosX;
 }
 
 void l3_4x4_matrix_scale(l3_4x4_matrix_t *m, float scale_x, float scale_y, float scale_z)
 {
     memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
-    m->_11 = scale_x;
-    m->_22 = scale_y;
-    m->_33 = scale_z;
+    m->u.e._11 = scale_x;
+    m->u.e._22 = scale_y;
+    m->u.e._33 = scale_z;
 }
 
 void l3_4x4_matrix_translate(l3_4x4_matrix_t *m, float t_x, float t_y, float t_z)
 {
     memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
-    m->_14 = t_x;   m->_24 = t_y;   m->_34 = t_z;
+    m->u.e._14 = t_x;   m->u.e._24 = t_y;   m->u.e._34 = t_z;
+
 }
 
 bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right,
@@ -412,57 +414,57 @@ bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right
 
 #else
 
-    output->m[0][0] = input_left->m[0][0] * input_right->m[0][0] + input_left->m[0][1] *
-                      input_right->m[1][0] +
-                      input_left->m[0][2] * input_right->m[2][0] + input_left->m[0][3] * input_right->m[3][0];
-    output->m[0][1] = input_left->m[0][0] * input_right->m[0][1] + input_left->m[0][1] *
-                      input_right->m[1][1] +
-                      input_left->m[0][2] * input_right->m[2][1] + input_left->m[0][3] * input_right->m[3][1];
-    output->m[0][2] = input_left->m[0][0] * input_right->m[0][2] + input_left->m[0][1] *
-                      input_right->m[1][2] +
-                      input_left->m[0][2] * input_right->m[2][2] + input_left->m[0][3] * input_right->m[3][2];
-    output->m[0][3] = input_left->m[0][0] * input_right->m[0][3] + input_left->m[0][1] *
-                      input_right->m[1][3] +
-                      input_left->m[0][2] * input_right->m[2][3] + input_left->m[0][3] * input_right->m[3][3];
+    output->u.m[0][0] = input_left->u.m[0][0] * input_right->u.m[0][0] + input_left->u.m[0][1] *
+                        input_right->u.m[1][0] +
+                        input_left->u.m[0][2] * input_right->u.m[2][0] + input_left->u.m[0][3] * input_right->u.m[3][0];
+    output->u.m[0][1] = input_left->u.m[0][0] * input_right->u.m[0][1] + input_left->u.m[0][1] *
+                        input_right->u.m[1][1] +
+                        input_left->u.m[0][2] * input_right->u.m[2][1] + input_left->u.m[0][3] * input_right->u.m[3][1];
+    output->u.m[0][2] = input_left->u.m[0][0] * input_right->u.m[0][2] + input_left->u.m[0][1] *
+                        input_right->u.m[1][2] +
+                        input_left->u.m[0][2] * input_right->u.m[2][2] + input_left->u.m[0][3] * input_right->u.m[3][2];
+    output->u.m[0][3] = input_left->u.m[0][0] * input_right->u.m[0][3] + input_left->u.m[0][1] *
+                        input_right->u.m[1][3] +
+                        input_left->u.m[0][2] * input_right->u.m[2][3] + input_left->u.m[0][3] * input_right->u.m[3][3];
 
-    output->m[1][0] = input_left->m[1][0] * input_right->m[0][0] + input_left->m[1][1] *
-                      input_right->m[1][0] +
-                      input_left->m[1][2] * input_right->m[2][0] + input_left->m[1][3] * input_right->m[3][0];
-    output->m[1][1] = input_left->m[1][0] * input_right->m[0][1] + input_left->m[1][1] *
-                      input_right->m[1][1] +
-                      input_left->m[1][2] * input_right->m[2][1] + input_left->m[1][3] * input_right->m[3][1];
-    output->m[1][2] = input_left->m[1][0] * input_right->m[0][2] + input_left->m[1][1] *
-                      input_right->m[1][2] +
-                      input_left->m[1][2] * input_right->m[2][2] + input_left->m[1][3] * input_right->m[3][2];
-    output->m[1][3] = input_left->m[1][0] * input_right->m[0][3] + input_left->m[1][1] *
-                      input_right->m[1][3] +
-                      input_left->m[1][2] * input_right->m[2][3] + input_left->m[1][3] * input_right->m[3][3];
+    output->u.m[1][0] = input_left->u.m[1][0] * input_right->u.m[0][0] + input_left->u.m[1][1] *
+                        input_right->u.m[1][0] +
+                        input_left->u.m[1][2] * input_right->u.m[2][0] + input_left->u.m[1][3] * input_right->u.m[3][0];
+    output->u.m[1][1] = input_left->u.m[1][0] * input_right->u.m[0][1] + input_left->u.m[1][1] *
+                        input_right->u.m[1][1] +
+                        input_left->u.m[1][2] * input_right->u.m[2][1] + input_left->u.m[1][3] * input_right->u.m[3][1];
+    output->u.m[1][2] = input_left->u.m[1][0] * input_right->u.m[0][2] + input_left->u.m[1][1] *
+                        input_right->u.m[1][2] +
+                        input_left->u.m[1][2] * input_right->u.m[2][2] + input_left->u.m[1][3] * input_right->u.m[3][2];
+    output->u.m[1][3] = input_left->u.m[1][0] * input_right->u.m[0][3] + input_left->u.m[1][1] *
+                        input_right->u.m[1][3] +
+                        input_left->u.m[1][2] * input_right->u.m[2][3] + input_left->u.m[1][3] * input_right->u.m[3][3];
 
-    output->m[2][0] = input_left->m[2][0] * input_right->m[0][0] + input_left->m[2][1] *
-                      input_right->m[1][0] +
-                      input_left->m[2][2] * input_right->m[2][0] + input_left->m[2][3] * input_right->m[3][0];
-    output->m[2][1] = input_left->m[2][0] * input_right->m[0][1] + input_left->m[2][1] *
-                      input_right->m[1][1] +
-                      input_left->m[2][2] * input_right->m[2][1] + input_left->m[2][3] * input_right->m[3][1];
-    output->m[2][2] = input_left->m[2][0] * input_right->m[0][2] + input_left->m[2][1] *
-                      input_right->m[1][2] +
-                      input_left->m[2][2] * input_right->m[2][2] + input_left->m[2][3] * input_right->m[3][2];
-    output->m[2][3] = input_left->m[2][0] * input_right->m[0][3] + input_left->m[2][1] *
-                      input_right->m[1][3] +
-                      input_left->m[2][2] * input_right->m[2][3] + input_left->m[2][3] * input_right->m[3][3];
+    output->u.m[2][0] = input_left->u.m[2][0] * input_right->u.m[0][0] + input_left->u.m[2][1] *
+                        input_right->u.m[1][0] +
+                        input_left->u.m[2][2] * input_right->u.m[2][0] + input_left->u.m[2][3] * input_right->u.m[3][0];
+    output->u.m[2][1] = input_left->u.m[2][0] * input_right->u.m[0][1] + input_left->u.m[2][1] *
+                        input_right->u.m[1][1] +
+                        input_left->u.m[2][2] * input_right->u.m[2][1] + input_left->u.m[2][3] * input_right->u.m[3][1];
+    output->u.m[2][2] = input_left->u.m[2][0] * input_right->u.m[0][2] + input_left->u.m[2][1] *
+                        input_right->u.m[1][2] +
+                        input_left->u.m[2][2] * input_right->u.m[2][2] + input_left->u.m[2][3] * input_right->u.m[3][2];
+    output->u.m[2][3] = input_left->u.m[2][0] * input_right->u.m[0][3] + input_left->u.m[2][1] *
+                        input_right->u.m[1][3] +
+                        input_left->u.m[2][2] * input_right->u.m[2][3] + input_left->u.m[2][3] * input_right->u.m[3][3];
 
-    output->m[3][0] = input_left->m[3][0] * input_right->m[0][0] + input_left->m[3][1] *
-                      input_right->m[1][0] +
-                      input_left->m[3][2] * input_right->m[2][0] + input_left->m[3][3] * input_right->m[3][0];
-    output->m[3][1] = input_left->m[3][0] * input_right->m[0][1] + input_left->m[3][1] *
-                      input_right->m[1][1] +
-                      input_left->m[3][2] * input_right->m[2][1] + input_left->m[3][3] * input_right->m[3][1];
-    output->m[3][2] = input_left->m[3][0] * input_right->m[0][2] + input_left->m[3][1] *
-                      input_right->m[1][2] +
-                      input_left->m[3][2] * input_right->m[2][2] + input_left->m[3][3] * input_right->m[3][2];
-    output->m[3][3] = input_left->m[3][0] * input_right->m[0][3] + input_left->m[3][1] *
-                      input_right->m[1][3] +
-                      input_left->m[3][2] * input_right->m[2][3] + input_left->m[3][3] * input_right->m[3][3];
+    output->u.m[3][0] = input_left->u.m[3][0] * input_right->u.m[0][0] + input_left->u.m[3][1] *
+                        input_right->u.m[1][0] +
+                        input_left->u.m[3][2] * input_right->u.m[2][0] + input_left->u.m[3][3] * input_right->u.m[3][0];
+    output->u.m[3][1] = input_left->u.m[3][0] * input_right->u.m[0][1] + input_left->u.m[3][1] *
+                        input_right->u.m[1][1] +
+                        input_left->u.m[3][2] * input_right->u.m[2][1] + input_left->u.m[3][3] * input_right->u.m[3][1];
+    output->u.m[3][2] = input_left->u.m[3][0] * input_right->u.m[0][2] + input_left->u.m[3][1] *
+                        input_right->u.m[1][2] +
+                        input_left->u.m[3][2] * input_right->u.m[2][2] + input_left->u.m[3][3] * input_right->u.m[3][2];
+    output->u.m[3][3] = input_left->u.m[3][0] * input_right->u.m[0][3] + input_left->u.m[3][1] *
+                        input_right->u.m[1][3] +
+                        input_left->u.m[3][2] * input_right->u.m[2][3] + input_left->u.m[3][3] * input_right->u.m[3][3];
 #endif
 
     return true;
@@ -478,10 +480,10 @@ l3_4d_point_t l3_4x4_matrix_mul_4d_point(l3_4x4_matrix_t *mat, l3_4d_point_t p)
     // float32x4_t m200, m210, m220, m230;
     // float32x4_t out;
 
-    // m200 = vldrwq_f32(&mat->m[0][0]);
-    // m210 = vldrwq_f32(&mat->m[1][0]);
-    // m220 = vldrwq_f32(&mat->m[2][0]);
-    // m230 = vldrwq_f32(&mat->m[3][0]);
+    // m200 = vldrwq_f32(&mat->u.m[0][0]);
+    // m210 = vldrwq_f32(&mat->u.m[1][0]);
+    // m220 = vldrwq_f32(&mat->u.m[2][0]);
+    // m230 = vldrwq_f32(&mat->u.m[3][0]);
 
     // out = vmulq_n_f32(m200, p.x) + vmulq_n_f32(m210, p.y) + vmulq_n_f32(m220, p.z);
     // out = vaddq_f32(out, m230);
@@ -492,10 +494,10 @@ l3_4d_point_t l3_4x4_matrix_mul_4d_point(l3_4x4_matrix_t *mat, l3_4d_point_t p)
 #else
     l3_4d_point_t point;
 
-    point.x = mat->m[0][0] * p.x + mat->m[0][1] * p.y + mat->m[0][2] * p.z + mat->m[0][3];
-    point.y = mat->m[1][0] * p.x + mat->m[1][1] * p.y + mat->m[1][2] * p.z + mat->m[1][3];
-    point.z = mat->m[2][0] * p.x + mat->m[2][1] * p.y + mat->m[2][2] * p.z + mat->m[2][3];
-    point.w = mat->m[3][0] * p.x + mat->m[3][1] * p.y + mat->m[3][2] * p.z + mat->m[3][3];
+    point.x = mat->u.m[0][0] * p.x + mat->u.m[0][1] * p.y + mat->u.m[0][2] * p.z + mat->u.m[0][3];
+    point.y = mat->u.m[1][0] * p.x + mat->u.m[1][1] * p.y + mat->u.m[1][2] * p.z + mat->u.m[1][3];
+    point.z = mat->u.m[2][0] * p.x + mat->u.m[2][1] * p.y + mat->u.m[2][2] * p.z + mat->u.m[2][3];
+    point.w = mat->u.m[3][0] * p.x + mat->u.m[3][1] * p.y + mat->u.m[3][2] * p.z + mat->u.m[3][3];
 
     return point;
 #endif
@@ -512,56 +514,56 @@ static void l3_generate_rotate_around_line(l3_4x4_matrix_t *mrot, float px, floa
     // Step 1: Translate to the origin
     l3_4x4_matrix_t T1;
     l3_4x4_matrix_identity(&T1);
-    T1.m[0][3] = -px;
-    T1.m[1][3] = -py;
-    T1.m[2][3] = -pz;
+    T1.u.m[0][3] = -px;
+    T1.u.m[1][3] = -py;
+    T1.u.m[2][3] = -pz;
 
     // Step 2: Rotate to align u with the Z-axis
     float theta = atan2f(b, c) * (180.0f / M_PI_F);  // Convert radians to degrees
     l3_4x4_matrix_t Rx;
     l3_4x4_matrix_identity(&Rx);
-    Rx.m[1][1] = l3_cos(theta);
-    Rx.m[1][2] = -l3_sin(theta);
-    Rx.m[2][1] = l3_sin(theta);
-    Rx.m[2][2] = l3_cos(theta);
+    Rx.u.m[1][1] = l3_cos(theta);
+    Rx.u.m[1][2] = -l3_sin(theta);
+    Rx.u.m[2][1] = l3_sin(theta);
+    Rx.u.m[2][2] = l3_cos(theta);
 
     float phi = atan2f(a, sqrtf(b * b + c * c)) * (180.0f / M_PI_F);
     l3_4x4_matrix_t Ry;
     l3_4x4_matrix_identity(&Ry);
-    Ry.m[0][0] = l3_cos(phi);
-    Ry.m[0][2] = -l3_sin(phi);
-    Ry.m[2][0] = l3_sin(phi);
-    Ry.m[2][2] = l3_cos(phi);
+    Ry.u.m[0][0] = l3_cos(phi);
+    Ry.u.m[0][2] = -l3_sin(phi);
+    Ry.u.m[2][0] = l3_sin(phi);
+    Ry.u.m[2][2] = l3_cos(phi);
 
     // Step 3: Rotate around the Z-axis
     l3_4x4_matrix_t Rz;
     l3_4x4_matrix_identity(&Rz);
-    Rz.m[0][0] = l3_cos(angle_degrees);
-    Rz.m[0][1] = -l3_sin(angle_degrees);
-    Rz.m[1][0] = l3_sin(angle_degrees);
-    Rz.m[1][1] = l3_cos(angle_degrees);
+    Rz.u.m[0][0] = l3_cos(angle_degrees);
+    Rz.u.m[0][1] = -l3_sin(angle_degrees);
+    Rz.u.m[1][0] = l3_sin(angle_degrees);
+    Rz.u.m[1][1] = l3_cos(angle_degrees);
 
     // Inverse rotations
     l3_4x4_matrix_t Ryi;
     l3_4x4_matrix_identity(&Ryi);
-    Ryi.m[0][0] = l3_cos(-phi);
-    Ryi.m[0][2] = -l3_sin(-phi);
-    Ryi.m[2][0] = l3_sin(-phi);
-    Ryi.m[2][2] = l3_cos(-phi);
+    Ryi.u.m[0][0] = l3_cos(-phi);
+    Ryi.u.m[0][2] = -l3_sin(-phi);
+    Ryi.u.m[2][0] = l3_sin(-phi);
+    Ryi.u.m[2][2] = l3_cos(-phi);
 
     l3_4x4_matrix_t Rxi;
     l3_4x4_matrix_identity(&Rxi);
-    Rxi.m[1][1] = l3_cos(-theta);
-    Rxi.m[1][2] = -l3_sin(-theta);
-    Rxi.m[2][1] = l3_sin(-theta);
-    Rxi.m[2][2] = l3_cos(-theta);
+    Rxi.u.m[1][1] = l3_cos(-theta);
+    Rxi.u.m[1][2] = -l3_sin(-theta);
+    Rxi.u.m[2][1] = l3_sin(-theta);
+    Rxi.u.m[2][2] = l3_cos(-theta);
 
     // Step 4: Translate back to the original position
     l3_4x4_matrix_t T2;
     l3_4x4_matrix_identity(&T2);
-    T2.m[0][3] = px;
-    T2.m[1][3] = py;
-    T2.m[2][3] = pz;
+    T2.u.m[0][3] = px;
+    T2.u.m[1][3] = py;
+    T2.u.m[2][3] = pz;
 
     // Combine all transformations
     l3_4x4_matrix_t temp1, temp2, temp3, temp4, temp5;
@@ -676,9 +678,9 @@ void l3_camera_build_UVN_matrix(l3_camera_t *camera)
     l3_4d_vector_t u;
 
     l3_4x4_matrix_identity(&mt_inv);
-    mt_inv._14 = -camera->position.x;
-    mt_inv._24 = -camera->position.y;
-    mt_inv._34 = -camera->position.z;
+    mt_inv.u.e._14 = -camera->position.x;
+    mt_inv.u.e._24 = -camera->position.y;
+    mt_inv.u.e._34 = -camera->position.z;
 
 
 
@@ -686,19 +688,19 @@ void l3_camera_build_UVN_matrix(l3_camera_t *camera)
     u = l3_4d_vector_cross(n, v);  // Right handed system U = N x V
     v = l3_4d_vector_cross(n, u);
     l3_4x4_matrix_zero(&mt_uvn);
-    mt_uvn._11 = u.ux;
-    mt_uvn._21 = v.ux;
-    mt_uvn._31 = n.ux;
+    mt_uvn.u.e._11 = u.ux;
+    mt_uvn.u.e._21 = v.ux;
+    mt_uvn.u.e._31 = n.ux;
 
-    mt_uvn._12 = u.uy;
-    mt_uvn._22 = v.uy;
-    mt_uvn._32 = n.uy;
+    mt_uvn.u.e._12 = u.uy;
+    mt_uvn.u.e._22 = v.uy;
+    mt_uvn.u.e._32 = n.uy;
 
-    mt_uvn._13 = u.uz;
-    mt_uvn._23 = v.uz;
-    mt_uvn._33 = n.uz;
+    mt_uvn.u.e._13 = u.uz;
+    mt_uvn.u.e._23 = v.uz;
+    mt_uvn.u.e._33 = n.uz;
 
-    mt_uvn._44 = 1;
+    mt_uvn.u.e._44 = 1;
     l3_4x4_matrix_mul(&mt_uvn, &mt_inv, &camera->mat_cam);
 }
 
