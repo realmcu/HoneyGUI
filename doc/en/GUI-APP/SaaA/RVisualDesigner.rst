@@ -2670,3 +2670,194 @@ Program the output ``.bin`` into your IC.
 .. |image5| image:: https://foruda.gitee.com/images/1710824483020058086/3ecd6f6d_12407535.png
 .. |image6| image:: https://foruda.gitee.com/images/1710824482944711702/8b73005d_12407535.png
 .. |image7| image:: https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png
+
+
+RVD Module Porting Guide
+-------------------------
+
+File System Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. **Add ROMFS Support**
+
+   - **Source File**: 
+     Add to project::
+
+       Wearable/system/dfs/romfs/romfs.c
+
+   - **Include Path**: 
+     Add to project's include paths::
+
+       Wearable/system/dfs/romfs
+
+2. **Update Filesystem Porting Layer**
+
+   Modify the following file to meet RVD's filesystem requirements::
+
+      gui_port_filesystem.c
+
+example code:
+
+.. code-block:: c
+   :linenos:
+
+   #include "guidef.h"
+   #include "gui_port.h"
+   #include "trace.h"
+
+   #include <romfs.h>
+
+
+   static int port_closedir(gui_fs_dir *d)
+   {
+      int r = closedir((DIR *)(d->dir));
+      if (d->dirent)
+      {
+         if (d->dirent->d_name)
+         {
+               free(d->dirent->d_name);
+               d->dirent->d_name = 0;
+         }
+
+         free(d->dirent);
+         d->dirent = 0;
+      }
+      free(d);
+      return r;
+   }
+   static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
+   {
+      struct dirent *dirent = readdir((DIR *)(d->dir));
+      if (!dirent)
+      {
+         return 0;
+      }
+
+      struct gui_fs_dirent *fs_dirent = malloc(sizeof(struct gui_fs_dirent));
+      if (!fs_dirent)
+      {
+         return NULL;
+      }
+      memset(fs_dirent, 0, sizeof(struct gui_fs_dirent));
+      if (d->dirent)
+      {
+         if (d->dirent->d_name)
+         {
+               free(d->dirent->d_name);
+               d->dirent->d_name = 0;
+         }
+         free(d->dirent);
+         d->dirent = 0;
+      }
+      d->dirent = fs_dirent;
+      int d_name_length = strlen(dirent->d_name) + 1;
+      fs_dirent->d_name = malloc(d_name_length);
+      memcpy(fs_dirent->d_name, dirent->d_name,  d_name_length);
+      fs_dirent->d_namlen = dirent->d_namlen;
+      fs_dirent->d_reclen = dirent->d_reclen;
+      fs_dirent->d_type = dirent->d_type;
+      fs_dirent->dirent = dirent;
+
+      return fs_dirent;
+   }
+   static gui_fs_dir *gui_port_opendir(const char *name)
+   {
+
+      DIR *dir = opendir(name);
+      if (!dir)
+      {
+         return 0;
+      }
+      gui_fs_dir *fs_dir = malloc(sizeof(gui_fs_dir));
+      memset(fs_dir, 0, sizeof(gui_fs_dir));
+      fs_dir->dir = dir;
+      return fs_dir;
+   }
+   static int gui_port_lseek(int fd, int offset, int whence)
+   {
+      return lseek(fd, offset, whence);
+   }
+
+   static void port_fstat(int fildes, gui_fs_stat_t *buf)
+   {
+      struct stat st;
+      int fd = fildes;
+      fstat(fd, &st);
+      buf->st_size = st.st_size;
+   }
+
+   static struct gui_fs fs_api =
+   {
+      .closedir  = port_closedir,
+      .close     = NULL,
+      .lseek     = gui_port_lseek,
+      .open      = NULL,
+      .opendir   = gui_port_opendir,
+      .read      = NULL,
+      .readdir   = port_readdir,
+      .write     = NULL,
+   };
+
+   extern void gui_fs_info_register(struct gui_fs *info);
+   void gui_port_fs_init(void)
+   {
+      gui_fs_info_register(&fs_api);
+
+   }
+
+Startup Modes
+~~~~~~~~~~~~~
+
+The RVD framework supports two distinct startup modes:
+
+1. **Direct Application Launch** (with ``RVD_APP_STARTUP`` defined)
+   
+   - **Behavior**: 
+     Directly launches the first RVD application (index 0) using ``rvd_startup_app()``
+   - **Use Cases**:
+
+     - Fixed-function devices (e.g., industrial control panels)
+     - Single-application environments
+
+2. **Launcher Interface** (without ``RVD_APP_STARTUP`` defined)
+
+   - **Behavior**: 
+     Displays interactive application launcher using ``gui_app_startup()`` with ``get_app_launcher_frontend()``
+   - **Use Cases**:
+
+     - Multi-application devices (e.g., smart watches)
+     - Scenarios requiring user application selection
+
+Implementation Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: c
+   :linenos:
+   :emphasize-lines: 3,6,9
+
+   #include "romfs.h"
+   
+   void gui_main(void)
+   {
+      #define ROMFS_ADDR (0x0240f000 + 0x400)  // RVD filesystem image address
+      romfs_mount((void *)ROMFS_ADDR);         // Mount ROM filesystem
+
+      #ifdef RVD_APP_STARTUP
+         /* Direct launch first RVD app */
+         int rst = rvd_startup_app(0);
+         gui_log("RVD_APP_STARTUP:%d\n", rst);
+      #else
+         /* Launch interactive launcher */
+         extern gui_app_t *get_app_launcher_frontend(void);
+         gui_app_startup(get_app_launcher_frontend());
+      #endif
+   }
+
+Key Notes
+~~~~~~~~~~~
+
+- Ensure the filesystem image at ``ROMFS_ADDR`` contains:
+
+   - ROMFS_ADDR = USER_DATA_ADDR + mp_header;
+   - Valid RVD application packages;
+   - Proper directory structure;

@@ -2588,3 +2588,201 @@ GUI 演示项目
 .. |image5| image:: https://foruda.gitee.com/images/1710824483020058086/3ecd6f6d_12407535.png
 .. |image6| image:: https://foruda.gitee.com/images/1710824482944711702/8b73005d_12407535.png
 .. |image7| image:: https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png
+
+RVD模块移植指南
+----------------
+
+文件系统配置
+~~~~~~~~~~~~
+
+1. **添加 ROMFS 支持**
+
+   - **源文件**: 
+     添加到项目中::
+
+       Wearable/system/dfs/romfs/romfs.c
+
+   - **包含路径**: 
+     添加到项目的包含路径中::
+
+       Wearable/system/dfs/romfs
+
+2. **更新文件系统移植层**
+
+   修改以下文件以满足 RVD 的文件系统要求::
+
+       gui_port_filesystem.c
+
+示例代码：
+
+.. code-block:: c
+   :linenos:
+
+   #include "guidef.h"
+   #include "gui_port.h"
+   #include "trace.h"
+
+   #include <romfs.h>
+
+
+   static int port_closedir(gui_fs_dir *d)
+   {
+      int r = closedir((DIR *)(d->dir));
+      if (d->dirent)
+      {
+         if (d->dirent->d_name)
+         {
+               free(d->dirent->d_name);
+               d->dirent->d_name = 0;
+         }
+
+         free(d->dirent);
+         d->dirent = 0;
+      }
+      free(d);
+      return r;
+   }
+   static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
+   {
+      struct dirent *dirent = readdir((DIR *)(d->dir));
+      if (!dirent)
+      {
+         return 0;
+      }
+
+      struct gui_fs_dirent *fs_dirent = malloc(sizeof(struct gui_fs_dirent));
+      if (!fs_dirent)
+      {
+         return NULL;
+      }
+      memset(fs_dirent, 0, sizeof(struct gui_fs_dirent));
+      if (d->dirent)
+      {
+         if (d->dirent->d_name)
+         {
+               free(d->dirent->d_name);
+               d->dirent->d_name = 0;
+         }
+         free(d->dirent);
+         d->dirent = 0;
+      }
+      d->dirent = fs_dirent;
+      int d_name_length = strlen(dirent->d_name) + 1;
+      fs_dirent->d_name = malloc(d_name_length);
+      memcpy(fs_dirent->d_name, dirent->d_name,  d_name_length);
+      fs_dirent->d_namlen = dirent->d_namlen;
+      fs_dirent->d_reclen = dirent->d_reclen;
+      fs_dirent->d_type = dirent->d_type;
+      fs_dirent->dirent = dirent;
+
+      return fs_dirent;
+   }
+   static gui_fs_dir *gui_port_opendir(const char *name)
+   {
+
+      DIR *dir = opendir(name);
+      if (!dir)
+      {
+         return 0;
+      }
+      gui_fs_dir *fs_dir = malloc(sizeof(gui_fs_dir));
+      memset(fs_dir, 0, sizeof(gui_fs_dir));
+      fs_dir->dir = dir;
+      return fs_dir;
+   }
+   static int gui_port_lseek(int fd, int offset, int whence)
+   {
+      return lseek(fd, offset, whence);
+   }
+
+   static void port_fstat(int fildes, gui_fs_stat_t *buf)
+   {
+      struct stat st;
+      int fd = fildes;
+      fstat(fd, &st);
+      buf->st_size = st.st_size;
+   }
+
+   static struct gui_fs fs_api =
+   {
+      .closedir  = port_closedir,
+      .close     = NULL,
+      .lseek     = gui_port_lseek,
+      .open      = NULL,
+      .opendir   = gui_port_opendir,
+      .read      = NULL,
+      .readdir   = port_readdir,
+      .write     = NULL,
+   };
+
+   extern void gui_fs_info_register(struct gui_fs *info);
+   void gui_port_fs_init(void)
+   {
+      gui_fs_info_register(&fs_api);
+
+   }
+
+
+启动模式
+~~~~~~~~~~~
+
+RVD 框架支持两种不同的启动模式：
+
+1. **直接应用启动** （定义了 ``RVD_APP_STARTUP`` ）
+
+   - **行为**: 
+     直接使用 ``rvd_startup_app()`` 启动第一个 RVD 应用程序（索引为0）
+
+   - **适用场景**:
+
+     - 固定功能设备（例如，工业控制面板）
+     - 单一应用环境
+
+2. **启动器界面** （未定义 ``RVD_APP_STARTUP`` ）
+
+   - **行为**: 
+     使用 ``gui_app_startup()`` 并结合 ``get_app_launcher_frontend()`` 显示交互式应用启动器
+
+   - **适用场景**:
+
+     - 多应用设备（例如，智能手表）
+     - 需要用户选择应用程序的场景
+
+EVB 烧录
+~~~~~~~~~~~  
+
+在 EVB 上烧录 RVD 应用程序时，直接烧录 RVD 设计器输出 root 文件。
+
+实施示例
+~~~~~~~~~~~
+
+.. code-block:: c
+   :linenos:
+   :emphasize-lines: 3,6,9
+
+   #include "romfs.h"
+   
+   void gui_main(void)
+   {
+      #define ROMFS_ADDR (0x0240f000 + 0x400)  // RVD 文件系统镜像地址
+      romfs_mount((void *)ROMFS_ADDR);         // 挂载 ROM 文件系统
+
+      #ifdef RVD_APP_STARTUP
+         /* 直接启动第一个 RVD 应用 */
+         int rst = rvd_startup_app(0);
+         gui_log("RVD_APP_STARTUP:%d\n", rst);
+      #else
+         /* 启动交互式启动器 */
+         extern gui_app_t *get_app_launcher_frontend(void);
+         gui_app_startup(get_app_launcher_frontend());
+      #endif
+   }
+
+关键注意事项
+~~~~~~~~~~~~~
+
+- 确保在 ``ROMFS_ADDR`` 的文件系统镜像包含：
+
+  - ROMFS_ADDR = USER_DATA_ADDR + mp_header；
+  - 有效的 RVD 应用程序包；
+  - 合适的目录结构；
