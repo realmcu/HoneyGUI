@@ -2,9 +2,19 @@
 3D Model
 =========
 
-This widget supports loading 3D models composed of :file:`.obj` and :file:`.mtl` files, handling the geometric and material information of the models. It also supports adding rich animation effects to enhance visual performance.
+Lite3D is a lightweight, cross-platform 3D graphics rendering library independently developed by Realtek. It supports software rendering and hardware acceleration extensions with the following features:
 
-This widget supports rendering 3D models with two basic geometric face types: rectangular faces and triangular faces. Rectangular faces are suitable for simple geometries like cubes and planes, while triangular faces are used for more complex models like human faces or animals. Users can choose the appropriate face type based on their needs.
+   - Lightweight: Small code size, easy to integrate.
+   - Cross-platform: Compatible with GUI frameworks such as HoneyGUI and LVGL, and supports environments like FreeRTOS and Zephyr.
+   - Flexible Rendering: Provides a software rendering pipeline with support for extending GPU acceleration interfaces.
+
+Lite3D supports loading 3D models comprised of :file:`.obj` and :file:`.mtl` files, capable of handling both the geometry and material information of the models. It also supports adding rich animation effects to enhance visual performance. The engine workflow is as follows:
+
+.. figure:: https://foruda.gitee.com/images/1755252209828076518/c91dad94_13408154.png
+   :width: 800px
+   :align: center
+   
+   Lite3D Workflow
 
 
 Components of a 3D Model
@@ -48,10 +58,10 @@ A complete 3D model consists of three core components:
    Example of 3D Model Components
 
 
-Processing 3D Models
----------------------
+3D Model Preprocessing
+--------------------------
 
-Before using 3D models in HoneyGUI, they need to be converted into binary format. The processing steps are as follows:
+Before rendering a 3D model, it needs to be converted into a binary format. The processing flow is as follows:
 
 1. **Locate Conversion Tools**
    
@@ -82,8 +92,8 @@ Before using 3D models in HoneyGUI, they need to be converted into binary format
    
    - The generated :file:`desc.txt` file contains the following:
 
-     - Parsed OBJ data
-     - Parsed MTL data
+     - Parsed obj data
+     - Parsed mtl data
      - Embedded texture data
    
    .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
@@ -92,92 +102,34 @@ Before using 3D models in HoneyGUI, they need to be converted into binary format
 
       Generating Binary Arrays
 
-.. note::
-   Models composed of triangular faces currently do not support texture mapping.
 
 
-Integration in HoneyGUI
------------------------
+3D Model Generation
+-------------------
 
-1. **Add Descriptor File to Project**
+Creating a Model
+~~~~~~~~~~~~~~~~
+Invoke the function ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)`` from the Lite3D library to create a 3D model. The imported ``desc_addr`` file contains the parsed data extracted by the script, whereas ``draw_type`` specifies the rendering method for the model. It supports the following three modes:
 
-   - Place the generated :file:`desc.txt` file into the project directory.
-
-2. **Create 3D Widget**
-
-   - Use the :cpp:any:`gui_3d_create` function to create the widget:
-
-   .. code-block:: c
-
-      gui_3d_t *test_3d = gui_3d_create(gui_obj_get_root(), "3d-widget", (void *)_acdesc, 0, 0, 480, 480);
-
-
-Usage
------
-
-Creating the Widget
-~~~~~~~~~~~~~~~~~~~~
-Use :cpp:any:`gui_3d_create` to create the 3D model. The imported ``desc_addr`` file is the parsed data extracted by the script.
++ ``L3_DRAW_FRONT_ONLY``: Renders only the front of the model, suitable for scenarios like a butterfly model where the back needs to be hidden.
++ ``L3_DRAW_FRONT_AND_BACK``: Renders both the front and back of the model, suitable for scenarios where both sides need to be visible, like a prism model.
++ ``L3_DRAW_FRONT_AND_SORT``: Renders the front of the model with sorting, suitable for scenarios with foreground and background occlusion, like a face model.
 
 Transformation Control
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 Global Transformation
 ^^^^^^^^^^^^^^^^^^^^^
-Use :cpp:any:`gui_3d_set_global_transform_cb` to apply a global transformation to the 3D model, where ``gui_3d_global_transform_cb`` type callback functions can set the same shape transformation for all faces of the object. For example, ``world`` represents the world coordinate transformation, and ``camera`` represents the camera view projection. Rectangular faces also support setting ``light`` information. For detailed configuration, refer to the :ref:`Coordinate Transformations and Lighting System` section.
+Use the function ``l3_set_global_transform(l3_model_t *_this, l3_global_transform_cb cb)`` to perform global transformations on the 3D model. The callback function of type ``l3_global_transform_cb`` can apply the same shape transformation to all faces of the object. Examples include ``world`` coordinate transformations and ``camera`` view projections.
 
-Typical use cases:
+**Typical use cases:**
 
 + Overall rotation/translation of the model
 + Scene perspective switching
 
-Face Transformation
-^^^^^^^^^^^^^^^^^^^^
-Use :cpp:any:`gui_3d_set_face_transform_cb` to apply a local transformation to the 3D model, where ``gui_3d_face_transform_cb`` type callback functions can set different shape transformations for each face of the object. The ``face_index`` specifies the face to be transformed.
-
-Features:
-
-+ Supports local animations
-+ Supports independent control by face indexs
-
-.. _Coordinate Transformations and Lighting System:
-
-Coordinate Transformations and Lighting System
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-World Transformation
-^^^^^^^^^^^^^^^^^^^^^
-
-The initialization function is ``gui_3d_world_inititalize(gui_3d_matrix_t *world, float x, float y, float z, float rotX, float rotY, float rotZ, float scale)``.
-
-+ ``world``: A pointer to the world transformation matrix, which transforms the 3D object from model coordinates to world coordinates.
-
-+ ``x``: The distance of translation along the X-axis, used to determine the object's position in the X direction within the world coordinate system.
-
-+ ``y``: The distance of translation along the Y-axis, used to determine the object's position in the Y direction within the world coordinate system.
-
-+ ``z``: The distance of translation along the Z-axis, used to determine the object's position in the Z direction within the world coordinate system.
-
-+ ``rotX``: The angle of rotation around the X-axis (in degrees).
-
-+ ``rotY``: The angle of rotation around the Y-axis (in degrees).
-
-+ ``rotZ``: The angle of rotation around the Z-axis (in degrees).
-
-+ ``scale``: A uniform scaling factor used to proportionally scale the object in all directions.
-
-
-Purpose:
-
-1. The world transformation matrix typically handles transforming the model coordinate system to the world coordinate system. For example, if an object is located at the origin of the model coordinate system, it can be moved to any position in the scene and scaled/rotated through world transformation.
-2. Performing independent world transformations for each face can achieve localized animations or static displays.
-3. Different faces can share the same world matrix, or you can use ``gui_3d_calculator_matrix(gui_3d_matrix_t *matrix, float x, float y, float z, gui_point_4d_t point, gui_vector_4d_t vector, float degrees, float scale)`` to generate different matrices for each face to achieve personalized local transformations.
-
-
 Camera Transformation
-^^^^^^^^^^^^^^^^^^^^^^
-
-The initialization function is ``gui_3d_camera_UVN_initialize(gui_3d_camera_t *camera, gui_point_4d_t cameraPosition, gui_point_4d_t cameraTarget, float near, float far, float fov, float viewPortWidth, float viewPortHeight)``.
+************************
+The initialization function is ``l3_camera_UVN_initialize(l3_camera_t *camera, l3_4d_point_t cameraPosition, l3_4d_point_t cameraTarget, float near, float far, float fov, float viewPortWidth, float viewPortHeight)``.
 
 + ``camera``: A pointer to the camera structure, used to initialize camera properties.
 
@@ -196,51 +148,64 @@ The initialization function is ``gui_3d_camera_UVN_initialize(gui_3d_camera_t *c
 + ``viewPortHeight``: The height of the viewport, defining the vertical size of the rendering target or window.
 
 
-Purpose:
+**Purpose:**
 
 1. Camera transformation defines the observer's position and direction in the scene, transforming the world coordinate system to the camera coordinate system.
 2. By manipulating the camera, different perspectives can be achieved, such as translating the camera position or changing the viewing direction.
 
 
-Lighting Information
-^^^^^^^^^^^^^^^^^^^^^
+World Transformation
+************************
+The initialization function is ``l3_world_initialize(l3_4x4_matrix_t *world, float x, float y, float z, float rotX, float rotY, float rotZ, float scale)``.
 
-The initialization function is ``gui_3d_light_inititalize(gui_3d_light_t *light, gui_point_4d_t lightPosition, gui_point_4d_t lightTarget, float included_angle, float blend_ratio, gui_3d_RGBAcolor_t color)``.
++ ``world``: A pointer to the world transformation matrix, which transforms the 3D object from model coordinates to world coordinates.
 
-+ ``light``: A pointer to the light source structure, used to initialize the properties of the light source.
++ ``x``: The distance of translation along the X-axis, used to determine the object's position in the X direction within the world coordinate system.
 
-+ ``lightPosition``: The position of the light source in world coordinates.
++ ``y``: The distance of translation along the Y-axis, used to determine the object's position in the Y direction within the world coordinate system.
 
-+ ``lightTarget``: The target position of the light source, defining the direction of illumination.
++ ``z``: The distance of translation along the Z-axis, used to determine the object's position in the Z direction within the world coordinate system.
 
-+ ``included_angle``: The cone angle of the light (in degrees), represented as angle :math:`\alpha` in the diagram. It determines the illumination range of the spotlight, which corresponds to the outer circle of the spotlight in the diagram.
++ ``rotX``: The angle of rotation around the X-axis (in degrees).
 
-+ ``blend_ratio``: The ratio of the light blending region, defining the softness of the spotlight's edge. It ranges from 0 to 1 and determines angle :math:`\beta` in the diagram. The value is calculated using the following formula:
++ ``rotY``: The angle of rotation around the Y-axis (in degrees).
 
-   .. math::
-   
-      β = α (1 - ratio)
++ ``rotZ``: The angle of rotation around the Z-axis (in degrees).
 
-   The blending region extends from the inner circle to the outer circle of the spotlight. Within the inner circle, the light intensity is constant, while it gradually diminishes from the inner to the outer circle.
-
-+ ``color``: The color of the light source in RGBA8888 format.
-
-.. figure:: https://foruda.gitee.com/images/1735889400996762341/a4f7e0c8_13408154.png
-   :width: 400px
-   :align: center
-
-   Example of Spotlight Effect
++ ``scale``: A uniform scaling factor used to proportionally scale the object in all directions.
 
 
-Purpose:
+**Purpose:**
 
-1. The light source type is a spotlight, and its properties include initial position, light direction, cone angle, blend ratio, and light color.
-2. Adjusting lighting locally for each face or object can create different visual styles.
+1. The world transformation defines the model's position and orientation in the world coordinate system, responsible for converting the model coordinate system to the world coordinate system.
+2. Through the world transformation matrix, the overall translation, rotation, and scaling of the model can be achieved.
 
 
-Set Animation
-~~~~~~~~~~~~~~
-The :cpp:any:`gui_obj_create_timer` function can be used to set animation properties for a 3D object. The ``callback`` parameter is a callback function for animation updates.
+Face Transformation
+^^^^^^^^^^^^^^^^^^^^
+Use the function ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)`` for local transformations on a 3D model. The callback function of type ``l3_face_transform_cb`` can apply different shape transformations to each face of the object, with ``face_index`` specifying the face to transform.
+
+**Features:**
+
++ Supports independent control by face index.
++ Use ``l3_calculator_4x4_matrix(l3_4x4_matrix_t *matrix, float tx, float ty, float tz, l3_4d_point_t point, l3_4d_vector_t vector, float degrees, float scale)`` to generate different matrices for each face, enabling customized local animations.
+
+
+
+3D Model Rendering
+--------------------
+
+Create Widget
+~~~~~~~~~~~~~~~~
+The Lite3D library has been integrated into HoneyGUI and encapsulated into the ``gui_lite3d`` widget. You can create a 3D model widget using the function :cpp:any:`gui_lite3d_create`.
+
+Set Click Events
+~~~~~~~~~~~~~~~~~
+The function :cpp:any:`gui_lite3d_on_click` can be used to set click events for the 3D model widget. When the user clicks the model, a callback function is triggered.
+
+Set Animations
+~~~~~~~~~~~~~~~
+The function :cpp:any:`gui_obj_create_timer` can be used to set animation properties for the 3D model widget, where ``callback`` is the animation update callback function.
 
 
 Example
@@ -251,9 +216,9 @@ Example
 3D Butterfly
 ~~~~~~~~~~~~~
 
-To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D`` in :file:`menu_config.h`. This model consists of 8 rectangular surfaces, each with its corresponding texture mapping. By calling the function :cpp:any:`gui_3d_set_face_transform_cb()`, you can set local transformations for different surfaces to achieve animation effects.
+This model consists of 8 rectangular faces, each with a corresponding texture map, and uses the ``L3_DRAW_FRONT_ONLY`` rendering method. By calling the function ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)``, you can set local transformations for different faces to achieve animation effects.
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_butterfly.c
+.. literalinclude:: ../../../example/application/screen_410_502/app_3d_butterfly.c
    :language: c
    :start-after: /* 3d butterfly demo start*/
    :end-before: /* 3d butterfly demo end*/
@@ -261,7 +226,7 @@ To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUT
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/butterfly.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/Lite3D/3d_butterfly.gif" width= "400" /></div>
    <br>
 
 
@@ -270,9 +235,9 @@ To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUT
 3D Face
 ~~~~~~~~
 
-To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUTTERFLY_3D`` in :file:`menu_config.h`. This model consists of 1454 triangular surfaces, filled with the default material base color.
+This model consists of 1454 triangular faces and is filled with a default material base color. The rendering method used is ``L3_DRAW_FRONT_AND_SORT``.
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_face.c
+.. literalinclude:: ../../../example/application/screen_410_502/app_3d_face.c
    :language: c
    :start-after: /* 3d face demo start*/
    :end-before: /* 3d face demo end*/
@@ -280,7 +245,7 @@ To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_BUT
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/face.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/Lite3D/3d_face.gif" width= "400" /></div>
    <br>
 
 
@@ -303,22 +268,22 @@ To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DOG
    <br>
 
 
-.. _3D Disc:
+.. _3D App List:
 
-3D Disc
-~~~~~~~~
+3D App List
+~~~~~~~~~~~~
 
-To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DISC_3D`` in :file:`menu_config.h`. The model is composed of 133 rectangular surfaces, with the disc part using texture mapping and the rectangular part using color filling.
+This interface consists of 6 3D application icons. By calling the function ``l3_set_face_image(l3_model_t *_this, uint8_t face_index, void *image_addr)``, you can replace the texture map of a specified face of the 3D model.
 
-.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_disc.c
+.. literalinclude:: ../../../example/application/screen_410_502/app_3d_applist.c
    :language: c
-   :start-after: /* 3d disc demo start*/
-   :end-before: /* 3d disc demo end*/
+   :start-after: /* 3d applist demo start*/
+   :end-before: /* 3d applist demo end*/
 
 .. raw:: html
 
    <br>
-   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/disc.gif" width= "400" /></div>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/Lite3D/3d_applist.gif" width= "400" /></div>
    <br>
 
 
@@ -328,14 +293,15 @@ FPS Benchmark
 The table below shows the frame rate performance of various examples on different chip platforms. The compilation environment uses ``ARMCLANG V6.22`` with the ``-O3 LTO`` compilation option.
 
 .. csv-table:: FPS Benchmark Results
-   :header: Chip Model,CPU Frequency,Resolution,:ref:`3D Butterfly`,:ref:`3D Face`,:ref:`3D Dog`,:ref:`3D Disc`
+   :header: Chip Model,CPU Frequency,Resolution,:ref:`3D Butterfly`,:ref:`3D Face`,:ref:`3D Dog`,:ref:`3D App List`
    :align: center
    :name: FPS Benchmark Results
 
-   RTL8773E,100MHz,410 x 502,40 FPS,13 FPS,20 FPS,10 FPS
+   RTL8773E,100MHz,410 x 502,33 FPS,13 FPS,22 FPS,24 FPS
+   RTL8773G,200MHz,410 x 502,58 FPS,24 FPS,46 FPS,56 FPS
 
 
 API
 ---
 
-.. doxygenfile:: gui_3d.h
+.. doxygenfile:: gui_lite3d.h

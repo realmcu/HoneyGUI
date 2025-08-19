@@ -1,3 +1,4 @@
+/* 3d applist demo start*/
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
@@ -280,3 +281,4 @@ static void applist_app(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(app_3d_list[0]), 10, true, update_applist_animation);
 
 }
+/* 3d applist demo end*/

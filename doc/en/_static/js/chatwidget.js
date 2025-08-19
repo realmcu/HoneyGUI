@@ -625,7 +625,7 @@
             const body = JSON.stringify(rawBody);
             let chatUrl = "https://wwwdev.realmcu.com/docs/aichatstream";
             if (rawBody.aiEnv.toLowerCase() == "prod") {
-                chatUrl = "https://wwwqa.realmcu.com/docs/aichatstream";
+                chatUrl = "https://www.realmcu.com/docs/aichatstream";
             }
             // return fetch config
             return {

@@ -82,7 +82,7 @@ static void __l3_push_tria_img(l3_model_t *_this)
         }
         else
         {
-            float nz = fabsf(tria_img->p0.normal.uz);
+            float nz = fabsf(vertices[0].normal.uz);
             uint8_t color_intensity = (uint8_t)(opacity_value * fmaxf(0.0f, fminf(1.0f, nz)));
             render_color = ((color_intensity & 0xF8) << 8) |
                            ((color_intensity & 0xFC) << 3) |
