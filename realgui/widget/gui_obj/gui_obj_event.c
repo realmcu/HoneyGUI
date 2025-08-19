@@ -137,7 +137,7 @@ void gui_obj_add_event_cb(void           *obj,
     event_dsc->filter = filter;
     event_dsc->user_data = user_data;
 
-    gui_obj_suppress_set(object, filter);
+    // gui_obj_suppress_set(object, filter);
 
 }
 

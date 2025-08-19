@@ -33,7 +33,7 @@ static void clear_heartrate_cache(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *activity_view = NULL;
+const static gui_view_descriptor_t *recorder_view = NULL;
 const static gui_view_descriptor_t *qrcode_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
@@ -69,7 +69,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    activity_view = gui_view_descriptor_get("activity_view");
+    recorder_view = gui_view_descriptor_get("recorder_view");
     qrcode_view = gui_view_descriptor_get("qrcode_view");
     menu_view = gui_view_descriptor_get("menu_view");
     watchface_view = gui_view_descriptor_get("watchface_view");
@@ -77,18 +77,6 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-// static void return_cb()
-// {
-//     gui_view_switch_direct(current_view, pre_view, SWITCH_OUT_ANIMATION_FADE,
-//                            SWITCH_IN_ANIMATION_FADE);
-// }
-
-// static void timer_cb(void *p)
-// {
-//     touch_info_t *tp = tp_get_info();
-//     GUI_RETURN_HELPER(tp, gui_get_dc()->screen_width, return_cb)
-// }
 
 static void draw_line_chart(NVGcontext *vg, float *samples)
 {
@@ -421,9 +409,9 @@ static void heartrate_design(gui_view_t *view)
 
     // view layout
     const char *name = GUI_BASE(gui_view_get_current())->name;
-    if (strcmp(name, "activity_view") == 0 || strcmp(name, "qrcode_view") == 0)
+    if (strcmp(name, "recorder_view") == 0 || strcmp(name, "qrcode_view") == 0)
     {
-        gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+        gui_view_switch_on_event(view, recorder_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                                  SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
         gui_view_switch_on_event(view, qrcode_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
@@ -442,5 +430,5 @@ static void heartrate_design(gui_view_t *view)
     gui_view_switch_on_event(view, pre_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
-    // gui_obj_create_timer(GUI_BASE(view), 17, true, timer_cb);
+
 }

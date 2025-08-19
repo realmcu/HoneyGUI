@@ -23,16 +23,26 @@ typedef struct gui_audio
     float (*music_current_time)(void);
 
     /* gui record */
+    void (*record_start)(void);
+    void (*record_stop)(void);
+    void (*record_play)(void);
+    void (*record_pause)(void);
+    bool (*record_completion_status)(void);
 } gui_audio_t;
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/* Audio */
 void gui_audio_info_register(gui_audio_t *info);
-
 gui_audio_t *gui_get_audio(void);
 
 
+/* Controlboard */
+void switch_bt(bool state); // true: on, false: off
+void switch_local_play(bool state);
+void switch_phone(bool state);
+void switch_earphone(bool state);
 
 #ifdef __cplusplus
 }

@@ -90,9 +90,9 @@ extern "C" {
 extern "C" {
     struct music_information_t
     {
-        char music_name[20];
+        char music_name[24];
         float music_time;
-        char music_time_str[6];
+        char music_time_str[8];
     };
 
     static music_information_t music_infor[MUSIC_NUM_MAX] =
@@ -145,7 +145,7 @@ extern "C" {
         return play_time;
     }
 
-    static void formatTime(float seconds, char *str)
+    static void format_time(float seconds, char *str)
     {
         int minutes = static_cast<int>(seconds) / 60;
         int sec = static_cast<int>(seconds) % 60;
@@ -447,7 +447,7 @@ private:
     }
     static void on_playing(void *p)
     {
-        play_time += 0.1f; // Simulate time progression
+        play_time += 0.1f;
         gui_audio_t *gui_audio = gui_get_audio();
         float duration = 0;
         if (gui_audio->music_length)
@@ -469,7 +469,7 @@ private:
             time = local_music_current_time();
         }
 
-        formatTime(time, play_time_array);
+        format_time(time, play_time_array);
         gui_text_content_set(play_time_text, play_time_array, strlen(play_time_array));
         gui_canvas_rect_set_size(current_time_bar, time / duration * COVER_W, 3);
         int16_t offset = -(time / duration * (page_list_item_space * lyrics_array_length));
@@ -513,11 +513,11 @@ private:
         {
             duration = local_music_length();
         }
-        formatTime(duration, music_time_array);
+        format_time(duration, music_time_array);
         gui_text_content_set(music_time_text, music_time_array, strlen(music_time_array));
 
         play_time = 0.0f; // Reset play time
-        formatTime(play_time, play_time_array);
+        format_time(play_time, play_time_array);
         gui_text_content_set(play_time_text, play_time_array, strlen(play_time_array));
     }
 
@@ -761,7 +761,7 @@ private:
         sprintf(music_name, "%s", music_infor[music_index].music_name);
         sprintf(artist_name, "%s", "FreeTestData.com");
         sprintf(album_name, "%s", "Sample Audio");
-        formatTime(length, music_time_array);
+        format_time(length, music_time_array);
         music_name_text = dispaly_text(parent, music_name, COVER_X, COVER_Y + COVER_W, APP_COLOR_WHITE, 24,
                                        LEFT);
         dispaly_text(parent, artist_name, COVER_X, COVER_Y + COVER_W + 18, COLOR_ARTISTNAME, 24, LEFT);

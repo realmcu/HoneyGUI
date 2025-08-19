@@ -41,7 +41,7 @@ static void clear_activity(gui_view_t *view);
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
-const static gui_view_descriptor_t *heartrate_view = NULL;
+const static gui_view_descriptor_t *recorder_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -77,7 +77,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     /* you can get other view descriptor point here */
     menu_view = gui_view_descriptor_get("menu_view");
     watchface_view = gui_view_descriptor_get("watchface_view");
-    heartrate_view = gui_view_descriptor_get("heartrate_view");
+    recorder_view = gui_view_descriptor_get("recorder_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -297,7 +297,7 @@ static void activity_design(gui_view_t *view)
 
     // view layout
     const char *name = GUI_BASE(gui_view_get_current())->name;
-    if (strcmp(name, "watchface_view") == 0 || strcmp(name, "heartrate_view") == 0)
+    if (strcmp(name, "watchface_view") == 0 || strcmp(name, "recorder_view") == 0)
     {
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, image_w, image_h, arc_activity_cb,
                                           img_data);
@@ -306,7 +306,7 @@ static void activity_design(gui_view_t *view)
         gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                                  SWITCH_IN_FROM_LEFT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_RIGHT);
-        gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+        gui_view_switch_on_event(view, recorder_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                                  SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                                  GUI_EVENT_TOUCH_MOVE_LEFT);
     }

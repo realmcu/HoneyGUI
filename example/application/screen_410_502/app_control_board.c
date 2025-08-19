@@ -6,6 +6,7 @@
 #include "app_main_watch.h"
 #include "gui_canvas_rect.h"
 #include "guidef.h"
+#include "watch_adapt.h"
 
 /*============================================================================*
  *                           Types

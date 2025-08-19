@@ -435,12 +435,14 @@ static int app_init(void)
     extern bool win32_music_completion_status(void);
     extern float win32_music_get_music_length(void);
     extern float win32_music_get_music_current_time(void);
+    extern void local_record_stop(void);
     gui_audio_info.music_load = win32_load_music;
     gui_audio_info.music_play = win32_play_music;
     gui_audio_info.music_stop = win32_stop_music;
     gui_audio_info.music_completion_status = win32_music_completion_status;
     gui_audio_info.music_length = win32_music_get_music_length;
     gui_audio_info.music_current_time = win32_music_get_music_current_time;
+    gui_audio_info.record_stop = local_record_stop;
 #endif
     if (gui_get_audio() == NULL)
     {
