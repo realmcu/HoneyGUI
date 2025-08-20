@@ -22,13 +22,10 @@ The entry point for any application is:
 .. toctree::
     :maxdepth: 2
 
-    Calculator <Calculator/Demo>
-    86Box <86box/86box>
     LiteGFX <LiteGFX/Demo>
-    Status Bar <Status-bar/Status bar>
     Fruit Ninja <Fruit_Ninja/Fruit_Ninja>
     Music Player <MusicPlayer/Music Player>
-    Timer <Timer/Timer>
-    Watchface Market <WatchfaceMarket/WatchfaceMarket>
     Watchface <WatchfaceKoiClock/KoiClock>
+    Weather <Weather/weather>
+    Rainbow Analog Clock <Rainbow_analog/rainbow_analog>
     
