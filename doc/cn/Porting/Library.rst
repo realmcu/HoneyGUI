@@ -1,7 +1,7 @@
 .. _Library_Porting_CN:
 
 ==============
-HoneyGUI移植
+HoneyGUI 移植
 ==============
 
 HoneyGUI 是一个轻量级的嵌入式 GUI 系统，专为 Realtek 系列芯片优化设计。本文档将指导您如何在不同的 Realtek 芯片平台上编译 HoneyGUI 库，包括 Armclang 和 Armcc 两种编译器环境的配置和使用方法。
@@ -12,8 +12,8 @@ HoneyGUI 是一个轻量级的嵌入式 GUI 系统，专为 Realtek 系列芯片
 - 编译前请确保相关依赖库已安装
 - 如遇编译错误，请检查芯片型号是否正确指定
 - 检查编译器路径设置：
-    - Armcc 编译器默认路径：C:/Keil_v5/ARM/ARMCC/bin
-    - Armclang 编译器默认路径：C:/Keil_v5/ARM/ArmCompilerforEmbedded6.22/bin
+    - Armcc 编译器默认路径： C:/Keil_v5/ARM/ARMCC/bin
+    - Armclang 编译器默认路径： C:/Keil_v5/ARM/ArmCompilerforEmbedded6.22/bin
     - 若安装路径不同，请在 CMake 配置中相应修改编译器路径
 
 .. figure:: https://foruda.gitee.com/images/1741658954829556595/7a3ac221_13406851.jpeg
@@ -95,7 +95,7 @@ Armcc 编译
     - 库文件： E:/HoneyGUI/lib/armcc/install/lib/gui.lib
 
 Armclang 编译
-------------
+--------------
 支持芯片:
   - RTL8762G (默认)
   - RTL8762D

@@ -11,4 +11,4 @@
 
     平台移植 <Platform>
     字库移植 <Font>
-    HoneyGUI移植 <Library>
+    HoneyGUI 移植 <Library>

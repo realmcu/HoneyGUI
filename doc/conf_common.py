@@ -94,7 +94,12 @@ intersphinx_mapping = {
     'api_cn': ('', (os.path.join(ROOT_BASE, '_build', 'cn', 'html', 'objects.inv'), None)),
 }
 
-exclude_patterns = []
+exclude_patterns = [
+    'doc/cn/widgets/gui_window.rst',
+    'doc/cn/widgets/gui_soccer.rst',
+    'doc/en/widgets/gui_window.rst',
+    'doc/en/widgets/gui_soccer.rst',
+]
 
 # The default language to highlight source code in. The default is 'python'.
 # The value should be a valid Pygments lexer name, see Showing code examples for more details.

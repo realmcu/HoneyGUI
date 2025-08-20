@@ -24,7 +24,7 @@
    * - ``gui_port_os.c``
      - 操作系统
 
-目前已在FreeRTOS、RT-Thread和Windows上进行了移植，可供参考。
+目前已在 FreeRTOS 、 RT-Thread 和 Windows 上进行了移植，可供参考。
 
 加速
 ----

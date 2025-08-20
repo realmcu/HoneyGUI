@@ -11,18 +11,18 @@
    acc,加速
    addr,地址
    att,属性
-   ax,x轴上的绝对坐标
+   ax,x 轴上的绝对坐标
    blit,位块图像传输
    buff,缓冲区
    cb,回调函数
    cbsize,立方体大小
    ctor,构造函数
-   cur_idx,x方向上的当前索引
-   cur_idy,y方向上的当前索引
-   cx,x轴上的中心坐标
+   cur_idx,x 方向上的当前索引
+   cur_idy,y 方向上的当前索引
+   cx,x 轴上的中心坐标
    dc,显示画布
    dur,持续时间
-   dx,触摸板沿x轴的偏移
+   dx,触摸板沿 x 轴的偏移
    fd,文件描述符
    fg,前景
    fs,文件系统
@@ -33,7 +33,7 @@
    init,初始化
    mem,内存
    mq,消息队列
-   nz,平面Z方向的法向量
+   nz,平面 Z 方向的法向量
    obj,对象
    off,偏移
    pic,图片
@@ -41,9 +41,9 @@
    prev,先前的
    rst,结果
    src,源
-   sx,x方向缩放
+   sx,x 方向缩放
    tmp,临时的
-   tx,x方向的平移
+   tx,x 方向的平移
 
 
 
@@ -63,7 +63,7 @@
 
 .. 窗口 (Window) <gui_window>
 .. 简单图像 (Simple Img) <gui_simple_img>
-.. STB图像 (STB Img) <gui_img_stb>
+.. STB 图像 (STB Img) <gui_img_stb>
 .. 选项卡容器 (Tabview) <gui_tabview>
 .. 选项卡 (Tab) <gui_tab>
 .. 幕布容器 (Curtainview) <gui_curtainview>
@@ -72,7 +72,7 @@
 .. 卡片 (Card) <gui_card>
 .. 页面 (Page) <gui_page>
 .. 页面列表 (Page List) <gui_pagelist>
-.. 开关(Switch) <gui_switch>
+.. 开关 (Switch) <gui_switch>
 .. 网格 (Grid) <gui_grid>
 .. 进度条 (Progressbar) <gui_progressbar>
 .. 画布 (Canvas) <gui_canvas>
@@ -85,5 +85,5 @@
 .. 返回 (Return) <gui_return>
 .. 多级菜单 (Multi Level) <gui_multi_level>
 .. 趣戴特效 (LiteGFX) <gui_widget_litegfx>
-.. 2.5D足球 (2.5D Soccer) <gui_soccer>
-.. 棱镜模型 (Prism Mirror 3D Model) <gui_prism_mirror3d> 
+.. 2.5D 足球 (2.5D Soccer) <gui_soccer>
+.. 棱镜模型 (Prism Mirror 3D Model) <gui_prism_mirror3d>

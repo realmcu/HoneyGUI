@@ -7,8 +7,8 @@
 源代码项目下载
 -----------------
 
-- 在GitHub上下载： `https://github.com/realmcu/HoneyGUI <https://github.com/realmcu/HoneyGUI>`_
-- 在Gitee上下载： `https://gitee.com/realmcu/HoneyGUI <https://gitee.com/realmcu/HoneyGUI>`_
+- 在 GitHub 上下载： `https://github.com/realmcu/HoneyGUI <https://github.com/realmcu/HoneyGUI>`_
+- 在 Gitee 上下载： `https://gitee.com/realmcu/HoneyGUI <https://gitee.com/realmcu/HoneyGUI>`_
 
 介绍
 ------
@@ -33,8 +33,8 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
    :align: center
    :width: 800
 
-安装在Windows操作系统上
------------------------
+安装在 Windows 操作系统上
+--------------------------
 
 安装编译器
 ^^^^^^^^^^
@@ -57,8 +57,8 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 测试过 Python 3.9.7 版本。
 
-安装Scons
-^^^^^^^^^
+安装 Scons
+^^^^^^^^^^^
 
 打开一个 CMD 窗口，并执行以下命令来安装 Python 的 scons 库：
 
@@ -68,8 +68,8 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 安装 ``MinGW-w64`` 工具链和 ``scons`` 库后，可以通过两种方式启动应用程序：通过 CMD 启动或通过 GUI 启动。
 
-通过CMD启动（Scons）
-^^^^^^^^^^^^^^^^^^^^^
+通过 CMD 启动（Scons）
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 在 ``HoneyGUI`` 或 ``gui`` 文件夹中打开一个 CMD 窗口，然后运行以下命令启动应用程序。
 
@@ -86,12 +86,12 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
    :align: center
    :width: 700
 
-通过CMD启动（CMake）
-^^^^^^^^^^^^^^^^^^^^^
+通过 CMD 启动（CMake）
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 - 依赖软件
     
-     **CMake** （测试版本为3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
+     **CMake** （测试版本为 3.31.2）：`https://cmake.org/download/ <https://cmake.org/download/>`_
     
      **MinGW-w64**：如前所述
 
@@ -123,14 +123,14 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
    
    > .\win32_sim\gui.exe
 
-通过VSCode启动
-^^^^^^^^^^^^^^^
+通过 VSCode 启动
+^^^^^^^^^^^^^^^^^
 
-安装VSCode
-""""""""""
+安装 VSCode
+""""""""""""
 
-- `下载VSCode <https://code.visualstudio.com/>`_
-- `安装C/C++插件 <https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools>`_
+- `下载 VSCode <https://code.visualstudio.com/>`_
+- `安装 C/C++ 插件 <https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools>`_
 
 打开项目
 """""""""

@@ -8,7 +8,7 @@
 -----
 创建控件
 ~~~~~~~~
-使用 :cpp:any:`gui_qbcode_create` 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数 ``encodeType`` 决定。``encodeType`` 枚举类型如下：
+使用 :cpp:any:`gui_qbcode_create` 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数 ``encodeType`` 决定。 ``encodeType`` 枚举类型如下：
 
 
 .. literalinclude:: ../../../realgui/widget/gui_qbcode/gui_qbcode.h
