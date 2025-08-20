@@ -37,8 +37,8 @@ Function ``static void app_ui_koiclock_design(gui_view_t *view)`` is located in 
 
 Control Tree Design
 ~~~~~~~~~~~~~~~~~~~
-.. figure:: https://foruda.gitee.com/images/1755487257590987087/0d0c0bbe_13406851.png
-   :width: 1000px
+.. figure:: https://foruda.gitee.com/images/1755677527679678751/6a1df64f_13406851.png
+   :width: 700px
    :align: center
    :name: control-tree-design
    
