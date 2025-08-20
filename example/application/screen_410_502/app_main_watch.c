@@ -63,7 +63,6 @@ struct tm *timeinfo;
 static struct tm watch_time;
 
 /* FPS */
-static gui_canvas_rect_t *fps_rect;
 static char fps[10];
 static char widget_count_string[20];
 static char mem_string[20];
@@ -105,6 +104,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void gui_fps_cb(void *p)
 {
     int fps_num = gui_fps();
+    gui_obj_t *fps_rect = GUI_BASE(p);
     sprintf(fps, "FPS:%d", fps_num);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(t_fps, "t_fps", fps_rect);
     gui_text_content_set((gui_text_t *)t_fps, fps, strlen(fps));
@@ -127,9 +127,10 @@ static void fps_create(void *parent)
 {
     char *text;
     int font_size = 24;
-    fps_rect = gui_canvas_rect_create(parent, "rect_fps", gui_get_screen_width() / 2 - 140 / 2, 0, 140,
-                                      70,
-                                      APP_COLOR_GRAY_OPACITY(150));
+    gui_canvas_rect_t *fps_rect = gui_canvas_rect_create(parent, "rect_fps",
+                                                         gui_get_screen_width() / 2 - 140 / 2, 0, 140,
+                                                         70,
+                                                         APP_COLOR_GRAY_OPACITY(150));
     gui_obj_create_timer(GUI_BASE(fps_rect), 10, true, gui_fps_cb);
     sprintf(fps, "FPS:%d", gui_fps());
     text = fps;
@@ -331,12 +332,6 @@ static void watchface_design(gui_view_t *view)
 
     gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
     gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
-
-    if (fps_rect)
-    {
-        gui_obj_start_timer(GUI_BASE(fps_rect)); //reset timer
-    }
-    gui_obj_start_timer(GUI_BASE(view->base.parent)); //reset timer
 }
 
 // Send information to the top view
@@ -406,16 +401,16 @@ static int app_init(void)
     extern int close(int fd);
     defaultPath = "example\\application\\screen_410_502\\root_image\\root\\";
     int fd;
-    fd = open("./example/application/screen_410_502/root_image/root(0x704D1000).bin", 0);
+    fd = open("./example/application/screen_410_502/root_image/root(0x704D1400).bin", 0);
     if (fd < 0)
     {
-        printf("open root(0x704D1000).bin Fail!\n");
-        printf("open root(0x704D1000).bin Fail!\n");
-        printf("open root(0x704D1000).bin Fail!\n");
+        printf("open root(0x704D1400).bin Fail!\n");
+        printf("open root(0x704D1400).bin Fail!\n");
+        printf("open root(0x704D1400).bin Fail!\n");
         return 0;
     }
 
-    printf("open root(0x704D1000).bin Successful!\n");
+    printf("open root(0x704D1400).bin Successful!\n");
     ssize_t bytes_read = read(fd, resource_root, 1024 * 1024 * 20);
     if (bytes_read < 0)
     {
