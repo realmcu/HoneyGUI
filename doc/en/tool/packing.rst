@@ -26,7 +26,7 @@ Then copy the ``bat and py scripts`` to that directory, ensuring that the ``root
 
 RTL8763E and RTL8773DO
 ----------------------
-RTL8763E is the name of a series IC type, including RTL8763EWE-VP/RTL8763EW-VC. The packaging process for RTL877DO is similar to that of RTL8763E.
+RTL8763E is the name of a series IC type, including RTL8763EWE-VP/RTL8763EW-VC. The packaging process for RTL8773DO is similar to that of RTL8763E.
 
 Before starting, navigate to the SDK directory ( ``\tool\Gadgets\gui_package_tool`` ) and choose the appropriate IC directory. Select the ``8763E`` directory for ``RTL8763EW`` and the ``87x3D`` directory for ``RTL8773DO``.
 

@@ -29,7 +29,7 @@ RTL87x2G 和 RTL8762D 的打包流程一样，以下以 RTL8762G 为例进行说
 RTL8763E 和 RTL8773DO
 -----------------------
 
-RTL8763E 是一个 IC 系列的名称，包含 RTL8763EWE-VP 和 RTL8763EW-VC。RTL8763E 和 RTL877DO 打包流程类似。
+RTL8763E 是一个 IC 系列的名称，包含 RTL8763EWE-VP 和 RTL8763EW-VC。RTL8763E 和 RTL8773DO 打包流程类似。
 
 在开始之前，请在 SDK 目录下的（ ``\tool\Gadgets\gui_package_tool`` ）选择对应 IC 的目录，8763EW 请选择 ``8763E`` 目录，8773DO 请选择 ``87x3D`` 目录。
 
