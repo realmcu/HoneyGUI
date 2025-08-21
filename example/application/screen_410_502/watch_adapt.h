@@ -30,6 +30,14 @@ typedef struct gui_audio
     bool (*record_completion_status)(void);
 } gui_audio_t;
 
+typedef struct gui_control_board
+{
+    void (*send_bt_status)(bool)        ;
+    void (*send_local_play_status)(bool);
+    void (*send_phone_status)(bool)     ;
+    void (*send_earphone_status)(bool)  ;
+} gui_control_board_t;
+
 /*============================================================================*
  *                         Functions
  *============================================================================*/
@@ -43,6 +51,8 @@ void switch_bt(bool state); // true: on, false: off
 void switch_local_play(bool state);
 void switch_phone(bool state);
 void switch_earphone(bool state);
+void gui_control_board_info_register(gui_control_board_t *info);
+gui_control_board_t *gui_get_control_board(void);
 
 #ifdef __cplusplus
 }

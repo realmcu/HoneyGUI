@@ -51,6 +51,8 @@ static gui_img_t *img_capsule_phone;
 static gui_img_t *img_capsule_nobother;
 static gui_img_t *img_capsule_mute;
 
+
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -171,25 +173,42 @@ void switch_nobother(bool state)
 static void switch_cb(void *obj, gui_event_t e, void *param)
 {
     gui_img_t *img = (gui_img_t *)obj;
+    gui_control_board_t *control_board = gui_get_control_board();
     if (strcmp(img->base.name, "sw_bt") == 0)
     {
         sw_state.sw_1 ^= 1;
         switch_bt(sw_state.sw_1);
+        if (control_board && control_board->send_bt_status)
+        {
+            control_board->send_bt_status(sw_state.sw_1);
+        }
     }
     else if (strcmp(img->base.name, "sw_local_play") == 0)
     {
         sw_state.sw_2 ^= 1;
         switch_local_play(sw_state.sw_2);
+        if (control_board && control_board->send_local_play_status)
+        {
+            control_board->send_local_play_status(sw_state.sw_2);
+        }
     }
     else if (strcmp(img->base.name, "sw_phone") == 0)
     {
         sw_state.sw_3 ^= 1;
         switch_phone(sw_state.sw_3);
+        if (control_board && control_board->send_phone_status)
+        {
+            control_board->send_phone_status(sw_state.sw_3);
+        }
     }
     else if (strcmp(img->base.name, "sw_earphone") == 0)
     {
         sw_state.sw_4 ^= 1;
         switch_earphone(sw_state.sw_4);
+        if (control_board && control_board->send_earphone_status)
+        {
+            control_board->send_earphone_status(sw_state.sw_4);
+        }
     }
     else if (strcmp(img->base.name, "sw_mute") == 0)
     {
@@ -280,3 +299,6 @@ static void control_board_design(gui_view_t *view)
         gui_img_set_image_data(img_capsule_nobother, NOBOTHER_ON_ICON_BIN);
     }
 }
+
+
+
