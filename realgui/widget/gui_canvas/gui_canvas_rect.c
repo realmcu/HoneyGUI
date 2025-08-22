@@ -65,6 +65,8 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
+    gui_obj_enable_event(GUI_BASE(this), GUI_EVENT_TOUCH_CLICKED);
+
     GUI_UNUSED(this);
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);

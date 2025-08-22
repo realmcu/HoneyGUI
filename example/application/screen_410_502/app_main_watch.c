@@ -46,6 +46,7 @@ const static gui_view_descriptor_t *app_bottom_view = NULL;
 const static gui_view_descriptor_t *app_top_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
 const static gui_view_descriptor_t *labubu_digital_view = NULL;
+const static gui_view_descriptor_t *call_incoming_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -95,6 +96,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     app_bottom_view = gui_view_descriptor_get("app_bottom_view");
     app_top_view = gui_view_descriptor_get("app_top_view");
     activity_view = gui_view_descriptor_get("activity_view");
+    call_incoming_view  = gui_view_descriptor_get("call_incoming_view");
     labubu_digital_view  = gui_view_descriptor_get("labubu_digital_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -309,6 +311,17 @@ static void win_cb()
     timeinfo = &watch_time;
 #endif
     inform_generate_cb();
+
+    //Call incoming
+    bool *call_incoming_flag = gui_call_incoming_flag_get();
+    if (*call_incoming_flag)
+    {
+        *call_incoming_flag = false;
+        gui_view_t *current_view = gui_view_get_current();
+        gui_view_set_animate_step(current_view, 1000);
+        gui_view_switch_direct(current_view, call_incoming_view, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_IN_NONE_ANIMATION);
+    }
 }
 
 static void watchface_design(gui_view_t *view)
@@ -390,6 +403,7 @@ static void app_main_watch_ui_design(void)
     gui_view_t *view = gui_view_create(win, labubu_digital_view, 0, 0, 0, 0); // watch turn on animation
     fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
+    gui_obj_start_timer(GUI_BASE(win));
     win_cb();
 }
 

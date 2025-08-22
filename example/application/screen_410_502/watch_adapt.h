@@ -38,6 +38,16 @@ typedef struct gui_control_board
     void (*send_earphone_status)(bool)  ;
 } gui_control_board_t;
 
+typedef struct gui_call
+{
+    void (*call_start)(void);
+    void (*call_end)(void);
+    void (*call_dail)(char *);
+    bool (*call_get_dail_status)(void); //True: the call is taken, switch to calling window
+    void (*call_set_mic)(bool); // True: on, false: off
+    void (*call_set_speaker)(bool); // True: on, false: off
+} gui_call_t;
+
 /*============================================================================*
  *                         Functions
  *============================================================================*/
@@ -53,6 +63,13 @@ void switch_phone(bool state);
 void switch_earphone(bool state);
 void gui_control_board_info_register(gui_control_board_t *info);
 gui_control_board_t *gui_get_control_board(void);
+
+/* Call */
+void gui_call_info_register(gui_call_t *info);
+gui_call_t *gui_get_call(void);
+void gui_update_call_number(char *number);
+bool *gui_call_incoming_flag_get(
+    void); // Get the call incoming flag, then set it to true when a call is incoming
 
 #ifdef __cplusplus
 }

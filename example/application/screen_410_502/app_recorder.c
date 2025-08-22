@@ -41,7 +41,7 @@ static void create_recorder(gui_view_t *view);
  *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *activity_view = NULL;
-const static gui_view_descriptor_t *heartrate_view = NULL;
+const static gui_view_descriptor_t *call_dial_view = NULL;
 static const gui_view_descriptor_t descriptor =
 {
     /* change Here for current view */
@@ -89,7 +89,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    heartrate_view = gui_view_descriptor_get("heartrate_view");
+    call_dial_view = gui_view_descriptor_get("call_dial_view");
     activity_view = gui_view_descriptor_get("activity_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -121,6 +121,11 @@ static void click_to_recorder_cb(void *obj, gui_event_t e, void *param)
             gui_audio->record_pause();
         }
     }
+}
+
+static void click_canvas_cb(void *obj, gui_event_t e, void *param)
+{
+    return;
 }
 
 static void click_play_cb(void *obj, gui_event_t e, void *param)
@@ -268,48 +273,53 @@ static void create_recorder_play(void)
     win_play = gui_win_create(current_view, "win_play", 0, 0, 0, 0);
     gui_obj_add_event_cb(GUI_BASE(win_play), win_scroll_cb, GUI_EVENT_TOUCH_SCROLL_HORIZONTAL,
                          NULL); // Disable view horizontal scroll
+    gui_obj_add_event_cb(GUI_BASE(win_play), win_scroll_cb, GUI_EVENT_TOUCH_SCROLL_VERTICAL,
+                         NULL); // Disable view vertical scroll
 
-    gui_list_t *list = gui_list_create(win_play, 0, 0, 70, 0, 0, 50, 5, VERTICAL, list_design, NULL,
+    gui_list_t *list = gui_list_create(win_play, 0, 0, 80, 0, 0, 50, 5, VERTICAL, list_design, NULL,
                                        false);
-    gui_list_set_note_num(list, record_file_num > 5 ? record_file_num + 2 : record_file_num);
+    gui_list_set_note_num(list, record_file_num > 5 ? record_file_num + 3 : record_file_num);
     gui_list_set_style(list, LIST_CLASSIC);
 
     gui_canvas_rect_t *canvas_top = gui_canvas_rect_create(GUI_BASE(win_play), 0, 0, 0, SCREEN_WIDTH,
-                                                           70, APP_COLOR_BLACK);
+                                                           80, APP_COLOR_BLACK);
+    gui_obj_add_event_cb(canvas_top, click_canvas_cb, GUI_EVENT_TOUCH_CLICKED,
+                         NULL); // Disable click event of this area
     gui_text_t *text = gui_text_create(canvas_top, 0, 0, 20, SCREEN_WIDTH, 60);
     gui_text_set(text, "Recorder files", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("Recorder files"),
                  48);
     gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, CENTER);
     gui_text_rendermode_set(text, 2);
-    gui_img_t *img_ret = gui_img_create_from_mem(canvas_top, "img_ret", UI_RETURN_W_ICON_BIN, 60, 35, 0,
+    gui_img_t *img_ret = gui_img_create_from_mem(canvas_top, "img_ret", UI_RETURN_W_ICON_BIN, 60, 25, 0,
                                                  0);
-    gui_img_scale(img_ret, 0.6f, 0.6f);
     gui_img_set_quality(img_ret, true);
     gui_obj_add_event_cb(img_ret, click_to_recorder_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_canvas_rect_t *canvas_bottom = gui_canvas_rect_create(GUI_BASE(win_play), 0, 0,
-                                                              SCREEN_HEIGHT - 100, SCREEN_WIDTH, 100, APP_COLOR_BLACK);
-    gui_img_t *img_play = gui_img_create_from_mem(canvas_bottom, "img_play", RECORD_PLAY_BIN, 180, 40,
+                                                              SCREEN_HEIGHT - 150, SCREEN_WIDTH, 150, APP_COLOR_BLACK);
+    gui_obj_add_event_cb(canvas_bottom, click_canvas_cb, GUI_EVENT_TOUCH_CLICKED,
+                         NULL); // Disable click event of this area
+    gui_img_t *img_play = gui_img_create_from_mem(canvas_bottom, "img_play", RECORD_PLAY_BIN, 165, 55,
                                                   0, 0);
     gui_obj_add_event_cb(img_play, click_play_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_create_timer(GUI_BASE(img_play), 1000, true, on_playing);
     gui_obj_stop_timer(GUI_BASE(img_play));
-    gui_canvas_rect_create(GUI_BASE(canvas_bottom), 0, 55, 30, 300, 3, gui_rgb(150, 150, 150));
-    gui_canvas_rect_create(GUI_BASE(canvas_bottom), "time_bar", 55, 30, 1, 3, APP_COLOR_WHITE);
+    gui_canvas_rect_create(GUI_BASE(canvas_bottom), 0, 55, 40, 300, 3, gui_rgb(150, 150, 150));
+    gui_canvas_rect_create(GUI_BASE(canvas_bottom), "time_bar", 55, 40, 1, 3, APP_COLOR_WHITE);
 
     text = gui_text_create(canvas_bottom, "file_name", 55, 5, 0, 0);
-    gui_text_set(text, play_file_name, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(play_file_name), 24);
+    gui_text_set(text, play_file_name, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(play_file_name), 32);
     gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
     gui_text_rendermode_set(text, 2);
-    text = gui_text_create(canvas_bottom, "play_time", 55, 35, 0, 0);
-    gui_text_set(text, play_time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(play_time_str), 24);
+    text = gui_text_create(canvas_bottom, "play_time", 55, 45, 0, 0);
+    gui_text_set(text, play_time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(play_time_str), 32);
     gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
     gui_text_rendermode_set(text, 2);
-    text = gui_text_create(canvas_bottom, "file_time", 295, 35, 0, 0);
-    gui_text_set(text, file_time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(file_time_str), 24);
+    text = gui_text_create(canvas_bottom, "file_time", 275, 45, 0, 0);
+    gui_text_set(text, file_time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(file_time_str), 32);
     gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
     gui_text_rendermode_set(text, 2);
@@ -377,7 +387,7 @@ static void create_recorder(gui_view_t *view)
     gui_view_switch_on_event(view, activity_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
-    gui_view_switch_on_event(view, heartrate_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, call_dial_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 

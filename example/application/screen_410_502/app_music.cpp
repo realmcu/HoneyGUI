@@ -176,13 +176,13 @@ namespace gui_music_app
 /*============================================================================*
 *                              Variables
 *============================================================================*/
-constexpr int SWITCH_W = 30;
-constexpr int SWITCH_H = 30;
-constexpr int BUTTON_Y = 440;
+constexpr int SWITCH_W = 40;
+constexpr int SWITCH_H = 40;
+constexpr int BUTTON_Y = 430;
 constexpr int COVER_Y = 50;
 constexpr int COVER_W = 300;
-constexpr int MINIMIZE_WINDOW_HEIGHT = 60;
-constexpr int MINIMIZE_COVER_HEIGHT = 50;
+constexpr int MINIMIZE_WINDOW_HEIGHT = 76;
+constexpr int MINIMIZE_COVER_HEIGHT = 66;
 constexpr int LIST_COVER_H = 120;
 constexpr int LIST_SONG_H = 64;
 constexpr char MP3_FILE[] =

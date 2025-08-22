@@ -255,13 +255,6 @@ static void switch_app_cb(void *obj)
     }
 }
 
-static void img_bg_cb(NVGcontext *vg)
-{
-    nvgRoundedRect(vg, 0, 0, 352, 157, 20);
-    nvgFillColor(vg, nvgRGB(98, 101, 102));
-    nvgFill(vg);
-}
-
 static void arc_activity_cb(NVGcontext *vg)
 {
     cJSON *root;

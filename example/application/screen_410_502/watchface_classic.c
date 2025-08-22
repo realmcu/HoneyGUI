@@ -11,6 +11,7 @@
 #include "gui_canvas.h"
 #include "guidef.h"
 #include "app_main_watch.h"
+#include "watch_adapt.h"
 
 /*============================================================================*
  *                           Types
@@ -601,6 +602,11 @@ static void switch_heartrate()
                            SWITCH_IN_ANIMATION_FADE);
 }
 
+static void switch_call_incoming()
+{
+    *gui_call_incoming_flag_get() = true;
+}
+
 static void switch_menu()
 {
     gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
@@ -770,6 +776,8 @@ void create_watchface_classic(gui_view_t *view)
     gui_img_t *img = gui_img_create_from_mem(win_watch, "CLOCK_COMPASS_DIAL",
                                              UI_CLOCK_COMPASS_DIAL_ICON_BIN, 155, 348, 0, 0);
     gui_img_set_quality(img, true);
+    gui_obj_add_event_cb(img, (gui_event_cb_t)switch_call_incoming, GUI_EVENT_TOUCH_CLICKED,
+                         NULL);
 
     compass_pointer = gui_img_create_from_mem(img, "CLOCK_COMPASS_POINTER",
                                               UI_CLOCK_COMPASS_POINTER_ICON_BIN, 42, 10, 0, 0);
