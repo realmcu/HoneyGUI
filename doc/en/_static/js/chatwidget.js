@@ -8,6 +8,7 @@
                 }
                 chat-widget * {
                     box-sizing: border-box;
+                    font-family: Lato,proxima-nova,Helvetica Neue,Arial,sans-serif !important;
                 }
                 .chat-modal-mask {
                     display: none; /* Initially hidden */
@@ -220,8 +221,19 @@
                 }
                 chat-widget .chatResp pre,
                 chat-widget .chatResp code {
-                    white-space: pre-line;
+                    color: #c9302c;
+                    white-space: pre;
                     border: none;
+                }
+                chat-widget .chatResp code,
+                chat-widget .chatResp table * {
+                    font-size: 14px;
+                    background: transparent !important;
+                    background-color: transparent !important;
+                }
+                chat-widget .chatResp table th,
+                chat-widget .chatResp table td {
+                    padding: 4px 10px;
                 }
                 .chat-feedback-box {
                     margin: 8px 0;
@@ -281,28 +293,6 @@
                 }
                 .font-small {
                     font-size: 12px;
-                }
-                chat-widget .toggle-chat-modal {
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background-color: #2980b9;
-                    border: none;
-                    border-radius: 50%;
-                    width: 41px;
-                    height: 41px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    cursor: pointer;
-                    z-index: 1001;
-                }
-                chat-widget .toggle-chat-modal:hover {
-                    /* transform: scale(1.1); */
-                    background-color: #0068B6;
-                }
-                chat-widget .toggle-chat-modal:hover svg {
-                    fill: #0068B6;
                 }
             </style>
             <div class="chat-modal-mask" id="ChatModalMask">
@@ -369,11 +359,7 @@
                 </div>
             </div>
             </div>
-            <button class="toggle-chat-modal" id="ToggleChatModal">
-                <svg t="1753839593628" class="icon" viewBox="0 0 1218 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="17319" width="24" height="24">
-                    <path d="M326.183722 206.500257c19.568414 0 36.788619 9.523295 47.529504 24.177863a41.528523 41.528523 0 0 1 17.394146 18.698707l1.348046 3.391858 249.910392 711.072687c8.088278 22.916787-6.348863 48.529667-32.17917 57.22674-24.525746 8.262219-50.529994-1.652444-60.009803-22.351478l-1.304561-3.348373-64.793194-184.247491H160.460996l-64.706223 184.247491c-8.088278 22.916787-35.527543 34.440409-61.314364 25.699851-24.569231-8.262219-38.788945-31.787802-33.222819-53.791396l1.000164-3.47883L252.08466 252.81217a43.267938 43.267938 0 0 1 30.439756-26.91744A58.574787 58.574787 0 0 1 326.140237 206.500257h0.043485z m459.553336 201.511181c25.960763 0 47.225106 12.958639 49.312404 29.396106l0.130456 2.609122v549.046217c0 17.698544-22.177536 32.005229-49.44286 32.005229-25.960763 0-47.225106-12.915153-49.268918-29.396107l-0.217427-2.609122V440.060152c0-17.698544 22.177536-32.005229 49.486345-32.005229zM322.226554 350.741212l-127.760002 363.494165h255.563489L322.226554 350.697727zM1038.430514 105.52724a14.958966 14.958966 0 0 1 9.697236 9.56678l38.658489 117.801853 120.889315 42.87657a14.958966 14.958966 0 0 1-0.869708 28.482914l-118.410648 33.266304-36.658163 116.018954a14.958966 14.958966 0 0 1-28.439428 0.130456l-38.701975-117.758368-117.323515-37.223473a14.958966 14.958966 0 0 1-0.217426-28.395943l115.975468-39.049858 36.658162-115.975468a14.958966 14.958966 0 0 1 18.742193-9.740721zM772.387051 0.553569a10.436488 10.436488 0 0 1 6.653261 6.827202l22.04708 70.489776 72.490103 24.569232a10.436488 10.436488 0 0 1-0.391368 19.959782l-72.185706 21.48177-23.569067 70.794174a10.436488 10.436488 0 0 1-19.872812-0.173941l-22.04708-70.489777-70.228865-21.220858a10.436488 10.436488 0 0 1-0.434853-19.872811l70.794174-24.873629 23.525582-70.881145a10.436488 10.436488 0 0 1 13.219551-6.609775z" p-id="17320" fill="#ffffff"></path>
-                </svg>
-            </button>
+            <button class="toggle-chat-modal" id="ToggleChatModal"></button>
         </chat-widget>
         `;
 
@@ -714,7 +700,7 @@
                             // asstNode.innerHTML = marked.parse(mdChatText);
                             const rawHtml = marked.parse(mdChatText);
                             const sanitizedHtml = DOMPurify.sanitize(rawHtml);
-                            asstNode.innerHTML = marked.parse(sanitizedHtml);
+                            asstNode.innerHTML = sanitizedHtml;
                             asstNode.ansData = mdChatText;
                         } else if (parsedChunk.status === "error") {
                             // append html content in asstNode

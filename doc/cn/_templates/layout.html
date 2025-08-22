@@ -12,6 +12,11 @@
     window.isMultitarget = "{{ is_multitarget | e }}";
     window.leftNavWidth = "{{ left_nav_width | e }}";
     window.chatAIBase = "{{ chat_aibase | e }}";
+
+    const topTopHoverImage = new Image();
+    topTopHoverImage.src = "{{ pathto('_static/image/totop-hover.png', 1) }}";
+    const aiaskHoverImage = new Image();
+    aiaskHoverImage.src = "{{ pathto('_static/image/aiask-hover.png', 1) }}";
 </script>
 {% endblock %}
 
@@ -22,7 +27,7 @@
         <img class="img-in-modal" id="imgInModal">
     </div>
 
-    <div id="back-to-top" onclick="backToTop()">↑</div>
+    <div id="back-to-top" onclick="backToTop()"></div>
 {% endblock %}
 
 
