@@ -58,7 +58,6 @@ l3_model_t *l3_create_model(void                 *desc_addr,
     l3_description_t *desc = l3_load_description((void *)desc_addr);
 
     l3_model_t *this = l3_malloc(sizeof(l3_model_t));
-    assert(this != NULL);
     memset(this, 0x00, sizeof(l3_model_t));
 
     this->x = x;
