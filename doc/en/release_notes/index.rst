@@ -1,5 +1,5 @@
 ==================
-SDK Release Notes
+Release Notes
 ==================
 
 .. toctree::

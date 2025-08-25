@@ -242,7 +242,7 @@ static void applist_app(gui_view_t *view)
     // App1
     l3_model_t *app1 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
                                        app_positions[1].pos_x, app_positions[1].pos_y, 200, 200);
-    l3_set_face_image(app1, 5, ALIPAY_BIN);
+    l3_set_face_image(app1, 5, FILM_BIN);
     app_3d_list[1] = gui_lite3d_create(obj, "app1", app1, 0, 0, 0, 0);
 
     // App2
@@ -254,7 +254,7 @@ static void applist_app(gui_view_t *view)
     // App3
     l3_model_t *app3 = l3_create_model(DESC_APP_BIN, L3_DRAW_FRONT_ONLY,
                                        app_positions[3].pos_x, app_positions[3].pos_y, 200, 200);
-    l3_set_face_image(app3, 5, QQ_BIN);
+    l3_set_face_image(app3, 5, MAIL_BIN);
     app_3d_list[3] = gui_lite3d_create(obj, "app3", app3, 0, 0, 0, 0);
 
     // App4
