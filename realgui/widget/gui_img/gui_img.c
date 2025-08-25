@@ -987,7 +987,8 @@ void gui_img_set_tp_block(gui_img_t *this, bool block)
 #define DEFAULT_TRANSFORM_T_Y 0
 static struct gui_img_transform *get_transform(gui_img_t *this)
 {
-    GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
+    //GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
+    if (!(((gui_obj_t *)this)->type == IMAGE_FROM_MEM)) { gui_assert_handler("GUI_BASE(this)->type == IMAGE_FROM_MEM", __FUNCTION__, 990); }
     if (this->transform == 0)
     {
         this->transform = gui_malloc(sizeof(*this->transform));
@@ -1003,7 +1004,9 @@ static struct gui_img_transform *get_transform(gui_img_t *this)
             this->transform->t_y     = DEFAULT_TRANSFORM_T_Y;
         }
     }
-    GUI_ASSERT(this->transform)
+    //GUI_ASSERT(this->transform)
+    if (!(this->transform)) { gui_assert_handler("this->transform", __FUNCTION__, 1007); }
+    this->simple = 0;
     return this->transform;
 }
 void gui_img_rotation(gui_img_t *this,

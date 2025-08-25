@@ -323,3 +323,778 @@ void cmd_return_home(void)
 GUI_EXPORT_CMD(return_home, cmd_return_home);
 #endif
 #endif
+
+static int button_hover_index;
+static char *button_hover_group_name;
+static unsigned char main_page_hover_index = 0;
+static unsigned char tv_main_page_hover_index = 0;
+static void gui_obj_tree_count_by_type_and_group(gui_obj_t *obj, T_OBJ_TYPE type, int *count,
+                                                 const char *group_name);
+static void get_first_active_radio(gui_obj_t *obj, gui_obj_t **rst);
+static int gui_page_tree_get_radio_gap(gui_obj_t *page, gui_obj_t **top_radio_window);
+int rvd_get_button_hover_index()
+{
+    return button_hover_index;
+}
+void rvd_set_button_hover_index(int index)
+{
+    button_hover_index = index;
+}
+gui_app_t *get_current_rvd_app(void)
+{
+    extern void *get_app_xml(void);
+    gui_app_t *app = get_app_xml();
+    // Verify if app matches current GUI context
+    if (app != gui_current_app())
+    {
+        return 0;
+    }
+    else
+    {
+        return app;
+    }
+}
+static void obj_tree_get_widget_by_type_and_index(gui_obj_t *root,
+                                                  T_OBJ_TYPE type, gui_obj_t **output, int index, int *count, int *flag, const char *group_name)
+{
+    if (!root)
+    {
+        return;
+    }
+
+    if (*flag)
+    {
+        return;
+    }
+
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &root->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, root);
+            gui_log("@name:%s, @type:%d\n", root->name, root->type);
+            return;
+        }
+        if (obj->not_show == 1)
+        {
+            continue;
+        }
+        if (type == obj->type &&
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name))
+        {
+            if (index == *count)
+            {
+                *output = obj;
+                *flag = 1;
+                return;
+            }
+            (*count)++;
+            //gui_log("%d,%d\n", *count, index);
+        }
+
+        obj_tree_get_widget_by_type_and_index(obj, type, output, index, count, flag, group_name);
+    }
+}
+static void radio_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
+                                               int index, const char *group_name)
+{
+    int count = 0;
+    int flag = 0;
+    obj_tree_get_widget_by_type_and_index(root, type, output, index, &count, &flag, group_name);
+}
+int rvd_click_button()
+{
+    gui_log("rvd_click_button%d\n", button_hover_index);
+    gui_win_t *win = 0;
+    gui_app_t *app = get_current_rvd_app();
+    if (!app)
+    {
+        return GUI_ERROR_NULL;
+    }
+    // Get root screen object
+    gui_obj_t *screen = &(app->screen);
+    gui_obj_t *rst = 0;
+    get_first_active_radio(screen, &rst);
+    if (rst == 0)
+    {
+        /* code */
+        return GUI_ERROR_NULL;
+    }
+    radio_get_widget_by_type_and_index((gui_obj_t *)get_current_rvd_app(), RADIO, (void *)&win,
+                                       button_hover_index, button_hover_group_name);
+    if (!win)
+    {
+        return GUI_ERROR_NULL;
+    }
+    radio_t *param = win->animate->p;
+    //param->img->data = (void *)param->pic;
+    param->click = 1;
+    return GUI_SUCCESS;
+}
+int rvd_hover_button(int index, int button_count)
+{
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    if (0 > index)
+    {
+        index = button_count - 1;
+    }
+    if (button_count <= index)
+    {
+        index = 0;
+    }
+    gui_log("rvd_hover_button%d\n", index);
+    gui_win_t *win = 0;
+    radio_get_widget_by_type_and_index((gui_obj_t *)get_current_rvd_app(), RADIO, (void *)&win,
+                                       button_hover_index, button_hover_group_name);
+    if (!win)
+    {
+        return GUI_ERROR_NULL;
+    }
+
+    radio_t *param = win->animate->p;
+    //param->img->data = (void *)param->pic;
+    //param->hover = 1;
+    extern void rvd_win_radio_hover(gui_obj_t *obj);
+    rvd_win_radio_hover((void *)win);
+    // if (GUI_STRINGS_EQUAL(param->radio_name, "RadioButtonGroup4"))
+    // {
+    //     main_page_hover_index = index;
+    // }
+    // else if (GUI_STRINGS_EQUAL(param->radio_name, "RadioButton"))
+    // {
+    //     tv_main_page_hover_index = index;
+    // }
+
+    return GUI_SUCCESS;
+}
+static int rvd_hover_down_default()
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index++;
+    if (button_count <= button_hover_index)
+    {
+        button_hover_index = 0;
+        // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+        // if (obj)
+        // {
+        //     gui_tabview_t *tabview = (void *)obj;
+        //     if (tabview->cur_id.x == 0 && tabview->cur_id.y == 0)
+        //     {
+        //         gui_tabview_jump_tab(tabview, 0, 1);
+        //     }
+
+        // }
+    }
+    gui_log("rvd_hover_down_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+
+static int rvd_hover_page(gui_page_t *page)
+{
+    gui_obj_t *radio_win = 0;
+    int gap = gui_page_tree_get_radio_gap((void *)page, &radio_win);
+    gui_log("rvd_hover_page%d\n", gap);
+    int radio_h = radio_win->h;
+    int screen_h = gui_get_screen_height();
+    int active_radio_count = (screen_h - radio_win->x) / gap;
+    page->gesture_flag = 1;
+    if (active_radio_count <= button_hover_index)
+    {
+        gui_page_set_offset(page, -(button_hover_index - active_radio_count + 1)*gap);
+    }
+    else
+    {
+        gui_page_set_offset(page, 0);
+    }
+    return 0;
+}
+
+#define INVALID_INDEX UINT8_MAX
+//static unsigned char  digit_tab_grid[4][3] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {INVALID_INDEX, 9, 10}};
+//static unsigned char  play_tab_grid[3][3] = {{0, 1, 2}, {3, 4, INVALID_INDEX}, {5, 5, 5}};
+static int rvd_hover_down_grid(unsigned char grid_index[][3], unsigned char grid_row,
+                               unsigned char grid_col)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+
+    //search the hover index in grid
+    int grid_x = 0, grid_y = 0;
+    for (int i = 0; i < grid_row; i++)
+    {
+        for (int j = 0; j < grid_col; j++)
+        {
+            if (grid_index[i][j] == button_hover_index)
+            {
+                grid_x = i;
+                grid_y = j;
+                break;
+            }
+        }
+    }
+    for (size_t i = 0; i < grid_row; i++)
+    {
+        grid_x++;
+        if (grid_row <= grid_x)
+        {
+            grid_x = 0;
+        }
+        int button_hover_index_temp = grid_index[grid_x][grid_y];
+        if (button_hover_index_temp != INVALID_INDEX)
+        {
+            button_hover_index = button_hover_index_temp;
+            break;
+        }
+
+    }
+    gui_log("rvd_hover_down_grid_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+static int rvd_hover_up_grid(unsigned char grid_index[][3], unsigned char grid_row,
+                             unsigned char grid_col)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+
+    //search the hover index in grid
+    int grid_x = 0, grid_y = 0;
+    for (int i = 0; i < grid_row; i++)
+    {
+        for (int j = 0; j < grid_col; j++)
+        {
+            if (grid_index[i][j] == button_hover_index)
+            {
+                grid_x = i;
+                grid_y = j;
+                break;
+            }
+        }
+    }
+
+    int button_hover_index_temp  = INVALID_INDEX;
+    for (size_t i = 0; i < grid_row; i++)
+    {
+        grid_x--;
+        if (grid_row <= grid_x)
+        {
+            grid_x = 0;
+        }
+        else if (grid_x < 0)
+        {
+            grid_x = grid_row - 1;
+        }
+
+        int button_hover_index_temp = grid_index[grid_x][grid_y];
+        if (button_hover_index_temp != INVALID_INDEX)
+        {
+            button_hover_index = button_hover_index_temp;
+            break;
+        }
+
+    }
+    gui_log("rvd_hover_down_grid_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+
+/**
+ * @brief Retrieves the current tab from the specified tabview.
+ *
+ * This function iterates through the child list of the given tabview object to find a tab
+ * that matches the current tab ID (both x and y coordinates). If a matching tab is found,
+ * it is returned. If the tabview is NULL or no matching tab is found, the function returns NULL.
+ *
+ * @param tabview Pointer to the tabview from which to retrieve the current tab.
+ * @return Pointer to the current gui_tab_t if found, otherwise NULL.
+ */
+
+static gui_tab_t *gui_tabview_get_current_tab(gui_tabview_t *tabview)
+{
+    if (tabview == NULL)
+    {
+        return NULL;
+    }
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_obj_t *root = (void *)tabview;
+    gui_list_for_each_safe(node, tmp, &root->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, root);
+            gui_log("@name:%s, @type:%d\n", root->name, root->type);
+            return NULL;
+        }
+        if (obj->type == TAB)
+        {
+            gui_tab_t *tab = GUI_TYPE(gui_tab_t, obj);
+            if (tab->id.x == tabview->cur_id.x && tab->id.y == tabview->cur_id.y)
+            {
+                return tab;
+            }
+        }
+    }
+    gui_log("gui_tabview_get_current_tab fail\n");
+    return NULL;
+}
+
+int rvd_hover_down_button()
+{
+    // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    //  gui_tabview_t *tabview = (void *)obj;
+    // gui_tab_t *cur_tab = gui_tabview_get_current_tab(tabview);
+    // //GUI_WIDGET_POINTER_BY_TYPE_LOG(page_obj, PAGE, cur_tab);
+    // { if (cur_tab == ((void *)0)) { gui_log("%s, %d, obj is NULL\n", __FUNCTION__, 15578); } else if (((gui_obj_t *)cur_tab)->magic != 0x0b) { gui_log("%s, %d, obj magic is invalid %p\n", __FUNCTION__, 15578, (void *)cur_tab); } } gui_obj_t *page_obj = 0; extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE , gui_obj_t **); gui_obj_tree_get_widget_by_type(cur_tab, PAGE, &page_obj); { if (page_obj == ((void *)0)) { gui_log("%s, %d, obj is NULL\n", __FUNCTION__, 15578); } else if (((gui_obj_t *)page_obj)->magic != 0x0b) { gui_log("%s, %d, obj magic is invalid %p\n", __FUNCTION__, 15578, (void *)page_obj); } }
+    // if (page_obj)
+    // {
+    //      rvd_hover_down_default();
+    //      return rvd_hover_page(page_obj);
+    // }
+
+    // if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    // {
+    //     return rvd_hover_down_grid(digit_tab_grid, 4, 3);
+    // }
+    // else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    // {
+    //     return rvd_hover_down_grid(play_tab_grid, 3, 3);
+    // }
+    // else
+    {
+        return rvd_hover_down_default();
+    }
+}
+
+int rvd_hover_button_by_index(int index)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index = index;
+    if (button_count <= button_hover_index)
+    {
+        button_hover_index = 0;
+        // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+        // if (obj)
+        // {
+        //     gui_tabview_t *tabview = (void *)obj;
+        //     if (tabview->cur_id.x == 0 && tabview->cur_id.y == 0)
+        //     {
+        //         gui_tabview_jump_tab(tabview, 0, 1);
+        //     }
+
+        // }
+    }
+    gui_log("rvd_hover_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+int rvd_hover_button_by_range_ahead(int start, int end)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    if (start < 0 || end < 0 || start > end || end > button_count || start > button_count)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index++;
+    if (button_hover_index < start)
+    {
+        button_hover_index = start;
+    }
+    if (button_hover_index > end)
+    {
+        button_hover_index = end;
+    }
+
+
+
+
+    gui_log("rvd_hover_button%d\n", button_hover_index);
+    int ret = rvd_hover_button(button_hover_index, button_count);
+
+    return ret;
+}
+int rvd_hover_button_by_range_back(int start, int end)
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    if (start < 0 || end < 0 || start > end || end > button_count || start > button_count)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index--;
+    if (button_hover_index < start)
+    {
+        button_hover_index = start;
+    }
+    if (button_hover_index > end)
+    {
+        button_hover_index = end;
+    }
+
+
+
+
+    gui_log("rvd_hover_button%d\n", button_hover_index);
+    int ret = rvd_hover_button(button_hover_index, button_count);
+
+    return ret;
+}
+//add default hover up func
+
+static int rvd_hover_up_default()
+{
+    int button_count = rvd_get_button_count();
+    if (button_count <= 0)
+    {
+        return GUI_ERROR;
+    }
+    button_hover_index--;
+    if (0 > button_hover_index)
+    {
+        button_hover_index = button_count - 1;
+        // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+        // if (obj)
+        // {
+        //     gui_tabview_t *tabview = (void *)obj;
+        //     if (tabview->cur_id.x == 0 && tabview->cur_id.y == 1)
+        //     {
+        //         gui_tabview_jump_tab(tabview, 0, 0);
+        //     }
+
+        // }
+    }
+    gui_log("rvd_hover_up_button%d\n", button_hover_index);
+    return rvd_hover_button(button_hover_index, button_count);
+}
+int rvd_hover_up_button()
+{
+    // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    // gui_tabview_t *tabview = (void *)obj;
+    // if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    // {
+    //     return rvd_hover_up_grid(digit_tab_grid, 4, 3);
+    // }
+    // else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    // {
+    //     return rvd_hover_up_grid(play_tab_grid, 3, 3);
+    // }
+    // else
+
+    //  GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    //  gui_tabview_t *tabview = (void *)obj;
+    // gui_tab_t *cur_tab = gui_tabview_get_current_tab(tabview);
+    // //GUI_WIDGET_POINTER_BY_TYPE_LOG(page_obj, PAGE, cur_tab);
+    // { if (cur_tab == ((void *)0)) { gui_log("%s, %d, obj is NULL\n", __FUNCTION__, 15578); } else if (((gui_obj_t *)cur_tab)->magic != 0x0b) { gui_log("%s, %d, obj magic is invalid %p\n", __FUNCTION__, 15578, (void *)cur_tab); } } gui_obj_t *page_obj = 0; extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE , gui_obj_t **); gui_obj_tree_get_widget_by_type(cur_tab, PAGE, &page_obj); { if (page_obj == ((void *)0)) { gui_log("%s, %d, obj is NULL\n", __FUNCTION__, 15578); } else if (((gui_obj_t *)page_obj)->magic != 0x0b) { gui_log("%s, %d, obj magic is invalid %p\n", __FUNCTION__, 15578, (void *)page_obj); } }
+    // if (page_obj)
+    // {
+    //      rvd_hover_up_default();
+    //      return rvd_hover_page(page_obj);
+    // }
+
+    {
+        return rvd_hover_up_default();
+    }
+}
+int rvd_get_main_page_hover_index()
+{
+    return main_page_hover_index;
+}
+int rvd_get_tv_main_page_hover_index()
+{
+    return tv_main_page_hover_index;
+}
+static
+void rvd_click_back_sync()
+{
+    // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0")
+    // if (obj)
+    // {
+    //     gui_tabview_t *tabview = (void *)obj;
+
+    //      if ((tabview->cur_id.x == 0 && tabview->cur_id.y == 1))
+    //     {
+    //         gui_tabview_jump_tab(tabview, 0, 0);
+    //         gui_log("rvd_click_back%d, %d\n", tabview->last_id.x, tabview->last_id.y);
+    //         rvd_hover_button_by_index(0);
+    //     }
+    //     else if (!(tabview->cur_id.x == 2 && tabview->cur_id.y == 0))
+    //     {
+    //         gui_tabview_jump_tab(tabview, 2, 0);
+    //         gui_log("rvd_click_back%d, %d\n", tabview->last_id.x, tabview->last_id.y);
+    //         rvd_hover_button_by_index(main_page_hover_index);
+    //     }
+
+    // }
+}
+
+void rvd_click_back()
+{
+    //  gui_msg_t msg =
+    // {
+    //     .event = GUI_EVENT_USER_DEFINE,
+    //     .payload = 0,
+    //     .cb = rvd_click_back_sync,
+    // };
+    // // Send message to GUI server
+    // extern bool gui_send_msg_to_server(gui_msg_t *msg);
+    // gui_send_msg_to_server(&msg);
+    rvd_click_back_sync();
+
+}
+
+void rvd_hover_right()
+{
+    // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    // gui_tabview_t *tabview = (void *)obj;
+
+    // if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    // {
+    //     int index = rvd_get_button_hover_index();
+    //     gui_log("rvd_click_right%d\n", index);
+    //     if (index < 0)
+    //     {
+    //         return;
+    //     }
+    //     if (index >= 0 && index <= 2)
+    //     {
+    //         rvd_hover_button_by_range_ahead(0, 2);
+    //     }
+    //     else if (index >= 3 && index <= 5)
+    //     {
+    //         rvd_hover_button_by_range_ahead(3, 5);
+    //     }
+    //     else if (index >= 6 && index <= 8)
+    //     {
+    //         rvd_hover_button_by_range_ahead(6, 8);
+    //     }
+    //     else if (index >= 9 && index <= 10)
+    //     {
+    //         rvd_hover_button_by_range_ahead(9, 10);
+    //     }
+
+    // }
+    // else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    // {
+    //     int index = rvd_get_button_hover_index();
+    //     gui_log("rvd_click_right%d\n", index);
+    //     if (index < 0)
+    //     {
+    //         return;
+    //     }
+    //     if (index >= 0 && index <= 2)
+    //     {
+    //         rvd_hover_button_by_range_ahead(0, 2);
+    //     }
+    //     else if (index >= 3 && index <= 4)
+    //     {
+    //         rvd_hover_button_by_range_ahead(3, 4);
+    //     }
+    //     else if (index >= 6 && index <= 6)
+    //     {
+    //         rvd_hover_button_by_range_ahead(6, 6);
+    //     }
+
+
+    // }
+
+}
+void rvd_hover_left()
+{
+    // GUI_WIDGET_POINTER_BY_NAME(obj, "tabview0");
+    // gui_tabview_t *tabview = (void *)obj;
+
+    // if (tabview->cur_id.x == 1 && tabview->cur_id.y == 0)
+    // {
+    //     int index = rvd_get_button_hover_index();
+    //     gui_log("rvd_click_right%d\n", index);
+    //     if (index < 0)
+    //     {
+    //         return;
+    //     }
+    //     if (index >= 0 && index <= 2)
+    //     {
+    //         rvd_hover_button_by_range_back(0, 2);
+    //     }
+    //     else if (index >= 3 && index <= 5)
+    //     {
+    //         rvd_hover_button_by_range_back(3, 5);
+    //     }
+    //     else if (index >= 6 && index <= 8)
+    //     {
+    //         rvd_hover_button_by_range_back(6, 8);
+    //     }
+    //     else if (index >= 9 && index <= 10)
+    //     {
+    //         rvd_hover_button_by_range_back(9, 10);
+    //     }
+
+    // }
+    // else if (tabview->cur_id.x == 4 && tabview->cur_id.y == 0)
+    // {
+    //     int index = rvd_get_button_hover_index();
+    //     gui_log("rvd_click_right%d\n", index);
+    //     if (index < 0)
+    //     {
+    //         return;
+    //     }
+    //     if (index >= 0 && index <= 2)
+    //     {
+    //         rvd_hover_button_by_range_back(0, 2);
+    //     }
+    //     else if (index >= 3 && index <= 4)
+    //     {
+    //         rvd_hover_button_by_range_back(3, 4);
+    //     }
+    //     else if (index >= 6 && index <= 6)
+    //     {
+    //         rvd_hover_button_by_range_back(6, 6);
+    //     }
+
+
+    // }
+}
+static void gui_obj_tree_count_by_type_and_group(gui_obj_t *obj, T_OBJ_TYPE type, int *count,
+                                                 const char *group_name)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
+        if (obj->not_show == 1)
+        {
+            continue;
+        }
+
+        if (obj->type == type &&
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name))
+        {
+            (*count)++;
+        }
+
+        gui_obj_tree_count_by_type_and_group(obj, type, count, group_name);
+    }
+}
+
+static int gui_page_tree_get_radio_gap(gui_obj_t *page, gui_obj_t **top_radio_window)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = page;
+    gui_obj_t *obj = page;
+    int gap = 0;
+    int i = 0;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return gap;
+        }
+        if (obj->not_show == 1)
+        {
+            continue;
+        }
+
+        if (obj->type == RADIO /*&&
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name)*/)
+        {
+            if (i < 2)
+            {
+                gap = obj->y - gap;
+                if (i == 0)
+                {
+                    *top_radio_window = obj;
+                }
+            }
+            else { return gap; }
+
+        }
+        i++;
+    }
+}
+
+static void get_first_active_radio(gui_obj_t *obj, gui_obj_t **rst)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *child = gui_list_entry(node, gui_obj_t, brother_list);
+        if (child->magic != GUI_MAGIC_NUMBER || child->not_show == 1)
+        {
+            continue;
+        }
+        if (child->type == RADIO)
+        {
+            *rst = child;
+            button_hover_group_name = ((radio_t *)(GUI_TYPE(gui_win_t, child)->animate->p))->radio_name;
+            return;
+        }
+        get_first_active_radio(child, rst);
+    }
+}
+
+int rvd_get_button_count()
+{
+    int button_count = 0;
+    // Get current application handle
+    extern void *get_app_xml(void);
+    gui_app_t *app = get_app_xml();
+    // Verify if app matches current GUI context
+    if (app != gui_current_app())
+    {
+        return 0;
+    }
+    // Get root screen object
+    gui_obj_t *screen = &(app->screen);
+    gui_obj_t *rst = 0;
+    get_first_active_radio(screen, &rst);
+    if (rst == 0)
+    {
+        /* code */
+        return 0;
+    }
+
+    gui_obj_tree_count_by_type_and_group(screen, RADIO, &button_count, ((radio_t *)(GUI_TYPE(gui_win_t,
+                                                                                    rst)->animate->p))->radio_name);
+    gui_log("rvd_get_button_count%d\n", button_count);
+    return button_count;
+}
+

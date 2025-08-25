@@ -28,6 +28,34 @@ void gui_server_msg_init(void)
     gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(gui_msg_t), 16);
 }
 
+static bool gui_server_sleep_flag = 0;
+/**
+ * @brief Sets the sleep flag for the GUI server, indicating that it should sleep.
+ *
+ * When the sleep flag is set, the GUI server will not process any messages or
+ * update the screen until the flag is cleared by calling gui_server_turnon().
+ */
+void gui_server_turnoff(void)
+{
+    gui_server_sleep_flag = 1;
+}
+/**
+ * @brief Turns on the GUI server and sends a display-on event.
+ *
+ * This function clears the sleep flag for the GUI server and sends a
+ * GUI_EVENT_DISPLAY_ON message to the server to indicate that the display
+ * should be turned on.
+ */
+
+void gui_server_turnon(void)
+{
+    gui_server_sleep_flag = 0;
+    extern bool gui_send_msg_to_server(gui_msg_t *msg);
+    gui_msg_t msg;
+    msg.event = GUI_EVENT_DISPLAY_ON;
+    gui_send_msg_to_server(&msg);
+
+}
 void gui_recv_msg_to_server(void)
 {
     gui_msg_t msg;
@@ -38,7 +66,7 @@ void gui_recv_msg_to_server(void)
         gui_server_msg_handler(&msg);
     }
 #ifndef _WIN32
-    if ((gui_ms_get() - app->start_ms) > app->active_ms)
+    if (((gui_ms_get() - app->start_ms) > app->active_ms) || gui_server_sleep_flag)
     {
         gui_sleep_cb();
         if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))

@@ -142,18 +142,11 @@ static void *port_malloc(uint32_t n)
 int (*write_to_file)(const void *buf, size_t len) = NULL;
 static void port_log(const char *format, ...)
 {
-    va_list args;
-    va_start(args, format);
-    char buf[2048];
-    vsnprintf(buf, sizeof(buf), format, args);
-
-    printf("[GUI MODULE]%s", buf);
+    printf("[GUI MODULE]%s", format);
     if (write_to_file != NULL)
     {
-        write_to_file(buf, strlen(buf));
+        write_to_file(format, strlen(format));
     }
-
-    va_end(args);
 }
 
 static void *port_realloc(void *ptr, uint32_t n)
@@ -170,7 +163,7 @@ static void port_free(void *rmem)
 #define PORT_GUI_MEMHEAP_SIZE 1024*1024*10
 static uint8_t gui_memheap[PORT_GUI_MEMHEAP_SIZE] = {0};
 
-#define PORT_GUI_LOWER_MEMHEAP_SIZE 1024*1024*200
+#define PORT_GUI_LOWER_MEMHEAP_SIZE 1024*1024*500
 static uint8_t gui_lower_memheap[PORT_GUI_LOWER_MEMHEAP_SIZE] = {0};
 
 

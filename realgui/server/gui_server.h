@@ -25,7 +25,22 @@ bool gui_send_msg_to_server(gui_msg_t *msg);
 void gui_recv_msg_to_server(void);
 void gui_server_exec_cb(gui_msg_cb cb);
 void gui_task_ext_execution_sethook(void (*hook)(void));
+/**
+ * @brief Sets the sleep flag for the GUI server, indicating that it should sleep.
+ *
+ * When the sleep flag is set, the GUI server will not process any messages or
+ * update the screen until the flag is cleared by calling gui_server_turnon().
+ */
+void gui_server_turnoff(void);
+/**
+ * @brief Turns on the GUI server and sends a display-on event.
+ *
+ * This function clears the sleep flag for the GUI server and sends a
+ * GUI_EVENT_DISPLAY_ON message to the server to indicate that the display
+ * should be turned on.
+ */
 
+void gui_server_turnon(void);
 #ifdef __cplusplus
 }
 #endif
