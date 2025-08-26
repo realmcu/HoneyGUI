@@ -43,6 +43,11 @@
 /*Thai*/
 #define THAI_ALPHABET_BASE_CODE        0x0E01
 #define THAI_ALPHABET_END_CODE         0x0E5B
+
+/*Hebrew*/
+#define HEBREW_ALPHABET_BASE_CODE      0x0590
+#define HEBREW_ALPHABET_END_CODE       0x05FF
+
 /*============================================================================*
  *                           Variables
  *============================================================================*/
@@ -607,6 +612,13 @@ static void update_thai_char_position(mem_char_t *base_chr, mem_char_t *mark_chr
     }
 }
 
+/*Hebrew*/
+static bool is_hebrew_unicode(uint32_t c)
+{
+    return (c >= HEBREW_ALPHABET_BASE_CODE) && (c <= HEBREW_ALPHABET_END_CODE);
+}
+
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -1027,6 +1039,33 @@ uint32_t post_process_thai_char_struct(mem_char_t *chr, uint32_t base_count, uin
     memcpy(chr, original_chr, sizeof(mem_char_t) * (base_count + mark_count));
     gui_free(original_chr);
     return active_len;
+}
+
+/*Hebrew*/
+bool content_has_hebrew_unicode(uint32_t *unicode_buf, uint32_t len)
+{
+    for (uint32_t i = 0; i < len; i++)
+    {
+        if (is_hebrew_unicode(unicode_buf[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool content_has_hebrew(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len)
+{
+    uint32_t *unicode_buf = NULL;
+    uint16_t unicode_len = 0;
+    bool has_hebrew = false;
+    unicode_len = process_content_by_charset(charset_type, content, len, &unicode_buf);
+    if (content_has_hebrew_unicode(unicode_buf, unicode_len))
+    {
+        has_hebrew = true;
+    }
+    gui_free(unicode_buf);
+    return has_hebrew;
 }
 
 

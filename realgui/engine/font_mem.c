@@ -470,7 +470,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     uint32_t font_len = text->font_len;
     uint32_t active_font_len = text->active_font_len;
     TEXT_MODE text_mode = text->mode;
-    bool wordwrap = text->wordwrap || text->arabic;
+    bool wordwrap = text->wordwrap || text->arabic || text->hebrew;
     bool need_rtl = false;
 
     if (text_mode >= RTL_RIGHT && text_mode <= RTL_MULTI_LEFT)

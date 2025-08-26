@@ -248,6 +248,28 @@ uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
 uint32_t post_process_thai_char_struct(mem_char_t *chr, uint32_t base_count, uint32_t active_base,
                                        uint32_t mark_count, THAI_MARK_INFO *marks);
 
+
+/**
+ * @brief Check if the content has any Hebrew Unicode characters.
+ *
+ * @param unicode_buf Unicode buffer to check.
+ * @param len Length of the Unicode buffer.
+ * @return true If the content has any Hebrew Unicode characters.
+ * @return false If the content does not have any Hebrew Unicode characters.
+ */
+bool content_has_hebrew_unicode(uint32_t *unicode_buf, uint32_t len);
+
+/**
+ * @brief Check if the content has any Hebrew Unicode characters.
+ *
+ * @param charset_type The charset type of the content.
+ * @param content Input content to be checked.
+ * @param len Length of the input content in bytes.
+ * @return true If the content has any Hebrew Unicode characters.
+ * @return false If the content does not have any Hebrew Unicode characters.
+ */
+bool content_has_hebrew(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len);
+
 #ifdef __cplusplus
 }
 #endif

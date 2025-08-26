@@ -176,6 +176,17 @@ static void thai_render_test(void)
     gui_text_type_set(single_text, fontnotothai, FONT_SRC_MEMADDR);
     gui_text_mode_set(single_text, MULTI_LEFT);
 }
+static void hebrew_render_test(void)
+{
+    char *test_text =
+        "לא יהא אדם נתון להתערבות שרירותית בחייו הפרטיים, במשפחתו, במעונו, בחליפת מכתבים שלו ולא לפגיעה בכבודו או בשמו הפוב כל אדם זכאי להגנת החוק בפני התערבות או פגיעה באלה כל אדם זכאי לחירות המחשבה, המצפון והדת;";
+
+    single_text = gui_text_create(gui_obj_get_root(), "text", 0, 0, 0, 0);
+    gui_text_set(single_text, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                 FONT_SIZE);
+    gui_text_type_set(single_text, fontnotohebrew, FONT_SRC_MEMADDR);
+    gui_text_mode_set(single_text, RTL_MULTI_RIGHT);
+}
 
 static void return_language_list(void *obj, gui_event_t e, void *param)
 {
@@ -207,6 +218,10 @@ static void single_language_test(void *obj, gui_event_t e, void *param)
     {
         thai_render_test();
     }
+    else if (strcmp(isoCode, "he") == 0)
+    {
+        hebrew_render_test();
+    }
 }
 
 static void note_design(gui_obj_t *obj, void *p)
@@ -237,7 +252,8 @@ static void note_design(gui_obj_t *obj, void *p)
     if (strcmp(isoCode, "ar") == 0
         || strcmp(isoCode, "en") == 0
         || strcmp(isoCode, "zh") == 0
-        || strcmp(isoCode, "th") == 0)
+        || strcmp(isoCode, "th") == 0
+        || strcmp(isoCode, "he") == 0)
     {
         gui_obj_add_event_cb(obj, single_language_test, GUI_EVENT_TOUCH_CLICKED, NULL);
         gui_text_color_set(localname, APP_COLOR_CRIMSON);

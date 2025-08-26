@@ -128,6 +128,7 @@ typedef struct gui_text
     bool scope            : 1;
     bool arabic           : 1;
     bool thai             : 1;
+    bool hebrew           : 1;
     uint8_t rendermode    : 2;
 } gui_text_t;
 

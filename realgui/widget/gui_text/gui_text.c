@@ -480,7 +480,7 @@ void gui_text_ctor(gui_text_t *this,
     this->use_img_blit = true;
 }
 
-static TEXT_MODE transfer_to_arabic_mode(TEXT_MODE mode)
+static TEXT_MODE transfer_to_rtl_mode(TEXT_MODE mode)
 {
     switch (mode)
     {
@@ -498,6 +498,39 @@ static TEXT_MODE transfer_to_arabic_mode(TEXT_MODE mode)
         return RTL_MULTI_RIGHT;
     default:
         return mode;
+    }
+}
+
+static void gui_text_multilanguage_check(gui_text_t *this)
+{
+    uint32_t *unicode_buf = NULL;
+    uint16_t unicode_len = 0;
+    unicode_len = process_content_by_charset(this->charset, this->content, this->len, &unicode_buf);
+    if (unicode_len == 0)
+    {
+        if (unicode_buf)
+        {
+            gui_free(unicode_buf);
+        }
+        return;
+    }
+    if (content_has_ap_unicode(unicode_buf, unicode_len))
+    {
+        this->arabic = true;
+        this->mode = transfer_to_rtl_mode(this->mode);
+    }
+    else if (content_has_thai_unicode(unicode_buf, unicode_len))
+    {
+        this->thai = true;
+    }
+    else if (content_has_hebrew_unicode(unicode_buf, unicode_len))
+    {
+        this->hebrew = true;
+        this->mode = transfer_to_rtl_mode(this->mode);
+    }
+    if (unicode_buf)
+    {
+        gui_free(unicode_buf);
     }
 }
 /*============================================================================*
@@ -641,16 +674,8 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->layout_refresh = true;
     this->arabic = false;
     this->thai = false;
-
-    if (content_has_ap(this->charset, this->content, this->len))
-    {
-        this->arabic = true;
-        this->mode = transfer_to_arabic_mode(this->mode);
-    }
-    if (content_has_thai(this->charset, this->content, this->len))
-    {
-        this->thai = true;
-    }
+    this->hebrew = false;
+    gui_text_multilanguage_check(this);
 }
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
