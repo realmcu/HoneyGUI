@@ -480,6 +480,26 @@ void gui_text_ctor(gui_text_t *this,
     this->use_img_blit = true;
 }
 
+static TEXT_MODE transfer_to_arabic_mode(TEXT_MODE mode)
+{
+    switch (mode)
+    {
+    case LEFT:
+        return RTL_LEFT;
+    case CENTER:
+        return RTL_CENTER;
+    case RIGHT:
+        return RTL_RIGHT;
+    case MULTI_LEFT:
+        return RTL_MULTI_LEFT;
+    case MULTI_CENTER:
+        return RTL_MULTI_CENTER;
+    case MULTI_RIGHT:
+        return RTL_MULTI_RIGHT;
+    default:
+        return mode;
+    }
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -518,6 +538,11 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 void gui_text_input_set(gui_text_t *this, bool inputable)
 {
     this->inputable = inputable;
+}
+
+void gui_text_color_set(gui_text_t *this, gui_color_t color)
+{
+    this->color = color;
 }
 
 void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)
@@ -614,32 +639,17 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->char_line_sum = 0;
     this->content_refresh = true;
     this->layout_refresh = true;
+    this->arabic = false;
+    this->thai = false;
+
     if (content_has_ap(this->charset, this->content, this->len))
     {
         this->arabic = true;
-        switch (this->mode)
-        {
-        case LEFT:
-            this->mode = RTL_LEFT;
-            break;
-        case CENTER:
-            this->mode = RTL_CENTER;
-            break;
-        case RIGHT:
-            this->mode = RTL_RIGHT;
-            break;
-        case MULTI_LEFT:
-            this->mode = RTL_MULTI_LEFT;
-            break;
-        case MULTI_RIGHT:
-            this->mode = RTL_MULTI_RIGHT;
-            break;
-        case MULTI_CENTER:
-            this->mode = RTL_MULTI_CENTER;
-            break;
-        default:
-            break;
-        }
+        this->mode = transfer_to_arabic_mode(this->mode);
+    }
+    if (content_has_thai(this->charset, this->content, this->len))
+    {
+        this->thai = true;
     }
 }
 

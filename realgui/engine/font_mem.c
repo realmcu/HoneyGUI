@@ -464,7 +464,11 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
     int rect_w = rect->x2 - rect->x1 + 1;
     int rect_h = rect->y2 - rect->y1 + 1;
-
+    uint32_t char_width_sum = text->char_width_sum;
+    uint32_t char_height_sum = text->char_height_sum;
+    uint32_t char_line_sum = text->char_line_sum;
+    uint32_t font_len = text->font_len;
+    uint32_t active_font_len = text->active_font_len;
     TEXT_MODE text_mode = text->mode;
     bool wordwrap = text->wordwrap || text->arabic;
     bool need_rtl = false;
@@ -475,15 +479,23 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         need_rtl = true;
     }
 
+    THAI_MARK_INFO *mark_array_out = NULL;
+    uint32_t mark_count_out;
+    if (text->thai)
+    {
+        char_width_sum -= get_thai_mark_char_width(chr, font_len);
+        font_len = process_thai_char_struct(chr, font_len, &mark_array_out, &mark_count_out);
+    }
+
     switch (text_mode)
     {
     case LEFT:
     case CENTER:
     case RIGHT:
         {
-            text->char_line_sum = 1;
-            int offset = _UI_MAX((rect_w - text->char_width_sum) / 2, 0);
-            for (uint16_t i = 0; i < text->font_len; i++)
+            char_line_sum = 1;
+            int offset = _UI_MAX((rect_w - char_width_sum) / 2, 0);
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 chr[i].y = rect->y1;
                 if (i == 0)
@@ -496,7 +508,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
                 {
-                    text->active_font_len = i;
+                    active_font_len = i;
                     break;
                 }
             }
@@ -512,21 +524,20 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             int max_line = rect_h / chr[0].h + 1;
             int line_count;
 
-            text->char_line_sum = text->char_width_sum / rect_w + 1 + text->char_line_sum;
+            char_line_sum = char_width_sum / rect_w + 1 + char_line_sum;
             if (wordwrap)
             {
-                line_count = _UI_MAX(text->char_line_sum * 2, max_line);
+                line_count = _UI_MAX(char_line_sum * 2, max_line);
             }
             else
             {
-                line_count = _UI_MAX(text->char_line_sum, max_line);
+                line_count = _UI_MAX(char_line_sum, max_line);
             }
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
 
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < font_len; i++)
             {
-                // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
                 if (chr[i].unicode == 0x20)
                 {
                     last_space_index = i;
@@ -549,7 +560,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         chr[i].char_w = rect->x2 + 1 - chr[i].x;
                         continue;
                     }
-                    if (wordwrap && i != text->font_len - 1)
+                    if (wordwrap && i != font_len - 1)
                     {
                         i = last_space_index + 1;
                     }
@@ -569,16 +580,16 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].y = rect->y1 + line * chr[i].h;
                 if (chr[i].y + chr[i].h - 1 > rect->y2)
                 {
-                    text->active_font_len = i;
+                    active_font_len = i;
                     break;
                 }
             }
 
-            line_buf[line].line_char = text->active_font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->active_font_len - 1].x + rect->x1 -
-                                      chr[text->active_font_len - 1].char_w) / 2 * (text_mode - MULTI_LEFT);
+            line_buf[line].line_char = active_font_len - 1;
+            line_buf[line].line_dx = (rect_w - chr[active_font_len - 1].x + rect->x1 -
+                                      chr[active_font_len - 1].char_w) / 2 * (text_mode - MULTI_LEFT);
             line = 0;
-            for (uint16_t i = 0; i < text->active_font_len; i++)
+            for (uint16_t i = 0; i < active_font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
 
@@ -587,8 +598,8 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     line++;
                 }
             }
-            text->char_line_sum = line;
-            text->char_height_sum = line * chr[0].h;
+            char_line_sum = line;
+            char_height_sum = line * chr[0].h;
             gui_free(line_buf);
             break;
         }
@@ -603,19 +614,19 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             int max_line = rect_h / chr[0].h + 1;
             int line_count;
 
-            text->char_line_sum = text->char_width_sum / rect_w + 1 + text->char_line_sum;
+            char_line_sum = char_width_sum / rect_w + 1 + char_line_sum;
             if (wordwrap)
             {
-                line_count = _UI_MAX(text->char_line_sum * 2, max_line);
+                line_count = _UI_MAX(char_line_sum * 2, max_line);
             }
             else
             {
-                line_count = _UI_MAX(text->char_line_sum, max_line);
+                line_count = _UI_MAX(char_line_sum, max_line);
             }
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
 
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 if (chr[i].unicode == 0x20)
                 {
@@ -639,7 +650,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         chr[i].char_w = rect->x2 + 1 - chr[i].x;
                         continue;
                     }
-                    if (wordwrap && i != text->font_len - 1)
+                    if (wordwrap && i != font_len - 1)
                     {
                         i = last_space_index + 1;
                     }
@@ -659,18 +670,18 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].y = rect->y1 + line * chr[i].h;
                 if (chr[i].y + chr[i].h - 1 > rect->y2)
                 {
-                    text->active_font_len = i;
+                    active_font_len = i;
                     break;
                 }
             }
 
-            line_buf[line].line_char = text->active_font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->active_font_len - 1].x + rect->x1 -
-                                      chr[text->active_font_len - 1].char_w) / 2 * (text_mode - MID_LEFT);
-            text->char_height_sum = (line + 1) * chr[0].h;
-            offset_y = (rect_h - text->char_height_sum) / 2;
+            line_buf[line].line_char = active_font_len - 1;
+            line_buf[line].line_dx = (rect_w - chr[active_font_len - 1].x + rect->x1 -
+                                      chr[active_font_len - 1].char_w) / 2 * (text_mode - MID_LEFT);
+            char_height_sum = (line + 1) * chr[0].h;
+            offset_y = (rect_h - char_height_sum) / 2;
             line = 0;
-            for (uint16_t i = 0; i < text->active_font_len; i++)
+            for (uint16_t i = 0; i < active_font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
                 chr[i].y += offset_y;
@@ -679,15 +690,15 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     line++;
                 }
             }
-            text->char_line_sum = line;
+            char_line_sum = line;
             gui_free(line_buf);
             break;
         }
     case SCROLL_X:
     case SCROLL_X_REVERSE:
         {
-            text->char_line_sum = 1;
-            for (uint16_t i = 0; i < text->font_len; i++)
+            char_line_sum = 1;
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 chr[i].y = rect->y1;
                 if (i == 0)
@@ -700,7 +711,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 if (chr[i].x > rect->xboundright)
                 {
-                    text->active_font_len = i;
+                    active_font_len = i;
                     break;
                 }
             }
@@ -711,7 +722,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             uint32_t line = 0;
             int last_space_index = 0;
 
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 if (chr[i].unicode == 0x20)
                 {
@@ -733,7 +744,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                         chr[i].char_w = rect->x2 + 1 - chr[i].x;
                         continue;
                     }
-                    if (wordwrap && i != text->font_len - 1)
+                    if (wordwrap && i != font_len - 1)
                     {
                         i = last_space_index + 1;
                     }
@@ -746,24 +757,24 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     chr[i].x = rect->x1;
                 }
                 chr[i].y = rect->y1 + line * chr[i].h;
-                if (text->char_line_sum != 0)
+                if (char_line_sum != 0)
                 {
                     if (chr[i].y >= rect->yboundbottom)
                     {
-                        text->active_font_len = i;
+                        active_font_len = i;
                         break;
                     }
                 }
             }
-            if (text->char_line_sum == 0)
+            if (char_line_sum == 0)
             {
-                text->char_line_sum = line;
+                char_line_sum = line;
             }
             break;
         }
     case SCROLL_Y_REVERSE:
         {
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 chr[i].x = rect->x1;
                 if (i == 0)
@@ -780,7 +791,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case VERTICAL_LEFT:
         {
             uint32_t line = 0;
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 if (i == 0)
                 {
@@ -799,7 +810,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].x = rect->x1 - line * chr[i].w;
                 if (chr[i].x < 0)
                 {
-                    text->active_font_len = i;
+                    active_font_len = i;
                     break;
                 }
             }
@@ -808,7 +819,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case VERTICAL_RIGHT:
         {
             uint32_t line = 0;
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < font_len; i++)
             {
                 if (i == 0)
                 {
@@ -826,7 +837,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].x = rect->x1 + line * chr[i].w;
                 if (chr[i].x >= rect->x2)
                 {
-                    text->active_font_len = i;
+                    active_font_len = i;
                     break;
                 }
             }
@@ -838,12 +849,20 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 
     if (need_rtl)
     {
-        for (uint32_t i = 0; i < text->font_len; i++)
+        for (uint32_t i = 0; i < active_font_len; i++)
         {
             chr[i].x = rect->x1 + rect_w - (chr[i].x - rect->x1) - chr[i].char_w;
         }
     }
-
+    if (text->thai && mark_array_out)
+    {
+        active_font_len = post_process_thai_char_struct(chr, font_len, active_font_len, mark_count_out,
+                                                        mark_array_out);
+        gui_free(mark_array_out);
+    }
+    text->active_font_len = active_font_len;
+    text->char_height_sum = char_height_sum;
+    text->char_line_sum = char_line_sum;
     text->layout_refresh = false;
 }
 
@@ -973,7 +992,7 @@ void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data, int16_t 
             chr->emoji_img = gui_img_create_from_mem(text, "emoji", data, x, y, 0, 0);
             float x_sccle = (float)(chr->char_w) / (float)(text->emoji_size);
             float y_scale = (float)(chr->char_h) / (float)(text->emoji_size);
-            gui_img_scale(chr->emoji_img, x_sccle, y_scale);
+            gui_img_scale((gui_img_t *)chr->emoji_img, x_sccle, y_scale);
         }
     }
 }

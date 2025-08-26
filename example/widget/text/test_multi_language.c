@@ -240,6 +240,7 @@ static void note_design(gui_obj_t *obj, void *p)
         || strcmp(isoCode, "th") == 0)
     {
         gui_obj_add_event_cb(obj, single_language_test, GUI_EVENT_TOUCH_CLICKED, NULL);
+        gui_text_color_set(localname, APP_COLOR_CRIMSON);
     }
 }
 

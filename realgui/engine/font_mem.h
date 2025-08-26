@@ -26,23 +26,6 @@ typedef struct
     uint8_t char_h;
 } GUI_CHAR_HEAD;
 
-/** @brief  mem char struct start */
-typedef struct
-{
-    uint32_t unicode;
-    int16_t x;
-    int16_t y;
-    int16_t w;
-    int16_t h;
-    uint8_t char_y;
-    uint8_t char_w;
-    uint8_t char_h;
-    uint8_t *dot_addr;
-    uint8_t *buf;
-    gui_img_t *emoji_img;
-} mem_char_t;
-/** @brief  mem char struct end */
-
 typedef struct
 {
     uint8_t *font_file;

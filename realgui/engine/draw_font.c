@@ -7,7 +7,7 @@
   * @details Draw font
   * @author luke_sun@realsil.com.cn
   * @date 2025/08/12
-  * @version 1.0
+  * @version 1.1
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2025 Realtek Semiconductor Corporation</center></h2>
@@ -17,6 +17,7 @@
 /*============================================================================*
  *                           Header Files
  *============================================================================*/
+
 #include <guidef.h>
 #include <draw_font.h>
 #include <string.h>
@@ -24,19 +25,6 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
-typedef struct
-{
-    uint8_t char_offset;
-    uint16_t char_end_form;
-    int8_t char_beginning_form_offset;
-    int8_t char_middle_form_offset;
-    int8_t char_isolated_form_offset;
-    struct
-    {
-        uint8_t conj_to_previous;
-        uint8_t conj_to_next;
-    } ap_chars_conjunction;
-} ap_chars_map_t;
 
 /*============================================================================*
  *                           Constants
@@ -45,14 +33,20 @@ typedef struct
 /*============================================================================*
  *                           Macros
  *============================================================================*/
+
+/*Arabic and Persian*/
 #define UNDEF_ARABIC_PERSIAN_CHARS     (UINT32_MAX)
 #define AP_ALPHABET_BASE_CODE          0x0622
 #define AP_ALPHABET_END_CODE           0x06F9
 #define AP_END_CHARS_LIST              {0,0,0,0,0,{0,0}}
 
+/*Thai*/
+#define THAI_ALPHABET_BASE_CODE        0x0E01
+#define THAI_ALPHABET_END_CODE         0x0E5B
 /*============================================================================*
  *                           Variables
  *============================================================================*/
+
 const ap_chars_map_t ap_chars_map[] =
 {
     /*{Key Offset, End, Beginning, Middle, Isolated, {conjunction}}*/
@@ -494,6 +488,7 @@ static int find_first_emoji(const uint32_t *unicode_buf, uint32_t len)
 }
 
 /*Arabic/Persian function*/
+
 static bool is_ap_unicode(uint32_t c)
 {
     return (c >= AP_ALPHABET_BASE_CODE) && (c <= AP_ALPHABET_END_CODE);
@@ -558,9 +553,64 @@ static bool is_arabic_vowel(uint16_t c)
     return (c >= 0x064B) && (c <= 0x0652);
 }
 
+/*Thai function*/
+static bool is_thai_unicode(uint32_t c)
+{
+    return (c >= THAI_ALPHABET_BASE_CODE) && (c <= THAI_ALPHABET_END_CODE);
+}
+
+// static bool is_thai_base(uint32_t ch)
+// {
+//     return (ch >= 0x0E01 && ch <= 0x0E2E) || (ch == 0E32) || (ch == 0x0E33);
+// }
+
+static bool is_thai_above_char(uint32_t ch)
+{
+    return (ch == 0x0E31) ||
+           (ch >= 0x0E34 && ch <= 0x0E37) ||
+           (ch >= 0x0E47 && ch <= 0x0E4E);
+}
+static bool is_thai_below_char(uint32_t ch)
+{
+    return (ch >= 0x0E38 && ch <= 0x0E3A);
+}
+// static bool is_thai_left_char(uint32_t ch)
+// {
+//     return (ch >= 0x0E40 && ch <= 0x0E44);
+// }
+
+THAI_MARK_POS get_thai_mark_pos(uint32_t ch)
+{
+    if (is_thai_above_char(ch))
+    {
+        return THAI_ABOVE;
+    }
+    if (is_thai_below_char(ch))
+    {
+        return THAI_BELOW;
+    }
+    return THAI_NONE;
+}
+
+static void update_thai_char_position(mem_char_t *base_chr, mem_char_t *mark_chr,
+                                      uint32_t mark_count, THAI_MARK_INFO *marks)
+{
+    for (uint32_t i = 0; i < mark_count; i++)
+    {
+        uint32_t base_idx = marks[i].base_index - 1;
+        mark_chr[i].x = base_chr[base_idx].x + base_chr[base_idx].char_w - mark_chr[i].char_w;
+        mark_chr[i].y = base_chr[base_idx].y;
+        if (marks[i].mark_pos == THAI_TOPMOST)
+        {
+            mark_chr[i].y -= mark_chr[i].char_h;
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
 uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len,
                                     uint32_t **unicode_buf_ptr)
 {
@@ -817,4 +867,166 @@ uint32_t process_ap_unicode(uint32_t *unicode_buf, uint32_t unicode_len)
 
     return j;
 }
+
+bool content_has_thai_unicode(uint32_t *unicode_buf, uint32_t len)
+{
+    for (uint32_t i = 0; i < len; i++)
+    {
+        if (is_thai_unicode(unicode_buf[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool content_has_thai(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len)
+{
+    uint32_t *unicode_buf = NULL;
+    uint16_t unicode_len = 0;
+    bool has_thai = false;
+    unicode_len = process_content_by_charset(charset_type, content, len, &unicode_buf);
+    if (content_has_thai_unicode(unicode_buf, unicode_len))
+    {
+        has_thai = true;
+    }
+    gui_free(unicode_buf);
+    return has_thai;
+}
+
+uint32_t get_thai_mark_char_width(mem_char_t *chr, uint32_t char_count)
+{
+    uint32_t updated_width = 0;
+    for (uint16_t i = 0; i < char_count; i++)
+    {
+        if (get_thai_mark_pos(chr[i].unicode) != THAI_NONE)
+        {
+            updated_width += chr[i].char_w;
+        }
+    }
+    return updated_width;
+}
+
+uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
+                                  THAI_MARK_INFO **mark_array_out, uint32_t *mark_count_out)
+{
+    uint32_t base_count = 0;
+    uint32_t mark_count = 0;
+    int32_t last_base_idx = -1;
+    uint32_t above_count_for_curr_base = 0;
+
+    mem_char_t *processed_chr = gui_malloc(sizeof(mem_char_t) * unicode_len);
+    memset(processed_chr, 0, sizeof(mem_char_t) * unicode_len);
+
+    for (uint32_t i = 0; i < unicode_len; ++i)
+    {
+        THAI_MARK_POS pos = get_thai_mark_pos(chr[i].unicode);
+        if (pos == THAI_NONE)
+        {
+            last_base_idx = base_count;
+            base_count++;
+        }
+        else if (pos != THAI_NONE && last_base_idx >= 0)
+        {
+            mark_count++;
+        }
+    }
+
+    if (base_count + mark_count != unicode_len)
+    {
+        gui_log("Warning! process_thai_char_struct: base_count + mark_count != unicode_len");
+    }
+
+    THAI_MARK_INFO *marks = NULL;
+    if (mark_count > 0)
+    {
+        marks = (THAI_MARK_INFO *)gui_malloc(sizeof(THAI_MARK_INFO) * mark_count);
+        memset(marks, 0, sizeof(THAI_MARK_INFO) * mark_count);
+    }
+    else
+    {
+        *mark_array_out = NULL;
+        mark_count_out = 0;
+        gui_free(processed_chr);
+        return base_count;
+    }
+
+    uint32_t base_idx = 0;
+    uint32_t mark_idx = 0;
+    last_base_idx = -1;
+    above_count_for_curr_base = 0;
+
+    for (uint32_t i = 0; i < unicode_len; ++i)
+    {
+        uint32_t ch = chr[i].unicode;
+        THAI_MARK_POS pos = get_thai_mark_pos(ch);
+        if (pos == THAI_NONE)
+        {
+            last_base_idx = base_idx;
+            above_count_for_curr_base = 0;
+            memcpy(&processed_chr[base_idx], &chr[i], sizeof(mem_char_t));
+            base_idx++;
+        }
+        else if (last_base_idx >= 0 && marks && mark_idx < mark_count)
+        {
+            if (pos == THAI_ABOVE)
+            {
+                above_count_for_curr_base++;
+                if (above_count_for_curr_base > 1)
+                {
+                    pos = THAI_TOPMOST;
+                }
+            }
+            memcpy(&processed_chr[base_count + mark_idx], &chr[i], sizeof(mem_char_t));
+            marks[mark_idx].base_index   = base_idx;
+            marks[mark_idx].mark_unicode = ch;
+            marks[mark_idx].mark_pos     = pos;
+            mark_idx++;
+        }
+    }
+    *mark_array_out = marks;
+    *mark_count_out = mark_idx;
+
+    memcpy(chr, processed_chr, sizeof(mem_char_t) * unicode_len);
+    gui_free(processed_chr);
+
+    return base_count;
+}
+
+uint32_t post_process_thai_char_struct(mem_char_t *chr, uint32_t base_count, uint32_t active_base,
+                                       uint32_t mark_count, THAI_MARK_INFO *marks)
+{
+    mem_char_t *base_chr = chr;
+    mem_char_t *mark_chr = chr + base_count;
+
+    update_thai_char_position(base_chr, mark_chr, mark_count, marks);
+
+    mem_char_t *original_chr = gui_malloc(sizeof(mem_char_t) * (base_count + mark_count));
+    // memset(original_chr, 0, sizeof(mem_char_t) * (base_count + mark_count));
+
+    uint32_t active_len = 0;
+    uint32_t original_idx = 0;
+    for (uint32_t i = 0; i < mark_count; i++)
+    {
+        uint32_t part_base_count = marks[i].base_index - (original_idx - i);
+        memcpy(&original_chr[original_idx], &base_chr[original_idx - i],
+               sizeof(mem_char_t) * part_base_count);
+        original_idx += part_base_count;
+        memcpy(&original_chr[original_idx++], &base_chr[base_count + i], sizeof(mem_char_t));
+        if (marks[i].base_index <= active_base)
+        {
+            active_len = active_base + i;
+        }
+    }
+    int32_t tail_count = base_count + mark_count - original_idx;
+    if (tail_count > 0)
+    {
+        memcpy(&original_chr[original_idx], &base_chr[base_count - tail_count],
+               sizeof(mem_char_t) * tail_count);
+    }
+    memcpy(chr, original_chr, sizeof(mem_char_t) * (base_count + mark_count));
+    gui_free(original_chr);
+    return active_len;
+}
+
 

@@ -1,11 +1,39 @@
+/**
+ \internal
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file draw_font.h
+  * @brief Draw font header file.
+  * @details Draw font header file.
+  * @author luke_sun@realsil.com.cn
+  * @date 2025/08/14
+  * @version v1.1
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+ \endinternal
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __DRAW_FONT_H__
 #define __DRAW_FONT_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_api.h>
+
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
 
 /** @brief  text rect struct start */
 typedef struct gui_text_rect
@@ -20,6 +48,23 @@ typedef struct gui_text_rect
     int16_t yboundbottom;
 } gui_text_rect_t;
 /** @brief  text rect struct end */
+
+/** @brief  mem char struct start */
+typedef struct
+{
+    uint32_t unicode;
+    int16_t x;
+    int16_t y;
+    int16_t w;
+    int16_t h;
+    uint8_t char_y;
+    uint8_t char_w;
+    uint8_t char_h;
+    uint8_t *dot_addr;
+    uint8_t *buf;
+    void *emoji_img;
+} mem_char_t;
+/** @brief  mem char struct end */
 
 /** @brief  text encoding format enum */
 typedef enum
@@ -36,6 +81,55 @@ typedef enum
 
     UTF_32BE             = 4,
 } TEXT_CHARSET;
+
+typedef struct
+{
+    uint8_t char_offset;
+    uint16_t char_end_form;
+    int8_t char_beginning_form_offset;
+    int8_t char_middle_form_offset;
+    int8_t char_isolated_form_offset;
+    struct
+    {
+        uint8_t conj_to_previous;
+        uint8_t conj_to_next;
+    } ap_chars_conjunction;
+} ap_chars_map_t;
+
+typedef enum
+{
+    THAI_NONE = 0,
+    THAI_BELOW,
+    THAI_ABOVE,
+    THAI_TOPMOST,
+    THAI_LEFT,
+    THAI_RIGHT
+} THAI_MARK_POS;
+
+typedef struct
+{
+    uint32_t base_index;
+    uint32_t mark_unicode;
+    THAI_MARK_POS mark_pos;
+} THAI_MARK_INFO;
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
 
 /**
  * @brief Converts content from a specified charset to Unicode code points.
@@ -98,6 +192,61 @@ bool content_has_ap(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len);
  * @return uint32_t The length of the processed Unicode buffer.
  */
 uint32_t process_ap_unicode(uint32_t *unicode_buf, uint32_t unicode_len);
+
+/**
+ * @brief Check if the content has any Thai Unicode characters.
+ *
+ * @param unicode_buf Unicode buffer to check.
+ * @param len Length of the Unicode buffer.
+ * @return true If the content has any Thai Unicode characters.
+ * @return false If the content does not have any Thai Unicode characters.
+ */
+bool content_has_thai_unicode(uint32_t *unicode_buf, uint32_t len);
+
+/**
+ * @brief Check if the content has any Thai Unicode characters.
+ *
+ * @param charset_type The charset type of the content.
+ * @param content Input content to be checked.
+ * @param len Length of the input content in bytes.
+ * @return true If the content has any Thai Unicode characters.
+ * @return false If the content does not have any Thai Unicode characters.
+ */
+bool content_has_thai(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len);
+
+/**
+ * @brief Get the width sum of mark Thai characters.
+ *
+ * @param chr The memory character array.
+ * @param char_count The count of characters.
+ * @return uint32_t The width sum of Thai characters.
+ */
+uint32_t get_thai_mark_char_width(mem_char_t *chr, uint32_t char_count);
+
+/**
+ * @brief Process Thai character struct.
+ *
+ * @param chr The memory character array.
+ * @param unicode_len The length of the Unicode buffer.
+ * @param mark_array_out Pointer to the array that will hold the Thai mark information.
+ * @param mark_count_out Pointer to the variable that will hold the count of Thai marks.
+ * @return uint32_t The length of the processed base Thai Unicode buffer.
+ */
+uint32_t process_thai_char_struct(mem_char_t *chr, uint32_t unicode_len,
+                                  THAI_MARK_INFO **mark_array_out, uint32_t *mark_count_out);
+
+/**
+ * @brief Post process Thai character struct.
+ *
+ * @param chr The memory character array.
+ * @param base_count The count of base Thai characters.
+ * @param mark_count The count of mark Thai characters.
+ * @param active_base The count of active base Thai characters.
+ * @param marks The Thai mark information array.
+ * @return uint32_t Finally active length include base and mark.
+ */
+uint32_t post_process_thai_char_struct(mem_char_t *chr, uint32_t base_count, uint32_t active_base,
+                                       uint32_t mark_count, THAI_MARK_INFO *marks);
 
 #ifdef __cplusplus
 }

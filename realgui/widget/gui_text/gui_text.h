@@ -127,6 +127,7 @@ typedef struct gui_text
     bool wordwrap         : 1;
     bool scope            : 1;
     bool arabic           : 1;
+    bool thai             : 1;
     uint8_t rendermode    : 2;
 } gui_text_t;
 
@@ -221,6 +222,14 @@ void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
  * @param inputable Inputable.
  */
 void gui_text_input_set(gui_text_t *this_widget, bool inputable);
+
+/**
+ * @brief Set font color.
+ *
+ * @param this_widget The text box widget pointer.
+ * @param color The font color.
+ */
+void gui_text_color_set(gui_text_t *this_widget, gui_color_t color);
 
 /**
  * @brief By setting wordwrap to enable English word wrapping.
