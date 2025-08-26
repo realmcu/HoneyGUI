@@ -25,7 +25,7 @@
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
-                    width: 60%;
+                    width: 42%;
                     height: 80%;
                     max-width: 100%;
                     max-height: 100%;
@@ -381,7 +381,7 @@
     }
 
     function chatWidgetInit(config) {
-        const chatTitle = config.chatWidgetTitle || '智能小客服';
+        const chatTitle = config.chatWidgetTitle || 'Real AI';
         const chatPlaceholder = config.chatWidgetPlaceholder || 'Type your question';
         const chatAIBase = config.chatAIBase;
         const isMultilingual = window.isMultilingual == "True";
