@@ -286,8 +286,22 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             }
             else if (buffer_bytes == 3)
             {
-                gui_log("this type font scale no support now!!! \n");
-                GUI_ASSERT(NULL != NULL);
+                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
+                uint16_t write_color = rgba2565(color);
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * i * 3;
+                    int dots_off = (i - font_y) * (font_w / 8);
+
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
+                        {
+                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
+                            writebuf[write_off + (j - x_start) * 3 + 2] = 0xff;
+                        }
+                    }
+                }
             }
             else if (buffer_bytes == 4)
             {
