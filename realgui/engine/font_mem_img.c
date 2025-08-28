@@ -188,7 +188,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 uint8_t alpha_output[16];
                 for (int i = 0; i < 16; i++)
                 {
-                    alpha_output[i] = 0x17 * i * color.color.rgba.a / 0xff;
+                    alpha_output[i] = 17 * i * color.color.rgba.a / 0xff;
                 }
 
                 for (uint32_t i = y_start; i < y_end; i++)
@@ -210,6 +210,13 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
                 gui_color_t write_color = color;
+
+                uint32_t color_output[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    write_color.color.rgba.a = 17 * i * color.color.rgba.a / 0xff;
+                    color_output[i] = write_color.color.argb_full;
+                }
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i;
@@ -219,8 +226,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                         uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
                         if (alpha != 0)
                         {
-                            write_color.color.rgba.a = (alpha & 0x0f) * 17;
-                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
+                            writebuf[write_off + j - x_start] = color_output[alpha & 0x0f];
                         }
                     }
                 }
