@@ -766,7 +766,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     }
                 }
             }
-            if (char_line_sum == 0)
+            if (char_line_sum <= line)
             {
                 char_line_sum = line;
             }

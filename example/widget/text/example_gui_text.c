@@ -26,6 +26,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_text.h"
+#include "gui_scroll_text.h"
 #include "gui_view.h"
 #include "test_font.h"
 /*============================================================================*
@@ -168,6 +169,31 @@ static void test_timer_cb(void *param)
 }
 
 /**
+ * @brief Create and configure a horizontal and a vertical scroll text widget example
+ */
+/* gui scroll text widget example start*/
+static void scroll_text_widget_example(void)
+{
+    char *test_text =
+        "Everyone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom, either alone or in community with others and in public or private, to manifest his religion or belief in teaching, practice, worship and observance. ";
+
+    gui_scroll_text_t *scroll_text_x = gui_scroll_text_create(gui_obj_get_root(), "scroll_text", 0, 200,
+                                                              300, 200);
+    gui_scroll_text_set(scroll_text_x, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                        32);
+    gui_scroll_text_scroll_set(scroll_text_x, SCROLL_X, 300, 100, 40000, 0);
+    gui_scroll_text_type_set(scroll_text_x, font32b2, FONT_SRC_MEMADDR);
+
+    gui_scroll_text_t *scroll_text_y = gui_scroll_text_create(gui_obj_get_root(), "scroll_text", 50,
+                                                              250, 300, 100);
+    gui_scroll_text_set(scroll_text_y, test_text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(test_text),
+                        32);
+    gui_scroll_text_scroll_set(scroll_text_y, SCROLL_Y, 100, 100, 10000, 0);
+    gui_scroll_text_type_set(scroll_text_y, font32b2, FONT_SRC_MEMADDR);
+}
+/* gui scroll text widget example end*/
+
+/**
  * @brief Create and configure a text widget example
  */
 /* gui text widget example start*/
@@ -190,6 +216,9 @@ static int app_init(void)
 
     /* gui text widget example */
     text_widget_example();
+
+    /* gui scroll text widget example */
+    // scroll_text_widget_example();
 
     /* gui text font rendering test */
     // text_font_test();
