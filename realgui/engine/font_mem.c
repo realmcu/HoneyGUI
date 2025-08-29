@@ -799,16 +799,16 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 else
                 {
-                    chr[i].y = chr[i - 1].y + chr[i - 1].char_h + 2;
+                    chr[i].y = chr[i - 1].y + chr[i - 1].char_h + chr[i - 1].char_y;
                 }
-                if ((chr[i].y + chr[i].char_y + chr[i].char_h) >= rect->y2 || (i != 0 &&
-                                                                               chr[i - 1].unicode == 0x0A))
+                if ((chr[i].y + chr[i].char_y + chr[i].char_h) >= rect->y2
+                    || (i != 0 && chr[i - 1].unicode == 0x0A))
                 {
                     line++;
                     chr[i].y = rect->y1;
                 }
-                chr[i].x = rect->x1 - line * chr[i].w;
-                if (chr[i].x < 0)
+                chr[i].x = rect->x2 - line * text->font_height;
+                if (chr[i].x < rect->x1)
                 {
                     active_font_len = i;
                     break;
@@ -823,18 +823,19 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             {
                 if (i == 0)
                 {
-                    chr[i].y = rect->y2 - chr[i].char_h;
+                    chr[i].y = rect->y2 - chr[i].char_h - chr[i].char_y;
                 }
                 else
                 {
-                    chr[i].y = chr[i - 1].y - chr[i].char_h - 2;
+                    chr[i].y = chr[i - 1].y - chr[i].char_h - chr[i - 1].char_y;
                 }
-                if (chr[i].y  <= rect->y1 || (i != 0 && chr[i - 1].unicode == 0x0A))
+                if (chr[i].y <= rect->y1
+                    || (i != 0 && chr[i - 1].unicode == 0x0A))
                 {
                     line++;
-                    chr[i].y = rect->y2 - chr[i].char_h;
+                    chr[i].y = rect->y2 - chr[i].char_h - chr[i].char_y;
                 }
-                chr[i].x = rect->x1 + line * chr[i].w;
+                chr[i].x = rect->x1 + line * text->font_height;
                 if (chr[i].x >= rect->x2)
                 {
                     active_font_len = i;

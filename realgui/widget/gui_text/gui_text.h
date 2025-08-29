@@ -118,6 +118,8 @@ typedef struct gui_text
     uint8_t font_height;
     uint8_t emoji_size;
     uint8_t checksum;
+    // int8_t extra_letter_spacing;
+    // int8_t extra_line_spacing;
 
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
