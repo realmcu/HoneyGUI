@@ -9,6 +9,8 @@
  *
  */
 
+#ifdef _WIN32
+
 #include <sys/time.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -145,5 +147,31 @@ SHELL_EXPORT_CMD(
     SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN,
     io, func, test);
 
+#endif
+#else
+
+#include "shell.h"
+#include "shell_ext.h"
+#include "shell_port.h"
+
+Shell shell_user;
+char shellBuffer[512];
+void *shell_task_handle;
+
+unsigned int userGetTick()
+{
+    return 0;
+}
+
+static short userShellWrite(char *data, unsigned short len)
+{
+    return 0;
+}
+
+void userShellInit(void)
+{
+    shell_user.write = userShellWrite;
+    shellInit(&shell_user, shellBuffer, 512);
+}
 #endif
 

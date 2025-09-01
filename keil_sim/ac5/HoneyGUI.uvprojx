@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define> ENABLE_HONEYGUI GUI_KEIL_SIM</Define>
+              <Define>GUI_KEIL_SIM ENABLE_HONEYGUI</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\sw;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_3d;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win</IncludePath>
+              <IncludePath>.;.;.;..\..\realgui\example\root_image;gui_port;..\..\realgui;..\..\realgui\3rd\cJSON;..\..\realgui\3rd\ezXML;..\..\realgui\3rd\gifdec;..\..\realgui\3rd\nanosvg\src;..\..\realgui\3rd\nanovg;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\base;..\..\realgui\3rd\nanovg\agge;..\..\realgui\3rd\nanovg\vglite;..\..\realgui\3rd\stb;..\..\realgui\3rd\tinyobj;..\..\realgui\3rd\tjpgd;..\..\realgui\3rd\h264bsd;..\..\realgui\3rd\h264bsd\inc;..\..\realgui\3rd\Lite3D\widget;..\..\realgui\3rd\minimp3;..\..\realgui\core;..\..\realgui\dc;..\..\realgui\engine;..\..\realgui\engine\sw;..\..\realgui\input;..\..\realgui\misc;..\..\realgui\misc\tlsf;..\..\realgui\SaaA;..\..\realgui\server;..\..\realgui\widget;..\..\realgui\widget\gui_canvas;..\..\realgui\widget\gui_gray;..\..\realgui\widget\gui_img;..\..\realgui\widget\gui_list;..\..\realgui\widget\gui_lite3d;..\..\realgui\widget\gui_menu_cellular;..\..\realgui\widget\gui_obj;..\..\realgui\widget\gui_qbcode;..\..\realgui\widget\gui_soccer;..\..\realgui\widget\gui_text;..\..\realgui\widget\gui_video;..\..\realgui\widget\gui_view;..\..\realgui\widget\gui_win</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -386,7 +386,7 @@
             <File>
               <FileName>menu_config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\win32_sim\menu_config.h</FilePath>
+              <FilePath>.\menu_config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -646,6 +646,56 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>realgui/3rd/Lite3D</GroupName>
+          <Files>
+            <File>
+              <FileName>l3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_port.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_rect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_rect.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_rect_transform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_rect_transform.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_sw_raster.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_sw_raster.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_tria.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_tria.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3_tria_transform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\widget\l3_tria_transform.c</FilePath>
+            </File>
+            <File>
+              <FileName>Lite3D_port_gui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\3rd\Lite3D\Lite3D_port_gui.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>realgui/dc</GroupName>
           <Files>
             <File>
@@ -869,36 +919,6 @@
           <GroupName>realgui/widget</GroupName>
           <Files>
             <File>
-              <FileName>def_3d_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d\def_3d_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>def_3d_rect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d\def_3d_rect.c</FilePath>
-            </File>
-            <File>
-              <FileName>def_3d_tria.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d\def_3d_tria.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_3d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d\gui_3d.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_3d_rect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d\gui_3d_rect.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_3d_tria.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_3d\gui_3d_tria.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_canvas\gui_canvas.c</FilePath>
@@ -954,6 +974,11 @@
               <FilePath>..\..\realgui\widget\gui_list\gui_list_rotate_helix.c</FilePath>
             </File>
             <File>
+              <FileName>gui_lite3d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\realgui\widget\gui_lite3d\gui_lite3d.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_menu_cellular.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_menu_cellular\gui_menu_cellular.c</FilePath>
@@ -962,11 +987,6 @@
               <FileName>gui_obj.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\realgui\widget\gui_obj\gui_obj.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_obj_animate.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\realgui\widget\gui_obj\gui_obj_animate.c</FilePath>
             </File>
             <File>
               <FileName>gui_obj_event.c</FileName>

@@ -176,7 +176,7 @@
 // </c>
 
 // <c> RTK GUI Enable Lite3D library
-#define CONFIG_REALTEK_BUILD_LITE3D  1
+#define CONFIG_REALTEK_BUILD_LITE3D
 // </c>
 
 #endif
