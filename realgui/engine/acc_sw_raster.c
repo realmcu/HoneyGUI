@@ -228,12 +228,21 @@ static void do_raster_pixel(const gui_raster_params_t *params)
 
 static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 {
+    static int x_record = -1;
+    static int y_record = -1;
+    static uint32_t line = 0;
+    static int location = 0;
     gui_img_file_t *file = (gui_img_file_t *)image->data;
     gui_rgb_data_head_t *head = image->data;
     char input_type = head->type;
     imdc_file_t *compressed = (imdc_file_t *)(&(file->data.imdc_file));
-    uint32_t line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
-    int location = 0;
+    if (y != y_record || x < x_record)
+    {
+        x_record = x;
+        y_record = y;
+        location = 0;
+        line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
+    }
     switch (input_type)
     {
     case RGB565:
@@ -246,6 +255,8 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
                 line = line + sizeof(imdc_rgb565_node_t);
             }
             while (location < (x + 1));
+            location -= node->len;
+            line -= sizeof(imdc_rgb565_node_t);
             memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
             break;
         }
@@ -259,6 +270,8 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
                 line = line + sizeof(imdc_argb8565_node_t);
             }
             while (location < (x + 1));
+            location -= node->len;
+            line -= sizeof(imdc_argb8565_node_t);
             memcpy(pixel, &(node->pixel), sizeof(node->pixel));
             pixel[2] = node->alpha; // Assuming 'pixel' is at least 3 bytes, adjust index if necessary
             break;
@@ -273,6 +286,8 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
                 line = line + sizeof(imdc_rgb888_node_t);
             }
             while (location < (x + 1));
+            location -= node->len;
+            line -= sizeof(imdc_rgb888_node_t);
             pixel[2] = node->pixel_r;
             pixel[1] = node->pixel_g;
             pixel[0] = node->pixel_b;
@@ -288,6 +303,8 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
                 line = line + sizeof(imdc_argb8888_node_t);
             }
             while (location < (x + 1));
+            location -= node->len;
+            line -= sizeof(imdc_argb8888_node_t);
             memcpy(pixel, &(node->pixel32), sizeof(node->pixel32));
             break;
         }
