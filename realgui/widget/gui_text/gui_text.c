@@ -583,6 +583,15 @@ void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)
     this->wordwrap = wordwrap;
 }
 
+void gui_text_extra_letter_spacing_set(gui_text_t *this, int8_t extra_letter_spacing)
+{
+    this->extra_letter_spacing = extra_letter_spacing;
+}
+void gui_text_extra_line_spacing_set(gui_text_t *this, int8_t extra_line_spacing)
+{
+    this->extra_line_spacing = extra_line_spacing;
+}
+
 void gui_text_use_matrix_by_img(gui_text_t *this, bool use_img_blit)
 {
     this->use_img_blit = use_img_blit;
