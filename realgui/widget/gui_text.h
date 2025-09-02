@@ -120,6 +120,7 @@ typedef struct gui_text
     uint8_t emoji_size;
     uint8_t checksum;
     int8_t extra_letter_spacing;
+    int8_t extra_line_spacing;
 
     bool layout_refresh   : 1;
     bool content_refresh  : 1;
@@ -231,6 +232,22 @@ void gui_text_input_set(gui_text_t *this_widget, bool inputable);
  * @param wordwrap Wordwrap.
  */
 void gui_text_wordwrap_set(gui_text_t *this_widget, bool wordwrap);
+
+/**
+ * @brief Set extra letter spacing.
+ *
+ * @param this_widget The text box widget pointer.
+ * @param extra_letter_spacing Extra letter spacing.
+ */
+void gui_text_extra_letter_spacing_set(gui_text_t *this_widget, int8_t extra_letter_spacing);
+
+/**
+ * @brief Set extra line spacing.
+ *
+ * @param this_widget The text box widget pointer.
+ * @param extra_line_spacing Extra line spacing.
+ */
+void gui_text_extra_line_spacing_set(gui_text_t *this_widget, int8_t extra_line_spacing);
 
 /**
  * @brief Enable or disable matrix-based image rendering for text.
