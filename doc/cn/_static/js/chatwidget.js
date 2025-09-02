@@ -606,15 +606,19 @@
         }
         function onChatError(error, element) {
             element.innerHTML = `
-            <div class="chatResp wy-text-danger">${error}</div>
+            <div class="chatResp">${error}</div>
             `;
             docRefsList = [];
             addChatHistory("assistant", error);
         }
 
         // Configure marked
+        const mdRenderer = new marked.Renderer();
+        mdRenderer.link = function({href, title, text}) {
+            return `<a href="${href}" target="_blank" rel="noopener noreferrer"${title ? ` title="${title}"` : ''}>${text}</a>`;
+        };
         marked.setOptions({
-            renderer: new marked.Renderer(),
+            renderer: mdRenderer,
             pedantic: false, //尽可能遵循原始 Markdown 语法，而不是 GitHub Flavored Markdown。如果设置为 true，则偏向于更严格的解析
             gfm: true, //启用 GitHub Flavored Markdown，如果需要 GFM 功能（如表格、任务列表等）可将其启用
             breaks: true, //启用 GFM 换行符解析。设置为 true 时，Markdown 文本中的新行符被视为 <br>
@@ -641,7 +645,7 @@
             const appendErrorMsg = (error, element) => {
                 if (hasError) return;
 
-                element.innerHTML += `<div class="wy-text-danger">${error}</div>`;
+                element.innerHTML += `<div>${error}</div>`;
                 docRefsList = [];
                 hasError = true;
                 abortCtrl.abort();
@@ -699,12 +703,14 @@
                             // replace asstNode html content
                             // asstNode.innerHTML = marked.parse(mdChatText);
                             const rawHtml = marked.parse(mdChatText);
-                            const sanitizedHtml = DOMPurify.sanitize(rawHtml);
-                            asstNode.innerHTML = sanitizedHtml;
+                            // const sanitizedHtml = DOMPurify.sanitize(rawHtml);
+                            // asstNode.innerHTML = sanitizedHtml;
+                            asstNode.innerHTML = rawHtml;
                             asstNode.ansData = mdChatText;
                         } else if (parsedChunk.status === "error") {
                             // append html content in asstNode
-                            appendErrorMsg(`Internal server error: ${parsedChunk.error.error_type}, ${parsedChunk.error.message}, please refresh and try again!`, asstNode);
+                            // appendErrorMsg(`${parsedChunk.error.error_type}: ${parsedChunk.error.message}`, asstNode);
+                            appendErrorMsg(`Internal server error, please refresh and try again!`, asstNode);
                         }
                     } catch (error) {
                         // go on
@@ -721,12 +727,12 @@
                         if (error.name === 'AbortError') {
                             appendErrorMsg(`AI fetch request has been aborted!`, asstNode);
                         } else {
-                            appendErrorMsg(`Read data from the stream error: ${error}, please refresh and try again!`, asstNode);
+                            appendErrorMsg(`Failed to read data stream, please refresh and try again!`, asstNode);
                         }
                         return { done: true };
                     });
                     if (done || hasError) break;
-    
+
                     // Decode the current chunk
                     const newChunk = decoder.decode(value, { stream: true });
                     processChunk(newChunk);
@@ -737,9 +743,9 @@
                         // const lineChunk = pendingBuffer.slice(0, lineEnd).trim();
                         const lineChunk = pendingBuffer.slice(0, lineEnd);
                         pendingBuffer = pendingBuffer.slice(lineEnd + 1);
-        
+
                         if (!lineChunk) continue;
-        
+
                         processChunk(lineChunk);
                     }
                 }
@@ -756,7 +762,7 @@
                 if (error.name === 'AbortError') {
                     onChatError(`AI fetch request has been aborted!`, messageNode);
                 } else {
-                    onChatError(`An error occured with the ai chat fetch operation: ${error}. Please refresh and try again!`, messageNode);
+                    onChatError(`An error occured with the ai chat fetch operation, please refresh and try again!`, messageNode);
                 }
             }
             finally {

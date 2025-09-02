@@ -4,7 +4,7 @@
 Fruit Ninja
 ==============
 
-This example demonstrates how to develop a simple "Fruit Ninja" APP, from which you can learn and understand the basic methods and processes of developing a UI application. Earn points by cutting fruits within one minute, and the game will be over if cut a bomb. Watch the demo video below to see its full functionality.
+This example demonstrates how to develop a simple 'Fruit Ninja' APP, from which you can learn and understand the basic methods and processes of developing a UI application. Earn points by cutting fruits within one minute, and the game will be over if cut a bomb. Watch the demo video below to see its full functionality.
 
 .. raw:: html
 

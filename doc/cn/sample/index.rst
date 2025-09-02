@@ -26,7 +26,7 @@
     LiteGFX <LiteGFX/Demo>
     水果忍者 <Fruit_Ninja/Fruit_Ninja>
     音乐播放器 <MusicPlayer/Music Player>
-    表盘界面 <WatchfaceKoiClock/KoiClock>
+    3D 表盘 <WatchfaceKoiClock/KoiClock>
     天气 <Weather/weather>
     彩虹模拟时钟 <Rainbow_analog/rainbow_analog>
 

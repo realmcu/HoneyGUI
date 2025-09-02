@@ -74,8 +74,8 @@ LiteGFX
     |      gui_widget_litegfx.h
     |      tab_app_energybox.c
     |      tab_app_notifications.c
-    |      tab_app_prsim.c
-    |      tab_app_prsim_refl.c
+    |      tab_app_prism.c
+    |      tab_app_prism_refl.c
     |      tab_app_soccer.c
     |      tab_watchface_butterfly.c
     |      tab_watchface_digitclock.c
@@ -103,8 +103,20 @@ LiteGFX
 控件适配层
 ~~~~~~~~~~
 
-此目录下的代码是趣戴为了适配 HoneyGUI 提供的 wrapper 层代码。其中 ``gui_widget_litegfx.c/h`` 为控件， ``tab_`` 开头的文件是示例代码，直接使用 user 可以
-参考示例代码实现自己的上层效果。注意，使用此方法本质仍然是通过 RealGUI 调用引擎显示相关效果，此控件支持 FrameBuffer 的分块方式。
+此目录下的代码是趣戴为了适配 HoneyGUI 提供的 wrapper 层代码。其中 ``gui_widget_litegfx.c/h`` 为控件，通过调用 ``gui_widget_litegfx_create()`` 函数可以创建一个 LiteGFX 控件。注意，使用此方法本质仍然是通过 RealGUI 调用引擎显示相关效果，此控件支持 FrameBuffer 的分块方式。
+
+项目中提供了多个示例代码，可直接参考使用：
+
+- ``tab_app_energybox.c`` : 能量盒效果示例
+- ``tab_app_notifications.c`` : 通知效果示例
+- ``tab_app_prism.c`` : 棱镜示例
+- ``tab_app_prism_refl.c`` : 棱镜倒影示例
+- ``tab_app_soccer.c`` : 足球游戏示例
+- ``tab_watchface_butterfly.c`` : 蝴蝶表盘示例
+- ``tab_watchface_digitclock.c`` : 数字时钟示例
+- ``tab_watchface_flowerfall.c`` : 花朵掉落示例
+- ``tab_watchface_windmill.c`` : 风车示例
+
 
 平台适配层
 ~~~~~~~~~~

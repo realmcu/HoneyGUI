@@ -1,7 +1,7 @@
 Rainbow Analog Clock
 =====================
 
-The example creates a scene for a "Rainbow Analog Clock" using graphical display and animation effects. This application integrates the Box2D physics engine to simulate the movement of capsule objects along a circular path. These capsules undergo dynamic movement and collision simulation based on user interactions and defined physical rules, creating a rich and dynamic visual experience.
+The example creates a scene for a 'Rainbow Analog Clock' using graphical display and animation effects. This application integrates the Box2D physics engine to simulate the movement of capsule objects along a circular path. These capsules undergo dynamic movement and collision simulation based on user interactions and defined physical rules, creating a rich and dynamic visual experience.
 
 .. raw:: html
 

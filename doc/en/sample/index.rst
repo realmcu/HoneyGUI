@@ -25,7 +25,7 @@ The entry point for any application is:
     LiteGFX <LiteGFX/Demo>
     Fruit Ninja <Fruit_Ninja/Fruit_Ninja>
     Music Player <MusicPlayer/Music Player>
-    Watchface <WatchfaceKoiClock/KoiClock>
+    3D Watch Face <WatchfaceKoiClock/KoiClock>
     Weather <Weather/weather>
     Rainbow Analog Clock <Rainbow_analog/rainbow_analog>
     

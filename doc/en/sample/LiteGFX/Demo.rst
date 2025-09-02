@@ -74,8 +74,8 @@ Source code path: ``HoneyGUI\realgui\3rd\litegfx``
     |      gui_widget_litegfx.h
     |      tab_app_energybox.c
     |      tab_app_notifications.c
-    |      tab_app_prsim.c
-    |      tab_app_prsim_refl.c
+    |      tab_app_prism.c
+    |      tab_app_prism_refl.c
     |      tab_app_soccer.c
     |      tab_watchface_butterfly.c
     |      tab_watchface_digitclock.c
@@ -103,8 +103,20 @@ Source code path: ``HoneyGUI\realgui\3rd\litegfx``
 Widget Adaptation Layer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The code in this directory is a wrapper layer provided by QuDai to adapt to HoneyGUI. The files ``gui_widget_litegfx.c/h`` are for the widgets, while files starting with ``tab_`` are sample code. 
-Users can refer to these sample codes to implement their own upper-layer effects. Note that essentially, using this method still involves calling the RealGUI engine to display related effects. This widget supports the tiled approach for FrameBuffer.
+The code in this directory is a wrapper layer provided by QuDai to adapt to HoneyGUI. Among these files, ``gui_widget_litegfx.c/h`` contains the widget component. By calling the ``gui_widget_litegfx_create()`` function, you can create a LiteGFX widget. 
+Note that essentially, using this method still involves calling the RealGUI engine to display related effects. This widget supports the tiled approach for FrameBuffer.
+
+The project provides multiple code examples for direct reference:
+
+- ``tab_app_energybox.c`` : Energy box effect example
+- ``tab_app_notifications.c`` : Notification effect example
+- ``tab_app_prism.c`` : Prism example
+- ``tab_app_prism_refl.c`` : Prism reflection example
+- ``tab_app_soccer.c`` : Soccer game example
+- ``tab_watchface_butterfly.c`` : Butterfly watchface example
+- ``tab_watchface_digitclock.c`` : Digital clock example
+- ``tab_watchface_flowerfall.c`` : Flower fall example
+- ``tab_watchface_windmill.c`` : Windmill example
 
 Platform Adaptation Layer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
