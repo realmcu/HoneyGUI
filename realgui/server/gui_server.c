@@ -110,7 +110,7 @@ static void gui_server_entry(void *parameter)
 
 
 #ifdef _WIN32
-        gui_thread_mdelay(17);
+        gui_thread_mdelay(1);
 #endif
         gui_recv_msg_to_server();
     }

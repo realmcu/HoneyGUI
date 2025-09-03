@@ -98,7 +98,7 @@ void gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t
 #define GUI_CANVAS_OUTPUT_RGB565 4
 
 typedef void (*gui_canvas_render_function)(NVGcontext *vg);
-
+typedef void (*gui_canvas_render_function_param)(NVGcontext *vg, void *param);
 /**
  * @brief Render a canvas and output it in the specified format.
  * @param output_format The format of the output image.
@@ -110,7 +110,18 @@ typedef void (*gui_canvas_render_function)(NVGcontext *vg);
  */
 const uint8_t *gui_canvas_output(int output_format, bool compression, int image_width,
                                  int image_height, gui_canvas_render_function renderer);
-
+/**
+ * @brief Render a canvas and output the result to a target buffer in the specified format.
+ * @param format The format of the output image.
+ * @param compression Whether to apply compression to the output.
+ * @param image_width The width of the output image.
+ * @param image_height The height of the output image.
+ * @param renderer A function pointer to the rendering function. It takes a NanoVG context and a void pointer to additional data.
+ * @param param The additional data to be passed to the rendering function.
+ * @return Return a pointer to the buffer containing the output image data.
+ */
+const uint8_t *gui_canvas_output_param(int output_format, bool compression, int image_width,
+                                       int image_height, gui_canvas_render_function_param renderer, void *param);
 /**
  * @brief Render a canvas and output the result to a target buffer in the specified format.
  * @param format The format of the output image.

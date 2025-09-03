@@ -391,11 +391,12 @@ static void gui_page_hold_y(gui_obj_t *obj)
         obj->y = this->start_y;
         gui_obj_enable_event(obj, GUI_EVENT_7);
     }
-    else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height()))
-             && obj->y != 0)/*@BOTTOM*/
+    else if (obj->y < (this->start_y - (obj->h - (int)this->default_h))
+             //&& obj->y != 0
+            )/*@BOTTOM*/
     {
         gui_obj_enable_event(obj, GUI_EVENT_7);
-        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
+        obj->y = this->start_y - (obj->h - (int)this->default_h);
     }
 
     gui_page_update_speed(obj);
@@ -478,11 +479,12 @@ static void gui_page_update_boundary(gui_obj_t *obj)
         gui_obj_enable_event(obj, GUI_EVENT_7);
         this->release = false;
     }
-    else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height()))
-             && obj->y != 0)/*@BOTTOM*/
+    else if (obj->y < (this->start_y - (obj->h - (int)this->default_h))
+             // && obj->y != 0
+            )/*@BOTTOM*/
     {
         this->release = false;
-        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
+        obj->y = this->start_y - (obj->h - (int)this->default_h);
         gui_obj_enable_event(obj, GUI_EVENT_7);
     }
 }
@@ -609,12 +611,13 @@ void gui_page_input_prepare(gui_obj_t *obj)
 
 void gui_page_update(gui_obj_t *obj)
 {
-    gui_page_update_att(obj);
-    obj->h = gui_get_screen_height();
-    gui_page_set_height(obj, obj);
-
     touch_info_t *tp = tp_get_info();
     gui_page_t *this = (gui_page_t *)obj;
+    gui_page_update_att(obj);
+    obj->h = this->default_h;
+    gui_page_set_height(obj, obj);
+
+
 
     if (this->gesture_flag)
     {
@@ -635,7 +638,7 @@ void gui_page_update(gui_obj_t *obj)
         }
     }
     bool touch_in = 0;
-    if (ax < tp->x && (ax + obj->w) > tp->x && ay < tp->y && (ay + obj->parent->h) > tp->y)
+    if (ax < tp->x && (ax + obj->w) > tp->x && ay < tp->y && (ay + this->default_h) > tp->y)
     {
         touch_in = 1;
     }
@@ -648,6 +651,7 @@ void gui_page_update(gui_obj_t *obj)
             {
                 if ((tp->type == TOUCH_HOLD_Y))
                 {
+                    //gui_log("page TOUCH_HOLD_Y\n");
                     gui_page_hold_y(obj);
                 }
                 else if (tp->released)
@@ -1787,6 +1791,7 @@ void gui_page_ctor(gui_page_t *this,
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;
+    this->default_h = h;
 }
 
 gui_page_t *gui_page_create(void       *parent,

@@ -649,7 +649,7 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(text_animate_wifi_callback);
 static void on_click_keyboard_cb_switch_turn_on(void *obj, gui_event_t e,
                                                 struct on_click_keyboard_cb_param *param);
 static bool shift;
-static void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 /**
  * @brief Writes a key value in a array at the specified ID.
  *
@@ -2071,6 +2071,32 @@ static void on_click_jump_to_capp_cb(void *obj, gui_event_t e, gui_app_t *handle
         gui_app_switch(gui_current_app(), handle);
     }
 }
+
+static char *unescape_string(const char *input)
+{
+    if (!input) { return NULL; }
+
+    int len = strlen(input);
+    char *output = malloc(len + 1);
+    if (!output) { return NULL; }
+
+    int j = 0;
+    for (int i = 0; i < len; i++)
+    {
+        if (input[i] == '\\' && input[i + 1] == 'n')
+        {
+            output[j] = '\n';
+            i++;
+        }
+        else
+        {
+            output[j] = input[i];
+        }
+        j++;
+    }
+    output[j] = '\0';
+    return output;
+}
 static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
     {
@@ -2089,6 +2115,16 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         uint8_t inputable = false;
         int16_t letter_space = 0;
         bool hidden = false;
+
+
+        const char *lineMode = "single";
+        const char *alignH = "left";
+        const char *alignV = "top";
+        const char *scroll = "none";
+        int16_t rotation = 0;
+        int16_t line_space = 0;
+
+
         while (true)
         {
             if (!(p->attr[i]))
@@ -2136,42 +2172,6 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 color = string_rgb888(p->attr[++i]);
             }
-            else if (!strcmp(p->attr[i], "mode"))
-            {
-                char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "truncate"))
-                {
-                    style = (TEXT_MODE)0;
-                }
-                else if (!strcmp(p->attr[i], "verticalscroll"))
-                {
-                    style = VERTICAL_LEFT;
-                }
-                else if (!strcmp(p->attr[i], "verticalLeft"))
-                {
-                    style = VERTICAL_LEFT;
-                }
-                else if (!strcmp(p->attr[i], "horizontalscroll"))
-                {
-                    style = VERTICAL_RIGHT;
-                }
-                else if (!strcmp(p->attr[i], "verticalRight"))
-                {
-                    style = VERTICAL_RIGHT;
-                }
-                else if (!strcmp(p->attr[i], "left"))
-                {
-                    style = LEFT;
-                }
-                else if (!strcmp(p->attr[i], "center"))
-                {
-                    style = CENTER;
-                }
-                else if (!strcmp(p->attr[i], "right"))
-                {
-                    style = RIGHT;
-                }
-            }
             else if (!strcmp(p->attr[i], "inputable"))
             {
                 inputable = atoi(p->attr[++i]);
@@ -2184,6 +2184,33 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 hidden = true;
             }
+
+            else if (!strcmp(p->attr[i], "lineMode"))
+            {
+                lineMode = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "alignH"))
+            {
+                alignH = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "alignV"))
+            {
+                alignV = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "scroll"))
+            {
+                scroll = p->attr[++i];
+            }
+            else if (!strcmp(p->attr[i], "rotation"))
+            {
+                rotation = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "lineSpace"))
+            {
+                line_space = atoi(p->attr[++i]);
+            }
+
+
             i++;
         }
         //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
@@ -2192,6 +2219,118 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
 
         if (text)
         {
+            {
+
+                if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                    GUI_STRINGS_EQUAL(alignH, "left") &&
+                    GUI_STRINGS_EQUAL(scroll, "none") &&
+                    rotation == 0)
+                {
+                    style = LEFT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         GUI_STRINGS_EQUAL(alignH, "center") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         rotation == 0)
+                {
+                    style = CENTER;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         GUI_STRINGS_EQUAL(alignH, "right") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         rotation == 0)
+                {
+                    style = RIGHT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "left") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == 0)
+                {
+                    style = MULTI_LEFT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "right") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == 0)
+                {
+                    style = MULTI_RIGHT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "center") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == 0)
+                {
+                    style = MULTI_CENTER;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "left") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = MID_LEFT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "right") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = MID_RIGHT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "center") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "center") &&
+                         rotation == 0)
+                {
+                    style = MID_CENTER;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         //  GUI_STRINGS_EQUAL(alignH, "right")&&
+                         GUI_STRINGS_EQUAL(scroll, "horizontal") &&
+                         //   GUI_STRINGS_EQUAL(alignV, "center")&&
+                         rotation == 0)
+                {
+                    style = SCROLL_X;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         //  GUI_STRINGS_EQUAL(alignH, "center")&&
+                         GUI_STRINGS_EQUAL(scroll, "vertical") &&
+                         //   GUI_STRINGS_EQUAL(alignV, "center")&&
+                         rotation == 0)
+                {
+                    style = SCROLL_Y;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "single") &&
+                         //  GUI_STRINGS_EQUAL(alignH, "center")&&
+                         GUI_STRINGS_EQUAL(scroll, "horizontal") &&
+                         //   GUI_STRINGS_EQUAL(alignV, "center")&&
+                         rotation == -90)
+                {
+                    style = SCROLL_Y_REVERSE;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "left") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == 90)
+                {
+                    style = VERTICAL_LEFT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "left") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == -90)
+                {
+                    style = VERTICAL_RIGHT;
+                }
+            }
             gui_text_t *t = 0;
             if (font == 0 ||
                 fontSize == 0 ||
@@ -2202,8 +2341,12 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 w = gui_get_screen_width();
                 font = "app/system/resource/font/arialbd_size16_bits4_font.bin";
             }
-            if (style == 0 || style == CENTER || style == RIGHT || style == LEFT || style == VERTICAL_LEFT ||
-                style == VERTICAL_RIGHT)
+            if (!(style == LEFT || style == CENTER || style == RIGHT || style == SCROLL_X))
+            {
+                text = unescape_string(text);
+            }
+
+            if (style != SCROLL_X && style != SCROLL_Y && style != SCROLL_Y_REVERSE)
             {
                 t = gui_text_create(parent, ptxt, x, y, w, h);
                 GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
@@ -2219,7 +2362,10 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 {
                     gui_text_set_extra_letter_spacing(t, letter_space);
                 }
-
+                if (line_space != 0)
+                {
+                    gui_text_extra_line_spacing_set(t, line_space);
+                }
                 {
                     FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
                     char *font_type = font;
@@ -2268,13 +2414,21 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             else
             {
                 gui_scroll_text_t *scroll_text = gui_scroll_text_create(parent,  ptxt, x, y,
-                                                                        strlen(text) * (fontSize / 4), h);
+                                                                        w, h);
                 gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
-                gui_color_t color_temporary;
-                color_temporary = color;
-                gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_TTF, color_temporary,
+                char *font_type = font;
+                void *addr1 = gui_get_file_address(font_type);
+                gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_BMP, color,
                                     strlen(text),
                                     fontSize);
+                if (strstr(font_type, ".bin") != NULL)
+                {
+                    gui_scroll_text_type_set(scroll_text, addr1, FONT_SRC_MEMADDR);
+                }
+                if (letter_space != 0)
+                {
+                    gui_text_set_extra_letter_spacing((void *)scroll_text, letter_space);
+                }
                 t = (void *)scroll_text;
             }
             parent = (void *)t;
@@ -2341,67 +2495,204 @@ static gui_obj_t *widget_create_window(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
 
     return parent;
 }
+//round rect
+typedef struct round_rect
+{
+    int x;
+    int y;
+    int w;
+    int h;
+    int rx;
+    int ry;
+    gui_color_t fill;
+    gui_color_t stroke;
+    int stroke_width;
+} round_rect_t;
+static void rect_cb(NVGcontext *vg, void *param)
+{
+    round_rect_t *rect = (round_rect_t *)param;
+    int x = rect->x + rect->stroke_width / 2;
+    int y = rect->y + rect->stroke_width / 2;
+    int w = rect->w;
+    int h = rect->h;
+    int rx = rect->rx;
+    int ry = rect->ry;
+    gui_color_t fill_color = rect->fill;
+    gui_color_t stroke_color = rect->stroke;
+    int stroke_width = rect->stroke_width;
+    if (vg)
+    {
+
+        nvgBeginPath(vg);
+
+        if (rx == ry && rx > 0)
+        {
+            nvgRoundedRect(vg, x, y, w, h, rx);
+        }
+        else
+        {
+
+            float left = x, top = y, right = x + w, bottom = y + h;
+            if (rx > w / 2) { rx = w / 2; }
+            if (ry > h / 2) { ry = h / 2; }
+
+
+            const float kappa = 0.5522847498f;
+            float cpx1, cpy1, cpx2, cpy2;
+
+
+            nvgMoveTo(vg, left + rx, top);
+            nvgLineTo(vg, right - rx, top);
+
+            cpx1 = right - rx + rx * kappa;
+            cpy1 = top;
+            cpx2 = right;
+            cpy2 = top + ry * kappa;
+            nvgBezierTo(vg, cpx1, cpy1, cpx2, cpy2, right, top + ry);
+            nvgLineTo(vg, right, bottom - ry);
+
+            cpx1 = right;
+            cpy1 = bottom - ry + ry * kappa;
+            cpx2 = right - rx * kappa;
+            cpy2 = bottom;
+            nvgBezierTo(vg, cpx1, cpy1, cpx2, cpy2, right - rx, bottom);
+            nvgLineTo(vg, left + rx, bottom);
+
+            cpx1 = left + rx - rx * kappa;
+            cpy1 = bottom;
+            cpx2 = left;
+            cpy2 = bottom - ry * kappa;
+            nvgBezierTo(vg, cpx1, cpy1, cpx2, cpy2, left, bottom - ry);
+            nvgLineTo(vg, left, top + ry);
+
+            cpx1 = left;
+            cpy1 = top + ry - ry * kappa;
+            cpx2 = left + rx - rx * kappa;
+            cpy2 = top;
+            nvgBezierTo(vg, cpx1, cpy1, cpx2, cpy2, left + rx, top);
+            nvgClosePath(vg);
+        }
+
+
+        if (fill_color.color.rgba.a > 0)
+        {
+            nvgFillColor(vg, nvgRGBA(fill_color.color.rgba.r, fill_color.color.rgba.g, fill_color.color.rgba.b,
+                                     fill_color.color.rgba.a));
+            nvgFill(vg);
+        }
+
+        if (stroke_width > 0)
+        {
+            nvgStrokeColor(vg, nvgRGBA(stroke_color.color.rgba.r, stroke_color.color.rgba.g,
+                                       stroke_color.color.rgba.b, stroke_color.color.rgba.a));
+            nvgStrokeWidth(vg, stroke_width);
+            nvgStroke(vg);
+        }
+
+
+    }
+}
 static gui_obj_t *widget_create_rectangle(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
+    size_t i = 0;
+    int16_t x = 0;
+    int16_t y = 0;
+    int16_t w = 0;
+    int16_t h = 0;
+    gui_color_t fill_color = APP_COLOR_WHITE;
+    gui_color_t stroke_color = APP_COLOR_BLACK;
+    uint8_t opacity = 255;
+    bool hidden = false;
+    int16_t rx = 0;
+    int16_t ry = 0;
+    int16_t stroke_width = 0;
 
+    while (true)
     {
-        size_t i = 0;
-        int16_t x = 0;
-        int16_t y = 0;
-        int16_t w = 0;
-        int16_t h = 0;
-        gui_color_t color = APP_COLOR_WHITE;
-        uint8_t opacity = 255;
-        bool hidden = false;
-        while (true)
+        if (!(p->attr[i]))
         {
-            if (!(p->attr[i]))
-            {
-                break;
-            }
-            ////gui_log("p->attr[i]:%s\n", p->attr[i]);
-            if (!strcmp(p->attr[i], "x"))
-            {
-                x = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "y"))
-            {
-                y = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "w"))
-            {
-                w = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "h"))
-            {
-                h = atoi(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "color"))
-            {
-                color = string_rgb888(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "opacity"))
-            {
-                opacity = atof(p->attr[++i]);
-            }
-            else if (!strcmp(p->attr[i], "hidden"))
-            {
-                hidden = true;
-            }
-            i++;
+            break;
         }
-        char *ptxt = get_space_string_head(p->txt);
-        //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
+        if (!strcmp(p->attr[i], "x"))
         {
-            if (opacity != 255)
-            {
-                color.color.rgba.a = opacity;
-            }
-
-            parent = (void *)gui_canvas_rect_create(parent, ptxt, x, y, w, h, color);
-            gui_obj_hidden(parent, hidden);
+            x = atoi(p->attr[++i]);
         }
+        else if (!strcmp(p->attr[i], "y"))
+        {
+            y = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "w"))
+        {
+            w = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "h"))
+        {
+            h = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "fill"))
+        {
+            fill_color = string_rgb888(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "stroke"))
+        {
+            stroke_color = string_rgb888(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "strokeWidth"))
+        {
+            stroke_width = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "rx"))
+        {
+            rx = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "ry"))
+        {
+            ry = atoi(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "opacity"))
+        {
+            opacity = atof(p->attr[++i]);
+        }
+        else if (!strcmp(p->attr[i], "hidden"))
+        {
+            hidden = true;
+        }
+        i++;
     }
+
+    char *ptxt = get_space_string_head(p->txt);
+    // gui_log("x:%d, y:%d, w:%d, h:%d, rx:%d, ry:%d, strokeWidth:%d\n", x, y, w, h, rx, ry, stroke_width);
+
+    if (opacity != 255)
+    {
+        fill_color.color.rgba.a = opacity;
+        stroke_color.color.rgba.a = opacity;
+    }
+
+    if (rx < 0) { rx = 0; }
+    if (ry < 0) { ry = 0; }
+    if (stroke_width < 0) { stroke_width = 0; }
+    if (ry == 0 && rx > 0) { ry = rx; }
+    if (rx == 0 && ry > 0) { rx = ry; }
+
+    if (rx > 0 || ry > 0 || stroke_width > 0)
+    {
+
+        round_rect_t rect = {0, 0, w, h, rx, ry, fill_color, stroke_color, stroke_width};
+        const uint8_t *imgdata = gui_canvas_output_param(GUI_CANVAS_OUTPUT_RGBA, 0, w + stroke_width,
+                                                         h + stroke_width, rect_cb, (void *)&rect);
+        gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)imgdata, x, y, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        parent = (void *)img;
+        gui_obj_hidden(parent, hidden);
+    }
+    else
+    {
+
+        parent = (void *)gui_canvas_rect_create(parent, ptxt, x, y, w, h, fill_color);
+        gui_obj_hidden(parent, hidden);
+    }
+
     return parent;
 }
 static gui_obj_t *widget_create_tabview(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -4409,8 +4700,9 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     gui_win_press((void *)parent, win_radio_press, param);
     gui_obj_add_event_cb((void *)parent, win_radio_hover, GUI_EVENT_WIN_RADIO_HOVER, param);
     gui_win_set_animate((void *)parent, 10000, -1, win_radio_cb, param);
-    gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)gui_get_image_file_address(picture), 0,
-                                             0, 0, 0);
+    gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)gui_get_image_file_address(picture),
+                                             picture_x,
+                                             picture_y, 0, 0);
     param->img = img;
     param->pic_hl = gui_get_image_file_address(hl_picture);
     param->pic = gui_get_image_file_address(picture);
@@ -5245,6 +5537,11 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                                 pl->click_param[i] = param;
                             }
                         }
+                        else if (parent->type == IMAGE_FROM_MEM)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb, GUI_EVENT_TOUCH_CLICKED, param);
+                            ((gui_img_t *)parent)->simple = 0;
+                        }
                     }
 
                     else if (!strcmp(to, "app"))
@@ -5263,6 +5560,12 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                             else if (parent->type == MACRO_KEY)
                             {
                                 gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_6, gui_strdup(id));
+                            }
+                            else if (parent->type == IMAGE_FROM_MEM)
+                            {
+                                gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_app_cb, GUI_EVENT_TOUCH_CLICKED,
+                                                     gui_strdup(id));
+                                ((gui_img_t *)parent)->simple = 0;
                             }
                         }
                         else
@@ -5288,6 +5591,12 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         {
                             gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_6,
                                                  gui_app_get_by_name(id));
+                        }
+                        else if (parent->type == IMAGE_FROM_MEM)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_to_capp_cb, GUI_EVENT_TOUCH_CLICKED,
+                                                 gui_app_get_by_name(id));
+                            ((gui_img_t *)parent)->simple = 0;
                         }
                     }
                     else if (!strcmp(to, "tabview") || !strcmp(to, "tab"))
@@ -5344,6 +5653,12 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         {
                             gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_6, param);
                         }
+                        else if (parent->type == IMAGE_FROM_MEM)
+                        {
+                            gui_obj_add_event_cb(parent, (gui_event_cb_t)on_click_jump_cb_tabview, GUI_EVENT_TOUCH_CLICKED,
+                                                 param);
+                            ((gui_img_t *)parent)->simple = 0;
+                        }
                     }
 
                 }
@@ -5371,6 +5686,11 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                                                          (gui_event_cb_t)light_switch_on_cb, light);
                         GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
                                                           (gui_event_cb_t)light_switch_off_cb, light);
+                    }
+                    else if (parent->type == IMAGE_FROM_MEM)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)light_control_cb, GUI_EVENT_TOUCH_CLICKED, light);
+                        ((gui_img_t *)parent)->simple = 0;
                     }
                 }
 
@@ -5404,6 +5724,11 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                                                           (gui_event_cb_t)pause_animation_cb,
                                                           (param));
                     }
+                    else if (parent->type == IMAGE_FROM_MEM)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)pause_animation_cb, GUI_EVENT_TOUCH_CLICKED, param);
+                        ((gui_img_t *)parent)->simple = 0;
+                    }
 
                 }
                 else if (!strcmp(type, "animate"))
@@ -5423,6 +5748,11 @@ static gui_obj_t *widget_create_macro_onclick(ezxml_t p, gui_obj_t *parent, T_OB
                         GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
                                                           (gui_event_cb_t)start_animation_cb,
                                                           (param));
+                    }
+                    else if (parent->type == IMAGE_FROM_MEM)
+                    {
+                        gui_obj_add_event_cb(parent, (gui_event_cb_t)start_animation_cb, GUI_EVENT_TOUCH_CLICKED, param);
+                        ((gui_img_t *)parent)->simple = 0;
                     }
 
                 }
@@ -10218,6 +10548,9 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
         int column_offset = 0; GUI_UNUSED(column_offset);
         const char *font = 0;
         int16_t font_size = 0;
+        const char *font_highlight = 0;
+        uint16_t font_size_highlight = 0;
+        uint16_t  index_highlight = 0;
         gui_color_t  font_color = {0};
         gui_color_t  font_color_highlight = {0};
         gui_color_t  item_color = {0}; GUI_UNUSED(item_color);
@@ -10266,9 +10599,21 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
             {
                 font = p->attr[++i];
             }
+            else if (!strcmp(p->attr[i], "fontHighlight"))
+            {
+                font_highlight = p->attr[++i];
+            }
             else if (!strcmp(p->attr[i], "fontSize"))
             {
                 font_size = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "fontSizeHighlight"))
+            {
+                font_size_highlight = atoi(p->attr[++i]);
+            }
+            else if (!strcmp(p->attr[i], "itemIndexHighlight"))
+            {
+                index_highlight = atoi(p->attr[++i]);
             }
             else if (!strcmp(p->attr[i], "fontColor"))
             {
@@ -10316,25 +10661,17 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
             else if (!strcmp(p->attr[i], "fontMode"))
             {
                 char *s = p->attr[++i];
-                if (!strcmp(p->attr[i], "truncate"))
+                if (!strcmp(p->attr[i], "left"))
                 {
-                    style = (TEXT_MODE)0;
-                }
-                else if (!strcmp(p->attr[i], "verticalscroll"))
-                {
-                    style = SCROLL_Y;
-                }
-                else if (!strcmp(p->attr[i], "left"))
-                {
-                    style = LEFT;
+                    style = MID_LEFT;
                 }
                 else if (!strcmp(p->attr[i], "center"))
                 {
-                    style = CENTER;
+                    style = MID_CENTER;
                 }
                 else if (!strcmp(p->attr[i], "right"))
                 {
-                    style = RIGHT;
+                    style = MID_RIGHT;
                 }
             }
             else if (!strcmp(p->attr[i], "hidden"))
@@ -10432,14 +10769,21 @@ static gui_obj_t *widget_create_type_scroll_wheel_new(ezxml_t p, gui_obj_t *pare
             gui_log("Failed to create scroll wheel widget.\n");
             return 0;;
         }
+        scroll_wheel->font = gui_get_file_address(font);
+        scroll_wheel->font_size = font_size;
+        scroll_wheel->font_size_highlight = font_size_highlight;
+        scroll_wheel->font_highlight = gui_get_file_address(font_highlight);
+
         scroll_wheel->font_color = font_color;
         scroll_wheel->font_color_highlight = font_color_highlight;
+        scroll_wheel->index_highlight = index_highlight;
         extern void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
                                                            const void *font_file_pointer,
                                                            int font_size, TEXT_MODE mode);
-        gui_scroll_wheel_new_render_text_alien(scroll_wheel, gui_get_file_address(font), font_size, style);
+        gui_scroll_wheel_new_render_text_alien(scroll_wheel, scroll_wheel->font, font_size, style);
         scroll_wheel->loop = loop;
         scroll_wheel->blank_count = blank_count;
+
         parent = GUI_BASE(scroll_wheel);
         gui_obj_hidden(parent, hidden);
     }
@@ -11862,7 +12206,11 @@ static gui_obj_t *widget_create_macro_chart(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
     return parent;
 }
-
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(image_input)
+{
+    gui_log("image_input\n");
+    return;
+}
 static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
 
@@ -12066,6 +12414,8 @@ static gui_obj_t *widget_create_image(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
             gui_img_set_mode((gui_img_t *)parent, blendMode);
             gui_img_set_opacity((gui_img_t *)parent, opacity);
             parent->obj_cb = img_render;
+            // gui_obj_add_event_cb(parent, image_input, GUI_EVENT_TOUCH_CLICKED, 0);
+            // ((gui_img_t *)parent)->simple = 0;
         }
     }
 
@@ -14773,174 +15123,8 @@ static void button_render(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
-#include "gui_text.h"
-#include "gui_matrix.h"
-#include "font_mem.h"
-#include "font_ttf.h"
 
-
-
-
-#include "gui_fb.h"
-static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
-{
-    text->scope = 0;
-    gui_obj_t *o = (gui_obj_t *)text;
-    gui_win_t *win_scope = NULL;
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
-        {
-            text->scope = 1;
-            win_scope = (void *)o;
-            break;
-        }
-    }
-    if (text->scope && win_scope != NULL)
-    {
-        int scopex = win_scope->base.matrix->m[0][2];
-        int scopey = win_scope->base.matrix->m[1][2];
-        int scopew = win_scope->base.matrix->m[0][0] * win_scope->base.w;
-        int scopeh = win_scope->base.matrix->m[1][1] * win_scope->base.h;
-
-        rect->xboundleft = _UI_MAX(scopex, rect->xboundleft);
-        rect->xboundright = _UI_MIN(scopex + scopew - 1, rect->xboundright);
-        rect->yboundtop = _UI_MAX(scopey, rect->yboundtop);
-        rect->yboundbottom = _UI_MIN(scopey + scopeh - 1, rect->yboundbottom);
-    }
-}
-
-
-
-
-
-static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
-{
-    extern void gui_text_font_load_global(gui_text_t *text, gui_text_rect_t *rect);
-    gui_text_font_load_global(text, rect);
-}
-
-static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
-{
-    extern void gui_text_font_draw_global(gui_text_t *text, gui_text_rect_t *rect);
-    gui_text_font_draw_global(text, rect);
-}
-
-static void gui_text_font_unload(gui_text_t *text)
-{
-    extern void gui_text_font_unload_global(gui_text_t *text);
-    gui_text_font_unload_global(text);
-}
-static void gui_text_draw(gui_obj_t *obj)
-{
-    gui_text_t *text = (gui_text_t *)obj;
-    struct gui_dispdev *dc;
-    gui_text_rect_t draw_rect = {0};
-    uint32_t total_section_count = UINT32_MAX;
-
-    if (text->len == 0)
-    {
-        text->content_refresh = false;
-        text->layout_refresh = false;
-        return;
-    }
-
-    dc = gui_get_dc();
-    draw_rect.x1 = text->offset_x;
-    draw_rect.y1 = text->offset_y;
-    draw_rect.x2 = draw_rect.x1 + obj->w - 1;
-    draw_rect.y2 = draw_rect.y1 + obj->h - 1;
-    if (text->mode != VERTICAL_LEFT)
-    {
-        draw_rect.xboundleft = draw_rect.x1;
-        draw_rect.xboundright = draw_rect.x2;
-        draw_rect.yboundtop = draw_rect.y1;
-        draw_rect.yboundbottom = draw_rect.y2;
-        gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
-    }
-
-
-
-    if (dc->section_count == 0)
-    {
-        gui_text_font_load(text, &draw_rect);
-    }
-    if (text->font_type == GUI_FONT_SRC_TTF)
-    {
-        gui_font_ttf_adapt_rect(text, &draw_rect);
-    }
-    if (text->font_type == GUI_FONT_SRC_MAT && text->use_img_blit)
-    {
-        gui_font_ttf_adapt_rect(text, &draw_rect);
-    }
-
-    if (dc->pfb_type == PFB_X_DIRECTION)
-    {
-        total_section_count = dc->screen_width / dc->fb_width -
-                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
-        if (!(draw_rect.x1 >= (int)(dc->section_count + 1)*dc->fb_width || \
-              draw_rect.x2 < (int)(dc->section_count)*dc->fb_width))
-        {
-            gui_text_font_draw(text, &draw_rect);
-        }
-    }
-    else if (dc->pfb_type == PFB_Y_DIRECTION)
-    {
-        total_section_count = dc->screen_height / dc->fb_height -
-                              ((dc->screen_height % dc->fb_height) ? 0 : 1);
-        if (!(draw_rect.y1 >= (int)(dc->section_count + 1)*dc->fb_height || \
-              draw_rect.y2 < (int)(dc->section_count)*dc->fb_height))
-        {
-            gui_text_font_draw(text, &draw_rect);
-        }
-    }
-
-    if (dc->section_count == total_section_count)
-    {
-        gui_text_font_unload(text);
-    }
-}
-
-
-static void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
-{
-    if (obj != NULL)
-    {
-        extern void gui_text_input_prepare_global(gui_obj_t *obj);
-
-        extern void gui_text_prepare_global(gui_obj_t *obj);
-
-        extern void gui_text_end_global(gui_obj_t *obj);
-
-        extern void gui_text_destroy_global(gui_obj_t *obj);
-
-        switch (cb_type)
-        {
-        case OBJ_INPUT_PREPARE:
-            gui_text_input_prepare_global(obj);
-            break;
-        case OBJ_PREPARE:
-            gui_text_prepare_global(obj);
-            break;
-
-        case OBJ_DRAW:
-            gui_text_draw(obj);
-            break;
-
-        case OBJ_END:
-            gui_text_end_global(obj);
-            break;
-
-        case OBJ_DESTROY:
-            gui_text_destroy_global(obj);
-            break;
-
-        default:
-            break;
-        }
-    }
-}
+extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
 
 static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(page_list_wifi_cb)
 {

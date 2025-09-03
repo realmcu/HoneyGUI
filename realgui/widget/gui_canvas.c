@@ -355,3 +355,71 @@ const uint8_t *gui_canvas_output(int format, bool compression, int image_width, 
     }
     return output_data;
 }
+
+const uint8_t *gui_canvas_output_param(int format, bool compression, int image_width,
+                                       int image_height, gui_canvas_render_function_param renderer, void *param)
+{
+    int pixel_length = 4;
+    int data_length = 0;
+    uint8_t *buffer = 0;
+    uint8_t *output_data = 0;
+    switch (format)
+    {
+    case GUI_CANVAS_OUTPUT_PNG:
+    case GUI_CANVAS_OUTPUT_JPG:
+        {
+            data_length = image_width * image_height * pixel_length;
+            buffer = gui_lower_malloc(data_length);
+            memset(buffer, 0, data_length);
+        }
+        break;
+    case GUI_CANVAS_OUTPUT_RGBA:
+        {
+            data_length = image_width * image_height * pixel_length + sizeof(gui_rgb_data_head_t);
+            output_data = gui_lower_malloc(data_length);
+            buffer = output_data + sizeof(gui_rgb_data_head_t);
+            memset(output_data, 0, data_length);
+            gui_rgb_data_head_t *head = (void *)output_data;
+            head->type = ARGB8888;
+            head->w = image_width;
+            head->h = image_height;
+        }
+        break;
+    case GUI_CANVAS_OUTPUT_RGB565:
+        {
+            pixel_length = 2;
+            data_length = image_width * image_height * pixel_length + sizeof(gui_rgb_data_head_t);
+            output_data = gui_lower_malloc(data_length);
+            memset(output_data, 0, data_length);
+            buffer = output_data + sizeof(gui_rgb_data_head_t);
+            gui_rgb_data_head_t *head = (void *)output_data;
+            head->type = RGB565;
+            head->w = image_width;
+            head->h = image_height;
+        }
+        break;
+    default:
+        break;
+    }
+
+    {
+        NVGcontext *vg = 0;
+        extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                         uint32_t h,
+                                         uint32_t stride,
+                                         enum     NVGtexture format,
+                                         uint8_t *data);
+        extern void nvgDeleteAGGE(NVGcontext * ctx);
+        vg = nvgCreateAGGE(image_width, image_height, image_width * (pixel_length),
+                           (pixel_length) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, buffer);
+        nvgBeginFrame(vg, image_width, image_height, 1);
+
+        nvgResetTransform(vg);
+
+        renderer(vg, param);
+
+        nvgEndFrame(vg);
+        nvgDeleteAGGE(vg);
+    }
+    return output_data;
+}

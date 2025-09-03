@@ -149,6 +149,7 @@ void gui_img_input_prepare(gui_obj_t *obj)
  */
 void gui_img_prepare(gui_obj_t *obj)
 {
+    gui_img_update_att(obj);
     uint8_t last;
     gui_img_t *this;
     touch_info_t *tp;
@@ -204,7 +205,7 @@ void gui_img_prepare(gui_obj_t *obj)
     this->draw_img->high_quality = this->high_quality;
     this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
 
-    gui_img_update_att(obj);
+
     if (!(((gui_img_t *)obj)->simple))
     {
         if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
@@ -239,7 +240,7 @@ void gui_img_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     draw_img_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
-    if (!(((gui_img_t *)obj)->simple))
+    //if (!(((gui_img_t *)obj)->simple))
     {
         {
             this->scope = 0;
@@ -332,12 +333,20 @@ void gui_img_prepare(gui_obj_t *obj)
     bool honeycomb_click = false;
     if (!(((gui_img_t *)obj)->simple))
     {
-        if (gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
+        for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+        {
+            gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+            if (event_dsc->filter == GUI_EVENT_1)
+            {
+                honeycomb_click = true;
+            }
+
+        }
+        if (honeycomb_click && gui_obj_point_in_obj_circle(obj, tp->x, tp->y) == true)
         {
             if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
             {
                 gui_obj_enable_event(obj, GUI_EVENT_1);
-                honeycomb_click = true;
             }
         }
         if (!honeycomb_click && gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
@@ -380,7 +389,7 @@ void gui_img_draw_cb(gui_obj_t *obj)
 
 
 
-    if (!(((gui_img_t *)obj)->simple))
+    //if (!(((gui_img_t *)obj)->simple))
     {
         // cache img to buffer
         draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
@@ -402,10 +411,10 @@ void gui_img_draw_cb(gui_obj_t *obj)
         // release img if cached
         draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
     }
-    else
-    {
-        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
-    }
+    // else
+    // {
+    //     gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+    // }
 
 
 
@@ -607,7 +616,6 @@ static void gui_img_ctor(gui_img_t            *this,
         this->ftl = (void *)path;
     }
 
-    this->opacity_value = 255;
     this->blend_mode = IMG_FILTER_BLACK;
     this->opacity_value = UINT8_MAX;
 

@@ -63,6 +63,12 @@ typedef struct gui_scroll_wheel_new
     int history_y;
     gui_color_t font_color;
     gui_color_t font_color_highlight;
+    const uint8_t *font;
+    const uint8_t *font_highlight;
+    uint16_t font_size;
+    uint16_t font_size_highlight;
+    uint16_t index_highlight;
+    uint16_t font_size_default;
 } gui_scroll_wheel_new_t;
 
 

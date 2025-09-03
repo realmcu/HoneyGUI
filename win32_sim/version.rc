@@ -1,8 +1,8 @@
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 1,0,12,2
-PRODUCTVERSION 1,0,12,2
+FILEVERSION 1,0,12,3
+PRODUCTVERSION 1,0,12,3
 FILEFLAGSMASK 0x3fL
 FILEFLAGS 0x0L
 FILEOS 0x4L
@@ -15,11 +15,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Realtek"
             VALUE "FileDescription", "UI Engine by Realtek"
-            VALUE "FileVersion", "1.0.12.2"
+            VALUE "FileVersion", "1.0.12.3"
             VALUE "InternalName", "RVD Engine"
             VALUE "OriginalFilename", "gui.exe"
             VALUE "ProductName", "HoneyGUI"
-            VALUE "ProductVersion", "1.0.12.2"
+            VALUE "ProductVersion", "1.0.12.3"
             VALUE "LegalCopyright", "REALTEK Semiconductor Corp. All rights reserved."
         END
     END

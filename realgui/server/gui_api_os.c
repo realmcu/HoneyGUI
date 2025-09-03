@@ -334,7 +334,14 @@ uint32_t gui_mem_used(void)
     gui_log("gui sram used: %d\n", total_used_size);
     return total_used_size;
 }
-
+uint32_t gui_mem_used_update(void)
+{
+    total_used_size = 0;
+    GUI_UNUSED(total_used_size);
+    GUI_ASSERT(tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(tlsf), walker, &total_used_size);
+    return total_used_size;
+}
 void *gui_lower_malloc(size_t n)
 {
     void *ptr = NULL;
@@ -379,6 +386,14 @@ uint32_t gui_low_mem_used(void)
     GUI_ASSERT(lower_tlsf != NULL);
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), walker, &total_used_size);
     gui_log("gui psram used: %d\n", total_used_size);
+    return total_used_size;
+}
+uint32_t gui_low_mem_used_update(void)
+{
+    total_used_size = 0;
+    GUI_UNUSED(total_used_size);
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(lower_tlsf), walker, &total_used_size);
     return total_used_size;
 }
 void gui_sleep_cb(void)

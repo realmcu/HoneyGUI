@@ -63,6 +63,7 @@ typedef struct gui_page
     uint8_t status;
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
     uint8_t checksum;
+    uint16_t default_h;
 } gui_page_t;
 
 typedef enum
@@ -82,8 +83,8 @@ typedef enum
  *                         Macros
  *============================================================================*/
 
-#define GUI_PAGE_MAX_SPEED 60
-#define GUI_PAGE_MIN_SPEED 7
+#define GUI_PAGE_MAX_SPEED 20
+#define GUI_PAGE_MIN_SPEED 1
 
 
 /*============================================================================*

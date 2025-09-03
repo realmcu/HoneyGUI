@@ -61,15 +61,20 @@ static char low_mem_string[20];
 
 static void gui_fps_cb(void *p, void *this_widget, gui_animate_t *animate)
 {
-
+    if (!animate->Beginning_frame)
+    {
+        return;
+    }
+    extern uint32_t gui_low_mem_used_update(void);
+    extern uint32_t gui_mem_used_update(void);
     int fps_num = gui_fps();
     sprintf(fps, "FPS:%d", fps_num);
     gui_text_content_set(t, fps, strlen(fps));
     int widget_count_number = gui_get_obj_count();
     sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
     gui_text_content_set(widget_count, widget_count_string, strlen(widget_count_string));
-    uint32_t mem_number =  gui_mem_used();
-    uint32_t low_mem_number =  gui_low_mem_used();
+    uint32_t mem_number =  gui_mem_used_update();
+    uint32_t low_mem_number =  gui_low_mem_used_update();
     sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
     gui_text_content_set(mem, mem_string, strlen(mem_string));
     sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
@@ -898,7 +903,7 @@ gui_obj_t *gui_fps_create(void *parent)
     gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
                                                      gui_get_screen_width() / 2 - 120 / 2, 0, 120, 65, APP_COLOR_GRAY_OPACITY(150));
     gui_win_t *win = gui_win_create(rect, 0, 0, 0, 454, 454);
-    gui_win_set_animate(win, 500, -1, gui_fps_cb, win);
+    gui_win_set_animate(win, 1000, -1, gui_fps_cb, win);
 
     sprintf(fps, "FPS:%d", 1000 / gui_spf());
     text = fps;
