@@ -17,11 +17,12 @@ int gui_h264bsd_get_frame(void *gui_decoder, uint8_t *frame_buff, uint32_t buff_
     gui_dec->decoder->conversionBufferSize = buff_size;
     while (gui_dec->len > 0)
     {
-        gui_dec->status = h264bsdDecode(decoder, gui_dec->byteStrm, gui_dec->len, 0, &(gui_dec->bytesRead));
+        gui_dec->status = h264bsdDecode(decoder, gui_dec->byteStrm, gui_dec->len, 0,
+                                        (u32 *) & (gui_dec->bytesRead));
 
         if (gui_dec->status == H264BSD_PIC_RDY)
         {
-            uint32_t picId, isIdrPic, numErrMbs;
+            u32 picId, isIdrPic, numErrMbs;
             // ++numFrames;
             // gui_log("h264 frame %f \n", numFrames);
             h264bsdNextOutputPictureBGR565(decoder, &picId, &isIdrPic, &numErrMbs);

@@ -34,14 +34,14 @@ private:
 
 inline void vertex_sequence::move_to(real_t x, real_t y)
 {
-    vertex v = { { x, y } };
+    vertex v = { { x, y }, 0};
 
     push_back(v);
 }
 
 inline void vertex_sequence::line_to(real_t x, real_t y)
 {
-    vertex v = { { x, y } };
+    vertex v = { { x, y }, 0};
 
     if (empty())
     {

@@ -39,14 +39,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -gdwarf-4 \
     -O3 \
     -Wno-packed \
-    -Wno-missing-variable-declarations \
-    -Wno-missing-prototypes \
     -Wno-missing-noreturn \
     -Wno-sign-conversion \
-    -Wno-nonportable-include-path \
-    -Wno-reserved-id-macro \
     -Wno-unused-macros \
-    -Wno-documentation-unknown-command \
-    -Wno-documentation \
-    -Wno-license-management \
-    -Wno-parentheses-equality")
+    -Wmissing-field-initializers")
