@@ -1,5 +1,5 @@
 #include <gui_img.h>
-#if  __ARM_FEATURE_MVE
+#ifdef  __ARM_FEATURE_MVE
 #include "arm_mve.h"
 #endif
 

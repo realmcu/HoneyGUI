@@ -120,7 +120,7 @@ static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
     }
 }
 
-#if _WIN32
+#ifdef _WIN32
 static const char *get_type_name(T_OBJ_TYPE type)
 {
     switch (type)
@@ -186,7 +186,7 @@ static const char *get_type_name(T_OBJ_TYPE type)
 }
 #endif
 
-#if _WIN32
+#ifdef _WIN32
 static void sanitize_identifier(char *id)
 {
     for (char *p = id; *p; p++)
@@ -199,7 +199,7 @@ static void sanitize_identifier(char *id)
 }
 #endif
 
-#if _WIN32
+#ifdef _WIN32
 static void internal_gui_obj_tree_print_mmd(FILE *file, gui_obj_t *obj)
 {
     gui_node_list_t *node = NULL;
@@ -417,7 +417,7 @@ void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
 
 void gui_obj_tree_print_mmd(gui_obj_t *obj)
 {
-#if _WIN32
+#ifdef _WIN32
     // Open the file for writing
     FILE *file = fopen("realgui/example/web/tree/diagram.mmd", "w");
     if (file == NULL)

@@ -34,7 +34,7 @@
 // #define ALLOW_UNALIGNED_TRUETYPE
 
 /*MVE*/
-#if  __ARM_FEATURE_MVE
+#ifdef  __ARM_FEATURE_MVE
 // #define STB_TRUETYPE_USE_MVE
 #define FONT_STB_USE_MVE
 #include "arm_mve.h"

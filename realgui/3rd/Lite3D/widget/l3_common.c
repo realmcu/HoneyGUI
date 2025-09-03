@@ -22,10 +22,14 @@
 #include "l3_port.h"
 
 #define GUI_ENABLE_MVE      0
-#if  __ARM_FEATURE_MVE & GUI_ENABLE_MVE
+
+#ifdef __ARM_FEATURE_MVE
+#if GUI_ENABLE_MVE
 #define GUI_3D_USE_MVE
 #include <arm_mve.h>
 #endif
+#endif
+
 
 /* Calculates coefficients of perspective transformation
 * which maps (xi,yi) to (ui,vi), (i=1,2,3,4):

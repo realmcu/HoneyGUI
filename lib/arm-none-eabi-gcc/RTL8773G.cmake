@@ -13,6 +13,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -mlittle-endian \
     -gdwarf-4 \
     -O3 \
+    -Werror=undef \
     -Wno-packed \
     -Wno-missing-variable-declarations \
     -Wno-missing-prototypes \
