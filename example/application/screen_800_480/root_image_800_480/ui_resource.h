@@ -1,5 +1,5 @@
 #if defined _WIN32
-extern unsigned char resource_root[];
+extern uint8_t *resource_root;
 
 #define   HARMONYOS_SANS_BIN                      (void *)(resource_root + 0x00000078)
 #define   HARMONYOS_SANS_BOLD_BIN                 (void *)(resource_root + 0x00002978)
@@ -10,7 +10,7 @@ extern unsigned char resource_root[];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[];
+extern uint8_t *resource_root;
 
 #define   HARMONYOS_SANS_BIN                      (void *)(resource_root + 0x00000078)
 #define   HARMONYOS_SANS_BOLD_BIN                 (void *)(resource_root + 0x00002978)
@@ -115,7 +115,7 @@ extern unsigned char resource_root[];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[];
+extern uint8_t *resource_root;
 
 #define   HARMONYOS_SANS_BIN                      (void *)(resource_root + 0x00000078)
 #define   HARMONYOS_SANS_BOLD_BIN                 (void *)(resource_root + 0x00002978)

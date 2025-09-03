@@ -33,7 +33,7 @@ CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
 
 LFLAGS = ' -T default.ld'
 # LFLAGS += ' -flto' #for arm2d
-LFLAGS += ' -pthread'
+LFLAGS += ' -pthread -static-libgcc -static-libstdc++ -static'
 LFLAGS += ' -Wl,-Map=gui.map'
 
 POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n'

@@ -88,7 +88,7 @@
 // </c>
 
 // <c> RTK GUI Demo 410 502
-#define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
 // </c>
 
 // <c> RTK GUI Demo 410 502 Lvgl
@@ -125,7 +125,7 @@
 // </c>
 
 // <c> RTK GUI Demo 800 480
-// #define CONFIG_REALTEK_BUILD_GUI_800_480_DEMO
+#define CONFIG_REALTEK_BUILD_GUI_800_480_DEMO
 // </c>
 
 // </h>

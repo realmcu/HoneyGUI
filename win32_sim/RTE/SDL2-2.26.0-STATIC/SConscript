@@ -1,0 +1,20 @@
+from building import *
+
+cwd = GetCurrentDir()
+
+src = []
+libs = ['']
+libs += ['SDL2main','SDL2']
+
+
+libpath = [cwd]
+libpath += [cwd + '/lib']
+
+
+include = [cwd]        
+include += [cwd + '/include/SDL2']
+
+
+group = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+
+Return('group')

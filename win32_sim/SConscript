@@ -13,6 +13,7 @@ CPPPATH = [cwd,
 
 #src = Glob('*.c')
 src = ['main.c']
+src += ['version.o']
 
 
 CPPDEFINES = ['GUI_WIN32_SIM']

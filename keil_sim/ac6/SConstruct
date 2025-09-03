@@ -32,6 +32,7 @@ Export('PLATFORM')
 
 Export('TOOL_ROOT')
 Export('RTK_GUI_ENGINE')
+Export('env')
 
 
 print('TOOL ROOT = ' + TOOL_ROOT)

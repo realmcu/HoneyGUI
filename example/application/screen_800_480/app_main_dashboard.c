@@ -42,7 +42,7 @@ static char mem_string[20];
 static char low_mem_string[20];
 
 #ifdef _WIN32
-uint8_t resource_root[1024 * 1024 * 20];
+uint8_t *resource_root = NULL;
 #endif
 
 /*============================================================================*
@@ -110,32 +110,14 @@ static void fps_create(void *parent)
     gui_text_rendermode_set(t_fps, 2);
 }
 
+extern const unsigned char _binary_root_0x4400000_bin_start[];
+extern const unsigned char _binary_root_0x4400000_bin_end[];
+extern const unsigned char _binary_root_0x4400000_bin_size[];
+
 static int app_init(void)
 {
 #ifdef _WIN32
-    extern int open(const char *file, int flags, ...);
-    extern int read(int fd, void *buf, size_t len);
-    extern int close(int fd);
-    defaultPath = "example\\application\\screen_800_480\\root_image_800_480\\root\\";
-    int fd;
-    fd = open("./example/application/screen_800_480/root_image_800_480/root(0x4400000).bin", 0);
-    if (fd < 0)
-    {
-        printf("open root(0x4400000).bin Fail!\n");
-        printf("open root(0x4400000).bin Fail!\n");
-        printf("open root(0x4400000).bin Fail!\n");
-        return 0;
-    }
-
-    printf("open root(0x4400000).bin Successful!\n");
-    ssize_t bytes_read = read(fd, resource_root, 1024 * 1024 * 20);
-    if (bytes_read < 0)
-    {
-        printf("read bin file failed!\n");
-        close(fd);
-        return 0;
-    }
-    close(fd);
+    resource_root = (uint8_t *)_binary_root_0x4400000_bin_start;
 #endif
     win_map = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);

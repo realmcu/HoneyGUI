@@ -4,7 +4,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <memory>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <exception>
 
 #define MINIMP3_IMPLEMENTATION
