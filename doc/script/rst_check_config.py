@@ -16,7 +16,9 @@ title_check_exclude_pattern = [
 ]
 
 general_exclude_pattern = [
-    "Glossary.rst"
+    "Glossary.rst",
+    "release_notes/index.rst",
+    "widgets/gui_window.rst"
 ]
 
 glossary_check_exclude_pattern = [

@@ -127,13 +127,13 @@ the multi-line layout will adhere to English word wrapping rules to prevent word
 Character Rendering
 ~~~~~~~~~~~~~~~~~~~~
 
-The code for rendering bitmap characters is located in the :cpp:any:`rtk_draw_unicode` function in ``font_mem.c``.
+The code for rendering bitmap characters is located in the ``rtk_draw_unicode`` function in ``font_mem.c``.
 
 You can enable matrix operations for the text widget to support text scaling effects;
-the rendering code for this feature is in :cpp:any:`rtk_draw_unicode_matrix` in ``font_mem_matrix.c``.
+the rendering code for this feature is in ``rtk_draw_unicode_matrix`` in ``font_mem_matrix.c``.
 
 Additionally, you can enable a feature to convert text into an image for achieving complex effects;
-this rendering code is found in :cpp:any:`gui_font_bmp2img_one_char` in ``font_mem_img.c``.
+this rendering code is found in ``gui_font_bmp2img_one_char`` in ``font_mem_img.c``.
 
 The character rendering stage does not involve any layout information; it only reads the glyph information and renders it to the screen buffer.
 

@@ -44,7 +44,7 @@ HoneyGUI 模拟器
 -----------------------------
 HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南`  章节。
 
-完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 :c:macro:`CONFIG_REALTEK_BUILD_LVGL_GUI`。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
+完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 ``CONFIG_REALTEK_BUILD_LVGL_GUI``。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
 
 
 .. image:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
@@ -53,7 +53,7 @@ HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中�
 
 
 1. 当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript`
-文件，修改其中的屏幕宽度 :c:macro:`DRV_LCD_WIDTH` 和 屏幕高度 :c:macro:`DRV_LCD_HIGHT`，均为像素单位。
+文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HIGHT``，均为像素单位。
 
 .. image:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center
@@ -196,13 +196,13 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 ``void lv_port_disp_init(void)`` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``。
 
-文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 :c:macro:`DISPLAY_FLUSH_TYPE` 以切换模式，其中 :c:macro:`RAMLESS_XXX` 适用于不带有 RAM 的 display IC， :c:macro:`RAM_XXX` 适用于带有 RAM 的 display IC，:c:macro:`XXX_FULL_SCREEN_XXX` 表示为每次整屏推出，:c:macro:`XXX_TWO_SEC` 表示为只绘制变化的显示内容，单位为两个 buffer 大小，buffer 的像素高度由 :c:macro:`SECTION_HEIGHT` 定义。
+文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有 RAM 的 display IC， ``RAM_XXX`` 适用于带有 RAM 的 display IC， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小，buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
 
 
 详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 RAM 的 display IC：
 
 - 使用不带有 RAM 的 display IC 时，必须为其分配整屏尺寸的 frame buffer，因此在 PSRAM 上分配了两个整屏尺寸的 frame buffer 用于显示。显示的参数宏定义已定义在文件 :file:`lv_conf.h` 中。
-- 若使用的 display IC 带有 RAM，则 frame buffer 的大小不必为整屏尺寸。由于刷屏方式的不同，需要配置 :file:`lv_port_disp.c` 中的 :c:macro:`LVGL_USE_EDPI` 为不启用(0)，以切换 ``disp_flush`` 函数适配刷屏。
+- 若使用的 display IC 带有 RAM，则 frame buffer 的大小不必为整屏尺寸。由于刷屏方式的不同，需要配置 :file:`lv_port_disp.c` 中的 ``LVGL_USE_EDPI`` 为不启用(0)，以切换 ``disp_flush`` 函数适配刷屏。
 
 
 .. code-block:: c
@@ -611,7 +611,7 @@ LittleFS 文件系统支持读写操作，且具有掉电保护的特点，Honey
 
 1. 工作路径为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
 2. 打开工作路径，将需要打包的文件放置于 :file:`root/` 文件夹下，双击脚本 :file:`mklittlefs_img.bat` 生成文件系统镜像 :file:`root.bin`。
-3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash。若需要修改文件系统的大小, 修改脚本 :file:`mklittlefs_img.bat` 中的 **"-s <number>"** 参数即可。当使用 :file:`rtk_fs.c` 中的接口进行文件操作时，其中的 :c:macro:`RTK_FS_MNT_ADDR` 需与烧录地址一致，:c:macro:`MAX_LFS_SIZE` 需与文件系统大小一致。
+3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash。若需要修改文件系统的大小, 修改脚本 :file:`mklittlefs_img.bat` 中的 **"-s <number>"** 参数即可。当使用 :file:`rtk_fs.c` 中的接口进行文件操作时，其中的 ``RTK_FS_MNT_ADDR`` 需与烧录地址一致， ``MAX_LFS_SIZE`` 需与文件系统大小一致。
 4. 如需解包文件系统镜像，双击脚本 :file:`unpack_littlefs_img.bat` 将 :file:`root.bin` 解包到 :file:`root_up/` 文件夹下。
 
 .. code-block:: console
@@ -818,7 +818,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
     **注意1：转换结果文件的存放路径:** 将转换后的 C 文件存放在以下参考路径：
     :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets`
     
-    **注意2：修改图像描述符中的色彩格式 cf:** 导出的C文件，例如 :file:`logo_lvgl_rle.c`，需要对其中的图像描述符进行修改，保证 `cf` 设置为 :c:macro:`LV_IMG_CF_RAW`：
+    **注意2：修改图像描述符中的色彩格式 cf:** 导出的 C 文件，例如 :file:`logo_lvgl_rle.c`，需要对其中的图像描述符进行修改，保证 `cf` 设置为 ``LV_IMG_CF_RAW``：
     
     .. code-block:: c
 
@@ -887,11 +887,11 @@ LVGL 启用 RLE 解码器
 
 为了在 LVGL 中解码 RLE 压缩的图片资源，需要配置启用 RLE 解码器，并为其分配缓存空间。
 
-1. 启用 RLE 解码器：在配置文件 :file:`lv_conf.h` 中找到 :c:macro:`LV_USE_RTK_IDU` 宏定义，并将其设置为启用 ``#define LV_USE_RTK_IDU 1``
+1. 启用 RLE 解码器：在配置文件 :file:`lv_conf.h` 中找到 ``LV_USE_RTK_IDU`` 宏定义，并将其设置为启用 ``#define LV_USE_RTK_IDU 1``
 
 2. 分配解码缓存：在 :file:`lv_conf.h` 文件中配置以下参数：
-    - :c:macro:`LV_PSRAM_START`：缓存的起始地址
-    - :c:macro:`LV_PSRAM_SIZE`：缓存空间大小，确保此大小足够容纳所使用的最大整张图片的解码数据
+    - ``LV_PSRAM_START``：缓存的起始地址
+    - ``LV_PSRAM_SIZE``：缓存空间大小，确保此大小足够容纳所使用的最大整张图片的解码数据
 
 .. code-block:: c
 

@@ -40,14 +40,14 @@ LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。�
 -----------------------------
 LVGL 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南`  章节。
 
-完成模拟器的环境安装后，启动运行将看到模拟器默认的 LVGL 工程。修改模拟器配置文件以运行不同的 LVGL 的工程，在路径 :file:`your lvgl dir/rtk/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，可以通过修改 :c:macro:`LVGL_DEMO_APP` 的数值来选择模拟器运行的示例工程。在 VScode 中再次启动运行，构建编译通过后即可看到模拟器运行选定的示例工程。
+完成模拟器的环境安装后，启动运行将看到模拟器默认的 LVGL 工程。修改模拟器配置文件以运行不同的 LVGL 的工程，在路径 :file:`your lvgl dir/rtk/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，可以通过修改 ``LVGL_DEMO_APP`` 的数值来选择模拟器运行的示例工程。在 VScode 中再次启动运行，构建编译通过后即可看到模拟器运行选定的示例工程。
 
 .. image:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
    :align: center
    :width: 408
 
 当需要修改屏幕尺寸时，修改文件 :file:`your lvgl dir/rtk/demos/xxxxxx/` 下的 :file:`SConscript`
-文件，修改其中的屏幕宽度 :c:macro:`DRV_LCD_WIDTH` 和 屏幕高度 :c:macro:`DRV_LCD_HIGHT`，均为像素单位。
+文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HIGHT``，均为像素单位。
 
 .. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
    :align: center
@@ -167,30 +167,30 @@ LVGL 支持三种显示缓冲区的渲染方式，每种方式适用于不同的
   - 优点：实现简单，适合对刷新速度或兼容性有特殊要求的场合。
 
 
-根据实际开发需求，根据不同的内存资源以及渲染方式，SDK 中的文件 :file:`lv_port_disp.c` 已配置好了四种推荐的渲染方案供参考，配置 :c:macro:`ACTIVE_DISPLAY_SCHEME` 以切换模式：
+根据实际开发需求，根据不同的内存资源以及渲染方式，SDK 中的文件 :file:`lv_port_disp.c` 已配置好了四种推荐的渲染方案供参考，配置 ``ACTIVE_DISPLAY_SCHEME`` 以切换模式：
 
-- :c:macro:`SCHEME_RAM_PARTIAL` 区域绘制方案
+- ``SCHEME_RAM_PARTIAL`` 区域绘制方案
 
   - 使用分块渲染方案
   - 配置两块 RAM 区域缓存
   - 适用于没有 PSRAM 的 MCU
   - 该方案仅支持带有 RAM 的 display IC
 
-- :c:macro:`SCHEME_RAM_PSRAM_PARTIAL` 带有整屏缓存的区域绘制方案
+- ``SCHEME_RAM_PSRAM_PARTIAL`` 带有整屏缓存的区域绘制方案
 
   - 使用分块渲染方案
   - 配置两块 RAM 区域缓存以及一块 PSRAM 整屏缓存
   - 该方案仅支持带有 PSRAM 的 MCU
   - 对 display IC 无特殊要求
 
-- :c:macro:`SCHEME_PSRAM_DIRECT` 整屏直写方案
+- ``SCHEME_PSRAM_DIRECT`` 整屏直写方案
 
   - 使用直写渲染方案
   - 配置两块 PSRAM 区域缓存
   - 该方案仅支持带有 PSRAM 的 MCU
   - 对 display IC 无特殊要求
 
-- :c:macro:`SCHEME_PSRAM_FULL` 整屏重绘方案
+- ``SCHEME_PSRAM_FULL`` 整屏重绘方案
 
   - 使用全屏重绘方案
   - 配置两块 PSRAM 区域缓存

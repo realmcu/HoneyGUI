@@ -40,13 +40,13 @@ Running LVGL in the Simulator
 -----------------------------------
 The LVGL simulator is based on the scons tool and the MinGW-w64 toolchain, running and debugging in VScode. For specific environment configuration and startup operations, please refer to the :ref:`Getting Started Guide` section.
 
-After completing the simulator environment installation, starting it will show the simulator's default LVGL project. Modify the simulator configuration file to run different LVGL projects. The configuration file for the simulator is located at :file:`your lvgl dir/rtk/win32_sim/` under :file:`menu_config.h`. You can select the example project for the simulator to run by modifying the value of :c:macro:`LVGL_DEMO_APP`. Start it again in VScode, and after a successful build and compile, you will see the simulator running the selected example project.
+After completing the simulator environment installation, starting it will show the simulator's default LVGL project. Modify the simulator configuration file to run different LVGL projects. The configuration file for the simulator is located at :file:`your lvgl dir/rtk/win32_sim/` under :file:`menu_config.h`. You can select the example project for the simulator to run by modifying the value of ``LVGL_DEMO_APP``. Start it again in VScode, and after a successful build and compile, you will see the simulator running the selected example project.
 
 .. image:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
    :align: center
    :width: 408
 
-When you need to modify the screen size, change the :file:`SConscript` file located under :file:`your lvgl dir/rtk/demos/xxxxxx/`. Modify the screen width :c:macro:`DRV_LCD_WIDTH` and screen height :c:macro:`DRV_LCD_HIGHT`, both in pixel units.
+When you need to modify the screen size, change the :file:`SConscript` file located under :file:`your lvgl dir/rtk/demos/xxxxxx/`. Modify the screen width ``DRV_LCD_WIDTH`` and screen height ``DRV_LCD_HIGHT``, both in pixel units.
 
 .. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
    :align: center
@@ -164,30 +164,30 @@ LVGL supports three rendering modes for display buffers, each suitable for diffe
   - Advantage: Simple implementation, suitable for scenarios with special requirements for refresh speed or compatibility.
 
 
-Based on actual development needs, different memory resources, and rendering modes, the SDK file :file:`lv_port_disp.c` has configured four recommended rendering schemes for reference. Configure :c:macro:`ACTIVE_DISPLAY_SCHEME` to switch modes:
+Based on actual development needs, different memory resources, and rendering modes, the SDK file :file:`lv_port_disp.c` has configured four recommended rendering schemes for reference. Configure ``ACTIVE_DISPLAY_SCHEME`` to switch modes:
 
-- :c:macro:`SCHEME_RAM_PARTIAL` Region Drawing Scheme
+- ``SCHEME_RAM_PARTIAL`` Region Drawing Scheme
 
   - Uses partial rendering scheme
   - Configures two RAM area caches
   - Suitable for MCUs without PSRAM
   - This scheme only supports display ICs with RAM
 
-- :c:macro:`SCHEME_RAM_PSRAM_PARTIAL` Region Drawing Scheme with Full Screen Cache
+- ``SCHEME_RAM_PSRAM_PARTIAL`` Region Drawing Scheme with Full Screen Cache
 
   - Uses partial rendering scheme
   - Configures two RAM area caches and one PSRAM full screen cache
   - This scheme only supports MCUs with PSRAM
   - No special requirements for display IC
 
-- :c:macro:`SCHEME_PSRAM_DIRECT` Full Screen Direct Write Scheme
+- ``SCHEME_PSRAM_DIRECT`` Full Screen Direct Write Scheme
 
   - Uses direct write rendering scheme
   - Configures two PSRAM area caches
   - This scheme only supports MCUs with PSRAM
   - No special requirements for display IC
 
-- :c:macro:`SCHEME_PSRAM_FULL` Full Screen Redraw Scheme
+- ``SCHEME_PSRAM_FULL`` Full Screen Redraw Scheme
 
   - Uses full screen redraw scheme
   - Configures two PSRAM area caches

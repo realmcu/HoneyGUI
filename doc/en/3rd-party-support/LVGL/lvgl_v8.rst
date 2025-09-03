@@ -41,13 +41,13 @@ Run LVGL in HoneyGUI Simulator
 --------------------------------
 HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the :ref:`Get Started` section.
 
-After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path :file:`your HoneyGUI dir/win32_sim/` and open the file :file:`menu_config.h`, which is the configuration file for the simulator. Under the section **HoneyGUI Demo Select**, comment out all the demos. Under the section **HoneyGUI Enable LVGL**, enable :c:macro:`CONFIG_REALTEK_BUILD_LVGL_GUI`. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
+After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path :file:`your HoneyGUI dir/win32_sim/` and open the file :file:`menu_config.h`, which is the configuration file for the simulator. Under the section **HoneyGUI Demo Select**, comment out all the demos. Under the section **HoneyGUI Enable LVGL**, enable ``CONFIG_REALTEK_BUILD_LVGL_GUI``. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
 
 .. image:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
    :align: center
    :width: 800
 
-1. If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir/realgui/example/demo/`, and modify the values of :c:macro:`DRV_LCD_WIDTH` and :c:macro:`DRV_LCD_HEIGHT` to the desired pixel values.
+1. If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir/realgui/example/demo/`, and modify the values of ``DRV_LCD_WIDTH`` and ``DRV_LCD_HEIGHT`` to the desired pixel values.
 
 .. image:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center
@@ -181,12 +181,12 @@ Once the developers have completed the debugging of the display device driver, a
 
 The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function ``void lv_port_disp_init(void)``, such as screen size and frame buffer configuration. The display refresh function is defined as ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``.
 
-The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure :c:macro:`DISPLAY_FLUSH_TYPE` to switch modes, where :c:macro:`RAMLESS_XXX` is suitable for display ICs without RAM, :c:macro:`RAM_XXX` is suitable for display ICs with RAM, :c:macro:`XXX_FULL_SCREEN_XXX` indicates pushing the entire screen each time, and :c:macro:`XXX_TWO_SEC` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by :c:macro:`SECTION_HEIGHT`.
+The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure ``DISPLAY_FLUSH_TYPE`` to switch modes, where ``RAMLESS_XXX`` is suitable for display ICs without RAM, ``RAM_XXX`` is suitable for display ICs with RAM, ``XXX_FULL_SCREEN_XXX`` indicates pushing the entire screen each time, and ``XXX_TWO_SEC`` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by ``SECTION_HEIGHT``.
 
 For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display IC without RAM:
 
 - When using a display IC without RAM, a frame buffer that covers the entire screen size needs to be allocated. Therefore, two frame buffers with a size equal to the screen size are allocated on the PSRAM for display. The macro definitions for display parameters are defined in the file :file:`lv_conf.h`.
-- If the display IC used has RAM, the size of the frame buffer does not need to be the same as the screen size. Due to different screen update methods, the :c:macro:`LVGL_USE_EDPI` in :file:`lv_port_disp.c` needs to be configured as not enabled (0) to switch the ``disp_flush`` function for screen update adaptation.
+- If the display IC used has RAM, the size of the frame buffer does not need to be the same as the screen size. Due to different screen update methods, the ``LVGL_USE_EDPI`` in :file:`lv_port_disp.c` needs to be configured as not enabled (0) to switch the ``disp_flush`` function for screen update adaptation.
 
 .. code-block:: c
 
@@ -598,7 +598,7 @@ The LittleFS file system supports read and write operations and features power-l
 
 1. The working directory is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`. External file resources used by the project will be packaged into a file system image and ultimately downloaded as :guilabel:`User Data`.
 2. Open the working directory and place the files you need to package under the :file:`root/` folder. Double-click the script :file:`mklittlefs_img.bat` to generate the file system image :file:`root.bin`.
-3. Use the :guilabel:`User Data` function in MP Tool to download and write the file system image to flash. To change the size of the file system, modify the **"-s <number>"** parameter in the script :file:`mklittlefs_img.bat`. When using interfaces from :file:`rtk_fs.c` for file operations, ensure that :c:macro:`RTK_FS_MNT_ADDR` matches the write address, and :c:macro:`MAX_LFS_SIZE` matches the file system size.
+3. Use the :guilabel:`User Data` function in MP Tool to download and write the file system image to flash. To change the size of the file system, modify the **"-s <number>"** parameter in the script :file:`mklittlefs_img.bat`. When using interfaces from :file:`rtk_fs.c` for file operations, ensure that ``RTK_FS_MNT_ADDR`` matches the write address, and ``MAX_LFS_SIZE`` matches the file system size.
 4. If you need to unpack a file system image, double-click the script :file:`unpack_littlefs_img.bat` to unpack :file:`root.bin` into the :file:`root_up/` folder.
 
 
@@ -788,7 +788,7 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
   **Note1: The storage path of the converted file:** Place the converted C file in the following reference path: :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets` 
 
-  **Note2: Modify the color format (cf) in the image descriptor:** The exported C file, for example :file:`logo_lvgl_rle.c`, needs to be modified to ensure ``cf: LV_IMG_CF_RAW``:
+  **Note2: Modify the color format (cf) in the image descriptor:** The exported C file, for example :file:`logo_lvgl_rle.c`, needs to be modified to ensure ``LV_IMG_CF_RAW``:
     
     .. code-block:: c
 
@@ -857,13 +857,13 @@ Enabling RLE Decoder in LVGL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To decode RLE compressed image resources in LVGL, you need to enable the RLE decoder and allocate cache space for it.
 
-1. Enable the RLE decoder: in the configuration file :file:`lv_conf.h`, locate the :c:macro:`LV_USE_RTK_IDU` macro definition and  set it to enable (1)
+1. Enable the RLE decoder: in the configuration file :file:`lv_conf.h`, locate the ``LV_USE_RTK_IDU`` macro definition and  set it to enable (1)
 
 2. Allocate decoding cache: Configure the following parameters in the :file:`lv_conf.h` file:
 
-- :c:macro:`LV_SSRAM_START`: The starting address of the cache
+- ``LV_SSRAM_START``: The starting address of the cache
 
-- :c:macro:`LV_SSRAM_SIZE`: Cache space size, ensuring that this size is sufficient to accommodate the decoding data of the largest entire image used
+- ``LV_SSRAM_SIZE``: Cache space size, ensuring that this size is sufficient to accommodate the decoding data of the largest entire image used
 
 
 .. code-block:: c

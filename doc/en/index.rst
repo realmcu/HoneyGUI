@@ -15,7 +15,7 @@ HoneyGUI
   Samples <sample/index>
   Tool <tool/index>
   Design Spec<Design/index>
-  3rd Party Support <3rd-party-support/index>
+  Third-party Support <3rd-party-support/index>
   FAQ <FAQ/index>
   Get PDF <get-pdf/index>
   Glossary <Glossary>

@@ -115,11 +115,11 @@
 字符绘制
 ~~~~~~~~~
 
-点阵字符的绘制代码位于 ``font_mem.c`` 中的 :cpp:any:`rtk_draw_unicode` 中。
+点阵字符的绘制代码位于 ``font_mem.c`` 中的 ``rtk_draw_unicode`` 中。
 
-可以指定文本控件开启矩阵运算功能以适配文本缩放效果，这部分字符的绘制代码位于 ``font_mem_matrix.c`` 中的 :cpp:any:`rtk_draw_unicode_matrix` 中。
+可以指定文本控件开启矩阵运算功能以适配文本缩放效果，这部分字符的绘制代码位于 ``font_mem_matrix.c`` 中的 ``rtk_draw_unicode_matrix`` 中。
 
-可以指定文本控件开启转图片功能，将文本转化成图片，可以实现复杂特效，这部分字符的绘制代码位于 ``font_mem_img.c`` 中的 :cpp:any:`gui_font_bmp2img_one_char` 中。
+可以指定文本控件开启转图片功能，将文本转化成图片，可以实现复杂特效，这部分字符的绘制代码位于 ``font_mem_img.c`` 中的 ``gui_font_bmp2img_one_char`` 中。
 
 字符绘制阶段不涉及任何排版信息，只会读取字形信息，并绘制到屏幕缓存中。
 
