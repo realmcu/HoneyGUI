@@ -16,6 +16,6 @@ include += [cwd + '/x86_64-w64-mingw32/include']
 include += [cwd + '/x86_64-w64-mingw32/include/SDL2']
 
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = include, LIBS = libs, LIBPATH = libpath)
 
 Return('group')
