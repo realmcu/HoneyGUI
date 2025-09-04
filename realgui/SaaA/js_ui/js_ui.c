@@ -383,10 +383,11 @@ DECLARE_HANDLER(rotation)
     degree = jerry_get_number_value(args[0]);
     c_x = jerry_get_number_value(args[1]);
     c_y = jerry_get_number_value(args[2]);
-
     if (img)
     {
         gui_img_rotation((void *)img, degree, c_x, c_y);
+        gui_img_set_quality(img, true);
+        img->simple = 0;
     }
     return jerry_create_undefined();
 }
@@ -402,6 +403,7 @@ DECLARE_HANDLER(scale)
     {
         gui_img_scale((void *)img, jerry_get_number_value(args[0]),
                       jerry_get_number_value(args[1]));
+        img->simple = 0;
     }
     return jerry_create_undefined();
 }
@@ -682,6 +684,32 @@ DECLARE_HANDLER(onClick_win)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(onLong_win)
+{
+    if (args_cnt >= 1 && jerry_value_is_function(args[0]))
+    {
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+        }
+
+        cb_arg->func = args[0];
+        gui_win_long((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
+    }
+
+    return jerry_create_undefined();
+}
+
 DECLARE_HANDLER(onPress_win)
 {
     ////gui_log("enter onPress\n");
@@ -1511,10 +1539,10 @@ void js_ui_timerThread(void *param)
     pthread_exit(NULL);
 }
 #else
-//#include "os_timer.h"
-//#include "trace.h"
+#include "os_timer.h"
+#include "trace.h"
 
-#if defined (RTL87x2G)
+#if defined (RTL87x2G) || defined (TARGET_RTL8773E)
 void arm_js_timercb(void *p_handle)
 {
     // DBG_DIRECT("Timercb 0x%x 0x%x\n", &p_handle, p_handle);
@@ -1564,7 +1592,7 @@ DECLARE_HANDLER(setTimeout)
 
         return jerry_create_number(js_timerID);
 #else
-#if defined (RTL87x2G)
+#if defined (RTL87x2G) || defined (TARGET_RTL8773E)
         void *p_handle = NULL;
 
         if (os_timer_create(&p_handle, "timer", (uint32_t)js_cb,
@@ -1612,7 +1640,7 @@ DECLARE_HANDLER(clearTimeout)
         }
 
 #else
-#if defined (RTL87x2G)
+#if defined (RTL87x2G) || defined (TARGET_RTL8773E)
         os_timer_delete((void **)&js_timerID);
 #endif
 #endif
@@ -1650,7 +1678,7 @@ DECLARE_HANDLER(setInterval)
 
         return jerry_create_number(js_timerID);
 #else
-#if defined (RTL87x2G)
+#if defined (RTL87x2G) || defined (TARGET_RTL8773E)
         void *p_handle = NULL;
 
         if (os_timer_create(&p_handle, "timer", (uint32_t)js_cb,
@@ -1698,7 +1726,7 @@ DECLARE_HANDLER(clearInterval)
             gui_log("res %d %s\n", res, strerror(res));
         }
 #else
-#if defined (RTL87x2G)
+#if defined (RTL87x2G) || defined (TARGET_RTL8773E)
         os_timer_delete((void **)&js_timerID);
 #endif
 #endif
@@ -1794,6 +1822,7 @@ void js_gui_init()
     REGISTER_METHOD(win, setShow);
     REGISTER_METHOD_NAME(win, "onRelease", onRelease_win);
     REGISTER_METHOD_NAME(win, "onClick", onClick_win);
+    REGISTER_METHOD_NAME(win, "onLong", onLong_win);
     REGISTER_METHOD_NAME(win, "onPress", onPress_win);
     REGISTER_METHOD_NAME(win, "onHold", onHold_win);
     REGISTER_METHOD_NAME(win, "onLeft", onLeft_win);

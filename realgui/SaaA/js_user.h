@@ -35,6 +35,10 @@
 #include "gui_page.h"
 #include "gui_server.h"
 
+#ifdef __arm__
+#include "os_sched.h"
+#endif
+
 #ifdef RTL87x2G
 #include "wdt.h"
 #include "rtl_wdt.h"
@@ -63,8 +67,7 @@ void js_mesh_init(void);
 void js_wifi_init(void);
 void js_key_init(void);
 void js_smarthome_init(void);
-void js_matter_init();
-void js_mesh_init();
+void js_rcu_init(void);
 jerry_value_t jerry_call_func_sem(const jerry_value_t func_obj_val,  /**< function object to call */
                                   const jerry_value_t this_val, /**< object for 'this' binding */
                                   const jerry_value_t args_p[], /**< function's call arguments */

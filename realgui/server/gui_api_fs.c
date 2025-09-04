@@ -329,16 +329,17 @@ void *gui_get_file_address(const char *file)
         char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
         sprintf(path, "%s%s", root_folder, file);
         int fd = gui_fs_open(path,  0);
-        gui_free(path);
         if (fd <= 0)
         {
             gui_log("!!!filename = %s, open fail!\n", path);
+            gui_free(path);
             return NULL;
         }
+        gui_free(path);
         void *rst;
         rst = (void *)gui_fs_ioctl(fd, 0);
         gui_fs_close(fd);
-        //gui_log("filename = %s, rst:%p\n", file, rst);
+        // gui_log("filename = %s, rst:%p\n", file, rst);
         return rst;
 
     }

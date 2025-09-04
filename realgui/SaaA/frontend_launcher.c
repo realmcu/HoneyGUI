@@ -39,6 +39,7 @@ void *get_app_launcher_frontend(void)
 }
 extern void *get_app_xml(void);
 #include "draw_font.h"
+// #define ENABLE_APP_AUTOSTART
 gui_grid_t *g;
 void button_cb(gui_button_t *b)
 {
@@ -50,7 +51,7 @@ void button_click_cb(gui_button_t *b)
     app->xml = b->data;
     gui_app_switch(get_app_launcher_frontend(), app);
 }
-//#define ENABLE_APP_AUTOSTART
+
 void button_release_cb(gui_button_t *b)
 {
     gui_img_set_opacity((void *)b->img, 255);
@@ -101,10 +102,14 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     {
                         continue;
                     }
+#ifdef ENABLE_APP_AUTOSTART
+                    text = "  ";
+#endif
                     gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, BUTTON_BG_ICON, 0);
                     gui_button_press(button, (gui_event_cb_t)button_cb, button);
                     gui_button_release(button, (gui_event_cb_t)button_release_cb, button);
 #ifdef ENABLE_APP_AUTOSTART
+                    gui_img_set_opacity((void *)button->img, 0);
                     gui_obj_enable_event((void *)button, GUI_EVENT_TOUCH_RELEASED);
                     button->flag = 1;
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
