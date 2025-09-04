@@ -20,6 +20,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Werror=unused-variable \
     -Werror=format \
     -Werror=char-subscripts \
+    -Werror=parentheses \
+    -Werror=implicit-fallthrough \
     -Wno-packed \
     -Wno-missing-variable-declarations \
     -Wno-missing-prototypes \
@@ -49,4 +51,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wno-missing-noreturn \
     -Wno-sign-conversion \
     -Wno-unused-macros \
+    -Werror=undef \
+    -Werror=sign-compare \
+    -Werror=unused-parameter \
+    -Werror=missing-braces \
+    -Werror=unused-variable \
+    -Werror=format \
+    -Werror=char-subscripts \
+    -Werror=parentheses \
+    -Werror=implicit-fallthrough \
+    -Werror=deprecated-copy \
     -Wmissing-field-initializers")

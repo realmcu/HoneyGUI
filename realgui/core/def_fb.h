@@ -95,7 +95,7 @@ typedef struct gui_dispdev
     void (*lcd_draw_sync)(void);
     uint8_t *lcd_gram;
     uint32_t frame_count;
-    gui_frame_monitor_t (*lcd_frame_monitor);
+    gui_frame_monitor_t *lcd_frame_monitor;
 } gui_dispdev_t;
 
 

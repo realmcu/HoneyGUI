@@ -29,6 +29,11 @@ class path_generator_adapter
 public:
     path_generator_adapter(const SourceT &source, GeneratorT &generator);
 
+    path_generator_adapter(const path_generator_adapter &other)
+        : _source(other._source), _generator(other._generator), 
+          _start_x(other._start_x), _start_y(other._start_y),
+          _state(other._state) {}
+
     void rewind(int /*path_id*/) { /*not implemented*/ }
     int vertex(real_t *x, real_t *y);
 
@@ -134,6 +139,7 @@ inline int path_generator_adapter<SourceT, GeneratorT>::vertex(real_t *x, real_t
         case initial:
             command = _source.vertex(&_start_x, &_start_y);
             set_stage(accumulate, path_command_stop == command);
+            /* fallthrough */
 
         case accumulate:
             if (_state & complete)
@@ -162,6 +168,7 @@ inline int path_generator_adapter<SourceT, GeneratorT>::vertex(real_t *x, real_t
                 break;
             }
             set_stage(generate, path_command_stop == command);
+            /* fallthrough */
 
         case generate:
             command = _generator.vertex(x, y);

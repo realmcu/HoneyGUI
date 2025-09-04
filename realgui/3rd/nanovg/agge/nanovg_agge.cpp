@@ -351,6 +351,9 @@ void renderFill(void *uptr, NVGpaint *paint, NVGcompositeOperationState composit
                 NVGscissor *scissor, float fringe, const float *bounds, const NVGpath *paths,
                 int npaths)
 {
+    (void) fringe;  // not used yet
+    (void) compositeOperation;  // not used yet
+    (void) bounds;  // not used yet
     AGGENVGcontext *agge = (AGGENVGcontext *)uptr;
     agge::rasterizer<agge::clipper<int> > &ras = agge->ras;
 
@@ -383,6 +386,9 @@ void renderStroke(void *uptr, NVGpaint *paint, NVGcompositeOperationState compos
                   NVGscissor *scissor, float fringe, float strokeWidth, const NVGpath *paths,
                   int npaths)
 {
+    (void)fringe;  // not used yet
+    (void)compositeOperation;  // not used yet
+
     AGGENVGcontext *agge = (AGGENVGcontext *)uptr;
     agge::stroke &line_style = agge->line_style;
     agge::rasterizer<agge::clipper<int> > &ras = agge->ras;
