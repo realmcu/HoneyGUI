@@ -9,6 +9,7 @@ void (* draw_img_acc_end_cb)(struct draw_img *image) = NULL;
 bool draw_img_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                           int32_t *x_start, int32_t *x_end, int32_t *y_start, int32_t *y_end)
 {
+    (void)rect;
     int16_t image_x = image->img_target_x;
     int16_t image_y = image->img_target_y;
 

@@ -1591,6 +1591,7 @@ u32 h264bsdCheckPriorPicsFlag(u32 *noOutputOfPriorPicsFlag,
 {
     /* Variables */
 
+    (void) nalUnitType;//not used in release builds
     u32 tmp, value, i;
     i32 ivalue;
     strmData_t tmpStrmData[1];

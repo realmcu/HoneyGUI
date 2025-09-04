@@ -445,6 +445,7 @@ static void stb_draw_vg(gui_text_t *text,
 
 void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
 {
+    (void)rect;
     if (text->path)
     {
         gui_font_stb_init(text->path);

@@ -286,6 +286,7 @@ void gui_menu_cellular_offset(gui_menu_cellular_t *menu_cellular, int offset_x, 
 void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
                                 struct gui_menu_cellular_gesture_parameter *para_array, int array_length)
 {
+    (void)array_length;
     gui_node_list_t *node = NULL;
     gui_node_list_t *tmp = NULL;
     gui_obj_t *obj = GUI_BASE(menu_cellular);

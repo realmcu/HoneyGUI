@@ -37,6 +37,7 @@ void l3_port_free(void *ptr)
 void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
                                      l3_rect_t *rect)
 {
+    (void)dc;
     gui_dispdev_t *gui_dc = gui_get_dc();
     draw_img_t *draw_image = (draw_img_t *)image;
     draw_img_cache(draw_image, IMG_SRC_MEMADDR);

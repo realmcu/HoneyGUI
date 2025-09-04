@@ -827,11 +827,13 @@ void nvgFillPaint(NVGcontext *ctx, NVGpaint paint)
 
 int nvgCreateImage(NVGcontext *ctx, const char *filename, int imageFlags)
 {
+    (void)ctx; (void)filename; (void)imageFlags;
     return -1;
 }
 
 int nvgCreateImageMem(NVGcontext *ctx, int imageFlags, unsigned char *data, int ndata)
 {
+    (void)ctx; (void)data; (void)ndata; (void)imageFlags;
     return -1;
 }
 
@@ -1484,6 +1486,8 @@ static int nvg__curveDivs(float r, float arc, float tol)
 static int nvg__expandStroke(NVGcontext *ctx, float w, float fringe, int lineCap, int lineJoin,
                              float miterLimit)
 {
+    (void)lineJoin;//not used
+    (void)miterLimit;
     NVGpathCache *cache = ctx->cache;
     NVGvertex *verts;
     NVGvertex *dst;
@@ -1596,6 +1600,8 @@ static int nvg__expandStroke(NVGcontext *ctx, float w, float fringe, int lineCap
 
 static int nvg__expandFill(NVGcontext *ctx, float w, int lineJoin, float miterLimit)
 {
+    (void)lineJoin;//not used
+    (void)miterLimit;
     NVGpathCache *cache = ctx->cache;
     NVGvertex *verts;
     NVGvertex *dst;
@@ -2082,47 +2088,78 @@ void nvgFontSize(NVGcontext *ctx, float size)
 
 void nvgFontBlur(NVGcontext *ctx, float blur)
 {
+    (void)ctx;//not used
+    (void)blur;
+
 }
 
 void nvgTextLetterSpacing(NVGcontext *ctx, float spacing)
 {
+    (void)ctx;//not used
+    (void)spacing;
 }
 
 void nvgTextLineHeight(NVGcontext *ctx, float lineHeight)
 {
+    (void)ctx;//not used
+    (void)lineHeight;
 }
 
 void nvgTextAlign(NVGcontext *ctx, int align)
 {
+    (void)ctx;//not used
+    (void)align;
 }
 
 void nvgFontFaceId(NVGcontext *ctx, int font)
 {
+    (void)ctx;//not used
+    (void)font;
 }
 
 void nvgFontFace(NVGcontext *ctx, const char *font)
 {
+    (void)ctx;//not used
+    (void)font;
 }
 
 int nvgCreateFontMem(NVGcontext *ctx, const char *name, unsigned char *data, int ndata,
                      int freeData)
 {
+    (void)ctx;//not used
+    (void)name;
+    (void)data;
+    (void)ndata;
+    (void)freeData;
     return 0;
 }
 
 int nvgFindFont(NVGcontext *ctx, const char *name)
 {
+    (void)ctx;//not used
+    (void)name;
     return 0;
 }
 
 float nvgText(NVGcontext *ctx, float x, float y, const char *string, const char *end)
 {
+    (void)ctx;//not used
+    (void)x;
+    (void)y;
+    (void)string;
+    (void)end;
     return 0;
 }
 
 float nvgTextBounds(NVGcontext *ctx, float x, float y, const char *string, const char *end,
                     float *bounds)
 {
+    (void)ctx;//not used
+    (void)x;
+    (void)y;
+    (void)string;
+    (void)end;
+    (void)bounds;
     return 0;
 }
 
@@ -2130,6 +2167,7 @@ float nvgTextBounds(NVGcontext *ctx, float x, float y, const char *string, const
 
 NVGparams *nvgGetParams(NVGcontext *ctx)
 {
+    (void)ctx;//not used
     return &(ctx->params);
 }
 

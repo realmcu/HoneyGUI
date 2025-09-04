@@ -217,6 +217,7 @@ static void widget_nanovg_img_ctor(gui_canvas_img_t *this, gui_obj_t *parent, co
                                    int16_t x,
                                    int16_t y, int16_t w, int16_t h)
 {
+    (void)data;
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();

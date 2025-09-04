@@ -409,7 +409,7 @@ static void gui_text_draw(gui_obj_t *obj)
 
 static void gui_text_end(gui_obj_t *obj)
 {
-
+    (void)obj;
 }
 
 static void gui_text_destroy(gui_obj_t *obj)
@@ -539,11 +539,17 @@ static void gui_text_multilanguage_check(gui_text_t *this)
 
 void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
+    (void)this;
+    (void)event_cb;
+    (void)parameter;
     //gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
     GUI_ASSERT(0);
 }
 void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
+    (void)this;
+    (void)event_cb;
+    (void)parameter;
     //gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
     GUI_ASSERT(0);
 }
@@ -633,6 +639,7 @@ void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
 
 void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
 {
+    (void)width;
     this->font_height = height;
     this->content_refresh = true;
     this->layout_refresh = true;

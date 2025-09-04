@@ -51,6 +51,7 @@
 
 static void gui_win_input_prepare(gui_obj_t *obj)
 {
+    (void)obj;
 }
 
 static void prepare(gui_obj_t *obj)
@@ -72,7 +73,7 @@ static void prepare(gui_obj_t *obj)
 
 static void gui_win_destroy(gui_obj_t *obj)
 {
-
+    (void)obj;
 }
 
 static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -118,24 +119,36 @@ void gui_win_ctor(gui_win_t  *this,
 
 void gui_win_left(gui_win_t *this, void *callback, void *parameter)
 {
+    (void)this;
+    (void)callback;
+    (void)parameter;
     //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
     GUI_ASSERT(0);
 }
 
 void gui_win_right(gui_win_t *this, void *callback, void *parameter)
 {
+    (void)this;
+    (void)callback;
+    (void)parameter;
     //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
     GUI_ASSERT(0);
 }
 
 void gui_win_up(gui_win_t *this, void *callback, void *parameter)
 {
+    (void)this;
+    (void)callback;
+    (void)parameter;
     //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
     GUI_ASSERT(0);
 }
 
 void gui_win_down(gui_win_t *this, void *callback, void *parameter)
 {
+    (void)this;
+    (void)callback;
+    (void)parameter;
     //gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
     GUI_ASSERT(0);
 }

@@ -14,6 +14,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -O2 \
     -Werror=undef \
     -Werror=sign-compare \
+    -Werror=unused-parameter \
     -Wno-packed \
     -Wno-missing-prototypes \
     -Wno-missing-noreturn \

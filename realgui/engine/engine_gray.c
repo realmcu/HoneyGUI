@@ -17,6 +17,7 @@
 
 void engine_gray16_blit_to_dc(engine_gray_t *gray16, struct gui_dispdev *dc, gui_rect_t *rect)
 {
+    (void)rect;
     gui_log("gray16 w = %d, h = %d, data = 0x%x \n", gray16->w, gray16->h, gray16->data);
     // memcpy(dc->frame_buf, gray16->data, gray16->w * gray16->h * dc->bit_depth / 8);
 
@@ -61,6 +62,7 @@ void engine_gray256_blit_to_dc(engine_gray_t *gray256, struct gui_dispdev *dc, g
     gui_log("gray256 w = %d, h = %d, data = 0x%x \n", gray256->w, gray256->h, gray256->data);
     // memcpy(dc->frame_buf, gray256->data, gray256->w * gray256->h * dc->bit_depth / 8);
 
+    (void)rect;
     int32_t x_start = 0;
     int32_t x_end = 0;
     int32_t y_start = 0;

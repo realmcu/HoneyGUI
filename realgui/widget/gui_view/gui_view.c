@@ -154,6 +154,9 @@ static void __view_animate_timer_cb(void *obj)
 
 static void __view_released_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
+
     touch_info_t *tp = tp_get_info();
     gui_view_t *_this = (gui_view_t *)obj;
     gui_obj_t *o = (gui_obj_t *)_this;
@@ -228,6 +231,9 @@ static void __view_released_cb(void *obj, gui_event_t e, void *param)
 
 static void __view_pressing_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     // gui_log("g_Offset %d\n", g_Offset);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();

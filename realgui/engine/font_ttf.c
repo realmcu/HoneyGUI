@@ -382,6 +382,7 @@ void adjustImageBufferPrecision(uint8_t *img_out, uint32_t out_size, uint8_t ras
 void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec, int out_w,
                      int out_h, int render_w, int render_h, uint32_t line_word, uint32_t block_bit)
 {
+    (void)render_w;
     memset(img_out, 0, out_w * out_h);
     if (raster_prec == 4)
     {

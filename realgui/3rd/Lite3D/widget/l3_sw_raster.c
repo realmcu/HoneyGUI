@@ -292,6 +292,7 @@ void do_raster_pixel(const gui_raster_params_t *params)
 bool l3_draw_img_target_area(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect_t *rect,
                              int32_t *x_start, int32_t *x_end, int32_t *y_start, int32_t *y_end)
 {
+    (void)rect;
     int16_t image_x = image->img_target_x;
     int16_t image_y = image->img_target_y;
 

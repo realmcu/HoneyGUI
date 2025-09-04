@@ -46,6 +46,7 @@ static uint32_t total_used_size = 0;
 
 static void gui_walker(void *ptr, size_t size, int used, void *user)
 {
+    (void)user;
     if (used)
     {
         total_used_size = total_used_size + size;
@@ -56,6 +57,8 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
 }
 static void walker(void *ptr, size_t size, int used, void *user)
 {
+    (void)user;
+    (void)ptr;
     if (used)
     {
         total_used_size = total_used_size + size;

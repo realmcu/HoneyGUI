@@ -695,6 +695,8 @@ static void gui_list_note_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     touch_info_t *tp = tp_get_info();
     gui_obj_t *obj = (gui_obj_t *)object;
     gui_list_t *_this = (gui_list_t *)object;
@@ -764,6 +766,8 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
 
 static void gui_list_released_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_list_t *_this = (gui_list_t *)obj;
     _this->hold = _this->offset;
 
@@ -776,6 +780,7 @@ static void gui_list_create_bar(gui_list_t *_this,
                                 int16_t     w,
                                 int16_t     h)
 {
+    (void)x;
     int bar_x = 0;
     int bar_y = 0;
     int bar_w = 0;

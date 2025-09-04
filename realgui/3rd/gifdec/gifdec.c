@@ -170,6 +170,9 @@ static gd_GIF *gd_open_gif_common(gd_GIF *gif, \
                                   int gct_sz, \
                                   uint8_t depth)
 {
+    (void)sigver; //Werror=unused-parameter
+    (void)fdsz;
+    (void)aspect;
     int i;
     uint8_t *bgcolor;
 
@@ -906,6 +909,8 @@ read_image(gd_GIF *gif)
 static void
 render_frame_rect(gd_GIF *gif, uint8_t *buffer)
 {
+    (void)gif;    // Werror=unused-parameter
+    (void)buffer;
 #if ENABLE_HONEYGUI // wanghao comment: this is not used in honeygui
     return;
 #else

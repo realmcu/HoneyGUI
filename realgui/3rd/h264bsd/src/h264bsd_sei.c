@@ -1108,6 +1108,7 @@ static u32 DecodeDecRefPicMarkingRepetition(
     seiDecRefPicMarkingRepetition_t *pDecRefPicMarkingRepetition,
     u32 numRefFrames)
 {
+    (void)numRefFrames;// not used
 
     /* Variables */
 

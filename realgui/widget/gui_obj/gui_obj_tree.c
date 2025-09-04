@@ -417,6 +417,7 @@ void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
 
 void gui_obj_tree_print_mmd(gui_obj_t *obj)
 {
+    (void)obj;
 #ifdef _WIN32
     // Open the file for writing
     FILE *file = fopen("realgui/example/web/tree/diagram.mmd", "w");

@@ -68,6 +68,7 @@ void gui_font_scale_destroy(gui_text_t *text)
 void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *img_x,
                        int16_t *img_y)
 {
+    (void)img_y;
     int16_t buf_width = 0;
     int16_t buf_height = 0;
     uint8_t font_img_pixel_bytes;

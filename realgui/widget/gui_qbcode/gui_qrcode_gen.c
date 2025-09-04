@@ -1385,6 +1385,7 @@ static long gui_qrcode_gen_get_penalty_score(const uint8_t *qrcode)
 // returns either 0, 1, or 2. A helper function for gui_qrcode_gen_get_penalty_score().
 static int gui_qrcode_gen_finder_penalty_count_patterns(const int run_history[7], int qrsize)
 {
+    (void)qrsize;
     int n = run_history[1];
     //assert(n <= qrsize * 3);  (void)qrsize;
     bool core = n > 0 && run_history[2] == n && run_history[3] == n * 3 && run_history[4] == n &&

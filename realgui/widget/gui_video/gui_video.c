@@ -426,6 +426,7 @@ static void gui_video_draw(gui_obj_t *obj)
 
 static void gui_video_draw_end(gui_obj_t *obj)
 {
+    (void)obj;
     // gui_log("gui_video_draw_end \n");
     // not free fb here
 #if 0
@@ -831,6 +832,8 @@ static int gui_video_src_init(gui_video_t  *this)
 }
 static void gui_video_input_prepare(gui_obj_t *obj)
 {
+    (void)obj;
+    // gui_log("gui_video_input_prepare \n");
 }
 
 static void gui_video_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)

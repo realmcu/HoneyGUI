@@ -97,6 +97,7 @@ static void gui_soccer_transfrom_blit(float              w,
                                       gui_vertex_t          *v3,
                                       struct gui_matrix *matrix)
 {
+    (void)v2;
     float sx, sy, shx, shy, tx, ty;
 
     // Compute 3x3 image transform matrix to map a rectangle image (w,h) to
@@ -513,6 +514,7 @@ static void gui_soccer_end(gui_obj_t *obj)
 
 static void gui_soccer_destroy(gui_obj_t *obj)
 {
+    (void)obj;
     return;
 }
 

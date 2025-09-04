@@ -105,11 +105,14 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 
 void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
 {
+    (void)image;
+    (void)rect;
     // GUI_LINE(1);
     return;
 }
 void sw_acc_end_cb(draw_img_t *image)
 {
+    (void)image;
     // GUI_LINE(1);
     return;
 }

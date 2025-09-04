@@ -376,11 +376,13 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
 
 static void gui_scroll_text_end(gui_obj_t *obj)
 {
+    (void)obj;
 
 }
 
 static void gui_scroll_text_destroy(gui_obj_t *obj)
 {
+    (void)obj;
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
 }
 

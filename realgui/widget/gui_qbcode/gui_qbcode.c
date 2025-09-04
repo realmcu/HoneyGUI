@@ -221,6 +221,7 @@ static void gui_qbcode_draw(gui_obj_t *obj)
 
 static void gui_qbcode_end(gui_obj_t *obj)
 {
+    (void)obj;
 
 }
 

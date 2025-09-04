@@ -704,11 +704,14 @@ float gui_img_get_t_y(gui_img_t *_this)
 
 void gui_img_skew_x(gui_img_t *_this, float degrees)
 {
+    (void)_this;
+    (void)degrees;
 
 }
 
 void gui_img_skew_y(gui_img_t *_this, float degrees)
 {
-
+    (void)_this;
+    (void)degrees;
 }
 

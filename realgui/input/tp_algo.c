@@ -259,6 +259,7 @@ static bool tp_judge_quick_y_up_slide(struct gui_touch_port_data *raw_data)
 
 static bool tp_judge_slow_x_left_slide(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp.type == TOUCH_HOLD_X)
     {
         if (abs(tp.deltaX) > gui_get_screen_width() / 2)
@@ -275,6 +276,7 @@ static bool tp_judge_slow_x_left_slide(struct gui_touch_port_data *raw_data)
 }
 static bool tp_judge_slow_x_right_slide(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp.type == TOUCH_HOLD_X)
     {
         if (abs(tp.deltaX) > gui_get_screen_width() / 2)
@@ -291,6 +293,7 @@ static bool tp_judge_slow_x_right_slide(struct gui_touch_port_data *raw_data)
 }
 static bool tp_judge_slow_x_orign_slide(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp.type == TOUCH_HOLD_X)
     {
         if (abs(tp.deltaX) <= gui_get_screen_width() / 2)
@@ -304,6 +307,7 @@ static bool tp_judge_slow_x_orign_slide(struct gui_touch_port_data *raw_data)
 }
 static bool tp_judge_slow_y_down_slide(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp.type == TOUCH_HOLD_Y)
     {
         if (abs(tp.deltaY) > gui_get_screen_height() / 2)
@@ -320,6 +324,7 @@ static bool tp_judge_slow_y_down_slide(struct gui_touch_port_data *raw_data)
 }
 static bool tp_judge_slow_y_up_slide(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp.type == TOUCH_HOLD_Y)
     {
         if (abs(tp.deltaY) > gui_get_screen_height() / 2)
@@ -336,6 +341,7 @@ static bool tp_judge_slow_y_up_slide(struct gui_touch_port_data *raw_data)
 }
 static bool tp_judge_slow_y_orign_slide(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp.type == TOUCH_HOLD_Y)
     {
         if (abs(tp.deltaY) <= gui_get_screen_height() / 2)
@@ -350,6 +356,7 @@ static bool tp_judge_slow_y_orign_slide(struct gui_touch_port_data *raw_data)
 
 static bool tp_judge_hold_x(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp_judge_same_point() == true)
     {
         return false;
@@ -376,6 +383,7 @@ static bool tp_judge_hold_x(struct gui_touch_port_data *raw_data)
 }
 static bool tp_judge_hold_y(struct gui_touch_port_data *raw_data)
 {
+    (void)raw_data;
     if (tp_judge_same_point() == false)
     {
         if (touch_direct == TOUCH_NONE)

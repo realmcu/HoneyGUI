@@ -2169,6 +2169,8 @@ static void FillRow1(
     i32 center,
     i32 right)
 {
+    (void) left;//-Werror=unused-parameter
+    (void) right;
 #ifndef FLASCC
     ASSERT(ref);
     ASSERT(fill);

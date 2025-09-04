@@ -930,6 +930,7 @@ void gui_font_mem_obj_destroy(gui_text_t *text)
 static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
                              gui_text_rect_t *rect, bool crop)
 {
+    (void)crop;
     if (chr->dot_addr == NULL) { return; }
     gui_dispdev_t *dc = gui_get_dc();
 

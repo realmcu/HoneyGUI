@@ -75,6 +75,8 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
 static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_img,
                         float rotate_degree, float image_angle, int img_w, int img_h)
 {
+    (void)image_angle;
+    (void)img_w;
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = NULL;
     img = gui_malloc(sizeof(draw_img_t));
@@ -103,6 +105,8 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
 static void set_arc_img_ftl(gui_canvas_arc_t *this, void *data, draw_img_t **input_img,
                             float rotate_degree, float image_angle, int img_w, int img_h)
 {
+    (void)image_angle;
+    (void)img_w;
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = NULL;
     img = gui_malloc(sizeof(draw_img_t));

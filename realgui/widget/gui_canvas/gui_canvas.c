@@ -114,6 +114,7 @@ static void gui_canvas_widget_nanovg_end(gui_obj_t *obj)
 
 static void gui_canvas_widget_nanovg_destroy(gui_obj_t *obj)
 {
+    (void)obj;
 
 }
 
@@ -154,6 +155,7 @@ static void gui_canvas_widget_nanovg_ctor(gui_canvas_t *this,
                                           int16_t       w,
                                           int16_t       h)
 {
+    (void)data;
     gui_obj_t *base = (gui_obj_t *)this;
     gui_obj_t *root = (gui_obj_t *)this;
 
@@ -215,6 +217,7 @@ void *gui_canvas_render_to_image_buffer(int format, bool compression, int image_
                                         int image_height,
                                         gui_canvas_render_function renderer, uint8_t *target_buffer)
 {
+    (void)compression;
     NVGcontext *vg = 0;
 
     int pixel_length = 4;

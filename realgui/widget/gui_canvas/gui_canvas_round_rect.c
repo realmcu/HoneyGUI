@@ -79,6 +79,7 @@ static void set_rect_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, 
 
 static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, gui_color_t color)
 {
+    (void)color;
     head->scan = 0;
     head->align = 0;
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
@@ -450,6 +451,7 @@ static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)
 }
 static void blit_to_dc_ftl(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
+    (void)rect;
     if (dc->section_count == 0)
     {
 

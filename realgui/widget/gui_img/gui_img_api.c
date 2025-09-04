@@ -32,6 +32,8 @@ static void gui_img_rect_copy(uint8_t       *target,
                               uint16_t       h,
                               gui_dispdev_t *dc)
 {
+    (void)x;
+    (void)y;
     uint16_t byte = dc->bit_depth / 8;
 
     for (uint16_t i = 0; i < h; i++)
@@ -101,6 +103,7 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
 
 void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)
 {
+    (void)matrix;
     gui_dispdev_t *dc = gui_get_dc();
     gui_dispdev_t *dc_bak = gui_malloc(sizeof(gui_dispdev_t));
     gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
