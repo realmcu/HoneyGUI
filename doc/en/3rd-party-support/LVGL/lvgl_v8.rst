@@ -2,7 +2,7 @@
 Use LVGL V8 to Design
 ===============================
 
-LVGL introduction
+LVGL Introduction
 ==========================
 - `LVGL Website <https://lvgl.io/>`_
 - `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_

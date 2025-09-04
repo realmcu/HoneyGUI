@@ -38,7 +38,7 @@ Advantages of using an simulator include:
 
 Running LVGL in the Simulator
 -----------------------------------
-The LVGL simulator is based on the scons tool and the MinGW-w64 toolchain, running and debugging in VScode. For specific environment configuration and startup operations, please refer to the :ref:`Getting Started Guide` section.
+The LVGL simulator is based on the scons tool and the MinGW-w64 toolchain, running and debugging in VScode. For specific environment configuration and startup operations, please refer to the :ref:`Get Started` section.
 
 After completing the simulator environment installation, starting it will show the simulator's default LVGL project. Modify the simulator configuration file to run different LVGL projects. The configuration file for the simulator is located at :file:`your lvgl dir/rtk/win32_sim/` under :file:`menu_config.h`. You can select the example project for the simulator to run by modifying the value of ``LVGL_DEMO_APP``. Start it again in VScode, and after a successful build and compile, you will see the simulator running the selected example project.
 
@@ -705,7 +705,7 @@ UI interfaces designed with Squareline Studio can be directly exported as C code
 
 How to run the UI interface designed with Squareline Studio in a simulator?
 
-- First, configure the simulator environment and successfully run the LVGL example project, referring to :ref:`Running LVGL in a Simulator`.
+- First, configure the simulator environment and successfully run the LVGL example project, referring to :ref:`Running LVGL in the Simulator`.
 
 - Then export the UI interface designed with Squareline Studio as C code and resource packages, and copy them to :file:`your lvgl dir/rtk/demos/benchmark`.
 
