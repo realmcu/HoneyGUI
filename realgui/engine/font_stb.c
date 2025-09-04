@@ -521,7 +521,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     baseline = ascent * scale;
 
-    gui_dispdev_t *dc = gui_get_dc();
+    // gui_dispdev_t *dc = gui_get_dc();
     uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);

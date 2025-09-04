@@ -16,6 +16,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Werror=sign-compare \
     -Werror=unused-parameter \
     -Werror=missing-braces \
+    -Werror=unused-variable \
     -Wno-packed \
     -Wno-missing-prototypes \
     -Wno-missing-noreturn \

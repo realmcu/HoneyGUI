@@ -188,7 +188,7 @@ gui_canvas_t *gui_canvas_create(void       *parent,
                                 int16_t     w,
                                 int16_t     h)
 {
-    gui_dispdev_t *dc = gui_get_dc();
+    // gui_dispdev_t *dc = gui_get_dc();
 
     GUI_ASSERT(parent != NULL);
     if (name == NULL)

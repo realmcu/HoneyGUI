@@ -638,7 +638,7 @@ static void gui_list_note_transform(gui_obj_t *obj)
 static void gui_list_note_prepare(gui_obj_t *obj)
 {
     gui_list_note_t *_this = (gui_list_note_t *)obj;
-    touch_info_t *tp = tp_get_info();
+    // touch_info_t *tp = tp_get_info();
     gui_list_t *list = (gui_list_t *)obj->parent;
 
     // matrix_translate(-list->base.x, -list->base.y,
@@ -890,7 +890,7 @@ gui_list_t *gui_list_create(void       *parent,
                             bool        create_bar)
 {
     gui_list_t *_this = gui_malloc(sizeof(gui_list_t));
-    gui_dispdev_t *dc = gui_get_dc();
+    // gui_dispdev_t *dc = gui_get_dc();
     memset(_this, 0, sizeof(gui_list_t));
     if (w == 0)
     {

@@ -198,7 +198,7 @@ static void obj_draw_scan(gui_obj_t *obj)
 {
 
     gui_node_list_t *node = NULL;
-    struct gui_dispdev *dc = gui_get_dc();
+    // struct gui_dispdev *dc = gui_get_dc();
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);

@@ -56,8 +56,8 @@ static void gui_win_input_prepare(gui_obj_t *obj)
 
 static void prepare(gui_obj_t *obj)
 {
-    touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
+    // touch_info_t *tp = tp_get_info();
+    // kb_info_t *kb = kb_get_info();
     gui_win_t *this = (void *)obj;
     GUI_UNUSED(this);
 

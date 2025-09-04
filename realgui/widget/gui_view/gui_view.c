@@ -641,7 +641,7 @@ gui_view_t *gui_view_create(void       *parent,
         return _this;
     }
     gui_view_t *_this = gui_malloc(sizeof(gui_view_t));
-    gui_dispdev_t *dc = gui_get_dc();
+    // gui_dispdev_t *dc = gui_get_dc();
     memset(_this, 0, sizeof(gui_view_t));
     _this->descriptor = descriptor;
     _this->animate_step = 40;
