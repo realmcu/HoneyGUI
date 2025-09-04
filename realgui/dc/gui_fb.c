@@ -51,10 +51,10 @@ static bool obj_is_active(gui_obj_t *obj)
 
     gui_point3f_t p[4] =
     {
-        {0, 0, 1},
-        {obj->w, 0, 1},
-        {0, obj->h, 1},
-        {obj->w, obj->h, 1}
+        { {0, 0, 1} },
+        { {obj->w, 0, 1} },
+        { {0, obj->h, 1} },
+        { {obj->w, obj->h, 1} }
     };
 
     float x_min = 0.0f;

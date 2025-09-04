@@ -322,11 +322,12 @@ void gui_obj_get_area(gui_obj_t *obj,
 {
     gui_point3f_t p[4] =
     {
-        {0, 0, 1},
-        {obj->w - 1, 0, 1},
-        {0, obj->h - 1, 1},
-        {obj->w - 1, obj->h - 1, 1}
+        {{0, 0, 1}},
+        {{obj->w - 1, 0, 1}},
+        {{0, obj->h - 1, 1}},
+        {{obj->w - 1, obj->h - 1, 1}}
     };
+
     float x_min = 0.0f, x_max = 0.0f, y_min = 0.0f, y_max = 0.0f;
 
     matrix_multiply_point(obj->matrix, p);

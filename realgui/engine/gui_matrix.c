@@ -714,7 +714,7 @@ bool matrix_is_full_rank(struct gui_matrix *m)
 bool matrix_get_transform_area(gui_matrix_t *matrix, gui_rect_t *input_area,
                                gui_rect_t *result_area)
 {
-    gui_point3f_t pox = {0.0f};
+    gui_point3f_t pox = {{0.0f}};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;

@@ -89,7 +89,7 @@ uint32_t draw_img_get_pixel_byte(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 
 bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 {
-    gui_point3f_t pox = {0.0f};
+    gui_point3f_t pox = {{0.0f}};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;

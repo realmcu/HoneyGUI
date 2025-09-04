@@ -198,7 +198,7 @@ static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *_this = (void *)obj;
-    gui_point3f_t point = {0, 0, 1};
+    gui_point3f_t point = {{0, 0, 1}};
 
     if (!_this->base.not_show)
     {
