@@ -18,6 +18,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Werror=missing-braces \
     -Werror=unused-variable \
     -Werror=format \
+    -Werror=char-subscripts \
     -Wno-packed \
     -Wno-missing-prototypes \
     -Wno-missing-noreturn \

@@ -252,7 +252,7 @@ char *ezxml_decode(char *s, char **ent, char t)
 
     for (s = r; ;)
     {
-        while (*s && *s != '&' && (*s != '%' || t != '%') && !isspace(*s)) { s++; }
+        while (*s && *s != '&' && (*s != '%' || t != '%') && !isspace((unsigned char)*s)) { s++; }
 
         if (! *s) { break; }
         else if (t != 'c' && ! strncmp(s, "&#", 2))   // character reference
@@ -292,7 +292,7 @@ char *ezxml_decode(char *s, char **ent, char t)
             }
             else { s++; } // not a known entity
         }
-        else if ((t == ' ' || t == '*') && isspace(*s)) { *(s++) = ' '; }
+        else if ((t == ' ' || t == '*') && isspace((unsigned char)*s)) { *(s++) = ' '; }
         else { s++; } // no decoding needed
     }
 
@@ -608,7 +608,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
         attr = (char **)EZXML_NIL;
         d = ++s;
 
-        if (isalpha(*s) || *s == '_' || *s == ':' || *s < '\0')   // new tag
+        if (isalpha((unsigned char)*s) || *s == '_' || *s == ':' || *s < '\0')   // new tag
         {
             if (! root->cur)
             {
@@ -616,7 +616,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
             }
 
             s += strcspn(s, EZXML_WS "/>");
-            while (isspace(*s)) { *(s++) = '\0'; } // null terminate tag name
+            while (isspace((unsigned char)*s)) { *(s++) = '\0'; } // null terminate tag name
 
             if (*s && *s != '/' && *s != '>') // find tag in default attr list
                 for (i = 0; (a = root->attr[i]) && strcmp(a[0], d); i++);
@@ -633,7 +633,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
                 attr[l] = s; // set attribute name
 
                 s += strcspn(s, EZXML_WS "=/>");
-                if (*s == '=' || isspace(*s))
+                if (*s == '=' || isspace((unsigned char)*s))
                 {
                     *(s++) = '\0'; // null terminate tag attribute name
                     q = *(s += strspn(s, EZXML_WS "="));
@@ -657,7 +657,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
                         }
                     }
                 }
-                while (isspace(*s)) { s++; }
+                while (isspace((unsigned char)*s)) { s++; }
             }
 
             if (*s == '/')   // self closing tag
@@ -689,7 +689,12 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
             if (!(q = *s) && e != '>') { return ezxml_err(root, d, "missing >"); }
             *s = '\0'; // temporarily null terminate tag name
             if (ezxml_close_tag(root, d, s)) { return &root->xml; }
-            if (isspace(*s = q)) { s += strspn(s, EZXML_WS); }
+            *s = q;
+            if (isspace((unsigned char)*s))
+            {
+                s += strspn(s, EZXML_WS);
+            }
+
         }
         else if (! strncmp(s, "!--", 3))   // xml comment
         {
