@@ -708,6 +708,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case SCROLL_X_REVERSE:
         {
             char_line_sum = 1;
+            active_font_len = font_len;
             for (uint16_t i = 0; i < font_len; i++)
             {
                 chr[i].y = rect->y1;
