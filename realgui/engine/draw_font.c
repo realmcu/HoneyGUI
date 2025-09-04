@@ -740,7 +740,7 @@ uint32_t generate_emoji_file_path_from_unicode(const uint32_t *unicode_buf, uint
         {
             continue;
         }
-        snprintf(buffer, sizeof(buffer), "%04x", unicode_buf[i]);
+        snprintf(buffer, sizeof(buffer), "%04x", (unsigned int)unicode_buf[i]);
         strcat(file_path, buffer);
         if (i < emoji_len - 1)
         {

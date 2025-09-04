@@ -18,6 +18,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Werror=unused-parameter \
     -Werror=missing-braces \
     -Werror=unused-variable \
+    -Werror=format \
     -Wno-packed \
     -Wno-missing-variable-declarations \
     -Wno-missing-prototypes \
