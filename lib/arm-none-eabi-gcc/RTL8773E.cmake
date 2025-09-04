@@ -13,6 +13,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -gdwarf-4 \
     -O2 \
     -Werror=undef \
+    -Werror=sign-compare \
     -Wno-packed \
     -Wno-missing-prototypes \
     -Wno-missing-noreturn \

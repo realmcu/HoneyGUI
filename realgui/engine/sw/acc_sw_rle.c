@@ -110,7 +110,7 @@ void uncompressed_rle_line(imdc_file_t *file, uint32_t line, int16_t x, int16_t 
 void uncompressed_rle_rect(imdc_file_t *file, int16_t x, int16_t y, int16_t w, int16_t h,
                            uint8_t *buf)
 {
-    for (uint32_t i = 0; i < h; i++)
+    for (int16_t i = 0; i < h; i++)
     {
         uncompressed_rle_line(file, i + y, x, w, buf + i * 2 * w);
     }

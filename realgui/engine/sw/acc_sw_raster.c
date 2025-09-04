@@ -354,9 +354,9 @@ void do_raster_no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     params.palette_index = ((gui_palette_file_t *)head)->palette_index;
     params.palette_data = ((gui_palette_file_t *)head)->palette_data;
 
-    for (uint32_t i = y_start; i <= y_end; i++)
+    for (int32_t i = y_start; i <= y_end; i++)
     {
-        for (uint32_t j = x_start; j <= x_end; j++)
+        for (int32_t j = x_start; j <= x_end; j++)
         {
             float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
             float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
@@ -394,9 +394,9 @@ void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
     uint8_t rle_pixel[4];
 
-    for (uint32_t i = y_start; i <= y_end; i++)
+    for (int32_t i = y_start; i <= y_end; i++)
     {
-        for (uint32_t j = x_start; j <= x_end; j++)
+        for (int32_t j = x_start; j <= x_end; j++)
         {
             float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
             float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];

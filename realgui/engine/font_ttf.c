@@ -385,7 +385,7 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
     memset(img_out, 0, out_w * out_h);
     if (raster_prec == 4)
     {
-        for (uint32_t y = 0; y < render_h; y += raster_prec)
+        for (int y = 0; y < render_h; y += raster_prec)
         {
             for (uint32_t ux = 0; ux < line_word; ux++)
             {
@@ -424,7 +424,7 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
     }
     else if (raster_prec == 2)
     {
-        for (uint32_t y = 0; y < render_h; y += raster_prec)
+        for (int y = 0; y < render_h; y += raster_prec)
         {
             for (uint32_t ux = 0; ux < line_word; ux++)
             {
@@ -467,7 +467,7 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
     }
     else if (raster_prec == 1)
     {
-        for (uint32_t y = 0; y < render_h; y += raster_prec)
+        for (int y = 0; y < render_h; y += raster_prec)
         {
             for (uint32_t ux = 0; ux < line_word; ux++)
             {
@@ -513,7 +513,7 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
     }
     else if (raster_prec == 8)
     {
-        for (uint32_t y = 0; y < render_h; y += raster_prec)
+        for (int y = 0; y < render_h; y += raster_prec)
         {
             for (uint32_t ux = 0; ux < line_word; ux++)
             {
@@ -767,7 +767,7 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         {
             font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x, chr[index].y, chr[index].w,
                                          chr[index].h);
-            if (dc->section_count * dc->fb_height >= chr[index].y + chr[index].h)
+            if (dc->section_count * dc->fb_height >= (unsigned long)(chr[index].y + chr[index].h))
             {
                 gui_free(chr[index].buf);
                 chr[index].buf = NULL;

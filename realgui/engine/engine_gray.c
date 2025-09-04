@@ -45,7 +45,7 @@ void engine_gray16_blit_to_dc(engine_gray_t *gray16, struct gui_dispdev *dc, gui
 
     gui_matrix_t *inverse = &gray16->inverse;
 
-    for (uint32_t i = y_start; i <= y_end; i++)
+    for (int32_t i = y_start; i <= y_end; i++)
     {
         uint32_t source_off = (i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2];
 
@@ -86,7 +86,7 @@ void engine_gray256_blit_to_dc(engine_gray_t *gray256, struct gui_dispdev *dc, g
 
     gui_matrix_t *inverse = &gray256->inverse;
 
-    for (uint32_t i = y_start; i <= y_end; i++)
+    for (int32_t i = y_start; i <= y_end; i++)
     {
         uint32_t source_off = (i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2];
 

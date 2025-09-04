@@ -95,7 +95,7 @@ static void gui_lite3d_end(gui_obj_t *obj)
     gui_lite3d_t *this = (gui_lite3d_t *)obj;
     if (this->model->img != NULL)
     {
-        for (int i = 0; i < this->model->desc->attrib.num_face_num_verts; i++)
+        for (unsigned int i = 0; i < this->model->desc->attrib.num_face_num_verts; i++)
         {
             if (draw_img_acc_end_cb != NULL)
             {

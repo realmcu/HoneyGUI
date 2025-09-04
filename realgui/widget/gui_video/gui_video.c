@@ -244,7 +244,7 @@ static void gui_video_play_cb(void *p)
     if (this->state == GUI_VIDEO_STATE_PLAYING)
     {
         this->frame_cur ++;
-        if (this->frame_cur >= this->num_frame)
+        if ((uint32_t)this->frame_cur >= this->num_frame)
         {
             if (this->repeat_cnt > 0)
             {

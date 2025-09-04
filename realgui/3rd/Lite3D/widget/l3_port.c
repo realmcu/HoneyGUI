@@ -52,9 +52,9 @@ __attribute__((weak)) void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *i
         gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
         uint8_t rle_pixel[4];
 
-        for (uint32_t i = y_start; i <= y_end; i++)
+        for (int32_t i = y_start; i <= y_end; i++)
         {
-            for (uint32_t j = x_start; j <= x_end; j++)
+            for (int32_t j = x_start; j <= x_end; j++)
             {
                 float X = inverse->u.m[0][0] * j + inverse->u.m[0][1] * i + inverse->u.m[0][2];
                 float Y = inverse->u.m[1][0] * j + inverse->u.m[1][1] * i + inverse->u.m[1][2];
@@ -91,9 +91,9 @@ __attribute__((weak)) void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *i
 
         gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
 
-        for (uint32_t i = y_start; i <= y_end; i++)
+        for (int32_t i = y_start; i <= y_end; i++)
         {
-            for (uint32_t j = x_start; j <= x_end; j++)
+            for (int32_t j = x_start; j <= x_end; j++)
             {
                 float X = inverse->u.m[0][0] * j + inverse->u.m[0][1] * i + inverse->u.m[0][2];
                 float Y = inverse->u.m[1][0] * j + inverse->u.m[1][1] * i + inverse->u.m[1][2];

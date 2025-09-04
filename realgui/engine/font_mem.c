@@ -498,7 +498,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     case RIGHT:
         {
             char_line_sum = 1;
-            int offset = _UI_MAX((rect_w - char_width_sum) / 2, 0);
+            int offset = _UI_MAX((int32_t)((rect_w - char_width_sum) / 2), 0);
             for (uint16_t i = 0; i < font_len; i++)
             {
                 chr[i].y = rect->y1;
@@ -532,11 +532,11 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             char_line_sum = char_width_sum / rect_w + 1 + char_line_sum;
             if (wordwrap)
             {
-                line_count = _UI_MAX(char_line_sum * 2, max_line);
+                line_count = _UI_MAX(((int32_t)char_line_sum * 2), (int32_t)max_line);
             }
             else
             {
-                line_count = _UI_MAX(char_line_sum, max_line);
+                line_count = _UI_MAX((int32_t)char_line_sum, (int32_t)max_line);
             }
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
@@ -625,11 +625,11 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             char_line_sum = char_width_sum / rect_w + 1 + char_line_sum;
             if (wordwrap)
             {
-                line_count = _UI_MAX(char_line_sum * 2, max_line);
+                line_count = _UI_MAX((int32_t)(char_line_sum * 2), (int32_t)max_line);
             }
             else
             {
-                line_count = _UI_MAX(char_line_sum, max_line);
+                line_count = _UI_MAX((int32_t)char_line_sum, (int32_t)max_line);
             }
             line_buf = gui_malloc(line_count * sizeof(gui_text_line_t));
             memset(line_buf, 0, line_count * sizeof(gui_text_line_t));
@@ -1057,7 +1057,7 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
         return UINT8_MAX;
     }
     int i = 0;
-    for (; i < sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB); i++)
+    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
     {
         if (font_lib_tab[i].font_file == NULL)
         {
@@ -1074,7 +1074,7 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
             break;
         }
     }
-    if (i >= sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB))
+    if (i >= (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)))
     {
         gui_free(data);
         return UINT8_MAX;
@@ -1116,7 +1116,7 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
         return UINT8_MAX;
     }
     int i = 0;
-    for (; i < sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB); i++)
+    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
     {
         if (font_lib_tab[i].font_file == NULL)
         {
@@ -1127,7 +1127,7 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
             break;
         }
     }
-    if (i >= sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB))
+    if (i >= (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)))
     {
         return UINT8_MAX;
     }
@@ -1145,7 +1145,7 @@ uint8_t gui_font_mem_destroy(uint8_t *font_bin_addr)
         return UINT8_MAX;
     }
     int i = 0;
-    for (; i < sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB); i++)
+    for (; i < (int)(sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB)); i++)
     {
         if (font_lib_tab[i].font_file == font_bin_addr)
         {

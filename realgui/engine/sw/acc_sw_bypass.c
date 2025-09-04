@@ -41,7 +41,7 @@ void bypass_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     gui_matrix_t *inverse = &image->inverse;
     uint32_t len = x_end - x_start + 1;
 
-    for (uint32_t i = y_start; i <= y_end; i++)
+    for (int32_t i = y_start; i <= y_end; i++)
     {
         uint32_t source_off = (i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2];
         uint32_t des_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -

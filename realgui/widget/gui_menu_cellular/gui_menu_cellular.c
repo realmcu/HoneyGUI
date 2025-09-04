@@ -57,7 +57,7 @@ static void gui_menu_cellular_update_speed(int16_t *record, int16_t *speed, int1
 {
     int record_num = 4;
 
-    for (size_t i = 0; i < record_num; i++)
+    for (int i = 0; i < record_num; i++)
     {
         record[i] = record[i + 1];
     }
@@ -245,7 +245,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 #define FOUCUS_OFFSET (icon_size / 2)
     uint8_t index = 0;
     uint8_t index_offset = 0;
-    for (size_t i = 0; i < array_size; i++)
+    for (size_t i = 0; i < (unsigned int)array_size; i++)
     {
         if (index >= 6) {index_offset += 7;}
         index = i - index_offset;

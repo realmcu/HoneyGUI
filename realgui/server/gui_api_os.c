@@ -398,7 +398,7 @@ void gui_log(const char *format, ...)
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size)
 {
     gui_log("gui Hex: %s \n", name);
-    for (uint32_t i = 0; i < (size - 1); i++)
+    for (uint16_t i = 0; i < (size - 1); i++)
     {
         gui_log("0x%x-", buf[i]);
     }

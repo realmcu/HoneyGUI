@@ -62,7 +62,7 @@ void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor)
 
 const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
 {
-    for (int i = 0; i < descriptor_count; i++)
+    for (uint32_t i = 0; i < descriptor_count; i++)
     {
         if (strcmp(descriptor_list[i]->name, name) == 0)
         {
@@ -74,7 +74,7 @@ const gui_view_descriptor_t *gui_view_descriptor_get(const char *name)
 
 static int gui_view_create_during_init(void)
 {
-    for (int i = 0; i < descriptor_count; i++)
+    for (uint32_t i = 0; i < descriptor_count; i++)
     {
         if (descriptor_list[i]->keep == 1)
         {

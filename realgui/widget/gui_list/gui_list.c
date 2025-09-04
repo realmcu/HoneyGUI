@@ -64,7 +64,7 @@ static void gui_list_update_speed(gui_list_t *_this, int16_t tp_delta)
 {
     int record_num = 4;
 
-    for (size_t i = 0; i < record_num; i++)
+    for (int i = 0; i < record_num; i++)
     {
         _this->record[i] = _this->record[i + 1];
     }

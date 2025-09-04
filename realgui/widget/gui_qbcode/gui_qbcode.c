@@ -84,7 +84,7 @@ static void gui_qrcode_draw(gui_qbcode_t *qbcode, gui_rect_t *rect)
     uint16_t qbcode_border_size = qbcode->border_size;
     uint16_t line_width = (x_end - x_start) << 1;
 
-    for (uint32_t i = y_start; i < y_end; i++)
+    for (int i = y_start; i < y_end; i++)
     {
         int16_t findey = (i - qbcode_y) * (qbcode_size + (qbcode_border_size + qbcode_border_size)) /
                          qbcode_h - qbcode_border_size;
@@ -95,7 +95,7 @@ static void gui_qrcode_draw(gui_qbcode_t *qbcode, gui_rect_t *rect)
             continue;
         }
 
-        for (uint32_t j = x_start; j < x_end; j++)
+        for (int j = x_start; j < x_end; j++)
         {
             int16_t findex = (j - qbcode_x) * (qbcode_size + (qbcode_border_size + qbcode_border_size)) /
                              qbcode_w - qbcode_border_size;
@@ -145,7 +145,7 @@ static void gui_barcode_draw(gui_qbcode_t *barcode, gui_rect_t *rect)
     uint16_t qbcode_border_size = barcode->border_size;
     uint16_t line_width = (x_end - x_start) << 1;
 
-    for (uint32_t i = y_start; i < y_end; i++)
+    for (int i = y_start; i < y_end; i++)
     {
         int16_t findy = (i - qbcode_y);
         int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
@@ -158,7 +158,7 @@ static void gui_barcode_draw(gui_qbcode_t *barcode, gui_rect_t *rect)
 
         if ((offset_record) == 0)
         {
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (int j = x_start; j < x_end; j++)
             {
                 int16_t findex = (j - qbcode_x) * (barcode_size + qbcode_border_size + qbcode_border_size) /
                                  qbcode_w - qbcode_border_size;

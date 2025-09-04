@@ -178,10 +178,10 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     {
         uint32_t *writebuf = (uint32_t *)dc->frame_buf;
         uint32_t color_back;
-        for (uint32_t i = y_start; i < y_end; i++)
+        for (int i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (int j = x_start; j < x_end; j++)
             {
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                 if (alpha != 0)
@@ -197,10 +197,10 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     {
         uint8_t *writebuf = (uint8_t *)dc->frame_buf;
         uint8_t color_back[3];
-        for (uint32_t i = y_start; i < y_end; i++)
+        for (int i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (int j = x_start; j < x_end; j++)
             {
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                 if (alpha != 0)
@@ -320,11 +320,11 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
         uint16_t color_output = rgba2565(text->color);
         uint16_t color_back;
         uint32_t section_width = dc->section.x2 - dc->section.x1 + 1;
-        for (uint32_t i = y_start; i < y_end; i++)
+        for (int i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * section_width;
             int dots_off = (i - font_y) * font_w - font_x;
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (int j = x_start; j < x_end; j++)
             {
                 uint8_t alpha = dots[dots_off + j];
                 if (alpha != 0)
