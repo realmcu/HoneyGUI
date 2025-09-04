@@ -5,17 +5,17 @@ Use LVGL V9 to Design
 Introduction to LVGL
 ==========================
 - `LVGL Official Website <https://lvgl.io/>`_
-- `LVGL Online Documentation <https://docs.lvgl.io/9.1/>`_
-- `LVGL Introduction <https://docs.lvgl.io/9.1/intro/index.html>`_
+- `LVGL Online Documentation <https://docs.lvgl.io/9.3/>`_
+- `LVGL Introduction <https://docs.lvgl.io/9.3/intro/introduction.html>`_
 
 LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library in C language, providing all the necessary tools to create embedded GUIs with easy-to-use graphical elements, attractive visual effects, and low memory usage.
 
-LVGL offers a "GUI engine" that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in GPU support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
+LVGL offers a GUI engine that handles all interactions between the application and the end user. This includes not only drawing display content and accepting user input to convert it into events that the application can capture, but also providing over 30 built-in widgets, more than 100 style properties, scrolling, animations, advanced software rendering, and built-in GPU support ranging from MCU to OpenGL, among other features. This combination of features allows you to efficiently develop user interfaces without reinventing the wheel.
 
 LVGL showcases demo effects on its official website to demonstrate LVGL's UI building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
+- `LVGL Example <ttps://docs.lvgl.io/9.3/examples.html>`_
 
 Simulator
 ==========================
@@ -67,7 +67,7 @@ Below are the directories and files related to LVGL:
     |-- libs
     |-- rtk
     |  |--demos
-    |  |  |-- benchmark
+    |  |  |-- single_demo
     |  |  |__ screen_410_502_lvgl
     |  |     |--fonts
     |  |     |--images
@@ -76,8 +76,8 @@ Below are the directories and files related to LVGL:
     |  |     |__root_image_lvgl
     |  |        |-- root                         // File system root directory
     |  |        |-- _bin_mkromfs.py
-    |  |        |-- mkromfs_0x704D1000.bat       // User Data packaging script
-    |  |        |-- root(0x704D1000).bin         // Packaged User Data
+    |  |        |-- mkromfs_0x704D1400.bat       // User Data packaging script
+    |  |        |-- root(0x704D1400).bin         // Packaged User Data
     |  |        :
     |  |        |__ ui_resource.h                // Address mapping of packaged file resources
     |  |--tool
@@ -100,15 +100,15 @@ Below are the directories and files related to LVGL:
     |__ zephyr
 
 
-1. The file structure of LVGL in the Realtek SDK is the same as the official version of LVGL V9.1.
+1. The file structure of LVGL in the Realtek SDK is the same as the official version of LVGL V9.3.
 
 - demos: Contains some comprehensive built-in examples of LVGL, some of which can be experienced at `LVGL Demo <https://lvgl.io/demos>`_ .
 
-- docs: Contains development documents for LVGL, which can be read online at the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ .
+- docs: Contains development documents for LVGL, which can be read online at the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/master/index.html>`_ .
 
 - env_support: Support for some environments or platforms.
 
-- examples: Contains built-in examples of LVGL, which can be experienced at `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ .
+- examples: Contains built-in examples of LVGL, which can be experienced at `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ .
 
 - libs: Contains library files used by LVGL.
 
@@ -128,16 +128,15 @@ Below are the directories and files related to LVGL:
 
 Actual Device Porting
 ==========================
-- Documentation: `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_
 
-LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Porting <https://docs.lvgl.io/9.1/porting/index.html>`_.
+LVGL offers extensive porting support, enabling developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touch screens, input devices, and custom GPUs. Developers can configure the porting based on project requirements, such as adjusting display parameters when changing display devices or adapting input interfaces when replacing input devices. This article uses display devices, input devices, and file systems as examples to introduce the porting process and methods. For more details, please refer to `LVGL Integration and Drivers <https://docs.lvgl.io/9.3/details/integration/index.html>`_ and `LVGL Main Modules <https://docs.lvgl.io/9.3/details/main-modules/index.html>`_.
 
 .. note::
     The following examples do not include the specific implementation of hardware device drivers, but simply demonstrate how to connect the drivers to LVGL's interfaces. Developers can complete the driver functions within the same API framework as the example driver to connect to the driver layer interface, and then reuse the porting interfaces of the example project.
 
 Display
 -----------------------------
-- Documentation: `LVGL Porting Display <https://docs.lvgl.io/9.1/porting/display.html>`_, `LVGL Overview Display <https://docs.lvgl.io/9.1/overview/display.html>`_
+- Documentation: `LVGL Display (lv_display) <https://docs.lvgl.io/9.3/details/main-modules/display/index.html>`_, `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.3/details/main-modules/display/setup.html>`_
 
 After developers complete the debugging of display device driver functions, the device can communicate normally with the display device and show colors. This section introduces how to connect the driver to LVGL's display interface to display LVGL's UI.
 
@@ -197,13 +196,13 @@ Based on actual development needs, different memory resources, and rendering mod
 
 Input Devices
 -----------------------------
-- Documentation: `LVGL Porting Input Devices <https://docs.lvgl.io/9.1/porting/indev.html>`_
+- Documentation: `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.3/details/main-modules/indev.html>`_
 
 Once developers have completed the debugging of the input device driver functionality, the device can communicate normally with the input device. This section introduces how to interface the driver with LVGL's input interface to interact with LVGL's UI.
 
 LVGL's input interface is implemented in the file :file:`lv_port_indev.c`, and input device parameters are configured in the initialization function ``void lv_port_indev_init(void)``, such as selecting the device type, configuring the data read callback function, and pointer binding.
 
-For detailed input device porting methods and precautions, please refer to the documentation `LVGL Porting Input Devices <https://docs.lvgl.io/9.1/porting/indev.html>`_ .
+For detailed input device porting methods and precautions, please refer to the documentation `LVGL Input Device (lv_indev) <https://docs.lvgl.io/9.3/details/main-modules/indev.html>`_ .
 
 - In the initialization function ``void lv_port_indev_init(void)``, select and register the corresponding type of input device, such as **Touchpad** for touch screen devices, and implement the corresponding interface.
 
@@ -280,13 +279,14 @@ For detailed input device porting methods and precautions, please refer to the d
 File System
 -----------------------------
 
+ - Documentation: `LVGL File System (lv_fs_drv) <https://docs.lvgl.io/9.3/details/main-modules/fs.html>`_
 
 LVGL Benchmark Test
 ==========================
 
 LVGL Benchmark is a performance testing tool used to evaluate the graphics display performance of the LVGL library across various hardware and software environments. By running the Benchmark, users can obtain data such as frame rates, rendering speeds, and memory usage, which helps optimize display configurations and debug performance issues. The Benchmark includes multiple test scenarios, such as graphics drawing, animations, and text rendering, with each scenario simulating common operations in actual applications. Users can compare performance across different configurations and platforms through these tests to make targeted optimization adjustments.
 
-The official documentation for LVGL benchmarking can be found at :file:`your HoneyGUI dir/lvgl/demos/README.md`.
+The official documentation for LVGL benchmarking can be found at :file:`your lvgl dir/lvgl/demos/README.md`.
 
 Benchmark Reference
 -----------------------------
@@ -360,15 +360,15 @@ Getting Started with Demo Development
 =========================================
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_
+- `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
 
-It is recommended that developers read and understand the `LVGL Overview <https://docs.lvgl.io/9.1/overview/index.html>`_ and `LVGL Widgets - Base Object <https://docs.lvgl.io/9.1/widgets/obj.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
+It is recommended that developers read and understand the `LVGL Introduction <https://docs.lvgl.io/9.3/intro/introduction.html>`_ and `LVGL Widget Basics <https://docs.lvgl.io/9.3/details/common-widget-features/basics.html>`_ sections before starting development to grasp the design concepts and logic of LVGL.
 
 LVGL offers a wealth of demos and examples to help developers become familiar with the use of various controls and features.
 
-- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/demo`. Developers can directly call the corresponding ``lv_demo_xxx()`` functions to familiarize themselves.
+- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos, with their source code stored in the directory :file:`your lvgl dir/lvgl/src/demo`. Developers can directly call the corresponding ``lv_demo_xxx()`` functions to familiarize themselves.
 
-- The online documentation `LVGL Example <https://docs.lvgl.io/9.1/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir/example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
+- The online documentation `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir/example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
 
 .. _Resource Converter:
 
@@ -396,9 +396,9 @@ LVGL Image Converter
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Online Image Converter: `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
-- Documentation: `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_
+- Documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
 
-The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Overview Images - Online Converter <https://docs.lvgl.io/9.1/overview/image.html#online-converter>`_：
+The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.3/details/main-modules/image.html#online-converter>`_：
 
 1. Select the LVGL Version: Choose ``LVGL v9``
 2. Upload Image Files: Select one or more local image files for batch conversion.
@@ -406,10 +406,10 @@ The LVGL Online Image Converter is a website provided by the LVGL development te
    The output C files will have the same name as the input files, and the variable name describing the image will also match the input file name. Therefore, avoid using Chinese characters or any illegal characters in the file names.
 3. Choose Output Color Format:
 
-   For an explanation of color formats, refer to  `LVGL Overview Images - Color Format <https://docs.lvgl.io/9.1/overview/image.html#color-formats>`_.
+   For an explanation of color formats, refer to  `LVGL Images (lv_image) - Color Format <https://docs.lvgl.io/9.3/details/main-modules/image.html#color-formats>`_.
 4. Click :guilabel:`Convert` to obtain the output file
 
-The document `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
+The document `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
 
 
 The online image converter for LVGL v9 only supports output in C file format and a limited selection of color formats. If you need features such as image compression, bin file output, or other color formats, please use the  `Python Image Converter <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_。
@@ -474,9 +474,10 @@ For platforms that support direct flash addressing, such as Nor Flash, the resou
 
 LVGL
 ^^^^^^^^^
+
 This conversion feature is fully supported by the native LVGL conversion script. The tool only accepts PNG images as input files and can output both C files and bin files, supporting multiple color formats.
 When outputting image resources in the bin file format, the data in the bin file is stored as ``12 Byte lv_img_header_t + data``, where the ``lv_img_header_t`` contains information such as the ``color format``, ``width``, and ``height``.
-For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Overview Images <https://docs.lvgl.io/9.1/overview/image.html>`_
+For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
 
 
 .. image:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
@@ -544,9 +545,9 @@ LVGL Online Conversion Tool
 
 - Online Conversion Tool: `LVGL Font Converter <https://lvgl.io/tools/fontconverter>`_
 
-- Documentation: `LVGL Overview Fonts <https://docs.lvgl.io/9.1/overview/font.html>`_
+- Documentation: `LVGL Font (lv_font) <https://docs.lvgl.io/9.3/details/main-modules/font.html>`_
 
-Please refer to `LVGL Overview Font - Add a New Font <https://docs.lvgl.io/9.1/overview/font.html#add-a-new-font>`_ for usage steps:
+Please refer to `LVGL Frequently Asked Questions - How to use the font converter? <https://lvgl.io/tools/fontconverter>`_ for usage steps:
 
 1. Set the name of the output font library
 
@@ -590,22 +591,22 @@ Font Conversion Steps:
 
 1. Open the Realtek Font Converter interface
 
-2. Click the "Add new setting" button to add a new configuration tab
+2. Click the Add new setting button to add a new configuration tab
 
-3. Click the "Add Fonts" button to add font files; multiple fonts can be added
+3. Click the Add Fonts button to add font files; multiple fonts can be added
 
 4. Fill in configuration items such as bpp, font size, and character set, where multiple font sizes can be entered, separated by commas
 
   - When bpp is 3, the generated font file cannot use GPU accelerated rendering
   - After selecting the compression option, the generated font file will be compressed, occupying less space, but cannot use GPU accelerated rendering
 
-5. Click the "Generate Font" button, choose the path, and generate the font file for the current configuration tab
+5. Click the Generate Font button, choose the path, and generate the font file for the current configuration tab
 
-6. If there are multiple tabs, click the "Browse" button, select the font file output path, and click the "Generate All" button to generate all configuration tab font files to the specified path
+6. If there are multiple tabs, click the Browse button, select the font file output path, and click the Generate All button to generate all configuration tab font files to the specified path
 
 Additional Features:
 
-- Supports batch generation of font files, with each tab's font file named "Font Name_Size_Configuration Item"
+- Supports batch generation of font files, with each tab's font file named Font Name_Size_Configuration Item
 
 - Supports copying, deleting, and renaming configuration tabs
 
@@ -618,9 +619,9 @@ Development Resources Support
 
 Online Documentation
 ---------------------
-- `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
+- `LVGL Document <https://docs.lvgl.io/master/index.html>`_
 
-The `online documentation <https://docs.lvgl.io/master/intro/index.html>`_ for LVGL provides comprehensive technical documentation and tutorials to help developers better understand and use the LVGL graphics library. The documentation includes the following:
+The `online documentation <https://docs.lvgl.io/master/index.html>`_ for LVGL provides comprehensive technical documentation and tutorials to help developers better understand and use the LVGL graphics library. The documentation includes the following:
 
 - Overview and Features: The documentation introduces the basic concepts and features of LVGL, including graphical objects, screen management, event handling, theme styling, and more. Users can read the documentation to understand the core functions and advantages of LVGL.
 
