@@ -47,7 +47,7 @@ static char date_text_content[10];
 
 /* Video */
 static gui_video_t *video = NULL;
-unsigned char *flower[] = {FLOWER_MJPG, PEONY_RED_MJPG, PEONY_BLUE_MJPG};
+unsigned char *flower[3] = {0};
 static uint8_t flower_index = 0;
 
 /*============================================================================*
@@ -141,6 +141,12 @@ static void create_watchface_flower(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 #ifdef FLOWER_MJPG
+    if (flower[0] == NULL)
+    {
+        unsigned char *flower_array[] = {FLOWER_MJPG, PEONY_RED_MJPG, PEONY_BLUE_MJPG};
+        memcpy(flower, flower_array, sizeof(flower_array));
+    }
+
     gui_obj_hidden(&(gui_view_get_current()->base), true);
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
 

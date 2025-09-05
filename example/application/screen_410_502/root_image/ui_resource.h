@@ -1,5 +1,5 @@
 #if defined _WIN32
-extern unsigned char resource_root[];
+extern unsigned char *resource_root;
 
 #define   DESC_BUTTERFLY_BIN                      (void *)(resource_root + 0x000001f8)
 #define   DESC_FACE_BIN                           (void *)(resource_root + 0x00017678)

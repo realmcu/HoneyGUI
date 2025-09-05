@@ -38,20 +38,7 @@ static const gui_view_descriptor_t descriptor =
     .keep = false,
 };
 
-void *text_num_black_array[] =
-{
-    UI_TEXT_0_B_BIN,
-    UI_TEXT_1_B_BIN,
-    UI_TEXT_2_B_BIN,
-    UI_TEXT_3_B_BIN,
-    UI_TEXT_4_B_BIN,
-    UI_TEXT_5_B_BIN,
-    UI_TEXT_6_B_BIN,
-    UI_TEXT_7_B_BIN,
-    UI_TEXT_8_B_BIN,
-    UI_TEXT_9_B_BIN,
-    UI_TEXT_COLON_B_BIN,
-};
+void *text_num_black_array[11] = {0};
 
 static gui_video_t *video = NULL;
 
@@ -119,6 +106,25 @@ static void time_update_cb(void *p)
 
 static void create_watchface_labubu(gui_view_t *view)
 {
+    if (text_num_black_array[0] == NULL)
+    {
+        void *text_num_black[11] =
+        {
+            UI_TEXT_0_B_BIN,
+            UI_TEXT_1_B_BIN,
+            UI_TEXT_2_B_BIN,
+            UI_TEXT_3_B_BIN,
+            UI_TEXT_4_B_BIN,
+            UI_TEXT_5_B_BIN,
+            UI_TEXT_6_B_BIN,
+            UI_TEXT_7_B_BIN,
+            UI_TEXT_8_B_BIN,
+            UI_TEXT_9_B_BIN,
+            UI_TEXT_COLON_B_BIN,
+        };
+        memcpy(text_num_black_array, text_num_black, sizeof(text_num_black));
+    }
+
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
     video = gui_video_create_from_mem(win, "labubu", LABUBU_MJPG, 0, 0, 410,
                                       502);

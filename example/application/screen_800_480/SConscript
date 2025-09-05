@@ -1,8 +1,10 @@
-from building import *
-Import('env')
-from SCons.Script import Flatten, Command
+# SConscript
 
+from building import *
+from honeygui import *
+from SCons.Script import Flatten
 import os
+import menu_config
 
 cwd = GetCurrentDir()
 src = Glob('*.c')
@@ -10,42 +12,24 @@ CPPDEFINES = []
 CPPPATH = [cwd]
 CPPPATH += [os.path.join(cwd, 'root_image_800_480')]
 
-BIN_SUBDIR = os.path.join(cwd, 'root_image_800_480')
-BIN_FILE = os.path.join(BIN_SUBDIR, 'root_0x4400000.bin')
-OBJ_FILE = os.path.join(BIN_SUBDIR, 'root_0x4400000_bin.o')
-
-def bin2obj_action(target, source, env):
-    bin_dir = os.path.dirname(str(source[0]))
-    bin_name = os.path.basename(str(source[0]))
-    obj_name = os.path.basename(str(target[0]))
-    cmd = f'cd "{bin_dir}" && objcopy -I binary -O elf64-x86-64 --binary-architecture i386 "{bin_name}" "{obj_name}"'
-    print('[BIN2OBJ]', cmd)
-    return os.system(cmd)
-
-additional_objs = []
-
-if os.path.exists(BIN_FILE):
-    bin_obj = Command(
-        target = OBJ_FILE,
-        source = BIN_FILE,
-        action = bin2obj_action
-    )
-    additional_objs.append(bin_obj)
-else:
-    print('warning, can not find bin file')
 
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_800_480_DEMO']
     CPPDEFINES += ['DRV_LCD_WIDTH=800']
     CPPDEFINES += ['DRV_LCD_HIGHT=480']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
+    if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
+        print("Target arch is win32, attempting to add prebuilt binary object...")
+        BIN_SUBDIR = os.path.join(cwd, 'root_image_800_480')
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'root_0x4400000.bin')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'root_0x4400000_bin.o')
+        result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
+        if result_node:
+            additional_objs = []
+            additional_objs.append(result_node)
+            src = Flatten(src + additional_objs)
 
-group = DefineGroup(
-    'realgui/demo',
-    Flatten(src + additional_objs),
-    depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'],
-    CPPPATH = CPPPATH,
-    CPPDEFINES = CPPDEFINES
-)
+
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

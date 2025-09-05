@@ -38,11 +38,11 @@ static gui_view_descriptor_t const descriptor =
 };
 
 /* 3D Digital Clock */
-static uint8_t *clock_fig_bin[10] =
-{
-    FIG0_BIN, FIG1_BIN, FIG2_BIN, FIG3_BIN, FIG4_BIN,
-    FIG5_BIN, FIG6_BIN, FIG7_BIN, FIG8_BIN, FIG9_BIN
-};
+static uint8_t *clock_fig_bin[10] = {0};
+// {
+//     FIG0_BIN, FIG1_BIN, FIG2_BIN, FIG3_BIN, FIG4_BIN,
+//     FIG5_BIN, FIG6_BIN, FIG7_BIN, FIG8_BIN, FIG9_BIN
+// };
 static uint8_t current_hour0 = 0;    // Face 0
 static uint8_t current_hour1 = 1;    // Face 1
 static uint8_t current_minute0 = 0;  // Face 2
@@ -150,6 +150,16 @@ static void digital_clock_global_cb(l3_model_t *this)
 
 static void digital_clock_app(gui_view_t *view)
 {
+    if (clock_fig_bin[0] == NULL)
+    {
+        uint8_t *clock_fig[10] =
+        {
+            FIG0_BIN, FIG1_BIN, FIG2_BIN, FIG3_BIN, FIG4_BIN,
+            FIG5_BIN, FIG6_BIN, FIG7_BIN, FIG8_BIN, FIG9_BIN
+        };
+        memcpy(clock_fig_bin, clock_fig, sizeof(clock_fig));
+    }
+
     gui_obj_t *obj = GUI_BASE(view);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,

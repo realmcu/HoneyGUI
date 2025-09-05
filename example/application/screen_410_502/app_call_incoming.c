@@ -269,7 +269,7 @@ void app_calling_design(gui_obj_t *parent)
     call_time = 0;
     format_time(call_time, call_time_str);
     text = gui_text_create(win_calling, 0, 0, 250, SCREEN_WIDTH, 50);
-    gui_text_set(text, call_time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(call_time_str), 32);
+    gui_text_set(text, call_time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(call_time_str), 46);
     gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, CENTER);
     gui_text_rendermode_set(text, 2);

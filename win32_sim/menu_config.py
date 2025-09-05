@@ -2,8 +2,7 @@ import os
 import sys
 
 # toolchains options
-#ARCH='arm'
-#CPU='cortex-m4'
+ARCH='win32'
 CROSS_TOOL='gcc'
 PLATFORM    = 'gcc'
 EXEC_PATH   = r'C:/mingw64/bin'

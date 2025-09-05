@@ -47,7 +47,7 @@ static char temp_low_content[3] = {0};
 static char temp_high_content[3] = {0};
 
 static gui_img_t *compass_pointer = NULL;
-static char degree_content[5] = "0°";
+static char degree_content[6] = "0°";
 static char orien_content[3] = "N";
 
 static uint8_t *img_data_temperature = NULL;
@@ -58,20 +58,20 @@ extern char *cjson_content;
 extern uint8_t json_refeash_flag;
 
 /*Define watch_text_num_array*/
-void *text_num_array[] =
-{
-    UI_TEXT_0_BIN,
-    UI_TEXT_1_BIN,
-    UI_TEXT_2_BIN,
-    UI_TEXT_3_BIN,
-    UI_TEXT_4_BIN,
-    UI_TEXT_5_BIN,
-    UI_TEXT_6_BIN,
-    UI_TEXT_7_BIN,
-    UI_TEXT_8_BIN,
-    UI_TEXT_9_BIN,
-    UI_TEXT_COLON_BIN,
-};
+void *text_num_array[11] = {0};
+// {
+//     UI_TEXT_0_BIN,
+//     UI_TEXT_1_BIN,
+//     UI_TEXT_2_BIN,
+//     UI_TEXT_3_BIN,
+//     UI_TEXT_4_BIN,
+//     UI_TEXT_5_BIN,
+//     UI_TEXT_6_BIN,
+//     UI_TEXT_7_BIN,
+//     UI_TEXT_8_BIN,
+//     UI_TEXT_9_BIN,
+//     UI_TEXT_COLON_BIN,
+// };
 extern char *day[];
 
 /*============================================================================*
@@ -618,6 +618,25 @@ static void switch_menu()
  *============================================================================*/
 void create_watchface_classic(gui_view_t *view)
 {
+    if (text_num_array[0] == NULL)
+    {
+        void *text_num[11] =
+        {
+            UI_TEXT_0_BIN,
+            UI_TEXT_1_BIN,
+            UI_TEXT_2_BIN,
+            UI_TEXT_3_BIN,
+            UI_TEXT_4_BIN,
+            UI_TEXT_5_BIN,
+            UI_TEXT_6_BIN,
+            UI_TEXT_7_BIN,
+            UI_TEXT_8_BIN,
+            UI_TEXT_9_BIN,
+            UI_TEXT_COLON_BIN,
+        };
+        memcpy(text_num_array, text_num, sizeof(text_num));
+    }
+
     gui_obj_t *parent = GUI_BASE(view);
 
     gui_canvas_create(parent, NULL, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); //fb_change

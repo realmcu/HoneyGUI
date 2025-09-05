@@ -39,29 +39,29 @@ static gui_view_descriptor_t const descriptor =
 };
 
 /* Soccer Management */
-static uint32_t *gui_soccer_array[] =
-{
-    SOCCER_P0001_CALL_BIN,
-    SOCCER_P0002_SPORTS_BIN,
-    SOCCER_P0003_HEARTRATE_BIN,
-    SOCCER_P0004_SLEEP_BIN,
-    SOCCER_P0005_WEATHER_BIN,
-    SOCCER_P0006_ACTIVITIES_BIN,
-    SOCCER_P0007_STRESS_BIN,
-    SOCCER_P0008_SPO2_BIN,
-    SOCCER_P0009_MUSIC_BIN,
-    SOCCER_P0010_VOICE_BIN,
-    SOCCER_P0011_NOTIFICATION_BIN,
-    SOCCER_P0012_SETTINGS_BIN,
-    SOCCER_P0013_SPORT_CORECD_BIN,
-    SOCCER_P0014_MEASURE_BIN,
-    SOCCER_P0015_MOOD_BIN,
-    SOCCER_P0016_BREATHE_BIN,
-    SOCCER_P0017_ALARM_BIN,
-    SOCCER_P0018_PERIOD_BIN,
-    SOCCER_P0019_HOME_BIN,
-    SOCCER_P0020_MORE_BIN,
-};
+static uint32_t *gui_soccer_array[20];
+// {
+//     SOCCER_P0001_CALL_BIN,
+//     SOCCER_P0002_SPORTS_BIN,
+//     SOCCER_P0003_HEARTRATE_BIN,
+//     SOCCER_P0004_SLEEP_BIN,
+//     SOCCER_P0005_WEATHER_BIN,
+//     SOCCER_P0006_ACTIVITIES_BIN,
+//     SOCCER_P0007_STRESS_BIN,
+//     SOCCER_P0008_SPO2_BIN,
+//     SOCCER_P0009_MUSIC_BIN,
+//     SOCCER_P0010_VOICE_BIN,
+//     SOCCER_P0011_NOTIFICATION_BIN,
+//     SOCCER_P0012_SETTINGS_BIN,
+//     SOCCER_P0013_SPORT_CORECD_BIN,
+//     SOCCER_P0014_MEASURE_BIN,
+//     SOCCER_P0015_MOOD_BIN,
+//     SOCCER_P0016_BREATHE_BIN,
+//     SOCCER_P0017_ALARM_BIN,
+//     SOCCER_P0018_PERIOD_BIN,
+//     SOCCER_P0019_HOME_BIN,
+//     SOCCER_P0020_MORE_BIN,
+// };
 
 /*============================================================================*
  *                           Private Functions
@@ -86,6 +86,34 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void soccer_app(gui_view_t *view)
 {
+    if (gui_soccer_array[0] == NULL)
+    {
+        uint32_t *soccer_array[20] =
+        {
+            SOCCER_P0001_CALL_BIN,
+            SOCCER_P0002_SPORTS_BIN,
+            SOCCER_P0003_HEARTRATE_BIN,
+            SOCCER_P0004_SLEEP_BIN,
+            SOCCER_P0005_WEATHER_BIN,
+            SOCCER_P0006_ACTIVITIES_BIN,
+            SOCCER_P0007_STRESS_BIN,
+            SOCCER_P0008_SPO2_BIN,
+            SOCCER_P0009_MUSIC_BIN,
+            SOCCER_P0010_VOICE_BIN,
+            SOCCER_P0011_NOTIFICATION_BIN,
+            SOCCER_P0012_SETTINGS_BIN,
+            SOCCER_P0013_SPORT_CORECD_BIN,
+            SOCCER_P0014_MEASURE_BIN,
+            SOCCER_P0015_MOOD_BIN,
+            SOCCER_P0016_BREATHE_BIN,
+            SOCCER_P0017_ALARM_BIN,
+            SOCCER_P0018_PERIOD_BIN,
+            SOCCER_P0019_HOME_BIN,
+            SOCCER_P0020_MORE_BIN,
+        };
+        memcpy(gui_soccer_array, soccer_array, sizeof(soccer_array));
+    }
+
     gui_obj_t *obj = GUI_BASE(view);
     gui_dispdev_t *dc = gui_get_dc();
 

@@ -70,7 +70,7 @@ static char mem_string[20];
 static char low_mem_string[20];
 
 #ifdef _WIN32
-uint8_t resource_root[1024 * 1024 * 20];
+unsigned char *resource_root = NULL;
 const char *filename =
     "./example/application/screen_410_502/root_image/web/peripheral_simulation/json/simulation_data.json";
 #endif
@@ -205,7 +205,7 @@ uint16_t xorshift16()
     return seed;
 }
 
-#ifndef __WIN32
+// #ifndef __WIN32
 static void json_refreash()
 {
     uint16_t degree = xorshift16() % 359;
@@ -273,7 +273,7 @@ static void json_refreash()
     // gui_log("json_refeash_flag %x, line: %d\n", json_refeash_flag, __LINE__);
     // gui_log("cjson_content: %s\n", cjson_content);
 }
-#endif
+// #endif
 
 // Update the watch time and the JSON data
 static void win_cb()
@@ -283,19 +283,26 @@ static void win_cb()
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     char *temp = cjson_content;
-    cjson_content = read_file(filename);
-    if (!cjson_content)
+    // cjson_content = read_file(filename);
+    // if (!cjson_content)
+    // {
+    //     cjson_content = temp;
+    //     perror("fopen");
+    // }
+    // else
+    // {
+    //     gui_free(temp);
+    // }
+    // if (gui_view_get_next() == NULL)
+    // {
+    //     json_refeash_flag = 0b1111;
+    // }
+    static uint8_t count = 0;
+    count++;
+    if (count >= 5)
     {
-        cjson_content = temp;
-        perror("fopen");
-    }
-    else
-    {
-        gui_free(temp);
-    }
-    if (gui_view_get_next() == NULL)
-    {
-        json_refeash_flag = 0b1111;
+        count = 0;
+        json_refreash();
     }
     // gui_log("json_refeash_flag %x\n", json_refeash_flag);
 #else
@@ -389,11 +396,14 @@ static void app_main_watch_ui_design(void)
     gui_log("app_main_watch_ui_design\n");
 
 #if defined __WIN32
-    cjson_content = read_file(filename);
-    if (!cjson_content)
-    {
-        perror("fopen");
-    }
+    // cjson_content = read_file(filename);
+    // if (!cjson_content)
+    // {
+    //     perror("fopen");
+    // }
+    cjson_content = gui_malloc(700);
+    memcpy(cjson_content, CJSON_DATA_BIN, 700);
+    json_refreash();
 #else
     cjson_content = gui_malloc(700);
     memcpy(cjson_content, CJSON_DATA_BIN, 700);
@@ -407,37 +417,18 @@ static void app_main_watch_ui_design(void)
     win_cb();
 }
 
+extern const unsigned char _binary_root_0x704D1400_bin_start[];
+extern const unsigned char _binary_root_0x704D1400_bin_end[];
+extern const unsigned char _binary_root_0x704D1400_bin_size[];
+
 static int app_init(void)
 {
-#ifdef _WIN32
-    extern int open(const char *file, int flags, ...);
-    extern int read(int fd, void *buf, size_t len);
-    extern int close(int fd);
-    defaultPath = "example\\application\\screen_410_502\\root_image\\root\\";
-    int fd;
-    fd = open("./example/application/screen_410_502/root_image/root(0x704D1400).bin", 0);
-    if (fd < 0)
-    {
-        printf("open root(0x704D1400).bin Fail!\n");
-        printf("open root(0x704D1400).bin Fail!\n");
-        printf("open root(0x704D1400).bin Fail!\n");
-        return 0;
-    }
-
-    printf("open root(0x704D1400).bin Successful!\n");
-    ssize_t bytes_read = read(fd, resource_root, 1024 * 1024 * 20);
-    if (bytes_read < 0)
-    {
-        printf("read bin file failed!\n");
-        close(fd);
-        return 0;
-    }
-    close(fd);
-#endif
     extern void l3_port_init(void);
     l3_port_init(); // make sure compiler link Lite3D_port_gui.o
 
 #ifdef _WIN32
+    resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
+
     extern void win32_load_music(void *p);
     extern void win32_play_music(void *p);
     extern void win32_stop_music(void);
@@ -460,6 +451,7 @@ static int app_init(void)
     app_main_watch_ui_design();
     return 0;
 }
+GUI_INIT_APP_EXPORT(app_init);
 
 /*============================================================================*
  *                           Public Functions
@@ -503,6 +495,3 @@ char *read_file(const char *file_path)
     return content;
 }
 #endif
-
-
-GUI_INIT_APP_EXPORT(app_init);

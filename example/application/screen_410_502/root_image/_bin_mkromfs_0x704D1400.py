@@ -278,7 +278,7 @@ def get_bin_data(tree, base_addr):
     tree_data, file_addr1, file_addr2 = tree.bin_data(v_len)
 	
     H_FILE += '#if defined _WIN32\n'
-    H_FILE += 'extern unsigned char resource_root[];\n\n'
+    H_FILE += 'extern unsigned char *resource_root;\n\n'
     H_FILE += file_addr1
     H_FILE += '\n#else\n'
     H_FILE += file_addr2

@@ -17,12 +17,6 @@ except:
 
 TARGET = 'gui.' + 'exe'
 
-#env = Environment(tools = ['mingw'],
-#    AS = menu_config.AS, ASFLAGS = menu_config.AFLAGS,
-#    CC = menu_config.CC, CCFLAGS = menu_config.CFLAGS,
-#    AR = menu_config.AR, ARFLAGS = '-rc',
-#    CXX = menu_config.CXX, CXXFLAGS = menu_config.CXXFLAGS,
-#    LINK = menu_config.LINK, LINKFLAGS = menu_config.LFLAGS)
 
 env = Environment(tools = ['mingw'],
                   CC=menu_config.CC, 
@@ -30,7 +24,6 @@ env = Environment(tools = ['mingw'],
                   CXX = menu_config.CXX, 
                   CXXFLAGS = menu_config.CXXFLAGS,
                   LINKFLAGS = menu_config.LFLAGS)
-
 
 
 

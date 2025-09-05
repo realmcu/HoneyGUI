@@ -90,14 +90,7 @@ static const LayerOffset MAX_OFFSET_LIMITS[5] =
 };
 
 /* Dot Image Binaries */
-static void *dot_img_bin[5] =
-{
-    RAINBOWDCLOCK_DOT_0_BIN,
-    RAINBOWDCLOCK_DOT_1_BIN,
-    RAINBOWDCLOCK_DOT_2_BIN,
-    RAINBOWDCLOCK_DOT_3_BIN,
-    RAINBOWDCLOCK_DOT_4_BIN
-};
+static void *dot_img_bin[5] = {0};
 
 /* Create Digits and Dots */
 static RainbowDigit digits[4];
@@ -302,6 +295,19 @@ static void dot_animation_cb()
 
 static void rainbow_digital_app(gui_view_t *view)
 {
+    if (dot_img_bin[0] == NULL)
+    {
+        void *dot_img[5] =
+        {
+            RAINBOWDCLOCK_DOT_0_BIN,
+            RAINBOWDCLOCK_DOT_1_BIN,
+            RAINBOWDCLOCK_DOT_2_BIN,
+            RAINBOWDCLOCK_DOT_3_BIN,
+            RAINBOWDCLOCK_DOT_4_BIN
+        };
+        memcpy(dot_img_bin, dot_img, sizeof(dot_img));
+    }
+
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = GUI_BASE(view);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
