@@ -19,6 +19,8 @@ int port_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len)
 
 int port_ftl_erase(uint32_t addr, uint32_t len)
 {
+    (void)addr;
+    (void)len;
     return 0;
 }
 

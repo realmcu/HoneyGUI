@@ -293,6 +293,7 @@ static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *
 static void get_butterfly_tail_position(gui_lite3d_t *lite3d_butterfly,
                                         Butterfly_Pos *butterfly_pos, float *tail_x, float *tail_y)
 {
+    (void)lite3d_butterfly;
     float screen_x = x_to_screen_w(butterfly_pos->x);
     float screen_y = y_to_screen_h(butterfly_pos->y);
 
@@ -440,6 +441,7 @@ static void init_butterfly_bg(gui_win_t *parent, Particle **particles)
 
 static void free_particles_resources(gui_view_t *view)
 {
+    (void)view;
     for (int i = 0; i < BUTTERFLY_COUNT; i++)
     {
         if (particles[i])

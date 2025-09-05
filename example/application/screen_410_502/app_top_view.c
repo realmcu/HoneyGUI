@@ -118,6 +118,8 @@ static void canvas_color_change_cb(void *p)
 
 static void view_more_click_cb(void *widget, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_obj_t *obj = GUI_BASE(widget);
     if (strcmp(obj->name, "cancel") == 0)
     {
@@ -131,11 +133,16 @@ static void view_more_click_cb(void *widget, gui_event_t e, void *param)
 
 static void view_more_event_cb(void *widget, gui_event_t e, void *param)
 {
-    ; // This function is intentionally left empty.
+    (void)widget;
+    (void)e;
+    (void)param;
+    // This function is intentionally left empty.
 }
 
 static void create_view_more(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
     if (in_view_more) {return;}
     in_view_more = true;
     information_t *inform = (information_t *)param;
@@ -149,9 +156,9 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     gui_obj_create_timer(GUI_BASE(win), 20, true, view_more_cb);
     gui_obj_add_event_cb(GUI_BASE(win), (gui_event_cb_t)view_more_event_cb,
                          GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL); // stop list scroll
-    gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0,
-                                                          SCREEN_WIDTH,
-                                                          SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+    // gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0,
+    //                                                       SCREEN_WIDTH,
+    //                                                       SCREEN_HEIGHT, gui_rgb(0, 0, 0));
     {
         char *content = "Cancel";
         gui_text_t *text = gui_text_create(win, "cancel",  37, 35, 80, 32);
@@ -396,6 +403,7 @@ static void create_inform_note(gui_obj_t *obj, void *param)
 
 static void list_timer_cb(void *param)
 {
+    (void)param;
     gui_view_t *next_view = gui_view_get_next();
     if (!note_dur_animation && !clear_flag &&
         (next_view == current_view || next_view == NULL))
@@ -422,7 +430,7 @@ static void list_timer_cb(void *param)
         gui_list_for_each(node, &(list->base.child_list))
         {
             gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-            gui_list_note_t *list_note = (gui_list_note_t *)o;
+            // gui_list_note_t *list_note = (gui_list_note_t *)o;
             gui_obj_hidden(o, false);
         }
     }
@@ -457,6 +465,8 @@ static void clear_all_timer_cb(void *widget)
 
 static void clear_all_note_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     if (in_view_more || list->note_num == 0) {return;}
     gui_obj_create_timer(GUI_BASE(obj), 10, true, clear_all_timer_cb);
     gui_obj_start_timer(GUI_BASE(obj));
@@ -465,6 +475,7 @@ static void clear_all_note_cb(void *obj, gui_event_t e, void *param)
 
 static void canvas_clear_update_pos_cb(void *widget)
 {
+    (void)widget;
     gui_obj_t *obj = GUI_BASE(canvas_clear);
     gui_obj_move(obj, obj->x, 40 + list->offset); // move with list
 }

@@ -64,6 +64,7 @@ extern "C" {
         .pView = &current_view,
         .on_switch_in = app_music_ui_design,
         .on_switch_out = clear_music,
+        .keep = 0,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -447,6 +448,7 @@ private:
     }
     static void on_playing(void *p)
     {
+        (void)p;
         play_time += 0.1f;
         gui_audio_t *gui_audio = gui_get_audio();
         float duration = 0;
@@ -501,7 +503,7 @@ private:
 
     static void music_switch_information(void)
     {
-        sprintf(music_name, "%s", music_infor[music_index].music_name);
+        snprintf(music_name, sizeof(music_name), "%s", music_infor[music_index].music_name);
         gui_text_content_set(music_name_text, music_name, strlen(music_name));
         gui_audio_t *gui_audio = gui_get_audio();
         float duration = 0;
@@ -527,6 +529,7 @@ private:
     }
     static void music_clicked(void *obj, gui_event_t e, void *param)
     {
+        (void)e;
         gui_obj_hidden(GUI_BASE(param), false);
         gui_obj_create_timer(GUI_BASE(param), 300, false, music_clicked_timer_cb);
         gui_obj_start_timer(GUI_BASE(param));
@@ -569,6 +572,7 @@ private:
     }
     static void music_list_design(gui_obj_t *obj, void *p)
     {
+        (void)p;
         gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
         uint8_t index = note->index;
         if (index == MUSIC_NUM_MAX) { return; }
@@ -612,6 +616,8 @@ private:
 
     static void play_button_cb(void *obj, gui_event_t e, void *param)
     {
+        (void)e;
+        (void)param;
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_audio_t *gui_audio = gui_get_audio();
         if (img->data == PLAY_BIN)
@@ -640,6 +646,8 @@ private:
     }
     static void skip_back_button_cb(void *obj, gui_event_t e, void *param)
     {
+        (void)e;
+        (void)param;
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_img_set_image_data(img, (const uint8_t *)SKIPBACKHL_BIN);
         gui_obj_create_timer(GUI_BASE(img), 100, false, skip_back_timer_cb);
@@ -667,6 +675,8 @@ private:
     }
     static void skip_fwd_button_cb(void *obj, gui_event_t e, void *param)
     {
+        (void)e;
+        (void)param;
         gui_img_t *img = GUI_TYPE(gui_img_t, obj);
         gui_img_set_image_data(img, (const uint8_t *)SKIPFWDHL_BIN);
         gui_obj_create_timer(GUI_BASE(img), 100, false, skip_fwd_timer_cb);
@@ -688,6 +698,9 @@ private:
     }
     static void win_clicked_cb(void *obj, gui_event_t e, void *param)
     {
+        (void)obj;
+        (void)e;
+        (void)param;
         // stop music list clicked event
     }
 
@@ -758,7 +771,7 @@ private:
         {
             length = local_music_length();
         }
-        sprintf(music_name, "%s", music_infor[music_index].music_name);
+        snprintf(music_name, sizeof(music_name), "%s", music_infor[music_index].music_name);
         sprintf(artist_name, "%s", "FreeTestData.com");
         sprintf(album_name, "%s", "Sample Audio");
         format_time(length, music_time_array);
@@ -902,6 +915,7 @@ private:
 // New function to get lyrics around a specific time and at a range size
     char **get_lyric_at_time(const std::string &content, int currentTime, int rangeSize, bool null)
     {
+        (void)null; // To avoid unused parameter warning
         std::istringstream stream(content);
         std::string line;
         std::vector<std::string> allLines;
@@ -1068,6 +1082,7 @@ extern "C"
 
     static void clear_music(gui_view_t *view)
     {
+        (void)view;
         gui_music_app::free_music_app();
     }
 

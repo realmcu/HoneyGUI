@@ -91,6 +91,7 @@ extern "C" {
         .pView = &current_view,
         .on_switch_in = app_fruit_ninja_design,
         .on_switch_out = close_FN,
+        .keep = 0,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -705,6 +706,7 @@ extern "C" {
     }
     static void close_FN(gui_view_t *view)
     {
+        (void)view;
         app_fruit_ninja::clear_world();
     }
 }

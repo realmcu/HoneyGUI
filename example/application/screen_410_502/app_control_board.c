@@ -172,6 +172,8 @@ void switch_nobother(bool state)
 
 static void switch_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = (gui_img_t *)obj;
     gui_control_board_t *control_board = gui_get_control_board();
     if (strcmp(img->base.name, "sw_bt") == 0)
@@ -228,8 +230,8 @@ static void control_board_design(gui_view_t *view)
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
     // draw background
-    gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(view), NULL, 0, 0,
-                                                            SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+    // gui_canvas_rect_t *canvas_rect = gui_canvas_rect_create(GUI_BASE(view), NULL, 0, 0,
+    //                                                         SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));
 
     // switch
     gui_img_t *sw_bt = gui_img_create_from_mem(view, "sw_bt", CONTROL_BT_OFF_BIN, 20, 100, 182, 121);

@@ -56,6 +56,21 @@
 #include "h264bsd_conceal.h"
 #include "h264bsd_storage.h"
 
+#if defined(__ARMCC_VERSION)
+#if (__ARMCC_VERSION >= 6000000)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
+#elif defined(__GNUC__)
+#if (__GNUC__ >= 7)
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+#else
+#define FALLTHROUGH
+#endif
 /*------------------------------------------------------------------------------
     2. External compiler flags
 --------------------------------------------------------------------------------
@@ -308,7 +323,8 @@ u32 h264bsdDecode(storage_t *pStorage, u8 *byteStrm, u32 len, u32 picId,
 
         case NAL_CODED_SLICE_IDR:
             DEBUG(("IDR "));
-        /* fall through */
+            /* fall through */
+            FALLTHROUGH;
         case NAL_CODED_SLICE:
             DEBUG(("SLICE HEADER\n"));
 

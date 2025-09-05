@@ -77,7 +77,7 @@ size_t userShellListDir(char *path, char *buffer, size_t maxLen)
 {
     DIR *dir;
     struct dirent *ptr;
-    int i;
+    // int i;
     dir = opendir(path);
     memset(buffer, 0, maxLen);
     while ((ptr = readdir(dir)) != NULL)
@@ -113,6 +113,7 @@ void userShellInit(void)
 #include <stdbool.h>
 static void *shell_task(void *arg)
 {
+    (void)arg;
     char data;
     while (true)
     {
@@ -137,6 +138,9 @@ GUI_INIT_DEVICE_EXPORT(gui_port_console_init);
 
 void func(int i, char ch, char *str)
 {
+    (void)i;
+    (void)ch;
+    (void)str;
     printf("\033[1;31m");
     printf("Hello, World!\n");
 

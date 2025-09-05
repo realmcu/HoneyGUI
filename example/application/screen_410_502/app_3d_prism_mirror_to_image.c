@@ -86,8 +86,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void app_ui_view_image_design(gui_view_t *view)
 {
-    touch_info_t *tp = tp_get_info();
-    gui_obj_t *obj = GUI_BASE(view);
+    // touch_info_t *tp = tp_get_info();
+    // gui_obj_t *obj = GUI_BASE(view);
     // gui_obj_create_timer(obj, 10, true, return_timer_cb);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,

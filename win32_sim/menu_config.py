@@ -26,10 +26,11 @@ CPATH = ''
 LPATH = ''
 
 
-CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc'
+CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc -Werror=undef -Werror=sign-compare -Werror=unused-parameter ' \
+'-Werror=missing-braces -Werror=unused-variable -Werror=format -Werror=char-subscripts -Werror=parentheses -Werror=implicit-fallthrough' \
 
 CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion'
-CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
+CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 
 LFLAGS = ' -T default.ld'
 # LFLAGS += ' -flto' #for arm2d

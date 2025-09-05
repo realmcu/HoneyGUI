@@ -43,7 +43,21 @@
 /*stb true type source*/
 #include "stb_truetype.h"
 
-
+#if defined(__ARMCC_VERSION)
+#if (__ARMCC_VERSION >= 6000000)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
+#elif defined(__GNUC__)
+#if (__GNUC__ >= 7)
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+#else
+#define FALLTHROUGH
+#endif
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -236,7 +250,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
         {
             max_opacity = true;
         }
-        for (uint32_t i = y_start; i < y_end; i++)
+        for (int i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * section_width;
             int dots_off = (i - font_y) * font_w - font_x;
@@ -245,7 +259,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
             for (uint32_t loopc = 0; loopc < loopCount; loopc ++)
             {
                 uint16_t js = x_start + 8 * loopc;
-                uint16x8_t jv = vidupq_n_u16(js, 1);
+                // uint16x8_t jv = vidupq_n_u16(js, 1);
 
                 uint16_t alpha[8];
                 for (uint32_t i = 0; i < 8; i++)
@@ -304,7 +318,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 vst1q_u16(&writebuf[write_off + js - dc->section.x1], resultv);
             }
             /*helium code end*/
-            for (uint32_t j = x_end - loopsLeft; j < x_end; j++)
+            for (int j = x_end - loopsLeft; j < x_end; j++)
             {
                 uint8_t alpha = dots[dots_off + j];
                 if (alpha != 0)
@@ -492,6 +506,7 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
         case SCROLL_Y:
             text->char_width_sum = all_char_w;
             text->char_line_sum = all_char_w / text->base.w + 1;
+            FALLTHROUGH;
         default:
             break;
         }

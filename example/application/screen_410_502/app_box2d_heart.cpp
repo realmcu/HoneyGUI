@@ -37,6 +37,7 @@ extern "C" {
         .pView = &current_view,
         .on_switch_in = app_heart_particle_ui_design,
         .on_switch_out = app_close,
+        .keep = 0,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -171,6 +172,7 @@ void create_heart_shape(gui_obj_t *obj, std::vector<Heart> &hearts)
 
 void bounce_animation_cb(void *obj)
 {
+    (void)obj;
     for (auto &heart : Heart_Particles)
     {
         // Adjust the phase of the animation based on distance
@@ -270,6 +272,9 @@ void expand_animation_cb(void *param)
 
 void win_press_callback(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
+    (void)obj;
     touch_info_t *tp = tp_get_info();
 
     waveOrigin.Set(tp->x, tp->y);
@@ -333,13 +338,14 @@ int ui_design(gui_obj_t *obj)
 extern "C" {
     static void app_close(gui_view_t *view)
     {
+        (void)view;
         app_heart_particle::close();
     }
 
     static void app_heart_particle_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
-        gui_win_t *win = gui_win_create(view, "win_heart", 0, 0, 0, 0);
+        // gui_win_t *win = gui_win_create(view, "win_heart", 0, 0, 0, 0);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);

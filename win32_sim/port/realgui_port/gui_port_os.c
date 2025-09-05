@@ -14,6 +14,8 @@ static volatile uint32_t gui_tick;
 static void *port_thread_create(const char *name, void (*entry)(void *param), void *param,
                                 uint32_t stack_size, uint8_t priority)
 {
+    (void)stack_size;
+    (void)priority;
     pthread_t *thread = malloc(sizeof(pthread_t));
     pthread_create(thread, NULL, (void *(*)(void *))entry, param);
     pthread_setname_np(*thread, name);
@@ -46,6 +48,9 @@ static Queue q;
 
 static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
 {
+    (void)name;
+    (void)msg_size;
+    (void)max_msgs;
     void **queue = handle;
 
     if (pthread_mutex_init(&port_mutex, NULL) != 0)
@@ -72,6 +77,8 @@ static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, ui
 
 static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
+    (void)timeout;
+    (void)size;
     QuDataType data = {0};
     GUI_ASSERT(handle != NULL);
 
@@ -96,6 +103,7 @@ static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t tim
 
 static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
+    (void)handle;
     if (QueueEmpty(&q) == true)
     {
         pthread_mutex_lock(&port_mutex);
@@ -201,6 +209,7 @@ static struct gui_os_api os_api =
 
 static void *rtk_gui_timer(void *arg)
 {
+    (void)arg;
     while (true)
     {
         usleep(10 * 1000); //10ms
@@ -214,6 +223,7 @@ static void *rtk_gui_timer(void *arg)
 #include <sys/time.h>
 static void *rtk_gui_tick(void *arg)
 {
+    (void)arg;
     struct timeval currentTime;
 
 

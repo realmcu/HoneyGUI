@@ -34,7 +34,7 @@
 void app_main(void *argument)
 {
 
-
+    (void)argument;
 //    GLCD_Initialize();                          /* Initialize the GLCD            */
 
 //    /* display initial screen */

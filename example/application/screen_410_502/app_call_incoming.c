@@ -81,6 +81,8 @@ static void format_time(uint32_t seconds, char *str)
 
 static void click_speaker_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_call_t *call = gui_get_call();
     bool status = true;
@@ -101,6 +103,8 @@ static void click_speaker_cb(void *obj, gui_event_t e, void *param)
 
 static void click_mic_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_call_t *call = gui_get_call();
     bool status = true;
@@ -121,6 +125,8 @@ static void click_mic_cb(void *obj, gui_event_t e, void *param)
 
 static void click_call_end_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_call_t *call = gui_get_call();
     if (call && call->call_end)
     {
@@ -140,6 +146,9 @@ static void click_call_end_cb(void *obj, gui_event_t e, void *param)
 
 static void click_call_incoming_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     gui_call_t *call = gui_get_call();
     if (call && call->call_start)
     {
@@ -152,6 +161,9 @@ static void click_call_incoming_cb(void *obj, gui_event_t e, void *param)
 
 static void win_scroll_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     // Disable view scroll
 }
 

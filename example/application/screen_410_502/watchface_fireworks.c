@@ -204,6 +204,7 @@ static void update_clock()
 
 static void cleanup_resources(gui_view_t *view)
 {
+    (void)view;
     if (img_data)
     {
         gui_lower_free(img_data);

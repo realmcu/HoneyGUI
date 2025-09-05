@@ -813,6 +813,7 @@ void create_watchface_classic(gui_view_t *view)
 
 void clear_watchface_classic(gui_view_t *view)
 {
+    (void)view;
     if (img_data_temperature)
     {
         gui_lower_free(img_data_temperature);

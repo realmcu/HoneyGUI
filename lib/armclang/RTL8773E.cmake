@@ -28,7 +28,16 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wno-documentation \
     -Wno-license-management \
     -Wno-parentheses-equality \
-    -Wno-implicit-function-declaration ")
+    -Wno-implicit-function-declaration \
+    -Werror=undef \
+    -Werror=sign-compare \
+    -Werror=unused-parameter \
+    -Werror=missing-braces \
+    -Werror=unused-variable \
+    -Werror=format \
+    -Werror=char-subscripts \
+    -Werror=parentheses \
+    -Werror=implicit-fallthrough ")
 	
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 	-std=c++11 \
@@ -54,4 +63,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Wno-documentation-unknown-command \
     -Wno-documentation \
     -Wno-license-management \
-    -Wno-parentheses-equality")
+    -Wno-parentheses-equality \
+    -Werror=undef \
+    -Werror=sign-compare \
+    -Werror=unused-parameter \
+    -Werror=missing-braces \
+    -Werror=unused-variable \
+    -Werror=format \
+    -Werror=char-subscripts \
+    -Werror=parentheses \
+    -Werror=implicit-fallthrough \
+    -Werror=deprecated-copy \
+    -Wmissing-field-initializers")
+
+    

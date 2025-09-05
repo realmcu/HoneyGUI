@@ -92,6 +92,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void time_update_cb(void *p)
 {
+    (void)p;
     extern struct tm *timeinfo;
     if (!timeinfo)
     {

@@ -69,11 +69,12 @@ static void exit_animation(void *p)
 
 static void run_animation(void *p)
 {
+    (void)p;
     GUI_WIDGET_POINTER_BY_NAME_ROOT(map_1, "map_1", win_map);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(map_2, "map_2", win_map);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(dist, "distance", win_map);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(dir, "arrow", win_map);
-    int8_t step = 0;
+    // int8_t step = 0;
     int16_t distance_value = 0;
 
     if (x_offset == x_offset_array[offset_index] &&
@@ -232,7 +233,7 @@ void map_design()
     gui_img_t *mask = gui_img_create_from_mem(win_map_img, 0, MAPFADING_BIN, 0, 0, 0, 0);
     gui_img_set_mode(mask, IMG_SRC_OVER_MODE);
 
-    gui_img_t *dir = gui_img_create_from_mem(win_map, "arrow", ARROW_RIGHT_BIN, 390, 95, 0, 30);
+    gui_img_create_from_mem(win_map, "arrow", ARROW_RIGHT_BIN, 390, 95, 0, 30);
     gui_text_t *text = gui_text_create(win_map, "distance", 0, 160, 0, 0);
     sprintf(dis_str, "%dm", distance[1]);
     gui_text_set(text, (void *)dis_str, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE, strlen(dis_str), 24);

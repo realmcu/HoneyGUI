@@ -55,6 +55,11 @@ struct AGGENVGcontext
         this->ntextures = 0;
         this->ctextures = 0;
         this->textureId = 0;
+        this->r = 0;
+        this->g = 0;
+        this->b = 0;
+        this->a = 0;
+        this->stride = 0;
 
         this->line_style.set_cap(agge::caps::round());
         this->line_style.set_join(agge::joins::bevel());
@@ -413,6 +418,12 @@ template <typename PixelT>
 void renderTriangles(void *uptr, NVGpaint *paint, NVGcompositeOperationState compositeOperation,
                      NVGscissor *scissor, const NVGvertex *verts, int nverts)
 {
+    (void)uptr;  // not used yet
+    (void)paint;  // not used yet
+    (void)verts;  // not used yet
+    (void)nverts;  // not used yet
+    (void)scissor;  // not used yet
+    (void)compositeOperation;  // not used yet
     /*XXX: not used yet*/
 }
 

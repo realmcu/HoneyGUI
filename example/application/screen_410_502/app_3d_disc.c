@@ -124,6 +124,7 @@ static void disc_global_cb(l3_model_t *this)
 
 static l3_4x4_matrix_t disc_face_cb(l3_model_t *this, size_t face_index)
 {
+    (void)face_index;
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
 
@@ -173,6 +174,8 @@ static void switch_to_origin_img(void *param)
 
 static void switch_to_highlight_img(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = (gui_img_t *)obj;
     if (strcmp(img->base.name, "music_backward") == 0)
     {
@@ -189,6 +192,8 @@ static void switch_to_highlight_img(void *obj, gui_event_t e, void *param)
 
 static void switch_to_play_pause_img(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = (gui_img_t *)obj;
 
     is_playing = !is_playing;
@@ -229,7 +234,7 @@ static void disc_app(gui_view_t *view)
                                             380);
     l3_set_global_transform(disc_cube, (l3_global_transform_cb)disc_global_cb);
     l3_set_face_transform(disc_cube, (l3_face_transform_cb)disc_cube_face_cb);
-    gui_lite3d_t *lite3d_disc_cube = gui_lite3d_create(obj, "lite3d_disc_cube", disc_cube, 0, 0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_disc_cube", disc_cube, 0, 0, 0, 0);
 
     gui_obj_create_timer(GUI_BASE(lite3d_disc), 10, true, update_disc_animation);
 

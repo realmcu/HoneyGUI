@@ -37,6 +37,7 @@ extern "C" {
         .pView = &current_view,
         .on_switch_in = app_box2d_ring_ui_design,
         .on_switch_out = close_box2d_ring,
+        .keep = 0,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -120,6 +121,7 @@ std::uniform_int_distribution<> dis(0, 255);
 *============================================================================*/
 static void app_box2d_cb(void *obj)
 {
+    (void)obj;
     for (const Ball &ball : balls)
     {
         apply_centripetal_force(ball.body); // Apply centripetal force
@@ -139,6 +141,9 @@ static void app_box2d_cb(void *obj)
 
 static void win_press_callback(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     touch_info_t *touch = tp_get_info();
     int mouseX = touch->x;
     int mouseY = touch->y;
@@ -296,7 +301,7 @@ static void create_balls(b2World *world)
 
         // Assign random color to the ball
         NVGcolor color = nvgRGB(xorshift16() % 256, xorshift16() % 256, xorshift16() % 256);
-        balls.push_back({ballBody, color}); // Add ball and color to vector
+        balls.push_back({ballBody, color, nullptr}); // Add ball and color to vector
     }
 }
 
@@ -389,7 +394,7 @@ extern "C" {
     static void app_box2d_ring_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
-        gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
+        // gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);
@@ -397,6 +402,7 @@ extern "C" {
     }
     static void close_box2d_ring(gui_view_t *view)
     {
+        (void)view;
         app_box2d_ring::clear_mem();
     }
 }

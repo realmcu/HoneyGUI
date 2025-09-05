@@ -638,7 +638,7 @@ static void font_render_8bpp_to_RGB565_mve(draw_font_t *font, font_glyph_t *glyp
     {
         max_opacity = true;
     }
-    for (uint32_t i = y_start; i < y_end; i++)
+    for (int i = y_start; i < y_end; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride - font->target_rect.x1;
         int dots_off = (i - glyph->pos_y) * dots_stride - glyph->pos_x;
@@ -700,7 +700,7 @@ static void font_render_8bpp_to_RGB565_mve(draw_font_t *font, font_glyph_t *glyp
             vst1q_u16(&writebuf[write_off + js], resultv);
         }
         /*helium code end*/
-        for (uint32_t j = x_end - loopsLeft; j < x_end; j++)
+        for (int j = x_end - loopsLeft; j < x_end; j++)
         {
             uint8_t alpha = dots[dots_off + j];
             if (alpha)

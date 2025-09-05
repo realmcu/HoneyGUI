@@ -464,15 +464,16 @@ static void update_particles(void *p)
 
 static void time_update_cb(void *p)
 {
-    int millisecond = 0;
+    (void)p;
+    // int millisecond = 0;
 #ifdef __WIN32
     time_t rawtime;
     struct tm *timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    uint16_t seconds = timeinfo->tm_sec;
-    uint16_t minute = timeinfo->tm_min;
-    uint16_t hour = timeinfo->tm_hour;
+    // uint16_t seconds = timeinfo->tm_sec;
+    // uint16_t minute = timeinfo->tm_min;
+    // uint16_t hour = timeinfo->tm_hour;
 #else
     // extern struct tm watch_clock_get(void);
     // struct tm watch_time = watch_clock_get();
@@ -529,6 +530,7 @@ static void data_create(void *p)
 
 static void free_particles_resources(gui_view_t *view)
 {
+    (void)view;
     if (particles)
     {
         gui_free(particles);

@@ -2,6 +2,40 @@
 
 #include "types.hpp"
 
+#ifndef AGGE_FALLTHROUGH_H
+#define AGGE_FALLTHROUGH_H
+
+
+#if defined(__ARMCC_VERSION)
+
+#if (__ARMCC_VERSION >= 6000000)
+
+#define AGGE_FALLTHROUGH [[fallthrough]]
+#else
+
+#define AGGE_FALLTHROUGH ((void)0)
+#endif
+#elif defined(__GNUC__)
+
+#if (__GNUC__ >= 7)
+
+#define AGGE_FALLTHROUGH __attribute__((fallthrough))
+#else
+
+#define AGGE_FALLTHROUGH ((void)0)
+#endif
+#elif defined(__clang__)
+#if __has_attribute(fallthrough) || __has_cpp_attribute(fallthrough)
+#define AGGE_FALLTHROUGH [[clang::fallthrough]]
+#else
+#define AGGE_FALLTHROUGH ((void)0)
+#endif
+#else
+#define AGGE_FALLTHROUGH ((void)0)
+#endif
+
+#endif // AGGE_FALLTHROUGH_H
+
 namespace agge
 {
 enum path_commands
@@ -30,7 +64,7 @@ public:
     path_generator_adapter(const SourceT &source, GeneratorT &generator);
 
     path_generator_adapter(const path_generator_adapter &other)
-        : _source(other._source), _generator(other._generator), 
+        : _source(other._source), _generator(other._generator),
           _start_x(other._start_x), _start_y(other._start_y),
           _state(other._state) {}
 
@@ -140,7 +174,7 @@ inline int path_generator_adapter<SourceT, GeneratorT>::vertex(real_t *x, real_t
             command = _source.vertex(&_start_x, &_start_y);
             set_stage(accumulate, path_command_stop == command);
             /* fallthrough */
-
+            AGGE_FALLTHROUGH;
         case accumulate:
             if (_state & complete)
             {
@@ -169,7 +203,7 @@ inline int path_generator_adapter<SourceT, GeneratorT>::vertex(real_t *x, real_t
             }
             set_stage(generate, path_command_stop == command);
             /* fallthrough */
-
+            AGGE_FALLTHROUGH;
         case generate:
             command = _generator.vertex(x, y);
             if (path_command_stop != command)

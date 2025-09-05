@@ -85,6 +85,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_activity(gui_view_t *view)
 {
+    (void)view;
     if (img_data)
     {
         gui_lower_free(img_data);
@@ -212,6 +213,7 @@ static void arc_activity_cb(NVGcontext *vg)
 
 static void activity_timer_cb(void *obj)
 {
+    (void)obj;
     if (current_view->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
         gui_view_get_next() != NULL)
     {

@@ -215,6 +215,8 @@ static void prism_mirror3d_render_animate_cb(void *param)
 
 static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     GUI_ASSERT(obj != NULL);
     gui_lite3d_t *lite3d_prism_mirror = (gui_lite3d_t *)obj;
 

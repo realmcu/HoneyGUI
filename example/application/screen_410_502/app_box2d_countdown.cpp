@@ -34,6 +34,7 @@ extern "C" {
         .pView = &current_view,
         .on_switch_in = app_box2d_time_ui_design,
         .on_switch_out = clear_mem,
+        .keep = 0,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -316,6 +317,7 @@ static void resetToNumber(int number)
 
 static void app_box2d_cb(void *obj)
 {
+    (void)obj;
     // update world
     world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
@@ -438,6 +440,7 @@ static void close()
 
 static int ui_design(gui_obj_t *obj)
 {
+    (void)obj;
     screen_w = gui_get_screen_width();
     screen_h = gui_get_screen_height();
     isExploding = false;
@@ -475,13 +478,14 @@ extern "C" {
 
     static void clear_mem(gui_view_t *view)
     {
+        (void)view;
         app_box2d_countdown::close();
     }
 
     void app_box2d_time_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
-        gui_win_t *win = gui_win_create(view, "win_time", 0, 0, 0, 0);
+        // gui_win_t *win = gui_win_create(view, "win_time", 0, 0, 0, 0);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);

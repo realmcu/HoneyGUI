@@ -1070,6 +1070,7 @@ ShellCommand *shellSeekCommand(Shell *shell,
  */
 int shellGetVarValue(Shell *shell, ShellCommand *command)
 {
+    (void)shell;
     int value = 0;
     switch (command->attr.attrs.type)
     {
@@ -1990,7 +1991,7 @@ int shellRun(Shell *shell, const char *cmd)
 {
     SHELL_ASSERT(shell && cmd, return -1);
     char active = shell->status.isActive;
-    if (strlen(cmd) > shell->parser.bufferSize - 1)
+    if (strlen(cmd) > (size_t)(shell->parser.bufferSize - 1))
     {
         shellWriteString(shell, shellText[SHELL_TEXT_CMD_TOO_LONG]);
         return -1;

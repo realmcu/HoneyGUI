@@ -180,6 +180,8 @@ static void gui_prism_thick_enter_animate(gui_lite3d_t *lite3d_prism_thick)
 
 static void prism_thick_on_face_click_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     GUI_ASSERT(obj != NULL);
     gui_lite3d_t *lite3d_prism_thick = (gui_lite3d_t *)obj;
 

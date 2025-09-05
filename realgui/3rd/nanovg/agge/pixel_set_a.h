@@ -3,6 +3,8 @@
 template <typename PixelT>
 inline void pixel_set_a(PixelT &p, uint8_t a)
 {
+    (void)p;
+    (void)a;
 }
 
 template <>

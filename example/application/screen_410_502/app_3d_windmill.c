@@ -169,6 +169,7 @@ static void windmill_global_cb(l3_model_t *this)
 }
 static l3_4x4_matrix_t windmill_face_cb(l3_model_t *this, size_t face_index)
 {
+    (void)face_index; // unused parameter
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
 
@@ -189,9 +190,9 @@ static void windmill_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    gui_img_t *bg = gui_img_create_from_mem(obj, "background", WINDMILL_BACKGROUND_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(obj, "background", WINDMILL_BACKGROUND_BIN, 0, 0, 0, 0);
 
-    gui_img_t *stick = gui_img_create_from_mem(obj, "stick", WINDMILL_STICK_BIN, 202, 246, 0, 0);
+    gui_img_create_from_mem(obj, "stick", WINDMILL_STICK_BIN, 202, 246, 0, 0);
 
     l3_model_t *windmill_3d = l3_create_model(DESC_WINDMILL_BIN, L3_DRAW_FRONT_AND_BACK, 15, 52, 380,
                                               380);

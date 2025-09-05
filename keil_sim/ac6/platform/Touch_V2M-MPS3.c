@@ -613,7 +613,7 @@ int32_t Touch_GetState(TOUCH_STATE *pState)
     uint8_t val;
     uint8_t num;
     uint8_t xyz[4];
-    uint32_t X, Y, XPXL, YPXL, XPXLN, YPXLN;
+    uint32_t X, Y, XPXL, YPXL;
 
 
     /* Read touch status */

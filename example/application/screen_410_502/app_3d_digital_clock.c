@@ -78,7 +78,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_digital_clock_animation(void *param)
 {
-    touch_info_t *tp = tp_get_info();
+    // touch_info_t *tp = tp_get_info();
     gui_lite3d_t *this = (gui_lite3d_t *)param;
 
     angle += 0.1f;

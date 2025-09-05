@@ -179,6 +179,8 @@ static void koi_animate_cb()
 
 static void koi_click_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_lite3d_t *this = (gui_lite3d_t *)obj;
 
     for (int i = 0; i < KOI_COUNT; i++)
@@ -201,6 +203,7 @@ static void koi_click_cb(void *obj, gui_event_t e, void *param)
 
 static void lotus_leaf_animate_cb(void *param)
 {
+    (void)param;
     lotus_swing_angle -= LOTUS_SWING_SPEED;
     if (lotus_swing_angle < 360.0f)
     {
@@ -396,14 +399,14 @@ static void app_ui_pond_koi_design(gui_view_t *view)
     l3_set_global_transform(fish3_shadow, (l3_global_transform_cb)fish3_shadow_global_cb);
     l3_set_face_transform(fish3_shadow, (l3_face_transform_cb)fish_face_cb);
 
-    gui_lite3d_t *lite3d_fish0_shadow = gui_lite3d_create(obj, "lite3d_fish0_shadow", fish0_shadow, 0,
-                                                          0, 0, 0);
-    gui_lite3d_t *lite3d_fish1_shadow = gui_lite3d_create(obj, "lite3d_fish1_shadow", fish1_shadow, 0,
-                                                          0, 0, 0);
-    gui_lite3d_t *lite3d_fish2_shadow = gui_lite3d_create(obj, "lite3d_fish2_shadow", fish2_shadow, 0,
-                                                          0, 0, 0);
-    gui_lite3d_t *lite3d_fish3_shadow = gui_lite3d_create(obj, "lite3d_fish3_shadow", fish3_shadow, 0,
-                                                          0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish0_shadow", fish0_shadow, 0,
+                      0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish1_shadow", fish1_shadow, 0,
+                      0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish2_shadow", fish2_shadow, 0,
+                      0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish3_shadow", fish3_shadow, 0,
+                      0, 0, 0);
     lite3d_koi[0] = gui_lite3d_create(obj, "lite3d_koi0", fish0, 0, 0, 0, 0);
     lite3d_koi[1] = gui_lite3d_create(obj, "lite3d_koi1", fish1, 0, 0, 0, 0);
     lite3d_koi[2] = gui_lite3d_create(obj, "lite3d_koi2", fish2, 0, 0, 0, 0);

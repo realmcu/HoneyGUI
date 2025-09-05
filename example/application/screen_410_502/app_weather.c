@@ -89,7 +89,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void update_panel_animation(void *param)
 {
-    touch_info_t *tp = tp_get_info();
+    // touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
     gui_list_note_t *note = (gui_list_note_t *)param;
 
@@ -226,8 +226,8 @@ static void update_leaf_animation()
 
 static void update_weather_animation(void *param)
 {
-    touch_info_t *tp = tp_get_info();
-    gui_dispdev_t *dc = gui_get_dc();
+    // touch_info_t *tp = tp_get_info();
+    // gui_dispdev_t *dc = gui_get_dc();
     gui_win_t *win = (gui_win_t *)param;
 
 
@@ -389,6 +389,7 @@ static void add_panel(gui_list_note_t *note)
 
 static void note_design(gui_obj_t *obj, void *p)
 {
+    (void)p;
     gui_list_note_t *note = (gui_list_note_t *)obj;
     uint16_t index = note->index;
     if (index != 0 && index != 7)

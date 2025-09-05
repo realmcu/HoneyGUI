@@ -39,6 +39,7 @@ extern "C" {
         .pView = &current_view,
         .on_switch_in = app_rainbow_analog_ui_design,
         .on_switch_out = app_close,
+        .keep = 0,
     };
 
     static int gui_view_descriptor_register_init(void)
@@ -188,6 +189,7 @@ void apply_centripetal_force(Capsule *capsule)
 
 void capsule_animation_cb(void *obj)
 {
+    (void)obj;
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)
@@ -484,13 +486,14 @@ int ui_design(gui_obj_t *obj)
 extern "C" {
     static void app_close(gui_view_t *view)
     {
+        (void)view;
         app_rainbow_analog::close();
     }
 
     static void app_rainbow_analog_ui_design(gui_view_t *view)
     {
         gui_obj_t *obj = GUI_BASE(view);
-        gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
+        // gui_win_t *win = gui_win_create(view, "win_ring", 0, 0, 0, 0);
         gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                                  SWITCH_IN_ANIMATION_FADE,
                                  GUI_EVENT_KB_SHORT_CLICKED);

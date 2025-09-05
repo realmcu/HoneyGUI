@@ -241,8 +241,9 @@ static void reset_shared_offsets()
 
 static void number_animation_cb(void *param)
 {
+    (void)param;
     touch_info_t *tp = tp_get_info();
-    gui_win_t *clock_win = (gui_win_t *)param;
+    // gui_win_t *clock_win = (gui_win_t *)param;
 
     if (tp->pressed || tp->pressing)
     {

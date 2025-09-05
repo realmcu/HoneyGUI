@@ -61,6 +61,22 @@
 #include "armVC.h"
 #endif /* H264DEC_OMXDL */
 
+
+#if defined(__ARMCC_VERSION)
+#if (__ARMCC_VERSION >= 6000000)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
+#elif defined(__GNUC__)
+#if (__GNUC__ >= 7)
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+#else
+#define FALLTHROUGH
+#endif
 /*------------------------------------------------------------------------------
     2. External compiler flags
 --------------------------------------------------------------------------------
@@ -446,8 +462,8 @@ u32 DecodeMbPred(strmData_t *pStrmData, mbPred_t *pMbPred, mbType_e mbType,
                 return (HANTRO_NOK);
             }
         }
-    /* fall-through */
-
+        /* fall-through */
+        FALLTHROUGH;
     case PRED_MODE_INTRA16x16:
         tmp = h264bsdDecodeExpGolombUnsigned(pStrmData, &value);
         if (tmp != HANTRO_OK || value > 3)

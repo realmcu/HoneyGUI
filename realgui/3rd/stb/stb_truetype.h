@@ -274,6 +274,21 @@
 //
 //  Incomplete text-in-3d-api example, which draws quads properly aligned to be lossless.
 //  See "tests/truetype_demo_win32.c" for a complete version.
+#if defined(__ARMCC_VERSION)
+#if (__ARMCC_VERSION >= 6000000)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
+#elif defined(__GNUC__)
+#if (__GNUC__ >= 7)
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+#else
+#define FALLTHROUGH
+#endif
 #if 0
 #define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
 #include "stb_truetype.h"
@@ -2425,6 +2440,7 @@ hvcurveto:
                 }
                 has_subrs = 1;
             }
+            FALLTHROUGH;
         // FALLTHROUGH
         case 0x1D: // callgsubr
             if (sp < 1) { return STBTT__CSERR("call(g|)subr stack"); }

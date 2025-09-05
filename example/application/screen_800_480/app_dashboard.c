@@ -168,7 +168,7 @@ static void dashboard_digital_exit_animation(void *p)
 {
     static uint16_t cnt = 0;
     uint16_t cnt_max = 20;
-    gui_obj_t *obj = GUI_BASE(p);
+    // gui_obj_t *obj = GUI_BASE(p);
     cnt++;
 
     static int16_t offset = 0;
@@ -225,7 +225,7 @@ static void dashboard_digital_entrance_animation(void *p)
     static uint16_t cnt = 0;
     uint16_t cnt_max_1 = switch_wait_cnt;
     uint16_t cnt_max_2 = cnt_max_1 + 20;
-    gui_obj_t *obj = GUI_BASE(p);
+    // gui_obj_t *obj = GUI_BASE(p);
     cnt++;
     if (cnt <= cnt_max_1)
     {
@@ -382,9 +382,9 @@ static void dashboard_digital_design(gui_obj_t *parent)
     gui_win_t *win_wing_right = gui_win_create(win_digital, "win_wing_right",
                                                SCREEN_WIDTH + WIN_DIGITAL_NEEDLE_W, WIN_DIGITAL_NEEDLE_Y, WIN_DIGITAL_NEEDLE_W,
                                                WIN_DIGITAL_NEEDLE_H);
-    gui_img_t *wing_left = gui_img_create_from_mem(win_wing_left, 0, LEFTWINGV2_BIN, 0, 0, 0, 0);
-    gui_img_t *wing_right = gui_img_create_from_mem(win_wing_right, 0, RIGHTWINGV2_BIN, 0, 0, 0,
-                                                    0);
+    gui_img_create_from_mem(win_wing_left, 0, LEFTWINGV2_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(win_wing_right, 0, RIGHTWINGV2_BIN, 0, 0, 0,
+                            0);
     gui_win_t *win_needle_left = gui_win_create(win_wing_left, "win_needle_left", 0, DIGITAL_NEEDLE_Y,
                                                 WIN_DIGITAL_NEEDLE_W, WIN_DIGITAL_NEEDLE_H);
     gui_win_t *win_needle_right = gui_win_create(win_wing_right, "win_needle_right", 0,
@@ -518,7 +518,7 @@ static void dashboard_dail_entrance_animation(void *p)
 {
     static uint16_t cnt = 0;
     uint16_t cnt_max = switch_wait_cnt;
-    gui_obj_t *obj = GUI_BASE(p);
+    // gui_obj_t *obj = GUI_BASE(p);
     cnt++;
     if (cnt <= cnt_max) // Move led position and wait exit animation
     {
@@ -620,9 +620,9 @@ static void dashboard_dail_design(gui_obj_t *parent)
     line_left->need_clip = true;
     line_right->need_clip = true;
 
-    gui_img_t *gloom_left = gui_img_create_from_mem(win_dail, 0, LEFTBOTTOMGLOOMV1_BIN, 40, 353, 0, 0);
-    gui_img_t *gloom_right = gui_img_create_from_mem(win_dail, 0, RIGHTBOTTOMGLOOMV1_BIN, 661, 353, 0,
-                                                     0);
+    gui_img_create_from_mem(win_dail, 0, LEFTBOTTOMGLOOMV1_BIN, 40, 353, 0, 0);
+    gui_img_create_from_mem(win_dail, 0, RIGHTBOTTOMGLOOMV1_BIN, 661, 353, 0,
+                            0);
 
     gui_img_t *dail_speed = gui_img_create_from_mem(win_dail, 0, DAIL_SPEED_BIN, 38, 64, 0, 0);
     gui_img_t *dail_power = gui_img_create_from_mem(win_dail, 0, DAIL_POWER_BIN, 470, 64, 0, 0);
@@ -655,6 +655,8 @@ static void dashboard_dail_design(gui_obj_t *parent)
 // Dashboard common part functions
 static void press_icon(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = (gui_img_t *)obj;
     if (strcmp(img->base.name, "switch_icon") == 0)
     {
@@ -668,6 +670,8 @@ static void press_icon(void *obj, gui_event_t e, void *param)
 
 static void release_icon(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = (gui_img_t *)obj;
     touch_info_t *tp = tp_get_info();
     bool valid_touch = (gui_obj_point_in_obj_rect(obj, tp->x + tp->deltaX - GUI_BASE(obj)->x,
@@ -943,6 +947,7 @@ static void update_text_display()
 
 static void update_inform(void *p)
 {
+    (void)p;
 #if defined __WIN32
     time_t rawtime;
     time(&rawtime);
@@ -1015,7 +1020,7 @@ static void dashboard_design(gui_view_t *view)
         gui_text_mode_set(text, CENTER);
         gui_text_rendermode_set(text, 2);
 
-        gui_img_t *img = gui_img_create_from_mem(win_speed_display, 0, DIVIDING_LINE_BIN, 96, 170, 0, 0);
+        gui_img_create_from_mem(win_speed_display, 0, DIVIDING_LINE_BIN, 96, 170, 0, 0);
 
         text = gui_text_create(win_speed_display, "odo_text", 0, 176, 294, 26);
         gui_text_set(text, odo_str, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE, strlen(odo_str), 14);
@@ -1041,7 +1046,7 @@ static void dashboard_design(gui_view_t *view)
         gui_text_mode_set(text, CENTER);
         gui_text_rendermode_set(text, 2);
 
-        gui_img_t *img = gui_img_create_from_mem(win_power_display, 0, DIVIDING_LINE_BIN, 96, 170, 0, 0);
+        gui_img_create_from_mem(win_power_display, 0, DIVIDING_LINE_BIN, 96, 170, 0, 0);
 
         text = gui_text_create(win_power_display, "soc_text", 0, 176, 294, 26);
         gui_text_set(text, soc_str, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE, strlen(soc_str), 14);
@@ -1070,16 +1075,16 @@ static void dashboard_design(gui_view_t *view)
     gui_obj_add_event_cb(off_icon, press_icon, GUI_EVENT_TOUCH_PRESSED, NULL);
     gui_obj_add_event_cb(off_icon, release_icon, GUI_EVENT_TOUCH_RELEASED, NULL);
 
-    gui_img_t *led_0 = gui_img_create_from_mem(win_common, "led0", LED0_OFF_BIN, DAIL_LED0_X,
-                                               DAIL_LED0_Y, 0, 0);
-    gui_img_t *led_1 = gui_img_create_from_mem(win_common, "led1", LED1_OFF_BIN, DAIL_LED1_X,
-                                               DAIL_LED1_Y, 0, 0);
-    gui_img_t *led_2 = gui_img_create_from_mem(win_common, "led2", LED2_OFF_BIN, DAIL_LED2_X,
-                                               DAIL_LED2_Y, 0, 0);
-    gui_img_t *led_3 = gui_img_create_from_mem(win_common, "led3", LED3_OFF_BIN, DAIL_LED3_X,
-                                               DAIL_LED3_Y, 0, 0);
-    gui_img_t *led_4 = gui_img_create_from_mem(win_common, "led4", LED4_OFF_BIN, DAIL_LED4_X,
-                                               DAIL_LED4_Y, 0, 0);
-    gui_img_t *led_5 = gui_img_create_from_mem(win_common, "led5", LED5_OFF_BIN, DAIL_LED5_X,
-                                               DAIL_LED5_Y, 0, 0);
+    gui_img_create_from_mem(win_common, "led0", LED0_OFF_BIN, DAIL_LED0_X,
+                            DAIL_LED0_Y, 0, 0);
+    gui_img_create_from_mem(win_common, "led1", LED1_OFF_BIN, DAIL_LED1_X,
+                            DAIL_LED1_Y, 0, 0);
+    gui_img_create_from_mem(win_common, "led2", LED2_OFF_BIN, DAIL_LED2_X,
+                            DAIL_LED2_Y, 0, 0);
+    gui_img_create_from_mem(win_common, "led3", LED3_OFF_BIN, DAIL_LED3_X,
+                            DAIL_LED3_Y, 0, 0);
+    gui_img_create_from_mem(win_common, "led4", LED4_OFF_BIN, DAIL_LED4_X,
+                            DAIL_LED4_Y, 0, 0);
+    gui_img_create_from_mem(win_common, "led5", LED5_OFF_BIN, DAIL_LED5_X,
+                            DAIL_LED5_Y, 0, 0);
 }

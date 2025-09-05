@@ -115,6 +115,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_bottom_view(gui_view_t *view)
 {
+    (void)view;
     if (img_data_activity)
     {
         gui_lower_free(img_data_activity);
@@ -207,6 +208,7 @@ static void draw_timecard(void *parent)
 
 static void timer_cb(void *obj)
 {
+    (void)obj;
     static uint16_t count = 0;
     count++;
     if (count >= 300)
@@ -348,6 +350,7 @@ static void arc_activity_cb(NVGcontext *vg)
 }
 static void note_design(gui_obj_t *obj, void *p)
 {
+    (void)p;
     uint16_t index = ((gui_list_note_t *)obj)->index;
     int16_t offset_X = 29;
 

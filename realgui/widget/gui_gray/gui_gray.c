@@ -107,6 +107,7 @@ static void gui_gray_draw(gui_gray_t *this)
         break;
     case 8:
         engine_gray256_blit_to_dc(this->gray, dc, NULL);
+        break;
     default:
         break;
     }

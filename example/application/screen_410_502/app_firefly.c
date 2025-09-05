@@ -102,7 +102,7 @@ static void update_all_fireflys()
 
     for (int i = 0; i < MAX_FIREFLY; i++)
     {
-        if (current_time - fireflys[i].last_change > 1000 + xorshift16() % 2000)
+        if (current_time - fireflys[i].last_change > 1000U + xorshift16() % 2000U)
         {
             fireflys[i].angle = (xorshift16() % 360) * M_PI_F / 180.0f;
             fireflys[i].speed = 0.5f + (xorshift16() % 20) / 20.0f;
@@ -174,6 +174,7 @@ static void create_firefly(gui_win_t *firefly_win)
 
 static void cleanup_resources(gui_view_t *view)
 {
+    (void)view;
     for (int i = 0; i < MAX_FIREFLY; i++)
     {
         if (fireflys[i].img)

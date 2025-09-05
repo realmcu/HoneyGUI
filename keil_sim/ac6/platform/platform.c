@@ -119,6 +119,7 @@ __asm(".global __ARM_use_no_argv\n\t");
 __NO_RETURN
 void _sys_exit(int ret)
 {
+    (void)ret;
     // UNUSED_PARAM(ret);
     while (1) {}
 }
@@ -143,6 +144,7 @@ void __aeabi_assert(const char *chCond, const char *chLine, int wErrCode)
 #if !defined(__IS_COMPILER_GCC__)
 void _ttywrch(int ch)
 {
+    (void)ch;
     // UNUSED_PARAM(ch);
 }
 #endif

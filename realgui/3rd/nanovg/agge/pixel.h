@@ -243,7 +243,7 @@ inline void pixel_blend(pixel32_bgra &t, const agge::pixel32_rgba &s, uint8_t a)
             t.g = (s.g * a + t.g * m_a) >> 8;
             t.b = (s.b * a + t.b * m_a) >> 8;
         }
-        if ((t.a == 0))
+        if (t.a == 0)
         {
             t.a = s.a * a >> 8;
         }

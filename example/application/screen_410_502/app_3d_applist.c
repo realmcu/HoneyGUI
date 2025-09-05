@@ -136,6 +136,7 @@ static void applist_global_cb(l3_model_t *this)
 
 static l3_4x4_matrix_t applist_face_cb(l3_model_t *this, size_t face_index)
 {
+    (void)face_index;
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
 

@@ -3,6 +3,7 @@
 template <typename PixelT>
 inline uint8_t pixel_a(const PixelT &p, uint8_t a)
 {
+    (void)p;
     return a;
 }
 

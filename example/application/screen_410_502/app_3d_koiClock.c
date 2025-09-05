@@ -138,6 +138,8 @@ static void update_koi_move()
 
 static void fish_click_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_lite3d_t *this = (gui_lite3d_t *)obj;
 
     for (int i = 0; i < FISH_COUNT; i++)
@@ -303,12 +305,12 @@ static void app_ui_koiclock_design(gui_view_t *view)
     l3_set_global_transform(fish2_shadow, (l3_global_transform_cb)fish2_shadow_global_cb);
     l3_set_face_transform(fish2_shadow, (l3_face_transform_cb)fish_face_cb);
 
-    gui_lite3d_t *lite3d_fish0_shadow = gui_lite3d_create(obj, "lite3d_fish0_shadow", fish0_shadow, 0,
-                                                          0, 0, 0);
-    gui_lite3d_t *lite3d_fish1_shadow = gui_lite3d_create(obj, "lite3d_fish1_shadow", fish1_shadow, 0,
-                                                          0, 0, 0);
-    gui_lite3d_t *lite3d_fish2_shadow = gui_lite3d_create(obj, "lite3d_fish2_shadow", fish2_shadow, 0,
-                                                          0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish0_shadow", fish0_shadow, 0,
+                      0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish1_shadow", fish1_shadow, 0,
+                      0, 0, 0);
+    gui_lite3d_create(obj, "lite3d_fish2_shadow", fish2_shadow, 0,
+                      0, 0, 0);
     lite3d_fish[0] = gui_lite3d_create(obj, "lite3d_fish0", fish0, 0, 0, 0, 0);
     lite3d_fish[1] = gui_lite3d_create(obj, "lite3d_fish1", fish1, 0, 0, 0, 0);
     lite3d_fish[2] = gui_lite3d_create(obj, "lite3d_fish2", fish2, 0, 0, 0, 0);

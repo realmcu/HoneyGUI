@@ -106,6 +106,9 @@ static void format_time(uint32_t seconds, char *str)
 
 static void click_to_recorder_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     gui_obj_hidden(GUI_BASE(win_recorder), false);
     gui_obj_tree_free_async(win_play);
 
@@ -125,11 +128,16 @@ static void click_to_recorder_cb(void *obj, gui_event_t e, void *param)
 
 static void click_canvas_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     return;
 }
 
 static void click_play_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     if (record_file_num == 0) { return; }
 
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
@@ -192,11 +200,16 @@ static void on_playing(void *p)
 
 static void win_scroll_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     // Disable view horizontal scroll
 }
 
 static void click_file_play(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_list_note_t *note = (gui_list_note_t *)GUI_BASE(obj)->parent;
     gui_audio_t *gui_audio = gui_get_audio();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_play", win_play)
@@ -237,13 +250,14 @@ static void click_file_play(void *obj, gui_event_t e, void *param)
 
 static void list_design(gui_obj_t *obj, void *p)
 {
+    (void)p;
     gui_list_note_t *note = GUI_TYPE(gui_list_note_t, obj);
     uint8_t index = note->index;
     if (index >= record_file_num) { return;}
     gui_canvas_round_rect_t *rect = gui_canvas_round_rect_create(obj, 0, 55, 0, 300, 50, 10, gui_rgb(60,
                                                                  150, 255));
 
-    gui_img_t *img_file = gui_img_create_from_mem(rect, 0, RECORD_FILE_BIN, 10, 10, 0, 0);
+    // gui_img_t *img_file = gui_img_create_from_mem(rect, 0, RECORD_FILE_BIN, 10, 10, 0, 0);
     gui_text_t *text = gui_text_create(rect, 0, 0, 0, 300, 50);
     gui_text_set(text, record_infor[index].name, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(record_infor[index].name), 32);
@@ -327,6 +341,8 @@ static void create_recorder_play(void)
 
 static void click_record_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)e;
+    (void)param;
     gui_img_t *img = GUI_TYPE(gui_img_t, obj);
     gui_audio_t *gui_audio = gui_get_audio();
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "record_time", win_recorder)
@@ -354,6 +370,9 @@ static void click_record_cb(void *obj, gui_event_t e, void *param)
 
 static void click_enter_file_win_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "img_record", win_recorder)
 
     gui_img_t *img = GUI_TYPE(gui_img_t, o);
@@ -418,7 +437,7 @@ static void create_recorder(gui_view_t *view)
     gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(win_recorder), 0, 105, 410,
                                                                    200, 50, 10, gui_rgb(70, 80, 90));
     gui_obj_add_event_cb(canvas, click_enter_file_win_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_img_t *img_file = gui_img_create_from_mem(canvas, 0, RECORD_FILE_BIN, 10, 10, 0, 0);
+    // gui_img_t *img_file = gui_img_create_from_mem(canvas, 0, RECORD_FILE_BIN, 10, 10, 0, 0);
     text = gui_text_create(canvas, 0, 0, 0, 200, 50);
     gui_text_set(text, "Files", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("Files"), 32);
     gui_text_type_set(text, SOURCEHANSANSSC_BIN, FONT_SRC_MEMADDR);
