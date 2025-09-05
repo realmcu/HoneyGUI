@@ -73,8 +73,8 @@ static void release_start(void *obj, gui_event_t e, void *param)
                                    tp->y + tp->deltaY - parent->y) == true))
     {
         GUI_WIDGET_POINTER_BY_NAME_ROOT(o, "gloom", current_view);
-        gui_obj_hidden(GUI_BASE(o), false);
         gui_obj_start_timer(GUI_BASE(o));
+        gui_obj_hidden(o, false);
     }
 }
 
@@ -85,9 +85,11 @@ static void exit_animation(void *p)
     gui_obj_t *obj = GUI_BASE(p);
     cnt++;
     gui_img_t *img = (gui_img_t *)p;
-    gui_img_set_opacity(img, cnt * 255 / cnt_max);
-
-    if (cnt >= cnt_max)
+    if (cnt <= cnt_max)
+    {
+        gui_img_set_opacity(img, cnt * 255 / cnt_max);
+    }
+    else if (cnt >= cnt_max + 5)
     {
         cnt = 0;
         gui_obj_stop_timer(obj);
@@ -103,6 +105,7 @@ static void start_engine_design(gui_view_t *view)
     gui_img_t *gloom = gui_img_create_from_mem(parent, "gloom", STARTENGINEGLOOM_BIN, 80, 58, 0, 0);
     gui_obj_hidden(GUI_BASE(gloom), true);
     gui_img_t *engine = gui_img_create_from_mem(parent, 0, STARTENGINE_BIN, 305, 145, 0, 0);
+    gui_img_set_mode(engine, IMG_SRC_OVER_MODE);
     gui_img_t *shadow = gui_img_create_from_mem(engine, 0, START_ENGINE_RELEASE_BIN, 42, 42, 0, 0);
     gui_obj_add_event_cb(shadow, press_start, GUI_EVENT_TOUCH_PRESSED, NULL);
     gui_obj_add_event_cb(shadow, release_start, GUI_EVENT_TOUCH_RELEASED, NULL);

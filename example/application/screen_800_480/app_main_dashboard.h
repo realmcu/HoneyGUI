@@ -10,10 +10,10 @@ extern "C" {
 #include "gui_components_init.h"
 
 /*============================================================================*
- *                           Types
+ *                           Variables
  *============================================================================*/
 
-
+uint8_t scene_flag;
 gui_win_t *win_map;
 
 /*============================================================================*
@@ -43,6 +43,7 @@ gui_win_t *win_map;
 // Map
 void map_design();
 void exit_map();
+void change_pos_indicator_color();
 
 #ifdef __cplusplus
 }

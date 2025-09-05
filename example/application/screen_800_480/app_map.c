@@ -46,6 +46,7 @@ static uint16_t distance[] = {0, 100, 20, 20, 110, 15, 50, 40, 50, 130};
 static uint8_t offset_index = 0;
 static int16_t x_offset = 0;
 static int16_t y_offset = 0;
+static NVGcolor color = {0};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -184,8 +185,39 @@ static void draw_cb(NVGcontext *vg)
 {
     nvgBeginPath(vg);
     nvgCircle(vg, 6, 6, 6);  // cap 20000 steps
-    nvgFillColor(vg, COLOR_BLUE);
+    nvgFillColor(vg, color);
     nvgFill(vg);
+}
+
+static void pos_indicator_timer(void *p)
+{
+    NVGcolor start = {0};
+    NVGcolor stop = {0};
+    if (scene_flag == 1)
+    {
+        start = COLOR_GREEN;
+        stop = COLOR_BLUE;
+    }
+    else
+    {
+        start = COLOR_BLUE;
+        stop = COLOR_GREEN;
+    }
+    static uint16_t cnt = 0;
+    uint16_t cnt_max = 30;
+    cnt++;
+    color.r = start.r + (stop.r - start.r) * cnt / cnt_max;
+    color.g = start.g + (stop.g - start.g) * cnt / cnt_max;
+    color.b = start.b + (stop.b - start.b) * cnt / cnt_max;
+
+    int image_h = 12;
+    int image_w = 12;
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_cb, img_data);
+    if (cnt == cnt_max)
+    {
+        cnt = 0;
+        gui_obj_stop_timer(GUI_BASE(p));
+    }
 }
 /*============================================================================*
  *                           Public Functions
@@ -200,8 +232,8 @@ void map_design()
     gui_img_t *mask = gui_img_create_from_mem(win_map_img, 0, MAPFADING_BIN, 0, 0, 0, 0);
     gui_img_set_mode(mask, IMG_SRC_OVER_MODE);
 
-    gui_img_t *dir = gui_img_create_from_mem(win_map, "arrow", ARROW_RIGHT_BIN, 390, 110, 0, 30);
-    gui_text_t *text = gui_text_create(win_map, "distance", 0, 175, 0, 0);
+    gui_img_t *dir = gui_img_create_from_mem(win_map, "arrow", ARROW_RIGHT_BIN, 390, 95, 0, 30);
+    gui_text_t *text = gui_text_create(win_map, "distance", 0, 160, 0, 0);
     sprintf(dis_str, "%dm", distance[1]);
     gui_text_set(text, (void *)dis_str, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE, strlen(dis_str), 24);
     gui_text_type_set(text, HARMONYOS_SANS_BOLD_BIN, FONT_SRC_MEMADDR);
@@ -210,6 +242,7 @@ void map_design()
 
     // Position ball
     {
+        color = COLOR_BLUE;
         int image_h = 12;
         int image_w = 12;
         int pixel_bytes = 4;
@@ -220,7 +253,7 @@ void map_design()
         }
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_cb, img_data);
-        gui_img_t *pos = gui_img_create_from_mem(win_map, 0, img_data, 394, Y_START + 141, 0, 0);
+        gui_img_t *pos = gui_img_create_from_mem(win_map, "pos", img_data, 394, Y_START + 141, 0, 0);
         gui_img_set_mode(pos, IMG_SRC_OVER_MODE);
     }
 
@@ -235,4 +268,11 @@ void exit_map()
 {
     gui_obj_create_timer(GUI_BASE(win_map), 10, true, exit_animation);
     gui_obj_start_timer(GUI_BASE(win_map));
+}
+
+void change_pos_indicator_color()
+{
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "pos", win_map);
+    gui_obj_create_timer(obj, 10, true, pos_indicator_timer);
+    gui_obj_start_timer(obj);
 }

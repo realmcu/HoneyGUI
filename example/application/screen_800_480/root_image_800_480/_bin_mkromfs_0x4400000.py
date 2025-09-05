@@ -60,8 +60,9 @@ class File(object):
         return len(self._data)
 
     def bin_data(self, base_addr=0x0):
-        file_addr = ''
-        return bytes(self._data), file_addr
+        file_addr1 = ''
+        file_addr2 = ''
+        return bytes(self._data), file_addr1, file_addr2
 
     def dump(self, indent=0):
         print ('%s%s' % (' ' * indent, self._name))
@@ -200,7 +201,7 @@ class Folder(object):
             name_addr = v_len
             v_len += len(name)
 
-            data,  file_addr1 = c.bin_data(base_addr=v_len)
+            data, file_addr1, file_addr2 = c.bin_data(base_addr=v_len)
             data_addr = v_len
 
             add_data = b''
@@ -230,14 +231,14 @@ class Folder(object):
         # if len(d_li)*self.bin_fmt.size % pad_len != 0:
         #     d_li.append(b'\0' * (pad_len - (len(d_li)*self.bin_fmt.size) % pad_len))
 
-        H_FILE += '#if defined _WIN32\n'
-        H_FILE += 'extern unsigned char resource_root[];\n\n'
-        H_FILE += H_FILE_IF
-        H_FILE += '\n#else\n'
-        H_FILE += H_FILE_ELSE
-        H_FILE += '\n#endif\n'
+        # H_FILE += '#if defined _WIN32\n'
+        # H_FILE += 'extern unsigned char resource_root[];\n\n'
+        # H_FILE += H_FILE_IF
+        # H_FILE += '\n#else\n'
+        # H_FILE += H_FILE_ELSE
+        # H_FILE += '\n#endif\n'
 
-        return (bytes().join(d_li) + bytes().join(p_li)), H_FILE
+        return (bytes().join(d_li) + bytes().join(p_li)), H_FILE_IF, H_FILE_ELSE
 
 def get_c_data(tree):
     # Handle the root dirent specially.
@@ -257,6 +258,7 @@ const struct romfs_dirent {name} = {{
                                   data=tree.c_data())
 
 def get_bin_data(tree, base_addr):
+    global H_FILE
     v_len = base_addr + Folder.bin_fmt.size
     name = bytes('/\0\0\0', 'utf8')
     name_addr = v_len
@@ -273,8 +275,16 @@ def get_bin_data(tree, base_addr):
     #     v_len += len(b'\0' * (pad_len - len(data) % pad_len))
     #     data += b'\0' * (pad_len - len(data) % pad_len)
 
-    tree_data, file_addr = tree.bin_data(v_len)
-    return (data + tree_data), file_addr
+    tree_data, file_addr1, file_addr2 = tree.bin_data(v_len)
+	
+    H_FILE += '#if defined _WIN32\n'
+    H_FILE += 'extern unsigned char *resource_root;\n\n'
+    H_FILE += file_addr1
+    H_FILE += '\n#else\n'
+    H_FILE += file_addr2
+    H_FILE += '\n#endif\n'
+	
+    return (data + tree_data), H_FILE
 
 if __name__ == '__main__':
     args = parser.parse_args()
