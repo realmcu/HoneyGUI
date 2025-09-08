@@ -21,7 +21,7 @@
 
 
 
-#define STEP 40
+#define STEP 4
 #define RELEASE_THRESHOLD_MS 300
 static touch_info_t wheel = {.type = TOUCH_INVALIDE, .x = 454 / 2, .y = 454 / 2};
 touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)

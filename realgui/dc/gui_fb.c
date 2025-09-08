@@ -445,7 +445,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         one_second = tick;
         frame_count_per_second = frame_count;
         frame_count = 0;
-        gui_log("fps:%d\r", frame_count_per_second);
+        gui_log("fps:%d                        \r", frame_count_per_second);
     }
     if (fb_change == true || force_fb_change)
     {

@@ -39,3 +39,5 @@
 
 # v1.0.12.3
 - Fix image opacity animation
+- Fix text scroll
+- Add page by mouse wheel

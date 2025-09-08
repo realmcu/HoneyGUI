@@ -218,8 +218,8 @@ static void gui_page_update_speed(gui_obj_t *obj)
 
     this->target = (this->speed * this->speed + _UI_ABS(this->speed)) / 2;
 
-    int top_height = -obj->y;
-    int buttom_height = obj->h + obj->y - (int)gui_get_screen_height();
+    int top_height = -obj->y + this->top_offset;
+    int buttom_height = obj->h + obj->y + this->bottom_offset;
 
     if (this->speed > 0)
     {
@@ -244,7 +244,7 @@ static void gui_page_update_speed(gui_obj_t *obj)
 
     if (this->align_hight > 0)
     {
-        int alien = _UI_ABS(this->target) % this->align_hight;
+        int alien = _UI_ABS(this->target - this->top_offset) % this->align_hight;
         if (alien > this->align_hight / 2)
         {
             this->target = this->target - this->align_hight + alien;
@@ -386,17 +386,17 @@ static void gui_page_hold_y(gui_obj_t *obj)
     obj->y = tp->deltaY + this->yold;
     gui_obj_enable_event(obj, GUI_EVENT_8);
 
-    if (obj->y > this->start_y)/*@TOP*/
+    if (obj->y > this->start_y + this->top_offset) /*@TOP*/
     {
-        obj->y = this->start_y;
+        obj->y = this->start_y + this->top_offset;
         gui_obj_enable_event(obj, GUI_EVENT_7);
     }
-    else if (obj->y < (this->start_y - (obj->h - (int)this->default_h))
+    else if (obj->y < (this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset)
              //&& obj->y != 0
             )/*@BOTTOM*/
     {
         gui_obj_enable_event(obj, GUI_EVENT_7);
-        obj->y = this->start_y - (obj->h - (int)this->default_h);
+        obj->y = this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset;
     }
 
     gui_page_update_speed(obj);
@@ -433,13 +433,13 @@ static void gui_page_update_inertial(gui_obj_t *obj)
         this->release = false;
     }
 
-    if (this->speed > 3)
+    if (this->speed > GUI_PAGE_MIN_SPEED)
     {
         obj->y += this->speed;
         gui_obj_enable_event(obj, GUI_EVENT_8);
         this->speed -= 1;
     }
-    else if (this->speed < -3)
+    else if (this->speed < -GUI_PAGE_MIN_SPEED)
     {
         obj->y += this->speed;
         gui_obj_enable_event(obj, GUI_EVENT_8);
@@ -473,18 +473,18 @@ static void gui_page_update_boundary(gui_obj_t *obj)
 {
     gui_page_t *this = (gui_page_t *)obj;
 
-    if (obj->y > this->start_y)/*@TOP*/
+    if (obj->y > this->start_y + this->top_offset) /*@TOP*/
     {
-        obj->y = this->start_y;
+        obj->y = this->start_y + this->top_offset;
         gui_obj_enable_event(obj, GUI_EVENT_7);
         this->release = false;
     }
-    else if (obj->y < (this->start_y - (obj->h - (int)this->default_h))
+    else if (obj->y < (this->start_y + this->bottom_offset - (obj->h - (int)this->default_h))
              // && obj->y != 0
             )/*@BOTTOM*/
     {
         this->release = false;
-        obj->y = this->start_y - (obj->h - (int)this->default_h);
+        obj->y = this->start_y + this->bottom_offset - (obj->h - (int)this->default_h);
         gui_obj_enable_event(obj, GUI_EVENT_7);
     }
 }
@@ -511,7 +511,7 @@ static void gui_page_update_alien(gui_obj_t *obj)
 {
     gui_page_t *this = (gui_page_t *)obj;
 
-    if ((this->speed <= 3) && (this->speed >= -3))
+    if ((this->speed <= GUI_PAGE_MIN_SPEED) && (this->speed >= -GUI_PAGE_MIN_SPEED))
     {
         if (this->align_hight > 0)
         {
@@ -623,6 +623,26 @@ void gui_page_update(gui_obj_t *obj)
     {
         return;
     }
+    IMPORT_GUI_WHEEL
+//
+    if (wheel->pressing)
+    {
+        obj->y = wheel->history_y;
+        if (obj->y > this->start_y + this->top_offset) /*@TOP*/
+        {
+            obj->y = this->start_y + this->top_offset;
+
+        }
+        else if (obj->y < (this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset)
+                 //&& obj->y != 0
+                )/*@BOTTOM*/
+        {
+            obj->y = this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset;
+        }
+        //gui_log("ywheel:%d\n", obj->y);
+        //gui_log("wheel:%d,%d,%d,%d\n",wheel->pressed, wheel->pressing, wheel->deltaY, wheel->history_y);
+        return;
+    }
 
 
 
@@ -732,6 +752,7 @@ void gui_page_update(gui_obj_t *obj)
     {
         gui_fb_change();
     }
+    // gui_log("y:%d\n", obj->y);
 }
 
 void gui_page_update_x(gui_obj_t *obj)

@@ -50,6 +50,8 @@ typedef struct gui_page
     int target;
     int start_x;
     int start_y;
+    int top_offset;
+    int bottom_offset;
     int align_hight;
     gui_img_t *scroll_bar;
     int get_yend;
@@ -84,7 +86,7 @@ typedef enum
  *============================================================================*/
 
 #define GUI_PAGE_MAX_SPEED 20
-#define GUI_PAGE_MIN_SPEED 1
+#define GUI_PAGE_MIN_SPEED 3
 
 
 /*============================================================================*
