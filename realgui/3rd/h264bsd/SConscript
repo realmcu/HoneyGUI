@@ -13,19 +13,21 @@ parent_dir = os.path.dirname(cwd)
 src = Split("""
 """)
 
-include_path = []
-libs = ['']
-libpath = ['']
+path = []
 
 
-if GetDepend(['CONFIG_REALTEK_H264BSD']) :
-    src += Glob(cwd + '/src/*.c')
-    include_path += [cwd,
-            cwd + '/inc',]
+src += Glob(cwd + '/src/*.c')
+src += Glob(cwd + '/port/*.c')
+
+path += [cwd, 
+         cwd + '/src',
+         cwd + '/port',
+         cwd + '/inc']
+
+print(path)
 
 
-
-group = DefineGroup('realgui/3rd/h264bsd', src, depend = ['CONFIG_REALTEK_H264BSD'], CPPPATH = include_path, DEFINE = ['H264_BSD_ENABLE'])
+group = DefineGroup('realgui/3rd/h264bsd', src, depend = [], CPPPATH = path)
 
 
 Return('group')

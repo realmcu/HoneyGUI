@@ -23,7 +23,7 @@ public:
 class MP3Player
 {
 public:
-    MP3Player() : dev(0), playing(false), data( {0}), want(), have(), info(), buffer(), thread(),
+    MP3Player() : dev(0), playing(false), data( {}), want(), have(), info(), buffer(), thread(),
               mutex(), cv(), load_flag()
     {
 

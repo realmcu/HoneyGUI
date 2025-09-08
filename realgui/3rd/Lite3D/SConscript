@@ -5,13 +5,16 @@ cwd = GetCurrentDir()
 list = os.listdir(cwd)
 objs = []
 
-
+src = Split("""
+""")
+CPPPATH = [cwd]
+src += ['Lite3D_port_gui.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_LITE3D']):
+    objs = DefineGroup('realgui/3rd/Lite3D', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):
             objs = objs + SConscript(os.path.join(d, 'SConscript'))
-
-Return('objs')
+    Return('objs')
 

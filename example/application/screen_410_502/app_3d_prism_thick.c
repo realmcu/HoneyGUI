@@ -85,8 +85,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void update_prism_thick_angle()
+static void update_prism_thick_angle(void *param)
 {
+    (void)param;
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)
@@ -124,7 +125,7 @@ static void prism_thick_global_cb(l3_model_t *this)
 
 }
 
-static void gui_prism_thick_swap_states()
+static void gui_prism_thick_swap_states(void)
 {
     Position temp = world_pos_raw;
     world_pos_raw = world_pos_target;
@@ -190,7 +191,7 @@ static void prism_thick_on_face_click_cb(void *obj, gui_event_t e, void *param)
 
 }
 
-static void prism_thick_position_init()
+static void prism_thick_position_init(void)
 {
     world_pos_raw.pos_x = 0.0f;
     world_pos_raw.pos_y = 8.0f;

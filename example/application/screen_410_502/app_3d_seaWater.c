@@ -118,7 +118,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-static void return_to_menu()
+static void return_to_menu(void)
 {
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
@@ -198,7 +198,7 @@ static void gui_wave_draw_graph(gui_canvas_t *canvas)
     }
 }
 
-static void wave_animate_cb()
+static void wave_animate_cb(void)
 {
     touch_info_t *tp = tp_get_info();
     uint32_t current_time = gui_ms_get();
@@ -217,7 +217,7 @@ static void wave_animate_cb()
     }
 }
 
-static void animate_cans_based_on_wave()
+static void animate_cans_based_on_wave(void)
 {
     float y_base = 230;
 
@@ -250,7 +250,7 @@ static void animate_cans_based_on_wave()
     }
 }
 
-static void can_update_param_cb()
+static void can_update_param_cb(void)
 {
     touch_info_t *tp = tp_get_info();
     // static uint32_t last_bubble_time = 0;
@@ -289,7 +289,7 @@ static void can_update_param_cb()
     }
 }
 
-static void init_bubble_pool()
+static void init_bubble_pool(void)
 {
     bubbles = gui_malloc(sizeof(Bubble) * MAX_BUBBLES);
     memset(bubbles, 0, sizeof(Bubble) * MAX_BUBBLES);
@@ -332,7 +332,7 @@ static void create_bubble(int x, int y)
     }
 }
 
-static void update_all_bubbles()
+static void update_all_bubbles(void)
 {
     uint32_t current_time = gui_ms_get();
 
@@ -384,7 +384,7 @@ static int fish_x_to_screen(float fish_x)
     return (int)screen_x;
 }
 
-static void fish_animate_cb()
+static void fish_animate_cb(void)
 {
     touch_info_t *tp = tp_get_info();
 

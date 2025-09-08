@@ -62,7 +62,7 @@ typedef struct information
     }\
 
 // Generate a pseudo-random number
-uint16_t xorshift16();
+uint16_t xorshift16(void);
 
 #ifdef __cplusplus
 }

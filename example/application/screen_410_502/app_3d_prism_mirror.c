@@ -40,12 +40,12 @@ typedef struct
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
-static void gui_prism_mirror3d_swap_states();
+static void gui_prism_mirror3d_swap_states(void);
 static void prism_mirror3d_render_animate_cb(void *param);
 static void gui_prism_mirror3d_enter_animate(gui_lite3d_t *lite3d_prism_mirror);
 static void prism_mirror3d_on_face_click_cb(void *obj, gui_event_t e, void *param);
-static void prism_mirror3d_update_angle_cb();
-static void prism_view_switch_to_other_view();
+static void prism_mirror3d_update_angle_cb(void *param);
+static void prism_view_switch_to_other_view(void);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -97,9 +97,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void prism_mirror3d_update_angle_cb()
+static void prism_mirror3d_update_angle_cb(void *param)
 {
-
+    (void)param;
     touch_info_t *tp = tp_get_info();
 
     static float prism_angle_increase = 0.0f;
@@ -151,7 +151,7 @@ static void prism_global_cb(l3_model_t *this)
                         0, prism_world_rot_temp.rot_y, 0, 18);
 }
 
-static void gui_prism_mirror3d_update_face_flags()
+static void gui_prism_mirror3d_update_face_flags(void)
 {
     if (face_flags_rotation < 0)
     {
@@ -286,7 +286,7 @@ static void prism_view_switch_to_other_view()
     }
 }
 
-static void prism_position_init()
+static void prism_position_init(void)
 {
     prism_world_pos_raw.pos_x = 0.0f;
     prism_world_pos_raw.pos_y = 10.0f;

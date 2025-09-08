@@ -790,7 +790,7 @@ l3_description_t *l3_load_description(void *desc_addr)
 
 bool l3_calulate_draw_img_target_area(l3_draw_rect_img_t *img, l3_rect_t *rect)
 {
-    l3_3d_point_t pox = {0.0f};
+    l3_3d_point_t pox = {0};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;

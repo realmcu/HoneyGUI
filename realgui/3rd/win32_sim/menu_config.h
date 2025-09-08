@@ -12,6 +12,7 @@
 
 // <h> Framework Config
 
+
 // <c> Enable ThorVG
 // #define CONFIG_REALTEK_BUILD_TVG
 // </c>
@@ -20,8 +21,8 @@
 // #define CONFIG_REALTEK_BUILD_GIFDEC
 // </c>
 
-// <c> Enable RTK Lite3D LIB
-// #define CONFIG_REALTEK_BUILD_LITE3D_LIB
+// <c> Enable RTK Lite3D
+#define CONFIG_REALTEK_BUILD_LITE3D
 // </c>
 
 // <c> Enable RTK Lite3D SOURCE

@@ -87,8 +87,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-static void time_update_cb()
+static void time_update_cb(void *param)
 {
+    (void)param;
     if (!timeinfo)
     {
         return;
@@ -264,8 +265,9 @@ static void update_weather_image(cJSON *weather, uint8_t i)
     gui_img_refresh_size((gui_img_t *)obj);
 }
 
-static void weather_cb()
+static void weather_cb(void *param)
 {
+    (void)param;
     if (!(json_refeash_flag & 0x01))
     {
         return;
@@ -479,8 +481,9 @@ static void arc_temperature_cb(NVGcontext *vg)
     cJSON_Delete(root);
 }
 
-static void compass_cb()
+static void compass_cb(void *param)
 {
+    (void)param;
     if (!(json_refeash_flag & 0x08))
     {
         return;
@@ -596,19 +599,28 @@ static void temp_timer_cb(void *obj)
     }
 }
 
-static void switch_heartrate()
+static void switch_heartrate(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     gui_view_switch_direct(gui_view_get_current(), heartrate_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
 
-static void switch_call_incoming()
+static void switch_call_incoming(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     *gui_call_incoming_flag_get() = true;
 }
 
-static void switch_menu()
+static void switch_menu(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)e;
+    (void)param;
     gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
@@ -819,7 +831,7 @@ void create_watchface_classic(gui_view_t *view)
     gui_text_mode_set(compass_orien, CENTER);
     gui_text_rendermode_set(compass_orien, 2);
     gui_obj_create_timer(GUI_BASE(img), 2000, true, compass_cb);
-    compass_cb();
+    compass_cb(NULL);
 
     gui_img_t *img_heart_rate = gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON",
                                                         UI_CLOCK_HEARTRATE_ICON_BIN, 272, 348, 0,

@@ -102,7 +102,7 @@ int gui_h264bsd_destroy_decoder(void *gui_decoder)
     h264bsdShutdown(decoder);
     h264bsdFree(decoder);
 
-    gui_free(gui_decoder);
+    h264bsd_free(gui_decoder);
     return H264BSD_SUCCESS;
 }
 
@@ -112,7 +112,7 @@ void *gui_h264bsd_create_decoder(uint8_t *fileData, long fileSize)
 
     if (fileData == NULL) { return NULL; }
 
-    gui_decoder = (GUI_H264BSD_DECODER *)gui_malloc(sizeof(GUI_H264BSD_DECODER));
+    gui_decoder = (GUI_H264BSD_DECODER *)h264bsd_malloc(sizeof(GUI_H264BSD_DECODER));
     if (!gui_decoder)
     {
         return NULL;
@@ -123,7 +123,7 @@ void *gui_h264bsd_create_decoder(uint8_t *fileData, long fileSize)
     if (gui_decoder->status > 0)
     {
         h264bsdFree(gui_decoder->decoder);
-        gui_free(gui_decoder);
+        h264bsd_free(gui_decoder);
         return NULL;
     }
 

@@ -70,7 +70,7 @@ typedef enum
     GUI_EVENT_KB_SHORT_CLICKED,
     GUI_EVENT_KB_LONG_CLICKED,
 
-    GUI_EVENT_VIEW_SWITCH_DIRECT,
+    GUI_EVENT_VIEW_SWITCH_DIRECT
     /** wheel device events*/
 
 } gui_event_t;

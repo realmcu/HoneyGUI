@@ -352,7 +352,7 @@ void do_raster_no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     uint32_t blend_mode = image->blend_mode;
     gui_matrix_t *inverse = &image->inverse;
 
-    gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
+    gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL};
     params.palette_index = ((gui_palette_file_t *)head)->palette_index;
     params.palette_data = ((gui_palette_file_t *)head)->palette_data;
 
@@ -393,7 +393,7 @@ void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     uint32_t blend_mode = image->blend_mode;
     gui_matrix_t *inverse = &image->inverse;
 
-    gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode };
+    gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL};
     uint8_t rle_pixel[4];
 
     for (int32_t i = y_start; i <= y_end; i++)

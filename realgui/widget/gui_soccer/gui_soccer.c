@@ -166,7 +166,7 @@ static gui_vertex_t computeNormal(gui_vertex_t a, gui_vertex_t b, gui_vertex_t c
     return normal;
 }
 
-gui_quaternion_t quat_identity()
+gui_quaternion_t quat_identity(void)
 {
     return (gui_quaternion_t) {1.0f, 0.0f, 0.0f, 0.0f};
 }

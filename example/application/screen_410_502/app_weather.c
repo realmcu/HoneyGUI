@@ -113,8 +113,9 @@ static void clear_weather_icons(gui_win_t *win)
 }
 
 // Sunny
-static void update_light_animation()
+static void update_light_animation(void *param)
 {
+    (void)param;
     for (int i = 0; i < NUM_LIGHTS_OR_THUNDER; i++)
     {
         if (i == current_light_index && lights_or_thunder[i]->opacity_value <= 250)
@@ -134,8 +135,9 @@ static void update_light_animation()
 }
 
 // Rainy
-static void update_raindrop_animation()
+static void update_raindrop_animation(void *param)
 {
+    (void)param;
     gui_dispdev_t *dc = gui_get_dc();
 
     for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
@@ -157,8 +159,9 @@ static void update_raindrop_animation()
 }
 
 // Snowy
-static void update_snow_animation()
+static void update_snow_animation(void *param)
 {
+    (void)param;
     for (int i = 0; i < NUM_DYNAMIC_ICON; i++)
     {
         dynamic[i].driftY ++;
@@ -178,8 +181,9 @@ static void update_snow_animation()
 }
 
 // Stormy
-static void update_thunder_animation()
+static void update_thunder_animation(void *param)
 {
+    (void)param;
     for (int i = 0; i < NUM_LIGHTS_OR_THUNDER; i++)
     {
         if (i == current_light_index && lights_or_thunder[i]->opacity_value <= 250)
@@ -199,8 +203,9 @@ static void update_thunder_animation()
 }
 
 // Windy
-static void update_leaf_animation()
+static void update_leaf_animation(void *param)
 {
+    (void)param;
     gui_dispdev_t *dc = gui_get_dc();
     leaf_rot_angle += 5.0f;
 

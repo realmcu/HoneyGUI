@@ -93,7 +93,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void fish_pos_init()
+static void fish_pos_init(void)
 {
     const float initial_angles[FISH_COUNT] = {0, 45, 240};
 
@@ -110,8 +110,9 @@ static void fish_pos_init()
     }
 }
 
-static void update_koi_move()
+static void update_koi_move(void *param)
 {
+    (void)param;
     swing_time += 0.4f;
     swing_angle = 3.0f * sinf(swing_time);
 

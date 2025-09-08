@@ -127,7 +127,7 @@ static void draw_hexagon(NVGcontext *vg, float centerX, float centerY, float rad
     nvgStroke(vg);
 }
 
-static void initialize_colors()
+static void initialize_colors(void)
 {
     rgba_color[0] = nvgRGBA(255, 255, 128, 230);
     rgba_color[1] = nvgRGBA(177, 255, 47, 230);
@@ -191,8 +191,9 @@ static void create_firework_clock_cb(NVGcontext *vg)
     }
 }
 
-static void update_clock()
+static void update_clock(void *param)
 {
+    (void)param;
     currentColorIndex = (currentColorIndex + 1) % 3;
 
     size_t buffer_size = screen_w * screen_h * 4 + sizeof(gui_rgb_data_head_t);

@@ -100,7 +100,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-static void return_to_menu()
+static void return_to_menu(void)
 {
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
@@ -128,7 +128,7 @@ static int y_to_screen_h(float butterfly_y)
     return (int)screen_y;
 }
 
-static void butterfly_pos_init()
+static void butterfly_pos_init(void)
 {
     const float initial_angles[BUTTERFLY_COUNT] = {0, 120, 240};
 
@@ -145,10 +145,12 @@ static void butterfly_pos_init()
 
 }
 
-static void update_butterfly()
+static void update_butterfly(void *param)
 {
     butterfly_time += 1.2f;
     butterfly_angle = 30 * sinf(butterfly_time);
+    (void)param;
+
 
     for (int i = 0; i < BUTTERFLY_COUNT; i++)
     {

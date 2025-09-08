@@ -11,7 +11,7 @@
 
 
 #include "h264bsd_decoder.h"
-#include "gui_api.h"
+#include "h264bsd_port.h"
 
 
 #ifdef __arm__

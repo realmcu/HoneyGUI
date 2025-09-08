@@ -2,6 +2,15 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../Lite3D"
+		},
+		{
+			"path": "../h264bsd"
+		},
+		{
+			"path": "../nanovg"
 		}
 	],
 	"settings": {}

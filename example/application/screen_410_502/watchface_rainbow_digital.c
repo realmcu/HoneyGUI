@@ -162,7 +162,7 @@ static void update_shared_offsets(float deltaX, float deltaY)
     shared_state.target_offsets[0].dy = -shared_state.current_offsets[1].dy / 2.0f;
 }
 
-static void apply_four_layer_offsets()
+static void apply_four_layer_offsets(void)
 {
     for (int d = 0; d < 4; d++)
     {
@@ -174,7 +174,7 @@ static void apply_four_layer_offsets()
     }
 }
 
-static void apply_five_layer_offsets()
+static void apply_five_layer_offsets(void)
 {
     for (int d = 0; d < 4; d++)
     {
@@ -187,7 +187,7 @@ static void apply_five_layer_offsets()
 }
 
 
-static void reset_shared_offsets()
+static void reset_shared_offsets(void)
 {
     reached_target_count = 0;
     for (int i = 0; i < 5; i++)
@@ -256,8 +256,9 @@ static void number_animation_cb(void *param)
     }
 }
 
-static void dot_animation_cb()
+static void dot_animation_cb(void *param)
 {
+    (void)param;
     for (int i = 0; i < DOT_NUM; i++)
     {
         if (dots[i].is_opacity_increase)

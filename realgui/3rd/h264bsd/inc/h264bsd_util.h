@@ -146,18 +146,18 @@
 /* macro to clip a value z, so that 0 <= z =< 255 */
 #define CLIP1(z) (((z) < 0) ? 0 : (((z) > 255) ? 255 : (z)))
 
-#include "gui_api.h"
+#include "h264bsd_port.h"
 /* macro to allocate memory */
 #define ALLOCATE(ptr, count, type) \
     { \
-        (ptr) = gui_lower_malloc((count) * sizeof(type));\
+        (ptr) = h264bsd_lower_malloc((count) * sizeof(type));\
     }
 // (ptr) = malloc((count) * sizeof(type));
 
 /* macro to free allocated memory */
 #define FREE(ptr) \
     { \
-        if(ptr){gui_lower_free((ptr)); (ptr) = NULL;} \
+        if(ptr){h264bsd_lower_free((ptr)); (ptr) = NULL;} \
     }
 // free((ptr)); (ptr) = NULL;
 

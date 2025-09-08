@@ -131,6 +131,8 @@
  * @param ...
  */
 #define SHELL_EXPORT_CMD(_attr, _name, _func, _desc, ...) \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wstrict-prototypes\"") \
     const char shellCmd##_name[] = #_name; \
     const char shellDesc##_name[] = #_desc; \
     SHELL_USED const ShellCommand \
@@ -141,7 +143,9 @@
                                                            .data.cmd.function = (int (*)())_func, \
                                                            .data.cmd.desc = shellDesc##_name, \
                                                            ##__VA_ARGS__ \
-                                                         }
+                                                         }; \
+    _Pragma("GCC diagnostic pop")
+
 
 #if SHELL_USING_FUNC_SIGNATURE == 1
 /**
@@ -449,6 +453,8 @@ typedef struct shell_def
 #endif
 } Shell;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-prototypes"
 
 /**
  * @brief Shell command definition
@@ -521,6 +527,7 @@ typedef struct
     int (*set)();                                               /**< Variable set method */
 } ShellNodeVarAttr;
 
+#pragma GCC diagnostic pop
 
 #define shellSetPath(_shell, _path)     (_shell)->info.path = _path
 #define shellGetPath(_shell)            ((_shell)->info.path)

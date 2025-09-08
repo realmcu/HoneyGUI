@@ -76,10 +76,11 @@ static int gui_view_get_other_view_descriptor_init(void)
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
-static void update_animation()
+static void update_animation(void *param)
 {
     touch_info_t *tp = tp_get_info();
     gui_dispdev_t *dc = gui_get_dc();
+    (void)param;
 
     if (tp->pressed)
     {

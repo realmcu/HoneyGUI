@@ -32,7 +32,7 @@ static void watchface_design(gui_view_t *view);
 #ifdef __WIN32
 char *read_file(const char *file_path);
 #endif
-static void inform_generate_cb();
+static void inform_generate_cb(void);
 extern void clear_watchface_classic(gui_view_t *view);
 
 /*============================================================================*
@@ -153,8 +153,9 @@ static void fps_create(void *parent)
 }
 
 // Enter menu and change menu style by button
-static void kb_button_cb()
+static void kb_button_cb(void *param)
 {
+    (void)param;
     extern gui_kb_port_data_t *kb_get_data(void);
     gui_kb_port_data_t *kb = kb_get_data();
     static uint32_t time_press = 0;
@@ -196,7 +197,7 @@ static void kb_button_cb()
 }
 
 /* Generate a pseudo-random number */
-uint16_t xorshift16()
+uint16_t xorshift16(void)
 {
     static uint16_t seed = 12345;
     seed ^= seed << 6;
@@ -206,7 +207,7 @@ uint16_t xorshift16()
 }
 
 // #ifndef __WIN32
-static void json_refreash()
+static void json_refreash(void)
 {
     uint16_t degree = xorshift16() % 359;
     uint16_t move = xorshift16() % 20000;
@@ -276,13 +277,14 @@ static void json_refreash()
 // #endif
 
 // Update the watch time and the JSON data
-static void win_cb()
+static void win_cb(void *param)
 {
+    (void)param;
 #if defined __WIN32
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    char *temp = cjson_content;
+    // char *temp = cjson_content;
     // cjson_content = read_file(filename);
     // if (!cjson_content)
     // {
@@ -355,7 +357,7 @@ static void watchface_design(gui_view_t *view)
 }
 
 // Send information to the top view
-static void inform_generate_cb()
+static void inform_generate_cb(void)
 {
     static char *content = NULL;
     static char *time = NULL;
@@ -414,7 +416,7 @@ static void app_main_watch_ui_design(void)
     fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));
-    win_cb();
+    win_cb(NULL);
 }
 
 extern const unsigned char _binary_root_0x704D1400_bin_start[];

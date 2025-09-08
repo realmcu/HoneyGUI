@@ -69,7 +69,7 @@
             END_OF_STREAM if not enough bits left
 
 ------------------------------------------------------------------------------*/
-#include "gui_api.h"
+#include "h264bsd_port.h"
 u32 h264bsdGetBits(strmData_t *pStrmData, u32 numBits)
 {
 

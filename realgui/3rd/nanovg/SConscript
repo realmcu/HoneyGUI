@@ -6,6 +6,7 @@ src = Split("""
 """)
 
 
+src += [cwd + '/base/nanovg_port.c']
 src += [cwd + '/base/nanovg.c']
 src += [cwd + '/agge/math.cpp']
 src += [cwd + '/agge/stroke.cpp']

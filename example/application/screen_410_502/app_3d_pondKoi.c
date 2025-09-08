@@ -103,7 +103,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-static void koi_pos_init()
+static void koi_pos_init(void)
 {
     for (int i = 0; i < KOI_COUNT; i++)
     {
@@ -127,10 +127,11 @@ static void koi_pos_init()
     }
 }
 
-static void koi_animate_cb()
+static void koi_animate_cb(void *param)
 {
     swing_time += 0.4f;
     swing_angle = 3.0f * sinf(swing_time);
+    (void)param;
 
     for (int i = 0; i < KOI_COUNT; i++)
     {

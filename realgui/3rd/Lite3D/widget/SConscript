@@ -7,7 +7,6 @@ src = Split("""
 """)
 
 src = Glob('*.c')
-src += ['../Lite3D_port_gui.c']
 
 CPPPATH = [cwd]
 

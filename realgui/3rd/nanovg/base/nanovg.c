@@ -18,16 +18,15 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "nanovg.h"
 
-#include <string.h>
-#define printf(...)
 
+#include "nanovg_port.h"
 
-#include "gui_api.h"
-#define NANOVG_MALLOC gui_malloc
-#define NANOVG_REALLOC gui_realloc
-#define NANOVG_FREE gui_free
+#define NANOVG_MALLOC nanovg_malloc
+#define NANOVG_REALLOC nanovg_realloc
+#define NANOVG_FREE nanovg_free
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)  // unreferenced formal parameter
@@ -351,10 +350,6 @@ void nvgDeleteInternal(NVGcontext *ctx)
 
 void nvgBeginFrame(NVGcontext *ctx, float windowWidth, float windowHeight, float devicePixelRatio)
 {
-    /*  printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
-            ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
-            ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
-
     ctx->nstates = 0;
     nvgSave(ctx);
     nvgReset(ctx);

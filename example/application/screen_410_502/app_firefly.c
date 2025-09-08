@@ -95,10 +95,11 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 
 
-static void update_all_fireflys()
+static void update_all_fireflys(void *param)
 {
     uint32_t current_time = gui_ms_get();
     gui_dispdev_t *dc = gui_get_dc();
+    (void)param;
 
     for (int i = 0; i < MAX_FIREFLY; i++)
     {

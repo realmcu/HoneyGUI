@@ -543,7 +543,7 @@ static void note_design(gui_obj_t *obj, void *p)
     }
 }
 
-static void cellular_timer_cb()
+static void cellular_timer_cb(void)
 {
     cellular_offset_x = menu_cellular->hor_offset;
     cellular_offset_y = menu_cellular->ver_offset;
