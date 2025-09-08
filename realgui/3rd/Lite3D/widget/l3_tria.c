@@ -48,8 +48,7 @@ static void __l3_push_tria_img(l3_model_t *_this)
         }
 
         memset(tria_img, 0x00, sizeof(l3_draw_tria_img_t));
-        l3_vertex_t vertices[3];
-        memcpy(vertices, _this->face.tria_face[i].transform_vertex, sizeof(vertices));
+        memcpy(tria_img, _this->face.tria_face[i].transform_vertex, 3 * sizeof(l3_vertex_t));
 
         int material_id = _this->desc->attrib.material_ids[i];
         if (material_id >= 0)
@@ -74,15 +73,15 @@ static void __l3_push_tria_img(l3_model_t *_this)
             else // Fill with texture image
             {
                 tria_img->fill_type = L3_FILL_IMAGE_RGB565;
-                for (int j = 0; j < 3; j++)
-                {
-                    vertices[j].v = 1.0f - vertices[j].v; // Inverse v coordinate
-                }
+
+                tria_img->p0.v = 1.0f - tria_img->p0.v; // Inverse v coordinate
+                tria_img->p1.v = 1.0f - tria_img->p1.v;
+                tria_img->p2.v = 1.0f - tria_img->p2.v;
             }
         }
         else
         {
-            float nz = fabsf(vertices[0].normal.uz);
+            float nz = fabsf(tria_img->p0.normal.uz);
             uint8_t color_intensity = (uint8_t)(opacity_value * fmaxf(0.0f, fminf(1.0f, nz)));
             render_color = ((color_intensity & 0xF8) << 8) |
                            ((color_intensity & 0xFC) << 3) |
@@ -91,9 +90,6 @@ static void __l3_push_tria_img(l3_model_t *_this)
             tria_img->fill_data = &render_color;
         }
 
-        tria_img->p0 = vertices[0];
-        tria_img->p1 = vertices[1];
-        tria_img->p2 = vertices[2];
         l3_draw_tria_to_canvas(tria_img, _this->combined_img, depthBuffer);
 
     }
