@@ -256,7 +256,7 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     gui_rgb_data_head_t *head = image->data;
     char input_type = head->type;
     imdc_file_t *compressed = (imdc_file_t *)(&(file->data.imdc_file));
-    if (y != y_record || x < x_record || image_record != image)
+    if (y != y_record || x <= x_record || image_record != image)
     {
         x_record = x;
         y_record = y;
