@@ -1052,6 +1052,7 @@ static int gui_page_tree_get_radio_gap(gui_obj_t *page, gui_obj_t **top_radio_wi
         }
         i++;
     }
+    return gap;
 }
 
 static void get_first_active_radio(gui_obj_t *obj, gui_obj_t **rst)

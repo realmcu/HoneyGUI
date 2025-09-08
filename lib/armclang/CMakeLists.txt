@@ -107,6 +107,11 @@ list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/3rd/cJSON/*.h")
 list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
 
+if(CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP)
+	file(GLOB_RECURSE NEW_HEADER_FILES "../../realgui/DOM/*.h")
+	list(APPEND HEADER_FILES ${NEW_HEADER_FILES})
+endif()
+
 install(FILES ${HEADER_FILES} DESTINATION include)
 
 install(DIRECTORY "../../realgui/3rd/box2d/include/box2d" DESTINATION "include")

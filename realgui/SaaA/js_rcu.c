@@ -27,6 +27,7 @@ DECLARE_HANDLER(wait)
 {
     gui_log("RCU wait\n");
 #ifdef __arm__
+    extern void os_delay(uint32_t ms);
     os_delay(10);
 #else
     gui_log("rcu delay\n");

@@ -3,7 +3,7 @@
 
 #if defined ENABLE_WIFI_NIC
 
-#if (defined RTL87x2G)
+#if (defined RTL87x2G) || (defined TARGET_RTL8773E)
 #include "app_msg.h"
 #include "wifi_nic_msg.h"
 
