@@ -800,10 +800,6 @@ gui_view_t *gui_view_get_next(void)
 
 void gui_view_set_opacity(gui_view_t *_this, uint8_t opacity)
 {
-    if (opacity > UINT8_MAX)
-    {
-        opacity = UINT8_MAX;
-    }
     _this->opacity = opacity;
 }
 

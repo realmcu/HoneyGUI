@@ -25,7 +25,7 @@ CPATH = ''
 LPATH = ''
 
 
-CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc -Werror=undef -Werror=sign-compare -Werror=unused-parameter ' \
+CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc -Werror=undef -Werror=sign-compare -Werror=unused-parameter -Werror=type-limits ' \
 '-Werror=missing-braces -Werror=unused-variable -Werror=format -Werror=char-subscripts -Werror=parentheses -Werror=implicit-fallthrough' \
 
 CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion'

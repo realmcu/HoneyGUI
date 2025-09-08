@@ -21,6 +21,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Werror=char-subscripts \
     -Werror=parentheses \
     -Werror=implicit-fallthrough \
+    -Werror=type-limits \
     -Wno-packed \
     -Wno-missing-prototypes \
     -Wno-missing-noreturn \
@@ -52,4 +53,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -Werror=parentheses \
     -Werror=implicit-fallthrough \
     -Werror=deprecated-copy \
+    -Werror=type-limits \
     -Wmissing-field-initializers")

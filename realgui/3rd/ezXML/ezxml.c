@@ -608,7 +608,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
         attr = (char **)EZXML_NIL;
         d = ++s;
 
-        if (isalpha((unsigned char)*s) || *s == '_' || *s == ':' || *s < '\0')   // new tag
+        if (isalpha((unsigned char)*s) || *s == '_' || *s == ':' || (signed char)*s < '\0')   // new tag
         {
             if (! root->cur)
             {
