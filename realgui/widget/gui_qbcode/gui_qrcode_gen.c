@@ -1751,7 +1751,9 @@ struct qrcodegen_Segment gui_qrcode_gen_make_eci(long assign_val, uint8_t buf[])
                                              &result.bit_length);
     }
     else
-        ;
+    {
+
+    }
     //assert(false);
     result.data = buf;
     return result;
