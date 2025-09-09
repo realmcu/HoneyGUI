@@ -20,9 +20,9 @@ The :cpp:any:`gui_menu_cellular_offset` function can be used to adjust horizonta
 
 
 
-Example
--------
-Example of using cellular menus is as follows. First, use the canvas widget to draw a set of solid-color icons, and then pass these icons to the cellular menu widget to display.
+Development Example
+---------------------
+The development example of cellular menu widget is as follows. First, use the canvas widget to draw a set of solid-color icons, and then pass these icons to the cellular menu widget to display.
 
 .. literalinclude:: ../../../example/widget/menu_cellular/example_gui_menu_cellular.c
    :language: c

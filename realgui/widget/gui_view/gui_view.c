@@ -617,7 +617,7 @@ gui_view_t *gui_view_create(void       *parent,
 {
     GUI_ASSERT(descriptor != NULL);
 
-    if (*descriptor->pView) // don't recreate view whether keep set of not
+    if (*descriptor->pView) // don't recreate view whether keep set or not
     {
         gui_view_t *_this = *descriptor->pView;
 

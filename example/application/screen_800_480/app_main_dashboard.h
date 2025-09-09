@@ -41,9 +41,9 @@ gui_win_t *win_map;
  *                           Public Functions
  *============================================================================*/
 // Map
-void map_design();
-void exit_map();
-void change_pos_indicator_color();
+void map_design(void);
+void exit_map(void);
+void change_pos_indicator_color(void);
 
 #ifdef __cplusplus
 }

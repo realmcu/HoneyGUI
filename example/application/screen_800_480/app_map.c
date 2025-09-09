@@ -223,7 +223,7 @@ static void pos_indicator_timer(void *p)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void map_design()
+void map_design(void)
 {
     gui_win_t *win_map_img = gui_win_create(win_map, 0, X_START, Y_START, MAP_W, MAP_H);
     gui_img_t *map_1 = gui_img_create_from_mem(win_map_img, "map_1", MAP_BIN, 0, 0, 0, 0);
@@ -265,13 +265,13 @@ void map_design()
     gui_obj_start_timer(GUI_BASE(win_map));
 }
 
-void exit_map()
+void exit_map(void)
 {
     gui_obj_create_timer(GUI_BASE(win_map), 10, true, exit_animation);
     gui_obj_start_timer(GUI_BASE(win_map));
 }
 
-void change_pos_indicator_color()
+void change_pos_indicator_color(void)
 {
     GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "pos", win_map);
     gui_obj_create_timer(obj, 10, true, pos_indicator_timer);
