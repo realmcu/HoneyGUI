@@ -794,20 +794,14 @@ u32 *h264bsdNextOutputPictureBGR565(storage_t *pStorage, u32 *picId, u32 *isIdrP
     }
 
 
-#ifdef __WIN32
-    h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
-#else
-#if defined(__CC_ARM)
-    // ===== Arm Compiler 5 (armcc) =====
-    h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
-#elif defined(__ARMCLANG__)
-    // ===== Arm Compiler 6 (armclang) =====
+#if defined(__ARM_FEATURE_MVE)
     extern void mve_yuv420_to_rgb565(uint8_t *data, uint8_t *pOutput,
                                      uint32_t width, uint32_t height);
     mve_yuv420_to_rgb565(data, (uint8_t *)pStorage->conversionBuffer, width, height);
+#else
+    h264bsdConvertToBGR565(width, height, data, pStorage->conversionBuffer);
 #endif
 
-#endif
     return pStorage->conversionBuffer;
 }
 /*------------------------------------------------------------------------------
