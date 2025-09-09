@@ -1543,6 +1543,12 @@ void js_ui_timerThread(void *param)
 // #include "os_timer.h"
 // #include "trace.h"
 
+extern bool os_timer_id_get(void **pp_handle, uint32_t *p_timer_id);
+bool os_timer_create(void **pp_handle, const char *p_timer_name, uint32_t timer_id,
+                     uint32_t interval_ms, bool reload, void (*p_timer_callback)(void *));
+bool os_timer_start(void **pp_handle);
+bool os_timer_delete(void **pp_handle);
+
 #if defined (RTL87x2G) || defined (TARGET_RTL8773E)
 void arm_js_timercb(void *p_handle)
 {
