@@ -177,8 +177,9 @@ static void entrance_animation(void *p)
     if (cnt >= cnt_max)
     {
         cnt = 0;
-        gui_obj_create_timer(obj, 10, true, run_animation);
-        gui_obj_start_timer(obj);
+        gui_obj_stop_timer(obj);
+        // gui_obj_create_timer(obj, 10, true, run_animation);
+        // gui_obj_start_timer(obj);
     }
 }
 
@@ -223,46 +224,56 @@ static void pos_indicator_timer(void *p)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+// void map_design(void)
+// {
+//     gui_win_t *win_map_img = gui_win_create(win_map, 0, X_START, Y_START, MAP_W, MAP_H);
+//     gui_img_t *map_1 = gui_img_create_from_mem(win_map_img, "map_1", MAP_BIN, 0, 0, 0, 0);
+//     gui_img_t *map_2 = gui_img_create_from_mem(win_map_img, "map_2", MAP_BIN, 0, -MAP_H, 0, 0);
+//     map_1->need_clip = true;
+//     map_2->need_clip = true;
+//     gui_img_t *mask = gui_img_create_from_mem(win_map_img, 0, MAPFADING_BIN, 0, 0, 0, 0);
+//     gui_img_set_mode(mask, IMG_SRC_OVER_MODE);
+
+//     gui_img_create_from_mem(win_map, "arrow", ARROW_RIGHT_BIN, 390, 95, 0, 30);
+//     gui_text_t *text = gui_text_create(win_map, "distance", 0, 160, 0, 0);
+//     sprintf(dis_str, "%dm", distance[1]);
+//     gui_text_set(text, (void *)dis_str, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE, strlen(dis_str), 24);
+//     gui_text_type_set(text, HARMONYOS_SANS_BOLD_BIN, FONT_SRC_MEMADDR);
+//     gui_text_mode_set(text, CENTER);
+//     gui_text_rendermode_set(text, 2);
+
+//     // Position ball
+//     {
+//         color = COLOR_BLUE;
+//         int image_h = 12;
+//         int image_w = 12;
+//         int pixel_bytes = 4;
+//         size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+//         if (img_data == NULL)
+//         {
+//             img_data = gui_lower_malloc(buffer_size);
+//         }
+//         memset(img_data, 0, buffer_size);
+//         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_cb, img_data);
+//         gui_img_t *pos = gui_img_create_from_mem(win_map, "pos", img_data, 394, Y_START + 141, 0, 0);
+//         gui_img_set_mode(pos, IMG_SRC_OVER_MODE);
+//     }
+
+//     offset_index = 0;
+//     x_offset = 0;
+//     y_offset = 0;
+//     gui_obj_create_timer(GUI_BASE(win_map), 10, true, entrance_animation);
+//     gui_obj_start_timer(GUI_BASE(win_map));
+// }
+
 void map_design(void)
 {
     gui_win_t *win_map_img = gui_win_create(win_map, 0, X_START, Y_START, MAP_W, MAP_H);
-    gui_img_t *map_1 = gui_img_create_from_mem(win_map_img, "map_1", MAP_BIN, 0, 0, 0, 0);
-    gui_img_t *map_2 = gui_img_create_from_mem(win_map_img, "map_2", MAP_BIN, 0, -MAP_H, 0, 0);
-    map_1->need_clip = true;
-    map_2->need_clip = true;
-    gui_img_t *mask = gui_img_create_from_mem(win_map_img, 0, MAPFADING_BIN, 0, 0, 0, 0);
-    gui_img_set_mode(mask, IMG_SRC_OVER_MODE);
-
-    gui_img_create_from_mem(win_map, "arrow", ARROW_RIGHT_BIN, 390, 95, 0, 30);
-    gui_text_t *text = gui_text_create(win_map, "distance", 0, 160, 0, 0);
-    sprintf(dis_str, "%dm", distance[1]);
-    gui_text_set(text, (void *)dis_str, GUI_FONT_SRC_TTF,  APP_COLOR_WHITE, strlen(dis_str), 24);
-    gui_text_type_set(text, HARMONYOS_SANS_BOLD_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(text, CENTER);
-    gui_text_rendermode_set(text, 2);
-
-    // Position ball
-    {
-        color = COLOR_BLUE;
-        int image_h = 12;
-        int image_w = 12;
-        int pixel_bytes = 4;
-        size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        if (img_data == NULL)
-        {
-            img_data = gui_lower_malloc(buffer_size);
-        }
-        memset(img_data, 0, buffer_size);
-        gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_cb, img_data);
-        gui_img_t *pos = gui_img_create_from_mem(win_map, "pos", img_data, 394, Y_START + 141, 0, 0);
-        gui_img_set_mode(pos, IMG_SRC_OVER_MODE);
-    }
-
-    offset_index = 0;
-    x_offset = 0;
-    y_offset = 0;
     gui_obj_create_timer(GUI_BASE(win_map), 10, true, entrance_animation);
     gui_obj_start_timer(GUI_BASE(win_map));
+    gui_img_create_from_mem(win_map_img, "map", MAP_BIN, 0, 0, 0, 0);
+    gui_img_t *mask = gui_img_create_from_mem(win_map_img, 0, MAPFADING_BIN, 0, 0, 0, 0);
+    gui_img_set_mode(mask, IMG_SRC_OVER_MODE);
 }
 
 void exit_map(void)

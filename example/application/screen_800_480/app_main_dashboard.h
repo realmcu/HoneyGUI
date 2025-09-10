@@ -8,6 +8,7 @@ extern "C" {
 #include "root_image_800_480/ui_resource.h"
 #include "gui_view.h"
 #include "gui_components_init.h"
+#include "dashboard_adapt.h"
 
 /*============================================================================*
  *                           Variables

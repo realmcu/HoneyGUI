@@ -118,7 +118,7 @@ static gui_win_t *win_common = NULL;
 static gui_win_t *win_speed_display = NULL;
 static gui_win_t *win_power_display = NULL;
 static char top_infor_str[32] = {0};
-static char loction_str[12] = "Suzhou";
+static char loction_str[16] = "Suzhou";
 static char temp_str[8] = "25°C";
 static char time_str[8] = "00:00";
 
@@ -127,8 +127,8 @@ static uint16_t power_val = 0; // kW
 static char speed_str[4] = "0";
 static char power_str[4] = "0";
 
-static uint16_t odo_val = 0; // km/h
-static uint16_t soc_val = 0; // kW
+static uint16_t odo_val = 0; // km
+static uint16_t soc_val = 0; // %
 static char odo_str[12] = "ODO 0km";
 static char soc_str[12] = "BATT 0%";
 
@@ -699,7 +699,7 @@ static void release_icon(void *obj, gui_event_t e, void *param)
                 exit_dashboard_digital();
                 switch_wait_cnt = SWITCH_TO_DAIL_DURATION;
             }
-            change_pos_indicator_color();
+            // change_pos_indicator_color();
         }
     }
     else
@@ -940,7 +940,7 @@ static void dashboard_entrance_animation(void *p)
     else if (cnt >= (cnt_max + 8 * cnt_max / 7))
     {
         cnt = 0;
-        gui_obj_create_timer(obj, 10, true, update_inform);
+        gui_obj_create_timer(obj, 20, true, update_inform);
         gui_obj_start_timer(obj);
         animate_flag = 0;
     }
@@ -974,47 +974,186 @@ static void update_text_display(void)
 static void update_inform(void *p)
 {
     (void)p;
+    static uint8_t cnt = 0;
+    cnt++;
 #if defined __WIN32
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 #endif
+    gui_dashboard_t *dashboard_info = get_dashboard_info();
+
     // Top information
     if (timeinfo)
     {
         sprintf(time_str, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
     }
+    if (dashboard_info)
+    {
+        sprintf(loction_str, "%s", dashboard_info->location);
+        sprintf(temp_str, "%d°C", dashboard_info->temp_val);
+    }
     sprintf(top_infor_str, "%s %s\n%s", loction_str, temp_str, time_str);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "top_infor", current_view);
     gui_text_content_set((gui_text_t *)text, top_infor_str, strlen(top_infor_str));
 
-    // Speed information
-    speed_val += 2;
-    if (speed_val >= SPEED_MAX)
+    if (dashboard_info)
     {
-        speed_val = 0;
+        speed_val = dashboard_info->speed_val;
+        power_val = dashboard_info->power_val;
+        odo_val = dashboard_info->odo_val;
+        soc_val = dashboard_info->soc_val;
+
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led0, "led0", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led1, "led1", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led2, "led2", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led3, "led3", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led4, "led4", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led5, "led5", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_l, "led_turn_l", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(led_turn_r, "led_turn_r", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(bt, "bt", GUI_BASE(win_common));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(wifi, "wifi", GUI_BASE(win_common));
+
+        if (dashboard_info->bt_status)
+        {
+            gui_obj_hidden(bt, false);
+        }
+        else
+        {
+            gui_obj_hidden(bt, true);
+        }
+        if (dashboard_info->wifi_status)
+        {
+            gui_obj_hidden(wifi, false);
+        }
+        else
+        {
+            gui_obj_hidden(wifi, true);
+        }
+        if (dashboard_info->led_turn_l_status)
+        {
+            if (cnt % 10 == 0)
+            {
+                if (((gui_img_t *)led_turn_l)->data == TURNLEFT_OFF_BIN)
+                {
+                    gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_ON_BIN);
+                }
+                else
+                {
+                    gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
+                }
+            }
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led_turn_l), TURNLEFT_OFF_BIN);
+        }
+        if (dashboard_info->led_turn_r_status)
+        {
+            if (cnt % 10 == 0)
+            {
+                if (((gui_img_t *)led_turn_r)->data == TURNRIGHT_OFF_BIN)
+                {
+                    gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_ON_BIN);
+                }
+                else
+                {
+                    gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+                }
+            }
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led_turn_r), TURNRIGHT_OFF_BIN);
+        }
+        if (dashboard_info->led0_status)
+        {
+            gui_img_set_image_data(((gui_img_t *)led0), LED0_ON_BIN);
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led0), LED0_OFF_BIN);
+        }
+        if (dashboard_info->led1_status)
+        {
+            gui_img_set_image_data(((gui_img_t *)led1), LED1_ON_BIN);
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led1), LED1_OFF_BIN);
+        }
+        if (dashboard_info->led2_status)
+        {
+            gui_img_set_image_data(((gui_img_t *)led2), LED2_ON_BIN);
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led2), LED2_OFF_BIN);
+        }
+        if (dashboard_info->led3_status)
+        {
+            gui_img_set_image_data(((gui_img_t *)led3), LED3_ON_BIN);
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led3), LED3_OFF_BIN);
+        }
+        if (dashboard_info->led4_status)
+        {
+            gui_img_set_image_data(((gui_img_t *)led4), LED4_ON_BIN);
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led4), LED4_OFF_BIN);
+        }
+        if (dashboard_info->led5_status)
+        {
+            gui_img_set_image_data(((gui_img_t *)led5), LED5_ON_BIN);
+        }
+        else
+        {
+            gui_img_set_image_data(((gui_img_t *)led5), LED5_OFF_BIN);
+        }
+        if (dashboard_info->map_data_update)
+        {
+            dashboard_info->map_data_update = 0;
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(map, "map", GUI_BASE(win_map));
+            gui_img_set_image_data(((gui_img_t *)map),
+                                   dashboard_info->map_data[dashboard_info->map_data_index]);
+        }
+    }
+    else
+    {
+        // Speed information
+        speed_val += 2;
+        if (speed_val >= SPEED_MAX)
+        {
+            speed_val = 0;
+        }
+
+        // Power information
+        power_val += 2;
+        if (power_val >= POWER_MAX)
+        {
+            power_val = 0;
+        }
+
+        // Odo information
+        odo_val += 1;
+        if (odo_val >= 1000)
+        {
+            odo_val = 0;
+        }
+
+        // Soc information
+        soc_val += 1;
+        if (soc_val >= 100)
+        {
+            soc_val = 0;
+        }
     }
 
-    // Power information
-    power_val += 2;
-    if (power_val >= POWER_MAX)
-    {
-        power_val = 0;
-    }
-
-    // Odo information
-    odo_val += 1;
-    if (odo_val >= 1000)
-    {
-        odo_val = 0;
-    }
-
-    // Soc information
-    soc_val += 1;
-    if (soc_val >= 100)
-    {
-        soc_val = 0;
-    }
     update_text_display();
 }
 
@@ -1101,8 +1240,10 @@ static void dashboard_design(gui_view_t *view)
     gui_obj_add_event_cb(off_icon, press_icon, GUI_EVENT_TOUCH_PRESSED, NULL);
     gui_obj_add_event_cb(off_icon, release_icon, GUI_EVENT_TOUCH_RELEASED, NULL);
 
-    gui_img_create_from_mem(win_common, "bt", BT_BIN, 294, 52, 0, 0);
-    gui_img_create_from_mem(win_common, "wifi", WIFI_BIN, 478, 52, 0, 0);
+    gui_img_t *bt = gui_img_create_from_mem(win_common, "bt", BT_BIN, 294, 52, 0, 0);
+    gui_img_t *wifi = gui_img_create_from_mem(win_common, "wifi", WIFI_BIN, 478, 52, 0, 0);
+    gui_obj_hidden(GUI_BASE(bt), true);
+    gui_obj_hidden(GUI_BASE(wifi), true);
 
     gui_img_create_from_mem(win_common, "led_turn_l", TURNLEFT_OFF_BIN, 20, 90, 0, 0);
     gui_img_create_from_mem(win_common, "led_turn_r", TURNRIGHT_OFF_BIN, 746, 90, 0, 0);

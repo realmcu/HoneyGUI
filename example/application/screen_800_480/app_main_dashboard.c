@@ -12,6 +12,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
 #include "app_main_dashboard.h"
+#include "shell.h"
 
 /*============================================================================*
  *                           Types
@@ -43,7 +44,30 @@ static char low_mem_string[20];
 
 #ifdef _WIN32
 uint8_t *resource_root = NULL;
+
+static gui_dashboard_t dashboard_info =
+{
+    .bt_status = 1,
+    .wifi_status = 0,
+    .led0_status = 1,
+    .led1_status = 0,
+    .led2_status = 1,
+    .led3_status = 0,
+    .led4_status = 1,
+    .led5_status = 0,
+    .led_turn_l_status = 0,
+    .led_turn_r_status = 1,
+    .speed_val = 88,
+    .power_val = 50,
+    .odo_val = 1234,
+    .soc_val = 75,
+    .temp_val = 30,
+    .location = "Suzhou",
+
+};
 #endif
+
+
 
 /*============================================================================*
  *                           Private Functions
@@ -110,6 +134,120 @@ static void fps_create(void *parent)
     gui_text_rendermode_set(t_fps, 2);
 }
 
+#ifdef _WIN32
+void dashboard_info_update(int argc, char *argv[])
+{
+    if (get_dashboard_info() == NULL) { return; }
+    int i = 1;
+    while (i < argc - 1)
+    {
+        if (!strcmp(argv[i], "map"))
+        {
+            if (dashboard_info.map_data_update) { break; }
+
+            extern int open(const char *file, int flags, ...);
+            extern int read(int fd, void *buf, size_t len);
+            extern int close(int fd);
+            char path[100] = "example/application/screen_800_480/root_image_800_480/root/resource/map_";
+            strcat(path, argv[++i]);
+            strcat(path, ".bin");
+            int fd;
+            fd = open(path, 0);
+            if (fd < 0)
+            {
+                printf("open %s Fail!\n", path);
+                break;
+            }
+            void *map_data = gui_malloc(1024 * 500);
+            ssize_t bytes_read = read(fd, map_data, 1024 * 500);
+            if (bytes_read < 0)
+            {
+                printf("read bin file failed!\n");
+                close(fd);
+                break;
+            }
+            close(fd);
+
+            dashboard_info.map_data_update = 1;
+            dashboard_info.map_data_index ^= 1;
+            if (dashboard_info.map_data[dashboard_info.map_data_index])
+            {
+                gui_free(dashboard_info.map_data[dashboard_info.map_data_index]);
+            }
+            dashboard_info.map_data[dashboard_info.map_data_index] = map_data;
+        }
+        else if (!strcmp(argv[i], "speed"))
+        {
+            dashboard_info.speed_val = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "power"))
+        {
+            dashboard_info.power_val = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "odo"))
+        {
+            dashboard_info.odo_val = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "soc"))
+        {
+            dashboard_info.soc_val = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "temp"))
+        {
+            dashboard_info.temp_val = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "location"))
+        {
+            snprintf(dashboard_info.location, sizeof(dashboard_info.location), "%s", argv[++i]);
+        }
+        else if (!strcmp(argv[i], "turn_l"))
+        {
+            dashboard_info.led_turn_l_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "turn_r"))
+        {
+            dashboard_info.led_turn_r_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "bt"))
+        {
+            dashboard_info.bt_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "wifi"))
+        {
+            dashboard_info.wifi_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "led0"))
+        {
+            dashboard_info.led0_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "led1"))
+        {
+            dashboard_info.led1_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "led2"))
+        {
+            dashboard_info.led2_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "led3"))
+        {
+            dashboard_info.led3_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "led4"))
+        {
+            dashboard_info.led4_status = atoi(argv[++i]);
+        }
+        else if (!strcmp(argv[i], "led5"))
+        {
+            dashboard_info.led5_status = atoi(argv[++i]);
+        }
+        ++i;
+    }
+}
+SHELL_EXPORT_CMD(
+    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN) | SHELL_CMD_DISABLE_RETURN,
+    cmd, dashboard_info_update, test);
+#endif
+
 extern const unsigned char _binary_root_0x4400000_bin_start[];
 extern const unsigned char _binary_root_0x4400000_bin_end[];
 extern const unsigned char _binary_root_0x4400000_bin_size[];
@@ -118,6 +256,8 @@ static int app_init(void)
 {
 #ifdef _WIN32
     resource_root = (uint8_t *)_binary_root_0x4400000_bin_start;
+
+    gui_dashboard_info_register(&dashboard_info);
 #endif
     win_map = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
