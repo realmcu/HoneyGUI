@@ -21,9 +21,9 @@
 #include "l3_common.h"
 #include "l3_port.h"
 
-#define GUI_ENABLE_MVE      0
+#define GUI_ENABLE_MVE      1
 
-#ifdef __ARM_FEATURE_MVE
+#if defined(__ARM_FEATURE_MVE) && defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 #if GUI_ENABLE_MVE
 #define GUI_3D_USE_MVE
 #include <arm_mve.h>
@@ -381,9 +381,9 @@ bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right
 {
 #ifdef GUI_3D_USE_MVE
     l3_4x4_matrix_t ptmat;
-    float *a = (float *)input_left->m;
-    float *b = (float *)input_right->m;
-    float *c = (float *)output->m;
+    float *a = (float *)input_left->u.m;
+    float *b = (float *)input_right->u.m;
+    float *c = (float *)output->u.m;
 
     float32x4_t m2;
     float32x4_t out00, out10, out20, out30;
@@ -475,33 +475,36 @@ bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right
 }
 
 
-
 l3_4d_point_t l3_4x4_matrix_mul_4d_point(l3_4x4_matrix_t *mat, l3_4d_point_t p)
 {
 #ifdef GUI_3D_USE_MVE
-    //bug todo
-    // l3_4d_point_t point;
-    // float32x4_t m200, m210, m220, m230;
-    // float32x4_t out;
+    l3_4d_point_t point;
+    uint32x4_t col_offsets = {0, 16, 32, 48};
 
-    // m200 = vldrwq_f32(&mat->u.m[0][0]);
-    // m210 = vldrwq_f32(&mat->u.m[1][0]);
-    // m220 = vldrwq_f32(&mat->u.m[2][0]);
-    // m230 = vldrwq_f32(&mat->u.m[3][0]);
+    float32x4_t col0 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][0],
+                                                      col_offsets); //// col0 = [m[0][0], m[1][0], m[2][0], m[3][0]]
+    float32x4_t col1 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][1],
+                                                      col_offsets); //// col1 = [m[0][1], m[1][1], m[2][1], m[3][1]]
+    float32x4_t col2 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][2],
+                                                      col_offsets); //// col2 = [m[0][2], m[1][2], m[2][2], m[3][2]]
+    float32x4_t col3 = __arm_vldrwq_gather_offset_f32(&mat->u.m[0][3],
+                                                      col_offsets); //// col3 = [m[0][3], m[1][3], m[2][3], m[3][3]]
 
-    // out = vmulq_n_f32(m200, p.x) + vmulq_n_f32(m210, p.y) + vmulq_n_f32(m220, p.z);
-    // out = vaddq_f32(out, m230);
 
-    // vst1q_f32((float *)&point, out);
+
+    float32x4_t out = vmulq_n_f32(col0, p.x) + vmulq_n_f32(col1, p.y) + vmulq_n_f32(col2,
+                                                                                    p.z) + vmulq_n_f32(col3, p.w);
+
+    vst1q_f32((float *)&point, out);
 
     return point;
 #else
     l3_4d_point_t point;
 
-    point.x = mat->u.m[0][0] * p.x + mat->u.m[0][1] * p.y + mat->u.m[0][2] * p.z + mat->u.m[0][3];
-    point.y = mat->u.m[1][0] * p.x + mat->u.m[1][1] * p.y + mat->u.m[1][2] * p.z + mat->u.m[1][3];
-    point.z = mat->u.m[2][0] * p.x + mat->u.m[2][1] * p.y + mat->u.m[2][2] * p.z + mat->u.m[2][3];
-    point.w = mat->u.m[3][0] * p.x + mat->u.m[3][1] * p.y + mat->u.m[3][2] * p.z + mat->u.m[3][3];
+    point.x = mat->u.m[0][0] * p.x + mat->u.m[0][1] * p.y + mat->u.m[0][2] * p.z + mat->u.m[0][3] * p.w;
+    point.y = mat->u.m[1][0] * p.x + mat->u.m[1][1] * p.y + mat->u.m[1][2] * p.z + mat->u.m[1][3] * p.w;
+    point.z = mat->u.m[2][0] * p.x + mat->u.m[2][1] * p.y + mat->u.m[2][2] * p.z + mat->u.m[2][3] * p.w;
+    point.w = mat->u.m[3][0] * p.x + mat->u.m[3][1] * p.y + mat->u.m[3][2] * p.z + mat->u.m[3][3] * p.w;
 
     return point;
 #endif
