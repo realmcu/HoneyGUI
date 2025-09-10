@@ -657,6 +657,7 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
     this->path = font_source;
     this->font_mode = font_mode;
     gui_font_refresh_font_size(this);
+    this->base.h = _UI_MAX(this->base.h, this->font_height);
 }
 
 void gui_text_emoji_set(gui_text_t *this, uint8_t *path, uint8_t size)
