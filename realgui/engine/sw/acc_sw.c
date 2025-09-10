@@ -85,7 +85,7 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         }
     }
 
-    do_raster_no_rle(image, dc, rect);
+    do_raster(image, dc, rect);
 }
 
 

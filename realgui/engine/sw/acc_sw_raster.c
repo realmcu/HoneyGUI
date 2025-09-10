@@ -337,50 +337,7 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     }
 }
 
-
-void do_raster_no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
-{
-    int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
-    if (!draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
-
-    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
-    gui_rgb_data_head_t *head = image->data;
-    char input_type = head->type;
-    int16_t source_w = image->img_w, source_h = image->img_h;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3, opacity_value = image->opacity_value;
-    uint8_t *writebuf = dc->frame_buf;
-    uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = &image->inverse;
-
-    gui_raster_params_t params = { writebuf, 0, image_base, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL};
-    params.palette_index = ((gui_palette_file_t *)head)->palette_index;
-    params.palette_data = ((gui_palette_file_t *)head)->palette_data;
-
-    for (int32_t i = y_start; i <= y_end; i++)
-    {
-        for (int32_t j = x_start; j <= x_end; j++)
-        {
-            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = roundf(X / Z);
-            int y = roundf(Y / Z);
-
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
-            if (rect && ((x > rect->x2) || (x < rect->x1) || (y < rect->y1) || (y > rect->y2))) { continue; }
-
-            int read_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
-            params.image_off = read_off;
-            params.write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j -
-                               dc->section.x1;
-
-            do_raster_pixel(&params);
-        }
-    }
-}
-
-
-void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     int32_t x_start = 0, x_end = 0, y_start = 0, y_end = 0;
     if (!draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end)) { return; }
@@ -394,6 +351,11 @@ void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     gui_matrix_t *inverse = &image->inverse;
 
     gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL};
+    params.image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    params.palette_index = ((gui_palette_file_t *)head)->palette_index;
+    params.palette_data = ((gui_palette_file_t *)head)->palette_data;
+
+    bool use_rle = (head->compress == 1);
     uint8_t rle_pixel[4];
 
     for (int32_t i = y_start; i <= y_end; i++)
@@ -409,11 +371,17 @@ void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
             if (rect && ((x > rect->x2) || (x < rect->x1) || (y < rect->y1) || (y > rect->y2))) { continue; }
 
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
-
-            gui_get_rle_pixel(image, x, y, rle_pixel);
-            params.image_base = (uint32_t)(uintptr_t)rle_pixel;
-            params.write_off = write_off;
+            params.write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j -
+                               dc->section.x1;
+            if (use_rle)
+            {
+                gui_get_rle_pixel(image, x, y, rle_pixel);
+                params.image_base = (uint32_t)(uintptr_t)rle_pixel;
+            }
+            else
+            {
+                params.image_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
+            }
 
             do_raster_pixel(&params);
         }

@@ -61,7 +61,9 @@ bool menu_style = 0;
 char *cjson_content = NULL;
 uint8_t json_refeash_flag = 0;
 struct tm *timeinfo;
-// static struct tm watch_time;
+#ifndef __WIN32
+static struct tm watch_time;
+#endif
 
 /* FPS */
 static char fps[10];

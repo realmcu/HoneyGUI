@@ -267,7 +267,7 @@ void handle_image_blend_mode(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *r
         break;
     default:
         // Handle other cases if necessary
-        do_raster_use_rle(image, dc, rect);
+        do_raster(image, dc, rect);
         break;
     }
 }
@@ -275,7 +275,7 @@ void rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (!is_identity_matrix(&image->matrix))
     {
-        do_raster_use_rle(image, dc, rect);
+        do_raster(image, dc, rect);
         return;
     }
 
@@ -290,5 +290,5 @@ void rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         return;
     }
 
-    do_raster_use_rle(image, dc, rect);
+    do_raster(image, dc, rect);
 }

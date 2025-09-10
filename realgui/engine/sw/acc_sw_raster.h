@@ -20,8 +20,7 @@
 extern "C" {
 #endif
 
-void do_raster_no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
-void do_raster_use_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
+void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
 
 #ifdef __cplusplus
 }
