@@ -887,9 +887,10 @@ LVGL 启用 RLE 解码器
 
 为了在 LVGL 中解码 RLE 压缩的图片资源，需要配置启用 RLE 解码器，并为其分配缓存空间。
 
-1. 启用 RLE 解码器：在配置文件 :file:`lv_conf.h` 中找到 ``LV_USE_RTK_IDU`` 宏定义，并将其设置为启用 ``#define LV_USE_RTK_IDU 1``
+1. 启用 RLE 解码器：在配置文件 :file:`lv_conf.h` 中找到 ``LV_USE_RTK_IDU`` 宏定义，并将其设置为启用（1）
 
-2. 分配解码缓存：在 :file:`lv_conf.h` 文件中配置以下参数：
+2. 分配解码缓存：在 ``lv_conf.h`` 文件中配置以下参数
+
     - ``LV_PSRAM_START``：缓存的起始地址
     - ``LV_PSRAM_SIZE``：缓存空间大小，确保此大小足够容纳所使用的最大整张图片的解码数据
 

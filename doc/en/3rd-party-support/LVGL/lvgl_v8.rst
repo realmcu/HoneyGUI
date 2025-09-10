@@ -177,7 +177,7 @@ Display
 ----------------
 - Documentation:  `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_, `LVGL Overview Display <https://docs.lvgl.io/8.3/overview/display.html>`_
 
-Once the developers have completed the debugging of the display device driver, and the device can communicate properly with the display device and show colors. This section explains how to interface the driver with LVGL's display interface to render LVGL's UI.”
+Once the developers have completed the debugging of the display device driver, and the device can communicate properly with the display device and show colors. This section explains how to interface the driver with LVGL's display interface to render LVGL's UI.
 
 The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function ``void lv_port_disp_init(void)``, such as screen size and frame buffer configuration. The display refresh function is defined as ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``.
 
@@ -573,7 +573,7 @@ HoneyGUI provides support for packaging `ROMFS` file system images:
 
 2. Open the working directory and place the files to be packaged in the :file:`root/` folder. Double-click the :file:`mkromfs_0x4600000.bat` script to generate the file system image :file:`root(0x4600000).bin` and the resource mapping address :file:`resource.h`. The default :guilabel:`base address` of the files is `0x4600000`. :file:`resource.h` records the mapping address of the packaged files. Since `ROMFS` supports direct access using physical addresses, developers can access the resource files directly through the mapping address.
 
-3. Use the :guilabel:`User Data` feature of the MP Tool to download and burn the file system image to flash. The burn address should match the :guilabel:`base address`. If you need to modify the :guilabel:`base address`, you can modify the **"--addr <number>"** parameter in the :file:`mkromfs_0x4600000.bat` script. For example, the following example changes the :guilabel:`base address` from `0x4600000` to `0x4000000`.
+3. Use the :guilabel:`User Data` feature of the MP Tool to download and burn the file system image to flash. The burn address should match the :guilabel:`base address`. If you need to modify the :guilabel:`base address`, you can modify the **'--addr <number>'** parameter in the :file:`mkromfs_0x4600000.bat` script. For example, the following example changes the :guilabel:`base address` from `0x4600000` to `0x4000000`.
 
 .. code-block:: console
 
@@ -598,7 +598,7 @@ The LittleFS file system supports read and write operations and features power-l
 
 1. The working directory is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`. External file resources used by the project will be packaged into a file system image and ultimately downloaded as :guilabel:`User Data`.
 2. Open the working directory and place the files you need to package under the :file:`root/` folder. Double-click the script :file:`mklittlefs_img.bat` to generate the file system image :file:`root.bin`.
-3. Use the :guilabel:`User Data` function in MP Tool to download and write the file system image to flash. To change the size of the file system, modify the **"-s <number>"** parameter in the script :file:`mklittlefs_img.bat`. When using interfaces from :file:`rtk_fs.c` for file operations, ensure that ``RTK_FS_MNT_ADDR`` matches the write address, and ``MAX_LFS_SIZE`` matches the file system size.
+3. Use the :guilabel:`User Data` function in MP Tool to download and write the file system image to flash. To change the size of the file system, modify the **'-s <number>'** parameter in the script :file:`mklittlefs_img.bat`. When using interfaces from :file:`rtk_fs.c` for file operations, ensure that ``RTK_FS_MNT_ADDR`` matches the write address, and ``MAX_LFS_SIZE`` matches the file system size.
 4. If you need to unpack a file system image, double-click the script :file:`unpack_littlefs_img.bat` to unpack :file:`root.bin` into the :file:`root_up/` folder.
 
 
