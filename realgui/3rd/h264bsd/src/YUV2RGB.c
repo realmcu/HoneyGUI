@@ -1,4 +1,4 @@
-#if defined(__ARM_FEATURE_MVE)
+#if defined(__ARM_FEATURE_MVE) && defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 
 #include "arm_mve.h"
 typedef enum

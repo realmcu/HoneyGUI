@@ -794,7 +794,7 @@ u32 *h264bsdNextOutputPictureBGR565(storage_t *pStorage, u32 *picId, u32 *isIdrP
     }
 
 
-#if defined(__ARM_FEATURE_MVE)
+#if defined(__ARM_FEATURE_MVE) && defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
     extern void mve_yuv420_to_rgb565(uint8_t *data, uint8_t *pOutput,
                                      uint32_t width, uint32_t height);
     mve_yuv420_to_rgb565(data, (uint8_t *)pStorage->conversionBuffer, width, height);
