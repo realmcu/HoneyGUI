@@ -139,7 +139,7 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 显示
 -----------------------------
-- 文档说明： `LVGL Display (lv_display) <https://docs.lvgl.io/9.3/details/main-modules/display/index.html>`_ 以及 `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.3/details/main-modules/display/setup.html>`_ 。
+- 文档说明： `LVGL Display (lv_display) <https://docs.lvgl.io/9.3/details/main-modules/display/index.html>`_ 以及 `LVGL Setting Up Your Display(s) <https://docs.lvgl.io/9.3/details/main-modules/display/setup.html>`_
 
 在开发者完成显示设备的驱动功能调试后，设备能够与显示设备正常通信并显示色彩。本小节介绍如何将驱动与 LVGL 的显示接口进行对接以展现 LVGL 的 UI 界面。
 
@@ -479,7 +479,10 @@ LVGL
 
 RTZIP
 ^^^^^^^^^
-将图片编码转换为 RTZIP 格式，支持多种压缩算法和自定义压缩编码参数。 RTZIP 格式是一种无损压缩，支持对透明图层编码。若输入图片带透明但输出格式不带透明度信息，建议使能 :guilabel:`Mix Alpha Channel`，如输入 PNG 图片，输出 ``RGB565``。
+将图片编码转换为 RTZIP 格式，支持多种压缩算法和自定义压缩编码参数。 RTZIP 格式是一种无损压缩，支持对透明图层编码。
+
+Tips:
+   - 若输入图片带透明但输出格式不带透明度信息，建议使能 :guilabel:`Mix Alpha Channel`，如输入 PNG 图片，输出 ``RGB565``。
 
 .. image:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
    :align: center

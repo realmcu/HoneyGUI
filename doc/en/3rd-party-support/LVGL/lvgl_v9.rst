@@ -491,7 +491,7 @@ RTZIP
 This configuration encodes images into the RTZIP format, which supports multiple compression algorithms and customizable compression parameters. RTZIP is a lossless compression format and supports encoding of transparent layers.
 
 Tips:
-  - If the input image contains transparency but the output format does not support alpha (such as when outputting in RGB565), it is recommended to enable the :guilabel:`Mix Alpha Channel` option. Example: Input: PNG with transparency → Output: RGB565 without alpha.
+  - If the input image contains transparency but the output format does not support alpha (such as when outputting in RGB565), it is recommended to enable the :guilabel:`Mix Alpha Channel` option. Example: Input: PNG with transparency → Output: ``RGB565``.
 
 .. image:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
    :align: center
