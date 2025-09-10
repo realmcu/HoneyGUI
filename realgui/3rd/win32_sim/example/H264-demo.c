@@ -28,4 +28,4 @@ static int h264bsd_example(void)
     return 0;
 }
 
-GUI_INIT_APP_EXPORT(h264bsd_example);
+// GUI_INIT_APP_EXPORT(h264bsd_example);

@@ -13,5 +13,11 @@
 			"path": "../nanovg"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"stdio.h": "c",
+			"unistd.h": "c",
+			"*.txt": "c"
+		}
+	}
 }
