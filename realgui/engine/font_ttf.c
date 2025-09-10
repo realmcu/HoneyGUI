@@ -78,7 +78,6 @@ static const uint8_t lookup_table_4b[16] =
 #define GUI_ENABLE_MVE      1
 #ifdef __ARM_FEATURE_MVE
 #if GUI_ENABLE_MVE
-#define GUI_3D_USE_MVE
 #define FONT_TTF_USE_MVE
 #include "arm_mve.h"
 #endif
