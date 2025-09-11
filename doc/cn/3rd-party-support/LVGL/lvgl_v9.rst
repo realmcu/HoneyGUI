@@ -361,6 +361,10 @@ LVGL 基准测试的官方文档位于 :file:`your lvgl dir/lvgl/demos/README.md
 
 从 Demo 入门开发
 ==========================
+
+LVGL 原生 Demo
+-----------------
+
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
 
@@ -371,6 +375,69 @@ LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控
 - `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your lvgl dir/lvgl/src/demo` 下，开发者可直接调用对应的 ``lv_demo_xxx()`` 函数来熟悉了解。
 
 - 在线文档 `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your lvgl dir/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
+
+RTK 扩展 Demo
+-----------------
+
+RTK 基于 LVGL 已有框架，将部分常用的 UI 组件设计封装为了标准的 LVGL 控件或者控件扩展模块，开发者可以直接调用这些控件与模块来快速搭建 UI 界面。
+
+为了方便开发者快速了解 RTK 的扩展控件， RTK 对扩展功能制作了独立 Demo ， 并尽可能使 Demo 足够精简并且便于理解。
+
+RTK 扩展 Demo 入口函数位于 :file:`your lvgl dir rtk/demos/single_demo/ui_init.c` , 其中包含了部分 LVGL 原生 Demo 以及 RTK 扩展 Demo ， 用户可以选择其中任意一个 Demo 执行并查看效果。
+
+所有扩展 Demo 均可使用模拟器运行，开发者可直接在模拟器中查看 Demo 的运行效果，也可以进行修改并快速查看修改后的效果差异。
+
+RTK 扩展 Demo 源码保存在目录 :file:`your lvgl dir rtk/demos/single_demo/xxx/rtk_demo_xxx.c` 下，开发者可直接调用对应的 ``rtk_demo_xxx()`` 函数来熟悉了解。
+
+
+卡片示例
+~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757557061445981954/fe093ccb_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
+蜂窝列表示例
+~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757557520907101802/95926e8f_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
+平铺视图转场示例
+~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757557892430171667/0183d5bd_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
+带有 2.5D 转场特效和快照缓存机制的平铺试图转场示例
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757559644406993741/db4f4ff2_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
 
 
 .. _资源转换器:

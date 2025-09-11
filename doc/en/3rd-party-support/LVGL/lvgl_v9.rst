@@ -359,6 +359,9 @@ Compilation environment: armclang6.22 version, optimization mode -Ofast to enabl
 Getting Started with Demo Development
 =========================================
 
+LVGL Native Demo
+-------------------
+
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
 
@@ -369,6 +372,68 @@ LVGL offers a wealth of demos and examples to help developers become familiar wi
 - The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos, with their source code stored in the directory :file:`your lvgl dir/lvgl/src/demo`. Developers can directly call the corresponding ``lv_demo_xxx()`` functions to familiarize themselves.
 
 - The online documentation `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir/example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
+
+RTK Extension Demo
+-----------------
+
+RTK, based on the existing LVGL framework, encapsulates some commonly used UI components into standard LVGL controls or control extension modules, allowing developers to quickly build UI interfaces by directly calling these controls and modules.
+
+To help developers quickly understand the RTK extension controls, RTK has created an independent demo for the extension features, making the demo as concise and easy to understand as possible.
+
+The entry function for the RTK extension demo is located at :file:`your lvgl dir rtk/demos/single_demo/ui_init.c`, which includes some LVGL native demos and RTK extension demos. Users can choose any demo to execute and view the effects.
+
+All extension demos can be run using a simulator, allowing developers to directly view the demo's running effect in the simulator, as well as modify and quickly see the differences in the modified effects.
+
+The source code for RTK extension demos is stored in the directory :file:`your lvgl dir rtk/demos/single_demo/xxx/rtk_demo_xxx.c`. Developers can directly call the corresponding ``rtk_demo_xxx()`` function to familiarize themselves with it.
+
+
+Card Demo
+~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757557061445981954/fe093ccb_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
+Cellular Demo
+~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757557520907101802/95926e8f_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
+Tileview Transition Demo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757557892430171667/0183d5bd_9325830.gif" width="502" />
+   </div>
+   <br>
+
+
+Tileview Transition Demo with 2.5D Transition Effects and Snapshot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://foruda.gitee.com/images/1757559644406993741/db4f4ff2_9325830.gif" width="502" />
+   </div>
+   <br>
+
 
 .. _Resource Converter:
 
