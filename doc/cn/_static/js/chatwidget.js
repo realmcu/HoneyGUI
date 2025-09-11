@@ -1,5 +1,5 @@
 (function() {
-    function inserChatWidgetHTML(title, placeholder) {
+    function inserChatWidgetHTML(title, placeholder, docSeries) {
         const chatWidgetHTML = `
         <chat-widget>
             <style>
@@ -29,7 +29,7 @@
                     height: 80%;
                     max-width: 100%;
                     max-height: 100%;
-                    min-width: 300px;
+                    min-width: 340px;
                     min-height: 450px;
                 }
                 chat-widget .fullscreen-chat-modal {
@@ -126,6 +126,45 @@
                 chat-widget .chat-content a:focus {
                     color: #3091d1;
                 }
+                .chat-switch-box {
+                    width: 92%;
+                    margin: 10px auto 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    color: #666;
+                }
+                .chat-switch-checkbox {
+                    display: none;
+                }
+                .chat-switch-label {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                    background-color: gray;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                }
+                .chat-switch-label::after {
+                    content: '';
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    width: 16px;
+                    height: 16px;
+                    background-color: white;
+                    border-radius: 50%;
+                    transition: 0.5s;
+                }
+                .chat-switch-checkbox:checked + .chat-switch-label {
+                    background-color: #0068b6;
+                }
+                .chat-switch-checkbox:checked + .chat-switch-label::after {
+                    transform: translateX(20px);
+                }
+
                 chat-widget .chat-input-box {
                     padding: 10px 0 0;
                 }
@@ -163,6 +202,7 @@
                     display: flex;
                     justify-content: flex-start;
                     margin: 5px 0;
+                    overflow-x: auto;
                 }
                 chat-widget .flex-justify-end {
                     justify-content: flex-end;
@@ -236,18 +276,29 @@
                     padding: 4px 10px;
                 }
                 .chat-feedback-box {
+                    display: flex;
+                    // justify-content: space-between;
+                    column-gap: 8px;
+                    row-gap: 8px;
                     margin: 8px 0;
                     font-size: 14px;
+                }
+                .chat-feedback-box .chat-feedback-btn:first-child {
+                    // margin-right: auto;
                 }
                 .chat-feedback-btn {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 4px 10px;
+                    width: 76px;
+                    padding: 3px 6px;
                     border: 1px solid #222e6e;
                     border-radius: 6px;
                     color: #222e6e;
-                    background: transparent; 
+                    background: transparent;
+                }
+                .chat-feedback-btn.btn-scored svg path {
+                    fill: #222e6e;
                 }
                 .chat-feedback-icon {
                     position: relative;
@@ -333,6 +384,14 @@
                         </button>
                     </div>
 
+                    <div class="chat-switch-box">
+                        <div>Only based on ${docSeries} document for Q&A</div>
+                        <div class="chat-switch-button">
+                            <input type="checkbox" class="chat-switch-checkbox" id="DocSwitch" checked>
+                            <label for="DocSwitch" class="chat-switch-label"></label>
+                        </div>
+                    </div>
+
                     <div class="chat-input-box">
                         <div class="chat-input">
                             <textarea id="ChatInputText" placeholder="${placeholder}"></textarea>
@@ -385,8 +444,21 @@
         const chatPlaceholder = config.chatWidgetPlaceholder || 'Type your question';
         const chatAIBase = config.chatAIBase;
         const isMultilingual = window.isMultilingual == "True";
+        let docTarget = "rtl87xxx";
 
-        inserChatWidgetHTML(chatTitle, chatPlaceholder);
+        const aiEnvString = "PROD"; // aiEnv is PROD or QA
+        // docDomain is "https://docs.realmcu.com/" or "https://docsqa.realmcu.com/"
+        const docDomain = "https://docs.realmcu.com/";      // default is formal document
+        let baseProxy = "https://www.realmcu.com/docs/";    // default is formal realmcu site
+        if (aiEnvString.toLowerCase() === "qa") {
+            baseProxy = "https://wwwdev.realmcu.com/docs/";
+        } else if (docDomain.toLowerCase().includes("docsqa.realmcu.com")) {
+            baseProxy = "https://wwwqa.realmcu.com/docs/";
+        }
+        let chatUrl = `${baseProxy}aichatstream`;
+        let feedbackUrl = `${baseProxy}AIFeedback`;
+
+        inserChatWidgetHTML(chatTitle, chatPlaceholder, docTarget);
 
         const userInputNode = document.querySelector('.chat-input textarea');
         const chatModalNode = document.getElementById('ChatModal');
@@ -505,63 +577,151 @@
         });
 
         /* =============== add feedback buttons =============== */
-        const copyInnerHTML = `
-        <span class="chat-feedback-icon">
-            <svg t="1755669476415" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8208" width="16" height="16" data-spm-anchor-id="a313x.search_index.0.i18.16ad3a81O4DMba">
-                <path d="M878.272 981.312H375.36a104.64 104.64 0 0 1-104.64-104.64V375.36c0-57.792 46.848-104.64 104.64-104.64h502.912c57.792 0 104.64 46.848 104.64 104.64v502.912c-1.6 56.192-48.448 103.04-104.64 103.04z m-502.912-616.96a10.688 10.688 0 0 0-10.944 11.008v502.912c0 6.208 4.672 10.88 10.88 10.88h502.976c6.208 0 10.88-4.672 10.88-10.88V375.36a10.688 10.688 0 0 0-10.88-10.944H375.36z" fill="#222e6e" p-id="8209"></path><path d="M192.64 753.28h-45.312a104.64 104.64 0 0 1-104.64-104.64V147.328c0-57.792 46.848-104.64 104.64-104.64h502.912c57.792 0 104.64 46.848 104.64 104.64v49.92a46.016 46.016 0 0 1-46.848 46.912 46.08 46.08 0 0 1-46.848-46.848v-49.984a10.688 10.688 0 0 0-10.944-10.944H147.328a10.688 10.688 0 0 0-10.944 10.88v502.976c0 6.208 4.672 10.88 10.88 10.88h45.312a46.08 46.08 0 0 1 46.848 46.912c0 26.496-21.824 45.248-46.848 45.248z" fill="#222e6e" p-id="8210"></path>
-            </svg>
-        </span>
-        <span class="chat-feedback-text">Copy</span>
+        const copySvg = `
+        <svg t="1755669476415" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8208" width="16" height="16" data-spm-anchor-id="a313x.search_index.0.i18.16ad3a81O4DMba">
+            <path d="M878.272 981.312H375.36a104.64 104.64 0 0 1-104.64-104.64V375.36c0-57.792 46.848-104.64 104.64-104.64h502.912c57.792 0 104.64 46.848 104.64 104.64v502.912c-1.6 56.192-48.448 103.04-104.64 103.04z m-502.912-616.96a10.688 10.688 0 0 0-10.944 11.008v502.912c0 6.208 4.672 10.88 10.88 10.88h502.976c6.208 0 10.88-4.672 10.88-10.88V375.36a10.688 10.688 0 0 0-10.88-10.944H375.36z" fill="#222e6e" p-id="8209"></path><path d="M192.64 753.28h-45.312a104.64 104.64 0 0 1-104.64-104.64V147.328c0-57.792 46.848-104.64 104.64-104.64h502.912c57.792 0 104.64 46.848 104.64 104.64v49.92a46.016 46.016 0 0 1-46.848 46.912 46.08 46.08 0 0 1-46.848-46.848v-49.984a10.688 10.688 0 0 0-10.944-10.944H147.328a10.688 10.688 0 0 0-10.944 10.88v502.976c0 6.208 4.672 10.88 10.88 10.88h45.312a46.08 46.08 0 0 1 46.848 46.912c0 26.496-21.824 45.248-46.848 45.248z" fill="#222e6e" p-id="8210"></path>
+        </svg>
         `;
-        const copyDoneHTML = `
-        <span class="chat-feedback-icon">
-            <svg t="1755756250746" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10267" width="17" height="17">
-                <path d="M784 266.666667h-373.333333c-92.885333 0-144 51.114667-144 144v373.333333c0 92.885333 51.114667 144 144 144h373.333333c92.885333 0 144-51.114667 144-144v-373.333333c0-92.885333-51.114667-144-144-144z m80 517.333333c0 56.832-23.168 80-80 80h-373.333333c-56.832 0-80-23.168-80-80v-373.333333c0-56.832 23.168-80 80-80h373.333333c56.832 0 80 23.168 80 80v373.333333zM160 239.786667v373.76c0 51.114667 20.608 63.701333 27.392 67.882666a32 32 0 1 1-33.450667 54.570667c-38.442667-23.552-57.941333-64.725333-57.941333-122.453333V239.786667c0-91.392 52.48-143.786667 143.786667-143.786667h373.76c71.893333 0 106.24 31.530667 122.453333 57.941333a32 32 0 0 1-54.613333 33.408c-4.096-6.784-16.725333-27.392-67.84-27.392H239.786667c-56.661333 0.042667-79.786667 23.168-79.786667 79.829334z m566.613333 263.808a32 32 0 0 1 0 45.269333l-142.208 142.208a31.957333 31.957333 0 0 1-45.226666 0L468.053333 619.946667a32 32 0 1 1 45.269334-45.269334l48.512 48.469334 119.594666-119.594667a31.957333 31.957333 0 0 1 45.184 0.042667z" fill="#222e6e" p-id="10268"></path>
-            </svg>
-        </span>
-        <span class="chat-feedback-text">Copied</span>
+        const copyDoneSvg = `
+        <svg t="1755756250746" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10267" width="17" height="17">
+            <path d="M784 266.666667h-373.333333c-92.885333 0-144 51.114667-144 144v373.333333c0 92.885333 51.114667 144 144 144h373.333333c92.885333 0 144-51.114667 144-144v-373.333333c0-92.885333-51.114667-144-144-144z m80 517.333333c0 56.832-23.168 80-80 80h-373.333333c-56.832 0-80-23.168-80-80v-373.333333c0-56.832 23.168-80 80-80h373.333333c56.832 0 80 23.168 80 80v373.333333zM160 239.786667v373.76c0 51.114667 20.608 63.701333 27.392 67.882666a32 32 0 1 1-33.450667 54.570667c-38.442667-23.552-57.941333-64.725333-57.941333-122.453333V239.786667c0-91.392 52.48-143.786667 143.786667-143.786667h373.76c71.893333 0 106.24 31.530667 122.453333 57.941333a32 32 0 0 1-54.613333 33.408c-4.096-6.784-16.725333-27.392-67.84-27.392H239.786667c-56.661333 0.042667-79.786667 23.168-79.786667 79.829334z m566.613333 263.808a32 32 0 0 1 0 45.269333l-142.208 142.208a31.957333 31.957333 0 0 1-45.226666 0L468.053333 619.946667a32 32 0 1 1 45.269334-45.269334l48.512 48.469334 119.594666-119.594667a31.957333 31.957333 0 0 1 45.184 0.042667z" fill="#222e6e" p-id="10268"></path>
+        </svg>
         `;
-        const copyFailHTML = `
-        <span class="chat-feedback-icon">
-            <svg t="1755756470581" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="21471" width="17" height="17">
-                <path d="M640.79 54l0.25 0.004a32.569 32.569 0 0 1 0.643 0.015l0.216 0.009c3.454 0.141 6.767 0.83 9.854 1.983 0.02 0.009 0.04 0.016 0.061 0.024 0.131 0.048 0.261 0.098 0.39 0.149l0.092 0.036a30.076 30.076 0 0 1 1.103 0.458l0.106 0.047a31.824 31.824 0 0 1 8.214 5.266l0.123 0.11c0.325 0.288 0.645 0.585 0.96 0.89l0.378 0.372 213.437 213.25 0.063 0.062 0.262 0.266-0.325-0.328a32.645 32.645 0 0 1 0.69 0.71l0.075 0.08a31.898 31.898 0 0 1 4.865 6.793l0.049 0.093A31.865 31.865 0 0 1 886 298.72V896.35c0 41.235-33.444 74.65-74.688 74.65H213.688C172.446 971 139 937.585 139 896.35v-767.7C139 87.416 172.445 54 213.688 54h427.101z m-32.228 64H213.687C207.78 118 203 122.774 203 128.65v767.7c0 5.876 4.778 10.65 10.688 10.65h597.625c5.909 0 10.687-4.774 10.687-10.65v-565.1H640.562c-17.496 0-31.713-14.042-31.995-31.47l-0.005-0.53V118zM663.2 447.233c12.366 12.377 12.481 32.359 0.351 44.877l-0.371 0.377L557.774 597.8 663.18 703.113c12.502 12.49 12.511 32.752 0.02 45.254-12.367 12.378-32.348 12.51-44.878 0.391l-0.377-0.37L512.5 643.033 407.055 748.387c-12.502 12.492-32.764 12.483-45.255-0.02-12.366-12.377-12.481-32.359-0.351-44.877l0.371-0.377L467.225 597.8 361.82 492.487c-12.502-12.49-12.511-32.752-0.02-45.254 12.367-12.378 32.348-12.51 44.878-0.391l0.377 0.37L512.5 552.566l105.445-105.352c12.502-12.492 32.764-12.483 45.255 0.02z m9.362-284.027V267.25h104.135L672.562 163.206z" p-id="21472" fill="#222e6e"></path>
-            </svg>
-        </span>
-        <span class="chat-feedback-text">Failed</span>
+        const copyFailSvg = `
+        <svg t="1755756470581" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="21471" width="17" height="17">
+            <path d="M640.79 54l0.25 0.004a32.569 32.569 0 0 1 0.643 0.015l0.216 0.009c3.454 0.141 6.767 0.83 9.854 1.983 0.02 0.009 0.04 0.016 0.061 0.024 0.131 0.048 0.261 0.098 0.39 0.149l0.092 0.036a30.076 30.076 0 0 1 1.103 0.458l0.106 0.047a31.824 31.824 0 0 1 8.214 5.266l0.123 0.11c0.325 0.288 0.645 0.585 0.96 0.89l0.378 0.372 213.437 213.25 0.063 0.062 0.262 0.266-0.325-0.328a32.645 32.645 0 0 1 0.69 0.71l0.075 0.08a31.898 31.898 0 0 1 4.865 6.793l0.049 0.093A31.865 31.865 0 0 1 886 298.72V896.35c0 41.235-33.444 74.65-74.688 74.65H213.688C172.446 971 139 937.585 139 896.35v-767.7C139 87.416 172.445 54 213.688 54h427.101z m-32.228 64H213.687C207.78 118 203 122.774 203 128.65v767.7c0 5.876 4.778 10.65 10.688 10.65h597.625c5.909 0 10.687-4.774 10.687-10.65v-565.1H640.562c-17.496 0-31.713-14.042-31.995-31.47l-0.005-0.53V118zM663.2 447.233c12.366 12.377 12.481 32.359 0.351 44.877l-0.371 0.377L557.774 597.8 663.18 703.113c12.502 12.49 12.511 32.752 0.02 45.254-12.367 12.378-32.348 12.51-44.878 0.391l-0.377-0.37L512.5 643.033 407.055 748.387c-12.502 12.492-32.764 12.483-45.255-0.02-12.366-12.377-12.481-32.359-0.351-44.877l0.371-0.377L467.225 597.8 361.82 492.487c-12.502-12.49-12.511-32.752-0.02-45.254 12.367-12.378 32.348-12.51 44.878-0.391l0.377 0.37L512.5 552.566l105.445-105.352c12.502-12.492 32.764-12.483 45.255 0.02z m9.362-284.027V267.25h104.135L672.562 163.206z" p-id="21472" fill="#222e6e"></path>
+        </svg>
         `;
-        function addFeedbackComp() {
-            let feeddbackHtml = `
-            <div class="chat-feedback-box">
-                <button class="chat-feedback-btn">${copyInnerHTML}</button>
-            </div>
-            `;
-            return feeddbackHtml;
+        const likeSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm iconify iconify--icon-park-solid" width="18px" height="18px" viewBox="0 0 48 48">
+            <path fill="none" stroke="#222e6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4.189 22.173A2 2 0 0 1 6.181 20H10a2 2 0 0 1 2 2v19a2 2 0 0 1-2 2H7.834a2 2 0 0 1-1.993-1.827zM18 21.375c0-.836.52-1.584 1.275-1.94c1.649-.778 4.458-2.341 5.725-4.454c1.633-2.724 1.941-7.645 1.991-8.772c.007-.158.003-.316.024-.472c.271-1.953 4.04.328 5.485 2.74c.785 1.308.885 3.027.803 4.37c-.089 1.436-.51 2.823-.923 4.201l-.88 2.937h10.857a2 2 0 0 1 1.925 2.543l-5.37 19.016A2 2 0 0 1 36.986 43H20a2 2 0 0 1-2-2z"/>
+        </svg>
+        `;
+        const dislikeSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm iconify iconify--icon-park-outline" width="18px" height="18px" viewBox="0 0 48 48">
+            <path fill="none" stroke="#222e6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4.18 26.834A2 2 0 0 0 6.175 29H10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7.84a2 2 0 0 0-1.993 1.834zM18 26.626c0 .835.52 1.583 1.275 1.94c1.649.777 4.458 2.34 5.725 4.454c1.633 2.723 1.941 7.644 1.991 8.771c.007.158.003.316.024.472c.271 1.953 4.04-.328 5.485-2.74c.785-1.308.885-3.027.803-4.37c-.089-1.435-.51-2.823-.923-4.201l-.88-2.937h10.857a2 2 0 0 0 1.925-2.543l-5.37-19.016A2 2 0 0 0 36.986 5H20a2 2 0 0 0-2 2z"></path>
+        </svg>
+        `;
+        const loadingSvg = `
+        <svg t="1757316892265" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4636" width="18" height="18">
+            <path d="M469.333333 85.333333m42.666667 0l0 0q42.666667 0 42.666667 42.666667l0 128q0 42.666667-42.666667 42.666667l0 0q-42.666667 0-42.666667-42.666667l0-128q0-42.666667 42.666667-42.666667Z" fill="#13227a" opacity=".8" p-id="4637"></path><path d="M469.333333 725.333333m42.666667 0l0 0q42.666667 0 42.666667 42.666667l0 128q0 42.666667-42.666667 42.666667l0 0q-42.666667 0-42.666667-42.666667l0-128q0-42.666667 42.666667-42.666667Z" fill="#13227a" opacity=".4" p-id="4638" data-spm-anchor-id="a313x.search_index.0.i1.16ad3a81Tc0Y2F" class=""></path><path d="M938.666667 469.333333m0 42.666667l0 0q0 42.666667-42.666667 42.666667l-128 0q-42.666667 0-42.666667-42.666667l0 0q0-42.666667 42.666667-42.666667l128 0q42.666667 0 42.666667 42.666667Z" fill="#13227a" opacity=".2" p-id="4639"></path><path d="M298.666667 469.333333m0 42.666667l0 0q0 42.666667-42.666667 42.666667l-128 0q-42.666667 0-42.666667-42.666667l0 0q0-42.666667 42.666667-42.666667l128 0q42.666667 0 42.666667 42.666667Z" fill="#13227a" opacity=".6" p-id="4640"></path><path d="M783.530667 180.138667m30.169889 30.169889l0 0q30.169889 30.169889 0 60.339779l-90.509668 90.509668q-30.169889 30.169889-60.339779 0l0 0q-30.169889-30.169889 0-60.339779l90.509668-90.509668q30.169889-30.169889 60.339779 0Z" fill="#13227a" opacity=".1" p-id="4641"></path><path d="M330.965333 632.661333m30.16989 30.16989l0 0q30.169889 30.169889 0 60.339778l-90.509668 90.509668q-30.169889 30.169889-60.339779 0l0 0q-30.169889-30.169889 0-60.339778l90.509668-90.509668q30.169889-30.169889 60.339779 0Z" fill="#13227a" opacity=".5" p-id="4642"></path><path d="M843.861333 783.530667m-30.169889 30.169889l0 0q-30.169889 30.169889-60.339779 0l-90.509668-90.509668q-30.169889-30.169889 0-60.339779l0 0q30.169889-30.169889 60.339779 0l90.509668 90.509668q30.169889 30.169889 0 60.339779Z" fill="#13227a" opacity=".3" p-id="4643"></path><path d="M391.338667 330.965333m-30.16989 30.16989l0 0q-30.169889 30.169889-60.339778 0l-90.509668-90.509668q-30.169889-30.169889 0-60.339779l0 0q30.169889-30.169889 60.339778 0l90.509668 90.509668q30.169889 30.169889 0 60.339779Z" fill="#13227a" opacity=".7" p-id="4644"></path>
+        </svg>
+        `;
+        const feeddbackHtml = `
+        <div class="chat-feedback-box">
+            <button class="chat-feedback-btn" id="CopyButton">
+                <span class="chat-feedback-icon">${copySvg}</span>
+                <span class="chat-feedback-text">Copy</span>
+            </button>
+            <button class="chat-feedback-btn" id="LikeButton" value="positive">
+                <span class="chat-feedback-icon">${likeSvg}</span>
+                <span class="chat-feedback-text">Like</span>
+            </button>
+            <button class="chat-feedback-btn" id="DislikeButton" value="negative">
+                <span class="chat-feedback-icon">${dislikeSvg}</span>
+                <span class="chat-feedback-text">Dislike</span>
+            </button>
+        </div>
+        `;
+
+        function updateFeedButton(element, icon, text) {
+            element.html(`
+                <span class="chat-feedback-icon">${icon}</span>
+                <span class="chat-feedback-text">${text}</span>
+            `);
         }
 
-        /* =============== listen copy button click =============== */
-        $(".chat-content").on("click", ".chat-feedback-btn", function(e) {
+        /* =============== listen feedback button click =============== */
+        $(".chat-content").on("click", "#CopyButton", function(e) {
             const copyBtn = $(this);
             const chatRespMain = copyBtn.closest('.chatResp');
             if (chatRespMain.length && chatRespMain[0].ansData) {
                 const ansData = chatRespMain[0].ansData;
                 navigator.clipboard.writeText(ansData).then(() => {
-                    copyBtn.html(copyDoneHTML);
+                    updateFeedButton(copyBtn, copyDoneSvg, "Copied");
                 }).catch((error) => {
-                    copyBtn.html(copyFailHTML);
+                    updateFeedButton(copyBtn, copyFailSvg, "Failed");
                 }).finally(() => {
                     setTimeout(() => {
-                        copyBtn.html(copyInnerHTML);
+                        updateFeedButton(copyBtn, copySvg, "Copy");
                     }, 2000);
                 });
             } else {
-                copyBtn.html(copyFailHTML);
+                updateFeedButton(copyBtn, copyFailSvg, "Failed");
                 setTimeout(() => {
-                    copyBtn.html(copyInnerHTML);
+                    updateFeedButton(copyBtn, copySvg, "Copy");
                 }, 2000);
             }
         });
 
-        const docDomain = "https://docs.realmcu.com/";
+        async function aiFeedback(messageId, userReaction) {
+            let resFeedBack = {
+                status: "error",
+                massage: ""
+            };
+
+            const rawBody = {
+                aiEnv: aiEnvString,     // aiEnv is PROD or QA
+                messageId: messageId,   // 当前 session 的标识符
+                userReaction: userReaction,     // 用户反馈，例如 "negative"
+            };
+            try {
+                const response = await fetch(feedbackUrl, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: JSON.stringify(rawBody)
+                });
+                if(response.ok) {
+                    const parsedData = await response.json();
+                    if(parsedData.status == "success") {
+                        resFeedBack.status = "success";
+                        resFeedBack.message = "feedback success!";
+                    }
+                    else {
+                        resFeedBack.message = parsedData.error.message;
+                    }
+                } else {
+                    resFeedBack.message = `Http error with status: ${response.status}, please refresh and try again!`;
+                }
+            } catch (error) {
+                resFeedBack.message = "Internal server error, please refresh and try again!";
+            }
+            return resFeedBack;
+        }
+        $(".chat-content").on("click", "#LikeButton, #DislikeButton", function(e) {
+            e.preventDefault();
+            const opBtn = $(this);
+            const chatRespMain = opBtn.closest('.chatResp');
+            if (!chatRespMain.length) return;
+
+            const opIcon = opBtn.find('.chat-feedback-icon').first();
+            const opIconHTML = opIcon.html();
+            const opText = opBtn.find('.chat-feedback-text').first();
+            const opTextHTML = opText.html();
+
+            updateFeedButton(opBtn, loadingSvg, opTextHTML);
+            const messageId = chatRespMain[0].id;
+            const userReaction = opBtn.val();
+            aiFeedback(messageId, userReaction).then(resFeedBack => {
+                if (resFeedBack.status == "success") {
+                    opBtn.addClass("btn-scored").siblings().removeClass("btn-scored");
+                    updateFeedButton(opBtn, opIconHTML, opTextHTML);
+                } else {
+                    updateFeedButton(opBtn, opIconHTML, "Failed");
+                    setTimeout(() => {
+                        updateFeedButton(opBtn, opIconHTML, opTextHTML);
+                    }, 2000);
+                }
+            }).catch(error => {
+                updateFeedButton(opBtn, opIconHTML, "Failed");
+                setTimeout(() => {
+                    updateFeedButton(opBtn, opIconHTML, opTextHTML);
+                }, 2000);
+            });
+        });
+
         function linkListToHTML(list) {
             docRefsList = [];
             if (!list || list.length === 0) {
@@ -598,7 +758,6 @@
             </div>`;
         }
         function onChatSuccess(mdContent, refs, element) {
-            let feeddbackHtml = addFeedbackComp();
             element.insertAdjacentHTML('beforeend', feeddbackHtml);
             let refsHtml = linkListToHTML(refs);
             element.insertAdjacentHTML('beforeend', refsHtml);
@@ -705,6 +864,7 @@
                             const rawHtml = marked.parse(mdChatText);
                             // const sanitizedHtml = DOMPurify.sanitize(rawHtml);
                             // asstNode.innerHTML = sanitizedHtml;
+                            asstNode.id = parsedChunk.message_id || "";
                             asstNode.innerHTML = rawHtml;
                             asstNode.ansData = mdChatText;
                         } else if (parsedChunk.status === "error") {
@@ -782,10 +942,11 @@
             //     }
             // }
 
+            let docSwitch = document.getElementById('DocSwitch');
             let curVersion = "";
             const rawBody = {
-                aiEnv: "QA",            // aiEnv is PROD or QA
-                docTarget: "",          // optional, 文档标识，用于文档分类
+                aiEnv: aiEnvString,     // aiEnv is PROD or QA
+                docTarget: docSwitch.checked ? docTarget : '',   // optional, 文档标识，用于文档分类
                 rawData: question,      // required, 要詢問 AI 的問句
                 docBase: chatAIBase,    // required, 知識庫id(測試區請使用 2039)
                 docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答
@@ -801,10 +962,6 @@
                 'Content-Type': 'application/x-www-form-urlencoded'
             };
             const body = JSON.stringify(rawBody);
-            let chatUrl = "https://wwwdev.realmcu.com/docs/aichatstream";
-            if (rawBody.aiEnv.toLowerCase() == "prod") {
-                chatUrl = "https://www.realmcu.com/docs/aichatstream";
-            }
             // return fetch config
             return {
                 url: chatUrl,

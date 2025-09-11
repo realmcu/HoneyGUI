@@ -380,7 +380,6 @@ bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right
                        l3_4x4_matrix_t *output)
 {
 #ifdef GUI_3D_USE_MVE
-    l3_4x4_matrix_t ptmat;
     float *a = (float *)input_left->u.m;
     float *b = (float *)input_right->u.m;
     float *c = (float *)output->u.m;
