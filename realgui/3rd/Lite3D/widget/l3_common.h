@@ -32,7 +32,28 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#ifdef CONFIG_SOC_SERIES_RTL87X3G //test code add by wanghao, remove later
+#include "trace.h"
+#include "platform_utils.h"
 
+#define MEASURE_CPU_CYCLES(...) \
+    do { \
+        uint32_t _cycle_start_ = read_cpu_counter(); \
+        { \
+            __VA_ARGS__; \
+        } \
+        uint32_t _cycle_end_ = read_cpu_counter(); \
+        APP_PRINT_INFO2("line = %d, cycles = %u", __LINE__, (_cycle_end_ - _cycle_start_)); \
+    } while (0)
+
+#else
+#define MEASURE_CPU_CYCLES(...) \
+    do { \
+        { \
+            __VA_ARGS__; \
+        } \
+    } while (0)
+#endif
 
 /*============================================================================*
  *                            Macros

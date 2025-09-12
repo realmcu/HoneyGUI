@@ -21,7 +21,7 @@
 #include "l3_common.h"
 #include "l3_port.h"
 
-#define GUI_ENABLE_MVE      1
+#define GUI_ENABLE_MVE      0
 
 #if defined(__ARM_FEATURE_MVE) && defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 #if GUI_ENABLE_MVE

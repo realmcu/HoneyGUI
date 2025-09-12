@@ -120,37 +120,42 @@ void l3_tria_push(l3_model_t *_this)
 
     l3_camera_build_UVN_matrix(&_this->camera);
 
-
-    for (size_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
+    MEASURE_CPU_CYCLES(
     {
-        // local transform
-        if (_this->face_transform_cb != NULL)
+        for (size_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
         {
-            transform_matrix = _this->face_transform_cb(_this, i);
+            // local transform
+            if (_this->face_transform_cb != NULL)
+            {
+                transform_matrix = _this->face_transform_cb(_this, i);
+            }
+
+            l3_tria_face_t *face = &_this->face.tria_face[i];
+            l3_attrib_t *attrib = &_this->desc->attrib;
+
+            size_t vertex_offset = i * 3;
+
+            for (size_t j = 0; j < 3; j++)
+            {
+                l3_vertex_index_t idx = attrib->faces[vertex_offset + j];
+                l3_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
+                l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
+
+                l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
+                face->transform_vertex[j].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+
+                face->transform_vertex[j].u = vt->u;
+                face->transform_vertex[j].v = vt->v;
+            }
+
+            l3_tria_scene(face, &_this->camera);
         }
-
-        l3_tria_face_t *face = &_this->face.tria_face[i];
-        l3_attrib_t *attrib = &_this->desc->attrib;
-
-        size_t vertex_offset = i * 3;
-
-        for (size_t j = 0; j < 3; j++)
-        {
-            l3_vertex_index_t idx = attrib->faces[vertex_offset + j];
-            l3_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
-            l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
-
-            l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
-            face->transform_vertex[j].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
-
-            face->transform_vertex[j].u = vt->u;
-            face->transform_vertex[j].v = vt->v;
-        }
-
-        l3_tria_scene(face, &_this->camera);
     }
+    );
 
-    __l3_push_tria_img(_this);
+    MEASURE_CPU_CYCLES(
+        __l3_push_tria_img(_this);
+    );
 }
 
 void l3_tria_draw(l3_model_t *_this)
