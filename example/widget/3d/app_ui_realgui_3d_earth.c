@@ -11,12 +11,14 @@
 #include "gui_lite3d.h"
 #include "tp_algo.h"
 #include "earth3d/desc.txt"
+#include "earth3d/desc_no_mtl.txt"
 
 static float rot_x_angle = 0.0f;
 static float rot_y_angle = 0.0f;
 
-static void update_earth_animation()
+static void update_earth_animation(void *param)
 {
+    (void)param;
     touch_info_t *tp = tp_get_info();
 
     if (tp->pressed || tp->pressing)
@@ -37,7 +39,12 @@ static void earth_global_cb(l3_model_t *this)
 
 static int app_init(void)
 {
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_AND_SORT, 0, 0, 480, 480);
+#if 0
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_AND_SORT, 0, 46, 410, 410);
+#else
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_no_mtl, L3_DRAW_FRONT_AND_SORT, 0, 46, 410,
+                                           410);
+#endif
 
     l3_set_global_transform(earth_3d, (l3_global_transform_cb)earth_global_cb);
 
