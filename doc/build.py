@@ -146,6 +146,12 @@ if version:
 # BUILD HTML
 os.chdir(doc_path)
 sdk_name = "gui"
+
+if archive:
+  version = "v0.1.test"
+  os.environ["COPY_RST_FILES"] = "true"
+  os.environ["SDK_Name"] = sdk_name
+  
 en_cn_build = [(" -c ./en en ./{}/{} -D language=en".format(html_out, en_html_out), 'en'), (" -c ./cn cn ./{}/{} -D language=zh_CN".format(html_out, cn_html_out), 'cn')]
 for l, p in en_cn_build:
   l_doc_path = os.path.join(doc_path, p)
@@ -237,6 +243,18 @@ for l, p in en_cn_build:
     version_list_file = "https://docsqa.realmcu.com/version_test.txt"
     version_js = os.path.join(html_out_path, r"_static\js\versions.js")
     replace_version_js(version_js, version_list_file)
+
+  if archive:
+    #start rst check step
+    sys.path.append(JenkinsBuild_doc_Dir)
+    from push import run_command_with_realtime_output
+    output = os.path.join(doc_path, "rst_check", sdk_name, l)
+    doc_src_path = os.path.join(doc_path, "src", sdk_name, l)
+    shutil.unpack_archive(os.path.join(doc_path, doc_src_zip), doc_src_path, 'zip')
+    rst_check_config = os.path.join(doc_path, "script/rst_check_config.py")
+    cmd = ["python", os.path.join(JenkinsBuild_doc_Dir, "doc_check/rst_check.py"), output, doc_src_path, html_out_path, rst_check_config]
+    print(cmd)
+    run_command_with_realtime_output(cmd)
 
 shutil.copytree(os.path.join(doc_path, html_out), os.path.join(doc_path, html_out + "_" + sdk_name))
 
