@@ -8,6 +8,9 @@
                 "${workspaceFolder}/../h264bsd/**",
                 "${workspaceFolder}/../Lite3D/**"
             ],
+            "defines": [
+                "__WIN32"
+            ],
             "compilerPath": "C:/mingw64/bin/gcc.exe",
             "cStandard": "${default}",
             "cppStandard": "${default}",

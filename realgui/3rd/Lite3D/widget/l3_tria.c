@@ -38,8 +38,6 @@ static void __l3_push_tria_img(l3_model_t *_this)
     uint16_t render_color = 0;
     uint8_t opacity_value = UINT8_MAX;
 
-    l3_draw_tria_img_t *tria_img = l3_malloc(sizeof(l3_draw_tria_img_t));
-
     for (uint32_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
     {
         if (_this->face.tria_face[i].state & L3_FACESTATE_BACKFACE)
@@ -47,16 +45,18 @@ static void __l3_push_tria_img(l3_model_t *_this)
             continue;
         }
 
-        memset(tria_img, 0x00, sizeof(l3_draw_tria_img_t));
-        memcpy(tria_img, _this->face.tria_face[i].transform_vertex, 3 * sizeof(l3_vertex_t));
+        l3_draw_tria_img_t tria_img;
+
+        memset(&tria_img, 0x00, sizeof(l3_draw_tria_img_t));
+        memcpy(&tria_img, _this->face.tria_face[i].transform_vertex, 3 * sizeof(l3_vertex_t));
 
         int material_id = _this->desc->attrib.material_ids[i];
         if (material_id >= 0)
         {
-            tria_img->fill_data = _this->desc->textures[material_id];
+            tria_img.fill_data = _this->desc->textures[material_id];
             opacity_value = _this->desc->materials[material_id].dissolve * UINT8_MAX;
 
-            if (tria_img->fill_data == NULL) // Fill with material color
+            if (tria_img.fill_data == NULL) // Fill with material color
             {
                 float *color_diffuse = _this->desc->materials[material_id].diffuse;
                 uint8_t color_r = (uint8_t)(*color_diffuse * opacity_value);
@@ -67,34 +67,32 @@ static void __l3_push_tria_img(l3_model_t *_this)
                                ((color_g & 0xFC) << 3) |
                                ((color_b & 0xF8) >> 3);
 
-                tria_img->fill_type = L3_FILL_COLOR_RGB565;
-                tria_img->fill_data = &render_color;
+                tria_img.fill_type = L3_FILL_COLOR_RGB565;
+                tria_img.fill_data = &render_color;
             }
             else // Fill with texture image
             {
-                tria_img->fill_type = L3_FILL_IMAGE_RGB565;
+                tria_img.fill_type = L3_FILL_IMAGE_RGB565;
 
-                tria_img->p0.v = 1.0f - tria_img->p0.v; // Inverse v coordinate
-                tria_img->p1.v = 1.0f - tria_img->p1.v;
-                tria_img->p2.v = 1.0f - tria_img->p2.v;
+                tria_img.p0.v = 1.0f - tria_img.p0.v; // Inverse v coordinate
+                tria_img.p1.v = 1.0f - tria_img.p1.v;
+                tria_img.p2.v = 1.0f - tria_img.p2.v;
             }
         }
         else
         {
-            float nz = fabsf(tria_img->p0.normal.uz);
+            float nz = fabsf(tria_img.p0.normal.uz);
             uint8_t color_intensity = (uint8_t)(opacity_value * fmaxf(0.0f, fminf(1.0f, nz)));
             render_color = ((color_intensity & 0xF8) << 8) |
                            ((color_intensity & 0xFC) << 3) |
                            ((color_intensity & 0xF8) >> 3);
-            tria_img->fill_type = L3_FILL_COLOR_RGB565;
-            tria_img->fill_data = &render_color;
+            tria_img.fill_type = L3_FILL_COLOR_RGB565;
+            tria_img.fill_data = &render_color;
         }
 
-        l3_draw_tria_to_canvas(tria_img, _this->combined_img, depthBuffer);
-
+        l3_draw_tria_to_canvas(&tria_img, _this->combined_img, depthBuffer);
     }
 
-    l3_free(tria_img);
     l3_free(depthBuffer);
 
     _this->combined_img->img_w = width;
