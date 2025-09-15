@@ -435,6 +435,39 @@ RTK 扩展 Demo 源码保存在目录 :file:`your lvgl dir rtk/demos/single_demo
    </div>
    <br>
 
+平铺视图（ tileview ）是一个容器小部件，其子元素为瓦片（ tile ），可以以网格形式排列。用户可以通过滑动在瓦片之间导航。如果平铺视图是屏幕大小，用户界面类似智能手表上的界面。
+
+RTK 扩展 Demo 中包含了一个平铺视图转场示例，该示例创建了一组平铺试图，并对每个瓦片增加了独立的转场效果，例如缩放、淡入淡出等。
+
+与原生 LVGL 平铺视图不同，本 Demo 中的平铺视图转场过程支持跟手拖拽滑动，更加符合用户的操作习惯。
+
+如果想要使用平铺转场效果，开发者需要对每个瓦片设置转场效果，并对平铺试图增加转场事件回调。
+
+转场效果以及回调函数在软件包中已经封装完毕，可以直接使用，源码保存在 :file:`lv_custom_tileview_slide.c` 中。
+
+平铺视图转场示例的完整代码请参考 :file:`rtk_demo_tileview_slide.c` 中的 ``rtk_demo_tileview_slide()`` 函数，此处提供一个精简版本与上文介绍对应理解：
+
+.. code-block:: c
+   :emphasize-lines: 14,15,16
+
+   tileview_slide_t slide_info;
+   SLIDE_EFFECT center_effect = CLASSIC;
+   SLIDE_EFFECT right_effect = SCALE;
+   ......
+
+   void rtk_demo_tileview_slide_snapshot(void)
+   {
+      lv_obj_t *tv = lv_tileview_create(lv_screen_active());
+      ......
+      lv_obj_t *tile_center = lv_tileview_add_tile(tv, 1, 1, LV_DIR_VER);
+      lv_obj_t *tile_right = lv_tileview_add_tile(tv, 2, 1, LV_DIR_VER);
+      ......
+
+      lv_obj_set_user_data(tile_center, &center_effect);
+      lv_obj_set_user_data(tile_right, &right_effect);
+      lv_obj_add_event_cb(tv, tileview_custom_cb, LV_EVENT_ALL, &slide_info);
+   }
+
 
 带有 2.5D 转场特效和快照缓存机制的平铺试图转场示例
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -447,7 +480,87 @@ RTK 扩展 Demo 源码保存在目录 :file:`your lvgl dir rtk/demos/single_demo
    </div>
    <br>
 
+本示例与上一个实例创建了一组相同的平铺试图，并额外增加了 2.5D 转场特效与快照缓存机制。
 
+2.5D 转场特效目前支持盒、旋转、立方体三种效果，开发者可以参考 :file:`lv_custom_tileview_slide.c` 的已有特效代码继续扩充。
+
+如果想要使用 2.5D 转场效果，需要对每个瓦片设置转场效果，并使能 LVGL 中的配置项 ``LV_DRAW_TRANSFORM_USE_MATRIX`` 。
+
+启用快照机制，需要开发者在每个瓦片下创建一个控件，用来管理快照缓存图像和实际的页面内容，并且新增两个快照事件，用来响应转场过程中快照的创建和销毁。
+
+开发者可以参考 :file:`rtk_demo_tileview_slide.c` 中的 ``rtk_demo_tileview_slide_snapshot()`` 函数，进行二次开发，此处提供一个精简版本与上文介绍对应理解：
+
+.. code-block:: c
+
+   tileview_slide_t slide_info;
+   ......
+   SLIDE_EFFECT right2_effect = BOX;
+   SLIDE_EFFECT right3_effect = CUBE_ROTATION;
+   SLIDE_EFFECT right4_effect = ROTATION;
+
+   static tile_info_t tile_cfg[] =
+   {
+      ......
+      , {3, 1, LV_DIR_HOR,   LV_PALETTE_AMBER,  "Right2", &right2_effect}
+      , {4, 1, LV_DIR_HOR,   LV_PALETTE_ORANGE, "Right3", &right3_effect}
+      , {5, 1, LV_DIR_LEFT,  LV_PALETTE_BROWN,  "Right4", &right4_effect}
+   };
+
+   static lv_obj_t *snapshot_tile_base_create(lv_obj_t *tile, uint32_t event_create,
+                                             uint32_t event_delete)
+   {
+      // Mandatory: Create the src_tile object and snapshot
+      lv_obj_t *src_tile = lv_obj_create(tile);
+      lv_obj_remove_style_all(src_tile);
+      lv_obj_set_size(src_tile, LV_PCT(100), LV_PCT(100));
+      create_snapshot_obj_with_enent(tile, tile, event_create, event_delete);
+      return src_tile;
+   }
+
+   static void create_snapshot_tile_content(lv_obj_t *tile, lv_palette_t palette, const char *text,
+                                          uint32_t event_create, uint32_t event_delete)
+   {
+      lv_obj_t *src_tile = snapshot_tile_base_create(tile, event_create, event_delete);
+      ......
+   }
+
+   static inline void bind_tile_effect(lv_obj_t *tile, SLIDE_EFFECT *effect)
+   {
+      // Mandatory: Always associate effect data with tile user data.
+      lv_obj_set_user_data(tile, effect);
+   }
+
+   void rtk_demo_tileview_slide_snapshot(void)
+   {
+      event_snapshot_creat  = lv_event_register_id();
+      event_snapshot_delete = lv_event_register_id();
+
+      slide_info.scrolling = false;
+      slide_info.snapshot = true;
+      slide_info.create_snapshot = event_snapshot_creat;
+      slide_info.delete_snapshot = event_snapshot_delete;
+
+      lv_obj_t *tv = lv_tileview_create(lv_screen_active());
+      ......
+
+      for (size_t i = 0; i < sizeof(tile_cfg) / sizeof(tile_cfg[0]); i++)
+      {
+         lv_obj_t *tile = lv_tileview_add_tile(tv, tile_cfg[i].col, tile_cfg[i].row, tile_cfg[i].dir);
+         bind_tile_effect(tile, tile_cfg[i].effect);
+         create_snapshot_tile_content(tile, tile_cfg[i].palette, tile_cfg[i].text, event_snapshot_creat,
+                                       event_snapshot_delete);
+      }
+
+      lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_OFF);
+      lv_obj_add_event_cb(tv, tileview_custom_cb, LV_EVENT_ALL, &slide_info);
+   }
+
+
+.. note::
+  1. 2.5D 转场特效需要支持矩阵绘制的 LVGL 版本以及支持矩阵绘制的硬件平台
+  2. 使用 2.5D 转场特效，需要同时启用平铺试图的快照缓存机制
+  3. 快照缓存机制可以单独启用，用于优化转场过程中的性能
+  4. 快照缓存机制需要较大的内存空间
 
 
 .. _资源转换器:

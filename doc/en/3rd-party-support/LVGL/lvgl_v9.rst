@@ -432,6 +432,39 @@ Tileview Transition Demo
    </div>
    <br>
 
+Tileview is a container widget whose child elements are tiles, which can be arranged in a grid format. Users can navigate between tiles by swiping. If the tileview is the size of the screen, the user interface resembles that on a smartwatch.
+
+The RTK Extension Demo includes a tileview transition example, which creates a set of tileviews and adds independent transition effects to each tile, such as scaling, fading, etc.
+
+Unlike the native LVGL tileview, the tileview transition process in this demo supports drag-and-swipe interactions, making it more in line with user operation habits.
+
+If you want to use tile transition effects, developers need to set transition effects for each tile and add transition event callbacks to the tileview.
+
+The transition effects and callback functions are already encapsulated in the software package and can be used directly. The source code is saved in :file:`lv_custom_tileview_slide.c`.
+
+For the complete code of the tileview transition example, please refer to the ``rtk_demo_tileview_slide()`` function in :file:`rtk_demo_tileview_slide.c`. Here is a simplified version for understanding in correspondence with the above introduction:
+
+.. code-block:: c
+   :emphasize-lines: 14,15,16
+
+   tileview_slide_t slide_info;
+   SLIDE_EFFECT center_effect = CLASSIC;
+   SLIDE_EFFECT right_effect = SCALE;
+   ......
+
+   void rtk_demo_tileview_slide_snapshot(void)
+   {
+      lv_obj_t *tv = lv_tileview_create(lv_screen_active());
+      ......
+      lv_obj_t *tile_center = lv_tileview_add_tile(tv, 1, 1, LV_DIR_VER);
+      lv_obj_t *tile_right = lv_tileview_add_tile(tv, 2, 1, LV_DIR_VER);
+      ......
+
+      lv_obj_set_user_data(tile_center, &center_effect);
+      lv_obj_set_user_data(tile_right, &right_effect);
+      lv_obj_add_event_cb(tv, tileview_custom_cb, LV_EVENT_ALL, &slide_info);
+   }
+
 
 Tileview Transition Demo with 2.5D Transition Effects and Snapshot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -443,6 +476,87 @@ Tileview Transition Demo with 2.5D Transition Effects and Snapshot
    <img src="https://foruda.gitee.com/images/1757559644406993741/db4f4ff2_9325830.gif" width="502" />
    </div>
    <br>
+
+This example, along with the previous one, creates the same set of tiled views and additionally incorporates 2.5D transition effects and a snapshot caching mechanism.
+
+The 2.5D transition effects currently support three types: box, rotation, and cube. Developers can refer to the existing effect code in :file:`lv_custom_tileview_slide.c` for further expansion.
+
+To use the 2.5D transition effects, you need to set the transition effect for each tile and enable the configuration option ``LV_DRAW_TRANSFORM_USE_MATRIX`` in LVGL.
+
+To enable the snapshot mechanism, developers must create a control under each tile to manage the snapshot cache image and the actual page content, and add two new snapshot events to handle the creation and destruction of snapshots during transitions.
+
+Developers can refer to the :file:`rtk_demo_tileview_slide_snapshot()` function in ``rtk_demo_tileview_slide.c`` for further development. Here is a simplified version to correspond with the understanding introduced above:
+
+.. code-block:: c
+
+   tileview_slide_t slide_info;
+   ......
+   SLIDE_EFFECT right2_effect = BOX;
+   SLIDE_EFFECT right3_effect = CUBE_ROTATION;
+   SLIDE_EFFECT right4_effect = ROTATION;
+
+   static tile_info_t tile_cfg[] =
+   {
+      ......
+      , {3, 1, LV_DIR_HOR,   LV_PALETTE_AMBER,  "Right2", &right2_effect}
+      , {4, 1, LV_DIR_HOR,   LV_PALETTE_ORANGE, "Right3", &right3_effect}
+      , {5, 1, LV_DIR_LEFT,  LV_PALETTE_BROWN,  "Right4", &right4_effect}
+   };
+
+   static lv_obj_t *snapshot_tile_base_create(lv_obj_t *tile, uint32_t event_create,
+                                             uint32_t event_delete)
+   {
+      // Mandatory: Create the src_tile object and snapshot
+      lv_obj_t *src_tile = lv_obj_create(tile);
+      lv_obj_remove_style_all(src_tile);
+      lv_obj_set_size(src_tile, LV_PCT(100), LV_PCT(100));
+      create_snapshot_obj_with_enent(tile, tile, event_create, event_delete);
+      return src_tile;
+   }
+
+   static void create_snapshot_tile_content(lv_obj_t *tile, lv_palette_t palette, const char *text,
+                                          uint32_t event_create, uint32_t event_delete)
+   {
+      lv_obj_t *src_tile = snapshot_tile_base_create(tile, event_create, event_delete);
+      ......
+   }
+
+   static inline void bind_tile_effect(lv_obj_t *tile, SLIDE_EFFECT *effect)
+   {
+      // Mandatory: Always associate effect data with tile user data.
+      lv_obj_set_user_data(tile, effect);
+   }
+
+   void rtk_demo_tileview_slide_snapshot(void)
+   {
+      event_snapshot_creat  = lv_event_register_id();
+      event_snapshot_delete = lv_event_register_id();
+
+      slide_info.scrolling = false;
+      slide_info.snapshot = true;
+      slide_info.create_snapshot = event_snapshot_creat;
+      slide_info.delete_snapshot = event_snapshot_delete;
+
+      lv_obj_t *tv = lv_tileview_create(lv_screen_active());
+      ......
+
+      for (size_t i = 0; i < sizeof(tile_cfg) / sizeof(tile_cfg[0]); i++)
+      {
+         lv_obj_t *tile = lv_tileview_add_tile(tv, tile_cfg[i].col, tile_cfg[i].row, tile_cfg[i].dir);
+         bind_tile_effect(tile, tile_cfg[i].effect);
+         create_snapshot_tile_content(tile, tile_cfg[i].palette, tile_cfg[i].text, event_snapshot_creat,
+                                       event_snapshot_delete);
+      }
+
+      lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_OFF);
+      lv_obj_add_event_cb(tv, tileview_custom_cb, LV_EVENT_ALL, &slide_info);
+   }
+
+.. note::
+  1. The 2.5D transition effects require an LVGL version that supports matrix rendering and a hardware platform that supports matrix rendering.
+  2. To use 2.5D transition effects, you need to enable the snapshot caching mechanism for tiled views.
+  3. The snapshot caching mechanism can be enabled independently to optimize performance during transitions.
+  4. The snapshot caching mechanism requires a large amount of memory space.
 
 
 .. _Resource Converter:
