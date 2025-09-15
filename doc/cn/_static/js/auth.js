@@ -9,8 +9,11 @@ $.ajax({
     xhrFields: {
         withCredentials: true // 发送请求时需携带cookie
     },
-    error: function (err) {   
-        window.location.href = `${rmcuBase}/${language}/Home/Error`;
+    error: function (err) {
+        let curHost = window.location.hostname || "";
+        if (curHost.toLowerCase().includes(".realmcu.com")) {
+            window.location.href = `${rmcuBase}/${language}/Home/Error`;
+        }
     },
     success: function (resp) {
         var data = resp.Data;
