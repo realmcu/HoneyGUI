@@ -875,6 +875,7 @@
                     } catch (error) {
                         // go on
                     }
+                    messageNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 };
 
                 const reader = response.body.getReader();
@@ -968,7 +969,8 @@
                 options: {
                     method,
                     headers,
-                    body
+                    body,
+                    credentials: 'include'
                 }
             };
         }

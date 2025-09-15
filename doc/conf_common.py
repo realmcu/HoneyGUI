@@ -95,21 +95,21 @@ intersphinx_mapping = {
 }
 
 exclude_patterns = [
-    'doc/cn/widgets/gui_window.rst',
-    'doc/cn/widgets/gui_soccer.rst',
-    'doc/cn/sample/86box/86box.rst',
-    'doc/cn/sample/Calculator/Demo.rst',
-    'doc/cn/sample/Status-bar/Status bar.rst',
-    'doc/cn/sample/Timer/Timer.rst',
-    'doc/cn/sample/WatchfaceMarket/WatchfaceMarket.rst',
+    'cn/widgets/gui_window.rst',
+    'cn/widgets/gui_soccer.rst',
+    'cn/sample/86box/86box.rst',
+    'cn/sample/Calculator/Demo.rst',
+    'cn/sample/Status-bar/Status bar.rst',
+    'cn/sample/Timer/Timer.rst',
+    'cn/sample/WatchfaceMarket/WatchfaceMarket.rst',
 
-    'doc/en/widgets/gui_window.rst',
-    'doc/en/widgets/gui_soccer.rst',
-    'doc/en/sample/86box/86box.rst',
-    'doc/en/sample/Calculator/Demo.rst',
-    'doc/en/sample/Status-bar/Status bar.rst',
-    'doc/en/sample/Timer/Timer.rst',
-    'doc/en/sample/WatchfaceMarket/WatchfaceMarket.rst',
+    'en/widgets/gui_window.rst',
+    'en/widgets/gui_soccer.rst',
+    'en/sample/86box/86box.rst',
+    'en/sample/Calculator/Demo.rst',
+    'en/sample/Status-bar/Status bar.rst',
+    'en/sample/Timer/Timer.rst',
+    'en/sample/WatchfaceMarket/WatchfaceMarket.rst',
 ]
 
 # The default language to highlight source code in. The default is 'python'.
