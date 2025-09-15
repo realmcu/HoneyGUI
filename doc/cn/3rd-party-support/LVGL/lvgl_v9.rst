@@ -393,6 +393,12 @@ RTK 扩展 Demo 源码保存在目录 :file:`your lvgl dir rtk/demos/single_demo
 卡片示例
 ~~~~~~~~~~~~
 
+用户可以使用 ``lv_card_view_create`` 函数创建 card view 容器控件，其子控件只能是 card 控件，该函数可以配置显示风格，子控件 card 的高度、间隔和总数量以及设计函数，通过用户自定义的设计函数完成对 card 控件中 UI 内容的设计，支持动态创建即 card 控件在进入显示区域时才会被创建并调用设计函数，退出显示区域就会被清理。
+
+用户可以使用 ``lv_card_view_set_number`` 函数设置 card view 控件的子控件 card 的数量。
+
+用户可以使用 ``lv_card_view_set_offset`` 函数设置 card view 控件的偏移量。
+
 .. raw:: html
 
    <br>
@@ -404,6 +410,10 @@ RTK 扩展 Demo 源码保存在目录 :file:`your lvgl dir rtk/demos/single_demo
 
 蜂窝列表示例
 ~~~~~~~~~~~~~~~~
+
+用户可以使用 ``lv_cellular_create_with_icon`` 函数创建 cellular 容器控件，需要提供图像描述指针数组以及回调函数指针数组。
+
+用户可以使用 ``lv_cellular_set_offset`` 函数设置 cellular 控件的偏移量。
 
 .. raw:: html
 

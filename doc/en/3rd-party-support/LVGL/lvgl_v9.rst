@@ -390,6 +390,12 @@ The source code for RTK extension demos is stored in the directory :file:`your l
 Card Demo
 ~~~~~~~~~~~~
 
+Users can use the ``lv_card_view_create`` function to create a card view container widget. The child widget can only be the card widget. This function can configure the display style, the height, interval, total number of the card widget, and the design function. The design of the UI content in the card widget is completed through the user-defined design function. It supports dynamic creation, that is, the card widget will be created and design function will be called when entering the display area, and when exiting display area the card widget will be cleaned.
+
+Users can use the ``lv_card_view_set_number`` function to set the number of card widgets.
+
+Users can use the ``lv_card_view_set_offset`` function to set the offset of the card view widget.
+
 .. raw:: html
 
    <br>
@@ -401,6 +407,10 @@ Card Demo
 
 Cellular Demo
 ~~~~~~~~~~~~~~~~
+
+Users can use the ``lv_cellular_create_with_icon`` function to create a cellular container widget, and you need to provide an array of image description pointers and an array of callback function pointers.
+
+Users can use the ``lv_cellular_set_offset`` function to set the offset of the cellular widget.
 
 .. raw:: html
 
