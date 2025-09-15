@@ -151,7 +151,7 @@ bool l3_generate_3x3_matrix(l3_2d_point_t *src, l3_2d_point_t *dst, float *ret)
 
 #if 1
 // Set the intial cube rotation degree and step.
-static const int16_t sin_table[] =
+static int16_t sin_table[] =
 {
     0,     572,   1144,  1715,  2286,  2856,  3425,  3993,  4560,  5126,  5690,  6252,  6813,  7371,  7927,  8481,
     9032,  9580,  10126, 10668, 11207, 11743, 12275, 12803, 13328, 13848, 14364, 14876, 15383, 15886, 16383, 16876,
@@ -221,7 +221,7 @@ l3_4d_vector_t l3_4d_vector_unit(l3_4d_vector_t v)
         vec.ux = v.ux / square;
         vec.uy = v.uy / square;
         vec.uz = v.uz / square;
-        vec.uw = 1;
+        vec.uw = 1.0f;
         return vec;
     }
     return v;
@@ -232,7 +232,7 @@ l3_4d_vector_t l3_4d_vector_cross(l3_4d_vector_t v1, l3_4d_vector_t v2)
     vec.ux = v1.uy * v2.uz - v2.uy * v1.uz;
     vec.uy = v1.uz * v2.ux - v2.uz * v1.ux;
     vec.uz = v1.ux * v2.uy - v2.ux * v1.uy;
-    vec.uw = 1;
+    vec.uw = 1.0f;
     return vec;
 }
 
@@ -519,7 +519,7 @@ static void l3_generate_rotate_around_line(l3_4x4_matrix_t *mrot, float px, floa
                                            float ux, float uy, float uz, float angle_degrees)
 {
     // Normalize the direction vector (u)
-    float mag = sqrt(ux * ux + uy * uy + uz * uz);
+    float mag = sqrtf(ux * ux + uy * uy + uz * uz);
     float a = ux / mag, b = uy / mag, c = uz / mag;
 
     // Step 1: Translate to the origin

@@ -135,17 +135,36 @@ void l3_tria_push(l3_model_t *_this)
 
             size_t vertex_offset = i * 3;
 
-            for (size_t j = 0; j < 3; j++)
+            //for (size_t j = 0; j < 3; j++)
             {
-                l3_vertex_index_t idx = attrib->faces[vertex_offset + j];
+                l3_vertex_index_t idx = attrib->faces[vertex_offset + 0];
                 l3_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
                 l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
                 l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
-                face->transform_vertex[j].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[0].u = vt->u;
+                face->transform_vertex[0].v = vt->v;
+            }
+            {
+                l3_vertex_index_t idx = attrib->faces[vertex_offset + 1];
+                l3_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
+                l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
-                face->transform_vertex[j].u = vt->u;
-                face->transform_vertex[j].v = vt->v;
+                l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
+                face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[1].u = vt->u;
+                face->transform_vertex[1].v = vt->v;
+            }
+            {
+                l3_vertex_index_t idx = attrib->faces[vertex_offset + 2];
+                l3_vertex_coordinate_t *v = &attrib->vertices[idx.v_idx];
+                l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
+
+                l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
+                face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[2].u = vt->u;
+                face->transform_vertex[2].v = vt->v;
             }
 
             l3_tria_scene(face, &_this->camera);
