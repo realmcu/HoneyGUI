@@ -250,7 +250,7 @@ for l, p in en_cn_build:
     from push import run_command_with_realtime_output
     output = os.path.join(doc_path, "rst_check", sdk_name, l)
     doc_src_path = os.path.join(doc_path, "src", sdk_name, l)
-    shutil.unpack_archive(os.path.join(doc_path, doc_src_zip), doc_src_path, 'zip')
+    shutil.unpack_archive(os.path.join(doc_path, doc_src_zip + '.zip'), doc_src_path, 'zip')
     rst_check_config = os.path.join(doc_path, "script/rst_check_config.py")
     cmd = ["python", os.path.join(JenkinsBuild_doc_Dir, "doc_check/rst_check.py"), output, doc_src_path, html_out_path, rst_check_config]
     print(cmd)
