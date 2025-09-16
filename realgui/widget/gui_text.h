@@ -58,9 +58,23 @@ typedef enum
     SCROLL_Y           = 0x31,
     SCROLL_Y_REVERSE   = 0x32,
     SCROLL_X_REVERSE   = 0x33,
-    /* VERTICAL */
-    VERTICAL_LEFT      = 0x40,
-    VERTICAL_RIGHT     = 0x41,
+    /* VERTICAL LEFT
+    &  CLOCKWISE*/
+    VERTICAL_LEFT_TOP  = 0x40,
+    VERTICAL_LEFT_MID  = 0x41,
+    VERTICAL_LEFT_BOT  = 0x42,
+    /* VERTICAL RIGHT
+    &  COUNTERCLOCKWISE*/
+    VERTICAL_RIGHT_TOP = 0x50,
+    VERTICAL_RIGHT_MID = 0x51,
+    VERTICAL_RIGHT_BOT = 0x52,
+    /* RTL */
+    RTL_RIGHT          = 0x60,
+    RTL_CENTER         = 0x61,
+    RTL_LEFT           = 0x62,
+    RTL_MULTI_RIGHT    = 0x63,
+    RTL_MULTI_CENTER   = 0x64,
+    RTL_MULTI_LEFT     = 0x65,
 } TEXT_MODE;
 /* TEXT_MODE end */
 
@@ -135,8 +149,8 @@ typedef struct gui_text
 /** @brief  Text line structure. */
 typedef struct gui_text_line
 {
-    uint16_t line_char;
-    uint16_t line_dx;
+    int16_t index;
+    int16_t offset;
 } gui_text_line_t;
 
 /*============================================================================*

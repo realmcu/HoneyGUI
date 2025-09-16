@@ -2320,7 +2320,39 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                          GUI_STRINGS_EQUAL(alignV, "top") &&
                          rotation == 90)
                 {
-                    style = VERTICAL_LEFT;
+                    style = VERTICAL_LEFT_TOP;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "center") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == 90)
+                {
+                    style = VERTICAL_LEFT_MID;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "right") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == 90)
+                {
+                    style = VERTICAL_LEFT_BOT;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "right") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == -90)
+                {
+                    style = VERTICAL_RIGHT_TOP;
+                }
+                else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
+                         GUI_STRINGS_EQUAL(alignH, "center") &&
+                         GUI_STRINGS_EQUAL(scroll, "none") &&
+                         GUI_STRINGS_EQUAL(alignV, "top") &&
+                         rotation == -90)
+                {
+                    style = VERTICAL_RIGHT_MID;
                 }
                 else if (GUI_STRINGS_EQUAL(lineMode, "multi") &&
                          GUI_STRINGS_EQUAL(alignH, "left") &&
@@ -2328,7 +2360,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                          GUI_STRINGS_EQUAL(alignV, "top") &&
                          rotation == -90)
                 {
-                    style = VERTICAL_RIGHT;
+                    style = VERTICAL_RIGHT_BOT;
                 }
             }
             gui_text_t *t = 0;

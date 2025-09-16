@@ -770,7 +770,7 @@ static void gui_text_draw(gui_obj_t *obj)
     draw_rect.y1 = text->offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w - 1;
     draw_rect.y2 = draw_rect.y1 + obj->h - 1;
-    if (text->mode != VERTICAL_LEFT)
+    if (text->mode != VERTICAL_LEFT_TOP)
     {
         draw_rect.xboundleft = draw_rect.x1;
         draw_rect.xboundright = draw_rect.x2;
