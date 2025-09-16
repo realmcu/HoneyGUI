@@ -155,6 +155,7 @@ static void font_file_init(void)
 static void test_event_cb(void *obj, gui_event_t e, void *param)
 {
     gui_obj_t *this = (gui_obj_t *)obj;
+    GUI_UNUSED(param);
     gui_log("Event test obj name = %s, e = 0x%x !\n", this->name, e);
 }
 
@@ -166,6 +167,7 @@ static void test_event_cb(void *obj, gui_event_t e, void *param)
 static void test_timer_cb(void *param)
 {
     gui_log("timer cb test!\n");
+    GUI_UNUSED(param);
 }
 
 /**

@@ -117,6 +117,7 @@ static void ui_text_font(gui_view_t *view)
         gui_text_type_set(text4[i], font32b4, FONT_SRC_MEMADDR);
         gui_text_use_matrix_by_img(text4[i], 1);
     }
+    GUI_UNUSED(text8);
     /*todobyluke*/
     // for (int i = 0; i < FONT_NUM; i++)
     // {

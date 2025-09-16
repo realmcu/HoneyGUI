@@ -98,7 +98,7 @@ gui_list_t *list;
 
 static void load_font_file_list(void)
 {
-    for (int i = 0; i < LANGUAGE_COUNT; i++)
+    for (int i = 0; i < (int)LANGUAGE_COUNT; i++)
     {
         if (strcmp(languages[i].isoCode, "zh") == 0)
         {
@@ -190,6 +190,9 @@ static void hebrew_render_test(void)
 
 static void return_language_list(void *obj, gui_event_t e, void *param)
 {
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
     gui_obj_hidden((gui_obj_t *)return_text, true);
     gui_obj_hidden((gui_obj_t *)list, false);
     gui_obj_tree_free((gui_obj_t *)single_text);
@@ -197,6 +200,9 @@ static void return_language_list(void *obj, gui_event_t e, void *param)
 
 static void single_language_test(void *obj, gui_event_t e, void *param)
 {
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
     uint16_t index = ((gui_list_note_t *)obj)->index;
     char *isoCode = languages[index].isoCode;
     gui_obj_hidden((gui_obj_t *)list, true);
@@ -226,6 +232,7 @@ static void single_language_test(void *obj, gui_event_t e, void *param)
 
 static void note_design(gui_obj_t *obj, void *p)
 {
+    GUI_UNUSED(p);
     uint16_t index = ((gui_list_note_t *)obj)->index;
 
     gui_text_t *localname = gui_text_create(obj, "text", 0, 0, 140, 0);
