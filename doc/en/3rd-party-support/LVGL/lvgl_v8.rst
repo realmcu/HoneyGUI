@@ -5,7 +5,7 @@ Use LVGL V8 to Design
 LVGL Introduction
 ==========================
 - `LVGL Website <https://lvgl.io/>`_
-- `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
+- `LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_
 - `LVGL Intro <https://docs.lvgl.io/8.3/intro/index.html>`_
 
 LVGL (Light and Versatile Graphics Library) is the most popular free and open-source embedded graphics library to create beautiful UIs for any MCU, MPU and display type. LVGL  provides everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
@@ -147,7 +147,7 @@ The directories and files related to LVGL in HoneyGUI are as follows:
 
    - demos: Contains various comprehensive built-in examples of LVGL. Some examples can be experienced on  `LVGL Demo <https://lvgl.io/demos>`_ .
 
-   - docs: Contains the development documentation for LVGL. It can be read online on the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_.
+   - docs: Contains the development documentation for LVGL. It can be read online on the LVGL documentation site: `LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_.
 
    - env_support: Provides support for various environments or platforms.
 
@@ -911,9 +911,9 @@ Development Resources
 
 Online Doucument
 ------------------
-- `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
+- `LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_
 
-The `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ provides comprehensive technical documentation and tutorials to help developers better understand and use the LVGL graphics library. The documentation includes the following:
+The `LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_ provides comprehensive technical documentation and tutorials to help developers better understand and use the LVGL graphics library. The documentation includes the following:
 
 - Overview and features: The documentation introduces the basic concepts and features of LVGL, including graphical objects, screen management, event handling, theme styles, and more. Users can read the documentation to understand the core functionality and advantages of LVGL.
 
@@ -947,7 +947,6 @@ The LVGL GitHub repository is an important platform for developers to use and co
 Designer
 -----------------------------
 
-.. <!-- - GUI Guider: [NXP GUI Guider](https://www.nxp.com/design/design-center/software/development-software/gui-guider:GUI-GUIDER) -->
 
 - GUI Guider: Free
 - Squareline: `Squareline Studio <https://squareline.io/>`_, Paid

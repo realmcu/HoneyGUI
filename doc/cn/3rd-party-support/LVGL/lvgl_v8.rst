@@ -7,7 +7,7 @@
 LVGL 简介
 ==========================
 - `LVGL 官网 <https://lvgl.io/>`_
-- `LVGL 在线文档 <https://docs.lvgl.io/master/intro/index.html>`_
+- `LVGL 在线文档 <https://docs.lvgl.io/8.3/intro/index.html>`_
 - `LVGL 简介 <https://docs.lvgl.io/8.3/intro/index.html>`_
 
 LVGL（Light and Versatile Graphics Library）是最受欢迎的免费开源嵌入式图形库，可为任何 MCU、MPU 和显示类型创建漂亮的用户界面，提供了一切你需要创建嵌入式 GUI 所需的功能，包括易于使用的图形元素、美观的视觉效果和低内存占用。
@@ -158,7 +158,7 @@ HoneyGUI LVGL
 
 - demos：存放 LVGL 一些综合的内置示例，部分示例可以在 `LVGL Demo <https://lvgl.io/demos>`_ 中体验。
 
-- docs：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：`LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_ 。
+- docs：存放 LVGL 的开发文档，可在 LVGL 的文档站点在线阅读：`LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_ 。
 
 - env_support：一些环境或者平台的支持。
 
@@ -946,9 +946,9 @@ LVGL 启用 RLE 解码器
 
 在线文档
 ---------
-- `LVGL Document <https://docs.lvgl.io/master/intro/index.html>`_
+- `LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_
 
-LVGL 的 `在线文档 <https://docs.lvgl.io/master/intro/index.html>`_ 提供了全面的技术文档和教程，帮助开发者更好地了解和使用 LVGL 图形库。该文档包含以下内容：
+LVGL 的 `在线文档 <https://docs.lvgl.io/8.3/intro/index.html>`_ 提供了全面的技术文档和教程，帮助开发者更好地了解和使用 LVGL 图形库。该文档包含以下内容：
 
 - 概述和特性：文档介绍了 LVGL 的基本概念和特性，包括图形对象、屏幕管理、事件处理、主题样式等。用户可以通过阅读文档了解 LVGL 的核心功能和优势。
 
@@ -984,7 +984,6 @@ LVGL 的 GitHub 仓库是开发者使用和贡献 LVGL 的重要平台：
 设计器
 -----------------------------
 
-.. <!-- - GUI Guider: `NXP GUI Guider <https://www.nxp.com/design/design-center/software/development-software/gui-guider:GUI-GUIDER>`_ -->
 
 - GUI Guider: 免费
 - Squareline: `Squareline Studio <https://squareline.io/>`_，付费
