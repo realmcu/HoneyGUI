@@ -597,6 +597,37 @@ l3_4d_vector_t l3_4d_vector(float ux, float uy, float uz)
     return vector;
 }
 
+
+// Helper function to determine triangle orientation
+void l3_adjust_triangle_winding(l3_vertex_t *p0, l3_vertex_t *p1, l3_vertex_t *p2)
+{
+    float x01m;
+    float x0 = p0->position.x;
+    float y0 = p0->position.y;
+    float x1 = p1->position.x;
+    float y1 = p1->position.y;
+    float x2 = p2->position.x;
+    float y2 = p2->position.y;
+
+    if (x0 == x1)
+    {
+        x01m = x0;
+    }
+    else
+    {
+        float k01 = (y0 - y1) / (x0 - x1);
+        float b01 = y0 - k01 * x0;
+        x01m = (y2 - b01) / k01;
+    }
+
+    if (x01m > x2)
+    {
+        l3_vertex_t t = *p2;
+        *p2 = *p1;
+        *p1 = t;
+    }
+}
+
 void l3_calculator_4x4_matrix(l3_4x4_matrix_t *matrix, \
                               float tx, float ty, float tz, \
                               l3_4d_point_t point, l3_4d_vector_t vector, float degrees, \

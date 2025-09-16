@@ -488,6 +488,14 @@ l3_description_t *l3_load_description(void *desc_addr);
 void l3_camera_build_UVN_matrix(l3_camera_t *camera);
 
 /**
+ * @brief Adjusts the winding order of a triangle's vertices to ensure correct face culling.
+ * @param p0 Pointer to the first vertex of the triangle.
+ * @param p1 Pointer to the second vertex of the triangle.
+ * @param p2 Pointer to the third vertex of the triangle.
+ */
+void l3_adjust_triangle_winding(l3_vertex_t *p0, l3_vertex_t *p1, l3_vertex_t *p2);
+
+/**
  * @brief Initializes the world matrix with translation, rotation, and scaling.
  * @param world Pointer to the world matrix.
  * @param x Translation along the x-axis.

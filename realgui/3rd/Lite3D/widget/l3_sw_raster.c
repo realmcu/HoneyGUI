@@ -315,39 +315,10 @@ bool l3_draw_img_target_area(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect
 
 
 
-// Helper function to determine triangle orientation
-static void determine_triangle_orientation(l3_vertex_t *p0, l3_vertex_t *p1, l3_vertex_t *p2)
-{
-    float x01m;
-    float x0 = p0->position.x;
-    float y0 = p0->position.y;
-    float x1 = p1->position.x;
-    float y1 = p1->position.y;
-    float x2 = p2->position.x;
-    float y2 = p2->position.y;
-
-    if (x0 == x1)
-    {
-        x01m = x0;
-    }
-    else
-    {
-        float k01 = (y0 - y1) / (x0 - x1);
-        float b01 = y0 - k01 * x0;
-        x01m = (y2 - b01) / k01;
-    }
-
-    if (x01m > x2)
-    {
-        l3_vertex_t t = *p2;
-        *p2 = *p1;
-        *p1 = t;
-    }
-}
 
 // Calculate edge properties (slope and intercept)
-static void calculate_edge_properties(float x0, float y0, float x1, float y1,
-                                      bool *infinite, float *k, float *b)
+static void l3_get_line_params(float x0, float y0, float x1, float y1,
+                               bool *infinite, float *k, float *b)
 {
     if (x0 == x1)
     {
@@ -771,7 +742,7 @@ __attribute__((weak)) void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image,
 
     float midy = p2.position.y < p1.position.y ? p2.position.y : p1.position.y;
 
-    determine_triangle_orientation(&p0, &p1, &p2);
+    l3_adjust_triangle_winding(&p0, &p1, &p2);
 
     // Reassignment and reordering of vertex coordinates and texture coordinates
     x0 = p0.position.x; y0 = p0.position.y; z0 = p0.position.z; s0 = p0.u; t0 = p0.v;
@@ -779,8 +750,8 @@ __attribute__((weak)) void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image,
     x2 = p2.position.x; y2 = p2.position.y; z2 = p2.position.z; s2 = p2.u; t2 = p2.v;
 
     // Calculate slope and intercept
-    calculate_edge_properties(x0, y0, x1, y1, &k01infinite, &k01, &b01);
-    calculate_edge_properties(x0, y0, x2, y2, &k02infinite, &k02, &b02);
+    l3_get_line_params(x0, y0, x1, y1, &k01infinite, &k01, &b01);
+    l3_get_line_params(x0, y0, x2, y2, &k02infinite, &k02, &b02);
 
     // Pre calculate constants
     inv_z0 = 1.0f / z0;
@@ -890,14 +861,14 @@ __attribute__((weak)) void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image,
 
     midy = p2.position.y < p1.position.y ? p1.position.y : p2.position.y;
 
-    determine_triangle_orientation(&p0, &p1, &p2);
+    l3_adjust_triangle_winding(&p0, &p1, &p2);
 
     x0 = p0.position.x; y0 = p0.position.y; z0 = p0.position.z; s0 = p0.u; t0 = p0.v;
     x1 = p1.position.x; y1 = p1.position.y; z1 = p1.position.z; s1 = p1.u; t1 = p1.v;
     x2 = p2.position.x; y2 = p2.position.y; z2 = p2.position.z; s2 = p2.u; t2 = p2.v;
 
-    calculate_edge_properties(x0, y0, x1, y1, &k01infinite, &k01, &b01);
-    calculate_edge_properties(x0, y0, x2, y2, &k02infinite, &k02, &b02);
+    l3_get_line_params(x0, y0, x1, y1, &k01infinite, &k01, &b01);
+    l3_get_line_params(x0, y0, x2, y2, &k02infinite, &k02, &b02);
 
     // Pre calculate constants
     inv_z0 = 1.0f / z0;
