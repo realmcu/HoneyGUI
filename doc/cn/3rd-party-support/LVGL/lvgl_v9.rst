@@ -470,7 +470,7 @@ RTK 扩展 Demo 中包含了一个平铺视图转场示例，该示例创建了�
 
 
 带有 2.5D 转场特效和快照缓存机制的平铺试图转场示例
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -562,6 +562,60 @@ RTK 扩展 Demo 中包含了一个平铺视图转场示例，该示例创建了�
   3. 快照缓存机制可以单独启用，用于优化转场过程中的性能
   4. 快照缓存机制需要较大的内存空间
 
+3D 模型示例
+~~~~~~~~~~~~~~~~
+
+LVGL 中集成了 Realtek 自研的 Lite3D 引擎，并封装为控件 ``lv_lite3d``，用户可以该控件加载和渲染 3D 模型。关于 Lite3D 引擎的详细介绍请参考 :ref:`3D 模型 (3D Model)` 。
+
+使用步骤：
+
+  1. 准备 3D 模型的描述文件。
+  2. 调用 Lite3D 库中的 ``l3_create_model()`` 函数创建 3D 模型。
+  3. 使用 ``l3_set_global_transform()`` 函数对 3D 模型进行全局变换，包括初始化世界坐标系和相机坐标系。
+  4. 使用 ``l3_set_face_transform()`` 函数对 3D 模型的不同面进行局部变换。（可选）
+  5. 调用 ``lv_lite3d_create()`` 函数创建 ``lv_lite3d`` 控件，并将 3D 模型与该控件进行绑定。
+  6. 使用 ``lv_lite3d_set_click_cb()`` 函数为 ``lv_lite3d`` 控件设置点击事件回调函数。（可选）
+
+以下提供了一个圆盘的 3D 模型示例，示例代码保存在 :file:`rtk_demo_lite3d_disc.c` 中：
+
+.. code-block:: c
+
+   void rtk_demo_lite3d_disc(void)
+   {
+   #if LV_DRAW_TRANSFORM_USE_MATRIX != 1
+      LV_LOG_WARN("It's recommended to enable LV_DRAW_TRANSFORM_USE_MATRIX for 3D");
+   #endif
+      lv_obj_t *screen = lv_scr_act();
+      lv_obj_set_style_bg_color(screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+      l3_model_t *disc_3d = l3_create_model((void *)_acdesc_disc, L3_DRAW_FRONT_ONLY, 15, 0,
+                                             DISC_MODEL_WIDTH, DISC_MODEL_HEIGHT);
+      l3_set_global_transform(disc_3d, (l3_global_transform_cb)disc_global_cb);
+      l3_set_face_transform(disc_3d, (l3_face_transform_cb)disc_face_cb);
+      lv_obj_t *lite3d_disc = lv_lite3d_create(screen, disc_3d);
+
+      l3_model_t *disc_cube = l3_create_model((void *)_acdesc_disc_cube, L3_DRAW_FRONT_AND_SORT, 15, 0,
+                                             DISC_MODEL_WIDTH,
+                                             DISC_MODEL_HEIGHT);
+      l3_set_global_transform(disc_cube, (l3_global_transform_cb)disc_global_cb);
+      l3_set_face_transform(disc_cube, (l3_face_transform_cb)disc_cube_face_cb);
+      lv_obj_t *lite3d_disc_cube = lv_lite3d_create(screen, disc_cube);
+
+      lv_lite3d_set_click_cb(lite3d_disc, disc_click_cb);
+      lv_lite3d_set_click_cb(lite3d_disc_cube, disc_click_cb);
+      lv_timer_t *timer = lv_timer_create(update_disc_animation, 16, lite3d_disc);
+   }
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://docs.realmcu.com/HoneyGUI/image/Lite3D/lvgl_disc.gif" width="502" />
+   </div>
+   <br>
+
+.. note::
+   需要使能 LVGL 中的配置项 ``LV_DRAW_TRANSFORM_USE_MATRIX``。
 
 .. _资源转换器:
 

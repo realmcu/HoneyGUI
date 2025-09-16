@@ -161,7 +161,7 @@
 ------
 
 简单文本控件
-~~~~~~~~~~
+~~~~~~~~~~~~~
 .. literalinclude:: ../../../example/widget/text/example_gui_text.c
    :language: c
    :start-after: /* gui text widget example start*/

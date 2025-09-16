@@ -85,7 +85,7 @@ Text Input
 Text widget supports the input setting. You can use this function to set input :cpp:any:`gui_text_input_set`.
 
 Text Modes
-^^^^^^^^
+^^^^^^^^^^^
 The text control currently supports 21 types of layout modes, including the following categories:
 
  + Single-line layout modes (3 types): Suitable for scenarios displaying only one line of text, such as single-line centered, left-aligned, right-aligned, etc.

@@ -592,7 +592,7 @@ HoneyGUI provides support for packaging `ROMFS` file system images:
 
 
 LittleFS File System Image
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The LittleFS file system supports read and write operations and features power-loss protection. HoneyGUI provides packaging support for LittleFS file system images:
 

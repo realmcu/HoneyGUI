@@ -7,7 +7,7 @@ HoneyGUI Porting
 HoneyGUI is a lightweight embedded GUI system optimized for Realtek series chips. This document will guide you through compiling the HoneyGUI library on different Realtek chip platforms, including both Armclang and Armcc compiler environments.
 
 Important Notes
--------------
+----------------
 - Ensure Keil MDK and CMake are properly installed
 - Make sure all required dependencies are installed before compilation
 - If compilation errors occur, verify the chip model specification
@@ -29,13 +29,13 @@ Important Notes
    Default path for Armclang
 
 Build Requirements
-----------------
+-------------------
 - CMake 3.15 or above
 - Keil MDK 5 or above
 - Windows OS
 
 Armcc Compilation
----------------
+------------------
 Supported chips:
   - RTL8773E (default)
   - RTL8763E
@@ -94,7 +94,7 @@ Build steps:
     - Library file: E:/HoneyGUI/lib/armcc/install/lib/gui.lib
 
 Armclang Compilation
-------------------
+---------------------
 Supported chips:
   - RTL8762G (default)
   - RTL8762D
@@ -147,7 +147,7 @@ Build steps:
     - Library file: E:/HoneyGUI/lib/armclang/install/lib/gui.lib
 
 Project Porting Example
-----------------------
+-------------------------
 
 This example demonstrates porting to RTL8773GWP dashboard project.
 

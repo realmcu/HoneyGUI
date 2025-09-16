@@ -374,7 +374,7 @@ LVGL offers a wealth of demos and examples to help developers become familiar wi
 - The online documentation `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_ displays the running effects of various examples, with their source code stored in the directory :file:`your lvgl dir/example`. Developers can directly call the corresponding ``lv_example_xxx()`` functions to familiarize themselves with controls and understand features.
 
 RTK Extension Demo
------------------
+-------------------
 
 RTK, based on the existing LVGL framework, encapsulates some commonly used UI components into standard LVGL controls or control extension modules, allowing developers to quickly build UI interfaces by directly calling these controls and modules.
 
@@ -558,6 +558,60 @@ Developers can refer to the :file:`rtk_demo_tileview_slide_snapshot()` function 
   3. The snapshot caching mechanism can be enabled independently to optimize performance during transitions.
   4. The snapshot caching mechanism requires a large amount of memory space.
 
+3D Model Demo
+~~~~~~~~~~~~~~~~
+
+LVGL integrates Realtek's self-developed Lite3D engine, encapsulated as the ``lv_lite3d`` widget. Users can use this widget to load and render 3D models. For a detailed introduction to the Lite3D engine, please refer to :ref:`3D Model`.
+
+Usage Steps:
+
+  1. Prepare the description file for the 3D model.
+  2. Call the ``l3_create_model()`` function from the Lite3D library to create the 3D model.
+  3. Use the ``l3_set_global_transform()`` function to apply a global transformation to the 3D model, including initializing the world and camera coordinate systems.
+  4. Use the ``l3_set_face_transform()`` function to apply local transformations to different faces of the 3D model. (Optional)
+  5. Call the ``lv_lite3d_create()`` function to create the ``lv_lite3d`` widget and bind the 3D model to it.
+  6. Use the ``lv_lite3d_set_click_cb()`` function to set a click event callback for the ``lv_lite3d`` widget. (Optional)
+
+The following provides an example of a 3D disc model. The sample code is saved in :file:`rtk_demo_lite3d_disc.c`:
+
+.. code-block:: c
+
+   void rtk_demo_lite3d_disc(void)
+   {
+   #if LV_DRAW_TRANSFORM_USE_MATRIX != 1
+      LV_LOG_WARN("It's recommended to enable LV_DRAW_TRANSFORM_USE_MATRIX for 3D");
+   #endif
+      lv_obj_t *screen = lv_scr_act();
+      lv_obj_set_style_bg_color(screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+      l3_model_t *disc_3d = l3_create_model((void *)_acdesc_disc, L3_DRAW_FRONT_ONLY, 15, 0,
+                                             DISC_MODEL_WIDTH, DISC_MODEL_HEIGHT);
+      l3_set_global_transform(disc_3d, (l3_global_transform_cb)disc_global_cb);
+      l3_set_face_transform(disc_3d, (l3_face_transform_cb)disc_face_cb);
+      lv_obj_t *lite3d_disc = lv_lite3d_create(screen, disc_3d);
+
+      l3_model_t *disc_cube = l3_create_model((void *)_acdesc_disc_cube, L3_DRAW_FRONT_AND_SORT, 15, 0,
+                                             DISC_MODEL_WIDTH,
+                                             DISC_MODEL_HEIGHT);
+      l3_set_global_transform(disc_cube, (l3_global_transform_cb)disc_global_cb);
+      l3_set_face_transform(disc_cube, (l3_face_transform_cb)disc_cube_face_cb);
+      lv_obj_t *lite3d_disc_cube = lv_lite3d_create(screen, disc_cube);
+
+      lv_lite3d_set_click_cb(lite3d_disc, disc_click_cb);
+      lv_lite3d_set_click_cb(lite3d_disc_cube, disc_click_cb);
+      lv_timer_t *timer = lv_timer_create(update_disc_animation, 16, lite3d_disc);
+   }
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center">
+   <img src="https://docs.realmcu.com/HoneyGUI/image/Lite3D/lvgl_disc.gif" width="502" />
+   </div>
+   <br>
+
+.. note::
+   The configuration option ``LV_DRAW_TRANSFORM_USE_MATRIX`` in LVGL needs to be enabled.
 
 .. _Resource Converter:
 
@@ -804,7 +858,7 @@ Additional Features:
 - Supports importing configuration information, importing configuration files in JSON format
 
 Development Resources Support
-==========================
+==============================
 
 Online Documentation
 ---------------------
