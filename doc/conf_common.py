@@ -95,21 +95,13 @@ intersphinx_mapping = {
 }
 
 exclude_patterns = [
-    'cn/widgets/gui_window.rst',
-    'cn/widgets/gui_soccer.rst',
-    'cn/sample/86box/86box.rst',
-    'cn/sample/Calculator/Demo.rst',
-    'cn/sample/Status-bar/Status bar.rst',
-    'cn/sample/Timer/Timer.rst',
-    'cn/sample/WatchfaceMarket/WatchfaceMarket.rst',
-
-    'en/widgets/gui_window.rst',
-    'en/widgets/gui_soccer.rst',
-    'en/sample/86box/86box.rst',
-    'en/sample/Calculator/Demo.rst',
-    'en/sample/Status-bar/Status bar.rst',
-    'en/sample/Timer/Timer.rst',
-    'en/sample/WatchfaceMarket/WatchfaceMarket.rst',
+    'widgets/gui_window.rst',
+    'widgets/gui_soccer.rst',
+    'sample/86box/86box.rst',
+    'sample/Calculator/Demo.rst',
+    'sample/Status-bar/Status bar.rst',
+    'sample/Timer/Timer.rst',
+    'sample/WatchfaceMarket/WatchfaceMarket.rst',
 ]
 
 # The default language to highlight source code in. The default is 'python'.
