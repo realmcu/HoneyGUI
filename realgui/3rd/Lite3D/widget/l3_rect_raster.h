@@ -3,7 +3,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file l3_port.h
+  * @file
   * @brief
   * @details
   * @author
@@ -19,8 +19,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef L3_PORT_H
-#define L3_PORT_H
+#ifndef L3_RECT_RASTER_H
+#define L3_RECT_RASTER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,22 +34,6 @@ extern "C" {
 #include <stdint.h>
 #include "l3_common.h"
 
-/*============================================================================*
- *                            Custom Define
- *============================================================================*/
-
-/**
- * @brief Allocates memory of the specified size using a custom allocator.
- * @param size The size of memory to allocate in bytes.
- * @return Pointer to the allocated memory block.
- */
-void *l3_malloc(size_t size);
-
-/**
- * @brief Frees memory allocated by l3_malloc.
- * @param ptr Pointer to the memory block to free.
- */
-void l3_free(void *ptr);
 
 /**
  * @brief Draws a rectangular image onto a canvas within the specified rectangle area.

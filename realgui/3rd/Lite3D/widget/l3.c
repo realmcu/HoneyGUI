@@ -27,7 +27,6 @@
 #include "l3_tria.h"
 #include "l3_rect.h"
 #include "gui_version.h"
-#include "l3_port.h"
 
 
 /*============================================================================*
@@ -47,6 +46,7 @@ char *l3_version(void)
 
     return version_info;
 }
+
 
 l3_model_t *l3_create_model(void                 *desc_addr,
                             L3_DRAW_TYPE          draw_type,

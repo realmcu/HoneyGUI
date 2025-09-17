@@ -37,6 +37,7 @@ extern "C" {
  *                               Types
  *============================================================================*/
 
+
 /**
  * @brief Callback type for global transformations.
  *
@@ -143,6 +144,13 @@ void l3_free_model(l3_model_t *_this);
  * @return Pointer to the version string.
  */
 char *l3_version(void);
+
+extern void *(*l3_malloc_imp)(size_t size);
+extern void (*l3_free_imp)(void *ptr);
+extern void (*l3_draw_tria_to_canvas_imp)(l3_draw_tria_img_t *image,
+                                          l3_draw_rect_img_t *combined_image, float *zbuffer);
+extern void (*l3_draw_rect_img_to_canvas_imp)(l3_draw_rect_img_t *image, l3_canvas_t *dc,
+                                              l3_rect_t *rect);
 
 #ifdef __cplusplus
 }

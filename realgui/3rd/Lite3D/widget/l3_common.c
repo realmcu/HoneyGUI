@@ -19,7 +19,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "l3_common.h"
-#include "l3_port.h"
 
 #define GUI_ENABLE_MVE      0
 
@@ -931,5 +930,26 @@ bool l3_calulate_draw_img_target_area(l3_draw_rect_img_t *img, l3_rect_t *rect)
     img->img_target_w = ceilf(x_max) - (int16_t)x_min + 1;
     img->img_target_h = ceilf(y_max) - (int16_t)y_min + 1;
     return true;
+}
+
+void *(*l3_malloc_imp)(size_t size) = NULL;
+void (*l3_free_imp)(void *ptr) = NULL;
+
+void *l3_malloc(size_t size)
+{
+    if (l3_malloc_imp != NULL)
+    {
+        return l3_malloc_imp(size);
+    }
+    return malloc(size);
+}
+void l3_free(void *ptr)
+{
+    if (l3_free_imp != NULL)
+    {
+        l3_free_imp(ptr);
+        return;
+    }
+    free(ptr);
 }
 

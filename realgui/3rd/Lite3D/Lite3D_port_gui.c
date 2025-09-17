@@ -17,13 +17,11 @@
 
 #include <stdlib.h>
 #include "l3.h"
-
-
-
 #include "gui_api.h"
 #include "def_file.h"
 #include "draw_img.h"
 #include "acc_api.h"
+#include "gui_components_init.h"
 
 void *l3_port_malloc(size_t size)
 {
@@ -46,9 +44,14 @@ void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
 }
 
 /* Please call this function in a source C file when this file in gui.lib to make sure compiler link this file. */
-void l3_port_init(void)
+static int  l3_init(void)
 {
+    l3_malloc_imp = l3_port_malloc;
+    l3_free_imp = l3_port_free;
+    l3_draw_rect_img_to_canvas_imp = l3_port_draw_rect_img_to_canvas;
     gui_log("Lite3D port initialized\n");
+    return 0;
 }
 
+GUI_INIT_APP_EXPORT(l3_init);
 

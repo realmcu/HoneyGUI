@@ -542,15 +542,8 @@ void l3_calculator_4x4_matrix(l3_4x4_matrix_t *matrix, \
                               float scale);
 
 
-/**
- * @brief Draws a triangle onto a canvas using the specified vertices.
- * @param image Pointer to the triangle data to draw.
- * @param combined_image Pointer to the combined image data.
- * @param zbuffer Pointer to the z-buffer for depth testing.
- */
-void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combined_image,
-                            float *zbuffer);
-
+void *l3_malloc(size_t size);
+void l3_free(void *ptr);
 
 #ifdef __cplusplus
 }

@@ -118,6 +118,9 @@ void do_raster_pixel(const gui_raster_params_t *params);
 void gui_get_rle_pixel(l3_draw_rect_img_t *image, int x, int y, uint8_t *pixel);
 bool l3_draw_img_target_area(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect_t *rect,
                              int32_t *x_start, int32_t *x_end, int32_t *y_start, int32_t *y_end);
+void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
+                          uint8_t *source_alpha,
+                          uint32_t image_base, uint32_t image_off, char input_type);
 
 #ifdef __cplusplus
 }

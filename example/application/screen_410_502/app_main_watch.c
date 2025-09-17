@@ -427,9 +427,6 @@ extern const unsigned char _binary_root_0x704D1400_bin_size[];
 
 static int app_init(void)
 {
-    extern void l3_port_init(void);
-    l3_port_init(); // make sure compiler link Lite3D_port_gui.o
-
 #ifdef _WIN32
     resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
 

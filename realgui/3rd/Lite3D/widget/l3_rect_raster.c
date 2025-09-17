@@ -2,11 +2,11 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
+  * @file acc_sw_raster.c
+  * @brief deal with no rle filter mode
+  * @details input:rgba/rgb/rgb565;output:rgba/rgb565
+  * @author howie_wang@realsil.com.cn
+  * @date 2024/04/09
   * @version 1.0
   ***************************************************************************************
     * @attention
@@ -14,28 +14,25 @@
   ***************************************************************************************
   */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <stdio.h>
 #include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include "l3_port.h"
+#include <stdint.h>
 #include "l3_sw_raster.h"
+#include "l3_common.h"
 
-// Default malloc/free functions
+void (*l3_draw_rect_img_to_canvas_imp)(l3_draw_rect_img_t *image, l3_canvas_t *dc,
+                                       l3_rect_t *rect) = NULL;
 
-__attribute__((weak)) void *l3_port_malloc(size_t size)
+void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect_t *rect)
 {
-    return malloc(size);
-}
-__attribute__((weak)) void l3_port_free(void *ptr)
-{
-    free(ptr);
-}
-
-
-__attribute__((weak)) void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image,
-                                                           l3_canvas_t *dc, l3_rect_t *rect)
-{
+    if (l3_draw_rect_img_to_canvas_imp)
+    {
+        l3_draw_rect_img_to_canvas_imp(image, dc, rect);
+        return;
+    }
     l3_img_head_t *head = image->data;
     if (head->compress)
     {
@@ -114,19 +111,4 @@ __attribute__((weak)) void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *i
         }
     }
 
-}
-
-void *l3_malloc(size_t size)
-{
-    return l3_port_malloc(size);
-}
-void l3_free(void *ptr)
-{
-    l3_port_free(ptr);
-}
-
-
-void l3_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc, l3_rect_t *rect)
-{
-    l3_port_draw_rect_img_to_canvas(image, dc, rect);
 }

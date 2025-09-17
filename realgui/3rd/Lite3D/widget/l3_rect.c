@@ -22,8 +22,8 @@
 #include <assert.h>
 #include "l3_common.h"
 #include "l3_rect_transform.h"
-#include "l3_sw_raster.h"
-#include "l3_port.h"
+#include "l3_tria_raster.h"
+#include "l3_rect_raster.h"
 
 static void __l3_push_rect_img_front(l3_model_t *this)
 {
