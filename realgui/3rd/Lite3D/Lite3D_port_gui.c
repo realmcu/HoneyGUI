@@ -44,7 +44,7 @@ void l3_port_draw_rect_img_to_canvas(l3_draw_rect_img_t *image, l3_canvas_t *dc,
 }
 
 /* Please call this function in a source C file when this file in gui.lib to make sure compiler link this file. */
-static int  l3_init(void)
+static int l3_init(void)
 {
     l3_malloc_imp = l3_port_malloc;
     l3_free_imp = l3_port_free;
@@ -53,5 +53,5 @@ static int  l3_init(void)
     return 0;
 }
 
-GUI_INIT_APP_EXPORT(l3_init);
+GUI_INIT_PREV_EXPORT(l3_init);
 

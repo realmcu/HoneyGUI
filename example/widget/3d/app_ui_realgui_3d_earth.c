@@ -23,8 +23,8 @@ static void update_earth_animation(void *param)
 
     if (tp->pressed || tp->pressing)
     {
-        rot_x_angle += tp->deltaY / 5.0f;
-        rot_y_angle += tp->deltaX / 5.0f;
+        rot_x_angle += tp->deltaY / 10.0f;
+        rot_y_angle += tp->deltaX / 10.0f;
     }
     rot_y_angle++;
 }
@@ -39,10 +39,10 @@ static void earth_global_cb(l3_model_t *this)
 
 static int app_init(void)
 {
-#if 0
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_AND_SORT, 0, 46, 410, 410);
+#if 1
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_ONLY, 0, 46, 410, 410);
 #else
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_no_mtl, L3_DRAW_FRONT_AND_SORT, 0, 46, 410,
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_no_mtl, L3_DRAW_FRONT_ONLY, 0, 46, 410,
                                            410);
 #endif
 

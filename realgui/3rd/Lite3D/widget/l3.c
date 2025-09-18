@@ -82,6 +82,19 @@ l3_model_t *l3_create_model(void                 *desc_addr,
                 this->img = l3_malloc(sizeof(l3_draw_rect_img_t) * this->desc->attrib.num_face_num_verts);
                 memset(this->img, 0x00, sizeof(l3_draw_rect_img_t) * this->desc->attrib.num_face_num_verts);
             }
+            else
+            {
+                this->combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
+                memset(this->combined_img, 0x00, sizeof(l3_draw_rect_img_t));
+
+                this->combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
+                memset(this->combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
+
+                l3_img_head_t *head = (l3_img_head_t *)this->combined_img->data;
+                head->w = w;
+                head->h = h;
+                head->type = LITE_RGB565;
+            }
         }
         break;
 
@@ -91,25 +104,22 @@ l3_model_t *l3_create_model(void                 *desc_addr,
                                              this->desc->attrib.num_face_num_verts);
             memset(this->face.tria_face, 0x1,
                    sizeof(l3_tria_face_t) * this->desc->attrib.num_face_num_verts);
+
+            this->combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
+            memset(this->combined_img, 0x00, sizeof(l3_draw_rect_img_t));
+
+            this->combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
+            memset(this->combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
+
+            l3_img_head_t *head = (l3_img_head_t *)this->combined_img->data;
+            head->w = w;
+            head->h = h;
+            head->type = LITE_RGB565;
         }
         break;
 
     default:
         break;
-    }
-
-    if (this->draw_type == L3_DRAW_FRONT_AND_SORT)
-    {
-        this->combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
-        memset(this->combined_img, 0x00, sizeof(l3_draw_rect_img_t));
-
-        this->combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
-        memset(this->combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
-
-        l3_img_head_t *head = (l3_img_head_t *)this->combined_img->data;
-        head->w = w;
-        head->h = h;
-        head->type = LITE_RGB565;
     }
 
 

@@ -44,6 +44,71 @@ static void l3_get_line_params(float x0, float y0, float x1, float y1,
     }
 }
 
+static void l3_get_z_interpolate(float y, float y0, float y1, float y2, \
+                                 float k01infinite, float k01, float b01, \
+                                 float k02infinite, float k02, float b02, \
+                                 float inv_z0, float inv_z1, float inv_z2, \
+                                 float *xleft, float *xright, \
+                                 float *oneoverz_left, float *oneoverz_step)
+{
+    *xleft = k01infinite ? b01 : (y - b01) / k01;
+    *xright = k02infinite ? b02 : (y - b02) / k02;
+
+    const float y_y0 = y - y0;
+    const float inv_y1_y0 = 1.0f / (y1 - y0);
+    const float inv_y2_y0 = 1.0f / (y2 - y0);
+
+    // Interpolate depth
+    *oneoverz_left = y_y0 * (inv_z1 - inv_z0) * inv_y1_y0 +
+                     inv_z0;         // 1/z interpolation on the left edge
+    float oneoverz_right = y_y0 * (inv_z2 - inv_z0) * inv_y2_y0  +
+                           inv_z0;       // 1/z interpolation on the right edge
+    *oneoverz_step = (oneoverz_right - *oneoverz_left) / (*xright -
+                                                          *xleft);   // Horizontal step size of 1/z
+}
+
+static void l3_get_z_s_t_interpolate(float y, float y0, float y1, float y2, \
+                                     float k01infinite, float k01, float b01, \
+                                     float k02infinite, float k02, float b02, \
+                                     float inv_z0, float inv_z1, float inv_z2, \
+                                     float soverz0, float soverz1, float soverz2, \
+                                     float toverz0, float toverz1, float toverz2, \
+                                     float *xleft, float *xright, \
+                                     float *oneoverz_left, float *oneoverz_step, \
+                                     float *soverz_left, float *soverz_step, \
+                                     float *toverz_left, float *toverz_step)
+{
+    *xleft = k01infinite ? b01 : (y - b01) / k01;
+    *xright = k02infinite ? b02 : (y - b02) / k02;
+
+    const float y_y0 = y - y0;
+    const float inv_y1_y0 = 1.0f / (y1 - y0);
+    const float inv_y2_y0 = 1.0f / (y2 - y0);
+
+    // Interpolate depth
+    *oneoverz_left = y_y0 * (inv_z1 - inv_z0) * inv_y1_y0 +
+                     inv_z0;         // 1/z interpolation on the left edge
+    float oneoverz_right = y_y0 * (inv_z2 - inv_z0) * inv_y2_y0  +
+                           inv_z0;       // 1/z interpolation on the right edge
+    *oneoverz_step = (oneoverz_right - *oneoverz_left) / (*xright -
+                                                          *xleft);   // Horizontal step size of 1/z
+
+    *soverz_left = y_y0 * (soverz1 - soverz0) * inv_y1_y0 +
+                   soverz0;      // Interpolation of texture coordinates s (u) on the left edge
+    float soverz_right = y_y0 * (soverz2 - soverz0) * inv_y2_y0 +
+                         soverz0;     // Interpolation of texture coordinates s (u) on the right edge
+    *soverz_step = (soverz_right - *soverz_left) / (*xright -
+                                                    *xleft);       // Horizontal step size of texture coordinates s (u)
+
+    *toverz_left = y_y0 * (toverz1 - toverz0) * inv_y1_y0 +
+                   toverz0;      // Interpolation of texture coordinates t (v) on the left edge
+    float toverz_right = y_y0 * (toverz2 - toverz0) * inv_y2_y0 +
+                         toverz0;     // Interpolation of texture coordinates t (v) on the right edge
+    *toverz_step = (toverz_right - *toverz_left) / (*xright -
+                                                    *xleft);       // Horizontal step size of texture coordinate t (v)
+
+}
+
 static void l3_fill_color_rgb565(float y, float xleft, float xright, float oneoverz,
                                  float oneoverz_step, \
                                  float *zbuffer, uint16_t *writebuf, int width, \
@@ -60,18 +125,32 @@ static void l3_fill_color_rgb565(float y, float xleft, float xright, float oneov
 
     int rowOffset = (int)y * width;
 
-    for (int ix = startX; ix < endX; ++ix)
+    if (zbuffer != NULL)
     {
-        int pixelIdx = ix + rowOffset;
-        const float originalZ = 1.0f / oneoverz;
-
-        if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+        for (int ix = startX; ix < endX; ++ix)
         {
-            zbuffer[pixelIdx] = originalZ;
-            writebuf[pixelIdx] = fill_color;
+            int pixelIdx = ix + rowOffset;
+            const float originalZ = 1.0f / oneoverz;
+
+            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+            {
+                zbuffer[pixelIdx] = originalZ;
+                writebuf[pixelIdx] = fill_color;
+            }
+            oneoverz += oneoverz_step;
         }
-        oneoverz += oneoverz_step;
     }
+    else
+    {
+        for (int ix = startX; ix < endX; ++ix)
+        {
+            int pixelIdx = ix + rowOffset;
+            writebuf[pixelIdx] = fill_color;
+
+            oneoverz += oneoverz_step;
+        }
+    }
+
 }
 
 static void l3_fill_color_argb8888(float y, float xleft, float xright, float oneoverz,
@@ -91,46 +170,83 @@ static void l3_fill_color_argb8888(float y, float xleft, float xright, float one
     int rowOffset = (int)y * width;
     const uint8_t alpha = (fill_color >> 24) & 0xFF;
 
-    if (alpha == 255)
+    if (zbuffer != NULL)
     {
-        for (int ix = startX; ix < endX; ++ix)
+        if (alpha == 255)
         {
-            int pixelIdx = ix + rowOffset;
-            const float originalZ = 1.0f / oneoverz;
-
-            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+            for (int ix = startX; ix < endX; ++ix)
             {
-                zbuffer[pixelIdx] = originalZ;
-                writebuf[pixelIdx] = fill_color;
+                int pixelIdx = ix + rowOffset;
+                const float originalZ = 1.0f / oneoverz;
+
+                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                {
+                    zbuffer[pixelIdx] = originalZ;
+                    writebuf[pixelIdx] = fill_color;
+                }
+                oneoverz += oneoverz_step;
             }
-            oneoverz += oneoverz_step;
+        }
+        else if (alpha > 0)
+        {
+            const uint8_t srcR = (fill_color >> 16) & 0xFF;
+            const uint8_t srcG = (fill_color >> 8) & 0xFF;
+            const uint8_t srcB = fill_color & 0xFF;
+            const uint8_t inv_alpha = 255 - alpha;
+            for (int ix = startX; ix < endX; ++ix)
+            {
+                int pixelIdx = ix + rowOffset;
+                const float originalZ = 1.0f / oneoverz;
+                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                {
+                    zbuffer[pixelIdx] = originalZ;
+                    l3_color_argb8888_t *pixel = (l3_color_argb8888_t *)(uintptr_t)writebuf + pixelIdx;
+
+                    pixel->a = (alpha * alpha + pixel->a * inv_alpha) / 255;
+                    pixel->r = (srcR * alpha + pixel->r * inv_alpha) / 255;
+                    pixel->g = (srcG * alpha + pixel->g * inv_alpha) / 255;
+                    pixel->b = (srcB * alpha + pixel->b * inv_alpha) / 255;
+                }
+
+                oneoverz += oneoverz_step;
+            }
         }
     }
-    else if (alpha > 0)
+    else
     {
-        const uint8_t srcR = (fill_color >> 16) & 0xFF;
-        const uint8_t srcG = (fill_color >> 8) & 0xFF;
-        const uint8_t srcB = fill_color & 0xFF;
-        const uint8_t inv_alpha = 255 - alpha;
-        for (int ix = startX; ix < endX; ++ix)
+        if (alpha == 255)
         {
-            int pixelIdx = ix + rowOffset;
-            const float originalZ = 1.0f / oneoverz;
-            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+            for (int ix = startX; ix < endX; ++ix)
             {
-                zbuffer[pixelIdx] = originalZ;
+                int pixelIdx = ix + rowOffset;
+                writebuf[pixelIdx] = fill_color;
+
+                oneoverz += oneoverz_step;
+            }
+        }
+        else if (alpha > 0)
+        {
+            const uint8_t srcR = (fill_color >> 16) & 0xFF;
+            const uint8_t srcG = (fill_color >> 8) & 0xFF;
+            const uint8_t srcB = fill_color & 0xFF;
+            const uint8_t inv_alpha = 255 - alpha;
+            for (int ix = startX; ix < endX; ++ix)
+            {
+                int pixelIdx = ix + rowOffset;
+
                 l3_color_argb8888_t *pixel = (l3_color_argb8888_t *)(uintptr_t)writebuf + pixelIdx;
 
                 pixel->a = (alpha * alpha + pixel->a * inv_alpha) / 255;
                 pixel->r = (srcR * alpha + pixel->r * inv_alpha) / 255;
                 pixel->g = (srcG * alpha + pixel->g * inv_alpha) / 255;
                 pixel->b = (srcB * alpha + pixel->b * inv_alpha) / 255;
-            }
 
-            oneoverz += oneoverz_step;
+                oneoverz += oneoverz_step;
+            }
         }
     }
 }
+
 
 // Fill with image data rgb565
 static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneoverz,
@@ -153,34 +269,65 @@ static void l3_fill_texture_rgb565(int y, float xleft, float xright, float oneov
     int rowOffset = (int)y * width;
     uint8_t source_red, source_green, source_blue, source_alpha;
 
-    for (int ix = startX; ix < endX; ++ix)
+    if (zbuffer != NULL)
     {
-        float originalZ = 1.0f / oneoverz;
-
-        // Calculate texture coordinates
-        int srcX = (int)(soverz * originalZ * (src_head->w - 1));
-        int srcY = (int)(toverz * originalZ * (src_head->h - 1));
-
-        if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
+        for (int ix = startX; ix < endX; ++ix)
         {
-            int pixelIdx = ix + rowOffset;
+            float originalZ = 1.0f / oneoverz;
 
-            gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
-                                 image_addr, srcX + srcY * src_head->w, src_head->type);
+            // Calculate texture coordinates
+            int srcX = (int)(soverz * originalZ * (src_head->w - 1));
+            int srcY = (int)(toverz * originalZ * (src_head->h - 1));
 
-            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+            if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
             {
-                // Completely opaque pixel processing
-                zbuffer[pixelIdx] = originalZ;
+                int pixelIdx = ix + rowOffset;
+
+                gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
+                                     image_addr, srcX + srcY * src_head->w, src_head->type);
+
+                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                {
+                    // Completely opaque pixel processing
+                    zbuffer[pixelIdx] = originalZ;
+                    writebuf[pixelIdx] = ((source_red & 0xF8) << 8) |
+                                         ((source_green & 0xFC) << 3) |
+                                         ((source_blue & 0xF8) >> 3);
+                }
+            }
+
+            oneoverz += oneoverz_step;
+            soverz += soverz_step;
+            toverz += toverz_step;
+        }
+    }
+    else
+    {
+        for (int ix = startX; ix < endX; ++ix)
+        {
+            float originalZ = 1.0f / oneoverz;
+
+            // Calculate texture coordinates
+            int srcX = (int)(soverz * originalZ * (src_head->w - 1));
+            int srcY = (int)(toverz * originalZ * (src_head->h - 1));
+
+            if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
+            {
+                int pixelIdx = ix + rowOffset;
+
+                gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
+                                     image_addr, srcX + srcY * src_head->w, src_head->type);
+
                 writebuf[pixelIdx] = ((source_red & 0xF8) << 8) |
                                      ((source_green & 0xFC) << 3) |
                                      ((source_blue & 0xF8) >> 3);
-            }
-        }
 
-        oneoverz += oneoverz_step;
-        soverz += soverz_step;
-        toverz += toverz_step;
+            }
+
+            oneoverz += oneoverz_step;
+            soverz += soverz_step;
+            toverz += toverz_step;
+        }
     }
 }
 
@@ -206,24 +353,75 @@ static void l3_fill_texture_argb8888(int y, float xleft, float xright, float one
     int rowOffset = (int)y * width;
     uint8_t source_red, source_green, source_blue, source_alpha;
 
-    for (int ix = startX; ix < endX; ++ix)
+    if (zbuffer != NULL)
     {
-        float originalZ = 1.0f / oneoverz;
-
-        // Calculate texture coordinates
-        int srcX = (int)(soverz * originalZ * (src_head->w - 1));
-        int srcY = (int)(toverz * originalZ * (src_head->h - 1));
-
-        if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
+        for (int ix = startX; ix < endX; ++ix)
         {
-            int pixelIdx = ix + rowOffset;
+            float originalZ = 1.0f / oneoverz;
 
-            gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
-                                 image_addr, srcX + srcY * src_head->w, src_head->type);
+            // Calculate texture coordinates
+            int srcX = (int)(soverz * originalZ * (src_head->w - 1));
+            int srcY = (int)(toverz * originalZ * (src_head->h - 1));
 
-            if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+            if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
             {
-                zbuffer[pixelIdx] = originalZ;
+                int pixelIdx = ix + rowOffset;
+
+                gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
+                                     image_addr, srcX + srcY * src_head->w, src_head->type);
+
+                if (zbuffer[pixelIdx] == 0 || originalZ < zbuffer[pixelIdx])
+                {
+                    zbuffer[pixelIdx] = originalZ;
+                    // Completely opaque pixel processing
+                    if (source_alpha == 255)
+                    {
+                        writebuf[pixelIdx] = ((uint32_t)source_alpha << 24) | ((uint32_t)source_red << 16) |
+                                             ((uint32_t)source_green << 8) | (uint32_t)source_blue;
+                    }
+                    // Translucent pixel processing, without updating depth buffer (keeping the objects behind visible)
+                    else if (source_alpha > 0)
+                    {
+                        uint32_t dstColor = writebuf[pixelIdx];
+
+                        uint8_t dstR = (dstColor >> 16) & 0xFF;
+                        uint8_t dstG = (dstColor >> 8) & 0xFF;
+                        uint8_t dstB = dstColor & 0xFF;
+                        uint8_t dstA = (dstColor >> 24) & 0xFF;
+
+                        // Blending
+                        uint8_t outA = (source_alpha * source_alpha + dstA * (255 - source_alpha)) / 255;
+                        uint8_t outR = (source_red * source_alpha + dstR * (255 - source_alpha)) / 255;
+                        uint8_t outG = (source_green * source_alpha + dstG * (255 - source_alpha)) / 255;
+                        uint8_t outB = (source_blue * source_alpha + dstB * (255 - source_alpha)) / 255;
+
+                        writebuf[pixelIdx] = (outA << 24) | (outR << 16) | (outG << 8) | outB;
+                    }
+                }
+            }
+
+            oneoverz += oneoverz_step;
+            soverz += soverz_step;
+            toverz += toverz_step;
+        }
+    }
+    else
+    {
+        for (int ix = startX; ix < endX; ++ix)
+        {
+            float originalZ = 1.0f / oneoverz;
+
+            // Calculate texture coordinates
+            int srcX = (int)(soverz * originalZ * (src_head->w - 1));
+            int srcY = (int)(toverz * originalZ * (src_head->h - 1));
+
+            if (srcX >= 0 && srcX < src_head->w && srcY >= 0 && srcY < src_head->h)
+            {
+                int pixelIdx = ix + rowOffset;
+
+                gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
+                                     image_addr, srcX + srcY * src_head->w, src_head->type);
+
                 // Completely opaque pixel processing
                 if (source_alpha == 255)
                 {
@@ -248,16 +446,15 @@ static void l3_fill_texture_argb8888(int y, float xleft, float xright, float one
 
                     writebuf[pixelIdx] = (outA << 24) | (outR << 16) | (outG << 8) | outB;
                 }
-            }
-        }
 
-        oneoverz += oneoverz_step;
-        soverz += soverz_step;
-        toverz += toverz_step;
+            }
+
+            oneoverz += oneoverz_step;
+            soverz += soverz_step;
+            toverz += toverz_step;
+        }
     }
 }
-
-
 
 
 static void l3_render_with_color_rgb565(float y, float y0, float y1, float y2, \
@@ -267,23 +464,17 @@ static void l3_render_with_color_rgb565(float y, float y0, float y1, float y2, \
                                         float *zbuffer, uint8_t *writebuf, int width, \
                                         uint16_t fill_color)
 {
-    float xleft = k01infinite ? b01 : (y - b01) / k01;
-    float xright = k02infinite ? b02 : (y - b02) / k02;
+    float xleft, xright, oneoverz_left, oneoverz_step;
 
-    const float y_y0 = y - y0;
-    const float inv_y1_y0 = 1.0f / (y1 - y0);
-    const float inv_y2_y0 = 1.0f / (y2 - y0);
-
-    // Interpolate depth
-    float oneoverz_left = y_y0 * (inv_z1 - inv_z0) * inv_y1_y0 +
-                          inv_z0;         // 1/z interpolation on the left edge
-    float oneoverz_right = y_y0 * (inv_z2 - inv_z0) * inv_y2_y0  +
-                           inv_z0;       // 1/z interpolation on the right edge
-    float oneoverz_step = (oneoverz_right - oneoverz_left) / (xright -
-                                                              xleft);   // Horizontal step size of 1/z
+    l3_get_z_interpolate(y, y0, y1, y2, \
+                         k01infinite, k01, b01, \
+                         k02infinite, k02, b02, \
+                         inv_z0, inv_z1, inv_z2, \
+                         &xleft, &xright, &oneoverz_left, &oneoverz_step);
 
     l3_fill_color_rgb565(y, xleft, xright, oneoverz_left, oneoverz_step, zbuffer,
                          (uint16_t *)writebuf, width, fill_color);
+
 }
 
 static void l3_render_with_color_argb8888(float y, float y0, float y1, float y2, \
@@ -293,23 +484,17 @@ static void l3_render_with_color_argb8888(float y, float y0, float y1, float y2,
                                           float *zbuffer, uint8_t *writebuf, int width, \
                                           uint32_t fill_color)
 {
-    float xleft = k01infinite ? b01 : (y - b01) / k01;
-    float xright = k02infinite ? b02 : (y - b02) / k02;
+    float xleft, xright, oneoverz_left, oneoverz_step;
 
-    const float y_y0 = y - y0;
-    const float inv_y1_y0 = 1.0f / (y1 - y0);
-    const float inv_y2_y0 = 1.0f / (y2 - y0);
-
-    // Interpolate depth
-    float oneoverz_left = y_y0 * (inv_z1 - inv_z0) * inv_y1_y0 +
-                          inv_z0;         // 1/z interpolation on the left edge
-    float oneoverz_right = y_y0 * (inv_z2 - inv_z0) * inv_y2_y0  +
-                           inv_z0;       // 1/z interpolation on the right edge
-    float oneoverz_step = (oneoverz_right - oneoverz_left) / (xright -
-                                                              xleft);   // Horizontal step size of 1/z
+    l3_get_z_interpolate(y, y0, y1, y2, \
+                         k01infinite, k01, b01, \
+                         k02infinite, k02, b02, \
+                         inv_z0, inv_z1, inv_z2, \
+                         &xleft, &xright, &oneoverz_left, &oneoverz_step);
 
     l3_fill_color_argb8888(y, xleft, xright, oneoverz_left, oneoverz_step, zbuffer,
                            (uint32_t *)writebuf, width, fill_color);
+
 }
 
 
@@ -322,35 +507,17 @@ static void l3_render_with_texture_rgb565(float y, float y0, float y1, float y2,
                                           float *zbuffer, uint8_t *writebuf, int width, \
                                           l3_img_head_t *src_head, uint32_t image_addr)
 {
-    float xleft = k01infinite ? b01 : (y - b01) / k01;
-    float xright = k02infinite ? b02 : (y - b02) / k02;
+    float xleft, xright, oneoverz_left, oneoverz_step, soverz_left, soverz_step, toverz_left,
+          toverz_step;
 
-    const float y_y0 = y - y0;
-    const float inv_y1_y0 = 1.0f / (y1 - y0);
-    const float inv_y2_y0 = 1.0f / (y2 - y0);
-
-    // Interpolate depth
-    float oneoverz_left = y_y0 * (inv_z1 - inv_z0) * inv_y1_y0 +
-                          inv_z0;         // 1/z interpolation on the left edge
-    float oneoverz_right = y_y0 * (inv_z2 - inv_z0) * inv_y2_y0  +
-                           inv_z0;       // 1/z interpolation on the right edge
-    float oneoverz_step = (oneoverz_right - oneoverz_left) / (xright -
-                                                              xleft);   // Horizontal step size of 1/z
-
-
-    float soverz_left = y_y0 * (soverz1 - soverz0) * inv_y1_y0 +
-                        soverz0;      // Interpolation of texture coordinates s (u) on the left edge
-    float soverz_right = y_y0 * (soverz2 - soverz0) * inv_y2_y0 +
-                         soverz0;     // Interpolation of texture coordinates s (u) on the right edge
-    float soverz_step = (soverz_right - soverz_left) / (xright -
-                                                        xleft);       // Horizontal step size of texture coordinates s (u)
-
-    float toverz_left = y_y0 * (toverz1 - toverz0) * inv_y1_y0 +
-                        toverz0;      // Interpolation of texture coordinates t (v) on the left edge
-    float toverz_right = y_y0 * (toverz2 - toverz0) * inv_y2_y0 +
-                         toverz0;     // Interpolation of texture coordinates t (v) on the right edge
-    float toverz_step = (toverz_right - toverz_left) / (xright -
-                                                        xleft);       // Horizontal step size of texture coordinate t (v)
+    l3_get_z_s_t_interpolate(y, y0, y1, y2, \
+                             k01infinite, k01, b01, \
+                             k02infinite, k02, b02, \
+                             inv_z0, inv_z1, inv_z2, \
+                             soverz0, soverz1, soverz2, \
+                             toverz0, toverz1, toverz2, \
+                             &xleft, &xright, &oneoverz_left, &oneoverz_step, \
+                             &soverz_left, &soverz_step, &toverz_left, &toverz_step);
 
 
     l3_fill_texture_rgb565(y, xleft, xright, oneoverz_left, oneoverz_step,
@@ -368,42 +535,25 @@ static void l3_render_with_texture_argb8888(float y, float y0, float y1, float y
                                             float *zbuffer, uint8_t *writebuf, int width, \
                                             l3_img_head_t *src_head, uint32_t image_addr)
 {
-    float xleft = k01infinite ? b01 : (y - b01) / k01;
-    float xright = k02infinite ? b02 : (y - b02) / k02;
+    float xleft, xright, oneoverz_left, oneoverz_step, soverz_left, soverz_step, toverz_left,
+          toverz_step;
 
-    const float y_y0 = y - y0;
-    const float inv_y1_y0 = 1.0f / (y1 - y0);
-    const float inv_y2_y0 = 1.0f / (y2 - y0);
-
-    // Interpolate depth
-    float oneoverz_left = y_y0 * (inv_z1 - inv_z0) * inv_y1_y0 +
-                          inv_z0;         // 1/z interpolation on the left edge
-    float oneoverz_right = y_y0 * (inv_z2 - inv_z0) * inv_y2_y0  +
-                           inv_z0;       // 1/z interpolation on the right edge
-    float oneoverz_step = (oneoverz_right - oneoverz_left) / (xright -
-                                                              xleft);   // Horizontal step size of 1/z
-
-
-    float soverz_left = y_y0 * (soverz1 - soverz0) * inv_y1_y0 +
-                        soverz0;      // Interpolation of texture coordinates s (u) on the left edge
-    float soverz_right = y_y0 * (soverz2 - soverz0) * inv_y2_y0 +
-                         soverz0;     // Interpolation of texture coordinates s (u) on the right edge
-    float soverz_step = (soverz_right - soverz_left) / (xright -
-                                                        xleft);       // Horizontal step size of texture coordinates s (u)
-
-    float toverz_left = y_y0 * (toverz1 - toverz0) * inv_y1_y0 +
-                        toverz0;      // Interpolation of texture coordinates t (v) on the left edge
-    float toverz_right = y_y0 * (toverz2 - toverz0) * inv_y2_y0 +
-                         toverz0;     // Interpolation of texture coordinates t (v) on the right edge
-    float toverz_step = (toverz_right - toverz_left) / (xright -
-                                                        xleft);       // Horizontal step size of texture coordinate t (v)
-
+    l3_get_z_s_t_interpolate(y, y0, y1, y2, \
+                             k01infinite, k01, b01, \
+                             k02infinite, k02, b02, \
+                             inv_z0, inv_z1, inv_z2, \
+                             soverz0, soverz1, soverz2, \
+                             toverz0, toverz1, toverz2, \
+                             &xleft, &xright, &oneoverz_left, &oneoverz_step, \
+                             &soverz_left, &soverz_step, &toverz_left, &toverz_step);
 
     l3_fill_texture_argb8888(y, xleft, xright, oneoverz_left, oneoverz_step,
                              soverz_left, soverz_step, toverz_left, toverz_step,
                              zbuffer, (uint32_t *)writebuf, width,
                              src_head, image_addr);
+
 }
+
 
 void (*l3_draw_tria_to_canvas_imp)(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combined_image,
                                    float *zbuffer) = NULL;
@@ -415,6 +565,7 @@ void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combi
         l3_draw_tria_to_canvas_imp(image, combined_image, zbuffer);
         return;
     }
+
     bool k01infinite, k02infinite;
     float k01, b01, k02, b02;
     float x0, y0, z0, s0, t0;
@@ -669,7 +820,6 @@ void l3_draw_tria_to_canvas(l3_draw_tria_img_t *image, l3_draw_rect_img_t *combi
                                             src_head, image_addr);
         }
     }
-
 }
 
 

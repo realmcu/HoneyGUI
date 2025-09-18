@@ -30,8 +30,12 @@ static void __l3_push_tria_img(l3_model_t *_this)
     uint32_t width = _this->viewPortWidth;
     uint32_t height = _this->viewPortHeight;
 
-    float *depthBuffer = l3_malloc(width * height * sizeof(float));
-    memset(depthBuffer, 0x00, width * height * sizeof(float));
+    float *depthBuffer = NULL;
+    if (_this->draw_type == L3_DRAW_FRONT_AND_SORT)
+    {
+        depthBuffer = l3_malloc(width * height * sizeof(float));
+        memset(depthBuffer, 0x00, width * height * sizeof(float));
+    }
 
     memset((uint8_t *)_this->combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
 
@@ -93,7 +97,10 @@ static void __l3_push_tria_img(l3_model_t *_this)
         l3_draw_tria_to_canvas(&tria_img, _this->combined_img, depthBuffer);
     }
 
-    l3_free(depthBuffer);
+    if (_this->draw_type == L3_DRAW_FRONT_AND_SORT)
+    {
+        l3_free(depthBuffer);
+    }
 
     _this->combined_img->img_w = width;
     _this->combined_img->img_h = height;
