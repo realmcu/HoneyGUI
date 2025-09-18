@@ -156,9 +156,7 @@ static void create_view_more(void *obj, gui_event_t e, void *param)
     gui_obj_create_timer(GUI_BASE(win), 20, true, view_more_cb);
     gui_obj_add_event_cb(GUI_BASE(win), (gui_event_cb_t)view_more_event_cb,
                          GUI_EVENT_TOUCH_SCROLL_VERTICAL, NULL); // stop list scroll
-    // gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0,
-    //                                                       SCREEN_WIDTH,
-    //                                                       SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+    gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, gui_rgb(0, 0, 0));
     {
         char *content = "Cancel";
         gui_text_t *text = gui_text_create(win, "cancel",  37, 35, 80, 32);
