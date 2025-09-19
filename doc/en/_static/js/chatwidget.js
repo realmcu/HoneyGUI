@@ -213,6 +213,7 @@
                     padding: 8px 12px;
                     border-radius: 5px;
                     line-height: 24px;
+                    word-break: break-word;
                 }
                 chat-widget .userText p, 
                 chat-widget .chatResp p {
@@ -290,7 +291,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    width: 76px;
+                    width: 80px;
                     padding: 3px 6px;
                     border: 1px solid #222e6e;
                     border-radius: 6px;
@@ -439,6 +440,19 @@
         };
     }
 
+    // 判断元素是否已达底部
+    function isEleAtBottom(node, threshold = 3) {
+        // threshold 容忍误差（像素），因为有时会有细微差别
+        return node.scrollTop + node.clientHeight >= node.scrollHeight - threshold;
+    }
+
+    function scrollToBottom(node) {
+        node.scrollTo({
+            top: node.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
     function chatWidgetInit(config) {
         const chatTitle = config.chatWidgetTitle || 'Real AI';
         const chatPlaceholder = config.chatWidgetPlaceholder || 'Type your question';
@@ -550,20 +564,55 @@
         /* ============ listen chat content box scroll ============ */
         const scrollBtn = document.querySelector('.chat-content-gobtm');
         function onContentBoxScroll() {
-            if (chatContentNode.scrollTop + chatContentNode.clientHeight >= chatContentNode.scrollHeight) {
+            if (isEleAtBottom(chatContentNode)) { // scrolled to bottom
                 scrollBtn.style.display = 'none';
             } else {
                 scrollBtn.style.display = 'flex';
             }
         }
-        const debouncedContentBoxScroll = debounce(onContentBoxScroll, 100);
+        const debouncedContentBoxScroll = debounce(onContentBoxScroll, 60);
         chatContentNode.addEventListener('scroll', debouncedContentBoxScroll);
         // click chat-content-gobtm to chat-content-box bottom
         scrollBtn.addEventListener('click', function() {
-            chatContentNode.scrollTo({
-                top: chatContentNode.scrollHeight,
-                behavior: 'smooth'
-            });
+            scrollToBottom(chatContentNode);
+        });
+
+        /* ====== listen wheel and touch events in chat content box ====== */
+        let chatContentAutoScroll = true;
+        function onChatContentWheelOrTouch(direction) {
+            if (direction === 'up') {
+                chatContentAutoScroll = false;
+            } else if (direction === 'down') {
+                if (isEleAtBottom(chatContentNode, 100)) {
+                    chatContentAutoScroll = true;
+                } else {
+                    chatContentAutoScroll = false;
+                }
+            }
+        }
+        // 监听PC端鼠标滚轮
+        chatContentNode.addEventListener('wheel', function(e) {
+            if (e.deltaY < 0) { // wheel up
+                onChatContentWheelOrTouch("up");
+            } else { // wheel down
+                onChatContentWheelOrTouch("down");
+            }
+        });
+        // 监听移动端手指滑动
+        let wheelY = 0;
+        chatContentNode.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 1) wheelY = e.touches[0].clientY;
+        });
+        chatContentNode.addEventListener('touchend', function(e) {
+            if (e.changedTouches.length === 1) {
+                const endY = e.changedTouches[0].clientY;
+                const deltaY = endY - wheelY;
+                if (deltaY < -30) { // touch scroll up
+                    onChatContentWheelOrTouch("up");
+                } else if (deltaY > 30) { // touch scroll down
+                    onChatContentWheelOrTouch("down");
+                }
+            }
         });
 
         /* ================= clear all ai content ================= */
@@ -875,9 +924,13 @@
                     } catch (error) {
                         // go on
                     }
-                    messageNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    // messageNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    if(chatContentAutoScroll) {
+                        scrollToBottom(chatContentNode);
+                    }
                 };
 
+                chatContentAutoScroll = true;
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
                 let pendingBuffer = '';
@@ -927,6 +980,10 @@
                 }
             }
             finally {
+                // scrolll to chatContentNode bottom
+                if(chatContentAutoScroll) {
+                    scrollToBottom(chatContentNode);
+                }
                 updateSendingStatus(false);
                 onContentBoxScroll();
             }
@@ -998,7 +1055,8 @@
             const fetchConfig = AIChatFetchConfig(userInputValue, chatHistoryCopy);
             fetchChatAnwser(fetchConfig, chatMessageNode);
 
-            chatMessageNode.scrollIntoView({ behavior: 'smooth' });
+            // chatMessageNode.scrollIntoView({ behavior: 'smooth' });
+            scrollToBottom(chatContentNode);
         }
         /* =============== triggle chat message send =============== */
         const sendButton = document.getElementById('ChatSendBtn');
