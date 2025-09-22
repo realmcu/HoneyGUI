@@ -42,6 +42,7 @@ ci_check_config = {
         r"example/widget/text/test_multi_language.c",
         r"realgui/engine/draw_font.c",
         r"doxygen_graphviz/readme.md",
+        r"tool/D2XML/",
     ],
     "ignore_cpp_astyle_check":[
         r"win32_sim/RTE/",
