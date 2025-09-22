@@ -1,4 +1,4 @@
-# MasterGo XML Exporter
+# MasterGo D2XML Plugin
 This is a plugin for MasterGo, designed to streamline the workflow for designers and developers by converting design layouts into a specific XML format and exporting all associated image assets.
 
 Built upon the official MasterGo Vue template, this plugin parses the properties of layers—such as position, size, text styles, and image fills—to automatically generate well-structured XML code suitable for custom UI frameworks.
@@ -10,6 +10,7 @@ Built upon the official MasterGo Vue template, this plugin parses the properties
 4. Component Parsing: Correctly handles Component Instances and resolves their child layers.
 5. Text Processing: Extracts text content, font family, font size, and color attributes.
 6. Special Keyword Handling: Applies custom logic to nested Frames whose names contain special keywords (e.g., list), generating unique XML tags (e.g., <LIST>) and employing a specialized asset collection strategy.
+7. Precautions: A list of important notes is provided to prevent discrepancies between the exported XML/assets and the UI design.
 
 
 ## Development Environment Setup
@@ -69,6 +70,11 @@ A notification will appear, informing you of the number of images discovered wit
 - Click it to bundle all discovered images into a single .zip file, which will then be downloaded by your browser.
 - Note: You must run "Generate XML" first to discover images before you can export them.
 
+### Step 5: Splitting the XML File for HoneyGUI
+- After generating the XML, copy the text content into the `tool/D2XML/spilt_xml/__template.xml` file and save it.
+- Double-click the `split_xml.bat` script file in the same directory to generate multiple XML files. Copy these files to the HoneyGUI project folder, which is typically `root/root_image/`.
+
+
 ## Core Concept: Special Keyword Handling
 To support dynamic layouts like lists and grids, the plugin uses a rule-based system that activates when layers are named with specific keywords.
 
@@ -86,3 +92,9 @@ If a nested Frame named my_contact_list is processed, the following occurs:
 1. XML Tag Is Changed: In the output XML, the Frame is converted to a tag matching the keyword, not a generic <WIN>.
 2. Child Nodes Are Not Rendered in XML: All layers inside my_contact_list will not be converted into XML elements.
 3. Specialized Image Collection: The plugin will still search inside the my_contact_list Frame to find images. However, if it encounters a descendant layer whose name exactly matches a keyword (e.g., a layer named precisely list), that layer and its entire subtree will be skipped.
+
+
+## Precautions
+- To ensure compatibility, please do not use Chinese characters in layer names.
+- When composing a single image from multiple images (including vector graphics), please create a `<GROUP>` for these layers. This ensures that only one `<IMAGE>` tag and one image asset are exported.
+- Boolean operations are supported and will also result in the export of a single `<IMAGE>` tag and one image asset.

@@ -3,13 +3,6 @@ import { UIMessage } from '@messages/sender'
 // --- 全局状态管理 ---
 let discoveredImageNodes: SceneNode[] = [];
 let processedComponentFamilyIds = new Set<string>();
-// [更新] 定义特殊关键字列表，用于以下场景（不区分大小写）：
-// 1. [特殊FRAME处理]: 如果一个 FRAME 节点的 name 包含列表中的关键字，
-//    - a) 它在 XML 中会转换为以匹配到的第一个关键字命名的新标签（例如 <LIST>）。
-//    - b) 它的所有子节点都不会出现在 XML 中。
-//    - c) 程序会深入其子节点搜集图片资源，但遵循下面的第2条规则。
-// 2. [资源收集时跳过]: 在执行特殊的资源搜集时，如果遇到任何一个后代节点的 name 完全匹配列表中的关键字，
-//    那么这个后代节点及其所有子树将被完全跳过，不再向下查找图片。
 const SPECIAL_KEYWORD_NAMES = new Set(['cellular', 'list', 'video']);
 
 
@@ -37,17 +30,35 @@ mg.ui.onmessage = async (msg) => {
   // --- 事件路由：处理“生成 XML”请求 ---
   if (msg.pluginMessage.type === 'generate-xml') {
     try {
+      // [新需求] 过滤用户的选择，只保留顶层的 FRAME 节点进行处理
+      const selectedFrames = selectedNodes.filter(node => node.type === 'FRAME');
+
+      // [新需求] 如果用户有选择，但选择的都不是 FRAME，则提示用户
+      if (selectedFrames.length === 0) {
+        const notification = "请选择一个或多个顶层画框 (Frame) 进行导出。";
+        mg.notify(notification);
+        mg.ui.postMessage({ pluginMessage: { type: 'xml-generated', data: `<!-- ${notification} -->` } });
+        return;
+      }
+
+      const notificationMessages = new Set<string>();
+
       discoveredImageNodes = [];
       processedComponentFamilyIds.clear();
 
       let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n';
-      for (const node of selectedNodes) {
-        xmlString += await nodeToXml(node, '', false);
+      
+      // [修改] 遍历过滤后的 FRAME 列表，而不是原始选择列表
+      for (const frameNode of selectedFrames) {
+        // 每次调用都会将一个完整的 <SCREEN>...</SCREEN> 块追加到 xmlString 中
+        // 同时，discoveredImageNodes 和 notificationMessages 会在多次调用中累积结果
+        xmlString += await nodeToXml(frameNode, '', false, undefined, notificationMessages);
       }
 
       mg.ui.postMessage({ pluginMessage:{ type: 'xml-generated', data: xmlString } });
       mg.ui.postMessage({ pluginMessage:{ type: 'images-discovered', count: discoveredImageNodes.length } });
       
+      // 检查图片重名问题，并将警告信息添加到集合中
       if (discoveredImageNodes.length > 0) {
         const filenameCounts = new Map<string, number>();
         discoveredImageNodes.forEach(imageNode => {
@@ -60,10 +71,16 @@ mg.ui.onmessage = async (msg) => {
           .map(([filename]) => filename);
 
         if (duplicateFilenames.length > 0) {
-          mg.notify(`注意：发现同名图片，导出时可能被覆盖：${duplicateFilenames.join(', ')}`, { timeout: 8000 });
-        } else {
-          mg.notify(`已识别出 ${discoveredImageNodes.length} 张图片，现在可以导出了。`);
+          notificationMessages.add(`图片重名警告: ${duplicateFilenames.join(', ')} (导出时可能被覆盖)`);
         }
+      }
+
+      // 在所有流程结束后，统一处理并显示通知
+      if (notificationMessages.size > 0) {
+        const finalMessage = Array.from(notificationMessages).join('\n');
+        mg.notify(finalMessage, { timeout: 8000});
+      } else if (discoveredImageNodes.length > 0) {
+        mg.notify(`已识别出 ${discoveredImageNodes.length} 张图片，现在可以导出了。`);
       }
 
     } catch (error) {
@@ -100,6 +117,7 @@ mg.ui.onmessage = async (msg) => {
 
 /**
  * 将单个场景节点递归转换为XML字符串（异步版本）。
+ * [无需修改] 此函数的设计已经能够正确处理作为根节点传入的 FRAME。
  */
 async function nodeToXml(
   node: SceneNode,
@@ -109,10 +127,12 @@ async function nodeToXml(
     offsetX: number;
     offsetY: number;
     reactions?: readonly Reaction[];
-  }
+  },
+  notificationMessages?: Set<string>
 ): Promise<string> {
   
-  // [修改 - 优先级1] 处理名称包含特殊关键字的 FRAME 节点。
+  const chineseCharsRegex = /[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/;
+
   if (node.type === 'FRAME' && isInsideFrame) {
     const nodeNameLower = node.name.toLowerCase();
     let matchedKeyword: string | null = null;
@@ -120,18 +140,15 @@ async function nodeToXml(
     for (const keyword of SPECIAL_KEYWORD_NAMES) {
       if (nodeNameLower.includes(keyword)) {
         matchedKeyword = keyword;
-        break; // 使用第一个匹配到的关键字
+        break;
       }
     }
 
-    // 如果找到了包含的关键字，则执行特殊逻辑
     if (matchedKeyword) {
-      // 步骤 1: 遍历其子节点，使用带特殊跳过规则的函数收集图片资源。
       if ('children' in node && node.children) {
         for (const child of node.children) {
           const foundImages = collectImagesWithSpecialSkip(child);
           foundImages.forEach(img => {
-            // 确保不重复添加。
             if (!discoveredImageNodes.includes(img)) {
               discoveredImageNodes.push(img);
             }
@@ -139,7 +156,6 @@ async function nodeToXml(
         }
       }
 
-      // 步骤 2: 生成此 FRAME 节点自身的 XML，并以匹配到的关键字作为标签名，不包含任何子节点 XML。
       const tagName = matchedKeyword.toUpperCase();
       const { offsetX = 0, offsetY = 0 } = parentInstanceInfo || {};
       const escapeXml = (str: string): string => str.replace(/[<>&'"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'})[c] || c);
@@ -154,11 +170,16 @@ async function nodeToXml(
       const attrIndent = indent + '  ';
       const attributesString = `\n${attrIndent}${attributes.join('\n' + attrIndent)}`;
       
-      // 生成一个没有子元素的XML标签。
-      let xml = `${indent}<${tagName}${attributesString}>${escapeXml(node.name)}\n`;
+      let processedNodeName = node.name;
+      if (chineseCharsRegex.test(node.name) && notificationMessages) {
+        processedNodeName = 'widget';
+        notificationMessages.add(`图层名含中文字符: '${node.name}' 请重命名`);
+      }
+
+      let xml = `${indent}<${tagName}${attributesString}>${escapeXml(processedNodeName)}\n`;
       xml += `${indent}</${tagName}>\n`;
       
-      return xml; // 处理完毕，直接返回
+      return xml;
     }
   }
   
@@ -194,7 +215,7 @@ async function nodeToXml(
         offsetY: (parentInstanceInfo?.offsetY || 0) + node.y,
         reactions: ('reactions' in node && node.reactions.length > 0) ? node.reactions : parentInstanceInfo?.reactions,
       };
-      const childXmlPromises = node.children.map(child => nodeToXml(child, indent, isInsideFrame, infoForChildren));
+      const childXmlPromises = node.children.map(child => nodeToXml(child, indent, isInsideFrame, infoForChildren, notificationMessages));
       childrenXml = (await Promise.all(childXmlPromises)).join('');
     }
     return childrenXml;
@@ -209,13 +230,11 @@ async function nodeToXml(
 
   let tagName: string;
 
-  // 如果 tagName 未被上述特殊逻辑设置，则使用默认规则。
-  if (!tagName) {
-    if (isFillImage) tagName = 'IMAGE';
-    else if (isBasicShape) tagName = hasReaction ? 'CANVAS' : 'IMAGE';
-    else if (node.type === 'FRAME') tagName = isInsideFrame ? 'WIN' : 'SCREEN';
-    else tagName = node.type;
-  }
+  if (isFillImage) tagName = 'IMAGE';
+  else if (isBasicShape) tagName = hasReaction ? 'CANVAS' : 'IMAGE';
+  // [关键逻辑点] 当一个顶层 FRAME (isInsideFrame=false) 传入时，这里会正确地将其 tagName 设置为 'SCREEN'
+  else if (node.type === 'FRAME') tagName = isInsideFrame ? 'WIN' : 'SCREEN';
+  else tagName = node.type;
   
   const attributes = [
     `x="${Math.round(node.x + offsetX)}"`,
@@ -290,10 +309,16 @@ async function nodeToXml(
   }
 
   const hasChildren = 'children' in node && node.children.length > 0;
-  const processChildren = hasChildren && node.type !== 'BOOLEAN_OPERATION';
+  const processChildren = hasChildren && node.type !== 'BOOLEAN_OPERATION' && node.type !== 'GROUP';
+
+  let processedNodeName = node.name;
+  if (chineseCharsRegex.test(node.name) && notificationMessages) {
+    processedNodeName = 'widget';
+    notificationMessages.add(`图层名含中文字符: '${node.name}' 请重命名`);
+  }
 
   if (processChildren || reactionsContent) {
-    xml += `>${escapeXml(node.name)}\n`;
+    xml += `>${escapeXml(processedNodeName)}\n`;
     if (reactionsContent) xml += reactionsContent;
     if (processChildren) {
       const childIsInsideFrame = isInsideFrame || node.type === 'FRAME';
@@ -302,37 +327,29 @@ async function nodeToXml(
         offsetY,
         reactions: 'reactions' in node && node.reactions.length > 0 ? node.reactions : inheritedReactions
       };
-      const childXmlPromises = node.children.map(child => nodeToXml(child, indent + '  ', childIsInsideFrame, infoForChildren));
+      const childXmlPromises = node.children.map(child => nodeToXml(child, indent + '  ', childIsInsideFrame, infoForChildren, notificationMessages));
       xml += (await Promise.all(childXmlPromises)).join('');
     }
     xml += `${indent}</${tagName}>\n`;
   } else {
-    xml += `>${escapeXml(node.name)}\n${indent}</${tagName}>\n`;
+    xml += `>${escapeXml(processedNodeName)}\n${indent}</${tagName}>\n`;
   }
 
   return xml;
 }
 
-// --- 辅助函数区 ---
+// --- 辅助函数区 (保持不变) ---
 
-/**
- * [新函数] 递归查找图片节点，但会跳过任何名称在 SPECIAL_KEYWORD_NAMES 中的节点及其整个子树。
- * @param node 起始节点
- * @returns 返回找到的图片节点数组
- */
 function collectImagesWithSpecialSkip(node: SceneNode): SceneNode[] {
-  // 检查当前节点本身是否需要被跳过（名称是否完全匹配关键字）。
   if (SPECIAL_KEYWORD_NAMES.has(node.name.toLowerCase())) {
-    return []; // 如果匹配，则不处理此节点及其任何子节点，直接返回空数组，实现“剪枝”。
+    return [];
   }
 
   let images: SceneNode[] = [];
-  // 如果当前节点是图片，则收集它。
   if (isImageRectangle(node)) {
     images.push(node);
   }
 
-  // 如果有子节点，则递归调用自身来处理子节点。
   if ('children' in node && node.children && node.type !== 'BOOLEAN_OPERATION') {
     for (const child of node.children) {
       images = images.concat(collectImagesWithSpecialSkip(child));
@@ -343,7 +360,7 @@ function collectImagesWithSpecialSkip(node: SceneNode): SceneNode[] {
 
 
 function isBasicVectorShape(node: SceneNode): boolean {
-  return ['RECTANGLE', 'LINE', 'ELLIPSE', 'POLYGON', 'STAR', 'PEN', 'BOOLEAN_OPERATION'].includes(node.type);
+  return ['RECTANGLE', 'LINE', 'ELLIPSE', 'POLYGON', 'STAR', 'PEN', 'BOOLEAN_OPERATION', 'GROUP'].includes(node.type);
 }
 
 function rgbToHex(color: RGB): string {

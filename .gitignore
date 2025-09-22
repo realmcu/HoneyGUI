@@ -92,3 +92,6 @@ gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Export/root/
 gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Simulate/
 gui_engine/example/web/tree/diagram.mmd
 win32_sim/build/
+
+# tool
+tool/D2XML/node_modules/
