@@ -102,7 +102,7 @@ static void win_power_animation(void *p);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *start_view = NULL;
+static const gui_view_descriptor_t *start_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */

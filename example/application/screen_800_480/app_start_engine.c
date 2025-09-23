@@ -25,7 +25,7 @@ static void start_engine_design(gui_view_t *view);
  *============================================================================*/
 /* View Management */
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *dashboard_view = NULL;
+static const gui_view_descriptor_t *dashboard_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */

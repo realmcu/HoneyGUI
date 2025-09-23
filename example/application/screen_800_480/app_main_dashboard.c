@@ -12,7 +12,9 @@
 #include "gui_canvas_rect.h"
 #include "gui_view.h"
 #include "app_main_dashboard.h"
+#ifdef _WIN32
 #include "shell.h"
+#endif
 
 /*============================================================================*
  *                           Types
@@ -33,14 +35,14 @@
  *                            Variables
  *============================================================================*/
 /* VIEW */
-const static gui_view_descriptor_t *start_view = NULL;
-const static gui_view_descriptor_t *dashboard_view = NULL;
+static const gui_view_descriptor_t *start_view = NULL;
+static const gui_view_descriptor_t *dashboard_view = NULL;
 
 /* FPS */
-static char fps[10];
-static char widget_count_string[20];
-static char mem_string[20];
-static char low_mem_string[20];
+// static char fps[10];
+// static char widget_count_string[20];
+// static char mem_string[20];
+// static char low_mem_string[20];
 
 #ifdef _WIN32
 uint8_t *resource_root = NULL;
@@ -81,6 +83,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
+#if 0
 static void gui_fps_cb(void *p)
 {
     int fps_num = gui_fps();
@@ -103,6 +106,7 @@ static void gui_fps_cb(void *p)
 }
 
 // Show the FPS, widget count, memory usage, and low memory usage
+
 static void fps_create(void *parent)
 {
     char *text;
@@ -112,7 +116,7 @@ static void fps_create(void *parent)
                                                          70,
                                                          APP_COLOR_GRAY_OPACITY(150));
     gui_obj_create_timer(GUI_BASE(fps_rect), 10, true, gui_fps_cb);
-    sprintf(fps, "FPS:%d", gui_fps());
+    sprintf(fps, "FPS:%d", (int)gui_fps());
     text = fps;
     gui_text_t *t_fps = gui_text_create(fps_rect, "t_fps", 10, 0, gui_get_screen_width(), font_size);
     gui_text_set(t_fps, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
@@ -133,6 +137,7 @@ static void fps_create(void *parent)
     gui_text_type_set(low_mem, HARMONYOS_SANS_BIN, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(t_fps, 2);
 }
+#endif
 
 #ifdef _WIN32
 void dashboard_info_update(int argc, char *argv[])

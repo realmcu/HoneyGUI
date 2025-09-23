@@ -38,14 +38,14 @@
 gui_win_t *win_map = NULL;
 
 static void *img_data = NULL;
-static char dis_str[8] = {0};
+// static char dis_str[8] = {0};
 
-static int16_t x_offset_array[] = {0, 32, 26, 15, -15, -23, -23, -45, -37, 0};
-static int16_t y_offset_array[] = {0, 51, 60, 64, 127, 125, 170, 177, 207, 282};
-static uint16_t distance[] = {0, 100, 20, 20, 110, 15, 50, 40, 50, 130};
-static uint8_t offset_index = 0;
-static int16_t x_offset = 0;
-static int16_t y_offset = 0;
+// static int16_t x_offset_array[] = {0, 32, 26, 15, -15, -23, -23, -45, -37, 0};
+// static int16_t y_offset_array[] = {0, 51, 60, 64, 127, 125, 170, 177, 207, 282};
+// static uint16_t distance[] = {0, 100, 20, 20, 110, 15, 50, 40, 50, 130};
+// static uint8_t offset_index = 0;
+// static int16_t x_offset = 0;
+// static int16_t y_offset = 0;
 static NVGcolor color = {0};
 /*============================================================================*
  *                           Private Functions
@@ -67,6 +67,7 @@ static void exit_animation(void *p)
     }
 }
 
+#if 0
 static void run_animation(void *p)
 {
     (void)p;
@@ -164,6 +165,7 @@ static void run_animation(void *p)
     gui_text_content_set((gui_text_t *)dist, (void *)dis_str, strlen(dis_str));
     // gui_log("x:%d y:%d \n", x_offset, y_offset);
 }
+#endif
 
 static void entrance_animation(void *p)
 {

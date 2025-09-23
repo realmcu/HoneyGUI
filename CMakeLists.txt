@@ -16,6 +16,7 @@ if(ZEPHYR_BASE)
 else()
   add_library(${GUI_TARGET_NAME})
   add_subdirectory(realgui)
+  add_subdirectory(example)
 endif()
 
 message(STATUS "[Complie info] target: ${GUI_TARGET_NAME}")
