@@ -316,7 +316,7 @@ static void app_ui_koiclock_design(gui_view_t *view)
     lite3d_fish[1] = gui_lite3d_create(obj, "lite3d_fish1", fish1, 0, 0, 0, 0);
     lite3d_fish[2] = gui_lite3d_create(obj, "lite3d_fish2", fish2, 0, 0, 0, 0);
 
-    gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 26, 102, 0, 0);
+    gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 55, 90, 0, 0);
     gui_img_set_mode(clock_img, IMG_SRC_OVER_MODE);
     gui_img_t *wave_img = gui_img_create_from_mem(obj, "wave", WAVE_BIN, 0, 0, 0, 0);
     gui_img_set_mode(wave_img, IMG_SRC_OVER_MODE);
