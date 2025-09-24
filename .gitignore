@@ -94,4 +94,5 @@ gui_engine/example/web/tree/diagram.mmd
 win32_sim/build/
 
 # tool
-tool/D2XML/node_modules/
+tool/D2XML/MasterGo_plugin/node_modules/
+tool/D2XML/Pixso_plugin/node_modules/

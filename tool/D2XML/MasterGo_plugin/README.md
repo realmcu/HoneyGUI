@@ -58,7 +58,7 @@ Follow these steps to export your designs using the plugin.
 In the MasterGo app, open the plugin by navigating to Plugins > Development > D2XML.
 
 ### Step 2: Select a Master Layer
-On your canvas, select the top-level Frame you wish to export. The plugin requires a selection to function. This Frame typically represents an entire screen or a complete UI view.
+On your canvas, select all the top-level Frames you wish to export. The plugin requires a selection to function. This Frame typically represents an entire screen or a complete UI view.
 
 ### Step 3: Generate XML
 Click the "Generate XML" button in the plugin panel.

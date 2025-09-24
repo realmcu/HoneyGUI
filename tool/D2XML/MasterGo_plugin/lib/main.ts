@@ -189,23 +189,32 @@ async function nodeToXml(
     let componentFamilyId: string;
     let componentsToScan: readonly SceneNode[] = [];
 
+    // 1. 确定要扫描的组件范围（是单个主组件还是整个组件集）
     if (componentParent && componentParent.type === 'COMPONENT_SET') {
       componentFamilyId = componentParent.id;
-      componentsToScan = componentParent.children;
+      componentsToScan = componentParent.children; // 扫描组件集下的所有变体
     } else {
       componentFamilyId = mainComp.id;
-      componentsToScan = [mainComp];
+      componentsToScan = [mainComp]; // 扫描单个主组件
     }
     
+    // 2. 检查这个组件族是否已经被处理过，防止重复工作
     if (!processedComponentFamilyIds.has(componentFamilyId)) {
       processedComponentFamilyIds.add(componentFamilyId);
-      componentsToScan.forEach(componentNode => {
-        findImageNodesRecursive(componentNode).forEach(imageNode => {
-          if (isImageRectangle(imageNode) && !discoveredImageNodes.includes(imageNode)) {
+
+      // 3. 遍历所有需要扫描的组件定义（变体）
+      for (const componentNode of componentsToScan) {
+        // 4. 在每个组件定义内部递归查找所有符合条件的图片节点
+        const imagesInComponent = findImageNodesRecursive(componentNode);
+        
+        for (const imageNode of imagesInComponent) {
+          // 5. 检查全局列表，如果图片未被添加，则添加
+          const isAlreadyDiscovered = discoveredImageNodes.some(n => n.id === imageNode.id);
+          if (!isAlreadyDiscovered) {
             discoveredImageNodes.push(imageNode);
           }
-        });
-      });
+        }
+      }
     }
     
     let childrenXml = '';
@@ -297,6 +306,7 @@ async function nodeToXml(
   
   let reactionsContent = '';
   if (reactionsToProcess.length > 0) {
+    console.log(node);
     reactionsToProcess.forEach(reaction => {
       const { action, trigger } = reaction;
       if (!trigger || !action || !action.destinationId) return;
@@ -342,15 +352,51 @@ async function nodeToXml(
 
 function collectImagesWithSpecialSkip(node: SceneNode): SceneNode[] {
   if (SPECIAL_KEYWORD_NAMES.has(node.name.toLowerCase())) {
+    console.log(node.name + ' 节点被跳过');
     return [];
   }
 
   let images: SceneNode[] = [];
-  if (isImageRectangle(node)) {
+  if (isImageRectangle(node) || isBasicVectorShape(node)) {
     images.push(node);
   }
+  else if (node.type === 'INSTANCE' && node.mainComponent) {
+    const mainComp = node.mainComponent;
+    const componentParent = mainComp.parent;
+    let componentFamilyId: string;
+    let componentsToScan: readonly SceneNode[] = [];
 
-  if ('children' in node && node.children && node.type !== 'BOOLEAN_OPERATION') {
+    // 1. 确定要扫描的组件范围（是单个主组件还是整个组件集）
+    if (componentParent && componentParent.type === 'COMPONENT_SET') {
+      componentFamilyId = componentParent.id;
+      componentsToScan = componentParent.children; // 扫描组件集下的所有变体
+    } else {
+      componentFamilyId = mainComp.id;
+      componentsToScan = [mainComp]; // 扫描单个主组件
+    }
+    
+    // 2. 检查这个组件族是否已经被处理过，防止重复工作
+    if (!processedComponentFamilyIds.has(componentFamilyId)) {
+      processedComponentFamilyIds.add(componentFamilyId);
+
+      // 3. 遍历所有需要扫描的组件定义（变体）
+      for (const componentNode of componentsToScan) {
+        // 4. 在每个组件定义内部递归查找所有符合条件的图片节点
+        const imagesInComponent = findImageNodesRecursive(componentNode);
+        
+        for (const imageNode of imagesInComponent) {
+          // 5. 检查全局列表，如果图片未被添加，则添加
+          const isAlreadyDiscovered = discoveredImageNodes.some(n => n.id === imageNode.id);
+          if (!isAlreadyDiscovered) {
+            discoveredImageNodes.push(imageNode);
+          }
+        }
+      }
+    }
+    return images;
+  }
+
+  if ('children' in node && node.children && node.type !== 'BOOLEAN_OPERATION' && node.type !== 'GROUP') {
     for (const child of node.children) {
       images = images.concat(collectImagesWithSpecialSkip(child));
     }
@@ -370,8 +416,8 @@ function rgbToHex(color: RGB): string {
 
 function findImageNodesRecursive(node: SceneNode): SceneNode[] {
   let images: SceneNode[] = [];
-  if (isImageRectangle(node)) images.push(node);
-  if ('children' in node && node.type !== 'BOOLEAN_OPERATION') {
+  if (isImageRectangle(node) || isBasicVectorShape(node)) images.push(node);
+  if ('children' in node && node.type !== 'BOOLEAN_OPERATION' && node.type !== 'GROUP') {
     node.children.forEach(child => {
       images = images.concat(findImageNodesRecursive(child));
     });
