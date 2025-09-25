@@ -44,7 +44,7 @@
 // </c>
 
 // <c> RTK GUI View Demo
-// #define CONFIG_REALTEK_BUILD_REAL_VIEW
+#define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>
 
 // <c> RTK GUI List Demo
@@ -88,7 +88,7 @@
 // </c>
 
 // <c> RTK GUI Demo 410 502
-#define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO
 // </c>
 
 // <c> RTK GUI Demo 410 502 WATCH_TURNKEY

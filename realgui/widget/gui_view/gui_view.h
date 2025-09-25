@@ -134,8 +134,9 @@ typedef struct gui_view_descriptor
     void (* on_switch_out)(gui_view_t
                            *view); // Callback function when view is switched out and destroyed.
 
-    uint8_t keep       : 1;
-} gui_view_descriptor_t; // If keep is true, the view will not be destroyed when switch to other view and will be created when register view
+uint8_t keep       :
+    1; // If keep is true, the view will not be destroyed when switch to other view and will be created when register view
+} gui_view_descriptor_t;
 /* gui_view_descriptor end*/
 
 typedef struct gui_view_on_event

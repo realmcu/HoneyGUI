@@ -43,7 +43,8 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static const gui_view_descriptor_t *descriptor_list[100];
+#define MAX_VIEW_NUM 100
+static const gui_view_descriptor_t *descriptor_list[MAX_VIEW_NUM];
 static uint32_t descriptor_count = 0;
 /*============================================================================*
  *                           Private Functions
@@ -56,6 +57,7 @@ static uint32_t descriptor_count = 0;
 
 void gui_view_descriptor_register(const gui_view_descriptor_t *descriptor)
 {
+    GUI_ASSERT(MAX_VIEW_NUM > descriptor_count);
     descriptor_list[descriptor_count] = descriptor;
     descriptor_count++;
 }

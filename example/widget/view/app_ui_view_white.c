@@ -55,8 +55,11 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-static void img_cb()
+static void img_cb(void *obj, gui_event_t e, void *param)
 {
+    (void)obj;
+    (void)param;
+    (void)e;
     gui_view_switch_direct(current_view, blue_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_OUT_NONE_ANIMATION);
 }
