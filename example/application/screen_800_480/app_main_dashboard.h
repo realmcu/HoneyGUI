@@ -14,8 +14,8 @@ extern "C" {
  *                           Variables
  *============================================================================*/
 
-uint8_t scene_flag;
-gui_win_t *win_map;
+extern uint8_t scene_flag;
+extern gui_win_t *win_map;
 
 /*============================================================================*
  *                            Macros
