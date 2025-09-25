@@ -291,7 +291,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    width: 80px;
+                    width: 84px;
                     padding: 3px 6px;
                     border: 1px solid #222e6e;
                     border-radius: 6px;
@@ -472,7 +472,7 @@
         let chatUrl = `${baseProxy}aichatstream`;
         let feedbackUrl = `${baseProxy}AIFeedback`;
 
-        inserChatWidgetHTML(chatTitle, chatPlaceholder, docTarget);
+        inserChatWidgetHTML(chatTitle, chatPlaceholder, docTarget.replace(/realAIfuel/gi, ''));
 
         const userInputNode = document.querySelector('.chat-input textarea');
         const chatModalNode = document.getElementById('ChatModal');
@@ -684,9 +684,9 @@
         $(".chat-content").on("click", "#CopyButton", function(e) {
             const copyBtn = $(this);
             const chatRespMain = copyBtn.closest('.chatResp');
-            if (chatRespMain.length && chatRespMain[0].ansData) {
-                const ansData = chatRespMain[0].ansData;
-                navigator.clipboard.writeText(ansData).then(() => {
+            if (chatRespMain.length && chatRespMain[0].aiMdData) {
+                const aiMdData = chatRespMain[0].aiMdData;
+                navigator.clipboard.writeText(aiMdData).then(() => {
                     updateFeedButton(copyBtn, copyDoneSvg, "Copied");
                 }).catch((error) => {
                     updateFeedButton(copyBtn, copyFailSvg, "Failed");
@@ -745,14 +745,19 @@
             const chatRespMain = opBtn.closest('.chatResp');
             if (!chatRespMain.length) return;
 
-            const opIcon = opBtn.find('.chat-feedback-icon').first();
-            const opIconHTML = opIcon.html();
+            let opIconHTML = "";
+            if (opBtn.attr('id') === 'LikeButton') {
+                opIconHTML = likeSvg;
+            } else {
+                opIconHTML = dislikeSvg;
+            }
             const opText = opBtn.find('.chat-feedback-text').first();
             const opTextHTML = opText.html();
 
             updateFeedButton(opBtn, loadingSvg, opTextHTML);
             const messageId = chatRespMain[0].id;
             const userReaction = opBtn.val();
+
             aiFeedback(messageId, userReaction).then(resFeedBack => {
                 if (resFeedBack.status == "success") {
                     opBtn.addClass("btn-scored").siblings().removeClass("btn-scored");
@@ -836,159 +841,6 @@
         });
 
         /* =============== handle chat message send =============== */
-        let isSending = false; // sending message status param
-        async function fetchChatAnwser(fetchConfig, messageNode) {
-            const { url, options } = fetchConfig;
-            const abortCtrl = new AbortController();
-            let hasError = false;
-            let mdChatText = "";
-            let refList = [];
-
-            /* ================ Interrupt chat request ================ */
-            const abortButton = document.getElementById('ChatAbortBtn');
-            abortButton.addEventListener('click', () => {
-                abortCtrl.abort(); // 中止 fetch 请求
-            });
-
-            const appendErrorMsg = (error, element) => {
-                if (hasError) return;
-
-                element.innerHTML += `<div>${error}</div>`;
-                docRefsList = [];
-                hasError = true;
-                abortCtrl.abort();
-            }
-
-            const updateSendingStatus = (startSending) => {
-                if(startSending) {
-                    isSending = true;
-                    chatRefreshButton.disabled = true;
-                    sendButton.classList.add("btn-hidden");
-                    abortButton.classList.remove("btn-hidden");
-                } else {
-                    chatRefreshButton.disabled = false;
-                    abortButton.classList.add("btn-hidden");
-                    sendButton.classList.remove("btn-hidden");
-                    isSending = false;
-                }
-            }
-
-            try {
-                updateSendingStatus(true);
-                // Init AI chat request and add abort controller
-                const response = await fetch(url, { 
-                    ...options, 
-                    signal: abortCtrl.signal 
-                });
-                if (!response.ok) {
-                    return onChatError(`Http error with status: ${response.status}, please refresh and try again!`, messageNode);
-                }
-
-                // Init massage container
-                messageNode.innerHTML = `<div class="chatResp"></div>`;
-                const asstNode = messageNode.querySelector(".chatResp");
-                if (!asstNode) {
-                    console.error("Assistant feedback element not found, please refresh and try again!");
-                    return;
-                }
-
-                /* ===============================
-                    parsed data chunk example:
-                    {
-                        "role": "assistant",
-                        "content": "xxxxxx",
-                        "docs": [{"url": "xxxx", "title": "xxxx"}],
-                        "status": "success",    // success or error
-                        "error": null           // null or {"error_type": "xxxx", "error_message": "xxxx"}
-                    }
-                  ===============================*/
-                const processChunk = (lineChunk) => {
-                    try {
-                        const parsedChunk = JSON.parse(lineChunk);
-                        if (parsedChunk.status === "success") {
-                            mdChatText = parsedChunk.content;
-                            refList = parsedChunk.docs;
-                            // replace asstNode html content
-                            // asstNode.innerHTML = marked.parse(mdChatText);
-                            const rawHtml = marked.parse(mdChatText);
-                            // const sanitizedHtml = DOMPurify.sanitize(rawHtml);
-                            // asstNode.innerHTML = sanitizedHtml;
-                            asstNode.id = parsedChunk.message_id || "";
-                            asstNode.innerHTML = rawHtml;
-                            asstNode.ansData = mdChatText;
-                        } else if (parsedChunk.status === "error") {
-                            // append html content in asstNode
-                            // appendErrorMsg(`${parsedChunk.error.error_type}: ${parsedChunk.error.message}`, asstNode);
-                            appendErrorMsg(`Internal server error, please refresh and try again!`, asstNode);
-                        }
-                    } catch (error) {
-                        // go on
-                    }
-                    // messageNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                    if(chatContentAutoScroll) {
-                        scrollToBottom(chatContentNode);
-                    }
-                };
-
-                chatContentAutoScroll = true;
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder("utf-8");
-                let pendingBuffer = '';
-
-                // Continuously read data from the stream
-                while (true) {
-                    const { done, value } = await reader.read().catch(error => {
-                        if (error.name === 'AbortError') {
-                            appendErrorMsg(`AI fetch request has been aborted!`, asstNode);
-                        } else {
-                            appendErrorMsg(`Failed to read data stream, please refresh and try again!`, asstNode);
-                        }
-                        return { done: true };
-                    });
-                    if (done || hasError) break;
-
-                    // Decode the current chunk
-                    const newChunk = decoder.decode(value, { stream: true });
-                    processChunk(newChunk);
-
-                    pendingBuffer += newChunk;
-                    let lineEnd;
-                    while ((lineEnd = pendingBuffer.indexOf('\n')) >= 0) {
-                        // const lineChunk = pendingBuffer.slice(0, lineEnd).trim();
-                        const lineChunk = pendingBuffer.slice(0, lineEnd);
-                        pendingBuffer = pendingBuffer.slice(lineEnd + 1);
-
-                        if (!lineChunk) continue;
-
-                        processChunk(lineChunk);
-                    }
-                }
-
-                if (pendingBuffer && !hasError) {
-                    processChunk(pendingBuffer);
-                }
-
-                reader.releaseLock();
-                if (!hasError) {
-                    onChatSuccess(mdChatText, refList, asstNode);
-                }
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    onChatError(`AI fetch request has been aborted!`, messageNode);
-                } else {
-                    onChatError(`An error occured with the ai chat fetch operation, please refresh and try again!`, messageNode);
-                }
-            }
-            finally {
-                // scrolll to chatContentNode bottom
-                if(chatContentAutoScroll) {
-                    scrollToBottom(chatContentNode);
-                }
-                updateSendingStatus(false);
-                onContentBoxScroll();
-            }
-        }
-
         function AIChatFetchConfig(question, histories) {
             // // get current doc version value
             // let curVersion = (document.querySelector("#version-selector")?.value) || "latest";
@@ -1006,7 +858,7 @@
                 aiEnv: aiEnvString,     // aiEnv is PROD or QA
                 docTarget: docSwitch.checked ? docTarget : '',   // optional, 文档标识，用于文档分类
                 rawData: question,      // required, 要詢問 AI 的問句
-                docBase: chatAIBase,    // required, 知識庫id(測試區請使用 2039)
+                docBase: chatAIBase,    // required, 知識庫id(RS_realmcu_B)
                 docVersion: curVersion, // optional, 文檔版本號，若沒有則 AI 會以最新的版本回答
                 // optional, 過去的對話紀錄，請符合範例的格式，
                 // 目前可以輸入長度最多為 6 (三組 user-assistant 組合).若無對話紀錄則不需輸入
@@ -1031,7 +883,150 @@
                 }
             };
         }
-        
+
+        let isSending = false; // sending message status param
+        async function fetchChatAnwser(fetchConfig, messageNode) {
+            const { url, options } = fetchConfig;
+            const abortCtrl = new AbortController();
+            let hasChatError = false;
+
+            /* ================ Interrupt chat request ================ */
+            const abortButton = document.getElementById('ChatAbortBtn');
+            if (abortButton) {
+                abortButton.onclick = null;
+                abortButton.onclick = () => abortCtrl.abort();
+            }
+
+            function appendChatError(error, element) {
+                if (hasChatError) return;
+
+                element.innerHTML += `<div>${error}</div>`;
+                docRefsList = [];
+                abortCtrl.abort();
+                hasChatError = true;
+            }
+            function updateSendingStatus(startSending) {
+                isSending = startSending;
+                chatRefreshButton.disabled = startSending;
+                sendButton.classList.toggle("btn-hidden", startSending);
+                if (abortButton) abortButton.classList.toggle("btn-hidden", !startSending);
+            }
+            /* ====================================================
+                parsed data chunk example:
+                {
+                    "role": "assistant",
+                    "content": "xxxxxx",
+                    "docs": [{"url": "xxxx", "title": "xxxx"}],
+                    "status": "success",    // success or error
+                    "error": null           // null or {"error_type": "xxxx", "error_message": "xxxx"}
+                }
+            =========================================================*/
+            function processChunk(chunkData, element) {
+                try {
+                    const parsedChunk = JSON.parse(chunkData);
+                    if (parsedChunk.status === "success") {
+                        let mdChatText = parsedChunk.content;
+                        let refList = parsedChunk.docs || [];
+                        // replace element html content
+                        const rawHtml = marked.parse(mdChatText);
+                        // const sanitizedHtml = DOMPurify.sanitize(rawHtml);
+                        // element.innerHTML = sanitizedHtml;
+                        element.id = parsedChunk.message_id || "";
+                        element.aiMdData = mdChatText;
+                        element.aiRefList = JSON.stringify(refList);
+
+                        element.innerHTML = rawHtml;
+                    } else if (parsedChunk.status === "error") {
+                        // append html content in element
+                        appendChatError(`Internal server error, please refresh and try again!`, element);
+                    }
+                } catch (e) { /* skip, process next data chunk */ }
+
+                if(chatContentAutoScroll) {
+                    scrollToBottom(chatContentNode);
+                }
+            }
+
+            try {
+                updateSendingStatus(true);
+                chatContentAutoScroll = true;
+                // Init AI chat request and add abort controller
+                const response = await fetch(url, { 
+                    ...options, 
+                    signal: abortCtrl.signal 
+                });
+                if (!response.ok) {
+                    return onChatError(`Http error with status: ${response.status}, please refresh and try again!`, messageNode);
+                }
+
+                // Init massage container
+                messageNode.innerHTML = `<div class="chatResp"></div>`;
+                const asstNode = messageNode.querySelector(".chatResp");
+                if (!asstNode) {
+                    console.error("Assistant feedback element not found, please refresh and try again!");
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let pendingBuffer = '';
+
+                // Continuously read data from the stream
+                while (true) {
+                    const { done, value } = await reader.read().catch(error => {
+                        if (error.name === 'AbortError') {
+                            appendChatError(`AI fetch request has been aborted!`, asstNode);
+                        } else {
+                            appendChatError(`Failed to read data stream, please refresh and try again!`, asstNode);
+                        }
+                        return { done: true };
+                    });
+                    if (done || hasChatError) break;
+
+                    // Decode the current chunk
+                    const newChunk = decoder.decode(value, { stream: true });
+                    processChunk(newChunk, asstNode);
+
+                    pendingBuffer += newChunk;
+                    let lineEnd;
+                    while ((lineEnd = pendingBuffer.indexOf('\n')) >= 0) {
+                        // const lineChunk = pendingBuffer.slice(0, lineEnd).trim();
+                        const lineChunk = pendingBuffer.slice(0, lineEnd);
+                        pendingBuffer = pendingBuffer.slice(lineEnd + 1);
+
+                        if (!lineChunk) continue;
+
+                        processChunk(lineChunk, asstNode);
+                    }
+                }
+
+                if (pendingBuffer && !hasChatError) {
+                    processChunk(pendingBuffer, asstNode);
+                }
+
+                reader.releaseLock();
+                if (!hasChatError) {
+                    let aiMdData = asstNode.aiMdData;
+                    let aiRefList = JSON.parse(asstNode.aiRefList || '[]');
+                    onChatSuccess(aiMdData, aiRefList, asstNode);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    onChatError(`AI fetch request has been aborted!`, messageNode);
+                } else {
+                    onChatError(`An error occured with the ai chat fetch operation, please refresh and try again!`, messageNode);
+                }
+            }
+            finally {
+                // scrolll to chatContentNode bottom
+                if(chatContentAutoScroll) {
+                    scrollToBottom(chatContentNode);
+                }
+                updateSendingStatus(false);
+                onContentBoxScroll();
+            }
+        }
+
         function sendChatMessage() {
             const userInputValue = userInputNode.value;
             if (userInputValue.trim() === '') return;
