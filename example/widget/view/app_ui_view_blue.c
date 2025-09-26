@@ -6,8 +6,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "../../assets/tiger_blue.txt"
-#include "../../assets/tiger_white.txt"
-#include "../../assets/tiger_yellow.txt"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_win.h"
@@ -32,7 +30,6 @@ static const gui_view_descriptor_t descriptor =
 
     .on_switch_in = switch_in_cb,
     .on_switch_out = switch_out_cb,
-
     .keep = true,
 };
 
@@ -58,16 +55,16 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
-    (void)obj;
-    (void)e;
-    (void)param;
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
     gui_view_switch_direct(current_view, white_view_descriptor, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_OUT_NONE_ANIMATION);
 }
 
 static void switch_out_cb(gui_view_t *view)
 {
-    (void)view;
+    GUI_UNUSED(view);
     gui_log("blue view clean\n");
 }
 

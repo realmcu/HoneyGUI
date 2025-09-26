@@ -1,20 +1,18 @@
 <template>
   <div class="container">
     <h2>设计转 XML 插件</h2>
-    <p>1. 点击 "生成 XML"; 2. 如果有图片，"导出图片" 按钮将激活。</p>
+    <p>1. 点击 "生成 XML"; 2. 如果有内容，"导出" 按钮将激活。</p>
     
-    <!-- [新增] 添加关于图层命名的提示 -->
     <p style="color: #FFC700; font-weight: bold;">注意：为确保兼容性，所有图层命名请勿使用中文字符。</p>
     
     <button @click="generateXml">生成 XML</button>
     
-    <button @click="exportImages" :disabled="!canExportImages || isExporting">
-      {{ isExporting ? '正在导出...' : '导出图片 (.zip)' }}
+    <!-- [修改] 按钮文本、点击事件和禁用逻辑 -->
+    <button @click="exportPackage" :disabled="!xmlOutput || xmlOutput === '正在生成...' || isExporting">
+      {{ isExporting ? '正在导出...' : '导出 (.zip)' }}
     </button>
     
     <textarea ref="xmlTextarea" v-model="xmlOutput" placeholder="生成的 XML 将显示在这里..." readonly></textarea>
-    
-    <button @click="copyToClipboard" :disabled="!xmlOutput">复制到剪贴板</button>
   </div>
 </template>
 
@@ -27,33 +25,22 @@ const xmlTextarea = ref<HTMLTextAreaElement | null>(null);
 
 const xmlOutput = ref('');
 const isExporting = ref(false);
-const canExportImages = ref(false);
+// [移除] 不再需要 canExportImages 状态
+// const canExportImages = ref(false);
 
 const generateXml = () => {
   xmlOutput.value = '正在生成...';
-  canExportImages.value = false;
+  // [移除] 不再需要重置 canExportImages
+  // canExportImages.value = false;
   console.log('UI: 正在发送 "generate-xml" 消息到核心逻辑...');
   parent.postMessage({ pluginMessage: { type: 'generate-xml' } }, '*');
 };
 
-const exportImages = () => {
-  console.log('UI: 正在发送 "export-images" 消息到核心逻辑...');
+// [修改] 函数重命名，并发送新的消息类型
+const exportPackage = () => {
+  console.log('UI: 正在发送 "export-package" 消息到核心逻辑...');
   isExporting.value = true;
-  parent.postMessage({ pluginMessage: { type: 'export-images' } }, '*');
-};
-
-const copyToClipboard = () => {
-  if (!xmlOutput.value || !xmlTextarea.value) return;
-
-  xmlTextarea.value.focus();
-  xmlTextarea.value.select();
-
-  parent.postMessage({ 
-    pluginMessage: { 
-      type: 'notify', 
-      message: '已全选，请按 Ctrl+C 或 Cmd+C 复制' 
-    } 
-  }, '*');
+  parent.postMessage({ pluginMessage: { type: 'export-package' } }, '*');
 };
 
 const handleMessage = (event: MessageEvent) => {
@@ -66,31 +53,36 @@ const handleMessage = (event: MessageEvent) => {
     xmlOutput.value = message.data;
   }
   
-  if (message.type === 'images-discovered') {
-    if (message.count > 0) {
-      canExportImages.value = true;
-    }
-  }
+  // [移除] 不再需要处理 images-discovered 消息
+  // if (message.type === 'images-discovered') { ... }
 
-  if (message.type === 'zip-and-download') {
-    const imageData = message.payload;
+  // [修改] 消息类型重命名，并更新打包逻辑
+  if (message.type === 'package-for-download') {
+    const payload = message.payload;
     isExporting.value = false;
 
-    if (!imageData || imageData.length === 0) {
-      parent.postMessage({ pluginMessage: { type: 'notify', message: '没有需要导出的图片。', options: { error: true } } }, '*');
+    if (!payload || (!payload.images?.length && !payload.xml)) {
+      parent.postMessage({ pluginMessage: { type: 'notify', message: '没有需要导出的内容。', options: { error: true } } }, '*');
       return;
     }
 
     const zip = new JSZip();
-    if (Array.isArray(imageData)) {
-      imageData.forEach((image: { filename: string, data: Uint8Array }) => {
-        zip.file(image.filename, image.data);
+    
+    // 1. 添加 XML 文件
+    if (payload.xml) {
+      zip.file("design.xml", payload.xml);
+    }
+    
+    // 2. 添加图片文件
+    if (Array.isArray(payload.images)) {
+      payload.images.forEach((image: { filename: string, data: Uint8Array }) => {
+        zip.file(`resource/${image.filename}`, image.data);
       });
     }
 
     zip.generateAsync({ type: "blob" })
       .then(content => {
-        saveAs(content, "exported_images.zip");
+        saveAs(content, "pixso_export.zip"); // 修改 zip 文件名
       });
   }
 };

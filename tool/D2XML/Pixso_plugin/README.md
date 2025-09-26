@@ -66,15 +66,15 @@ On your canvas, select the top-level frame(s) you wish to export. The plugin req
 -   The plugin will process your selection and display the generated XML code in the text area.
 -   A notification will pop up, informing you how many images were found in the selected layers.
 
-### Step 4: Export Images
+### Step 4: Export Images and XML File
 
--   After generating the XML, if any images were found, the **"Export Images"** button will become available.
+-   After the XML is generated, if any images are detected, the "Export" button will become enabled.
 -   Click this button, and it will package all discovered images into a `.zip` file, which will be downloaded by your browser.
 -   **Note**: You must run "Generate XML" first to discover the images before you can export them.
 
 ### Step 5: Split the XML File for HoneyGUI
 
--   After generating the XML, copy the text content into the `tool/D2XML/spilt_xml/__template.xml` file and save it.
+-   Copy the `design.xml` file from the downloaded zip package to the `tool/D2XML/split_xml/` directory.
 -   Double-click the `split_xml.bat` script in the same directory to get multiple XML files. Copy these files into the HoneyGUI project folder, which is typically `root/root_image/`.
 
 ## Core Concept: Special Keyword Handling

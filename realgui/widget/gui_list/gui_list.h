@@ -72,6 +72,7 @@ typedef struct gui_list
     int offset;                  // offset = hold + tp_delta, when sliding.
     int hold;
     int total_length;
+    int16_t card_stack_location; // the distance from stack location to the screen bottom
 
     uint16_t created_note_index; // Index of the last created note.
     uint8_t keep_note_num;       // Number of created notes.
@@ -184,6 +185,8 @@ void gui_list_set_bar_color(gui_list_t *list, gui_color_t color);
  * @param num The spacific number, must be a nonnegative number.
  */
 void gui_list_set_note_num(gui_list_t *list, uint16_t num);
+
+void gui_list_set_card_stack_location(gui_list_t *list, int16_t location);
 
 #ifdef __cplusplus
 }

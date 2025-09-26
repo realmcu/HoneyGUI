@@ -10,12 +10,12 @@ import re
 #                summary of all found screens.
 #   Requirements: Python 3.x
 #   Usage:
-#     1. Place this script in the same directory as your '__template.xml' file.
+#     1. Place this script in the same directory as your 'design.xml' file.
 #     2. Open a terminal/CMD in that directory and run: python split_screens.py
 # ============================================================================
 
 # --- 1. Configuration ---
-INPUT_FILENAME = "__template.xml"
+INPUT_FILENAME = "design.xml"
 DESCRIPTOR_FILENAME = "view_descriptor.xml"  # [NEW] Name for the new descriptor file
 XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n'
 
@@ -27,9 +27,9 @@ def sanitize_filename(name: str) -> str:
 
 def cleanup_xml_files():
     """
-    Delete all XML files in the current directory except '__template.xml'
+    Delete all XML files in the current directory except 'design.xml'
     """
-    print("[INFO] Cleaning up existing XML files (except '__template.xml')...")
+    print("[INFO] Cleaning up existing XML files (except 'design.xml')...")
     files_deleted = 0
     
     for filename in os.listdir('.'):
@@ -44,7 +44,7 @@ def cleanup_xml_files():
     if files_deleted > 0:
         print(f"[INFO] Cleanup completed. Removed {files_deleted} XML file(s).")
     else:
-        print("[INFO] No XML files found to remove (except '__template.xml').")
+        print("[INFO] No XML files found to remove (except 'design.xml').")
     print()
 
 def split_screens():

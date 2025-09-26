@@ -5,13 +5,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "../../assets/tiger_blue.txt"
-#include "../../assets/tiger_grey.txt"
-#include "../../assets/tiger_laven.txt"
 #include "../../assets/tiger_lime.txt"
-#include "../../assets/tiger_turk.txt"
-#include "../../assets/tiger_white.txt"
-#include "../../assets/tiger_yellow.txt"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
@@ -32,7 +26,6 @@ static const gui_view_descriptor_t descriptor =
 
     .on_switch_in = app_ui_view_lime_design,
     .on_switch_out = NULL,
-
     .keep = false,
 };
 
@@ -57,9 +50,9 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
-    (void)obj;
-    (void)e;
-    (void)param;
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
     gui_view_switch_direct(current_view, blue_view, SWITCH_OUT_ANIMATION_ZOOM,
                            SWITCH_IN_ANIMATION_ZOOM);
 }

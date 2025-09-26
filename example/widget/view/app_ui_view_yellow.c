@@ -5,12 +5,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "../../assets/tiger_blue.txt"
-#include "../../assets/tiger_grey.txt"
-#include "../../assets/tiger_laven.txt"
-#include "../../assets/tiger_lime.txt"
-#include "../../assets/tiger_turk.txt"
-#include "../../assets/tiger_white.txt"
 #include "../../assets/tiger_yellow.txt"
 #include "gui_server.h"
 #include "gui_components_init.h"
@@ -32,7 +26,6 @@ static const gui_view_descriptor_t descriptor =
 
     .on_switch_in = app_ui_view_yellow_design,
     .on_switch_out = NULL,
-
     .keep = false,
 };
 
@@ -59,7 +52,8 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void app_ui_view_yellow_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);
-    gui_img_create_from_mem(view, "img", (void *)_actiger_yellow, 0, 0, 0, 0);
+    gui_img_create_from_mem(view, "img", (void *)_actiger_yellow, 0, 0, 0,
+                            0);
 
     gui_view_switch_on_event(view, white_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
                              SWITCH_IN_FROM_LEFT_USE_ROTATE,

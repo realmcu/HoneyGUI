@@ -19,8 +19,6 @@
  *============================================================================*/
 #include <string.h>
 #include "guidef.h"
-#include "tp_algo.h"
-#include "kb_algo.h"
 #include "gui_matrix.h"
 #include "gui_obj.h"
 #include "gui_win.h"

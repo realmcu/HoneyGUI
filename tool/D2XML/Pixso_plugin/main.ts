@@ -1,11 +1,11 @@
 // --- 类型定义 ---
-//highlight-start
 /**
  * 定义从 UI 发送到核心逻辑的消息结构
  */
 type PluginUIMessage = 
   | { type: 'generate-xml' }
-  | { type: 'export-images' }
+  // [修改] 消息类型重命名
+  | { type: 'export-package' } 
   | { type: 'notify', message: string, options?: NotificationOptions };
 
 /**
@@ -20,7 +20,9 @@ interface ParentInstanceInfo {
 // --- 全局状态管理 ---
 let discoveredImageNodes: SceneNode[] = [];
 let processedComponentFamilyIds: Set<string> = new Set();
-//highlight-end
+// [新增] 用于存储最近一次生成的 XML 字符串
+let lastGeneratedXml: string = '';
+
 const SPECIAL_KEYWORD_NAMES = new Set(['cellular', 'list', 'video']);
 
 // 显示插件UI，并设置一个合适的初始尺寸
@@ -29,12 +31,9 @@ pixso.showUI(__html__, { width: 400, height: 600 });
 /**
  * 主消息处理器，负责监听并响应来自UI界面的事件。
  */
-//highlight-start
 pixso.ui.onmessage = async (msg: PluginUIMessage) => {
-//highlight-end
   console.log('核心逻辑: 收到来自 UI 的消息', msg);
   
-  // Pixso 中 msg 对象就是消息本身，不需要 .pluginMessage 包装
   const messageData = msg;
 
   const currentPage = pixso.currentPage;
@@ -63,21 +62,25 @@ pixso.ui.onmessage = async (msg: PluginUIMessage) => {
       const notificationMessages: Set<string> = new Set();
       discoveredImageNodes = [];
       processedComponentFamilyIds.clear();
+      lastGeneratedXml = ''; // 重置
 
       let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n';
       
       for (const frameNode of selectedFrames) {
         xmlString += await nodeToXml(frameNode, '', false, undefined, notificationMessages);
       }
+      
+      // [新增] 将生成的 XML 存储在全局变量中
+      lastGeneratedXml = xmlString;
 
       pixso.ui.postMessage({ type: 'xml-generated', data: xmlString });
-      pixso.ui.postMessage({ type: 'images-discovered', count: discoveredImageNodes.length });
+      
+      // [移除] 不再需要向 UI 单独发送图片数量
+      // pixso.ui.postMessage({ type: 'images-discovered', count: discoveredImageNodes.length });
       
       if (discoveredImageNodes.length > 0) {
-        //highlight-start
         const filenameCounts = new Map<string, number>();
         discoveredImageNodes.forEach((imageNode: SceneNode) => {
-        //highlight-end
           const filename = generateImageFilename(imageNode);
           filenameCounts.set(filename, (filenameCounts.get(filename) || 0) + 1);
         });
@@ -95,7 +98,9 @@ pixso.ui.onmessage = async (msg: PluginUIMessage) => {
         const finalMessage = Array.from(notificationMessages).join('\n');
         pixso.notify(finalMessage, { timeout: 8000 });
       } else if (discoveredImageNodes.length > 0) {
-        pixso.notify(`已识别出 ${discoveredImageNodes.length} 张图片，现在可以导出了。`);
+        pixso.notify(`XML 生成完毕！已识别出 ${discoveredImageNodes.length} 张图片，现在可以导出了。`);
+      } else {
+        pixso.notify(`XML 生成完毕！现在可以导出了。`);
       }
 
     } catch (error) {
@@ -104,35 +109,44 @@ pixso.ui.onmessage = async (msg: PluginUIMessage) => {
     }
   }
 
-  else if (messageData.type === 'export-images') {
-    if (discoveredImageNodes.length === 0) {
-      pixso.notify('没有可导出的图片。请先点击“生成 XML”来查找图层中的图片。');
-      pixso.ui.postMessage({ type: 'zip-and-download', payload: [] });
+  // [修改] 将 'export-images' 逻辑替换为 'export-package'
+  else if (messageData.type === 'export-package') {
+    if (!lastGeneratedXml) {
+      pixso.notify('没有可导出的内容。请先点击“生成 XML”。');
+      pixso.ui.postMessage({ type: 'package-for-download', payload: null });
       return;
     }
 
     try {
+      // 1. 异步导出所有图片
       const imageDataPayload = await Promise.all(discoveredImageNodes.map(async (imageNode) => {
         const imageBytes = await imageNode.exportAsync({ format: 'PNG' });
         const filename = generateImageFilename(imageNode);
         return { filename, data: imageBytes };
       }));
-      pixso.ui.postMessage({ type: 'zip-and-download', payload: imageDataPayload });
+
+      // 2. 准备包含 XML 和图片数据的 payload
+      const payload = {
+        xml: lastGeneratedXml,
+        images: imageDataPayload
+      };
+      
+      // 3. 将所有数据一次性发送到 UI 进行打包
+      pixso.ui.postMessage({ type: 'package-for-download', payload: payload });
 
     } catch (error) {
-      console.error('核心逻辑: 导出图片时发生错误:', error);
-      pixso.notify('导出图片失败，请查看插件开发者工具获取详情。');
+      console.error('核心逻辑: 导出打包文件时发生错误:', error);
+      pixso.notify('导出失败，请查看插件开发者工具获取详情。');
     }
   }
+
   else if (messageData.type === 'notify') {
     pixso.notify(messageData.message, messageData.options || {});
   }
 };
 
-/**
- * 将单个场景节点递归转换为XML字符串。
- */
-//highlight-start
+// ... nodeToXml 和其他辅助函数保持不变 ...
+// (此处省略了未修改的 nodeToXml 及其他辅助函数代码，它们与您之前提供的版本相同)
 async function nodeToXml(
   node: SceneNode, 
   indent: string, 
@@ -140,7 +154,7 @@ async function nodeToXml(
   parentInstanceInfo: ParentInstanceInfo | undefined, 
   notificationMessages: Set<string>
 ): Promise<string> {
-//highlight-end
+//highlight-start
   const chineseCharsRegex = /[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/;
 
   if (node.type === 'FRAME' && isInsideFrame) {
@@ -175,7 +189,8 @@ async function nodeToXml(
         `x="${Math.round(node.x + offsetX)}"`,
         `y="${Math.round(node.y + offsetY)}"`,
         `w="${Math.round(node.width)}"`,
-        `h="${Math.round(node.height)}"`
+        `h="${Math.round(node.height)}"`,
+        `hide="${node.visible === false ? 1 : 0}"`,
       ];
 
       const attrIndent = indent + '  ';
@@ -260,7 +275,8 @@ async function nodeToXml(
     `x="${Math.round(node.x + offsetX)}"`,
     `y="${Math.round(node.y + offsetY)}"`,
     `w="${Math.round(node.width)}"`,
-    `h="${Math.round(node.height)}"`
+    `h="${Math.round(node.height)}"`,
+    `hide="${node.visible === false ? 1 : 0}"`,
   ];
 
   if (node.type === 'TEXT') {

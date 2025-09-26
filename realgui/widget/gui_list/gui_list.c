@@ -482,6 +482,7 @@ static void gui_list_note_circle(gui_obj_t *obj)
     matrix_translate(-obj->x, -obj->y, obj->matrix);
 
     int32_t r = (list->dir == HORIZONTAL) ? list->base.h : list->base.w;
+    r *= 2;
     int32_t diff = (list->dir == HORIZONTAL)
                    ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
                    : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
@@ -525,7 +526,8 @@ static void gui_list_note_card(gui_obj_t *obj)
     int obj_location, list_length, list_location;
     if (list->dir == HORIZONTAL)
     {
-        int16_t limit = (int16_t)(list->base.x + list->base.w - (int16_t)(list->note_length * scale_1));
+        int16_t limit = (int16_t)(list->base.x + list->base.w - list->card_stack_location - (int16_t)(
+                                      list->note_length * scale_1));
         if (obj->x > limit)
         {
             obj->x = limit;
@@ -536,7 +538,8 @@ static void gui_list_note_card(gui_obj_t *obj)
     }
     else
     {
-        int16_t limit = (int16_t)(list->base.y + list->base.h - (int16_t)(list->note_length * scale_1));
+        int16_t limit = (int16_t)(list->base.y + list->base.h - list->card_stack_location - (int16_t)(
+                                      list->note_length * scale_1));
         if (obj->y > limit)
         {
             obj->y = limit;
@@ -545,7 +548,8 @@ static void gui_list_note_card(gui_obj_t *obj)
         list_length = list->base.h;
         list_location = list->base.y;
     }
-    int location_1 = list_location + list_length - (int16_t)(list->note_length * scale_1);
+    int location_1 = list_location + list_length - list->card_stack_location - (int16_t)(
+                         list->note_length * scale_1);
     int location_0 = location_1 - list->note_length / 3;
 
     if (obj_location >= location_0 && obj_location <= location_1)
@@ -1014,4 +1018,9 @@ void gui_list_set_offset(gui_list_t *list, int16_t offset)
 void gui_list_set_bar_color(gui_list_t *list, gui_color_t color)
 {
     list->bar_color = color;
+}
+
+void gui_list_set_card_stack_location(gui_list_t *list, int16_t location)
+{
+    list->card_stack_location = location;
 }
