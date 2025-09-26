@@ -68,8 +68,8 @@ menuconfig REALTEK_HONEYGUI
                 config REALTEK_BUILD_GUI_800_480_DEMO
                     bool "Enable 800_480_DEMO"
 
-                config REALTEK_BUILD_GUI_DEMO
-                    bool "Enable Simple GUI_DEMO"
+                config REALTEK_BUILD_GUI_IMAGE_EXAMPLE
+                    bool "Enable HoneyGUI image widget example"
 
                 config REALTEK_BUILD_GUI_320_384_DEMO
                     bool "Enable 320_384_DEMO"

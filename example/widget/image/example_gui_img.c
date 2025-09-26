@@ -10,9 +10,9 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "../../assets/tiger_blue_compressed.txt"
-#include "jpeg.c"
-#include "green.c"
-#include "gif_demo.c"
+#include "jpeg.txt"
+#include "green.txt"
+#include "gif_demo.txt"
 
 
 /* gui image widget example start*/
@@ -34,9 +34,9 @@ void test_timer_cb(void *param)
 static int app_init(void)
 {
 
-    // void *addr = (void *)_actiger_blue_compressed;
+    void *addr = (void *)_actiger_blue_compressed;
     // void *addr = (void *)_acgreen;
-    void *addr = (void *)_acgif_demo;
+    // void *addr = (void *)_acgif_demo;
 
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
 
