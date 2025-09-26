@@ -45,6 +45,17 @@ typedef struct information
     extern void gui_obj_tree_get_widget_by_name(gui_obj_t *, const char *, gui_obj_t **);\
     gui_obj_tree_get_widget_by_name((void *)root_widget, name, &pointer);
 
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+extern struct tm *timeinfo;
+extern const char *month[12];
+extern const char *day[7];
+
+
+/*============================================================================*
+ *                           Punblic Functions
+ *============================================================================*/
 // Generate a pseudo-random number
 uint16_t xorshift16(void);
 

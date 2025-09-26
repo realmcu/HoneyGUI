@@ -27,7 +27,7 @@
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
-static void watchface_design(gui_view_t *view);
+static void app_main_watch_ui_design(gui_view_t *view);
 static void inform_generate_cb(void);
 
 /*============================================================================*
@@ -44,7 +44,7 @@ static gui_view_descriptor_t const descriptor =
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .on_switch_in = watchface_design,
+    .on_switch_in = app_main_watch_ui_design,
     .on_switch_out = NULL,
     .keep = false,
 };
@@ -67,6 +67,34 @@ static char low_mem_string[20];
 unsigned char *resource_root = NULL;
 #endif
 
+/* Date */
+const char *month[12] =
+{
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC"
+};
+
+const char *day[7] =
+{
+    "SUN",
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT"
+};
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -81,7 +109,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    // menu_view = gui_view_descriptor_get("menu_view");
+    menu_view = gui_view_descriptor_get("menu_view");
     // control_view = gui_view_descriptor_get("control_view");
     // bottom_view = gui_view_descriptor_get("bottom_view");
     // top_view = gui_view_descriptor_get("top_view");
@@ -125,52 +153,51 @@ static void fps_create(void *parent)
     text = fps;
     gui_text_t *t_fps = gui_text_create(fps_rect, "t_fps", 10, 0, gui_get_screen_width(), font_size);
     gui_text_set(t_fps, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(t_fps, INTERREGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_fps, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(t_fps, 2);
     gui_text_t *widget_count = gui_text_create(fps_rect, "widget_count", 10, 16, gui_get_screen_width(),
                                                font_size);
     gui_text_set(widget_count, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(widget_count, INTERREGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(widget_count, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
     gui_text_t *mem = gui_text_create(fps_rect, "mem", 10, 16 * 2, gui_get_screen_width(), font_size);
     gui_text_set(mem, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(mem, INTERREGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(mem, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(mem, 2);
     gui_text_t *low_mem = gui_text_create(fps_rect, "low_mem", 10, 16 * 3, gui_get_screen_width(),
                                           font_size);
     gui_text_set(low_mem, text, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255), strlen(text), font_size);
-    gui_text_type_set(low_mem, INTERREGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(low_mem, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
     gui_text_rendermode_set(low_mem, 2);
 }
 
 // Enter menu and change menu style by button
-static void kb_button_cb(void *param)
+static void kb_button_cb(void)
 {
-    (void)param;
     extern gui_kb_port_data_t *kb_get_data(void);
     gui_kb_port_data_t *kb = kb_get_data();
     static uint32_t time_press = 0;
     static bool hold = 0;
     static bool press_his = 0;
-    static uint32_t release_his = 0;
+    // static uint32_t release_his = 0;
     if (hold)
     {
         if (kb->event == GUI_KB_EVENT_UP)
         {
             hold = 0;
-            uint32_t time = kb->timestamp_ms_release - time_press;
-            if (time <= 150)
-            {
-                // Press twice quickly to change menu style
-                if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
-                {
-                    gui_log("change menu style\n");
-                    menu_style = !menu_style;
-                }
-                press_his = !press_his;
-                release_his = kb->timestamp_ms_release;
-                return;
-            }
-            else
+            // uint32_t time = kb->timestamp_ms_release - time_press;
+            // if (time <= 150)
+            // {
+            //     // Press twice quickly to change menu style
+            //     if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
+            //     {
+            //         gui_log("change menu style\n");
+            //         menu_style = !menu_style;
+            //     }
+            //     press_his = !press_his;
+            //     release_his = kb->timestamp_ms_release;
+            //     return;
+            // }
+            // else
             {
                 // Press once to enter menu
                 press_his = 0;
@@ -274,33 +301,16 @@ static void win_cb(void *param)
     timeinfo = localtime(&rawtime);
     static uint8_t count = 0;
     count++;
-    if (count >= 5)
+    if (count == 5)
     {
         count = 0;
-        json_refreash();
+        // json_refreash();
     }
 #else
     timeinfo = &watch_time;
 #endif
-    inform_generate_cb();
-}
-
-static void watchface_design(gui_view_t *view)
-{
-    GUI_UNUSED(view);
-    /* view layout */
-    // gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
-    //                          SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
-    //                          GUI_EVENT_TOUCH_MOVE_UP);
-    // gui_view_switch_on_event(view, top_view, SWITCH_OUT_STILL_USE_BLUR,
-    //                          SWITCH_IN_FROM_TOP_USE_TRANSLATION,
-    //                          GUI_EVENT_TOUCH_MOVE_DOWN);
-    // gui_view_switch_on_event(view, control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
-    //                          SWITCH_IN_FROM_LEFT_USE_ROTATE,
-    //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
-
-    // gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
-    // gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
+    // kb_button_cb();
+    // inform_generate_cb();
 }
 
 // Send information to the top view
@@ -340,20 +350,22 @@ static void inform_generate_cb(void)
     // add_information(&payload);
 }
 
-static void app_main_watch_ui_design(void)
+static void app_main_watch_ui_design(gui_view_t *view)
 {
-    gui_log("app_main_watch_ui_design\n");
-
-    cjson_content = gui_malloc(700);
-    memcpy(cjson_content, CJSON_DATA_BIN, 700);
-    json_refreash();
-
-    gui_win_t *win = gui_win_create(gui_obj_get_root(), "app_main_watch_win", 0, 0, 0, 0);
-    GUI_UNUSED(win);
-    fps_create(gui_obj_get_root());
-    // gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
-    // gui_obj_start_timer(GUI_BASE(win));
-    // win_cb(NULL);
+    // gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
+    //                          SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+    //                          GUI_EVENT_TOUCH_MOVE_UP);
+    // gui_view_switch_on_event(view, top_view, SWITCH_OUT_STILL_USE_BLUR,
+    //                          SWITCH_IN_FROM_TOP_USE_TRANSLATION,
+    //                          GUI_EVENT_TOUCH_MOVE_DOWN);
+    // gui_view_switch_on_event(view, control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
+    //                          SWITCH_IN_FROM_LEFT_USE_ROTATE,
+    //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
+    extern void create_watchface_labubu(gui_obj_t *parent);
+    create_watchface_labubu((void *)view);
 }
 
 extern const unsigned char _binary_root_0x704D1400_bin_start[];
@@ -366,7 +378,18 @@ static int app_init(void)
     resource_root = (unsigned char *)_binary_root_0x704D1400_bin_start;
 #endif
 
-    app_main_watch_ui_design();
+    cjson_content = gui_malloc(700);
+    memcpy(cjson_content, CJSON_DATA_BIN, 700);
+    json_refreash();
+
+    gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
+    // fps_create(gui_obj_get_root());
+    gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
+    gui_obj_start_timer(GUI_BASE(win));
+    win_cb(NULL);
+
+    gui_view_create(win, &descriptor, 0, 0, 0, 0);
+
     return 0;
 }
 GUI_INIT_APP_EXPORT(app_init);

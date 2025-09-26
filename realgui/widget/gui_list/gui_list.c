@@ -482,7 +482,7 @@ static void gui_list_note_circle(gui_obj_t *obj)
     matrix_translate(-obj->x, -obj->y, obj->matrix);
 
     int32_t r = (list->dir == HORIZONTAL) ? list->base.h : list->base.w;
-    r *= 2;
+    r *= 3;
     int32_t diff = (list->dir == HORIZONTAL)
                    ? (list->base.w / 2 + list->base.x) - (obj->x + list->note_length / 2)
                    : (list->base.h / 2 + list->base.y) - (obj->y + list->note_length / 2);
