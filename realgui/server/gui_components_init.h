@@ -47,10 +47,11 @@ typedef int (*gui_init_fn_t)(void);
 
 #define GUI_APP_USED                     __attribute__((used))
 #define GUI_APP_SECTION(x)                  __attribute__((section(x)))
+#define GUI_FN_ALIGN                    __attribute__((aligned(sizeof(void *))))
 
 
 #define GUI_APP_INIT_EXPORT(fn, level)                                                       \
-    GUI_APP_USED const gui_init_fn_t __ui_init_##fn GUI_APP_SECTION(".uii_fn." level) = fn
+    GUI_APP_USED const gui_init_fn_t __honeygui_init_##fn GUI_APP_SECTION(".honeygui$init" level) GUI_FN_ALIGN= fn
 
 /* board init routines will be called in board_init() function */
 #define GUI_INIT_BOARD_EXPORT(fn)           GUI_APP_INIT_EXPORT(fn, "1")
