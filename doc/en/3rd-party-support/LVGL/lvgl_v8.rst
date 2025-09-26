@@ -716,7 +716,7 @@ Please refer to the following steps for usage in `LVGL Overview Images - Online 
 
 The `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
 
-It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of ``4 Byte header + data``. The ``lv_img_header_t`` contains information such as ``color format``, ``width``, and ``height``. To construct a complete ``lv_img_dsc_t`` to describe the image, you can calculate the ``data_size`` using the information from the `:`lv_img_header_t``.
+It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of ``4 Byte header + data``. The ``lv_img_header_t`` contains information such as ``color format``, ``width``, and ``height``. To construct a complete ``lv_img_dsc_t`` to describe the image, you can calculate the ``data_size`` using the information from the ``lv_img_header_t``.
 
 .. code-block:: c
 
