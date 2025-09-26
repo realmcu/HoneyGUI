@@ -133,14 +133,22 @@ html_show_sphinx = False
 html_static_path = ['_static']
 html_js_files = [
     'js/auth.js',
+    'js/purify.min.js',
+    'js/marked.min.js',
+    'js/typed.umd.js',
     'js/custom.js',
     'js/versions.js',
     'js/imgmodal.js',
     'js/aisummary.js',
     'js/chatwidget.js',
-    'js/marked.min.js',
-    'js/typed.umd.js',
-    'js/purify.min.js'
+    'js/hljs.min.js',
+]
+
+html_css_files = [
+    'css/fontawesome.min.css',
+    'css/auto.number.title.css',
+    'css/custom.css',
+    'css/hljs-vs.css',
 ]
 
 html_logo = './_static/image/logo.png'
@@ -294,9 +302,6 @@ def setup(app):
             'enable_auto_toc_tree': 'True',
             }, True)
     app.add_transform(AutoStructify)
-    app.add_css_file('css/custom.css')
-    app.add_css_file('css/fontawesome.min.css')
-    app.add_css_file('css/auto.number.title.css')
     # register custom class role
     for role in custom_role_list:
         app.add_role(role, custom_role)

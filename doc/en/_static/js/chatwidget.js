@@ -202,7 +202,7 @@
                     display: flex;
                     justify-content: flex-start;
                     margin: 5px 0;
-                    overflow-x: auto;
+                    // overflow-x: auto;
                 }
                 chat-widget .flex-justify-end {
                     justify-content: flex-end;
@@ -214,6 +214,7 @@
                     border-radius: 5px;
                     line-height: 24px;
                     word-break: break-word;
+                    overflow-x: auto;
                 }
                 chat-widget .userText p, 
                 chat-widget .chatResp p {
@@ -260,15 +261,20 @@
                         opacity: 1;
                     }
                 }
-                chat-widget .chatResp pre,
-                chat-widget .chatResp code {
-                    color: #c9302c;
-                    white-space: pre;
-                    border: none;
-                }
+
                 chat-widget .chatResp code,
                 chat-widget .chatResp table * {
                     font-size: 14px;
+                }
+                chat-widget .chatResp pre,
+                chat-widget .chatResp code {
+                    position: relative;
+                    white-space: pre;
+                    line-height: 24px;
+                    border: none;
+                    border-radius: 8px;
+                }
+                chat-widget .chatResp table * {
                     background: transparent !important;
                     background-color: transparent !important;
                 }
@@ -291,7 +297,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    width: 84px;
+                    width: 82px;
                     padding: 3px 6px;
                     border: 1px solid #222e6e;
                     border-radius: 6px;
@@ -304,7 +310,7 @@
                 .chat-feedback-icon {
                     position: relative;
                     top: 2px;
-                    margin-right: 6px; 
+                    margin-right: 4px; 
                 }
 
                 .chatRefDocs ul li {
@@ -570,7 +576,7 @@
                 scrollBtn.style.display = 'flex';
             }
         }
-        const debouncedContentBoxScroll = debounce(onContentBoxScroll, 60);
+        const debouncedContentBoxScroll = debounce(onContentBoxScroll, 100);
         chatContentNode.addEventListener('scroll', debouncedContentBoxScroll);
         // click chat-content-gobtm to chat-content-box bottom
         scrollBtn.addEventListener('click', function() {
@@ -590,30 +596,38 @@
                 }
             }
         }
-        // 监听PC端鼠标滚轮
-        chatContentNode.addEventListener('wheel', function(e) {
-            if (e.deltaY < 0) { // wheel up
+        function handleWheelScroll(e) {
+            if (e.deltaY < 0) {
                 onChatContentWheelOrTouch("up");
-            } else { // wheel down
+            } else {
                 onChatContentWheelOrTouch("down");
             }
-        });
-        // 监听移动端手指滑动
+        }
+
         let wheelY = 0;
-        chatContentNode.addEventListener('touchstart', function(e) {
+        function handleTouchStart(e) {
             if (e.touches.length === 1) wheelY = e.touches[0].clientY;
-        });
-        chatContentNode.addEventListener('touchend', function(e) {
+        }
+        function handleTouchEnd(e) {
             if (e.changedTouches.length === 1) {
                 const endY = e.changedTouches[0].clientY;
                 const deltaY = endY - wheelY;
-                if (deltaY < -30) { // touch scroll up
+                if (deltaY < -30) {
                     onChatContentWheelOrTouch("up");
-                } else if (deltaY > 30) { // touch scroll down
+                } else if (deltaY > 30) {
                     onChatContentWheelOrTouch("down");
                 }
             }
-        });
+        }
+
+        const debouncedWheelScroll = debounce(handleWheelScroll, 60);
+        const debouncedTouchStart = debounce(handleTouchStart, 60);
+        const debouncedTouchEnd = debounce(handleTouchEnd, 60);
+        // 监听鼠标滚轮滚动
+        chatContentNode.addEventListener('wheel', debouncedWheelScroll);
+        // 监听移动端手指滑动
+        chatContentNode.addEventListener('touchstart', debouncedTouchStart);
+        chatContentNode.addEventListener('touchend', debouncedTouchEnd);
 
         /* ================= clear all ai content ================= */
         const chatRefreshButton = document.getElementById('ChatRefresh');
@@ -627,8 +641,11 @@
 
         /* =============== add feedback buttons =============== */
         const copySvg = `
-        <svg t="1755669476415" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8208" width="16" height="16" data-spm-anchor-id="a313x.search_index.0.i18.16ad3a81O4DMba">
-            <path d="M878.272 981.312H375.36a104.64 104.64 0 0 1-104.64-104.64V375.36c0-57.792 46.848-104.64 104.64-104.64h502.912c57.792 0 104.64 46.848 104.64 104.64v502.912c-1.6 56.192-48.448 103.04-104.64 103.04z m-502.912-616.96a10.688 10.688 0 0 0-10.944 11.008v502.912c0 6.208 4.672 10.88 10.88 10.88h502.976c6.208 0 10.88-4.672 10.88-10.88V375.36a10.688 10.688 0 0 0-10.88-10.944H375.36z" fill="#222e6e" p-id="8209"></path><path d="M192.64 753.28h-45.312a104.64 104.64 0 0 1-104.64-104.64V147.328c0-57.792 46.848-104.64 104.64-104.64h502.912c57.792 0 104.64 46.848 104.64 104.64v49.92a46.016 46.016 0 0 1-46.848 46.912 46.08 46.08 0 0 1-46.848-46.848v-49.984a10.688 10.688 0 0 0-10.944-10.944H147.328a10.688 10.688 0 0 0-10.944 10.88v502.976c0 6.208 4.672 10.88 10.88 10.88h45.312a46.08 46.08 0 0 1 46.848 46.912c0 26.496-21.824 45.248-46.848 45.248z" fill="#222e6e" p-id="8210"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="18" height="18" viewBox="0 0 22 22" stroke-width="1.5" stroke="#222e6e" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <title>Copy to clipboard</title>
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
         </svg>
         `;
         const copyDoneSvg = `
@@ -837,7 +854,15 @@
             breaks: true, //启用 GFM 换行符解析。设置为 true 时，Markdown 文本中的新行符被视为 <br>
             smartypants: true, //使用智能排版标记替换引号和破折号为直观形式
             headerIds: false,
-            mangle: true //对嵌入的电子邮件地址进行加密处理（防止抓取），实现简单的防邮件爬虫
+            mangle: true, //对嵌入的电子邮件地址进行加密处理（防止抓取），实现简单的防邮件爬虫
+            highlight: function(code, lang) {
+                // 如果指定了语言，并且hljs支持，按指定高亮
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                // 否则自动检测语言高亮
+                return hljs.highlightAuto(code).value;
+            }
         });
 
         /* =============== handle chat message send =============== */
@@ -934,8 +959,39 @@
                         element.id = parsedChunk.message_id || "";
                         element.aiMdData = mdChatText;
                         element.aiRefList = JSON.stringify(refList);
-
                         element.innerHTML = rawHtml;
+
+                        const fragArr = []; // 用于记录每个pre准备好的fragment
+                        const timestamp = Date.now();  // 例如 1727248066137
+                        element.querySelectorAll('pre code').forEach((blk, i) => {
+                            hljs.highlightElement(blk);
+
+                            // 2. 获取pre标签
+                            const pre = blk.parentElement;
+                            if (!pre || pre.tagName.toLowerCase() !== 'pre') return;
+
+                            // 3. 构造 id：codeblock-时间戳
+                            const codeId = `codeblock-${timestamp}-${i}`;
+                            blk.id = codeId;  // 把 id 赋值给 code 标签
+
+                            const fragment = document.createDocumentFragment();
+                            // 4. 创建按钮并保存到fragArr中
+                            const btn = document.createElement('button');
+                            btn.className = 'copybtn o-tooltip--left';
+                            btn.setAttribute('data-tooltip', 'Copy');
+                            btn.setAttribute('data-clipboard-target', `#${codeId}`);
+                            btn.innerHTML = copySvg;
+                            
+                            fragment.appendChild(btn);
+                            // 用数组保存，避免直接反复append到DOM
+                            fragArr.push({ pre, fragment });
+
+                            // pre.appendChild(btn);
+                        });
+                        // 批量一次性append，页面只重排一次
+                        fragArr.forEach(({ pre, fragment }) => {
+                            pre.appendChild(fragment);
+                        });
                     } else if (parsedChunk.status === "error") {
                         // append html content in element
                         appendChatError(`Internal server error, please refresh and try again!`, element);

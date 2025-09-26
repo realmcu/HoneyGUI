@@ -92,7 +92,7 @@ Before rendering a 3D model, it needs to be converted into a binary format. The 
 
       Script Processing
    
-   - The generated :file:`desc.txt` file contains the following:
+   - The generated :file:`desc.txt` and :file:`desc.bin` files contain the following:
 
      - Parsed obj data
      - Parsed mtl data
