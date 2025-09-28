@@ -158,7 +158,7 @@ No RLE Bypass Mode
 
 The following flowchart describes the process of writing uncompressed images to a frame buffer in bypass mode . Taking the target device image type as RGB565 as an example.
 
-.. figure:: https://foruda.gitee.com/images/1726135914549506931/43192327_13671125.png
+.. figure:: https://foruda.gitee.com/images/1726135755236374806/661c982d_13671125.png
        :align: center
        :width: 900px
        :name: Bypass_blit_2_rgb565
@@ -168,9 +168,9 @@ The following flowchart describes the process of writing uncompressed images to 
 1. Perform different processing steps based on the img_type.
 2. Based on the opacity_value , execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0 , the image is not displayed and the process is break.
-- If the opacity_value is 255 , convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255 , perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255) . Write the blended result to the frame buffer.
+  - If the opacity_value is 0 , the image is not displayed and the process is break.
+  - If the opacity_value is 255 , convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255 , perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255) . Write the blended result to the frame buffer.
 
 No RLE Bypass Matrix
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -188,9 +188,9 @@ The following flowchart describes the process of writing uncompressed images to 
 2. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
 3. Based on the opacity_value, execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 Overview No RLE Filter
 -----------------------
@@ -220,9 +220,9 @@ The following flowchart describes the process of writing uncompressed images to 
 2. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
 3. Based on the opacity_value , execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 No RLE Filter Matrix
 ~~~~~~~~~~~~~~~~~~~~~
@@ -241,9 +241,9 @@ The following flowchart describes the process of writing uncompressed images to 
 3. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
 4. Based on the opacity_value, execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 Overview No RLE Source_over
 ----------------------------
@@ -271,9 +271,10 @@ The following flowchart describes the process of writing uncompressed images to 
        Alpha_blit_2_rgb565
 
 Based on the opacity_value , execute the corresponding operation to write image pixels into the framebuffer.
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform do_blending_acc_2_rgb565_opacity to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform do_blending_acc_2_rgb565_opacity to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
 
 No RLE Alpha Matrix
 ~~~~~~~~~~~~~~~~~~~~
@@ -290,9 +291,9 @@ The following flowchart describes the process of writing uncompressed images to 
 1. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
 2. Based on the opacity_value, execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform do_blending_acc_2_rgb565_opacity to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform do_blending_acc_2_rgb565_opacity to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
 
 Overview RLE Cover Mode
 ------------------------
@@ -367,9 +368,9 @@ The following flowchart describes the process of writing compressed images to a 
 2. Decompress the compressed image data.
 3. Based on the opacity_value, execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 RLE Bypass Matrix
 ~~~~~~~~~~~~~~~~~~
@@ -388,9 +389,9 @@ The following flowchart describes the process of writing compressed images to a 
 3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
 4. Based on the opacity_value, execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 Overview RLE Filter
 --------------------
@@ -421,9 +422,9 @@ The following flowchart describes the process of writing compressed images to a 
 3. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
 4. Based on the opacity_value, execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 RLE Filter Matrix
 ~~~~~~~~~~~~~~~~~~
@@ -433,7 +434,7 @@ The following flowchart describes the process of writing compressed images to a 
 .. figure:: https://foruda.gitee.com/images/1726136044246530066/3cb24841_13671125.png
        :align: center
        :width: 900px
-       :name: 图-rle_filter_matrix_blit_2_rgb565
+       :name: fig-rle_filter_matrix_blit_2_rgb565
         
        Rle_filter_matrix_blit_2_rgb565
 
@@ -443,39 +444,41 @@ The following flowchart describes the process of writing compressed images to a 
 4. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
 5. Based on the opacity_value , execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
-- If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255, convert the source image pixels to RGB565 format and write them to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is ((255 - Sa) * D + Sa * S) / 255). Write the blended result to the frame buffer.
 
 Overview RLE Source_over
 ------------------------
 
 The following flow describes the source_over mode process for RLE compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-.. figure:: https://foruda.gitee.com/images/1726136048376898937/05600e92_13671125.png
+.. figure:: https://foruda.gitee.com/images/1726135833249440419/4bf65309_13671125.png
        :align: center
        :width: 900px
-       :name: Rle_alpha_blit_2_rgb565
+       :name: Rle_alpha_mode_path
         
-       Rle_alpha_blit_2_rgb565
+       Rle_alpha_mode_path
 
 RLE Source_over No Matrix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following flowchart describes the process of writing compressed images to a frame buffer in source_over mode. Taking the target device image type as RGB565 as an example.
 
-.. figure:: https://foruda.gitee.com/images/1726136048376898937/05600e92_13671125.png
+.. figure:: https://foruda.gitee.com/images/1726136052909602952/42461659_13671125.png
        :align: center
        :width: 900px
-       :name: 图-rle_alpha_blit_2_rgb565
+       :name: fig-rle_alpha_blit_2_rgb565
+
+       Rle_alpha_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
 3. Based on the opacity_value , execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity_value is 255: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding do blend operation and write the blend result to the frame buffer.
-- If the opacity_value is between 0 and 255, perform the appropriate do_blending operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity_value is 255: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding do blend operation and write the blend result to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform the appropriate do_blending operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
 
 RLE Source_over Matrix
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,9 +497,9 @@ The following flowchart describes the process of writing compressed images to a 
 3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
 4. Based on the opacity_value , execute the corresponding operation to write image pixels into the framebuffer.
 
-- If the opacity_value is 0, the image is not displayed and the process is break.
-- If the opacity value level is 255: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding do blend operation and write the blend result to the frame buffer.
-- If the opacity_value is between 0 and 255, perform the appropriate do_blending operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+  - If the opacity_value is 0, the image is not displayed and the process is break.
+  - If the opacity value level is 255: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding do blend operation and write the blend result to the frame buffer.
+  - If the opacity_value is between 0 and 255, perform the appropriate do_blending operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
 
 
 .. note:: 
