@@ -88,7 +88,7 @@ touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
             }
             if (wheel.pressing)
             {
-                wheel.deltaY = wheel.deltaY + wheel_raw->delta * STEP;
+                wheel.deltaY =  wheel_raw->delta * STEP;
                 wheel.type = TOUCH_HOLD_Y;
             }
 

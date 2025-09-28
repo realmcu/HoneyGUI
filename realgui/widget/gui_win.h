@@ -42,18 +42,19 @@ typedef struct gui_win
     gui_obj_t base;
     gui_animate_t *animate;
     gui_animate_t **animate_array;
-    float scale;
-    float scale_y;
+    float scale;//init 0.0f
+    float scale_y;//init 0.0f
 
-    uint8_t checksum;
-    uint8_t press_flag   : 1;
-    uint8_t long_flag : 1;
-    uint8_t release_flag : 1;
-    uint8_t enter_auto_scale : 1;
-    uint8_t event5_flag : 1;
-    uint8_t scope : 1;
-    uint8_t hold_tp : 1;
-    uint8_t load : 1;
+    uint16_t checksum;
+    uint16_t press_flag   : 1;
+    uint16_t long_flag : 1;
+    uint16_t release_flag : 1;
+    uint16_t enter_auto_scale : 1;
+    uint16_t event5_flag : 1;
+    uint16_t scope : 1;
+    uint16_t hold_tp : 1;
+    uint16_t load : 1;
+    uint8_t override_click   : 1;
     uint8_t animate_array_length;
 } gui_win_t;
 

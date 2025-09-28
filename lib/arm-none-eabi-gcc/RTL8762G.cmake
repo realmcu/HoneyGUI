@@ -1,12 +1,4 @@
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-    -xc \
-    -march=armv8.1-m.main+dsp+mve+fp \
-    -mthumb \
-    -std=c11 \
-    -mfloat-abi=hard \
-    -O2 \
-    -Wall -fdata-sections -ffunction-sections \
-    -Wno-implicit-function-declaration")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O1 -march=armv8.1-m.main+dsp+mve+fp -mthumb -mfloat-abi=hard -specs=nano.specs -Wall -fdata-sections -ffunction-sections")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -std=c++11 \
@@ -14,6 +6,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -mthumb \
     -std=c11 \
     -mfloat-abi=hard \
-    -O2 \
+    -O1 \
     -Wall -fdata-sections -ffunction-sections \
     -Wno-unused-macros")

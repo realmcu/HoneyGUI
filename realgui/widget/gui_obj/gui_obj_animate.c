@@ -169,6 +169,22 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
     return animate;
 }
 
+
+void gui_obj_restart_animate(gui_animate_t *animate)
+{
+    gui_log("gui_obj_restart_animate\n");
+    animate->animate = true;
+    animate->init_time_ms = 0;
+    animate->cur_time_ms = 0;
+    animate->current_repeat_count = 0;
+    animate->current_frame = 0;
+    animate->last_round = 0;
+    animate->progress_percent = 0;
+    animate->last_per = 0;
+    animate->init = 0;
+    animate->Beginning_frame = 0;
+    animate->end_frame = 0;
+}
 float gui_animation_get_progress(gui_animate_t *animation)
 {
     GUI_ASSERT(animation)

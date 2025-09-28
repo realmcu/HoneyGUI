@@ -198,6 +198,16 @@ void gui_button_prepare(gui_obj_t *obj)
     {
         this->release_flag = true;
     }
+    if (this->override_click)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+        this->override_click = false;
+        // gui_img_set_attribute(this->img, this->img->base.name, this->off_pic_addr, this->img->base.x,
+        //                           this->img->base.y);
+        //                           gui_log("override_click button\n");
+    }
+
+
 }
 
 static void gui_button_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)

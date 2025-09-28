@@ -47,6 +47,9 @@ typedef struct gui_page
     int yold;
     int16_t recode[5];
     int speed;
+    float velocity ;
+    uint32_t last_ms;
+    float y ;
     int target;
     int start_x;
     int start_y;
@@ -58,10 +61,13 @@ typedef struct gui_page
     gui_animate_t *animate;
     void (*ctor)(struct gui_page *, gui_obj_t *parent, const char *name, int16_t x,
                  int16_t y, int16_t w, int16_t h);
-    bool release;
-    bool press;
-    bool gesture_flag;
-    bool top_slide_only;
+    uint8_t release      : 1;
+    uint8_t press        : 1;
+    uint8_t gesture_flag      : 1;
+    uint8_t top_slide_only    : 1;
+    uint8_t wheel_take_over   : 1;
+    uint8_t wheel_up   : 1;
+    uint8_t wheel_pressed   : 1;
     uint8_t status;
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
     uint8_t checksum;

@@ -99,7 +99,16 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
  * @return The current progress of the animation, ranging from 0.0 to 1.0.
  */
 float gui_animation_get_progress(gui_animate_t *animation);
-
+/**
+ * @brief Restarts an animation object.
+ *
+ * Resets an animation object to its initial state, such that
+ * the animation is set to be active, and all counters and
+ * progress values are reset to their initial values.
+ *
+ * @param animate Pointer to the animation object to be restarted.
+ */
+void gui_obj_restart_animate(gui_animate_t *animate);
 #ifdef __cplusplus
 }
 #endif

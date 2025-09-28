@@ -25,7 +25,7 @@
 #include <gui_curtain.h>
 #include <tp_algo.h>
 #include "wheel_algo.h"
-
+#include "gui_api_os.h"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -608,7 +608,10 @@ void gui_page_input_prepare(gui_obj_t *obj)
         gui_obj_skip_other_up_hold(obj);
     }
 }
-
+static const int deceleration = -5;
+static const float minVelocity = 0.1;
+//static const int maxScroll = 1000;
+static const float velocity = 400;
 void gui_page_update(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
@@ -625,7 +628,7 @@ void gui_page_update(gui_obj_t *obj)
     }
     IMPORT_GUI_WHEEL
 //
-    if (wheel->pressing)
+    if (wheel->pressing && this->align_hight <= 0) //no align
     {
         obj->y = wheel->history_y;
         if (obj->y > this->start_y + this->top_offset) /*@TOP*/
@@ -641,6 +644,129 @@ void gui_page_update(gui_obj_t *obj)
         }
         //gui_log("ywheel:%d\n", obj->y);
         //gui_log("wheel:%d,%d,%d,%d\n",wheel->pressed, wheel->pressing, wheel->deltaY, wheel->history_y);
+        uint8_t last = this->checksum;
+        this->checksum = 0;
+        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_page_t));
+        if (last != this->checksum)
+        {
+            gui_fb_change();
+        }
+        return;
+    }
+
+    if (this->align_hight > 0 && wheel->pressed) //align
+    {
+
+        int wheel_offset = _UI_ABS((this->base.y + this->top_offset)) % this->align_hight;
+        this->y = this->base.y;
+        this->wheel_up = 0;
+        if (wheel->deltaY > 0) //up
+        {
+            if (this->base.y - this->bottom_offset + this->base.h - this->default_h < this->align_hight &&
+                this->base.y - this->bottom_offset + this->base.h - this->default_h >= 0)
+            {
+                return;
+            }
+            gui_log("aaa:%d\n", this->base.y - this->bottom_offset + this->base.h - this->default_h);
+            if (wheel_offset == 0)
+            {
+                wheel_offset = this->align_hight;
+            }
+            this->wheel_up = 1;
+            this->velocity = -velocity;
+            wheel_offset =  - wheel_offset;
+        }
+        else//down
+        {
+            gui_log("bbb:%d,%d,%d\n", -(this->base.y - this->top_offset), this->base.y, this->top_offset);
+            if (-(this->base.y - this->top_offset) < this->align_hight &&
+                -(this->base.y - this->top_offset) >= 0)
+            {
+                return;
+            }
+
+            this->velocity = velocity;
+            wheel_offset = this->align_hight - wheel_offset;
+        }
+        this->target = wheel_offset + this->base.y;
+        this->wheel_take_over = 1;
+
+    }
+    if (this->align_hight > 0 && this->wheel_pressed) //align by user
+    {
+        this->wheel_pressed = 0;
+        int wheel_offset = _UI_ABS((this->base.y + this->top_offset)) % this->align_hight;
+        this->y = this->base.y;
+        if (this->wheel_up > 0) //up
+        {
+            if (this->base.y - this->bottom_offset + this->base.h - this->default_h < this->align_hight &&
+                this->base.y - this->bottom_offset + this->base.h - this->default_h >= 0)
+            {
+                return;
+            }
+            gui_log("aaaa:%d\n", this->base.y - this->bottom_offset + this->base.h - this->default_h);
+            if (wheel_offset == 0)
+            {
+                wheel_offset = this->align_hight;
+            }
+            this->wheel_up = 1;
+            this->velocity = -velocity;
+            wheel_offset =  - wheel_offset;
+        }
+        else//down
+        {
+            gui_log("bbbb:%d,%d,%d\n", -(this->base.y - this->top_offset), this->base.y, this->top_offset);
+            if (-(this->base.y - this->top_offset) < this->align_hight &&
+                -(this->base.y - this->top_offset) >= 0)
+            {
+                return;
+            }
+
+            this->velocity = velocity;
+            wheel_offset = this->align_hight - wheel_offset;
+        }
+        this->target = wheel_offset + this->base.y;
+        this->wheel_take_over = 1;
+
+    }
+    if (this->align_hight > 0 && this->wheel_take_over)
+    {
+        float deltaTime = ((float)(gui_ms_get() - this->last_ms)) /
+                          1000.0f;
+        if (deltaTime > 1.0f / 30.0f)
+        {
+            deltaTime = 1.0f / 30.0f;
+        }
+
+        this->last_ms = gui_ms_get();
+        gui_log("deltaTime:%f\n", deltaTime);
+        this->velocity += deceleration * deltaTime;
+        this->y += this->velocity * deltaTime;
+        this->base.y = this->y;
+        //gui_log("velocity:%f   y:%d target:%d wheel:%d\n", this->velocity,this->base.y, this->target, this->wheel_up);
+        if (_UI_ABS(this->velocity) < minVelocity)
+        {
+            this->base.y = this->target;
+            this->wheel_take_over = 0;
+        }
+
+        if (this->wheel_up == 1 && this->base.y < this->target)
+        {
+            this->base.y = this->target;
+            this->wheel_take_over = 0;
+        }
+        if (this->wheel_up == 0 && this->base.y > this->target)
+        {
+            this->base.y = this->target;
+            this->wheel_take_over = 0;
+        }
+        uint8_t last = this->checksum;
+        this->checksum = 0;
+        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_page_t));
+        if (last != this->checksum)
+        {
+            gui_fb_change();
+        }
         return;
     }
 

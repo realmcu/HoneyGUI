@@ -294,12 +294,15 @@ void gui_img_prepare(gui_obj_t *obj)
                 int img_y = GUI_TYPE(gui_img_t, obj)->ay;
                 int img_w = this->draw_img->img_w;
                 int img_h = this->draw_img->img_h;
-                //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
+                //gui_log("%s,ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n", obj->name,ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
                 GUI_TYPE(gui_img_t, obj)->scope_x1 = 0;
                 GUI_TYPE(gui_img_t, obj)->scope_x2 = img_w;
                 GUI_TYPE(gui_img_t, obj)->scope_y1 = 0;
                 GUI_TYPE(gui_img_t, obj)->scope_y2 = img_h;
                 obj->not_show = 0;
+                img_w = img_w * gui_img_get_transform_scale_x(this);
+                img_h = img_h * gui_img_get_transform_scale_y(this);
+
                 if (ax > img_x)
                 {
                     GUI_TYPE(gui_img_t, obj)->scope_x1 = ax - img_x;

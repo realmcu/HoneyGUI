@@ -193,6 +193,11 @@ static void prepare(gui_obj_t *obj)
             this->load = 1;
         }
     }
+    if (this->override_click)
+    {
+        gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+        this->override_click = 0;
+    }
     uint8_t last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_win_t));

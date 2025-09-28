@@ -73,6 +73,7 @@ typedef struct gui_button
     uint8_t flag   : 1;
     uint8_t enable : 1;                 //!< enable function
     uint8_t load : 1;
+    uint8_t override_click : 1;
 } gui_button_t;
 //_GUI_API_DEFINE(gui_button_t)
 typedef struct __gui_api_gui_button_t

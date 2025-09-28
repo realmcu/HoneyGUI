@@ -908,7 +908,7 @@ void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
 
                 const void *addr1 = widget->font_highlight;
                 gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
-                gui_text_mode_set(t, MID_CENTER);
+                gui_text_mode_set(t, mode);
 
                 GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
                 //GUI_BASE(t)->h = t->font_height;
@@ -925,14 +925,14 @@ void gui_scroll_wheel_new_render_text_alien(gui_scroll_wheel_new_t *widget,
 
                     const void *addr1 = widget->font_highlight;
                     gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
-                    gui_text_mode_set(t, MID_CENTER);
+                    gui_text_mode_set(t, mode);
                     widget->font_size_default = t->font_height;
                 }
                 gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, color, strlen(text), font_size);
 
                 const void *addr1 = font_file_pointer;
                 gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
-                gui_text_mode_set(t, MID_CENTER);
+                gui_text_mode_set(t, mode);
                 GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
                 //GUI_BASE(t)->h = t->font_height;
                 if (!highlight_bigger)

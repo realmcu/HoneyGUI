@@ -8,6 +8,7 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include "gui_message.h"
+
 #ifndef DRV_LCD_WIDTH
 #define DRV_LCD_WIDTH   480
 #endif
@@ -169,7 +170,7 @@ static void *sdl_flush(void *arg)
 #include "rvd.h"
 static void rvd_update_page_radio_list(gui_page_t *page, const char **device_list,
                                        int device_list_count) ;
-
+#include "rvd.h"
 static void key_gui_msg_cb(void *p)
 {
 
@@ -215,6 +216,27 @@ static void key_gui_msg_cb(void *p)
             rvd_hover_right();
         }
         break;
+    case /*key PageUp up */ 1073741899:
+        {
+
+            extern void rvd_tab_last(void);
+            rvd_tab_last();
+        }
+        break;
+    case /*key PageDown up */ 1073741902:
+        {
+            extern void rvd_tab_next(void);
+            rvd_tab_next();
+        }
+        break;
+    case 1073741898:
+        /* PC KEY Home */
+        {
+
+            rvd_tab_first();
+        }
+        break;
+
     case /*PC KEY R */ 114:
         {
             break;
@@ -247,6 +269,100 @@ static void key_gui_msg_cb(void *p)
             }
         }
         break;
+    default:
+        break;
+    }
+}
+static void key_gui_msg_cb_down(void *p)
+{
+
+    extern gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
+    gui_msg_t *msg = p;
+
+    gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
+    gui_log("key %d\n", (int)(size_t)msg->payload);
+
+    switch ((int)(size_t)msg->payload)
+    {
+    case 13:
+        /* PC KEY Enter */
+        {
+            rvd_click_button_down();
+        }
+        break;
+    // case 1073741905:
+    //     /* PC KEY Down */
+    //     {
+    //         rvd_hover_down_button();
+    //     }
+    //     break;
+    // case 1073741906:
+    //     /* PC KEY Up */
+    //     {
+    //         rvd_hover_up_button();
+    //     }
+    //     break;
+    // case 27:
+    //     /* PC KEY ESC */
+    //     {
+    //         rvd_click_back();
+    //     }
+    //     break;
+    // case /*PC KEY LEFT */ 1073741904:
+    //     {
+    //         rvd_hover_left();
+    //     }
+    //     break;
+    // case /*PC KEY RIGHT */ 1073741903:
+    //     {
+    //         rvd_hover_right();
+    //     }
+    //     break;
+    // case /*key PageUp up */ 1073741899:
+    //     {
+
+    //         extern void rvd_tab_last(void);
+    //         rvd_tab_last();
+    //     }
+    //     break;
+    // case /*key PageDown up */ 1073741902:
+    //     {
+    //         extern void rvd_tab_next(void);
+    //         rvd_tab_next();
+    //     }
+    //     break;
+    // case /*PC KEY R */ 114:
+    //     {
+    //         break;
+    //         GUI_WIDGET_POINTER_BY_NAME(obj1, "tab11")
+    //         gui_tabview_t *tabview = (void *)obj1;
+    //         GUI_WIDGET_POINTER_BY_NAME(obj2, "page0")
+    //         gui_page_t *page1 = (void *)obj2;
+    //         static const char *device_list[50] = {"SONY", "NOKIA", "SAMSUNG", "APPLE",
+    //                                               "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG"
+    //                                              };
+    //         static bool device_update_flag = false;
+    //         device_update_flag = true;
+    //         if (device_update_flag)
+    //         {
+    //             int device_list_count = 0 ;
+    //             for (size_t i = 0; i < 50; i++)
+    //             {
+    //                 if (device_list[i] == NULL)
+    //                 {
+    //                     break;
+    //                 }
+    //                 else
+    //                 {
+    //                     device_list_count++;
+    //                 }
+
+    //             }
+
+    //             rvd_update_page_radio_list(page1, device_list, device_list_count);
+    //         }
+    //     }
+    //     break;
     default:
         break;
     }
@@ -369,6 +485,7 @@ void *rtk_gui_sdl(void *arg)
     pthread_create(&thread, NULL, sdl_flush, NULL);
 
     SDL_Event event;
+    static bool release = true;
     while (true)
     {
         SDL_WaitEventTimeout(&event, 0xffffffff);
@@ -434,6 +551,21 @@ void *rtk_gui_sdl(void *arg)
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
                 strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
                 kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
+#ifdef REALTEK_BUILD_GUI_XML_DOM
+
+                if (release)
+                {
+                    gui_msg_t msg =
+                    {
+                        .event = GUI_EVENT_USER_DEFINE,
+                        .payload = (void *)(size_t)event.key.keysym.sym,
+                        .cb = (gui_msg_cb)key_gui_msg_cb_down,
+                    };
+                    extern bool gui_send_msg_to_server(gui_msg_t *msg);
+                    gui_send_msg_to_server(&msg);
+                    release = false;
+                }
+#endif
             }
             break;
         case SDL_KEYUP:
@@ -447,6 +579,7 @@ void *rtk_gui_sdl(void *arg)
                 strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
                 kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
 #ifdef REALTEK_BUILD_GUI_XML_DOM
+
                 gui_msg_t msg =
                 {
                     .event = GUI_EVENT_USER_DEFINE,
@@ -455,6 +588,10 @@ void *rtk_gui_sdl(void *arg)
                 };
                 extern bool gui_send_msg_to_server(gui_msg_t *msg);
                 gui_send_msg_to_server(&msg);
+                release = true;
+
+
+
 #endif
             }
             break;

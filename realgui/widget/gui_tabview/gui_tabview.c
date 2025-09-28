@@ -48,7 +48,7 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-
+static void gui_tabview_push_history_id(gui_tabview_t *tabview, gui_tabview_tab_id_t id);
 static void gui_tabview_input_prepare(gui_obj_t *obj)
 {
     if (((gui_tabview_t *)obj)->tp_disable)
@@ -104,6 +104,12 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         {
             gui_fb_change();
         }
+
+        {
+            gui_tabview_push_history_id(this, this->cur_id);
+
+        }
+
 
         return;
     }
@@ -441,8 +447,10 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         this->initial = false;
         this->tab_need_pre_load = true;
 
-        gui_log("cur_id.x, cur_id.y, last_id.x, last_id.y %d,%d, %d,%d \n", this->cur_id.x, this->cur_id.y,
+        gui_log("tp on cur_id.x, cur_id.y, last_id.x, last_id.y %d,%d, %d,%d \n", this->cur_id.x,
+                this->cur_id.y,
                 this->last_id.x, this->last_id.y);
+
     }
     else
     {
@@ -615,7 +623,60 @@ gui_tabview_t *gui_tabview_create(void       *parent,
     return this;
 }
 #include "gui_tab.h"
+static void jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy);
+
+void gui_tabview_back(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
+{
+//gui_tabview_tab_id_t end_id = {idx, idy};
+    if (parent_tabview->cur_id.x == idx && parent_tabview->cur_id.y == idy)
+    {
+        return;
+    }
+
+    if (parent_tabview->back_count == 0)
+    {
+        parent_tabview->back_count = 1;
+    }
+    else if (parent_tabview->back_count > 0 &&
+             parent_tabview->back_count < GUI_ARRAY_SIZE(parent_tabview->history_id_array) - 2)
+    {
+        parent_tabview->back_count += 2;
+    }
+
+
+    if (/*parent_tabview->back_count<0||*/parent_tabview->back_count >= GUI_ARRAY_SIZE(
+                                              parent_tabview->history_id_array))
+    {
+        parent_tabview->back_count = 0;
+        gui_log("gui_tabview_back reach end error");
+        memset(parent_tabview->history_id_array, 0, sizeof(parent_tabview->history_id_array));
+        jump_tab(parent_tabview, idx, idy);
+        return;
+    }
+
+    if (parent_tabview->history_id_array[parent_tabview->back_count].x == idx &&
+        parent_tabview->history_id_array[parent_tabview->back_count].y == idy)
+    {
+        parent_tabview->back_count = 0;
+        gui_log("gui_tabview_back reach end");
+        jump_tab(parent_tabview, idx, idy);
+        memset(parent_tabview->history_id_array, 0, sizeof(parent_tabview->history_id_array));
+        return;
+    }
+
+    jump_tab(parent_tabview, parent_tabview->history_id_array[parent_tabview->back_count].x,
+             parent_tabview->history_id_array[parent_tabview->back_count].y);
+
+
+}
+
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
+{
+    parent_tabview->back_count = 0;
+
+    jump_tab(parent_tabview, idx, idy);
+}
+static void jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
 {
     parent_tabview->jump.jump_flag = true;
     parent_tabview->jump.jump_id.x = idx;
@@ -657,14 +718,30 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
         parent_tabview->cur_id.y = parent_tabview->jump.jump_id.y;
         parent_tabview->cur_id.x = parent_tabview->jump.jump_id.x;
         {
-            gui_obj_enable_event(object, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
-            gui_log("cur_id.x, cur_id.y, last_id.x, last_id.y %d,%d, %d,%d \n", parent_tabview->cur_id.x,
+            //gui_obj_enable_event(object, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+            gui_log("tp off cur_id.x, cur_id.y, last_id.x, last_id.y %d,%d, %d,%d \n", parent_tabview->cur_id.x,
                     parent_tabview->cur_id.y, parent_tabview->last_id.x, parent_tabview->last_id.y);
+            //  gui_tabview_push_history_id(parent_tabview, parent_tabview->cur_id);
+            for (uint8_t i = 0; i < object->event_dsc_cnt; i++)
+            {
+                gui_event_dsc_t *event_dsc = object->event_dsc + i;
+                if (event_dsc->filter == TABVIEW_EVENT_TAB_CHANGE)
+                {
+                    event_dsc->event_cb(object, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE, event_dsc->user_data);
+                }
+            }
         }
 
     }
 }
-
+static void gui_tabview_push_history_id(gui_tabview_t *tabview, gui_tabview_tab_id_t id)
+{
+    for (int i = GUI_ARRAY_SIZE(tabview->history_id_array) - 1; i > 0; i--)
+    {
+        tabview->history_id_array[i] = tabview->history_id_array[i - 1];
+    }
+    tabview->history_id_array[0] = id;
+}
 void gui_tabview_loop_x(gui_tabview_t *tabview, bool loop)
 {
     tabview->loop_x = loop;

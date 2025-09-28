@@ -548,8 +548,8 @@ gui_tab_t *gui_tab_create(void       *parent,
                           int16_t     y,
                           int16_t     w,
                           int16_t     h,
-                          int16_t     idx,
-                          int16_t     idy)
+                          int8_t     idx,
+                          int8_t     idy)
 {
     if (w == 0)
     {

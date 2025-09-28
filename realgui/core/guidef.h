@@ -132,6 +132,7 @@ extern "C" {
 typedef int gui_error_t;
 #define GUI_MAGIC_NUMBER 0x0b
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT(obj != NULL);GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
+#define GUI_WIDGET_TRY_EXCEPT_SOFT(obj) {if(obj == NULL){gui_log("obj is NULL");return;}if((GUI_BASE(obj)->magic != GUI_MAGIC_NUMBER)){gui_log("obj magic is broken");return;}}
 /**
  * @brief Macro to retrieve a GUI widget pointer by its name.
  *
@@ -184,6 +185,12 @@ typedef int gui_error_t;
     extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE , gui_obj_t **);\
     gui_obj_tree_get_widget_by_type(root, type, &pointer);\
     GUI_WIDGET_TRY_EXCEPT(pointer)
+#define GUI_WIDGET_POINTER_BY_TYPE_SOFT(pointer, type, root) \
+    GUI_WIDGET_TRY_EXCEPT_SOFT(root)\
+    gui_obj_t *pointer = 0;\
+    extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE , gui_obj_t **);\
+    gui_obj_tree_get_widget_by_type(root, type, &pointer);\
+    GUI_WIDGET_TRY_EXCEPT_SOFT(pointer)
 /**
  * @brief Macro to calculate the size of an array.
  *

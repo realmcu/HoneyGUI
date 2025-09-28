@@ -1,32 +1,7 @@
 # Apply the flags to C and C++ compiler settings
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-    -xc \
-	-std=c11 \
-    --target=arm-arm-none-eabi \
-    -march=armv8.1-m.main+dsp+mve.fp+fp \
-    -mfloat-abi=hard \
-    -fno-rtti \
-    -flto \
-    -funsigned-char \
-    -fshort-enums \
-    -fshort-wchar \
-    -mlittle-endian \
-    -gdwarf-4 \
-    -O2 \
-    -fno-function-sections \
-    -Wno-packed \
-    -Wno-missing-variable-declarations \
-    -Wno-missing-prototypes \
-    -Wno-missing-noreturn \
-    -Wno-sign-conversion \
-    -Wno-nonportable-include-path \
-    -Wno-reserved-id-macro \
-    -Wno-unused-macros \
-    -Wno-documentation-unknown-command \
-    -Wno-documentation \
-    -Wno-license-management \
-    -Wno-parentheses-equality \
-    -Wno-implicit-function-declaration ")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -xc -std=c11 --target=arm-arm-none-eabi -march=armv8.1-m.main+dsp+mve.fp+fp -mfloat-abi=hard -c \
+-fno-rtti -flto -funsigned-char -fshort-enums -fshort-wchar \
+-mlittle-endian -gdwarf-4 -Oz -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier  ")
 	
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 	-xc++ \
@@ -42,7 +17,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -fshort-wchar \
     -mlittle-endian \
     -gdwarf-4 \
-    -O2 \
+    -Oz \
 	-fno-exceptions \
     -fno-function-sections \
     -Wno-packed \

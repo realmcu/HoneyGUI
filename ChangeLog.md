@@ -41,3 +41,13 @@
 - Fix image opacity animation
 - Fix text scroll
 - Add page by mouse wheel
+
+# v1.0.12.4
+
+- Add text modes to 18
+
+# v1.0.12.5
+
+- Add tab next/last
+- Add page by key
+- Add radio button highlight scale

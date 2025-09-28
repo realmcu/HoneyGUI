@@ -73,16 +73,7 @@ static xml_dom_wifi_t wifi_array[XML_DOM_WIFI_COUINT] =
     {"WiFi11"}, {"WiFi12"}, {"WiFi13"}, {"WiFi14"}, {"WiFi15"}, {"WiFi16"}, {"WiFi17"}, {"WiFi18"}, {"WiFi19"}, {"WiFi20"},
     {"WiFi21"}, {"WiFi22"}, {"WiFi23"}, {"WiFi24"}, {"WiFi25"}, {"WiFi26"}, {"WiFi27"},
 };
-#define MACRO_CONNECTED 9001
-#define MACRO_DISCONNECTED 9002
-#define MACRO_CONNECTING 9003
-#define MACRO_WIFI 9004
-#define MACRO_FRAME 9005
-#define MACRO_INTERACTION 9006
-#define MACRO_FPS 9007
 
-#define GUI_EVENT_WIN_FRAME_PARAM (0XFF-2)
-#define GUI_EVENT_WIN_RADIO_HOVER (0XFF-3)
 static struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -2713,7 +2704,7 @@ static gui_obj_t *widget_create_rectangle(ezxml_t p, gui_obj_t *parent, T_OBJ_TY
         round_rect_t rect = {0, 0, w, h, rx, ry, fill_color, stroke_color, stroke_width};
         const uint8_t *imgdata = gui_canvas_output_param(GUI_CANVAS_OUTPUT_RGBA, 0, w + stroke_width,
                                                          h + stroke_width, rect_cb, (void *)&rect);
-        gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)imgdata, x, y, 0, 0);
+        gui_img_t *img = gui_img_create_from_mem(parent, ptxt, (void *)imgdata, x, y, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         parent = (void *)img;
         gui_obj_hidden(parent, hidden);
@@ -3526,7 +3517,10 @@ static gui_obj_t *widget_create_tab(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wid
         char *ptxt = get_space_string_head(p->txt);
         //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
         parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
-        gui_obj_hidden(parent, hidden);
+        if (!GUI_BASE(parent)->not_show)
+        {
+            gui_obj_hidden(parent, hidden);
+        }
     }
 
     return parent;
@@ -4221,7 +4215,8 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
 
     return parent;
 }
-
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_press_highlight_ani_up);
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_press_highlight_ani_down);
 static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_cb)
 {
     radio_t *param = p;
@@ -4239,6 +4234,13 @@ static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_cb)
     {
         gui_obj_enable_event(this_widget, GUI_EVENT_TOUCH_PRESSED);
         param->click = 0;
+    }
+    else if (param->press)
+    {
+        gui_log("param->press\n");
+
+        gui_obj_restart_animate(GUI_TYPE(gui_win_t, this_widget)->animate_array[1]);
+        param->press = 0;
     }
     else
     {
@@ -4463,7 +4465,7 @@ static void radio_group_fill_widgets(gui_obj_t *node, T_OBJ_TYPE target_type,
             continue;
         }
         if (target_type == obj->type &&
-            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(GUI_TYPE(gui_win_t, obj)->animate->p))->radio_name))
+            GUI_STRINGS_EQUAL(group_name, ((radio_t *)(rvd_get_radio_data(obj)))->radio_name))
         {
             array[*index] = obj;
             (*index)++;
@@ -4472,10 +4474,11 @@ static void radio_group_fill_widgets(gui_obj_t *node, T_OBJ_TYPE target_type,
         radio_group_fill_widgets(obj, target_type, array, index, group_name);
     }
 }
-static int radio_group_get_array(gui_obj_t *root,
-                                 T_OBJ_TYPE type,
-                                 gui_obj_t ***output_array,
-                                 int *length, const char *group_name)
+
+int radio_group_get_array(gui_obj_t *root,
+                          T_OBJ_TYPE type,
+                          gui_obj_t ***output_array,
+                          int *length, const char *group_name)
 {
     // Check input parameters
     if (root == NULL || output_array == NULL || length == NULL || group_name == NULL)
@@ -4533,8 +4536,44 @@ static void radio_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
+#include <math.h>
+
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(win_radio_press_highlight_ani)
+{
+    float percent = animate->progress_percent;
+    float min_scale = 0.9f;
+    float scale;
+    float delta = 1.0f - min_scale;
+
+    if (percent <= 0.5f)
+    {
+        float t = percent / 0.5f;
+        scale = 1.0f - delta * (1.0f - cosf(3.14159f * t / 2.0f));
+    }
+    else
+    {
+        float t = (percent - 0.5f) / 0.5f;
+        scale = min_scale + delta * (1.0f - cosf(3.14159f * t / 2.0f));
+    }
+    gui_log("default scale:%f\n", scale);
+    GUI_TYPE(gui_win_t, this_widget)->scale = scale;
+    GUI_TYPE(gui_win_t, this_widget)->scale_y = scale;
 
 
+}
+
+
+
+radio_t *rvd_get_radio_data(gui_obj_t *radio)
+{
+    if (radio && GUI_TYPE(gui_win_t, radio)->animate_array_length > 0
+        && GUI_TYPE(gui_win_t, radio)->animate_array[0]
+        && GUI_TYPE(gui_win_t, radio)->animate_array[0]->p)
+    {
+        return GUI_TYPE(gui_win_t, radio)->animate_array[0]->p;
+    }
+    return 0;
+}
 static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_press)
 {
     gui_obj_t **widgets = NULL;
@@ -4542,7 +4581,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_press)
 
     {
         gui_win_t *win = GUI_TYPE(gui_win_t, obj);
-        radio_t *param = win->animate->p;
+        radio_t *param = rvd_get_radio_data((void *)win);
         radio_group_get_array(
             (gui_obj_t *)gui_current_app(), RADIO, &widgets, &count, param->radio_name);
 
@@ -4550,7 +4589,7 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_press)
         {
 
             gui_win_t *win = GUI_TYPE(gui_win_t, widgets[i]);
-            radio_t *param = win->animate->p;
+            radio_t *param = rvd_get_radio_data((void *)win);
             param->img->data = (void *)param->pic;
             param->check = 0;
         }
@@ -4562,15 +4601,16 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_press)
         }
     }
 
+
 }
 static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_hover)
 {
     gui_obj_t **widgets = NULL;
     int count = 0;
-
+//gui_log("radio:%s\n",GUI_BASE(obj)->name);
     {
         gui_win_t *win = GUI_TYPE(gui_win_t, obj);
-        radio_t *param = win->animate->p;
+        radio_t *param = rvd_get_radio_data((void *)win);
         radio_group_get_array(
             (gui_obj_t *)gui_current_app(), RADIO, &widgets, &count, param->radio_name);
 
@@ -4578,13 +4618,13 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(win_radio_hover)
         {
 
             gui_win_t *win = GUI_TYPE(gui_win_t, widgets[i]);
-            radio_t *param = win->animate->p;
+            radio_t *param = rvd_get_radio_data((void *)win);
             param->img->data = (void *)param->pic;
         }
         //gui_free(widgets);
         {
             gui_win_t *win = GUI_TYPE(gui_win_t, obj);
-            radio_t *param = win->animate->p;
+            radio_t *param = rvd_get_radio_data((void *)win);
             param->img->data = (void *)param->pic_hl;
         }
     }
@@ -4605,7 +4645,9 @@ gui_obj_t *gui_create_radiobutton(gui_obj_t *parent, const char *name, const cha
     GUI_TYPE(gui_obj_t, parent)->type = RADIO;
     gui_win_press((void *)parent, win_radio_press, param);
     gui_obj_add_event_cb((void *)parent, win_radio_hover, GUI_EVENT_WIN_RADIO_HOVER, param);
-    gui_win_set_animate((void *)parent, 10000, -1, win_radio_cb, param);
+    gui_win_append_animate((void *)parent, 10000, -1, win_radio_cb, param, "radio_ani_1");
+    gui_win_append_animate((void *)parent, 200, 0, win_radio_press_highlight_ani, param, "radio_ani_2");
+    GUI_TYPE(gui_win_t, parent)->animate_array[1]->animate = 0;
     gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)pic, 0,
                                              0, 0, 0);
     param->img = img;
@@ -4617,15 +4659,8 @@ gui_obj_t *gui_create_radiobutton(gui_obj_t *parent, const char *name, const cha
     // {
     //     img->data = (void *)param->pic_hl;
     // }
-
-
     last_radio_name = (void *)group_name;
     img->blend_mode = (uint32_t)blendMode;
-
-
-
-
-
     return parent;
 }
 static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
@@ -4731,7 +4766,9 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     GUI_TYPE(gui_obj_t, parent)->type = RADIO;
     gui_win_press((void *)parent, win_radio_press, param);
     gui_obj_add_event_cb((void *)parent, win_radio_hover, GUI_EVENT_WIN_RADIO_HOVER, param);
-    gui_win_set_animate((void *)parent, 10000, -1, win_radio_cb, param);
+    gui_win_append_animate((void *)parent, 10000, -1, win_radio_cb, param, "radio_ani_1");
+    gui_win_append_animate((void *)parent, 200, 0, win_radio_press_highlight_ani, param, "radio_ani_2");
+    GUI_TYPE(gui_win_t, parent)->animate_array[1]->animate = 0;
     gui_img_t *img = gui_img_create_from_mem(parent, 0, (void *)gui_get_image_file_address(picture),
                                              picture_x,
                                              picture_y, 0, 0);
@@ -11708,6 +11745,7 @@ static gui_obj_t *widget_create_macro_combo(ezxml_t p, gui_obj_t *parent, T_OBJ_
 
         // parent = GUI_BASE(combo);
         gui_obj_hidden((void *)combo, hidden);
+        GUI_BASE(combo) ->name = get_space_string_head(p->txt);
     }
 
     return parent;

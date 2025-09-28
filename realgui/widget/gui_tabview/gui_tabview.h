@@ -38,8 +38,8 @@ extern "C" {
 
 typedef struct
 {
-    int32_t x;
-    int32_t y;
+    int8_t x;
+    int8_t y;
 } gui_tabview_tab_id_t;
 typedef struct gui_index
 {
@@ -65,12 +65,13 @@ typedef enum t_slide_style
     TAB_PAGE         = 0x0007,
     TAB_ROTATE_BOOK  = 0x0008,
 } T_SLIDE_STYLE;
+#define GUI_TABVIEW_HISTORY_MAX 10
 /* T_SLIDE_STYLE enum end*/
 /** @brief  Tabview structure. */
 typedef struct gui_tabview
 {
     gui_obj_t base;
-    uint16_t tab_cnt;
+    uint8_t tab_cnt;
     int8_t tab_cnt_left;
     int8_t tab_cnt_right;
     int8_t tab_cnt_up;
@@ -83,15 +84,18 @@ typedef struct gui_tabview
     int16_t release_y;
     uint8_t loop_x : 1;
     uint8_t loop_y : 1;
-    bool enable_pre_load;
-    bool tab_change_ready;
-    bool tab_need_pre_load;
-    bool tp_disable;
-    bool initial;
+    uint8_t enable_pre_load : 1;
+    uint8_t tab_change_ready : 1;
+    uint8_t tab_need_pre_load : 1;
+    uint8_t tp_disable : 1;
+    uint8_t initial : 1;
+    uint8_t back_flag : 1;
     uint8_t *left_shot;
     uint8_t *center_shot;
     uint8_t *right_shot;
     uint8_t checksum;
+    uint8_t back_count;
+    gui_tabview_tab_id_t history_id_array[GUI_TABVIEW_HISTORY_MAX];
 } gui_tabview_t;
 
 typedef enum
@@ -138,6 +142,8 @@ gui_tabview_t *gui_tabview_create(void       *parent,
 
 /**
  * @brief Jumps to a specified tab.
+ *
+ * @warning This function must be called from the UI thread.
  *
  * @param parent_tabview Tabview pointer.
  * @param idx Horizontal index value.
@@ -193,8 +199,17 @@ void gui_tabview_enable_pre_load(gui_tabview_t *_this, bool enable);
  * @param parameter Callback parameter.
  */
 void gui_tabview_tab_change(gui_tabview_t *tabview, void *callback, void *parameter);
-
-
+/**
+ * @brief Jump to the history tab.
+ *
+ * @param parent_tabview Tabview pointer.
+ * @param end_idx Horizontal end index value.
+ * @param end_idy Vertical end index value.
+ *
+ *
+ * This function is used to implement the back key function in the tabview.
+ */
+void gui_tabview_back(gui_tabview_t *parent_tabview, int8_t end_idx, int8_t end_idy);
 #ifdef __cplusplus
 }
 #endif
