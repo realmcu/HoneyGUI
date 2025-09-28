@@ -513,6 +513,7 @@ static void top_view_design(gui_view_t *view)
                            NOTE_INTERVAL, VERTICAL, create_inform_note, infor_rec, true);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);
+    gui_list_set_out_scope(list, 50);
     gui_obj_create_timer(GUI_BASE(list), 20, true, list_timer_cb);
 }
 

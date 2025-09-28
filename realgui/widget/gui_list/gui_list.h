@@ -72,7 +72,9 @@ typedef struct gui_list
     int offset;                  // offset = hold + tp_delta, when sliding.
     int hold;
     int total_length;
-    int16_t card_stack_location; // the distance from stack location to the screen bottom
+    int16_t out_scope;           // Out scope of list.
+    int16_t card_stack_location; // The distance from stack location to the screen bottom.
+    bool auto_align;             // Automatic alignment of notes.
 
     uint16_t created_note_index; // Index of the last created note.
     uint8_t keep_note_num;       // Number of created notes.
@@ -111,9 +113,8 @@ typedef struct gui_list_note
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-#define OUT_SCOPE 0 // Out scope of list.
 #define GUI_MAX_SPEED 50
-#define GUI_MIN_SPEED 7
+#define GUI_MIN_SPEED 10
 #define LIST_TAB_ANIMATE_MAX 15
 #define LIST_BAR_WIDTH 5
 /*============================================================================*
@@ -186,7 +187,23 @@ void gui_list_set_bar_color(gui_list_t *list, gui_color_t color);
  */
 void gui_list_set_note_num(gui_list_t *list, uint16_t num);
 
+/**
+ * @brief Set card stack location, only valid when list style is LIST_CARD.
+ * @param location The distance from stack location to the screen bottom of right.
+ */
 void gui_list_set_card_stack_location(gui_list_t *list, int16_t location);
+
+/**
+ * @brief Set out scope of list, which is the distance that can be slightly exceeded when scrolling.
+ * @param out_scope The out scope of list.
+ */
+void gui_list_set_out_scope(gui_list_t *list, int16_t out_scope);
+
+/**
+ * @brief Set auto align of list, which is used to automatically align notes when the list stops moving.
+ * @param auto_align true: enable auto align, false: disable auto align.
+ */
+void gui_list_set_auto_align(gui_list_t *list, bool auto_align);
 
 #ifdef __cplusplus
 }

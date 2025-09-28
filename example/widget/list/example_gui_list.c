@@ -10,11 +10,11 @@
 #include "gui_list.h"
 
 /* Use the following macro to checkout the different style lists */
-#define RUN_VERTICAL_CIRCLE_STYLE
+// #define RUN_VERTICAL_CIRCLE_STYLE
 // #define RUN_VERTICAL_CARD_STYLE
 // #define RUN_HORIZONTAL_ZOOM_STYLE
 // #define RUN_VERTICAL_FAN_STYLE
-// #define RUN_VERTICAL_HELIX_STYLE
+#define RUN_VERTICAL_HELIX_STYLE
 // #define RUN_VERTICAL_CURL_STYLE
 
 #define NOTE_NUM 20
@@ -23,6 +23,7 @@ int length = 100;
 
 static void note_design(gui_obj_t *obj, void *p)
 {
+    GUI_UNUSED(p);
     gui_color_t color[] =
     {
         APP_COLOR_WHITE_OPACITY,
@@ -73,6 +74,7 @@ static void note_design(gui_obj_t *obj, void *p)
     };
     gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 0, 100, color2[index % 2]);
 #endif
+    GUI_UNUSED(canvas);
 }
 
 static int app_init(void)
@@ -86,6 +88,7 @@ static int app_init(void)
                                        note_design, NULL, false);
     gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_CIRCLE);
+    gui_list_set_out_scope(list, 100);
     return 0;
 #endif
 
@@ -98,6 +101,7 @@ static int app_init(void)
                                        false);
     gui_list_set_style(list, LIST_CARD); //if LIST_CARD style, must set style before set note num
     gui_list_set_note_num(list, NOTE_NUM);
+    gui_list_set_card_stack_location(list, 20);
     return 0;
 #endif
 
@@ -106,8 +110,8 @@ static int app_init(void)
 
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space,
                                        HORIZONTAL, note_design, NULL, false);
-    gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_ZOOM);
+    gui_list_set_note_num(list, NOTE_NUM);
     return 0;
 #endif
 
@@ -127,6 +131,7 @@ static int app_init(void)
                                        note_design, NULL, true);
     gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_HELIX);
+    gui_list_set_auto_align(list, true);
     return 0;
 #endif
 

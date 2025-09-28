@@ -15,7 +15,7 @@
  *============================================================================*/
 typedef struct note_design_param
 {
-    // void **click_cb;
+    void **click_cb;
     uint32_t **img_data_array;
 } note_design_param_t;
 
@@ -98,13 +98,14 @@ static int gui_view_get_other_view_descriptor_init(void)
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_menu(gui_view_t *view)
 {
     (void)view;
     if (design_p)
     {
-        // gui_free(design_p->click_cb);
+        gui_free(design_p->click_cb);
         gui_free(design_p->img_data_array);
         gui_free(design_p);
         design_p = NULL;
@@ -127,8 +128,11 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_type_set(t, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_LEFT);
         gui_text_rendermode_set(t, 2);
-        // gui_obj_add_event_cb(note, (gui_event_cb_t)design_p->click_cb[index], GUI_EVENT_TOUCH_CLICKED,
-        //                      NULL);
+        if (design_p->click_cb[index] != NULL)
+        {
+            gui_obj_add_event_cb(note, (gui_event_cb_t)design_p->click_cb[index], GUI_EVENT_TOUCH_CLICKED,
+                                 NULL);
+        }
     }
     else
     {
@@ -183,13 +187,17 @@ static void app_menu_design(gui_view_t *view)
         APP_STORE_ICON_BIN,
     };
     int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
-
+    void *click_cb[] =
+    {
+        NULL,
+    };
     design_p = gui_malloc(sizeof(note_design_param_t));
-    // void **func_cb = gui_malloc(array_size * sizeof(void *));
-    // memcpy(func_cb, click_cb, array_size * sizeof(void *));
+    void **func_cb = gui_malloc(array_size * sizeof(void *));
+    memset(func_cb, 0, array_size * sizeof(void *));
+    memcpy(func_cb, click_cb, sizeof(click_cb));
     uint32_t **data_array = gui_malloc(array_size * sizeof(uint32_t *));
     memcpy(data_array, img_data_array, array_size * sizeof(void *));
-    // design_p->click_cb = func_cb;
+    design_p->click_cb = func_cb;
     design_p->img_data_array = data_array;
 
     int length = 120;

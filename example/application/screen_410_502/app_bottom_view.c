@@ -522,6 +522,7 @@ static void bottom_view_design(gui_view_t *view)
     gui_list_set_style(list, LIST_CARD);
     gui_list_set_note_num(list, 5);
     gui_list_set_offset(list, 215);
+    gui_list_set_card_stack_location(list, 20);
 
     draw_timecard(parent);
 
