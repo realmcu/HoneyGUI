@@ -170,8 +170,7 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
         hard_offset_min = soft_offset_min;
         hard_offset_max = soft_offset_max;
     }
-
-    if (_this->speed == 0)
+    if (!_this->inertia || _this->speed == 0)
     {
         if (_this->offset > hard_offset_max || _this->offset < hard_offset_min)
         {
@@ -184,15 +183,31 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
         }
         else if (_this->auto_align)
         {
-            int16_t grid_offset = _this->offset % (_this->note_length + _this->space);
-            if (grid_offset != 0)
+            int16_t grid_size = _this->note_length + _this->space;
+            if (grid_size == 0) { return; }
+
+            int16_t remainder = _this->offset % grid_size;
+            if (remainder == 0) { return; }
+
+            int16_t distance;
+            int16_t half_grid = grid_size / 2;
+
+            if (remainder > half_grid)
             {
-                float e_factor = 0.2f;
-                int16_t distance = -grid_offset;
-                int delta = (int16_t)(distance * e_factor); //exponential decay
-                if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
-                _this->offset += delta;
+                distance = grid_size - remainder;
             }
+            else if (remainder < -half_grid)
+            {
+                distance = -grid_size - remainder;
+            }
+            else
+            {
+                distance = -remainder;
+            }
+            float e_factor = 0.2f;
+            int delta = (int16_t)(distance * e_factor); //exponential decay
+            if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
+            _this->offset += delta;
         }
     }
     else
@@ -962,6 +977,7 @@ gui_list_t *gui_list_create(void       *parent,
     _this->factor = 0.05;
     _this->note_design = note_design;
     _this->design_param = design_param;
+    _this->inertia = true;
     if (dir == HORIZONTAL)
     {
         _this->total_length = w;
@@ -970,7 +986,7 @@ gui_list_t *gui_list_create(void       *parent,
     {
         _this->total_length = h;
     }
-    _this->keep_note_num = _this->total_length / (note_length + space) + 1; //
+    // _this->keep_note_num = _this->total_length / (note_length + space) + 1;
     GET_BASE(_this)->obj_cb = gui_list_cb;
     GET_BASE(_this)->has_input_prepare_cb = true;
     GET_BASE(_this)->has_prepare_cb = true;
@@ -1006,11 +1022,11 @@ void gui_list_set_note_num(gui_list_t *list, uint16_t num)
 {
     list->note_num = num;
     list->created_note_index = 0;
-    if (list->style == LIST_CARD &&
-        num > list->keep_note_num) //if LIST_CARD style, must set style before set note num
-    {
-        list->keep_note_num += 1;
-    }
+    // if (list->style == LIST_CARD &&
+    //     num > list->keep_note_num) //if LIST_CARD style, must set style before set note num
+    // {
+    //     list->keep_note_num += 1;
+    // }
 
     if (list->dir == HORIZONTAL)
     {
@@ -1051,6 +1067,11 @@ void gui_list_set_auto_align(gui_list_t *list, bool auto_align)
     list->auto_align = auto_align;
 }
 
+void gui_list_set_inertia(gui_list_t *list, bool inertia)
+{
+    list->inertia = inertia;
+}
+
 void gui_list_set_offset(gui_list_t *list, int16_t offset)
 {
     int temp = list->dir == HORIZONTAL ? list->base.w : list->base.h;
@@ -1071,6 +1092,7 @@ void gui_list_set_offset(gui_list_t *list, int16_t offset)
     }
 
     list->offset = offset;
+    list->hold = offset;
 }
 
 void gui_list_set_bar_color(gui_list_t *list, gui_color_t color)

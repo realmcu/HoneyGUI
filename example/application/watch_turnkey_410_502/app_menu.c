@@ -207,6 +207,7 @@ static void app_menu_design(gui_view_t *view)
     gui_list_set_style(list, LIST_CIRCLE);
     gui_list_set_note_num(list, array_size);
     gui_list_set_offset(list, list_offset_his);
+    gui_list_set_out_scope(list, 50);
     gui_list_set_bar_color(list, APP_COLOR_SILVER);
     gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
 }

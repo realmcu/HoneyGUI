@@ -39,7 +39,7 @@ extern "C" {
 /* LIST_STYLE enum start*/
 typedef enum
 {
-    LIST_CLASSIC = 0x0000, ///< Classic list.
+    LIST_CLASSIC = 0, ///< Classic list.
     LIST_CIRCLE,           ///< Circle list.
     LIST_ZOOM,             ///< Zoom center list.
     LIST_CARD,             ///< Stack like card.
@@ -52,18 +52,22 @@ typedef enum
 
 typedef enum
 {
-    VERTICAL    = 0x0000,
-    HORIZONTAL  = 0x0001,
+    VERTICAL    = 0,
+    HORIZONTAL  = 1,
 } LIST_DIR;
 
 /** @brief List Structure. */
 typedef struct gui_list
 {
     gui_obj_t base;
-    LIST_STYLE style;
-    LIST_DIR dir;                // 0:vertical, 1:horizontal.
-    uint8_t note_num;            // number of whole notes.
-    uint8_t space;
+    uint32_t dir             : 1; // 0:vertical, 1:horizontal.
+    uint32_t style           : 4; // List style.
+    uint32_t auto_align      : 1; // Automatic alignment of notes.
+    uint32_t inertia         : 1; // Enable inertia effect while tp released.
+    uint32_t need_update_bar : 1;
+    uint32_t note_num        : 8; // number of whole notes.
+    uint32_t space           : 8;
+
     uint16_t note_length;        // List note length.
     int16_t speed;
     int16_t record[5];
@@ -72,9 +76,8 @@ typedef struct gui_list
     int offset;                  // offset = hold + tp_delta, when sliding.
     int hold;
     int total_length;
-    int16_t out_scope;           // Out scope of list.
-    int16_t card_stack_location; // The distance from stack location to the screen bottom.
-    bool auto_align;             // Automatic alignment of notes.
+    int16_t out_scope;           // Out scope of list. Don't support CARD style.
+    int16_t card_stack_location; // The distance from stack location to the screen bottom. Only support CARD style.
 
     uint16_t created_note_index; // Index of the last created note.
     uint8_t keep_note_num;       // Number of created notes.
@@ -84,7 +87,6 @@ typedef struct gui_list
     gui_img_t *bar;
     void *bar_data;
     gui_color_t bar_color;
-    bool need_update_bar;
 
     uint8_t checksum;
 } gui_list_t;
@@ -204,6 +206,12 @@ void gui_list_set_out_scope(gui_list_t *list, int16_t out_scope);
  * @param auto_align true: enable auto align, false: disable auto align.
  */
 void gui_list_set_auto_align(gui_list_t *list, bool auto_align);
+
+/**
+ * @brief Set inertia of list, which is used to enable inertia effect while tp released.
+ * @param inertia Default is true. true: enable inertia, false: disable inertia.
+ */
+void gui_list_set_inertia(gui_list_t *list, bool inertia);
 
 #ifdef __cplusplus
 }

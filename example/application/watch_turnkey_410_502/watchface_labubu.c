@@ -58,13 +58,13 @@ void create_watchface_labubu(gui_obj_t *parent)
     sprintf(date_content, "%d %s", timeinfo->tm_mday, day[timeinfo->tm_wday]);
     gui_text_t *t_time = gui_text_create(win, "t_time", 128, 84, 159, 84);
     gui_text_set(t_time, time_content, GUI_FONT_SRC_TTF, gui_rgb(0, 0, 0), strlen(time_content), 70);
-    gui_text_type_set(t_time, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, MID_CENTER);
     gui_text_rendermode_set(t_time, 2);
 
     gui_text_t *t_date = gui_text_create(win, "t_date", 155, 51, 105, 38);
     gui_text_set(t_date, date_content, GUI_FONT_SRC_TTF, gui_rgb(0, 0, 0), strlen(date_content), 32);
-    gui_text_type_set(t_date, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
+    gui_text_type_set(t_date, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_date, MID_CENTER);
     gui_text_rendermode_set(t_date, 2);
 
