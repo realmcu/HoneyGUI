@@ -832,6 +832,13 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     break;
                 }
             }
+            if (active_font_len == 0)
+            {
+                char_line_sum = line;
+                char_height_sum = line * line_height;
+                gui_free(line_buf);
+                return;
+            }
             line_buf[line].index = active_font_len - 1;
             line_buf[line].offset = (rect_h - chr[active_font_len - 1].y + rect->y1 - chr[active_font_len -
                                                                                           1].char_y - chr[active_font_len - 1].char_h) / 2 * (text_mode - VERTICAL_LEFT_TOP);
@@ -887,6 +894,13 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     active_font_len = i;
                     break;
                 }
+            }
+            if (active_font_len == 0)
+            {
+                char_line_sum = line;
+                char_height_sum = line * line_height;
+                gui_free(line_buf);
+                return;
             }
             line_buf[line].index = active_font_len - 1;
             line_buf[line].offset = (chr[active_font_len - 1].y - rect->y1) / 2 *
