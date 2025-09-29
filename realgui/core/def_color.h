@@ -33,10 +33,33 @@ extern "C" {
   * ARGB888 31 A,R,G,B 0
   * RGBA888 31 R,G,B,A 0
   * ABGR888 31 A,B,G,R 0
+  * ALPHAMASK 7 A       0
   *
   * The gui_color is defined as ARGB888.
   *        bit31 A,R,G,B bit0
   */
+
+/**
+ * @brief Combines R, G, B, and A components into a 32-bit color value in ABGR8888 format.
+ *
+ * The resulting integer has the following byte layout:
+ * - Bits 31-24: Alpha (A)
+ * - Bits 23-16: Blue (B)
+ * - Bits 15-8:  Green (G)
+ * - Bits 7-0:   Red (R)
+ *
+ * @param r Red component (0-255).
+ * @param g Green component (0-255).
+ * @param b Blue component (0-255).
+ * @param a Alpha component (0-255).
+ * @return A 32-bit unsigned integer representing the color in ABGR8888 format (e.g., 0xAABBGGRR).
+ */
+#define GUI_COLOR_ARGB8888(a, r, g, b) \
+    ( ((uint32_t)(a) << 24) | \
+      ((uint32_t)(r) << 16) | \
+      ((uint32_t)(g) << 8)  | \
+      ((uint32_t)(b)) )
+
 
 #pragma pack(1)
 typedef struct _color_rgb888
@@ -68,6 +91,11 @@ typedef struct _color_argb88888
     uint8_t r; ///< Red color component
     uint8_t a; ///< Alpha channel for transparency, at the highest address
 } color_argb8888_t;
+
+typedef struct _color_a8
+{
+    uint8_t a; ///< Alpha channel for transparency, at the highest address
+} color_a8_t;
 #pragma pack()
 
 typedef struct _gui_color

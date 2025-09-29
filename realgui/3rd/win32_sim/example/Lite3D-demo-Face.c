@@ -47,4 +47,4 @@ static int lite3D_example(void)
     return 0;
 }
 
-GUI_INIT_APP_EXPORT(lite3D_example);
+// GUI_INIT_APP_EXPORT(lite3D_example);

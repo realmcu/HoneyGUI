@@ -35,12 +35,13 @@ typedef struct
 
     uint8_t *palette_data;
     uint8_t *palette_index;
+    uint32_t color_mix;
 } gui_raster_params_t;
 
 static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
                                  uint8_t *source_alpha,
                                  uint32_t image_base, uint32_t image_off, char input_type, uint8_t *palette_data,
-                                 uint8_t *palette_index)
+                                 uint8_t *palette_index, uint32_t color_mix)
 {
     switch (input_type)
     {
@@ -89,6 +90,17 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
             // *source_red = 0xFF;
             *source_green = color[1];
             *source_blue = color[2];
+            break;
+        }
+    case ALPHAMASK:
+        {
+            color_a8_t *pixel = (color_a8_t *)(uintptr_t)image_base + image_off;
+            color_argb8888_t *pixel_mix = (color_argb8888_t *)&color_mix;
+            uint32_t alpha = pixel->a * pixel_mix->a / 255;
+            *source_alpha = alpha;
+            *source_red = pixel_mix->r;
+            *source_green = pixel_mix->g;
+            *source_blue = pixel_mix->b;
             break;
         }
     default:
@@ -232,7 +244,7 @@ static void do_raster_pixel(const gui_raster_params_t *params)
 
     gui_get_source_color(&source_red, &source_green, &source_blue, &source_alpha,
                          params->image_base, params->image_off, params->input_type, params->palette_data,
-                         params->palette_index);
+                         params->palette_index, params->color_mix);
 
     gui_get_target_color(&target_red, &target_green, &target_blue, &target_alpha,
                          params->writebuf, params->write_off, params->dc_bytes_per_pixel);
@@ -350,10 +362,11 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     uint32_t blend_mode = image->blend_mode;
     gui_matrix_t *inverse = &image->inverse;
 
-    gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL};
+    gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL, 0};
     params.image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
     params.palette_index = ((gui_palette_file_t *)head)->palette_index;
     params.palette_data = ((gui_palette_file_t *)head)->palette_data;
+    params.color_mix = image->color_mix;
 
     bool use_rle = (head->compress == 1);
     uint8_t rle_pixel[4];

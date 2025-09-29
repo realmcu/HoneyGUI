@@ -13,6 +13,7 @@
 #include "jpeg.txt"
 #include "green.txt"
 #include "gif_demo.txt"
+#include "nanovg_generate_pixel.txt"
 
 
 /* gui image widget example start*/
@@ -34,17 +35,19 @@ void test_timer_cb(void *param)
 static int app_init(void)
 {
 
-    void *addr = (void *)_actiger_blue_compressed;
+    void *addr = (void *)_acnanovg_generate_pixel;
     // void *addr = (void *)_acgreen;
     // void *addr = (void *)_acgif_demo;
 
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
 
-    gui_img_set_focus(img, 50, 50);
+    gui_img_set_color_mix(img, GUI_COLOR_ARGB8888(255, 255, 0, 0));
 
-    gui_img_rotation(img, 45.0f);
+    // gui_img_set_focus(img, 50, 50);
 
-    gui_img_translate(img, 50, 50);
+    // gui_img_rotation(img, 45.0f);
+
+    // gui_img_translate(img, 50, 50);
 
     // gui_obj_add_event_cb(img, (gui_event_cb_t)test_event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 

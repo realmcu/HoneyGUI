@@ -64,6 +64,7 @@ typedef struct gui_img
         void *ftl;                    /* FTL address. */
     };
     gd_GIF *gif;                        /* GIF data */
+    uint32_t color_mix;
 
     uint32_t opacity_value : 8;        /* Opacity value (0-255). */
     uint32_t blend_mode    : 3;        /* Blend mode. */
@@ -359,6 +360,11 @@ void gui_img_set_image_data(gui_img_t *_this, const uint8_t *image_data_pointer)
  * @return A pointer to the image data currently set in the widget. If no image data is set, the result may be `NULL`.
  */
 const uint8_t *gui_img_get_image_data(gui_img_t *_this);
+
+/**
+ * @brief Sets the color mixing value for the image widget.
+ */
+void gui_img_set_color_mix(gui_img_t *_this, uint32_t color_mix);
 
 
 

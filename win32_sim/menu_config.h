@@ -24,7 +24,7 @@
 // <h> HoneyGUI Demo Select
 
 // <c> RTK GUI Base Demo
-// #define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+#define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 // </c>
 
 // <c> RTK GUI Base Demo
@@ -44,7 +44,7 @@
 // </c>
 
 // <c> RTK GUI View Demo
-#define CONFIG_REALTEK_BUILD_REAL_VIEW
+// #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>
 
 // <c> RTK GUI List Demo

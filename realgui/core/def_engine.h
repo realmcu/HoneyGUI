@@ -44,7 +44,7 @@ typedef struct draw_img
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
     uint32_t high_quality : 1;
-    //uint32_t color_mix; //todo for QuDai
+    uint32_t color_mix;
     void *acc_user;
 } draw_img_t;
 

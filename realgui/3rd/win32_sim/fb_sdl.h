@@ -20,7 +20,7 @@ extern "C" {
 #define DRV_LCD_HIGHT   480
 #endif
 #ifndef DRV_PIXEL_BITS
-#define DRV_PIXEL_BITS   16
+#define DRV_PIXEL_BITS   32
 #endif
 
 // #define USE_DC_PFB
