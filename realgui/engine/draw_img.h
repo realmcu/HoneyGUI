@@ -53,6 +53,7 @@ typedef enum
     IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
     IMG_COVER_MODE,
     IMG_RECT,
+    IMG_2D_SW_RGB565_ONLY,
 } BLEND_MODE_TYPE;
 /* BLEND_MODE_TYPE structure end*/
 

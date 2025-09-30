@@ -22,9 +22,9 @@
 #include <stdint.h>
 #include "acc_sw_rle.h"
 #include "acc_sw_bypass.h"
-#include "acc_sw_cover.h"
 #include "acc_sw_filter.h"
 #include "acc_sw_raster.h"
+#include "acc_sw_transform.h"
 #include "acc_sw.h"
 
 /*============================================================================*
@@ -72,8 +72,6 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         switch (image->blend_mode)
         {
         case IMG_COVER_MODE:
-            cover_blit_2_rgb565(image, dc, rect);
-            return;
         case IMG_BYPASS_MODE:
             bypass_blit_2_rgb565(image, dc, rect);
             return;
@@ -85,7 +83,16 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         }
     }
 
-    do_raster(image, dc, rect);
+    if (image->blend_mode == IMG_2D_SW_RGB565_ONLY)
+    {
+        sw_transform_for_rgb565(image, dc, rect);
+    }
+    else
+    {
+        do_raster(image, dc, rect);
+    }
+
+
 }
 
 

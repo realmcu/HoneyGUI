@@ -10,6 +10,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "../../assets/tiger_blue_compressed.txt"
+#include "../../assets/tiger_blue.txt"
 #include "jpeg.txt"
 #include "green.txt"
 #include "gif_demo.txt"
@@ -35,17 +36,20 @@ void test_timer_cb(void *param)
 static int app_init(void)
 {
 
-    void *addr = (void *)_acnanovg_generate_pixel;
+    void *addr = (void *)_actiger_blue;
     // void *addr = (void *)_acgreen;
     // void *addr = (void *)_acgif_demo;
 
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
 
-    gui_img_set_color_mix(img, GUI_COLOR_ARGB8888(255, 255, 0, 0));
+    // gui_img_set_color_mix(img, GUI_COLOR_ARGB8888(255, 255, 0, 0));
+
+    // gui_img_set_mode(img, IMG_2D_SW_RGB565_ONLY);
 
     // gui_img_set_focus(img, 50, 50);
 
-    // gui_img_rotation(img, 45.0f);
+    gui_img_rotation(img, 45.0f);
+    gui_img_scale(img, 0.5f, 0.5f);
 
     // gui_img_translate(img, 50, 50);
 
