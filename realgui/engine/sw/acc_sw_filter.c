@@ -38,14 +38,21 @@ void filter_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
     int16_t source_w = image->img_w;
     gui_matrix_t *inverse = &image->inverse;
+    float m12 = inverse->m[1][2];
+    float m02 = inverse->m[0][2];
+
+    int16_t y1 = dc->section.y1;
+    // int16_t y2 = dc->section.y2;
+    int16_t x1 = dc->section.x1;
+    int16_t x2 = dc->section.x2;
+
 
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
-                        dc->section.x1;
+        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
 
         uint16_t *image_ptr = (uint16_t *)(uintptr_t)image_base + (uint32_t)((
-                                                                                 i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2]);
+                                                                                 i + m12) * source_w + x_start + m02);
 
         for (int32_t j = x_start; j <= x_end; j++)
         {

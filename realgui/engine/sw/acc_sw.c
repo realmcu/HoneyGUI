@@ -25,6 +25,7 @@
 #include "acc_sw_filter.h"
 #include "acc_sw_raster.h"
 #include "acc_sw_transform.h"
+#include "acc_sw_blend.h"
 #include "acc_sw.h"
 
 /*============================================================================*
@@ -66,8 +67,13 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
                     (image->matrix.m[2][0] == 0) &&
                     (image->matrix.m[2][1] == 0);
 
-    if ((dc_bytes_per_pixel == 2) && identity && (head->type == RGB565) &&
-        (opacity == 255) && (rect == NULL))
+    if (\
+        (dc_bytes_per_pixel == 2) && \
+        identity && \
+        (head->type == RGB565 || head->type == RTKARGB8565) && \
+        (opacity == 255) && \
+        (rect == NULL) \
+       )
     {
         switch (image->blend_mode)
         {
@@ -77,6 +83,10 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             return;
         case IMG_FILTER_BLACK:
             filter_blit_2_rgb565(image, dc, rect);
+            return;
+        case IMG_SRC_OVER_MODE:
+            GUI_ASSERT(head->type == RTKARGB8565);
+            src_over_blit_2_rgb565(image, dc, rect);
             return;
         default:
             break;

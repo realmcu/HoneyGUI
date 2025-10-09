@@ -27,7 +27,7 @@ static void draw_circle_callback(gui_canvas_t *canvas)
     nvgStroke(canvas->vg);
 }
 
-void test_circle_drawing()
+void test_circle_drawing(void)
 {
     gui_canvas_t *canvas = gui_canvas_create(gui_obj_get_root(), "test_circle", NULL, 0, 0, 300, 200);
     gui_canvas_set_canvas_cb(canvas, draw_circle_callback);
@@ -47,7 +47,7 @@ static void canvas_rect_cb(gui_canvas_t *canvas)
     nvgFillPaint(vg, gradient);
     nvgFill(vg);
 }
-void test_rect_drawing()
+void test_rect_drawing(void)
 {
 
     gui_canvas_t *canvas = gui_canvas_create(gui_obj_get_root(), "canvas", 0, 0, 0, 480, 480);
@@ -64,7 +64,7 @@ static void arc_cb(gui_canvas_t *canvas)
     nvgStroke(canvas->vg);
 }
 
-void test_arc_drawing()
+void test_arc_drawing(void)
 {
     gui_canvas_t *canvas = gui_canvas_create(gui_obj_get_root(), "test_arc", NULL, 0, 0, 480, 480);
     gui_canvas_set_canvas_cb(canvas, arc_cb);
@@ -72,20 +72,6 @@ void test_arc_drawing()
 }
 
 
-void test_render(NVGcontext *vg)
-{
-    // Draw red background
-    nvgBeginPath(vg);
-    nvgRect(vg, 0, 0, 480, 480);
-    nvgFillColor(vg, nvgRGBA(255, 0, 0, 255));
-    nvgFill(vg);
-
-    // Draw green rectangle
-    nvgBeginPath(vg);
-    nvgRect(vg, 100, 100, 200, 200);
-    nvgFillColor(vg, nvgRGBA(0, 255, 0, 255));
-    nvgFill(vg);
-}
 static int app_init(void)
 {
     test_rect_drawing();
