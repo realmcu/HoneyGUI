@@ -10,13 +10,14 @@
 #include "gui_list.h"
 
 /* Use the following macro to checkout the different style lists */
-#define RUN_VERTICAL_CIRCLE_STYLE
+// #define RUN_VERTICAL_CIRCLE_STYLE
 // #define RUN_VERTICAL_CARD_STYLE
 // #define RUN_HORIZONTAL_ZOOM_STYLE
 // #define RUN_VERTICAL_FAN_STYLE
 // #define RUN_VERTICAL_HELIX_STYLE
 // #define RUN_VERTICAL_CURL_STYLE
 // #define RUN_VERTICAL_CLASSIC_STYLE
+#define RUN_VERTICAL_FADE_STYLE
 
 #define NOTE_NUM 20
 
@@ -77,6 +78,10 @@ static void note_design(gui_obj_t *obj, void *p)
 #endif
 
 #ifdef RUN_VERTICAL_CLASSIC_STYLE
+    gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 480, 480, color[index]);
+#endif
+
+#ifdef RUN_VERTICAL_FADE_STYLE
     gui_canvas_rect_t *canvas = gui_canvas_rect_create(obj, "note", 0, 0, 480, 480, color[index]);
 #endif
     GUI_UNUSED(canvas);
@@ -162,6 +167,21 @@ static int app_init(void)
     gui_list_set_auto_align(list, true);
     gui_list_set_offset(list, -length * 5);
     gui_list_set_inertia(list, false);
+    return 0;
+#endif
+
+    /* VERTICAL FADE STYLE */
+#ifdef RUN_VERTICAL_FADE_STYLE
+    int length = 480;
+    gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
+                                       note_design, NULL,
+                                       false);
+    gui_list_set_style(list, LIST_FADE);
+    gui_list_set_note_num(list, 10);
+    gui_list_set_auto_align(list, true);
+    gui_list_set_inertia(list, false);
+    gui_list_set_out_scope(list, 480 / 2);
+    gui_list_set_offset(list, -length * 5);
     return 0;
 #endif
 }

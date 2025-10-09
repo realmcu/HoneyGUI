@@ -255,16 +255,16 @@ static void gui_list_free_notes(gui_obj_t *obj)
             range += (1.2 * _this->note_length); // scale_1 = 0.8f;
         }
 
-        if (pos + _this->note_length < 0)
+        if (pos + _this->note_length <= 0)
         {
             // gui_log("free note %d\n", note->index);
             gui_obj_tree_free(o);
         }
-        else if (pos > range)
+        else if (pos >= range)
         {
             // gui_log("free note %d\n", note->index);
             gui_obj_tree_free(o);
-            _this->created_note_index -= 1;
+            _this->max_created_note_index -= 1;
         }
     }
 }
@@ -300,7 +300,7 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         gui_obj_t *o = gui_list_entry((&(_this->base.child_list))->next, gui_obj_t, brother_list);
         gui_list_note_t *note = (gui_list_note_t *)o;
         int16_t index = note->index;
-        _this->created_note_index = index;
+        _this->max_created_note_index = index;
         int16_t pos = 0;
         int16_t range = 0;
         if (_this->dir == HORIZONTAL)
@@ -675,6 +675,49 @@ static void gui_list_note_curl(gui_obj_t *obj)
     }
 }
 
+static void gui_list_note_fade(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_list_note_t *_this = (gui_list_note_t *)obj;
+    gui_list_t *list = (gui_list_t *)obj->parent;
+    static bool flag = true;
+    if (_this->index == list->last_created_note_index)
+    {
+        if (list->dir == HORIZONTAL)
+        {
+            obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->x - list->base.x) / obj->w;
+            obj->matrix->m[0][2] = list->base.x;
+        }
+        else
+        {
+            obj->opacity_value = UINT8_MAX - UINT8_MAX * abs(obj->y - list->base.y) / obj->h;
+            obj->matrix->m[1][2] = list->base.y;
+
+        }
+        flag = obj->opacity_value > UINT8_MAX / 2;
+    }
+    else
+    {
+        if (tp->pressing)
+        {
+            obj->opacity_value = 0;
+        }
+        else
+        {
+            if (flag)
+            {
+                obj->opacity_value = 0;
+            }
+            else
+            {
+                obj->opacity_value = UINT8_MAX;
+                obj->matrix->m[0][2] = list->base.x;
+                obj->matrix->m[1][2] = list->base.y;
+            }
+        }
+    }
+}
+
 static void gui_list_note_transform(gui_obj_t *obj)
 {
     gui_list_t *list = (gui_list_t *)obj->parent;
@@ -697,6 +740,9 @@ static void gui_list_note_transform(gui_obj_t *obj)
         break;
     case LIST_CURL:
         gui_list_note_curl(obj);
+        break;
+    case LIST_FADE:
+        gui_list_note_fade(obj);
         break;
     default:
         break;
@@ -727,7 +773,6 @@ static void gui_list_note_prepare(gui_obj_t *obj)
 
     matrix_translate(_this->t_x, _this->t_y,
                      obj->matrix); //_this way to move note in order not to lose tp
-
     uint8_t last = _this->checksum;
     _this->checksum = 0;
     _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, (uint8_t)sizeof(gui_list_note_t));
@@ -881,15 +926,17 @@ static void gui_list_create_bar(gui_list_t *_this,
 static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
 {
     GUI_ASSERT(index < list->note_num);
+    list->last_created_note_index = index;
+    // gui_log("add note %d\n", index);
 
     gui_list_note_t *_this = gui_malloc(sizeof(gui_list_note_t));
     memset(_this, 0, sizeof(gui_list_note_t));
 
     bool add_at_head = 0;
-    if (list->created_note_index < index)
+    if (list->max_created_note_index < index)
     {
         add_at_head = true;
-        list->created_note_index = index;
+        list->max_created_note_index = index;
     }
 
     int16_t x, y, w, h;
@@ -986,7 +1033,6 @@ gui_list_t *gui_list_create(void       *parent,
     {
         _this->total_length = h;
     }
-    // _this->keep_note_num = _this->total_length / (note_length + space) + 1;
     GET_BASE(_this)->obj_cb = gui_list_cb;
     GET_BASE(_this)->has_input_prepare_cb = true;
     GET_BASE(_this)->has_prepare_cb = true;
@@ -1021,12 +1067,8 @@ gui_list_t *gui_list_create(void       *parent,
 void gui_list_set_note_num(gui_list_t *list, uint16_t num)
 {
     list->note_num = num;
-    list->created_note_index = 0;
-    // if (list->style == LIST_CARD &&
-    //     num > list->keep_note_num) //if LIST_CARD style, must set style before set note num
-    // {
-    //     list->keep_note_num += 1;
-    // }
+    list->max_created_note_index = 0;
+    list->last_created_note_index = 0;
 
     if (list->dir == HORIZONTAL)
     {

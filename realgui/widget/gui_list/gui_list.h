@@ -46,6 +46,7 @@ typedef enum
     LIST_FAN,              ///< Rotate like fan.
     LIST_HELIX,            ///< Rotate like helix.
     LIST_CURL,             ///< Rotate curly.
+    LIST_FADE,             ///< Fade in.
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/
@@ -79,8 +80,8 @@ typedef struct gui_list
     int16_t out_scope;           // Out scope of list. Don't support CARD style.
     int16_t card_stack_location; // The distance from stack location to the screen bottom. Only support CARD style.
 
-    uint16_t created_note_index; // Index of the last created note.
-    uint8_t keep_note_num;       // Number of created notes.
+    uint16_t max_created_note_index; // Max index of the created notes.
+    uint16_t last_created_note_index; // Index of the last created note.
     void (* note_design)(gui_obj_t *obj, void *param);
     void *design_param;
 
