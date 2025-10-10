@@ -270,12 +270,12 @@ static void gui_get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     imdc_file_t *compressed = (imdc_file_t *)(&(file->data.imdc_file));
     if (y != y_record || x <= x_record || image_record != image)
     {
-        x_record = x;
         y_record = y;
         image_record = image;
         location = 0;
         line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
     }
+    x_record = x;
     switch (input_type)
     {
     case RGB565:
