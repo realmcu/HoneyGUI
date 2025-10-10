@@ -70,7 +70,7 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     if (\
         (dc_bytes_per_pixel == 2) && \
         identity && \
-        (head->type == RGB565 || head->type == RTKARGB8565) && \
+        (head->type == RGB565 || head->type == ARGB8565) && \
         (opacity == 255) && \
         (rect == NULL) \
        )
@@ -84,8 +84,8 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         case IMG_FILTER_BLACK:
             filter_blit_2_rgb565(image, dc, rect);
             return;
-        case IMG_SRC_OVER_MODE:
-            GUI_ASSERT(head->type == RTKARGB8565);
+        case IMG_2D_SW_SRC_OVER_MODE:
+            GUI_ASSERT(head->type == ARGB8565);
             src_over_blit_2_rgb565(image, dc, rect);
             return;
         default:

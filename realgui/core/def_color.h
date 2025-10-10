@@ -84,6 +84,11 @@ typedef struct _color_argb8565
     uint8_t a;
 } color_argb8565_t;
 
+typedef struct _color_argb8565_value //only use for sw fast blending
+{
+    uint16_t rgb;
+    uint8_t a;
+} color_argb8565_value_t;
 typedef struct _color_argb88888
 {
     uint8_t b; ///< Blue color component, at the lowest address

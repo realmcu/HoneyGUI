@@ -55,7 +55,6 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
     int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
 
     gui_matrix_t *inverse = &image->inverse;
     float m12 = inverse->m[1][2];
@@ -70,18 +69,18 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     {
         int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
 
-        uint16_t *image_ptr = (uint16_t *)(uintptr_t)image_base + (uint32_t)((
-                                                                                 i + m12) * source_w + x_start + m02 + source_w * source_h / 2);
-        uint8_t  *alpha     = (uint8_t *)(uintptr_t)image_base + (uint32_t)((i + m12) * source_w + x_start +
-                                                                            m02);
+
+        color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + (uint32_t)((
+                                            i + m12) * source_w + x_start + m02);
+
 
         for (int32_t j = x_start; j <= x_end; j++)
         {
-            uint16_t pixel = *image_ptr++;
-            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel, writebuf[write_off], *alpha);
+
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], pixel->a);
 
             write_off++;
-            alpha++;
+            pixel++;
         }
     }
 

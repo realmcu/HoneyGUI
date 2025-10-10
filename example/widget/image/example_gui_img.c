@@ -15,8 +15,7 @@
 #include "green.txt"
 #include "gif_demo.txt"
 #include "nanovg_generate_pixel.txt"
-#include "hour_mask.txt"
-#include "hour.txt"
+#include "test_png.txt"
 
 
 /* gui image widget example start*/
@@ -38,7 +37,7 @@ void test_timer_cb(void *param)
 static int app_init(void)
 {
 
-    void *addr = (void *)_achour_mask;
+    void *addr = (void *)_actest_png;
     // void *addr = (void *)_acgreen;
     // void *addr = (void *)_acgif_demo;
 
@@ -47,7 +46,7 @@ static int app_init(void)
 
     // gui_img_set_color_mix(img, GUI_COLOR_ARGB8888(255, 255, 0, 0));
 
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
 
     // gui_img_set_focus(img, 50, 50);
 
