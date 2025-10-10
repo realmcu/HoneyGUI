@@ -112,7 +112,6 @@ static int16_t list_offset_his = 0;
 static gui_menu_cellular_t *menu_cellular = NULL;
 static int16_t cellular_offset_x = 0;
 static int16_t cellular_offset_y = 0;
-static uint16_t list_index_rec = 0;
 
 static gui_color_t color_t[2] = {0};
 static note_design_param_t *design_p = NULL;
@@ -490,7 +489,6 @@ static void list_timer_cb(void *obj)
 {
     gui_list_t *list = (gui_list_t *)obj;
     list_offset_his = list->offset;
-    list_index_rec = list->created_note_index;
 }
 
 static void clear_menu(gui_view_t *view)
