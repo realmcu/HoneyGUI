@@ -238,7 +238,7 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     //         _this->base.matrix->m[0][0],_this->base.matrix->m[1][1],
     //         _this->scale_img->base.matrix->m[0][0],_this->scale_img->base.matrix->m[1][1]);
 #endif
-    _this->color.color.rgba.a = (_this->color.color.rgba.a * _this->base.parent->opacity_value) / 255;
+
     matrix_multiply_point(obj->matrix, &point);
 
     _this->offset_x = point.p[0];

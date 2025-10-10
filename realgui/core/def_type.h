@@ -61,6 +61,8 @@ typedef int gui_error_t;
 #define _UI_BITBYTES(bits)      ((bits + 7)/8)
 #define _UI_ABS(x)              ((x)>=0? (x):-(x))
 
+#define _UI_UDIV255(x)          (((x) * 0x8081U) >> 0x17)
+
 typedef struct gui_vertex
 {
     float x;                    //!< x axis

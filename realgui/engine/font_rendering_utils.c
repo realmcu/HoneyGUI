@@ -287,7 +287,6 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
             {
                 alpha = alpha & 0x03;
                 alpha = alpha * 85;
-                // alpha = font->color.color.rgba.a * alpha / 0xff;
                 color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -307,7 +306,6 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
                     else
                     {
                         alpha_2bit *= 85;
-                        // alpha_2bit = font->color.color.rgba.a * alpha_2bit / 0xff;
                         color_back = writebuf[write_off + j - font->target_rect.x1];
                         writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
                                                                                           alpha_2bit);
@@ -323,7 +321,6 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
                     else
                     {
                         alpha_2bit *= 85;
-                        // alpha_2bit = font->color.color.rgba.a * alpha_2bit / 0xff;
                         color_back = writebuf[write_off + j + 1 - font->target_rect.x1];
                         writebuf[write_off + j + 1 - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
                                                                                               alpha_2bit);
@@ -339,7 +336,6 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
                     else
                     {
                         alpha_2bit *= 85;
-                        // alpha_2bit = font->color.color.rgba.a * alpha_2bit / 0xff;
                         color_back = writebuf[write_off + j + 2 - font->target_rect.x1];
                         writebuf[write_off + j + 2 - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
                                                                                               alpha_2bit);
@@ -355,7 +351,6 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
                     else
                     {
                         alpha_2bit *= 85;
-                        // alpha_2bit = font->color.color.rgba.a * alpha_2bit / 0xff;
                         color_back = writebuf[write_off + j + 3 - font->target_rect.x1];
                         writebuf[write_off + j + 3 - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back,
                                                                                               alpha_2bit);
@@ -373,7 +368,6 @@ static void font_render_2bpp_to_RGB565_turbo(draw_font_t *font, font_glyph_t *gl
             {
                 alpha = alpha & 0x03;
                 alpha = alpha * 85;
-                // alpha = font->color.color.rgba.a * alpha / 0xff;
                 color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -434,9 +428,9 @@ static void font_render_2bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
                 uint8_t color_back[3];
                 memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
                 uint8_t color[3];
-                color[0] = color_output[0] * alpha / 255 + color_back[0] * (255 - alpha) / 255;
-                color[1] = color_output[1] * alpha / 255 + color_back[1] * (255 - alpha) / 255;
-                color[2] = color_output[2] * alpha / 255 + color_back[2] * (255 - alpha) / 255;
+                color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
                 memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
             }
         }
@@ -549,9 +543,9 @@ static void font_render_4bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
                 uint8_t color_back[3];
                 memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
                 uint8_t color[3];
-                color[0] = color_output[0] * alpha / 255 + color_back[0] * (255 - alpha) / 255;
-                color[1] = color_output[1] * alpha / 255 + color_back[1] * (255 - alpha) / 255;
-                color[2] = color_output[2] * alpha / 255 + color_back[2] * (255 - alpha) / 255;
+                color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
                 memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
             }
         }
@@ -705,7 +699,7 @@ static void font_render_8bpp_to_RGB565_mve(draw_font_t *font, font_glyph_t *glyp
             uint8_t alpha = dots[dots_off + j];
             if (alpha)
             {
-                alpha = font->color.color.rgba.a * alpha / 0xff;
+                alpha = _UI_UDIV255(font->color.color.rgba.a * alpha);
                 color_back = writebuf[write_off + j];
                 writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -730,6 +724,7 @@ static void font_render_8bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
             uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb];
             if (alpha)
             {
+                // alpha = _UI_UDIV255(font->color.color.rgba.a * alpha);
                 uint16_t color_back = writebuf[write_off + j - font->target_rect.x1];
                 writebuf[write_off + j - font->target_rect.x1] = alphaBlendRGB565(color_output, color_back, alpha);
             }
@@ -789,9 +784,9 @@ static void font_render_8bpp_to_RGB888_stable(draw_font_t *font, font_glyph_t *g
                 uint8_t color_back[3];
                 memcpy(color_back, &writebuf[write_off + j * 3 - font->target_rect.x1 * 3], 3);
                 uint8_t color[3];
-                color[0] = color_output[0] * alpha / 255 + color_back[0] * (255 - alpha) / 255;
-                color[1] = color_output[1] * alpha / 255 + color_back[1] * (255 - alpha) / 255;
-                color[2] = color_output[2] * alpha / 255 + color_back[2] * (255 - alpha) / 255;
+                color[0] = _UI_UDIV255(color_output[0] * alpha) + _UI_UDIV255(color_back[0] * (255 - alpha));
+                color[1] = _UI_UDIV255(color_output[1] * alpha) + _UI_UDIV255(color_back[1] * (255 - alpha));
+                color[2] = _UI_UDIV255(color_output[2] * alpha) + _UI_UDIV255(color_back[2] * (255 - alpha));
                 memcpy(&writebuf[write_off + j * 3 - font->target_rect.x1 * 3], color, 3);
             }
         }

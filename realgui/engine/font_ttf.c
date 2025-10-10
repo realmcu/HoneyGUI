@@ -261,11 +261,14 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
                 : _UI_MIN(dc->section.y2, y + h - 1);
     if (x_start >= x_end || y_start >= y_end) { return; }
 
+    gui_color_t outcolor = text->color;
+    outcolor.color.rgba.a = _UI_UDIV255(text->color.color.rgba.a * text->base.opacity_value);
+
     draw_font_t render_font =
     {
         .target_buf = dc->frame_buf,
         .target_buf_stride = dc->fb_width * (dc->bit_depth >> 3),
-        .color = text->color,
+        .color = outcolor,
         .target_rect = {
             .x1 = dc->section.x1,
             .y1 = dc->section.y1,
