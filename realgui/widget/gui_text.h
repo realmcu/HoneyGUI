@@ -140,6 +140,7 @@ typedef struct gui_text
     bool content_refresh  : 1;
     bool use_img_blit     : 1;
     uint8_t inputable     : 1;
+    uint8_t clickable     : 1;
     uint8_t ispasswd      : 1;
     uint8_t wordwrap      : 1;
     uint8_t scope         : 1;

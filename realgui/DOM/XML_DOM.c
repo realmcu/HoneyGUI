@@ -5228,10 +5228,6 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
                     config.ime = KB_METHOD_PINYIN;
                 }
             }
-            else if (!strcmp(p->attr[i], "hidden"))
-            {
-                hidden = true;
-            }
             i++;
         }
 
@@ -5312,7 +5308,7 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
 
         parent = (void *)gui_keyboard_create(parent, "test", &config,
                                              0, 0, gui_get_screen_width(), gui_get_screen_height());
-        gui_obj_hidden(parent, hidden);
+        gui_obj_hidden(parent, true);
     }
 
     return parent;

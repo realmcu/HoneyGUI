@@ -304,7 +304,7 @@ static void gui_text_input_prepare(gui_obj_t *obj)
     {
     case TOUCH_SHORT:
         {
-            if (this->inputable)
+            if (this->clickable)
             {
                 gui_obj_skip_other_short(obj);
             }
@@ -529,6 +529,7 @@ void gui_text_ctor(gui_text_t *this,
 
 void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
+    this->clickable = true;
     gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
 }
 void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
@@ -572,7 +573,8 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 
 void gui_text_input_set(gui_text_t *this, bool inputable)
 {
-    this->inputable = inputable;
+    this->inputable = true;
+    this->clickable = true;
 }
 
 void gui_text_wordwrap_set(gui_text_t *this, bool wordwrap)

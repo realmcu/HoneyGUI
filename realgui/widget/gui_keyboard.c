@@ -306,6 +306,8 @@ static void gui_kb_cursor_del()
     }
 }
 
+static void gui_kb_input_prepare(gui_obj_t *obj)
+{}
 static void gui_kb_prepare(gui_obj_t *obj)
 {}
 static void gui_kb_draw_cb(gui_obj_t *obj)
@@ -321,6 +323,9 @@ static void gui_kb_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_kb_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_kb_prepare(obj);
             break;
@@ -1357,7 +1362,7 @@ static void gui_kb_layout_basic_letter(gui_kb_t  *this)
         gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
 
-        btn = gui_button_create(this->win_letter, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_l",
+        btn = gui_button_create(this->win_letter, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                 BUTTON_BG_ICON, 0);
         gui_img_scale(btn->img, scale, scale);
         gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1404,7 +1409,7 @@ static void gui_kb_layout_basic_func(gui_kb_t  *this)
 
         if (key_is_sw(key_val) == false)
         {
-            btn = gui_button_create(this->win_func, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_f",
+            btn = gui_button_create(this->win_func, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                     BUTTON_BG_ICON, 0);
             gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1457,7 +1462,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
             gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
-            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_n",
+            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                     BUTTON_BG_ICON, 0);
             gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1488,7 +1493,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
             gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
-            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_s",
+            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                     BUTTON_BG_ICON, 0);
             gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
