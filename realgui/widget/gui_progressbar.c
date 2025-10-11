@@ -71,14 +71,15 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t     *this,
     }
 
     this->src_mode = src_mode;
+    uint32_t idx = this->per * this->max;
 
     if (src_mode == IMG_SRC_FILESYS)
     {
-        this->c = (void *)gui_img_create_from_fs(this, "pro", picture_array[0], 0, 0, 0, 0);
+        this->c = (void *)gui_img_create_from_fs(this, "pro", picture_array[idx], 0, 0, 0, 0);
     }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
-        this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
+        this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[idx], 0, 0, 0, 0);
     }
     this->image_type = IMAGE_ARRAY;
     this->color_hl = (uint32_t)(uintptr_t)picture_array;

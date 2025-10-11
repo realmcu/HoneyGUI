@@ -23,11 +23,27 @@
 
 #define STEP 4
 #define RELEASE_THRESHOLD_MS 300
-static touch_info_t wheel = {.type = TOUCH_INVALIDE, .x = 454 / 2, .y = 454 / 2};
-touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
+static knob_info_t knob = {.type = KNOB_INVALIDE};
+knob_info_t *knob_algo_process(gui_knob_port_data_t *knob_raw)
 {
-    GUI_ASSERT(wheel_raw != NULL);
+    static uint32_t timestamp_ms;
+    GUI_ASSERT(knob_raw != NULL);
 
+    if (timestamp_ms != knob_raw->timestamp_ms && knob_raw->delta)
+    {
+        knob.type = KNOB_ING;
+        knob.delta = knob_raw->delta;
+        gui_log("event %d delta %d", knob.type, knob.delta);
+        timestamp_ms = knob_raw->timestamp_ms;
+    }
+    else
+    {
+        knob.type = KNOB_INVALIDE;
+        knob.delta = 0;
+    }
+    return &knob;
+
+#if 0
 
     static uint32_t timestamp;
     wheel.button_down = 0;
@@ -102,9 +118,10 @@ touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
     }
     wheel_raw->event = GUI_WHEEL_NO_EVENT;
     return &wheel;
+#endif
 }
 
-touch_info_t *wheel_get_info(void)
+knob_info_t *knob_get_info(void)
 {
-    return &wheel;
+    return &knob;
 }

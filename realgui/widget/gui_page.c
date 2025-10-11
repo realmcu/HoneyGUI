@@ -626,72 +626,73 @@ void gui_page_update(gui_obj_t *obj)
     {
         return;
     }
-    IMPORT_GUI_WHEEL
+    IMPORT_GUI_KNOB
 //
-    if (wheel->pressing && this->align_hight <= 0) //no align
+    if (this->knob_en && knob->type == KNOB_ING)
     {
-        obj->y = wheel->history_y;
-        if (obj->y > this->start_y + this->top_offset) /*@TOP*/
+        if (this->align_hight <= 0) //no align
         {
-            obj->y = this->start_y + this->top_offset;
+            obj->y += knob->delta * this->knob_step * 0.1f * obj->h;
+            if (obj->y > this->start_y + this->top_offset) /*@TOP*/
+            {
+                obj->y = this->start_y + this->top_offset;
 
+            }
+            else if (obj->y < (this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset)
+                     //&& obj->y != 0
+                    )/*@BOTTOM*/
+            {
+                obj->y = this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset;
+            }
+            //gui_log("ywheel:%d\n", obj->y);
+            //gui_log("wheel:%d,%d,%d,%d\n",wheel->pressed, wheel->pressing, wheel->deltaY, wheel->history_y);
+            uint8_t last = this->checksum;
+            this->checksum = 0;
+            this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_page_t));
+            if (last != this->checksum)
+            {
+                gui_fb_change();
+            }
+            return;
         }
-        else if (obj->y < (this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset)
-                 //&& obj->y != 0
-                )/*@BOTTOM*/
+        else
         {
-            obj->y = this->start_y - (obj->h - (int)this->default_h) + this->bottom_offset;
+            int wheel_offset = _UI_ABS((this->base.y + this->top_offset)) % this->align_hight;
+            this->y = this->base.y;
+            this->wheel_up = 0;
+            if (knob->delta < 0) //up
+            {
+                if (this->base.y - this->bottom_offset + this->base.h - this->default_h < this->align_hight &&
+                    this->base.y - this->bottom_offset + this->base.h - this->default_h >= 0)
+                {
+                    return;
+                }
+                gui_log("aaa:%d\n", this->base.y - this->bottom_offset + this->base.h - this->default_h);
+                if (wheel_offset == 0)
+                {
+                    wheel_offset = this->align_hight;
+                }
+                this->wheel_up = 1;
+                this->velocity = -velocity;
+                wheel_offset =  - wheel_offset;
+            }
+            else//down
+            {
+                gui_log("bbb:%d,%d,%d\n", -(this->base.y - this->top_offset), this->base.y, this->top_offset);
+                if (-(this->base.y - this->top_offset) < this->align_hight &&
+                    -(this->base.y - this->top_offset) >= 0)
+                {
+                    return;
+                }
+
+                this->velocity = velocity;
+                wheel_offset = this->align_hight - wheel_offset;
+            }
+            this->target = wheel_offset + this->base.y;
+            this->wheel_take_over = 1;
         }
-        //gui_log("ywheel:%d\n", obj->y);
-        //gui_log("wheel:%d,%d,%d,%d\n",wheel->pressed, wheel->pressing, wheel->deltaY, wheel->history_y);
-        uint8_t last = this->checksum;
-        this->checksum = 0;
-        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_page_t));
-        if (last != this->checksum)
-        {
-            gui_fb_change();
-        }
-        return;
     }
 
-    if (this->align_hight > 0 && wheel->pressed) //align
-    {
-
-        int wheel_offset = _UI_ABS((this->base.y + this->top_offset)) % this->align_hight;
-        this->y = this->base.y;
-        this->wheel_up = 0;
-        if (wheel->deltaY > 0) //up
-        {
-            if (this->base.y - this->bottom_offset + this->base.h - this->default_h < this->align_hight &&
-                this->base.y - this->bottom_offset + this->base.h - this->default_h >= 0)
-            {
-                return;
-            }
-            gui_log("aaa:%d\n", this->base.y - this->bottom_offset + this->base.h - this->default_h);
-            if (wheel_offset == 0)
-            {
-                wheel_offset = this->align_hight;
-            }
-            this->wheel_up = 1;
-            this->velocity = -velocity;
-            wheel_offset =  - wheel_offset;
-        }
-        else//down
-        {
-            gui_log("bbb:%d,%d,%d\n", -(this->base.y - this->top_offset), this->base.y, this->top_offset);
-            if (-(this->base.y - this->top_offset) < this->align_hight &&
-                -(this->base.y - this->top_offset) >= 0)
-            {
-                return;
-            }
-
-            this->velocity = velocity;
-            wheel_offset = this->align_hight - wheel_offset;
-        }
-        this->target = wheel_offset + this->base.y;
-        this->wheel_take_over = 1;
-
-    }
     if (this->align_hight > 0 && this->wheel_pressed) //align by user
     {
         this->wheel_pressed = 0;
@@ -1105,7 +1106,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
     gui_page_set_height(obj, obj);
 
     touch_info_t *tp = tp_get_info();
-    touch_info_t *wheel = wheel_get_info();
+    knob_info_t *knob = knob_get_info();
     gui_page_t *this = (gui_page_t *)obj;
 
     if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
@@ -1305,7 +1306,7 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
     gui_page_set_width(obj, obj);
 
     touch_info_t *tp = tp_get_info();
-    touch_info_t *wheel = wheel_get_info();
+    knob_info_t *knob = knob_get_info();
     gui_page_t *this = (gui_page_t *)obj;
 
     if (obj->parent->matrix && obj->parent->matrix->m[0][2] != 0)
@@ -1706,8 +1707,9 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
         }
     }
 }
-static void prepare_rebound_wheel(gui_obj_t *obj, touch_info_t *tp)
+static void prepare_rebound_knob(gui_obj_t *obj, knob_info_t *knob)
 {
+#if 0
     gui_page_update_att(obj);
 
     obj->h = gui_get_screen_height();
@@ -1770,13 +1772,13 @@ static void prepare_rebound_wheel(gui_obj_t *obj, touch_info_t *tp)
         }
 
     }
-
+#endif
 
 }
 void gui_page_prepare_rebound(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
-    touch_info_t *wheel = wheel_get_info();
+    knob_info_t *knob = knob_get_info();
     static bool tp_over;
     if (tp->pressed)
     {
@@ -1788,7 +1790,7 @@ void gui_page_prepare_rebound(gui_obj_t *obj)
     }
     else
     {
-        prepare_rebound_wheel(obj, wheel);
+        prepare_rebound_knob(obj, knob);
     }
 
 
@@ -1939,6 +1941,8 @@ void gui_page_ctor(gui_page_t *this,
     this->start_x = x;
     this->start_y = y;
     this->default_h = h;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 
 gui_page_t *gui_page_create(void       *parent,

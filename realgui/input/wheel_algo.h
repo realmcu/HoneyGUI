@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef __WHEEL_ALGO_H__
-#define __WHEEL_ALGO_H__
+#ifndef __KNOB_ALGO_H__
+#define __KNOB_ALGO_H__
 #include <string.h>
 #include "guidef.h"
 
@@ -18,8 +18,8 @@
 extern "C" {
 #endif
 
-touch_info_t *wheel_get_info(void);
-touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw);
+knob_info_t *knob_get_info(void);
+knob_info_t *knob_algo_process(gui_knob_port_data_t *knob_raw);
 
 #ifdef __cplusplus
 }

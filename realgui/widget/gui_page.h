@@ -72,6 +72,10 @@ typedef struct gui_page
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
     uint8_t checksum;
     uint16_t default_h;
+
+    // knob
+    int16_t knob_step;
+    uint8_t  knob_en:  1;
 } gui_page_t;
 
 typedef enum

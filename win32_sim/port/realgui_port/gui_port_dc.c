@@ -16,7 +16,7 @@
 #define DRV_LCD_HIGHT   480
 #endif
 #ifndef DRV_PIXEL_BITS
-#define DRV_PIXEL_BITS   32
+#define DRV_PIXEL_BITS   16
 #endif
 
 #define USE_DC_PFB
@@ -39,7 +39,7 @@ static gui_touch_port_data_t tp_port_data = {0};
 
 static gui_kb_port_data_t kb_port_data = {0};
 
-static gui_wheel_port_data_t wheel_port_data = {0};
+static gui_knob_port_data_t knob_port_data = {0};
 
 
 int sim_screen_width = DRV_LCD_WIDTH;
@@ -498,6 +498,7 @@ void *rtk_gui_sdl(void *arg)
                 //gui_log("mouse motion:(%d,%d)\n",event.button.x,event.button.y);
                 tp_port_data.x_coordinate = event.button.x;
                 tp_port_data.y_coordinate = event.button.y;
+
             }
             break;
 
@@ -511,8 +512,8 @@ void *rtk_gui_sdl(void *arg)
                 //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
                 if (event.button.button == SDL_BUTTON_MIDDLE)
                 {
-                    wheel_port_data.event = GUI_WHEEL_BUTTON_DOWN;
-                    wheel_port_data.timestamp_ms = gui_ms_get();
+                    knob_port_data.event = GUI_WHEEL_BUTTON_DOWN;
+                    knob_port_data.timestamp_ms = gui_ms_get();
                 }
             }
             break;
@@ -527,17 +528,17 @@ void *rtk_gui_sdl(void *arg)
                 //gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
                 if (event.button.button == SDL_BUTTON_MIDDLE)
                 {
-                    wheel_port_data.event = GUI_WHEEL_BUTTON_UP;
-                    wheel_port_data.timestamp_ms = gui_ms_get();
+                    knob_port_data.event = GUI_WHEEL_BUTTON_UP;
+                    knob_port_data.timestamp_ms = gui_ms_get();
                 }
             }
             break;
         case SDL_MOUSEWHEEL:
             {
 
-                wheel_port_data.delta = event.wheel.y;
-                wheel_port_data.timestamp_ms = gui_ms_get();
-                wheel_port_data.event = GUI_WHEEL_SCROLL;
+                knob_port_data.delta = event.wheel.y;
+                knob_port_data.timestamp_ms = gui_ms_get();
+                knob_port_data.event = GUI_WHEEL_SCROLL;
             }
             break;
         case SDL_KEYDOWN:
@@ -675,9 +676,9 @@ gui_kb_port_data_t *port_kb_get_data(void)
     return &kb_port_data;
 }
 
-gui_wheel_port_data_t *port_wheel_get_data(void)
+gui_knob_port_data_t *port_knob_get_data(void)
 {
-    return &wheel_port_data;
+    return &knob_port_data;
 }
 
 
@@ -685,7 +686,7 @@ static struct gui_indev indev =
 {
     .tp_get_data = port_touchpad_get_data,
     .kb_get_port_data = port_kb_get_data,
-    .wheel_get_port_data = port_wheel_get_data,
+    .knob_get_port_data = port_knob_get_data,
     .tp_height = 0,
     .tp_witdh = 0,
     .touch_timeout_ms = 110,

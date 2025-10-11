@@ -9,7 +9,10 @@
 			"gui_card.h": "c",
 			"gui_obj.h": "c",
 			"gui_page.h": "c",
-			"gui_img.h": "c"
+			"gui_img.h": "c",
+			"js_user.h": "c",
+			"gui_server.h": "c",
+			"guidef.h": "c"
 		}
 	}
 }

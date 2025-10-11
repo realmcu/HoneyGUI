@@ -54,10 +54,10 @@ typedef enum
     KB_LONG                     = 0x202,
     KB_INVALIDE                 = 0x203,
 
-    WHEEL_INIT                  = 0x300,
-    WHEEL_ING                   = 0x301,
-    WHEEL_FINISHED              = 0x302,
-    WHEEL_INVALIDE              = 0x303,
+    KNOB_INIT                  = 0x300,
+    KNOB_ING                   = 0x301,
+    KNOB_FINISHED              = 0x302,
+    KNOB_INVALIDE              = 0x303,
 } T_GUI_INPUT_TYPE;
 /* T_GUI_INPUT_TYPE enum end*/
 
@@ -89,11 +89,11 @@ typedef struct kb_info
     uint8_t short_click_twice   : 1;
 } kb_info_t;
 
-typedef struct wheel_info
+typedef struct knob_info
 {
     uint32_t type;
     int16_t delta;
-} wheel_info_t;
+} knob_info_t;
 
 typedef struct gui_touch_port_data
 {
@@ -118,12 +118,12 @@ typedef struct gui_kb_port_data
     uint32_t timestamp_ms_pressing;         /* The timestamp when pressing, update periodically*/
 } gui_kb_port_data_t;
 
-typedef struct gui_wheel_port_data
+typedef struct gui_knob_port_data
 {
     uint8_t  event;//0:no event//1:button down//2:button up//3:scroll
     int16_t  delta;//positive away from the user and negative toward the user
     uint32_t timestamp_ms;             /* The timestamp when the data was received */
-} gui_wheel_port_data_t;
+} gui_knob_port_data_t;
 
 /* gui_indev struct define start */
 typedef struct gui_indev
@@ -143,7 +143,7 @@ typedef struct gui_indev
 
     gui_kb_port_data_t *(*kb_get_port_data)(void);
 
-    gui_wheel_port_data_t *(*wheel_get_port_data)(void);
+    gui_knob_port_data_t *(*knob_get_port_data)(void);
 } gui_indev_t;
 /* gui_indev struct define end */
 

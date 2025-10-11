@@ -29,7 +29,7 @@
 // #define APP_C2
 // #define APP_C3
 // #define APP_C4
-// #define APP_C5
+// #define APP_C5    // TM
 
 
 
@@ -178,7 +178,7 @@ int rvd_scan_xml_files()
                 continue; // Skip the "system" directory
             }
             // Construct path to subdirectory
-            char path2[100];
+            char path2[256];
             sprintf(path2, "%s/%s", dirPath, entry->d_name);
             gui_fs_dir *dirr = 0;
             // Open subdirectory
@@ -196,7 +196,7 @@ int rvd_scan_xml_files()
                 if (strstr(entryy->d_name, ".xml") != NULL)
                 {
                     // Construct full path to XML file
-                    char path[100];
+                    char path[256];
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     // Store path in array if within size limit
                     if (index < XML_ARRAY_SIZE)
@@ -1000,6 +1000,7 @@ int rvd_click_button()
     }
 
 #endif
+    return GUI_SUCCESS;
 }
 
 int rvd_click_button_down()
@@ -1050,7 +1051,7 @@ int rvd_click_button_down()
     // Return success to indicate the operation completed
     return GUI_SUCCESS;
 #endif
-
+    return GUI_SUCCESS;
 }
 int rvd_hover_button(int index, int button_count)
 {

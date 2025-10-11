@@ -97,7 +97,6 @@ static void gui_perspective_prepare(gui_obj_t *obj)
     gui_vertex_t tv0, tv1, tv2, tv3;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    touch_info_t *wheel = wheel_get_info();
 
     gui_perspective_t *this = (gui_perspective_t *)obj;
     float w = 300;
@@ -150,19 +149,6 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         {
             this->release_x = tp->deltaX;
         }
-        break;
-    default:
-        break;
-    }
-
-    switch (wheel->type)
-    {
-    case TOUCH_HOLD_Y:
-        {
-            this->release_x = wheel->history_y;
-        }
-        break;
-    case WHEEL_FINISHED:
         break;
     default:
         break;

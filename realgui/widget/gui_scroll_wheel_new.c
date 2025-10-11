@@ -221,16 +221,15 @@ static void override(gui_obj_t *win)
         GUI_ASSERT(please_set_scroll_wheel_new_render_mode);
     }
     IMPORT_GUI_TOUCHPAD
-    IMPORT_GUI_WHEEL
+    IMPORT_GUI_KNOB
     bool wheel_take_over = this->wheel_take_over;
     int16_t time_array_offset = this->time_array_offset;
     int time_array_size = this->string_array_size;
-    if (wheel->pressed)
+    if (knob->type == KNOB_ING)
     {
         wheel_take_over = 1;
-        wheel->history_x = this->touch_y;
     }
-    if (wheel->released)
+    else
     {
         wheel_take_over = 0;
     }
@@ -421,7 +420,14 @@ static void override(gui_obj_t *win)
     }
     else
     {
-        this->touch_y = wheel->history_y;
+        this->touch_y = this->history_y + knob->delta * this->gap;
+        if (!this->loop)
+        {
+            this->touch_y = (this->touch_y > 2 * this->gap) ? 2 * this->gap : this->touch_y;
+            this->touch_y = (this->touch_y < this->touch_y_old - this->gap * (time_array_size -
+                                                                              this->blank_count - 1)) ? this->touch_y_old - this->gap * (time_array_size - this->blank_count - 1)
+                            : this->touch_y;
+        }
         {
             time_array_offset = -(this->touch_y / this->gap % time_array_size);
             int widget_offset = this->touch_y % this->gap;

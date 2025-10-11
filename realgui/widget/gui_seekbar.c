@@ -22,7 +22,7 @@
 #include "gui_seekbar.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-
+#include "wheel_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -73,14 +73,25 @@ static void gui_seekbar_update_att(gui_obj_t *obj)
 static void gui_seekbar_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp;
+    knob_info_t *knob;
     gui_seekbar_t *circle;
 
     gui_seekbar_update_att(obj);
     tp = tp_get_info();
+    knob = knob_get_info();
     circle = (gui_seekbar_t *)obj;
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
+        if (circle->knob_en && knob->type == KNOB_ING)
+        {
+            int pro = gui_progressbar_get_progress((void *)circle);
+            pro += knob->delta * circle->knob_step;
+            pro = (pro < 0) ? 0 : pro;
+            pro = (pro > circle->base.max) ? circle->base.max : pro;
+            gui_progressbar_set_progress((void *)circle, pro);
+        }
+
         if (tp->type == TOUCH_HOLD_Y)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
@@ -203,14 +214,25 @@ static float gui_seekbar_get_gegree_to_center(uint16_t cx,
 static void gui_seekbar_prepare_arc(gui_obj_t *obj)
 {
     touch_info_t *tp;
+    knob_info_t *knob;
     gui_seekbar_t *circle;
 
     gui_seekbar_update_att(obj);
     tp = tp_get_info();
+    knob = knob_get_info();
     circle = (gui_seekbar_t *)obj;
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
+        if (circle->knob_en && knob->type == KNOB_ING)
+        {
+            float per = gui_progressbar_get_percentage((void *)circle);
+            per += knob->delta * circle->knob_step * 0.01f;
+            per = (per < 0) ? 0 : per;
+            per = (per > 1) ? 1 : per;
+            gui_progressbar_set_percentage((void *)circle, per);
+        }
+
         if ((tp->type == TOUCH_HOLD_X)
             || (tp->type == TOUCH_HOLD_Y)
             || (tp->pressed))
@@ -339,14 +361,25 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
 static void gui_seekbar_h_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp;
+    knob_info_t *knob;
     gui_seekbar_t *circle;
 
     gui_seekbar_update_att(obj);
     tp = tp_get_info();
+    knob = knob_get_info();
     circle = (gui_seekbar_t *)obj;
     static bool event_4;
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
+        if (circle->knob_en && knob->type == KNOB_ING)
+        {
+            int pro = gui_progressbar_get_progress((void *)circle);
+            pro += knob->delta * circle->knob_step;
+            pro = (pro < 0) ? 0 : pro;
+            pro = (pro > circle->base.max) ? circle->base.max : pro;
+            gui_progressbar_set_progress((void *)circle, pro);
+        }
+
         if ((tp->type == TOUCH_HOLD_X)
             || (tp->type == TOUCH_HOLD_Y)
             || (tp->pressed))
@@ -457,10 +490,12 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
 static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
 {
     touch_info_t *tp;
+    knob_info_t *knob;
     gui_seekbar_t *circle;
 
     gui_seekbar_update_att(obj);
     tp = tp_get_info();
+    knob = knob_get_info();
     circle = (gui_seekbar_t *)obj;
     static float pro_last;
     if (tp->released)
@@ -469,6 +504,14 @@ static void gui_seekbar_h_prepare_double(gui_obj_t *obj)
     }
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
+        if (circle->knob_en && knob->type == KNOB_ING)
+        {
+            float per = gui_progressbar_get_percentage((void *)circle);
+            per += knob->delta * circle->knob_step * 0.01f;
+            per = (per < 0) ? 0 : per;
+            per = (per > 1) ? 1 : per;
+            gui_progressbar_set_percentage((void *)circle, per);
+        }
 
         if (tp->pressed)
         {
@@ -632,6 +675,8 @@ void gui_seekbar_ctor_img_v(gui_seekbar_t *this,
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_cb = gui_seekbar_cb;
     GET_BASE(this)->has_prepare_cb = true;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 
 void gui_seekbar_ctor_img_h(gui_seekbar_t *this,
@@ -646,6 +691,8 @@ void gui_seekbar_ctor_img_h(gui_seekbar_t *this,
     GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
     GET_BASE(this)->has_prepare_cb = true;
     this->last_pro = this->base.per * this->base.max;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 void gui_seekbar_ctor_thumb_h(gui_seekbar_t *this,
                               gui_obj_t     *parent,
@@ -663,6 +710,8 @@ void gui_seekbar_ctor_thumb_h(gui_seekbar_t *this,
     this->thumb_picture = picture;
     this->thumb_picture_highlight = picture_hl;
     //this->last_pro = this->base.per*this->base.max;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 void gui_seekbar_ctor_movie_h(gui_seekbar_t  *this,
                               gui_obj_t      *parent,
@@ -680,6 +729,8 @@ void gui_seekbar_ctor_movie_h(gui_seekbar_t  *this,
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
     GET_BASE(this)->h = h;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 static void gui_seekbar_ctor_movie_h_double(gui_seekbar_t  *this,
                                             gui_obj_t      *parent,
@@ -697,6 +748,8 @@ static void gui_seekbar_ctor_movie_h_double(gui_seekbar_t  *this,
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
     GET_BASE(this)->h = h;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 void gui_seekbar_ctor_movie_v(gui_seekbar_t  *this,
                               gui_obj_t      *parent,
@@ -714,6 +767,8 @@ void gui_seekbar_ctor_movie_v(gui_seekbar_t  *this,
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
     GET_BASE(this)->h = h;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 
 void gui_seekbar_ctor_movie_arc(gui_seekbar_t  *this,
@@ -747,6 +802,8 @@ void gui_seekbar_ctor_movie_arc(gui_seekbar_t  *this,
     h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
     GET_BASE(this)->h = h;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 
 void gui_seekbar_ctor(gui_seekbar_t *this,
@@ -762,6 +819,8 @@ void gui_seekbar_ctor(gui_seekbar_t *this,
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_cb = gui_seekbar_cb;
     GET_BASE(this)->has_prepare_cb = true;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 
 void gui_seekbar_h_ctor(gui_seekbar_t *this,
@@ -777,6 +836,8 @@ void gui_seekbar_h_ctor(gui_seekbar_t *this,
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
     GET_BASE(this)->has_prepare_cb = true;
+    this->knob_en = 1;
+    this->knob_step = 1;
 }
 static void gui_seekbar_set_animate(gui_seekbar_t *this, uint32_t dur, int repeat_count,
                                     void *callback,
@@ -799,6 +860,27 @@ _gui_api_gui_seekbar_t _gui_api_for_gui_seekbar_t =
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
+bool gui_seekbar_get_knob_en(gui_seekbar_t *this)
+{
+    return (this->knob_en == 1);
+}
+
+int16_t gui_seekbar_get_knob_step(gui_seekbar_t *this)
+{
+    return this->knob_step;
+}
+
+void gui_seekbar_set_knob_en(gui_seekbar_t *this, bool en)
+{
+    this->knob_en = (en == true) ? 1 : 0;
+}
+
+void gui_seekbar_set_knob_step(gui_seekbar_t *this, int16_t step)
+{
+    this->knob_step = step;
+}
+
 gui_seekbar_t *gui_seekbar_create_img_v(void       *parent,
                                         const char *name,
                                         int16_t     x,

@@ -123,8 +123,10 @@ extern "C" {
 
 #define GUI_TOUCHPAD_IMPORT_AS_TP touch_info_t *tp = tp_get_info();
 #define IMPORT_GUI_TOUCHPAD  extern touch_info_t *tp_get_info(void); touch_info_t *touch = tp_get_info();
-#define IMPORT_GUI_WHEEL extern touch_info_t *wheel_get_info(void);\
-    touch_info_t *wheel = wheel_get_info();
+#define IMPORT_GUI_KNOB extern knob_info_t *knob_get_info(void);\
+    knob_info_t *knob = knob_get_info();
+#define IMPORT_GUI_WHEEL extern knob_info_t *knob_get_info(void);\
+    touch_info_t *wheel = (touch_info_t*)knob_get_info();
 #define GUI_ERROR (gui_error_t)1
 #define GUI_ERROR_NULL (gui_error_t)2
 #define GUI_ERROR_FORMAT (gui_error_t)3

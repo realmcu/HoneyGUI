@@ -58,6 +58,10 @@ typedef struct gui_seekbar
     gui_animate_t *animate;
     const uint8_t *thumb_picture_highlight;
     const uint8_t *thumb_picture;
+
+    // knob
+    int16_t knob_step;
+    uint8_t  knob_en:  1;
 } gui_seekbar_t;
 
 //_GUI_API_DEFINE(gui_seekbar_t)
@@ -87,6 +91,56 @@ typedef struct __gui_api_gui_seekbar_t
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+
+/**
+ * @brief Retrieves the enabled state of the seekbar's knob.
+ *
+ * This function checks whether the knob of the seekbar is currently enabled.
+ * If the knob is enabled, the user can adjust the seekbar value by interacting with the knob.
+ *
+ * @param this  A pointer to the seekbar.
+ * @return      A boolean value indicating whether the knob is enabled.
+ *              Returns true if enabled, false if not.
+ */
+bool gui_seekbar_get_knob_en(gui_seekbar_t *this);
+
+/**
+ * @brief Retrieves the step value of the seekbar's knob.
+ *
+ * This function returns the current step value set for the seekbar's knob.
+ * The step value defines the increment by which the seekbar's value changes
+ * when the knob is moved.
+ *
+ * @param this  A pointer to the seekbar.
+ * @return      The current step value of the knob, returned as an int16_t.
+ */
+int16_t gui_seekbar_get_knob_step(gui_seekbar_t *this);
+
+/**
+ * @brief Enables or disables the knob of the seekbar.
+ *
+ * This function is used to enable or disable the knob of the seekbar.
+ * When enabled, the knob is interactable by the user, allowing changes
+ * to the seekbar's value. When disabled, the knob is not interactable.
+ *
+ * @param this  A pointer to the seekbar.
+ * @param en    A boolean value indicating whether to enable (true) or
+ *              disable (false) the knob.
+ */
+void gui_seekbar_set_knob_en(gui_seekbar_t *this, bool en);
+
+/**
+ * @brief Sets the step value for the seekbar's knob.
+ *
+ * This function assigns a step value for the knob of the seekbar.
+ * The step value determines how much the seekbar's value changes
+ * when the knob is rolled. By default, the step value is 1.
+ *
+ * @param this  A pointer to the seekbar.
+ * @param step  The step value for the knob, which can be a negative value.
+ */
+void gui_seekbar_set_knob_step(gui_seekbar_t *this, int16_t step);
+
 
 /**
   * @brief  Create a vertical seekbar based on a picture.
