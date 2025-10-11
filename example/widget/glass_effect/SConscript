@@ -1,0 +1,39 @@
+# building script for HoneyGUI
+
+from building import *
+import menu_config
+from SCons.Script import Flatten
+import os
+
+cwd = GetCurrentDir()
+CPPPATH = [cwd]
+CPPPATH += [cwd + '\\root_image']
+src = Split("""
+""")
+
+group = []
+
+CPPDEFINES = []
+
+if GetDepend('CONFIG_REALTEK_BUILD_EXAMPLE_GLASS_EFFECT_WIDGET'):
+    src += ['example_glass_effect.c']
+    CPPDEFINES = ['DRV_LCD_WIDTH=410']
+    CPPDEFINES += ['DRV_LCD_HIGHT=502']
+    CPPDEFINES += ['DRV_PIXEL_BITS=16']
+    if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
+        from honeygui import *
+        
+        print("Target arch is win32, attempting to add prebuilt binary object...")
+        BIN_SUBDIR = os.path.join(cwd, 'root_image')
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'bg.bin')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'bg_bin.o')
+        result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
+        if result_node:
+            additional_objs = []
+            additional_objs.append(result_node)
+            print(additional_objs)
+            src = Flatten(src + additional_objs)
+
+group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('group')
