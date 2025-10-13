@@ -111,16 +111,16 @@ static void gui_list_update_bar(gui_obj_t *obj)
         _this->need_update_bar = false;
         if (_this->dir == HORIZONTAL)
         {
-            int16_t w = obj->w - obj->x;
+            int16_t w = obj->w;
             g_Bar_Width = w * w / _this->total_length;
             g_Bar_Height = LIST_BAR_WIDTH;
             gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == w));
         }
         else
         {
-            int16_t h = obj->h - obj->y;
+            int16_t h = obj->h;
             g_Bar_Width = LIST_BAR_WIDTH;
-            g_Bar_Height = h * h / (_this->total_length - obj->y); //_this->total_length = obj->y + ...
+            g_Bar_Height = h * h / _this->total_length;
             gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == h));
         }
         g_Bar_Color = _this->bar_color;
@@ -144,7 +144,7 @@ static void gui_list_update_bar(gui_obj_t *obj)
         }
         else if (_this->dir == VERTICAL && _this->total_length > obj->h)
         {
-            float range = (float)(obj->h - obj->y - g_Bar_Height);
+            float range = (float)(obj->h - g_Bar_Height);
             t_y = -offset * range / (_this->total_length - obj->h);
             t_y = (t_y > range) ? range : t_y;
         }
@@ -245,12 +245,12 @@ static void gui_list_free_notes(gui_obj_t *obj)
         if (_this->dir == HORIZONTAL)
         {
             pos = obj->x + note->start_x + _this->offset;
-            range = obj->w;
+            range = obj->x + obj->w;
         }
         else
         {
             pos = obj->y + note->start_y + _this->offset;
-            range = obj->h;
+            range = obj->y + obj->h;
         }
         if (_this->style == LIST_CARD)
         {
@@ -260,7 +260,6 @@ static void gui_list_free_notes(gui_obj_t *obj)
         if (pos + _this->note_length <= 0)
         {
             // gui_log("free note %d\n", note->index);
-
             _this->last_created_note_index += (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
         }
@@ -311,12 +310,12 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         if (_this->dir == HORIZONTAL)
         {
             pos = obj->x + note->start_x + _this->offset + _this->note_length;
-            range = obj->w;
+            range = obj->w + obj->x;
         }
         else
         {
             pos = obj->y + note->start_y + _this->offset + _this->note_length;
-            range = obj->h;
+            range = obj->h + obj->y;
         }
         if (_this->style == LIST_CARD)
         {
@@ -820,11 +819,10 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
     gui_list_t *_this = (gui_list_t *)object;
     g_Limit = false;
 
-    switch (tp->type)
+    switch (_this->dir)
     {
-    case TOUCH_HOLD_X:
+    case HORIZONTAL:
         {
-            if (_this->dir == VERTICAL) { break; }
             gui_list_update_speed(_this, tp->deltaX);
 
             _this->offset = _this->hold + tp->deltaX;
@@ -849,9 +847,8 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
             // gui_log("_this->offset = %d\n", _this->offset);
         }
         break;
-    case TOUCH_HOLD_Y:
+    case VERTICAL:
         {
-            if (_this->dir == HORIZONTAL) { break; }
             gui_list_update_speed(_this, tp->deltaY);
 
             _this->offset = _this->hold + tp->deltaY;
@@ -1014,12 +1011,12 @@ gui_list_t *gui_list_create(void       *parent,
     memset(_this, 0, sizeof(gui_list_t));
     if (w == 0)
     {
-        w = (int)gui_get_screen_width();
+        w = (int)gui_get_screen_width() - x;
     }
 
     if (h == 0)
     {
-        h = (int)gui_get_screen_height();
+        h = (int)gui_get_screen_height() - y;
     }
     gui_obj_ctor(&_this->base, parent, name, x, y, w, h);
 
@@ -1077,14 +1074,12 @@ void gui_list_set_note_num(gui_list_t *list, uint16_t num)
 
     if (list->dir == HORIZONTAL)
     {
-        list->total_length = list->base.x + list->note_num * (list->note_length + list->space) -
-                             list->space;
+        list->total_length = list->note_num * (list->note_length + list->space) - list->space;
         list->total_length = (list->total_length < list->base.w) ? list->base.w : list->total_length;
     }
     else
     {
-        list->total_length = list->base.y + list->note_num * (list->note_length + list->space) -
-                             list->space;
+        list->total_length = list->note_num * (list->note_length + list->space) - list->space;
         list->total_length = (list->total_length < list->base.h) ? list->base.h : list->total_length;
     }
 

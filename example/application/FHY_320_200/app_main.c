@@ -1,0 +1,177 @@
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <stdio.h>
+#include <time.h>
+#include "cJSON.h"
+#include "root_image/ui_resource.h"
+#include "gui_obj.h"
+#include "gui_text.h"
+#include "gui_win.h"
+#include "guidef.h"
+#include "kb_algo.h"
+#include "tp_algo.h"
+#include "gui_canvas_rect.h"
+#include "gui_view.h"
+#include "app_main.h"
+#include "common_data.h"
+
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                           Function Declaration
+ *============================================================================*/
+
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/* VIEW */
+const static gui_view_descriptor_t *test_view = NULL;
+const static gui_view_descriptor_t *clock_view = NULL;
+
+/* FPS */
+static char fps[10];
+static char widget_count_string[20];
+static char mem_string[20];
+static char low_mem_string[20];
+
+#ifdef _WIN32
+unsigned char *resource_root = NULL;
+#endif
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    test_view = gui_view_descriptor_get("charging_view");
+    clock_view = gui_view_descriptor_get("clock_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+static void gui_fps_cb(void *p)
+{
+    int fps_num = gui_fps();
+    gui_obj_t *fps_rect = GUI_BASE(p);
+    sprintf(fps, "FPS:%d", fps_num);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(t_fps, "t_fps", fps_rect);
+    gui_text_content_set((gui_text_t *)t_fps, fps, strlen(fps));
+    int widget_count_number = gui_get_obj_count();
+    sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(widget_count, "widget_count", fps_rect);
+    gui_text_content_set((gui_text_t *)widget_count, widget_count_string, strlen(widget_count_string));
+    uint32_t mem_number =  gui_mem_used();
+    uint32_t low_mem_number =  gui_low_mem_used();
+    sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(mem, "mem", fps_rect);
+    gui_text_content_set((gui_text_t *)mem, mem_string, strlen(mem_string));
+    sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(low_mem, "low_mem", fps_rect);
+    gui_text_content_set((gui_text_t *)low_mem, low_mem_string, strlen(low_mem_string));
+}
+
+// Show the FPS, widget count, memory usage, and low memory usage
+static void fps_create(void *parent)
+{
+    char *text;
+    int font_size = 20;
+    gui_canvas_rect_t *fps_rect = gui_canvas_rect_create(parent, "rect_fps",
+                                                         gui_get_screen_width() / 2 - 140 / 2, 0, 140,
+                                                         70,
+                                                         APP_COLOR_GRAY_OPACITY(150));
+    gui_obj_create_timer(GUI_BASE(fps_rect), 10, true, gui_fps_cb);
+    sprintf(fps, "FPS:%d", gui_fps());
+    text = fps;
+    gui_text_t *t_fps = gui_text_create(fps_rect, "t_fps", 10, 0, gui_get_screen_width(), font_size);
+    gui_text_set(t_fps, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(t_fps, HEADING_1_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *widget_count = gui_text_create(fps_rect, "widget_count", 10, 16, gui_get_screen_width(),
+                                               font_size);
+    gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(widget_count, HEADING_1_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *mem = gui_text_create(fps_rect, "mem", 10, 16 * 2, gui_get_screen_width(), font_size);
+    gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *low_mem = gui_text_create(fps_rect, "low_mem", 10, 16 * 3, gui_get_screen_width(),
+                                          font_size);
+    gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_text_type_set(low_mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
+}
+
+
+// Update the watch time and the JSON data
+static void time_update_cb(void *param)
+{
+    GUI_UNUSED(param);
+    touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
+
+    static uint32_t sleep_cnt = 0;
+    sleep_cnt += 20;
+
+#if defined __WIN32
+    time_t rawtime;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+#else
+    //timeinfo = &watch_time;
+#endif
+
+    if (sleep_cnt >= 300000 || kb->pressed) //300s
+    {
+        sleep_cnt = 0;
+        gui_view_t *view = gui_view_get_current();
+        if (view->descriptor != clock_view)
+        {
+            gui_view_switch_direct(view, clock_view, SWITCH_OUT_NONE_ANIMATION,
+                                   SWITCH_IN_ANIMATION_FADE);
+        }
+    }
+    else if (tp->pressed || tp->pressing)
+    {
+        sleep_cnt = 0;
+    }
+}
+
+extern const unsigned char _binary_root_0x00950000_bin_start[];
+extern const unsigned char _binary_root_0x00950000_bin_end[];
+extern const unsigned char _binary_root_0x00950000_bin_size[];
+
+static int app_init(void)
+{
+#ifdef _WIN32
+    resource_root = (unsigned char *)_binary_root_0x00950000_bin_start;
+#endif
+    theme_color = gui_rgb(255, 89, 1); //#FF5901
+    theme_bg_white = false;
+    detail_page_design_func = page_dark_light_design;
+
+    screen_bg = gui_img_create_from_mem(gui_obj_get_root(), 0, SCREEN_BG_BIN, 0, 0, 0, 0);
+    gui_img_set_a8_fg_color(screen_bg, SCREEN_BG_LIGHT.color.argb_full);
+    gui_img_set_mode(screen_bg, IMG_2D_SW_FIX_A8_FG);
+    gui_obj_hidden((void *)screen_bg, true);
+
+    gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
+    // fps_create(gui_obj_get_root());
+    gui_obj_create_timer(GUI_BASE(win), 10, true, time_update_cb);
+    gui_obj_start_timer(GUI_BASE(win));
+    time_update_cb(NULL);
+
+    gui_view_create(win, clock_view, 0, 0, 0, 0);
+
+    return 0;
+}
+GUI_INIT_APP_EXPORT(app_init);
+

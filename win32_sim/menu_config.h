@@ -24,7 +24,7 @@
 // <h> HoneyGUI Demo Select
 
 // <c> RTK GUI Base Demo
-#define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+// #define CONFIG_REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
 // </c>
 
 // <c> RTK GUI Base Demo
@@ -93,6 +93,10 @@
 
 // <c> RTK GUI Demo 410 502 WATCH_TURNKEY
 // #define CONFIG_REALTEK_BUILD_GUI_WATCH_TURNKEY_410_502_DEMO
+// </c>
+
+// <c> RTK GUI Demo 410 502 WATCH_TURNKEY
+#define CONFIG_REALTEK_BUILD_GUI_FHY_320_200_DEMO
 // </c>
 
 
@@ -168,7 +172,7 @@
 // </c>
 
 // <c> RTK GUI BOX2D
-#define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// #define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 
 // <c> RTK GUI XML_DOM
@@ -176,7 +180,7 @@
 // </c>
 
 // <c> RTK GUI Enable Lite3D library
-#define CONFIG_REALTEK_BUILD_LITE3D
+// #define CONFIG_REALTEK_BUILD_LITE3D
 // </c>
 
 #endif

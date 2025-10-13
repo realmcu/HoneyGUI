@@ -509,7 +509,7 @@ static void top_view_design(gui_view_t *view)
 
     create_clear_note(view);
 
-    list = gui_list_create(view, "list", 0, NOTE_START, SCREEN_WIDTH, SCREEN_HEIGHT, NOTE_HEIGHT,
+    list = gui_list_create(view, "list", 0, NOTE_START, 0, 0, NOTE_HEIGHT,
                            NOTE_INTERVAL, VERTICAL, create_inform_note, infor_rec, true);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_bar_color(list, APP_COLOR_GRAY);

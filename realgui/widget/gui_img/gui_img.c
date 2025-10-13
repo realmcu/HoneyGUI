@@ -721,11 +721,13 @@ void gui_img_skew_y(gui_img_t *_this, float degrees)
 
 void gui_img_set_a8_fg_color(gui_img_t *_this, uint32_t fg_color_mix)
 {
+    gui_img_set_mode(_this, IMG_2D_SW_FIX_A8_FG);
     _this->fg_color_mix = fg_color_mix;
 }
 
 void gui_img_set_a8_bg_color(gui_img_t *_this, uint32_t bg_color_mix)
 {
     _this->bg_color_mix = bg_color_mix;
+    gui_img_set_mode(_this, IMG_2D_SW_FIX_A8_BGFG);
 }
 
