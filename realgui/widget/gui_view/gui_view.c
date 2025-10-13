@@ -142,6 +142,8 @@ static void gui_view_animate_timer_cb(void *obj)
         }
         g_SwitchDone = true;
         g_CurrentView = g_NextView;
+        g_CurrentView->base.x = 0;
+        g_CurrentView->base.y = 0;
         g_CurrentView->current_transition_style = SWITCH_INIT_STATE;
         g_NextView = NULL;
     }
@@ -371,6 +373,11 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t e,
 
     g_SurpressEvent = true;
     g_SurpressTP = true;
+
+    if (e == GUI_EVENT_INVALIDE)
+    {
+        g_NextView->base.x = gui_get_screen_width();
+    }
 
     // gui_log("gui_view_on_event_cb\n");
 }

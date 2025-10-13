@@ -111,15 +111,17 @@ static void gui_list_update_bar(gui_obj_t *obj)
         _this->need_update_bar = false;
         if (_this->dir == HORIZONTAL)
         {
-            g_Bar_Width = obj->w * obj->w / _this->total_length;
+            int16_t w = obj->w - obj->x;
+            g_Bar_Width = w * w / _this->total_length;
             g_Bar_Height = LIST_BAR_WIDTH;
-            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == obj->w));
+            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Width == w));
         }
         else
         {
+            int16_t h = obj->h - obj->y;
             g_Bar_Width = LIST_BAR_WIDTH;
-            g_Bar_Height = obj->h * obj->h / _this->total_length;
-            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == obj->h));
+            g_Bar_Height = h * h / (_this->total_length - obj->y); //_this->total_length = obj->y + ...
+            gui_obj_hidden(GUI_BASE(_this->bar), (g_Bar_Height == h));
         }
         g_Bar_Color = _this->bar_color;
         memset(_this->bar_data, 0, _this->bar->base.w * _this->bar->base.h * 4);
@@ -136,14 +138,14 @@ static void gui_list_update_bar(gui_obj_t *obj)
         offset = (offset > 0) ? 0 : offset;
         if (_this->dir == HORIZONTAL && _this->total_length > obj->w)
         {
-            float range = (float)(obj->w - g_Bar_Width);
-            t_x = fabsf(offset) * range / (_this->total_length - obj->w);
+            float range = (float)(obj->w - obj->x - g_Bar_Width);
+            t_x = offset * range / (_this->total_length - obj->w);
             t_x = (t_x > range) ? range : t_x;
         }
         else if (_this->dir == VERTICAL && _this->total_length > obj->h)
         {
-            float range = (float)(obj->h - g_Bar_Height);
-            t_y = fabsf(offset) * range / (_this->total_length - obj->h);
+            float range = (float)(obj->h - obj->y - g_Bar_Height);
+            t_y = -offset * range / (_this->total_length - obj->h);
             t_y = (t_y > range) ? range : t_y;
         }
         gui_img_translate(_this->bar, t_x, t_y);
@@ -258,11 +260,14 @@ static void gui_list_free_notes(gui_obj_t *obj)
         if (pos + _this->note_length <= 0)
         {
             // gui_log("free note %d\n", note->index);
+
+            _this->last_created_note_index += (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
         }
         else if (pos >= range)
         {
             // gui_log("free note %d\n", note->index);
+            _this->last_created_note_index -= (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
             _this->max_created_note_index -= 1;
         }
@@ -297,7 +302,7 @@ static void gui_list_input_prepare(gui_obj_t *obj)
 
     // create note from the last note
     {
-        gui_obj_t *o = gui_list_entry((&(_this->base.child_list))->next, gui_obj_t, brother_list);
+        gui_obj_t *o = gui_list_entry(_this->base.child_list.next, gui_obj_t, brother_list);
         gui_list_note_t *note = (gui_list_note_t *)o;
         int16_t index = note->index;
         _this->max_created_note_index = index;
@@ -894,8 +899,8 @@ static void gui_list_create_bar(gui_list_t *_this,
                                 int16_t     h)
 {
     (void)x;
-    int bar_x = 0;
-    int bar_y = 0;
+    int bar_x = x;
+    int bar_y = y;
     int bar_w = 0;
     int bar_h = 0;
     if (_this->dir == HORIZONTAL)
