@@ -366,7 +366,7 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     params.image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
     params.palette_index = ((gui_palette_file_t *)head)->palette_index;
     params.palette_data = ((gui_palette_file_t *)head)->palette_data;
-    params.color_mix = image->color_mix;
+    params.color_mix = image->fg_color_mix;
 
     bool use_rle = (head->compress == 1);
     uint8_t rle_pixel[4];

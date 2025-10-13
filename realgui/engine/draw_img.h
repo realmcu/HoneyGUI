@@ -55,6 +55,8 @@ typedef enum
     IMG_RECT,
     IMG_2D_SW_RGB565_ONLY,
     IMG_2D_SW_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
+    IMG_2D_SW_FIX_A8_FG, //fixed fg
+    IMG_2D_SW_FIX_A8_BGFG, //fixed fg and bg
 } BLEND_MODE_TYPE;
 /* BLEND_MODE_TYPE structure end*/
 

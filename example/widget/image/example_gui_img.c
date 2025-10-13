@@ -16,6 +16,7 @@
 #include "gif_demo.txt"
 #include "nanovg_generate_pixel.txt"
 #include "test_png.txt"
+#include "clock3_Vector.txt"
 
 
 /* gui image widget example start*/
@@ -37,16 +38,18 @@ void test_timer_cb(void *param)
 static int app_init(void)
 {
 
-    void *addr = (void *)_actest_png;
+    void *addr = (void *)_acclock3_Vector;
     // void *addr = (void *)_acgreen;
     // void *addr = (void *)_acgif_demo;
 
     // gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", _achour, 0, 0, 0, 0);
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
 
-    // gui_img_set_color_mix(img, GUI_COLOR_ARGB8888(255, 255, 0, 0));
+    gui_img_set_a8_fg_color(img, GUI_COLOR_ARGB8888(255, 255, 255, 255));
 
-    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    gui_img_set_a8_bg_color(img, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
+
+    gui_img_set_mode(img, IMG_2D_SW_FIX_A8_BGFG);
 
     // gui_img_set_focus(img, 50, 50);
 

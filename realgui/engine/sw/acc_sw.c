@@ -70,7 +70,7 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     if (\
         (dc_bytes_per_pixel == 2) && \
         identity && \
-        (head->type == RGB565 || head->type == ARGB8565) && \
+        (head->type == RGB565 || head->type == ARGB8565 || head->type == ALPHAMASK) && \
         (opacity == 255) && \
         (rect == NULL) \
        )
@@ -87,6 +87,14 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         case IMG_2D_SW_SRC_OVER_MODE:
             GUI_ASSERT(head->type == ARGB8565);
             src_over_blit_2_rgb565(image, dc, rect);
+            return;
+        case IMG_2D_SW_FIX_A8_FG:
+            GUI_ASSERT(head->type == ALPHAMASK);
+            preconfig_a8_fg(image, dc, rect);
+            return;
+        case IMG_2D_SW_FIX_A8_BGFG:
+            GUI_ASSERT(head->type == ALPHAMASK);
+            preconfig_a8_fgbg(image, dc, rect);
             return;
         default:
             break;

@@ -86,3 +86,124 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
 }
 
+#include <stdint.h>
+
+static inline uint16_t argb8888_to_rgb565(uint32_t argb)
+{
+    uint8_t b8 = (uint8_t)(argb & 0xFF);
+    uint8_t g8 = (uint8_t)((argb >> 8) & 0xFF);
+    uint8_t r8 = (uint8_t)((argb >> 16) & 0xFF);
+    // Alpha (argb >> 24) not used in RGB565 conversion
+
+    uint16_t r5 = (uint16_t)(r8 >> 3);
+    uint16_t g6 = (uint16_t)(g8 >> 2);
+    uint16_t b5 = (uint16_t)(b8 >> 3);
+
+    return (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+}
+
+
+void preconfig_a8_fgbg(draw_img_t *image, gui_dispdev_t *dc,
+                       gui_rect_t *rect)////fixed fg and bg
+{
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
+
+    if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    {
+        return;
+    }
+
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    int16_t source_w = image->img_w;
+
+    gui_matrix_t *inverse = &image->inverse;
+    float m12 = inverse->m[1][2];
+    float m02 = inverse->m[0][2];
+
+    int16_t y1 = dc->section.y1;
+    int16_t x1 = dc->section.x1;
+    int16_t x2 = dc->section.x2;
+
+
+    uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_mix);
+    uint32_t bg_rgb565 = argb8888_to_rgb565(image->bg_color_mix);
+
+
+    for (int32_t i = y_start; i <= y_end; i++)
+    {
+        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+
+
+        color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((
+                                                                             i + m12) * source_w + x_start + m02);
+
+
+        for (int32_t j = x_start; j <= x_end; j++)
+        {
+
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, bg_rgb565, a->a);
+
+            write_off++;
+            a++;
+        }
+    }
+
+}
+
+
+void preconfig_a8_fg(draw_img_t *image, gui_dispdev_t *dc,
+                     gui_rect_t *rect)////fixed fg
+{
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
+
+    if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    {
+        return;
+    }
+
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    int16_t source_w = image->img_w;
+
+    gui_matrix_t *inverse = &image->inverse;
+    float m12 = inverse->m[1][2];
+    float m02 = inverse->m[0][2];
+
+    int16_t y1 = dc->section.y1;
+    int16_t x1 = dc->section.x1;
+    int16_t x2 = dc->section.x2;
+
+
+    uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_mix);
+
+
+    for (int32_t i = y_start; i <= y_end; i++)
+    {
+        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+
+
+        color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((
+                                                                             i + m12) * source_w + x_start + m02);
+
+
+        for (int32_t j = x_start; j <= x_end; j++)
+        {
+
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, writebuf[write_off], a->a);
+
+            write_off++;
+            a++;
+        }
+    }
+
+}
+

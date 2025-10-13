@@ -89,7 +89,8 @@ static void gui_img_prepare(gui_obj_t *obj)
     _this->draw_img->blend_mode = _this->blend_mode;
     _this->draw_img->high_quality = _this->high_quality;
     _this->draw_img->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
-    _this->draw_img->color_mix = _this->color_mix;
+    _this->draw_img->fg_color_mix = _this->fg_color_mix;
+    _this->draw_img->bg_color_mix = _this->bg_color_mix;
 
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
@@ -347,7 +348,8 @@ static void gui_img_ctor(gui_img_t            *_this,
     _this->degrees = 0;
     _this->high_quality = false;
     _this->need_clip = false;
-    _this->color_mix = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
+    _this->fg_color_mix = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
+    _this->bg_color_mix = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
 
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
@@ -717,8 +719,13 @@ void gui_img_skew_y(gui_img_t *_this, float degrees)
     (void)degrees;
 }
 
-void gui_img_set_color_mix(gui_img_t *_this, uint32_t color_mix)
+void gui_img_set_a8_fg_color(gui_img_t *_this, uint32_t fg_color_mix)
 {
-    _this->color_mix = color_mix;
+    _this->fg_color_mix = fg_color_mix;
+}
+
+void gui_img_set_a8_bg_color(gui_img_t *_this, uint32_t bg_color_mix)
+{
+    _this->bg_color_mix = bg_color_mix;
 }
 

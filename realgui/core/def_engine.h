@@ -41,10 +41,11 @@ typedef struct draw_img
     gui_matrix_t matrix; //seems can remve by howie
     gui_matrix_t inverse;
     uint8_t opacity_value;
-    uint32_t blend_mode : 3;
     uint32_t checksum : 8;
+    uint32_t blend_mode : 5;
     uint32_t high_quality : 1;
-    uint32_t color_mix;
+    uint32_t fg_color_mix;//fg color mix
+    uint32_t bg_color_mix;//bg color mix
     void *acc_user;
 } draw_img_t;
 
