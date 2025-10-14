@@ -101,7 +101,16 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         }
         else
         {
-            sw_transform_for_rgb565(image, dc, rect);
+            if (head->type == RGB565)
+            {
+                sw_transform_for_rgb565(image, dc, rect);
+            }
+            else if (head->type == ARGB8565)
+            {
+                sw_transform_for_argb8565(image, dc, rect);
+            }
+
+            GUI_ASSERT(NULL);
 
         }
     }

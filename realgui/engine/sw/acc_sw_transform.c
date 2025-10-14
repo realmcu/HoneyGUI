@@ -20,6 +20,22 @@
 #include <stdint.h>
 #include <math.h>
 
+static uint16_t do_blending_acc_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t alpha)
+{
+    // Alpha converted from [0..255] to [0..31]
+    // Converts  0000000000000000rrrrrggggggbbbbb
+    //     into  00000gggggg00000rrrrr000000bbbbb
+    // with mask 00000111111000001111100000011111
+    // This is useful because it makes space for a parallel fixed-point multiply
+
+    alpha = (alpha + 4) >> 3;
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+    fg = ((fg | (fg << 16)) & 0x07e0f81f);
+    uint32_t result = (((((fg - bg) * alpha) >> 5) + bg) & 0x07e0f81f);
+
+    return (uint16_t)((result >> 16) | result);
+}
+
 void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
                              gui_rect_t *rect)
 {
@@ -60,10 +76,13 @@ void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
         for (int32_t j = x_start; j <= x_end; j++)
         {
-            //int x = roundf(X);
-            //int y = roundf(Y);
+            // int x = roundf(X);
+            // int y = roundf(Y);
 
-            if ((X >= source_w) || (X < 0) || (Y < 0) || (Y >= source_h))
+            int x = (int)X;
+            int y = (int)Y;
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
                 X += m00;
                 Y += m10;
@@ -71,9 +90,75 @@ void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
             }
 
             int write_off = write_offset + j;
-            int image_off = (image->blend_mode == IMG_RECT) ? 0 : Y * source_w + X;
+            int image_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
 
             writebuf[write_off] = readbuf[image_off];
+            X += m00;
+            Y += m10;
+        }
+    }
+}
+
+
+void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
+                               gui_rect_t *rect)
+{
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
+
+    if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    {
+        return;
+    }
+
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    gui_matrix_t *inverse = &image->inverse;
+
+    float m00 = inverse->m[0][0];
+    float m01 = inverse->m[0][1];
+    float m02 = inverse->m[0][2];
+    float m10 = inverse->m[1][0];
+    float m11 = inverse->m[1][1];
+    float m12 = inverse->m[1][2];
+
+
+    for (int32_t i = y_start; i <= y_end; i++)
+    {
+        float detalX = m01 * i + m02;
+        float detalY = m11 * i + m12;
+        float X = m00 * x_start + detalX;
+        float Y = m10 * x_start + detalY;
+
+        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+
+        for (int32_t j = x_start; j <= x_end; j++)
+        {
+            // int x = roundf(X);
+            // int y = roundf(Y);
+
+            int x = (int)X;
+            int y = (int)Y;
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+            {
+                X += m00;
+                Y += m10;
+                continue;
+            }
+
+            int write_off = write_offset + j;
+            int image_off = y * source_w + x;
+
+            color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + image_off;
+
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], pixel->a);
+
             X += m00;
             Y += m10;
         }
