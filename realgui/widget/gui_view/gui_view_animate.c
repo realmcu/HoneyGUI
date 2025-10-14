@@ -313,6 +313,7 @@ static void animation_case(gui_view_t *this, float pro)
     switch (style)
     {
     case SWITCH_OUT_NONE_ANIMATION:
+        gui_obj_hidden(obj, true);
         break;
     case SWITCH_IN_NONE_ANIMATION:
         break;

@@ -86,6 +86,7 @@ static const char *music_array[MUSIC_ARRAY_NUM] =
     "Heat Waves",
 };
 
+static void *progressbar_array[10] = {0};
 
 /*============================================================================*
  *                           Private Functions
@@ -236,23 +237,32 @@ static void press_button_page_volume(void *obj)
         {
             if (pressed_add)
             {
-                volume_val += 0.1f;
+                volume_val ++;
             }
             else if (pressed_sub)
             {
-                volume_val -= 0.1f;
+                volume_val --;
             }
-
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(progressbar, "progressbar", o->parent);
             if (volume_val < 0)
             {
                 volume_val = 0;
+
             }
-            else if (volume_val > 1.0f)
+            else if (volume_val > 10)
             {
-                volume_val = 1.0f;
+                volume_val = 10;
             }
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(rect, "progressbar", o->parent);
-            gui_canvas_rect_set_size((gui_canvas_rect_t *)rect, volume_val * PROGRESSBAR_W_MAX, 36);
+
+            if (volume_val == 0)
+            {
+                gui_obj_hidden((void *)progressbar, true);
+            }
+            else
+            {
+                gui_obj_hidden((void *)progressbar, false);
+                gui_img_set_image_data((void *)progressbar, progressbar_array[volume_val - 1]);
+            }
         }
         pressed_add = false;
         pressed_sub = false;
@@ -496,6 +506,20 @@ void page_volume_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
         progressbar_color = FG_THEME1_DARK;
     }
+    if (!progressbar_array[0])
+    {
+        progressbar_array[0] = PROGRESSBAR_1_BIN;
+        progressbar_array[1] = PROGRESSBAR_2_BIN;
+        progressbar_array[2] = PROGRESSBAR_3_BIN;
+        progressbar_array[3] = PROGRESSBAR_4_BIN;
+        progressbar_array[4] = PROGRESSBAR_5_BIN;
+        progressbar_array[5] = PROGRESSBAR_6_BIN;
+        progressbar_array[6] = PROGRESSBAR_7_BIN;
+        progressbar_array[7] = PROGRESSBAR_8_BIN;
+        progressbar_array[8] = PROGRESSBAR_9_BIN;
+        progressbar_array[9] = PROGRESSBAR_10_BIN;
+    }
+
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 100, 15);
     gui_text_set(text, "Volume", GUI_FONT_SRC_BMP, font_color, 6, 28);
     gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
@@ -510,12 +534,20 @@ void page_volume_design(gui_obj_t *parent)
     gui_img_t *add = gui_img_create_from_mem(control_bg, 0, ADD_BIN, 237, 31, 0, 0);
     gui_img_t *progressbar_bg = gui_img_create_from_mem(control_bg, 0, PROGRESSBAR_BG_BIN, 90, 27, 0,
                                                         0);
-    gui_canvas_rect_create(GUI_BASE(control_bg), "progressbar", 90, 27, volume_val * PROGRESSBAR_W_MAX,
-                           36, progressbar_color);
-    gui_img_t *progressbar_mask = gui_img_create_from_mem(control_bg, 0, PROGRESSBAR_MASK_BIN, 90, 27,
-                                                          0, 0);
+    gui_img_t *progressbar = gui_img_create_from_mem(control_bg, "progressbar", progressbar_array[0],
+                                                     90, 27,
+                                                     0, 0);
     gui_obj_hidden((void *)button_sub_bg, 1);
     gui_obj_hidden((void *)button_add_bg, 1);
+    if (volume_val == 0)
+    {
+        gui_obj_hidden((void *)progressbar, 1);
+    }
+    else
+    {
+        gui_img_set_image_data(progressbar, progressbar_array[volume_val - 1]);
+    }
+
     gui_obj_create_timer(GUI_BASE(button_sub_bg), 10, true, press_button_page_volume);
     gui_obj_create_timer(GUI_BASE(button_add_bg), 10, true, press_button_page_volume);
 
@@ -527,7 +559,7 @@ void page_volume_design(gui_obj_t *parent)
         gui_img_set_a8_fg_color(button_add_bg, BG_THEME1_MID_LIGHT.color.argb_full);
         gui_img_set_a8_fg_color(add, FG_1_LIGHT.color.argb_full);
         gui_img_set_a8_fg_color(progressbar_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(progressbar_mask, BG_THEME1_DARK_LIGHT.color.argb_full);
+        gui_img_set_a8_fg_color(progressbar, FG_THEME1_LIGHT.color.argb_full);
     }
     else
     {
@@ -537,7 +569,7 @@ void page_volume_design(gui_obj_t *parent)
         gui_img_set_a8_fg_color(button_add_bg, BG_THEME1_MID_DARK.color.argb_full);
         gui_img_set_a8_fg_color(add, FG_1_DARK.color.argb_full);
         gui_img_set_a8_fg_color(progressbar_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(progressbar_mask, BG_THEME1_DARK_DARK.color.argb_full);
+        gui_img_set_a8_fg_color(progressbar, FG_THEME1_DARK.color.argb_full);
     }
 }
 

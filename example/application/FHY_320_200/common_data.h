@@ -84,7 +84,7 @@ extern gui_color_t theme_color;
 extern bool theme_bg_white; // default black bg
 
 /* Volume */
-extern float volume_val;
+extern int8_t volume_val;
 
 /* Screent bg */
 extern gui_img_t *screen_bg;

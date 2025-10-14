@@ -58,7 +58,7 @@ gui_color_t theme_color = {0};
 bool theme_bg_white = false; // default black bg
 
 /* Volume */
-float volume_val = 0.5f;
+int8_t volume_val = 5;
 
 /* Screent bg */
 gui_img_t *screen_bg = NULL;
