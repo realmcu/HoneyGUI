@@ -59,6 +59,7 @@
     画布 (Canvas) <gui_canvas>
     蜂窝菜单 (Menu Cellular) <gui_menu_cellular>
     二维码或条形码 (Qbcode) <gui_qbcode>
+    玻璃效果 (Glass) <gui_glass>
 
 
 .. 窗口 (Window) <gui_window>

@@ -58,6 +58,7 @@ Widgets
     Canvas <gui_canvas>
     Menu Cellular <gui_menu_cellular>
     Qbcode <gui_qbcode>
+    Glass <gui_glass>
 
 .. Window <gui_window>
 .. Simple Img <gui_simple_img>
