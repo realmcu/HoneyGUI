@@ -57,7 +57,6 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
-    uint8_t opacity = image->opacity_value;
 
     bool identity = (image->matrix.m[0][0] == 1) &&
                     (image->matrix.m[1][1] == 1) &&
@@ -67,43 +66,44 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
                     (image->matrix.m[2][0] == 0) &&
                     (image->matrix.m[2][1] == 0);
 
-    if (\
-        (dc_bytes_per_pixel == 2) && \
-        identity && \
-        (head->type == RGB565 || head->type == ARGB8565 || head->type == ALPHAMASK) && \
-        (opacity == 255) && \
-        (rect == NULL) \
-       )
-    {
-        switch (image->blend_mode)
-        {
-        case IMG_COVER_MODE:
-        case IMG_BYPASS_MODE:
-            bypass_blit_2_rgb565(image, dc, rect);
-            return;
-        case IMG_FILTER_BLACK:
-            filter_blit_2_rgb565(image, dc, rect);
-            return;
-        case IMG_2D_SW_SRC_OVER_MODE:
-            GUI_ASSERT(head->type == ARGB8565);
-            src_over_blit_2_rgb565(image, dc, rect);
-            return;
-        case IMG_2D_SW_FIX_A8_FG:
-            GUI_ASSERT(head->type == ALPHAMASK);
-            preconfig_a8_fg(image, dc, rect);
-            return;
-        case IMG_2D_SW_FIX_A8_BGFG:
-            GUI_ASSERT(head->type == ALPHAMASK);
-            preconfig_a8_fgbg(image, dc, rect);
-            return;
-        default:
-            break;
-        }
-    }
 
-    if (image->blend_mode == IMG_2D_SW_RGB565_ONLY)
+
+    if ((dc_bytes_per_pixel == 2) && (head->type == RGB565 || head->type == ARGB8565 ||
+                                      head->type == ALPHAMASK) && (rect == NULL))
     {
-        sw_transform_for_rgb565(image, dc, rect);
+        if (identity)
+        {
+            switch (image->blend_mode)
+            {
+            case IMG_COVER_MODE:
+            case IMG_BYPASS_MODE:
+                GUI_ASSERT(image->opacity_value == 0xFF);
+                bypass_blit_2_rgb565(image, dc, rect);
+                return;
+            case IMG_FILTER_BLACK:
+                filter_blit_2_rgb565(image, dc, rect);
+                return;
+            case IMG_2D_SW_SRC_OVER_MODE:
+                GUI_ASSERT(head->type == ARGB8565);
+                src_over_blit_2_rgb565(image, dc, rect);
+                return;
+            case IMG_2D_SW_FIX_A8_FG:
+                GUI_ASSERT(head->type == ALPHAMASK);
+                preconfig_a8_fg(image, dc, rect);
+                return;
+            case IMG_2D_SW_FIX_A8_BGFG:
+                GUI_ASSERT(head->type == ALPHAMASK);
+                preconfig_a8_fgbg(image, dc, rect);
+                return;
+            default:
+                break;
+            }
+        }
+        else
+        {
+            sw_transform_for_rgb565(image, dc, rect);
+
+        }
     }
     else
     {

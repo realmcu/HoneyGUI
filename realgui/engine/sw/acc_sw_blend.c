@@ -63,26 +63,49 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     int16_t y1 = dc->section.y1;
     int16_t x1 = dc->section.x1;
     int16_t x2 = dc->section.x2;
-
-
-    for (int32_t i = y_start; i <= y_end; i++)
+    uint8_t opacity_value = image->opacity_value;
+    if (opacity_value == 0)
     {
-        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
-
-
-        color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + (uint32_t)((
-                                            i + m12) * source_w + x_start + m02);
-
-
-        for (int32_t j = x_start; j <= x_end; j++)
+        // fully transparent, nothing to draw
+        return;
+    }
+    else if (opacity_value == 255)
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
         {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+            color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + (uint32_t)((
+                                                i + m12) * source_w + x_start + m02);
 
-            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], pixel->a);
-
-            write_off++;
-            pixel++;
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], pixel->a);
+                write_off++;
+                pixel++;
+            }
         }
     }
+    else
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
+        {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+            color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + (uint32_t)((
+                                                i + m12) * source_w + x_start + m02);
+
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                uint8_t alpha = pixel->a;
+                alpha = (alpha * opacity_value) >> 8;
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], alpha);
+
+                write_off++;
+                pixel++;
+            }
+        }
+    }
+
+
 
 }
 
@@ -132,26 +155,49 @@ void preconfig_a8_fgbg(draw_img_t *image, gui_dispdev_t *dc,
 
     uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_mix);
     uint32_t bg_rgb565 = argb8888_to_rgb565(image->bg_color_mix);
+    uint8_t opacity_value = image->opacity_value;
 
-
-    for (int32_t i = y_start; i <= y_end; i++)
+    if (opacity_value == 0)
     {
-        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
-
-
-        color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((
-                                                                             i + m12) * source_w + x_start + m02);
-
-
-        for (int32_t j = x_start; j <= x_end; j++)
+        // fully transparent, nothing to draw
+        return;
+    }
+    else if (opacity_value == 255)
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
         {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+            color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((i + m12) * source_w + x_start +
+                                                                             m02);
 
-            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, bg_rgb565, a->a);
-
-            write_off++;
-            a++;
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, bg_rgb565, a->a);
+                write_off++;
+                a++;
+            }
         }
     }
+    else
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
+        {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+            color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((i + m12) * source_w + x_start +
+                                                                             m02);
+
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                uint8_t alpha = a->a;
+                alpha = (alpha * opacity_value) >> 8;
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, bg_rgb565, alpha);
+
+                write_off++;
+                a++;
+            }
+        }
+    }
+
 
 }
 
@@ -184,24 +230,46 @@ void preconfig_a8_fg(draw_img_t *image, gui_dispdev_t *dc,
 
 
     uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_mix);
+    uint8_t opacity_value = image->opacity_value;
 
-
-    for (int32_t i = y_start; i <= y_end; i++)
+    if (opacity_value == 0)
     {
-        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
-
-
-        color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((
-                                                                             i + m12) * source_w + x_start + m02);
-
-
-        for (int32_t j = x_start; j <= x_end; j++)
+        // fully transparent, nothing to draw
+        return;
+    }
+    else if (opacity_value == 255)
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
         {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+            color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((i + m12) * source_w + x_start +
+                                                                             m02);
 
-            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, writebuf[write_off], a->a);
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, writebuf[write_off], a->a);
+                write_off++;
+                a++;
+            }
+        }
+    }
+    else
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
+        {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+            color_a8_t *a = (color_a8_t *)(uintptr_t)image_base + (uint32_t)((i + m12) * source_w + x_start +
+                                                                             m02);
 
-            write_off++;
-            a++;
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                uint8_t alpha = a->a;
+                alpha = (alpha * opacity_value) >> 8;
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_rgb565, writebuf[write_off], alpha);
+
+                write_off++;
+                a++;
+            }
         }
     }
 

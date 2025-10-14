@@ -41,23 +41,45 @@ void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     int16_t source_h = image->img_h;
     gui_matrix_t *inverse = &image->inverse;
 
+    float m00 = inverse->m[0][0];
+    float m01 = inverse->m[0][1];
+    float m02 = inverse->m[0][2];
+    float m10 = inverse->m[1][0];
+    float m11 = inverse->m[1][1];
+    float m12 = inverse->m[1][2];
+
+
     for (int32_t i = y_start; i <= y_end; i++)
     {
+        float detalX = m01 * i + m02;
+        float detalY = m11 * i + m12;
+        float X = m00 * x_start + detalX;
+        float Y = m10 * x_start + detalY;
+
         for (int32_t j = x_start; j <= x_end; j++)
         {
-            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
             int x = roundf(X);
             int y = roundf(Y);
 
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h)) { continue; }
-            if (rect && ((x > rect->x2) || (x < rect->x1) || (y < rect->y1) || (y > rect->y2))) { continue; }
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+            {
+                X += m00;
+                Y += m10;
+                continue;
+            }
+            if (rect && ((x > rect->x2) || (x < rect->x1) || (y < rect->y1) || (y > rect->y2)))
+            {
+                X += m00;
+                Y += m10;
+                continue;
+            }
 
             int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
             int image_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
 
             writebuf[write_off] = readbuf[image_off];
-
+            X += m00;
+            Y += m10;
         }
     }
 }

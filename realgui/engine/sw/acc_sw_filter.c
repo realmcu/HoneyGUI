@@ -20,6 +20,23 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
+
+static uint16_t do_blending_acc_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t alpha)
+{
+    // Alpha converted from [0..255] to [0..31]
+    // Converts  0000000000000000rrrrrggggggbbbbb
+    //     into  00000gggggg00000rrrrr000000bbbbb
+    // with mask 00000111111000001111100000011111
+    // This is useful because it makes space for a parallel fixed-point multiply
+
+    alpha = (alpha + 4) >> 3;
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+    fg = ((fg | (fg << 16)) & 0x07e0f81f);
+    uint32_t result = (((((fg - bg) * alpha) >> 5) + bg) & 0x07e0f81f);
+
+    return (uint16_t)((result >> 16) | result);
+}
+
 void filter_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
                           gui_rect_t *rect)
 {
@@ -45,25 +62,55 @@ void filter_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     // int16_t y2 = dc->section.y2;
     int16_t x1 = dc->section.x1;
     int16_t x2 = dc->section.x2;
-
-
-    for (int32_t i = y_start; i <= y_end; i++)
+    uint8_t opacity_value = image->opacity_value;
+    if (opacity_value == 0)
     {
-        int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
-
-        uint16_t *image_ptr = (uint16_t *)(uintptr_t)image_base + (uint32_t)((
-                                                                                 i + m12) * source_w + x_start + m02);
-
-        for (int32_t j = x_start; j <= x_end; j++)
+        // fully transparent, nothing to draw
+        return;
+    }
+    else if (opacity_value == 255)
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
         {
-            uint16_t pixel = *image_ptr++;
-            if (pixel != 0)
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+
+            uint16_t *image_ptr = (uint16_t *)(uintptr_t)image_base + (uint32_t)((
+                                                                                     i + m12) * source_w + x_start + m02);
+
+            for (int32_t j = x_start; j <= x_end; j++)
             {
-                writebuf[write_off] = pixel;
+                uint16_t pixel = *image_ptr++;
+                if (pixel != 0)
+                {
+                    writebuf[write_off] = pixel;
+                }
+                write_off++;
             }
-            write_off++;
         }
     }
+    else
+    {
+        for (int32_t i = y_start; i <= y_end; i++)
+        {
+            int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
+
+            uint16_t *image_ptr = (uint16_t *)(uintptr_t)image_base + (uint32_t)((
+                                                                                     i + m12) * source_w + x_start + m02);
+
+            for (int32_t j = x_start; j <= x_end; j++)
+            {
+                uint16_t pixel = *image_ptr++;
+                if (pixel != 0)
+                {
+                    writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel, writebuf[write_off], opacity_value);
+                }
+                write_off++;
+            }
+        }
+
+    }
+
+
 
 }
 
