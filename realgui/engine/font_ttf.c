@@ -257,9 +257,9 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
                 : _UI_MIN(x + w - 1, dc->section.x2);
 
     int y_start = _UI_MAX3(dc->section.y1, y, rect->yboundtop);
-    int y_end = rect->yboundbottom ? _UI_MIN(dc->section.y2, y + h - 1)
+    int y_end = rect->yboundbottom ? _UI_MIN(rect->yboundbottom, y + h - 1)
                 : _UI_MIN(dc->section.y2, y + h - 1);
-    if (x_start >= x_end || y_start >= y_end) { return; }
+    if (x_start > x_end || y_start > y_end) { return; }
 
     gui_color_t outcolor = text->color;
     outcolor.color.rgba.a = _UI_UDIV255(text->color.color.rgba.a * text->base.opacity_value);
@@ -770,11 +770,23 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         {
             font_ttf_draw_bitmap_classic(text, chr[index].buf, rect, chr[index].x, chr[index].y, chr[index].w,
                                          chr[index].h);
-            if (dc->section_count * dc->fb_height >= (unsigned long)(chr[index].y + chr[index].h))
+            if (dc->pfb_type == PFB_Y_DIRECTION)
             {
-                gui_free(chr[index].buf);
-                chr[index].buf = NULL;
-                chr[index].char_w = 0;
+                if (dc->section_count * dc->fb_height >= (unsigned long)(chr[index].y + chr[index].h))
+                {
+                    gui_free(chr[index].buf);
+                    chr[index].buf = NULL;
+                    chr[index].char_w = 0;
+                }
+            }
+            else
+            {
+                if (dc->section_count * dc->fb_width >= (unsigned long)(chr[index].x + chr[index].w))
+                {
+                    gui_free(chr[index].buf);
+                    chr[index].buf = NULL;
+                    chr[index].char_w = 0;
+                }
             }
             continue;
         }
