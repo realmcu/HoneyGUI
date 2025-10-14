@@ -167,10 +167,11 @@ static void lock_view_design(gui_view_t *view)
     // gui_img_set_a8_fg_color(tab, GUI_COLOR_ARGB8888(255, 0, 0x4C, 0x7A));
 
     gui_img_set_focus(tab_bg, focus, focus);
+    gui_img_set_mode(tab_bg, IMG_2D_SW_SRC_OVER_MODE);
     gui_img_t *unlock = gui_img_create_from_mem(parent, 0, ICON_UNLOCK_BIN, 246, 82, 0, 0);
     gui_img_set_a8_fg_color(unlock, GUI_COLOR_ARGB8888(255, 0x05, 0x5B, 0x90));
     gui_obj_add_event_cb(tab_bg, press_tab, GUI_EVENT_TOUCH_PRESSED, NULL);
-    // gui_obj_add_event_cb(unlock, click_unlock, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(unlock, click_unlock, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     // gui_obj_create_timer(GUI_BASE(tab_bg), 10, true, pressing_tab);
 }

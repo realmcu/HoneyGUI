@@ -36,6 +36,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = clock_view_design,
 };
 
+gui_img_t *vec = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -59,6 +60,27 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void time_update(void *obj)
 {
     GUI_UNUSED(obj);
+    static uint8_t cnt = 0;
+    cnt++;
+    switch (cnt % 4)
+    {
+    case 0:
+        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
+        break;
+    case 1:
+        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0x8F, 0xBF, 0x80));
+        break;
+    case 2:
+        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0x7C, 0x9E, 0xFF));
+        break;
+    case 3:
+        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0xB4, 0x90, 0xFF));
+        break;
+
+    default:
+        break;
+    }
+    return;
 
     if (!timeinfo)
     {
@@ -120,7 +142,7 @@ static void clock_view_design(gui_view_t *view)
         break;
     }
 
-    // gui_obj_create_timer(GUI_BASE(view), 3000, true, time_update);
+    gui_obj_create_timer(GUI_BASE(view), 1000, true, time_update);
 }
 
 static void clock3_design(gui_view_t *view)
@@ -128,7 +150,7 @@ static void clock3_design(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
 
     // Background
-    gui_img_t *vec = gui_img_create_from_mem(parent, 0, CLOCK3_VECTOR_BIN, 0, 0, 0, 0);
+    vec = gui_img_create_from_mem(parent, 0, CLOCK3_VECTOR_BIN, 0, 0, 0, 0);
     gui_img_set_a8_fg_color(vec, FG_1_DARK.color.argb_full);
     gui_img_set_a8_bg_color(vec, theme_color.color.argb_full);
     gui_img_set_mode(vec, IMG_2D_SW_FIX_A8_BGFG);

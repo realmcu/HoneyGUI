@@ -54,7 +54,7 @@ unsigned char *resource_root = NULL;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("case_menu_view");
+    test_view = gui_view_descriptor_get("lock_view");
     clock_view = gui_view_descriptor_get("clock_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;

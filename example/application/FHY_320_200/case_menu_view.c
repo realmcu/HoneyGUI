@@ -190,16 +190,18 @@ static void case_menu_view_design(gui_view_t *view)
     gui_list_set_offset(list, list_offset_his);
     gui_list_set_out_scope(list, 20);
     gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
+    gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
 
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
-        gui_canvas_rect_create(parent, 0, 0, 0, 320, 60, SCREEN_BG_LIGHT);
+        gui_img_set_a8_fg_color(mask, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
-        gui_canvas_rect_create(parent, 0, 0, 0, 320, 60, gui_rgb(0, 0, 0));
+        gui_set_bg_color(BG_1_LIGHT);
+        gui_img_set_a8_fg_color(mask, BG_1_LIGHT.color.argb_full);
         font_color = FG_1_DARK;
     }
     gui_list_set_bar_color(list, font_color);
