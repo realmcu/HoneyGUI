@@ -207,37 +207,31 @@ static void update_ambient_sound_status(gui_obj_t *obj)
     }
 }
 
-static void pressed_button_page_volume(void *obj, gui_event_t e, void *param)
-{
-    GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
-    gui_img_t *img = (gui_img_t *)obj;
-    gui_obj_t *o = GUI_BASE(obj);
-    gui_img_set_opacity(img, 0xff);
-    if (strcmp(o->name, "add") == 0)
-    {
-        pressed_add = true;
-    }
-    else
-    {
-        pressed_sub = true;
-    }
-}
-
 static void press_button_page_volume(void *obj)
 {
     GUI_UNUSED(obj);
-    gui_img_t *img = (gui_img_t *)obj;
     gui_obj_t *o = GUI_BASE(obj);
     touch_info_t *tp = tp_get_info();
-    if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        gui_img_set_opacity(img, 0);
+        gui_obj_hidden(o, false);
+        if (strcmp(o->name, "add") == 0)
+        {
+            pressed_add = true;
+        }
+        else
+        {
+            pressed_sub = true;
+        }
+    }
+
+    else if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        gui_obj_hidden(o, true);
     }
     else if (tp->released)
     {
-        gui_img_set_opacity(img, 0);
+        gui_obj_hidden(o, true);
         if (tp->deltaX == 0 && tp->deltaY == 0)
         {
             if (pressed_add)
@@ -265,37 +259,30 @@ static void press_button_page_volume(void *obj)
     }
 }
 
-static void pressed_button_page_equalizer(void *obj, gui_event_t e, void *param)
-{
-    GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
-    gui_img_t *img = (gui_img_t *)obj;
-    gui_obj_t *o = GUI_BASE(obj);
-    gui_img_set_opacity(img, 0xff);
-    if (strcmp(o->name, "switch_l") == 0)
-    {
-        pressed_switch_l = true;
-    }
-    else
-    {
-        pressed_switch_r = true;
-    }
-}
-
 static void press_button_page_equalizer(void *obj)
 {
     GUI_UNUSED(obj);
-    gui_img_t *img = (gui_img_t *)obj;
     gui_obj_t *o = GUI_BASE(obj);
     touch_info_t *tp = tp_get_info();
-    if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        gui_img_set_opacity(img, 0);
+        gui_obj_hidden(o, false);
+        if (strcmp(o->name, "switch_l") == 0)
+        {
+            pressed_switch_l = true;
+        }
+        else
+        {
+            pressed_switch_r = true;
+        }
+    }
+    else if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        gui_obj_hidden(o, true);
     }
     else if (tp->released)
     {
-        gui_img_set_opacity(img, 0);
+        gui_obj_hidden(o, true);
         if (tp->deltaX == 0 && tp->deltaY == 0)
         {
             if (pressed_switch_l)
@@ -322,37 +309,32 @@ static void press_button_page_equalizer(void *obj)
     }
 }
 
-static void pressed_button_page_music(void *obj, gui_event_t e, void *param)
-{
-    GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
-    gui_img_t *img = (gui_img_t *)obj;
-    gui_obj_t *o = GUI_BASE(obj);
-    gui_img_set_opacity(img, 0xff);
-    if (strcmp(o->name, "last") == 0)
-    {
-        pressed_last = true;
-    }
-    else
-    {
-        pressed_next = true;
-    }
-}
 
 static void press_button_page_music(void *obj)
 {
     GUI_UNUSED(obj);
-    gui_img_t *img = (gui_img_t *)obj;
     gui_obj_t *o = GUI_BASE(obj);
     touch_info_t *tp = tp_get_info();
-    if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        gui_img_set_opacity(img, 0);
+        gui_obj_hidden(o, false);
+        if (strcmp(o->name, "last") == 0)
+        {
+            pressed_last = true;
+        }
+        else
+        {
+            pressed_next = true;
+        }
+    }
+    else if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        gui_obj_hidden(o, true);
+
     }
     else if (tp->released)
     {
-        gui_img_set_opacity(img, 0);
+        gui_obj_hidden(o, true);
         if (tp->deltaX == 0 && tp->deltaY == 0)
         {
             if (pressed_last)
@@ -532,10 +514,8 @@ void page_volume_design(gui_obj_t *parent)
                            36, progressbar_color);
     gui_img_t *progressbar_mask = gui_img_create_from_mem(control_bg, 0, PROGRESSBAR_MASK_BIN, 90, 27,
                                                           0, 0);
-    gui_img_set_opacity(button_sub_bg, 0);
-    gui_img_set_opacity(button_add_bg, 0);
-    gui_obj_add_event_cb(button_sub_bg, pressed_button_page_volume, GUI_EVENT_TOUCH_PRESSED, NULL);
-    gui_obj_add_event_cb(button_add_bg, pressed_button_page_volume, GUI_EVENT_TOUCH_PRESSED, NULL);
+    gui_obj_hidden((void *)button_sub_bg, 1);
+    gui_obj_hidden((void *)button_add_bg, 1);
     gui_obj_create_timer(GUI_BASE(button_sub_bg), 10, true, press_button_page_volume);
     gui_obj_create_timer(GUI_BASE(button_add_bg), 10, true, press_button_page_volume);
 
@@ -601,12 +581,8 @@ void page_equalizer_design(gui_obj_t *parent)
     gui_img_t *switch_r = gui_img_create_from_mem(control_bg, 0, SWITCH_R_BIN, 241, 32, 0, 0);
     gui_img_t *music_type = gui_img_create_from_mem(control_bg, "music_type",
                                                     music_type_addr[music_type_index], 86, 5, 0, 0);
-    gui_img_set_opacity(button_switch_l_bg, 0);
-    gui_img_set_opacity(button_switch_r_bg, 0);
-    gui_obj_add_event_cb(button_switch_l_bg, pressed_button_page_equalizer, GUI_EVENT_TOUCH_PRESSED,
-                         NULL);
-    gui_obj_add_event_cb(button_switch_r_bg, pressed_button_page_equalizer, GUI_EVENT_TOUCH_PRESSED,
-                         NULL);
+    gui_obj_hidden((void *)button_switch_l_bg, 1);
+    gui_obj_hidden((void *)button_switch_r_bg, 1);
     gui_obj_create_timer(GUI_BASE(button_switch_l_bg), 10, true, press_button_page_equalizer);
     gui_obj_create_timer(GUI_BASE(button_switch_r_bg), 10, true, press_button_page_equalizer);
 
@@ -754,16 +730,12 @@ void page_music_design(gui_obj_t *parent)
                                                         6, 0, 0);
     gui_img_t *next = gui_img_create_from_mem(control_bg, 0, SKIP_NEXT_BIN, 233, 32, 0, 0);
     gui_img_t *play = gui_img_create_from_mem(control_bg, 0, PLAY_BIN, 132, 24, 0, 0);
+    gui_obj_add_event_cb(play, click_button_page_music, GUI_EVENT_TOUCH_CLICKED, NULL);
     if (music_play)
     {
         gui_img_set_image_data(play, PAUSE_BIN);
         gui_img_refresh_size(play);
     }
-    gui_img_set_opacity(button_last_bg, 0);
-    gui_img_set_opacity(button_next_bg, 0);
-    gui_obj_add_event_cb(play, click_button_page_music, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_add_event_cb(button_last_bg, pressed_button_page_music, GUI_EVENT_TOUCH_PRESSED, NULL);
-    gui_obj_add_event_cb(button_next_bg, pressed_button_page_music, GUI_EVENT_TOUCH_PRESSED, NULL);
     gui_obj_create_timer(GUI_BASE(button_last_bg), 10, true, press_button_page_music);
     gui_obj_create_timer(GUI_BASE(button_next_bg), 10, true, press_button_page_music);
 

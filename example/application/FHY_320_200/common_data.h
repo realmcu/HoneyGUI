@@ -30,12 +30,13 @@ extern "C" {
 #define FG_WARNING                       gui_rgb(0xDF,0x2D,0x00)
 #define FG_NORMAL                        gui_rgb(0x00,0xB4,0x36)
 #define FG_1_DARK                        gui_rgb(0xFF,0xFF,0xFF)
-#define FG_2_DARK                        gui_rgba(0xFF,0xFF,0xFF,0xFF*0.3f)
-#define FG_3_DARK                        gui_rgba(0xFF,0xFF,0xFF,0xFF*0.5f)
+#define FG_2_DARK                        gui_rgb(0xFF*0.3f,0xFF*0.3f,0xFF*0.3f)
+#define FG_3_DARK                        gui_rgb(0xFF*0.5f,0xFF*0.5f,0xFF*0.5f)
 #define FG_1_LIGHT                       gui_rgb(0x32,0x32,0x32)
-#define FG_2_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.3f)
-#define FG_3_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.5f)
+#define FG_2_LIGHT                       gui_rgb(0x32*0.3f,0x32*0.3f,0x32*0.3f)
+#define FG_3_LIGHT                       gui_rgb(0x32*0.5f,0x32*0.5f,0x32*0.5f)
 #define FG_WHITE                         FG_1_DARK
+#define FG_WARNING                       gui_rgb(0xDF,0x2D,0x00)
 
 #define BG_THEME1_BRIGHT_DARK            gui_rgb(0xF6,0x87,0x1F)
 #define BG_THEME1_MID_DARK               gui_rgb(0x5A,0x30,0x1E)
@@ -57,10 +58,10 @@ extern "C" {
 #define BG_THEME3_MID_LIGHT              gui_rgb(0xB1,0xD9,0xFF)
 #define BG_THEME3_DARK_LIGHT             gui_rgb(0xD3,0xE8,0xFF)
 
-#define BG_1_DARK                        gui_rgba(0xFF,0xFF,0xFF,0xFF*0.1f)
-#define BG_2_DARK                        gui_rgba(0xFF,0xFF,0xFF,0xFF*0.2f)
-#define BG_1_LIGHT                       gui_rgba(0,0,0,0xFF*0.05f)
-#define BG_2_LIGHT                       gui_rgba(0,0,0,0xFF*0.2f)
+#define BG_1_DARK                        gui_rgb(0xFF*0.1f,0xFF*0.1f,0xFF*0.1f)
+#define BG_2_DARK                        gui_rgb(0xFF*0.1f,0xFF*0.1f,0xFF*0.1f)
+#define BG_1_LIGHT                       gui_rgb(0,0,0)
+#define BG_2_LIGHT                       gui_rgb(0,0,0)
 #define SCREEN_BG_LIGHT                  gui_rgb(0xF2,0xF2,0xF7)
 
 /*============================================================================*

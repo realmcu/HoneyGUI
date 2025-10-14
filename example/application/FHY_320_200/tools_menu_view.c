@@ -185,11 +185,11 @@ static void audio_menu_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(icon_back, FG_2_LIGHT.color.argb_full);
+        gui_img_set_a8_fg_color(icon_back, FG_1_LIGHT.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color(icon_back, FG_2_DARK.color.argb_full);
+        gui_img_set_a8_fg_color(icon_back, FG_1_DARK.color.argb_full);
     }
 }
 

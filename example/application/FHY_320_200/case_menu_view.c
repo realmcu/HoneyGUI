@@ -38,6 +38,7 @@ static void clear(gui_view_t *view);
 /* View Management */
 static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *menu_view = NULL;
+static const gui_view_descriptor_t *detail_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -81,6 +82,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     menu_view = gui_view_descriptor_get("menu_view");
+    detail_view = gui_view_descriptor_get("detail_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -95,6 +97,16 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     list_offset_his = 0;
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
+}
+
+static void switch_page_dark_light(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    detail_page_design_func = page_dark_light_design;
+    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
 static void note_design(gui_obj_t *obj, void *p)
@@ -161,7 +173,7 @@ static void case_menu_view_design(gui_view_t *view)
     int array_size = sizeof(text_array) / sizeof(text_array[0]);
     void *click_cb[] =
     {
-        NULL,
+        switch_page_dark_light,
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
     void **func_cb = gui_malloc(array_size * sizeof(void *));

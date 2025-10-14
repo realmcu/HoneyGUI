@@ -38,8 +38,9 @@ static gui_view_descriptor_t const descriptor =
 };
 
 void (*detail_page_design_func)(gui_obj_t *parent) = NULL;
-gui_view_descriptor_t *descriptor_rec = NULL;
+const gui_view_descriptor_t *descriptor_rec = NULL;
 
+static bool is_favorite = false;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -51,46 +52,126 @@ static int gui_view_descriptor_register_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
+static bool page_in_favorite(void)
+{
+    for (uint8_t i = 0; i < quick_page_num; i++)
+    {
+        if (detail_page_design_func == quick_page_design_func_array[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void page_add_in_favorite(void)
+{
+    if (quick_page_num < QUICK_PAGE_NUM_MAX)
+    {
+        quick_page_design_func_array[quick_page_num++] = detail_page_design_func;
+    }
+    else
+    {
+        for (uint8_t i = 0; i < QUICK_PAGE_NUM_MAX - 1; i++)
+        {
+            quick_page_design_func_array[i] = quick_page_design_func_array[i + 1];
+        }
+        quick_page_design_func_array[QUICK_PAGE_NUM_MAX - 1] = detail_page_design_func;
+    }
+}
+
+static void page_delete_from_favorite(void)
+{
+    int8_t index = 0;
+    while (1)
+    {
+        if (quick_page_design_func_array[index] == detail_page_design_func)
+        {
+            break;
+        }
+        index++;
+    }
+    while (index < quick_page_num - 1)
+    {
+        quick_page_design_func_array[index] = quick_page_design_func_array[index + 1];
+        index++;
+    }
+    quick_page_design_func_array[--quick_page_num] = NULL;
+}
+
+static void click_button_back(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
+                           SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
+}
+
+static void click_button_favorite(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_img_t *icon = (gui_img_t *)obj;
+    is_favorite = !is_favorite;
+    if (is_favorite)
+    {
+        gui_img_set_image_data(icon, ICON_IS_FAVORITE_BIN);
+        page_add_in_favorite();
+        gui_img_set_a8_fg_color(icon, FG_WARNING.color.argb_full);
+    }
+    else
+    {
+        gui_img_set_image_data(icon, ICON_NOT_FAVORITE_BIN);
+        page_delete_from_favorite();
+        if (theme_bg_white)
+        {
+            gui_img_set_a8_fg_color(icon, FG_1_LIGHT.color.argb_full);
+        }
+        else
+        {
+            gui_img_set_a8_fg_color(icon, FG_1_DARK.color.argb_full);
+        }
+    }
+}
+
 static void detail_view_design(gui_view_t *view)
 {
+    descriptor_rec = gui_view_get_current()->descriptor;
     gui_obj_t *parent = GUI_BASE(view);
-    gui_color_t font_color;
     if (theme_bg_white)
     {
         gui_obj_hidden((void *)screen_bg, false);
     }
-    else
-    {
-        font_color = FG_1_DARK;
-    }
-    gui_img_create_from_mem(parent, "indicator0", PAGE_INDICATOR_BIN, 140, 188, 0, 0);
-    gui_img_create_from_mem(parent, "indicator1", PAGE_INDICATOR_BIN, 152, 188, 0, 0);
-    gui_img_create_from_mem(parent, "indicator2", PAGE_INDICATOR_BIN, 164, 188, 0, 0);
-    gui_img_create_from_mem(parent, "indicator3", PAGE_INDICATOR_BIN, 176, 188, 0, 0);
 
-    gui_img_t *bt = gui_img_create_from_mem(parent, 0, BLUETOOTH_BIN, 12, 13, 0, 0);
-    gui_img_t *home_bg = gui_img_create_from_mem(parent, 0, STATUSBAR_HOME_BG_BIN, 131, 10, 0, 0);
-    gui_img_t *barn_inner = gui_img_create_from_mem(home_bg, 0, BARN_INNER_BIN, 23, 6, 0, 0);
-    gui_img_t *barn_outer = gui_img_create_from_mem(home_bg, 0, BARN_OUTER_BIN, 20, 3, 0, 0);
-    gui_img_t *earphone_l = gui_img_create_from_mem(home_bg, 0, EARPLUG_L_BIN, 7, 3, 0, 0);
-    gui_img_t *earphone_r = gui_img_create_from_mem(home_bg, 0, EARPLUG_R_BIN, 42, 3, 0, 0);
+    gui_img_t *icon_back = gui_img_create_from_mem(parent, 0, ICON_BACK_BIN, 0, 0, 0, 0);
+    gui_obj_add_event_cb(icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_img_t *icon_favorite = gui_img_create_from_mem(parent, 0, ICON_NOT_FAVORITE_BIN, 146, 6, 0, 0);
+    is_favorite = false;
+    if (page_in_favorite())
+    {
+        gui_img_set_image_data(icon_favorite, ICON_IS_FAVORITE_BIN);
+        is_favorite = true;
+        gui_img_set_a8_fg_color(icon_favorite, FG_WARNING.color.argb_full);
+    }
+    gui_obj_add_event_cb(icon_favorite, click_button_favorite, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(bt, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(home_bg, BG_2_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(barn_inner, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(barn_outer, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_l, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_r, FG_1_LIGHT.color.argb_full);
+        gui_img_set_a8_fg_color(icon_back, FG_1_LIGHT.color.argb_full);
+        if (!is_favorite)
+        {
+            gui_img_set_a8_fg_color(icon_favorite, FG_1_LIGHT.color.argb_full);
+        }
     }
     else
     {
-        gui_img_set_a8_fg_color(bt, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(home_bg, BG_2_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(barn_inner, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(barn_outer, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_l, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_r, FG_1_DARK.color.argb_full);
+        gui_img_set_a8_fg_color(icon_back, FG_1_DARK.color.argb_full);
+        if (!is_favorite)
+        {
+            gui_img_set_a8_fg_color(icon_favorite, FG_1_DARK.color.argb_full);
+        }
     }
+    detail_page_design_func(parent);
 }

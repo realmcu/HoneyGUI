@@ -121,8 +121,8 @@ static void view_transition_animation_from_right(float pro, gui_view_t *view, fl
     GUI_BASE(view)->y = y_position;
 
     // Calculate and set opacity
-    unsigned char opacity_value = (unsigned char)(255 * eased_pro);
-    GUI_BASE(view)->opacity_value = opacity_value;
+    // unsigned char opacity_value = (unsigned char)(255 * eased_pro);
+    // GUI_BASE(view)->opacity_value = opacity_value;
 
     // Optionally add scale animation, assume no scale animation here
     float scale_rate_horizontal = 1.0f;
@@ -158,8 +158,8 @@ static void view_transition_animation_from_left(float pro, gui_view_t *view, flo
     GUI_BASE(view)->x = new_x_position;
     GUI_BASE(view)->y = y_position;
     // Calculate and set opacity
-    unsigned char opacity_value = (unsigned char)(255 * eased_pro);
-    GUI_BASE(view)->opacity_value = opacity_value;
+    // unsigned char opacity_value = (unsigned char)(255 * eased_pro);
+    // GUI_BASE(view)->opacity_value = opacity_value;
 
     // Optionally add scale animation, assume no scale animation here
     float scale_rate_horizontal = 1.0f;
@@ -214,8 +214,8 @@ static void view_transition_animation_to_right(float pro, gui_view_t *view, floa
     GUI_BASE(view)->y = y_position;
 
     // Calculate and set opacity
-    unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
-    GUI_BASE(view)->opacity_value = opacity_value;
+    // unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
+    // GUI_BASE(view)->opacity_value = opacity_value;
 
     // Optionally add scale animation, assume no scale animation here
     float scale_rate_horizontal = 1.0f;
@@ -252,8 +252,8 @@ static void view_transition_animation_to_left(float pro, gui_view_t *view, float
     GUI_BASE(view)->y = y_position;
 
     // Calculate and set opacity
-    unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
-    GUI_BASE(view)->opacity_value = opacity_value;
+    // unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
+    // GUI_BASE(view)->opacity_value = opacity_value;
 
     // Optionally add scale animation, assume no scale animation here
     float scale_rate_horizontal = 1.0f;

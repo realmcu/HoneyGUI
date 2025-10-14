@@ -56,17 +56,6 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void press_tab(void *obj, gui_event_t e, void *param)
-{
-    GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
-
-    gui_img_t *img = (gui_img_t *)obj;
-    gui_img_set_image_data(img, TAP_BIN);
-}
-
 static void time_update(void *obj)
 {
     GUI_UNUSED(obj);
@@ -108,7 +97,7 @@ static void time_update(void *obj)
 static void clock_view_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, lock_view, SWITCH_OUT_NONE_ANIMATION,
-                             SWITCH_IN_ANIMATION_FADE,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
     gui_obj_hidden((void *)screen_bg, true);
     switch (clock_style)
@@ -130,7 +119,7 @@ static void clock_view_design(gui_view_t *view)
         break;
     }
 
-    gui_obj_create_timer(GUI_BASE(view), 3000, true, time_update);
+    // gui_obj_create_timer(GUI_BASE(view), 3000, true, time_update);
 }
 
 static void clock3_design(gui_view_t *view)
@@ -145,13 +134,13 @@ static void clock3_design(gui_view_t *view)
 
     // time hands
     gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK3_MIN_BIN, 160, 100, 0, 0);
+    gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
     gui_img_set_focus(img, 160 - 151, 100 - 15); // img target is (151, 15), focus is (160, 100)
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     img = gui_img_create_from_mem(parent, "hour", CLOCK3_HOUR_BIN, 160, 100, 0, 0);
+    gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
     gui_img_set_focus(img, 160 - 148, 100 - 47); // img target is (148, 47), focus is (160, 100)
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     img = gui_img_create_from_mem(parent, 0, CLOCK3_CENTER_BIN, 146, 86, 0, 0);
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    gui_img_set_a8_fg_color(img, FG_WHITE.color.argb_full);
 }
 
 static void clock4_design(gui_view_t *view)

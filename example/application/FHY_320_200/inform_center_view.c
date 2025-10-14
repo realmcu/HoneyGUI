@@ -206,21 +206,47 @@ static void click_button_right(void *obj, gui_event_t e, void *param)
     }
 }
 
+static void show_bg(void *obj)
+{
+    static bool flag = false;
+    if (gui_view_get_next())
+    {
+        gui_obj_hidden((void *)obj, false);
+        flag = false;
+    }
+    else
+    {
+        if (flag)
+        {
+            flag = false;
+            gui_obj_hidden((void *)obj, true);
+        }
+        else
+        {
+            flag = true;
+        }
+    }
+}
+
 static void inform_center_view_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
-                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+                             SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
+    gui_img_t *bg = gui_img_create_from_mem(parent, 0, SCREEN_BG_BIN, 0, 0, 0, 0);
+    gui_obj_create_timer((void *)bg, 10, true, show_bg);
     if (theme_bg_white)
     {
         gui_obj_hidden((void *)screen_bg, false);
+        gui_img_set_a8_fg_color(bg, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
+        gui_img_set_a8_fg_color(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
         font_color = FG_1_DARK;
     }
 
@@ -231,7 +257,8 @@ static void inform_center_view_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(text), 3000, true, time_update_cb);
 
 
-    gui_img_t *battery_bg = gui_img_create_from_mem(parent, 0, BATTERY_STATUS_BG_BIN, 12, 40, 0, 0);
+    gui_img_t *battery_bg = gui_img_create_from_mem(parent, "battery_bg", BATTERY_STATUS_BG_BIN, 12, 40,
+                                                    0, 0);
     gui_img_t *barn_inner = gui_img_create_from_mem(battery_bg, 0, BARN_INNER_BIG_BIN, 88, 15, 0, 0);
     gui_img_t *barn_outer = gui_img_create_from_mem(battery_bg, 0, BARN_OUTER_BIG_BIN, 85, 11, 0, 0);
     gui_img_t *earphone_l = gui_img_create_from_mem(battery_bg, 0, EARPLUG_BIG_L_BIN, 31, 11, 0, 0);

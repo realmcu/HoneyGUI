@@ -54,7 +54,7 @@ unsigned char *resource_root = NULL;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("charging_view");
+    test_view = gui_view_descriptor_get("case_menu_view");
     clock_view = gui_view_descriptor_get("clock_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -129,7 +129,7 @@ static void time_update_cb(void *param)
     //timeinfo = &watch_time;
 #endif
 
-    if (sleep_cnt >= 300000 || kb->pressed) //300s
+    if (sleep_cnt >= 30000 || kb->pressed) //30s
     {
         sleep_cnt = 0;
         gui_view_t *view = gui_view_get_current();
