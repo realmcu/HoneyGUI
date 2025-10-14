@@ -639,9 +639,9 @@
               <FilePath>..\..\realgui\input\tp_algo_v2.c</FilePath>
             </File>
             <File>
-              <FileName>wheel_algo.c</FileName>
+              <FileName>knob_algo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\realgui\input\wheel_algo.c</FilePath>
+              <FilePath>..\..\realgui\input\knob_algo.c</FilePath>
             </File>
           </Files>
         </Group>

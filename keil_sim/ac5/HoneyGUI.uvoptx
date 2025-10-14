@@ -804,8 +804,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\realgui\input\wheel_algo.c</PathWithFileName>
-      <FilenameWithoutPath>wheel_algo.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\realgui\input\knob_algo.c</PathWithFileName>
+      <FilenameWithoutPath>knob_algo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

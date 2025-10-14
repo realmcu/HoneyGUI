@@ -54,7 +54,7 @@
 #include "gui_components_init.h"
 #include "kb_algo.h"
 #include "tp_algo.h"
-#include "wheel_algo.h"
+#include "knob_algo.h"
 #include "gui_app.h"
 #include "gui_multi_level.h"
 

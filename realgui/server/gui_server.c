@@ -15,7 +15,7 @@
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <kb_algo.h>
-#include <wheel_algo.h>
+#include <knob_algo.h>
 #include <string.h>
 #include <gui_app.h>
 #include "gui_win.h"

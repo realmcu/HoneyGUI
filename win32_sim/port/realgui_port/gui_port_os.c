@@ -160,7 +160,7 @@ static void port_free(void *rmem)
 }
 
 
-#define PORT_GUI_MEMHEAP_SIZE 1024*1024*10
+#define PORT_GUI_MEMHEAP_SIZE 1024*1024*20
 static uint8_t gui_memheap[PORT_GUI_MEMHEAP_SIZE] = {0};
 
 #define PORT_GUI_LOWER_MEMHEAP_SIZE 1024*1024*500

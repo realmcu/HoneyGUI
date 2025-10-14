@@ -5228,6 +5228,23 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
                     config.ime = KB_METHOD_PINYIN;
                 }
             }
+            else if (!strcmp(p->attr[i], "pos"))
+            {
+                i++;
+                if (!strcmp(p->attr[i], "bottom"))
+                {
+                    config.ime = KB_POS_BOTTOM;
+                }
+                else if (!strcmp(p->attr[i], "center"))
+                {
+                    config.ime = KB_POS_CENTER;
+                }
+            }
+            else if (!strcmp(p->attr[i], "offset_y"))
+            {
+                config.offset_y = atof(p->attr[++i]);
+
+            }
             i++;
         }
 
@@ -5279,11 +5296,11 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
                         addr = (void *)gui_get_image_file_address(file_path);
                         if (!config.img_array)
                         {
-                            data = gui_malloc(sizeof(uint8_t *));
+                            data = gui_lower_malloc(sizeof(uint8_t *));
                         }
                         else
                         {
-                            data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                            data = gui_lower_realloc(config.img_array, file_count * (sizeof(void *)));
                         }
                         config.img_array = data;
                         config.img_array[file_count - 1] = addr;

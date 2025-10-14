@@ -126,8 +126,8 @@
         <file category="sourceC" name="input/tp_algo.c"/>
         <file category="header" name="input/tp_algo.h"/>
         <file category="sourceC" name="input/tp_algo_v2.c"/>
-        <file category="sourceC" name="input/wheel_algo.c"/>
-        <file category="header" name="input/wheel_algo.h"/>
+        <file category="sourceC" name="input/knob_algo.c"/>
+        <file category="header" name="input/knob_algo.h"/>
       </files>
     </component>
     <component Cclass="HoneyGUI" Cversion="2.0.1" Cgroup="realgui" Csub="misc" Cvariant="Source" isDefaultVariant="true" Cvendor="Realtek">

@@ -51,3 +51,9 @@
 - Add tab next/last
 - Add page by key
 - Add radio button highlight scale
+
+# v1.0.12.6
+
+- Add keyboard position "center" and relative offset_y
+- Add widget page, seekbar, roller support knob input device
+

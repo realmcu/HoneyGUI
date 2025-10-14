@@ -1,5 +1,5 @@
 /**
- * @file wheel_algo.h
+ * @file knob_algo.h
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
  * @version 0.1

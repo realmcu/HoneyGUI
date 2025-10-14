@@ -984,27 +984,34 @@ static void gui_kb_input_char_proc(uint32_t key_val)
 }
 
 
-static void gui_kb_cursor_animate(void *p)
+static void gui_kb_cursor_animate(void *p, void *this_widget, struct gui_animate *animate)
 {
     gui_kb_t *this = gui_get_kb();
     char *cur = gui_kb_get_cursor();
     uint16_t len_bf = cur - buff_display;
     char *pcontent = (char *)(this->txt_display->content);
-    static uint8_t i = 0;
+    static int8_t i = -1;
+    static uint16_t lst_cnt = 0;
 
-    i++;
-    // printf(">%c\n", *(char*)cur);
-    // printf(">%d %s\n", len_display,(char*)buff_display);
-
-    memset(pcontent, 0, KB_BUFF_DISPLAY_MAXLEN);
-    if (len_bf)
+    if (!animate || lst_cnt != animate->current_repeat_count)
     {
-        memcpy(pcontent, buff_display, len_bf);
-    }
-    pcontent[len_bf] = (i & 0x01) ? '_' : ' ';
-    memcpy(pcontent + len_bf + 1, cur, len_display - len_bf);
+        // printf(">%c\n", *(char*)cur);
+        // printf(">%d %s\n", len_display,(char*)buff_display);
+        i++;
+        memset(pcontent, 0, KB_BUFF_DISPLAY_MAXLEN);
+        if (len_bf)
+        {
+            memcpy(pcontent, buff_display, len_bf);
+        }
+        pcontent[len_bf] = (i & 0x01) ? '_' : ' ';
+        memcpy(pcontent + len_bf + 1, cur, len_display - len_bf);
 
-    gui_text_content_set(this->txt_display, pcontent, len_display + 1);
+        gui_text_content_set(this->txt_display, pcontent, len_display + 1);
+        if (animate)
+        {
+            lst_cnt = animate->current_repeat_count;
+        }
+    }
 }
 
 static void gui_kb_update_key(void)
@@ -1029,7 +1036,7 @@ static void gui_kb_update_cand(void)
 }
 static void gui_kb_update_display(void)
 {
-    gui_kb_cursor_animate(NULL);
+    gui_kb_cursor_animate(NULL, NULL, NULL);
 }
 static void gui_kb_input_proc(void *obj, gui_event_t event_code, void *param)
 {
@@ -1323,6 +1330,12 @@ static void gui_kb_set_obj_scale(int16_t *obj_x, int16_t *obj_y, int16_t *obj_w,
     *obj_w = *obj_w * scale;
     *obj_h = *obj_h * scale;
 }
+static void gui_kb_set_obj_offset(int16_t *obj_x, int16_t *obj_y)
+{
+    gui_kb_t *this = gui_get_kb();
+
+    *obj_y += this->offset_y;
+}
 static void gui_kb_layout_basic_letter(gui_kb_t  *this)
 {
     int16_t x = this->base.x, y = this->base.y, w = this->base.w, h = this->base.h;
@@ -1360,6 +1373,7 @@ static void gui_kb_layout_basic_letter(gui_kb_t  *this)
         obj_w = ((gui_rgb_data_head_t *)img_default)->w;
         obj_h = ((gui_rgb_data_head_t *)img_default)->h;
         gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+        gui_kb_set_obj_offset(&obj_x, &obj_y);
 
 
         btn = gui_button_create(this->win_letter, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
@@ -1406,6 +1420,7 @@ static void gui_kb_layout_basic_func(gui_kb_t  *this)
         obj_w = ((gui_rgb_data_head_t *)img_default)->w;
         obj_h = ((gui_rgb_data_head_t *)img_default)->h;
         gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+        gui_kb_set_obj_offset(&obj_x, &obj_y);
 
         if (key_is_sw(key_val) == false)
         {
@@ -1461,6 +1476,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             obj_w = ((gui_rgb_data_head_t *)img_default)->w;
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
             gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+            gui_kb_set_obj_offset(&obj_x, &obj_y);
 
             btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                     BUTTON_BG_ICON, 0);
@@ -1492,6 +1508,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             obj_w = ((gui_rgb_data_head_t *)img_default)->w;
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
             gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+            gui_kb_set_obj_offset(&obj_x, &obj_y);
 
             btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                     BUTTON_BG_ICON, 0);
@@ -1540,12 +1557,13 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
     // text: candi cn
     obj_w = x_step; obj_h = font_size_cn;
     int16_t x_pos_cand_start_scale = x_pos_cand_start * scale;
-    obj_y = 92;
-    obj_y = h - (360 - (obj_y + obj_h)) * scale - obj_h;
     for (size_t i = 0; i < page_sz; i++)
     {
+        obj_y = 92;
+        obj_y = h - (360 - (obj_y + obj_h)) * scale - obj_h;
         obj_x = x_pos_cand_start_scale + i * x_step;
 
+        gui_kb_set_obj_offset(&obj_x, &obj_y);
         txt = gui_text_create(this->win_ime, "icon_text", obj_x, obj_y,
                               obj_w, obj_h);
         gui_text_mode_set(txt, CENTER);
@@ -1559,7 +1577,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
     }
 
     // text: pinyin
-    obj_x = 34; obj_y = 64;
+    obj_x = 34; obj_y = 56;
     obj_w = 300; obj_h = font_size_key;
     obj_x = obj_x * scale;
     obj_y = h - (360 - (obj_y + obj_h)) * scale - obj_h;
@@ -1568,6 +1586,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
     // len_key = strlen("yong");
     // memcpy(buff_key, "yong", len_key);
 
+    gui_kb_set_obj_offset(&obj_x, &obj_y);
     txt = gui_text_create(this->win_ime, "txt_key", obj_x, obj_y,
                           obj_w, obj_h);
     gui_text_mode_set(txt, LEFT);
@@ -1591,6 +1610,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
         obj_w = ((gui_rgb_data_head_t *)img_default)->w;
         obj_h = ((gui_rgb_data_head_t *)img_default)->h;
         gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+        gui_kb_set_obj_offset(&obj_x, &obj_y);
 
         btn = gui_button_create(this->win_ime, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                 BUTTON_BG_ICON, 0);
@@ -1607,6 +1627,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
         obj_w = ((gui_rgb_data_head_t *)img_default)->w;
         obj_h = ((gui_rgb_data_head_t *)img_default)->h;
         gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+        gui_kb_set_obj_offset(&obj_x, &obj_y);
 
         btn = gui_button_create(this->win_ime, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                 BUTTON_BG_ICON, 0);
@@ -1665,12 +1686,23 @@ static void gui_kb_ctor(gui_kb_t                        *this,
     this->layout = config->layout;
     this->mode = config->mode;
     this->input_Method = config->ime;
-    // this->input_Method = KB_METHOD_PINYIN;
     this->img_array = config->img_array;
     this->num_pic = config->num_pic;
     this->file_mark[0] = config->file_mark[0];
     this->file_mark[1] = config->file_mark[1];
     this->scale = gui_get_screen_width() / 640.f;
+    this->offset_y = config->offset_y;
+
+    int16_t offset_box = this->offset_y;
+    if (config->pos == KB_POS_CENTER)
+    {
+        // default kb size for 640x360 is 240 + 2*30 + 45, lock w&h scaling
+        uint16_t kb_h = 240;
+        int16_t start_y = (gui_get_screen_height() - kb_h * this->scale) / 2;
+        start_y = start_y - 50 / 2 - ((this->input_Method == KB_METHOD_NULL) ? 0 : 30);
+        offset_box += start_y - 17;
+        this->offset_y -= start_y;
+    }
 
     img_data = get_other_img(this, KB_IMG_IDX_BG);
     this->img_bg = gui_img_create_from_mem(this, "KB_BG",
@@ -1698,13 +1730,13 @@ static void gui_kb_ctor(gui_kb_t                        *this,
     img_data = get_other_img(this, KB_IMG_IDX_INPUTBOX);
     this->img_box = gui_img_create_from_mem(this, "KB_BOX",
                                             img_data,
-                                            19, 17, w, h);
+                                            19, 17 + offset_box, w, h);
     gui_img_set_mode(this->img_box, IMG_BYPASS_MODE);
     gui_img_scale(this->img_box, this->scale, 1.f);
 
     char *text = buff_txt_display;
 
-    this->txt_display = gui_text_create(this, "icon_text", 24, 26,
+    this->txt_display = gui_text_create(this, "icon_text", 24, 26 + offset_box,
                                         w, h - 60);
     gui_text_mode_set(this->txt_display, LEFT);
     {

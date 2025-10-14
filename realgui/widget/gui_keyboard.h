@@ -56,6 +56,8 @@ typedef struct
     void **img_array;
     uint16_t num_pic;
     uint16_t file_mark[2];   // func, other start point
+    int16_t pos;
+    int16_t offset_y;
 } gui_kb_config_t;
 
 typedef struct
@@ -85,6 +87,7 @@ typedef struct
     void **img_array;
     uint16_t file_mark[2];   // func, other start point
     float scale;             // refer to 640*360, keep screen horizontal full
+    int16_t offset_y;
 
     uint8_t checksum;
 } gui_kb_t;
@@ -104,6 +107,10 @@ typedef enum
     KB_MODE_BASIC_NUM,
     KB_MODE_BASIC_SYMBOL_EN,
     KB_MODE_BASIC_SYMBOL_CN,
+
+// kb position
+    KB_POS_BOTTOM = 0,
+    KB_POS_CENTER = 1,
 
 // img src type to get, // src order
     KB_SRC_DEFAULT    = 0,

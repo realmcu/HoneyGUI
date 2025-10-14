@@ -13,7 +13,7 @@
 #include "gui_components_init.h"
 #include <stdio.h>
 #include "guidef.h"
-#include "wheel_algo.h"
+#include "knob_algo.h"
 #include "kb_algo.h"
 #include <time.h>
 #include "gui_fps.h"

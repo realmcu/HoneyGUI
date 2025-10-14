@@ -22,7 +22,7 @@
 #include "gui_seekbar.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-#include "wheel_algo.h"
+#include "knob_algo.h"
 
 /*============================================================================*
  *                           Types

@@ -1,6 +1,6 @@
 
 /**
- * @file wheel_algo.c
+ * @file knob_algo.c
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
  * @version 0.1
@@ -13,7 +13,7 @@
 #include <gui_server.h>
 #include <guidef.h>
 #include <gui_api.h>
-#include <wheel_algo.h>
+#include <knob_algo.h>
 
 
 

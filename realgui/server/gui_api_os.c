@@ -187,8 +187,8 @@ void *gui_malloc(size_t n)
     }
     if (ptr == NULL)
     {
-        gui_log("SRAM OVERFLOW!!!%d\n", n);
-        gui_mem_used();
+        // gui_log("SRAM OVERFLOW!!!%d\n", n);
+        // gui_mem_used();
         ptr = gui_lower_malloc(n);
     }
     // if (ptr == (void *)0x0000000000749D30)
@@ -274,8 +274,8 @@ void *gui_realloc(void *ptr_old, size_t n)
             ptr = tlsf_realloc(tlsf, ptr_old, n);
             if (ptr == NULL)
             {
-                gui_log("SRAM OVERFLOW!!!%d\n", n);
-                gui_mem_used();
+                // gui_log("SRAM OVERFLOW!!!%d\n", n);
+                // gui_mem_used();
                 ptr = tlsf_malloc(lower_tlsf, n);
                 memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
                 tlsf_free(tlsf, ptr_old);

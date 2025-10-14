@@ -21,7 +21,7 @@
 #include <string.h>
 #include "gui_obj.h"
 #include "tp_algo.h"
-#include "wheel_algo.h"
+#include "knob_algo.h"
 #include "draw_img.h"
 #include "acc_init.h"
 #include "gui_matrix.h"

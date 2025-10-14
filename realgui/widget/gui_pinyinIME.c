@@ -241,7 +241,7 @@ static void gui_IME_parse_dict_json(gui_ime_t *this, char *buff_json)
         cJSON *cjson_os = NULL;
         cJSON *cjson_num = NULL;
 
-        this->dict_info = gui_malloc(this->dict_len * sizeof(Dict_info_t));
+        this->dict_info = gui_lower_malloc(this->dict_len * sizeof(Dict_info_t));
         for (uint32_t i = 0; i < dict_len; i++)
         {
             cJSON *cjson_dict_item = cJSON_GetArrayItem(cjson_dict_info_array, i);
@@ -255,7 +255,7 @@ static void gui_IME_parse_dict_json(gui_ime_t *this, char *buff_json)
             //
             this->dict_info[i].len = cjson_len->valueint;
 
-            this->dict_info[i].key = gui_malloc(this->dict_info[i].len + 1);
+            this->dict_info[i].key = gui_lower_malloc(this->dict_info[i].len + 1);
             GUI_ASSERT(this->dict_info[i].key != NULL);
             memset(this->dict_info[i].key, 0, this->dict_info[i].len + 1);
             memcpy(this->dict_info[i].key, cjson_key->valuestring, this->dict_info[i].len);
