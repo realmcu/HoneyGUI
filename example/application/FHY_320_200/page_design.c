@@ -760,6 +760,8 @@ void page_music_design(gui_obj_t *parent)
     gui_img_t *last = gui_img_create_from_mem(control_bg, 0, SKIP_LAST_BIN, 24, 32, 0, 0);
     gui_img_t *button_next_bg = gui_img_create_from_mem(control_bg, "next", BUTTON_BG_CIRCLE_BIN, 212,
                                                         6, 0, 0);
+    gui_obj_hidden((void *)button_last_bg, 1);
+    gui_obj_hidden((void *)button_next_bg, 1);
     gui_img_t *next = gui_img_create_from_mem(control_bg, 0, SKIP_NEXT_BIN, 233, 32, 0, 0);
     gui_img_t *play = gui_img_create_from_mem(control_bg, 0, PLAY_BIN, 132, 24, 0, 0);
     gui_obj_add_event_cb(play, click_button_page_music, GUI_EVENT_TOUCH_CLICKED, NULL);

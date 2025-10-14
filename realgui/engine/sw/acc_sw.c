@@ -109,9 +109,6 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             {
                 sw_transform_for_argb8565(image, dc, rect);
             }
-
-            GUI_ASSERT(NULL);
-
         }
     }
     else
@@ -158,6 +155,7 @@ void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 
     if (header->compress)
     {
+        GUI_ASSERT(NULL);
         rle(image, dc, rect);
     }
     else

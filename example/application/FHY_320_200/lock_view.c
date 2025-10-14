@@ -80,7 +80,7 @@ static void pressing_tab(void *obj)
     else if (img->t_x != 0)
     {
         int16_t x = (int16_t)img->t_x;
-        if (x == TAB_STOP_POS_X - TAB_START_POS_X)
+        if (x >= TAB_STOP_POS_X - TAB_START_POS_X - 50)
         {
             gui_view_switch_direct(current_view, quick_view, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_ANIMATION_FADE);
@@ -171,7 +171,7 @@ static void lock_view_design(gui_view_t *view)
     gui_img_t *unlock = gui_img_create_from_mem(parent, 0, ICON_UNLOCK_BIN, 246, 82, 0, 0);
     gui_img_set_a8_fg_color(unlock, GUI_COLOR_ARGB8888(255, 0x05, 0x5B, 0x90));
     gui_obj_add_event_cb(tab_bg, press_tab, GUI_EVENT_TOUCH_PRESSED, NULL);
-    gui_obj_add_event_cb(unlock, click_unlock, GUI_EVENT_TOUCH_CLICKED, NULL);
+    // gui_obj_add_event_cb(unlock, click_unlock, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     // gui_obj_create_timer(GUI_BASE(tab_bg), 10, true, pressing_tab);
 }
