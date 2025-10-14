@@ -151,7 +151,7 @@ static void click_unlock(void *obj, gui_event_t e, void *param)
 static void lock_view_design(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
-    gui_obj_hidden((void *)screen_bg, true);
+    gui_set_bg_color(BG_1_LIGHT);
     gui_img_t *bg = gui_img_create_from_mem(parent, "bg", LOCK_SCROLLBAR_BG_BIN, 17, TAB_START_POS_Y, 0,
                                             0);
     gui_img_set_a8_fg_color(bg, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));

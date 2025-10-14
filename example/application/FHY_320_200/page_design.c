@@ -140,7 +140,7 @@ static void regenerate_for_dark_light_change(void *msg)
     const struct gui_view_descriptor *descriptor = current_view->descriptor;
     gui_obj_t *parent = current_view->base.parent;
     gui_obj_tree_free(GUI_BASE(current_view));
-    gui_obj_hidden((void *)screen_bg, true);
+    gui_set_bg_color(BG_1_LIGHT);
 
     gui_view_create(parent, descriptor, 0, 0, 0, 0);
 }
@@ -706,7 +706,7 @@ void page_ambient_sound_design(gui_obj_t *parent)
     {
         gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
         gui_img_set_a8_fg_color(button_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-        if (equalizer_on)
+        if (ambient_sound_on)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
             gui_img_set_a8_fg_color(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
@@ -720,7 +720,7 @@ void page_ambient_sound_design(gui_obj_t *parent)
     {
         gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
         gui_img_set_a8_fg_color(button_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
-        if (equalizer_on)
+        if (ambient_sound_on)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
             gui_img_set_a8_fg_color(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);

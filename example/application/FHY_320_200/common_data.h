@@ -86,9 +86,6 @@ extern bool theme_bg_white; // default black bg
 /* Volume */
 extern int8_t volume_val;
 
-/* Screent bg */
-extern gui_img_t *screen_bg;
-
 /* Battery */
 extern uint8_t battery_barn_val;
 extern uint8_t battery_earphone_l_val;

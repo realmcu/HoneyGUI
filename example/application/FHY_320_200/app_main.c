@@ -158,11 +158,6 @@ static int app_init(void)
     theme_bg_white = false;
     detail_page_design_func = page_dark_light_design;
 
-    screen_bg = gui_img_create_from_mem(gui_obj_get_root(), 0, SCREEN_BG_BIN, 0, 0, 0, 0);
-    gui_img_set_a8_fg_color(screen_bg, SCREEN_BG_LIGHT.color.argb_full);
-    gui_img_set_mode(screen_bg, IMG_2D_SW_FIX_A8_FG);
-    gui_obj_hidden((void *)screen_bg, true);
-
     gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 10, true, time_update_cb);

@@ -60,9 +60,6 @@ bool theme_bg_white = false; // default black bg
 /* Volume */
 int8_t volume_val = 5;
 
-/* Screent bg */
-gui_img_t *screen_bg = NULL;
-
 /* Battery */
 uint8_t battery_barn_val = 90;
 uint8_t battery_earphone_l_val = 90;

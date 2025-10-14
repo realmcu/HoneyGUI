@@ -209,7 +209,7 @@ static void audio_menu_view_design(gui_view_t *view)
     design_p->click_cb = func_cb;
     design_p->img_data_array = data_array;
     gui_list_t *list = gui_list_create(view, "list", 0, 60, 0, 0, 56, 0,
-                                       VERTICAL, note_design, design_p, 1);
+                                       VERTICAL, note_design, design_p, 0);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, array_size);
     gui_list_set_offset(list, list_offset_his);
@@ -218,7 +218,7 @@ static void audio_menu_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
-        gui_obj_hidden((void *)screen_bg, false);
+        gui_set_bg_color(SCREEN_BG_LIGHT);
         gui_canvas_rect_create(parent, 0, 0, 0, 320, 60, SCREEN_BG_LIGHT);
         font_color = FG_1_LIGHT;
     }

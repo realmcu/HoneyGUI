@@ -149,7 +149,7 @@ static void menu_view_design(gui_view_t *view)
     gui_obj_create_timer((void *)bg, 10, true, show_bg);
     if (theme_bg_white)
     {
-        gui_obj_hidden((void *)screen_bg, false);
+        gui_set_bg_color(SCREEN_BG_LIGHT);
         gui_img_set_a8_fg_color(bg, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }

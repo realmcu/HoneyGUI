@@ -138,11 +138,14 @@ static void click_button_favorite(void *obj, gui_event_t e, void *param)
 
 static void detail_view_design(gui_view_t *view)
 {
-    descriptor_rec = gui_view_get_current()->descriptor;
+    if (gui_view_get_current())
+    {
+        descriptor_rec = gui_view_get_current()->descriptor;
+    }
     gui_obj_t *parent = GUI_BASE(view);
     if (theme_bg_white)
     {
-        gui_obj_hidden((void *)screen_bg, false);
+        gui_set_bg_color(SCREEN_BG_LIGHT);
     }
 
     gui_img_t *icon_back = gui_img_create_from_mem(parent, 0, ICON_BACK_BIN, 0, 0, 0, 0);

@@ -187,7 +187,7 @@ static void quick_view_design(gui_view_t *view)
     gui_color_t font_color;
     if (theme_bg_white)
     {
-        gui_obj_hidden((void *)screen_bg, false);
+        gui_set_bg_color(SCREEN_BG_LIGHT);
     }
     else
     {

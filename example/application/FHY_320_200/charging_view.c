@@ -124,7 +124,7 @@ static void charging_view_design(gui_view_t *view)
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 
-    gui_obj_hidden((void *)screen_bg, true);
+    gui_set_bg_color(BG_1_LIGHT);
     if (!icon_array[0])
     {
         icon_array[0] = ICON_CHARGING_0_BIN;

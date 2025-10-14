@@ -99,7 +99,8 @@ static void clock_view_design(gui_view_t *view)
     gui_view_switch_on_event(view, lock_view, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
-    gui_obj_hidden((void *)screen_bg, true);
+
+    gui_set_bg_color(BG_1_LIGHT);
     switch (clock_style)
     {
     case 1:
