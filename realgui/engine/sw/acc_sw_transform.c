@@ -56,26 +56,22 @@ void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
         float X = m00 * x_start + detalX;
         float Y = m10 * x_start + detalY;
 
+        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+
         for (int32_t j = x_start; j <= x_end; j++)
         {
-            int x = roundf(X);
-            int y = roundf(Y);
+            //int x = roundf(X);
+            //int y = roundf(Y);
 
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
-            {
-                X += m00;
-                Y += m10;
-                continue;
-            }
-            if (rect && ((x > rect->x2) || (x < rect->x1) || (y < rect->y1) || (y > rect->y2)))
+            if ((X >= source_w) || (X < 0) || (Y < 0) || (Y >= source_h))
             {
                 X += m00;
                 Y += m10;
                 continue;
             }
 
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
-            int image_off = (image->blend_mode == IMG_RECT) ? 0 : y * source_w + x;
+            int write_off = write_offset + j;
+            int image_off = (image->blend_mode == IMG_RECT) ? 0 : Y * source_w + X;
 
             writebuf[write_off] = readbuf[image_off];
             X += m00;
