@@ -27,32 +27,6 @@
 #include "math.h"
 
 
-#ifdef  GUI_USE_ARM_MATH
-#include "arm_math.h"
-void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
-{
-    arm_fill_q15(pixel, (int16_t *)addr, len);
-}
-void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
-{
-    arm_fill_q31(pixel, (int32_t *)addr, len);
-}
-#else
-void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
-{
-    for (uint32_t i = 0; i < len; i++)
-    {
-        addr[i] = pixel;
-    }
-}
-void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
-{
-    for (uint32_t i = 0; i < len; i++)
-    {
-        addr[i] = pixel;
-    }
-}
-#endif
 
 void uncompressed_rle_line(imdc_file_t *file, uint32_t line, int16_t x, int16_t w, uint8_t *buf)
 {

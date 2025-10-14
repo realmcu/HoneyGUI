@@ -23,6 +23,12 @@ static uint32_t obj_count;
 static int frame_count_per_second;
 static uint32_t spf = 5;
 
+static gui_color_t fb_bg_color = {0};
+
+void gui_set_bg_color(gui_color_t color)
+{
+    fb_bg_color = color;
+}
 
 uint32_t gui_get_obj_count(void)
 {
@@ -283,7 +289,7 @@ static void gui_fb_draw(gui_obj_t *root)
                 }
                 else
                 {
-                    memset(dc->frame_buf, 0x0, ((size_t)dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+                    gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
                 }
             }
             dc->section_count = i;
@@ -323,7 +329,7 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     else if (dc->type == DC_SINGLE)
     {
-        memset(dc->frame_buf, 0x00, ((size_t)dc->fb_height * dc->fb_width * dc->bit_depth) >> 3);
+        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
         dc->section = (gui_rect_t) {0, 0, dc->fb_width - 1, dc->fb_height - 1};
         obj_draw_scan(root);
         post_process_handle();

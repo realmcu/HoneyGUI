@@ -71,6 +71,8 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event);
  */
 void gui_fb_change(void);
 
+void gui_set_bg_color(gui_color_t color);
+
 /**
  * @brief Get fps.
  *

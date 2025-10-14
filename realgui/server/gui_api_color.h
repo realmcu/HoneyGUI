@@ -106,6 +106,20 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
  */
 gui_color_t gui_color_css(const char *color_str);
 
+/**
+ *
+ */
+void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len);
+
+/**
+ *
+ */
+void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len);
+
+/**
+ * @brief clear framebuffer with color
+ */
+void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/);  //argb8888
 #ifdef __cplusplus
 }
 #endif

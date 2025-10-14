@@ -66,7 +66,7 @@ void gui_dc_info_register(struct gui_dispdev *info)
     }
 }
 
-struct gui_dispdev *gui_get_dc(void)
+gui_dispdev_t *gui_get_dc(void)
 {
     return dc;
 }
