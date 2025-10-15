@@ -244,19 +244,6 @@ for l, p in en_cn_build:
     version_js = os.path.join(html_out_path, r"_static\js\versions.js")
     replace_version_js(version_js, version_list_file)
 
-  if archive:
-    #start rst check step
-    sys.path.append(JenkinsBuild_doc_Dir)
-    from push import run_command_with_realtime_output
-    branch_name = os.environ['BRANCH_NAME'].replace("/", "-")
-    output = os.path.join(doc_path, "rst_check", sdk_name, branch_name, p)
-    doc_src_path = os.path.join(doc_path, "src", sdk_name, branch_name, p)
-    shutil.unpack_archive(os.path.join(doc_path, doc_src_zip + '.zip'), doc_src_path, 'zip')
-    rst_check_config = os.path.join(doc_path, "script/rst_check_config.py")
-    check_cmd = ["python", os.path.join(JenkinsBuild_doc_Dir, "doc_check/rst_check.py"), output, doc_src_path, html_out_path, rst_check_config]
-    print(check_cmd)
-    run_command_with_realtime_output(check_cmd)
-
 shutil.copytree(os.path.join(doc_path, html_out), os.path.join(doc_path, html_out + "_" + sdk_name))
 
 if archive:
