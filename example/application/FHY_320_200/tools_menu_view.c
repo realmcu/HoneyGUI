@@ -98,12 +98,12 @@ static void note_design(gui_obj_t *obj, void *p)
     gui_color_t font_color;
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(img, FG_THEME2_LIGHT.color.argb_full);
+        gui_img_a8_recolor(img, FG_THEME2_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
-        gui_img_set_a8_fg_color(img, FG_THEME2_DARK.color.argb_full);
+        gui_img_a8_recolor(img, FG_THEME2_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
     char *text = (char *)text_array[index];
@@ -165,13 +165,13 @@ static void audio_menu_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
-        gui_img_set_a8_fg_color(mask, SCREEN_BG_LIGHT.color.argb_full);
+        gui_img_a8_recolor(mask, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
         gui_set_bg_color(BG_1_LIGHT);
-        gui_img_set_a8_fg_color(mask, BG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(mask, BG_1_LIGHT.color.argb_full);
         font_color = FG_1_DARK;
     }
     gui_list_set_bar_color(list, font_color);
@@ -187,11 +187,11 @@ static void audio_menu_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(icon_back, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color(icon_back, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
     }
 }
 

@@ -45,9 +45,11 @@ static int app_init(void)
     // gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", _achour, 0, 0, 0, 0);
     gui_img_t *img = gui_img_create_from_mem(gui_obj_get_root(),  "img_1_test", addr, 0, 0, 0, 0);
 
-    gui_img_set_a8_fg_color(img, GUI_COLOR_ARGB8888(255, 255, 255, 255));
+    gui_img_a8_recolor(img, GUI_COLOR_ARGB8888(255, 0, 0, 0));
 
-    gui_img_set_a8_bg_color(img, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
+    gui_img_a8_fix_bg(img, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
+
+    gui_img_a8_mix_alpha(img, 128);
 
     gui_img_set_mode(img, IMG_2D_SW_FIX_A8_BGFG);
 

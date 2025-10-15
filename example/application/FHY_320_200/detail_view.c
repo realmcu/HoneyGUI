@@ -121,7 +121,7 @@ static void click_button_favorite(void *obj, gui_event_t e, void *param)
     {
         gui_img_set_image_data(icon, ICON_IS_FAVORITE_BIN);
         page_add_in_favorite();
-        gui_img_set_a8_fg_color(icon, FG_WARNING.color.argb_full);
+        gui_img_a8_recolor(icon, FG_WARNING.color.argb_full);
     }
     else
     {
@@ -129,11 +129,11 @@ static void click_button_favorite(void *obj, gui_event_t e, void *param)
         page_delete_from_favorite();
         if (theme_bg_white)
         {
-            gui_img_set_a8_fg_color(icon, FG_1_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_1_LIGHT.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon, FG_1_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_1_DARK.color.argb_full);
         }
     }
 }
@@ -161,24 +161,24 @@ static void detail_view_design(gui_view_t *view)
     {
         gui_img_set_image_data(icon_favorite, ICON_IS_FAVORITE_BIN);
         is_favorite = true;
-        gui_img_set_a8_fg_color(icon_favorite, FG_WARNING.color.argb_full);
+        gui_img_a8_recolor(icon_favorite, FG_WARNING.color.argb_full);
     }
     gui_obj_add_event_cb(win_icon_favorite, click_button_favorite, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(icon_back, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
         if (!is_favorite)
         {
-            gui_img_set_a8_fg_color(icon_favorite, FG_1_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_favorite, FG_1_LIGHT.color.argb_full);
         }
     }
     else
     {
-        gui_img_set_a8_fg_color(icon_back, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
         if (!is_favorite)
         {
-            gui_img_set_a8_fg_color(icon_favorite, FG_1_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_favorite, FG_1_DARK.color.argb_full);
         }
     }
     detail_page_design_func(parent);

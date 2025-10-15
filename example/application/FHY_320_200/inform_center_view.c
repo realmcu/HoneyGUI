@@ -104,26 +104,26 @@ static void click_button_left(void *obj, gui_event_t e, void *param)
     {
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(bg, BG_2_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_3_LIGHT.color.argb_full);
+            gui_img_a8_recolor(bg, BG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_3_LIGHT.color.argb_full);
         }
     }
     else
     {
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(bg, BG_2_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_3_DARK.color.argb_full);
+            gui_img_a8_recolor(bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_3_DARK.color.argb_full);
         }
     }
 }
@@ -143,26 +143,26 @@ static void click_button_center(void *obj, gui_event_t e, void *param)
     {
         if (status_spatial_sound)
         {
-            gui_img_set_a8_fg_color(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(bg, BG_2_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_3_LIGHT.color.argb_full);
+            gui_img_a8_recolor(bg, BG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_3_LIGHT.color.argb_full);
         }
     }
     else
     {
         if (status_spatial_sound)
         {
-            gui_img_set_a8_fg_color(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(bg, BG_2_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_3_DARK.color.argb_full);
+            gui_img_a8_recolor(bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_3_DARK.color.argb_full);
         }
     }
 }
@@ -182,26 +182,26 @@ static void click_button_right(void *obj, gui_event_t e, void *param)
     {
         if (status_flashlight)
         {
-            gui_img_set_a8_fg_color(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(bg, BG_2_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_3_LIGHT.color.argb_full);
+            gui_img_a8_recolor(bg, BG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon, FG_3_LIGHT.color.argb_full);
         }
     }
     else
     {
         if (status_flashlight)
         {
-            gui_img_set_a8_fg_color(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(bg, BG_2_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon, FG_3_DARK.color.argb_full);
+            gui_img_a8_recolor(bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(icon, FG_3_DARK.color.argb_full);
         }
     }
 }
@@ -241,13 +241,13 @@ static void inform_center_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
-        gui_img_set_a8_fg_color(bg, SCREEN_BG_LIGHT.color.argb_full);
+        gui_img_a8_recolor(bg, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
         gui_set_bg_color(BG_1_LIGHT);
-        gui_img_set_a8_fg_color(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
+        gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
         font_color = FG_1_DARK;
     }
 
@@ -312,84 +312,84 @@ static void inform_center_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(battery_bg, BG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(barn_inner, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(barn_outer, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_l, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_r, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(message_bg, BG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(message, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(arrow, FG_2_LIGHT.color.argb_full);
+        gui_img_a8_recolor(battery_bg, BG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(barn_inner, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(barn_outer, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(earphone_l, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(earphone_r, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(message_bg, BG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(message, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(arrow, FG_2_LIGHT.color.argb_full);
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(icon_bg_left, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon_left, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(icon_bg_left, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_left, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon_bg_left, BG_2_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon_left, FG_3_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_bg_left, BG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_left, FG_3_LIGHT.color.argb_full);
         }
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(icon_bg_center, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon_center, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(icon_bg_center, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_center, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon_bg_center, BG_2_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon_center, FG_3_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_bg_center, BG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_center, FG_3_LIGHT.color.argb_full);
         }
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(icon_bg_right, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon_right, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(icon_bg_right, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_right, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon_bg_right, BG_2_LIGHT.color.argb_full);
-            gui_img_set_a8_fg_color(icon_right, FG_3_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_bg_right, BG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_right, FG_3_LIGHT.color.argb_full);
         }
     }
     else
     {
-        gui_img_set_a8_fg_color(battery_bg, BG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(barn_inner, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(barn_outer, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_l, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_r, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(message_bg, BG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(message, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(arrow, FG_2_DARK.color.argb_full);
+        gui_img_a8_recolor(battery_bg, BG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(barn_inner, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(barn_outer, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(earphone_l, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(earphone_r, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(message_bg, BG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(message, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(arrow, FG_2_DARK.color.argb_full);
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(icon_bg_left, BG_THEME1_BRIGHT_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon_left, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(icon_bg_left, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_left, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon_bg_left, BG_2_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon_left, FG_3_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_bg_left, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_left, FG_3_DARK.color.argb_full);
         }
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(icon_bg_center, BG_THEME1_BRIGHT_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon_center, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(icon_bg_center, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_center, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon_bg_center, BG_2_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon_center, FG_3_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_bg_center, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_center, FG_3_DARK.color.argb_full);
         }
         if (status_asc)
         {
-            gui_img_set_a8_fg_color(icon_bg_right, BG_THEME1_BRIGHT_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon_right, FG_WHITE.color.argb_full);
+            gui_img_a8_recolor(icon_bg_right, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_right, FG_WHITE.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(icon_bg_right, BG_2_DARK.color.argb_full);
-            gui_img_set_a8_fg_color(icon_right, FG_3_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_bg_right, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_right, FG_3_DARK.color.argb_full);
         }
     }
 }

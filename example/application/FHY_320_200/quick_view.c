@@ -120,10 +120,10 @@ static void update_page_indicator(void)
     {
         if (page_indicator_array[i])
         {
-            gui_img_set_a8_fg_color((gui_img_t *)page_indicator_array[i], indicator_color.color.argb_full);
+            gui_img_a8_recolor((gui_img_t *)page_indicator_array[i], indicator_color.color.argb_full);
         }
     }
-    gui_img_set_a8_fg_color(page_indicator_array[page_index], indicator_color_cur.color.argb_full);
+    gui_img_a8_recolor(page_indicator_array[page_index], indicator_color_cur.color.argb_full);
 }
 
 static void note_design(gui_obj_t *obj, void *p)
@@ -214,21 +214,21 @@ static void quick_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(bt, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(home_bg, BG_2_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(barn_inner, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(barn_outer, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_l, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_r, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(home_bg, BG_2_LIGHT.color.argb_full);
+        gui_img_a8_recolor(barn_inner, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(barn_outer, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(earphone_l, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(earphone_r, FG_1_LIGHT.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color(bt, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(home_bg, BG_2_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(barn_inner, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(barn_outer, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_l, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(earphone_r, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(home_bg, BG_2_DARK.color.argb_full);
+        gui_img_a8_recolor(barn_inner, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(barn_outer, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(earphone_l, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(earphone_r, FG_1_DARK.color.argb_full);
     }
     if (quick_page_num)
     {

@@ -63,7 +63,7 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
     int16_t y1 = dc->section.y1;
     int16_t x1 = dc->section.x1;
     int16_t x2 = dc->section.x2;
-    uint8_t opacity_value = image->opacity_value;
+    uint8_t opacity_value = image->opacity_value * image->alpha_mix / 255;
     if (opacity_value == 0)
     {
         // fully transparent, nothing to draw
@@ -153,9 +153,9 @@ void preconfig_a8_fgbg(draw_img_t *image, gui_dispdev_t *dc,
     int16_t x2 = dc->section.x2;
 
 
-    uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_mix);
-    uint32_t bg_rgb565 = argb8888_to_rgb565(image->bg_color_mix);
-    uint8_t opacity_value = image->opacity_value;
+    uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_set);
+    uint32_t bg_rgb565 = argb8888_to_rgb565(image->bg_color_fix);
+    uint8_t opacity_value = image->opacity_value * image->alpha_mix / 255;
 
     if (opacity_value == 0)
     {
@@ -229,8 +229,8 @@ void preconfig_a8_fg(draw_img_t *image, gui_dispdev_t *dc,
     int16_t x2 = dc->section.x2;
 
 
-    uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_mix);
-    uint8_t opacity_value = image->opacity_value;
+    uint32_t fg_rgb565 = argb8888_to_rgb565(image->fg_color_set);
+    uint8_t opacity_value = image->opacity_value * image->alpha_mix / 255;
 
     if (opacity_value == 0)
     {

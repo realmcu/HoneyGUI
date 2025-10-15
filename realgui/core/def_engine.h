@@ -44,8 +44,9 @@ typedef struct draw_img
     uint32_t checksum : 8;
     uint32_t blend_mode : 5;
     uint32_t high_quality : 1;
-    uint32_t fg_color_mix;//fg color mix
-    uint32_t bg_color_mix;//bg color mix
+    uint32_t fg_color_set;  //A8 image set color
+    uint32_t bg_color_fix;  //bg color fix for A8 image
+    uint8_t alpha_mix;      //alpha mix for A8 image
     void *acc_user;
 } draw_img_t;
 

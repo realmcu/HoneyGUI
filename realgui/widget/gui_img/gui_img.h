@@ -64,8 +64,9 @@ typedef struct gui_img
         void *ftl;                    /* FTL address. */
     };
     gd_GIF *gif;                        /* GIF data */
-    uint32_t fg_color_mix;//fg color mix
-    uint32_t bg_color_mix;//bg color mix
+    uint32_t fg_color_set;  //A8 image set color
+    uint32_t bg_color_fix;  //bg color fix for A8 image
+    uint8_t alpha_mix;      //alpha mix for A8 image
 
     uint32_t opacity_value : 8;        /* Opacity value (0-255). */
     uint32_t blend_mode    : 5;        /* Blend mode. */
@@ -366,12 +367,17 @@ const uint8_t *gui_img_get_image_data(gui_img_t *_this);
  * @brief Sets the foreground color mixing value for the image widget.
  */
 
-void gui_img_set_a8_fg_color(gui_img_t *_this, uint32_t fg_color_mix);
+void gui_img_a8_recolor(gui_img_t *_this, uint32_t fg_color_mix);
 
 /**
  * @brief Sets the background color mixing value for the image widget.
  */
-void gui_img_set_a8_bg_color(gui_img_t *_this, uint32_t bg_color_mix);
+void gui_img_a8_fix_bg(gui_img_t *_this, uint32_t bg_color_mix);
+
+/**
+ * @brief Sets the alpha mixing value for the A8 image widget.
+ */
+void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix);
 
 
 

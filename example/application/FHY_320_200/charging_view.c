@@ -142,17 +142,17 @@ static void charging_view_design(gui_view_t *view)
     gui_img_t *bg = gui_img_create_from_mem(parent, 0, BATTERY_CHARGING_BG_BIN, 0, 0, 0, 0);
     // gui_img_set_mode(bg, IMG_BYPASS_MODE);
     // gui_img_t *bg = gui_img_create_from_mem(parent, 0, BATTERY_CHARGING_BG_NEW_BIN, 0, 0, 0, 0);
-    // gui_img_set_a8_fg_color(bg, GUI_COLOR_ARGB8888(255, 0x0, 0x51, 0xFF));
+    // gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0x0, 0x51, 0xFF));
     // gui_img_t *bg_mid = gui_img_create_from_mem(bg, 0, BATTERY_CHARGING_MID_BG_BIN, 35, 0, 0, 0);
-    // gui_img_set_a8_fg_color(bg_mid, GUI_COLOR_ARGB8888(255, 0x0, 0xD9, 0xFF));
+    // gui_img_a8_recolor(bg_mid, GUI_COLOR_ARGB8888(255, 0x0, 0xD9, 0xFF));
     // gui_img_t *bg_top = gui_img_create_from_mem(bg, 0, BATTERY_CHARGING_TOP_BG_BIN, 0, 0, 0, 0);
-    // gui_img_set_a8_fg_color(bg_top, GUI_COLOR_ARGB8888(255, 0x0, 0xFF, 0xF6));
+    // gui_img_a8_recolor(bg_top, GUI_COLOR_ARGB8888(255, 0x0, 0xFF, 0xF6));
 
     gui_img_t *charging_icon_bg = gui_img_create_from_mem(parent, "icon", ICON_CHARGING_BG_BIN,
                                                           ICON_CHARGING_X, ICON_CHARGING_START_Y, 0, 0);
-    gui_img_set_a8_fg_color(charging_icon_bg, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xA6));
+    gui_img_a8_recolor(charging_icon_bg, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xA6));
     gui_img_t *charging_icon = gui_img_create_from_mem(charging_icon_bg, 0, icon_array[0], 10, 4, 0, 0);
-    gui_img_set_a8_fg_color(charging_icon, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xF6));
+    gui_img_a8_recolor(charging_icon, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xF6));
 
     gui_obj_create_timer(GUI_BASE(bg), 10, true, entrance_animation);
 }

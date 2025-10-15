@@ -150,12 +150,12 @@ static void menu_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
-        gui_img_set_a8_fg_color(bg, SCREEN_BG_LIGHT.color.argb_full);
+        gui_img_a8_recolor(bg, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
-        gui_img_set_a8_fg_color(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
+        gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
         font_color = FG_1_DARK;
     }
     gui_text_t *title = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);
@@ -184,20 +184,20 @@ static void menu_view_design(gui_view_t *view)
     gui_obj_add_event_cb(settings_bg, click_button, GUI_EVENT_TOUCH_CLICKED, NULL);
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(audio_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(tools_bg, BG_THEME2_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(settings_bg, BG_THEME3_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(audio, FG_THEME1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(tools, FG_THEME2_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(settings, FG_THEME3_LIGHT.color.argb_full);
+        gui_img_a8_recolor(audio_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(tools_bg, BG_THEME2_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(settings_bg, BG_THEME3_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(audio, FG_THEME1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(tools, FG_THEME2_LIGHT.color.argb_full);
+        gui_img_a8_recolor(settings, FG_THEME3_LIGHT.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color(audio_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(tools_bg, BG_THEME2_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(settings_bg, BG_THEME3_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(audio, FG_THEME1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(tools, FG_THEME2_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(settings, FG_THEME3_DARK.color.argb_full);
+        gui_img_a8_recolor(audio_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(tools_bg, BG_THEME2_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(settings_bg, BG_THEME3_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(audio, FG_THEME1_DARK.color.argb_full);
+        gui_img_a8_recolor(tools, FG_THEME2_DARK.color.argb_full);
+        gui_img_a8_recolor(settings, FG_THEME3_DARK.color.argb_full);
     }
 }

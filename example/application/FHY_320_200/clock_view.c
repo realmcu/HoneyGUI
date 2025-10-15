@@ -65,16 +65,16 @@ static void time_update(void *obj)
     switch (cnt % 4)
     {
     case 0:
-        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
+        gui_img_a8_fix_bg(vec, GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01));
         break;
     case 1:
-        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0x8F, 0xBF, 0x80));
+        gui_img_a8_fix_bg(vec, GUI_COLOR_ARGB8888(255, 0x8F, 0xBF, 0x80));
         break;
     case 2:
-        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0x7C, 0x9E, 0xFF));
+        gui_img_a8_fix_bg(vec, GUI_COLOR_ARGB8888(255, 0x7C, 0x9E, 0xFF));
         break;
     case 3:
-        gui_img_set_a8_bg_color(vec, GUI_COLOR_ARGB8888(255, 0xB4, 0x90, 0xFF));
+        gui_img_a8_fix_bg(vec, GUI_COLOR_ARGB8888(255, 0xB4, 0x90, 0xFF));
         break;
 
     default:
@@ -144,21 +144,21 @@ static void clock3_design(gui_view_t *view)
 
     // Background
     vec = gui_img_create_from_mem(parent, 0, CLOCK3_VECTOR_BIN, 0, 0, 0, 0);
-    gui_img_set_a8_fg_color(vec, FG_1_DARK.color.argb_full);
-    gui_img_set_a8_bg_color(vec, theme_color.color.argb_full);
+    gui_img_a8_recolor(vec, FG_1_DARK.color.argb_full);
+    gui_img_a8_fix_bg(vec, theme_color.color.argb_full);
     gui_img_set_mode(vec, IMG_2D_SW_FIX_A8_BGFG);
 
     // time hands
     gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK3_MIN_BIN, 160, 100, 0, 0);
     gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
-    // gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
+    // gui_img_a8_recolor(img, BG_1_LIGHT.color.argb_full);
     gui_img_set_focus(img, 160 - 151, 100 - 15); // img target is (151, 15), focus is (160, 100)
     img = gui_img_create_from_mem(parent, "hour", CLOCK3_HOUR_BIN, 160, 100, 0, 0);
     gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
-    // gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
+    // gui_img_a8_recolor(img, BG_1_LIGHT.color.argb_full);
     gui_img_set_focus(img, 160 - 148, 100 - 47); // img target is (148, 47), focus is (160, 100)
     img = gui_img_create_from_mem(parent, 0, CLOCK3_CENTER_BIN, 146, 86, 0, 0);
-    gui_img_set_a8_fg_color(img, FG_WHITE.color.argb_full);
+    gui_img_a8_recolor(img, FG_WHITE.color.argb_full);
 }
 
 static void clock4_design(gui_view_t *view)
@@ -166,8 +166,8 @@ static void clock4_design(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
 
     vec = gui_img_create_from_mem(parent, "bg", CLOCK4_VECTOR_BIN, 55, 0, 0, 0);
-    gui_img_set_a8_fg_color(vec, FG_1_DARK.color.argb_full);
-    gui_img_set_a8_bg_color(vec, theme_color.color.argb_full);
+    gui_img_a8_recolor(vec, FG_1_DARK.color.argb_full);
+    gui_img_a8_fix_bg(vec, theme_color.color.argb_full);
     gui_img_set_mode(vec, IMG_2D_SW_FIX_A8_BGFG);
 
 

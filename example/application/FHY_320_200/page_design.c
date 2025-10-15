@@ -103,22 +103,22 @@ static void toggle_move(void *p)
         {
             if (theme_bg_white)
             {
-                gui_img_set_a8_fg_color((gui_img_t *)(obj->parent), BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+                gui_img_a8_recolor((gui_img_t *)(obj->parent), BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             }
             else
             {
-                gui_img_set_a8_fg_color((gui_img_t *)(obj->parent), BG_THEME1_BRIGHT_DARK.color.argb_full);
+                gui_img_a8_recolor((gui_img_t *)(obj->parent), BG_THEME1_BRIGHT_DARK.color.argb_full);
             }
         }
         else
         {
             if (theme_bg_white)
             {
-                gui_img_set_a8_fg_color((gui_img_t *)(obj->parent), FG_1_LIGHT.color.argb_full);
+                gui_img_a8_recolor((gui_img_t *)(obj->parent), FG_1_LIGHT.color.argb_full);
             }
             else
             {
-                gui_img_set_a8_fg_color((gui_img_t *)(obj->parent), BG_2_DARK.color.argb_full);
+                gui_img_a8_recolor((gui_img_t *)(obj->parent), BG_2_DARK.color.argb_full);
             }
         }
     }
@@ -191,20 +191,20 @@ static void update_ambient_sound_status(gui_obj_t *obj)
     GUI_WIDGET_POINTER_BY_NAME_ROOT(tt, "tt", obj);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(aa, "aa", obj);
 
-    gui_img_set_a8_fg_color((void *)anc, FG_1_LIGHT.color.argb_full);
-    gui_img_set_a8_fg_color((void *)tt, FG_1_LIGHT.color.argb_full);
-    gui_img_set_a8_fg_color((void *)aa, FG_1_LIGHT.color.argb_full);
+    gui_img_a8_recolor((void *)anc, FG_1_LIGHT.color.argb_full);
+    gui_img_a8_recolor((void *)tt, FG_1_LIGHT.color.argb_full);
+    gui_img_a8_recolor((void *)aa, FG_1_LIGHT.color.argb_full);
     if (ambient_sound_status == ANC)
     {
-        gui_img_set_a8_fg_color((void *)anc, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor((void *)anc, FG_1_DARK.color.argb_full);
     }
     else if (ambient_sound_status == TT)
     {
-        gui_img_set_a8_fg_color((void *)tt, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor((void *)tt, FG_1_DARK.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color((void *)aa, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor((void *)aa, FG_1_DARK.color.argb_full);
     }
 }
 
@@ -553,23 +553,23 @@ void page_volume_design(gui_obj_t *parent)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_sub_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(sub, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_add_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(add, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(progressbar_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(progressbar, FG_THEME1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_sub_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(sub, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_add_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(add, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(progressbar_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(progressbar, FG_THEME1_LIGHT.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_sub_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(sub, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_add_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(add, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(progressbar_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(progressbar, FG_THEME1_DARK.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
+        gui_img_a8_recolor(button_sub_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(sub, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(button_add_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(add, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(progressbar_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(progressbar, FG_THEME1_DARK.color.argb_full);
     }
 }
 
@@ -601,7 +601,7 @@ void page_equalizer_design(gui_obj_t *parent)
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, EQUALIZER, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
-    gui_img_set_a8_fg_color(toggle, FG_1_DARK.color.argb_full);
+    gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
     gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
@@ -620,38 +620,38 @@ void page_equalizer_design(gui_obj_t *parent)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_switch_l_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(switch_l, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_switch_r_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(switch_r, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(music_type, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_switch_l_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(switch_l, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_switch_r_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(switch_r, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(music_type, FG_1_LIGHT.color.argb_full);
         if (equalizer_on)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
-            gui_img_set_a8_fg_color(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(toggle_bg, FG_1_LIGHT.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, FG_1_LIGHT.color.argb_full);
         }
     }
     else
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_switch_l_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(switch_l, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_switch_r_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(switch_r, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(music_type, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
+        gui_img_a8_recolor(button_switch_l_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(switch_l, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(button_switch_r_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(switch_r, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(music_type, FG_1_DARK.color.argb_full);
         if (equalizer_on)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
-            gui_img_set_a8_fg_color(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(toggle_bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, BG_2_DARK.color.argb_full);
         }
     }
 }
@@ -675,7 +675,7 @@ void page_ambient_sound_design(gui_obj_t *parent)
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, AMBIENT_SOUND, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
-    gui_img_set_a8_fg_color(toggle, FG_1_DARK.color.argb_full);
+    gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
     gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
@@ -704,30 +704,30 @@ void page_ambient_sound_design(gui_obj_t *parent)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
         if (ambient_sound_on)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
-            gui_img_set_a8_fg_color(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(toggle_bg, FG_1_LIGHT.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, FG_1_LIGHT.color.argb_full);
         }
     }
     else
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
+        gui_img_a8_recolor(button_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
         if (ambient_sound_on)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
-            gui_img_set_a8_fg_color(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
         }
         else
         {
-            gui_img_set_a8_fg_color(toggle_bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(toggle_bg, BG_2_DARK.color.argb_full);
         }
     }
 }
@@ -775,21 +775,21 @@ void page_music_design(gui_obj_t *parent)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_last_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(last, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_next_bg, BG_THEME1_MID_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(next, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(play, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_last_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(last, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_next_bg, BG_THEME1_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(next, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(play, FG_1_LIGHT.color.argb_full);
     }
     else
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_last_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(last, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_next_bg, BG_THEME1_MID_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(next, FG_1_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(play, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
+        gui_img_a8_recolor(button_last_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(last, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(button_next_bg, BG_THEME1_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(next, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(play, FG_1_DARK.color.argb_full);
     }
 }
 
@@ -828,17 +828,17 @@ void page_dark_light_design(gui_obj_t *parent)
 
     if (theme_bg_white)
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME3_DARK_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(button_bg, BG_THEME3_BRIGHT_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(light, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(dark, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME3_DARK_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_bg, BG_THEME3_BRIGHT_LIGHT.color.argb_full);
+        gui_img_a8_recolor(light, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(dark, FG_1_DARK.color.argb_full);
         button_bg->base.x = BUTTON_X_LIGHT;
     }
     else
     {
-        gui_img_set_a8_fg_color(control_bg, BG_THEME3_DARK_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(button_bg, BG_THEME3_BRIGHT_DARK.color.argb_full);
-        gui_img_set_a8_fg_color(light, FG_1_LIGHT.color.argb_full);
-        gui_img_set_a8_fg_color(dark, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME3_DARK_DARK.color.argb_full);
+        gui_img_a8_recolor(button_bg, BG_THEME3_BRIGHT_DARK.color.argb_full);
+        gui_img_a8_recolor(light, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(dark, FG_1_DARK.color.argb_full);
     }
 }

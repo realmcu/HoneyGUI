@@ -93,7 +93,7 @@ static void pressing_tab(void *obj)
         {
             x = 0;
             gui_img_set_image_data(img, DEFAULT_BIN);
-            // gui_img_set_a8_fg_color(img, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));
+            // gui_img_a8_recolor(img, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));
             // gui_obj_t *tab = gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
             //                                       brother_list);
             // gui_obj_hidden(tab, false);
@@ -132,7 +132,7 @@ static void press_tab(void *obj, gui_event_t e, void *param)
 
     // gui_obj_t *tab = gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
     //                                               brother_list);
-    // gui_img_set_a8_fg_color(img, FG_1_DARK.color.argb_full);
+    // gui_img_a8_recolor(img, FG_1_DARK.color.argb_full);
     // gui_obj_hidden(tab, true);
 
     gui_obj_create_timer(GUI_BASE(img), 10, true, tab_scale);
@@ -154,7 +154,7 @@ static void lock_view_design(gui_view_t *view)
     gui_set_bg_color(BG_1_LIGHT);
     gui_img_t *bg = gui_img_create_from_mem(parent, "bg", LOCK_SCROLLBAR_BG_BIN, 17, TAB_START_POS_Y, 0,
                                             0);
-    gui_img_set_a8_fg_color(bg, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));
+    gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));
     int16_t focus = 40;
     gui_img_t *tab_bg = gui_img_create_from_mem(parent, "tab_bg", DEFAULT_BIN, TAB_START_POS_X + focus,
                                                 TAB_START_POS_Y + focus, 0, 0);
@@ -162,14 +162,14 @@ static void lock_view_design(gui_view_t *view)
     // int16_t focus = 36;
     // gui_img_t *tab_bg = gui_img_create_from_mem(parent, "tab_bg", TAB_BG_BIN, TAB_START_POS_X,
     //                                          TAB_START_POS_Y, 0, 0);
-    // gui_img_set_a8_fg_color(tab_bg, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xF6));
+    // gui_img_a8_recolor(tab_bg, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xF6));
     // gui_img_t *tab = gui_img_create_from_mem(tab_bg, 0, ICON_TOUCH_BIN, 22, 22, 0, 0);
-    // gui_img_set_a8_fg_color(tab, GUI_COLOR_ARGB8888(255, 0, 0x4C, 0x7A));
+    // gui_img_a8_recolor(tab, GUI_COLOR_ARGB8888(255, 0, 0x4C, 0x7A));
 
     gui_img_set_focus(tab_bg, focus, focus);
     gui_img_set_mode(tab_bg, IMG_2D_SW_SRC_OVER_MODE);
     gui_img_t *unlock = gui_img_create_from_mem(parent, 0, ICON_UNLOCK_BIN, 246, 82, 0, 0);
-    gui_img_set_a8_fg_color(unlock, GUI_COLOR_ARGB8888(255, 0x05, 0x5B, 0x90));
+    gui_img_a8_recolor(unlock, GUI_COLOR_ARGB8888(255, 0x05, 0x5B, 0x90));
     gui_obj_add_event_cb(tab_bg, press_tab, GUI_EVENT_TOUCH_PRESSED, NULL);
     // gui_obj_add_event_cb(unlock, click_unlock, GUI_EVENT_TOUCH_CLICKED, NULL);
 
