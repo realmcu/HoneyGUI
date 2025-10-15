@@ -19,6 +19,16 @@
  *============================================================================*/
 /* Time */
 struct tm *timeinfo = NULL;
+struct tm barn_time =
+{
+    .tm_hour = 11,
+    .tm_min = 20,
+    .tm_sec = 0,
+    .tm_mday = 15,
+    .tm_mon = 10,
+    .tm_year = 2025,
+    .tm_wday = 3,
+};
 
 
 /* Date */
@@ -42,7 +52,7 @@ const char *day[7] =
     "Sun",
     "Mon",
     "Tue",
-    "Wwe",
+    "Wen",
     "Thu",
     "Fri",
     "Sat"

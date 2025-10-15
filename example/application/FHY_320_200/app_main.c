@@ -126,7 +126,7 @@ static void time_update_cb(void *param)
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 #else
-    //timeinfo = &watch_time;
+    // timeinfo = &barn_time;
 #endif
 
     if (sleep_cnt >= 30000 || kb->pressed) //30s
@@ -157,6 +157,7 @@ static int app_init(void)
     theme_color = gui_rgb(255, 89, 1); //#FF5901
     theme_bg_white = false;
     detail_page_design_func = page_dark_light_design;
+    timeinfo = &barn_time;
 
     gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());

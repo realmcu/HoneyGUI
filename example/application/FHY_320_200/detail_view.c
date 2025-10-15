@@ -113,7 +113,9 @@ static void click_button_favorite(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_img_t *icon = (gui_img_t *)obj;
+
+    gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t,
+                                                  brother_list);
     is_favorite = !is_favorite;
     if (is_favorite)
     {
@@ -148,9 +150,12 @@ static void detail_view_design(gui_view_t *view)
         gui_set_bg_color(SCREEN_BG_LIGHT);
     }
 
-    gui_img_t *icon_back = gui_img_create_from_mem(parent, 0, ICON_BACK_BIN, 0, 0, 0, 0);
-    gui_obj_add_event_cb(icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_img_t *icon_favorite = gui_img_create_from_mem(parent, 0, ICON_NOT_FAVORITE_BIN, 146, 6, 0, 0);
+    gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 52, 52);
+    gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 0, 0, 0);
+    gui_obj_add_event_cb(win_icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_win_t *win_icon_favorite = (gui_win_t *)gui_win_create(parent, 0, 130, 0, 60, 60);
+    gui_img_t *icon_favorite = gui_img_create_from_mem(win_icon_favorite, 0, ICON_NOT_FAVORITE_BIN, 16,
+                                                       6, 0, 0);
     is_favorite = false;
     if (page_in_favorite())
     {
@@ -158,7 +163,7 @@ static void detail_view_design(gui_view_t *view)
         is_favorite = true;
         gui_img_set_a8_fg_color(icon_favorite, FG_WARNING.color.argb_full);
     }
-    gui_obj_add_event_cb(icon_favorite, click_button_favorite, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(win_icon_favorite, click_button_favorite, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     if (theme_bg_white)
     {

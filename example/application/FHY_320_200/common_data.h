@@ -69,6 +69,7 @@ extern "C" {
  *============================================================================*/
 /* Time */
 extern struct tm *timeinfo;
+extern struct tm barn_time;
 
 /* Date */
 extern const char *month[12];

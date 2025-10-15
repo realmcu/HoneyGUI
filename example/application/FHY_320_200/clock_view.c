@@ -80,17 +80,10 @@ static void time_update(void *obj)
     default:
         break;
     }
-    return;
 
     if (!timeinfo)
     {
         return;
-    }
-    static float angel = 0;
-    angel++;
-    if (angel >= 360.f)
-    {
-        angel = 0;
     }
     switch (clock_style)
     {
@@ -101,7 +94,7 @@ static void time_update(void *obj)
     case 3:
         {
             GUI_WIDGET_POINTER_BY_NAME_ROOT(hour, "hour", current_view);
-            gui_img_rotation((gui_img_t *)hour, (timeinfo->tm_hour % 12) * 30.0f);
+            gui_img_rotation((gui_img_t *)hour, (timeinfo->tm_hour % 12) * 30.0f + timeinfo->tm_min / 2.f);
             GUI_WIDGET_POINTER_BY_NAME_ROOT(min, "min", current_view);
             gui_img_rotation((gui_img_t *)min, timeinfo->tm_min * 6.0f);
         }
@@ -157,10 +150,12 @@ static void clock3_design(gui_view_t *view)
 
     // time hands
     gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK3_MIN_BIN, 160, 100, 0, 0);
-    gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
+    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    // gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
     gui_img_set_focus(img, 160 - 151, 100 - 15); // img target is (151, 15), focus is (160, 100)
     img = gui_img_create_from_mem(parent, "hour", CLOCK3_HOUR_BIN, 160, 100, 0, 0);
-    gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
+    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    // gui_img_set_a8_fg_color(img, BG_1_LIGHT.color.argb_full);
     gui_img_set_focus(img, 160 - 148, 100 - 47); // img target is (148, 47), focus is (160, 100)
     img = gui_img_create_from_mem(parent, 0, CLOCK3_CENTER_BIN, 146, 86, 0, 0);
     gui_img_set_a8_fg_color(img, FG_WHITE.color.argb_full);
@@ -170,7 +165,7 @@ static void clock4_design(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
 
-    gui_img_t *vec = gui_img_create_from_mem(parent, "bg", CLOCK4_VECTOR_BIN, 55, 0, 0, 0);
+    vec = gui_img_create_from_mem(parent, "bg", CLOCK4_VECTOR_BIN, 55, 0, 0, 0);
     gui_img_set_a8_fg_color(vec, FG_1_DARK.color.argb_full);
     gui_img_set_a8_bg_color(vec, theme_color.color.argb_full);
     gui_img_set_mode(vec, IMG_2D_SW_FIX_A8_BGFG);
