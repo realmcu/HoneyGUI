@@ -37,12 +37,12 @@ static int app_init(void)
                                                    502);
     gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
     gui_video_set_repeat_count(video, GUI_VIDEO_REPEAT_INFINITE);
-    gui_glass_effect_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)glass_0, 195, 40, 0, 0);
-    gui_glass_effect_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)_acglass_1, 50, 40, 0,
-                                     0);
-    gui_glass_effect_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)glass_0, 30, 261, 0, 0);
-    gui_glass_effect_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)_acglass_1_2, 240, 270,
-                                     0, 0);
+    gui_glass_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)glass_0, 195, 40, 0, 0);
+    gui_glass_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)_acglass_1, 50, 40, 0,
+                              0);
+    gui_glass_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)glass_0, 30, 261, 0, 0);
+    gui_glass_create_from_mem(gui_obj_get_root(),  "img_2_test", (void *)_acglass_1_2, 240, 270,
+                              0, 0);
 
     return 0;
 }

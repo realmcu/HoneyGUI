@@ -43,7 +43,7 @@ extern "C" {
 #pragma anon_unions
 #endif
 
-typedef struct gui_glass_effect
+typedef struct gui_glass
 {
     gui_obj_t base;                    /* Base object structure. */
     draw_img_t *draw_img;              /* Drawing image structure. */
@@ -59,7 +59,7 @@ typedef struct gui_glass_effect
     };
     uint32_t storage_type  : 3;        /* Storage type: e.g., file system, flash, etc. */
     uint8_t checksum;                  /* Checksum for change detection. */
-} gui_glass_effect_t;
+} gui_glass_t;
 
 
 /*============================================================================*
@@ -87,7 +87,7 @@ typedef struct gui_glass_effect
  * @param this The glass widget pointer.
  * @return uint16_t Width of glass.
  */
-uint16_t gui_glass_effect_get_width(gui_glass_effect_t *_this);
+uint16_t gui_glass_get_width(gui_glass_t *_this);
 
 /**
  * @brief Load the height of glass in pixel.
@@ -95,21 +95,21 @@ uint16_t gui_glass_effect_get_width(gui_glass_effect_t *_this);
  * @param this The glass widget pointer.
  * @return uint16_t Height of glass.
  */
-uint16_t gui_glass_effect_get_height(gui_glass_effect_t *_this);
+uint16_t gui_glass_get_height(gui_glass_t *_this);
 
 /**
  * @brief Refresh the size of glass.
  *
  * @param this The glass widget pointer.
  */
-void gui_glass_effect_refresh_size(gui_glass_effect_t *_this);
+void gui_glass_refresh_size(gui_glass_t *_this);
 
 /**
  * @brief Refresh the source data of glass.
  *
  * @param this The glass widget pointer.
  */
-void gui_glass_effect_refresh_draw_data(gui_glass_effect_t  *_this);
+void gui_glass_refresh_draw_data(gui_glass_t  *_this);
 
 
 /**
@@ -121,11 +121,11 @@ void gui_glass_effect_refresh_draw_data(gui_glass_effect_t  *_this);
  * @param x X-axis coordinate.
  * @param y Y-axis coordinate.
  */
-void gui_glass_effect_set_attribute(gui_glass_effect_t  *_this,
-                                    const char *name,
-                                    void       *addr,
-                                    int16_t     x,
-                                    int16_t     y);
+void gui_glass_set_attribute(gui_glass_t  *_this,
+                             const char *name,
+                             void       *addr,
+                             int16_t     x,
+                             int16_t     y);
 
 
 /**
@@ -135,7 +135,7 @@ void gui_glass_effect_set_attribute(gui_glass_effect_t  *_this,
  * @param t_x New X-axis coordinate.
  * @param t_y New Y-axis coordinate.
  */
-void gui_glass_effect_translate(gui_glass_effect_t *_this, float t_x, float t_y);
+void gui_glass_translate(gui_glass_t *_this, float t_x, float t_y);
 
 
 /**
@@ -150,13 +150,13 @@ void gui_glass_effect_translate(gui_glass_effect_t *_this, float t_x, float t_y)
  * @param h The height of the widget.
  * @return The widget object pointer.
  */
-gui_glass_effect_t *gui_glass_effect_create_from_mem(void       *parent,
-                                                     const char *name,
-                                                     void       *addr,
-                                                     int16_t     x,
-                                                     int16_t     y,
-                                                     int16_t     w,
-                                                     int16_t     h);
+gui_glass_t *gui_glass_create_from_mem(void       *parent,
+                                       const char *name,
+                                       void       *addr,
+                                       int16_t     x,
+                                       int16_t     y,
+                                       int16_t     w,
+                                       int16_t     h);
 
 /**
  * @brief Create an glass widget from memory address.
@@ -170,13 +170,13 @@ gui_glass_effect_t *gui_glass_effect_create_from_mem(void       *parent,
  * @param h The height of the widget.
  * @return Return the widget object pointer.
  */
-gui_glass_effect_t *gui_glass_effect_create_from_ftl(void       *parent,
-                                                     const char *name,
-                                                     void       *ftl,
-                                                     int16_t     x,
-                                                     int16_t     y,
-                                                     int16_t     w,
-                                                     int16_t     h);
+gui_glass_t *gui_glass_create_from_ftl(void       *parent,
+                                       const char *name,
+                                       void       *ftl,
+                                       int16_t     x,
+                                       int16_t     y,
+                                       int16_t     w,
+                                       int16_t     h);
 
 /**
  * @brief Create an glass widget from filesystem.
@@ -188,15 +188,15 @@ gui_glass_effect_t *gui_glass_effect_create_from_ftl(void       *parent,
  * @param y The Y-axis coordinate of the widget.
  * @param w The width of the widget.
  * @param h The height of the widget.
- * @return gui_glass_effect_t*.
+ * @return gui_glass_t*.
  */
-gui_glass_effect_t *gui_glass_effect_create_from_fs(void       *parent,
-                                                    const char *name,
-                                                    void       *file,
-                                                    int16_t     x,
-                                                    int16_t     y,
-                                                    int16_t     w,
-                                                    int16_t     h);
+gui_glass_t *gui_glass_create_from_fs(void       *parent,
+                                      const char *name,
+                                      void       *file,
+                                      int16_t     x,
+                                      int16_t     y,
+                                      int16_t     w,
+                                      int16_t     h);
 
 
 /**
@@ -205,7 +205,7 @@ gui_glass_effect_t *gui_glass_effect_create_from_fs(void       *parent,
  * @param this The glass widget pointer.
  * @return Translation in X direction.
  */
-float gui_glass_effect_get_t_x(gui_glass_effect_t *_this);
+float gui_glass_get_t_x(gui_glass_t *_this);
 
 /**
  * @brief Get the translation in Y direction.
@@ -213,7 +213,7 @@ float gui_glass_effect_get_t_x(gui_glass_effect_t *_this);
  * @param this The glass widget pointer.
  * @return Translation in Y direction.
  */
-float gui_glass_effect_get_t_y(gui_glass_effect_t *_this);
+float gui_glass_get_t_y(gui_glass_t *_this);
 
 
 /**
@@ -221,24 +221,24 @@ float gui_glass_effect_get_t_y(gui_glass_effect_t *_this);
  *
  * This function assigns the given glass data to the specified glass widget.
  * The glass data might correspond to various formats, and the format
- * should be compatible with the handling of `gui_glass_effect_t`.
+ * should be compatible with the handling of `gui_glass_t`.
  *
- * @param widget          The pointer to the glass widget (`gui_glass_effect_t`) for which the glass data is to be set.
+ * @param widget          The pointer to the glass widget (`gui_glass_t`) for which the glass data is to be set.
  * @param glass_data_pointer  The pointer to the glass data to be set to the widget.
  *                            The data should persist as long as the widget needs it or until it is explicitly updated.
  */
-void gui_glass_effect_set_data(gui_glass_effect_t *_this, const uint8_t *glass_data_pointer);
+void gui_glass_set_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
 
 /**
  * @brief Gets the glass data from a specified glass widget.
  *
  * This function returns the current glass data that is set in the specified glass widget.
  *
- * @param widget The pointer to the glass widget (`gui_glass_effect_t`) from which the glass data should be retrieved.
+ * @param widget The pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
  *
  * @return A pointer to the glass data currently set in the widget. If no glass data is set, the result may be `NULL`.
  */
-const uint8_t *gui_glass_effect_get_data(gui_glass_effect_t *_this);
+const uint8_t *gui_glass_get_data(gui_glass_t *_this);
 
 
 

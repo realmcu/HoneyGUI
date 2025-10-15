@@ -13,6 +13,16 @@
    
    简化模型 
 
+玻璃数据生成
+------------
+
+基于以上简化模型可以得到规则：折射后的像素点仅与玻璃遮盖范围内像素点的偏移量有关。因此只需要生成玻璃上每个点偏移量的集合即可。在 :ref:`示例 <glass_example_cn>` 的设计中，偏移量由玻璃厚度t（折射率）与观测点位置（x_o, y_o）通过以下关系决定：
+.. math::
+
+   offset(x, y) = distortion(x, y) * d(x, y)
+
+其中distortion为玻璃上各个点的厚度（折射率），g(x, y)为当前玻璃上的点与观测点（x_o, y_o）的关系。
+
 用法
 ----
 
@@ -22,18 +32,19 @@
    * - 描述
      - API 
    * - 创建控件
-     - :cpp:any:`gui_glass_effect_create_from_mem`  
+     - :cpp:any:`gui_glass_create_from_mem`  
    * - 设置属性
-     - :cpp:any:`gui_glass_effect_set_attribute`
+     - :cpp:any:`gui_glass_set_attribute`
    * - 获得高度
-     - :cpp:any:`gui_glass_effect_get_height` 
+     - :cpp:any:`gui_glass_get_height` 
    * - 获得宽度
-     - :cpp:any:`gui_glass_effect_get_width`
+     - :cpp:any:`gui_glass_get_width`
    * - 刷新属性
-     - :cpp:any:`gui_glass_effect_refresh_size`
+     - :cpp:any:`gui_glass_refresh_size`
    * - 移动位置
-     - :cpp:any:`gui_glass_effect_translate`
+     - :cpp:any:`gui_glass_translate`
 
+.. _glass_example_cn:
 示例
 -------
 

@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_glass_effect.c
+  * @file gui_glass.c
   * @brief image widget
   * @details image widget is used to show image on the screen
   * @author howie_wang@realsil.com.cn
@@ -60,16 +60,16 @@
  *                preparation is conducted. This object must be properly
  *                initialized before passing to this function.
  */
-static void gui_glass_effect_prepare(gui_obj_t *obj)
+static void gui_glass_prepare(gui_obj_t *obj)
 {
     uint8_t last;
-    gui_glass_effect_t *_this;
+    gui_glass_t *_this;
     touch_info_t *tp;
     GUI_UNUSED(tp);
 
     GUI_ASSERT(obj != NULL);
 
-    _this = (gui_glass_effect_t *)obj;
+    _this = (gui_glass_t *)obj;
     tp = tp_get_info();
     matrix_identity(obj->matrix);
     matrix_translate(_this->t_x + _this->base.x, _this->t_y + _this->base.y, obj->matrix);
@@ -103,7 +103,7 @@ static void gui_glass_effect_prepare(gui_obj_t *obj)
 
     last = _this->checksum;
     _this->checksum = 0;
-    _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, sizeof(gui_glass_effect_t));
+    _this->checksum = gui_obj_checksum(0, (uint8_t *)_this, sizeof(gui_glass_t));
 
     if (last != _this->checksum)
     {
@@ -241,13 +241,13 @@ static void gui_glass_draw(draw_img_t *image, struct gui_dispdev *dc)
  *
  * @param[in] obj A pointer to the `gui_obj_t` object that contains the image
  *                to be drawn. The image should be prepared in advance using
- *                `gui_glass_effect_prepare`.
+ *                `gui_glass_prepare`.
  */
-static void gui_glass_effect_draw_cb(gui_obj_t *obj)
+static void gui_glass_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
-    gui_glass_effect_t *_this = (gui_glass_effect_t *)obj;
+    gui_glass_t *_this = (gui_glass_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
     gui_glass_draw(_this->draw_img, dc);
 }
@@ -260,11 +260,11 @@ static void gui_glass_effect_draw_cb(gui_obj_t *obj)
  * @param[in] obj A pointer to the `gui_obj_t` object associated with the image
  *                whose resources are being cleaned up.
  */
-static void gui_glass_effect_end(gui_obj_t *obj)
+static void gui_glass_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 
-    gui_glass_effect_t *_this = (gui_glass_effect_t *)obj;
+    gui_glass_t *_this = (gui_glass_t *)obj;
 
     if (_this->draw_img != NULL)
     {
@@ -294,13 +294,13 @@ static void gui_glass_effect_end(gui_obj_t *obj)
  *       object is no longer valid and should not be used. This function
  *       should be called when the image is no longer needed.
  */
-static void gui_glass_effect_destroy(gui_obj_t *obj)
+static void gui_glass_destroy(gui_obj_t *obj)
 {
-    gui_glass_effect_t *_this = (gui_glass_effect_t *)obj;
+    gui_glass_t *_this = (gui_glass_t *)obj;
     GUI_UNUSED(_this);
 }
 
-static void gui_glass_effect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+static void gui_glass_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
@@ -308,25 +308,25 @@ static void gui_glass_effect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         {
         case OBJ_PREPARE:
             {
-                gui_glass_effect_prepare(obj);
+                gui_glass_prepare(obj);
             }
             break;
 
         case OBJ_DRAW:
             {
-                gui_glass_effect_draw_cb(obj);
+                gui_glass_draw_cb(obj);
             }
             break;
 
         case OBJ_END:
             {
-                gui_glass_effect_end(obj);
+                gui_glass_end(obj);
             }
             break;
 
         case OBJ_DESTROY:
             {
-                gui_glass_effect_destroy(obj);
+                gui_glass_destroy(obj);
             }
             break;
 
@@ -336,15 +336,15 @@ static void gui_glass_effect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void gui_glass_effect_ctor(gui_glass_effect_t            *_this,
-                                  gui_obj_t            *parent,
-                                  const char           *name,
-                                  IMG_SOURCE_MODE_TYPE  storage_type,
-                                  void                 *path,
-                                  int16_t               x,
-                                  int16_t               y,
-                                  int16_t               w,
-                                  int16_t               h)
+static void gui_glass_ctor(gui_glass_t            *_this,
+                           gui_obj_t            *parent,
+                           const char           *name,
+                           IMG_SOURCE_MODE_TYPE  storage_type,
+                           void                 *path,
+                           int16_t               x,
+                           int16_t               y,
+                           int16_t               w,
+                           int16_t               h)
 {
     gui_obj_t *obj = (gui_obj_t *)_this;
 
@@ -354,7 +354,7 @@ static void gui_glass_effect_ctor(gui_glass_effect_t            *_this,
 
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
-    obj->obj_cb = gui_glass_effect_cb;
+    obj->obj_cb = gui_glass_cb;
     obj->has_input_prepare_cb = false;
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
@@ -382,28 +382,28 @@ static void gui_glass_effect_ctor(gui_glass_effect_t            *_this,
 
 
 
-    obj->w = gui_glass_effect_get_width(_this);
-    obj->h = gui_glass_effect_get_height(_this);
+    obj->w = gui_glass_get_width(_this);
+    obj->h = gui_glass_get_height(_this);
 }
 
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-gui_glass_effect_t *gui_glass_effect_create_from_mem(void       *parent,
-                                                     const char *name,
-                                                     void       *addr,
-                                                     int16_t     x,
-                                                     int16_t     y,
-                                                     int16_t     w,
-                                                     int16_t     h)
+gui_glass_t *gui_glass_create_from_mem(void       *parent,
+                                       const char *name,
+                                       void       *addr,
+                                       int16_t     x,
+                                       int16_t     y,
+                                       int16_t     w,
+                                       int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_glass_effect_t *_this = gui_malloc(sizeof(gui_glass_effect_t));
+    gui_glass_t *_this = gui_malloc(sizeof(gui_glass_t));
     GUI_ASSERT(_this != NULL);
-    memset(_this, 0x00, sizeof(gui_glass_effect_t));
-    gui_glass_effect_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_MEMADDR, addr, x, y, w, h);
+    memset(_this, 0x00, sizeof(gui_glass_t));
+    gui_glass_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_MEMADDR, addr, x, y, w, h);
 
     gui_list_init(&(GET_BASE(_this)->child_list));
     if ((GET_BASE(_this)->parent) != NULL)
@@ -415,20 +415,20 @@ gui_glass_effect_t *gui_glass_effect_create_from_mem(void       *parent,
     return _this;
 }
 
-gui_glass_effect_t *gui_glass_effect_create_from_ftl(void       *parent,
-                                                     const char *name,
-                                                     void       *ftl,
-                                                     int16_t     x,
-                                                     int16_t     y,
-                                                     int16_t     w,
-                                                     int16_t     h)
+gui_glass_t *gui_glass_create_from_ftl(void       *parent,
+                                       const char *name,
+                                       void       *ftl,
+                                       int16_t     x,
+                                       int16_t     y,
+                                       int16_t     w,
+                                       int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_glass_effect_t *_this = gui_malloc(sizeof(gui_glass_effect_t));
+    gui_glass_t *_this = gui_malloc(sizeof(gui_glass_t));
     GUI_ASSERT(_this != NULL);
-    memset(_this, 0x00, sizeof(gui_glass_effect_t));
-    gui_glass_effect_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FTL, ftl, x, y, w, h);
+    memset(_this, 0x00, sizeof(gui_glass_t));
+    gui_glass_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FTL, ftl, x, y, w, h);
 
     gui_list_init(&(GET_BASE(_this)->child_list));
     if ((GET_BASE(_this)->parent) != NULL)
@@ -441,20 +441,20 @@ gui_glass_effect_t *gui_glass_effect_create_from_ftl(void       *parent,
 }
 
 
-gui_glass_effect_t *gui_glass_effect_create_from_fs(void       *parent,
-                                                    const char *name,
-                                                    void       *file,
-                                                    int16_t     x,
-                                                    int16_t     y,
-                                                    int16_t     w,
-                                                    int16_t     h)
+gui_glass_t *gui_glass_create_from_fs(void       *parent,
+                                      const char *name,
+                                      void       *file,
+                                      int16_t     x,
+                                      int16_t     y,
+                                      int16_t     w,
+                                      int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
-    gui_glass_effect_t *_this = gui_malloc(sizeof(gui_glass_effect_t));
+    gui_glass_t *_this = gui_malloc(sizeof(gui_glass_t));
     GUI_ASSERT(_this != NULL);
-    memset(_this, 0x00, sizeof(gui_glass_effect_t));
-    gui_glass_effect_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FILESYS, file, x, y, w, h);
+    memset(_this, 0x00, sizeof(gui_glass_t));
+    gui_glass_ctor(_this, (gui_obj_t *)parent, name, IMG_SRC_FILESYS, file, x, y, w, h);
 
     gui_list_init(&(GET_BASE(_this)->child_list));
     if ((GET_BASE(_this)->parent) != NULL)
@@ -466,7 +466,7 @@ gui_glass_effect_t *gui_glass_effect_create_from_fs(void       *parent,
     return _this;
 }
 
-uint16_t gui_glass_effect_get_width(gui_glass_effect_t *_this)
+uint16_t gui_glass_get_width(gui_glass_t *_this)
 {
     if (_this->storage_type == IMG_SRC_FILESYS)
     {
@@ -499,7 +499,7 @@ uint16_t gui_glass_effect_get_width(gui_glass_effect_t *_this)
     return 0;
 }
 
-uint16_t gui_glass_effect_get_height(gui_glass_effect_t *_this)
+uint16_t gui_glass_get_height(gui_glass_t *_this)
 {
     if (_this->storage_type == IMG_SRC_FILESYS)
     {
@@ -532,24 +532,24 @@ uint16_t gui_glass_effect_get_height(gui_glass_effect_t *_this)
     return 0;
 }
 
-void gui_glass_effect_refresh_size(gui_glass_effect_t *_this)
+void gui_glass_refresh_size(gui_glass_t *_this)
 {
-    _this->base.w = gui_glass_effect_get_width(_this);
-    _this->base.h = gui_glass_effect_get_height(_this);
+    _this->base.w = gui_glass_get_width(_this);
+    _this->base.h = gui_glass_get_height(_this);
 }
 
-void gui_glass_effect_refresh_draw_data(gui_glass_effect_t  *this)
+void gui_glass_refresh_draw_data(gui_glass_t  *this)
 {
     GUI_ASSERT(GUI_BASE(this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(this->data != NULL);
     this->draw_img->data = this->data;
 }
 
-void gui_glass_effect_set_attribute(gui_glass_effect_t  *_this,
-                                    const char *name,
-                                    void       *path,
-                                    int16_t     x,
-                                    int16_t     y)
+void gui_glass_set_attribute(gui_glass_t  *_this,
+                             const char *name,
+                             void       *path,
+                             int16_t     x,
+                             int16_t     y)
 {
     GUI_ASSERT(_this != NULL);
 
@@ -567,36 +567,36 @@ void gui_glass_effect_set_attribute(gui_glass_effect_t  *_this,
     }
     else
     {
-        _this->base.name = "gui_glass_effect_set_attribute";
+        _this->base.name = "gui_glass_set_attribute";
     }
 
     _this->data = path;
 }
-void gui_glass_effect_set_image_data(gui_glass_effect_t  *_this, const uint8_t *file_pointer)
+void gui_glass_set_image_data(gui_glass_t  *_this, const uint8_t *file_pointer)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     GUI_ASSERT(file_pointer != NULL);
     _this->data = (void *)file_pointer;
 }
-const uint8_t *gui_glass_effect_get_image_data(gui_glass_effect_t  *_this)
+const uint8_t *gui_glass_get_image_data(gui_glass_t  *_this)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     return _this->data;
 }
 
-void gui_glass_effect_translate(gui_glass_effect_t *_this, float t_x, float t_y)
+void gui_glass_translate(gui_glass_t *_this, float t_x, float t_y)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     _this->t_x = t_x;
     _this->t_y = t_y;
 }
 
-float gui_glass_effect_get_t_x(gui_glass_effect_t *_this)
+float gui_glass_get_t_x(gui_glass_t *_this)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     return _this->t_x;
 }
-float gui_glass_effect_get_t_y(gui_glass_effect_t *_this)
+float gui_glass_get_t_y(gui_glass_t *_this)
 {
     GUI_ASSERT(GUI_BASE(_this)->type == IMAGE_FROM_MEM);
     return _this->t_y;
