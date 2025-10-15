@@ -148,8 +148,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                 uint32_t offset = 0;
                 if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
                 {
-                    chr[chr_i].char_w = text->font_height / 2;
-                    chr[chr_i].char_h = text->font_height / 2;
+                    chr[chr_i].char_w = text->font_height / 4;
+                    chr[chr_i].char_h = text->font_height / 4;
                 }
                 else if (chr[chr_i].unicode == 0x0A)
                 {
@@ -269,8 +269,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                 uint16_t offset = 0;
                 if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
                 {
-                    chr[chr_i].char_w = text->font_height / 2;
-                    chr[chr_i].char_h = text->font_height / 2;
+                    chr[chr_i].char_w = text->font_height / 4;
+                    chr[chr_i].char_h = text->font_height / 4;
                 }
                 else if (chr[chr_i].unicode == 0x0A)
                 {
@@ -352,8 +352,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                     }
                     else if (chr[chr_i].unicode == 0x20)
                     {
-                        chr[chr_i].char_w = text->font_height / 2;
-                        chr[chr_i].char_h = text->font_height / 2;
+                        chr[chr_i].char_w = text->font_height / 4;
+                        chr[chr_i].char_h = text->font_height / 4;
                     }
                     else if (chr[chr_i].unicode >= 0x10000)
                     {
@@ -1264,7 +1264,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 uint16_t char_w = 0;
                 if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
                 {
-                    char_w = font->font_size / 2;
+                    char_w = font->font_size / 4;
                 }
                 else if (unicode_buffer[i] == 0x0A)
                 {
@@ -1304,7 +1304,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 uint16_t char_w = 0;
                 if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
                 {
-                    char_w = font->font_size / 2;
+                    char_w = font->font_size / 4;
                 }
                 else if (unicode_buffer[i] == 0x0A)
                 {
@@ -1333,7 +1333,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 }
                 else if (unicode_buffer[i] == 0x20)
                 {
-                    char_w = font->font_size / 2;
+                    char_w = font->font_size / 4;
                 }
                 else
                 {
