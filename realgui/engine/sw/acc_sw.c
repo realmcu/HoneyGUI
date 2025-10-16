@@ -107,7 +107,14 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             }
             else if (head->type == ARGB8565)
             {
-                sw_transform_for_argb8565(image, dc, rect);
+                if (image->high_quality)
+                {
+                    sw_transform_for_argb8565_aa(image, dc, rect);
+                }
+                else
+                {
+                    sw_transform_for_argb8565(image, dc, rect);
+                }
             }
         }
     }

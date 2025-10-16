@@ -21,7 +21,7 @@
 #include <math.h>
 #include <stdint.h>
 #include "draw_img.h"
-
+//#define HONEYGUI_SUPPORT_DITHER
 typedef struct
 {
     uint8_t *writebuf;
@@ -36,6 +36,11 @@ typedef struct
     uint8_t *palette_data;
     uint8_t *palette_index;
     uint32_t color_mix;
+#ifdef HONEYGUI_SUPPORT_DITHER
+    uint8_t r_rest;
+    uint8_t g_rest;
+    uint8_t b_rest;
+#endif
 } gui_raster_params_t;
 
 static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uint8_t *source_blue,
@@ -206,6 +211,9 @@ static void gui_apply_blend_mode(uint8_t *target_red, uint8_t *target_green, uin
 }
 
 static void gui_set_pixel_color(uint8_t *writebuf, int write_off, uint8_t dc_bytes_per_pixel,
+#ifdef HONEYGUI_SUPPORT_DITHER
+                                gui_raster_params_t *params,
+#endif
                                 uint8_t target_red, uint8_t target_green, uint8_t target_blue, uint8_t target_alpha)
 {
     switch (dc_bytes_per_pixel)
@@ -216,6 +224,26 @@ static void gui_set_pixel_color(uint8_t *writebuf, int write_off, uint8_t dc_byt
             pixel->r = target_red >> 3;
             pixel->g = target_green >> 2;
             pixel->b = target_blue >> 3;
+#ifdef HONEYGUI_SUPPORT_DITHER
+            params->r_rest += (target_red & 7);
+            params->g_rest += (target_green & 3);
+            params->b_rest += (target_blue & 7);
+            if (params->r_rest > 7 && pixel->r < 31)
+            {
+                pixel->r++;
+                params->r_rest -= 7;
+            }
+            if (params->g_rest > 3 && pixel->g < 63)
+            {
+                pixel->g++;
+                params->r_rest -= 3;
+            }
+            if (params->b_rest > 7 && pixel->b < 31)
+            {
+                pixel->b++;
+                params->r_rest -= 7;
+            }
+#endif
             break;
         }
     case 3:
@@ -254,6 +282,9 @@ static void do_raster_pixel(const gui_raster_params_t *params)
                          params->opacity_value, params->blend_mode);
 
     gui_set_pixel_color(params->writebuf, params->write_off, params->dc_bytes_per_pixel,
+#ifdef HONEYGUI_SUPPORT_DITHER
+                        params,
+#endif
                         target_red, target_green, target_blue, target_alpha);
 }
 
@@ -362,7 +393,11 @@ void do_raster(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
     uint32_t blend_mode = image->blend_mode;
     gui_matrix_t *inverse = &image->inverse;
 
-    gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL, 0};
+    gui_raster_params_t params = { writebuf, 0, 0, 0, input_type, dc_bytes_per_pixel, opacity_value, blend_mode, NULL, NULL, 0
+#ifdef HONEYGUI_SUPPORT_DITHER
+                                   , 0, 0, 0
+#endif
+                                 };
     params.image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
     params.palette_index = ((gui_palette_file_t *)head)->palette_index;
     params.palette_data = ((gui_palette_file_t *)head)->palette_data;

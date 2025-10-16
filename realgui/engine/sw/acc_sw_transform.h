@@ -24,6 +24,9 @@ void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
 void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
                                gui_rect_t *rect);
+
+void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
+                                  gui_rect_t *rect);
 #ifdef __cplusplus
 }
 #endif
