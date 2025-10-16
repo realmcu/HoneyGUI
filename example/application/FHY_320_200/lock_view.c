@@ -80,15 +80,22 @@ static void pressing_tab(void *obj)
     else if (img->t_x != 0)
     {
         int16_t x = (int16_t)img->t_x;
-        if (x >= TAB_STOP_POS_X - TAB_START_POS_X - 50)
+        const int16_t step = 20;
+        if (x >= TAB_STOP_POS_X - TAB_START_POS_X)
         {
             gui_view_switch_direct(current_view, quick_view, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_ANIMATION_FADE);
             gui_obj_stop_timer(GUI_BASE(img));
             return;
         }
-        const int16_t step = 40;
-        x -= step;
+        else if (x >= (TAB_STOP_POS_X - TAB_START_POS_X - 40))
+        {
+            x += step;
+        }
+        else
+        {
+            x -= step;
+        }
         if (x <= 0)
         {
             x = 0;
@@ -97,6 +104,10 @@ static void pressing_tab(void *obj)
             // gui_obj_t *tab = gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
             //                                       brother_list);
             // gui_obj_hidden(tab, false);
+        }
+        else if (x >= TAB_STOP_POS_X - TAB_START_POS_X)
+        {
+            x = TAB_STOP_POS_X - TAB_START_POS_X;
         }
         gui_img_translate(img, (float)x, 0);
     }
@@ -112,7 +123,7 @@ static void tab_scale(void *obj)
     cnt++;
     uint8_t cnt_max = 5;
     gui_img_t *img = (gui_img_t *)obj;
-    float scale = cnt / (float)cnt_max;
+    float scale = 0.9f + 0.1f * cnt / (float)cnt_max;
     gui_img_scale(img, scale, scale);
     if (cnt >= cnt_max)
     {
@@ -136,6 +147,7 @@ static void press_tab(void *obj, gui_event_t e, void *param)
     // gui_obj_hidden(tab, true);
 
     gui_obj_create_timer(GUI_BASE(img), 10, true, tab_scale);
+    gui_img_scale(img, 0.9f, 0.9f);
 }
 
 static void click_unlock(void *obj, gui_event_t e, void *param)
@@ -151,10 +163,11 @@ static void click_unlock(void *obj, gui_event_t e, void *param)
 static void lock_view_design(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
-    gui_set_bg_color(BG_1_LIGHT);
+    gui_set_bg_color(SCREEN_BG_DARK);
     gui_img_t *bg = gui_img_create_from_mem(parent, "bg", LOCK_SCROLLBAR_BG_BIN, 17, TAB_START_POS_Y, 0,
                                             0);
-    gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));
+    gui_img_set_mode(bg, IMG_BYPASS_MODE);
+    // gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0xC8, 0xFF));
     int16_t focus = 40;
     gui_img_t *tab_bg = gui_img_create_from_mem(parent, "tab_bg", DEFAULT_BIN, TAB_START_POS_X + focus,
                                                 TAB_START_POS_Y + focus, 0, 0);

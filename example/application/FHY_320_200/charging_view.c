@@ -36,6 +36,7 @@ static gui_view_descriptor_t const descriptor =
 };
 
 static void *icon_array[8] = {0};
+static uint8_t animation_cnt = 0;
 
 /*============================================================================*
  *                           Private Functions
@@ -72,8 +73,7 @@ static void battery_update_cb(void *p)
 static void entrance_animation(void *p)
 {
     GUI_UNUSED(p);
-    static uint8_t cnt = 0;
-    cnt++;
+    animation_cnt++;
     uint8_t cnt_max_1 = 25;
     uint8_t cnt_max_2 = 50;
     uint8_t cnt_max_3 = 75;
@@ -82,29 +82,30 @@ static void entrance_animation(void *p)
     gui_img_t *icon_bg = (gui_img_t *)gui_list_entry(GUI_BASE(current_view)->child_list.prev, gui_obj_t,
                                                      brother_list);
 
-    if (cnt <= cnt_max_1) //fade in
+    if (animation_cnt <= cnt_max_1) //fade in
     {
-        gui_img_set_opacity(bg, UINT8_MAX * cnt / cnt_max_1);
-        gui_img_set_opacity(icon_bg, UINT8_MAX * cnt / cnt_max_1);
+        gui_img_set_opacity(bg, UINT8_MAX * animation_cnt / cnt_max_1);
+        gui_img_set_opacity(icon_bg, UINT8_MAX * animation_cnt / cnt_max_1);
     }
-    else if (cnt <= cnt_max_2) //wait
+    else if (animation_cnt <= cnt_max_2) //wait
     {
         return;
     }
-    else if (cnt <= cnt_max_3) //scale
+    else if (animation_cnt <= cnt_max_3) //scale
     {
-        uint8_t index = 7 * (cnt - cnt_max_2) / (cnt_max_3 - cnt_max_2);
+        uint8_t index = 7 * (animation_cnt - cnt_max_2) / (cnt_max_3 - cnt_max_2);
         gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(icon_bg)->child_list.next, gui_obj_t,
                                                       brother_list);
         gui_img_set_image_data(icon, icon_array[index]);
     }
-    else if (cnt <= cnt_max_4) //move
+    else if (animation_cnt <= cnt_max_4) //move
     {
-        gui_img_set_opacity(bg, UINT8_MAX * (cnt_max_4 - cnt) / (cnt_max_4 - cnt_max_3));
-        gui_img_translate(icon_bg, 0, (ICON_CHARGING_STOP_Y - ICON_CHARGING_START_Y) * (cnt - cnt_max_3) /
+        gui_img_set_opacity(bg, UINT8_MAX * (cnt_max_4 - animation_cnt) / (cnt_max_4 - cnt_max_3));
+        gui_img_translate(icon_bg, 0, (ICON_CHARGING_STOP_Y - ICON_CHARGING_START_Y) *
+                          (animation_cnt - cnt_max_3) /
                           (cnt_max_4 - cnt_max_3));
     }
-    if (cnt == cnt_max_4)
+    if (animation_cnt == cnt_max_4)
     {
         gui_obj_hidden((void *)bg, true);
         gui_obj_stop_timer(GUI_BASE(p));
@@ -114,7 +115,7 @@ static void entrance_animation(void *p)
         gui_text_type_set(text, CAPTION_1_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, CENTER);
         gui_obj_create_timer(GUI_BASE(text), 30, true, battery_update_cb);
-        cnt = 0;
+        animation_cnt = 0;
     }
 }
 
@@ -124,7 +125,8 @@ static void charging_view_design(gui_view_t *view)
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
 
-    gui_set_bg_color(BG_1_LIGHT);
+    animation_cnt = 0;
+    gui_set_bg_color(SCREEN_BG_DARK);
     if (!icon_array[0])
     {
         icon_array[0] = ICON_CHARGING_0_BIN;

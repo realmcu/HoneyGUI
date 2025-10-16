@@ -7,6 +7,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_win.h"
 #include "gui_text.h"
+#include "tp_algo.h"
 
 /*============================================================================*
  *                            Macros
@@ -39,7 +40,7 @@ static void menu_view_design(gui_view_t *view);
 static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *quick_view = NULL;
 static const gui_view_descriptor_t *audio_menu_view = NULL;
-static const gui_view_descriptor_t *case_menu_view = NULL;
+static const gui_view_descriptor_t *settings_menu_view = NULL;
 static const gui_view_descriptor_t *tools_menu_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
@@ -48,6 +49,10 @@ static gui_view_descriptor_t const descriptor =
     .pView = &current_view,
     .on_switch_in = menu_view_design,
 };
+
+static bool pressed_audio = false;
+static bool pressed_tools = false;
+static bool pressed_settings = false;
 
 /*============================================================================*
  *                           Private Functions
@@ -65,52 +70,118 @@ static int gui_view_get_other_view_descriptor_init(void)
     /* you can get other view descriptor point here */
     quick_view = gui_view_descriptor_get("quick_view");
     audio_menu_view = gui_view_descriptor_get("audio_menu_view");
-    case_menu_view = gui_view_descriptor_get("case_menu_view");
+    settings_menu_view = gui_view_descriptor_get("settings_menu_view");
     tools_menu_view = gui_view_descriptor_get("tools_menu_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
-
-static void click_button(void *obj, gui_event_t e, void *param)
+static void press_button_audio(void *obj)
 {
     GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
+    gui_obj_t *o = GUI_BASE(obj)->parent;
+    gui_img_t *bg = (gui_img_t *)o;
+    gui_img_t *icon = (gui_img_t *)obj;
+    touch_info_t *tp = tp_get_info();
 
-    gui_img_t *img = (gui_img_t *)obj;
-    gui_obj_t *o = GUI_BASE(obj);
-    gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
-                                                  brother_list);
-    // gui_img_scale(img, 1.2f, 1.2f);
-    gui_img_set_image_data(img, MENU_BUTTON_BG_SCALE_BIN);
-    gui_img_refresh_size(img);
-    gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
-
-    if (strcmp(o->name, "audio") == 0)
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
+        pressed_audio = true;
         gui_img_set_image_data(icon, MENU_AUDIO_SCALE_BIN);
         gui_img_refresh_size(icon);
-        gui_obj_move((void *)img, BG_AUDIO_SCALE_X, BG_SCALE_Y);
+        gui_img_set_image_data(bg, MENU_BUTTON_BG_SCALE_BIN);
+        gui_img_refresh_size(bg);
+        gui_obj_move((void *)bg, BG_AUDIO_SCALE_X, BG_SCALE_Y);
+        gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
+    }
+    else if (tp->pressing && pressed_audio && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        pressed_audio = false;
+        gui_img_set_image_data(icon, MENU_AUDIO_BIN);
+        gui_img_refresh_size(icon);
+        gui_img_set_image_data(bg, MENU_BUTTON_BG_BIN);
+        gui_img_refresh_size(bg);
+        gui_obj_move((void *)bg, BG_AUDIO_X, BG_Y);
+        gui_obj_move((void *)icon, ICON_POS, ICON_POS);
+    }
+    else if (tp->released && pressed_audio)
+    {
         gui_view_switch_direct(current_view, audio_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+        pressed_audio = false;
     }
-    else if (strcmp(o->name, "tools") == 0)
+}
+
+static void press_button_tools(void *obj)
+{
+    GUI_UNUSED(obj);
+    gui_obj_t *o = GUI_BASE(obj)->parent;
+    gui_img_t *bg = (gui_img_t *)o;
+    gui_img_t *icon = (gui_img_t *)obj;
+    touch_info_t *tp = tp_get_info();
+
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
+        pressed_tools = true;
         gui_img_set_image_data(icon, MENU_TOOLS_SCALE_BIN);
         gui_img_refresh_size(icon);
-        gui_obj_move((void *)img, BG_TOOLS_SCALE_X, BG_SCALE_Y);
+        gui_img_set_image_data(bg, MENU_BUTTON_BG_SCALE_BIN);
+        gui_img_refresh_size(bg);
+        gui_obj_move((void *)bg, BG_TOOLS_SCALE_X, BG_SCALE_Y);
+        gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
+    }
+    else if (tp->pressing && pressed_tools && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        pressed_tools = false;
+        gui_img_set_image_data(icon, MENU_TOOLS_BIN);
+        gui_img_refresh_size(icon);
+        gui_img_set_image_data(bg, MENU_BUTTON_BG_BIN);
+        gui_img_refresh_size(bg);
+        gui_obj_move((void *)bg, BG_TOOLS_X, BG_Y);
+        gui_obj_move((void *)icon, ICON_POS, ICON_POS);
+    }
+    else if (tp->released && pressed_tools)
+    {
         gui_view_switch_direct(current_view, tools_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+        pressed_tools = false;
     }
-    else if (strcmp(o->name, "settings") == 0)
+}
+
+static void press_button_settings(void *obj)
+{
+    GUI_UNUSED(obj);
+    gui_obj_t *o = GUI_BASE(obj)->parent;
+    gui_img_t *bg = (gui_img_t *)o;
+    gui_img_t *icon = (gui_img_t *)obj;
+    touch_info_t *tp = tp_get_info();
+
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
+        pressed_settings = true;
         gui_img_set_image_data(icon, MENU_SETTINGS_SCALE_BIN);
         gui_img_refresh_size(icon);
-        gui_obj_move((void *)img, BG_SETTINGS_SCALE_X, BG_SCALE_Y);
-        gui_view_switch_direct(current_view, case_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+        gui_img_set_image_data(bg, MENU_BUTTON_BG_SCALE_BIN);
+        gui_img_refresh_size(bg);
+        gui_obj_move((void *)bg, BG_SETTINGS_SCALE_X, BG_SCALE_Y);
+        gui_obj_move((void *)icon, ICON_SCALE_POS, ICON_SCALE_POS);
+    }
+    else if (tp->pressing && pressed_settings && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        pressed_settings = false;
+        gui_img_set_image_data(icon, MENU_SETTINGS_BIN);
+        gui_img_refresh_size(icon);
+        gui_img_set_image_data(bg, MENU_BUTTON_BG_BIN);
+        gui_img_refresh_size(bg);
+        gui_obj_move((void *)bg, BG_SETTINGS_X, BG_Y);
+        gui_obj_move((void *)icon, ICON_POS, ICON_POS);
+    }
+    else if (tp->released && pressed_settings)
+    {
+        gui_view_switch_direct(current_view, settings_menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                                SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+        pressed_settings = false;
     }
 }
 
@@ -138,7 +209,7 @@ static void show_bg(void *obj)
 
 static void menu_view_design(gui_view_t *view)
 {
-    gui_view_set_animate_step(view, 20);
+    gui_view_set_animate_step(view, 10);
     gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
@@ -179,9 +250,9 @@ static void menu_view_design(gui_view_t *view)
     gui_img_set_focus(audio_bg, focus, focus);
     gui_img_set_focus(tools_bg, focus, focus);
     gui_img_set_focus(settings_bg, focus, focus);
-    gui_obj_add_event_cb(audio_bg, click_button, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_add_event_cb(tools_bg, click_button, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_obj_add_event_cb(settings_bg, click_button, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_create_timer(GUI_BASE(audio), 10, true, press_button_audio);
+    gui_obj_create_timer(GUI_BASE(tools), 10, true, press_button_tools);
+    gui_obj_create_timer(GUI_BASE(settings), 10, true, press_button_settings);
     if (theme_bg_white)
     {
         gui_img_a8_recolor(audio_bg, BG_THEME1_MID_LIGHT.color.argb_full);

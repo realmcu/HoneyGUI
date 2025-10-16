@@ -29,7 +29,7 @@ struct tm barn_time =
     .tm_year = 2025,
     .tm_wday = 3,
 };
-
+bool time_format_24 = false; // default 24H format
 
 /* Date */
 const char *month[12] =
@@ -59,7 +59,8 @@ const char *day[7] =
 };
 
 /* Clock style */
-uint8_t clock_style = 3;
+int8_t clock_style = 2;
+bool switch_from_lock_screen = false;
 
 /* Theme color */
 gui_color_t theme_color = {0};
@@ -79,6 +80,4 @@ uint8_t battery_earphone_r_val = 90;
 uint8_t message_num_val = 10;
 
 /* Function status */
-bool status_asc = false;
-bool status_flashlight = false;
-bool status_spatial_sound = false;
+struct FUNCTION_STATUS f_status = {0};

@@ -7,6 +7,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_win.h"
 #include "gui_text.h"
+#include "gui_scroll_text.h"
 #include "gui_list.h"
 #include "tp_algo.h"
 #include "gui_message.h"
@@ -24,10 +25,12 @@ typedef enum
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#define VOLUME           "Volume"
 #define EQUALIZER        "Equalizer"
 #define AMBIENT_SOUND    "Ambient Sound"
 #define MUSIC            "music"
 #define DARK_LIGHT_MODE  "Dark/Light Mode"
+#define LOCK_SCREEN      "Lock Screen"
 
 #define PROGRESSBAR_W_MAX 116
 #define TOGGLE_OFF_X 4
@@ -51,6 +54,8 @@ static void update_ambient_sound_status(gui_obj_t *obj);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+static const gui_view_descriptor_t *clock_view = NULL;
+
 static uint8_t toggle_target_x = 0;
 
 static bool pressed_sub = false;
@@ -60,67 +65,56 @@ static bool pressed_switch_l = false;
 static bool pressed_switch_r = false;
 void *music_type_addr[6] = {0};
 static int8_t music_type_index = 0;
-static bool equalizer_on = false;
 
-static bool ambient_sound_on = false;
 static AMBIENT_SOUND_STATUS ambient_sound_status = ANC;
 static uint8_t button_bg_target_x = 0;
 
-static bool music_play = false;
 static bool pressed_last = false;
 static bool pressed_next = false;
 static int8_t music_index = 0;
 static const char *music_array[MUSIC_ARRAY_NUM] =
 {
+    "Watermelon Sugar",
+    "Save Your Tears",
     "Feels",
     "Stay",
     "Blinding Lights",
     "Levitating",
     "Peaches",
     "Montero",
-    "Watermelon Sugar",
     "Good 4 U",
     "Kiss Me More",
-    "Save Your Tears",
     "Industry Baby",
     "Heat Waves",
 };
 
 static void *progressbar_array[10] = {0};
 
+static void *clock_array[5] = {0};
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static int gui_view_get_other_view_descriptor_init(void)
+{
+    /* you can get other view descriptor point here */
+    clock_view = gui_view_descriptor_get("clock_view");
+    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
+    return 0;
+}
+static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
 static void toggle_move(void *p)
 {
     gui_obj_t *obj = (gui_obj_t *)p;
-    int step = 4;
+    int step = 2;
+    gui_color_t color_origin;
+    gui_color_t color_target;
 
     if (obj->x == toggle_target_x)
     {
         gui_obj_delete_timer(obj);
-        if (toggle_target_x == TOGGLE_ON_X)
-        {
-            if (theme_bg_white)
-            {
-                gui_img_a8_recolor((gui_img_t *)(obj->parent), BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-            }
-            else
-            {
-                gui_img_a8_recolor((gui_img_t *)(obj->parent), BG_THEME1_BRIGHT_DARK.color.argb_full);
-            }
-        }
-        else
-        {
-            if (theme_bg_white)
-            {
-                gui_img_a8_recolor((gui_img_t *)(obj->parent), FG_1_LIGHT.color.argb_full);
-            }
-            else
-            {
-                gui_img_a8_recolor((gui_img_t *)(obj->parent), BG_2_DARK.color.argb_full);
-            }
-        }
+        return;
     }
     else if (obj->x < toggle_target_x)
     {
@@ -130,6 +124,35 @@ static void toggle_move(void *p)
     {
         obj->x -= step;
     }
+
+    if (theme_bg_white)
+    {
+        color_origin = FG_1_LIGHT;
+        color_target = BG_THEME1_BRIGHT_LIGHT;
+    }
+    else
+    {
+        color_origin = BG_2_DARK;
+        color_target = BG_THEME1_BRIGHT_DARK;
+    }
+    if (toggle_target_x != TOGGLE_ON_X)
+    {
+        uint32_t temp = color_origin.color.argb_full;
+        color_origin.color.argb_full = color_target.color.argb_full;
+        color_target.color.argb_full = temp;
+    }
+    uint8_t scope = TOGGLE_ON_X - TOGGLE_OFF_X;
+    float mutiply = (float)(scope - abs(obj->x - toggle_target_x)) / scope;
+    uint8_t a = color_origin.color.rgba.a + (uint8_t)(mutiply * (color_target.color.rgba.a -
+                                                                 color_origin.color.rgba.a));
+    uint8_t r = color_origin.color.rgba.r + (uint8_t)(mutiply * (color_target.color.rgba.r -
+                                                                 color_origin.color.rgba.r));
+    uint8_t g = color_origin.color.rgba.g + (uint8_t)(mutiply * (color_target.color.rgba.g -
+                                                                 color_origin.color.rgba.g));
+    uint8_t b = color_origin.color.rgba.b + (uint8_t)(mutiply * (color_target.color.rgba.b -
+                                                                 color_origin.color.rgba.b));
+    gui_img_a8_recolor((void *)obj->parent, GUI_COLOR_ARGB8888(a, r, g, b));
+    gui_img_a8_mix_alpha((void *)obj->parent, a);
 }
 
 static void regenerate_for_dark_light_change(void *msg)
@@ -140,7 +163,7 @@ static void regenerate_for_dark_light_change(void *msg)
     const struct gui_view_descriptor *descriptor = current_view->descriptor;
     gui_obj_t *parent = current_view->base.parent;
     gui_obj_tree_free(GUI_BASE(current_view));
-    gui_set_bg_color(BG_1_LIGHT);
+    gui_set_bg_color(SCREEN_BG_DARK);
 
     gui_view_create(parent, descriptor, 0, 0, 0, 0);
 }
@@ -364,8 +387,8 @@ static void press_button_page_music(void *obj)
                 music_index--;
             }
             GUI_WIDGET_POINTER_BY_NAME_ROOT(text, MUSIC, o->parent->parent);
-            gui_text_content_set((gui_text_t *)text, (void *)music_array[music_index],
-                                 strlen(music_array[music_index]));
+            gui_scroll_text_content_set((void *)text, (void *)music_array[music_index],
+                                        strlen(music_array[music_index]));
         }
         pressed_last = false;
         pressed_next = false;
@@ -403,8 +426,8 @@ static void click_button_page_music(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     gui_obj_t *o = GUI_BASE(obj);
-    music_play = !music_play;
-    if (music_play)
+    f_status.music_play = !f_status.music_play;
+    if (f_status.music_play)
     {
         gui_img_set_image_data((gui_img_t *)o, PAUSE_BIN);
     }
@@ -434,6 +457,42 @@ static void click_button_page_dark_light(void *obj, gui_event_t e, void *param)
                          button_move);
 }
 
+static void click_clock_page_lock_screen(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    switch_from_lock_screen = true;
+    gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+}
+
+static void click_button_page_lock_screen(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_obj_t *o = GUI_BASE(obj);
+    if (strcmp(o->name, "switch_l") == 0)
+    {
+        clock_style--;
+    }
+    else
+    {
+        clock_style++;
+    }
+    if (clock_style < 0)
+    {
+        clock_style = 0;
+    }
+    else if (clock_style > 4)
+    {
+        clock_style = 4;
+    }
+    gui_obj_t *img = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
+    gui_img_set_image_data((gui_img_t *)img, clock_array[clock_style]);
+}
+
 static void click_toggle_cb(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
@@ -444,8 +503,8 @@ static void click_toggle_cb(void *obj, gui_event_t e, void *param)
 
     if (strcmp(toggle->name, EQUALIZER) == 0)
     {
-        equalizer_on = !equalizer_on;
-        if (equalizer_on)
+        f_status.equalizer = !f_status.equalizer;
+        if (f_status.equalizer)
         {
             toggle_target_x = TOGGLE_ON_X;
         }
@@ -456,8 +515,8 @@ static void click_toggle_cb(void *obj, gui_event_t e, void *param)
     }
     else
     {
-        ambient_sound_on = !ambient_sound_on;
-        if (ambient_sound_on)
+        f_status.ambient_sound = !f_status.ambient_sound;
+        if (f_status.ambient_sound)
         {
             toggle_target_x = TOGGLE_ON_X;
         }
@@ -469,29 +528,17 @@ static void click_toggle_cb(void *obj, gui_event_t e, void *param)
     gui_obj_create_timer(toggle, 10, true, toggle_move);
 }
 
-static void note_design(gui_obj_t *obj, void *p)
+static void click_button_no_action(void *obj, gui_event_t e, void *param)
 {
-    GUI_UNUSED(p);
-    uint16_t index = ((gui_list_note_t *)obj)->index;
-    switch (index)
-    {
-    case 0:
-        page_dark_light_design(obj);
-        break;
-    case 1:
-        page_equalizer_design(obj);
-        break;
-    case 2:
-        page_ambient_sound_design(obj);
-        break;
-    case 3:
-        page_music_design(obj);
-        break;
-    default:
-        break;
-    }
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
 }
 
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void page_volume_design(gui_obj_t *parent)
 {
     gui_color_t font_color;
@@ -520,9 +567,9 @@ void page_volume_design(gui_obj_t *parent)
         progressbar_array[9] = PROGRESSBAR_10_BIN;
     }
 
-    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 100, 15);
-    gui_text_set(text, "Volume", GUI_FONT_SRC_BMP, font_color, 6, 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, VOLUME, GUI_FONT_SRC_BMP, font_color, 6, 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
@@ -593,9 +640,9 @@ void page_equalizer_design(gui_obj_t *parent)
     {
         font_color = FG_1_DARK;
     }
-    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 100, 15);
-    gui_text_set(text, EQUALIZER, GUI_FONT_SRC_BMP, font_color, 9, 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, EQUALIZER, GUI_FONT_SRC_BMP, font_color, 9, 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
@@ -626,7 +673,7 @@ void page_equalizer_design(gui_obj_t *parent)
         gui_img_a8_recolor(button_switch_r_bg, BG_THEME1_MID_LIGHT.color.argb_full);
         gui_img_a8_recolor(switch_r, FG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(music_type, FG_1_LIGHT.color.argb_full);
-        if (equalizer_on)
+        if (f_status.equalizer)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
             gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
@@ -644,7 +691,7 @@ void page_equalizer_design(gui_obj_t *parent)
         gui_img_a8_recolor(button_switch_r_bg, BG_THEME1_MID_DARK.color.argb_full);
         gui_img_a8_recolor(switch_r, FG_1_DARK.color.argb_full);
         gui_img_a8_recolor(music_type, FG_1_DARK.color.argb_full);
-        if (equalizer_on)
+        if (f_status.equalizer)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
             gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
@@ -652,6 +699,7 @@ void page_equalizer_design(gui_obj_t *parent)
         else
         {
             gui_img_a8_recolor(toggle_bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_mix_alpha(toggle_bg, BG_2_DARK.color.rgba.a);
         }
     }
 }
@@ -667,9 +715,9 @@ void page_ambient_sound_design(gui_obj_t *parent)
     {
         font_color = FG_1_DARK;
     }
-    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 150, 15);
-    gui_text_set(text, AMBIENT_SOUND, GUI_FONT_SRC_BMP, font_color, strlen(AMBIENT_SOUND), 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, AMBIENT_SOUND, GUI_FONT_SRC_BMP, font_color, strlen(AMBIENT_SOUND), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
@@ -706,7 +754,7 @@ void page_ambient_sound_design(gui_obj_t *parent)
     {
         gui_img_a8_recolor(control_bg, BG_THEME1_DARK_LIGHT.color.argb_full);
         gui_img_a8_recolor(button_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
-        if (ambient_sound_on)
+        if (f_status.ambient_sound)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
             gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
@@ -720,7 +768,7 @@ void page_ambient_sound_design(gui_obj_t *parent)
     {
         gui_img_a8_recolor(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
         gui_img_a8_recolor(button_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
-        if (ambient_sound_on)
+        if (f_status.ambient_sound)
         {
             gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
             gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
@@ -728,6 +776,7 @@ void page_ambient_sound_design(gui_obj_t *parent)
         else
         {
             gui_img_a8_recolor(toggle_bg, BG_2_DARK.color.argb_full);
+            gui_img_a8_mix_alpha(toggle_bg, BG_2_DARK.color.rgba.a);
         }
     }
 }
@@ -744,12 +793,13 @@ void page_music_design(gui_obj_t *parent)
     {
         font_color = FG_1_DARK;
     }
-    gui_text_t *text = gui_text_create(parent, MUSIC, 12, 40, 200, 15);
-    gui_text_set(text, (char *)music_array[music_index], GUI_FONT_SRC_BMP, font_color,
-                 strlen(music_array[music_index]), 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(text, LEFT);
-    text = gui_text_create(parent, 0, 12, 65, 200, 15);
+    gui_scroll_text_t *t = gui_scroll_text_create(parent, MUSIC, 12, 40, 160, 56);
+    gui_scroll_text_set(t, (char *)music_array[music_index], GUI_FONT_SRC_BMP, font_color,
+                        strlen(music_array[music_index]), 30);
+    gui_scroll_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(t, SCROLL_X, 160, 160, 5000, 0);
+
+    gui_text_t *text = gui_text_create(parent, 0, 12, 65, 200, 15);
     gui_text_set(text, "Artist-Album", GUI_FONT_SRC_BMP, font_color, 13, 20);
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
@@ -765,7 +815,7 @@ void page_music_design(gui_obj_t *parent)
     gui_img_t *next = gui_img_create_from_mem(control_bg, 0, SKIP_NEXT_BIN, 233, 32, 0, 0);
     gui_img_t *play = gui_img_create_from_mem(control_bg, 0, PLAY_BIN, 132, 24, 0, 0);
     gui_obj_add_event_cb(play, click_button_page_music, GUI_EVENT_TOUCH_CLICKED, NULL);
-    if (music_play)
+    if (f_status.music_play)
     {
         gui_img_set_image_data(play, PAUSE_BIN);
         gui_img_refresh_size(play);
@@ -793,12 +843,7 @@ void page_music_design(gui_obj_t *parent)
     }
 }
 
-static void click_button_no_action(void *obj, gui_event_t e, void *param)
-{
-    GUI_UNUSED(obj);
-    GUI_UNUSED(e);
-    GUI_UNUSED(param);
-}
+
 
 void page_dark_light_design(gui_obj_t *parent)
 {
@@ -811,9 +856,9 @@ void page_dark_light_design(gui_obj_t *parent)
     {
         font_color = FG_1_DARK;
     }
-    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 150, 15);
-    gui_text_set(text, DARK_LIGHT_MODE, GUI_FONT_SRC_BMP, font_color, strlen(DARK_LIGHT_MODE), 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, DARK_LIGHT_MODE, GUI_FONT_SRC_BMP, font_color, strlen(DARK_LIGHT_MODE), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
@@ -841,4 +886,59 @@ void page_dark_light_design(gui_obj_t *parent)
         gui_img_a8_recolor(light, FG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(dark, FG_1_DARK.color.argb_full);
     }
+}
+
+void page_lock_screen_design(gui_obj_t *parent)
+{
+    if (!clock_array[0])
+    {
+        clock_array[0] = CLOCK1_BIN;
+        clock_array[1] = CLOCK2_BIN;
+        clock_array[2] = CLOCK3_BIN;
+        clock_array[3] = CLOCK4_BIN;
+        clock_array[4] = CLOCK5_BIN;
+    }
+
+    gui_color_t font_color;
+
+    if (theme_bg_white)
+    {
+        font_color = FG_1_LIGHT;
+    }
+    else
+    {
+        font_color = FG_1_DARK;
+    }
+
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, LOCK_SCREEN, GUI_FONT_SRC_BMP, font_color, strlen(LOCK_SCREEN), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, LEFT);
+    gui_win_t *win_l = gui_win_create(parent, "switch_l", 18, 98, 78, 78);
+    gui_win_t *win_r = gui_win_create(parent, "switch_r", 224, 98, 78, 78);
+    gui_img_t *switch_l = gui_img_create_from_mem(win_l, 0, SWITCH_L_BIN, 29, 26, 0, 0);
+    gui_img_t *switch_r = gui_img_create_from_mem(win_r, 0, SWITCH_R_BIN, 29, 26, 0, 0);
+    gui_obj_add_event_cb(win_l, click_button_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(win_r, click_button_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    gui_img_t *clock = gui_img_create_from_mem(parent, 0, clock_array[clock_style], 96, 97, 0, 0);
+    gui_img_set_mode(clock, IMG_BYPASS_MODE);
+    gui_obj_add_event_cb(clock, click_clock_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    if (theme_bg_white)
+    {
+        gui_img_a8_recolor(switch_l, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(switch_r, FG_1_LIGHT.color.argb_full);
+    }
+    else
+    {
+        gui_img_a8_recolor(switch_l, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(switch_r, FG_1_DARK.color.argb_full);
+    }
+}
+
+void page_qrcode_design(gui_obj_t *parent)
+{
+    gui_img_t *img = gui_img_create_from_mem(parent, 0, QRCODE_BIN, 104, 40, 0, 0);
+    gui_img_set_mode(img, IMG_BYPASS_MODE);
 }

@@ -38,7 +38,8 @@ static gui_view_descriptor_t const descriptor =
 };
 
 void (*detail_page_design_func)(gui_obj_t *parent) = NULL;
-const gui_view_descriptor_t *descriptor_rec = NULL;
+
+static const gui_view_descriptor_t *descriptor_rec = NULL;
 
 static bool is_favorite = false;
 /*============================================================================*
@@ -140,6 +141,7 @@ static void click_button_favorite(void *obj, gui_event_t e, void *param)
 
 static void detail_view_design(gui_view_t *view)
 {
+    gui_view_set_animate_step(view, 10);
     if (gui_view_get_current())
     {
         descriptor_rec = gui_view_get_current()->descriptor;

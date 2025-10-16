@@ -75,8 +75,18 @@ static void time_update_cb(void *obj)
     {
         return;
     }
-    sprintf(time_str, "%s %s %d %02d:%02d", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
-            timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min);
+    if (time_format_24)
+    {
+        sprintf(time_str, "%s %s %d %02d:%02d", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
+                timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min);
+    }
+    else
+    {
+        int tm_hour = (timeinfo->tm_hour % 12 == 0 ? 12 : timeinfo->tm_hour % 12);
+        sprintf(time_str, "%s %s %d %d:%02d %s", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
+                timeinfo->tm_mday, tm_hour, timeinfo->tm_min, (timeinfo->tm_hour >= 12 ? "PM" : "AM"));
+    }
+
     gui_text_content_set((gui_text_t *)obj, time_str, strlen(time_str));
 }
 
@@ -95,14 +105,14 @@ static void click_button_left(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
 
-    status_asc = !status_asc;
+    f_status.asc = !f_status.asc;
     gui_img_t *bg = (gui_img_t *)obj;
     gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
                                                   brother_list);
 
     if (theme_bg_white)
     {
-        if (status_asc)
+        if (f_status.asc)
         {
             gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
@@ -115,7 +125,7 @@ static void click_button_left(void *obj, gui_event_t e, void *param)
     }
     else
     {
-        if (status_asc)
+        if (f_status.asc)
         {
             gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
             gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
@@ -126,6 +136,8 @@ static void click_button_left(void *obj, gui_event_t e, void *param)
             gui_img_a8_recolor(icon, FG_3_DARK.color.argb_full);
         }
     }
+    gui_img_a8_mix_alpha(bg, bg->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
 }
 
 static void click_button_center(void *obj, gui_event_t e, void *param)
@@ -134,14 +146,14 @@ static void click_button_center(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
 
-    status_spatial_sound = !status_spatial_sound;
+    f_status.spatial_sound = !f_status.spatial_sound;
     gui_img_t *bg = (gui_img_t *)obj;
     gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
                                                   brother_list);
 
     if (theme_bg_white)
     {
-        if (status_spatial_sound)
+        if (f_status.spatial_sound)
         {
             gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
@@ -154,7 +166,7 @@ static void click_button_center(void *obj, gui_event_t e, void *param)
     }
     else
     {
-        if (status_spatial_sound)
+        if (f_status.spatial_sound)
         {
             gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
             gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
@@ -165,6 +177,8 @@ static void click_button_center(void *obj, gui_event_t e, void *param)
             gui_img_a8_recolor(icon, FG_3_DARK.color.argb_full);
         }
     }
+    gui_img_a8_mix_alpha(bg, bg->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
 }
 
 static void click_button_right(void *obj, gui_event_t e, void *param)
@@ -173,14 +187,14 @@ static void click_button_right(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
 
-    status_flashlight = !status_flashlight;
+    f_status.flashlight = !f_status.flashlight;
     gui_img_t *bg = (gui_img_t *)obj;
     gui_img_t *icon = (gui_img_t *)gui_list_entry(GUI_BASE(obj)->child_list.next, gui_obj_t,
                                                   brother_list);
 
     if (theme_bg_white)
     {
-        if (status_flashlight)
+        if (f_status.flashlight)
         {
             gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
@@ -189,11 +203,12 @@ static void click_button_right(void *obj, gui_event_t e, void *param)
         {
             gui_img_a8_recolor(bg, BG_2_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon, FG_3_LIGHT.color.argb_full);
+
         }
     }
     else
     {
-        if (status_flashlight)
+        if (f_status.flashlight)
         {
             gui_img_a8_recolor(bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
             gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
@@ -204,6 +219,8 @@ static void click_button_right(void *obj, gui_event_t e, void *param)
             gui_img_a8_recolor(icon, FG_3_DARK.color.argb_full);
         }
     }
+    gui_img_a8_mix_alpha(bg, bg->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
 }
 
 static void show_bg(void *obj)
@@ -246,16 +263,16 @@ static void inform_center_view_design(gui_view_t *view)
     }
     else
     {
-        gui_set_bg_color(BG_1_LIGHT);
+        gui_set_bg_color(SCREEN_BG_DARK);
         gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
         font_color = FG_1_DARK;
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);
-    gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+    gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 20);
+    gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
-    gui_obj_create_timer(GUI_BASE(text), 3000, true, time_update_cb);
+    gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
 
 
     gui_img_t *battery_bg = gui_img_create_from_mem(parent, "battery_bg", BATTERY_STATUS_BG_BIN, 12, 40,
@@ -320,7 +337,7 @@ static void inform_center_view_design(gui_view_t *view)
         gui_img_a8_recolor(message_bg, BG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(message, FG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(arrow, FG_2_LIGHT.color.argb_full);
-        if (status_asc)
+        if (f_status.asc)
         {
             gui_img_a8_recolor(icon_bg_left, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon_left, FG_WHITE.color.argb_full);
@@ -329,8 +346,9 @@ static void inform_center_view_design(gui_view_t *view)
         {
             gui_img_a8_recolor(icon_bg_left, BG_2_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon_left, FG_3_LIGHT.color.argb_full);
+
         }
-        if (status_asc)
+        if (f_status.spatial_sound)
         {
             gui_img_a8_recolor(icon_bg_center, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon_center, FG_WHITE.color.argb_full);
@@ -340,7 +358,7 @@ static void inform_center_view_design(gui_view_t *view)
             gui_img_a8_recolor(icon_bg_center, BG_2_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon_center, FG_3_LIGHT.color.argb_full);
         }
-        if (status_asc)
+        if (f_status.flashlight)
         {
             gui_img_a8_recolor(icon_bg_right, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
             gui_img_a8_recolor(icon_right, FG_WHITE.color.argb_full);
@@ -361,7 +379,7 @@ static void inform_center_view_design(gui_view_t *view)
         gui_img_a8_recolor(message_bg, BG_1_DARK.color.argb_full);
         gui_img_a8_recolor(message, FG_1_DARK.color.argb_full);
         gui_img_a8_recolor(arrow, FG_2_DARK.color.argb_full);
-        if (status_asc)
+        if (f_status.asc)
         {
             gui_img_a8_recolor(icon_bg_left, BG_THEME1_BRIGHT_DARK.color.argb_full);
             gui_img_a8_recolor(icon_left, FG_WHITE.color.argb_full);
@@ -371,7 +389,7 @@ static void inform_center_view_design(gui_view_t *view)
             gui_img_a8_recolor(icon_bg_left, BG_2_DARK.color.argb_full);
             gui_img_a8_recolor(icon_left, FG_3_DARK.color.argb_full);
         }
-        if (status_asc)
+        if (f_status.spatial_sound)
         {
             gui_img_a8_recolor(icon_bg_center, BG_THEME1_BRIGHT_DARK.color.argb_full);
             gui_img_a8_recolor(icon_center, FG_WHITE.color.argb_full);
@@ -381,7 +399,7 @@ static void inform_center_view_design(gui_view_t *view)
             gui_img_a8_recolor(icon_bg_center, BG_2_DARK.color.argb_full);
             gui_img_a8_recolor(icon_center, FG_3_DARK.color.argb_full);
         }
-        if (status_asc)
+        if (f_status.flashlight)
         {
             gui_img_a8_recolor(icon_bg_right, BG_THEME1_BRIGHT_DARK.color.argb_full);
             gui_img_a8_recolor(icon_right, FG_WHITE.color.argb_full);
@@ -392,4 +410,13 @@ static void inform_center_view_design(gui_view_t *view)
             gui_img_a8_recolor(icon_right, FG_3_DARK.color.argb_full);
         }
     }
+    gui_img_a8_mix_alpha(battery_bg, battery_bg->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(message_bg, message_bg->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(arrow, arrow->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon_bg_left, icon_bg_left->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon_left, icon_left->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon_bg_center, icon_bg_center->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon_center, icon_center->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon_bg_right, icon_bg_right->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(icon_right, icon_right->fg_color_set >> 24);
 }

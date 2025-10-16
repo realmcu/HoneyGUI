@@ -87,7 +87,16 @@ static void time_update_cb(void *obj)
     {
         return;
     }
-    sprintf(time_str, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    if (time_format_24)
+    {
+        sprintf(time_str, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    }
+    else
+    {
+        int tm_hour = (timeinfo->tm_hour % 12 == 0 ? 12 : timeinfo->tm_hour % 12);
+        sprintf(time_str, "%1d:%02d %s", tm_hour, timeinfo->tm_min,
+                (timeinfo->tm_hour >= 12 ? "PM" : "AM"));
+    }
     gui_text_content_set((gui_text_t *)obj, time_str, strlen(time_str));
 }
 
@@ -121,9 +130,11 @@ static void update_page_indicator(void)
         if (page_indicator_array[i])
         {
             gui_img_a8_recolor((gui_img_t *)page_indicator_array[i], indicator_color.color.argb_full);
+            gui_img_a8_mix_alpha((gui_img_t *)page_indicator_array[i], indicator_color.color.rgba.a);
         }
     }
     gui_img_a8_recolor(page_indicator_array[page_index], indicator_color_cur.color.argb_full);
+    gui_img_a8_mix_alpha(page_indicator_array[page_index], indicator_color_cur.color.rgba.a);
 }
 
 static void note_design(gui_obj_t *obj, void *p)
@@ -206,11 +217,11 @@ static void quick_view_design(gui_view_t *view)
     gui_text_set(text, "AAC", GUI_FONT_SRC_BMP, font_color, 3, 28);
     gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
-    text = gui_text_create(parent, 0, 275, 8, 50, 15);
-    gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
-    gui_obj_create_timer(GUI_BASE(text), 3000, true, time_update_cb);
-    gui_text_mode_set(text, LEFT);
+    text = gui_text_create(parent, 0, 260, 13, 50, 15);
+    gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 20);
+    gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
+    gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
+    gui_text_mode_set(text, RIGHT);
 
     if (theme_bg_white)
     {

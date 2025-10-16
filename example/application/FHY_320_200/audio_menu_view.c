@@ -26,6 +26,8 @@ typedef struct note_design_param
 
 #define TITLE "Audio Settings"
 
+#define LIST_Y  60
+
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
@@ -63,6 +65,9 @@ static const char *text_array[] =
     "Auto Play&Pause",
     "Bluetooth Source",
 };
+
+static gui_img_t *bg_note = NULL;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -95,14 +100,22 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
 
+static void note_timer_cb(void *p)
+{
+    gui_obj_stop_timer(p);
+    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+}
+
 static void switch_page_playback(void *obj, gui_event_t e, void *param)
 {
     (void)obj;
     (void)e;
     (void)param;
     detail_page_design_func = page_music_design;
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
-                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
 }
 
 static void switch_page_volume(void *obj, gui_event_t e, void *param)
@@ -111,8 +124,9 @@ static void switch_page_volume(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     detail_page_design_func = page_volume_design;
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
-                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
 }
 
 static void switch_page_ambient_sound(void *obj, gui_event_t e, void *param)
@@ -121,8 +135,9 @@ static void switch_page_ambient_sound(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     detail_page_design_func = page_ambient_sound_design;
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
-                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
 }
 
 static void switch_page_equalizer(void *obj, gui_event_t e, void *param)
@@ -131,8 +146,9 @@ static void switch_page_equalizer(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     detail_page_design_func = page_equalizer_design;
-    gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
-                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
 }
 
 static void note_design(gui_obj_t *obj, void *p)
@@ -154,11 +170,11 @@ static void note_design(gui_obj_t *obj, void *p)
         font_color = FG_1_DARK;
     }
     char *text = (char *)text_array[index];
-    int font_size = 28;
-    gui_text_t *t = gui_text_create(note, "txt", 56, 8, 300, 40);
+    int font_size = 30;
+    gui_text_t *t = gui_text_create(note, "txt", 56, 15, 260, 56);
     gui_text_set(t, text, GUI_FONT_SRC_BMP, font_color, strlen(text), font_size);
-    gui_text_type_set(t, CAPTION_2_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(t, MID_LEFT);
+    gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(t, LEFT);
     if (design_p->click_cb[index] != NULL)
     {
         gui_obj_add_event_cb(note, (gui_event_cb_t)design_p->click_cb[index], GUI_EVENT_TOUCH_CLICKED,
@@ -174,10 +190,12 @@ static void list_timer_cb(void *obj)
 
 static void audio_menu_view_design(gui_view_t *view)
 {
-    gui_view_set_animate_step(view, 20);
+    gui_view_set_animate_step(view, 10);
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
+    bg_note = gui_img_create_from_mem(parent, "bg_note", MENU_LISTNOTE_BG_BIN, 0, 0, 0, 0);
+    gui_obj_hidden((void *)bg_note, true);
 
     uint32_t *img_data_array[] =
     {
@@ -208,7 +226,7 @@ static void audio_menu_view_design(gui_view_t *view)
     memcpy(data_array, img_data_array, array_size * sizeof(void *));
     design_p->click_cb = func_cb;
     design_p->img_data_array = data_array;
-    gui_list_t *list = gui_list_create(view, "list", 0, 60, 0, 0, 56, 0,
+    gui_list_t *list = gui_list_create(view, "list", 0, LIST_Y, 0, 0, 56, 0,
                                        VERTICAL, note_design, design_p, 0);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, array_size);
@@ -216,20 +234,21 @@ static void audio_menu_view_design(gui_view_t *view)
     gui_list_set_out_scope(list, 20);
     gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
-
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
         gui_img_a8_recolor(mask, SCREEN_BG_LIGHT.color.argb_full);
+        gui_img_a8_recolor(bg_note, BG_1_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
-        gui_set_bg_color(BG_1_LIGHT);
-        gui_img_a8_recolor(mask, BG_1_LIGHT.color.argb_full);
+        gui_set_bg_color(SCREEN_BG_DARK);
+        gui_img_a8_recolor(mask, SCREEN_BG_DARK.color.argb_full);
+        gui_img_a8_recolor(bg_note, BG_1_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
-    gui_list_set_bar_color(list, font_color);
+    gui_img_a8_mix_alpha(bg_note, bg_note->fg_color_set >> 24);
 
     gui_text_t *title = gui_text_create(parent, 0, 0, 13, gui_get_screen_width(), 30);
     gui_text_set(title, TITLE, GUI_FONT_SRC_BMP, font_color, strlen(TITLE), 28);
