@@ -109,7 +109,7 @@ extern uint8_t battery_earphone_r_val;
 extern uint8_t message_num_val;
 
 /* Function status */
-struct FUNCTION_STATUS f_status;
+extern struct FUNCTION_STATUS f_status;
 
 /*============================================================================*
  *                           Punblic Functions

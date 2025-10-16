@@ -247,16 +247,87 @@ static void obj_draw_end(gui_obj_t *obj)
     }
 }
 
+static void gui_pfb_draw(gui_obj_t *root)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    uint32_t scan_line_time_us = dc->driver_ic_scan_line_time_us;
+    uint32_t write_line_time_us = dc->host_write_line_time_us;
+    uint32_t line_section_cnt = 0; //mean section line cnt for tear effect issue
+
+    gui_flash_boost();
+    uint32_t time_base = 0;
+
+    if (dc->get_lcd_us != NULL) //add by wanghao, code for tear effect
+    {
+        time_base = dc->get_lcd_us();
+    }
+
+    for (uint32_t i = 0; i < dc->section_total; i++)
+    {
+        if (i % 2 == 0)
+        {
+            dc->frame_buf = dc->disp_buf_1;
+        }
+        else
+        {
+            dc->frame_buf = dc->disp_buf_2;
+        }
+
+        gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
+
+        dc->section_count = i;
+
+        if (dc->pfb_type == PFB_Y_DIRECTION)
+        {
+            dc->section.x1 = 0;
+            dc->section.y1 = dc->section_count * dc->fb_height;
+            line_section_cnt = dc->fb_height;
+        }
+        else
+        {
+            dc->section.x1 = dc->section_count * dc->fb_width;
+            dc->section.y1 = 0;
+            line_section_cnt = dc->fb_width;
+        }
+
+        dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
+        dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
+        obj_draw_scan(root);
+        post_process_handle();
+
+        if (dc->get_lcd_us != NULL) //add by wanghao, code for tear effect
+        {
+
+            uint32_t scanned_line_cnt = (dc->get_lcd_us() - time_base) / scan_line_time_us;
+            uint32_t writed_line_cnt = i * line_section_cnt;
+
+            uint32_t scanned_line_cnt_next = (dc->get_lcd_us() + write_line_time_us * line_section_cnt -
+                                              time_base) / scan_line_time_us;
+            uint32_t writed_line_cnt_next = (i + 1) * line_section_cnt;;
+
+            //gui_log("scanned_line_cnt = %d, writed_line_cnt = %d", scanned_line_cnt, writed_line_cnt);
+
+            while ((writed_line_cnt > scanned_line_cnt) && (writed_line_cnt_next > scanned_line_cnt_next))
+            {
+                scanned_line_cnt = (dc->get_lcd_us() - time_base) / scan_line_time_us;
+                scanned_line_cnt_next = (dc->get_lcd_us() + write_line_time_us * line_section_cnt - time_base) /
+                                        scan_line_time_us;
+            }
+        }
+
+        if (dc->lcd_draw_sync != NULL)
+        {
+            dc->lcd_draw_sync();
+        }
+        dc->lcd_update(dc);
+    }
+
+    gui_flash_boost_disable();
+}
+
 static void gui_fb_draw(gui_obj_t *root)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    uint32_t active_line = dc->driver_ic_active_width;
-    uint32_t hfp_line = dc->driver_ic_hfp;
-    uint32_t hbp_line = dc->driver_ic_hbp;
-    uint32_t fps = dc->driver_ic_fps;
-    uint32_t line_time = 1000000 / (fps * (active_line + hfp_line + hbp_line));
-    uint32_t read_time = 0;
-    uint32_t write_time = 0;
 
     if (dc->reset_lcd_timer != NULL)
     {
@@ -270,62 +341,7 @@ static void gui_fb_draw(gui_obj_t *root)
 
     if (dc->type == DC_RAMLESS)
     {
-        gui_flash_boost();
-        for (uint32_t i = 0; i < dc->section_total; i++)
-        {
-            if (i % 2 == 0)
-            {
-                dc->frame_buf = dc->disp_buf_1;
-            }
-            else
-            {
-                dc->frame_buf = dc->disp_buf_2;
-            }
-            if (dc->frame_buf)
-            {
-                if (dc->lcd_section_hook)
-                {
-                    dc->lcd_section_hook(dc);
-                }
-                else
-                {
-                    gui_fb_clear(dc->frame_buf, fb_bg_color, ((size_t)dc->fb_height * dc->fb_width));
-                }
-            }
-            dc->section_count = i;
-
-            if (dc->pfb_type == PFB_Y_DIRECTION)
-            {
-                dc->section.x1 = 0;
-                dc->section.y1 = dc->section_count * dc->fb_height;
-            }
-            else
-            {
-                dc->section.x1 = dc->section_count * dc->fb_width;
-                dc->section.y1 = 0;
-            }
-
-            dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
-            dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
-            obj_draw_scan(root);
-            post_process_handle();
-            if (dc->get_lcd_us != NULL)
-            {
-                read_time = line_time * (i * dc->fb_height + hfp_line);
-                write_time = dc->get_lcd_us();
-                while (write_time < read_time)
-                {
-                    write_time = dc->get_lcd_us();
-                }
-            }
-            if (dc->lcd_draw_sync != NULL)
-            {
-                dc->lcd_draw_sync();
-            }
-            dc->lcd_update(dc);
-        }
-
-        gui_flash_boost_disable();
+        gui_pfb_draw(root);
     }
     else if (dc->type == DC_SINGLE)
     {

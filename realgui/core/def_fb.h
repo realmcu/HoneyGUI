@@ -62,10 +62,8 @@ typedef struct gui_dispdev
     uint16_t fb_width;
     uint16_t fb_height;
     uint16_t bit_depth;
-    uint16_t driver_ic_fps;
-    uint16_t driver_ic_hfp;
-    uint16_t driver_ic_hbp;
-    uint16_t driver_ic_active_width;
+    uint16_t driver_ic_scan_line_time_us;
+    uint16_t host_write_line_time_us;
     uint16_t target_w;
     uint16_t target_h;
     T_GUI_DC_TYPE type;
@@ -75,8 +73,7 @@ typedef struct gui_dispdev
     uint8_t *shot_buf;
     uint8_t *disp_buf_1;
     uint8_t *disp_buf_2;
-    float scale_x;
-    float scale_y;
+
     gui_rect_t section;
     uint32_t section_count;
     uint32_t section_total;
@@ -88,7 +85,6 @@ typedef struct gui_dispdev
     int (*flash_seq_trans_disable)(void);
     uint32_t (*get_lcd_us)(void);
     void (*reset_lcd_timer)(void);
-    void (*lcd_section_hook)(struct gui_dispdev *dc);
     void (*lcd_te_wait)(void);
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
