@@ -388,6 +388,22 @@ gui_text_t *gui_text_create(void       *parent,
                             int16_t     h);
 
 
+gui_inline bool gui_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
+{
+    if (a->x2 < b->x1) { return false; }
+    if (b->x2 < a->x1) { return false; }
+    if (a->y2 < b->y1) { return false; }
+    if (b->y2 < a->y1) { return false; }
+    return true;
+}
+gui_inline bool gui_scroll_text_rect_hit(gui_text_rect_t *a, gui_rect_t *b)
+{
+    if (a->xboundright < b->x1) { return false; }
+    if (b->x2 < a->xboundleft) { return false; }
+    if (a->yboundbottom < b->y1) { return false; }
+    if (b->y2 < a->yboundtop) { return false; }
+    return true;
+}
 
 #ifdef __cplusplus
 }

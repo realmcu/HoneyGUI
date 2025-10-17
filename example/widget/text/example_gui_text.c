@@ -192,6 +192,7 @@ static void scroll_text_widget_example(void)
                         32);
     gui_scroll_text_scroll_set(scroll_text_y, SCROLL_Y, 100, 100, 10000, 0);
     gui_scroll_text_type_set(scroll_text_y, font32b2, FONT_SRC_MEMADDR);
+    gui_text_wordwrap_set(&scroll_text_y->base, true);
 }
 /* gui scroll text widget example end*/
 

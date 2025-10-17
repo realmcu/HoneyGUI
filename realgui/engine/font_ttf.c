@@ -253,12 +253,12 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
     gui_dispdev_t *dc = gui_get_dc();
 
     int x_start = _UI_MAX3(x, rect->xboundleft, dc->section.x1);
-    int x_end = rect->xboundright ? _UI_MIN(x + w - 1, rect->xboundright)
+    int x_end = rect->xboundright ? _UI_MIN3(x + w - 1, rect->xboundright, dc->section.x2)
                 : _UI_MIN(x + w - 1, dc->section.x2);
 
     int y_start = _UI_MAX3(dc->section.y1, y, rect->yboundtop);
-    int y_end = rect->yboundbottom ? _UI_MIN(rect->yboundbottom, y + h - 1)
-                : _UI_MIN(dc->section.y2, y + h - 1);
+    int y_end = rect->yboundbottom ? _UI_MIN3(y + h - 1, rect->yboundbottom, dc->section.y2)
+                : _UI_MIN(y + h - 1, dc->section.y2);
     if (x_start > x_end || y_start > y_end) { return; }
 
     gui_color_t outcolor = text->color;

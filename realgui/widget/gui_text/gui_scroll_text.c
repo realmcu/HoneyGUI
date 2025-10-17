@@ -252,7 +252,6 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     int32_t offset;
     uint32_t index;
     gui_text_rect_t draw_rect = {0};
-    uint32_t total_section_count;
 
     if (text->base.len == 0)
     {
@@ -268,6 +267,11 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     draw_rect.y1 = text->base.offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w - 1;
     draw_rect.y2 = draw_rect.y1 + obj->h - 1;
+
+    draw_rect.xboundleft = draw_rect.x1;
+    draw_rect.xboundright = draw_rect.x2;
+    draw_rect.yboundtop = draw_rect.y1;
+    draw_rect.yboundbottom = draw_rect.y2;
 
     if (text->base.mode == SCROLL_X)
     {
@@ -327,11 +331,6 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         }
     }
 
-    draw_rect.xboundleft = text->base.offset_x;
-    draw_rect.xboundright = text->base.offset_x + obj->w - 1;
-    draw_rect.yboundtop = text->base.offset_y;
-    draw_rect.yboundbottom = text->base.offset_y + obj->h - 1;
-
     if (dc->section_count == 0)
     {
         gui_scroll_text_font_load(&text->base, &draw_rect);
@@ -347,28 +346,14 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
 
     gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
 
-    if (text->duration_time_ms == 0)
+    if ((text->duration_time_ms == 0 ||
+         cur_time_ms < (text->init_time_ms + text->duration_time_ms)) &&
+        gui_scroll_text_rect_hit(&draw_rect, &dc->section))
     {
         gui_scroll_text_font_draw(&text->base, &draw_rect);
     }
-    else
-    {
-        if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
-        {
-            gui_scroll_text_font_draw(&text->base, &draw_rect);
-        }
-    }
-    if (dc->pfb_type == PFB_X_DIRECTION)
-    {
-        total_section_count = dc->screen_width / dc->fb_width -
-                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
-    }
-    else
-    {
-        total_section_count = dc->screen_height / dc->fb_height -
-                              ((dc->screen_height % dc->fb_height) ? 0 : 1);
-    }
-    if (dc->section_count == total_section_count)
+
+    if (dc->section_count == dc->section_total - 1)
     {
         gui_scroll_text_font_unload(&text->base);
     }
