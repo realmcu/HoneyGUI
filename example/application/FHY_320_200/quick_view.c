@@ -52,10 +52,10 @@ static gui_img_t *page_indicator_array[QUICK_PAGE_NUM_MAX] = {0};
 int8_t quick_page_num = 4;
 void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
-    page_dark_light_design,
-    page_ambient_sound_design,
     page_music_design,
-    page_volume_design
+    page_volume_design,
+    page_ambient_sound_design,
+    page_equalizer_design,
 };
 
 /*============================================================================*
@@ -183,10 +183,10 @@ static void create_indicator(gui_obj_t *parent)
 
 static void quick_view_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, menu_view, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
-    gui_view_switch_on_event(view, inform_center_view, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, inform_center_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
@@ -213,7 +213,7 @@ static void quick_view_design(gui_view_t *view)
     gui_img_t *earphone_l = gui_img_create_from_mem(home_bg, 0, EARPLUG_L_BIN, 7, 3, 0, 0);
     gui_img_t *earphone_r = gui_img_create_from_mem(home_bg, 0, EARPLUG_R_BIN, 42, 3, 0, 0);
 
-    gui_text_t *text = gui_text_create(parent, 0, 25, 8, 50, 15);
+    gui_text_t *text = gui_text_create(parent, 0, 25, 6, 50, 28);
     gui_text_set(text, "AAC", GUI_FONT_SRC_BMP, font_color, 3, 28);
     gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);

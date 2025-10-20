@@ -211,7 +211,7 @@ static void menu_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
     gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
-                             SWITCH_INIT_STATE,
+                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
     gui_obj_t *parent = GUI_BASE(view);

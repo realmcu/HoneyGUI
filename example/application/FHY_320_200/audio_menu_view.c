@@ -96,6 +96,8 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     list_offset_his = 0;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(list, "list", current_view);
+    gui_obj_stop_timer(list);
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }

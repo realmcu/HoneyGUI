@@ -65,6 +65,9 @@ void page_dark_light_design(gui_obj_t *parent);
 void page_music_design(gui_obj_t *parent);
 void page_lock_screen_design(gui_obj_t *parent);
 void page_qrcode_design(gui_obj_t *parent);
+void page_notification_design(gui_obj_t *parent);
+void page_screen_brightness_design(gui_obj_t *parent);
+void page_time_format_design(gui_obj_t *parent);
 
 #ifdef __cplusplus
 }

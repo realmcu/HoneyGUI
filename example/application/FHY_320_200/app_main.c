@@ -54,7 +54,7 @@ unsigned char *resource_root = NULL;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("menu_view");
+    test_view = gui_view_descriptor_get("quick_view");
     clock_view = gui_view_descriptor_get("clock_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
@@ -163,7 +163,6 @@ static int app_init(void)
 #ifdef _WIN32
     resource_root = (unsigned char *)_binary_root_0x00950000_bin_start;
 #endif
-    theme_color = gui_rgb(255, 89, 1); //#FF5901
     theme_bg_white = false;
     detail_page_design_func = page_dark_light_design;
     timeinfo = &barn_time;

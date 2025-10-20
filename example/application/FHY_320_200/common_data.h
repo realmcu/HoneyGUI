@@ -24,6 +24,10 @@ struct FUNCTION_STATUS
     uint32_t asc                : 1;
     uint32_t spatial_sound      : 1;
     uint32_t flashlight         : 1;
+    uint32_t notification       : 1;
+    uint32_t message_preview    : 1;
+
+    uint32_t rvd                : 24;
 };
 
 
@@ -92,13 +96,14 @@ extern int8_t clock_style;
 extern bool switch_from_lock_screen;
 
 /* Theme color */
-extern gui_color_t theme_color;
+extern uint8_t theme_color_index;
+extern uint32_t theme_color_array[5];
 
 /* Theme bg */
 extern bool theme_bg_white; // default black bg
 
 /* Volume */
-extern int8_t volume_val;
+extern int8_t volume_val; // [0, 10]
 
 /* Battery */
 extern uint8_t battery_barn_val;
@@ -110,6 +115,9 @@ extern uint8_t message_num_val;
 
 /* Function status */
 extern struct FUNCTION_STATUS f_status;
+
+/* Screen Brightness */
+extern int8_t screen_brightness_val; // [1, 3]
 
 /*============================================================================*
  *                           Punblic Functions

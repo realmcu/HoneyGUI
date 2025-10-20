@@ -35,7 +35,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = clock_view_design,
 };
 
-static void *clock4_num_array[10] = {0};
+static void *clock_num_array[10] = {0};
 
 static const gui_view_descriptor_t *descriptor_rec = NULL;
 
@@ -70,8 +70,27 @@ static void time_update(void *obj)
     switch (clock_style + 1)
     {
     case 1:
+        {
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(hour, "hour", current_view);
+            gui_img_rotation((gui_img_t *)hour, (timeinfo->tm_hour % 12) * 30.0f + timeinfo->tm_min / 2.f);
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(min, "min", current_view);
+            gui_img_rotation((gui_img_t *)min, timeinfo->tm_min * 6.0f);
+        }
         break;
     case 2:
+        {
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(m_decimal, "m_decimal", current_view);
+            gui_obj_t *m_single = gui_list_entry(m_decimal->brother_list.next, gui_obj_t, brother_list);
+            gui_obj_t *h_decimal = gui_list_entry(m_single->brother_list.next, gui_obj_t, brother_list);
+            gui_obj_t *h_single = gui_list_entry(h_decimal->brother_list.next, gui_obj_t, brother_list);
+
+            int tm_hour = time_format_24 ? timeinfo->tm_hour : (timeinfo->tm_hour % 12 == 0 ? 12 :
+                                                                timeinfo->tm_hour % 12);
+            gui_img_set_image_data((gui_img_t *)h_decimal, clock_num_array[tm_hour / 10]);
+            gui_img_set_image_data((gui_img_t *)h_single, clock_num_array[tm_hour % 10]);
+            gui_img_set_image_data((gui_img_t *)m_decimal, clock_num_array[timeinfo->tm_min / 10]);
+            gui_img_set_image_data((gui_img_t *)m_single, clock_num_array[timeinfo->tm_min % 10]);
+        }
         break;
     case 3:
         {
@@ -93,12 +112,12 @@ static void time_update(void *obj)
 
             int tm_hour = time_format_24 ? timeinfo->tm_hour : (timeinfo->tm_hour % 12 == 0 ? 12 :
                                                                 timeinfo->tm_hour % 12);
-            gui_img_set_image_data((gui_img_t *)h_decimal, clock4_num_array[tm_hour / 10]);
-            gui_img_set_image_data((gui_img_t *)h_single, clock4_num_array[tm_hour % 10]);
-            gui_img_set_image_data((gui_img_t *)m_decimal, clock4_num_array[timeinfo->tm_min / 10]);
-            gui_img_set_image_data((gui_img_t *)m_single, clock4_num_array[timeinfo->tm_min % 10]);
-            gui_img_set_image_data((gui_img_t *)m_decimal_mask, clock4_num_array[timeinfo->tm_min / 10]);
-            gui_img_set_image_data((gui_img_t *)m_single_mask, clock4_num_array[timeinfo->tm_min % 10]);
+            gui_img_set_image_data((gui_img_t *)h_decimal, clock_num_array[tm_hour / 10]);
+            gui_img_set_image_data((gui_img_t *)h_single, clock_num_array[tm_hour % 10]);
+            gui_img_set_image_data((gui_img_t *)m_decimal, clock_num_array[timeinfo->tm_min / 10]);
+            gui_img_set_image_data((gui_img_t *)m_single, clock_num_array[timeinfo->tm_min % 10]);
+            gui_img_set_image_data((gui_img_t *)m_decimal_mask, clock_num_array[timeinfo->tm_min / 10]);
+            gui_img_set_image_data((gui_img_t *)m_single_mask, clock_num_array[timeinfo->tm_min % 10]);
         }
         break;
     case 5:
@@ -109,36 +128,54 @@ static void time_update(void *obj)
 
 }
 
+static void clock1_bg_update(void *obj)
+{
+    GUI_UNUSED(obj);
+    gui_img_t *img_0 = (gui_img_t *)obj;
+    theme_color_index++;
+    theme_color_index %= 5;
+    uint32_t color = theme_color_array[theme_color_index];
+
+    gui_img_t *img_1 = (gui_img_t *)gui_list_entry(GUI_BASE(img_0)->brother_list.next, gui_obj_t,
+                                                   brother_list);
+    gui_img_t *img_2 = (gui_img_t *)gui_list_entry(GUI_BASE(img_1)->brother_list.next, gui_obj_t,
+                                                   brother_list);
+    gui_img_t *img_3 = (gui_img_t *)gui_list_entry(GUI_BASE(img_2)->brother_list.next, gui_obj_t,
+                                                   brother_list);
+    gui_img_t *img_edge = (gui_img_t *)gui_list_entry(GUI_BASE(img_0)->brother_list.prev, gui_obj_t,
+                                                      brother_list);
+    gui_img_t *img_center = (gui_img_t *)gui_list_entry(GUI_BASE(img_edge)->brother_list.prev,
+                                                        gui_obj_t, brother_list);
+    img_0->fg_color_set = color;
+    img_1->fg_color_set = color;
+    img_2->fg_color_set = color;
+    img_3->fg_color_set = color;
+    img_center->fg_color_set = color;
+
+}
+
+static void clock2_bg_update(void *obj)
+{
+    GUI_UNUSED(obj);
+    theme_color_index++;
+    theme_color_index %= 5;
+    uint32_t color = theme_color_array[theme_color_index];
+
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(m_decimal, "m_decimal", current_view);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(m_single, "m_single", current_view);
+
+    gui_img_a8_recolor((void *)m_decimal, color);
+    gui_img_a8_recolor((void *)m_single, color);
+}
+
 static void clock3_bg_update(void *obj)
 {
     GUI_UNUSED(obj);
     gui_img_t *vec = (gui_img_t *)obj;
-    static uint8_t cnt = 0;
-    uint32_t color = 0;
-    cnt++;
-    switch (cnt % 5)
-    {
-    case 0:
-        color = theme_color.color.argb_full;
-        break;
-    case 1:
-        color = GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01);
-        break;
-    case 2:
-        color = GUI_COLOR_ARGB8888(255, 0x8F, 0xBF, 0x80);
-        break;
-    case 3:
-        color = GUI_COLOR_ARGB8888(255, 0x7C, 0x9E, 0xFF);
-        break;
-    case 4:
-        color = GUI_COLOR_ARGB8888(255, 0xB4, 0x90, 0xFF);
-        break;
+    theme_color_index++;
+    theme_color_index %= 5;
+    uint32_t color = theme_color_array[theme_color_index];
 
-    default:
-        color = theme_color.color.argb_full;
-        break;
-    }
-    theme_color.color.argb_full = color;
     gui_img_a8_fix_bg(vec, color);
 }
 
@@ -146,38 +183,84 @@ static void clock4_bg_update(void *obj)
 {
     GUI_UNUSED(obj);
     gui_img_t *vec = (gui_img_t *)obj;
-    static uint8_t cnt = 0;
-    uint32_t color = 0;
-    cnt++;
+    theme_color_index++;
+    theme_color_index %= 5;
+    uint32_t color = theme_color_array[theme_color_index];
+
     GUI_WIDGET_POINTER_BY_NAME_ROOT(m_decimal, "m_decimal", current_view);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(m_single, "m_single", current_view);
 
-    switch (cnt % 5)
-    {
-    case 0:
-        color = theme_color.color.argb_full;
-        break;
-    case 1:
-        color = GUI_COLOR_ARGB8888(255, 0xFF, 0x59, 0x01);
-        break;
-    case 2:
-        color = GUI_COLOR_ARGB8888(255, 0x8F, 0xBF, 0x80);
-        break;
-    case 3:
-        color = GUI_COLOR_ARGB8888(255, 0x7C, 0x9E, 0xFF);
-        break;
-    case 4:
-        color = GUI_COLOR_ARGB8888(255, 0xB4, 0x90, 0xFF);
-        break;
-
-    default:
-        color = theme_color.color.argb_full;
-        break;
-    }
-    theme_color.color.argb_full = color;
     gui_img_a8_recolor(vec, color);
     gui_img_a8_recolor((void *)m_decimal, color);
     gui_img_a8_recolor((void *)m_single, color);
+}
+
+static void clock1_design(gui_view_t *view)
+{
+    gui_obj_t *parent = GUI_BASE(view);
+    // Background
+    gui_img_t *vec = gui_img_create_from_mem(parent, 0, CLOCK1_BG_BIN, 0, 0, 0, 0);
+    gui_img_a8_recolor(vec, GUI_COLOR_ARGB8888(255, 0x2F, 0x2F, 0x2F));
+
+    // time hands
+    gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK1_MIN_BIN, 160, 100, 0, 0);
+    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    gui_img_set_quality(img, true);
+    // gui_img_a8_recolor(img, SCREEN_BG_DARK.color.argb_full);
+    gui_img_set_focus(img, 160 - 154, 100 - 18); // img target is (154, 18), focus is (160, 100)
+    img = gui_img_create_from_mem(parent, "hour", CLOCK1_HOUR_BIN, 160, 100, 0, 0);
+    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    gui_img_set_quality(img, true);
+    // gui_img_a8_recolor(img, SCREEN_BG_DARK.color.argb_full);
+    gui_img_set_focus(img, 160 - 151, 100 - 48); // img target is (151, 48), focus is (160, 100)
+    img = gui_img_create_from_mem(parent, 0, CLOCK1_CENTER_BIN, 154, 94, 0, 0);
+    gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
+    img = gui_img_create_from_mem(parent, 0, CLOCK1_CENTER_EDGE_BIN, 154, 94, 0, 0);
+    gui_img_a8_recolor(img, SCREEN_BG_DARK.color.argb_full);
+
+    // time numbers
+    img = gui_img_create_from_mem(parent, 0, CLOCK1_NUM_12_BIN, 144, 6, 0, 0);
+    gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
+    gui_obj_create_timer(GUI_BASE(img), 1000, true, clock1_bg_update);
+    img = gui_img_create_from_mem(parent, 0, CLOCK1_NUM_6_BIN, 151, 168, 0, 0);
+    gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
+    img = gui_img_create_from_mem(parent, 0, CLOCK1_NUM_9_BIN, 19, 86, 0, 0);
+    gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
+    gui_img_a8_fix_bg(img, SCREEN_BG_DARK.color.argb_full);
+    img = gui_img_create_from_mem(parent, 0, CLOCK1_NUM_3_BIN, 266, 86, 0, 0);
+    gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
+    gui_img_a8_fix_bg(img, SCREEN_BG_DARK.color.argb_full);
+}
+
+static void clock2_design(gui_view_t *view)
+{
+    clock_num_array[0] = CLOCK2_NUM_0_BIN;
+    clock_num_array[1] = CLOCK2_NUM_1_BIN;
+    clock_num_array[2] = CLOCK2_NUM_2_BIN;
+    clock_num_array[3] = CLOCK2_NUM_3_BIN;
+    clock_num_array[4] = CLOCK2_NUM_4_BIN;
+    clock_num_array[5] = CLOCK2_NUM_5_BIN;
+    clock_num_array[6] = CLOCK2_NUM_6_BIN;
+    clock_num_array[7] = CLOCK2_NUM_7_BIN;
+    clock_num_array[8] = CLOCK2_NUM_8_BIN;
+    clock_num_array[9] = CLOCK2_NUM_9_BIN;
+
+    gui_obj_t *parent = GUI_BASE(view);
+
+    gui_img_t *m_decimal = gui_img_create_from_mem(parent, "m_decimal", clock_num_array[0], 105, 75,
+                                                   0, 0);
+    gui_img_t *m_single = gui_img_create_from_mem(parent, "m_single", clock_num_array[8], 210, 75, 0,
+                                                  0);
+    gui_img_t *h_decimal = gui_img_create_from_mem(parent, "h_decimal", clock_num_array[1], 0, -15, 0,
+                                                   0);
+    gui_img_t *h_single = gui_img_create_from_mem(parent, "h_single", clock_num_array[0], 105, -15, 0,
+                                                  0);
+    gui_img_a8_recolor(h_decimal, FG_WHITE.color.argb_full);
+    gui_img_a8_recolor(h_single, FG_WHITE.color.argb_full);
+    gui_img_a8_recolor(m_decimal, theme_color_array[theme_color_index]);
+    gui_img_a8_recolor(m_single, theme_color_array[theme_color_index]);
+
+    gui_obj_create_timer(GUI_BASE(m_decimal), 1000, true, clock2_bg_update);
 }
 
 static void clock3_design(gui_view_t *view)
@@ -186,62 +269,61 @@ static void clock3_design(gui_view_t *view)
     // Background
     gui_img_t *vec = gui_img_create_from_mem(parent, 0, CLOCK3_VECTOR_BIN, 0, 0, 0, 0);
     gui_img_a8_recolor(vec, FG_1_DARK.color.argb_full);
-    gui_img_a8_fix_bg(vec, theme_color.color.argb_full);
+    gui_img_a8_fix_bg(vec, theme_color_array[theme_color_index]);
     gui_img_set_mode(vec, IMG_2D_SW_FIX_A8_BGFG);
     gui_obj_create_timer(GUI_BASE(vec), 1000, true, clock3_bg_update);
 
     // time hands
     gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK3_MIN_BIN, 160, 100, 0, 0);
     gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    gui_img_set_quality(img, true);
     // gui_img_a8_recolor(img, SCREEN_BG_DARK.color.argb_full);
-    gui_img_set_focus(img, 160 - 146, 100 - 7); // img target is (146, 7), focus is (160, 100)
+    gui_img_set_focus(img, 160 - 150, 100 - 15); // img target is (150, 15), focus is (160, 100)
     img = gui_img_create_from_mem(parent, "hour", CLOCK3_HOUR_BIN, 160, 100, 0, 0);
     gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
+    gui_img_set_quality(img, true);
     // gui_img_a8_recolor(img, SCREEN_BG_DARK.color.argb_full);
-    gui_img_set_focus(img, 160 - 146, 100 - 27); // img target is (146, 27), focus is (160, 100)
+    gui_img_set_focus(img, 160 - 147, 100 - 47); // img target is (147, 47), focus is (160, 100)
     img = gui_img_create_from_mem(parent, 0, CLOCK3_CENTER_BIN, 146, 86, 0, 0);
     gui_img_a8_recolor(img, FG_WHITE.color.argb_full);
 }
 
 static void clock4_design(gui_view_t *view)
 {
-    if (!clock4_num_array[0])
-    {
-        clock4_num_array[0] = CLOCK_4_NUM_0_BIN;
-        clock4_num_array[1] = CLOCK_4_NUM_1_BIN;
-        clock4_num_array[2] = CLOCK_4_NUM_2_BIN;
-        clock4_num_array[3] = CLOCK_4_NUM_3_BIN;
-        clock4_num_array[4] = CLOCK_4_NUM_4_BIN;
-        clock4_num_array[5] = CLOCK_4_NUM_5_BIN;
-        clock4_num_array[6] = CLOCK_4_NUM_6_BIN;
-        clock4_num_array[7] = CLOCK_4_NUM_7_BIN;
-        clock4_num_array[8] = CLOCK_4_NUM_8_BIN;
-        clock4_num_array[9] = CLOCK_4_NUM_9_BIN;
-    }
+    clock_num_array[0] = CLOCK4_NUM_0_BIN;
+    clock_num_array[1] = CLOCK4_NUM_1_BIN;
+    clock_num_array[2] = CLOCK4_NUM_2_BIN;
+    clock_num_array[3] = CLOCK4_NUM_3_BIN;
+    clock_num_array[4] = CLOCK4_NUM_4_BIN;
+    clock_num_array[5] = CLOCK4_NUM_5_BIN;
+    clock_num_array[6] = CLOCK4_NUM_6_BIN;
+    clock_num_array[7] = CLOCK4_NUM_7_BIN;
+    clock_num_array[8] = CLOCK4_NUM_8_BIN;
+    clock_num_array[9] = CLOCK4_NUM_9_BIN;
 
     gui_obj_t *parent = GUI_BASE(view);
 
     gui_img_t *vec = gui_img_create_from_mem(parent, "bg", CLOCK4_VECTOR_BIN, 55, 0, 0, 0);
-    gui_img_a8_recolor(vec, theme_color.color.argb_full);
+    gui_img_a8_recolor(vec, theme_color_array[theme_color_index]);
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, CLOCK4_MASK_BIN, 55, 0, 0, 0);
     gui_img_set_mode(mask, IMG_2D_SW_SRC_OVER_MODE);
 
-    gui_img_t *h_decimal = gui_img_create_from_mem(parent, "h_decimal", clock4_num_array[1], 102, 30, 0,
+    gui_img_t *h_decimal = gui_img_create_from_mem(parent, "h_decimal", clock_num_array[1], 102, 30, 0,
                                                    0);
-    gui_img_t *h_single = gui_img_create_from_mem(parent, "h_single", clock4_num_array[0], 157, 30, 0,
+    gui_img_t *h_single = gui_img_create_from_mem(parent, "h_single", clock_num_array[0], 157, 30, 0,
                                                   0);
     gui_img_a8_recolor(h_decimal, FG_WHITE.color.argb_full);
     gui_img_a8_recolor(h_single, FG_WHITE.color.argb_full);
-    gui_img_t *m_decimal = gui_img_create_from_mem(parent, "m_decimal", clock4_num_array[0], 102, 105,
+    gui_img_t *m_decimal = gui_img_create_from_mem(parent, "m_decimal", clock_num_array[0], 102, 105,
                                                    0, 0);
-    gui_img_t *m_single = gui_img_create_from_mem(parent, "m_single", clock4_num_array[8], 157, 105, 0,
+    gui_img_t *m_single = gui_img_create_from_mem(parent, "m_single", clock_num_array[8], 157, 105, 0,
                                                   0);
-    gui_img_t *m_decimal_mask = gui_img_create_from_mem(parent, "m_decimal_mask", clock4_num_array[0],
+    gui_img_t *m_decimal_mask = gui_img_create_from_mem(parent, "m_decimal_mask", clock_num_array[0],
                                                         102, 104, 0, 0);
-    gui_img_t *m_single_mask = gui_img_create_from_mem(parent, "m_single_mask", clock4_num_array[8],
+    gui_img_t *m_single_mask = gui_img_create_from_mem(parent, "m_single_mask", clock_num_array[8],
                                                        157, 104, 0, 0);
-    gui_img_a8_recolor(m_decimal, theme_color.color.argb_full);
-    gui_img_a8_recolor(m_single, theme_color.color.argb_full);
+    gui_img_a8_recolor(m_decimal, theme_color_array[theme_color_index]);
+    gui_img_a8_recolor(m_single, theme_color_array[theme_color_index]);
     gui_img_a8_recolor(m_decimal_mask, SCREEN_BG_DARK.color.argb_full);
     gui_img_a8_recolor(m_single_mask, SCREEN_BG_DARK.color.argb_full);
     gui_img_a8_mix_alpha(m_decimal_mask, 0xFF * 0.3f);
@@ -266,8 +348,10 @@ static void clock_view_design(gui_view_t *view)
     switch (clock_style + 1)
     {
     case 1:
+        clock1_design(view);
         break;
     case 2:
+        clock2_design(view);
         break;
     case 3:
         clock3_design(view);

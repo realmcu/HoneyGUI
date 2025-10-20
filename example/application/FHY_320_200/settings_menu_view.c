@@ -101,6 +101,8 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     list_offset_his = 0;
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(list, "list", current_view);
+    gui_obj_stop_timer(list);
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
@@ -110,6 +112,17 @@ static void note_timer_cb(void *p)
     gui_obj_stop_timer(p);
     gui_view_switch_direct(current_view, detail_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+}
+
+static void switch_page_screen_brightness(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    detail_page_design_func = page_screen_brightness_design;
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
 }
 
 static void switch_page_dark_light(void *obj, gui_event_t e, void *param)
@@ -129,6 +142,28 @@ static void switch_page_lock_screen(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     detail_page_design_func = page_lock_screen_design;
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
+}
+
+static void switch_page_time_format(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    detail_page_design_func = page_time_format_design;
+    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
+    gui_obj_hidden((void *)bg_note, false);
+    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
+}
+
+static void switch_page_notification(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    detail_page_design_func = page_notification_design;
     gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
     gui_obj_hidden((void *)bg_note, false);
     gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
@@ -211,9 +246,16 @@ static void settings_menu_view_design(gui_view_t *view)
     int array_size = sizeof(text_array) / sizeof(text_array[0]);
     void *click_cb[] =
     {
-        NULL,
+        switch_page_screen_brightness,
         switch_page_dark_light,
         switch_page_lock_screen,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        switch_page_notification,
+        switch_page_time_format,
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
     void **func_cb = gui_malloc(array_size * sizeof(void *));

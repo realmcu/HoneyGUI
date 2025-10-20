@@ -248,7 +248,7 @@ static void show_bg(void *obj)
 static void inform_center_view_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, quick_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
-                             SWITCH_INIT_STATE,
+                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
     gui_obj_t *parent = GUI_BASE(view);

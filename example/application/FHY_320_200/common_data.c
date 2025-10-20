@@ -59,17 +59,25 @@ const char *day[7] =
 };
 
 /* Clock style */
-int8_t clock_style = 2;
+int8_t clock_style = 0;
 bool switch_from_lock_screen = false;
 
 /* Theme color */
-gui_color_t theme_color = {0};
+uint8_t theme_color_index = 0;
+uint32_t theme_color_array[5] =
+{
+    0xFFFF5901,
+    0xFFFF9420,
+    0xFF8FBF80,
+    0xFF7C9EFF,
+    0xFFB490FF,
+};
 
 /* Theme bg */
 bool theme_bg_white = false; // default black bg
 
 /* Volume */
-int8_t volume_val = 5;
+int8_t volume_val = 0; // [0, 10]
 
 /* Battery */
 uint8_t battery_barn_val = 90;
@@ -81,3 +89,6 @@ uint8_t message_num_val = 10;
 
 /* Function status */
 struct FUNCTION_STATUS f_status = {0};
+
+/* Screen Brightness */
+int8_t screen_brightness_val = 1; // [1, 3]
