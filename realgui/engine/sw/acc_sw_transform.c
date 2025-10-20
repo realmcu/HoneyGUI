@@ -311,3 +311,195 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
         }
     }
 }
+
+void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
+                               gui_rect_t *rect)
+{
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
+
+    if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    {
+        return;
+    }
+
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    gui_matrix_t *inverse = &image->inverse;
+
+    float m00 = inverse->m[0][0];
+    float m01 = inverse->m[0][1];
+    float m02 = inverse->m[0][2];
+    float m10 = inverse->m[1][0];
+    float m11 = inverse->m[1][1];
+    float m12 = inverse->m[1][2];
+
+    uint32_t argb_value = image->fg_color_set;
+    uint8_t b8 = (uint8_t)(argb_value & 0xFF);
+    uint8_t g8 = (uint8_t)((argb_value >> 8) & 0xFF);
+    uint8_t r8 = (uint8_t)((argb_value >> 16) & 0xFF);
+    // Alpha (argb >> 24) not used in RGB565 conversion
+
+    uint16_t r5 = (uint16_t)(r8 >> 3);
+    uint16_t g6 = (uint16_t)(g8 >> 2);
+    uint16_t b5 = (uint16_t)(b8 >> 3);
+
+    uint16_t fg_color = (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+    for (int32_t i = y_start; i <= y_end; i++)
+    {
+        float detalX = m01 * i + m02;
+        float detalY = m11 * i + m12;
+        float X = m00 * x_start + detalX;
+        float Y = m10 * x_start + detalY;
+
+        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+
+        for (int32_t j = x_start; j <= x_end; j++)
+        {
+            // int x = roundf(X);
+            // int y = roundf(Y);
+
+            int x = (int)X;
+            int y = (int)Y;
+
+            if ((x >= source_w) || (x < -1) ||
+#ifdef HONEYGUI_4XAA
+                (y < -1)
+#else
+                (y < 0)
+#endif
+                || (y >= source_h))
+            {
+                X += m00;
+                Y += m10;
+                continue;
+            }
+            uint8_t xRatio = (X - x) * 0xFF;
+            uint8_t alpha1 = 0, alpha2 = 0;
+#ifdef HONEYGUI_4XAA
+            uint8_t yRatio = (Y - y) * 0xFF;
+            uint8_t alpha3 = 0, alpha4 = 0;
+#endif
+            int write_off = write_offset + j;
+            int image_off = y * source_w + x;
+
+#ifdef HONEYGUI_4XAA
+            if (x >= 0 && y >= 0)
+#else
+            if (x >= 0)
+#endif
+            {
+                alpha1 = *((uint8_t *)(uintptr_t)image_base + image_off);
+            }
+#ifdef HONEYGUI_4XAA
+            if (y >= -1)
+            {
+                alpha3 = *((uint8_t *)(uintptr_t)mage_base + image_off + source_w);
+            }
+
+            if (x < source_w - 1 && y >= 0)
+#else
+            if (x < source_w - 1)
+#endif
+            {
+                alpha2 = *((uint8_t *)(uintptr_t)image_base + image_off + 1);
+            }
+#ifdef HONEYGUI_4XAA
+            if (y < source_h - 1)
+            {
+                alpha4 = *((uint8_t *)(uintptr_t)image_base + image_off + source_w + 1);
+            }
+#endif
+#ifdef HONEYGUI_4XAA
+            alpha1 = ((alpha1 * (0xFF - xRatio) + alpha2 * xRatio) >> 8);
+            alpha3 = ((alpha3 * (0xFF - xRatio) + alpha4 * xRatio) >> 8);
+            alpha1 = ((alpha1 * (0xFF - yRatio) + alpha3 * yRatio) >> 8);
+#else
+            alpha1 = ((alpha1 * (0xFF - xRatio) + alpha2 * xRatio) >> 8);
+#endif
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_color, writebuf[write_off], alpha1);
+            X += m00;
+            Y += m10;
+        }
+    }
+}
+
+void sw_transform_for_alpha(draw_img_t *image, gui_dispdev_t *dc,
+                            gui_rect_t *rect)
+{
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
+
+    if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    {
+        return;
+    }
+
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    gui_matrix_t *inverse = &image->inverse;
+
+    float m00 = inverse->m[0][0];
+    float m01 = inverse->m[0][1];
+    float m02 = inverse->m[0][2];
+    float m10 = inverse->m[1][0];
+    float m11 = inverse->m[1][1];
+    float m12 = inverse->m[1][2];
+
+    uint32_t argb_value = image->fg_color_set;
+    uint8_t b8 = (uint8_t)(argb_value & 0xFF);
+    uint8_t g8 = (uint8_t)((argb_value >> 8) & 0xFF);
+    uint8_t r8 = (uint8_t)((argb_value >> 16) & 0xFF);
+    // Alpha (argb >> 24) not used in RGB565 conversion
+
+    uint16_t r5 = (uint16_t)(r8 >> 3);
+    uint16_t g6 = (uint16_t)(g8 >> 2);
+    uint16_t b5 = (uint16_t)(b8 >> 3);
+
+    uint16_t fg_color = (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+    for (int32_t i = y_start; i <= y_end; i++)
+    {
+        float detalX = m01 * i + m02;
+        float detalY = m11 * i + m12;
+        float X = m00 * x_start + detalX;
+        float Y = m10 * x_start + detalY;
+
+        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+
+        for (int32_t j = x_start; j <= x_end; j++)
+        {
+            // int x = roundf(X);
+            // int y = roundf(Y);
+
+            int x = (int)X;
+            int y = (int)Y;
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+            {
+                X += m00;
+                Y += m10;
+                continue;
+            }
+
+            int write_off = write_offset + j;
+            int image_off = y * source_w + x;
+
+            uint8_t alpha = *((uint8_t *)(uintptr_t)image_base + image_off);
+
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(fg_color, writebuf[write_off], alpha);
+
+            X += m00;
+            Y += m10;
+        }
+    }
+}

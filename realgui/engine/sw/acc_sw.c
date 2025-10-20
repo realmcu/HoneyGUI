@@ -116,6 +116,17 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
                     sw_transform_for_argb8565(image, dc, rect);
                 }
             }
+            else if (head->type == ALPHAMASK)
+            {
+                if (image->high_quality)
+                {
+                    sw_transform_for_alpha_aa(image, dc, rect);
+                }
+                else
+                {
+                    sw_transform_for_alpha(image, dc, rect);
+                }
+            }
         }
     }
     else
