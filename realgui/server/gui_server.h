@@ -16,7 +16,6 @@ typedef void (* touch_sync_cb)(void);
 int gui_server_init(void);
 void gui_debug_sethook(void (*hook)(void));
 bool gui_server_dlps_check(void);
-uint32_t gui_spf(void);
 
 
 void gui_server_exec_cb(gui_msg_cb cb);

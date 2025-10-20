@@ -40,20 +40,6 @@ typedef enum t_gui_pfb_type
 } T_GUI_PFB_TYPE;
 
 
-typedef struct _gui_frame_monitor_t
-{
-    uint32_t start;
-    void (*start_cb)(void);
-    uint32_t input_prepare;
-    void (*input_prepare_cb)(void);
-    uint32_t draw_prepare;
-    void (*draw_prepare_cb)(void);
-    uint32_t draw;
-    void (*draw_cb)(void);
-    uint32_t end;
-    void (*end_cb)(void);
-} gui_frame_monitor_t;
-
 typedef struct gui_dispdev
 {
     /* width and height */
@@ -91,7 +77,7 @@ typedef struct gui_dispdev
     void (*lcd_draw_sync)(void);
     uint8_t *lcd_gram;
     uint32_t frame_count;
-    gui_frame_monitor_t *lcd_frame_monitor;
+    bool fb_measure_enable;
 } gui_dispdev_t;
 
 

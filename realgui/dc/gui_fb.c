@@ -21,7 +21,6 @@ static bool fb_change = false;
 static uint32_t gui_obj_count;
 static uint32_t obj_count;
 static int frame_count_per_second;
-static uint32_t spf = 5;
 
 static gui_color_t fb_bg_color = {0};
 
@@ -327,6 +326,7 @@ static void gui_pfb_draw(gui_obj_t *root)
 
 static void gui_fb_draw(gui_obj_t *root)
 {
+    uint32_t measure_start_time = gui_ms_get();
     gui_dispdev_t *dc = gui_get_dc();
 
     if (dc->reset_lcd_timer != NULL)
@@ -380,6 +380,11 @@ static void gui_fb_draw(gui_obj_t *root)
         dc->lcd_update(dc);
     }
     post_process_end();
+    uint32_t measure_end_time = gui_ms_get();
+    if (dc->fb_measure_enable == true)
+    {
+        gui_log("fb draw time %d ms", measure_end_time - measure_start_time);
+    }
 }
 
 uint32_t gui_fps()
@@ -391,10 +396,7 @@ void gui_fb_change(void)
     fb_change = true;
 }
 
-uint32_t gui_spf()
-{
-    return spf;
-}
+
 void gui_fb_disp(gui_obj_t *root, bool enable_event)
 {
     if (root == NULL)
@@ -404,10 +406,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     }
 
     gui_dispdev_t *dc = gui_get_dc();
-    if (dc->lcd_frame_monitor)
-    {
-        dc->lcd_frame_monitor->start_cb();
-    }
+
 
     if ((dc->frame_buf == NULL) && (dc->disp_buf_1 == NULL) && (dc->disp_buf_2 == NULL))
     {
@@ -417,16 +416,9 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
 
     obj_input_prepare(root);
     obj_reset_active(root);
-    if (dc->lcd_frame_monitor)
-    {
-        dc->lcd_frame_monitor->input_prepare_cb();
-    }
+
     obj_draw_prepare(root);
 
-    if (dc->lcd_frame_monitor)
-    {
-        dc->lcd_frame_monitor->draw_prepare_cb();
-    }
 
     static uint32_t one_second = 0;
     uint32_t tick = gui_ms_get();
@@ -448,10 +440,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     {
         gui_thread_mdelay(17);
     }
-    if (dc->lcd_frame_monitor)
-    {
-        dc->lcd_frame_monitor->draw_cb();
-    }
+
 
     obj_draw_end(root);
 
@@ -462,10 +451,6 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
 
     dc->frame_count++;
 
-    if (dc->lcd_frame_monitor)
-    {
-        dc->lcd_frame_monitor->end_cb();
-    }
 
 }
 
