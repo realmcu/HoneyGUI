@@ -20,7 +20,7 @@ MP Tool 支持调试模式和批量生产模式，集成了打包和 flash map �
 + 加载烧录所需的文件，包含 flash map、System Config File、APP Image 等。 
 + 选择 User Data。
 
-.. figure:: https://foruda.gitee.com/images/1761015146063126544/775a0ab6_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761026187912386940/43f9518e_13408154.png
    :width: 800px
    :align: center
 
