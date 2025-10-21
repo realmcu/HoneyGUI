@@ -20,7 +20,7 @@ MP Tool 支持调试模式和批量生产模式，集成了打包和 flash map �
 + 加载烧录所需的文件，包含 flash map、System Config File、APP Image 等。 
 + 选择 User Data。
 
-.. figure:: https://foruda.gitee.com/images/1727331689141596564/ebfcbd14_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761015146063126544/775a0ab6_13408154.png
    :width: 800px
    :align: center
 
@@ -28,7 +28,7 @@ MP Tool 支持调试模式和批量生产模式，集成了打包和 flash map �
 
 + 将生成的图像文件下载到指定的地址（例如文件系统挂载地址）， 8762G 的地址为 0x04400000。
 
-.. figure:: https://foruda.gitee.com/images/1727331747989671600/86b564da_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761015541576180221/a4c2ba8b_13408154.png
    :width: 800px
    :align: center
 
@@ -36,7 +36,7 @@ MP Tool 支持调试模式和批量生产模式，集成了打包和 flash map �
 
 + 文件准备完成后，先检测 UART 端口，正常则显示 :guilabel:`Ready`。然后打开 UART 端口，显示 :guilabel:`OK` 后即可点击 :guilabel:`Download` 烧录。
 
-.. figure:: https://foruda.gitee.com/images/1728973687663258532/d05f55d2_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761017037961739146/da1c9699_13408154.png
    :width: 900px
    :align: center
 

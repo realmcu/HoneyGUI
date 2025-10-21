@@ -20,7 +20,7 @@ Select the chip type and language in the MP Tool startup interface, taking RTL87
 + Load the necessary files for burning, including flash map, System Config File, APP Image, etc.
 + Select User Data.
 
-.. figure:: https://foruda.gitee.com/images/1727331689141596564/ebfcbd14_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761015146063126544/775a0ab6_13408154.png
    :width: 800px
    :align: center
 
@@ -28,7 +28,7 @@ Select the chip type and language in the MP Tool startup interface, taking RTL87
 
 + Download the generated image file to the specified address (such as the file system mount address), where the 8762G address is 0x04400000.
 
-.. figure:: https://foruda.gitee.com/images/1727331747989671600/86b564da_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761015541576180221/a4c2ba8b_13408154.png
    :width: 800px
    :align: center
 
@@ -36,7 +36,7 @@ Select the chip type and language in the MP Tool startup interface, taking RTL87
 
 + After the file preparation is completed, first check the UART port. If it is normal, it will display :guilabel:`Ready`. Then open the UART port and display :guilabel:`OK`. Once this is done, click :guilabel:`Download` to start the burning process.
 
-.. figure:: https://foruda.gitee.com/images/1728973687663258532/d05f55d2_13408154.png
+.. figure:: https://foruda.gitee.com/images/1761017037961739146/da1c9699_13408154.png
    :width: 900px
    :align: center
 

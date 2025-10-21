@@ -539,6 +539,10 @@ html.writer-html4 .rst-content dl:not(.docutils)>dt,
 html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)>dt {
     color: inherit;
 }
+html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple) dl:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple) > dt:not([class]) {
+    border-left: none;
+    background: transparent;
+}
 dl.macro span.sig-name + span.pre,
 dl.macro span.sig-name + span.sig-paren,
 dl.macro span.sig-name + a.reference {

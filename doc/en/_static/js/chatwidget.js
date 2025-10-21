@@ -3,6 +3,9 @@
         const chatWidgetHTML = `
         <chat-widget>
             <style>
+                chat-widget {
+                    --rtk-blue: #0068b6;
+                }
                 .overY-clip {
                     overflow-y: clip;
                 }
@@ -43,7 +46,7 @@
                     fill: #b0b0b0;
                 }
                 chat-widget .btn-hidden {
-                    display: none;
+                    display: none !important;
                 }
                 chat-widget .resize-modal {
                     position: absolute;
@@ -68,7 +71,7 @@
                     height: 60px;
                     padding: 15px 20px;
                     border-radius: 8px 8px 0 0;
-                    background-color: #0068b6;
+                    background-color: var(--rtk-blue);
                     color: #fff;
                     font-weight: bold;
                 }
@@ -159,7 +162,7 @@
                     transition: 0.5s;
                 }
                 .chat-switch-checkbox:checked + .chat-switch-label {
-                    background-color: #0068b6;
+                    background-color: var(--rtk-blue);
                 }
                 .chat-switch-checkbox:checked + .chat-switch-label::after {
                     transform: translateX(20px);
@@ -224,7 +227,7 @@
                 chat-widget .userText {
                     white-space: pre-wrap;
                     margin-left: 40px;
-                    background-color: #0068b6;
+                    background-color: var(--rtk-blue);
                     color: #fff;
                 }
                 chat-widget .chatResp {
@@ -273,6 +276,10 @@
                     line-height: 24px;
                     border: none;
                     border-radius: 8px;
+                    background: transparent;
+                }
+                chat-widget .chatResp code.hljs {
+                    background: white;
                 }
                 chat-widget .chatResp table * {
                     background: transparent !important;
@@ -345,12 +352,12 @@
                     font-family: FontAwesome;
                     content: "\\f0a4";
                     display: inline-block;
-                    color: #0068B6;
+                    color: var(--rtk-blue);
                     font-size: 16px;
                     margin-right: 5px;
                 }
                 .font-small {
-                    font-size: 12px;
+                    font-size: 12px !important;
                 }
             </style>
             <div class="chat-modal-mask" id="ChatModalMask">
@@ -432,7 +439,59 @@
         document.body.insertAdjacentHTML('beforeend', chatWidgetHTML);
     }
 
-    function textAreaResize(element) {
+    /* ----------------------- svg icons ----------------------- */
+    const copySvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="18" height="18" viewBox="0 0 22 22" stroke-width="1.5" stroke="#222e6e" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <title>Copy to clipboard</title>
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+    </svg>
+    `;
+    const copyDoneSvg = `
+    <svg t="1755756250746" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10267" width="17" height="17">
+        <path d="M784 266.666667h-373.333333c-92.885333 0-144 51.114667-144 144v373.333333c0 92.885333 51.114667 144 144 144h373.333333c92.885333 0 144-51.114667 144-144v-373.333333c0-92.885333-51.114667-144-144-144z m80 517.333333c0 56.832-23.168 80-80 80h-373.333333c-56.832 0-80-23.168-80-80v-373.333333c0-56.832 23.168-80 80-80h373.333333c56.832 0 80 23.168 80 80v373.333333zM160 239.786667v373.76c0 51.114667 20.608 63.701333 27.392 67.882666a32 32 0 1 1-33.450667 54.570667c-38.442667-23.552-57.941333-64.725333-57.941333-122.453333V239.786667c0-91.392 52.48-143.786667 143.786667-143.786667h373.76c71.893333 0 106.24 31.530667 122.453333 57.941333a32 32 0 0 1-54.613333 33.408c-4.096-6.784-16.725333-27.392-67.84-27.392H239.786667c-56.661333 0.042667-79.786667 23.168-79.786667 79.829334z m566.613333 263.808a32 32 0 0 1 0 45.269333l-142.208 142.208a31.957333 31.957333 0 0 1-45.226666 0L468.053333 619.946667a32 32 0 1 1 45.269334-45.269334l48.512 48.469334 119.594666-119.594667a31.957333 31.957333 0 0 1 45.184 0.042667z" fill="#222e6e" p-id="10268"></path>
+    </svg>
+    `;
+    const copyFailSvg = `
+    <svg t="1755756470581" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="21471" width="17" height="17">
+        <path d="M640.79 54l0.25 0.004a32.569 32.569 0 0 1 0.643 0.015l0.216 0.009c3.454 0.141 6.767 0.83 9.854 1.983 0.02 0.009 0.04 0.016 0.061 0.024 0.131 0.048 0.261 0.098 0.39 0.149l0.092 0.036a30.076 30.076 0 0 1 1.103 0.458l0.106 0.047a31.824 31.824 0 0 1 8.214 5.266l0.123 0.11c0.325 0.288 0.645 0.585 0.96 0.89l0.378 0.372 213.437 213.25 0.063 0.062 0.262 0.266-0.325-0.328a32.645 32.645 0 0 1 0.69 0.71l0.075 0.08a31.898 31.898 0 0 1 4.865 6.793l0.049 0.093A31.865 31.865 0 0 1 886 298.72V896.35c0 41.235-33.444 74.65-74.688 74.65H213.688C172.446 971 139 937.585 139 896.35v-767.7C139 87.416 172.445 54 213.688 54h427.101z m-32.228 64H213.687C207.78 118 203 122.774 203 128.65v767.7c0 5.876 4.778 10.65 10.688 10.65h597.625c5.909 0 10.687-4.774 10.687-10.65v-565.1H640.562c-17.496 0-31.713-14.042-31.995-31.47l-0.005-0.53V118zM663.2 447.233c12.366 12.377 12.481 32.359 0.351 44.877l-0.371 0.377L557.774 597.8 663.18 703.113c12.502 12.49 12.511 32.752 0.02 45.254-12.367 12.378-32.348 12.51-44.878 0.391l-0.377-0.37L512.5 643.033 407.055 748.387c-12.502 12.492-32.764 12.483-45.255-0.02-12.366-12.377-12.481-32.359-0.351-44.877l0.371-0.377L467.225 597.8 361.82 492.487c-12.502-12.49-12.511-32.752-0.02-45.254 12.367-12.378 32.348-12.51 44.878-0.391l0.377 0.37L512.5 552.566l105.445-105.352c12.502-12.492 32.764-12.483 45.255 0.02z m9.362-284.027V267.25h104.135L672.562 163.206z" p-id="21472" fill="#222e6e"></path>
+    </svg>
+    `;
+    const likeSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm iconify iconify--icon-park-solid" width="18px" height="18px" viewBox="0 0 48 48">
+        <path fill="none" stroke="#222e6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4.189 22.173A2 2 0 0 1 6.181 20H10a2 2 0 0 1 2 2v19a2 2 0 0 1-2 2H7.834a2 2 0 0 1-1.993-1.827zM18 21.375c0-.836.52-1.584 1.275-1.94c1.649-.778 4.458-2.341 5.725-4.454c1.633-2.724 1.941-7.645 1.991-8.772c.007-.158.003-.316.024-.472c.271-1.953 4.04.328 5.485 2.74c.785 1.308.885 3.027.803 4.37c-.089 1.436-.51 2.823-.923 4.201l-.88 2.937h10.857a2 2 0 0 1 1.925 2.543l-5.37 19.016A2 2 0 0 1 36.986 43H20a2 2 0 0 1-2-2z"/>
+    </svg>
+    `;
+    const dislikeSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm iconify iconify--icon-park-outline" width="18px" height="18px" viewBox="0 0 48 48">
+        <path fill="none" stroke="#222e6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4.18 26.834A2 2 0 0 0 6.175 29H10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7.84a2 2 0 0 0-1.993 1.834zM18 26.626c0 .835.52 1.583 1.275 1.94c1.649.777 4.458 2.34 5.725 4.454c1.633 2.723 1.941 7.644 1.991 8.771c.007.158.003.316.024.472c.271 1.953 4.04-.328 5.485-2.74c.785-1.308.885-3.027.803-4.37c-.089-1.435-.51-2.823-.923-4.201l-.88-2.937h10.857a2 2 0 0 0 1.925-2.543l-5.37-19.016A2 2 0 0 0 36.986 5H20a2 2 0 0 0-2 2z"></path>
+    </svg>
+    `;
+    const loadingSvg = `
+    <svg t="1757316892265" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4636" width="18" height="18">
+        <path d="M469.333333 85.333333m42.666667 0l0 0q42.666667 0 42.666667 42.666667l0 128q0 42.666667-42.666667 42.666667l0 0q-42.666667 0-42.666667-42.666667l0-128q0-42.666667 42.666667-42.666667Z" fill="#13227a" opacity=".8" p-id="4637"></path><path d="M469.333333 725.333333m42.666667 0l0 0q42.666667 0 42.666667 42.666667l0 128q0 42.666667-42.666667 42.666667l0 0q-42.666667 0-42.666667-42.666667l0-128q0-42.666667 42.666667-42.666667Z" fill="#13227a" opacity=".4" p-id="4638" data-spm-anchor-id="a313x.search_index.0.i1.16ad3a81Tc0Y2F" class=""></path><path d="M938.666667 469.333333m0 42.666667l0 0q0 42.666667-42.666667 42.666667l-128 0q-42.666667 0-42.666667-42.666667l0 0q0-42.666667 42.666667-42.666667l128 0q42.666667 0 42.666667 42.666667Z" fill="#13227a" opacity=".2" p-id="4639"></path><path d="M298.666667 469.333333m0 42.666667l0 0q0 42.666667-42.666667 42.666667l-128 0q-42.666667 0-42.666667-42.666667l0 0q0-42.666667 42.666667-42.666667l128 0q42.666667 0 42.666667 42.666667Z" fill="#13227a" opacity=".6" p-id="4640"></path><path d="M783.530667 180.138667m30.169889 30.169889l0 0q30.169889 30.169889 0 60.339779l-90.509668 90.509668q-30.169889 30.169889-60.339779 0l0 0q-30.169889-30.169889 0-60.339779l90.509668-90.509668q30.169889-30.169889 60.339779 0Z" fill="#13227a" opacity=".1" p-id="4641"></path><path d="M330.965333 632.661333m30.16989 30.16989l0 0q30.169889 30.169889 0 60.339778l-90.509668 90.509668q-30.169889 30.169889-60.339779 0l0 0q-30.169889-30.169889 0-60.339778l90.509668-90.509668q30.169889-30.169889 60.339779 0Z" fill="#13227a" opacity=".5" p-id="4642"></path><path d="M843.861333 783.530667m-30.169889 30.169889l0 0q-30.169889 30.169889-60.339779 0l-90.509668-90.509668q-30.169889-30.169889 0-60.339779l0 0q30.169889-30.169889 60.339779 0l90.509668 90.509668q30.169889 30.169889 0 60.339779Z" fill="#13227a" opacity=".3" p-id="4643"></path><path d="M391.338667 330.965333m-30.16989 30.16989l0 0q-30.169889 30.169889-60.339778 0l-90.509668-90.509668q-30.169889-30.169889 0-60.339779l0 0q30.169889-30.169889 60.339778 0l90.509668 90.509668q30.169889 30.169889 0 60.339779Z" fill="#13227a" opacity=".7" p-id="4644"></path>
+    </svg>
+    `;
+
+    const feeddbackHtml = `
+    <div class="chat-feedback-box">
+        <button class="chat-feedback-btn" id="CopyButton">
+            <span class="chat-feedback-icon">${copySvg}</span>
+            <span class="chat-feedback-text">Copy</span>
+        </button>
+        <button class="chat-feedback-btn" id="LikeButton" value="positive">
+            <span class="chat-feedback-icon">${likeSvg}</span>
+            <span class="chat-feedback-text">Like</span>
+        </button>
+        <button class="chat-feedback-btn" id="DislikeButton" value="negative">
+            <span class="chat-feedback-icon">${dislikeSvg}</span>
+            <span class="chat-feedback-text">Dislike</span>
+        </button>
+    </div>
+    `;
+
+    function adjustEleHeight(element) {
         element.style.height = 'auto';
         element.style.height = element.scrollHeight + 'px';
     }
@@ -459,6 +518,55 @@
         });
     }
 
+    function initMarked() {
+        // Configure marked
+        const mdRenderer = new marked.Renderer();
+        mdRenderer.link = function({href, title, text}) {
+            return `<a href="${href}" target="_blank" rel="noopener noreferrer"${title ? ` title="${title}"` : ''}>${text}</a>`;
+        };
+        marked.setOptions({
+            renderer: mdRenderer,
+            pedantic: false, //尽可能遵循原始 Markdown 语法，而不是 GitHub Flavored Markdown。如果设置为 true，则偏向于更严格的解析
+            gfm: true, //启用 GitHub Flavored Markdown，如果需要 GFM 功能（如表格、任务列表等）可将其启用
+            breaks: true, //启用 GFM 换行符解析。设置为 true 时，Markdown 文本中的新行符被视为 <br>
+            smartypants: true, //使用智能排版标记替换引号和破折号为直观形式
+            headerIds: false,
+            mangle: true, //对嵌入的电子邮件地址进行加密处理（防止抓取），实现简单的防邮件爬虫
+            highlight: function(code, lang) {
+                // 如果指定了语言，并且hljs支持，按指定高亮
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                // 否则自动检测语言高亮
+                return hljs.highlightAuto(code).value;
+            }
+        });
+    }
+
+    /**
+     * 从源数组倒数第 n 个元素开始，向前复制指定数量的元素
+     * @param {Array} sourceArr 源数组
+     * @param {number} count 要复制的元素个数
+     * @param {number} n 倒数第 n 个元素作为起始（n >= 1）
+     * @returns {Array} 新数组（与原数组同排列方向，如需反转可增加 reverse 选项）
+     */
+    function copyArrFromEnd(sourceArr, count, n) {
+        if (!Array.isArray(sourceArr) || count <= 0 || n <= 0) {
+            return [];
+        }
+        const arrLen = sourceArr.length;
+        let endIdx = arrLen - n;
+        let startIdx = endIdx - count + 1;
+
+        // 防止越界，确保 startIdx >= 0
+        startIdx = Math.max(0, startIdx);
+
+        // slice 截取时需加1，因为 slice(开始, 结束)不包含结束，所以最后+1
+        let result = sourceArr.slice(startIdx, endIdx + 1);
+
+        return result;
+    }
+
     function chatWidgetInit(config) {
         const chatTitle = config.chatWidgetTitle || 'Real AI';
         const chatPlaceholder = config.chatWidgetPlaceholder || 'Type your question';
@@ -467,7 +575,7 @@
         let docTarget = "rtl87xxx";
 
         const aiEnvString = "PROD"; // aiEnv is PROD or QA
-        // docDomain is "https://docs.realmcu.com/" or "https://docsqa.realmcu.com/"
+        /* docDomain is "https://docs.realmcu.com/" or "https://docsqa.realmcu.com/" */
         const docDomain = "https://docs.realmcu.com/";      // default is formal document
         let baseProxy = "https://www.realmcu.com/docs/";    // default is formal realmcu site
         if (aiEnvString.toLowerCase() === "qa") {
@@ -479,9 +587,15 @@
         let feedbackUrl = `${baseProxy}AIFeedback`;
 
         inserChatWidgetHTML(chatTitle, chatPlaceholder, docTarget.replace(/realAIfuel/gi, ''));
+        initMarked();
 
-        const userInputNode = document.querySelector('.chat-input textarea');
+        let chatHistoryList = [{"role": "assistant", "content": "Hi there! How can I help?"}];
+        let docRefsList = [];
+
         const chatModalNode = document.getElementById('ChatModal');
+        const chatContentNode = document.querySelector('.chat-content');
+        const userInputNode = document.querySelector('.chat-input textarea');
+        adjustEleHeight(userInputNode);
 
         /* ============== update chat-note font-size ============== */
         const chatNoteNode = chatModalNode.querySelector('.chat-note');
@@ -494,8 +608,9 @@
             }
         }
 
-        const chatModalMaskNode = document.getElementById('ChatModalMask');
         /* ============= show or hide ai chat modal ============= */
+        const wyGridContainer = document.querySelector('.wy-grid-for-nav');
+        const chatModalMaskNode = document.getElementById('ChatModalMask');
         // click mask(not modal) to close
         let isMouseDownInsideModal = false;
         chatModalMaskNode.addEventListener('mousedown', function(event) {
@@ -513,7 +628,6 @@
         });
 
         const toggleChatModalButton = document.getElementById('ToggleChatModal');
-        const wyGridContainer = document.querySelector('.wy-grid-for-nav');
         toggleChatModalButton.onclick = function() {
             if(chatModalMaskNode.style.display === 'none' || chatModalMaskNode.style.display === '') {
                 document.documentElement.classList.add('overY-clip');
@@ -530,7 +644,52 @@
             }
         };
 
-        /* =========== close modal button click handler =========== */
+        /* ==================================================================
+           header widgets: drag modal, clear screen, full screen, close modal
+           ================================================================== */
+        /* -------------------- drag modal -------------------- */
+        function startDrag(e) {
+            if (!isDragging) return;
+            chatModalNode.style.left = e.clientX - dragX + 'px';
+            chatModalNode.style.top = e.clientY - dragY + 'px';
+        }
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', startDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        let isDragging = false;
+        let dragX, dragY;
+        const dragBar = chatModalNode.querySelector('.chat-title');
+        dragBar.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // 阻止默认行为，防止文本选择
+            isDragging = true;
+            dragX = e.clientX - chatModalNode.offsetLeft;
+            dragY = e.clientY - chatModalNode.offsetTop;
+
+            document.addEventListener('mousemove', startDrag);
+            document.addEventListener('mouseup', stopDrag);
+        });
+
+        /* -------------------- clear screen --------------------- */
+        const chatRefreshButton = document.getElementById('ChatRefresh');
+        chatRefreshButton.addEventListener('click', () => {
+            if (chatContentNode) {
+                chatContentNode.innerHTML = '';
+            }
+            chatHistoryList = [];
+            docRefsList = [];
+        });
+        /* --------------------- full screen --------------------- */
+        const fullScreenCtrlNode = document.getElementById('FullScreenControl');
+        fullScreenCtrlNode.addEventListener('click', function() {
+            chatModalNode.style.top = '';
+            chatModalNode.style.left = '';
+            chatModalNode.classList.toggle('fullscreen-chat-modal');
+            updateChatNoteFont();
+        });
+        /* --------------------- close modal --------------------- */
         const closeChatModalButton = document.getElementById('CloseChatModal');
         closeChatModalButton.onclick = function() {
             userInputNode.blur();
@@ -539,52 +698,69 @@
             wyGridContainer.classList.remove("prevent-manipulation");
         };
 
-        /* ====== update textarea height accrording to input ====== */
-        userInputNode.addEventListener('input', function() {
-            textAreaResize(userInputNode);
-            if (userInputNode.value.trim() === '') {
-                sendButton.disabled = true;
-            } else {
-                sendButton.disabled = false;
-            }
-        });
-        textAreaResize(userInputNode);
+        /* =======================================================
+           footer widgets: resize screen
+           ======================================================= */
+        /* -------------------- resize screen -------------------- */
+        const resizeCtrl = chatModalNode.querySelector('.resize-modal');
+        let isResizing = false;
+        let resizeX;
+        let resizeY;
+        let startWidth;
+        let startHeight;
 
-        /* ================ save ai chat hiatory ================ */
-        let chatHistoryList = [{"role": "assistant", "content": "Hi there! How can I help?"}];
-        let docRefsList = [];
-        function addChatHistory(role, text) {
-            // let forwardText = text.replace(/(\\n|\n)+/g, '').trim();
-            let forwardText = text;
-            let newChat = {
-                "role":role,
-                "content": forwardText
-            };
-            chatHistoryList.push(newChat);
-            if (chatHistoryList.length > 6) {
-                chatHistoryList.shift();
-            }
+        function startResize(e) {
+            if (!isResizing) return;
+            $('body').css('user-select', 'none');
+            chatModalNode.classList.remove('fullscreen-chat-modal');
+            chatModalNode.style.width = startWidth + (e.clientX - resizeX) + 'px';
+            chatModalNode.style.height = startHeight + (e.clientY - resizeY) + 'px';
         }
+        function stopResize() {
+            isResizing = false;
+            updateChatNoteFont();
+            $('body').css('user-select', '');
+            document.removeEventListener('mousemove', startResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+        resizeCtrl.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            resizeX = e.clientX;
+            resizeY = e.clientY;
+            startWidth = parseInt(window.getComputedStyle(chatModalNode).width, 10);
+            startHeight = parseInt(window.getComputedStyle(chatModalNode).height, 10);
+            document.addEventListener('mousemove', startResize);
+            document.addEventListener('mouseup', stopResize);
+        });
 
-        const chatContentNode = document.querySelector('.chat-content');
-        /* ============ listen chat content box scroll ============ */
+        /* ============== listen textarea input event ============== */
+        userInputNode.addEventListener('input', function() {
+            adjustEleHeight(this);
+            sendButton.disabled = !this.value.trim();
+        });
+
+        /* =======================================================
+           handle chat-content element scroll
+           ======================================================= */
+        /* -------- listen chat-content-gobtm click event -------- */
+        let chatContentAutoScroll = true;
         const scrollBtn = document.querySelector('.chat-content-gobtm');
-        function onContentBoxScroll() {
+        scrollBtn.addEventListener('click', function() {
+            scrollToBottom(chatContentNode);
+            chatContentAutoScroll = true;
+        });
+        /* ---------- listen chat content element scroll --------- */
+        function onChatContentScroll() {
             if (isEleAtBottom(chatContentNode)) { // scrolled to bottom
                 scrollBtn.style.display = 'none';
             } else {
                 scrollBtn.style.display = 'flex';
             }
         }
-        const debouncedContentBoxScroll = debounce(onContentBoxScroll, 100);
-        chatContentNode.addEventListener('scroll', debouncedContentBoxScroll);
-        // click chat-content-gobtm to chat-content-box bottom
-        scrollBtn.addEventListener('click', function() {
-            scrollToBottom(chatContentNode);
-        });
+        const debouncedChatContentScroll = debounce(onChatContentScroll, 100);
+        chatContentNode.addEventListener('scroll', debouncedChatContentScroll);
 
-        /* ====== listen wheel and touch events in chat content box ====== */
-        let chatContentAutoScroll = true;
+        /* ----- listen wheel and touch events in chat content ----- */
         function onChatContentWheelOrTouch(direction) {
             if (direction === 'up') {
                 chatContentAutoScroll = false;
@@ -623,81 +799,20 @@
         const debouncedWheelScroll = debounce(handleWheelScroll, 60);
         const debouncedTouchStart = debounce(handleTouchStart, 60);
         const debouncedTouchEnd = debounce(handleTouchEnd, 60);
-        // 监听鼠标滚轮滚动
         chatContentNode.addEventListener('wheel', debouncedWheelScroll);
-        // 监听移动端手指滑动
         chatContentNode.addEventListener('touchstart', debouncedTouchStart);
         chatContentNode.addEventListener('touchend', debouncedTouchEnd);
 
-        /* ================= clear all ai content ================= */
-        const chatRefreshButton = document.getElementById('ChatRefresh');
-        chatRefreshButton.addEventListener('click', () => {
-            if (chatContentNode) {
-                chatContentNode.innerHTML = '';
-            }
-            chatHistoryList = [];
-            docRefsList = [];
-        });
-
-        /* =============== add feedback buttons =============== */
-        const copySvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="18" height="18" viewBox="0 0 22 22" stroke-width="1.5" stroke="#222e6e" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <title>Copy to clipboard</title>
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
-            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
-        </svg>
-        `;
-        const copyDoneSvg = `
-        <svg t="1755756250746" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10267" width="17" height="17">
-            <path d="M784 266.666667h-373.333333c-92.885333 0-144 51.114667-144 144v373.333333c0 92.885333 51.114667 144 144 144h373.333333c92.885333 0 144-51.114667 144-144v-373.333333c0-92.885333-51.114667-144-144-144z m80 517.333333c0 56.832-23.168 80-80 80h-373.333333c-56.832 0-80-23.168-80-80v-373.333333c0-56.832 23.168-80 80-80h373.333333c56.832 0 80 23.168 80 80v373.333333zM160 239.786667v373.76c0 51.114667 20.608 63.701333 27.392 67.882666a32 32 0 1 1-33.450667 54.570667c-38.442667-23.552-57.941333-64.725333-57.941333-122.453333V239.786667c0-91.392 52.48-143.786667 143.786667-143.786667h373.76c71.893333 0 106.24 31.530667 122.453333 57.941333a32 32 0 0 1-54.613333 33.408c-4.096-6.784-16.725333-27.392-67.84-27.392H239.786667c-56.661333 0.042667-79.786667 23.168-79.786667 79.829334z m566.613333 263.808a32 32 0 0 1 0 45.269333l-142.208 142.208a31.957333 31.957333 0 0 1-45.226666 0L468.053333 619.946667a32 32 0 1 1 45.269334-45.269334l48.512 48.469334 119.594666-119.594667a31.957333 31.957333 0 0 1 45.184 0.042667z" fill="#222e6e" p-id="10268"></path>
-        </svg>
-        `;
-        const copyFailSvg = `
-        <svg t="1755756470581" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="21471" width="17" height="17">
-            <path d="M640.79 54l0.25 0.004a32.569 32.569 0 0 1 0.643 0.015l0.216 0.009c3.454 0.141 6.767 0.83 9.854 1.983 0.02 0.009 0.04 0.016 0.061 0.024 0.131 0.048 0.261 0.098 0.39 0.149l0.092 0.036a30.076 30.076 0 0 1 1.103 0.458l0.106 0.047a31.824 31.824 0 0 1 8.214 5.266l0.123 0.11c0.325 0.288 0.645 0.585 0.96 0.89l0.378 0.372 213.437 213.25 0.063 0.062 0.262 0.266-0.325-0.328a32.645 32.645 0 0 1 0.69 0.71l0.075 0.08a31.898 31.898 0 0 1 4.865 6.793l0.049 0.093A31.865 31.865 0 0 1 886 298.72V896.35c0 41.235-33.444 74.65-74.688 74.65H213.688C172.446 971 139 937.585 139 896.35v-767.7C139 87.416 172.445 54 213.688 54h427.101z m-32.228 64H213.687C207.78 118 203 122.774 203 128.65v767.7c0 5.876 4.778 10.65 10.688 10.65h597.625c5.909 0 10.687-4.774 10.687-10.65v-565.1H640.562c-17.496 0-31.713-14.042-31.995-31.47l-0.005-0.53V118zM663.2 447.233c12.366 12.377 12.481 32.359 0.351 44.877l-0.371 0.377L557.774 597.8 663.18 703.113c12.502 12.49 12.511 32.752 0.02 45.254-12.367 12.378-32.348 12.51-44.878 0.391l-0.377-0.37L512.5 643.033 407.055 748.387c-12.502 12.492-32.764 12.483-45.255-0.02-12.366-12.377-12.481-32.359-0.351-44.877l0.371-0.377L467.225 597.8 361.82 492.487c-12.502-12.49-12.511-32.752-0.02-45.254 12.367-12.378 32.348-12.51 44.878-0.391l0.377 0.37L512.5 552.566l105.445-105.352c12.502-12.492 32.764-12.483 45.255 0.02z m9.362-284.027V267.25h104.135L672.562 163.206z" p-id="21472" fill="#222e6e"></path>
-        </svg>
-        `;
-        const likeSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm iconify iconify--icon-park-solid" width="18px" height="18px" viewBox="0 0 48 48">
-            <path fill="none" stroke="#222e6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4.189 22.173A2 2 0 0 1 6.181 20H10a2 2 0 0 1 2 2v19a2 2 0 0 1-2 2H7.834a2 2 0 0 1-1.993-1.827zM18 21.375c0-.836.52-1.584 1.275-1.94c1.649-.778 4.458-2.341 5.725-4.454c1.633-2.724 1.941-7.645 1.991-8.772c.007-.158.003-.316.024-.472c.271-1.953 4.04.328 5.485 2.74c.785 1.308.885 3.027.803 4.37c-.089 1.436-.51 2.823-.923 4.201l-.88 2.937h10.857a2 2 0 0 1 1.925 2.543l-5.37 19.016A2 2 0 0 1 36.986 43H20a2 2 0 0 1-2-2z"/>
-        </svg>
-        `;
-        const dislikeSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm iconify iconify--icon-park-outline" width="18px" height="18px" viewBox="0 0 48 48">
-            <path fill="none" stroke="#222e6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4.18 26.834A2 2 0 0 0 6.175 29H10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7.84a2 2 0 0 0-1.993 1.834zM18 26.626c0 .835.52 1.583 1.275 1.94c1.649.777 4.458 2.34 5.725 4.454c1.633 2.723 1.941 7.644 1.991 8.771c.007.158.003.316.024.472c.271 1.953 4.04-.328 5.485-2.74c.785-1.308.885-3.027.803-4.37c-.089-1.435-.51-2.823-.923-4.201l-.88-2.937h10.857a2 2 0 0 0 1.925-2.543l-5.37-19.016A2 2 0 0 0 36.986 5H20a2 2 0 0 0-2 2z"></path>
-        </svg>
-        `;
-        const loadingSvg = `
-        <svg t="1757316892265" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4636" width="18" height="18">
-            <path d="M469.333333 85.333333m42.666667 0l0 0q42.666667 0 42.666667 42.666667l0 128q0 42.666667-42.666667 42.666667l0 0q-42.666667 0-42.666667-42.666667l0-128q0-42.666667 42.666667-42.666667Z" fill="#13227a" opacity=".8" p-id="4637"></path><path d="M469.333333 725.333333m42.666667 0l0 0q42.666667 0 42.666667 42.666667l0 128q0 42.666667-42.666667 42.666667l0 0q-42.666667 0-42.666667-42.666667l0-128q0-42.666667 42.666667-42.666667Z" fill="#13227a" opacity=".4" p-id="4638" data-spm-anchor-id="a313x.search_index.0.i1.16ad3a81Tc0Y2F" class=""></path><path d="M938.666667 469.333333m0 42.666667l0 0q0 42.666667-42.666667 42.666667l-128 0q-42.666667 0-42.666667-42.666667l0 0q0-42.666667 42.666667-42.666667l128 0q42.666667 0 42.666667 42.666667Z" fill="#13227a" opacity=".2" p-id="4639"></path><path d="M298.666667 469.333333m0 42.666667l0 0q0 42.666667-42.666667 42.666667l-128 0q-42.666667 0-42.666667-42.666667l0 0q0-42.666667 42.666667-42.666667l128 0q42.666667 0 42.666667 42.666667Z" fill="#13227a" opacity=".6" p-id="4640"></path><path d="M783.530667 180.138667m30.169889 30.169889l0 0q30.169889 30.169889 0 60.339779l-90.509668 90.509668q-30.169889 30.169889-60.339779 0l0 0q-30.169889-30.169889 0-60.339779l90.509668-90.509668q30.169889-30.169889 60.339779 0Z" fill="#13227a" opacity=".1" p-id="4641"></path><path d="M330.965333 632.661333m30.16989 30.16989l0 0q30.169889 30.169889 0 60.339778l-90.509668 90.509668q-30.169889 30.169889-60.339779 0l0 0q-30.169889-30.169889 0-60.339778l90.509668-90.509668q30.169889-30.169889 60.339779 0Z" fill="#13227a" opacity=".5" p-id="4642"></path><path d="M843.861333 783.530667m-30.169889 30.169889l0 0q-30.169889 30.169889-60.339779 0l-90.509668-90.509668q-30.169889-30.169889 0-60.339779l0 0q30.169889-30.169889 60.339779 0l90.509668 90.509668q30.169889 30.169889 0 60.339779Z" fill="#13227a" opacity=".3" p-id="4643"></path><path d="M391.338667 330.965333m-30.16989 30.16989l0 0q-30.169889 30.169889-60.339778 0l-90.509668-90.509668q-30.169889-30.169889 0-60.339779l0 0q30.169889-30.169889 60.339778 0l90.509668 90.509668q30.169889 30.169889 0 60.339779Z" fill="#13227a" opacity=".7" p-id="4644"></path>
-        </svg>
-        `;
-        const feeddbackHtml = `
-        <div class="chat-feedback-box">
-            <button class="chat-feedback-btn" id="CopyButton">
-                <span class="chat-feedback-icon">${copySvg}</span>
-                <span class="chat-feedback-text">Copy</span>
-            </button>
-            <button class="chat-feedback-btn" id="LikeButton" value="positive">
-                <span class="chat-feedback-icon">${likeSvg}</span>
-                <span class="chat-feedback-text">Like</span>
-            </button>
-            <button class="chat-feedback-btn" id="DislikeButton" value="negative">
-                <span class="chat-feedback-icon">${dislikeSvg}</span>
-                <span class="chat-feedback-text">Dislike</span>
-            </button>
-        </div>
-        `;
-
+        /* =======================================================
+           handle feedback buttons click event: copy, like, dislike
+           ======================================================= */
         function updateFeedButton(element, icon, text) {
             element.html(`
                 <span class="chat-feedback-icon">${icon}</span>
                 <span class="chat-feedback-text">${text}</span>
             `);
         }
-
-        /* =============== listen feedback button click =============== */
+        /* ----------- listen copy button click event ----------- */
         $(".chat-content").on("click", "#CopyButton", function(e) {
             const copyBtn = $(this);
             const chatRespMain = copyBtn.closest('.chatResp');
@@ -719,7 +834,7 @@
                 }, 2000);
             }
         });
-
+        /* --------- listen like&dislike button click event --------- */
         async function aiFeedback(messageId, userReaction) {
             let resFeedBack = {
                 status: "error",
@@ -793,7 +908,10 @@
             });
         });
 
-        function linkListToHTML(list) {
+        /* =======================================================
+           handle chat message send
+           ======================================================= */
+        function handleRefDocs(list) {
             docRefsList = [];
             if (!list || list.length === 0) {
                 return `<p class="chatRefDocs"></p>`;
@@ -828,12 +946,28 @@
                 ${refNoteHtml}
             </div>`;
         }
+
+        /* ----------------- save ai chat history ----------------- */
+        function addChatHistory(role, text) {
+            // let forwardText = text.replace(/(\\n|\n)+/g, '').trim();
+            let forwardText = text;
+            let newChat = {
+                "role":role,
+                "content": forwardText
+            };
+            chatHistoryList.push(newChat);
+            if (chatHistoryList.length > 10) {
+                chatHistoryList.shift();
+            }
+        }
+        /* ------------ handle chat message send success ------------ */
         function onChatSuccess(mdContent, refs, element) {
             element.insertAdjacentHTML('beforeend', feeddbackHtml);
-            let refsHtml = linkListToHTML(refs);
+            let refsHtml = handleRefDocs(refs);
             element.insertAdjacentHTML('beforeend', refsHtml);
             addChatHistory("assistant", mdContent);
         }
+        /* ------------- handle chat message send fail -------------- */
         function onChatError(error, element) {
             element.innerHTML = `
             <div class="chatResp">${error}</div>
@@ -842,41 +976,8 @@
             addChatHistory("assistant", error);
         }
 
-        // Configure marked
-        const mdRenderer = new marked.Renderer();
-        mdRenderer.link = function({href, title, text}) {
-            return `<a href="${href}" target="_blank" rel="noopener noreferrer"${title ? ` title="${title}"` : ''}>${text}</a>`;
-        };
-        marked.setOptions({
-            renderer: mdRenderer,
-            pedantic: false, //尽可能遵循原始 Markdown 语法，而不是 GitHub Flavored Markdown。如果设置为 true，则偏向于更严格的解析
-            gfm: true, //启用 GitHub Flavored Markdown，如果需要 GFM 功能（如表格、任务列表等）可将其启用
-            breaks: true, //启用 GFM 换行符解析。设置为 true 时，Markdown 文本中的新行符被视为 <br>
-            smartypants: true, //使用智能排版标记替换引号和破折号为直观形式
-            headerIds: false,
-            mangle: true, //对嵌入的电子邮件地址进行加密处理（防止抓取），实现简单的防邮件爬虫
-            highlight: function(code, lang) {
-                // 如果指定了语言，并且hljs支持，按指定高亮
-                if (lang && hljs.getLanguage(lang)) {
-                    return hljs.highlight(code, { language: lang }).value;
-                }
-                // 否则自动检测语言高亮
-                return hljs.highlightAuto(code).value;
-            }
-        });
-
-        /* =============== handle chat message send =============== */
+        /* ------------ generate ai chat fetch parameters ------------ */
         function AIChatFetchConfig(question, histories) {
-            // // get current doc version value
-            // let curVersion = (document.querySelector("#version-selector")?.value) || "latest";
-            // // If the current version is "latest", check and update it from LatestVersion
-            // if (curVersion === "latest") {
-            //     const versionNode = document.querySelector('#LatestVersion');
-            //     if (versionNode && versionNode.value) {
-            //         curVersion = versionNode.value;
-            //     }
-            // }
-
             let docSwitch = document.getElementById('DocSwitch');
             let curVersion = "";
             const rawBody = {
@@ -891,7 +992,7 @@
                 // previous reference doc links list
                 docRefs: JSON.stringify(docRefsList).replace(/"/g, "'"),
             };
-        
+
             const method = "POST";
             const headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -908,14 +1009,14 @@
                 }
             };
         }
-
+        /* ------------- start ai chat fetch request ------------- */
         let isSending = false; // sending message status param
         async function fetchChatAnwser(fetchConfig, messageNode) {
             const { url, options } = fetchConfig;
             const abortCtrl = new AbortController();
             let hasChatError = false;
 
-            /* ================ Interrupt chat request ================ */
+            // ============ Interrupt chat request ============
             const abortButton = document.getElementById('ChatAbortBtn');
             if (abortButton) {
                 abortButton.onclick = null;
@@ -945,7 +1046,7 @@
                     "status": "success",    // success or error
                     "error": null           // null or {"error_type": "xxxx", "error_message": "xxxx"}
                 }
-            =========================================================*/
+               ====================================================== */
             function processChunk(chunkData, element) {
                 try {
                     const parsedChunk = JSON.parse(chunkData);
@@ -981,7 +1082,7 @@
                             btn.setAttribute('data-tooltip', 'Copy');
                             btn.setAttribute('data-clipboard-target', `#${codeId}`);
                             btn.innerHTML = copySvg;
-                            
+
                             fragment.appendChild(btn);
                             // 用数组保存，避免直接反复append到DOM
                             fragArr.push({ pre, fragment });
@@ -1074,12 +1175,12 @@
                 }
             }
             finally {
+                updateSendingStatus(false);
                 // scrolll to chatContentNode bottom
                 if(chatContentAutoScroll) {
                     scrollToBottom(chatContentNode);
                 }
-                updateSendingStatus(false);
-                onContentBoxScroll();
+                onChatContentScroll();
             }
         }
 
@@ -1094,7 +1195,7 @@
             <div class="userText">${userInputValue}</div>
             `;
             chatContentNode.appendChild(userMessageNode);
-            const chatHistoryCopy = [...chatHistoryList];
+            const chatHistoryCopy = copyArrFromEnd(chatHistoryList, 6, 1);
             addChatHistory("user", userInputValue);
 
             const chatMessageNode = document.createElement('div');
@@ -1109,6 +1210,7 @@
             // chatMessageNode.scrollIntoView({ behavior: 'smooth' });
             scrollToBottom(chatContentNode);
         }
+
         /* =============== triggle chat message send =============== */
         const sendButton = document.getElementById('ChatSendBtn');
         sendButton.onclick = sendChatMessage;
@@ -1128,73 +1230,7 @@
             }
         });
 
-        /* ============== handle chat modal draggle ============= */
-        const dragBar = chatModalNode.querySelector('.chat-title');
-        let isDragging = false;
-        let dragX, dragY;
 
-        dragBar.addEventListener('mousedown', (e) => {
-            e.preventDefault(); // 阻止默认行为，防止文本选择
-            isDragging = true;
-            dragX = e.clientX - chatModalNode.offsetLeft;
-            dragY = e.clientY - chatModalNode.offsetTop;
-
-            document.addEventListener('mousemove', startDrag);
-            document.addEventListener('mouseup', stopDrag);
-        });
-
-        function startDrag(e) {
-            if (!isDragging) return;
-            chatModalNode.style.left = e.clientX - dragX + 'px';
-            chatModalNode.style.top = e.clientY - dragY + 'px';
-        }
-
-        function stopDrag() {
-            isDragging = false;
-            document.removeEventListener('mousemove', startDrag);
-            document.removeEventListener('mouseup', stopDrag);
-        }
-
-        /* ============= handle chat modal full screen ============= */
-        const fullScreenCtrlNode = document.getElementById('FullScreenControl');
-        fullScreenCtrlNode.addEventListener('click', function() {
-            chatModalNode.style.top = '';
-            chatModalNode.style.left = '';
-            chatModalNode.classList.toggle('fullscreen-chat-modal');
-            updateChatNoteFont();
-        });
-
-        /* =============== handle chat modal resize =============== */
-        const resizeModalCtrlNode = chatModalNode.querySelector('.resize-modal');
-        let isResizing = false;
-        let resizeX;
-        let resizeY;
-        let startWidth;
-        let startHeight;
-
-        function startResize(e) {
-            if (!isResizing) return;
-            $('body').css('user-select', 'none');
-            chatModalNode.classList.remove('fullscreen-chat-modal');
-            chatModalNode.style.width = startWidth + (e.clientX - resizeX) + 'px';
-            chatModalNode.style.height = startHeight + (e.clientY - resizeY) + 'px';
-        }
-        function stopResize() {
-            isResizing = false;
-            updateChatNoteFont();
-            $('body').css('user-select', '');
-            document.removeEventListener('mousemove', startResize);
-            document.removeEventListener('mouseup', stopResize);
-        }
-        resizeModalCtrlNode.addEventListener('mousedown', function(e) {
-            isResizing = true;
-            resizeX = e.clientX;
-            resizeY = e.clientY;
-            startWidth = parseInt(window.getComputedStyle(chatModalNode).width, 10);
-            startHeight = parseInt(window.getComputedStyle(chatModalNode).height, 10);
-            document.addEventListener('mousemove', startResize);
-            document.addEventListener('mouseup', stopResize);
-        });
     }
 
     // Expose the init function
