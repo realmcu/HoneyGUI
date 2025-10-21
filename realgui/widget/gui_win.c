@@ -497,4 +497,8 @@ void gui_win_prepare(gui_obj_t *obj)
 {
     prepare(obj);
 }
-
+void gui_win_click_force(gui_win_t *this)
+{
+    GUI_WIDGET_TRY_EXCEPT(this) // cppcheck-suppress unknownMacro
+    this->override_click = 1;
+}

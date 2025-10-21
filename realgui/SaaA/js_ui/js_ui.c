@@ -172,8 +172,82 @@ DECLARE_HANDLER(getAttribute)
     gui_free(a);
     return jerry_create_string((void *)widget_type);
 }
+#include "rvd.h"
+struct widget_create
+{
+    char *name;
+    int type;
+};
+static struct widget_create widget[] =
+{
+    { "win", WINDOW }, //
+    { "textbox", TEXTBOX },//
+    { "img", IMAGE },//
+    { "progressbar", PROGRESSBAR },
+    { "seekbar", SEEKBAR },
+    { "tabview", TABVIEW },//
+    { "tab", TAB },
+    { "curtainview", CURTAINVIEW },//
+    { "curtain", CURTAIN },
+    //{ "iconlist", ICONLIST },
+    { "icon", ICON },//
+    { "script", JAVASCRIPT },
+    { "switch", CLICKSWITCH },
+    { "page", PAGE },//
+    //{ "pagebar", PAGEBAR },
+    { "screen", SCREEN },
+    { "grid",  GRID},
+    {"gallery", GALLERY},
+    {"radio", RADIO},
+    {"appendTexts", RADIOSWITCH},
+    {"arc", MACRO_CANVAS_ARC},
+    {"movie", MOVIE},
+    {"animateTransform", MACRO_ANIMATETRANSFORM},
+    {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
+    {"keyboard", KEYBOARD},
+    {"multiLevel", MULTI_LEVEL},
+    {"onClick", MACRO_ONCLICK},
+    {"backIcon", MACRO_BACKICON},
+    {"slider", SLIDER},
+    {"onChange", MACRO_ONCHANGE},
+    {"onOn", MACRO_ONON},
+    {"onOff", MACRO_ONOFF},
+    {"onLoad", MACRO_ONLOAD},
+    {"roller", TYPE_SCROLL_WHEEL_NEW},
+    {"calendar", MACRO_CALENDAR},
+    {"onTime", MACRO_ONTIME},
+    {"combo", MACRO_COMBO},
+    {"onPeripheral", MACRO_ON_PERIPHERAL},
+    {"chart", MACRO_CHART},
+    {"listview", MACRO_PAGE_LIST_NEW},
+    {"onComplete", MACRO_ONCOMPLETE},
+    {"key", MACRO_KEY},
+    {"onSelect", MACRO_ONSELECT},
+    {"rect", RECTANGLE},
+    {"wifi", MACRO_WIFI},
+    {"onConnected", MACRO_CONNECTED},
+    {"onDisconnected", MACRO_DISCONNECTED},
+    {"onConnecting", MACRO_CONNECTING},
+    {"frame", MACRO_FRAME},
+    {"interaction", MACRO_INTERACTION},
+    {"fps", MACRO_FPS},
+};
+static const char *get_tag_by_widget_type(int type)
+{
+    if (type == BUTTON)
+    {
+        type = ICON;
+    }
 
-extern const char *get_tag_by_widget_type(int type);
+    for (size_t i = 0; i < sizeof(widget) / sizeof(struct widget_create); i++)
+    {
+        if (widget[i].type == type)
+        {
+            return widget[i].name;
+        }
+    }
+    return NULL;
+}
 
 extern ezxml_t get_child_ele(char *xml, char *ele, char *txt, char *chile_ele);
 DECLARE_HANDLER(getChildElementByTag)

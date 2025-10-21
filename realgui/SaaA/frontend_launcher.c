@@ -24,6 +24,7 @@
 #include "rvd.h"
 #include "gui_switch.h"
 #include "gui_combo.h"
+#include "gui_obj_animate.h"
 #define APP_0
 // #define APP_C1
 // #define APP_C2
@@ -588,7 +589,7 @@ static void rvd_hover_combo(bool up, gui_obj_t *root)
 static int hover_widgets_index = 0;
 static int hover_widgets_index_last = 0;
 static bool hover_first;
-static T_OBJ_TYPE hover_types[] = {BUTTON, MACRO_COMBO};
+static T_OBJ_TYPE hover_types[] = {BUTTON, MACRO_COMBO, WINDOW};
 static void rvd_hover_widgets(bool up, gui_obj_t *root)
 {
     int hover_count = 0;
@@ -669,6 +670,11 @@ static void rvd_hover_widgets(bool up, gui_obj_t *root)
                         {
                             gui_button_t *button = (void *)obj;
                             button->img->data = button->on_pic_addr;
+
+                        }
+                        else if (obj->type == WINDOW)
+                        {
+                            gui_win_click_force((void *)obj);
 
                         }
                         hover_obj = obj;
@@ -1488,6 +1494,11 @@ int rvd_hover_down_button()
         gui_tab_t *cur_tab = gui_tabview_get_current_tab(tabview);
         rvd_hover_widgets(0, (void *)cur_tab);
     }
+    else if (tabview->cur_id.x == 2 && tabview->cur_id.y == 0)
+    {
+        gui_tab_t *cur_tab = gui_tabview_get_current_tab(tabview);
+        rvd_hover_widgets(0, (void *)cur_tab);
+    }
 #endif
 }
 
@@ -1667,8 +1678,11 @@ int rvd_hover_up_button()
     }
     else if (tabview->cur_id.x == 0 && tabview->cur_id.y == 0)
     {
-        // const char *widget_name_array[]={"combobox0", "button0"};
-        // hover_widgets(1, widget_name_array, 2);
+        gui_tab_t *cur_tab = gui_tabview_get_current_tab(tabview);
+        rvd_hover_widgets(1, (void *)cur_tab);
+    }
+    else if (tabview->cur_id.x == 2 && tabview->cur_id.y == 0)
+    {
         gui_tab_t *cur_tab = gui_tabview_get_current_tab(tabview);
         rvd_hover_widgets(1, (void *)cur_tab);
     }
@@ -2108,6 +2122,7 @@ static void set_text_convert_to_img_in_root(gui_obj_t *root)
         if (obj->type == TEXTBOX)
         {
             gui_text_convert_to_img((void *)obj, ARGB8565);
+            obj->w = 100;
         }
         set_text_convert_to_img_in_root(obj);
     }
@@ -2232,38 +2247,106 @@ static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(wincb)
 {
     gui_log("wincb:%s", GUI_BASE(obj)->name);
 }
+
+static GUI_EVENT_CALLBACK_FUNCTION_DEFINE(wincb6)
+{
+    gui_log("wincb:%s", GUI_BASE(obj)->name);
+    GUI_WIDGET_POINTER_BY_NAME(img, "image3");
+    gui_img_t *img_p = GUI_CAST img;
+    uintptr_t widget_id = (uintptr_t)param; // Safe cast
+    int index = (int)widget_id;
+    if (!(index < img_p->animate_array_length && index >= 0))
+    {
+        return;
+    }
+    gui_obj_restart_animate(
+        gui_get_animation_from_array(
+            GUI_CAST img_p->animate,
+            img_p->animate_array_length,
+            index));
+}
+
+static GUI_ANIMATION_CALLBACK_FUNCTION_DEFINE(img_text_highlight_ani)
+{
+    if (animate->Beginning_frame == 0)
+    {
+        // return;
+    }
+
+    GUI_WIDGET_POINTER_BY_NAME(tabview, "tabview0")
+    gui_tab_t *tab = gui_tabview_get_current_tab(GUI_CAST tabview);
+    gui_obj_t **win_array = 0;
+    int length = 0;
+    gui_obj_tree_get_widget_array_by_type(GUI_CAST tab, WINDOW, &win_array, &length);
+    if (win_array == 0 || length == 0)
+    {
+        return;
+    }
+    gui_obj_t *img = (void *)this_widget;
+    int img_ay, img_ax;
+    gui_get_absolute_xy(img, &img_ax, &img_ay);
+    img_ay += gui_img_get_transform_t_y(GUI_CAST img);
+
+    for (size_t i = 0; i < length; i++)
+    {
+        int ax, ay;
+        gui_get_absolute_xy(win_array[i], &ax, &ay);
+        gui_log("%dimg_ax:%d,img_ay:%d, win_ax:%d, win_ay:%d,%d,%d,,%d,%d\n", i, img_ax, img_ay, ax, ay,
+                win_array[i]->h, img->h, ay + win_array[i]->h, img_ay + img->h);
+        if (ay + win_array[i]->h > img_ay && ay < img_ay + img->h)
+        {
+            gui_log("highlight win:%s\n", win_array[i]->name);
+            //gui_win_click((gui_win_t *)win_array[i], wincb6, i%2);
+            GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, win_array[i]);
+            gui_text_set_color(GUI_CAST text, gui_color_css("black"));
+        }
+        else
+        {
+            GUI_WIDGET_POINTER_BY_TYPE(text, TEXTBOX, win_array[i]);
+            gui_text_set_color(GUI_CAST text, gui_color_css("white"));
+        }
+
+    }
+
+    gui_free(win_array);
+
+}
 static void C3_init(void)
 {
-    GUI_WIDGET_POINTER_BY_NAME(page0, "page0");// cppcheck-suppress unknownMacro
-    set_text_convert_to_img_in_root((void *)page0);
-    gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, page0);
-    GUI_TYPE(gui_page_t, page0)->top_offset = 50;
-    GUI_TYPE(gui_page_t, page0)->bottom_offset = -150;
-    gui_page_center_alignment((void *)page0, 50);
     {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win0")// cppcheck-suppress unknownMacro
-        gui_win_click((gui_win_t *)win, wincb, 0);
+        GUI_WIDGET_POINTER_BY_NAME(page0, "page0");// cppcheck-suppress unknownMacro
+        set_text_convert_to_img_in_root((void *)page0);
+        gui_page_set_animate((gui_page_t *)page0, 1000, -1, page_callback, page0);
+        GUI_TYPE(gui_page_t, page0)->top_offset = 50;
+        GUI_TYPE(gui_page_t, page0)->bottom_offset = -150;
+        gui_page_center_alignment((void *)page0, 50);
     }
     {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win1")// cppcheck-suppress unknownMacro
-        gui_win_click((gui_win_t *)win, wincb, 0);
+        char *win_name_array[] = { "win0", "win1", "win2", "win3", "win4", "win5" };
+        for (size_t i = 0; i < GUI_ARRAY_SIZE(win_name_array); i++)
+        {
+            GUI_WIDGET_POINTER_BY_NAME(win, win_name_array[i])// cppcheck-suppress unknownMacro
+            gui_win_click((gui_win_t *)win, wincb, 0);
+        }
     }
+
     {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win2")// cppcheck-suppress unknownMacro
-        gui_win_click((gui_win_t *)win, wincb, 0);
+        GUI_WIDGET_POINTER_BY_NAME(img, "image3");
+        GUI_TYPE(gui_img_t, img)->animate[0].animate = 0;
+        GUI_TYPE(gui_img_t, img)->animate[1].animate = 0;
+        gui_obj_stop_animate(&GUI_TYPE(gui_img_t, img)->animate[0]);
+        gui_obj_stop_animate(&GUI_TYPE(gui_img_t, img)->animate[1]);
+        gui_img_append_animate(GUI_CAST img, 1000, -1, img_text_highlight_ani, 0, "img_text_highlight_ani");
+        {
+            GUI_WIDGET_POINTER_BY_NAME(win, "win7")
+            gui_win_click((gui_win_t *)win, wincb6, GUI_CAST 0);
+        }
+        {
+            GUI_WIDGET_POINTER_BY_NAME(win, "win6")
+            gui_win_click((gui_win_t *)win, wincb6, GUI_CAST 1);
+        }
     }
-    {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win3")// cppcheck-suppress unknownMacro
-        gui_win_click((gui_win_t *)win, wincb, 0);
-    }
-    {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win4")// cppcheck-suppress unknownMacro
-        gui_win_click((gui_win_t *)win, wincb, 0);
-    }
-    {
-        GUI_WIDGET_POINTER_BY_NAME(win, "win5")// cppcheck-suppress unknownMacro
-        gui_win_click((gui_win_t *)win, wincb, 0);
-    }
+
 }
 
 #endif
@@ -2425,6 +2508,10 @@ static void C2_init(void)
         GUI_WIDGET_POINTER_BY_NAME(obj, "page0");// cppcheck-suppress unknownMacro
         set_text_convert_to_img_in_root((void *)obj);
         rvd_override_radio((void *)obj);
+    }
+    {
+        GUI_WIDGET_POINTER_BY_NAME(obj, "page1");
+        set_text_convert_to_img_in_root((void *)obj);
     }
     {
         gui_log("C2_init\n");
@@ -2684,7 +2771,292 @@ int rvd_tab_first(void)
 #endif
     return GUI_ERROR;
 }
+#if defined _WIN32
 
+static void rvd_update_page_radio_list(gui_page_t *page, const char **device_list,
+                                       int device_list_count)
+{
+    gui_obj_t *radio_window = 0;
+    gui_obj_tree_get_widget_by_type((void *)page, RADIO, &radio_window);
+    if ((radio_window && radio_window->magic == GUI_MAGIC_NUMBER &&
+         radio_window->type == RADIO) == false)
+    {
+        return;
+    }
+    gui_obj_t *radio_text_obj = 0;
+    gui_obj_tree_get_widget_by_type((void *)page, TEXTBOX, &radio_text_obj);
+    if (radio_text_obj == NULL)
+    {
+        return;
+    }
+
+    gui_text_t *radio_text = (gui_text_t *)radio_text_obj;
+    int text_x = radio_text_obj->x;
+    int text_y = radio_text_obj->y;
+    int text_w = radio_text_obj->w;
+    int text_h = radio_text_obj->h;
+    int radio_x = radio_window->x;
+    int radio_y = radio_window->y;
+    int radio_w = radio_window->w;
+    int radio_h = radio_window->h;
+    gui_color_t color = radio_text->color;
+    int font_size = radio_text->font_height;
+    void *font = radio_text->path;
+    TEXT_MODE style = radio_text->mode;
+    const unsigned char *pic = rvd_get_image404_address();
+    const unsigned char *hl_pic = rvd_get_image404_address();
+    const char *radio_group_name = "radio_group_name";
+    {
+        gui_win_t *win = (gui_win_t *)radio_window;
+        if (win->animate && win->animate->p)
+        {
+            radio_t *param = win->animate->p;
+            pic = param->pic;
+            hl_pic = param->pic_hl;
+            radio_group_name = param->radio_name;
+        }
+    }
+
+    gui_obj_child_free((void *)page);
+
+    for (int i = 0; i < device_list_count; i++)
+    {
+        //gui_img_create_from_mem(page, "radio", gui_get_file_address("app/system/resource/icMenuBird.bin"), 0, i*40, 0, 0);
+        gui_obj_t *win = gui_create_radiobutton(
+                             (void *)page,
+                             "radio",
+                             radio_group_name,
+                             radio_x,
+
+                             i * 60 + 40,
+                             radio_w,
+                             radio_h,
+                             pic,
+                             hl_pic,
+                             IMG_BYPASS_MODE);
+        gui_text_t *t = gui_text_create(win, 0, text_x, text_y, gui_get_screen_width(), text_h);
+        //extern void gui_xml_dom_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
+        // GUI_BASE(t)->obj_cb = gui_xml_dom_text_cb;
+        gui_text_set(t, (void *)device_list[i], GUI_FONT_SRC_BMP, color, strlen(device_list[i]),
+                     font_size);
+        gui_text_type_set(t, (void *)font, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, style);
+
+    }
+}
+
+void win32_key_gui_msg_cb(void *p)
+{
+
+    extern gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
+    gui_msg_t *msg = p;
+
+    gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
+    gui_log("key %d\n", (int)(size_t)msg->payload);
+
+    switch ((int)(size_t)msg->payload)
+    {
+    case 13:
+        /* PC KEY Enter */
+        {
+            rvd_click_button();
+        }
+        break;
+    case 1073741905:
+        /* PC KEY Down */
+        {
+            rvd_hover_down_button();
+        }
+        break;
+    case 1073741906:
+        /* PC KEY Up */
+        {
+            rvd_hover_up_button();
+        }
+        break;
+    case 27:
+        /* PC KEY ESC */
+        {
+            rvd_click_back();
+        }
+        break;
+    case /*PC KEY LEFT */ 1073741904:
+        {
+            rvd_hover_left();
+        }
+        break;
+    case /*PC KEY RIGHT */ 1073741903:
+        {
+            rvd_hover_right();
+        }
+        break;
+    case /*key PageUp up */ 1073741899:
+        {
+
+            extern void rvd_tab_last(void);
+            rvd_tab_last();
+        }
+        break;
+    case /*key PageDown up */ 1073741902:
+        {
+            extern void rvd_tab_next(void);
+            rvd_tab_next();
+        }
+        break;
+    case 1073741898:
+        /* PC KEY Home */
+        {
+
+            rvd_tab_first();
+        }
+        break;
+
+    case /*PC KEY R */ 114:
+        {
+            break;
+            GUI_WIDGET_POINTER_BY_NAME(obj1, "tab11")
+            gui_tabview_t *tabview = (void *)obj1;
+            GUI_WIDGET_POINTER_BY_NAME(obj2, "page0")
+            gui_page_t *page1 = (void *)obj2;
+            static const char *device_list[50] = {"SONY", "NOKIA", "SAMSUNG", "APPLE",
+                                                  "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG"
+                                                 };
+            static bool device_update_flag = false;
+            device_update_flag = true;
+            if (device_update_flag)
+            {
+                int device_list_count = 0 ;
+                for (size_t i = 0; i < 50; i++)
+                {
+                    if (device_list[i] == NULL)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        device_list_count++;
+                    }
+
+                }
+
+                rvd_update_page_radio_list(page1, device_list, device_list_count);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+void win32_key_gui_msg_cb_down(void *p)
+{
+
+    extern gui_error_t gui_xml_dom_write_key_array(int id, bool up, bool down);
+    gui_msg_t *msg = p;
+
+    gui_xml_dom_write_key_array((int)(size_t)msg->payload, 1, 0);
+    gui_log("key %d\n", (int)(size_t)msg->payload);
+
+    switch ((int)(size_t)msg->payload)
+    {
+    case 13:
+        /* PC KEY Enter */
+        {
+            rvd_click_button_down();
+        }
+        break;
+    // case 1073741905:
+    //     /* PC KEY Down */
+    //     {
+    //         rvd_hover_down_button();
+    //     }
+    //     break;
+    // case 1073741906:
+    //     /* PC KEY Up */
+    //     {
+    //         rvd_hover_up_button();
+    //     }
+    //     break;
+    // case 27:
+    //     /* PC KEY ESC */
+    //     {
+    //         rvd_click_back();
+    //     }
+    //     break;
+    // case /*PC KEY LEFT */ 1073741904:
+    //     {
+    //         rvd_hover_left();
+    //     }
+    //     break;
+    // case /*PC KEY RIGHT */ 1073741903:
+    //     {
+    //         rvd_hover_right();
+    //     }
+    //     break;
+    // case /*key PageUp up */ 1073741899:
+    //     {
+
+    //         extern void rvd_tab_last(void);
+    //         rvd_tab_last();
+    //     }
+    //     break;
+    // case /*key PageDown up */ 1073741902:
+    //     {
+    //         extern void rvd_tab_next(void);
+    //         rvd_tab_next();
+    //     }
+    //     break;
+    // case /*PC KEY R */ 114:
+    //     {
+    //         break;
+    //         GUI_WIDGET_POINTER_BY_NAME(obj1, "tab11")
+    //         gui_tabview_t *tabview = (void *)obj1;
+    //         GUI_WIDGET_POINTER_BY_NAME(obj2, "page0")
+    //         gui_page_t *page1 = (void *)obj2;
+    //         static const char *device_list[50] = {"SONY", "NOKIA", "SAMSUNG", "APPLE",
+    //                                               "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG", "SONY", "NOKIA", "SAMSUNG", "APPLE", "LG"
+    //                                              };
+    //         static bool device_update_flag = false;
+    //         device_update_flag = true;
+    //         if (device_update_flag)
+    //         {
+    //             int device_list_count = 0 ;
+    //             for (size_t i = 0; i < 50; i++)
+    //             {
+    //                 if (device_list[i] == NULL)
+    //                 {
+    //                     break;
+    //                 }
+    //                 else
+    //                 {
+    //                     device_list_count++;
+    //                 }
+
+    //             }
+
+    //             rvd_update_page_radio_list(page1, device_list, device_list_count);
+    //         }
+    //     }
+    //     break;
+    default:
+        break;
+    }
+}
+
+#endif
+void close_gui_task(void)
+{
+    gui_app_t *app = get_app_xml();
+    app->active_ms = 0;
+}
+extern bool gui_send_msg_to_server(gui_msg_t *msg);
+void restart_gui_task(void)
+{
+    gui_app_t *app = get_app_xml();
+    app->active_ms = 0xFFFFFFFF;
+    gui_msg_t msg;
+    msg.event = GUI_EVENT_DISPLAY_ON;
+    gui_send_msg_to_server(&msg);
+}
 void rvd_custom_init(void)
 {
 #ifdef APP_C3
@@ -2699,18 +3071,4 @@ void rvd_custom_init(void)
 #ifdef APP_C4
     C4_init();
 #endif
-}
-void close_gui_task(void)
-{
-    gui_app_t *app = get_app_xml();
-    app->active_ms = 0;
-}
-extern bool gui_send_msg_to_server(gui_msg_t *msg);
-void restart_gui_task(void)
-{
-    gui_app_t *app = get_app_xml();
-    app->active_ms = 0xFFFFFFFF;
-    gui_msg_t msg;
-    msg.event = GUI_EVENT_DISPLAY_ON;
-    gui_send_msg_to_server(&msg);
 }

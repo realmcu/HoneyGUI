@@ -110,6 +110,7 @@ extern "C" {
     GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #define GUI_BASE(_p) ((gui_obj_t *)_p)
+#define GUI_CAST (void *)
 #define _GUI_API_DEFINE(type) typedef struct __gui_api_##type{
 #define _GUI_API_DECLARE(type) } _gui_api_##type;extern _gui_api_##type _gui_api_for_##type;
 #define _GUI_API_ASSIGN(type) _gui_api_##type _gui_api_for_##type ={

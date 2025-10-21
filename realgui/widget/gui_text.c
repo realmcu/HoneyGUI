@@ -810,3 +810,7 @@ void gui_text_font_unload_global(gui_text_t *text)
 {
     gui_text_font_unload(text);
 }
+void gui_text_set_color(gui_text_t *this, gui_color_t color)
+{
+    this->color = color;
+}

@@ -524,6 +524,32 @@ int gui_obj_tree_get_widget_array_by_type(gui_obj_t *root,
     return 0;
 }
 
-
+/**
+ * @brief Calculates the absolute X and Y coordinates of a widget relative to the root.
+ *
+ * This function computes the absolute position of a widget by summing its relative
+ * coordinates and those of its ancestors up to the root widget.
+ *
+ * @param widget Pointer to the widget whose absolute coordinates are to be calculated.
+ * @param absolute_x Pointer to store the calculated absolute X coordinate.
+ * @param absolute_y Pointer to store the calculated absolute Y coordinate.
+ * @return gui_error_t Returns GUI_SUCCESS on successful calculation, or an error code
+ *         if the widget pointer is invalid.
+ */
+gui_error_t gui_get_absolute_xy(gui_obj_t *widget, int *absolute_x, int *absolute_y)
+{
+    GUI_WIDGET_TRY_EXCEPT(widget)
+    gui_obj_t *root = widget->parent;
+    int ax = widget->x, ay = widget->y;
+    while (root)
+    {
+        ax += root->x;
+        ay += root->y;
+        root = root->parent;
+    }
+    *absolute_x = ax;
+    *absolute_y = ay;
+    return GUI_SUCCESS;
+}
 
 

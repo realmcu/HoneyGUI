@@ -27,7 +27,13 @@ static knob_info_t knob = {.type = KNOB_INVALIDE};
 knob_info_t *knob_algo_process(gui_knob_port_data_t *knob_raw)
 {
     static uint32_t timestamp_ms;
-    GUI_ASSERT(knob_raw != NULL);
+    //GUI_ASSERT(knob_raw != NULL);
+    if (!knob_raw)
+    {
+        knob.type = KNOB_INVALIDE;
+        knob.delta = 0;
+        return &knob;
+    }
 
     if (timestamp_ms != knob_raw->timestamp_ms && knob_raw->delta)
     {

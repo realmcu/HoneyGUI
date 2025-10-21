@@ -40,12 +40,9 @@
 #include "gui_pagelist_new.h"
 #include "gui_canvas_rect.h"
 #include "rvd.h"
+#include "gui_obj_animate.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
-struct widget_create
-{
-    char *name;
-    int type;
-};
+
 
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
 #define XML_DOM_KEY_COUINT (INT8_MAX + 1)
@@ -74,67 +71,13 @@ static xml_dom_wifi_t wifi_array[XML_DOM_WIFI_COUINT] =
     {"WiFi21"}, {"WiFi22"}, {"WiFi23"}, {"WiFi24"}, {"WiFi25"}, {"WiFi26"}, {"WiFi27"},
 };
 
-static struct widget_create widget[] =
-{
-    { "win", WINDOW }, //
-    { "textbox", TEXTBOX },//
-    { "img", IMAGE },//
-    { "progressbar", PROGRESSBAR },
-    { "seekbar", SEEKBAR },
-    { "tabview", TABVIEW },//
-    { "tab", TAB },
-    { "curtainview", CURTAINVIEW },//
-    { "curtain", CURTAIN },
-    //{ "iconlist", ICONLIST },
-    { "icon", ICON },//
-    { "script", JAVASCRIPT },
-    { "switch", CLICKSWITCH },
-    { "page", PAGE },//
-    //{ "pagebar", PAGEBAR },
-    { "screen", SCREEN },
-    { "grid",  GRID},
-    {"gallery", GALLERY},
-    {"radio", RADIO},
-    {"appendTexts", RADIOSWITCH},
-    {"arc", MACRO_CANVAS_ARC},
-    {"movie", MOVIE},
-    {"animateTransform", MACRO_ANIMATETRANSFORM},
-    {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
-    {"keyboard", KEYBOARD},
-    {"multiLevel", MULTI_LEVEL},
-    {"onClick", MACRO_ONCLICK},
-    {"backIcon", MACRO_BACKICON},
-    {"slider", SLIDER},
-    {"onChange", MACRO_ONCHANGE},
-    {"onOn", MACRO_ONON},
-    {"onOff", MACRO_ONOFF},
-    {"onLoad", MACRO_ONLOAD},
-    {"roller", TYPE_SCROLL_WHEEL_NEW},
-    {"calendar", MACRO_CALENDAR},
-    {"onTime", MACRO_ONTIME},
-    {"combo", MACRO_COMBO},
-    {"onPeripheral", MACRO_ON_PERIPHERAL},
-    {"chart", MACRO_CHART},
-    {"listview", MACRO_PAGE_LIST_NEW},
-    {"onComplete", MACRO_ONCOMPLETE},
-    {"key", MACRO_KEY},
-    {"onSelect", MACRO_ONSELECT},
-    {"rect", RECTANGLE},
-    {"wifi", MACRO_WIFI},
-    {"onConnected", MACRO_CONNECTED},
-    {"onDisconnected", MACRO_DISCONNECTED},
-    {"onConnecting", MACRO_CONNECTING},
-    {"frame", MACRO_FRAME},
-    {"interaction", MACRO_INTERACTION},
-    {"fps", MACRO_FPS},
-};
 
 
 typedef struct
 {
-    float values[10];
-    float values_2[10];
-    float key_times[10];
+    float values[30];
+    float values_2[30];
+    float key_times[30];
     int length;
     char *img_name;
     char *animate_type;
@@ -2088,6 +2031,9 @@ static char *unescape_string(const char *input)
     output[j] = '\0';
     return output;
 }
+#if defined (_WIN32)
+static char **text_set; static int text_set_num;
+#endif
 static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type)
 {
     {
@@ -2368,7 +2314,13 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 text = unescape_string(text);
             }
+#if defined (_WIN32)
 
+
+            text_set_num++;
+            text_set = gui_realloc(text_set, text_set_num * sizeof(char *));
+            text_set[text_set_num - 1] = gui_strdup(text);
+#endif
             if (style != SCROLL_X && style != SCROLL_Y && style != SCROLL_Y_REVERSE)
             {
                 t = gui_text_create(parent, ptxt, x, y, w, h);
@@ -2511,7 +2463,7 @@ static gui_obj_t *widget_create_window(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE 
             {
                 parent->not_show = 1;
             }
-
+            gui_win_set_scope((void *)parent, 1);
 
         }
     }
@@ -3414,7 +3366,7 @@ static gui_obj_t *widget_create_seekbar(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             bool if_widget = 0;
             if (p->parent)
             {
-                if (!strcmp(widget[21].name, p->parent->name))
+                if (!strcmp("motorizedCurtain", p->parent->name))
                 {
                     if_widget = 1;
                 }
@@ -4179,7 +4131,7 @@ static gui_obj_t *widget_create_icon(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE wi
             bool if_widget = 0;
             if (p->parent)
             {
-                if (!strcmp(widget[21].name, p->parent->name))
+                if (!strcmp("motorizedCurtain", p->parent->name))
                 {
                     if_widget = 1;
                 }
@@ -5017,7 +4969,7 @@ static gui_obj_t *widget_create_clickswitch(ezxml_t p, gui_obj_t *parent, T_OBJ_
         bool if_widget = 0;
         if (p->parent)
         {
-            if (!strcmp(widget[21].name, p->parent->name))
+            if (!strcmp("motorizedCurtain", p->parent->name))
             {
                 if_widget = 1;
             }
@@ -9997,9 +9949,9 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
                     {
                         GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
                                                          (param));
-                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                          (gui_event_cb_t)pause_animation_cb,
-                                                          (param));
+                        // GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                        //                                   (gui_event_cb_t)pause_animation_cb,
+                        //                                   (param));
                     }
 
                 }
@@ -10017,9 +9969,9 @@ static gui_obj_t *widget_create_macro_onon(ezxml_t p, gui_obj_t *parent, T_OBJ_T
                     {
                         GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
                                                          (param));
-                        GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
-                                                          (gui_event_cb_t)start_animation_cb,
-                                                          (param));
+                        // GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                        //                                   (gui_event_cb_t)start_animation_cb,
+                        //                                   (param));
                     }
 
                 }
@@ -12512,71 +12464,9 @@ typedef struct xml_widget_create_new
     gui_obj_t *(* widget_create)(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE widget_type);
 } xml_widget_create_new_t;
 
-static xml_widget_create_new_t xml_widget_create_new_array[] =
-{
-    { "textbox", widget_create_textbox },
-    { "img", widget_create_image },
-    { "win", widget_create_window },
-    { "progressbar", widget_create_progressbar },
-    { "seekbar", widget_create_seekbar },
-    { "tabview", widget_create_tabview },
-    { "tab", widget_create_tab },
-    { "curtainview", widget_create_curtainview },
-    { "curtain", widget_create_curtain },
-    { "icon", widget_create_icon },
-    { "script", widget_create_javascript },
-    { "switch", widget_create_clickswitch },
-    { "page", widget_create_page },
-    { "screen", widget_create_screen },
-    { "grid", widget_create_grid },
-    { "gallery", widget_create_gallery },
-    { "radio", widget_create_radio },
-    { "arc", widget_create_macro_canvas_arc },
-    { "motorizedCurtain", widget_create_macro_motorized_curtain },
-    { "keyboard", widget_create_keyboard },
-    { "multiLevel", widget_create_multi_level },
-    { "onClick", widget_create_macro_onclick },
-    { "backIcon", widget_create_macro_backicon },
-    { "slider", widget_create_slider },
-    { "onChange", widget_create_macro_onchange },
-    { "onOn", widget_create_macro_onon },
-    { "onOff", widget_create_macro_onoff },
-    { "onLoad", widget_create_macro_onload },
-    { "roller", widget_create_type_scroll_wheel_new },
-    { "calendar", widget_create_macro_calendar },
-    { "onTime", widget_create_macro_ontime },
-    { "combo", widget_create_macro_combo },
-    { "onPeripheral", widget_create_macro_on_peripheral },
-    { "chart", widget_create_macro_chart },
-    { "listview", widget_create_macro_page_list_new },
-    { "onComplete", widget_create_macro_oncomplete },
-    { "key", widget_create_macro_key },
-    { "onSelect", widget_create_macro_on_select },
-    { "rect", widget_create_rectangle },
-    { "wifi", widget_create_macro_wifi },
-    { "onConnected", widget_create_macro_on_connected },
-    { "onDisconnected", widget_create_macro_on_disconnected },
-    { "onConnecting", widget_create_macro_on_connecting },
-    { "frame", widget_create_macro_frame },
-    { "interaction", widget_create_macro_interaction },
-    { "fps", widget_create_macro_fps },
-};
 
-gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
-{
-    char *name = p->name;
-    //gui_log("widget_create_handle:%s: %s", name, p->txt);
-    for (size_t i = 0; i < sizeof(xml_widget_create_new_array) / sizeof(xml_widget_create_new_array[0]);
-         i++)
-    {
-        if (!strcmp(xml_widget_create_new_array[i].name, name))
-        {
-            return xml_widget_create_new_array[i].widget_create(p, parent, 0);
-        }
-    }
-    gui_log("Unknown widget %s\n", name);
-    return parent;
-}
+
+gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent);
 // Define various formats
 #define MON_FORMAT     0         // "MON"
 #define Mon_FORMAT     1         // "Mon"
@@ -13191,9 +13081,9 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     }
                     else if (type && key_times && values && dur && repeatCount)
                     {
-                        float values_num_f[10];
-                        float values2_num_f[10];
-                        float key_times_num_f[10];
+                        float values_num_f[30];
+                        float values2_num_f[30];
+                        float key_times_num_f[30];
                         memset(values_num_f, 0, sizeof(values_num_f));
                         memset(values2_num_f, 0, sizeof(values2_num_f));
                         memset(key_times_num_f, 0, sizeof(key_times_num_f));
@@ -13258,7 +13148,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                             {
                                 //values
                                 int from_length = strlen(values);
-                                int index[10 + 1];
+                                int index[30 + 1];
                                 index[0] = -1;
                                 int idcount = 1;
 
@@ -13277,7 +13167,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
 // Parse each segment
                                 for (int i = 0; i < values_length; i++)
                                 {
-                                    char segment[20]; // Assuming no segment will be longer than 19 characters
+                                    char segment[30]; // Assuming no segment will be longer than 19 characters
                                     int segment_length;
 
                                     if (i == values_length - 1) // Last segment
@@ -13841,22 +13731,7 @@ ezxml_t get_child_ele(char *xml, char *ele, char *txt, char *chile_ele)
     ezxml_t title = ezxml_get(t, chile_ele, -1);
     return title;
 }
-const char *get_tag_by_widget_type(int type)
-{
-    if (type == BUTTON)
-    {
-        type = ICON;
-    }
 
-    for (size_t i = 0; i < sizeof(widget) / sizeof(struct widget_create); i++)
-    {
-        if (widget[i].type == type)
-        {
-            return widget[i].name;
-        }
-    }
-    return NULL;
-}
 void get_app(gui_app_t *app, char *pic, char *text)
 {
     ezxml_t f1 = ezxml_parse_file(app->xml);
@@ -14060,6 +13935,12 @@ static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[])
 
 
             }
+            else  if (to->type == SEEKBAR)
+            {
+
+                gui_seekbar_t *img = GUI_TYPE(gui_seekbar_t, to);
+                gui_obj_stop_animate(img->animate);
+            }
         }
     }
 }
@@ -14143,6 +14024,44 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                     {
                         ((gui_animate_t **)(img->animate))[i]->animate = 1;
                     }
+                }
+            }
+            else  if (to->type == SEEKBAR)
+            {
+                gui_seekbar_t *img = GUI_TYPE(gui_seekbar_t, to);
+                bool create = 1;
+                bool new_trigger = 0;
+
+
+
+
+                if (img->animate)
+                {
+                    create = 0;
+                }
+
+                if (create)
+                {
+                    ezxml_t f = 0;
+                    if (f1 != 0)
+                    {
+                        f = f1;
+                    }
+                    else
+                    {
+                        f = ezxml_parse_file(((gui_app_t *)gui_current_app())->xml);
+                    }
+                    foreach_create_animate(f, to, to_name[1]);
+
+                    //gui_log(" ");
+                    if (f1 == 0)
+                    {
+                        ezxml_free(f);
+                    }
+                }
+                else
+                {
+                    gui_obj_restart_animate(img->animate);
                 }
             }
         }
@@ -14943,6 +14862,15 @@ static void app_xml_ui_design(gui_app_t *app)
     gui_low_mem_used();
     gui_mem_used();
     gui_fb_change();
+#if defined(_WIN32)
+    gui_log("text used:\n");
+    for (size_t i = 0; i < text_set_num; i++)
+    {
+        printf("%s", text_set[i]);
+    }
+    printf("\n");
+    gui_log("text used end\n");
+#endif
 }
 static gui_app_t app_xml =
 {
@@ -15523,7 +15451,70 @@ scan_code get_scan_code_by_keyboard_string(const char *keyboard)
     return SCANCODE_UNKNOWN;
 }
 
-
+static xml_widget_create_new_t xml_widget_create_new_array[] =
+{
+    { "textbox", widget_create_textbox },
+    { "img", widget_create_image },
+    { "win", widget_create_window },
+    { "progressbar", widget_create_progressbar },
+    { "seekbar", widget_create_seekbar },
+    { "tabview", widget_create_tabview },
+    { "tab", widget_create_tab },
+    { "curtainview", widget_create_curtainview },
+    { "curtain", widget_create_curtain },
+    { "icon", widget_create_icon },
+    { "script", widget_create_javascript },
+    { "switch", widget_create_clickswitch },
+    { "page", widget_create_page },
+    { "screen", widget_create_screen },
+    { "grid", widget_create_grid },
+    { "gallery", widget_create_gallery },
+    { "radio", widget_create_radio },
+    { "arc", widget_create_macro_canvas_arc },
+    { "motorizedCurtain", widget_create_macro_motorized_curtain },
+    { "keyboard", widget_create_keyboard },
+    { "multiLevel", widget_create_multi_level },
+    { "onClick", widget_create_macro_onclick },
+    { "backIcon", widget_create_macro_backicon },
+    { "slider", widget_create_slider },
+    { "onChange", widget_create_macro_onchange },
+    { "onOn", widget_create_macro_onon },
+    { "onOff", widget_create_macro_onoff },
+    { "onLoad", widget_create_macro_onload },
+    { "roller", widget_create_type_scroll_wheel_new },
+    { "calendar", widget_create_macro_calendar },
+    { "onTime", widget_create_macro_ontime },
+    { "combo", widget_create_macro_combo },
+    { "onPeripheral", widget_create_macro_on_peripheral },
+    { "chart", widget_create_macro_chart },
+    { "listview", widget_create_macro_page_list_new },
+    { "onComplete", widget_create_macro_oncomplete },
+    { "key", widget_create_macro_key },
+    { "onSelect", widget_create_macro_on_select },
+    { "rect", widget_create_rectangle },
+    { "wifi", widget_create_macro_wifi },
+    { "onConnected", widget_create_macro_on_connected },
+    { "onDisconnected", widget_create_macro_on_disconnected },
+    { "onConnecting", widget_create_macro_on_connecting },
+    { "frame", widget_create_macro_frame },
+    { "interaction", widget_create_macro_interaction },
+    { "fps", widget_create_macro_fps },
+};
+gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
+{
+    char *name = p->name;
+    //gui_log("widget_create_handle:%s: %s", name, p->txt);
+    for (size_t i = 0; i < sizeof(xml_widget_create_new_array) / sizeof(xml_widget_create_new_array[0]);
+         i++)
+    {
+        if (!strcmp(xml_widget_create_new_array[i].name, name))
+        {
+            return xml_widget_create_new_array[i].widget_create(p, parent, 0);
+        }
+    }
+    gui_log("Unknown widget %s\n", name);
+    return parent;
+}
 
 
 

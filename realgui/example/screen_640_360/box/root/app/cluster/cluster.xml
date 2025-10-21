@@ -1,0 +1,506 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app>cluster
+
+<animateTransform
+    type="progress"
+    from="0.00"
+    to="1.00"
+    dur="100000ms"
+    repeatCount="0">animate0
+</animateTransform>
+<animateTransform
+    type="translate"
+    values="-125,-87; -312,-198; -45,-156; -278,-267; -312,-23; -267,-156; -78,-245; -345,-112; -89,-90; -290,-245; -219,-150; -300,-100; -150,-56; -320,-180; -100,-198; -340,-230; -200,-200; -275,-220; -180,-102; -125,-87"
+    keyTimes="0; 0.05; 0.1; 0.15; 0.2; 0.25; 0.3; 0.35; 0.4; 0.45; 0.5; 0.55; 0.6; 0.65; 0.7; 0.75; 0.8; 0.85; 0.9; 0.95; 1"
+    dur="50000ms"
+    repeatCount="-1"
+    calcMode="linear">animate1
+</animateTransform>
+
+<script
+    file="app/cluster/cluster.js"></script><screen
+    w="800"
+    h="480"
+    x="0"
+    y="0">screen0
+<img
+      opacity="255"
+      blendMode="imgBypassMode"
+      file="app/cluster/resource/new_folder/bc1.bin"
+      rotationAngle="0"
+      scaleX="1"
+      scaleY="1"
+      w="800"
+      h="480"
+      x="0"
+      y="0">image0
+</img><rect
+      fill="#ffffffaa"
+      stroke="#ffffffff"
+      strokeWidth="0"
+      ry="30"
+      rx="30"
+      w="120"
+      h="450"
+      x="0"
+      y="15">rect0
+<radio
+        picture="app/cluster/resource/new_folder/3dicons-map-pin-dynamic-color.bin"
+        highlightPicture="app/cluster/resource/new_folder/map-pin-dynamic-gradient.bin"
+        blendMode="imgSrcOverMode"
+        opacity="255"
+        pictureX="0"
+        pictureY="0"
+        rotationAngle="0"
+        name="RadioButton"
+        w="120"
+        h="120"
+        x="0"
+        y="0">radiobutton0
+    <onSelect
+          type="jump"
+          to="tabview"
+          id="0,0,tabview0"></onSelect>
+                            </radio><radio
+        picture="app/cluster/resource/new_folder/3dicons-music-dynamic-color.bin"
+        highlightPicture="app/cluster/resource/new_folder/music-dynamic-gradient.bin"
+        blendMode="imgSrcOverMode"
+        opacity="255"
+        pictureX="0"
+        pictureY="0"
+        rotationAngle="0"
+        name="RadioButton"
+        w="120"
+        h="120"
+        x="0"
+        y="165">radiobutton1
+    <onSelect
+          type="jump"
+          to="tabview"
+          id="1,0,tabview0"></onSelect>
+                            </radio><radio
+        picture="app/cluster/resource/new_folder/3dicons-toggle-dynamic-color.bin"
+        highlightPicture="app/cluster/resource/new_folder/toggle-dynamic-gradient.bin"
+        blendMode="imgSrcOverMode"
+        opacity="255"
+        pictureX="0"
+        pictureY="0"
+        rotationAngle="0"
+        name="RadioButton"
+        w="120"
+        h="120"
+        x="0"
+        y="330">radiobutton2
+    <onSelect
+          type="jump"
+          to="tabview"
+          id="2,0,tabview0"></onSelect>
+                            </radio></rect><tabview
+      transition="normal"
+      gestures="false"
+      w="800"
+      h="480"
+      x="0"
+      y="0">tabview0
+<tab
+        idx="0"
+        idy="0">tab0
+<rect
+          fill="#ffffffaa"
+          stroke="#ffffffff"
+          strokeWidth="0"
+          ry="30"
+          rx="30"
+          w="650"
+          h="450"
+          x="135"
+          y="15">rect1
+<win
+            w="649"
+            h="449"
+            x="0"
+            y="0">win3
+<img
+              opacity="255"
+              blendMode="imgBypassMode"
+              file="app/cluster/resource/new_folder2/image (1).bin"
+              rotationAngle="0"
+              scaleX="1"
+              scaleY="1"
+              w="1000"
+              h="720"
+              x="0"
+              y="0">image4
+    <onLoad
+                type="animate"
+                to="image4"
+                id="animate1">
+    </onLoad>
+</img></win></rect></tab><tab
+        idx="1"
+        idy="0">tab1
+<rect
+          fill="#ffffffaa"
+          stroke="#ffffffff"
+          strokeWidth="0"
+          ry="30"
+          rx="30"
+          w="650"
+          h="450"
+          x="135"
+          y="15">rect5
+<win
+            w="353"
+            h="110"
+            x="0"
+            y="230">win0
+<icon
+              text=""
+              picture="app/cluster/resource/new_folder10/forward_normal.bin"
+              highlightPicture="app/cluster/resource/new_folder10/forward_highlight.bin"
+              blendMode="imgSrcOverMode"
+              opacity="255"
+              pictureX="0"
+              pictureY="0"
+              rotationAngle="0"
+              textX="0"
+              textY="0"
+              mode="normal"
+              w="100"
+              h="100"
+              x="0"
+              y="0">button0
+    <onClick
+                type="jump"
+                to="tabview"
+                id="0,0,tabview1"></onClick>
+                            </icon><icon
+              text=""
+              picture="app/cluster/resource/new_folder10/rewind_normal.bin"
+              highlightPicture="app/cluster/resource/new_folder10/rewind_highlight.bin"
+              blendMode="imgSrcOverMode"
+              opacity="255"
+              pictureX="0"
+              pictureY="0"
+              rotationAngle="0"
+              textX="0"
+              textY="0"
+              mode="normal"
+              w="100"
+              h="100"
+              x="253"
+              y="0">button1
+    <onClick
+                type="jump"
+                to="tabview"
+                id="1,0,tabview1"></onClick>
+                            </icon><switch
+              opacity="255"
+              blendMode="imgSrcOverMode"
+              picture="app/cluster/resource/new_folder10/play_pause_normal.bin"
+              highlightPicture="app/cluster/resource/new_folder10/play_pause_highlight.bin"
+              mode="normal"
+              folder=""
+              duration="200"
+              w="100"
+              h="100"
+              x="126"
+              y="0">switch0
+    <onOn
+                type="animate"
+                to="imageseekbar0"
+                id="animate0">
+    </onOn>
+    <onOff
+                type="animatePause"
+                to="imageseekbar0"
+                id="animate0">
+    </onOff>
+</switch></win><seekbar
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            orientation="horizontal"
+            centralX="0"
+            centralY="0"
+            folder="app/cluster/resource/new_folder12"
+            startDegree="0"
+            endDegree="0"
+            w="650"
+            h="32"
+            x="0"
+            y="382">imageseekbar0
+    <onLoad
+              type="animate"
+              to="imageseekbar0"
+              id="animate0">
+    </onLoad>
+</seekbar></rect><tabview
+          transition="normal"
+          gestures="false"
+          w="800"
+          h="480"
+          x="0"
+          y="0">tabview1
+<tab
+            idx="0"
+            idy="0">tab3
+<img
+              opacity="255"
+              blendMode="imgBypassMode"
+              file="app/cluster/resource/new_folder11/Rectangle86.bin"
+              rotationAngle="0"
+              scaleX="1"
+              scaleY="1"
+              w="270"
+              h="270"
+              x="501"
+              y="58">image2
+</img><win
+              w="344"
+              h="120"
+              x="147"
+              y="45">win1
+<textbox
+                text="Track1"
+                font="app/cluster/resource/font/NotoSansSC-Bold_size32_bits4_font.bin"
+                fontSize="32"
+                color="#ffffffff"
+                inputable="0"
+                letterSpace="0"
+                lineSpace="0"
+                alignH="center"
+                alignV="top"
+                lineMode="single"
+                scroll="none"
+                rotation="0"
+                w="344"
+                h="40"
+                x="0"
+                y="0">textbox0
+</textbox><textbox
+                text="Artist1"
+                font="app/cluster/resource/font/NotoSansSC-Medium_size32_bits4_font.bin"
+                fontSize="32"
+                color="#ffffffff"
+                inputable="0"
+                letterSpace="0"
+                lineSpace="0"
+                alignH="center"
+                alignV="top"
+                lineMode="single"
+                scroll="none"
+                rotation="0"
+                w="344"
+                h="40"
+                x="0"
+                y="40">textbox1
+</textbox><textbox
+                text="Album1"
+                font="app/cluster/resource/font/NotoSansSC-Medium_size32_bits4_font.bin"
+                fontSize="32"
+                color="#ffffffff"
+                inputable="0"
+                letterSpace="0"
+                lineSpace="0"
+                alignH="center"
+                alignV="top"
+                lineMode="single"
+                scroll="none"
+                rotation="0"
+                w="344"
+                h="40"
+                x="0"
+                y="80">textbox2
+</textbox></win></tab><tab
+            idx="1"
+            idy="0">tab4
+<img
+              opacity="255"
+              blendMode="imgBypassMode"
+              file="app/cluster/resource/new_folder11/COVER2.bin"
+              rotationAngle="0"
+              scaleX="1"
+              scaleY="1"
+              w="270"
+              h="270"
+              x="501"
+              y="58">image3
+</img><win
+              w="344"
+              h="120"
+              x="147"
+              y="45">win2
+<textbox
+                text="Track2"
+                font="app/cluster/resource/font/NotoSansSC-Bold_size32_bits4_font.bin"
+                fontSize="32"
+                color="#ffffffff"
+                inputable="0"
+                letterSpace="0"
+                lineSpace="0"
+                alignH="center"
+                alignV="top"
+                lineMode="single"
+                scroll="none"
+                rotation="0"
+                w="344"
+                h="40"
+                x="0"
+                y="0">textbox3
+</textbox><textbox
+                text="Artist2"
+                font="app/cluster/resource/font/NotoSansSC-Medium_size32_bits4_font.bin"
+                fontSize="32"
+                color="#ffffffff"
+                inputable="0"
+                letterSpace="0"
+                lineSpace="0"
+                alignH="center"
+                alignV="top"
+                lineMode="single"
+                scroll="none"
+                rotation="0"
+                w="344"
+                h="40"
+                x="0"
+                y="40">textbox4
+</textbox><textbox
+                text="Album2"
+                font="app/cluster/resource/font/NotoSansSC-Medium_size32_bits4_font.bin"
+                fontSize="32"
+                color="#ffffffff"
+                inputable="0"
+                letterSpace="0"
+                lineSpace="0"
+                alignH="center"
+                alignV="top"
+                lineMode="single"
+                scroll="none"
+                rotation="0"
+                w="344"
+                h="40"
+                x="0"
+                y="80">textbox5
+</textbox></win></tab></tabview></tab><tab
+        idx="2"
+        idy="0">tab2
+<rect
+          fill="#ffffffaa"
+          stroke="#ffffffff"
+          strokeWidth="0"
+          ry="30"
+          rx="30"
+          w="300"
+          h="300"
+          x="145"
+          y="25">rect2
+<img
+            folder="app/cluster/resource/new_folder3"
+            duration="10000"
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file=""
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="300"
+            h="300"
+            x="0"
+            y="0">imagemovie1
+</img><img
+            folder="app/cluster/resource/new_folder4"
+            duration="6000"
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file=""
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="180"
+            h="54"
+            x="60"
+            y="221">imagemovie2
+</img></rect><rect
+          fill="#ffffffaa"
+          stroke="#ffffffff"
+          strokeWidth="0"
+          ry="30"
+          rx="30"
+          w="300"
+          h="300"
+          x="473"
+          y="23">rect3
+<img
+            folder="app/cluster/resource/new_folder5"
+            duration="3000"
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file=""
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="300"
+            h="300"
+            x="0"
+            y="0">imagemovie3
+</img><img
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file="app/cluster/resource/new_folder7/water_temp_000.bin"
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="183"
+            h="50"
+            x="58"
+            y="231">image1
+</img><img
+            folder="app/cluster/resource/new_folder6"
+            duration="24000"
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file=""
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="90"
+            h="80"
+            x="105"
+            y="115">imagemovie4
+</img></rect><rect
+          fill="#ffffffaa"
+          stroke="#ffffffff"
+          strokeWidth="0"
+          ry="30"
+          rx="30"
+          w="300"
+          h="128"
+          x="145"
+          y="337">rect4
+<img
+            folder="app/cluster/resource/new_folder9"
+            duration="10000"
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file=""
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="280"
+            h="80"
+            x="10"
+            y="0">imagemovie5
+</img><img
+            folder="app/cluster/resource/new_folder8"
+            duration="6000"
+            opacity="255"
+            blendMode="imgSrcOverMode"
+            file=""
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1"
+            w="276"
+            h="40"
+            x="12"
+            y="82">imagemovie6
+</img></rect></tab></tabview></screen></app>

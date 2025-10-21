@@ -88,6 +88,6 @@ gui_knob_port_data_t *knob_get_data(void)
     {
         return indev->knob_get_port_data();
     }
-    GUI_ASSERT(NULL != NULL);
+    //GUI_ASSERT(NULL != NULL);
     return NULL;
 }

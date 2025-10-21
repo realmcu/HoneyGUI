@@ -109,6 +109,27 @@ float gui_animation_get_progress(gui_animate_t *animation);
  * @param animate Pointer to the animation object to be restarted.
  */
 void gui_obj_restart_animate(gui_animate_t *animate);
+/**
+ * @brief Stop an ongoing animation.
+ *
+ * This function stops the animation by setting the animate flag to false.
+ *
+ * @param animate Pointer to the gui_animate_t structure to be stopped.
+ */
+void gui_obj_stop_animate(gui_animate_t *animate);
+/**
+ * @brief Retrieves an animation object from an array using the specified index.
+ *
+ * This function checks if the provided index is within the valid range of the array.
+ * If the index is out of bounds, it returns 0.
+ *
+ * @param animation_array Array of pointers to animation objects.
+ * @param array_length    The length of the animation array (number of elements).
+ * @param index           The index of the animation object to retrieve (0-based).
+ * @return Pointer to the animation object at the specified index, or 0 if the index is out of range.
+ */
+gui_animate_t *gui_get_animation_from_array(gui_animate_t **animation_array, int array_length,
+                                            int index);
 #ifdef __cplusplus
 }
 #endif

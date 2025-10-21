@@ -305,7 +305,18 @@ int gui_win_get_x(gui_win_t *win);
  * @return The current y-coordinate of the window.
  */
 int gui_win_get_y(gui_win_t *win);
-
+/**
+ * @brief Forces a click event override for a GUI window.
+ *
+ * This function sets the `override_click` flag of the specified GUI window to 1,
+ * indicating that a click event should be forced or prioritized. It includes a
+ * safety check to ensure the window pointer is valid.
+ *
+ * @param this Pointer to the GUI window (`gui_win_t`) to modify.
+ * @return None
+ * @throws GUI_ERROR_INVALID_PARAM If the `this` pointer is NULL or invalid.
+ */
+void gui_win_click_force(gui_win_t *this);
 #ifdef __cplusplus
 }
 #endif

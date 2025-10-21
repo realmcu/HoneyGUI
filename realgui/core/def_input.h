@@ -124,7 +124,7 @@ typedef struct gui_knob_port_data
     int16_t  delta;//positive away from the user and negative toward the user
     uint32_t timestamp_ms;             /* The timestamp when the data was received */
 } gui_knob_port_data_t;
-
+typedef gui_knob_port_data_t gui_wheel_port_data_t;
 /* gui_indev struct define start */
 typedef struct gui_indev
 {

@@ -185,6 +185,11 @@ void gui_obj_restart_animate(gui_animate_t *animate)
     animate->Beginning_frame = 0;
     animate->end_frame = 0;
 }
+void gui_obj_stop_animate(gui_animate_t *animate)
+{
+    gui_log("gui_obj_stop_animate\n");
+    animate->animate = false;
+}
 float gui_animation_get_progress(gui_animate_t *animation)
 {
     GUI_ASSERT(animation)
@@ -196,4 +201,14 @@ float gui_animation_get_progress(gui_animate_t *animation)
     {
         return 0;
     }
+}
+
+gui_animate_t *gui_get_animation_from_array(gui_animate_t **animation_array, int array_length,
+                                            int index)
+{
+    if (array_length - 1 < index)
+    {
+        return 0;
+    }
+    return animation_array[index];
 }

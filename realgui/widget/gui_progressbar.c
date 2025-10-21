@@ -59,7 +59,7 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t     *this,
 {
     gui_obj_ctor(&(this->base), parent, "progressbar_movie", x, y, 0, 0);
 
-    this->per = 0.3f;
+    this->per = 0.0f;
     this->base.type = PROGRESSBAR;
     this->max = array_number - 1;
 

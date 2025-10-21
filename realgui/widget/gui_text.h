@@ -393,7 +393,17 @@ gui_text_t *gui_text_create(void       *parent,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h);
-
+/**
+ * @brief Sets the color of a GUI text element.
+ *
+ * This function updates the color property of the specified GUI text element to the provided color value.
+ * It assumes the input text element and color are valid and performs no additional checks.
+ *
+ * @param this Pointer to the GUI text element (`gui_text_t`) to modify.
+ * @param color The color (`gui_color_t`) to set for the text element.
+ * @return None
+ */
+void gui_text_set_color(gui_text_t    *this, gui_color_t color);
 
 
 #ifdef __cplusplus

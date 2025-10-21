@@ -290,8 +290,8 @@ void gui_img_prepare(gui_obj_t *obj)
                 }
                 int w_w = win_scope->base.w;
                 int w_h = win_scope->base.h;
-                int img_x = GUI_TYPE(gui_img_t, obj)->ax;
-                int img_y = GUI_TYPE(gui_img_t, obj)->ay;
+                int img_x = GUI_TYPE(gui_img_t, obj)->ax + gui_img_get_transform_t_x(this);
+                int img_y = GUI_TYPE(gui_img_t, obj)->ay + gui_img_get_transform_t_y(this);
                 int img_w = this->draw_img->img_w;
                 int img_h = this->draw_img->img_h;
                 //gui_log("%s,ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n", obj->name,ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
