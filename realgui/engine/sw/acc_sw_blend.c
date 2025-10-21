@@ -74,12 +74,13 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
         for (int32_t i = y_start; i <= y_end; i++)
         {
             int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
-            color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + (uint32_t)((
-                                                i + m12) * source_w + x_start + m02);
+            color_argb8565_t *pixel = (color_argb8565_t *)(uintptr_t)image_base + (uint32_t)((
+                                          i + m12) * source_w + x_start + m02);
 
             for (int32_t j = x_start; j <= x_end; j++)
             {
-                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], pixel->a);
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->color.rgb565, writebuf[write_off],
+                                                                       pixel->a);
                 write_off++;
                 pixel++;
             }
@@ -90,14 +91,15 @@ void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
         for (int32_t i = y_start; i <= y_end; i++)
         {
             int write_off = (i - y1) * (x2 - x1 + 1) + x_start - x1;
-            color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + (uint32_t)((
-                                                i + m12) * source_w + x_start + m02);
+            color_argb8565_t *pixel = (color_argb8565_t *)(uintptr_t)image_base + (uint32_t)((
+                                          i + m12) * source_w + x_start + m02);
 
             for (int32_t j = x_start; j <= x_end; j++)
             {
                 uint8_t alpha = pixel->a;
                 alpha = (alpha * opacity_value) >> 8;
-                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], alpha);
+                writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->color.rgb565, writebuf[write_off],
+                                                                       alpha);
 
                 write_off++;
                 pixel++;

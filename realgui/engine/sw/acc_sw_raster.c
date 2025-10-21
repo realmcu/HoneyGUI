@@ -54,9 +54,9 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
         {
             color_rgb565_t *pixel = (color_rgb565_t *)(uintptr_t)image_base + image_off;
             *source_alpha = 0xff;
-            *source_red = pixel->r << 3;
-            *source_green = pixel->g << 2;
-            *source_blue = pixel->b << 3;
+            *source_red = pixel->color.rgb_channel.r << 3;
+            *source_green = pixel->color.rgb_channel.g << 2;
+            *source_blue = pixel->color.rgb_channel.b << 3;
             break;
         }
     case RGB888:
@@ -72,18 +72,18 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
         {
             color_argb8565_t *pixel = (color_argb8565_t *)(uintptr_t)image_base + image_off;
             *source_alpha = pixel->a;
-            *source_red = pixel->r << 3;
-            *source_green = pixel->g << 2;
-            *source_blue = pixel->b << 3;
+            *source_red = pixel->color.rgb_channel.r << 3;
+            *source_green = pixel->color.rgb_channel.g << 2;
+            *source_blue = pixel->color.rgb_channel.b << 3;
             break;
         }
     case ARGB8888:
         {
             color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)image_base + image_off;
-            *source_alpha = pixel->a;
-            *source_red = pixel->r;
-            *source_green = pixel->g;
-            *source_blue = pixel->b;
+            *source_alpha = pixel->color.argb_channel.a;
+            *source_red = pixel->color.argb_channel.r;
+            *source_green = pixel->color.argb_channel.g;
+            *source_blue = pixel->color.argb_channel.b;
             break;
         }
     case PALETTE:
@@ -101,11 +101,11 @@ static void gui_get_source_color(uint8_t *source_red, uint8_t *source_green, uin
         {
             color_a8_t *pixel = (color_a8_t *)(uintptr_t)image_base + image_off;
             color_argb8888_t *pixel_mix = (color_argb8888_t *)&color_mix;
-            uint32_t alpha = pixel->a * pixel_mix->a / 255;
+            uint32_t alpha = pixel->a * pixel_mix->color.argb_channel.a / 255;
             *source_alpha = alpha;
-            *source_red = pixel_mix->r;
-            *source_green = pixel_mix->g;
-            *source_blue = pixel_mix->b;
+            *source_red = pixel_mix->color.argb_channel.r;
+            *source_green = pixel_mix->color.argb_channel.g;
+            *source_blue = pixel_mix->color.argb_channel.b;
             break;
         }
     default:
@@ -125,9 +125,9 @@ static void gui_get_target_color(uint8_t *target_red, uint8_t *target_green, uin
         {
             color_rgb565_t *pixel = (color_rgb565_t *)(uintptr_t)writebuf + write_off;
             *target_alpha = 0xff;
-            *target_red = pixel->r << 3;
-            *target_green = pixel->g << 2;
-            *target_blue = pixel->b << 3;
+            *target_red = pixel->color.rgb_channel.r << 3;
+            *target_green = pixel->color.rgb_channel.g << 2;
+            *target_blue = pixel->color.rgb_channel.b << 3;
             break;
         }
     case 3:
@@ -142,10 +142,10 @@ static void gui_get_target_color(uint8_t *target_red, uint8_t *target_green, uin
     case 4:
         {
             color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)writebuf + write_off;
-            *target_alpha = pixel->a;
-            *target_red = pixel->r;
-            *target_green = pixel->g;
-            *target_blue = pixel->b;
+            *target_alpha = pixel->color.argb_channel.a;
+            *target_red = pixel->color.argb_channel.r;
+            *target_green = pixel->color.argb_channel.g;
+            *target_blue = pixel->color.argb_channel.b;
             break;
         }
     }
@@ -221,9 +221,9 @@ static void gui_set_pixel_color(uint8_t *writebuf, int write_off, uint8_t dc_byt
     case 2:
         {
             color_rgb565_t *pixel = (color_rgb565_t *)(uintptr_t)writebuf + write_off;
-            pixel->r = target_red >> 3;
-            pixel->g = target_green >> 2;
-            pixel->b = target_blue >> 3;
+            pixel->color.rgb_channel.r = target_red >> 3;
+            pixel->color.rgb_channel.g = target_green >> 2;
+            pixel->color.rgb_channel.b = target_blue >> 3;
 #ifdef HONEYGUI_SUPPORT_DITHER
             params->r_rest += (target_red & 7);
             params->g_rest += (target_green & 3);
@@ -257,10 +257,10 @@ static void gui_set_pixel_color(uint8_t *writebuf, int write_off, uint8_t dc_byt
     case 4:
         {
             color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)writebuf + write_off;
-            pixel->a = target_alpha;
-            pixel->r = target_red;
-            pixel->g = target_green;
-            pixel->b = target_blue;
+            pixel->color.argb_channel.a = target_alpha;
+            pixel->color.argb_channel.r = target_red;
+            pixel->color.argb_channel.g = target_green;
+            pixel->color.argb_channel.b = target_blue;
             break;
         }
     }

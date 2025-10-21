@@ -480,19 +480,19 @@ void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/)
     {
         uint16_t pixel = 0;
         color_rgb565_t *p = (color_rgb565_t *)(uintptr_t)&pixel;
-        p->b = (color.color.rgba.b >> 3) & 0x1F;
-        p->g = (color.color.rgba.g >> 2) & 0x3F;
-        p->r = (color.color.rgba.r >> 3) & 0x1F;
+        p->color.rgb_channel.b = (color.color.rgba.b >> 3) & 0x1F;
+        p->color.rgb_channel.g = (color.color.rgba.g >> 2) & 0x3F;
+        p->color.rgb_channel.r = (color.color.rgba.r >> 3) & 0x1F;
         gui_memset16((uint16_t *)addr, (uint16_t)pixel, len);
     }
     else if (dc->bit_depth == 32)
     {
         uint32_t pixel = 0;
         color_argb8888_t *p = (color_argb8888_t *)(uintptr_t)&pixel;
-        p->a = color.color.rgba.a;
-        p->r = color.color.rgba.r;
-        p->g = color.color.rgba.g;
-        p->b = color.color.rgba.b;
+        p->color.argb_channel.a = color.color.rgba.a;
+        p->color.argb_channel.r = color.color.rgba.r;
+        p->color.argb_channel.g = color.color.rgba.g;
+        p->color.argb_channel.b = color.color.rgba.b;
         gui_memset32((uint32_t *)addr, pixel, len);
     }
 }

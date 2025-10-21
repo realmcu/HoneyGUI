@@ -37,8 +37,8 @@ static uint16_t do_blending_acc_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8
 }
 
 #ifdef HONEYGUI_4XAA
-static color_argb8565_value_t do_average_acc_2_argb8565_opacity(uint32_t fg, uint32_t bg,
-                                                                uint8_t alpha_fg, uint8_t alpha_bg, uint8_t ratio)
+static color_argb8565_t do_average_acc_2_argb8565_opacity(uint32_t fg, uint32_t bg,
+                                                          uint8_t alpha_fg, uint8_t alpha_bg, uint8_t ratio)
 {
     // Alpha converted from [0..255] to [0..31]
     // Converts  0000000000000000rrrrrggggggbbbbb
@@ -50,7 +50,7 @@ static color_argb8565_value_t do_average_acc_2_argb8565_opacity(uint32_t fg, uin
     bg = ((bg | (bg << 16)) & 0x07e0f81f);
     fg = ((fg | (fg << 16)) & 0x07e0f81f);
     uint32_t result = (((((fg - bg) * rgb_ratio) >> 5) + bg) & 0x07e0f81f);
-    color_argb8565_value_t pixel = {.rgb = (uint16_t)((result >> 16) | result), .a = ((alpha_fg * ratio + alpha_bg * (255 - ratio)) >> 8)};
+    color_argb8565_t pixel = {.rgb = (uint16_t)((result >> 16) | result), .a = ((alpha_fg * ratio + alpha_bg * (255 - ratio)) >> 8)};
     return pixel;
 }
 #endif
@@ -194,9 +194,10 @@ void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
             int write_off = write_offset + j;
             int image_off = y * source_w + x;
 
-            color_argb8565_value_t *pixel = (color_argb8565_value_t *)(uintptr_t)image_base + image_off;
+            color_argb8565_t *pixel = (color_argb8565_t *)(uintptr_t)image_base + image_off;
 
-            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->rgb, writebuf[write_off], pixel->a);
+            writebuf[write_off] = do_blending_acc_2_rgb565_opacity(pixel->color.rgb565, writebuf[write_off],
+                                                                   pixel->a);
 
             X += m00;
             Y += m10;
@@ -262,10 +263,10 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
                 continue;
             }
             uint8_t xRatio = (1 + x - X) * 0xFF;
-            color_argb8565_value_t pixel1 = {0}, pixel2 = {0};
+            color_argb8565_t pixel1 = {0}, pixel2 = {0};
 #ifdef HONEYGUI_4XAA
             uint8_t yRatio = (1 + y - Y) * 0xFF;
-            color_argb8565_value_t pixel3 = {0}, pixel4 = {0};
+            color_argb8565_t pixel3 = {0}, pixel4 = {0};
 #endif
             int write_off = write_offset + j;
             int image_off = y * source_w + x;
@@ -276,12 +277,12 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             if (x >= 0)
 #endif
             {
-                pixel1 = *((color_argb8565_value_t *)(uintptr_t)image_base + image_off);
+                pixel1 = *((color_argb8565_t *)(uintptr_t)image_base + image_off);
             }
 #ifdef HONEYGUI_4XAA
             if (y >= -1)
             {
-                pixel3 = *((color_argb8565_value_t *)(uintptr_t)image_base + image_off + source_w);
+                pixel3 = *((color_argb8565_t *)(uintptr_t)image_base + image_off + source_w);
             }
 
             if (x < source_w - 1 && y >= 0)
@@ -289,7 +290,7 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             if (x < source_w - 1)
 #endif
             {
-                pixel2 = *((color_argb8565_value_t *)(uintptr_t)image_base + image_off + 1);
+                pixel2 = *((color_argb8565_t *)(uintptr_t)image_base + image_off + 1);
             }
 #ifdef HONEYGUI_4XAA
             if (y < source_h - 1)
@@ -303,7 +304,8 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             writebuf[write_off] = do_average_blend_acc_2_argb8565_opacity(pixel2.rgb, pixel4.rgb,
                                                                           writebuf[write_off], pixel2.a, pixel4.a, yRatio);
 #else
-            writebuf[write_off] = do_average_blend_acc_2_argb8565_opacity(pixel1.rgb, pixel2.rgb,
+            writebuf[write_off] = do_average_blend_acc_2_argb8565_opacity(pixel1.color.rgb565,
+                                                                          pixel2.color.rgb565,
                                                                           writebuf[write_off], pixel1.a, pixel2.a, xRatio);
 #endif
             X += m00;

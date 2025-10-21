@@ -71,30 +71,47 @@ typedef struct _color_rgb888
 
 typedef struct _color_rgb565
 {
-    uint16_t b : 5;
-    uint16_t g : 6;
-    uint16_t r : 5;
+    union
+    {
+        struct
+        {
+            uint16_t b : 5;
+            uint16_t g : 6;
+            uint16_t r : 5;
+        } rgb_channel;
+        uint16_t rgb565;
+    } color;
 } color_rgb565_t;
 
 typedef struct _color_argb8565
 {
-    uint16_t b : 5;
-    uint16_t g : 6;
-    uint16_t r : 5;
+    union
+    {
+        struct
+        {
+            uint16_t b : 5;
+            uint16_t g : 6;
+            uint16_t r : 5;
+        } rgb_channel;
+        uint16_t rgb565;
+    } color;
     uint8_t a;
 } color_argb8565_t;
 
-typedef struct _color_argb8565_value //only use for sw fast blending
-{
-    uint16_t rgb;
-    uint8_t a;
-} color_argb8565_value_t;
+
 typedef struct _color_argb88888
 {
-    uint8_t b; ///< Blue color component, at the lowest address
-    uint8_t g; ///< Green color component
-    uint8_t r; ///< Red color component
-    uint8_t a; ///< Alpha channel for transparency, at the highest address
+    union
+    {
+        struct
+        {
+            uint8_t b; ///< Blue color component, at the lowest address
+            uint8_t g; ///< Green color component
+            uint8_t r; ///< Red color component
+            uint8_t a; ///< Alpha channel for transparency, at the highest address
+        } argb_channel;
+        uint32_t argb8888;
+    } color;
 } color_argb8888_t;
 
 typedef struct _color_a8
