@@ -221,8 +221,8 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
     uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
-    int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
+    uint16_t source_w = image->img_w;
+    uint16_t source_h = image->img_h;
     gui_matrix_t *inverse = &image->inverse;
 
     float m00 = inverse->m[0][0];
@@ -250,19 +250,14 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             int x = (int)X;
             int y = (int)Y;
 
-            if ((x >= source_w) || (x < -1) ||
-#ifdef HONEYGUI_4XAA
-                (y < -1)
-#else
-                (y < 0)
-#endif
-                || (y >= source_h))
+            if ((uint32_t)x >= source_w || (uint32_t)y >= source_h)
             {
                 X += m00;
                 Y += m10;
                 continue;
             }
-            uint8_t xRatio = (1 + x - X) * 0xFF;
+
+            uint32_t xRatio = (1 + x - X) * 0xFF;
             color_argb8565_t pixel1 = {0}, pixel2 = {0};
 #ifdef HONEYGUI_4XAA
             uint8_t yRatio = (1 + y - Y) * 0xFF;
@@ -381,8 +376,8 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
                 Y += m10;
                 continue;
             }
-            uint8_t xRatio = (X - x) * 0xFF;
-            uint8_t alpha1 = 0, alpha2 = 0;
+            uint32_t xRatio = (X - x) * 0xFF;
+            uint32_t alpha1 = 0, alpha2 = 0;
 #ifdef HONEYGUI_4XAA
             uint8_t yRatio = (Y - y) * 0xFF;
             uint8_t alpha3 = 0, alpha4 = 0;
