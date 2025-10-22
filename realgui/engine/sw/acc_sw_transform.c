@@ -205,6 +205,11 @@ void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
     }
 }
 
+static inline int fast_floor(float x)
+{
+    return (x >= 0) ? (int)x : (int)(x - 1);
+}
+
 void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
                                   gui_rect_t *rect)
 {
@@ -232,22 +237,25 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
     float m11 = inverse->m[1][1];
     float m12 = inverse->m[1][2];
 
-
+    const float m00xx = m00 * x_start;
+    const float m10xx = m10 * x_start;
+    const int fb_width = (dc->section.x2 - dc->section.x1 + 1);
+    const int offset_constant = dc->section.y1 * fb_width - dc->section.x1;
     for (int32_t i = y_start; i <= y_end; i++)
     {
         float detalX = m01 * i + m02;
         float detalY = m11 * i + m12;
-        float X = m00 * x_start + detalX;
-        float Y = m10 * x_start + detalY;
+        float X = m00xx + detalX;
+        float Y = m10xx + detalY;
 
-        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+        int write_offset = i * fb_width - offset_constant;
 
         for (int32_t j = x_start; j <= x_end; j++)
         {
             // int x = roundf(X);
             // int y = roundf(Y);
 
-            int x = (int)X;
+            int x = fast_floor(X);
             int y = (int)Y;
 
             if ((uint32_t)x >= source_w || (uint32_t)y >= source_h)
@@ -257,7 +265,7 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
                 continue;
             }
 
-            uint32_t xRatio = (1 + x - X) * 0xFF;
+            uint8_t xRatio = (1 + x - X) * 0xFF;
             color_argb8565_t pixel1 = {0}, pixel2 = {0};
 #ifdef HONEYGUI_4XAA
             uint8_t yRatio = (1 + y - Y) * 0xFF;
@@ -266,14 +274,8 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             int write_off = write_offset + j;
             int image_off = y * source_w + x;
 
-#ifdef HONEYGUI_4XAA
-            if (x >= 0 && y >= 0)
-#else
-            if (x >= 0)
-#endif
-            {
-                pixel1 = *((color_argb8565_t *)(uintptr_t)image_base + image_off);
-            }
+            pixel1 = *((color_argb8565_t *)(uintptr_t)image_base + image_off);
+
 #ifdef HONEYGUI_4XAA
             if (y >= -1)
             {
@@ -325,8 +327,8 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
     uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
-    int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
+    uint16_t source_w = image->img_w;
+    uint16_t source_h = image->img_h;
     gui_matrix_t *inverse = &image->inverse;
 
     float m00 = inverse->m[0][0];
@@ -347,37 +349,35 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
     uint16_t b5 = (uint16_t)(b8 >> 3);
 
     uint16_t fg_color = (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+    const float m00xx = m00 * x_start;
+    const float m10xx = m10 * x_start;
+    const int fb_width = (dc->section.x2 - dc->section.x1 + 1);
+    const int offset_constant = dc->section.y1 * fb_width - dc->section.x1;
     for (int32_t i = y_start; i <= y_end; i++)
     {
         float detalX = m01 * i + m02;
         float detalY = m11 * i + m12;
-        float X = m00 * x_start + detalX;
-        float Y = m10 * x_start + detalY;
+        float X = m00xx + detalX;
+        float Y = m10xx + detalY;
 
-        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+        int write_offset = i * fb_width - offset_constant;
 
         for (int32_t j = x_start; j <= x_end; j++)
         {
             // int x = roundf(X);
             // int y = roundf(Y);
 
-            int x = (int)X;
+            int x = fast_floor(X);
             int y = (int)Y;
 
-            if ((x >= source_w) || (x < -1) ||
-#ifdef HONEYGUI_4XAA
-                (y < -1)
-#else
-                (y < 0)
-#endif
-                || (y >= source_h))
+            if ((uint32_t)x >= source_w || (uint32_t)y >= source_h)
             {
                 X += m00;
                 Y += m10;
                 continue;
             }
-            uint32_t xRatio = (X - x) * 0xFF;
-            uint32_t alpha1 = 0, alpha2 = 0;
+            uint8_t xRatio = (X - x) * 0xFF;
+            uint8_t alpha1 = 0, alpha2 = 0;
 #ifdef HONEYGUI_4XAA
             uint8_t yRatio = (Y - y) * 0xFF;
             uint8_t alpha3 = 0, alpha4 = 0;
@@ -385,14 +385,7 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
             int write_off = write_offset + j;
             int image_off = y * source_w + x;
 
-#ifdef HONEYGUI_4XAA
-            if (x >= 0 && y >= 0)
-#else
-            if (x >= 0)
-#endif
-            {
-                alpha1 = *((uint8_t *)(uintptr_t)image_base + image_off);
-            }
+            alpha1 = *((uint8_t *)(uintptr_t)image_base + image_off);
 #ifdef HONEYGUI_4XAA
             if (y >= -1)
             {
