@@ -4595,7 +4595,7 @@ gui_obj_t *gui_create_radiobutton(gui_obj_t *parent, const char *name, const cha
     parent = (void *)gui_win_create(parent, name, x, y, w, h);
     parent->obj_cb = radio_win_cb;
     GUI_TYPE(gui_obj_t, parent)->type = RADIO;
-    gui_win_press((void *)parent, win_radio_press, param);
+    gui_win_click((void *)parent, win_radio_press, param);
     gui_obj_add_event_cb((void *)parent, win_radio_hover, GUI_EVENT_WIN_RADIO_HOVER, param);
     gui_win_append_animate((void *)parent, 10000, -1, win_radio_cb, param, "radio_ani_1");
     gui_win_append_animate((void *)parent, 200, 0, win_radio_press_highlight_ani, param, "radio_ani_2");
@@ -4716,7 +4716,7 @@ static gui_obj_t *widget_create_radio(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE w
     gui_obj_hidden(parent, hidden);
     parent->obj_cb = radio_win_cb;
     GUI_TYPE(gui_obj_t, parent)->type = RADIO;
-    gui_win_press((void *)parent, win_radio_press, param);
+    gui_win_click((void *)parent, win_radio_press, param);
     gui_obj_add_event_cb((void *)parent, win_radio_hover, GUI_EVENT_WIN_RADIO_HOVER, param);
     gui_win_append_animate((void *)parent, 10000, -1, win_radio_cb, param, "radio_ani_1");
     gui_win_append_animate((void *)parent, 200, 0, win_radio_press_highlight_ani, param, "radio_ani_2");
@@ -5185,11 +5185,11 @@ static gui_obj_t *widget_create_keyboard(ezxml_t p, gui_obj_t *parent, T_OBJ_TYP
                 i++;
                 if (!strcmp(p->attr[i], "bottom"))
                 {
-                    config.ime = KB_POS_BOTTOM;
+                    config.pos = KB_POS_BOTTOM;
                 }
                 else if (!strcmp(p->attr[i], "center"))
                 {
-                    config.ime = KB_POS_CENTER;
+                    config.pos = KB_POS_CENTER;
                 }
             }
             else if (!strcmp(p->attr[i], "offset_y"))
