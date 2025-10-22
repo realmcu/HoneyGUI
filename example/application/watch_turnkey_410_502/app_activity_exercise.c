@@ -45,21 +45,11 @@
  *============================================================================*/
 // void activity_exercise_design(gui_view_t *view);
 void activity_exercise_design(gui_obj_t *obj);
-static void clear_activity_exercise(gui_view_t *view);
 extern void time_update_cb(void *p);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-// const static gui_view_descriptor_t *menu_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = activity_exercise_design,
-    .on_switch_out = clear_activity_exercise,
-};
+
 
 extern char *cjson_content;
 static uint8_t *img_ring_data = NULL;
@@ -74,7 +64,7 @@ static bool draw_flag = 0; //0: get new json data
 // static char exercise_content[30] = {0};
 static char ex_content[30] = {0};
 
-static char time_text_content[10];
+// static char time_text_content[10];
 extern gui_text_t *time_text;
 static char exercise_text_content[10];
 static char per_text_content[10];
@@ -91,34 +81,7 @@ extern const char *majorLabels[];
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    // menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-static void clear_activity_exercise(gui_view_t *view)
-{
-    (void)view;
-    if (img_ring_data)
-    {
-        gui_lower_free(img_ring_data);
-        img_ring_data = NULL;
-
-        count = COUNT_MAX;
-    }
-}
 // half-hour data structure
 typedef struct
 {
@@ -211,7 +174,7 @@ static void drawGroupedBarChart(NVGcontext *vg, float x, float y, float width, f
             float barHeight = (float)segments[seg].halfHours[halfHour].exercise / maxStepsPerHalfHour *
                               (height * 1.0f);
             float barY = y + height * 0.9f - barHeight;
-            gui_log("seg %d barHeight %f \n", seg, barHeight);
+            // gui_log("seg %d barHeight %f \n", seg, barHeight);
             nvgBeginPath(vg);
             nvgMoveTo(vg, barX, y + height * 0.9f);  // buttom
             nvgLineTo(vg, barX, barY);               // top

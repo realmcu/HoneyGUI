@@ -7,7 +7,7 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "cJSON.h"
+// #include "cJSON.h"
 #include "gui_canvas.h"
 #include "guidef.h"
 #include "gui_view.h"
@@ -191,7 +191,7 @@ void drawCircles_cb(NVGcontext *vg)
     NVGcolor circleColor = nvgRGB(120, 80, 90);
     NVGcolor specialCircleColor = nvgRGB(255, 255, 255);
     // gui_log("activeIndex: %d\n", activeIndex);
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         nvgBeginPath(vg);
 
@@ -317,12 +317,13 @@ static void note_design(gui_obj_t *obj, void *p)
     uint16_t index = note->index;
     // static const char *text_array[4];
     gui_log("index: %d ring_flag_enter: %d\n", index, ring_flag_enter);
-    if (index < 4)
+    if (index < 5)
     {
         if (index == 0)
         {
             activeIndex = 0;
-            imageIcon_not_show();
+            // imageIcon_not_show();
+            win_activity->base.not_show = false;
             //refresh dot img
             gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                               drawCircles_cb, img_dot_data);
@@ -351,7 +352,8 @@ static void note_design(gui_obj_t *obj, void *p)
         }
         if (index == 1)
         {
-            imageIcon_not_show();
+            // imageIcon_not_show();
+            win_activity->base.not_show = true;
             gui_obj_stop_timer(GUI_BASE(img_ring));
             activity_move_design((gui_obj_t *)obj);
         }
@@ -364,14 +366,33 @@ static void note_design(gui_obj_t *obj, void *p)
         {
             activity_stand_design((gui_obj_t *)obj);
         }
-        // else if(index == 4)
-        // {
-        //     text_array[index] = "Today";
-        // }
-        // else if(index == 5)
-        // {
+        else if (index == 4)
+        {
+            activeIndex = 4;
+            time_update_cb(NULL);
+            gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
+                                              drawCircles_cb, img_dot_data);
+            gui_img_set_image_data(img_dot, img_dot_data);
+            gui_img_refresh_size(img_dot);
 
-        // }
+            char *text_today = "Today";
+            int font_size = 30;
+            gui_text_t *t_day = gui_text_create(obj, "txt", -30,
+                                                70, 0, font_size);
+            gui_text_set(t_day, text_today, GUI_FONT_SRC_TTF, gui_rgb(0xA0, 0x77, 0x83), strlen(text_today),
+                         font_size);
+            gui_text_mode_set(t_day, RIGHT);
+            gui_text_type_set(t_day, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_rendermode_set(t_day, 2);
+
+            char *text = "No activities recorded today.";
+            gui_text_t *t = gui_text_create(obj, "txt", 30,
+                                            251, 0, font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(text), font_size);
+            gui_text_mode_set(t, LEFT);
+            gui_text_type_set(t, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_rendermode_set(t, 2);
+        }
     }
     return;
 
@@ -383,10 +404,7 @@ static void activity_design(gui_view_t *view)
     ring_flag_enter = false;
     activeIndex = 0;
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    win_activity = gui_win_create(obj, "win_activity", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    // win_menu_activity = gui_win_create(obj, "win_menu_activity", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    // gui_img_create_from_mem(win_activity, "bg_move", (void *)ACTIVITY_APP_BG2_BIN, 0, 0, 0, 0);
-    // draw_flag = 0;
+
     //create list
     int length = 502;
     uint8_t space = 0;
@@ -398,6 +416,10 @@ static void activity_design(gui_view_t *view)
     gui_list_set_auto_align(list, true);
     gui_list_set_inertia(list, false);
     gui_list_set_out_scope(list, length / 2);
+
+    win_activity = gui_win_create(obj, "win_activity", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // draw_flag = 0;
 
     win_menu_activity = gui_win_create(obj, "win_menu_activity", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     win_activity_arc = gui_win_create(obj, "win_activity_arc", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
