@@ -825,7 +825,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                     line++;
                     chr[i].y = rect->y1;
                 }
-                chr[i].x = rect->x2 - line * line_height - chr[i].h;
+                chr[i].x = rect->x2 - line * line_height - chr[i].h + 1;
                 if (chr[i].x < rect->x1)
                 {
                     active_font_len = i;
