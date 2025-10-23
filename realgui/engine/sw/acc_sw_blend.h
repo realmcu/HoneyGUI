@@ -24,6 +24,9 @@ extern "C" {
 void src_over_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
                             gui_rect_t *rect);////S * Sa + (1 - Sa) * D
 
+void cover_blit_2_rgb565(draw_img_t *image, gui_dispdev_t *dc,
+                         gui_rect_t *rect);////cover
+
 void preconfig_a8_fg(draw_img_t *image, gui_dispdev_t *dc,
                      gui_rect_t *rect);////fixed fg
 

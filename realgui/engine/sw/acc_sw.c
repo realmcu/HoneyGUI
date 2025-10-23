@@ -76,6 +76,8 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
             switch (image->blend_mode)
             {
             case IMG_COVER_MODE:
+                cover_blit_2_rgb565(image, dc, rect);
+                return;
             case IMG_BYPASS_MODE:
                 GUI_ASSERT(image->opacity_value == 0xFF);
                 bypass_blit_2_rgb565(image, dc, rect);
