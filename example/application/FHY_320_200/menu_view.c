@@ -185,28 +185,6 @@ static void press_button_settings(void *obj)
     }
 }
 
-static void show_bg(void *obj)
-{
-    static bool flag = false;
-    if (gui_view_get_next())
-    {
-        gui_obj_hidden((void *)obj, false);
-        flag = false;
-    }
-    else
-    {
-        if (flag)
-        {
-            flag = false;
-            gui_obj_hidden((void *)obj, true);
-        }
-        else
-        {
-            flag = true;
-        }
-    }
-}
-
 static void menu_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
@@ -216,17 +194,13 @@ static void menu_view_design(gui_view_t *view)
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
-    gui_img_t *bg = gui_img_create_from_mem(parent, 0, SCREEN_BG_BIN, 0, 0, 0, 0);
-    gui_obj_create_timer((void *)bg, 10, true, show_bg);
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
-        gui_img_a8_recolor(bg, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
-        gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
         font_color = FG_1_DARK;
     }
     gui_text_t *title = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);

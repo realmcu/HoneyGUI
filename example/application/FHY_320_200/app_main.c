@@ -138,7 +138,7 @@ static void time_update_cb(void *param)
     }
 #endif
 
-    if (sleep_cnt >= 300000 || kb->pressed) //300s
+    if (sleep_cnt >= 10000 || kb->pressed) //10s
     {
         sleep_cnt = 0;
         gui_view_t *view = gui_view_get_current();
@@ -167,13 +167,15 @@ static int app_init(void)
     detail_page_design_func = page_dark_light_design;
     timeinfo = &barn_time;
 
+    // f_status.bt = 1;
+
     gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());
-    gui_obj_create_timer(GUI_BASE(win), 10, true, time_update_cb);
+    gui_obj_create_timer(GUI_BASE(win), 100, true, time_update_cb);
     gui_obj_start_timer(GUI_BASE(win));
     time_update_cb(NULL);
 
-    gui_view_create(win, clock_view, 0, 0, 0, 0);
+    gui_view_create(win, test_view, 0, 0, 0, 0);
 
     return 0;
 }

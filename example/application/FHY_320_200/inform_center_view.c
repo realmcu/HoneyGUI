@@ -11,12 +11,6 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
-typedef enum
-{
-    ANC = 0,
-    AA,
-    TT
-} AMBIENT_SOUND_STATUS;
 
 /*============================================================================*
  *                            Macros
@@ -253,18 +247,14 @@ static void inform_center_view_design(gui_view_t *view)
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
-    gui_img_t *bg = gui_img_create_from_mem(parent, 0, SCREEN_BG_BIN, 0, 0, 0, 0);
-    gui_obj_create_timer((void *)bg, 10, true, show_bg);
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
-        gui_img_a8_recolor(bg, SCREEN_BG_LIGHT.color.argb_full);
         font_color = FG_1_LIGHT;
     }
     else
     {
         gui_set_bg_color(SCREEN_BG_DARK);
-        gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
         font_color = FG_1_DARK;
     }
 
@@ -273,7 +263,6 @@ static void inform_center_view_design(gui_view_t *view)
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
     gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
-
 
     gui_img_t *battery_bg = gui_img_create_from_mem(parent, "battery_bg", BATTERY_STATUS_BG_BIN, 12, 40,
                                                     0, 0);

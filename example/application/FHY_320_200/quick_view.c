@@ -11,12 +11,6 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
-typedef enum
-{
-    ANC = 0,
-    AA,
-    TT
-} AMBIENT_SOUND_STATUS;
 
 /*============================================================================*
  *                            Macros
@@ -52,8 +46,12 @@ static gui_img_t *page_indicator_array[QUICK_PAGE_NUM_MAX] = {0};
 int8_t quick_page_num = 4;
 void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
-    page_music_design,
-    page_volume_design,
+    // page_lock_screen_design,
+    // page_notification_design,
+    // page_playback_design,
+    page_voice_aware_design,
+    page_spatial_sound_design,
+    // page_volume_design,
     page_ambient_sound_design,
     page_equalizer_design,
 };
@@ -190,7 +188,7 @@ static void quick_view_design(gui_view_t *view)
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, wallpaper_view, SWITCH_INIT_STATE,
+    gui_view_switch_on_event(view, wallpaper_view, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
@@ -199,6 +197,7 @@ static void quick_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
+        font_color = FG_1_LIGHT;
     }
     else
     {
@@ -217,7 +216,7 @@ static void quick_view_design(gui_view_t *view)
     gui_text_set(text, "AAC", GUI_FONT_SRC_BMP, font_color, 3, 28);
     gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
-    text = gui_text_create(parent, 0, 260, 13, 50, 15);
+    text = gui_text_create(parent, 0, 200, 13, 110, 15);
     gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 20);
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
@@ -225,7 +224,16 @@ static void quick_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
-        gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
+        if (f_status.bt)
+        {
+            gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(bt, FG_2_LIGHT.color.argb_full);
+            gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
+        }
+
         gui_img_a8_recolor(home_bg, BG_2_LIGHT.color.argb_full);
         gui_img_a8_recolor(barn_inner, FG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(barn_outer, FG_1_LIGHT.color.argb_full);
@@ -234,7 +242,15 @@ static void quick_view_design(gui_view_t *view)
     }
     else
     {
-        gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
+        if (f_status.bt)
+        {
+            gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(bt, FG_2_DARK.color.argb_full);
+            gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
+        }
         gui_img_a8_recolor(home_bg, BG_2_DARK.color.argb_full);
         gui_img_a8_recolor(barn_inner, FG_1_DARK.color.argb_full);
         gui_img_a8_recolor(barn_outer, FG_1_DARK.color.argb_full);

@@ -74,18 +74,25 @@ static void entrance_animation(void *p)
 {
     GUI_UNUSED(p);
     animation_cnt++;
-    uint8_t cnt_max_1 = 25;
-    uint8_t cnt_max_2 = 50;
-    uint8_t cnt_max_3 = 75;
-    uint8_t cnt_max_4 = 100;
+    uint8_t cnt_max_0 = 5;
+    uint8_t cnt_max_1 = 25 + cnt_max_0;
+    uint8_t cnt_max_2 = 50 + cnt_max_0;
+    uint8_t cnt_max_3 = 75 + cnt_max_0;
+    uint8_t cnt_max_4 = 100 + cnt_max_0;
     gui_img_t *bg = (gui_img_t *)p;
     gui_img_t *icon_bg = (gui_img_t *)gui_list_entry(GUI_BASE(current_view)->child_list.prev, gui_obj_t,
                                                      brother_list);
 
-    if (animation_cnt <= cnt_max_1) //fade in
+    if (animation_cnt <= cnt_max_0)
     {
-        gui_img_set_opacity(bg, UINT8_MAX * animation_cnt / cnt_max_1);
-        gui_img_set_opacity(icon_bg, UINT8_MAX * animation_cnt / cnt_max_1);
+        gui_obj_hidden((void *)bg, true);
+        return;
+    }
+    else if (animation_cnt <= cnt_max_1) //fade in
+    {
+        gui_obj_hidden((void *)bg, false);
+        gui_img_set_opacity(bg, UINT8_MAX * (animation_cnt - cnt_max_0) / (cnt_max_1 - cnt_max_0));
+        gui_img_set_opacity(icon_bg, UINT8_MAX * (animation_cnt - cnt_max_0) / (cnt_max_1 - cnt_max_0));
     }
     else if (animation_cnt <= cnt_max_2) //wait
     {
@@ -121,6 +128,7 @@ static void entrance_animation(void *p)
 
 static void charging_view_design(gui_view_t *view)
 {
+    gui_view_set_animate_step(view, 400);
     gui_view_switch_on_event(view, wallpaper_view, SWITCH_OUT_NONE_ANIMATION,
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_TOUCH_CLICKED);
@@ -141,14 +149,9 @@ static void charging_view_design(gui_view_t *view)
 
 
     gui_obj_t *parent = GUI_BASE(view);
-    gui_img_t *bg = gui_img_create_from_mem(parent, 0, BATTERY_CHARGING_BG_BIN, 0, 0, 0, 0);
-    // gui_img_set_mode(bg, IMG_BYPASS_MODE);
-    // gui_img_t *bg = gui_img_create_from_mem(parent, 0, BATTERY_CHARGING_BG_NEW_BIN, 0, 0, 0, 0);
-    // gui_img_a8_recolor(bg, GUI_COLOR_ARGB8888(255, 0x0, 0x51, 0xFF));
-    // gui_img_t *bg_mid = gui_img_create_from_mem(bg, 0, BATTERY_CHARGING_MID_BG_BIN, 35, 0, 0, 0);
-    // gui_img_a8_recolor(bg_mid, GUI_COLOR_ARGB8888(255, 0x0, 0xD9, 0xFF));
-    // gui_img_t *bg_top = gui_img_create_from_mem(bg, 0, BATTERY_CHARGING_TOP_BG_BIN, 0, 0, 0, 0);
-    // gui_img_a8_recolor(bg_top, GUI_COLOR_ARGB8888(255, 0x0, 0xFF, 0xF6));
+    gui_img_t *bg = gui_img_create_from_mem(parent, "bg", BATTERY_CHARGING_BG_BIN, 0, 0, 0, 0);
+    gui_img_set_mode(bg, IMG_COVER_MODE);
+    gui_img_set_opacity(bg, 1);
 
     gui_img_t *charging_icon_bg = gui_img_create_from_mem(parent, "icon", ICON_CHARGING_BG_BIN,
                                                           ICON_CHARGING_X, ICON_CHARGING_START_Y, 0, 0);

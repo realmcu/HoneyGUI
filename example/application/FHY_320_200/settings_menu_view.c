@@ -16,7 +16,7 @@
  *============================================================================*/
 typedef struct note_design_param
 {
-    void **click_cb;
+    void **page_design;
     uint32_t **img_data_array;
 } note_design_param_t;
 
@@ -114,56 +114,12 @@ static void note_timer_cb(void *p)
                            SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
-static void switch_page_screen_brightness(void *obj, gui_event_t e, void *param)
+static void switch_page(void *obj, gui_event_t e, void *param)
 {
     (void)obj;
     (void)e;
     (void)param;
-    detail_page_design_func = page_screen_brightness_design;
-    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
-    gui_obj_hidden((void *)bg_note, false);
-    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
-}
-
-static void switch_page_dark_light(void *obj, gui_event_t e, void *param)
-{
-    (void)obj;
-    (void)e;
-    (void)param;
-    detail_page_design_func = page_dark_light_design;
-    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
-    gui_obj_hidden((void *)bg_note, false);
-    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
-}
-
-static void switch_page_lock_screen(void *obj, gui_event_t e, void *param)
-{
-    (void)obj;
-    (void)e;
-    (void)param;
-    detail_page_design_func = page_lock_screen_design;
-    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
-    gui_obj_hidden((void *)bg_note, false);
-    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
-}
-
-static void switch_page_time_format(void *obj, gui_event_t e, void *param)
-{
-    (void)obj;
-    (void)e;
-    (void)param;
-    detail_page_design_func = page_time_format_design;
-    gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
-    gui_obj_hidden((void *)bg_note, false);
-    gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
-}
-
-static void switch_page_notification(void *obj, gui_event_t e, void *param)
-{
-    (void)obj;
-    (void)e;
-    (void)param;
-    detail_page_design_func = page_notification_design;
+    detail_page_design_func = param;
     gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
     gui_obj_hidden((void *)bg_note, false);
     gui_obj_create_timer(GUI_BASE(obj), 800, true, note_timer_cb);
@@ -204,10 +160,10 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_scroll_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_scroll_text_scroll_set(t, SCROLL_X, 260, 260, 5000, 0);
     }
-    if (design_p->click_cb[index] != NULL)
+    if (design_p->page_design[index] != NULL)
     {
-        gui_obj_add_event_cb(note, (gui_event_cb_t)design_p->click_cb[index], GUI_EVENT_TOUCH_CLICKED,
-                             NULL);
+        gui_obj_add_event_cb(note, switch_page, GUI_EVENT_TOUCH_CLICKED,
+                             design_p->page_design[index]);
     }
 }
 
@@ -244,26 +200,26 @@ static void settings_menu_view_design(gui_view_t *view)
     };
 
     int array_size = sizeof(text_array) / sizeof(text_array[0]);
-    void *click_cb[] =
+    void *page_design[] =
     {
-        switch_page_screen_brightness,
-        switch_page_dark_light,
-        switch_page_lock_screen,
+        page_screen_brightness_design,
+        page_dark_light_design,
+        page_lock_screen_design,
         NULL,
         NULL,
         NULL,
         NULL,
         NULL,
-        switch_page_notification,
-        switch_page_time_format,
+        page_notification_design,
+        page_time_format_design,
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
     void **func_cb = gui_malloc(array_size * sizeof(void *));
     memset(func_cb, 0, array_size * sizeof(void *));
-    memcpy(func_cb, click_cb, sizeof(click_cb));
+    memcpy(func_cb, page_design, sizeof(page_design));
     uint32_t **data_array = gui_malloc(array_size * sizeof(uint32_t *));
     memcpy(data_array, img_data_array, array_size * sizeof(void *));
-    design_p->click_cb = func_cb;
+    design_p->page_design = func_cb;
     design_p->img_data_array = data_array;
     gui_list_t *list = gui_list_create(view, "list", 0, LIST_Y, 0, 0, 56, 0,
                                        VERTICAL, note_design, design_p, 0);
@@ -313,7 +269,7 @@ static void clear(gui_view_t *view)
     GUI_UNUSED(view);
     if (design_p)
     {
-        gui_free(design_p->click_cb);
+        gui_free(design_p->page_design);
         gui_free(design_p->img_data_array);
         gui_free(design_p);
         design_p = NULL;

@@ -142,9 +142,10 @@ static void click_button_favorite(void *obj, gui_event_t e, void *param)
 static void detail_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
-    if (gui_view_get_current())
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c && strcmp(view_c->descriptor->name, "clock_view"))
     {
-        descriptor_rec = gui_view_get_current()->descriptor;
+        descriptor_rec = view_c->descriptor;
     }
     gui_obj_t *parent = GUI_BASE(view);
     if (theme_bg_white)

@@ -18,18 +18,35 @@ extern "C" {
  *============================================================================*/
 struct FUNCTION_STATUS
 {
+    uint32_t bt                 : 1;
+
     uint32_t equalizer          : 1;
     uint32_t ambient_sound      : 1;
-    uint32_t music_play         : 1;
-    uint32_t asc                : 1;
+    uint32_t smart_talk         : 1;
     uint32_t spatial_sound      : 1;
+    uint32_t voice_aware        : 1;
+    uint32_t playback           : 1;
+    uint32_t asc                : 1;
     uint32_t flashlight         : 1;
     uint32_t notification       : 1;
     uint32_t message_preview    : 1;
 
-    uint32_t rvd                : 24;
+    uint32_t rvd                : 21;
 };
 
+typedef enum
+{
+    ANC = 0,
+    AA,
+    TT
+} AMBIENT_SOUND_TYPE;
+
+typedef enum
+{
+    SPATIAL_SOUND_MOVIE = 0,
+    SPATIAL_SOUND_MUSIC,
+    SPATIAL_SOUND_GAME
+} SPATIAL_SOUND_TYPE;
 
 /*============================================================================*
  *                            Macros
@@ -79,6 +96,51 @@ struct FUNCTION_STATUS
 #define SCREEN_BG_LIGHT                  gui_rgb(0xF2,0xF2,0xF7)
 #define SCREEN_BG_DARK                   gui_rgb(0,0,0)
 
+// #define FG_THEME1_DARK                   GUI_COLOR_ARGB8888(255, 0xFF,0xB4,0x11)
+// #define FG_THEME2_DARK                   GUI_COLOR_ARGB8888(255, 0x1F,0xE5,0x7F)
+// #define FG_THEME3_DARK                   GUI_COLOR_ARGB8888(255, 0x11,0xC8,0xFF)
+// #define FG_THEME1_LIGHT                  GUI_COLOR_ARGB8888(255, 0xDC,0x82,0x14)
+// #define FG_THEME2_LIGHT                  GUI_COLOR_ARGB8888(255, 0x14,0x9A,0x43)
+// #define FG_THEME3_LIGHT                  GUI_COLOR_ARGB8888(255, 0x00,0x81,0xEA)
+// #define FG_WARNING                       GUI_COLOR_ARGB8888(255, 0xDF,0x2D,0x00)
+// #define FG_NORMAL                        GUI_COLOR_ARGB8888(255, 0x00,0xB4,0x36)
+// #define FG_1_DARK                        GUI_COLOR_ARGB8888(255, 0xFF,0xFF,0xFF)
+// #define FG_2_DARK                        GUI_COLOR_ARGB8888(0xFF*0.3f, 0xFF,0xFF,0xFF)
+// #define FG_3_DARK                        GUI_COLOR_ARGB8888(0xFF*0.5f, 0xFF,0xFF,0xFF)
+// #define FG_1_LIGHT                       GUI_COLOR_ARGB8888(255, 0x32,0x32,0x32)
+// #define FG_2_LIGHT                       GUI_COLOR_ARGB8888(0xFF*0.3f, 0x32,0x32,0x32)
+// #define FG_3_LIGHT                       GUI_COLOR_ARGB8888(0xFF*0.5f, 0x32,0x32,0x32)
+// #define FG_WHITE                         FG_1_DARK
+// #define FG_WARNING                       GUI_COLOR_ARGB8888(255, 0xDF,0x2D,0x00)
+
+// #define BG_THEME1_BRIGHT_DARK            GUI_COLOR_ARGB8888(255, 0xF6,0x87,0x1F)
+// #define BG_THEME1_MID_DARK               GUI_COLOR_ARGB8888(255, 0x5A,0x30,0x1E)
+// #define BG_THEME1_DARK_DARK              GUI_COLOR_ARGB8888(255, 0x2C,0x17,0x00)
+// #define BG_THEME2_BRIGHT_DARK            GUI_COLOR_ARGB8888(255, 0x00,0xA1,0x4E)
+// #define BG_THEME2_MID_DARK               GUI_COLOR_ARGB8888(255, 0x05,0x44,0x2F)
+// #define BG_THEME2_DARK_DARK              GUI_COLOR_ARGB8888(255, 0x00,0x28,0x21)
+// #define BG_THEME3_BRIGHT_DARK            GUI_COLOR_ARGB8888(255, 0x00,0x85,0xFF)
+// #define BG_THEME3_MID_DARK               GUI_COLOR_ARGB8888(255, 0x1A,0x1D,0x6E)
+// #define BG_THEME3_DARK_DARK              GUI_COLOR_ARGB8888(255, 0x0F,0x11,0x3D)
+
+// #define BG_THEME1_BRIGHT_LIGHT           GUI_COLOR_ARGB8888(255, 0xFF,0x94,0x20)
+// #define BG_THEME1_MID_LIGHT              GUI_COLOR_ARGB8888(255, 0xEF,0xBD,0x8A)
+// #define BG_THEME1_DARK_LIGHT             GUI_COLOR_ARGB8888(255, 0xF5,0xE4,0xD3)
+// #define BG_THEME2_BRIGHT_LIGHT           GUI_COLOR_ARGB8888(255, 0x14,0xCD,0x6E)
+// #define BG_THEME2_MID_LIGHT              GUI_COLOR_ARGB8888(255, 0xA8,0xE5,0xC3)
+// #define BG_THEME2_DARK_LIGHT             GUI_COLOR_ARGB8888(255, 0xD1,0xEB,0xDF)
+// #define BG_THEME3_BRIGHT_LIGHT           GUI_COLOR_ARGB8888(255, 0x41,0xAA,0xFF)
+// #define BG_THEME3_MID_LIGHT              GUI_COLOR_ARGB8888(255, 0xB1,0xD9,0xFF)
+// #define BG_THEME3_DARK_LIGHT             GUI_COLOR_ARGB8888(255, 0xD3,0xE8,0xFF)
+
+// #define BG_1_DARK                        GUI_COLOR_ARGB8888(0xFF*0.1f, 0xFF,0xFF,0xFF)
+// #define BG_2_DARK                        GUI_COLOR_ARGB8888(0xFF*0.2f, 0xFF,0xFF,0xFF)
+// #define BG_1_LIGHT                       GUI_COLOR_ARGB8888(0xFF*0.05f, 0,0,0)
+// #define BG_2_LIGHT                       GUI_COLOR_ARGB8888(0xFF*0.2f, 0,0,0)
+// #define SCREEN_BG_LIGHT                  GUI_COLOR_ARGB8888(255, 0xF2,0xF2,0xF7)
+// #define SCREEN_BG_DARK                   GUI_COLOR_ARGB8888(255, 0,0,0)
+
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
@@ -116,8 +178,20 @@ extern uint8_t message_num_val;
 /* Function status */
 extern struct FUNCTION_STATUS f_status;
 
-/* Screen Brightness */
+/* Screen brightness */
 extern int8_t screen_brightness_val; // [1, 3]
+
+/* Smart talk time */
+extern uint8_t smart_talk_time_type; // 0: 5s, 1: 15s, 2: 20s
+
+/* Ambient sound type */
+extern uint8_t ambient_sound_type;
+
+/* Spatial sound type */
+extern uint8_t spatial_sound_type;
+
+/* Voice Aware */
+extern int8_t voice_aware_val; // [1, 3]
 
 /*============================================================================*
  *                           Punblic Functions

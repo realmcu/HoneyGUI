@@ -59,7 +59,7 @@ const char *day[7] =
 };
 
 /* Clock style */
-int8_t clock_style = 0;
+int8_t clock_style = 0; // [0, 4]
 bool switch_from_lock_screen = false;
 
 /* Theme color */
@@ -92,3 +92,15 @@ struct FUNCTION_STATUS f_status = {0};
 
 /* Screen Brightness */
 int8_t screen_brightness_val = 1; // [1, 3]
+
+/* Smart talk time */
+uint8_t smart_talk_time_type = 0; // 0: 5s, 1: 15s, 2: 20s
+
+/* Ambient sound type */
+uint8_t ambient_sound_type = ANC;
+
+/* Spatial sound type */
+uint8_t spatial_sound_type = SPATIAL_SOUND_MOVIE;
+
+/* Voice Aware */
+int8_t voice_aware_val = 2; // [1, 3]
