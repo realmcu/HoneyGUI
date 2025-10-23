@@ -270,6 +270,8 @@ ai_ask_split_exclude_patterns = [] # skip split by anchor path
 
 numfig = False
 
+smartquotes = False
+
 GA_ID_MAPPING = {
     ("gui", "en"): "G-YSMY2F6NER",
     ("gui", "cn"):  "G-L7QPTX3F0Z",
