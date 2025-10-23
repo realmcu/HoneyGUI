@@ -166,15 +166,14 @@ void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
     float m11 = inverse->m[1][1];
     float m12 = inverse->m[1][2];
 
-
+    float detalX = m01 * y_start + m02;
+    float detalY = m11 * y_start + m12;
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float detalX = m01 * i + m02;
-        float detalY = m11 * i + m12;
         float X = m00 * x_start + detalX;
         float Y = m10 * x_start + detalY;
 
-        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
+        int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + dc->section.x1;
 
         for (int32_t j = x_start; j <= x_end; j++)
         {
@@ -202,6 +201,8 @@ void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
             X += m00;
             Y += m10;
         }
+        detalX += m01;
+        detalY += m11;
     }
 }
 
@@ -240,11 +241,11 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
     const float m00xx = m00 * x_start;
     const float m10xx = m10 * x_start;
     const int fb_width = (dc->section.x2 - dc->section.x1 + 1);
-    const int offset_constant = dc->section.y1 * fb_width - dc->section.x1;
+    const int offset_constant = dc->section.y1 * fb_width + dc->section.x1;
+    float detalX = m01 * y_start + m02;
+    float detalY = m11 * y_start + m12;
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float detalX = m01 * i + m02;
-        float detalY = m11 * i + m12;
         float X = m00xx + detalX;
         float Y = m10xx + detalY;
 
@@ -308,6 +309,8 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             X += m00;
             Y += m10;
         }
+        detalX += m01;
+        detalY += m11;
     }
 }
 
@@ -352,11 +355,11 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
     const float m00xx = m00 * x_start;
     const float m10xx = m10 * x_start;
     const int fb_width = (dc->section.x2 - dc->section.x1 + 1);
-    const int offset_constant = dc->section.y1 * fb_width - dc->section.x1;
+    const int offset_constant = dc->section.y1 * fb_width + dc->section.x1;
+    float detalX = m01 * y_start + m02;
+    float detalY = m11 * y_start + m12;
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float detalX = m01 * i + m02;
-        float detalY = m11 * i + m12;
         float X = m00xx + detalX;
         float Y = m10xx + detalY;
 
@@ -416,6 +419,8 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
             X += m00;
             Y += m10;
         }
+        detalX += m01;
+        detalY += m11;
     }
 }
 
