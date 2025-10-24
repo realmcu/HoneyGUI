@@ -146,13 +146,47 @@ static void a8_2_rgb565_2d_use_bg(draw_img_t *image, gui_dispdev_t *dc, gui_rect
     }
 }
 
+static void a8_2_rgb565_2d_use_bg_with_aa(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 0)
+    {
+        return;// fully transparent, nothing to draw
+    }
+    else if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_2D_WITH_1X2_ANTI_ALIASING(
+            color_a8_t,
+        {
+            writebuf[write_offset] = pixel_aliasing_a8_1x2(fg, writebuf[write_offset], pixel_00->a, pixel_01->a, xRatio);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_2D_WITH_1X2_ANTI_ALIASING(
+            color_a8_t,
+        {
+            writebuf[write_offset] = pixel_aliasing_a8_1x2(fg, writebuf[write_offset], pixel_00->a * opacity_value >> 8, pixel_01->a * opacity_value >> 8, xRatio);
+        };
+        );
+    }
+}
+
 
 
 static void a8_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (image->blend_mode == IMG_2D_SW_FIX_A8_FG)
     {
-        a8_2_rgb565_2d_use_bg(image, dc, rect);
+        if (image->high_quality == true)
+        {
+            a8_2_rgb565_2d_use_bg_with_aa(image, dc, rect);
+        }
+        else
+        {
+            a8_2_rgb565_2d_use_bg(image, dc, rect);
+        }
     }
     else if (image->blend_mode == IMG_2D_SW_FIX_A8_BGFG)
     {

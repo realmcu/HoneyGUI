@@ -1,5 +1,5 @@
 /**
- * @file acc_sw_bypass.h
+ * @file acc_sw_rgb565.h
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
  * @version 0.1

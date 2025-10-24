@@ -14,6 +14,7 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,6 +104,109 @@ extern "C" {
         }                                                                                                   \
     } while(0)
 
+#define PROCESS_IMAGE_PIXEL_2D_WITH_2X2_ANTI_ALIASING(PIXEL_TYPE, PIXEL_ACTION)                             \
+    do {                                                                                                    \
+        for (int32_t i = y_start; i <= y_end; i++)                                                          \
+        {                                                                                                   \
+            float detalX = m01 * i + m02;   \
+            float detalY = m11 * i + m12;   \
+            float X = m00 * x_start + detalX;  \
+            float Y = m10 * x_start + detalY;  \
+            int write_off = (i - y1) * (x2 - x1 + 1) - x1;                                               \
+            \
+            for (int32_t j = x_start; j <= x_end; j++)                                                      \
+            {                 \
+                if (!(X > -1.0f && Y > -1.0f && X < (float)source_w && Y < (float)source_h))   \
+                { \
+                    X += m00; \
+                    Y += m10; \
+                    continue; \
+                } \
+                int x = floorf(X);   \
+                int y = floorf(Y);   \
+                float xRatio = X - (float)x;  GUI_UNUSED(xRatio);\
+                float yRatio = Y - (float)y;  GUI_UNUSED(yRatio); \
+                int write_offset = write_off + j;                                                           \
+                \
+                PIXEL_TYPE pixel_dummy = {0};                                                    \
+                PIXEL_TYPE *pixel_00 = &pixel_dummy; \
+                PIXEL_TYPE *pixel_01 = &pixel_dummy; \
+                PIXEL_TYPE *pixel_10 = &pixel_dummy; \
+                PIXEL_TYPE *pixel_11 = &pixel_dummy; \
+                \
+                if ((x != -1) && (y != -1)) {  \
+                    pixel_00 = (PIXEL_TYPE *)(uintptr_t)image_base + y * source_w + x;               \
+                    if (x + 1 < source_w) { \
+                        pixel_01 = pixel_00 + 1;               \
+                    } \
+                    if ((y + 1 < source_h)) { \
+                        pixel_10 = pixel_00 + source_w;               \
+                    } \
+                    if ((x + 1 < source_w) && (y + 1 < source_h)) { \
+                        pixel_11 = pixel_10 + 1;               \
+                    } \
+                } \
+                else if(x != -1) { \
+                    pixel_10 = (PIXEL_TYPE *)(uintptr_t)image_base + (y + 1) * source_w + x;               \
+                    if ((x + 1 < source_w) && (y + 1 < source_h)) { \
+                        pixel_11 = pixel_10 + 1;               \
+                    } \
+                } \
+                else if(y != -1) { \
+                    pixel_01 = (PIXEL_TYPE *)(uintptr_t)image_base + y * source_w + x + 1;               \
+                    if ((x + 1 < source_w) && (y + 1 < source_h)) { \
+                        pixel_11 = pixel_01 + source_w;               \
+                    } \
+                } \
+                else { \
+                    pixel_11 = (PIXEL_TYPE *)(uintptr_t)image_base + (y + 1) * source_w + x + 1;           \
+                } \
+                PIXEL_ACTION;                                                                               \
+                X += m00; \
+                Y += m10; \
+            }                                                                                               \
+        }                                                                                                   \
+    } while(0)
+
+#define PROCESS_IMAGE_PIXEL_2D_WITH_1X2_ANTI_ALIASING(PIXEL_TYPE, PIXEL_ACTION)                             \
+    do {                                                                                                    \
+        for (int32_t i = y_start; i <= y_end; i++)                                                          \
+        {                                                                                                   \
+            float detalX = m01 * i + m02;   \
+            float detalY = m11 * i + m12;   \
+            float X = m00 * x_start + detalX;  \
+            float Y = m10 * x_start + detalY;  \
+            int write_off = (i - y1) * (x2 - x1 + 1) - x1;                                               \
+            \
+            for (int32_t j = x_start; j <= x_end; j++)                                                      \
+            {                 \
+                int x = (X >= 0) ? (int)X : (int)(X - 1);   \
+                int y = (int)(Y);   \
+                if ((uint32_t)x >= (uint16_t)source_w || (uint32_t)y >= (uint16_t)source_h)   \
+                { \
+                    X += m00; \
+                    Y += m10; \
+                    continue; \
+                } \
+                uint8_t xRatio = (X - x) * 0xFF;\
+                int write_offset = write_off + j;                                                           \
+                \
+                PIXEL_TYPE pixel_dummy = {0};                                                    \
+                PIXEL_TYPE *pixel_00 = &pixel_dummy; \
+                PIXEL_TYPE *pixel_01 = &pixel_dummy; \
+                \
+                int image_offset = y * source_w + x;\
+                pixel_00 = (PIXEL_TYPE *)(uintptr_t)image_base + image_offset;  \
+                if (x < source_w - 1) {\
+                    pixel_01 = (PIXEL_TYPE *)(uintptr_t)image_base + image_offset + 1; \
+                } \
+                PIXEL_ACTION;                                                                               \
+                X += m00; \
+                Y += m10; \
+            }                                                                                               \
+        }                                                                                                   \
+    } while(0)
+
 static inline uint16_t rgb565_fast_blending(uint32_t fg, uint32_t bg, uint8_t alpha)
 {
     // Alpha converted from [0..255] to [0..31] for 5-bit precision
@@ -121,17 +225,95 @@ static inline uint16_t rgb565_fast_blending(uint32_t fg, uint32_t bg, uint8_t al
     return (uint16_t)((result >> 16) | result);
 }
 
-static inline uint16_t pixel_aliasing_1x2(uint32_t fg_left_rgb, uint32_t fg_right_rgb,
-                                          uint8_t fg_left_alpha, uint8_t fg_right_alpha, uint8_t ratio, uint32_t bg)
+static inline uint16_t pixel_aliasing_1x2(uint32_t pixel1_rgb, uint32_t pixel2_rgb,
+                                          uint8_t pixel1_alpha, uint8_t pixel2_alpha, uint8_t ratio, uint32_t bg)
 {
     uint8_t rgb_ratio = (ratio + 4) >> 3;
-    fg_left_rgb = ((fg_left_rgb | (fg_left_rgb << 16)) & 0x07e0f81f);
-    fg_right_rgb = ((fg_right_rgb | (fg_right_rgb << 16)) & 0x07e0f81f);
+    pixel1_rgb = ((pixel1_rgb | (pixel1_rgb << 16)) & 0x07e0f81f);
+    pixel2_rgb = ((pixel2_rgb | (pixel2_rgb << 16)) & 0x07e0f81f);
     bg = ((bg | (bg << 16)) & 0x07e0f81f);
-    uint32_t fg_rgb = (((((fg_right_rgb - fg_left_rgb) * rgb_ratio) >> 5) + fg_left_rgb) & 0x07e0f81f);
-    uint8_t fg_alpha = (fg_left_alpha * (255 - ratio) + fg_right_alpha * ratio) >> 8;
+    uint32_t fg_rgb = (((((pixel2_rgb - pixel1_rgb) * rgb_ratio) >> 5) + pixel1_rgb) & 0x07e0f81f);
+    uint8_t fg_alpha = (pixel1_alpha * (255 - ratio) + pixel2_alpha * ratio) >> 8;
     fg_alpha = (fg_alpha + 4) >> 3;
     uint32_t result = (((((fg_rgb - bg) * fg_alpha) >> 5) + bg) & 0x07e0f81f);
+    return (uint16_t)((result >> 16) | result);
+}
+static inline uint16_t pixel_aliasing_2x2(uint32_t pixel00_rgb, uint32_t pixel01_rgb,
+                                          uint32_t pixel10_rgb, uint32_t pixel11_rgb,
+                                          uint8_t pixel00_alpha, uint8_t pixel01_alpha,
+                                          uint8_t pixel10_alpha, uint8_t pixel11_alpha,
+                                          uint8_t x_ratio, uint8_t y_ratio, uint32_t bg)
+{
+    uint8_t xr = (x_ratio + 4) >> 3;
+    uint8_t yr = (y_ratio + 4) >> 3;
+
+    pixel00_rgb = ((pixel00_rgb | (pixel00_rgb << 16)) & 0x07e0f81f);
+    pixel01_rgb = ((pixel01_rgb | (pixel01_rgb << 16)) & 0x07e0f81f);
+    pixel10_rgb = ((pixel10_rgb | (pixel10_rgb << 16)) & 0x07e0f81f);
+    pixel11_rgb = ((pixel11_rgb | (pixel11_rgb << 16)) & 0x07e0f81f);
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+
+    uint32_t top_rgb = (((((pixel01_rgb - pixel00_rgb) * xr) >> 5) + pixel00_rgb) & 0x07e0f81f);
+    uint32_t bottom_rgb = (((((pixel11_rgb - pixel10_rgb) * xr) >> 5) + pixel10_rgb) & 0x07e0f81f);
+    uint32_t fg_rgb = (((((bottom_rgb - top_rgb) * yr) >> 5) + top_rgb) & 0x07e0f81f);
+
+    uint8_t fg_alpha = (pixel00_alpha * (255 - xr) * (255 - yr) +
+                        pixel01_alpha * xr * (255 - yr) +
+                        pixel10_alpha * (255 - xr) * yr +
+                        pixel11_alpha * xr * yr) >> 16;
+    fg_alpha = (fg_alpha + 4) >> 3;
+
+    uint32_t result = (((((fg_rgb - bg) * fg_alpha) >> 5) + bg) & 0x07e0f81f);
+    return (uint16_t)((result >> 16) | result);
+}
+
+static inline uint16_t pixel_aliasing_a8_1x2(uint32_t fg, uint32_t bg, uint8_t pixel00_alpha,
+                                             uint8_t pixel01_alpha, uint8_t ratio)
+{
+    fg = ((fg | (fg << 16)) & 0x07e0f81f);
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+    uint8_t fg_alpha = (pixel00_alpha * (255 - ratio) + pixel01_alpha * ratio) >> 8;
+    fg_alpha = (fg_alpha + 4) >> 3;
+    uint32_t result = (((((fg - bg) * fg_alpha) >> 5) + bg) & 0x07e0f81f);
+    return (uint16_t)((result >> 16) | result);
+}
+
+static inline uint16_t pixel_aliasing_a8_2x2(uint32_t fg, uint32_t bg, uint8_t pixel00_alpha,
+                                             uint8_t pixel01_alpha, uint8_t pixel10_alpha, uint8_t pixel11_alpha, uint8_t x_ratio,
+                                             uint8_t y_ratio)
+{
+    uint8_t xr = (x_ratio + 4) >> 3;
+    uint8_t yr = (y_ratio + 4) >> 3;
+    fg = ((fg | (fg << 16)) & 0x07e0f81f);
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+    uint8_t fg_alpha = (pixel00_alpha * (255 - xr) * (255 - yr) +
+                        pixel01_alpha * xr * (255 - yr) +
+                        pixel10_alpha * (255 - xr) * yr +
+                        pixel11_alpha * xr * yr) >> 16;
+
+    fg_alpha = (fg_alpha + 4) >> 3;
+    uint32_t result = (((((fg - bg) * fg_alpha) >> 5) + bg) & 0x07e0f81f);
+    return (uint16_t)((result >> 16) | result);
+}
+
+static inline uint16_t pixel_aliasing_2x2_without_alpha(uint32_t pixel00_rgb, uint32_t pixel01_rgb,
+                                                        uint32_t pixel10_rgb, uint32_t pixel11_rgb,
+                                                        uint8_t x_ratio, uint8_t y_ratio, uint32_t bg)
+{
+    uint8_t xr = (x_ratio + 4) >> 3;
+    uint8_t yr = (y_ratio + 4) >> 3;
+
+    pixel00_rgb = ((pixel00_rgb | (pixel00_rgb << 16)) & 0x07e0f81f);
+    pixel01_rgb = ((pixel01_rgb | (pixel01_rgb << 16)) & 0x07e0f81f);
+    pixel10_rgb = ((pixel10_rgb | (pixel10_rgb << 16)) & 0x07e0f81f);
+    pixel11_rgb = ((pixel11_rgb | (pixel11_rgb << 16)) & 0x07e0f81f);
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+
+    uint32_t top_rgb = (((((pixel01_rgb - pixel00_rgb) * xr) >> 5) + pixel00_rgb) & 0x07e0f81f);
+    uint32_t bottom_rgb = (((((pixel11_rgb - pixel10_rgb) * xr) >> 5) + pixel10_rgb) & 0x07e0f81f);
+    uint32_t fg_rgb = (((((bottom_rgb - top_rgb) * yr) >> 5) + top_rgb) & 0x07e0f81f);
+
+    uint32_t result = (((((fg_rgb - bg) * 31) >> 5) + bg) & 0x07e0f81f);
     return (uint16_t)((result >> 16) | result);
 }
 

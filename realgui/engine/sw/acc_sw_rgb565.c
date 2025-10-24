@@ -71,6 +71,44 @@ static void rgb565_2_rgb565_1d_filter(draw_img_t *image, gui_dispdev_t *dc, gui_
 
 }
 
+static void rgb565_2_rgb565_1d_cover(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+
+    if (opacity_value == 0)
+    {
+        return;// fully transparent, nothing to draw
+    }
+    else if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_1D(
+            color_rgb565_t,
+        {
+            if (pixel->color.rgb565 != 0)
+            {
+                writebuf[write_offset] = pixel->color.rgb565;
+            }
+        };
+        );
+    }
+    else
+    {
+        uint8_t alpha = (opacity_value + 4) >> 3;
+        PROCESS_IMAGE_PIXEL_1D(
+            color_rgb565_t,
+        {
+            if (pixel->color.rgb565 != 0)
+            {
+                uint32_t fg = ((pixel->color.rgb565 | (pixel->color.rgb565 << 16)) & 0x07e0f81f);
+                uint32_t result = ((((fg * alpha) >> 5)) & 0x07e0f81f);
+                writebuf[write_offset] = (uint16_t)((result >> 16) | result);
+            }
+        };
+        );
+    }
+
+}
+
 static void rgb565_2_rgb565_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     if (image->blend_mode == IMG_BYPASS_MODE)
@@ -80,6 +118,10 @@ static void rgb565_2_rgb565_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
     else if (image->blend_mode == IMG_FILTER_BLACK)
     {
         rgb565_2_rgb565_1d_filter(image, dc, rect);
+    }
+    else if (image->blend_mode == IMG_COVER_MODE)
+    {
+        rgb565_2_rgb565_1d_cover(image, dc, rect);
     }
 }
 
@@ -112,6 +154,52 @@ static void rgb565_2_rgb565_2d_filter(draw_img_t *image, gui_dispdev_t *dc, gui_
                 writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, writebuf[write_offset],
                                                               opacity_value);
             }
+        };
+        );
+    }
+}
+
+static void rgb565_2_rgb565_2d_filter_with_2x2_aa(draw_img_t *image, gui_dispdev_t *dc,
+                                                  gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 0)
+    {
+        return;// fully transparent, nothing to draw
+    }
+    else if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_2D_WITH_2X2_ANTI_ALIASING(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = pixel_aliasing_2x2_without_alpha(
+                pixel_00->color.rgb565,
+                pixel_01->color.rgb565,
+                pixel_10->color.rgb565,
+                pixel_11->color.rgb565,
+                (uint8_t)(xRatio * 255),
+                (uint8_t)(yRatio * 255),
+                writebuf[write_offset]);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_2D_WITH_2X2_ANTI_ALIASING(
+            color_rgb565_t,
+        {
+            writebuf[write_offset] = pixel_aliasing_2x2(
+                pixel_00->color.rgb565,
+                pixel_01->color.rgb565,
+                pixel_10->color.rgb565,
+                pixel_11->color.rgb565,
+                opacity_value,
+                opacity_value,
+                opacity_value,
+                opacity_value,
+                (uint8_t)(xRatio * 255),
+                (uint8_t)(yRatio * 255),
+                writebuf[write_offset]);
         };
         );
     }
@@ -152,7 +240,14 @@ static void rgb565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
     }
     else if (image->blend_mode == IMG_FILTER_BLACK)
     {
-        rgb565_2_rgb565_2d_filter(image, dc, rect);
+        if (image->high_quality == true)
+        {
+            rgb565_2_rgb565_2d_filter_with_2x2_aa(image, dc, rect);
+        }
+        else
+        {
+            rgb565_2_rgb565_2d_filter(image, dc, rect);
+        }
     }
 }
 
