@@ -44,7 +44,6 @@
  *                            Variables
  *============================================================================*/
 
-static uint32_t cur_time_ms;
 /**
  * @brief The number of frames that need to be skipped.
  * If the value of scroll_skip_frame is 10, the scrolling text
@@ -259,10 +258,12 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     }
 
     dc = gui_get_dc();
-    if (dc->section_count == 0)
+    if (dc->section_count == 0 && text->scrolling)
     {
-        cur_time_ms = gui_ms_get();
+        text->cur_time_ms = gui_ms_get();
     }
+    index = (text->cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+
     draw_rect.x1 = text->base.offset_x;
     draw_rect.y1 = text->base.offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w - 1;
@@ -278,7 +279,6 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset = text->base.char_width_sum;
         if (offset > obj->w)
         {
-            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
             text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
                               text->interval_time_ms;
             draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
@@ -292,10 +292,9 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset = text->base.char_width_sum;
         if (offset > obj->w)
         {
-            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
             text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
                               text->interval_time_ms;
-            draw_rect.x1 = text->base.offset_x + text->cnt_value - text->start_value - obj->w;
+            draw_rect.x1 = text->base.offset_x + text->cnt_value - text->start_value - offset + obj->w;
             draw_rect.x2 = draw_rect.x1 + offset - 1;
             draw_rect.y1 = text->base.offset_y;
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
@@ -307,7 +306,6 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset += (text->base.char_line_sum - 1) * text->base.extra_line_spacing;
         if (offset > obj->h || offset == 0)
         {
-            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
             text->cnt_value = (text->end_value + text->start_value + offset) * index
                               / text->interval_time_ms;
             draw_rect.x1 = text->base.offset_x;
@@ -321,7 +319,6 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         offset = text->base.char_height_sum;
         if (offset > obj->h || offset == 0)
         {
-            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
             text->cnt_value = (text->end_value + text->start_value + offset) * index
                               / text->interval_time_ms;
             draw_rect.x1 = text->base.offset_x;
@@ -347,7 +344,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     gui_scroll_text_read_scope((gui_text_t *)text, &draw_rect);
 
     if ((text->duration_time_ms == 0 ||
-         cur_time_ms < (text->init_time_ms + text->duration_time_ms)) &&
+         text->cur_time_ms < (text->init_time_ms + text->duration_time_ms)) &&
         gui_scroll_text_rect_hit(&draw_rect, &dc->section))
     {
         gui_scroll_text_font_draw(&text->base, &draw_rect);
@@ -442,7 +439,7 @@ void gui_scroll_text_set(gui_scroll_text_t *_this,
                          uint8_t            font_size)
 {
     gui_text_set(&_this->base, text, text_type, color, length, font_size);
-    gui_scroll_text_restart(_this);
+    gui_scroll_text_reset(_this);
 }
 
 void gui_scroll_text_type_set(gui_scroll_text_t *_this, void *font_source, FONT_SRC_MODE font_mode)
@@ -453,14 +450,41 @@ void gui_scroll_text_type_set(gui_scroll_text_t *_this, void *font_source, FONT_
 void gui_scroll_text_content_set(gui_scroll_text_t *_this, void *text, uint16_t length)
 {
     gui_text_content_set(&_this->base, text, length);
-    gui_scroll_text_restart(_this);
+    gui_scroll_text_reset(_this);
 }
 
-void gui_scroll_text_restart(gui_scroll_text_t *_this)
+void gui_scroll_text_reset(gui_scroll_text_t *_this)
 {
-    _this->base.char_width_sum = 0;
-    _this->base.char_line_sum = 0;
+    gui_obj_show(_this, true);
+    _this->base.layout_refresh = true;
+    _this->base.content_refresh = true;
+    _this->scrolling = true;
     _this->init_time_ms = gui_ms_get();
+    gui_fb_change();
+}
+
+void gui_scroll_text_stop(gui_scroll_text_t *_this)
+{
+    _this->scrolling = false;
+    gui_obj_show(_this, false);
+    gui_fb_change();
+}
+
+void gui_scroll_text_pause(gui_scroll_text_t *_this)
+{
+    _this->scrolling = false;
+    gui_fb_change();
+}
+
+void gui_scroll_text_start(gui_scroll_text_t *_this)
+{
+    gui_scroll_text_reset(_this);
+}
+
+void gui_scroll_text_resume(gui_scroll_text_t *_this)
+{
+    _this->scrolling = true;
+    _this->init_time_ms += gui_ms_get() - _this->cur_time_ms;
     gui_fb_change();
 }
 

@@ -58,7 +58,12 @@ extern "C" {
 #define APP_COLOR_GRAY                      gui_rgb(128,128,128)
 #define APP_COLOR_BLACK_OPACITY(opacity)    gui_rgba(0,0,0, opacity)
 #define APP_COLOR_GRAY_OPACITY(opacity)     gui_rgba(128,128,128, opacity)
-
+#define APP_COLOR_TOMATO                    gui_rgb(255,99,71)
+#define APP_COLOR_YELLOW                    gui_rgb(255,255,0)
+#define APP_COLOR_ORANGE                    gui_rgb(255,165,0)
+#define APP_COLOR_SPRING_GREEN              gui_rgb(0,255,127)
+#define APP_COLOR_CYAN                      gui_rgb(0,255,255)
+#define APP_COLOR_PURPLE                    gui_rgb(128,0,128)
 
 
 /*============================================================================*

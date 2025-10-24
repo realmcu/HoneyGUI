@@ -1007,7 +1007,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                           rect->yboundbottom ? rect->yboundbottom : dc->section.y2,
                           dc->section.y2
                       );
-    if (x_start >= x_end || y_start >= y_end) { return; }
+    if (x_start > x_end || y_start > y_end) { return; }
 
     draw_font_t df =
     {

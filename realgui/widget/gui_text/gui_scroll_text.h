@@ -45,8 +45,10 @@ typedef struct gui_scroll_text
     uint32_t end_value;
     uint32_t cnt_value;
     uint32_t init_time_ms;
+    uint32_t cur_time_ms;
     uint32_t duration_time_ms;
     uint32_t interval_time_ms;
+    bool scrolling;
 } gui_scroll_text_t;
 
 
@@ -166,8 +168,35 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame);
  *
  * @param this the scroll text widget pointer
  */
-void gui_scroll_text_restart(gui_scroll_text_t *_this);
+void gui_scroll_text_reset(gui_scroll_text_t *_this);
 
+/**
+ * @brief Stop scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_stop(gui_scroll_text_t *_this);
+
+/**
+ * @brief Pause scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_pause(gui_scroll_text_t *_this);
+
+/**
+ * @brief Resume scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_resume(gui_scroll_text_t *_this);
+
+/**
+ * @brief Start scrolling effects
+ *
+ * @param _this the scroll text widget pointer
+ */
+void gui_scroll_text_start(gui_scroll_text_t *_this);
 
 #ifdef __cplusplus
 }

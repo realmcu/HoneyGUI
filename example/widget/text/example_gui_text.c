@@ -143,6 +143,8 @@ static void font_file_init(void)
     fontnotohebrew = load_file_to_memory("./example/assets/font/NotoSansHebrew_size32_bits2_font.bin",
                                          NULL);
     fontharmonysc = load_file_to_memory("./example/assets/font/HarmonyOS_size32_bits2_font.bin", NULL);
+
+    gui_font_mem_init(font32b2);
 }
 
 
@@ -228,6 +230,9 @@ static int app_init(void)
 
     /* gui text multi language test */
     // text_multi_language_test();
+
+    /* gui text font scroll function test */
+    // text_font_scroll_function_test();
     return 0;
 }
 
