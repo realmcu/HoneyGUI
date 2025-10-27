@@ -109,10 +109,10 @@ GUI框架具有很强的可移植性，可以在多种芯片和 OS 上运行。�
 
 ## 显示
 ### 手表工程
-窗口中显示出表盘，您可以通过滑动和长按与其进行交互。
+窗口中显示出表盘，您可以通过滑动和点击与其进行交互。
 
 
-<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
+<div style="text-align: center"><img width="400" src ="https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif"/></div><br/>
 
 ### 仪表盘工程
 窗口中显示仪表盘。

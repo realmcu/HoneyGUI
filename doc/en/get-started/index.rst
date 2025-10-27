@@ -161,7 +161,7 @@ Watch Project
 The watchface is displayed in the window, and you can interact with it by swiping and clicking.
 
 
-.. image:: https://foruda.gitee.com/images/1753340570827728922/610cb752_10737458.png
+.. image:: https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif
    :align: center
    :width: 400
 

@@ -107,10 +107,10 @@ You can select the `Run and Debug` options after entering the vscode interface, 
 
 ## Display
 ### Watch Project
-The watchface is displayed in the window, and you can interact with it by swiping and long pressing.
+The watchface is displayed in the window, and you can interact with it by swiping and clicking.
 
 
-<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
+<div style="text-align: center"><img width="400" src ="https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif"/></div><br/>
 
 ### Dashboard Project
 The dashboard is displayed in the window.

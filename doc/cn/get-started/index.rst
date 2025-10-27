@@ -154,7 +154,7 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 窗口中显示出表盘，您可以通过滑动和点击与其进行交互。
 
-.. image:: https://foruda.gitee.com/images/1753340570827728922/610cb752_10737458.png
+.. image:: https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif
    :align: center
    :width: 400
 
