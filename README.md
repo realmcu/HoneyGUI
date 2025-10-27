@@ -2,6 +2,8 @@
 
 [EN](README.md)   |  [中文](README_zh.md)
 
+For detailed information, please refer to [HoneyGUI online documentation](https://docs.realmcu.com/gui/en/latest/index.html).
+
 ## Example
 <table>
   <tr>
