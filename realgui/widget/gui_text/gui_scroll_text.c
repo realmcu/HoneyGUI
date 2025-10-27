@@ -165,6 +165,44 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
     }
 }
 
+static void gui_scroll_text_font_destroy(gui_text_t *text)
+{
+    if (text->matrix)
+    {
+        gui_free(text->matrix);
+    }
+
+    switch (text->font_type)
+    {
+    case GUI_FONT_SRC_BMP:
+        {
+            gui_font_mem_obj_destroy(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_STB:
+        {
+
+        }
+        break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_destroy(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
+        {
+
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void gui_scroll_text_read_scope(gui_text_t *text, gui_text_rect_t *rect)
 {
     text->scope = 0;
@@ -366,6 +404,8 @@ static void gui_scroll_text_destroy(gui_obj_t *obj)
 {
     (void)obj;
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
+    gui_scroll_text_t *st = (gui_scroll_text_t *)obj;
+    gui_scroll_text_font_destroy(&st->base);
 }
 
 static void gui_scroll_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
