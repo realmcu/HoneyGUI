@@ -553,6 +553,10 @@ void gui_text_set(gui_text_t    *this,
     this->char_line_sum = 0;
     this->content_refresh = true;
     this->layout_refresh = true;
+    if (this->path)
+    {
+        gui_font_refresh_font_size(this);
+    }
 }
 
 void gui_text_set_animate(void     *o,

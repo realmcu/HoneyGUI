@@ -166,6 +166,44 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
     }
 }
 
+static void gui_scroll_text_font_destroy(gui_text_t *text)
+{
+    if (text->matrix)
+    {
+        gui_free(text->matrix);
+    }
+
+    switch (text->font_type)
+    {
+    case GUI_FONT_SRC_BMP:
+        {
+            gui_font_mem_obj_destroy(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_STB:
+        {
+
+        }
+        break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_destroy(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
+        {
+
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void gui_scroll_text_update_att(gui_obj_t *obj)
 {
     gui_scroll_text_t *this = (void *)obj;
@@ -247,6 +285,10 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     this->color.color.rgba.a = (this->color.color.rgba.a * this->base.parent->opacity_value) / 255;
     gui_scroll_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
+
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
 
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
@@ -389,6 +431,8 @@ static void gui_scroll_text_end(gui_obj_t *obj)
 static void gui_scroll_text_destroy(gui_obj_t *obj)
 {
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
+    gui_scroll_text_t *st = (gui_scroll_text_t *)obj;
+    gui_scroll_text_font_destroy(&st->base);
 }
 
 static void gui_scroll_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
