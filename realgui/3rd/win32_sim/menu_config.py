@@ -26,11 +26,11 @@ LPATH = ''
 
 CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc'
 
-CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion'
+CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wdouble-promotion'
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
 
 LFLAGS = ' -T default.ld'
-LFLAGS += ' -flto' #for arm2d
+# LFLAGS += ' -flto' #for arm2d
 LFLAGS += ' -pthread'
 LFLAGS += ' -Wl,-Map=sdl_sim.map'
 

@@ -1,0 +1,22 @@
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+CPPDEFINES = ['_RTE_']
+
+src = src + Glob(os.path.join(cwd + '/Library/Source','arm*.c')) # add all .c files
+src = src + Glob(os.path.join(cwd + '/platform','*.c'))
+src = src + Glob(os.path.join(cwd + '/platform/math','*.c'))
+
+path = [cwd,
+        cwd + '/Library/Include', 
+        cwd + '/platform', 
+        cwd + '/platform/math', 
+        cwd + '/platform/math/dsp', 
+        cwd + '/Library/Source']
+
+group = DefineGroup('realgui/3rd/arm2d', src, depend = ['CONFIG_REALTEK_BUILD_GUI_USE_ARM2D'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+Return('group')

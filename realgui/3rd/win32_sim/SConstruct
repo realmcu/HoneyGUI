@@ -33,6 +33,7 @@ PLATFORM = menu_config.PLATFORM
 LITE3D_DIR = os.path.abspath('./../Lite3D/')
 NANOVG_DIR = os.path.abspath('./../nanovg/')
 H264BSD_DIR = os.path.abspath('./../h264bsd/')
+ARM2D_DIR = os.path.abspath('./../Arm2D/')
 
 Export('PLATFORM')
 Export('TOOL_ROOT')
@@ -76,6 +77,7 @@ if platform.system() == 'Windows':
 objs.extend(SConscript(os.path.join(LITE3D_DIR, 'SConscript')))
 objs.extend(SConscript(os.path.join(H264BSD_DIR, 'SConscript')))
 objs.extend(SConscript(os.path.join(NANOVG_DIR, 'SConscript')))
+objs.extend(SConscript(os.path.join(ARM2D_DIR, 'SConscript')))
 objs.extend(SConscript(os.path.join(RTE_ROOT, 'SConscript')))
 
 env.Append(LIBS = [
