@@ -275,6 +275,10 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     //         _this->base.matrix->m[0][0],_this->base.matrix->m[1][1],
     //         _this->scale_img->base.matrix->m[0][0],_this->scale_img->base.matrix->m[1][1]);
 #endif
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
+
 
     matrix_multiply_point(obj->matrix, &point);
 
