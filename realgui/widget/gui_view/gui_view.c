@@ -782,7 +782,7 @@ void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *desc
                             VIEW_SWITCH_STYLE switch_out_style,
                             VIEW_SWITCH_STYLE switch_in_style)
 {
-    if (g_SurpressEvent || g_SwitchDone) { return; }
+    if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor) { return; }
     gui_view_switch_on_event(_this, descriptor, switch_out_style, switch_in_style, GUI_EVENT_INVALIDE);
 }
 

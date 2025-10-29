@@ -37,6 +37,12 @@
 #define SCREEN_BRIGHTNESS   "Screen Brightness"
 #define TIME_FORMAT         "Time Format"
 
+#define FIND_MY_BUDS        "Find My Buds"
+#define TIMER               "Timer"
+#define FLASHLIGHT          "Flashlight"
+
+
+
 #define PROGRESSBAR_W_MAX 116
 #define TOGGLE_OFF_X 4
 #define TOGGLE_ON_X 28
@@ -65,6 +71,9 @@ static void update_icon_color(gui_obj_t *obj, uint8_t status);
  *                            Variables
  *============================================================================*/
 static const gui_view_descriptor_t *clock_view = NULL;
+static const gui_view_descriptor_t *find_buds_view = NULL;
+static const gui_view_descriptor_t *timer_view = NULL;
+static const gui_view_descriptor_t *flashlight_view = NULL;
 
 static uint8_t toggle_target_x = 0;
 static int8_t index_rec = 0;
@@ -93,8 +102,19 @@ static const char *music_array[MUSIC_ARRAY_NUM] =
     "Heat Waves",
 };
 
+static const char lyrics_str[200] =
+{
+    "Never gonna give you up \
+    Never gonna let you down \
+    Never gonna run around and desert you \
+    Never gonna make you cry \
+    Never gonna say goodbye \
+    Never gonna tell a lie and hurt you"
+};
+
 static bool control_invalid = false;
 
+static char timer_max_str[4] = {0};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -102,23 +122,13 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     clock_view = gui_view_descriptor_get("clock_view");
+    find_buds_view = gui_view_descriptor_get("find_buds_view");
+    timer_view = gui_view_descriptor_get("timer_view");
+    flashlight_view = gui_view_descriptor_get("flashlight_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
-
-static void regenerate_current_view(void *msg)
-{
-    GUI_UNUSED(msg);
-
-    gui_view_t *current_view = gui_view_get_current();
-    const struct gui_view_descriptor *descriptor = current_view->descriptor;
-    gui_obj_t *parent = current_view->base.parent;
-    gui_obj_tree_free(GUI_BASE(current_view));
-    gui_set_bg_color(SCREEN_BG_DARK);
-
-    gui_view_create(parent, descriptor, 0, 0, 0, 0);
-}
 
 static void toggle_move(void *p)
 {
@@ -243,9 +253,9 @@ static void button_move(void *p)
 
 static void update_icon_color(gui_obj_t *obj, uint8_t status)
 {
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(left, "left", obj);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(mid, "mid", obj);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(right, "right", obj);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(left, "l", obj);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(mid, "m", obj);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(right, "r", obj);
 
     gui_img_a8_mix_alpha((void *)left, 122);
     gui_img_a8_mix_alpha((void *)mid, 122);
@@ -271,7 +281,7 @@ static void press_button_page_volume(void *obj)
     touch_info_t *tp = tp_get_info();
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        if (strcmp(o->name, "sub") == 0)
+        if (strcmp(o->name, "l") == 0)
         {
             if (volume_val != 0)
             {
@@ -301,7 +311,7 @@ static void press_button_page_volume(void *obj)
             int8_t compare;
             gui_img_t *icon = (gui_img_t *)gui_list_entry(o->brother_list.next, gui_obj_t, brother_list);
 
-            if (strcmp(o->name, "sub") == 0)
+            if (strcmp(o->name, "l") == 0)
             {
                 compare = 0;
                 index_rec = volume_val;
@@ -347,6 +357,81 @@ static void press_button_page_volume(void *obj)
     }
 }
 
+static void press_button_page_voice_aware(void *obj)
+{
+    GUI_UNUSED(obj);
+    if (control_invalid) { return; }
+    gui_obj_t *o = GUI_BASE(obj);
+    touch_info_t *tp = tp_get_info();
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
+    {
+        if (strcmp(o->name, "l") == 0)
+        {
+            if (voice_aware_val != 1)
+            {
+                pressed_l = true;
+                gui_obj_hidden(o, false);
+            }
+        }
+        else
+        {
+            if (voice_aware_val != 3)
+            {
+                pressed_r = true;
+                gui_obj_hidden(o, false);
+            }
+        }
+    }
+
+    else if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
+    {
+        gui_obj_hidden(o, true);
+    }
+    else if (tp->released)
+    {
+        gui_obj_hidden(o, true);
+        if (tp->deltaX == 0 && tp->deltaY == 0)
+        {
+            int8_t compare;
+            gui_img_t *icon = (gui_img_t *)gui_list_entry(o->brother_list.next, gui_obj_t, brother_list);
+
+            if (strcmp(o->name, "l") == 0)
+            {
+                compare = 1;
+                index_rec = voice_aware_val;
+            }
+            else
+            {
+                compare = 3;
+            }
+            if (pressed_r)
+            {
+                voice_aware_val++;
+                gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
+                gui_img_set_image_data((void *)progressbar, img_data_array[voice_aware_val - 1]);
+            }
+            else if (pressed_l)
+            {
+                voice_aware_val--;
+                gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
+                gui_img_set_image_data((void *)progressbar, img_data_array[voice_aware_val - 1]);
+            }
+
+            if (voice_aware_val == compare)
+            {
+                gui_img_a8_recolor(icon, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
+            }
+            else if (index_rec == compare)
+            {
+                gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
+            }
+            gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
+        }
+        pressed_r = false;
+        pressed_l = false;
+    }
+}
+
 static void press_button_page_equalizer(void *obj)
 {
     GUI_UNUSED(obj);
@@ -355,7 +440,7 @@ static void press_button_page_equalizer(void *obj)
     touch_info_t *tp = tp_get_info();
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        if (strcmp(o->name, "switch_l") == 0)
+        if (strcmp(o->name, "l") == 0)
         {
             if (music_type_index != 0)
             {
@@ -384,7 +469,7 @@ static void press_button_page_equalizer(void *obj)
             int8_t compare;
             gui_img_t *icon = (gui_img_t *)gui_list_entry(o->brother_list.next, gui_obj_t, brother_list);
 
-            if (strcmp(o->name, "switch_l") == 0)
+            if (strcmp(o->name, "l") == 0)
             {
                 compare = 0;
                 index_rec = music_type_index;
@@ -423,14 +508,14 @@ static void press_button_page_equalizer(void *obj)
 }
 
 
-static void press_button_page_music(void *obj)
+static void press_button_page_playback(void *obj)
 {
     GUI_UNUSED(obj);
     gui_obj_t *o = GUI_BASE(obj);
     touch_info_t *tp = tp_get_info();
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        if (strcmp(o->name, "last") == 0)
+        if (strcmp(o->name, "l") == 0)
         {
             if (music_index != 0)
             {
@@ -472,7 +557,7 @@ static void press_button_page_music(void *obj)
                                             strlen(music_array[music_index]));
             }
 
-            if (strcmp(o->name, "last") == 0)
+            if (strcmp(o->name, "l") == 0)
             {
                 if (music_index == 0)
                 {
@@ -508,7 +593,7 @@ static void press_button_page_screen_brightness(void *obj)
     touch_info_t *tp = tp_get_info();
     if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
     {
-        if (strcmp(o->name, "sub") == 0)
+        if (strcmp(o->name, "l") == 0)
         {
             if (screen_brightness_val != 1)
             {
@@ -538,7 +623,7 @@ static void press_button_page_screen_brightness(void *obj)
             int8_t compare;
             gui_img_t *icon = (gui_img_t *)gui_list_entry(o->brother_list.next, gui_obj_t, brother_list);
 
-            if (strcmp(o->name, "sub") == 0)
+            if (strcmp(o->name, "l") == 0)
             {
                 compare = 1;
                 index_rec = screen_brightness_val;
@@ -575,6 +660,114 @@ static void press_button_page_screen_brightness(void *obj)
     }
 }
 
+static void press_button_page_timer(void *obj)
+{
+    GUI_UNUSED(obj);
+    gui_obj_t *o = GUI_BASE(obj);
+    touch_info_t *tp = tp_get_info();
+    static uint32_t time_rec = 0;
+    static bool flag = 0;
+    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
+    {
+        if (strcmp(o->name, "l") == 0)
+        {
+            if (timer_max_min_val != 1)
+            {
+                pressed_l = true;
+                gui_obj_hidden(o, false);
+                time_rec = gui_ms_get();
+            }
+        }
+        else
+        {
+            if (timer_max_min_val != 60)
+            {
+                pressed_r = true;
+                gui_obj_hidden(o, false);
+                time_rec = gui_ms_get();
+            }
+        }
+    }
+    else if (tp->pressing)
+    {
+        if (tp->deltaX != 0 || tp->deltaY != 0)
+        {
+            gui_obj_hidden(o, true);
+        }
+        else if ((pressed_r || pressed_l) && (gui_ms_get() - time_rec >= 300))
+        {
+            time_rec = gui_ms_get();
+            flag = 1;
+            if (pressed_r)
+            {
+                timer_max_min_val += 5;
+                if (timer_max_min_val >= 60)
+                {
+                    timer_max_min_val = 60;
+                }
+            }
+            else if (pressed_l)
+            {
+                timer_max_min_val -= 5;
+                if (timer_max_min_val <= 1)
+                {
+                    timer_max_min_val = 1;
+                }
+            }
+            gui_obj_t *text = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
+            sprintf(timer_max_str, "%d", timer_max_min_val);
+            gui_text_content_set((void *)text, timer_max_str, strlen(timer_max_str));
+        }
+    }
+    else if (tp->released)
+    {
+        gui_obj_hidden(o, true);
+        if (tp->deltaX == 0 && tp->deltaY == 0)
+        {
+            int8_t compare;
+            gui_img_t *icon = (gui_img_t *)gui_list_entry(o->brother_list.next, gui_obj_t, brother_list);
+
+            if (strcmp(o->name, "l") == 0)
+            {
+                compare = 1;
+            }
+            else
+            {
+                compare = 60;
+            }
+            if (!flag)
+            {
+                if (pressed_r)
+                {
+                    timer_max_min_val++;
+                }
+                else if (pressed_l)
+                {
+                    timer_max_min_val--;
+                }
+                gui_obj_t *text = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
+                sprintf(timer_max_str, "%d", timer_max_min_val);
+                gui_text_content_set((void *)text, timer_max_str, strlen(timer_max_str));
+            }
+            else
+            {
+                flag = 0;
+            }
+            if (timer_max_min_val == compare)
+            {
+                gui_img_a8_recolor(icon, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
+            }
+            else
+            {
+                gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
+            }
+            gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
+        }
+        pressed_r = false;
+        pressed_l = false;
+    }
+}
+
 static void click_button_page_ambient_sound(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
@@ -582,12 +775,12 @@ static void click_button_page_ambient_sound(void *obj, gui_event_t e, void *para
     GUI_UNUSED(param);
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
-    if (strcmp(o->name, "left") == 0)
+    if (strcmp(o->name, "l") == 0)
     {
         ambient_sound_type = ANC;
         button_bg_target_x = BUTTON_X_LEFT;
     }
-    else if (strcmp(o->name, "mid") == 0)
+    else if (strcmp(o->name, "m") == 0)
     {
         ambient_sound_type = AA;
         button_bg_target_x = BUTTON_X_MID;
@@ -608,12 +801,20 @@ static void click_button_page_playback(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
     gui_obj_t *o = GUI_BASE(obj);
     f_status.playback = !f_status.playback;
+    gui_scroll_text_t *name = (void *)gui_list_entry(o->parent->parent->child_list.next, gui_obj_t,
+                                                     brother_list);
+    gui_scroll_text_t *lyrics = (void *)gui_list_entry(GUI_BASE(name)->brother_list.next, gui_obj_t,
+                                                       brother_list);
     if (f_status.playback)
     {
+        gui_scroll_text_resume(name);
+        gui_scroll_text_resume(lyrics);
         gui_img_set_image_data((gui_img_t *)o, PAUSE_BIN);
     }
     else
     {
+        gui_scroll_text_pause(name);
+        gui_scroll_text_pause(lyrics);
         gui_img_set_image_data((gui_img_t *)o, PLAY_BIN);
     }
     gui_img_refresh_size((gui_img_t *)o);
@@ -626,12 +827,12 @@ static void click_button_page_smart_talk(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
-    if (strcmp(o->name, "left") == 0)
+    if (strcmp(o->name, "l") == 0)
     {
         smart_talk_time_type = 0;
         button_bg_target_x = BUTTON_X_LEFT;
     }
-    else if (strcmp(o->name, "mid") == 0)
+    else if (strcmp(o->name, "m") == 0)
     {
         smart_talk_time_type = 1;
         button_bg_target_x = BUTTON_X_MID;
@@ -652,12 +853,12 @@ static void click_button_page_spatial_sound(void *obj, gui_event_t e, void *para
     GUI_UNUSED(param);
     if (control_invalid) { return; }
     gui_obj_t *o = GUI_BASE(obj);
-    if (strcmp(o->name, "left") == 0)
+    if (strcmp(o->name, "l") == 0)
     {
         spatial_sound_type = SPATIAL_SOUND_MOVIE;
         button_bg_target_x = BUTTON_X_LEFT;
     }
-    else if (strcmp(o->name, "mid") == 0)
+    else if (strcmp(o->name, "m") == 0)
     {
         spatial_sound_type = SPATIAL_SOUND_MUSIC;
         button_bg_target_x = BUTTON_X_MID;
@@ -696,7 +897,7 @@ static void click_clock_page_lock_screen(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     switch_from_lock_screen = true;
-    gui_view_set_animate_step(gui_view_get_current(), 300);
+    gui_view_set_animate_step(gui_view_get_current(), 400);
     gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
@@ -709,7 +910,7 @@ static void click_button_page_lock_screen(void *obj, gui_event_t e, void *param)
     gui_obj_t *o = GUI_BASE(obj);
     gui_img_t *icon_l;
     gui_img_t *icon_r;
-    bool is_switch_l = (strcmp(o->name, "switch_l") == 0);
+    bool is_switch_l = (strcmp(o->name, "l") == 0);
     if (is_switch_l)
     {
         clock_style--;
@@ -765,103 +966,102 @@ static void click_button_time_format_light(void *obj, gui_event_t e, void *param
                          button_move);
 }
 
+static void click_button_page_find_buds(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_obj_t *o = GUI_BASE(obj);
+    if (strcmp(o->name, "l") == 0)
+    {
+        if (f_status.earbuds_shock_l)
+        {
+            f_status.earbuds_shock_l = 0;
+            gui_obj_t *icon = gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
+            gui_img_set_image_data((void *)icon, ICON_L_BIN);
+            gui_img_refresh_size((void *)icon);
+            if (theme_bg_white)
+            {
+                gui_img_a8_recolor((void *)o, BG_THEME2_BRIGHT_LIGHT.color.argb_full);
+                gui_img_a8_recolor((void *)icon, FG_1_LIGHT.color.argb_full);
+            }
+            else
+            {
+                gui_img_a8_recolor((void *)o, BG_THEME2_BRIGHT_DARK.color.argb_full);
+                gui_img_a8_recolor((void *)icon, FG_1_DARK.color.argb_full);
+            }
+            return;
+        }
+        f_status.earbuds_find_l = 1;
+    }
+    else
+    {
+        if (f_status.earbuds_shock_r)
+        {
+            f_status.earbuds_shock_r = 0;
+            gui_obj_t *icon = gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
+            gui_img_set_image_data((void *)icon, ICON_R_BIN);
+            gui_img_refresh_size((void *)icon);
+            if (theme_bg_white)
+            {
+                gui_img_a8_recolor((void *)o, BG_THEME2_BRIGHT_LIGHT.color.argb_full);
+                gui_img_a8_recolor((void *)icon, FG_1_LIGHT.color.argb_full);
+            }
+            else
+            {
+                gui_img_a8_recolor((void *)o, BG_THEME2_BRIGHT_DARK.color.argb_full);
+                gui_img_a8_recolor((void *)icon, FG_1_DARK.color.argb_full);
+            }
+            return;
+        }
+        f_status.earbuds_find_r = 1;
+    }
+    gui_view_set_animate_step(gui_view_get_current(), 400);
+    gui_view_switch_direct(gui_view_get_current(), find_buds_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+}
+
+static void click_button_page_timer(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    f_status.timer = 0;
+    gui_view_set_animate_step(gui_view_get_current(), 10);
+    gui_view_switch_direct(gui_view_get_current(), timer_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
+}
+
+static void click_button_page_flashlight(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    f_status.timer = 0;
+    gui_view_set_animate_step(gui_view_get_current(), 400);
+    gui_view_switch_direct(gui_view_get_current(), flashlight_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+}
+
 static void click_toggle_cb(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     gui_obj_t *o = GUI_BASE(obj);
+    bool *status = param;
     gui_obj_t *toggle = gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
 
-    if (strcmp(toggle->name, EQUALIZER) == 0)
+    *status = !(*status);
+    if (*status)
     {
-        f_status.equalizer = !f_status.equalizer;
-        if (f_status.equalizer)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-        control_invalid = !f_status.equalizer;
+        toggle_target_x = TOGGLE_ON_X;
     }
-    else if (strcmp(toggle->name, AMBIENT_SOUND) == 0)
+    else
     {
-        f_status.ambient_sound = !f_status.ambient_sound;
-        if (f_status.ambient_sound)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-        control_invalid = !f_status.ambient_sound;
+        toggle_target_x = TOGGLE_OFF_X;
     }
-    else if (strcmp(toggle->name, SMART_TALK) == 0)
-    {
-        f_status.smart_talk = !f_status.smart_talk;
-        if (f_status.smart_talk)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-        control_invalid = !f_status.smart_talk;
-    }
-    else if (strcmp(toggle->name, SPATIAL_SOUND) == 0)
-    {
-        f_status.spatial_sound = !f_status.spatial_sound;
-        if (f_status.spatial_sound)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-        control_invalid = !f_status.spatial_sound;
-    }
-    else if (strcmp(toggle->name, VOICE_AWARE) == 0)
-    {
-        f_status.voice_aware = !f_status.voice_aware;
-        if (f_status.voice_aware)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-        control_invalid = !f_status.voice_aware;
-    }
-    else if (strcmp(toggle->name, NOTIFICATION) == 0)
-    {
-        f_status.notification = !f_status.notification;
-        if (f_status.notification)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-    }
-    else if (strcmp(toggle->name, MESSAGE_PREVIEW) == 0)
-    {
-        f_status.message_preview = !f_status.message_preview;
-        if (f_status.message_preview)
-        {
-            toggle_target_x = TOGGLE_ON_X;
-        }
-        else
-        {
-            toggle_target_x = TOGGLE_OFF_X;
-        }
-    }
+    control_invalid = !(*status);
     gui_obj_create_timer(toggle, 10, true, toggle_move);
 }
 
@@ -876,6 +1076,18 @@ static void click_button_no_action(void *obj, gui_event_t e, void *param)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+void regenerate_current_view(void *msg)
+{
+    GUI_UNUSED(msg);
+
+    gui_view_t *current_view = gui_view_get_current();
+    const struct gui_view_descriptor *descriptor = current_view->descriptor;
+    gui_obj_t *parent = current_view->base.parent;
+    gui_obj_tree_free(GUI_BASE(current_view));
+
+    gui_view_create(parent, descriptor, 0, 0, 0, 0);
+}
+
 /* Audio settings page */
 void page_playback_design(gui_obj_t *parent)
 {
@@ -889,35 +1101,35 @@ void page_playback_design(gui_obj_t *parent)
     {
         font_color = FG_1_DARK;
     }
-    gui_scroll_text_t *t = gui_scroll_text_create(parent, PLAYBACK, 12, 40, 160, 56);
-    gui_scroll_text_set(t, (char *)music_array[music_index], GUI_FONT_SRC_BMP, font_color,
-                        strlen(music_array[music_index]), 30);
-    gui_scroll_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_scroll_text_scroll_set(t, SCROLL_X, 160, 160, 5000, 0);
-
-    gui_text_t *text = gui_text_create(parent, 0, 12, 65, 200, 15);
-    gui_text_set(text, "Artist-Album", GUI_FONT_SRC_BMP, font_color, 13, 20);
-    gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(text, LEFT);
+    gui_scroll_text_t *music_name = gui_scroll_text_create(parent, PLAYBACK, 12, 40, 308, 56);
+    gui_scroll_text_type_set(music_name, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_scroll_text_scroll_set(music_name, SCROLL_X, 0, 308, 5000, 0);
+    gui_scroll_text_t *lyrics;
+    if (f_status.music_input)
+    {
+        gui_scroll_text_set(music_name, (char *)music_array[music_index], GUI_FONT_SRC_BMP, font_color,
+                            strlen(music_array[music_index]), 30);
+        lyrics = gui_scroll_text_create(parent, 0, 12, 65, 308, 20);
+        gui_scroll_text_set(lyrics, (char *)lyrics_str, GUI_FONT_SRC_BMP, font_color,
+                            strlen(lyrics_str), 20);
+        gui_scroll_text_type_set(lyrics, HEADING_1_BIN, FONT_SRC_MEMADDR);
+        gui_scroll_text_scroll_set(lyrics, SCROLL_X, 0, 308, 20000, 0);
+    }
+    else
+    {
+        gui_scroll_text_set(music_name, "No music", GUI_FONT_SRC_BMP, font_color, 9, 30);
+    }
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_last_bg = gui_img_create_from_mem(control_bg, "last", BUTTON_BG_CIRCLE_BIN, 6, 6,
+    gui_img_t *button_last_bg = gui_img_create_from_mem(control_bg, "l", BUTTON_BG_CIRCLE_BIN, 6, 6,
                                                         0, 0);
     gui_img_t *last = gui_img_create_from_mem(control_bg, 0, SKIP_LAST_BIN, 24, 32, 0, 0);
-    gui_img_t *button_next_bg = gui_img_create_from_mem(control_bg, "next", BUTTON_BG_CIRCLE_BIN, 212,
+    gui_img_t *button_next_bg = gui_img_create_from_mem(control_bg, "r", BUTTON_BG_CIRCLE_BIN, 212,
                                                         6, 0, 0);
     gui_obj_hidden((void *)button_last_bg, 1);
     gui_obj_hidden((void *)button_next_bg, 1);
     gui_img_t *next = gui_img_create_from_mem(control_bg, 0, SKIP_NEXT_BIN, 233, 32, 0, 0);
     gui_img_t *play = gui_img_create_from_mem(control_bg, 0, PLAY_BIN, 132, 24, 0, 0);
-    gui_obj_add_event_cb(play, click_button_page_playback, GUI_EVENT_TOUCH_CLICKED, NULL);
-    if (f_status.playback)
-    {
-        gui_img_set_image_data(play, PAUSE_BIN);
-        gui_img_refresh_size(play);
-    }
-    gui_obj_create_timer(GUI_BASE(button_last_bg), 10, true, press_button_page_music);
-    gui_obj_create_timer(GUI_BASE(button_next_bg), 10, true, press_button_page_music);
 
     if (theme_bg_white)
     {
@@ -952,6 +1164,30 @@ void page_playback_design(gui_obj_t *parent)
         {
             gui_img_a8_recolor(next, FG_2_DARK.color.argb_full);
         }
+    }
+    if (f_status.music_input)
+    {
+        if (f_status.playback)
+        {
+            gui_img_set_image_data(play, PAUSE_BIN);
+            gui_img_refresh_size(play);
+        }
+        else
+        {
+            gui_scroll_text_pause(music_name);
+            gui_scroll_text_pause(lyrics);
+        }
+        gui_obj_add_event_cb(play, click_button_page_playback, GUI_EVENT_TOUCH_CLICKED, NULL);
+        gui_obj_create_timer(GUI_BASE(button_last_bg), 10, true, press_button_page_playback);
+        gui_obj_create_timer(GUI_BASE(button_next_bg), 10, true, press_button_page_playback);
+    }
+    else
+    {
+        gui_img_a8_mix_alpha(control_bg, CONTROL_BG_OPACITY);
+        gui_img_a8_recolor(last, FG_2_DARK.color.argb_full);
+        gui_img_a8_recolor(next, FG_2_DARK.color.argb_full);
+        gui_img_a8_recolor(play, FG_2_DARK.color.argb_full);
+        gui_img_a8_mix_alpha(play, play->fg_color_set >> 24);
     }
     gui_img_a8_mix_alpha(last, last->fg_color_set >> 24);
     gui_img_a8_mix_alpha(next, next->fg_color_set >> 24);
@@ -990,10 +1226,10 @@ void page_volume_design(gui_obj_t *parent)
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "sub", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
+    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "l", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
                                                        0);
     gui_img_t *sub = gui_img_create_from_mem(control_bg, 0, SUB_BIN, 31, 42, 0, 0);
-    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "add", BUTTON_BG_CIRCLE_BIN, 212, 6,
+    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "r", BUTTON_BG_CIRCLE_BIN, 212, 6,
                                                        0, 0);
     gui_img_t *add = gui_img_create_from_mem(control_bg, 0, ADD_BIN, 237, 31, 0, 0);
     gui_img_t *progressbar_bg = gui_img_create_from_mem(control_bg, 0, PROGRESSBAR_BG_BIN, 90, 27, 0,
@@ -1075,7 +1311,8 @@ void page_ambient_sound_design(gui_obj_t *parent)
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, AMBIENT_SOUND, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
-    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED,
+                         &(f_status.ambient_sound));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
     int button_bg_x;
@@ -1093,9 +1330,9 @@ void page_ambient_sound_design(gui_obj_t *parent)
     }
     gui_img_t *button_bg = gui_img_create_from_mem(control_bg, AMBIENT_SOUND, BUTTON_BG_ELLIPSE_BIN,
                                                    button_bg_x, 0, 0, 0);
-    gui_img_t *anc = gui_img_create_from_mem(control_bg, "left", ICON_ANC_BIN, 25, 21, 0, 0);
-    gui_img_t *aa = gui_img_create_from_mem(control_bg, "mid", ICON_AA_BIN, 124, 21, 0, 0);
-    gui_img_t *tt = gui_img_create_from_mem(control_bg, "right", ICON_TT_BIN, 223, 21, 0, 0);
+    gui_img_t *anc = gui_img_create_from_mem(control_bg, "l", ICON_ANC_BIN, 25, 21, 0, 0);
+    gui_img_t *aa = gui_img_create_from_mem(control_bg, "m", ICON_AA_BIN, 124, 21, 0, 0);
+    gui_img_t *tt = gui_img_create_from_mem(control_bg, "r", ICON_TT_BIN, 223, 21, 0, 0);
     update_icon_color((void *)control_bg, ambient_sound_type);
     gui_img_a8_recolor(anc, FG_WHITE.color.argb_full);
     gui_img_a8_recolor(aa, FG_WHITE.color.argb_full);
@@ -1166,13 +1403,13 @@ void page_equalizer_design(gui_obj_t *parent)
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, EQUALIZER, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
-    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, &(f_status.equalizer));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_switch_l_bg = gui_img_create_from_mem(control_bg, "switch_l",
+    gui_img_t *button_switch_l_bg = gui_img_create_from_mem(control_bg, "l",
                                                             BUTTON_BG_CIRCLE_BIN, 6, 6, 0, 0);
     gui_img_t *switch_l = gui_img_create_from_mem(control_bg, 0, SWITCH_L_BIN, 32, 32, 0, 0);
-    gui_img_t *button_switch_r_bg = gui_img_create_from_mem(control_bg, "switch_r",
+    gui_img_t *button_switch_r_bg = gui_img_create_from_mem(control_bg, "r",
                                                             BUTTON_BG_CIRCLE_BIN, 212, 6, 0, 0);
     gui_img_t *switch_r = gui_img_create_from_mem(control_bg, 0, SWITCH_R_BIN, 241, 32, 0, 0);
     gui_img_t *music_type = gui_img_create_from_mem(control_bg, "music_type",
@@ -1263,7 +1500,7 @@ void page_smart_talk_design(gui_obj_t *parent)
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, SMART_TALK, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
-    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, &(f_status.smart_talk));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
     int button_bg_x;
@@ -1281,9 +1518,9 @@ void page_smart_talk_design(gui_obj_t *parent)
     }
     gui_img_t *button_bg = gui_img_create_from_mem(control_bg, SMART_TALK, BUTTON_BG_ELLIPSE_BIN,
                                                    button_bg_x, 0, 0, 0);
-    gui_img_t *st_5 = gui_img_create_from_mem(control_bg, "left", SMART_TALK_5S_BIN, 22, 20, 0, 0);
-    gui_img_t *st_15 = gui_img_create_from_mem(control_bg, "mid", SMART_TALK_15S_BIN, 121, 20, 0, 0);
-    gui_img_t *st_20 = gui_img_create_from_mem(control_bg, "right", SMART_TALK_20S_BIN, 219, 20, 0, 0);
+    gui_img_t *st_5 = gui_img_create_from_mem(control_bg, "l", SMART_TALK_5S_BIN, 22, 20, 0, 0);
+    gui_img_t *st_15 = gui_img_create_from_mem(control_bg, "m", SMART_TALK_15S_BIN, 121, 20, 0, 0);
+    gui_img_t *st_20 = gui_img_create_from_mem(control_bg, "r", SMART_TALK_20S_BIN, 219, 20, 0, 0);
     update_icon_color((void *)control_bg, smart_talk_time_type);
     gui_img_a8_recolor(st_5, FG_WHITE.color.argb_full);
     gui_img_a8_recolor(st_15, FG_WHITE.color.argb_full);
@@ -1346,7 +1583,8 @@ void page_spatial_sound_design(gui_obj_t *parent)
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, SPATIAL_SOUND, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
-    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED,
+                         &(f_status.spatial_sound));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
     int button_bg_x;
@@ -1364,11 +1602,11 @@ void page_spatial_sound_design(gui_obj_t *parent)
     }
     gui_img_t *button_bg = gui_img_create_from_mem(control_bg, SPATIAL_SOUND, BUTTON_BG_ELLIPSE_BIN,
                                                    button_bg_x, 0, 0, 0);
-    gui_img_t *movie = gui_img_create_from_mem(control_bg, "left", SPATIAL_SOUND_MOVIE_BIN, 25, 21, 0,
+    gui_img_t *movie = gui_img_create_from_mem(control_bg, "l", SPATIAL_SOUND_MOVIE_BIN, 25, 21, 0,
                                                0);
-    gui_img_t *music = gui_img_create_from_mem(control_bg, "mid", SPATIAL_SOUND_MUSIC_BIN, 124, 21, 0,
+    gui_img_t *music = gui_img_create_from_mem(control_bg, "m", SPATIAL_SOUND_MUSIC_BIN, 124, 21, 0,
                                                0);
-    gui_img_t *game = gui_img_create_from_mem(control_bg, "right", SPATIAL_SOUND_GAME_BIN, 223, 21, 0,
+    gui_img_t *game = gui_img_create_from_mem(control_bg, "r", SPATIAL_SOUND_GAME_BIN, 223, 21, 0,
                                               0);
     update_icon_color((void *)control_bg, spatial_sound_type);
     gui_img_a8_recolor(movie, FG_WHITE.color.argb_full);
@@ -1412,81 +1650,6 @@ void page_spatial_sound_design(gui_obj_t *parent)
     control_invalid = !f_status.spatial_sound;
 }
 
-static void press_button_page_voice_aware(void *obj)
-{
-    GUI_UNUSED(obj);
-    if (control_invalid) { return; }
-    gui_obj_t *o = GUI_BASE(obj);
-    touch_info_t *tp = tp_get_info();
-    if (tp->pressed && gui_obj_point_in_obj_rect(o, tp->x, tp->y))
-    {
-        if (strcmp(o->name, "sub") == 0)
-        {
-            if (voice_aware_val != 1)
-            {
-                pressed_l = true;
-                gui_obj_hidden(o, false);
-            }
-        }
-        else
-        {
-            if (voice_aware_val != 3)
-            {
-                pressed_r = true;
-                gui_obj_hidden(o, false);
-            }
-        }
-    }
-
-    else if (tp->pressing && (tp->deltaX != 0 || tp->deltaY != 0))
-    {
-        gui_obj_hidden(o, true);
-    }
-    else if (tp->released)
-    {
-        gui_obj_hidden(o, true);
-        if (tp->deltaX == 0 && tp->deltaY == 0)
-        {
-            int8_t compare;
-            gui_img_t *icon = (gui_img_t *)gui_list_entry(o->brother_list.next, gui_obj_t, brother_list);
-
-            if (strcmp(o->name, "sub") == 0)
-            {
-                compare = 1;
-                index_rec = voice_aware_val;
-            }
-            else
-            {
-                compare = 3;
-            }
-            if (pressed_r)
-            {
-                voice_aware_val++;
-                gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-                gui_img_set_image_data((void *)progressbar, img_data_array[voice_aware_val - 1]);
-            }
-            else if (pressed_l)
-            {
-                voice_aware_val--;
-                gui_obj_t *progressbar = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-                gui_img_set_image_data((void *)progressbar, img_data_array[voice_aware_val - 1]);
-            }
-
-            if (voice_aware_val == compare)
-            {
-                gui_img_a8_recolor(icon, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
-            }
-            else if (index_rec == compare)
-            {
-                gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
-            }
-            gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
-        }
-        pressed_r = false;
-        pressed_l = false;
-    }
-}
-
 void page_voice_aware_design(gui_obj_t *parent)
 {
     gui_color_t font_color;
@@ -1516,13 +1679,13 @@ void page_voice_aware_design(gui_obj_t *parent)
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, VOICE_AWARE, TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
-    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, &(f_status.voice_aware));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "sub", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
+    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "l", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
                                                        0);
     gui_img_t *sub = gui_img_create_from_mem(control_bg, 0, SUB_BIN, 31, 42, 0, 0);
-    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "add", BUTTON_BG_CIRCLE_BIN, 212, 6,
+    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "r", BUTTON_BG_CIRCLE_BIN, 212, 6,
                                                        0, 0);
     gui_img_t *add = gui_img_create_from_mem(control_bg, 0, ADD_BIN, 237, 31, 0, 0);
     gui_img_t *progressbar_bg = gui_img_create_from_mem(control_bg, 0, img_data_array[2], 90, 27, 0,
@@ -1594,6 +1757,59 @@ void page_voice_aware_design(gui_obj_t *parent)
     }
     gui_img_a8_mix_alpha(sub, sub->fg_color_set >> 24);
     gui_img_a8_mix_alpha(add, add->fg_color_set >> 24);
+    control_invalid = !f_status.voice_aware;
+}
+
+void page_auto_play_pause_design(gui_obj_t *parent)
+{
+    gui_color_t font_color;
+    if (theme_bg_white)
+    {
+        font_color = FG_1_LIGHT;
+    }
+    else
+    {
+        font_color = FG_1_DARK;
+    }
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, AUTO_PLAY_PAUSE, GUI_FONT_SRC_BMP, font_color, strlen(AUTO_PLAY_PAUSE), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, LEFT);
+
+    gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0,
+                                                   0);
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, AUTO_PLAY_PAUSE,
+                                                TOGGLE_BIN, TOGGLE_OFF_X,
+                                                TOGGLE_Y, 0, 0);
+    gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
+    gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED,
+                         &(f_status.auto_play_pause));
+
+    if (theme_bg_white)
+    {
+        if (f_status.auto_play_pause)
+        {
+            gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
+            gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_LIGHT.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(toggle_bg, FG_1_LIGHT.color.argb_full);
+        }
+    }
+    else
+    {
+        if (f_status.auto_play_pause)
+        {
+            gui_obj_move(GUI_BASE(toggle), TOGGLE_ON_X, TOGGLE_Y);
+            gui_img_a8_recolor(toggle_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(toggle_bg, BG_2_DARK.color.argb_full);
+        }
+    }
+    gui_img_a8_mix_alpha(toggle_bg, toggle_bg->fg_color_set >> 24);
 }
 
 /* Case settings page */
@@ -1665,15 +1881,15 @@ void page_lock_screen_design(gui_obj_t *parent)
     gui_text_set(text, LOCK_SCREEN, GUI_FONT_SRC_BMP, font_color, strlen(LOCK_SCREEN), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
-    gui_win_t *win_l = gui_win_create(parent, "switch_l", 18, 98, 78, 78);
-    gui_win_t *win_r = gui_win_create(parent, "switch_r", 224, 98, 78, 78);
+    gui_win_t *win_l = gui_win_create(parent, "l", 18, 98, 78, 78);
+    gui_win_t *win_r = gui_win_create(parent, "r", 224, 98, 78, 78);
     gui_img_t *switch_l = gui_img_create_from_mem(win_l, 0, SWITCH_L_BIN, 29, 26, 0, 0);
     gui_img_t *switch_r = gui_img_create_from_mem(win_r, 0, SWITCH_R_BIN, 29, 26, 0, 0);
     gui_obj_add_event_cb(win_l, click_button_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(win_r, click_button_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_img_t *clock = gui_img_create_from_mem(parent, 0, img_data_array[clock_style], 96, 97, 0, 0);
-    gui_img_set_mode(clock, IMG_BYPASS_MODE);
+    gui_img_set_mode(clock, IMG_2D_SW_SRC_OVER_MODE);
     gui_obj_add_event_cb(clock, click_clock_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     if (theme_bg_white)
@@ -1728,7 +1944,8 @@ void page_notification_design(gui_obj_t *parent)
                                                              TOGGLE_BIN, TOGGLE_OFF_X,
                                                              TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle_notification, FG_1_DARK.color.argb_full);
-    gui_obj_add_event_cb(toggle_notification_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(toggle_notification_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED,
+                         &(f_status.notification));
 
     gui_img_t *toggle_message_bg = NULL;
     gui_img_t *toggle_message = NULL;
@@ -1744,7 +1961,8 @@ void page_notification_design(gui_obj_t *parent)
                                                  TOGGLE_Y, 0, 0);
         gui_img_a8_recolor(toggle_message, FG_1_DARK.color.argb_full);
 
-        gui_obj_add_event_cb(toggle_message_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        gui_obj_add_event_cb(toggle_message_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED,
+                             &(f_status.message_preview));
     }
 
     if (theme_bg_white)
@@ -1819,10 +2037,10 @@ void page_screen_brightness_design(gui_obj_t *parent)
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "sub", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
+    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "l", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
                                                        0);
     gui_img_t *sub = gui_img_create_from_mem(control_bg, 0, SUB_BIN, 31, 42, 0, 0);
-    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "add", BUTTON_BG_CIRCLE_BIN, 212, 6,
+    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "r", BUTTON_BG_CIRCLE_BIN, 212, 6,
                                                        0, 0);
     gui_img_t *add = gui_img_create_from_mem(control_bg, 0, ADD_BIN, 237, 31, 0, 0);
     gui_img_t *progressbar_bg = gui_img_create_from_mem(control_bg, 0, img_data_array[2], 90, 27, 0,
@@ -1925,8 +2143,207 @@ void page_time_format_design(gui_obj_t *parent)
 }
 
 /* Tools page */
+void page_find_buds_design(gui_obj_t *parent)
+{
+    gui_color_t font_color;
+    if (theme_bg_white)
+    {
+        font_color = FG_1_LIGHT;
+    }
+    else
+    {
+        font_color = FG_1_DARK;
+    }
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, FIND_MY_BUDS, GUI_FONT_SRC_BMP, font_color, strlen(FIND_MY_BUDS), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, LEFT);
+
+    gui_img_t *button_bg_l = gui_img_create_from_mem(parent, "l", BUTTON_BG_ELLIPSE_134_66_BIN, 12, 92,
+                                                     0, 0);
+    gui_img_t *button_bg_r = gui_img_create_from_mem(parent, "r", BUTTON_BG_ELLIPSE_134_66_BIN, 174, 92,
+                                                     0, 0);
+    gui_img_t *icon_l = gui_img_create_from_mem(button_bg_l, 0, ICON_L_BIN, 58, 21, 0, 0);
+    gui_img_t *icon_r = gui_img_create_from_mem(button_bg_r, 0, ICON_R_BIN, 58, 21, 0, 0);
+    gui_obj_add_event_cb(button_bg_l, click_button_page_find_buds, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(button_bg_r, click_button_page_find_buds, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    if (f_status.earbuds_shock_l)
+    {
+        gui_img_set_image_data(icon_l, TIMER_PAUSE_BIN);
+        gui_img_refresh_size(icon_l);
+    }
+    else if (f_status.earbuds_in_ear_l)
+    {
+        gui_img_t *note = gui_img_create_from_mem(parent, 0, ICON_NOTE_BIN, 44, 162, 0, 0);
+        gui_img_set_mode(note, IMG_2D_SW_SRC_OVER_MODE);
+
+        gui_text_t *text = gui_text_create(parent, 0, 68, 163, 50, 20);
+        gui_text_set(text, "In ear", GUI_FONT_SRC_BMP, FG_WARNING, 7, 20);
+        gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(text, LEFT);
+    }
+    if (f_status.earbuds_shock_r)
+    {
+        gui_img_set_image_data(icon_r, TIMER_PAUSE_BIN);
+        gui_img_refresh_size(icon_r);
+    }
+    else if (f_status.earbuds_in_ear_r)
+    {
+        gui_img_t *note = gui_img_create_from_mem(parent, 0, ICON_NOTE_BIN, 204, 162, 0, 0);
+        gui_img_set_mode(note, IMG_2D_SW_SRC_OVER_MODE);
+
+        gui_text_t *text = gui_text_create(parent, 0, 228, 163, 50, 20);
+        gui_text_set(text, "In ear", GUI_FONT_SRC_BMP, FG_WARNING, 7, 20);
+        gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(text, LEFT);
+    }
+
+    if (theme_bg_white)
+    {
+        if (f_status.earbuds_shock_l)
+        {
+            gui_img_a8_recolor(button_bg_l, BG_THEME2_MID_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_l, FG_THEME2_LIGHT.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(button_bg_l, BG_THEME2_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_l, FG_1_LIGHT.color.argb_full);
+        }
+        if (f_status.earbuds_shock_r)
+        {
+            gui_img_a8_recolor(button_bg_r, BG_THEME2_MID_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_r, FG_THEME2_LIGHT.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(button_bg_r, BG_THEME2_BRIGHT_LIGHT.color.argb_full);
+            gui_img_a8_recolor(icon_r, FG_1_LIGHT.color.argb_full);
+        }
+    }
+    else
+    {
+        if (f_status.earbuds_shock_l)
+        {
+            gui_img_a8_recolor(button_bg_l, BG_THEME2_MID_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_l, FG_THEME2_DARK.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(button_bg_l, BG_THEME2_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_l, FG_1_DARK.color.argb_full);
+        }
+        if (f_status.earbuds_shock_r)
+        {
+            gui_img_a8_recolor(button_bg_r, BG_THEME2_MID_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_r, FG_THEME2_DARK.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(button_bg_r, BG_THEME2_BRIGHT_DARK.color.argb_full);
+            gui_img_a8_recolor(icon_r, FG_1_DARK.color.argb_full);
+        }
+    }
+}
+
+void page_timer_design(gui_obj_t *parent)
+{
+    gui_color_t font_color;
+    if (theme_bg_white)
+    {
+        font_color = FG_1_LIGHT;
+    }
+    else
+    {
+        font_color = FG_1_DARK;
+    }
+
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, TIMER, GUI_FONT_SRC_BMP, font_color, strlen(TIMER), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, LEFT);
+
+    gui_img_t *play_bg = gui_img_create_from_mem(parent, 0, BUTTON_BG_ELLIPSE_64_40_BIN, 244, 40, 0, 0);
+    gui_img_t *play = gui_img_create_from_mem(play_bg, 0, TIMER_PLAY_BIN, 24, 10, 0, 0);
+    gui_obj_add_event_cb(play_bg, click_button_page_timer, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
+    gui_img_t *button_sub_bg = gui_img_create_from_mem(control_bg, "l", BUTTON_BG_CIRCLE_BIN, 6, 6, 0,
+                                                       0);
+    gui_img_t *sub = gui_img_create_from_mem(control_bg, 0, SUB_BIN, 31, 42, 0, 0);
+    gui_img_t *button_add_bg = gui_img_create_from_mem(control_bg, "r", BUTTON_BG_CIRCLE_BIN, 212, 6,
+                                                       0, 0);
+    gui_img_t *add = gui_img_create_from_mem(control_bg, 0, ADD_BIN, 237, 31, 0, 0);
+
+    text = gui_text_create(control_bg, 0, 30, 0, 266, 90);
+    gui_text_set(text, "min", GUI_FONT_SRC_BMP, font_color, 3, 20);
+    gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, MID_CENTER);
+    sprintf(timer_max_str, "%d", timer_max_min_val);
+    text = gui_text_create(control_bg, 0, -15, 0, 296, 90);
+    gui_text_set(text, timer_max_str, GUI_FONT_SRC_BMP, font_color, strlen(timer_max_str), 32);
+    gui_text_type_set(text, CAPTION_1_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, MID_CENTER);
+
+    gui_obj_hidden((void *)button_sub_bg, 1);
+    gui_obj_hidden((void *)button_add_bg, 1);
+    gui_obj_create_timer(GUI_BASE(button_sub_bg), 10, true, press_button_page_timer);
+    gui_obj_create_timer(GUI_BASE(button_add_bg), 10, true, press_button_page_timer);
+    gui_obj_add_event_cb(button_sub_bg, click_button_no_action, GUI_EVENT_TOUCH_LONG, NULL);
+    gui_obj_add_event_cb(button_add_bg, click_button_no_action, GUI_EVENT_TOUCH_LONG, NULL);
+
+    if (theme_bg_white)
+    {
+        gui_img_a8_recolor(play_bg, BG_THEME2_BRIGHT_LIGHT.color.argb_full);
+        gui_img_a8_recolor(play, FG_WHITE.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME2_DARK_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_sub_bg, BG_THEME2_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(button_add_bg, BG_THEME2_MID_LIGHT.color.argb_full);
+        gui_img_a8_recolor(sub, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(add, FG_1_LIGHT.color.argb_full);
+    }
+    else
+    {
+        gui_img_a8_recolor(play_bg, BG_THEME2_BRIGHT_DARK.color.argb_full);
+        gui_img_a8_recolor(play, FG_WHITE.color.argb_full);
+        gui_img_a8_recolor(control_bg, BG_THEME2_DARK_DARK.color.argb_full);
+        gui_img_a8_recolor(button_sub_bg, BG_THEME2_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(button_add_bg, BG_THEME2_MID_DARK.color.argb_full);
+        gui_img_a8_recolor(sub, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(add, FG_1_DARK.color.argb_full);
+    }
+    gui_img_a8_mix_alpha(sub, sub->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(add, add->fg_color_set >> 24);
+}
+
+void page_flashlight_design(gui_obj_t *parent)
+{
+    gui_color_t font_color;
+    if (theme_bg_white)
+    {
+        font_color = FG_1_LIGHT;
+    }
+    else
+    {
+        font_color = FG_1_DARK;
+    }
+
+    gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
+    gui_text_set(text, FLASHLIGHT, GUI_FONT_SRC_BMP, font_color, strlen(FLASHLIGHT), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, LEFT);
+
+    gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
+    gui_img_t *icon = gui_img_create_from_mem(control_bg, 0, ICON_FLASHLIGHT_ON_BIN, 138, 28, 0, 0);
+    gui_img_a8_recolor(control_bg,
+                       theme_bg_white ? BG_THEME2_BRIGHT_LIGHT.color.argb_full : BG_THEME2_BRIGHT_DARK.color.argb_full);
+    gui_img_a8_recolor(icon, FG_WHITE.color.argb_full);
+    gui_obj_add_event_cb(control_bg, click_button_page_flashlight, GUI_EVENT_TOUCH_CLICKED, NULL);
+}
+
 void page_qrcode_design(gui_obj_t *parent)
 {
     gui_img_t *img = gui_img_create_from_mem(parent, 0, QRCODE_BIN, 104, 40, 0, 0);
-    gui_img_set_mode(img, IMG_BYPASS_MODE);
+    gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
 }

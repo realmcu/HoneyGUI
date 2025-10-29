@@ -37,6 +37,7 @@
 /* VIEW */
 const static gui_view_descriptor_t *test_view = NULL;
 const static gui_view_descriptor_t *clock_view = NULL;
+const static gui_view_descriptor_t *menu_view = NULL;
 
 /* FPS */
 static char fps[10];
@@ -48,6 +49,10 @@ static char low_mem_string[20];
 unsigned char *resource_root = NULL;
 #endif
 
+static uint8_t click_cnt = 0;
+static uint32_t last_click_time = 0;
+static uint16_t sleep_cnt = 0;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -56,6 +61,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     /* you can get other view descriptor point here */
     test_view = gui_view_descriptor_get("quick_view");
     clock_view = gui_view_descriptor_get("clock_view");
+    menu_view = gui_view_descriptor_get("menu_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -110,16 +116,55 @@ static void fps_create(void *parent)
     gui_text_type_set(low_mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
 }
 
+static void timer_touch_cb(void *param)
+{
+    GUI_UNUSED(param);
+    kb_info_t *kb = kb_get_info();
+    touch_info_t *tp = tp_get_info();
 
-// Update the watch time and the JSON data
+    if (click_cnt != 0 && (touchpad_get_data()->timestamp_ms - last_click_time) > 200)
+    {
+        switch (click_cnt)
+        {
+        case 1 :
+            break;
+        case 2 :
+            {
+                gui_view_set_animate_step(gui_view_get_current(), 400);
+                gui_view_switch_direct(gui_view_get_current(), test_view, SWITCH_OUT_NONE_ANIMATION,
+                                       SWITCH_IN_NONE_ANIMATION);
+            }
+            break;
+        default:
+            break;
+        }
+        click_cnt = 0;
+        return;
+    }
+
+    if (kb->pressed)
+    {
+        gui_view_set_animate_step(gui_view_get_current(), 400);
+        gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_IN_NONE_ANIMATION);
+    }
+    if (tp->pressed || tp->pressing)
+    {
+        sleep_cnt = 0;
+    }
+}
+
+// Update the watch time
 static void time_update_cb(void *param)
 {
     GUI_UNUSED(param);
-    touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
 
-    static uint32_t sleep_cnt = 0;
-    sleep_cnt += 20;
+    sleep_cnt++;
+    if (f_status.timer && timer_val != 0)
+    {
+        timer_val--;
+        sprintf(timer_str, "%02d:%02d", timer_val / 60, timer_val % 60);
+    }
 
 #if defined __WIN32
     time_t rawtime;
@@ -138,19 +183,46 @@ static void time_update_cb(void *param)
     }
 #endif
 
-    if (sleep_cnt >= 10000 || kb->pressed) //10s
+    if (sleep_cnt >= 3000) //3000s
     {
         sleep_cnt = 0;
-        gui_view_t *view = gui_view_get_current();
-        if (view->descriptor != clock_view)
+        if (f_status.timer)
         {
-            gui_view_switch_direct(view, clock_view, SWITCH_OUT_NONE_ANIMATION,
-                                   SWITCH_IN_ANIMATION_FADE);
+            extern const gui_view_descriptor_t *timer_descriptor_rec;
+            timer_descriptor_rec = clock_view;
+            return;
         }
+        gui_view_set_animate_step(gui_view_get_current(), 400);
+        gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_IN_NONE_ANIMATION);
     }
-    else if (tp->pressed || tp->pressing)
+}
+
+static void touch_long_cb(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_view_set_animate_step(gui_view_get_current(), 400);
+    detail_page_design_func = page_dark_light_design;
+    gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+}
+
+static void click_cb(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_touch_port_data_t *touch_data = touchpad_get_data();
+    if (click_cnt == 0)
     {
-        sleep_cnt = 0;
+        click_cnt++;
+        last_click_time = touch_data->timestamp_ms;
+    }
+    else if (click_cnt == 1 && (touch_data->timestamp_ms - last_click_time) < 200)
+    {
+        click_cnt++;
     }
 }
 
@@ -167,15 +239,23 @@ static int app_init(void)
     detail_page_design_func = page_dark_light_design;
     timeinfo = &barn_time;
 
-    // f_status.bt = 1;
+    f_status.bt = BT_CONNECT;
+    f_status.music_input = 1;
+    f_status.earbuds_connect_l = 1;
+    f_status.earbuds_connect_r = 1;
+    f_status.notification_new = 1;
+    f_status.earbuds_in_ear_l = 1;
+    f_status.earbuds_in_ear_r = 1;
+    // f_status.call = 1;
+    gui_win_t *win_touch = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
+    gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_TOUCH_LONG, NULL);
+    gui_obj_add_event_cb(win_touch, click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_create_timer(GUI_BASE(win_touch), 10, true, timer_touch_cb);
 
-    gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
+    gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());
-    gui_obj_create_timer(GUI_BASE(win), 100, true, time_update_cb);
-    gui_obj_start_timer(GUI_BASE(win));
-    time_update_cb(NULL);
-
-    gui_view_create(win, test_view, 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win_view), 1000, true, time_update_cb);
+    gui_view_create(win_view, test_view, 0, 0, 0, 0);
 
     return 0;
 }

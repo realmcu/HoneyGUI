@@ -137,7 +137,7 @@ static void time_update(void *obj)
     }
 
 }
-
+#if 0
 static void clock1_bg_update(void *obj)
 {
     GUI_UNUSED(obj);
@@ -225,7 +225,7 @@ static void clock5_bg_update(void *obj)
     gui_img_a8_recolor((void *)hour, GUI_COLOR_ARGB8888(0xFF, r, g, b));
 
 }
-
+#endif
 static void clock1_design(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
@@ -239,8 +239,8 @@ static void clock1_design(gui_view_t *view)
     gui_img_t *img = gui_img_create_from_mem(parent, 0, CLOCK1_NUM_12_BIN, 144, 6, 0, 0);
     gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
     gui_img_a8_fix_bg(img, SCREEN_BG_DARK.color.argb_full);
-    gui_obj_create_timer(GUI_BASE(img), 1000, true, clock1_bg_update);
-    gui_obj_start_timer(GUI_BASE(img));
+    // gui_obj_create_timer(GUI_BASE(img), 1000, true, clock1_bg_update);
+    // gui_obj_start_timer(GUI_BASE(img));
     img = gui_img_create_from_mem(parent, 0, CLOCK1_NUM_6_BIN, 151, 168, 0, 0);
     gui_img_a8_recolor(img, theme_color_array[theme_color_index]);
     gui_img_a8_fix_bg(img, SCREEN_BG_DARK.color.argb_full);
@@ -294,7 +294,7 @@ static void clock2_design(gui_view_t *view)
     gui_img_a8_recolor(m_decimal, theme_color_array[theme_color_index]);
     gui_img_a8_recolor(m_single, theme_color_array[theme_color_index]);
 
-    gui_obj_create_timer(GUI_BASE(m_decimal), 1000, true, clock2_bg_update);
+    // gui_obj_create_timer(GUI_BASE(m_decimal), 1000, true, clock2_bg_update);
 }
 
 static void clock3_design(gui_view_t *view)
@@ -305,8 +305,8 @@ static void clock3_design(gui_view_t *view)
     gui_img_a8_recolor(vec, FG_1_DARK.color.argb_full);
     gui_img_a8_fix_bg(vec, theme_color_array[theme_color_index]);
     gui_img_set_mode(vec, IMG_2D_SW_FIX_A8_BGFG);
-    gui_obj_create_timer(GUI_BASE(vec), 1000, true, clock3_bg_update);
-    gui_obj_start_timer(GUI_BASE(vec));
+    // gui_obj_create_timer(GUI_BASE(vec), 1000, true, clock3_bg_update);
+    // gui_obj_start_timer(GUI_BASE(vec));
 
     // time hands
     gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK3_MIN_BIN, 160, 100, 0, 0);
@@ -373,8 +373,8 @@ static void clock4_design(gui_view_t *view)
 
     // gui_obj_create_timer(GUI_BASE(mask), 1000, true, clock4_bg_update);
     // gui_obj_start_timer(GUI_BASE(mask));
-    gui_obj_create_timer(GUI_BASE(vec), 1000, true, clock4_bg_update);
-    gui_obj_start_timer(GUI_BASE(vec));
+    // gui_obj_create_timer(GUI_BASE(vec), 1000, true, clock4_bg_update);
+    // gui_obj_start_timer(GUI_BASE(vec));
 }
 
 static void clock5_design(gui_view_t *view)
@@ -384,8 +384,8 @@ static void clock5_design(gui_view_t *view)
     gui_img_t *bg = gui_img_create_from_mem(parent, "bg", CLOCK5_BG_BIN, 109, 49, 0, 0);
     gui_img_a8_recolor(bg, theme_color_array[theme_color_index]);
     gui_img_a8_fix_bg(bg, GUI_COLOR_ARGB8888(255, 0, 0, 0));
-    gui_obj_create_timer(GUI_BASE(bg), 1000, true, clock5_bg_update);
-    gui_obj_start_timer(GUI_BASE(bg));
+    // gui_obj_create_timer(GUI_BASE(bg), 1000, true, clock5_bg_update);
+    // gui_obj_start_timer(GUI_BASE(bg));
 
     // time hands
     gui_img_t *img = gui_img_create_from_mem(parent, "min", CLOCK5_MIN_BIN, 160, 100, 0, 0);

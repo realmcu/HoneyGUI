@@ -48,12 +48,27 @@ void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
     // page_lock_screen_design,
     // page_notification_design,
-    // page_playback_design,
-    page_voice_aware_design,
+    page_playback_design,
+    // page_auto_play_pause_design,
+    // page_voice_aware_design,
+    // page_find_buds_design,
+    // page_timer_design,
+    // page_flashlight_design,
+    page_dark_light_design,
     page_spatial_sound_design,
     // page_volume_design,
     page_ambient_sound_design,
-    page_equalizer_design,
+    // page_equalizer_design,
+};
+
+static const char *codec_type[6] =
+{
+    "SBC",
+    "AAC",
+    "LC3",
+    "LC3+",
+    "LDAC",
+    "PCM"
 };
 
 /*============================================================================*
@@ -201,62 +216,220 @@ static void quick_view_design(gui_view_t *view)
     }
     else
     {
+        gui_set_bg_color(SCREEN_BG_DARK);
         font_color = FG_1_DARK;
     }
     create_indicator(parent);
 
-    gui_img_t *bt = gui_img_create_from_mem(parent, 0, BLUETOOTH_BIN, 12, 13, 0, 0);
-    gui_img_t *home_bg = gui_img_create_from_mem(parent, 0, STATUSBAR_HOME_BG_BIN, 131, 10, 0, 0);
-    gui_img_t *barn_inner = gui_img_create_from_mem(home_bg, 0, BARN_INNER_BIN, 23, 6, 0, 0);
-    gui_img_t *barn_outer = gui_img_create_from_mem(home_bg, 0, BARN_OUTER_BIN, 20, 3, 0, 0);
-    gui_img_t *earphone_l = gui_img_create_from_mem(home_bg, 0, EARPLUG_L_BIN, 7, 3, 0, 0);
-    gui_img_t *earphone_r = gui_img_create_from_mem(home_bg, 0, EARPLUG_R_BIN, 42, 3, 0, 0);
+    gui_img_t *bt = gui_img_create_from_mem(parent, 0, ICON_BT_CONNECT_BIN, 12, 13, 0, 0);
 
-    gui_text_t *text = gui_text_create(parent, 0, 25, 6, 50, 28);
-    gui_text_set(text, "AAC", GUI_FONT_SRC_BMP, font_color, 3, 28);
-    gui_text_type_set(text, CAPTION_2_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(text, LEFT);
-    text = gui_text_create(parent, 0, 200, 13, 110, 15);
+    int pos_x = 28;
+
+    if (f_status.bt != BT_UNKNOWN)
+    {
+        gui_text_t *text = gui_text_create(parent, 0, pos_x, 12, 32, 20);
+        gui_text_set(text, (void *)codec_type[codec_type_index], GUI_FONT_SRC_BMP, font_color,
+                     strlen(codec_type[codec_type_index]), 20);
+        gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(text, LEFT);
+        pos_x += 36;
+    }
+    else
+    {
+        f_status.earbuds_connect_l = 0;
+        f_status.earbuds_connect_r = 0;
+    }
+    if (f_status.notification_new)
+    {
+        gui_img_t *icon = gui_img_create_from_mem(parent, 0, ICON_MESSAGE_SMALL_BIN, pos_x, 14, 0, 0);
+        gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
+        pos_x += 22;
+    }
+    if (f_status.call)
+    {
+        gui_img_t *icon = gui_img_create_from_mem(parent, 0, ICON_CALL_BIN, pos_x, 13, 0, 0);
+        gui_img_a8_recolor(icon, FG_NORMAL.color.argb_full);
+        pos_x += 20;
+    }
+    if (f_status.timer)
+    {
+        gui_img_t *icon = gui_img_create_from_mem(parent, 0, ICON_TIMER_SMALL_BIN, pos_x, 13, 0, 0);
+        gui_img_a8_recolor(icon, theme_bg_white ? FG_THEME2_LIGHT.color.argb_full :
+                           FG_THEME2_DARK.color.argb_full);
+    }
+
+    gui_text_t *text = gui_text_create(parent, 0, 200, 13, 110, 15);
     gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 20);
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
     gui_text_mode_set(text, RIGHT);
 
+    gui_img_t *home_bg = gui_img_create_from_mem(parent, 0, STATUSBAR_HOME_BG_BIN, 131, 12, 0, 0);
+    gui_img_t *barn_inner = gui_img_create_from_mem(home_bg, 0, BARN_INNER_BIN, 23, 6, 0, 0);
+    gui_img_t *barn_outer = gui_img_create_from_mem(home_bg, 0, BARN_OUTER_BIN, 20, 3, 0, 0);
+    gui_img_t *earbuds_connect_l = gui_img_create_from_mem(home_bg, 0, EARPLUG_L_BIN, 7, 3, 0, 0);
+    gui_img_t *earbuds_connect_r = gui_img_create_from_mem(home_bg, 0, EARPLUG_R_BIN, 42, 3, 0, 0);
+
     if (theme_bg_white)
     {
-        if (f_status.bt)
+        if (f_status.bt == 0)
+        {
+            gui_img_set_image_data(bt, ICON_BT_DISCONNECT_BIN);
+            gui_img_refresh_size(bt);
+            gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
+        }
+        else if (f_status.bt == 1)
         {
             gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
         }
         else
         {
             gui_img_a8_recolor(bt, FG_2_LIGHT.color.argb_full);
-            gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
         }
 
         gui_img_a8_recolor(home_bg, BG_2_LIGHT.color.argb_full);
-        gui_img_a8_recolor(barn_inner, FG_1_LIGHT.color.argb_full);
-        gui_img_a8_recolor(barn_outer, FG_1_LIGHT.color.argb_full);
-        gui_img_a8_recolor(earphone_l, FG_1_LIGHT.color.argb_full);
-        gui_img_a8_recolor(earphone_r, FG_1_LIGHT.color.argb_full);
+        {
+            uint32_t color;
+            if (battery_barn_val > 50)
+            {
+                color = FG_1_LIGHT.color.argb_full;
+            }
+            else if (battery_barn_val > 10)
+            {
+                color = FG_THEME1_LIGHT.color.argb_full;
+            }
+            else
+            {
+                color = FG_WARNING.color.argb_full;
+            }
+            gui_img_a8_recolor(barn_inner, color);
+            gui_img_a8_recolor(barn_outer, color);
+        }
+
+        if (f_status.earbuds_connect_l)
+        {
+            uint32_t color;
+            if (battery_earbuds_connect_l_val > 50)
+            {
+                color = FG_1_LIGHT.color.argb_full;
+            }
+            else if (battery_earbuds_connect_l_val > 10)
+            {
+                color = FG_THEME1_LIGHT.color.argb_full;
+            }
+            else
+            {
+                color = FG_WARNING.color.argb_full;
+            }
+            gui_img_a8_recolor(earbuds_connect_l, color);
+        }
+        else
+        {
+            gui_img_a8_recolor(earbuds_connect_l, FG_2_LIGHT.color.argb_full);
+        }
+        if (f_status.earbuds_connect_r)
+        {
+            uint32_t color;
+            if (battery_earbuds_connect_r_val > 50)
+            {
+                color = FG_1_LIGHT.color.argb_full;
+            }
+            else if (battery_earbuds_connect_r_val > 10)
+            {
+                color = FG_THEME1_LIGHT.color.argb_full;
+            }
+            else
+            {
+                color = FG_WARNING.color.argb_full;
+            }
+            gui_img_a8_recolor(earbuds_connect_r, color);
+        }
+        else
+        {
+            gui_img_a8_recolor(earbuds_connect_r, FG_2_LIGHT.color.argb_full);
+        }
     }
     else
     {
-        if (f_status.bt)
+        if (f_status.bt == 0)
+        {
+            gui_img_set_image_data(bt, ICON_BT_DISCONNECT_BIN);
+            gui_img_refresh_size(bt);
+            gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
+        }
+        else if (f_status.bt == 1)
         {
             gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
         }
         else
         {
             gui_img_a8_recolor(bt, FG_2_DARK.color.argb_full);
-            gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
         }
+
         gui_img_a8_recolor(home_bg, BG_2_DARK.color.argb_full);
-        gui_img_a8_recolor(barn_inner, FG_1_DARK.color.argb_full);
-        gui_img_a8_recolor(barn_outer, FG_1_DARK.color.argb_full);
-        gui_img_a8_recolor(earphone_l, FG_1_DARK.color.argb_full);
-        gui_img_a8_recolor(earphone_r, FG_1_DARK.color.argb_full);
+        {
+            uint32_t color;
+            if (battery_barn_val > 50)
+            {
+                color = FG_1_DARK.color.argb_full;
+            }
+            else if (battery_barn_val > 10)
+            {
+                color = FG_THEME1_DARK.color.argb_full;
+            }
+            else
+            {
+                color = FG_WARNING.color.argb_full;
+            }
+            gui_img_a8_recolor(barn_inner, color);
+            gui_img_a8_recolor(barn_outer, color);
+        }
+        if (f_status.earbuds_connect_l)
+        {
+            uint32_t color;
+            if (battery_earbuds_connect_l_val > 50)
+            {
+                color = FG_1_DARK.color.argb_full;
+            }
+            else if (battery_earbuds_connect_l_val > 10)
+            {
+                color = FG_THEME1_DARK.color.argb_full;
+            }
+            else
+            {
+                color = FG_WARNING.color.argb_full;
+            }
+            gui_img_a8_recolor(earbuds_connect_l, color);
+        }
+        else
+        {
+            gui_img_a8_recolor(earbuds_connect_l, FG_2_DARK.color.argb_full);
+        }
+        if (f_status.earbuds_connect_r)
+        {
+            uint32_t color;
+            if (battery_earbuds_connect_r_val > 50)
+            {
+                color = FG_1_DARK.color.argb_full;
+            }
+            else if (battery_earbuds_connect_r_val > 10)
+            {
+                color = FG_THEME1_DARK.color.argb_full;
+            }
+            else
+            {
+                color = FG_WARNING.color.argb_full;
+            }
+            gui_img_a8_recolor(earbuds_connect_r, color);
+        }
+        else
+        {
+            gui_img_a8_recolor(earbuds_connect_r, FG_2_DARK.color.argb_full);
+        }
     }
+    gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(earbuds_connect_l, earbuds_connect_l->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(earbuds_connect_r, earbuds_connect_r->fg_color_set >> 24);
     if (quick_page_num)
     {
         update_page_indicator();

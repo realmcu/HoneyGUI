@@ -80,9 +80,9 @@ bool theme_bg_white = false; // default black bg
 int8_t volume_val = 0; // [0, 10]
 
 /* Battery */
-uint8_t battery_barn_val = 90;
-uint8_t battery_earphone_l_val = 90;
-uint8_t battery_earphone_r_val = 90;
+uint8_t battery_barn_val = 30; //[0,100]
+uint8_t battery_earbuds_connect_l_val = 10;
+uint8_t battery_earbuds_connect_r_val = 20;
 
 /* Message */
 uint8_t message_num_val = 10;
@@ -97,10 +97,18 @@ int8_t screen_brightness_val = 1; // [1, 3]
 uint8_t smart_talk_time_type = 0; // 0: 5s, 1: 15s, 2: 20s
 
 /* Ambient sound type */
-uint8_t ambient_sound_type = ANC;
+AMBIENT_SOUND_TYPE ambient_sound_type = ANC;
 
 /* Spatial sound type */
-uint8_t spatial_sound_type = SPATIAL_SOUND_MOVIE;
+SPATIAL_SOUND_TYPE spatial_sound_type = SPATIAL_SOUND_MOVIE;
 
-/* Voice Aware */
+/* Voice aware */
 int8_t voice_aware_val = 2; // [1, 3]
+
+/* Codec type index */
+uint8_t codec_type_index = AAC; // [0, 5]
+
+/* Timer */
+int8_t timer_max_min_val = 5; // minutes [1, 60]
+uint16_t timer_val = 0; // seconds
+char timer_str[6] = {0};

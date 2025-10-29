@@ -16,7 +16,13 @@ extern "C" {
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-#define QUICK_PAGE_NUM_MAX 4
+#define QUICK_PAGE_NUM_MAX  4
+#define SCROLL_BAR_S_H      25
+#define SCROLL_BAR_M_H      50
+#define SCROLL_BAR_L_H      75
+#define SCROLL_BAR_BG_H     100
+
+
 
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT(obj != NULL);GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
 
@@ -50,12 +56,13 @@ extern int8_t quick_page_num;
 extern void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent);
 
 /* Battery */
-extern char battery_earphone_l_str[4];
-extern char battery_earphone_r_str[4];
+extern char battery_earbuds_connect_l_str[4];
+extern char battery_earbuds_connect_r_str[4];
 extern char battery_barn_str[4];
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/
+void regenerate_current_view(void *msg);
 
 /* Page design */
 void page_playback_design(gui_obj_t *parent);
@@ -65,6 +72,7 @@ void page_ambient_sound_design(gui_obj_t *parent);
 void page_smart_talk_design(gui_obj_t *parent);
 void page_spatial_sound_design(gui_obj_t *parent);
 void page_voice_aware_design(gui_obj_t *parent);
+void page_auto_play_pause_design(gui_obj_t *parent);
 
 void page_dark_light_design(gui_obj_t *parent);
 void page_lock_screen_design(gui_obj_t *parent);
@@ -72,6 +80,10 @@ void page_qrcode_design(gui_obj_t *parent);
 void page_notification_design(gui_obj_t *parent);
 void page_screen_brightness_design(gui_obj_t *parent);
 void page_time_format_design(gui_obj_t *parent);
+
+void page_find_buds_design(gui_obj_t *parent);
+void page_timer_design(gui_obj_t *parent);
+void page_flashlight_design(gui_obj_t *parent);
 
 #ifdef __cplusplus
 }

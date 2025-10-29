@@ -143,15 +143,12 @@ static void detail_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
     gui_view_t *view_c = gui_view_get_current();
-    if (view_c && strcmp(view_c->descriptor->name, "clock_view"))
+    if (view_c && strcmp(view_c->descriptor->name, "timer_view") &&
+        strcmp(view_c->descriptor->name, "flashlight_view"))
     {
         descriptor_rec = view_c->descriptor;
     }
     gui_obj_t *parent = GUI_BASE(view);
-    if (theme_bg_white)
-    {
-        gui_set_bg_color(SCREEN_BG_LIGHT);
-    }
 
     gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 52, 52);
     gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 0, 0, 0);
@@ -170,6 +167,7 @@ static void detail_view_design(gui_view_t *view)
 
     if (theme_bg_white)
     {
+        gui_set_bg_color(SCREEN_BG_LIGHT);
         gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
         if (!is_favorite)
         {
@@ -178,6 +176,7 @@ static void detail_view_design(gui_view_t *view)
     }
     else
     {
+        gui_set_bg_color(SCREEN_BG_DARK);
         gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
         if (!is_favorite)
         {

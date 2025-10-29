@@ -31,7 +31,7 @@ typedef struct note_design_param
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
-static void audio_menu_view_design(gui_view_t *view);
+static void tools_menu_view_design(gui_view_t *view);
 static void clear(gui_view_t *view);
 
 /*============================================================================*
@@ -46,7 +46,7 @@ static gui_view_descriptor_t const descriptor =
     /* change Here for current view */
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
-    .on_switch_in = audio_menu_view_design,
+    .on_switch_in = tools_menu_view_design,
     .on_switch_out = clear,
 };
 
@@ -149,10 +149,15 @@ static void note_design(gui_obj_t *obj, void *p)
 static void list_timer_cb(void *obj)
 {
     gui_list_t *list = (gui_list_t *)obj;
-    list_offset_his = list->offset;
+    int list_offset_his = list->offset;
+    int range = list->base.h - list->total_length;
+    int t_y = list_offset_his * (SCROLL_BAR_BG_H - SCROLL_BAR_L_H) / range;
+    gui_obj_t *scrollbar = gui_list_entry(GUI_BASE(obj)->parent->child_list.prev, gui_obj_t,
+                                          brother_list);
+    gui_img_translate((void *)scrollbar, 0, t_y);
 }
 
-static void audio_menu_view_design(gui_view_t *view)
+static void tools_menu_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
 
@@ -172,9 +177,9 @@ static void audio_menu_view_design(gui_view_t *view)
     int array_size = sizeof(text_array) / sizeof(text_array[0]);
     void *page_design[] =
     {
-        NULL,
-        NULL,
-        NULL,
+        page_find_buds_design,
+        page_timer_design,
+        page_flashlight_design,
         page_qrcode_design,
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
@@ -218,6 +223,11 @@ static void audio_menu_view_design(gui_view_t *view)
 
     gui_img_t *icon_back = gui_img_create_from_mem(parent, 0, ICON_BACK_BIN, 0, 8, 0, 0);
     gui_obj_add_event_cb(icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
+
+    gui_img_t *scrollbar_bg = gui_img_create_from_mem(parent, 0, SCROLLBAR_BG_BIN, 310, 62, 0, 0);
+    gui_img_t *scrollbar = gui_img_create_from_mem(parent, 0, SCROLLBAR_L_BIN, 310, 62, 0, 0);
+    gui_img_a8_recolor(scrollbar_bg, FG_WHITE.color.argb_full);
+    gui_img_a8_recolor(scrollbar, FG_WHITE.color.argb_full);
 
     if (theme_bg_white)
     {

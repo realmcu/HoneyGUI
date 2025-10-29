@@ -201,6 +201,7 @@ static void menu_view_design(gui_view_t *view)
     }
     else
     {
+        gui_set_bg_color(SCREEN_BG_DARK);
         font_color = FG_1_DARK;
     }
     gui_text_t *title = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);

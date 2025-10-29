@@ -18,20 +18,43 @@ extern "C" {
  *============================================================================*/
 struct FUNCTION_STATUS
 {
-    uint32_t bt                 : 1;
+    bool equalizer          ;
+    bool ambient_sound      ;
+    bool smart_talk         ;
+    bool spatial_sound      ;
+    bool voice_aware        ;
+    bool auto_play_pause    ;
+    bool notification       ;
+    bool message_preview    ;
 
-    uint32_t equalizer          : 1;
-    uint32_t ambient_sound      : 1;
-    uint32_t smart_talk         : 1;
-    uint32_t spatial_sound      : 1;
-    uint32_t voice_aware        : 1;
+    uint32_t bt                 : 2;
+
+    // uint32_t equalizer          : 1;
+    // uint32_t ambient_sound      : 1;
+    // uint32_t smart_talk         : 1;
+    // uint32_t spatial_sound      : 1;
+    // uint32_t voice_aware        : 1;
+    // uint32_t auto_play_pause    : 1;
+    // uint32_t notification       : 1;
+    // uint32_t message_preview    : 1;
     uint32_t playback           : 1;
-    uint32_t asc                : 1;
     uint32_t flashlight         : 1;
-    uint32_t notification       : 1;
-    uint32_t message_preview    : 1;
+    uint32_t music_input        : 1;
+    uint32_t notification_new   : 1;
+    uint32_t call               : 1;
+    uint32_t timer              : 1;
 
-    uint32_t rvd                : 21;
+    uint32_t earbuds_connect_l          : 1;
+    uint32_t earbuds_connect_r          : 1;
+    uint32_t earbuds_in_ear_l           : 1;
+    uint32_t earbuds_in_ear_r           : 1;
+    uint32_t earbuds_find_l             : 1;
+    uint32_t earbuds_find_r             : 1;
+    uint32_t earbuds_shock_l            : 1;
+    uint32_t earbuds_shock_r            : 1;
+
+
+
 };
 
 typedef enum
@@ -47,6 +70,23 @@ typedef enum
     SPATIAL_SOUND_MUSIC,
     SPATIAL_SOUND_GAME
 } SPATIAL_SOUND_TYPE;
+
+typedef enum
+{
+    BT_DISCONNECT = 0,
+    BT_CONNECT,
+    BT_UNKNOWN
+} BT_STATUS;
+
+typedef enum
+{
+    SBC = 0,
+    AAC,
+    LC3,
+    LC3_PLUS,
+    LDAC,
+    PCM
+} CODEC_TYPE;
 
 /*============================================================================*
  *                            Macros
@@ -68,6 +108,7 @@ typedef enum
 #define FG_3_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.5f)
 #define FG_WHITE                         FG_1_DARK
 #define FG_WARNING                       gui_rgb(0xDF,0x2D,0x00)
+#define FG_NORMAL                        gui_rgb(0x00,0xB4,0x36)
 
 #define BG_THEME1_BRIGHT_DARK            gui_rgb(0xF6,0x87,0x1F)
 #define BG_THEME1_MID_DARK               gui_rgb(0x5A,0x30,0x1E)
@@ -169,8 +210,8 @@ extern int8_t volume_val; // [0, 10]
 
 /* Battery */
 extern uint8_t battery_barn_val;
-extern uint8_t battery_earphone_l_val;
-extern uint8_t battery_earphone_r_val;
+extern uint8_t battery_earbuds_connect_l_val;
+extern uint8_t battery_earbuds_connect_r_val;
 
 /* Message */
 extern uint8_t message_num_val;
@@ -185,13 +226,21 @@ extern int8_t screen_brightness_val; // [1, 3]
 extern uint8_t smart_talk_time_type; // 0: 5s, 1: 15s, 2: 20s
 
 /* Ambient sound type */
-extern uint8_t ambient_sound_type;
+extern AMBIENT_SOUND_TYPE ambient_sound_type;
 
 /* Spatial sound type */
-extern uint8_t spatial_sound_type;
+extern SPATIAL_SOUND_TYPE spatial_sound_type;
 
 /* Voice Aware */
 extern int8_t voice_aware_val; // [1, 3]
+
+/* Codec type index */
+extern uint8_t codec_type_index; // [0, 5]
+
+/* Timer */
+extern int8_t timer_max_min_val; // minutes [1, 60]
+extern uint16_t timer_val; // seconds
+extern char timer_str[6];
 
 /*============================================================================*
  *                           Punblic Functions
