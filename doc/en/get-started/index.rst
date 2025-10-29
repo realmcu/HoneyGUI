@@ -29,9 +29,12 @@ The :term:`GUI` framework has good portability, which can run on a variety of ch
 Software Architecture
 -----------------------
 
-.. image:: https://foruda.gitee.com/images/1753340174900062921/e20848cb_10737458.png
+.. figure:: https://foruda.gitee.com/images/1753340174900062921/e20848cb_10737458.png
    :align: center
    :width: 800
+
+   HoneyGUI Software Architecture
+
 
 Installation For Windows
 -------------------------
@@ -84,9 +87,12 @@ Open a CMD window in the ``HoneyGUI`` or ``gui`` folder, and then run the follow
 The ``scons`` command to perform the build process and then execute ``gui.exe`` to run it.
 
 
-.. image:: https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png
+.. figure:: https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png
    :align: center
    :width: 700
+
+   Run Application
+
 
 Startup by CMD (CMake)
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -147,9 +153,11 @@ Run Project
 You can select the ``Run and Debug`` options after entering the vscode interface, and then click the ``Run`` button.
 
 
-.. image:: https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png
+.. figure:: https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png
    :align: center
    :width: 400
+
+   VSCode Run Project
 
 
 Display
@@ -161,15 +169,19 @@ Watch Project
 The watchface is displayed in the window, and you can interact with it by swiping and clicking.
 
 
-.. image:: https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif
+.. figure:: https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif
    :align: center
    :width: 400
+
+   Watch Project Example
 
 Dashboard Project
 """""""""""""""""""
 
 The dashboard is displayed in the window.
 
-.. image:: https://foruda.gitee.com/images/1753340204000227545/39228f04_10737458.png
+.. figure:: https://foruda.gitee.com/images/1753340204000227545/39228f04_10737458.png
    :align: center
    :width: 400
+
+   Dashboard Project Example

@@ -26,7 +26,7 @@ Select the chip type and language in the MP Tool startup interface, taking RTL87
 
    MP Tool Main Interface
 
-+ Download the generated image file to the specified address (such as the file system mount address), where the 8762G address is 0x04400000.
++ Download the generated image file to the specified address (such as the file system mount address), where the RTL8762G address is 0x04400000.
 
 .. figure:: https://foruda.gitee.com/images/1761015541576180221/a4c2ba8b_13408154.png
    :width: 800px

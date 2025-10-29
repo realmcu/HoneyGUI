@@ -42,22 +42,25 @@ HoneyGUI 模拟器
 
 在 HoneyGUI 模拟器中运行 LVGL
 -----------------------------
-HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南`  章节。
+HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南` 章节。
 
 完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 ``CONFIG_REALTEK_BUILD_LVGL_GUI``。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
 
 
-.. image:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
+.. figure:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
    :align: center
    :width: 800
 
+   模拟器配置文件
 
-1. 当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript`
-文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HIGHT``，均为像素单位。
 
-.. image:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
+当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript` 文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HIGHT``，均为像素单位。
+
+.. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center
    :width: 400
+
+   模拟器屏幕尺寸配置文件
 
 
 .. .. <!-- - 运行流程，结构 -->

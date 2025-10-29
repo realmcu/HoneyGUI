@@ -20,13 +20,13 @@ HoneyGUI 是一个轻量级的嵌入式 GUI 系统，专为 Realtek 系列芯片
    :align: center
    :width: 800px
 
-   armcc默认路径
+   Armcc 默认路径
 
 .. figure:: https://foruda.gitee.com/images/1741658971923798243/db601575_13406851.jpeg
    :align: center
    :width: 800px
 
-   armclang默认路径
+   Armclang 默认路径
 
 编译环境要求
 ------------

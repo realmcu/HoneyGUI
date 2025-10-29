@@ -42,15 +42,19 @@ The LVGL simulator is based on the scons tool and the MinGW-w64 toolchain, runni
 
 After completing the simulator environment installation, starting it will show the simulator's default LVGL project. Modify the simulator configuration file to run different LVGL projects. The configuration file for the simulator is located at :file:`your lvgl dir/rtk/win32_sim/` under :file:`menu_config.h`. You can select the example project for the simulator to run by modifying the value of ``LVGL_DEMO_APP``. Start it again in VScode, and after a successful build and compile, you will see the simulator running the selected example project.
 
-.. image:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
+.. figure:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
    :align: center
    :width: 408
+
+   Simulator Configuration File
 
 When you need to modify the screen size, change the :file:`SConscript` file located under :file:`your lvgl dir/rtk/demos/xxxxxx/`. Modify the screen width ``DRV_LCD_WIDTH`` and screen height ``DRV_LCD_HIGHT``, both in pixel units.
 
-.. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
+.. figure:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
    :align: center
    :width: 408
+
+   Simulator Screen Size Configuration File
 
 LVGL Structure
 ----------------
@@ -641,7 +645,7 @@ LVGL Image Converter
 - Online Image Converter: `LVGL Image Converter <https://lvgl.io/tools/imageconverter>`_
 - Documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
 
-The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.3/details/main-modules/image.html#online-converter>`_：
+The LVGL Online Image Converter is a website provided by the LVGL development team that allows you to upload local image files and convert them into standard C files. The converted files describe image information in the form of variables. For usage steps, please refer to `LVGL Images (lv_image) - Online Converter <https://docs.lvgl.io/9.3/details/main-modules/image.html#online-converter>`_:
 
 1. Select the LVGL Version: Choose ``LVGL v9``
 2. Upload Image Files: Select one or more local image files for batch conversion.
@@ -655,7 +659,7 @@ The LVGL Online Image Converter is a website provided by the LVGL development te
 The document `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ provides a detailed introduction on using image resources and the image converter tool in LVGL, as well as simple usage examples.
 
 
-The online image converter for LVGL v9 only supports output in C file format and a limited selection of color formats. If you need features such as image compression, bin file output, or other color formats, please use the  `Python Image Converter <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_。
+The online image converter for LVGL v9 only supports output in C file format and a limited selection of color formats. If you need features such as image compression, bin file output, or other color formats, please use the  `Python Image Converter <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`_.
 When exporting image resources in bin file format, the data in the bin file is stored as ``12 Byte lv_img_header_t + data``, where ``lv_img_header_t`` includes information such as ``Color format``, ``width``, and ``height``.
 
 .. code-block:: c
@@ -723,10 +727,11 @@ When outputting image resources in the bin file format, the data in the bin file
 For more details on using image resources and the image conversion tool in LVGL, as well as simple usage examples, please refer to the documentation: `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_
 
 
-.. image:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
    :align: center
    :width: 408
 
+   LVGL Image Conversion Configuration Interface
 
 
 RTZIP
@@ -736,19 +741,23 @@ This configuration encodes images into the RTZIP format, which supports multiple
 Tips:
   - If the input image contains transparency but the output format does not support alpha (such as when outputting in RGB565), it is recommended to enable the :guilabel:`Mix Alpha Channel` option. Example: Input: PNG with transparency → Output: ``RGB565``.
 
-.. image:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
    :align: center
    :width: 408
+
+   RTZIP Image Conversion Configuration Interface
+
 
 
 JPG
 ^^^^^^^^^
 This configuration re-encodes images into the JPEG format. You can adjust the image sampling ratio and quality settings to reduce the file size. JPEG is a lossy compression format that achieves a good balance between display quality and file size. Please note that images converted to JPEG will lose any transparency (alpha channel) information.
 
-.. image:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
    :align: center
    :width: 408
 
+   JPEG Image Conversion Configuration Interface
 
 
 AVI
@@ -759,9 +768,11 @@ This configuration converts an image sequence or video file into AVI format, sup
 - If the input is a video file, the settings will be applied directly to that video file.
 
 
-.. image:: https://foruda.gitee.com/images/1753864947902502287/d16f5802_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864947902502287/d16f5802_9218678.png
    :align: center
    :width: 408
+
+   AVI Video Conversion Configuration Interface
 
 
 Below is the usage example:
@@ -826,9 +837,12 @@ Realtek has launched a newly upgraded Realtek Font Converter based on the packag
 
 Below is the interface image of the Realtek Font Converter:
 
-.. image:: https://foruda.gitee.com/images/1753432503991458121/2c546aae_9325830.png
+.. figure:: https://foruda.gitee.com/images/1753432503991458121/2c546aae_9325830.png
    :align: center
    :width: 983
+
+   Realtek Font Converter Interface
+
 
 Font Conversion Steps:
 
@@ -991,7 +1005,7 @@ Squareline Studio supports most of LVGL's basic features, such as UI design, com
 LVGL Editor
 ~~~~~~~~~~~~~
 
-`LVGL Editor <https://lvgl.io/editor/>`_ is a professional GUI development tool based on the free open-source LVGL library, supporting Windows, Linux, and macOS. It defines interfaces through XML, supports auto-completion, version control, real-time preview, and deep integration with Figma, allowing online sharing and testing of UIs. The editor supports exporting to C code, runtime XML loading, and various advanced components, with CLI integration, automatic style synchronization, data binding, and event handling, greatly enhancing embedded UI development efficiency.
+`LVGL Editor <https://pro.lvgl.io/>`_ is a professional GUI development tool based on the free open-source LVGL library, supporting Windows, Linux, and macOS. It defines interfaces through XML, supports auto-completion, version control, real-time preview, and deep integration with Figma, allowing online sharing and testing of UIs. The editor supports exporting to C code, runtime XML loading, and various advanced components, with CLI integration, automatic style synchronization, data binding, and event handling, greatly enhancing embedded UI development efficiency.
 
 EEZ Studio
 ~~~~~~~~~~~~~

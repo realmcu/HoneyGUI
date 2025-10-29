@@ -2,7 +2,7 @@ Music Player
 ============
 
 - UI design: `Figma - Music Mobile App UI <https://www.figma.com/community/file/1180142936953078905/music-mobile-app-ui>`_
-- Intuitive Three-Layer Design: Navigate effortlessly between three distinct interfaces. The central interface features a sleek display of the current track’s album cover along with essential playback widgets.
+- Intuitive Three-Layer Design: Navigate effortlessly between three distinct interfaces. The central interface displays the album cover of the current track and basic playback widgets.
 
 - Swipe Navigation: With a simple swipe, transition to the top interface to access your song list.
 - Lyric Display: Swipe down to reveal the lyrics interface, which is a full-screen display of lyrics, synchronized with the music.

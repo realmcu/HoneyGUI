@@ -13,7 +13,7 @@
 用法
 ----
 
-.. table:: Gui_Obj 表格
+.. table:: Obj 控件使用
    :widths: 100 100
    :align: center
    :name: Gui_Obj_Table

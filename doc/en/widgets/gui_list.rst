@@ -51,7 +51,7 @@ The :cpp:any:`gui_list_set_bar_color` function can be used to set scroll bar col
 
 Set List Widget Note Number
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The :cpp:any:`gui_list_set_note_num` function can be used to set note number of list widget。
+The :cpp:any:`gui_list_set_note_num` function can be used to set note number of list widget.
 
 Example
 ---------

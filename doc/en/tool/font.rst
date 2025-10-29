@@ -8,6 +8,8 @@ Font conversion tool features: Obtain the Unicode code corresponding to all char
    :width: 500px
    :align: center
 
+   Font Convert Tool Flowchart
+
 Font Bin Generation
 --------------------
 Please refer to the following steps for how to generate files:
@@ -18,11 +20,15 @@ Please refer to the following steps for how to generate files:
    :width: 500px
    :align: center
 
+   Copy Font Library File
+
 2. Please refer to the documentation under the directory ``\Font Convert Tool\doc`` for the specific meanings of each parameter to configure font parameters by editing :red-text:`FontConfig.json`.
 
 .. figure:: https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png
    :width: 500px
    :align: center
+
+   Edit FontConfig.json File
 
 3. Please open :red-text:`setting.ini` and modify the optional configuration items.
 
@@ -30,11 +36,15 @@ Please refer to the following steps for how to generate files:
    :width: 500px
    :align: center
 
+   Edit Setting.ini File
+
 4. Double-click :red-text:`fontDirctionary.exe` and the font bin will be generated.
 
 .. figure:: https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png
    :width: 500px
    :align: center
+
+   Generate Font.bin File
 
 FontConfig.json Parameter Description
 -------------------------------------

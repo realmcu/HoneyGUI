@@ -29,9 +29,12 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 软件架构
 ----------
 
-.. image:: https://foruda.gitee.com/images/1753340174900062921/e20848cb_10737458.png
+.. figure:: https://foruda.gitee.com/images/1753340174900062921/e20848cb_10737458.png
    :align: center
    :width: 800
+
+   HoneyGUI 软件架构
+
 
 安装在 Windows 操作系统上
 --------------------------
@@ -82,9 +85,12 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 ``scons`` 命令执行构建过程，然后执行 ``gui.exe`` 来运行应用程序。
 
-.. image:: https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png
+.. figure:: https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png
    :align: center
    :width: 700
+
+   启动应用程序
+
 
 通过 CMD 启动（CMake）
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -142,9 +148,11 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 进入 VSCode 界面后，可以选择 ``Run and Debug`` 选项，然后点击 ``Run`` 按钮。
 
-.. image:: https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png
+.. figure:: https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png
    :align: center
    :width: 400
+
+   VSCode 运行项目
 
 显示
 ----
@@ -154,15 +162,19 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 窗口中显示出表盘，您可以通过滑动和点击与其进行交互。
 
-.. image:: https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif
+.. figure:: https://docs.realmcu.com/HoneyGUI/image/gui_watch.gif
    :align: center
    :width: 400
+
+   手表工程示例
 
 仪表盘工程
 ^^^^^^^^^^^
 
 窗口中显示仪表盘。
 
-.. image:: https://foruda.gitee.com/images/1753340204000227545/39228f04_10737458.png
+.. figure:: https://foruda.gitee.com/images/1753340204000227545/39228f04_10737458.png
    :align: center
    :width: 400
+
+   仪表盘工程示例

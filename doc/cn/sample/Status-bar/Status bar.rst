@@ -25,7 +25,7 @@
 设计
 ------
 
-.. image:: https://foruda.gitee.com/images/1727331942036912794/13bb32b7_10088396.png
+.. figure:: https://foruda.gitee.com/images/1727331942036912794/13bb32b7_10088396.png
    :align: center
 
 

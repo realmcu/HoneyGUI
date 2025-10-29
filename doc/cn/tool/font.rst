@@ -2,14 +2,16 @@
  字体转换工具
 =============
 
-字体转换工具功能：从标准内部码表（代码页文件）、自定义Unicode码表（或补充码表.txt文件，自定义.cst文件）中获取所有待转换字符对应的Unicode码。根据Unicode编码从字体文件（如.ttf）中找到相应字符的矢量字体数据。将其转换为位图，并输出为.bin文件。
+字体转换工具功能：从标准内部码表（代码页文件）、自定义 Unicode 码表（或补充码表 .txt 文件，自定义 .cst 文件）中获取所有待转换字符对应的 Unicode 码。根据 Unicode 编码从字体文件（如 .ttf）中找到相应字符的矢量字体数据。将其转换为位图，并输出为 .bin 文件。
 
 .. figure:: https://foruda.gitee.com/images/1725358504194067891/e9f8aa2f_13674272.png
    :width: 500px
    :align: center
 
-生成字体bin文件
----------------
+   字体转换工具流程图
+
+生成字体 bin 文件
+------------------
 如何生成对应的文件，请参考以下步骤:
 
 1. 将字体库文件复制到该目录 ``\Font Convert Tool\font``。
@@ -18,11 +20,15 @@
    :width: 500px
    :align: center
 
+   复制字体库文件
+
 2. 可以参考 ``\Font Convert Tool\doc`` 目录下的文档，了解每个参数的具体含义，通过编辑 :red-text:`FontConfig.json` 配置字体参数。
 
 .. figure:: https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png
    :width: 500px
    :align: center
+
+   编辑 FontConfig.json 文件
 
 3. 打开 :red-text:`setting.ini`，修改可选配置项。
 
@@ -30,18 +36,22 @@
    :width: 500px
    :align: center
 
-4. 双击 :red-text:`fontDirctionary.exe` 生成font.bin。
+   编辑 setting.ini 文件
+
+4. 双击 :red-text:`fontDirctionary.exe` 生成 font.bin。
 
 .. figure:: https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png
    :width: 500px
    :align: center
 
-FontConfig.json参数说明
------------------------
-.. table:: FontConfig.json参数说明
+   生成 font.bin 文件
+
+FontConfig.json 参数说明
+--------------------------
+.. table:: FontConfig.json 参数说明
    :widths: 25 75 
    :align: center
-   :name: FontConfig.json参数说明
+   :name: FontConfig.json 参数说明
 
    +--------------------------+---------------------------------------------------------------------------------------+
    | 字段名称                 | 字段含义                                                                              |
@@ -79,10 +89,10 @@ FontConfig.json参数说明
 
 Setting.ini 参数说明
 --------------------
-.. table:: Setting.ini参数说明
+.. table:: Setting.ini 参数说明
    :widths: 25 25  50
    :align: center
-   :name: Setting.ini参数说明
+   :name: Setting.ini 参数说明
 
    +--------------+--------+-------------------------------------------------------------------------------------------+
    | gamma        | 1      | gamma 值是用于描述输入像素值和输出亮度之间非线性关系的参数。该值越大，文本亮度越高。      |

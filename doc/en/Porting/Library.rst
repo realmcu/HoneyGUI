@@ -20,13 +20,13 @@ Important Notes
    :align: center
    :width: 800px
 
-   Default path for Armcc
+   Default Path for Armcc
 
 .. figure:: https://foruda.gitee.com/images/1741658971923798243/db601575_13406851.jpeg
    :align: center
    :width: 800px
 
-   Default path for Armclang
+   Default Path for Armclang
 
 Build Requirements
 -------------------
@@ -165,10 +165,10 @@ This example demonstrates porting to RTL8773GWP dashboard project.
    :align: center
    :width: 800px
 
-   Copy header files to project directory
+   Link Header Files to Project Directory
 
 .. figure:: https://foruda.gitee.com/images/1741657914099825115/216c4d69_13406851.jpeg
    :align: center
    :width: 800px
 
-   Link library file to project directory
+   Link Library File to Project Directory

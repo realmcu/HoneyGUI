@@ -15,6 +15,8 @@ Convert pictures in various formats into RGB raw pictures
    :align: center
    :width: 600px
 
+   Image Conversion Tool Interface
+
 1. Open the image folder.
 2. Open the settings.
 3. Select the output folder.
@@ -92,6 +94,8 @@ The following files will be generated.
    :align: center
    :width: 300px
 
+   Binary File Generation
+
 By using the image conversion tool, we can convert the three ``JPG files a, b, and c`` into three ``binary files a, b, and c``.
 
 Place the ``binary file`` into the ``root`` folder of the packaging directory. For the packaging process, please refer to the :ref:`Pack Tool` section.
@@ -99,4 +103,6 @@ Place the ``binary file`` into the ``root`` folder of the packaging directory. F
 .. figure:: https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png
    :align: center
    :width: 200px
+
+   Root Folder
 

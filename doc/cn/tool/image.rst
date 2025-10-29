@@ -17,6 +17,8 @@
    :align: center
    :width: 600px
 
+   图像转换工具界面
+
 1. 打开图片文件夹。
 2. 打开设置。
 3. 选择输出文件夹。
@@ -99,6 +101,8 @@
    :align: center
    :width: 300px
 
+   二进制文件生成
+
 通过使用图像转换工具（ ImageConvert Tool ），开发者可以将三个 ``JPG 文件（a、b 和 c）`` 转换为 ``二进制文件（a、b 和 c）`` 。
 
 接下来，开发者需要将这些 ``二进制文件`` 放置在打包目录的 ``根文件夹（root）`` 中。关于打包资源的过程，请参考 :ref:`打包工具` 章节。
@@ -106,4 +110,6 @@
 .. figure:: https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png
    :align: center
    :width: 200px
+
+   根文件夹
 

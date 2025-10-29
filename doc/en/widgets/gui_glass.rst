@@ -17,39 +17,37 @@ To reduce time consumption in HoneyGUI, a simplified glass model which doesn't f
 Glass Data Generation
 ----------------------
 
-Based on the simplified model above, the rule can be derived that the offset of the pixel points after refraction is only related to the pixels within the range of the glass. Therefore, only a collection of the offset of each point on the glass is needed. In the design of the :ref:example <glass_example_en> , the offset is determined by the thickness(refractive) of the glass and the position of the observing point (x_o, y_o) through the following relationship:
+Based on the simplified model above, the rule can be derived that the offset of the pixel points after refraction is only related to the pixels within the range of the glass. Therefore, only a collection of the offset of each point on the glass is needed. In the design of the :ref:`example <glass_example_en>` , the offset is determined by the thickness (refractive) of the glass and the position of the observing point (x_o, y_o) through the following relationship:
 
 .. math::
 
-offset(x, y) = distortion(x, y) * d(x, y)
+   offset(x, y) = distortion(x, y) * d(x, y)
 
-where distortion represents the thickness (refractive index) of each point on the glass, and d(x, y) represents the relationship between the current point on the glass and the observed point (x_o, y_o).
+Where distortion represents the thickness (refractive index) of each point on the glass, and d(x, y) represents the relationship between the current point on the glass and the observed point (x_o, y_o).
 
 Usage
 -----
 
-.. table:: Gui_Glass table
-   :widths: 100 100
-   :align: center
-   :name: Gui_Glass_Table
+.. list-table::
+   :header-rows: 1
 
-   +------------------------------------------------------+---------------------------------------------------+
-   | Description                                          | API                                               |
-   +======================================================+===================================================+
-   | Create Widget                                        | :cpp:any:`gui_glass_create_from_mem`       |
-   +------------------------------------------------------+---------------------------------------------------+
-   | Set Attrei                                           | :cpp:any:`gui_glass_set_attribute`         |
-   +------------------------------------------------------+---------------------------------------------------+
-   | Obtain Height                                        | :cpp:any:`gui_glass_get_height`            |
-   +------------------------------------------------------+---------------------------------------------------+
-   | Obtain Width                                         | :cpp:any:`gui_glass_get_width`             |
-   +------------------------------------------------------+---------------------------------------------------+
-   | Refresh Attribute                                    | :cpp:any:`gui_glass_refresh_size`          |
-   +------------------------------------------------------+---------------------------------------------------+
-   | Posistion Translation                                | :cpp:any:`gui_glass_translate`             |
-   +------------------------------------------------------+---------------------------------------------------+
+   * - Description
+     - API 
+   * - Create Widget
+     - :cpp:any:`gui_glass_create_from_mem`  
+   * - Set Attribute 
+     - :cpp:any:`gui_glass_set_attribute`
+   * - Obtain Height 
+     - :cpp:any:`gui_glass_get_height` 
+   * - Obtain Width 
+     - :cpp:any:`gui_glass_get_width`
+   * - Refresh Attribute
+     - :cpp:any:`gui_glass_refresh_size`
+   * - Posistion Translation
+     - :cpp:any:`gui_glass_translate`
 
 .. _glass_example_en:
+
 Example
 -------
 

@@ -13,7 +13,7 @@ The Object implements the basic properties of widgets on a screen. The screen wi
 Usage
 -----
 
-.. table:: Gui_Obj Table
+.. table:: Obj Widget Usage
    :widths: 100 100
    :align: center
    :name: Gui_Obj_Table

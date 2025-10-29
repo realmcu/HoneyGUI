@@ -25,7 +25,7 @@ Function ``static void status_bar(void *parent, gui_obj_t *ignore_gesture)`` is 
 Design
 ------
 
-.. image:: https://foruda.gitee.com/images/1727331942036912794/13bb32b7_10088396.png
+.. figure:: https://foruda.gitee.com/images/1727331942036912794/13bb32b7_10088396.png
    :align: center
 
 * In this status bar, the window widget is the root node. A white semi-transparent background of the status bar is drawn using the rectangle drawing function. Three text boxes are nested, representing time, date, and notification messages, respectively. Among them, the time text box uses a function to cache into an image because the time display needs to be scaled. The rectangular background and the text of the date and notification messages are initially hidden. Touch screen interactive effects are implemented in the animation callback function of the root node window widget.

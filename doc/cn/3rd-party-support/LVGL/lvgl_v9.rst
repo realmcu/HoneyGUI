@@ -42,16 +42,20 @@ LVGL 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行
 
 完成模拟器的环境安装后，启动运行将看到模拟器默认的 LVGL 工程。修改模拟器配置文件以运行不同的 LVGL 的工程，在路径 :file:`your lvgl dir/rtk/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，可以通过修改 ``LVGL_DEMO_APP`` 的数值来选择模拟器运行的示例工程。在 VScode 中再次启动运行，构建编译通过后即可看到模拟器运行选定的示例工程。
 
-.. image:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
+.. figure:: https://foruda.gitee.com/images/1753343343333452747/20abc72e_9325830.png
    :align: center
    :width: 408
+
+   模拟器配置文件
 
 当需要修改屏幕尺寸时，修改文件 :file:`your lvgl dir/rtk/demos/xxxxxx/` 下的 :file:`SConscript`
 文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HIGHT``，均为像素单位。
 
-.. image:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
+.. figure:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
    :align: center
    :width: 408
+
+   模拟器屏幕尺寸配置文件
 
 LVGL 结构
 ----------------
@@ -715,9 +719,11 @@ LVGL
 
 该转换功能完全由原生的 LVGL 转换脚本支持，输入文件仅支持 PNG 格式图片，支持输出 C 文件和 bin 文件，支持多种颜色格式。输出 bin 文件格式的图片资源时， bin 文件中数据的存储格式为 ``12 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height`` 等信息。在文档 `LVGL Images (lv_image) <https://docs.lvgl.io/9.3/details/main-modules/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
 
-.. image:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864909573136949/b12eb86a_9218678.png
    :align: center
    :width: 408
+
+   LVGL 图片转换配置界面
 
 
 
@@ -728,9 +734,11 @@ RTZIP
 Tips:
    - 若输入图片带透明但输出格式不带透明度信息，建议使能 :guilabel:`Mix Alpha Channel`，如输入 PNG 图片，输出 ``RGB565``。
 
-.. image:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864936117526804/e64c6628_9218678.png
    :align: center
    :width: 408
+
+   RTZIP 图片转换配置界面
 
 
 JPG
@@ -738,9 +746,11 @@ JPG
 将图片重新编码转换为 JPEG 格式，配置图片采样比和图片质量以压缩图片体积。 JPEG 格式是一种能很好地平衡显示画质和文件大小的有损压缩，转换为 JPEG 的图片将丢失透明度信息。
 
 
-.. image:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864922836242088/290c1bd8_9218678.png
    :align: center
    :width: 408
+
+   JPEG 图片转换配置界面
 
 
 
@@ -751,9 +761,11 @@ AVI
 - 输入图片序列文件夹时，将转换配置应用于文件夹，务必保证图片序列的命名格式为类 ``xxx_%04d.xxx``，从 0 排序，如 frame_0000.jpg , frame_0001.jpg 。
 - 输入视频文件时，对视频文件应用转换配置。
 
-.. image:: https://foruda.gitee.com/images/1753864947902502287/d16f5802_9218678.png
+.. figure:: https://foruda.gitee.com/images/1753864947902502287/d16f5802_9218678.png
    :align: center
    :width: 408
+
+   AVI 视频转换配置界面
 
 
 以下为使用示例：
@@ -820,9 +832,12 @@ Realtek 在封装和扩展 LVGL 字体转换工具的基础上，推出了全新
 
 下图为 Realtek 字体转换器的界面图：
 
-.. image:: https://foruda.gitee.com/images/1753432503991458121/2c546aae_9325830.png
+.. figure:: https://foruda.gitee.com/images/1753432503991458121/2c546aae_9325830.png
    :align: center
    :width: 983
+
+   Realtek 字体转换器界面
+   
 
 字体转换步骤：
 
@@ -993,7 +1008,7 @@ Squareline Studio 支持 LVGL 大部分的基础功能，例如 UI 设计、组�
 LVGL Editor
 ~~~~~~~~~~~~~
 
-`LVGL Editor <https://lvgl.io/editor/>`_ 是一款基于免费开源 LVGL 库的专业 GUI 开发工具，支持 Windows、Linux 和 macOS。通过 XML 定义界面，支持自动补全、版本控制、实时预览及 Figma 深度集成，可在线共享和测试 UI。编辑器支持导出为 C 代码、运行时 XML 加载及多种高级组件，并具备 CLI 集成、自动同步样式、数据绑定和事件处理等功能，大大提升了嵌入式 UI 开发效率。
+`LVGL Editor <https://pro.lvgl.io/>`_ 是一款基于免费开源 LVGL 库的专业 GUI 开发工具，支持 Windows、Linux 和 macOS。通过 XML 定义界面，支持自动补全、版本控制、实时预览及 Figma 深度集成，可在线共享和测试 UI。编辑器支持导出为 C 代码、运行时 XML 加载及多种高级组件，并具备 CLI 集成、自动同步样式、数据绑定和事件处理等功能，大大提升了嵌入式 UI 开发效率。
 
 
 EEZ Studio

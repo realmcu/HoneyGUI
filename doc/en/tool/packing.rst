@@ -20,6 +20,8 @@ The user data generation process is as follows:
    :align: center
    :width: 500px
 
+   RTL8762G Generate User Data
+
 1. Copy all generated ``.bin`` files to the folder ``\src\app\dashboard\application\root_image\root``.
 2. In the directory ``\src\app\dashboard\application\root_image``,  double-click the script file ``mkromfs_0xa00000.bat`` to execute it. This will generate an image of the ``root`` folder. After execution, a new ``.bin`` file and a ``.h`` file will appear in this directory.
 3. The ``.h`` file contains the address offset of each file in the file system, allowing direct access without using the file system. Before developing the GUI code, add the folder containing the ``.h`` file to the include directory.
@@ -37,6 +39,8 @@ The process for generating user data is as follows:
 .. figure:: https://foruda.gitee.com/images/1726730627101594191/d43820b6_13671125.png
    :align: center
    :width: 500px
+
+   RTL8763E Generate User Data
 
 1. Copy all the generated ``.bin`` files to the folder ``\tool\Gadgets\gui_package_tool\8763E\root``.
 2. Double-click ``gen_root_image.bat`` in the ``\tool\Gadgets\gui_package_tool\8763E`` directory to execute the script and generate an image of the root folder. A new ``.bin`` file and ``.h`` file will appear in the directory.
@@ -58,6 +62,8 @@ Generate Root Bin
 .. figure:: https://foruda.gitee.com/images/1726730908892819237/3349d8fb_13671125.png
    :align: center
    :width: 500px
+
+   RTL8773E Generate User Data
 
 
 .. note::
@@ -84,6 +90,8 @@ Using the MPPG Tool to add header information to user data files, the process is
 .. figure:: https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png
    :align: center
    :width: 700px 
+
+   MPPG Tool Add Header Information
 
 1. In the menu, select :menuselection:`Tool-->Prepend header for user data`.
 2. Add the path to ``flash_map.ini``.
