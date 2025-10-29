@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
 
 #define NANOVG_CANVAS_WIDTH   200
@@ -97,4 +98,4 @@ static int nanovg_example(void)
     return 0;
 }
 
-GUI_INIT_APP_EXPORT(nanovg_example);
+// GUI_INIT_APP_EXPORT(nanovg_example);

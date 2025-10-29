@@ -22,44 +22,73 @@ static int ARM2D_example(void)
 
     memset(pixel, 0x0, DRV_LCD_WIDTH * DRV_LCD_HIGHT * DRV_PIXEL_BITS / 8);
 
-    const arm_2d_tile_t ptTile = {    
+    const arm_2d_tile_t rootTile = {    
         .tRegion = {        
             .tSize = {            
                 .iWidth = DRV_LCD_WIDTH,            
-                .iHeight = DRV_LCD_HIGHT,        
+                .iHeight = DRV_LCD_HIGHT/2,        
             },    
         },    
         .tInfo = {        
             .bIsRoot = true,        
             .bHasEnforcedColour = true,        
             .tColourInfo = {            
-                .chScheme = ARM_2D_COLOUR_8BIT,        
+                .chScheme = ARM_2D_COLOUR_CCCA8888,        
             },    
         },    
         .pchBuffer = (uint8_t *)pixel,
     };
-    //arm_2d_rgb32_fill_colour(&ptTile, NULL, 0xFF0000FF);
-    extern const arm_2d_tile_t c_tilearm2d_testCCCN888;
-    // arm_2d_rgb32_tile_copy(&c_tilearm2d_testCCCN888, &ptTile, 
-    //                         NULL,
-    //                         ARM_2D_CP_MODE_XY_MIRROR);
 
-
-    arm_2d_location_t ptTileLoc = {
-        .iX = 0,
-        .iY = 0,
+    const arm_2d_tile_t childTile = {    
+        .tRegion = {   
+            .tLocation = {        
+                .iX = 0,        
+                .iY = -DRV_LCD_HIGHT/2,    
+            },     
+            .tSize = {            
+                .iWidth = DRV_LCD_WIDTH,            
+                .iHeight = DRV_LCD_HIGHT,        
+            },    
+        },    
+        .tInfo = {        
+            .bIsRoot = false,        
+            .bHasEnforcedColour = true, 
+            .bVirtualScreen = true,       
+            .tColourInfo = {            
+                .chScheme = ARM_2D_COLOUR_CCCA8888,        
+            },    
+        },    
+        .ptParent = &rootTile,
     };
-    arm_2d_cccn888_tile_rotation(
-        &c_tilearm2d_testCCCN888,
-        &ptTile,
-        NULL,
-        ptTileLoc,
-        45.0f,
-        0x0
-    );
+
+    //arm_2d_rgb32_fill_colour(&ptTile, NULL, 0xFF0000FF);
+    extern const arm_2d_tile_t c_tileALPHAMask;
 
 
-    port_direct_draw_bitmap_to_lcd(0, 0, DRV_LCD_WIDTH, DRV_LCD_HIGHT, (uint8_t *)pixel);
+    arm_2d_point_float_t tCentre = {
+        .fX = 0,
+        .fY = 0,
+    };
+    arm_2d_point_float_t tPivot = {
+        .fX = 0,
+        .fY = 0,
+    };
+    bool bIsNewFrame = true;
+    arm_2dp_cccn888_fill_colour_with_mask_opacity_and_transform_xy(
+                                    NULL,
+                                    &c_tileALPHAMask,
+                                    &childTile,
+                                    NULL,
+                                    tCentre,
+                                    0.0f,
+                                    1.0f,
+                                    1.0f,
+                                    0xFFFF00FF,
+                                    255,
+                                    &tPivot);
+
+
+    port_direct_draw_bitmap_to_lcd(0, DRV_LCD_HIGHT/2, DRV_LCD_WIDTH, DRV_LCD_HIGHT/2, (uint8_t *)pixel);
 
     return 0;
 }

@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../nanovg"
+		},
+		{
+			"path": "../Arm2D"
 		}
 	],
 	"settings": {
