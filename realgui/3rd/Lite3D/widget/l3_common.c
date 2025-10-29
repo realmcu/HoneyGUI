@@ -678,19 +678,21 @@ bool l3_camera_UVN_initialize(l3_camera_t *camera, l3_4d_point_t cameraPosition,
 {
     camera->position = cameraPosition;
     camera->targetDirection = cameraTarget;
-    camera->near_z = near;
-    camera->far_z = far;
+    // camera->near_z = near;
+    // camera->far_z = far;
+    (void)near;
+    (void)far;
     camera->viewport_width = viewPortWidth;
     camera->viewport_height = viewPortHeight;
 
-    camera->viewport_center_x = (viewPortWidth - 1) / 2;
-    camera->viewport_center_y = (viewPortHeight - 1) / 2;
+    camera->viewport_center_x = 0.5f * (viewPortWidth - 1);
+    camera->viewport_center_y = 0.5f * (viewPortHeight - 1);
 
     camera->aspect_ratio = viewPortWidth / (float)viewPortHeight;
 
     l3_4x4_matrix_identity(&camera->mat_cam);
-    l3_4x4_matrix_identity(&camera->mat_per);
-    l3_4x4_matrix_identity(&camera->mat_scr);
+    // l3_4x4_matrix_identity(&camera->mat_per);
+    // l3_4x4_matrix_identity(&camera->mat_scr);
 
     camera->fov = fov;
     camera->viewplane_width = 2.0f;

@@ -216,6 +216,9 @@ void l3_rect_push_prepare(l3_model_t *_this)
             transform_matrix = _this->face_transform_cb(_this, i);
         }
 
+        l3_4x4_matrix_t view_matrix;
+        l3_4x4_matrix_mul(&_this->camera.mat_cam, &transform_matrix, &view_matrix);
+
         l3_rect_face_t *face = &_this->face.rect_face[i];
         l3_attrib_t *attrib = &_this->desc->attrib;
 
@@ -228,7 +231,7 @@ void l3_rect_push_prepare(l3_model_t *_this)
             l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
             l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
-            face->transform_vertex[j].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+            face->transform_vertex[j].position = l3_4x4_matrix_mul_4d_point(&view_matrix, local_position);
 
             face->transform_vertex[j].u = vt->u;
             face->transform_vertex[j].v = vt->v;

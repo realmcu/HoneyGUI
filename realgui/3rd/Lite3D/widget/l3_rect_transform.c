@@ -19,29 +19,29 @@
 #include "l3_common.h"
 
 
-void l3_light_initialize(l3_light_t *light, l3_4d_point_t lightPosition,
-                         l3_4d_point_t lightTarget, float included_angle, float blend_ratio, l3_color_argb8888_t color)
-{
-    light->position = lightPosition;
-    light->targetDirection = lightTarget;
-    light->included_angle = included_angle;
-    light->blend_ratio = blend_ratio;
-    light->color = color;
-    light->initialized = true;
-}
+// void l3_light_initialize(l3_light_t *light, l3_4d_point_t lightPosition,
+//                          l3_4d_point_t lightTarget, float included_angle, float blend_ratio, l3_color_argb8888_t color)
+// {
+//     light->position = lightPosition;
+//     light->targetDirection = lightTarget;
+//     light->included_angle = included_angle;
+//     light->blend_ratio = blend_ratio;
+//     light->color = color;
+//     light->initialized = true;
+// }
 
 
-static void l3_rect_face_transform_camera(l3_rect_face_t *face, l3_camera_t *camera)
-{
-    face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[0].position);
-    face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[1].position);
-    face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[2].position);
-    face->transform_vertex[3].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[3].position);
-}
+// static void l3_rect_face_transform_camera(l3_rect_face_t *face, l3_camera_t *camera)
+// {
+//     face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[0].position);
+//     face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[1].position);
+//     face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[2].position);
+//     face->transform_vertex[3].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[3].position);
+// }
 
 
 static void l3_rect_face_calculate_normal(l3_rect_face_t *face)
@@ -111,21 +111,20 @@ static void l3_rect_face_transform_perspective(l3_rect_face_t *face, l3_camera_t
 
 static void l3_rect_face_transform_screen(l3_rect_face_t *face, l3_camera_t *camera)
 {
-    float alpha = 0.5f * (camera->viewport_width - 1);
-    float beta = 0.5f * (camera->viewport_height - 1);
-
     for (int i = 0; i < 4; i++)
     {
         // Transform to screen space
-        face->transform_vertex[i].position.x = alpha + alpha * face->transform_vertex[i].position.x;
-        face->transform_vertex[i].position.y = beta + beta * face->transform_vertex[i].position.y;
+        face->transform_vertex[i].position.x = camera->viewport_center_x + camera->viewport_center_x *
+                                               face->transform_vertex[i].position.x;
+        face->transform_vertex[i].position.y = camera->viewport_center_y + camera->viewport_center_y *
+                                               face->transform_vertex[i].position.y;
     }
 
 }
 
 void l3_rect_scene(l3_rect_face_t *face, l3_camera_t *camera)
 {
-    l3_rect_face_transform_camera(face, camera);
+    // l3_rect_face_transform_camera(face, camera);
     l3_rect_face_calculate_normal(face);
     l3_rect_face_update_back_face(face, L3_CULLMODE_CCW);
     l3_rect_face_transform_perspective(face, camera);

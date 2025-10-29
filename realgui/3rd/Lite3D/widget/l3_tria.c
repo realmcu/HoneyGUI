@@ -127,15 +127,18 @@ void l3_tria_push(l3_model_t *_this)
 
     l3_camera_build_UVN_matrix(&_this->camera);
 
+    l3_4x4_matrix_t view_matrix;
+    l3_4x4_matrix_mul(&_this->camera.mat_cam, &transform_matrix, &view_matrix);
+
     MEASURE_CPU_CYCLES(
     {
         for (size_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
         {
             // local transform
-            if (_this->face_transform_cb != NULL)
-            {
-                transform_matrix = _this->face_transform_cb(_this, i);
-            }
+            // if (_this->face_transform_cb != NULL)
+            // {
+            //     transform_matrix = _this->face_transform_cb(_this, i);
+            // }
 
             l3_tria_face_t *face = &_this->face.tria_face[i];
             l3_attrib_t *attrib = &_this->desc->attrib;
@@ -149,7 +152,7 @@ void l3_tria_push(l3_model_t *_this)
                 l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
                 l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
-                face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&view_matrix, local_position);
                 face->transform_vertex[0].u = vt->u;
                 face->transform_vertex[0].v = vt->v;
             }
@@ -159,7 +162,7 @@ void l3_tria_push(l3_model_t *_this)
                 l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
                 l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
-                face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&view_matrix, local_position);
                 face->transform_vertex[1].u = vt->u;
                 face->transform_vertex[1].v = vt->v;
             }
@@ -169,7 +172,7 @@ void l3_tria_push(l3_model_t *_this)
                 l3_texcoord_coordinate_t *vt = &attrib->texcoords[idx.vt_idx];
 
                 l3_4d_point_t local_position = {v->x, v->y, v->z, 1.0f};
-                face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&transform_matrix, local_position);
+                face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&view_matrix, local_position);
                 face->transform_vertex[2].u = vt->u;
                 face->transform_vertex[2].v = vt->v;
             }

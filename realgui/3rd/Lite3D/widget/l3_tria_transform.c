@@ -20,15 +20,15 @@
 
 
 
-static void l3_tria_face_transform_camera(l3_tria_face_t *face, l3_camera_t *camera)
-{
-    face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[0].position);
-    face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[1].position);
-    face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
-                                                                    face->transform_vertex[2].position);
-}
+// static void l3_tria_face_transform_camera(l3_tria_face_t *face, l3_camera_t *camera)
+// {
+//     face->transform_vertex[0].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[0].position);
+//     face->transform_vertex[1].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[1].position);
+//     face->transform_vertex[2].position = l3_4x4_matrix_mul_4d_point(&camera->mat_cam,
+//                                                                     face->transform_vertex[2].position);
+// }
 
 static void l3_tria_face_calculate_normal(l3_tria_face_t *face)
 {
@@ -102,21 +102,20 @@ static void l3_tria_face_transform_perspective(l3_tria_face_t *face, l3_camera_t
 
 static void l3_tria_face_transform_screen(l3_tria_face_t *face, l3_camera_t *camera)
 {
-    float alpha = 0.5f * (camera->viewport_width - 1);
-    float beta = 0.5f * (camera->viewport_height - 1);
-
     for (int i = 0; i < 3; i++)
     {
         // Transform to screen space
-        face->transform_vertex[i].position.x = alpha + alpha * face->transform_vertex[i].position.x;
-        face->transform_vertex[i].position.y = beta + beta * face->transform_vertex[i].position.y;
+        face->transform_vertex[i].position.x = camera->viewport_center_x + camera->viewport_center_x *
+                                               face->transform_vertex[i].position.x;
+        face->transform_vertex[i].position.y = camera->viewport_center_y + camera->viewport_center_y *
+                                               face->transform_vertex[i].position.y;
     }
 
 }
 
 void l3_tria_scene(l3_tria_face_t *face, l3_camera_t *camera)
 {
-    l3_tria_face_transform_camera(face, camera);
+    // l3_tria_face_transform_camera(face, camera);
     l3_tria_face_calculate_normal(face);
     l3_tria_face_update_back_face(face, L3_CULLMODE_CCW);
     l3_tria_face_transform_perspective(face, camera);
