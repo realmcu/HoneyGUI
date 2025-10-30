@@ -7,6 +7,7 @@
 #include <guidef.h>
 #include <gui_api.h>
 #include <gui_matrix.h>
+#include <draw_img.h>
 
 
 #ifdef __cplusplus
@@ -21,6 +22,7 @@ typedef struct engine_gray
     uint16_t w;
     uint16_t h;
     void *data;
+    GUI_FormatType format;
     // gui_matrix_t matrix; //seems can remve by howie
     gui_matrix_t inverse;
 } engine_gray_t;

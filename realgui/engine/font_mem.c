@@ -1043,7 +1043,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_
         df.target_format = ARGB8888;
         break;
     case 8:
-        df.target_format = ALPHA8BIT;
+        df.target_format = GRAY8;
         break;
     default:
         break;

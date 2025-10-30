@@ -97,13 +97,13 @@ static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, 
     uint8_t *read = (uint8_t *)input;
     uint8_t *write = (uint8_t *)output;
 
-    uint16_t byte_x_start = xStart / 2;
-    uint16_t byte_x_end = (xStart + w + 1) / 2;
-    uint16_t x_offset = xStart % 2;
+    uint16_t byte_x_start = x1 / 2;
+    uint16_t byte_x_end = (x2 + 1) / 2;
+    uint16_t x_offset = x1 % 2;
 
-    for (uint32_t y = yStart; y < yStart + h; y++)
+    for (uint32_t y = y1; y < y2; y++)
     {
-        uint32_t src_row_offset = (y - yStart) * w / 2;
+        uint32_t src_row_offset = (y - y1) * w / 2;
         uint32_t dst_row_offset = y * (sim_get_width() / 2);
 
         if (x_offset)

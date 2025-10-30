@@ -447,6 +447,10 @@ gui_color_t gui_color_css(const char *color_str)
 
 #ifdef  GUI_USE_ARM_MATH
 #include "arm_math.h"
+void gui_memset8(uint8_t *addr, uint8_t pixel, uint32_t len) //a8
+{
+    arm_fill_q7(pixel, (int8_t *)addr, len);
+}
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 {
     arm_fill_q15(pixel, (int16_t *)addr, len);
@@ -456,6 +460,10 @@ void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
     arm_fill_q31(pixel, (int32_t *)addr, len);
 }
 #else
+void gui_memset8(uint8_t *addr, uint8_t pixel, uint32_t len) //a8
+{
+    memset(addr, pixel, len);
+}
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 {
     for (uint32_t i = 0; i < len; i++)
@@ -472,7 +480,7 @@ void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
 }
 #endif
 
-void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/)  //argb8888
+void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/)
 {
     extern gui_dispdev_t *gui_get_dc(void);
     gui_dispdev_t *dc = gui_get_dc();
@@ -494,6 +502,20 @@ void gui_fb_clear(uint8_t *addr, gui_color_t color, uint32_t len/*pixel count*/)
         p->color.argb_channel.g = color.color.rgba.g;
         p->color.argb_channel.b = color.color.rgba.b;
         gui_memset32((uint32_t *)addr, pixel, len);
+    }
+    else if (dc->bit_depth == 8)
+    {
+        uint8_t pixel = 0;
+        color_a8_t *p = (color_a8_t *)(uintptr_t)&pixel;
+        p->a = color.color.rgba.a;
+        gui_memset8((uint8_t *)addr, pixel, len);
+    }
+    else if (dc->bit_depth == 4)
+    {
+        uint8_t pixel = 0;
+        color_a8_t *p = (color_a8_t *)(uintptr_t)&pixel;
+        p->a = (uint8_t)((uint8_t)color.color.rgba.a & 0x0Fu) * 0x11u;
+        gui_memset8((uint8_t *)addr, pixel, len / 2);
     }
 }
 

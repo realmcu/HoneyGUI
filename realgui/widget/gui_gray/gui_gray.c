@@ -66,11 +66,14 @@ static void gui_gray_prepare(gui_gray_t *this)
     }
     this->gray = gui_malloc(sizeof(engine_gray_t));
     memset(this->gray, 0x00, sizeof(engine_gray_t));
+    struct gui_rgb_data_head *gray_img_head = (struct gui_rgb_data_head *)this->data;
+
     this->gray->x = obj->x;
     this->gray->y = obj->y;
-    this->gray->w = obj->w;
-    this->gray->h = obj->h;
-    this->gray->data = this->data;
+    this->gray->w = gray_img_head->w;
+    this->gray->h = gray_img_head->h;
+    this->gray->data = (void *)((uint8_t *)this->data + sizeof(struct gui_rgb_data_head));
+    this->gray->format = (GUI_FormatType)gray_img_head->type;
 
     memcpy(&this->gray->inverse, obj->matrix, sizeof(struct gui_matrix));
     matrix_inverse(&this->gray->inverse);
@@ -85,8 +88,6 @@ static void gui_gray_prepare(gui_gray_t *this)
     {
         gui_fb_change();
     }
-
-
 }
 
 static void gui_gray_draw(gui_gray_t *this)
@@ -100,17 +101,40 @@ static void gui_gray_draw(gui_gray_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
+    GUI_FormatType dest_format;
     switch (dc->bit_depth)
     {
+    case 1:
+        dest_format = GRAY1;
+        break;
+    case 2:
+        dest_format = GRAY2;
+        break;
     case 4:
-        engine_gray16_blit_to_dc(this->gray, dc, NULL);
+        dest_format = GRAY4;
         break;
     case 8:
-        engine_gray256_blit_to_dc(this->gray, dc, NULL);
+        dest_format = GRAY8;
         break;
     default:
         break;
     }
+    GUI_FormatType source_format = this->gray->format;
+
+    if (dest_format == GRAY4 && source_format == GRAY4)
+    {
+        engine_gray16_blit_to_dc(this->gray, dc, NULL);
+    }
+    else if (dest_format == GRAY8 && source_format == GRAY8)
+    {
+        engine_gray256_blit_to_dc(this->gray, dc, NULL);
+    }
+    else
+    {
+        gui_log("Not support gray format %d to %d \n", source_format, dest_format);
+        GUI_ASSERT(source_format == dest_format);
+    }
+
 }
 
 static void gui_gray_end(gui_gray_t *this)

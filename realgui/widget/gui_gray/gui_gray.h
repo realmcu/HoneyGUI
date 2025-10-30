@@ -29,6 +29,7 @@ extern "C" {
  *                        Header Files
  *============================================================================*/
 #include "guidef.h"
+#include "def_file.h"
 #include "gui_api.h"
 #include "gui_obj.h"
 #include "engine_gray.h"

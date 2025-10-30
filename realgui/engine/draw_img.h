@@ -21,28 +21,39 @@ typedef enum
     BYTE_PIXEL_RGBA8888 = 4,
 } GUI_BYTE_PIXEL_ENUM;
 
-
-
+/**
+ * GUI_FormatType
+ * Pixel and image format identifiers.
+ * Note: Bit indices refer to positions within the pixel word where bit0 is LSB.
+ */
 typedef enum
 {
-    RGB565 = 0, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, pls refs def_def.h
-    ARGB8565 = 1, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha
-    RGB888 = 3, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red
-    ARGB8888 = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[24:31] for Alpha
-    XRGB8888 = 5, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[24:31] for (255 - Alpha)
-    BINARY = 6,
-    ALPHAMASK = 9,
-    PALETTE = 10,
-    BMP = 11,
-    JPEG = 12,
-    PNG = 13,
-    GIF = 14,
-    RTKARGB8565 = 15,
+    /* Packed RGB formats, pls refs def_color.h */
+    RGB565       = 0,  /* 16-bit: bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red */
+    ARGB8565     = 1,  /* 24-bit: bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha, packed*/
+    RGB888       = 3,  /* 24-bit: bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red */
+    ARGB8888     = 4,  /* 32-bit: bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[31:24] for Alpha */
+    XRGB8888     = 5,  /* 32-bit: bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[31:24] for X (unused or fixed 0xFF) */
 
-    ALPHA1BIT = 0X20, /*Gray 2*/
-    ALPHA2BIT = 0X21, /*Gray 4*/
-    ALPHA4BIT = 0X22, /*Gray 16*/
-    ALPHA8BIT = 0X23, /*Gray 256*/
+    /* Luma / mask / indexed formats */
+    BINARY       = 6,  /* 1-bit monochrome (black/white) */
+    GRAY         = 7,  /* Grayscale, 8 bits per pixel */
+    ALPHAMASK    = 9,  /* Alpha-only mask (default 8 bits) */
+    PALETTE      = 10, /* Indexed color using a palette (CLUT) */
+
+    /* Encoded image container formats */
+    BMP          = 11, /* BMP image file format */
+    JPEG         = 12, /* JPEG image file format */
+    PNG          = 13, /* PNG image file format */
+    GIF          = 14, /* GIF image file format */
+
+    RTKARGB8565  = 15, /* Planar: [A 8bpp plane][RGB565 plane], not interleaved */
+
+    /* Grayscale subtypes (luminance only) */
+    GRAY1        = BINARY, /* 1 bpp grayscale (2 levels) */
+    GRAY2        = 0x21,   /* 2 bpp grayscale (4 levels) */
+    GRAY4        = 0x22,   /* 4 bpp grayscale (16 levels) */
+    GRAY8        = GRAY,   /* 8 bpp grayscale (256 levels) */
 } GUI_FormatType;
 
 /* BLEND_MODE_TYPE structure start*/

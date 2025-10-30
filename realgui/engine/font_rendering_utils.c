@@ -1013,7 +1013,7 @@ void font_glyph_render(draw_font_t *font, font_glyph_t *glyph)
         case ARGB8888:
             font_render_8bpp_to_ARGB8888(font, glyph);
             break;
-        case ALPHA8BIT:
+        case GRAY8:
             font_render_8bpp_to_ALPHA8BIT(font, glyph);
             break;
         default:

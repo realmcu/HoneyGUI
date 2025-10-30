@@ -59,7 +59,7 @@ void engine_gray16_blit_to_dc(engine_gray_t *gray16, struct gui_dispdev *dc, gui
 
 void engine_gray256_blit_to_dc(engine_gray_t *gray256, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    gui_log("gray256 w = %d, h = %d, data = 0x%x \n", gray256->w, gray256->h, gray256->data);
+    // gui_log("gray256 w = %d, h = %d, data = 0x%x \n", gray256->w, gray256->h, gray256->data);
     // memcpy(dc->frame_buf, gray256->data, gray256->w * gray256->h * dc->bit_depth / 8);
 
     (void)rect;
