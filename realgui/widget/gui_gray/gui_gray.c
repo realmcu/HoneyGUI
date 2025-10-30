@@ -64,8 +64,6 @@ static void gui_gray_prepare(gui_gray_t *this)
     {
         return;
     }
-    this->gray = gui_malloc(sizeof(engine_gray_t));
-    memset(this->gray, 0x00, sizeof(engine_gray_t));
     struct gui_rgb_data_head *gray_img_head = (struct gui_rgb_data_head *)this->data;
 
     this->gray->x = obj->x;
@@ -155,7 +153,12 @@ static void gui_gray_destroy(gui_gray_t *this)
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
-    GUI_UNUSED(this);
+    if (this->gray != NULL)
+    {
+        gui_free(this->gray);
+        this->gray = NULL;
+    }
+
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
@@ -211,6 +214,9 @@ static void gui_gray_ctor(gui_gray_t *this,
     /* Initialize gray level to middle value (128) */
     this->gray_level = 128;
     this->data = data;
+
+    this->gray = gui_malloc(sizeof(engine_gray_t));
+    memset(this->gray, 0x00, sizeof(engine_gray_t));
 }
 
 /*============================================================================*
