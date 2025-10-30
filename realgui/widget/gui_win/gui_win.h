@@ -76,7 +76,7 @@ typedef struct gui_win
  * @param x the X-axis coordinate.
  * @param x the Y-axis coordinate.
  * @param w the width.
- * @param h the hight.
+ * @param h the height.
  * @return return the widget object pointer
  *
  */
@@ -219,7 +219,7 @@ void gui_win_prepare(gui_obj_t *obj);
  * @param repeat_count number of times the animation should repeat.
  * @param callback function to be called at each frame.
  * @param p user data to be passed to the callback function.
- * @param name aniamte name.
+ * @param name animate name.
  *
  * @note The `callback` function should match the expected signature for animation
  *       callbacks in the GUI library being used. The `p` parameter allows the

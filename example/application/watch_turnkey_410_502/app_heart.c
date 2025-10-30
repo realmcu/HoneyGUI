@@ -150,7 +150,7 @@ static void drawHeartPath(NVGcontext *vg, float centerX, float centerY, float si
     nvgBezierTo(vg,
                 x - w * 0.5f, y - h * 0.6f,   // left upper control point
                 x - w * 0.9f, y + h * 0.1f,   // left middle control point
-                x, y + h * 0.5f);             // buttom point
+                x, y + h * 0.5f);             // bottom point
 
     // right side curve
     nvgBezierTo(vg,

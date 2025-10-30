@@ -89,7 +89,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         up_cnt++;
         if (down_cnt == 0)
         {
-            tp.type = TOUCH_INVALIDE;
+            tp.type = TOUCH_INVALID;
         }
 
         if ((up_cnt == 1) && (down_cnt > 0))
@@ -115,7 +115,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         y_min_record = *raw_data;
         y_max_record = *raw_data;
         first_record = *raw_data;
-        tp.type = TOUCH_INVALIDE;
+        tp.type = TOUCH_INVALID;
         touch_direct = TOUCH_NONE;
     }
     else

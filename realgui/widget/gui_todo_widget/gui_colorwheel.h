@@ -79,7 +79,7 @@ typedef struct gui_colorwheel
  * @param x  left
  * @param y  top
  * @param w  width
- * @param h  hight
+ * @param h  height
  * @return gui_colorwheel_t* widget pointer
  * <b>Example usage</b>
  * \code{.c}
@@ -106,7 +106,7 @@ gui_colorwheel_t *gui_colorwheel_create(void       *parent,
  * @param x  left
  * @param y  top
  * @param w  width
- * @param h  hight
+ * @param h  height
  * @param t  one frame time
  */
 void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float h, float t);

@@ -370,7 +370,7 @@ void benchmark_perspective(void *parent)
     image_list.data_addr[5] = A6_BIN;
     gui_perspective_t *ppp = gui_perspective_create(parent, "ppp", &image_list, 0, 0);
 
-    /*todo: add animate to rotate automaticlly*/
+    /* TODO: add animate to rotate automatically */
     gui_win_t *win = gui_win_create(ppp, "win_perspective_animate", 0, 0, 0, 0);
     gui_win_set_animate(win, 1, -1, (gui_animate_callback_t)win_perspective_animate_cb, win);
 

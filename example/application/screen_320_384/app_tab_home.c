@@ -159,7 +159,7 @@ void design_tab_home(void *parent)
     home_bg = gui_img_create_from_mem(parent, "home_bg", home[0], 0,
                                       0, 0, 0);
     hour = gui_img_create_from_mem(parent, "hour", TIME_HOUR_BIN, 160, 192, 0, 0);
-    minute = gui_img_create_from_mem(parent, "minute", TIME_MUNITE_BIN, 160, 192, 0, 0);
+    minute = gui_img_create_from_mem(parent, "minute", TIME_MINUTE_BIN, 160, 192, 0, 0);
     second = gui_img_create_from_mem(parent, "second", TIME_SECOND_BIN, 160, 192, 0, 0);
 
     gui_win_t *clock = gui_win_create(parent, "clock", 0, 84, 320, 300);

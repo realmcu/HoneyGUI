@@ -54,7 +54,7 @@ HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中�
    模拟器配置文件
 
 
-当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript` 文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HIGHT``，均为像素单位。
+当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript` 文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HEIGHT``，均为像素单位。
 
 .. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center

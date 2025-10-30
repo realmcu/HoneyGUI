@@ -18,7 +18,7 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_DOG_3D'):
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_EARTH_3D'):
     CPPDEFINES += ['DRV_LCD_WIDTH=410']
-    CPPDEFINES += ['DRV_LCD_HIGHT=502']
+    CPPDEFINES += ['DRV_LCD_HEIGHT=502']
     src += ['app_ui_realgui_3d_earth.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 

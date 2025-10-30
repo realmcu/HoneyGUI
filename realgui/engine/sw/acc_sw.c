@@ -95,7 +95,7 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
  * @brief show image to display
  *
  * @param image image
- * @param dc dispaly
+ * @param dc display
  * @param rect scope
  */
 

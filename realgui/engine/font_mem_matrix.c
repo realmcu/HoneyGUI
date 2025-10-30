@@ -551,7 +551,7 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
     GUI_FONT_HEAD_BMP *font = (GUI_FONT_HEAD_BMP *)text->path;
     gui_dispdev_t *dc = gui_get_dc();
-    uint8_t rendor_mode = font->rendor_mode;
+    uint8_t rendor_mode = font->render_mode;
 
     if (text->use_img_blit)
     {

@@ -226,7 +226,7 @@ void gui_keyboard_launch_by_widget(void *obj, gui_event_t e, void *param);
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param h the height of the widget.
  * @return return the widget object pointer.
  */
 gui_kb_t *gui_keyboard_create(void       *parent,

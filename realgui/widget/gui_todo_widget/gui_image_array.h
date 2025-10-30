@@ -96,7 +96,7 @@ void gui_image_array_write(gui_image_array_t *obj, void **image_data_array, int 
  * @param x left
  * @param y top
  * @param image_data_array  image_data_array
- * @param array_lenght  array_lenght
+ * @param array_length  array_length
  * @param name  widget name
  * @return gui_image_array_t* widget pointer
  */
@@ -104,7 +104,7 @@ gui_image_array_t *gui_image_array_create(void *parent,
                                           int16_t x,
                                           int16_t y,
                                           void **image_data_array,
-                                          int array_lenght,
+                                          int array_length,
                                           const char *widget_name);
 /**
  * @brief image array create (ftl address mode)
@@ -113,7 +113,7 @@ gui_image_array_t *gui_image_array_create(void *parent,
  * @param x left
  * @param y top
  * @param image_data_array  image_data_array (ftl address mode)
- * @param array_lenght  array_lenght
+ * @param array_length  array_length
  * @param name  widget name
  * @return gui_image_array_t* widget pointer
  */
@@ -121,7 +121,7 @@ gui_image_array_t *gui_image_array_create_ftl(void *parent,
                                               int16_t x,
                                               int16_t y,
                                               void **image_data_array,
-                                              int array_lenght,
+                                              int array_length,
                                               const char *widget_name);
 
 #ifdef __cplusplus

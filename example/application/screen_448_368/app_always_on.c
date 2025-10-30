@@ -100,7 +100,7 @@ static void always_on_animate_cb(gui_win_t *win_always_on)
     }
 }
 /**
- * @brief window press genture callback. IF pressed, set the animate invalid. The always-on will not show until released.
+ * @brief window press gesture callback. IF pressed, set the animate invalid. The always-on will not show until released.
  *
  */
 static void callback_always_on()
@@ -122,7 +122,7 @@ static void callback_always_on()
 
 }
 /**
- * @brief window release genture callback. IF released, set the animate starting. It is a timer.
+ * @brief window release gesture callback. IF released, set the animate starting. It is a timer.
  *
  */
 static void callback_always_on_release()

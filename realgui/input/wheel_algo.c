@@ -16,14 +16,9 @@
 #include <wheel_algo.h>
 
 
-
-
-
-
-
 #define STEP 40
 #define RELEASE_THRESHOLD_MS 300
-static touch_info_t wheel = {.type = TOUCH_INVALIDE, .x = 454 / 2, .y = 454 / 2};
+static touch_info_t wheel = {.type = TOUCH_INVALID, .x = 454 / 2, .y = 454 / 2};
 touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
 {
     GUI_ASSERT(wheel_raw != NULL);
@@ -37,7 +32,7 @@ touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
 
     if (wheel.type == TOUCH_DOWN_SLIDE || wheel.type == TOUCH_UP_SLIDE)
     {
-        wheel.type = TOUCH_INVALIDE;
+        wheel.type = TOUCH_INVALID;
     }
 
     switch (wheel_raw->event)
@@ -81,7 +76,7 @@ touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
     case GUI_WHEEL_SCROLL:
         {
 
-            if (wheel.type == TOUCH_INVALIDE)
+            if (wheel.type == TOUCH_INVALID)
             {
                 wheel.pressed = 1;
                 wheel.pressing = 1;

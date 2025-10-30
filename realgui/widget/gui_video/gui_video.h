@@ -185,16 +185,16 @@ void gui_video_refresh_size(gui_video_t *this);
 void gui_video_refresh_type(gui_video_t *this);
 
 /**
- * @brief Creat a image live widget with buffer.
- * @note This widget is use to display live image which can be play.
- * @note The data of image can be static char or data transformed by BLE.
- * @param parent The father widget .
+ * @brief Create an image live widget with buffer.
+ * @note This widget is used to display live images which can be played.
+ * @note The data of the image can be static char or data transformed by BLE.
+ * @param parent The father widget.
  * @param name The widget's name.
- * @param addr The data address of image.
- * @param x The X-axis coordinate .
- * @param y The Y-axis coordinate .
- * @param w The widget width .
- * @param h The widget hight .
+ * @param addr The data address of the image.
+ * @param x The X-axis coordinate.
+ * @param y The Y-axis coordinate.
+ * @param w The widget width.
+ * @param h The widget height.
  * @return gui_video_t*
  */
 gui_video_t *gui_video_create_from_mem(void           *parent,

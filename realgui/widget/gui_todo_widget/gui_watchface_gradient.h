@@ -5,7 +5,7 @@
 *****************************************************************************************
   * @file gui_watchface_gradient.h
   * @brief  This file is part of GUI Engine
-  * @details  create watchface gradien widget
+  * @details  create watchface gradient widget
   * @author triton_yu@realsil.com.cn
   * @date 2023/10/24
   * @version 1.0

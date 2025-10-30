@@ -95,7 +95,7 @@ void gui_server_msg_handler(gui_msg_t *msg)
         }
     case GUI_EVENT_DISPLAY_OFF:
         {
-            //also need clear all message
+            // also need to clear all messages
             break;
         }
     case GUI_EVENT_FREE_ALL:

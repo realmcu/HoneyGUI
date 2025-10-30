@@ -7,7 +7,7 @@ if(POLICY CMP0079)
 endif()
 
 # Define a variable for the library name
-if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for depnedency
+if(CONFIG_REALTEK_BUILD_LITE3D) #set to 1 to enable or variable to for dependency
 
     file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")

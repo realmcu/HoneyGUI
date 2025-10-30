@@ -249,7 +249,7 @@ void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)
     GUI_BASE(win)->opacity_value = opacity_value;
 }
 
-void gui_win_prepare_globle(gui_obj_t *obj)
+void gui_win_prepare_global(gui_obj_t *obj)
 {
     prepare(obj);
 }

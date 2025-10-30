@@ -76,7 +76,7 @@ typedef struct gui_wave
  * @param x X-axis coordinate
  * @param x Y-axis coordinate
  * @param w width
- * @param h hight
+ * @param h height
  * @return return the widget object pointer
  *
  * <b>Example usage</b>
@@ -100,7 +100,7 @@ gui_wave_t *gui_wave_create(void       *parent,
  * @param x  X-axis coordinate
  * @param y  Y-axis coordinate
  * @param w  width
- * @param h  hight
+ * @param h  height
  * @param t  one frame time
  */
 void gui_wave_set(gui_wave_t *this,

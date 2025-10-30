@@ -107,10 +107,10 @@ void design_curtain_player_vol(void *parent)
                             ICON_CALL_VOLUME_BAR_2_BIN, 117, 67, 0, 0);
 
     //volume bar
-    //todo :add volume black base bar; add volume blue progress bar
+    // TODO: add volume black base bar; add volume blue progress bar
     progressbar_player_vol = gui_progressbar_img_h_create(curtain_down_player_vol,
                                                           ICON_VOLUME_BAR_BLUE_BIN, 117, 67);
-    //todo get volume from profile
+    // TODO: get volume from profile
     //curr_volume 0~15
 
     gui_player_vol = 8;//default volume

@@ -1,5 +1,5 @@
 /**
- * @file components.c
+ * @file gui_components_init.c
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
  * @version 0.1

@@ -23,7 +23,7 @@
 #endif
 
 static uint32_t start_tick = 0;
-static kb_info_t kb = {.type = KB_INVALIDE};
+static kb_info_t kb = {.type = KB_INVALID};
 static bool long_button_flag = false;
 
 static uint32_t judge_timestamp_overflow(uint32_t timestamp, uint32_t timestamp_sub)
@@ -149,9 +149,9 @@ struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
     }
     else if (flag == GUI_KB_EVENT_UP)
     {
-        if (kb.type != KB_INVALIDE)
+        if (kb.type != KB_INVALID)
         {
-            kb.type = KB_INVALIDE;
+            kb.type = KB_INVALID;
             KB_LOG("=====END UP====== tick = %d\n", kb_raw->timestamp_ms_release);
         }
         else

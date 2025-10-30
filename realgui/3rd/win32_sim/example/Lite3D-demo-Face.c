@@ -24,8 +24,8 @@ static int lite3D_example(void)
 {
     printf("Lite3D example test code!\n");
 
-    uint8_t *pixel = malloc(DRV_LCD_WIDTH * DRV_LCD_HIGHT * sizeof(uint16_t));
-    memset(pixel, 0x0, DRV_LCD_WIDTH * DRV_LCD_HIGHT * sizeof(uint16_t));
+    uint8_t *pixel = malloc(DRV_LCD_WIDTH * DRV_LCD_HEIGHT * sizeof(uint16_t));
+    memset(pixel, 0x0, DRV_LCD_WIDTH * DRV_LCD_HEIGHT * sizeof(uint16_t));
 
     l3_model_t *face_3d = l3_create_model((void *)(_acdesc_face), L3_DRAW_FRONT_AND_SORT, 0, 0,
                                           MODEL_CANVAS_WIDTH, MODEL_CANVAS_HEIGHT);
@@ -39,7 +39,7 @@ static int lite3D_example(void)
     l3_draw(face_3d);
 
 
-    port_direct_draw_bitmap_to_lcd(0, 0, DRV_LCD_WIDTH, DRV_LCD_HIGHT, (uint8_t *)pixel);
+    port_direct_draw_bitmap_to_lcd(0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT, (uint8_t *)pixel);
 
 
 

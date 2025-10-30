@@ -153,7 +153,7 @@ void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t
 void gui_obj_tree_print_bfs(gui_obj_t *root);
 
 /**
- * @brief tree print mermaid.
+ * @brief tree print Mermaid.
  *
  * @param obj Pointer to the GUI object root.
  */

@@ -56,7 +56,7 @@
 // </c>
 
 // <c> RTK GUI Canvas Demo
-// #define CONFIG_REALTEK_BUILD_REAL_CANCAS
+// #define CONFIG_REALTEK_BUILD_REAL_CANVAS
 // </c>
 
 // <c> RTK GUI Menu Cellular Demo

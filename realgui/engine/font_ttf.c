@@ -4,7 +4,7 @@
 *****************************************************************************************
   * @file font_ttf.c
   * @brief realui ttf engine
-  * @details srealui ttf engine
+  * @details realui ttf engine
   * @author luke_sun@realsil.com.cn
   * @date 2024/12/09
   * @version v1.0

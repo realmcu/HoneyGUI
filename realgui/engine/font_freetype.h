@@ -21,7 +21,7 @@ typedef struct
 
 
 /**
- * @brief Preprocessing of ttf font drawing with ft
+ * @brief Preprocessing of TTF font rendering with FreeType
  *
  * @param text Widget pointer
  */

@@ -43,7 +43,7 @@ int app_player_switch_tabs(player_ids id)
     }
     else
     {
-        gui_log("player switch to id %d fail!", id);
+        gui_log("player switch to id %d failed!", id);
         return -1;
     }
 

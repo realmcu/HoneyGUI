@@ -21,7 +21,7 @@ void wallpaper_last_cb(void)
         wallpaper_idx--;
         gui_img_set_attribute(img_wallpaper, "wallpaper", wallpaper_size_list[wallpaper_idx],
                               GET_BASE(img_wallpaper)->x, GET_BASE(img_wallpaper)->y);
-        //gui_img_scale(img_wallpaper, 0.4, 0.4);
+        // gui_img_scale(img_wallpaper, 0.4, 0.4);
 
         gui_img_set_attribute(screen_wallpaper, "screen lock", wallpaper_list[wallpaper_idx], 0, 0);
     }
@@ -35,7 +35,7 @@ void wallpaper_next_cb(void)
         wallpaper_idx++;
         gui_img_set_attribute(img_wallpaper, "wallpaper", wallpaper_size_list[wallpaper_idx],
                               GET_BASE(img_wallpaper)->x, GET_BASE(img_wallpaper)->y);
-        //gui_img_scale(img_wallpaper, 0.4, 0.4);
+        // gui_img_scale(img_wallpaper, 0.4, 0.4);
 
         gui_img_set_attribute(screen_wallpaper, "screen lock", wallpaper_list[wallpaper_idx], 0, 0);
     }
@@ -49,7 +49,7 @@ void page_tb_wallpaper(void *parent)
                  strlen(func), 28);
 
     img_wallpaper = gui_img_create_from_mem(parent, "wallpaper", WALLPAPER1_SIZE_BIN, 120, 120, 0, 0);
-    //gui_img_scale(img_wallpaper, 0.4, 0.4);
+    // gui_img_scale(img_wallpaper, 0.4, 0.4);
     gui_img_set_mode(img_wallpaper, IMG_BYPASS_MODE);
 
     gui_button_t *button_wallpaper_last = gui_button_create(parent, 20, 150, 80, 80, OPTION_LEFT_BIN,

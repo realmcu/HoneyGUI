@@ -89,7 +89,7 @@ static void gui_soccer_scale(gui_vertex_t *vertex, float scale)
 //
 // So the homogeneous matrix sx, sy, shx, shy, tx, ty can be easily solved from above equations.
 //
-static void gui_soccer_transfrom_blit(float              w,
+static void gui_soccer_transform_blit(float              w,
                                       float              h,
                                       gui_vertex_t          *v0,
                                       gui_vertex_t          *v1,
@@ -101,7 +101,7 @@ static void gui_soccer_transfrom_blit(float              w,
     float sx, sy, shx, shy, tx, ty;
 
     // Compute 3x3 image transform matrix to map a rectangle image (w,h) to
-    // a parallelogram (x0,y0), (x1,y1), (x2,y2), (x3,y3) counterclock wise.
+    // a parallelogram (x0,y0), (x1,y1), (x2,y2), (x3,y3) counterclockwise.
     sx = (v1->x - v0->x) / w;
     sy = (v3->y - v0->y) / h;
     shx = (v3->x - v0->x) / h;
@@ -393,7 +393,7 @@ static void gui_soccer_prepare(gui_obj_t *obj)
         matrix_transfrom_rotate(&rotate_3D, &qv1, &qrv1, xoff, yoff, 0);
         matrix_transfrom_rotate(&rotate_3D, &qv2, &qrv2, xoff, yoff, 0);
         matrix_transfrom_rotate(&rotate_3D, &qv3, &qrv3, xoff, yoff, 0);
-        gui_soccer_transfrom_blit(98, 98, &qrv1, &qrv0, &qrv3, &qrv2, &matrix);
+        gui_soccer_transform_blit(98, 98, &qrv1, &qrv0, &qrv3, &qrv2, &matrix);
 
 
         gui_matrix_t tmp;

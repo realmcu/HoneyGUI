@@ -103,7 +103,7 @@ extern _gui_api_gui_slider_t _gui_api_for_gui_slider_t;
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param h the height of the widget.
  * @param minValue minimum value of slider range.
  * @param maxValue maximum value of slider range.
  * @param slider_img the slider image of the slider widget.

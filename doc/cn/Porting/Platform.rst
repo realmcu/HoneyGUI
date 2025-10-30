@@ -55,7 +55,7 @@
          .fb_width = DRV_LCD_WIDTH,
          .fb_height = FB_HEIGHT,
          .screen_width =  DRV_LCD_WIDTH,
-         .screen_height = DRV_LCD_HIGHT,
+         .screen_height = DRV_LCD_HEIGHT,
          .dc.disp_buf_1 = disp_write_buff1_port,
          .dc.disp_buf_2 = disp_write_buff2_port,
          .driver_ic_fps = 60,

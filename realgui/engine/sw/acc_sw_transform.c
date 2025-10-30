@@ -106,10 +106,10 @@ void sw_transform_for_rgb565(draw_img_t *image, gui_dispdev_t *dc,
 
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float detalX = m01 * i + m02;
-        float detalY = m11 * i + m12;
-        float X = m00 * x_start + detalX;
-        float Y = m10 * x_start + detalY;
+        float deltaX = m01 * i + m02;
+        float deltaY = m11 * i + m12;
+        float X = m00 * x_start + deltaX;
+        float Y = m10 * x_start + deltaY;
 
         int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
 
@@ -166,12 +166,12 @@ void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
     float m11 = inverse->m[1][1];
     float m12 = inverse->m[1][2];
 
-    float detalX = m01 * y_start + m02;
-    float detalY = m11 * y_start + m12;
+    float deltaX = m01 * y_start + m02;
+    float deltaY = m11 * y_start + m12;
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float X = m00 * x_start + detalX;
-        float Y = m10 * x_start + detalY;
+        float X = m00 * x_start + deltaX;
+        float Y = m10 * x_start + deltaY;
 
         int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + dc->section.x1;
 
@@ -201,8 +201,8 @@ void sw_transform_for_argb8565(draw_img_t *image, gui_dispdev_t *dc,
             X += m00;
             Y += m10;
         }
-        detalX += m01;
-        detalY += m11;
+        deltaX += m01;
+        deltaY += m11;
     }
 }
 
@@ -242,12 +242,12 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
     const float m10xx = m10 * x_start;
     const int fb_width = (dc->section.x2 - dc->section.x1 + 1);
     const int offset_constant = dc->section.y1 * fb_width + dc->section.x1;
-    float detalX = m01 * y_start + m02;
-    float detalY = m11 * y_start + m12;
+    float deltaX = m01 * y_start + m02;
+    float deltaY = m11 * y_start + m12;
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float X = m00xx + detalX;
-        float Y = m10xx + detalY;
+        float X = m00xx + deltaX;
+        float Y = m10xx + deltaY;
 
         int write_offset = i * fb_width - offset_constant;
 
@@ -309,8 +309,8 @@ void sw_transform_for_argb8565_aa(draw_img_t *image, gui_dispdev_t *dc,
             X += m00;
             Y += m10;
         }
-        detalX += m01;
-        detalY += m11;
+        deltaX += m01;
+        deltaY += m11;
     }
 }
 
@@ -356,12 +356,12 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
     const float m10xx = m10 * x_start;
     const int fb_width = (dc->section.x2 - dc->section.x1 + 1);
     const int offset_constant = dc->section.y1 * fb_width + dc->section.x1;
-    float detalX = m01 * y_start + m02;
-    float detalY = m11 * y_start + m12;
+    float deltaX = m01 * y_start + m02;
+    float deltaY = m11 * y_start + m12;
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float X = m00xx + detalX;
-        float Y = m10xx + detalY;
+        float X = m00xx + deltaX;
+        float Y = m10xx + deltaY;
 
         int write_offset = i * fb_width - offset_constant;
 
@@ -419,8 +419,8 @@ void sw_transform_for_alpha_aa(draw_img_t *image, gui_dispdev_t *dc,
             X += m00;
             Y += m10;
         }
-        detalX += m01;
-        detalY += m11;
+        deltaX += m01;
+        deltaY += m11;
     }
 }
 
@@ -464,10 +464,10 @@ void sw_transform_for_alpha(draw_img_t *image, gui_dispdev_t *dc,
     uint16_t fg_color = (uint16_t)((r5 << 11) | (g6 << 5) | b5);
     for (int32_t i = y_start; i <= y_end; i++)
     {
-        float detalX = m01 * i + m02;
-        float detalY = m11 * i + m12;
-        float X = m00 * x_start + detalX;
-        float Y = m10 * x_start + detalY;
+        float deltaX = m01 * i + m02;
+        float deltaY = m11 * i + m12;
+        float X = m00 * x_start + deltaX;
+        float Y = m10 * x_start + deltaY;
 
         int write_offset = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) - dc->section.x1;
 

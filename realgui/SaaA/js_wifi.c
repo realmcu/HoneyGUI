@@ -82,7 +82,7 @@ typedef struct
 {
     char ssid[33];
     uint8_t ssid_len;
-    uint8_t security;  // 0: no passwd
+    uint8_t security;  // 0: no password
     int16_t rssi;
 } ap_info_t;
 
@@ -203,9 +203,9 @@ DECLARE_HANDLER(setConIndex)
     return jerry_create_undefined();
 }
 
-DECLARE_HANDLER(initPasswd)
+DECLARE_HANDLER(initPassword)
 {
-    gui_log("wifi initPasswd\n");
+    gui_log("wifi initPassword\n");
 #if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
     js_wifi_data.ssid_info.password[0] = '\0';
     gui_kb_set_pswd(js_wifi_data.ssid_info.password, 0);
@@ -379,7 +379,7 @@ void js_wifi_init()
     REGISTER_METHOD(wifi, disconnect);
 
     REGISTER_METHOD(wifi, setConIndex);
-    REGISTER_METHOD(wifi, initPasswd);
+    REGISTER_METHOD(wifi, initPassword);
     REGISTER_METHOD(wifi, setConPasswd);
     REGISTER_METHOD(wifi, setPasswdVisible);
 

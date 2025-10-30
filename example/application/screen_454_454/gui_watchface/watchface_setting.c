@@ -10,8 +10,8 @@
 #include "app_task.h"
 #endif
 
-char *txet_sw_reset = "确认重启？";
-char *txet_factory_data_reset = "确认恢复出厂？";
+char *text_sw_reset = "确认重启？";
+char *text_factory_data_reset = "确认恢复出厂？";
 
 static void switch_back_menu_setting_touch_cb(void *obj, uint16_t event, void *param)
 {
@@ -38,7 +38,7 @@ static void switch_text_base_sw_reset_touch_cb(void *obj, uint16_t event, void *
 
     set_confirm_yes(switch_sw_reset_yes_action, obj);
     set_confirm_no(switch_sw_reset_no_action, obj);
-    set_confirm_text(txet_sw_reset, 157, 131, 5);
+    set_confirm_text(text_sw_reset, 157, 131, 5);
 
     app_watchface_switch_tabs(WATCHFACE_CONFIRM);
 }
@@ -68,7 +68,7 @@ static void switch_text_base_factory_data_reset_touch_cb(void *obj, uint16_t eve
 
     set_confirm_yes(switch_factory_data_reset_yes_action, obj);
     set_confirm_no(switch_factory_data_reset_no_action, obj);
-    set_confirm_text(txet_factory_data_reset, 123, 131, 7);
+    set_confirm_text(text_factory_data_reset, 123, 131, 7);
 
     app_watchface_switch_tabs(WATCHFACE_CONFIRM);
 }

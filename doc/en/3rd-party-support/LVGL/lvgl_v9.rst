@@ -48,7 +48,7 @@ After completing the simulator environment installation, starting it will show t
 
    Simulator Configuration File
 
-When you need to modify the screen size, change the :file:`SConscript` file located under :file:`your lvgl dir/rtk/demos/xxxxxx/`. Modify the screen width ``DRV_LCD_WIDTH`` and screen height ``DRV_LCD_HIGHT``, both in pixel units.
+When you need to modify the screen size, change the :file:`SConscript` file located under :file:`your lvgl dir/rtk/demos/xxxxxx/`. Modify the screen width ``DRV_LCD_WIDTH`` and screen height ``DRV_LCD_HEIGHT``, both in pixel units.
 
 .. figure:: https://foruda.gitee.com/images/1753343552380283109/09329a68_9325830.png
    :align: center

@@ -242,12 +242,12 @@ static void gui_page_update_speed(gui_obj_t *obj)
         this->target = obj->y;
     }
 
-    if (this->align_hight > 0)
+    if (this->align_height > 0)
     {
-        int alien = _UI_ABS(this->target) % this->align_hight;
-        if (alien > this->align_hight / 2)
+        int alien = _UI_ABS(this->target) % this->align_height;
+        if (alien > this->align_height / 2)
         {
-            this->target = this->target - this->align_hight + alien;
+            this->target = this->target - this->align_height + alien;
 
             if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
             {
@@ -340,12 +340,12 @@ static void gui_page_update_speed_x(gui_obj_t *obj)
         this->target = obj->x;
     }
     gui_log("2222this->target:%d\n", this->target);
-    if (this->align_hight > 0)
+    if (this->align_height > 0)
     {
-        int alien = _UI_ABS(this->target) % this->align_hight;
-        if (alien > this->align_hight / 2)
+        int alien = _UI_ABS(this->target) % this->align_height;
+        if (alien > this->align_height / 2)
         {
-            this->target = this->target - this->align_hight + alien;
+            this->target = this->target - this->align_height + alien;
 
             if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
             {
@@ -525,7 +525,7 @@ static void gui_page_update_alien(gui_obj_t *obj)
 
     if ((this->speed <= 3) && (this->speed >= -3))
     {
-        if (this->align_hight > 0)
+        if (this->align_height > 0)
         {
             if (((this->speed > 0) && (obj->y >= this->target))
                 || ((this->speed < 0) && (obj->y <= this->target)))
@@ -560,7 +560,7 @@ static void gui_page_update_alien_x(gui_obj_t *obj)
 
     if ((this->speed <= 3) && (this->speed >= -3))
     {
-        if (this->align_hight > 0)
+        if (this->align_height > 0)
         {
             if (((this->speed > 0) && (obj->x >= this->target))
                 || ((this->speed < 0) && (obj->x <= this->target)))
@@ -655,17 +655,17 @@ void gui_page_update(gui_obj_t *obj)
                     }
                     else
 
-                        if (this->align_hight > 0 && obj->y % this->align_hight != 0)
+                        if (this->align_height > 0 && obj->y % this->align_height != 0)
                         {
                             this->release = true;
-                            if (_UI_ABS(obj->y % this->align_hight) < this->align_hight / 2)
+                            if (_UI_ABS(obj->y % this->align_height) < this->align_height / 2)
                             {
-                                this->target = obj->y - (obj->y % this->align_hight);
+                                this->target = obj->y - (obj->y % this->align_height);
                                 this->speed = GUI_PAGE_MIN_SPEED;
                             }
                             else
                             {
-                                this->target = obj->y - this->align_hight + _UI_ABS(obj->y % this->align_hight);
+                                this->target = obj->y - this->align_height + _UI_ABS(obj->y % this->align_height);
                                 this->speed = -GUI_PAGE_MIN_SPEED;
                             }
                         }
@@ -767,17 +767,17 @@ void gui_page_update_x(gui_obj_t *obj)
                     }
                     else
 
-                        if (this->align_hight > 0 && obj->x % this->align_hight != 0)
+                        if (this->align_height > 0 && obj->x % this->align_height != 0)
                         {
                             this->release = true;
-                            if (_UI_ABS(obj->x % this->align_hight) < this->align_hight / 2)
+                            if (_UI_ABS(obj->x % this->align_height) < this->align_height / 2)
                             {
-                                this->target = obj->x - (obj->x % this->align_hight);
+                                this->target = obj->x - (obj->x % this->align_height);
                                 this->speed = GUI_PAGE_MIN_SPEED;
                             }
                             else
                             {
-                                this->target = obj->x - this->align_hight + _UI_ABS(obj->x % this->align_hight);
+                                this->target = obj->x - this->align_height + _UI_ABS(obj->x % this->align_height);
                                 this->speed = -GUI_PAGE_MIN_SPEED;
                             }
                         }
@@ -878,17 +878,17 @@ void gui_page_loop_update(gui_obj_t *obj)
                     }
                     else
 
-                        if (this->align_hight > 0 && obj->y % this->align_hight != 0)
+                        if (this->align_height > 0 && obj->y % this->align_height != 0)
                         {
                             this->release = true;
-                            if (_UI_ABS(obj->y % this->align_hight) < this->align_hight / 2)
+                            if (_UI_ABS(obj->y % this->align_height) < this->align_height / 2)
                             {
-                                this->target = obj->y - (obj->y % this->align_hight);
+                                this->target = obj->y - (obj->y % this->align_height);
                                 this->speed = GUI_PAGE_MIN_SPEED;
                             }
                             else
                             {
-                                this->target = obj->y - this->align_hight + _UI_ABS(obj->y % this->align_hight);
+                                this->target = obj->y - this->align_height + _UI_ABS(obj->y % this->align_height);
                                 this->speed = -GUI_PAGE_MIN_SPEED;
                             }
                         }
@@ -1015,17 +1015,17 @@ void gui_page_update_rebound(gui_obj_t *obj)
             }
             else
             {
-                if (this->align_hight > 0 && obj->y % this->align_hight != 0)
+                if (this->align_height > 0 && obj->y % this->align_height != 0)
                 {
                     this->release = true;
-                    if (_UI_ABS(obj->y % this->align_hight) < this->align_hight / 2)
+                    if (_UI_ABS(obj->y % this->align_height) < this->align_height / 2)
                     {
-                        this->target = obj->y - (obj->y % this->align_hight);
+                        this->target = obj->y - (obj->y % this->align_height);
                         this->speed = GUI_PAGE_MIN_SPEED;
                     }
                     else
                     {
-                        this->target = obj->y - this->align_hight + _UI_ABS(obj->y % this->align_hight);
+                        this->target = obj->y - this->align_height + _UI_ABS(obj->y % this->align_height);
                         this->speed = -GUI_PAGE_MIN_SPEED;
                     }
                 }
@@ -1224,17 +1224,17 @@ void gui_page_update_rebound_x(gui_obj_t *obj)
             }
             else
             {
-                if (this->align_hight > 0 && obj->x % this->align_hight != 0)
+                if (this->align_height > 0 && obj->x % this->align_height != 0)
                 {
                     this->release = true;
-                    if (_UI_ABS(obj->x % this->align_hight) < this->align_hight / 2)
+                    if (_UI_ABS(obj->x % this->align_height) < this->align_height / 2)
                     {
-                        this->target = obj->x - (obj->x % this->align_hight);
+                        this->target = obj->x - (obj->x % this->align_height);
                         this->speed = GUI_PAGE_MIN_SPEED;
                     }
                     else
                     {
-                        this->target = obj->x - this->align_hight + _UI_ABS(obj->x % this->align_hight);
+                        this->target = obj->x - this->align_height + _UI_ABS(obj->x % this->align_height);
                         this->speed = -GUI_PAGE_MIN_SPEED;
                     }
                 }
@@ -1431,17 +1431,17 @@ static void prepare_rebound(gui_obj_t *obj, bool *take_over, touch_info_t *tp)
             }
             else
             {
-                if (this->align_hight > 0 && obj->y % this->align_hight != 0)
+                if (this->align_height > 0 && obj->y % this->align_height != 0)
                 {
                     this->release = true;
-                    if (_UI_ABS(obj->y % this->align_hight) < this->align_hight / 2)
+                    if (_UI_ABS(obj->y % this->align_height) < this->align_height / 2)
                     {
-                        this->target = obj->y - (obj->y % this->align_hight);
+                        this->target = obj->y - (obj->y % this->align_height);
                         this->speed = GUI_PAGE_MIN_SPEED;
                     }
                     else
                     {
-                        this->target = obj->y - this->align_hight + _UI_ABS(obj->y % this->align_hight);
+                        this->target = obj->y - this->align_height + _UI_ABS(obj->y % this->align_height);
                         this->speed = -GUI_PAGE_MIN_SPEED;
                     }
                 }
@@ -1865,9 +1865,9 @@ void gui_page_loop(gui_page_t *this)
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_destroy_cb = true;
 }
-void gui_page_center_alignment(gui_page_t *this, int align_hight)
+void gui_page_center_alignment(gui_page_t *this, int align_height)
 {
-    this->align_hight = align_hight;
+    this->align_height = align_height;
 }
 
 void gui_page_set_only_top_slide(gui_page_t *this, bool flag)

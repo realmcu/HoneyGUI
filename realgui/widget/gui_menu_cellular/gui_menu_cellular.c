@@ -242,7 +242,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 #define HEIGHT_GAP (ICON_SIZE)
 #define INIT_OFFSET_X (icon_size / 2)
 #define INIT_OFFSET_Y (0)
-#define FOUCUS_OFFSET (icon_size / 2)
+#define FOCUS_OFFSET (icon_size / 2)
     uint8_t index = 0;
     uint8_t index_offset = 0;
     for (size_t i = 0; i < (unsigned int)array_size; i++)
@@ -253,17 +253,17 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
         int16_t start_y = 0;
         if (index < 3)
         {
-            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2) + FOUCUS_OFFSET;
+            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2) + FOCUS_OFFSET;
             img = gui_img_create_from_mem(this, 0, icon_array[i],
-                                          WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOUCUS_OFFSET, start_y, 0, 0);
+                                          WIDTH_GAP * index + INIT_OFFSET_X * 1 + FOCUS_OFFSET, start_y, 0, 0);
         }
         else
         {
-            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2 + 1) + FOUCUS_OFFSET;
+            start_y = INIT_OFFSET_Y + HEIGHT_GAP * (index_offset / 7 * 2 + 1) + FOCUS_OFFSET;
             img = gui_img_create_from_mem(this, 0, icon_array[i],
-                                          WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOUCUS_OFFSET, start_y, 0, 0);
+                                          WIDTH_GAP * (index - 3) + INIT_OFFSET_X * 0 + FOCUS_OFFSET, start_y, 0, 0);
         }
-        gui_img_set_focus(img, FOUCUS_OFFSET, FOUCUS_OFFSET);
+        gui_img_set_focus(img, FOCUS_OFFSET, FOCUS_OFFSET);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_set_quality(img, true);
         this->ver_offset_min = -(start_y + HEIGHT_GAP - SCREEN_H);

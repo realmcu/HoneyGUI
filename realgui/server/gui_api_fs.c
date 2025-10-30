@@ -189,9 +189,9 @@ struct file_load_node
     uint32_t file_id;
     void *mem_addr;
 };
-typedef struct file_load_node FIEL_LOAD_NODE;
+typedef struct file_load_node FILE_LOAD_NODE;
 
-FIEL_LOAD_NODE *fielload_root;
+FILE_LOAD_NODE *fileload_root;
 
 static uint32_t fileload_get_id(const char *str)
 {
@@ -206,23 +206,23 @@ static uint32_t fileload_get_id(const char *str)
     return id;
 }
 
-static void fileload_insert_node(FIEL_LOAD_NODE *node)
+static void fileload_insert_node(FILE_LOAD_NODE *node)
 {
-    if (node == fielload_root)
+    if (node == fileload_root)
     {
         return;
     }
     else
     {
-        FIEL_LOAD_NODE *cur = fielload_root;
-        FIEL_LOAD_NODE *nxt = fielload_root;
+        FILE_LOAD_NODE *cur = fileload_root;
+        FILE_LOAD_NODE *nxt = fileload_root;
         while (nxt)
         {
             if (nxt->file_id > node->file_id)
             {
-                if (nxt == fielload_root)
+                if (nxt == fileload_root)
                 {
-                    fielload_root = node;
+                    fileload_root = node;
                 }
                 else
                 {
@@ -239,21 +239,21 @@ static void fileload_insert_node(FIEL_LOAD_NODE *node)
     }
 }
 
-static FIEL_LOAD_NODE *fileload_get_node(const char *file)
+static FILE_LOAD_NODE *fileload_get_node(const char *file)
 {
     uint32_t file_id = fileload_get_id(file);
-    FIEL_LOAD_NODE *root = fielload_root;
-    FIEL_LOAD_NODE *node = NULL;
+    FILE_LOAD_NODE *root = fileload_root;
+    FILE_LOAD_NODE *node = NULL;
 
     if (!root)
     {
         // empty file load list
-        fielload_root = (FIEL_LOAD_NODE *)gui_malloc(sizeof(FIEL_LOAD_NODE));
-        node = fielload_root;
+        fileload_root = (FILE_LOAD_NODE *)gui_malloc(sizeof(FILE_LOAD_NODE));
+        node = fileload_root;
     }
     else
     {
-        root = fielload_root;
+        root = fileload_root;
         node = root;
         // search node by file_id
         while (node && (node->file_id < file_id))
@@ -264,11 +264,11 @@ static FIEL_LOAD_NODE *fileload_get_node(const char *file)
         {
             return node;
         }
-        node = (FIEL_LOAD_NODE *)gui_malloc(sizeof(FIEL_LOAD_NODE));
+        node = (FILE_LOAD_NODE *)gui_malloc(sizeof(FILE_LOAD_NODE));
     }
 
     // GUI_ASSERT(node != NULL);
-    memset(node, 0, sizeof(FIEL_LOAD_NODE));
+    memset(node, 0, sizeof(FILE_LOAD_NODE));
     node->file_id = file_id;
     fileload_insert_node(node);
     return node;
@@ -286,7 +286,7 @@ void *gui_get_file_address(const char *file)
     {
         // gui_log("get file: %s\n", file);
         // check whether file has already been loaded
-        FIEL_LOAD_NODE *file_node = fileload_get_node(file);
+        FILE_LOAD_NODE *file_node = fileload_get_node(file);
         if (file_node->mem_addr)
         {
             //gui_log(">loaded before\n");

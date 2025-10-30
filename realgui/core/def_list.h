@@ -63,7 +63,7 @@ gui_inline void gui_list_append(gui_node_list_t *l, gui_node_list_t *n)
         node = node->next;
     }
 
-    /* append the node to the tail */
+    /* Appends the node to the tail */
     node->next = n;
     n->next = l;
 }

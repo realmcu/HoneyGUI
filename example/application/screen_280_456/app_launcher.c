@@ -236,15 +236,15 @@ static void tab_text(void *tab)
     gui_text_type_set(text5, HARMONYOS_SIZE32_BITS4_VFONT_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text5, MULTI_LEFT);
 
-    gui_scroll_text_t *scrool_text1 = gui_scroll_text_create(tab,  "scrool_text1",  80, 300, 100, 50);
-    gui_scroll_text_scroll_set(scrool_text1, SCROLL_X, 100, 0, 3000, 1500000);
-    gui_scroll_text_type_set(scrool_text1, HARMONYOS_SIZE32_BITS4_VFONT_BIN, FONT_SRC_MEMADDR);
-    gui_scroll_text_set(scrool_text1, "0123456789", GUI_FONT_SRC_TTF, gui_rgb(0, 0xff, 0), 10, 32);
+    gui_scroll_text_t *scroll_text1 = gui_scroll_text_create(tab,  "scroll_text1",  80, 300, 100, 50);
+    gui_scroll_text_scroll_set(scroll_text1, SCROLL_X, 100, 0, 3000, 1500000);
+    gui_scroll_text_type_set(scroll_text1, HARMONYOS_SIZE32_BITS4_VFONT_BIN, FONT_SRC_MEMADDR);
+    gui_scroll_text_set(scroll_text1, "0123456789", GUI_FONT_SRC_TTF, gui_rgb(0, 0xff, 0), 10, 32);
 
-    gui_scroll_text_t *scrool_text2 = gui_scroll_text_create(tab,  "scrool_text2",  80, 360, 100, 60);
-    gui_scroll_text_scroll_set(scrool_text2, SCROLL_Y, 100, 0, 3000, 1500000);
-    gui_scroll_text_type_set(scrool_text2, HARMONYOS_SIZE32_BITS4_VFONT_BIN, FONT_SRC_MEMADDR);
-    gui_scroll_text_set(scrool_text2, "123456789012345678901234567890", GUI_FONT_SRC_TTF,
+    gui_scroll_text_t *scroll_text2 = gui_scroll_text_create(tab,  "scroll_text2",  80, 360, 100, 60);
+    gui_scroll_text_scroll_set(scroll_text2, SCROLL_Y, 100, 0, 3000, 1500000);
+    gui_scroll_text_type_set(scroll_text2, HARMONYOS_SIZE32_BITS4_VFONT_BIN, FONT_SRC_MEMADDR);
+    gui_scroll_text_set(scroll_text2, "123456789012345678901234567890", GUI_FONT_SRC_TTF,
                         APP_COLOR_WHITE, 30, 32);
 #else
     gui_color_t color[FONT_NUM];

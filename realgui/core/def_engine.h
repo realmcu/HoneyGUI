@@ -38,7 +38,7 @@ typedef struct draw_img
     uint16_t img_target_w;
     uint16_t img_target_h;
     void *data;
-    gui_matrix_t matrix; //seems can remve by howie
+    gui_matrix_t matrix; //seems can remove by howie
     gui_matrix_t inverse;
     uint8_t opacity_value;
     uint32_t checksum : 8;

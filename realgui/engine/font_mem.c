@@ -89,12 +89,12 @@ void gui_font_get_dot_info(gui_text_t *text)
         GUI_ASSERT(font != NULL);
         return;
     }
-    uint8_t rendor_mode = 0;
-    rendor_mode = font->rendor_mode;
-    if (rendor_mode == 0)
+    uint8_t render_mode = 0;
+    render_mode = font->render_mode;
+    if (render_mode == 0)
     {
-        rendor_mode = 1;
-        gui_log("font file error ! rendor_mode is 0 ! \n");
+        render_mode = 1;
+        gui_log("font file error ! render_mode is 0 ! \n");
     }
     uint8_t index_method = font->index_method;
     uint8_t index_unit_length = 4; //now set to 4 , todo
@@ -200,12 +200,12 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_w = (uint8_t)(*(chr[chr_i].dot_addr - 2));
                         chr[chr_i].char_y = (uint8_t)(*(chr[chr_i].dot_addr - 4));
                         chr[chr_i].char_h = (uint8_t)(*(chr[chr_i].dot_addr - 1)) - chr[chr_i].char_y;
-                        line_byte = (chr[chr_i].char_w * rendor_mode + 8 - 1) / 8;
-                        chr[chr_i].w = line_byte * 8 / rendor_mode;
+                        line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
+                        chr[chr_i].w = line_byte * 8 / render_mode;
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
-                        uint32_t read_size_max = font->font_size * font->font_size * rendor_mode / 8 + 4;
+                        uint32_t read_size_max = font->font_size * font->font_size * render_mode / 8 + 4;
                         uint8_t *dot_buf_max = gui_malloc(read_size_max);
                         if (dot_buf_max == NULL)
                         {
@@ -220,8 +220,8 @@ void gui_font_get_dot_info(gui_text_t *text)
                         chr[chr_i].char_h = *(dot_buf_max + 3);
 
                         chr[chr_i].char_h = chr[chr_i].char_h - chr[chr_i].char_y;
-                        line_byte = (chr[chr_i].char_w * rendor_mode + 8 - 1) / 8;
-                        chr[chr_i].w = line_byte * 8 / rendor_mode;
+                        line_byte = (chr[chr_i].char_w * render_mode + 8 - 1) / 8;
+                        chr[chr_i].w = line_byte * 8 / render_mode;
 
                         uint32_t dot_size = line_byte * chr[chr_i].char_h;
                         uint8_t *dot_buf = gui_malloc(dot_size);
@@ -257,7 +257,7 @@ void gui_font_get_dot_info(gui_text_t *text)
         {
             aliened_font_size = 8 - text->font_height % 8 + text->font_height;
         }
-        uint32_t font_area = aliened_font_size * text->font_height / 8 * rendor_mode + 4;
+        uint32_t font_area = aliened_font_size * text->font_height / 8 * render_mode + 4;
         switch (index_method)
         {
         case 0: //address
@@ -987,7 +987,7 @@ void gui_font_mem_obj_destroy(gui_text_t *text)
     return;
 }
 
-static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
+static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t render_mode,
                              gui_text_rect_t *rect, bool crop)
 {
     (void)crop;
@@ -1012,7 +1012,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
     draw_font_t df =
     {
         .color = color,
-        .render_mode = rendor_mode,
+        .render_mode = render_mode,
         .target_buf = dc->frame_buf,
         .target_buf_stride = dc->fb_width * dc->bit_depth / 8,
         .clip_rect = {
@@ -1086,7 +1086,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
     {
         font = (GUI_FONT_HEAD_BMP *)text->path;
     }
-    uint8_t rendor_mode = font->rendor_mode;
+    uint8_t render_mode = font->render_mode;
     gui_color_t outcolor = text->color;
     outcolor.color.rgba.a = text->color.color.rgba.a * text->base.parent->opacity_value / 0xff;
     for (uint16_t i = 0; i < text->active_font_len; i++)
@@ -1097,7 +1097,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         else
         {
-            rtk_draw_unicode(chr + i, outcolor, rendor_mode, rect, font->crop);
+            rtk_draw_unicode(chr + i, outcolor, render_mode, rect, font->crop);
         }
     }
 }
@@ -1240,7 +1240,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
     {
         aliened_font_size = 8 - font->font_size % 8 + font->font_size;
     }
-    uint32_t font_area = aliened_font_size * font->font_size / 8 * font->rendor_mode + 4;
+    uint32_t font_area = aliened_font_size * font->font_size / 8 * font->render_mode + 4;
     uint8_t index_unit_length = 4; //now set to 4 , todo
     uint32_t *unicode_buffer = NULL;
     uint16_t unicode_len = 0;

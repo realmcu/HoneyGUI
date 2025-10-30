@@ -83,7 +83,7 @@ extern void nvgDeleteAGGE(NVGcontext *ctx);
   * @param  x       left
   * @param  y       top
   * @param  w       width
-  * @param  h       high
+  * @param  h       height
   * @return         gui_watch_gradient_spot_t* widget pointer
   *
   * <b>Example usage</b>

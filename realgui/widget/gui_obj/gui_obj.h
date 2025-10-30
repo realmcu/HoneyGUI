@@ -88,7 +88,7 @@ gui_obj_t *gui_obj_get_fake_root(void);
   * @param x the X-axis coordinate of the widget.
   * @param y the Y-axis coordinate of the widget.
   * @param w the width of the widget.
-  * @param h the hight of the widget.
+  * @param h the height of the widget.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(void *parent, const char *name, int16_t x,
@@ -117,7 +117,7 @@ void gui_obj_ctor(gui_obj_t  *_this,
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param h the height of the widget.
  * @return gui_obj_t*.
  */
 gui_obj_t *gui_obj_create(void       *parent,
@@ -166,7 +166,7 @@ void gui_obj_get_clip_rect(gui_obj_t *obj, gui_rect_t *rect);
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param h the height of the widget.
  * @return true.
  * @return false.
 */
@@ -197,7 +197,7 @@ void gui_obj_enable_this_parent_short(gui_obj_t *obj);
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param h the height of the widget.
  */
 void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *x,

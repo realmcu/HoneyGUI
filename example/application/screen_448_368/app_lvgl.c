@@ -6,7 +6,7 @@
 
 static void app_lvgl_ui_design(gui_app_t *app);
 
-static void lvgl_loop(void *tihs)
+static void lvgl_loop(void *this)
 {
     while ((1))
     {

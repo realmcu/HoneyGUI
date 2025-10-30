@@ -1,5 +1,5 @@
 if(ZEPHYR_BASE)
-  if(CONFIG_REALTEK_HONEYGUI) #set to 1 to enable or variable to for depnedency
+  if(CONFIG_REALTEK_HONEYGUI) #set to 1 to enable or variable to for dependency
 	  message(STATUS "ZEPHYR_BASE is set to: ${ZEPHYR_BASE}")
 	  set(GUI_TARGET_NAME guiLib)
 	  zephyr_library_named(${GUI_TARGET_NAME})

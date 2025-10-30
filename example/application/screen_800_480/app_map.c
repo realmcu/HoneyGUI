@@ -188,7 +188,7 @@ static void entrance_animation(void *p)
 static void draw_cb(NVGcontext *vg)
 {
     nvgBeginPath(vg);
-    nvgCircle(vg, 6, 6, 6);  // cap 20000 steps
+    nvgCircle(vg, 6, 6, 6);  // capable of 20000 steps
     nvgFillColor(vg, color);
     nvgFill(vg);
 }

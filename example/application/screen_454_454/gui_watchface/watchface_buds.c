@@ -20,7 +20,7 @@ static gui_switch_t *switch_text_base_buds_device = NULL;
 //for bt buds
 static uint8_t app_bond_earphone_index = 0xff;
 
-char *txet_disconnect = "确认断开连接？";
+char *text_disconnect = "确认断开连接？";
 char bond_bd_addr[20];
 //todo:
 static void tab_buds_update_cb(void *obj, uint16_t event, void *param)
@@ -144,7 +144,7 @@ static void switch_disconnect_touch_cb(void *obj, uint16_t event, void *param)
 
     set_confirm_yes(switch_disconnect_yes_action, obj);
     set_confirm_no(switch_disconnect_no_action, obj);
-    set_confirm_text(txet_disconnect, 123, 131, 7);
+    set_confirm_text(text_disconnect, 123, 131, 7);
 
     app_watchface_switch_tabs(WATCHFACE_CONFIRM);
 }

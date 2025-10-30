@@ -3,7 +3,7 @@
 *********************22, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
    * @file      app_tb_conn.c
-   * @brief     Source file for chargebox project, mainly used for initialize modules
+   * @brief     Source file for chargebox project, mainly used for initializing modules
    * @author    sienna_shen
    * @date      2024-05-22
    * @version   v1.0

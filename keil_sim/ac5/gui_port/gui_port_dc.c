@@ -8,10 +8,10 @@
 
 #if defined(__ARMCC_VERSION)
 #undef DRV_LCD_WIDTH
-#undef DRV_LCD_HIGHT
+#undef DRV_LCD_HEIGHT
 #undef DRV_PIXEL_BITS
 #define DRV_LCD_WIDTH   320
-#define DRV_LCD_HIGHT   240
+#define DRV_LCD_HEIGHT   240
 #define DRV_PIXEL_BITS  16
 #endif
 
@@ -30,10 +30,10 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 static struct gui_dispdev dc =
 {
     .bit_depth = DRV_PIXEL_BITS,
-    .fb_height = DRV_LCD_HIGHT,
+    .fb_height = DRV_LCD_HEIGHT,
     .fb_width = DRV_LCD_WIDTH,
     .screen_width =  DRV_LCD_WIDTH,
-    .screen_height = DRV_LCD_HIGHT,
+    .screen_height = DRV_LCD_HEIGHT,
     .type = DC_SINGLE,
 
     .section = {0, 0, 0, 0},

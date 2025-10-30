@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 
 # Define a variable for the library name
-if(1) #set to 1 to enable or variable to for depnedency
+if(1) #set to 1 to enable or variable to for dependency
     add_compile_definitions(ENABLE_HONEYGUI)
     target_compile_definitions(${GUI_TARGET_NAME} PRIVATE ENABLE_HONEYGUI)
 

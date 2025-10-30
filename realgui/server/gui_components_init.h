@@ -57,7 +57,7 @@ typedef int (*gui_init_fn_t)(void);
 #define GUI_INIT_BOARD_EXPORT(fn)           GUI_APP_INIT_EXPORT(fn, "1")
 
 /* pre/device/component/env/app init routines will be called in init_thread */
-/* components pre-initialization (pure software initilization) */
+/* components pre-initialization (pure software initialization) */
 #define GUI_INIT_PREV_EXPORT(fn)            GUI_APP_INIT_EXPORT(fn, "2")
 /* device initialization */
 #define GUI_INIT_DEVICE_EXPORT(fn)          GUI_APP_INIT_EXPORT(fn, "3")

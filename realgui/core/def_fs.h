@@ -36,7 +36,7 @@ extern char *defaultPath;
 typedef struct gui_fs_dirent
 {
     uint8_t d_type;           /* The type of the file */
-    uint8_t d_namlen;         /* The length of the not including the terminating null file name */
+    uint8_t d_namlen;         /* The length of the file name not included the terminating null */
     uint16_t d_reclen;        /* length of this record */
     char *d_name;         /* The null-terminated file name */
     void *dirent;

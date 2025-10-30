@@ -374,7 +374,7 @@ static void gui_view_on_event_change_cb(gui_obj_t *obj, gui_event_t e,
     g_SurpressEvent = true;
     g_SurpressTP = true;
 
-    if (e == GUI_EVENT_INVALIDE)
+    if (e == GUI_EVENT_INVALID)
     {
         g_NextView->base.x = gui_get_screen_width();
     }
@@ -783,7 +783,7 @@ void gui_view_switch_direct(gui_view_t *_this, const gui_view_descriptor_t *desc
                             VIEW_SWITCH_STYLE switch_in_style)
 {
     if (g_SurpressEvent || g_SwitchDone || g_CurrentView->descriptor == descriptor) { return; }
-    gui_view_switch_on_event(_this, descriptor, switch_out_style, switch_in_style, GUI_EVENT_INVALIDE);
+    gui_view_switch_on_event(_this, descriptor, switch_out_style, switch_in_style, GUI_EVENT_INVALID);
 }
 
 void gui_view_set_animate_step(gui_view_t *_this, uint16_t step)

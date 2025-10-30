@@ -182,7 +182,7 @@ static void drawGroupedBarChart(NVGcontext *vg, float x, float y, float width, f
             float barY = y + height * 0.9f - barHeight;
 
             nvgBeginPath(vg);
-            nvgMoveTo(vg, barX, y + height * 0.9f);  // buttom
+            nvgMoveTo(vg, barX, y + height * 0.9f);  // bottom
             nvgLineTo(vg, barX, barY);               // top
 
             nvgStrokeColor(vg, nvgRGB(0xE4, 0x36, 0x4B));  // red line
@@ -190,7 +190,7 @@ static void drawGroupedBarChart(NVGcontext *vg, float x, float y, float width, f
             nvgStroke(vg);
 
             nvgBeginPath(vg);
-            nvgCircle(vg, barX + (barSpacing * 0.1f), y + height * 0.89f, barSpacing * 0.25f); // buttom circle
+            nvgCircle(vg, barX + (barSpacing * 0.1f), y + height * 0.89f, barSpacing * 0.25f); // bottom circle
             nvgFillColor(vg, nvgRGB(0xE4, 0x36, 0x4B));
             nvgFill(vg);
         }

@@ -16,8 +16,8 @@ extern "C" {
 #ifndef DRV_LCD_WIDTH
 #define DRV_LCD_WIDTH   480
 #endif
-#ifndef DRV_LCD_HIGHT
-#define DRV_LCD_HIGHT   480
+#ifndef DRV_LCD_HEIGHT
+#define DRV_LCD_HEIGHT   480
 #endif
 #ifndef DRV_PIXEL_BITS
 #define DRV_PIXEL_BITS   32

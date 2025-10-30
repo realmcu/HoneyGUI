@@ -4,7 +4,7 @@
 
 extern MEM_FONT_LIB font_lib_tab[10];
 
-static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
+static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t render_mode,
                                       gui_text_rect_t *rect, uint8_t *buffer, int buf_width, GUI_FormatType type)
 {
     if (chr->dot_addr == NULL || buffer == NULL) { return; }
@@ -23,7 +23,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
     draw_font_t df =
     {
         .color = color,
-        .render_mode = rendor_mode,
+        .render_mode = render_mode,
         .target_buf = buffer,
         .target_buf_stride = buf_width * target_bit_depth / 8,
         .target_format = type,
@@ -139,13 +139,13 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     {
         font = (GUI_FONT_HEAD_BMP *)text->path;
     }
-    uint8_t rendor_mode = font->rendor_mode;
+    uint8_t render_mode = font->render_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
     rect.x2 = rect.x1 + buf_width - 1;
     rect.y2 = rect.y1 + buf_height - 1;
     for (uint16_t i = 0; i < text->active_font_len; i++)
     {
-        gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
+        gui_font_bmp2img_one_char(chr + i, text->color, render_mode, &rect, buffer_addr, buf_width,
                                   font_img_type);
     }
     gui_font_mem_unload(text);

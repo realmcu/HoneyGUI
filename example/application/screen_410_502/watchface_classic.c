@@ -39,7 +39,7 @@ extern struct tm *timeinfo;
 bool return_to_watchface_flag = true; //true: return to watchface; false: return to app_menu
 
 static gui_text_t *weather_date_text[4] = {0};
-static bool weather_syn_flag = true; // sychronize data update of weather card and temp arc
+static bool weather_syn_flag = true; // synchronize data update of weather card and temp arc
 static char content_cur[5] = {0};
 static char content_range[15] = {0};
 static char temp_cur_content[3] = {0};
@@ -55,7 +55,7 @@ static uint8_t *img_data_activity = NULL;
 static size_t buffer_size = 0;
 
 extern char *cjson_content;
-extern uint8_t json_refeash_flag;
+extern uint8_t json_refresh_flag;
 
 /*Define watch_text_num_array*/
 void *text_num_array[11] = {0};
@@ -114,7 +114,7 @@ static void time_update_cb(void *param)
     sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
     gui_text_content_set((gui_text_t *)date_text, date_text_content, strlen(date_text_content));
 
-    // refreash weather date
+    // refresh weather date
     uint8_t index = timeinfo->tm_wday + 1;
 
     for (uint8_t i = 0; i < 4; i++)
@@ -268,7 +268,7 @@ static void update_weather_image(cJSON *weather, uint8_t i)
 static void weather_cb(void *param)
 {
     (void)param;
-    if (!(json_refeash_flag & 0x01))
+    if (!(json_refresh_flag & 0x01))
     {
         return;
     }
@@ -307,7 +307,7 @@ static void weather_cb(void *param)
         update_weather_image(weather, i);
     }
     cJSON_Delete(root);
-    json_refeash_flag &= 0b1110;
+    json_refresh_flag &= 0b1110;
 }
 
 static void arc_temperature_cb(NVGcontext *vg)
@@ -425,7 +425,7 @@ static void arc_temperature_cb(NVGcontext *vg)
             nvgFillPaint(vg, paint);
             nvgFill(vg);
 
-            // draw black circle to formate arc
+            // draw black circle to format arc
             nvgBeginPath(vg);
             nvgArc(vg, x, y, r - 8.0f, 0, M_PI_F * 2.0f, NVG_CW);
             nvgFillColor(vg, nvgRGB(0, 0, 0));
@@ -484,7 +484,7 @@ static void arc_temperature_cb(NVGcontext *vg)
 static void compass_cb(void *param)
 {
     (void)param;
-    if (!(json_refeash_flag & 0x08))
+    if (!(json_refresh_flag & 0x08))
     {
         return;
     }
@@ -568,34 +568,34 @@ static void compass_cb(void *param)
     gui_text_content_set((gui_text_t *)compass_orien, orien_content, strlen(orien_content));
     // clear
     cJSON_Delete(root);
-    json_refeash_flag &= 0b0111;
+    json_refresh_flag &= 0b0111;
 }
 
 static void activity_timer_cb(void *obj)
 {
     gui_img_t *img = (gui_img_t *)obj;
-    if (json_refeash_flag & 0x04)
+    if (json_refresh_flag & 0x04)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_activity_cb, img_data);
         gui_img_set_image_data(img, img_data);
 
-        json_refeash_flag &= 0b1011;
+        json_refresh_flag &= 0b1011;
     }
 }
 
 static void temp_timer_cb(void *obj)
 {
     gui_img_t *img = (gui_img_t *)obj;
-    if (json_refeash_flag & 0x02)
+    if (json_refresh_flag & 0x02)
     {
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, 100, 100, arc_temperature_cb,
                                           img_data);
         gui_img_set_image_data(img, img_data);
-        json_refeash_flag &= 0b1101;
+        json_refresh_flag &= 0b1101;
     }
 }
 

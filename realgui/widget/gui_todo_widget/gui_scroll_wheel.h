@@ -82,7 +82,7 @@ typedef struct gui_scroll_wheel
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param h the height of the widget.
  * @return return the widget object pointer.
  */
 gui_scroll_wheel_t *gui_scroll_wheel_create(void    *parent,

@@ -487,7 +487,7 @@ static GUI_ANIMATION_CALLBACK(fruit_ninja_cb)
 
         ballBodyDef.position.Set(20, (SCREEN_HEIGHT + HEIGHT_OFFSET) * P2M);
         body_bomb = world->CreateBody(&ballBodyDef);
-        //creat body shape and attach the shape to the Body
+        // Create body shape and attach the shape to the Body
         b2CircleShape circleShape;
         circleShape.m_radius = 0.01; //RADIUS_ST * P2M; small number reducing the impact of collisions
         b2FixtureDef FixtureDef;

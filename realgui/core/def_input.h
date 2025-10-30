@@ -48,17 +48,17 @@ typedef enum
     TOUCH_LONG_BUTTON,
     TOUCH_UP_SLIDE_TWO_PAGE,
     TOUCH_DOWN_SLIDE_TWO_PAGE,
-    TOUCH_INVALIDE              = 0x1FF,
+    TOUCH_INVALID              = 0x1FF,
 
     KB_INIT                     = 0x200,
     KB_SHORT                    = 0x201,
     KB_LONG                     = 0x202,
-    KB_INVALIDE                 = 0x2FF,
+    KB_INVALID                 = 0x2FF,
 
     WHEEL_INIT                  = 0x300,
     WHEEL_ING,
     WHEEL_FINISHED,
-    WHEEL_INVALIDE              = 0x3FF,
+    WHEEL_INVALID              = 0x3FF,
 } T_GUI_INPUT_TYPE;
 /* T_GUI_INPUT_TYPE enum end*/
 

@@ -181,7 +181,7 @@ static void obj_draw_prepare(gui_obj_t *object)
             obj->obj_cb(obj, OBJ_PREPARE);
         }
 
-        extern void gui_obj_timer_handler(gui_obj_t *obj); //not called for appliacation
+        extern void gui_obj_timer_handler(gui_obj_t *obj); // not called for application
         gui_obj_timer_handler(obj);
 
         if (obj->not_show)
@@ -251,7 +251,7 @@ static void gui_pfb_draw(gui_obj_t *root)
     gui_dispdev_t *dc = gui_get_dc();
     uint32_t scan_line_time_us = dc->driver_ic_scan_line_time_us;
     uint32_t write_line_time_us = dc->host_write_line_time_us;
-    uint32_t line_section_cnt = 0; //mean section line cnt for tear effect issue
+    uint32_t line_section_cnt = 0; // means section line count for tear effect issue
 
     gui_flash_boost();
     uint32_t time_base = 0;

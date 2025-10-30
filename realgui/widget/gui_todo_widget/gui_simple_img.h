@@ -88,7 +88,7 @@ typedef struct gui_simple_img
 uint16_t gui_simple_img_get_width(gui_simple_img_t *this);
 
 /**
- * @brief load the image to read it's hight
+ * @brief load the image to read it's height
  *
  * @param img the image widget pointer.
  * @return uint16_t image's height
@@ -154,7 +154,7 @@ void gui_simple_img_set_quality(gui_simple_img_t *this, bool high_quality);
 * @param x the X-axis coordinate of the widget.
 * @param y the Y-axis coordinate of the widget.
 * @param w the width of the widget.
-* @param h the hight of the widget.
+* @param h the height of the widget.
 * @param src_mode_type the type of image source.
 * @return return the widget object pointer.
 */

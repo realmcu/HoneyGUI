@@ -68,18 +68,18 @@ static void gui_watch_gradient_spot_draw(gui_watch_gradient_spot_t *this, NVGcon
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
 
-    static float vary_anlge =   0;
-    vary_anlge += 0.01f;
-    float dx1 = 25.0f * (float)cos(1.5f * vary_anlge);
-    float dy1 = 25.0f * (float)sin(1.5f * vary_anlge);
-    float dx2 = 30.0f * (float)cos(-vary_anlge);
-    float dy2 = 30.0f * (float)sin(-vary_anlge);
-    float dx3 = 32.0f * (float)cos(2.0f * vary_anlge);
-    float dy3 = 25.0f * (float)sin(2.0f * vary_anlge);
-    float dx4 = 20.0f * (float)cos(vary_anlge);
-    float dy4 = 20.0f * (float)sin(vary_anlge);
-    float dx5 = 30.0f * (float)sin(3.0f * vary_anlge);
-    float dy5 = 10.0f * (float)sin(3.0f * vary_anlge);
+    static float vary_angle =   0;
+    vary_angle += 0.01f;
+    float dx1 = 25.0f * (float)cos(1.5f * vary_angle);
+    float dy1 = 25.0f * (float)sin(1.5f * vary_angle);
+    float dx2 = 30.0f * (float)cos(-vary_angle);
+    float dy2 = 30.0f * (float)sin(-vary_angle);
+    float dx3 = 32.0f * (float)cos(2.0f * vary_angle);
+    float dy3 = 25.0f * (float)sin(2.0f * vary_angle);
+    float dx4 = 20.0f * (float)cos(vary_angle);
+    float dy4 = 20.0f * (float)sin(vary_angle);
+    float dx5 = 30.0f * (float)sin(3.0f * vary_angle);
+    float dy5 = 10.0f * (float)sin(3.0f * vary_angle);
 
     float cx1 = 60 + dx1 - cx, cy1 = 60 + dy1 - cy;
     float cx2 = 394 + dx2 - cx, cy2 = 60 + dy2 - cy;

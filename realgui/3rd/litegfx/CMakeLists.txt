@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 
 # Define a variable for the library name
-if(CONFIG_REALTEK_BUILD_LITE_GFX) #set to 1 to enable or variable to for depnedency
+if(CONFIG_REALTEK_BUILD_LITE_GFX) #set to 1 to enable or variable to for dependency
 
 	add_definitions(-DENABLE_LITE_GFX)
     file(GLOB SOURCES "*.c" "*.cpp")

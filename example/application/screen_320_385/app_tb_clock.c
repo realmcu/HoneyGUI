@@ -7,18 +7,18 @@
 #include "app_chargebox.h"
 #include "gui_tabview.h"
 
-#define ALRAM_CLOCK_LENGTH 10
+#define ALARM_CLOCK_LENGTH 10
 gui_text_t *text_set_time;
 static uint8_t set_time = 5;
 static char *set_time_uint = "分钟";
-static char set_alarm_clock[ALRAM_CLOCK_LENGTH];
+static char set_alarm_clock[ALARM_CLOCK_LENGTH];
 
 void time_dec_cb(void)
 {
     if (set_time >= 5)
     {
         set_time = set_time - 5;
-        snprintf(set_alarm_clock, ALRAM_CLOCK_LENGTH, "%d%s", set_time, set_time_uint);
+        snprintf(set_alarm_clock, ALARM_CLOCK_LENGTH, "%d%s", set_time, set_time_uint);
         gui_text_set(text_set_time, set_alarm_clock, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                                UINT8_MAX),
                      strlen(set_alarm_clock), 28);
@@ -30,7 +30,7 @@ void time_inc_cb(void)
     if (set_time <= 55)
     {
         set_time = set_time + 5;
-        snprintf(set_alarm_clock, ALRAM_CLOCK_LENGTH, "%d%s", set_time, set_time_uint);
+        snprintf(set_alarm_clock, ALARM_CLOCK_LENGTH, "%d%s", set_time, set_time_uint);
         gui_text_set(text_set_time, set_alarm_clock, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                                UINT8_MAX),
                      strlen(set_alarm_clock), 28);
@@ -45,7 +45,7 @@ void page_tb_clock(void *parent)
                  strlen(func), 28);
 
     text_set_time = gui_text_create(parent, "text_set_time", 160, 180, 100, 28);
-    snprintf(set_alarm_clock, ALRAM_CLOCK_LENGTH, "%d%s", set_time, set_time_uint);
+    snprintf(set_alarm_clock, ALARM_CLOCK_LENGTH, "%d%s", set_time, set_time_uint);
     gui_text_set(text_set_time, set_alarm_clock, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                            UINT8_MAX),
                  strlen(set_alarm_clock), 28);

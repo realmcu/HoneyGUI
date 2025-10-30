@@ -54,7 +54,7 @@ extern const char *day[7];
 
 
 /*============================================================================*
- *                           Punblic Functions
+ *                           Public Functions
  *============================================================================*/
 // Generate a pseudo-random number
 uint16_t xorshift16(void);

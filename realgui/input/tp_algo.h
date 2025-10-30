@@ -48,7 +48,7 @@ extern "C" {
 #define HALF_SCREEN_SIZE    (320/2) //!< half of screen size 
 
 /* Touch event */
-#define GUI_TOUCH_EVENT_NONE     0                //!<Touch none 
+#define GUI_TOUCH_EVENT_NONE     0                //!< Touch none 
 #define GUI_TOUCH_EVENT_UP       1                //!< Touch up event 
 #define GUI_TOUCH_EVENT_DOWN     2                //!< Touch down event 
 

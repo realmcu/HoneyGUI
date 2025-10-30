@@ -90,7 +90,7 @@ typedef struct gui_soccer
  *============================================================================*/
 
 /**
- * @brief soccer create, images can be loaded from filesystem or memory address
+ * @brief Create a soccer widget, images can be loaded from filesystem or memory address
  *
  * @param parent parent widget
  * @param name  widget name

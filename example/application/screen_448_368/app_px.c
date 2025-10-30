@@ -5,7 +5,7 @@
 
 static void app_px_ui_design(gui_app_t *app);
 
-static void px_loop(void *tihs)
+static void px_loop(void *this)
 {
     while ((1))
     {

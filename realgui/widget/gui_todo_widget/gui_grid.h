@@ -134,7 +134,7 @@ gui_grid_t *gui_grid_create(void     *parent,
 /**
  * @brief config grid style.
  *
- * @param grid grid wodget pointer.
+ * @param grid grid widget pointer.
  * @param style GRID_CLASSIC, GRID_SCALE.
  * <b>Example usage</b>
  * \code{.c}

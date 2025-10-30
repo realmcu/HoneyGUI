@@ -61,7 +61,7 @@ static void switch_incoming_call_hangup_touch_cb(void *obj, uint16_t event, void
 #endif
 }
 
-void design_tab_call_incomming(void *parent)
+void design_tab_call_incoming(void *parent)
 {
     char *string_incoming_call_title = "来电";
     gui_text_t *text_incoming_call_title = gui_text_create(parent, "text_incoming_call_title", 195, 24,

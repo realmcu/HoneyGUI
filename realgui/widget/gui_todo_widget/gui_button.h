@@ -116,7 +116,7 @@ typedef struct __gui_api_gui_button_t
  * @param x The X-axis relative coordinate of the button(left).
  * @param y The Y-axis v coordinate of the button(up).
  * @param w The width of the button(response area).
- * @param h The hight of the button(response area).
+ * @param h The height of the button(response area).
  * @param background_pic The image shown when button was not pressed.
  * @param highlight_pic The image shown when button was pressed.
  * @param text The text of the button which always shown.
@@ -146,7 +146,7 @@ gui_button_t *gui_button_create(void             *parent,
  * @param x The X-axis relative coordinate of the button(left).
  * @param y The Y-axis v coordinate of the button(up).
  * @param w The width of the button(response area).
- * @param h The hight of the button(response area).
+ * @param h The height of the button(response area).
  * @param background_pic The image shown when button was not pressed.
  * @param highlight_pic The image shown when button was pressed.
  * @param text The text of the button which always shown.

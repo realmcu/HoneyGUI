@@ -9,10 +9,10 @@ src = Split("""
 
 group = []
 CPPDEFINES = ['DRV_LCD_WIDTH=480']
-CPPDEFINES += ['DRV_LCD_HIGHT=480']
+CPPDEFINES += ['DRV_LCD_HEIGHT=480']
 CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
-if GetDepend('CONFIG_REALTEK_BUILD_REAL_CANCAS'):
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_CANVAS'):
     src += ['example_gui_canvas.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
     

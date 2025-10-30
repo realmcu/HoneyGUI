@@ -45,7 +45,7 @@ int app_record_switch_tabs(record_ids id)
     }
     else
     {
-        gui_log("record switch to id %d fail!", id);
+        gui_log("record switch to id %d failed!", id);
         return -1;
     }
 

@@ -8,7 +8,7 @@ extern "C" {
 #include "gui_obj.h"
 
 typedef void (*pConstruct)(void *parent);
-typedef void (*pDesturct)();
+typedef void (*pDestruct)();
 
 typedef enum
 {
@@ -38,7 +38,7 @@ typedef struct
     const char *name;
     uint32_t scenario;
     pConstruct ctor;
-    pDesturct dtor;
+    pDestruct dtor;
 } benchmark_info_t;
 
 typedef struct

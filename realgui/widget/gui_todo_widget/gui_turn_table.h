@@ -114,7 +114,7 @@ typedef struct gui_turn_table
  *============================================================================*/
 
 /**
- * @brief crear turn table widget
+ * @brief Create turn table widget.
  *
  * @param parent Pointer to parent app or container on which the turn table will be created
  * @param icon_quantity The number of icons to be displayed on the turn table

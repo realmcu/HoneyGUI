@@ -50,7 +50,7 @@ typedef struct gui_page
     int target;
     int start_x;
     int start_y;
-    int align_hight;
+    int align_height;
     gui_img_t *scroll_bar;
     int get_yend;
     gui_animate_t *animate;
@@ -120,7 +120,7 @@ void gui_page_destroy(gui_obj_t *obj);
  * @param x the X-axis coordinate.
  * @param x the Y-axis coordinate.
  * @param w the width.
- * @param h the hight.
+ * @param h the height.
  *
  */
 void gui_page_ctor(gui_page_t *,
@@ -139,7 +139,7 @@ void gui_page_ctor(gui_page_t *,
  * @param x the X-axis coordinate.
  * @param x the Y-axis coordinate.
  * @param w the width.
- * @param h the hight.
+ * @param h the height.
  * @return return the widget object pointer
  *
  * <b>Example usage</b>
@@ -164,7 +164,7 @@ gui_page_t *gui_page_create(void       *parent,
  * @param x the X-axis coordinate.
  * @param x the Y-axis coordinate.
  * @param w the width.
- * @param h the hight.
+ * @param h the height.
  * @return return the widget object pointer
  *
  * \endcode

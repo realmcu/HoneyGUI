@@ -13,7 +13,7 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
-static SDL_Rect _rect = { 0, 0, DRV_LCD_WIDTH, DRV_LCD_HIGHT};
+static SDL_Rect _rect = { 0, 0, DRV_LCD_WIDTH, DRV_LCD_HEIGHT};
 static SDL_Surface *surface;
 static int bpp;                              /* texture bits per pixel */
 static uint32_t Rmask, Gmask, Bmask, Amask;  /* masks for pixel format passed into OpenGL */
@@ -23,14 +23,14 @@ static pthread_cond_t sdl_ok_event;
 
 
 int sim_screen_width = DRV_LCD_WIDTH;
-int sim_screen_hight = DRV_LCD_HIGHT;
+int sim_screen_height = DRV_LCD_HEIGHT;
 int32_t sim_get_width(void)
 {
     return sim_screen_width;
 }
-int32_t sim_get_hight(void)
+int32_t sim_get_height(void)
 {
-    return sim_screen_hight;
+    return sim_screen_height;
 }
 
 
@@ -93,11 +93,11 @@ void *rtk_gui_sdl(void *arg)
     }
 
     char str[50];
-    sprintf(str, "HoneyGUI Simulator %d x %d", sim_get_width(), sim_get_hight());
+    sprintf(str, "HoneyGUI Simulator %d x %d", sim_get_width(), sim_get_height());
 
     window = SDL_CreateWindow(str, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               sim_get_width(),
-                              sim_get_hight(), 0);
+                              sim_get_height(), 0);
     renderer = SDL_CreateRenderer(window, -1, 0);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -114,7 +114,7 @@ void *rtk_gui_sdl(void *arg)
         SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ARGB8888, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
     }
 
-    surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+    surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_height(), bpp, Rmask, Gmask, Bmask,
                                    Amask);
     SDL_RenderPresent(renderer);
 

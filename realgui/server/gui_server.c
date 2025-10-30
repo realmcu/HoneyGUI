@@ -57,7 +57,7 @@ static void gui_server_entry(void *parameter)
     while (1)
     {
 
-        /*exe some app action, like kick watchdog*/
+        /* execute some app action, like kick watchdog */
         if (gui_task_ext_execution_hook != NULL)
         {
             gui_task_ext_execution_hook();

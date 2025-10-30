@@ -505,7 +505,7 @@ static void ctor(gui_image_array_t *this, void *parent,
                  int16_t x,
                  int16_t y,
                  void **image_data_array,
-                 int array_lenght,
+                 int array_length,
                  const char *widget_name)
 {
     GUI_ASSERT(this);
@@ -519,11 +519,11 @@ static void ctor(gui_image_array_t *this, void *parent,
     base->has_draw_cb = true;
     base->has_end_cb = true;
     base->has_destroy_cb = true;
-    base->w = ((gui_rgb_data_head_t *)image_data_array[0])->w * array_lenght;
+    base->w = ((gui_rgb_data_head_t *)image_data_array[0])->w * array_length;
     base->h = ((gui_rgb_data_head_t *)image_data_array[0])->h;
-    this->image_data = gui_malloc(array_lenght * sizeof(void *));
-    memcpy(this->image_data, image_data_array, array_lenght * sizeof(void *));
-    this->array_count = array_lenght;
+    this->image_data = gui_malloc(array_length * sizeof(void *));
+    memcpy(this->image_data, image_data_array, array_length * sizeof(void *));
+    this->array_count = array_length;
 }
 static void img_get_width(IMG_SOURCE_MODE_TYPE mode, void *address, int *width, int *height)
 {
@@ -548,7 +548,7 @@ static void ctor_ftl(gui_image_array_t *this, void *parent,
                      int16_t x,
                      int16_t y,
                      void **image_data_array,
-                     int array_lenght,
+                     int array_length,
                      const char *widget_name)
 {
     GUI_ASSERT(this);
@@ -565,11 +565,11 @@ static void ctor_ftl(gui_image_array_t *this, void *parent,
 
     int w, h;
     img_get_width(IMG_SRC_FTL, image_data_array[0], &w, &h);
-    base->w = w * array_lenght;
+    base->w = w * array_length;
     base->h = h;
-    this->image_data = gui_malloc(array_lenght * sizeof(void *));
-    memcpy(this->image_data, image_data_array, array_lenght * sizeof(void *));
-    this->array_count = array_lenght;
+    this->image_data = gui_malloc(array_length * sizeof(void *));
+    memcpy(this->image_data, image_data_array, array_length * sizeof(void *));
+    this->array_count = array_length;
 }
 /*============================================================================*
  *                           Public Functions
@@ -590,10 +590,10 @@ gui_image_array_t *gui_image_array_create(void *parent,
                                           int16_t x,
                                           int16_t y,
                                           void **image_data_array,
-                                          int array_lenght,
+                                          int array_length,
                                           const char *widget_name)
 {
-#define _GUI_IMG_ARRAR_WIDGET_CTOR_PARAMETER_ this, parent, x, y, image_data_array, array_lenght, widget_name
+#define _GUI_IMG_ARRAR_WIDGET_CTOR_PARAMETER_ this, parent, x, y, image_data_array, array_length, widget_name
     GUI_CREATE_HELPER(gui_image_array_t, ctor, _GUI_IMG_ARRAR_WIDGET_CTOR_PARAMETER_)
     return this;
 }
@@ -601,10 +601,10 @@ gui_image_array_t *gui_image_array_create_ftl(void *parent,
                                               int16_t x,
                                               int16_t y,
                                               void **image_data_array,
-                                              int array_lenght,
+                                              int array_length,
                                               const char *widget_name)
 {
-#define _GUI_IMG_ARRAR_WIDGET_CTOR_PARAMETER_ this, parent, x, y, image_data_array, array_lenght, widget_name
+#define _GUI_IMG_ARRAR_WIDGET_CTOR_PARAMETER_ this, parent, x, y, image_data_array, array_length, widget_name
     GUI_CREATE_HELPER(gui_image_array_t, ctor_ftl, _GUI_IMG_ARRAR_WIDGET_CTOR_PARAMETER_)
     return this;
 }

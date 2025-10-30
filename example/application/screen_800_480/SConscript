@@ -15,7 +15,7 @@ CPPPATH += [os.path.join(cwd, 'root_image_800_480')]
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_800_480_DEMO']
     CPPDEFINES += ['DRV_LCD_WIDTH=800']
-    CPPDEFINES += ['DRV_LCD_HIGHT=480']
+    CPPDEFINES += ['DRV_LCD_HEIGHT=480']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
     if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
         from honeygui import *

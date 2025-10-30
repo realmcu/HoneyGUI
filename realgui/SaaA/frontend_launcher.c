@@ -144,7 +144,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     }
     gui_fs_closedir(dir);
 }
-void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
+void xml_get_screen(char *dirPath, char *xml_file, int *width, int *height)
 {
     extern void gui_port_fs_init(void);
     gui_port_fs_init();
@@ -183,8 +183,8 @@ void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
                     get_app_by_file(path, (char *)&pic, (char *)&text); gui_log("get:%s,%s\n", pic, text);
                     if (strcmp(text, "launcher") == 0)
                     {
-                        extern void get_screen_size(char *xml, int *widgt, int *hight);
-                        get_screen_size(path, width, hight);
+                        extern void get_screen_size(char *xml, int *width, int *height);
+                        get_screen_size(path, width, height);
 
                         return;
                     }

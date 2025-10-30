@@ -73,7 +73,7 @@ static void text_record_tips_animate_cb(void *obj)
     gui_text_t *this = (gui_text_t *)obj;
     gui_log("text_record_tips_animate_cb\n");
     gui_log("text_record_tips_animate_cb, os_time_ms = %d\n", gui_ms_get());
-    gui_log("text_record_tips_animate_cb, current_frame = %d, repeate_count = %d, progress_percent = %f\n",
+    gui_log("text_record_tips_animate_cb, current_frame = %d, repeat_count = %d, progress_percent = %f\n",
             this->animate->current_frame, this->animate->current_repeat_count, this->animate->progress_percent);
 
     //update every 7 frame(about 210 ms)

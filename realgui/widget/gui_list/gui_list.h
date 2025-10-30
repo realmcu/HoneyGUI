@@ -186,7 +186,7 @@ void gui_list_set_bar_color(gui_list_t *list, gui_color_t color);
 /**
  * @brief Set note number of list.
  * @param list Pointer to the list widget.
- * @param num The spacific number, must be a nonnegative number.
+ * @param num The specific number, must be a nonnegative number.
  */
 void gui_list_set_note_num(gui_list_t *list, uint16_t num);
 

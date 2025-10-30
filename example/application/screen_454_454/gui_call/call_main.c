@@ -13,7 +13,7 @@ static void gui_call_status_update_cb(void *obj, uint16_t event)
     {
     case GUI_EVENT_CALL_INCOMING:
         {
-            app_call_switch_tabs(CALL_INCOMMING);
+            app_call_switch_tabs(CALL_INCOMING);
         }
         break;
     case GUI_EVENT_CALL_OUTGOING:

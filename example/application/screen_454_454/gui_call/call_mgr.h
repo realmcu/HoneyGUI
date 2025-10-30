@@ -16,7 +16,7 @@ typedef enum
 {
     CALL_MAIN,
     CALL_DIAL,
-    CALL_INCOMMING,
+    CALL_INCOMING,
     CALL_OUTGOING,
     CALL_ACTIVE,
     CALL_MAX,
@@ -35,7 +35,7 @@ void set_dial_num(char *dial_num, uint8_t length);
 char *get_dial_num(void);
 
 //call incomming apis
-void design_tab_call_incomming(void *parent);
+void design_tab_call_incoming(void *parent);
 
 //call outgoing apis
 void design_tab_call_outgoing(void *parent);

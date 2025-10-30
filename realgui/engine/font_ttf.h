@@ -46,7 +46,7 @@ typedef struct
     uint8_t file_type;                  /*0x2-FONT_FILE_TTF_FLAG is font file*/
     uint8_t version[4];                 /*version*/
     uint8_t font_size;                  /*font size*/
-    uint8_t rendor_mode;                /*support 1/2/4/8*/
+    uint8_t render_mode;                /*support 1/2/4/8*/
     uint8_t bold :          1;          /*bold*/
     uint8_t italic :        1;          /*italic*/
     uint8_t scan_mode :     1;          /*scan_mode*/

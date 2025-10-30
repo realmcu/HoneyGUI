@@ -17,8 +17,8 @@
 #define CURRENT_VIEW_NAME "flower_clock_view"
 #define SCREEN_WIDTH  (int16_t)gui_get_width_height()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-#define X_ORINGIN 50
-#define Y_ORINGIN 180
+#define X_ORIGIN 50
+#define Y_ORIGIN 180
 
 /*============================================================================*
  *                           Function Declaration
@@ -124,10 +124,10 @@ static void flower_change_cb(void *obj, gui_event_t e, void *param)
         flower_index = (flower_index + 1) % 3;
         video = gui_video_create_from_mem(p, "flower",
                                           (unsigned char *)flower[flower_index],
-                                          X_ORINGIN, Y_ORINGIN, 410, 502);
+                                          X_ORIGIN, Y_ORIGIN, 410, 502);
         gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
         gui_video_set_repeat_count(video, 0);
-        // gui_img_translate(video->img, X_ORINGIN, Y_ORINGIN);
+        // gui_img_translate(video->img, X_ORIGIN, Y_ORIGIN);
         // gui_img_scale(video->img, 1.2f, 1.2f);
         gui_video_set_frame_rate(video, 60.f);
     }
@@ -151,10 +151,10 @@ static void create_watchface_flower(gui_view_t *view)
     gui_win_t *win = gui_win_create(view, "win", 0, 0, 0, 0);
 
     video = gui_video_create_from_mem(win, "flower", (void *)flower[flower_index],
-                                      X_ORINGIN, Y_ORINGIN, 410, 502);
+                                      X_ORIGIN, Y_ORIGIN, 410, 502);
     gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
     gui_video_set_repeat_count(video, 0);
-    // gui_img_translate(video->img, X_ORINGIN, Y_ORINGIN);
+    // gui_img_translate(video->img, X_ORIGIN, Y_ORIGIN);
     // gui_img_scale(video->img, 1.5f, 1.5f);
     gui_video_set_frame_rate(video, 60.f);
 

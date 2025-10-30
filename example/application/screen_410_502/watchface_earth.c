@@ -19,8 +19,8 @@
 #define CURRENT_VIEW_NAME "earth_clock_view"
 #define X_TARGET  37
 #define Y_TARGET  42
-#define X_ORINGIN -300
-#define Y_ORINGIN 50
+#define X_ORIGIN -300
+#define Y_ORIGIN 50
 #define SCALE_ORINGIN 2.f
 #define COUNT_MAX 30
 
@@ -113,8 +113,8 @@ static void time_update_cb(void *p)
 static void enter_cb(void *p)
 {
     static uint8_t count = 0;
-    int16_t x_offset = X_ORINGIN + (X_TARGET - X_ORINGIN) * count / COUNT_MAX;
-    int16_t y_offset = Y_ORINGIN + (Y_TARGET - Y_ORINGIN) * count / COUNT_MAX;
+    int16_t x_offset = X_ORIGIN + (X_TARGET - X_ORIGIN) * count / COUNT_MAX;
+    int16_t y_offset = Y_ORIGIN + (Y_TARGET - Y_ORIGIN) * count / COUNT_MAX;
     gui_img_translate(video->img, x_offset, y_offset);
 
     float scale = SCALE_ORINGIN + (1.f - SCALE_ORINGIN) * count / COUNT_MAX;
@@ -138,7 +138,7 @@ static void create_watchface_earth(gui_view_t *view)
                                       502);
     gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
     gui_video_set_repeat_count(video, GUI_VIDEO_REPEAT_INFINITE);
-    gui_img_translate(video->img, X_ORINGIN, Y_ORINGIN);
+    gui_img_translate(video->img, X_ORIGIN, Y_ORIGIN);
     gui_img_scale(video->img, 1.5f, 1.5f);
     gui_video_set_frame_rate(video, 60.f);
     gui_obj_create_timer(GUI_BASE(win), 17, true, enter_cb);

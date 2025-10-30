@@ -59,7 +59,7 @@ static gui_view_descriptor_t const descriptor =
 
 bool menu_style = 0;
 char *cjson_content = NULL;
-uint8_t json_refeash_flag = 0;
+uint8_t json_refresh_flag = 0;
 struct tm *timeinfo;
 #ifndef __WIN32
 static struct tm watch_time;
@@ -272,8 +272,8 @@ static void json_refreash(void)
     sprintf(cjson_content, "%s", temp);
     gui_free(temp);
     cJSON_Delete(root);
-    json_refeash_flag = 0b1111;
-    // gui_log("json_refeash_flag %x, line: %d\n", json_refeash_flag, __LINE__);
+    json_refresh_flag = 0b1111;
+    // gui_log("json_refresh_flag %x, line: %d\n", json_refresh_flag, __LINE__);
     // gui_log("cjson_content: %s\n", cjson_content);
 }
 // #endif
@@ -299,7 +299,7 @@ static void win_cb(void *param)
     // }
     // if (gui_view_get_next() == NULL)
     // {
-    //     json_refeash_flag = 0b1111;
+    //     json_refresh_flag = 0b1111;
     // }
     static uint8_t count = 0;
     count++;
@@ -308,7 +308,7 @@ static void win_cb(void *param)
         count = 0;
         json_refreash();
     }
-    // gui_log("json_refeash_flag %x\n", json_refeash_flag);
+    // gui_log("json_refresh_flag %x\n", json_refresh_flag);
 #else
     static uint8_t count = 0;
     count++;

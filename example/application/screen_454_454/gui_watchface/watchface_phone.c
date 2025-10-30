@@ -20,7 +20,7 @@ static gui_switch_t *switch_disconnect_phone = NULL;
 static gui_text_t *text_phone_device_name = NULL;
 static gui_text_t *text_phone_media_audio = NULL;
 
-char *txet_disconnect_phone = "确认断开连接？";
+char *text_disconnect_phone = "确认断开连接？";
 static uint8_t app_bond_phone_index = 0xff;
 
 static void tab_phone_update_cb(void *obj, uint16_t event, void *param)
@@ -138,7 +138,7 @@ static void switch_text_base_phone_touch_cb(void *obj, uint16_t event, void *par
         {
             set_confirm_yes(switch_disconnect_yes_action, obj);
             set_confirm_no(switch_disconnect_no_action, obj);
-            set_confirm_text(txet_disconnect_phone, 123, 131, 7);
+            set_confirm_text(text_disconnect_phone, 123, 131, 7);
 
             app_watchface_switch_tabs(WATCHFACE_CONFIRM);
         }
@@ -221,7 +221,7 @@ static void switch_disconnect_touch_cb(void *obj, uint16_t event, void *param)
 
     set_confirm_yes(switch_disconnect_yes_action, obj);
     set_confirm_no(switch_disconnect_no_action, obj);
-    set_confirm_text(txet_disconnect_phone, 123, 131, 7);
+    set_confirm_text(text_disconnect_phone, 123, 131, 7);
 
     app_watchface_switch_tabs(WATCHFACE_CONFIRM);
 }

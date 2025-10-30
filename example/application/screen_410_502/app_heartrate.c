@@ -53,7 +53,7 @@ size_t buffer_size = 0;
 
 extern void *text_num_array[];
 extern char *cjson_content;
-extern uint8_t json_refeash_flag;
+extern uint8_t json_refresh_flag;
 
 /*============================================================================*
  *                           Private Functions
@@ -254,9 +254,9 @@ static void draw_heartrate_graph(NVGcontext *vg)
 static void hr_timer_cb(void *obj)
 {
     gui_img_t *img = (gui_img_t *)obj;
-    if (json_refeash_flag & 0x01)
+    if (json_refresh_flag & 0x01)
     {
-        json_refeash_flag &= 0b1110;
+        json_refresh_flag &= 0b1110;
         uint8_t *img_data = (void *)gui_img_get_image_data(img);
         memset(img_data, 0, buffer_size);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, SCREEN_WIDTH, 300,

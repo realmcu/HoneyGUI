@@ -78,10 +78,10 @@ extern "C" {
     do {                                                                                                    \
         for (int32_t i = y_start; i <= y_end; i++)                                                          \
         {                                                                                                   \
-            float detalX = m01 * i + m02;   \
-            float detalY = m11 * i + m12;   \
-            float X = m00 * x_start + detalX;   \
-            float Y = m10 * x_start + detalY;   \
+            float deltaX = m01 * i + m02;   \
+            float deltaY = m11 * i + m12;   \
+            float X = m00 * x_start + deltaX;   \
+            float Y = m10 * x_start + deltaY;   \
             int write_off = (i - y1) * (x2 - x1 + 1) - x1;                                               \
             \
             for (int32_t j = x_start; j <= x_end; j++)                                                      \
@@ -108,10 +108,10 @@ extern "C" {
     do {                                                                                                    \
         for (int32_t i = y_start; i <= y_end; i++)                                                          \
         {                                                                                                   \
-            float detalX = m01 * i + m02;   \
-            float detalY = m11 * i + m12;   \
-            float X = m00 * x_start + detalX;  \
-            float Y = m10 * x_start + detalY;  \
+            float deltaX = m01 * i + m02;   \
+            float deltaY = m11 * i + m12;   \
+            float X = m00 * x_start + deltaX;  \
+            float Y = m10 * x_start + deltaY;  \
             int write_off = (i - y1) * (x2 - x1 + 1) - x1;                                               \
             \
             for (int32_t j = x_start; j <= x_end; j++)                                                      \
@@ -172,10 +172,10 @@ extern "C" {
     do {                                                                                                    \
         for (int32_t i = y_start; i <= y_end; i++)                                                          \
         {                                                                                                   \
-            float detalX = m01 * i + m02;   \
-            float detalY = m11 * i + m12;   \
-            float X = m00 * x_start + detalX;  \
-            float Y = m10 * x_start + detalY;  \
+            float deltaX = m01 * i + m02;   \
+            float deltaY = m11 * i + m12;   \
+            float X = m00 * x_start + deltaX;  \
+            float Y = m10 * x_start + deltaY;  \
             int write_off = (i - y1) * (x2 - x1 + 1) - x1;                                               \
             \
             for (int32_t j = x_start; j <= x_end; j++)                                                      \

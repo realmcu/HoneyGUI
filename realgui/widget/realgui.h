@@ -21,7 +21,7 @@
 #include "gui_keyboard.h"
 #include "gui_map.h"
 #include "gui_menu_cellular.h"
-#include "gui_multi_level.c"
+#include "gui_multi_level.h"
 #include "gui_obj.h"
 #include "gui_page.h"
 #include "gui_pagelist.h"
@@ -56,5 +56,4 @@
 #include "tp_algo.h"
 #include "wheel_algo.h"
 #include "gui_app.h"
-#include "gui_multi_level.h"
 

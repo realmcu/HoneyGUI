@@ -8,8 +8,8 @@ gui_tabview_t *tabview_call_mgr = NULL;
 const tab_info_t call_tab_infos[CALL_MAX] =
 {
     {CALL_MAIN, 0, 0, "call_main", design_tab_call_main, NULL},
-    {CALL_DIAL, 1, 0, "call_dail", design_tab_call_dial, NULL},
-    {CALL_INCOMMING, 2, 0, "call_incomming", design_tab_call_incomming, NULL},
+    {CALL_DIAL, 1, 0, "call_dial", design_tab_call_dial, NULL},
+    {CALL_INCOMING, 2, 0, "call_incoming", design_tab_call_incoming, NULL},
     {CALL_OUTGOING, 3, 0, "call_outgoing", design_tab_call_outgoing, NULL},
     {CALL_ACTIVE, 4, 0, "call_active", design_tab_call_active, NULL},
 };
@@ -18,7 +18,7 @@ app_tab_t call_tabs[CALL_MAX] =
 {
     {NULL, &call_tab_infos[CALL_MAIN]},
     {NULL, &call_tab_infos[CALL_DIAL]},
-    {NULL, &call_tab_infos[CALL_INCOMMING]},
+    {NULL, &call_tab_infos[CALL_INCOMING]},
     {NULL, &call_tab_infos[CALL_OUTGOING]},
     {NULL, &call_tab_infos[CALL_ACTIVE]},
 };
@@ -58,7 +58,7 @@ int app_call_switch_tabs(call_ids id)
     }
     if (!app_tab_manager_switch(&call_tabs[id]))
     {
-        if (id == CALL_INCOMMING || id == CALL_OUTGOING || id == CALL_ACTIVE)
+        if (id == CALL_INCOMING || id == CALL_OUTGOING || id == CALL_ACTIVE)
         {
             gui_tabview_jump_tab(tabview_main, 2, 0);
         }

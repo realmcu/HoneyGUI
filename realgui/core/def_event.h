@@ -33,7 +33,7 @@ extern "C" {
 
 typedef enum
 {
-    GUI_EVENT_INVALIDE                = 0x0000,
+    GUI_EVENT_INVALID                = 0x0000,
     GUI_EVENT_SYSTEM_RESET,
     GUI_EVENT_SYSTEM_FREE,
     GUI_EVENT_SYSTEM_SLEEP,
