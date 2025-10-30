@@ -1,5 +1,5 @@
 /**
- * @file def_matrix.h
+ * @file def_type.h
  * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
  * @brief
  * @version 0.1

@@ -23,9 +23,9 @@
 #include "acc_sw_rle.h"
 #include "acc_sw_raster.h"
 #include "acc_sw.h"
-#include "acc_sw_rgb565.h"
-#include "acc_sw_argb8565.h"
-#include "acc_sw_a8.h"
+#include "rgb565_2_rgb565.h"
+#include "argb8565_2_rgb565.h"
+#include "a8_2_rgb565.h"
 
 /*============================================================================*
  *                           Types

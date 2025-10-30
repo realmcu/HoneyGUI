@@ -1,5 +1,5 @@
 /**
- * @file acc_sw_rle_filter.h
+ * @file acc_sw_raster.h
  * @author wenjing_jiang@realsil.com.cn
  * @brief
  * @version 0.1

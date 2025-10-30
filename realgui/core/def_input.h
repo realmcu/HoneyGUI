@@ -1,5 +1,5 @@
 /**
- * @file def_vg.h
+ * @file def_input.h
  * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
  * @brief
  * @version 0.1

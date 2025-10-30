@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file acc_sw_a8.c
+  * @file a8_2_rgb565.c
   * @brief
   * @author howie_wang@realsil.com.cn
   * @date 2025/10/20

@@ -1,5 +1,5 @@
 /**
- * @file gui_server.c
+ * @file gui_message.c
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
  * @version 0.1

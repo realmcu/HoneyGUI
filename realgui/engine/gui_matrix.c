@@ -1,5 +1,5 @@
 /*
- * File      : gui_img.c
+ * File      : gui_matrix.c
  * This file is part of GUI Engine
  */
 

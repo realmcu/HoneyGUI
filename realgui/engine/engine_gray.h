@@ -1,8 +1,8 @@
 /*
- * File      : engine_gray16.h
+ * File      : engine_gray.h
  */
-#ifndef __ENGINE_GRAY16_H__
-#define __ENGINE_GRAY16_H__
+#ifndef __ENGINE_GRAY_H__
+#define __ENGINE_GRAY_H__
 
 #include <guidef.h>
 #include <gui_api.h>

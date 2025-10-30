@@ -1,5 +1,5 @@
 /**
- * @file acc_sw_rgb565.h
+ * @file a8_2_rgb565.h
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
  * @version 0.1
@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2025
  *
  */
-#ifndef __ACC_SW_RGB565_H__
-#define __ACC_SW_RGB565_H__
+#ifndef __A8_2_RGB565_H__
+#define __A8_2_RGB565_H__
 
 #include <draw_img.h>
 #include <stdio.h>
@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-void rgb565_2_rgb565(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
+void a8_2_rgb565(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
 
 #ifdef __cplusplus
 }

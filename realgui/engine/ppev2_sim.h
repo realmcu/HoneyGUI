@@ -1,5 +1,5 @@
 /*
- * File      : draw_img.h
+ * File      : ppev2_sim.h
  */
 #ifndef __PPEV2_SIM_H__
 #define __PPEV2_SIM_H__

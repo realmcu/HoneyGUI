@@ -3,7 +3,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_obj.h
+  * @file gui_obj_event.h
   * @brief  object widget
   * @details create a object
   * @author howie_wang@realsil.com.cn

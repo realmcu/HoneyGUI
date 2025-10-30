@@ -1,5 +1,5 @@
 /**
- * @file acc_init.c
+ * @file acc_api.c
  * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
  * @brief
  * @version 0.1
