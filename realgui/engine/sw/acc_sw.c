@@ -21,11 +21,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_sw_rle.h"
-#include "acc_sw_bypass.h"
-#include "acc_sw_filter.h"
 #include "acc_sw_raster.h"
-#include "acc_sw_transform.h"
-#include "acc_sw_blend.h"
 #include "acc_sw.h"
 #include "acc_sw_rgb565.h"
 #include "acc_sw_argb8565.h"
