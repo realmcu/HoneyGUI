@@ -26,6 +26,7 @@
 #include "rgb565_2_rgb565.h"
 #include "argb8565_2_rgb565.h"
 #include "a8_2_rgb565.h"
+#include "a8_2_a8.h"
 
 /*============================================================================*
  *                           Types
@@ -54,10 +55,9 @@
 
 void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
 
-    if ((dc_bytes_per_pixel == 2) && (rect == NULL))
+    if ((dc->bit_depth == 16) && (rect == NULL))
     {
         if (head->type == RGB565)
         {
@@ -70,6 +70,13 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         else if (head->type == ALPHAMASK)
         {
             a8_2_rgb565(image, dc, rect);
+        }
+    }
+    else if ((dc->bit_depth == 8) && (rect == NULL))
+    {
+        if (head->type == GRAY)
+        {
+            a8_2_a8(image, dc, rect);
         }
     }
     else
