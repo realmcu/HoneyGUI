@@ -8,20 +8,23 @@ cmake_minimum_required(VERSION 3.10)
 if(1) #set to 1 to enable or variable to for dependency
 
     file(GLOB HEADERS "*.h" "*.hpp")
-	set(SOURCES
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_api.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/draw_img.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/gui_matrix.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/draw_font.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/engine_gray.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/gui_post_process.c"
-	)
+    set(SOURCES
+            "${CMAKE_CURRENT_SOURCE_DIR}/font_rendering_utils.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/font_mem.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/font_mem_img.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/font_mem_matrix.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/font_stb.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/font_ttf.c"
+    )
 
+    if(CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE)
+        list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/font_freetype.c")
+    endif()
 
-    # Determine if we should create a library
+# Determine if we should create a library
     if((NOT HEADERS) AND (NOT SOURCES))
         message(STATUS "No source or header files found in ${CMAKE_CURRENT_SOURCE_DIR}.")
-		target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+        target_include_directories(${GUI_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
     if(HEADERS AND (NOT SOURCES))

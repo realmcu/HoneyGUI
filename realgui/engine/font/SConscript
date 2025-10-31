@@ -1,0 +1,15 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+
+if not GetDepend(['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE']):
+    SrcRemove(src,'font_freetype.c')
+
+CPPPATH = [cwd]
+
+group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
+
+Return('group')
