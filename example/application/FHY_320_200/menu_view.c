@@ -209,7 +209,7 @@ static void menu_view_design(gui_view_t *view)
     gui_text_type_set(title, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 
-    int16_t focus = 0; //40
+    int16_t focus = 0;
     gui_img_t *audio_bg = gui_img_create_from_mem(parent, "audio", MENU_BUTTON_BG_BIN,
                                                   BG_AUDIO_X + focus,
                                                   BG_Y + focus, 0, 0);

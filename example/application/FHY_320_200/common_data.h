@@ -18,16 +18,22 @@ extern "C" {
  *============================================================================*/
 struct FUNCTION_STATUS
 {
-    bool equalizer          ;
-    bool ambient_sound      ;
-    bool smart_talk         ;
-    bool spatial_sound      ;
-    bool voice_aware        ;
-    bool auto_play_pause    ;
-    bool notification       ;
-    bool message_preview    ;
+    bool equalizer              ;
+    bool ambient_sound          ;
+    bool smart_talk             ;
+    bool spatial_sound          ;
+    bool voice_aware            ;
+    bool auto_play_pause        ;
+    bool notification           ;
+    bool message_preview        ;
+    bool auto_dim_off_screen    ;
+    bool quick_wake_up_screen   ;
+    bool unlock_slider          ;
 
     uint32_t bt                 : 2;
+    uint32_t ble                : 1;
+
+    uint32_t factory_reset_done : 1;
 
     // uint32_t equalizer          : 1;
     // uint32_t ambient_sound      : 1;
@@ -53,10 +59,49 @@ struct FUNCTION_STATUS
     uint32_t earbuds_shock_l            : 1;
     uint32_t earbuds_shock_r            : 1;
 
+    uint32_t infor_center_func_0        : 1;
+    uint32_t infor_center_func_1        : 1;
+    uint32_t infor_center_func_2        : 1;
+    uint32_t infor_center_func_3        : 1;
+    uint32_t infor_center_func_4        : 1;
+    uint32_t infor_center_func_5        : 1;
 
 
 };
 
+typedef enum
+{
+    PLAYBACK = 0,
+    VOLUME,
+    AMBIENT_SOUND,
+    EQUALIZER,
+    SMART_TALK,
+    SPATIAL_SOUND,
+    VOICE_AWARE,
+    AUTO_PLAY_PAUSE,
+    BT_SOURCE,
+
+    FIND_MY_BUDS,
+    TIMER,
+    FLASHLIGHT,
+    JBL_HEADPHONES_APP,
+
+    SCREEN_BRIGHTNESS,
+    DARK_LIGHT_MODE,
+    LOCK_SCREEN,
+    AUTO_DIM_OFF_SCREEN,
+    QUICK_WAKE_UP_SCREEN,
+    CASE_BUTTON_CUSTOMIZE,
+    INFORMATION_CENTER_CUSTOMIZE,
+    UNLOCK_SLIDER,
+    NOTIFICATION,
+    TIME_FORMAT,
+    LANGUAGE,
+    REORDER_QUICK_ACCESS,
+    SUPPORT,
+    PRODUCT_TIPS,
+    FACTORY_RESET
+} FUNCTION_TYPE;
 typedef enum
 {
     ANC = 0,
@@ -88,6 +133,23 @@ typedef enum
     PCM
 } CODEC_TYPE;
 
+typedef enum
+{
+    ENGLISH = 0,
+    FRENCH,
+    GERMAN,
+    SPANISH,
+    ITALIAN,
+    DUTCH,
+    PORTUGUESE,
+    RUSSIAN,
+    CHINESE,
+    JAPANESE,
+    KOREAN,
+    THAI,
+    VIETNAM
+} LANGUAGE_TYPE;
+
 /*============================================================================*
  *                            Macros
  *============================================================================*/
@@ -107,6 +169,7 @@ typedef enum
 #define FG_2_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.3f)
 #define FG_3_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.5f)
 #define FG_WHITE                         FG_1_DARK
+#define FG_DARK                          gui_rgb(0,0,0)
 #define FG_WARNING                       gui_rgb(0xDF,0x2D,0x00)
 #define FG_NORMAL                        gui_rgb(0x00,0xB4,0x36)
 
@@ -194,6 +257,9 @@ extern bool time_format_24; // default 24H format
 extern const char *month[12];
 extern const char *day[7];
 
+/* Page name */
+extern const char *page_name_array[28];
+
 /* Clock style */
 extern int8_t clock_style;
 extern bool switch_from_lock_screen;
@@ -242,6 +308,27 @@ extern int8_t timer_max_min_val; // minutes [1, 60]
 extern uint16_t timer_val; // seconds
 extern char timer_str[6];
 
+/* Auto dim off screen*/
+extern int8_t auto_dim_time_val; // [5, 60], step 5
+
+/* Quick wake up screen*/
+extern int8_t quick_wake_up_click_num; // [0, 2]
+
+/* Case button customize*/
+extern uint8_t case_button_customize_index_array[3];
+extern uint8_t case_button_customize_type_index;
+extern const char *case_button_customize_type[3];
+
+/* Language */
+extern int8_t language_type_index;
+
+/* Reorder quick access */
+extern const char *quick_page_name[4];
+extern uint8_t quick_page_name_index;
+
+/* Information center customize */
+extern int8_t info_center_func_cnt; //[0,3]
+extern const char *info_center_func_name[6];
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/

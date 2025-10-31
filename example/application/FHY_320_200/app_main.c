@@ -38,6 +38,9 @@
 const static gui_view_descriptor_t *test_view = NULL;
 const static gui_view_descriptor_t *clock_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
+const static gui_view_descriptor_t *quick_view = NULL;
+const static gui_view_descriptor_t *flashlight_view = NULL;
+const static gui_view_descriptor_t *timer_view = NULL;
 
 /* FPS */
 static char fps[10];
@@ -49,7 +52,8 @@ static char low_mem_string[20];
 unsigned char *resource_root = NULL;
 #endif
 
-static uint8_t click_cnt = 0;
+static uint8_t tp_click_cnt = 0;
+static uint8_t kb_click_cnt = 0;
 static uint32_t last_click_time = 0;
 static uint16_t sleep_cnt = 0;
 
@@ -59,9 +63,12 @@ static uint16_t sleep_cnt = 0;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("quick_view");
+    test_view = gui_view_descriptor_get("oobe_view");
     clock_view = gui_view_descriptor_get("clock_view");
     menu_view = gui_view_descriptor_get("menu_view");
+    quick_view = gui_view_descriptor_get("quick_view");
+    flashlight_view = gui_view_descriptor_get("flashlight_view");
+    timer_view = gui_view_descriptor_get("timer_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -116,39 +123,92 @@ static void fps_create(void *parent)
     gui_text_type_set(low_mem, HEADING_1_BIN, FONT_SRC_MEMADDR);
 }
 
+static void button_2_view(uint8_t index)
+{
+    switch (index)
+    {
+    case 0:
+        {
+            gui_log("Wake up/dim off screen \n");
+            gui_view_set_animate_step(gui_view_get_current(), 400);
+            gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+                                   SWITCH_IN_NONE_ANIMATION);
+        }
+        break;
+    case 1:
+        {
+            gui_view_set_animate_step(gui_view_get_current(), 400);
+            gui_view_switch_direct(gui_view_get_current(), quick_view, SWITCH_OUT_NONE_ANIMATION,
+                                   SWITCH_IN_NONE_ANIMATION);
+        }
+        break;
+    case 2:
+        {
+            gui_log("Shut down/enable screen \n");
+        }
+        break;
+    case 3:
+        {
+            gui_view_set_animate_step(gui_view_get_current(), 400);
+            gui_view_switch_direct(gui_view_get_current(), flashlight_view, SWITCH_OUT_NONE_ANIMATION,
+                                   SWITCH_IN_NONE_ANIMATION);
+        }
+        break;
+    case 4:
+        {
+            gui_view_set_animate_step(gui_view_get_current(), 400);
+            gui_view_switch_direct(gui_view_get_current(), timer_view, SWITCH_OUT_NONE_ANIMATION,
+                                   SWITCH_IN_NONE_ANIMATION);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 static void timer_touch_cb(void *param)
 {
     GUI_UNUSED(param);
     kb_info_t *kb = kb_get_info();
     touch_info_t *tp = tp_get_info();
 
-    if (click_cnt != 0 && (touchpad_get_data()->timestamp_ms - last_click_time) > 200)
+    if (tp_click_cnt != 0 && (gui_ms_get() - last_click_time) > 200)
     {
-        switch (click_cnt)
+        switch (tp_click_cnt)
         {
         case 1 :
+            gui_log("tp click\n");
             break;
         case 2 :
-            {
-                gui_view_set_animate_step(gui_view_get_current(), 400);
-                gui_view_switch_direct(gui_view_get_current(), test_view, SWITCH_OUT_NONE_ANIMATION,
-                                       SWITCH_IN_NONE_ANIMATION);
-            }
+            gui_log("tp double click\n");
+            break;
+        case 3 :
+            gui_log("tp triple click\n");
             break;
         default:
             break;
         }
-        click_cnt = 0;
+        tp_click_cnt = 0;
+        return;
+    }
+    else if (kb_click_cnt != 0 && (gui_ms_get() - last_click_time) > 450)
+    {
+        switch (kb_click_cnt)
+        {
+        case 1 :
+            button_2_view(case_button_customize_index_array[0]);
+            break;
+        case 2 :
+            button_2_view(case_button_customize_index_array[1]);
+            break;
+        default:
+            break;
+        }
+        kb_click_cnt = 0;
         return;
     }
 
-    if (kb->pressed)
-    {
-        gui_view_set_animate_step(gui_view_get_current(), 400);
-        gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
-                               SWITCH_IN_NONE_ANIMATION);
-    }
-    if (tp->pressed || tp->pressing)
+    if (tp->pressed || tp->pressing || kb->pressed || kb->released)
     {
         sleep_cnt = 0;
     }
@@ -183,7 +243,7 @@ static void time_update_cb(void *param)
     }
 #endif
 
-    if (sleep_cnt >= 3000) //3000s
+    if (f_status.auto_dim_off_screen && sleep_cnt >= auto_dim_time_val)
     {
         sleep_cnt = 0;
         if (f_status.timer)
@@ -203,26 +263,41 @@ static void touch_long_cb(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_set_animate_step(gui_view_get_current(), 400);
-    detail_page_design_func = page_dark_light_design;
-    gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_NONE_ANIMATION,
-                           SWITCH_IN_NONE_ANIMATION);
+    button_2_view(case_button_customize_index_array[2]);
 }
 
-static void click_cb(void *obj, gui_event_t e, void *param)
+static void tp_click_cb(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     gui_touch_port_data_t *touch_data = touchpad_get_data();
-    if (click_cnt == 0)
+    if (tp_click_cnt == 0)
     {
-        click_cnt++;
+        tp_click_cnt++;
         last_click_time = touch_data->timestamp_ms;
     }
-    else if (click_cnt == 1 && (touch_data->timestamp_ms - last_click_time) < 200)
+    else if (tp_click_cnt < 3 && (touch_data->timestamp_ms - last_click_time) < 150)
     {
-        click_cnt++;
+        tp_click_cnt++;
+        last_click_time = touch_data->timestamp_ms;
+    }
+}
+
+static void kb_click_cb(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    gui_touch_port_data_t *touch_data = touchpad_get_data();
+    if (kb_click_cnt == 0)
+    {
+        kb_click_cnt++;
+        last_click_time = touch_data->timestamp_ms;
+    }
+    else if (kb_click_cnt < 2 && (touch_data->timestamp_ms - last_click_time) < 400)
+    {
+        kb_click_cnt++;
     }
 }
 
@@ -240,16 +315,34 @@ static int app_init(void)
     timeinfo = &barn_time;
 
     f_status.bt = BT_CONNECT;
+    f_status.ble = 1;
     f_status.music_input = 1;
     f_status.earbuds_connect_l = 1;
     f_status.earbuds_connect_r = 1;
     f_status.notification_new = 1;
     f_status.earbuds_in_ear_l = 1;
     f_status.earbuds_in_ear_r = 1;
+
+    f_status.infor_center_func_0 = 1;
+    f_status.infor_center_func_1 = 1;
+    f_status.infor_center_func_2 = 1;
+    f_status.infor_center_func_3 = 0;
+    f_status.infor_center_func_4 = 0;
+    f_status.infor_center_func_5 = 0;
+
     // f_status.call = 1;
+
+    quick_page_name[0] = page_name_array[0];
+    quick_page_name[1] = page_name_array[1];
+    quick_page_name[2] = page_name_array[2];
+    quick_page_name[3] = page_name_array[3];
+    detail_page_design_func = page_information_center_customize_design;
+
     gui_win_t *win_touch = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
-    gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_TOUCH_LONG, NULL);
-    gui_obj_add_event_cb(win_touch, click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    // gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_TOUCH_LONG, NULL);
+    // gui_obj_add_event_cb(win_touch, tp_click_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(win_touch, kb_click_cb, GUI_EVENT_KB_SHORT_CLICKED, NULL);
+    gui_obj_add_event_cb(win_touch, touch_long_cb, GUI_EVENT_KB_LONG_CLICKED, NULL);
     gui_obj_create_timer(GUI_BASE(win_touch), 10, true, timer_touch_cb);
 
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);

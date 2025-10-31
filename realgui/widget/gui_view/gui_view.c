@@ -65,13 +65,18 @@ static void gui_view_released_view_timer_cb(void *obj)
     GUI_UNUSED(tp);
     // gui_log("released in view timer cb, g_Release = %d!\n", g_Release);
 
-    const float factor = 0.4f;
-    int16_t distance = g_Target - g_Release;
-    int delta = (int16_t)(distance * factor); //exponential decay
-    if (delta == 0) { delta = (distance > 0) ? 1 : -1; }
-    g_Release += delta;
-
-    if (g_Release == g_Target)
+    if (g_Release != g_Target)
+    {
+        const float factor = 0.4f;
+        int16_t distance = g_Target - g_Release;
+        int delta = (int16_t)(distance * factor); //exponential decay
+        if (delta == 0)
+        {
+            delta = (distance > 0) ? 1 : -1;
+        }
+        g_Release += delta;
+    }
+    else
     {
         if (g_Target != 0) // change view, need reset
         {

@@ -27,6 +27,7 @@ static void clock_view_design(gui_view_t *view);
 /* View Management */
 static gui_view_t *current_view = NULL;
 static const gui_view_descriptor_t *lock_view = NULL;
+static const gui_view_descriptor_t *quick_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -54,6 +55,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     lock_view = gui_view_descriptor_get("lock_view");
+    quick_view = gui_view_descriptor_get("quick_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -465,7 +467,12 @@ static void clock_view_design(gui_view_t *view)
     }
     else
     {
-        gui_view_switch_on_event(view, lock_view, SWITCH_OUT_NONE_ANIMATION,
+        const gui_view_descriptor_t *target_view = lock_view;
+        if (!f_status.unlock_slider)
+        {
+            target_view = quick_view;
+        }
+        gui_view_switch_on_event(view, target_view, SWITCH_OUT_NONE_ANIMATION,
                                  SWITCH_IN_NONE_ANIMATION,
                                  GUI_EVENT_TOUCH_CLICKED);
     }

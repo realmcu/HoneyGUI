@@ -91,7 +91,6 @@ typedef struct kb_info
     uint8_t pressed             : 1;
     uint8_t released            : 1;
     uint8_t pressing            : 1;
-    uint8_t short_click_twice   : 1;
 } kb_info_t;
 
 typedef struct wheel_info

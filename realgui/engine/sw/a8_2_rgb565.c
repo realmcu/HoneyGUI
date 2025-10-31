@@ -25,6 +25,7 @@
 static void a8_2_rgb565_1d_fix_bg(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     SETUP_DRAW_VARIABLES;
+    opacity_value = image->opacity_value * image->alpha_mix / 255;
 
     if (opacity_value == 0)
     {

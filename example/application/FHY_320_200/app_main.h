@@ -63,6 +63,7 @@ extern char battery_barn_str[4];
  *                           Punblic Functions
  *============================================================================*/
 void regenerate_current_view(void *msg);
+void set_device_name(const char *name);
 
 /* Page design */
 void page_playback_design(gui_obj_t *parent);
@@ -74,16 +75,24 @@ void page_spatial_sound_design(gui_obj_t *parent);
 void page_voice_aware_design(gui_obj_t *parent);
 void page_auto_play_pause_design(gui_obj_t *parent);
 
+void page_screen_brightness_design(gui_obj_t *parent);
 void page_dark_light_design(gui_obj_t *parent);
 void page_lock_screen_design(gui_obj_t *parent);
-void page_qrcode_design(gui_obj_t *parent);
+void page_auto_dim_off_screen_design(gui_obj_t *parent);
+void page_quick_wake_up_screen_design(gui_obj_t *parent);
+void page_case_button_customize_design(gui_obj_t *parent);
+void page_information_center_customize_design(gui_obj_t *parent);
+void page_unlock_slider_design(gui_obj_t *parent);
 void page_notification_design(gui_obj_t *parent);
-void page_screen_brightness_design(gui_obj_t *parent);
 void page_time_format_design(gui_obj_t *parent);
+void page_language_design(gui_obj_t *parent);
+void page_reorder_quick_access_design(gui_obj_t *parent);
+void page_support_design(gui_obj_t *parent);
 
 void page_find_buds_design(gui_obj_t *parent);
 void page_timer_design(gui_obj_t *parent);
 void page_flashlight_design(gui_obj_t *parent);
+void page_qrcode_design(gui_obj_t *parent);
 
 #ifdef __cplusplus
 }

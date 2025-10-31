@@ -54,23 +54,6 @@ static gui_view_descriptor_t const descriptor =
 static note_design_param_t *design_p = NULL;
 static int16_t list_offset_his = 0;
 
-static const char *text_array[] =
-{
-    "Screen Brightness",
-    "Dark/Light Mode",
-    "Lock Screen",
-    "Auto Dim Off Screen",
-    "Quick Wake Up Screen",
-    "Case Button Customize",
-    "Information Center Customize",
-    "Unlock Slider",
-    "Notification",
-    "Time Format",
-    "Language",
-    "Reorder Quick Access",
-    "Support",
-};
-
 static gui_img_t *bg_note = NULL;
 
 /*============================================================================*
@@ -100,7 +83,6 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    list_offset_his = 0;
     GUI_WIDGET_POINTER_BY_NAME_ROOT(list, "list", current_view);
     gui_obj_stop_timer(list);
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
@@ -119,6 +101,7 @@ static void switch_page(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
+    if (GUI_BASE(obj)->y < -28) { return; }
     detail_page_design_func = param;
     gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
     gui_obj_hidden((void *)bg_note, false);
@@ -143,19 +126,19 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_a8_recolor(img, FG_THEME3_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
-    char *text = (char *)text_array[index];
+    char *text = (char *)page_name_array[index + 13];
     uint16_t text_length = strlen(text);
     int font_size = 30;
     if (text_length < 23)
     {
-        gui_text_t *t = gui_text_create(note, "txt", 56, 15, 256, 56);
+        gui_text_t *t = gui_text_create(note, 0, 56, 15, 244, 56);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, font_color, text_length, font_size);
         gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, LEFT);
     }
     else
     {
-        gui_scroll_text_t *t = gui_scroll_text_create(note, "txt", 56, 15, 256, 56);
+        gui_scroll_text_t *t = gui_scroll_text_create(note, 0, 56, 15, 244, 56);
         gui_scroll_text_set(t, text, GUI_FONT_SRC_BMP, font_color, text_length, font_size);
         gui_scroll_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_scroll_text_scroll_set(t, SCROLL_X, 260, 260, 5000, 0);
@@ -180,6 +163,10 @@ static void list_timer_cb(void *obj)
 
 static void settings_menu_view_design(gui_view_t *view)
 {
+    if (gui_view_get_current()->descriptor == menu_view)
+    {
+        list_offset_his = 0;
+    }
     gui_view_set_animate_step(view, 10);
 
     gui_obj_t *parent = GUI_BASE(view);
@@ -204,19 +191,22 @@ static void settings_menu_view_design(gui_view_t *view)
         ICON_SUPPORT_BIN,
     };
 
-    int array_size = sizeof(text_array) / sizeof(text_array[0]);
+    int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
     void *page_design[] =
     {
         page_screen_brightness_design,
         page_dark_light_design,
         page_lock_screen_design,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
+        page_auto_dim_off_screen_design,
+        page_quick_wake_up_screen_design,
+        page_case_button_customize_design,
+        page_information_center_customize_design,
+        page_unlock_slider_design,
         page_notification_design,
         page_time_format_design,
+        page_language_design,
+        page_reorder_quick_access_design,
+        page_support_design
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
     void **func_cb = gui_malloc(array_size * sizeof(void *));
@@ -250,27 +240,30 @@ static void settings_menu_view_design(gui_view_t *view)
     }
     gui_img_a8_mix_alpha(bg_note, bg_note->fg_color_set >> 24);
 
-    gui_text_t *title = gui_text_create(parent, 0, 0, 13, gui_get_screen_width(), 30);
+    gui_text_t *title = gui_text_create(parent, 0, 0, 13, 320, 30);
     gui_text_set(title, TITLE, GUI_FONT_SRC_BMP, font_color, strlen(TITLE), 28);
     gui_text_type_set(title, CAPTION_2_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 
-
-    gui_img_t *icon_back = gui_img_create_from_mem(parent, 0, ICON_BACK_BIN, 0, 8, 0, 0);
-    gui_obj_add_event_cb(icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 60, 60);
+    gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 8, 0, 0);
+    gui_obj_add_event_cb(win_icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_img_t *scrollbar_bg = gui_img_create_from_mem(parent, 0, SCROLLBAR_BG_BIN, 310, 62, 0, 0);
     gui_img_t *scrollbar = gui_img_create_from_mem(parent, 0, SCROLLBAR_S_BIN, 310, 62, 0, 0);
-    gui_img_a8_recolor(scrollbar_bg, FG_WHITE.color.argb_full);
-    gui_img_a8_recolor(scrollbar, FG_WHITE.color.argb_full);
+
 
     if (theme_bg_white)
     {
         gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(scrollbar_bg, FG_DARK.color.argb_full);
+        gui_img_a8_recolor(scrollbar, FG_DARK.color.argb_full);
     }
     else
     {
         gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(scrollbar_bg, FG_WHITE.color.argb_full);
+        gui_img_a8_recolor(scrollbar, FG_WHITE.color.argb_full);
     }
 }
 

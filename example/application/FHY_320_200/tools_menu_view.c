@@ -53,14 +53,6 @@ static gui_view_descriptor_t const descriptor =
 static note_design_param_t *design_p = NULL;
 static int16_t list_offset_his = 0;
 
-static const char *text_array[] =
-{
-    "Find My Buds",
-    "Timer",
-    "Flashlight",
-    "JBL Headphones App",
-};
-
 static gui_img_t *bg_note = NULL;
 
 /*============================================================================*
@@ -90,7 +82,6 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    list_offset_his = 0;
     GUI_WIDGET_POINTER_BY_NAME_ROOT(list, "list", current_view);
     gui_obj_stop_timer(list);
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
@@ -109,6 +100,7 @@ static void switch_page(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
+    if (GUI_BASE(obj)->y < -28) { return; }
     detail_page_design_func = param;
     gui_obj_move(GUI_BASE(bg_note), 0, GUI_BASE(obj)->y + LIST_Y);
     gui_obj_hidden((void *)bg_note, false);
@@ -133,9 +125,9 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_a8_recolor(img, FG_THEME2_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
-    char *text = (char *)text_array[index];
+    char *text = (char *)page_name_array[index + 9];
     int font_size = 30;
-    gui_text_t *t = gui_text_create(note, "txt", 56, 15, 260, 56);
+    gui_text_t *t = gui_text_create(note, 0, 56, 15, 260, 56);
     gui_text_set(t, text, GUI_FONT_SRC_BMP, font_color, strlen(text), font_size);
     gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t, LEFT);
@@ -149,7 +141,7 @@ static void note_design(gui_obj_t *obj, void *p)
 static void list_timer_cb(void *obj)
 {
     gui_list_t *list = (gui_list_t *)obj;
-    int list_offset_his = list->offset;
+    list_offset_his = list->offset;
     int range = list->base.h - list->total_length;
     int t_y = list_offset_his * (SCROLL_BAR_BG_H - SCROLL_BAR_L_H) / range;
     gui_obj_t *scrollbar = gui_list_entry(GUI_BASE(obj)->parent->child_list.prev, gui_obj_t,
@@ -159,6 +151,10 @@ static void list_timer_cb(void *obj)
 
 static void tools_menu_view_design(gui_view_t *view)
 {
+    if (gui_view_get_current()->descriptor == menu_view)
+    {
+        list_offset_his = 0;
+    }
     gui_view_set_animate_step(view, 10);
 
     gui_obj_t *parent = GUI_BASE(view);
@@ -174,7 +170,7 @@ static void tools_menu_view_design(gui_view_t *view)
         ICON_ICON_APP_BIN,
     };
 
-    int array_size = sizeof(text_array) / sizeof(text_array[0]);
+    int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
     void *page_design[] =
     {
         page_find_buds_design,
@@ -220,9 +216,9 @@ static void tools_menu_view_design(gui_view_t *view)
     gui_text_type_set(title, CAPTION_2_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 
-
-    gui_img_t *icon_back = gui_img_create_from_mem(parent, 0, ICON_BACK_BIN, 0, 8, 0, 0);
-    gui_obj_add_event_cb(icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 60, 60);
+    gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 8, 0, 0);
+    gui_obj_add_event_cb(win_icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_img_t *scrollbar_bg = gui_img_create_from_mem(parent, 0, SCROLLBAR_BG_BIN, 310, 62, 0, 0);
     gui_img_t *scrollbar = gui_img_create_from_mem(parent, 0, SCROLLBAR_L_BIN, 310, 62, 0, 0);
@@ -232,10 +228,14 @@ static void tools_menu_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
+        gui_img_a8_recolor(scrollbar_bg, FG_DARK.color.argb_full);
+        gui_img_a8_recolor(scrollbar, FG_DARK.color.argb_full);
     }
     else
     {
         gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
+        gui_img_a8_recolor(scrollbar_bg, FG_WHITE.color.argb_full);
+        gui_img_a8_recolor(scrollbar, FG_WHITE.color.argb_full);
     }
 }
 

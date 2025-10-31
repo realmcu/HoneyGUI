@@ -48,16 +48,20 @@ void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
     // page_lock_screen_design,
     // page_notification_design,
-    page_playback_design,
+    // page_playback_design,
     // page_auto_play_pause_design,
     // page_voice_aware_design,
     // page_find_buds_design,
     // page_timer_design,
     // page_flashlight_design,
+    // page_auto_dim_off_screen_design,
+    // page_quick_wake_up_screen_design,
+    page_unlock_slider_design,
+    page_language_design,
     page_dark_light_design,
     page_spatial_sound_design,
     // page_volume_design,
-    page_ambient_sound_design,
+    // page_ambient_sound_design,
     // page_equalizer_design,
 };
 
@@ -155,7 +159,7 @@ static void note_design(gui_obj_t *obj, void *p)
     GUI_UNUSED(p);
     uint16_t index = ((gui_list_note_t *)obj)->index;
     quick_page_design_func_array[index](obj);
-
+    quick_page_name[index] = page_name_array[quick_page_name_index];
 }
 
 static void create_indicator(gui_obj_t *parent)
@@ -219,6 +223,16 @@ static void quick_view_design(gui_view_t *view)
         gui_set_bg_color(SCREEN_BG_DARK);
         font_color = FG_1_DARK;
     }
+    gui_list_t *list = gui_list_create(parent, "list", 0, 0, 0, 0, 320, 0, HORIZONTAL,
+                                       note_design, NULL,
+                                       false);
+    gui_list_set_style(list, LIST_CLASSIC);
+    gui_list_set_note_num(list, quick_page_num);
+    gui_list_set_auto_align(list, true);
+    gui_list_set_offset(list, -page_index * 320);
+    gui_list_set_inertia(list, false);
+    gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
+
     create_indicator(parent);
 
     gui_img_t *bt = gui_img_create_from_mem(parent, 0, ICON_BT_CONNECT_BIN, 12, 13, 0, 0);
@@ -434,13 +448,4 @@ static void quick_view_design(gui_view_t *view)
     {
         update_page_indicator();
     }
-    gui_list_t *list = gui_list_create(parent, "list", 0, 0, 0, 0, 320, 0, HORIZONTAL,
-                                       note_design, NULL,
-                                       false);
-    gui_list_set_style(list, LIST_CLASSIC); //if LIST_CARD style, must set style before set note num
-    gui_list_set_note_num(list, quick_page_num);
-    gui_list_set_auto_align(list, true);
-    gui_list_set_offset(list, -page_index * 320);
-    gui_list_set_inertia(list, false);
-    gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
 }

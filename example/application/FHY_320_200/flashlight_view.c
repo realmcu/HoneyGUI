@@ -6,7 +6,6 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "tp_algo.h"
 
 /*============================================================================*
  *                            Macros
@@ -32,6 +31,7 @@ static gui_view_descriptor_t const descriptor =
 };
 
 static const gui_view_descriptor_t *descriptor_rec = NULL;
+static int8_t brightness_val_rec = 0;
 
 /*============================================================================*
  *                           Private Functions
@@ -50,6 +50,7 @@ static void click_cancel(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
+    screen_brightness_val = brightness_val_rec;
     gui_view_set_animate_step(current_view, 400);
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
@@ -62,6 +63,8 @@ static void flashlight_view_design(gui_view_t *view)
                              GUI_EVENT_TOUCH_CLICKED);
 
     gui_set_bg_color(FG_WHITE);
+    brightness_val_rec = screen_brightness_val;
+    screen_brightness_val = 3;
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_img_t *icon = gui_img_create_from_mem(parent, 0, ICON_FLASHLIGHT_OFF_BIN, 143, 118, 0, 0);

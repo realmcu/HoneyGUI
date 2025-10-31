@@ -58,6 +58,41 @@ const char *day[7] =
     "Sat"
 };
 
+/* Page name */
+const char *page_name_array[28] =
+{
+    "playback",
+    "Volume",
+    "Ambient Sound",
+    "Equalizer",
+    "Smart Talk",
+    "Spatial Sound",
+    "Voice Aware",
+    "Auto Play/Pause",
+    "Audio Source",
+
+    "Find My Buds",
+    "Timer",
+    "Flashlight",
+    "JBL Headphones App",
+
+    "Screen Brightness",
+    "Dark/Light Mode",
+    "Lock Screen",
+    "Auto Dim Off Screen",
+    "Quick Wake Up Screen",
+    "Case Button Customize",
+    "Information Center Customize",
+    "Unlock Slider",
+    "Notification",
+    "Time Format",
+    "language",
+    "Reorder Quick Access",
+    "Support",
+    "Product Tips",
+    "Factory Reset"
+};
+
 /* Clock style */
 int8_t clock_style = 0; // [0, 4]
 bool switch_from_lock_screen = false;
@@ -112,3 +147,38 @@ uint8_t codec_type_index = AAC; // [0, 5]
 int8_t timer_max_min_val = 5; // minutes [1, 60]
 uint16_t timer_val = 0; // seconds
 char timer_str[6] = {0};
+
+/* Auto dim off screen*/
+int8_t auto_dim_time_val = 30; // [5, 60], step 5
+
+/* Quick wake up screen*/
+int8_t quick_wake_up_click_num = 0; // [0, 2]
+
+/* Case button customize*/
+uint8_t case_button_customize_index_array[3] = {0};
+uint8_t case_button_customize_type_index = 0; // [0, 2] single, double, long
+const char *case_button_customize_type[3] =
+{
+    "Single press",
+    "Double press",
+    "Long press 5s"
+};
+
+/* Language */
+int8_t language_type_index = ENGLISH;
+
+/* Reorder quick access */
+const char *quick_page_name[4] = {0};
+uint8_t quick_page_name_index = 0;
+
+/* Information center customize */
+int8_t info_center_func_cnt = 3;
+const char *info_center_func_name[6] =
+{
+    "Play/Pause",
+    "Ambient\nSound",
+    "EQ",
+    "Spatial\nSound",
+    "Flash light",
+    "Dark/Light\nMode"
+};

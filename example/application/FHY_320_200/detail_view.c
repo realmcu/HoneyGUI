@@ -143,33 +143,47 @@ static void detail_view_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 10);
     gui_view_t *view_c = gui_view_get_current();
-    if (view_c && strcmp(view_c->descriptor->name, "timer_view") &&
-        strcmp(view_c->descriptor->name, "flashlight_view"))
+    if (view_c && !(!strcmp(view_c->descriptor->name, "timer_view") ||
+                    !strcmp(view_c->descriptor->name, "flashlight_view")        ||
+                    !strcmp(view_c->descriptor->name, "button_customize_view")  ||
+                    !strcmp(view_c->descriptor->name, "support_view")))
     {
         descriptor_rec = view_c->descriptor;
     }
     gui_obj_t *parent = GUI_BASE(view);
 
-    gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 52, 52);
+    gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 60, 60);
     gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 0, 0, 0);
     gui_obj_add_event_cb(win_icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_win_t *win_icon_favorite = (gui_win_t *)gui_win_create(parent, 0, 130, 0, 60, 60);
-    gui_img_t *icon_favorite = gui_img_create_from_mem(win_icon_favorite, 0, ICON_NOT_FAVORITE_BIN, 16,
-                                                       6, 0, 0);
+    gui_win_t *win_icon_favorite = NULL;
+    gui_img_t *icon_favorite = NULL;
     is_favorite = false;
-    if (page_in_favorite())
+    if (detail_page_design_func == page_case_button_customize_design ||
+        detail_page_design_func == page_reorder_quick_access_design  ||
+        detail_page_design_func == page_information_center_customize_design ||
+        detail_page_design_func == page_support_design)
     {
-        gui_img_set_image_data(icon_favorite, ICON_IS_FAVORITE_BIN);
-        is_favorite = true;
-        gui_img_a8_recolor(icon_favorite, FG_WARNING.color.argb_full);
+        icon_back->base.y = 8;
     }
-    gui_obj_add_event_cb(win_icon_favorite, click_button_favorite, GUI_EVENT_TOUCH_CLICKED, NULL);
+    else
+    {
+        win_icon_favorite = (gui_win_t *)gui_win_create(parent, 0, 130, 0, 60, 60);
+        icon_favorite = gui_img_create_from_mem(win_icon_favorite, 0, ICON_NOT_FAVORITE_BIN, 16,
+                                                6, 0, 0);
+        if (page_in_favorite())
+        {
+            gui_img_set_image_data(icon_favorite, ICON_IS_FAVORITE_BIN);
+            is_favorite = true;
+            gui_img_a8_recolor(icon_favorite, FG_WARNING.color.argb_full);
+        }
+        gui_obj_add_event_cb(win_icon_favorite, click_button_favorite, GUI_EVENT_TOUCH_CLICKED, NULL);
+    }
 
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
         gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
-        if (!is_favorite)
+        if (icon_favorite && !is_favorite)
         {
             gui_img_a8_recolor(icon_favorite, FG_1_LIGHT.color.argb_full);
         }
@@ -178,7 +192,7 @@ static void detail_view_design(gui_view_t *view)
     {
         gui_set_bg_color(SCREEN_BG_DARK);
         gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
-        if (!is_favorite)
+        if (icon_favorite && !is_favorite)
         {
             gui_img_a8_recolor(icon_favorite, FG_1_DARK.color.argb_full);
         }
