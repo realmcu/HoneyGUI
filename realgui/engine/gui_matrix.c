@@ -49,6 +49,14 @@ bool rect_intersect(gui_rect_t *result_rect, gui_rect_t *rect1, gui_rect_t *rect
     }
 }
 
+void rect_move(gui_rect_t *out, gui_rect_t *in, int16_t x, int16_t y)
+{
+    out->x1 = in->x1 + x;
+    out->x2 = in->x2 + x;
+    out->y1 = in->y1 + y;
+    out->y2 = in->y2 + y;
+}
+
 float fix_sin(int angle)
 {
     int16_t ret = 0;

@@ -45,6 +45,7 @@ bool matrix_is_full_rank(struct gui_matrix *m);
 bool matrix_get_transform_area(gui_matrix_t *matrix, gui_rect_t *input_area,
                                gui_rect_t *result_area);
 bool rect_intersect(gui_rect_t *result_rect, gui_rect_t *rect1, gui_rect_t *rect2);
+void rect_move(gui_rect_t *out, gui_rect_t *in, int16_t x, int16_t y);
 float fix_cos(int angle);
 float fix_sin(int angle);
 
