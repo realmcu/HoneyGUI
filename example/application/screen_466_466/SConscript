@@ -1,0 +1,39 @@
+# building script for HoneyGUI
+from building import *
+from SCons.Script import Flatten
+import os
+import menu_config
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+src += Glob('./*.cpp') 
+
+
+CPPPATH = [cwd]
+CPPPATH += [cwd + '\\root_image']
+
+CPPDEFINES = []
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_466_466_DEMO'):
+    CPPDEFINES += ['DRV_LCD_WIDTH=466']
+    CPPDEFINES += ['DRV_LCD_HIGHT=466']
+    CPPDEFINES += ['DRV_PIXEL_BITS=32']
+    if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
+        from honeygui import *
+        
+        print("Target arch is win32, attempting to add prebuilt binary object...")
+        BIN_SUBDIR = os.path.join(cwd, 'root_image')
+        BIN_FILE = os.path.join(BIN_SUBDIR, 'root_0x00950000.bin')
+        OBJ_FILE = os.path.join(BIN_SUBDIR, 'root_0x00950000_bin.o')
+        result_node = add_prebuilt_binary_object(BIN_FILE, OBJ_FILE)
+        if result_node:
+            additional_objs = []
+            additional_objs.append(result_node)
+            print(additional_objs)
+            src = Flatten(src + additional_objs)
+
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_466_466_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('group')

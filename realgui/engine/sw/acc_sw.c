@@ -123,7 +123,7 @@ void sw_acc_blit(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 
     if (header->compress)
     {
-        GUI_ASSERT(NULL);
+        //GUI_ASSERT(NULL);
         rle(image, dc, rect);
     }
     else
