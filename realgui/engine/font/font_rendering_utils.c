@@ -150,11 +150,11 @@ static void font_render_1bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
     uint8_t ppb = 8; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 2;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
             if ((dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb)) & 0x01)
             {
@@ -385,11 +385,11 @@ static void font_render_2bpp_to_RGB565_stable(draw_font_t *font, font_glyph_t *g
     uint8_t ppb = 4; //pixel_per_byte = 8 / rendor_mode
     uint32_t write_stride = font->target_buf_stride / 2;
     uint32_t dots_stride = glyph->stride / ppb;
-    for (uint32_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
+    for (int16_t i = font->clip_rect.y1; i <= font->clip_rect.y2; i++)
     {
         int write_off = (i - font->target_rect.y1) * write_stride;
         int dots_off = (i - glyph->pos_y) * dots_stride;
-        for (uint32_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
+        for (int16_t j = font->clip_rect.x1; j <= font->clip_rect.x2; j++)
         {
             uint8_t alpha = dots[dots_off + (j - glyph->pos_x) / ppb] >> ((j - glyph->pos_x) % ppb * 2);
             alpha &= 0x03;
