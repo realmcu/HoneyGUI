@@ -278,6 +278,15 @@ static void gui_text_font_destroy(gui_text_t *text)
     }
 }
 
+static void gui_text_resize_rect(gui_text_t *text, gui_text_rect_t *rect)
+{
+    if (text->thai)
+    {
+        rect->y1 -= text->font_height / 2;
+        rect->y2 += text->font_height / 2;
+    }
+}
+
 static void gui_text_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
@@ -370,6 +379,7 @@ static void gui_text_draw(gui_obj_t *obj)
     {
         gui_text_font_load(text, &draw_rect);
     }
+    gui_text_resize_rect(text, &draw_rect);
     if (text->font_type == GUI_FONT_SRC_TTF)
     {
         gui_font_ttf_adapt_rect(text, &draw_rect);

@@ -488,6 +488,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     {
         char_width_sum -= get_thai_mark_char_width(chr, font_len);
         font_len = process_thai_char_struct(chr, font_len, &mark_array_out, &mark_count_out);
+        active_font_len = font_len;
         char_width_sum -= mark_count_out * letter_spacing;
     }
 
