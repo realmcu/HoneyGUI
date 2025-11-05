@@ -62,29 +62,29 @@ void no_rle(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
         if (head->type == RGB565)
         {
             rgb565_2_rgb565(image, dc, rect);
+            return;
         }
         else if (head->type == ARGB8565)
         {
             argb8565_2_rgb565(image, dc, rect);
+            return;
         }
         else if (head->type == ALPHAMASK)
         {
             a8_2_rgb565(image, dc, rect);
+            return;
         }
+
     }
     else if ((dc->bit_depth == 8) && (rect == NULL))
     {
         if (head->type == GRAY)
         {
             a8_2_a8(image, dc, rect);
+            return;
         }
     }
-    else
-    {
-        do_raster(image, dc, rect);
-    }
-
-
+    do_raster(image, dc, rect);
 }
 
 
