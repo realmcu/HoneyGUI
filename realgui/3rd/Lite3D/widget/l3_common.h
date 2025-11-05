@@ -478,6 +478,8 @@ void l3_4x4_matrix_rotateY(l3_4x4_matrix_t *m, float rotY);
 void l3_4x4_matrix_rotateX(l3_4x4_matrix_t *m, float rotX);
 void l3_4x4_matrix_rotateZ(l3_4x4_matrix_t *m, float rotZ);
 void l3_4x4_matrix_scale(l3_4x4_matrix_t *m, float scale_x, float scale_y, float scale_z);
+void l3_4x4_matrix_compose_trs(l3_4x4_matrix_t *m, float translation[3], float rotation[4],
+                               float scale[3]);
 
 l3_4d_point_t l3_4x4_matrix_mul_4d_point(l3_4x4_matrix_t *mat, l3_4d_point_t p);
 bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right,

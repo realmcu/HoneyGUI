@@ -43,6 +43,10 @@
 // #define CONFIG_REALTEK_BUILD_REAL_EARTH_3D
 // </c>
 
+// <c> RTK GUI 3D GLTF Demo
+// #define CONFIG_REALTEK_BUILD_REAL_PIKACHU_GLTF_3D
+// </c>
+
 // <c> RTK GUI View Demo
 // #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>

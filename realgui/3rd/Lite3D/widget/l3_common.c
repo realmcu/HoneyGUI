@@ -375,6 +375,35 @@ void l3_4x4_matrix_translate(l3_4x4_matrix_t *m, float t_x, float t_y, float t_z
 
 }
 
+void l3_4x4_matrix_compose_trs(l3_4x4_matrix_t *m, float translation[3], float rotation[4],
+                               float scale[3])
+{
+    memcpy(m, &identity_4x4_matrix, sizeof(l3_4x4_matrix_t));
+
+    float x = rotation[0], y = rotation[1], z = rotation[2], w = rotation[3];
+
+    float x2 = x + x, y2 = y + y, z2 = z + z;
+    float xx = x * x2, xy = x * y2, xz = x * z2;
+    float yy = y * y2, yz = y * z2, zz = z * z2;
+    float wx = w * x2, wy = w * y2, wz = w * z2;
+
+    m->u.e._11 = scale[0] * (1.0f - (yy + zz));
+    m->u.e._12 = scale[0] * (xy - wz);
+    m->u.e._13 = scale[0] * (xz + wy);
+
+    m->u.e._21 = scale[1] * (xy + wz);
+    m->u.e._22 = scale[1] * (1.0f - (xx + zz));
+    m->u.e._23 = scale[1] * (yz - wx);
+
+    m->u.e._31 = scale[2] * (xz - wy);
+    m->u.e._32 = scale[2] * (yz + wx);
+    m->u.e._33 = scale[2] * (1.0f - (xx + yy));
+
+    m->u.e._14 = translation[0];
+    m->u.e._24 = translation[1];
+    m->u.e._34 = translation[2];
+}
+
 __attribute__((noinline)) bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left,
                                                  l3_4x4_matrix_t *input_right,
                                                  l3_4x4_matrix_t *output)

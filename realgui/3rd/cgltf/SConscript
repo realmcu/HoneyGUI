@@ -1,0 +1,13 @@
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Glob('*.c')
+src += Glob('*.cpp')
+
+CPPPATH = [cwd]
+
+group = DefineGroup('realgui/3rd', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')
