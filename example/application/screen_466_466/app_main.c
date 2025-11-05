@@ -333,7 +333,11 @@ static button_t buttons_about[] =
     {240, 70, 2, 0, 0},
     {310, 70, 1, 0, 0},
 };
-#define FILE_POINTER(ADDRESS) (const uint8_t *)(resource_root+ADDRESS)
+#ifdef _WIN32
+#define FILE_POINTER(ADDRESS) (const uint8_t *)(resource_root + ADDRESS)
+#else
+#define FILE_POINTER(ADDRESS) (const uint8_t *)(0x704D1400 + ADDRESS)
+#endif
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
 static bool switch_playing = false;
 extern const unsigned char _binary_root_0x00950000_bin_start[];
@@ -1027,6 +1031,7 @@ static void release_setting_cb_about(void *obj, gui_event_t e, void *param)
 
 
 }
+
 static int app_init(void)
 {
     gui_set_bg_color(gui_color_css("#f1f2f1"));

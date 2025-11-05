@@ -64,6 +64,9 @@ menuconfig REALTEK_HONEYGUI
 
                 config REALTEK_BUILD_GUI_410_502_DEMO
                     bool "Enable 410_502_DEMO"
+                   
+                config REALTEK_BUILD_GUI_466_466_DEMO
+                    bool "Enable 466_466_DEMO"
 
                 config REALTEK_BUILD_GUI_800_480_DEMO
                     bool "Enable 800_480_DEMO"
