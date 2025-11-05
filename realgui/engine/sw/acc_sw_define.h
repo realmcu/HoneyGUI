@@ -188,7 +188,7 @@ extern "C" {
                     Y += m10; \
                     continue; \
                 } \
-                uint8_t xRatio = (X - x) * 0xFF;\
+                float xRatio = X - (float)x;  GUI_UNUSED(xRatio);\
                 int write_offset = write_off + j;                                                           \
                 \
                 PIXEL_TYPE pixel_dummy = {0};                                                    \
@@ -282,8 +282,8 @@ static inline uint16_t pixel_aliasing_a8_2x2(uint32_t fg, uint32_t bg, uint8_t p
                                              uint8_t pixel01_alpha, uint8_t pixel10_alpha, uint8_t pixel11_alpha, uint8_t x_ratio,
                                              uint8_t y_ratio)
 {
-    uint8_t xr = (x_ratio + 4) >> 3;
-    uint8_t yr = (y_ratio + 4) >> 3;
+    uint8_t xr = x_ratio;
+    uint8_t yr = y_ratio;
     fg = ((fg | (fg << 16)) & 0x07e0f81f);
     bg = ((bg | (bg << 16)) & 0x07e0f81f);
     uint8_t fg_alpha = (pixel00_alpha * (255 - xr) * (255 - yr) +
