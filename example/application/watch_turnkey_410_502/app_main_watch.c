@@ -37,8 +37,8 @@ static void inform_generate_cb(void);
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 // const static gui_view_descriptor_t *control_view = NULL;
-// const static gui_view_descriptor_t *bottom_view = NULL;
-// const static gui_view_descriptor_t *top_view = NULL;
+const static gui_view_descriptor_t *bottom_view = NULL;
+const static gui_view_descriptor_t *top_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -68,32 +68,32 @@ unsigned char *resource_root = NULL;
 #endif
 
 /* Date */
-const char *month[12] =
-{
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC"
-};
+// const char *month[12] =
+// {
+//     "JAN",
+//     "FEB",
+//     "MAR",
+//     "APR",
+//     "MAY",
+//     "JUN",
+//     "JUL",
+//     "AUG",
+//     "SEP",
+//     "OCT",
+//     "NOV",
+//     "DEC"
+// };
 
-const char *day[7] =
-{
-    "SUN",
-    "MON",
-    "TUE",
-    "WED",
-    "THU",
-    "FRI",
-    "SAT"
-};
+// const char *day[7] =
+// {
+//     "SUN",
+//     "MON",
+//     "TUE",
+//     "WED",
+//     "THU",
+//     "FRI",
+//     "SAT"
+// };
 
 /*============================================================================*
  *                           Private Functions
@@ -111,8 +111,8 @@ static int gui_view_get_other_view_descriptor_init(void)
     /* you can get other view descriptor point here */
     menu_view = gui_view_descriptor_get("menu_view");
     // control_view = gui_view_descriptor_get("control_view");
-    // bottom_view = gui_view_descriptor_get("bottom_view");
-    // top_view = gui_view_descriptor_get("top_view");
+    bottom_view = gui_view_descriptor_get("bottom_view");
+    top_view = gui_view_descriptor_get("top_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -352,20 +352,20 @@ static void inform_generate_cb(void)
 
 static void app_main_watch_ui_design(gui_view_t *view)
 {
-    // gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
-    //                          SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
-    //                          GUI_EVENT_TOUCH_MOVE_UP);
-    // gui_view_switch_on_event(view, top_view, SWITCH_OUT_STILL_USE_BLUR,
-    //                          SWITCH_IN_FROM_TOP_USE_TRANSLATION,
-    //                          GUI_EVENT_TOUCH_MOVE_DOWN);
+    gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
+                             SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+                             GUI_EVENT_TOUCH_MOVE_UP);
+    gui_view_switch_on_event(view, top_view, SWITCH_OUT_STILL_USE_BLUR,
+                             SWITCH_IN_FROM_TOP_USE_TRANSLATION,
+                             GUI_EVENT_TOUCH_MOVE_DOWN);
     // gui_view_switch_on_event(view, control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
     //                          SWITCH_IN_FROM_LEFT_USE_ROTATE,
     //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
-    extern void create_watchface_labubu(gui_obj_t *parent);
-    create_watchface_labubu((void *)view);
+    extern void create_watchface_number(gui_obj_t *parent);
+    create_watchface_number((void *)view);
 }
 
 extern const unsigned char _binary_root_0x704D1400_bin_start[];
