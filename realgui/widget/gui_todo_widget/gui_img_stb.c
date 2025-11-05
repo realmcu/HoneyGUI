@@ -75,9 +75,9 @@ static void rgb888_to_rgb565(const uint8_t *src, uint8_t *dst, size_t source_w, 
 
     for (size_t i = 0; i < source_w * source_h; i++)
     {
-        uint8_t r = rgb888_data[3 * i + 2];
+        uint8_t r = rgb888_data[3 * i + 0];
         uint8_t g = rgb888_data[3 * i + 1];
-        uint8_t b = rgb888_data[3 * i + 0];
+        uint8_t b = rgb888_data[3 * i + 2];
 
         uint16_t r5 = (r >> 3) & 0x1F;
         uint16_t g6 = (g >> 2) & 0x3F;
@@ -102,13 +102,18 @@ static uint8_t *gui_img_stb_decode_image(gui_stb_img_t *img)
         output = stbi_load_from_memory(img->data_buffer, img->data_length, &source_w, &source_h,
                                        &num_components, 0);
         GUI_ASSERT(output != NULL);
+        uint8_t *rgb888_buf = gui_malloc(source_w * source_h * 3 + head_len);
+        GUI_ASSERT(rgb888_buf != NULL);
+        memcpy(rgb888_buf + head_len, output, source_w * source_h * 3);
+
         memset(&head, 0x0, sizeof(head));
         head.w = source_w;
         head.h = source_h;
         head.type = RGB888;
         memcpy(output, &head, sizeof(head));
 
-        return output;
+        gui_free(output);
+        return rgb888_buf;
     }
     else if (img->output_format == RGB565)
     {
@@ -117,7 +122,7 @@ static uint8_t *gui_img_stb_decode_image(gui_stb_img_t *img)
         GUI_ASSERT(output != NULL);
         uint8_t *rgb565_buf = gui_malloc(source_w * source_h * 2 + head_len);
         GUI_ASSERT(rgb565_buf != NULL);
-        rgb888_to_rgb565(output + head_len, rgb565_buf + head_len, source_w, source_h);
+        rgb888_to_rgb565(output, rgb565_buf + head_len, source_w, source_h);
 
         memset(&head, 0x0, sizeof(head));
         head.w = source_w;
