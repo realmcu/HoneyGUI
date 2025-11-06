@@ -186,6 +186,12 @@ typedef struct
 
 #pragma pack()
 
+typedef struct
+{
+    uint8_t *data;
+    size_t size;
+    size_t capacity;
+} g3m_data_blob_t;
 
 // -------------------------- Run-time Layout --------------------------
 typedef struct

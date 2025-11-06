@@ -15,7 +15,7 @@ LVGL offers a GUI engine that handles all interactions between the application a
 LVGL showcases demo effects on its official website to demonstrate LVGL's UI building capabilities. The online documentation serves as the primary development resource for LVGL, detailing the design and operational logic of LVGL, usage methods for various controls, a wealth of example programs, and porting methods. Whether you are a beginner or an experienced developer, you can quickly get started and gain an in-depth understanding of LVGL's functions and features based on the online documentation.
 
 - `LVGL Demo <https://lvgl.io/demos>`_
-- `LVGL Example <ttps://docs.lvgl.io/9.3/examples.html>`_
+- `LVGL Example <https://docs.lvgl.io/9.3/examples.html>`_
 
 Simulator
 ==========================

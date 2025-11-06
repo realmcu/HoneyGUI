@@ -16,7 +16,7 @@ The flowchart depicts the image resource processing flow accelerated by software
        :width: 1200px
        :name: sw_acc
         
-       Software acceleration
+       Software Acceleration
 
 - The img_type can be obtained from the head of the image, where the structure of the image head is as follows.
 
