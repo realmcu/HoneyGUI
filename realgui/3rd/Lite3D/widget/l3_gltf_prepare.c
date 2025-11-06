@@ -247,10 +247,13 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
         else
         {
             uint8_t *base_color = prim->material->base_color;
-            uint8_t color_r = base_color[0];
-            uint8_t color_g = base_color[1];
-            uint8_t color_b = base_color[2];
-            // uint8_t color_a = base_color[3];
+
+            float nz = fabsf(tria_img.p0.normal.uz);
+            float light_intensity = fmaxf(0.7f, fminf(1.0f, nz));
+
+            uint8_t color_r = (uint8_t)(base_color[0] * light_intensity);
+            uint8_t color_g = (uint8_t)(base_color[1] * light_intensity);
+            uint8_t color_b = (uint8_t)(base_color[2] * light_intensity);
 
             render_color = ((color_r & 0xF8) << 8) |
                            ((color_g & 0xFC) << 3) |
@@ -262,8 +265,6 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
 
         l3_draw_tria_to_canvas(&tria_img, _this->combined_img, _this->depthBuffer);
     }
-
-
 }
 
 static void render_primitive_no_skin(l3_gltf_model_t *_this, l3_gltf_primitive_t *prim,

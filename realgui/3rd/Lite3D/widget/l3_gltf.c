@@ -113,7 +113,7 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
         {
             g3m_texture_on_disk_t *tex_disk = &textures_on_disk[src_mat->texture_index];
             dst_mat->texture_data = (unsigned char *)(data_blob_base +
-                                                      tex_disk->data_offset); // 指向 Flash 地址
+                                                      tex_disk->data_offset);
             dst_mat->texture_length = tex_disk->data_size;
         }
         else
@@ -131,11 +131,11 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
 
         dst_prim->triangle_count = src_prim->triangle_count;
         dst_prim->triangles = (l3_gltf_triangle_t *)(data_blob_base +
-                                                     src_prim->triangles_offset); // 指向 Flash 地址
+                                                     src_prim->triangles_offset);
 
         if (src_prim->material_index != -1)
         {
-            dst_prim->material = &desc->materials[src_prim->material_index]; // 指向 RAM 中的材质外壳
+            dst_prim->material = &desc->materials[src_prim->material_index];
         }
         else
         {
@@ -151,7 +151,7 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
 
         dst_mesh->primitive_count = src_mesh->primitive_count;
         dst_mesh->primitives =
-            &all_primitives_ram[src_mesh->primitive_start_index]; // 指向 RAM 中的图元外壳数组
+            &all_primitives_ram[src_mesh->primitive_start_index];
     }
 
     // 2.5 Node Reconstruction
