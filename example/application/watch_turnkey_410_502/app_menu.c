@@ -29,12 +29,17 @@ typedef struct note_design_param
  *============================================================================*/
 static void app_menu_design(gui_view_t *view);
 static void clear_menu(gui_view_t *view);
+static void switch_app_activity(void *obj, gui_event_t e, void *param);
+static void switch_app_heart_rate(void *obj, gui_event_t e, void *param);
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
+const static gui_view_descriptor_t *activity_view = NULL;
+const static gui_view_descriptor_t *heartrate_view = NULL;
+
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -95,6 +100,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     watchface_view = gui_view_descriptor_get("watchface_view");
+    activity_view = gui_view_descriptor_get("activity_view");
+    heartrate_view = gui_view_descriptor_get("heartrate_view");
+
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -110,6 +118,23 @@ static void clear_menu(gui_view_t *view)
         gui_free(design_p);
         design_p = NULL;
     }
+}
+static void switch_app_activity(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    gui_view_switch_direct(current_view, activity_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
+}
+
+static void switch_app_heart_rate(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    gui_view_switch_direct(current_view, heartrate_view, SWITCH_OUT_ANIMATION_FADE,
+                           SWITCH_IN_ANIMATION_FADE);
 }
 
 static void note_design(gui_obj_t *obj, void *p)
@@ -189,7 +214,8 @@ static void app_menu_design(gui_view_t *view)
     int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
     void *click_cb[] =
     {
-        NULL,
+        switch_app_activity,
+        switch_app_heart_rate,
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
     void **func_cb = gui_malloc(array_size * sizeof(void *));

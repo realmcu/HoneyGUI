@@ -43,7 +43,7 @@ extern void activity_stand_design(gui_obj_t *obj);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-// const static gui_view_descriptor_t *menu_view = NULL;
+const static gui_view_descriptor_t *watchface_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -91,7 +91,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    // menu_view = gui_view_descriptor_get("menu_view");
+    watchface_view = gui_view_descriptor_get("watchface_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -400,6 +400,10 @@ static void note_design(gui_obj_t *obj, void *p)
 static void activity_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
+    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
+
     has_draw_bg = false;
     ring_flag_enter = false;
     activeIndex = 0;

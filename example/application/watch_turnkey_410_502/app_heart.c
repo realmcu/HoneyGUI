@@ -709,6 +709,9 @@ static void note_design(gui_obj_t *obj, void *p)
 static void heartrate_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
+    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
     g_lastUpdateTime = gui_ms_get();
 
     win_heart = gui_win_create(obj, "win_heart", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
