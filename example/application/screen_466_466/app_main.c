@@ -561,6 +561,20 @@ static void press_setting_cb_timer(void *p)
     GUI_UNUSED(obj);
 
     IMPORT_GUI_TOUCHPAD
+    if (tp->type != TOUCH_ORIGIN_FROM_Y
+        && tp->type != TOUCH_HOLD_Y
+        && tp->type != TOUCH_UP_SLIDE
+        && tp->type != TOUCH_DOWN_SLIDE
+        && tp->type != TOUCH_UP_SLIDE_TWO_PAGE
+        && tp->type != TOUCH_DOWN_SLIDE_TWO_PAGE
+        && tp->type != TOUCH_INIT
+        && tp->type != TOUCH_INVALID)
+    {
+        gui_obj_stop_timer(obj);
+        return;
+    }
+
+
     // int dx = tp->deltaX;
     int dy = tp->deltaY;
     //gui_log("press_setting_cb_timer dx:%d dy:%d\n",dx,dy);
@@ -969,9 +983,15 @@ static void release_setting_cb(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
     //gui_obj_create_timer(obj, 1, true, release_setting_cb_timer);
     //gui_obj_start_timer(obj);
+    gui_obj_t *o = GUI_BASE(obj);
+    if (o->timer != NULL)
+    {
+        gui_obj_stop_timer(obj);
+    }
+
     IMPORT_GUI_TOUCHPAD
 //int dx = tp->deltaX;
-    gui_obj_t *o = GUI_BASE(obj);
+
     int dy = tp->deltaY;
     setting_y += dy;
     if (setting_y > 0)
@@ -1143,6 +1163,7 @@ static void view_switch_in(gui_view_t *view)
                                     0, (void *)FILE_POINTER(IOS_NAV_466PX_GRADIENT_BIN), 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
+    setting_y = 0;
 }
 static void view_switch_in_watchface(gui_view_t *view)
 {
