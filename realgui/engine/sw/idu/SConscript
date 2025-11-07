@@ -1,0 +1,20 @@
+# building script for HoneyGUI
+from building import *
+cwd = GetCurrentDir()
+list = os.listdir(cwd)
+
+
+src = Glob('*.c')
+src += Glob('*.cpp')
+
+inc = [cwd]
+
+group = DefineGroup('realgui/engine', src, depend = [''], CPPPATH = inc)
+
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        if not os.path.isfile(os.path.join(path, 'SConstruct')):
+            group = group + SConscript(os.path.join(d, 'SConscript'))
+
+Return('group')
