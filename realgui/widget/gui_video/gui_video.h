@@ -51,11 +51,11 @@ typedef enum
 
 typedef enum
 {
+    GUI_VIDEO_STATE_ERR,
     GUI_VIDEO_STATE_INIT,
     GUI_VIDEO_STATE_PLAYING,
     GUI_VIDEO_STATE_PAUSE,
     GUI_VIDEO_STATE_STOP,
-
 } GUI_VIDEO_STATE;
 
 typedef enum
@@ -133,6 +133,7 @@ typedef struct
     uint8_t *frame_buff_raw;
     void *decoder;
     uint32_t frame_time;
+    uint32_t frame_step;
     int32_t frame_cur;
     int32_t frame_last;        // for cache management
     int32_t repeat_cnt;
@@ -170,6 +171,8 @@ typedef struct
 
 void gui_video_set_frame_rate(gui_video_t *this, float fps);
 
+uint32_t gui_video_get_frame_time(gui_video_t *this);
+
 void gui_video_set_scale(gui_video_t *this, float scale_x, float scale_y);
 
 void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state);
@@ -178,7 +181,9 @@ void gui_video_set_repeat_count(gui_video_t *this, int32_t cnt);
 
 GUI_VIDEO_STATE gui_video_get_state(gui_video_t *this);
 
+void gui_video_set_frame_step(gui_video_t *this, uint32_t step);
 
+uint32_t gui_video_get_frame_step(gui_video_t *this);
 
 void gui_video_refresh_size(gui_video_t *this);
 

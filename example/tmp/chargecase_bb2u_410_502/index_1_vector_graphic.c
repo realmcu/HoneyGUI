@@ -1,6 +1,13 @@
 #include "gui_view_macro.h"
 #include "gui_canvas.h"
 
+#ifdef _WIN32
+unsigned char __attribute__((aligned(8))) resource_array[1024 * 1024 * 10] ;
+unsigned char *resource_root = resource_array;
+#endif
+#include "root_image/ui_resource.h"
+
+
 static void canvas_rect_cb(gui_canvas_t *canvas)
 {
     NVGcontext *vg = canvas->vg;
@@ -38,8 +45,27 @@ static void vector_graphic_switch_out(gui_view_t *view)
 
 GUI_VIEW_INSTANCE("vector_graphic_view", true, vector_graphic_switch_in, vector_graphic_switch_out);
 
+
+
 static int chargecase_demo_entry(void)
 {
+#ifdef _WIN32
+    const char *filename =
+        "./example/tmp/chargecase_bb2u_410_502/root_image/root_0x704D1400.bin";
+
+    int fd;
+    fd = gui_fs_open(filename, 0);
+    if (fd > 0)
+    {
+        printf("open root.bin Successful!\n");
+        gui_fs_read(fd, resource_root, 1024 * 1024 * 10);
+    }
+    else
+    {
+        printf("open root.bin Fail!\n");
+    }
+#endif
+
     gui_view_create(gui_obj_get_root(), gui_view_descriptor_get("vector_graphic_view"), 0, 0, 0, 0);
     return 0;
 }

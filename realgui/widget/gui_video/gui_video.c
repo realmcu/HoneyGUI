@@ -243,7 +243,7 @@ static void gui_video_play_cb(void *p)
 
     if (this->state == GUI_VIDEO_STATE_PLAYING)
     {
-        this->frame_cur ++;
+        this->frame_cur += this->frame_step;
         if ((uint32_t)this->frame_cur >= this->num_frame)
         {
             if (this->repeat_cnt > 0)
@@ -499,7 +499,8 @@ static void gui_video_prepare(gui_obj_t *obj)
     // gui_log("gui_video_prepare  %d %d", this->frame_cur, this->frame_last);
     gui_img_set_image_data(this->img, (const uint8_t *) & (this->header));
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
 }
 
 
@@ -891,6 +892,7 @@ static void gui_img_video_ctor(gui_video_t  *this,
 
     //for self
     this->frame_time = 42; // 24fps, 42 ms
+    this->frame_step = 1;
     this->frame_cur = -1;
     this->frame_last = -1;
     this->data = addr;
@@ -952,6 +954,8 @@ static void gui_img_video_ctor(gui_video_t  *this,
 
 void gui_video_set_frame_rate(gui_video_t *this, float fps)
 {
+    if (!this) { return; }
+
     if (fps > 0)
     {
         this->frame_time = round(1000.f / fps);
@@ -959,15 +963,24 @@ void gui_video_set_frame_rate(gui_video_t *this, float fps)
     }
 }
 
+uint32_t gui_video_get_frame_time(gui_video_t *this)
+{
+    if (!this) { return 0; }
+
+    return this->frame_time;
+}
+
 void gui_video_set_scale(gui_video_t *this, float scale_x, float scale_y)
 {
+    if (!this) { return; }
+
     gui_img_scale(this->img, scale_x, scale_y);
 }
 
 void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state)
 {
-
-    // TODO: handle stop -> play reset
+    if (!this) { return; }
+    // handle stop -> play reset
     if (this->state == GUI_VIDEO_STATE_STOP && state == GUI_VIDEO_STATE_PLAYING)
     {
         gui_video_reset(this);
@@ -982,13 +995,32 @@ void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state)
 
 void gui_video_set_repeat_count(gui_video_t *this, int32_t cnt)
 {
+    if (!this) { return; }
+
     this->repeat_cnt = cnt;
 }
 
 GUI_VIDEO_STATE gui_video_get_state(gui_video_t *this)
 {
+    if (!this) { return GUI_VIDEO_STATE_ERR; }
+
     return (GUI_VIDEO_STATE)this->state;
 }
+
+void gui_video_set_frame_step(gui_video_t *this, uint32_t step)
+{
+    if (!this) { return; }
+
+    this->frame_step = step;
+}
+
+uint32_t gui_video_get_frame_step(gui_video_t *this)
+{
+    if (!this) { return 0; }
+
+    return this->frame_step;
+}
+
 void gui_video_refresh_size(gui_video_t *this)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
