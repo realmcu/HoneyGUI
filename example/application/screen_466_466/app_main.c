@@ -7,6 +7,7 @@
 #include "gui_components_init.h"
 #include "gui_view.h"
 #include "gui_img.h"
+#include "HoneyGUI_APP_.version"
 /*============================================================================*
  *                           Types
  *============================================================================*/
@@ -15,7 +16,8 @@
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-
+// #define UI_VERSION_STRING "HoneyGUI_APP_1_0_1_"
+// #define UI_USERDATA_LENGTH (7618516)
 
 /*============================================================================*
  *                           Function Declaration
@@ -259,6 +261,10 @@ static void press_setting_cb_enter(void *obj, gui_event_t e, void *param);
 static void release_setting_cb_enter(void *obj, gui_event_t e, void *param);
 static void press_setting_cb_about(void *obj, gui_event_t e, void *param);
 static void release_setting_cb_about(void *obj, gui_event_t e, void *param);
+static void release_setting_cb_key_win(void *obj, gui_event_t e, void *param);
+static void press_setting_cb_key_win(void *obj, gui_event_t e, void *param);
+static void press_setting_cb_key_win_timer(void *p);
+static gui_obj_t *key_obj_array[12];
 #define WIFI_ENTER_IMAGE_NAME "enter_wifi_image"
 static char before_keyboard = 0;
 #define BEFORE_KEYBOARD_NONE 0
@@ -334,13 +340,13 @@ static button_t buttons_about[] =
     {310, 70, 1, 0, 0},
 };
 #ifdef _WIN32
-#define FILE_POINTER(ADDRESS) (const uint8_t *)(resource_root + ADDRESS)
+#define FILE_POINTER(ADDRESS) ( uint8_t *)(resource_root + ADDRESS)
 #else
 #define FILE_POINTER(ADDRESS) (const uint8_t *)(0x704D1400 + ADDRESS)
 #endif
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
 static bool switch_playing = false;
-extern const unsigned char _binary_root_0x00950000_bin_start[];
+extern const unsigned char _binary_HoneyGUI_APP_root_0x00950000_bin_start[];
 extern const unsigned char _binary_root_0x00950000_bin_end[];
 extern const unsigned char _binary_root_0x00950000_bin_size[];
 // Update the watch time and the JSON data
@@ -403,12 +409,7 @@ static void view_switch_in_about(gui_view_t *view)
                                         0, (void *)FILE_POINTER(SQUARE4_BIN), 75 + 1, 258 + 2, 0, 0);
             gui_img_set_mode(img2, IMG_SRC_OVER_MODE);
         }
-        {
-            gui_img_t *img2 =
-                gui_img_create_from_mem(img,
-                                        0, (void *)FILE_POINTER(FLOPPY_BIN), 75 + 2, 326 + 2, 0, 0);
-            gui_img_set_mode(img2, IMG_SRC_OVER_MODE);
-        }
+
 
         gui_obj_add_event_cb(img, press_setting_cb_about, GUI_EVENT_TOUCH_PRESSED, NULL);
         gui_obj_add_event_cb(img, release_setting_cb_about, GUI_EVENT_TOUCH_RELEASED, NULL);
@@ -456,6 +457,7 @@ static  uint32_t key_highlight_array[] =
     BUTTON_BACKSPACE_HIGHLIGHT_BIN,
     BUTTON_DOT_HIGHLIGHT_BIN,
 };
+
 static void view_switch_in_keyboard(gui_view_t *view)
 {
     input_ip4_x = 0;
@@ -468,23 +470,32 @@ static void view_switch_in_keyboard(gui_view_t *view)
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
     GUI_UNUSED(view);
+
+    {
+        gui_win_t *win = gui_win_create(view, 0, 0, 0, 466, 466);
+        gui_obj_add_event_cb(win, release_setting_cb_key_win, GUI_EVENT_TOUCH_RELEASED, 0);
+        gui_obj_add_event_cb(win, press_setting_cb_key_win, GUI_EVENT_TOUCH_PRESSED, 0);
+        gui_obj_create_timer((void *) win, 10, 1, press_setting_cb_key_win_timer);
+
+    }
     GUI_UNUSED(key_highlight_array);
     {
         for (size_t i = 0; i < 12; i++)
         {
-            int x = i % 3 * 90 + 100;
-            int y = i / 3 * 90 + 107;
+            int x = i % 4 * 97 + 45 - 4;
+            int y = i / 4 * 97 + 107;
             gui_img_t *img = gui_img_create_from_mem(view,
                                                      0, (void *)FILE_POINTER(key_array[i]), x, y, 0, 0);
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             gui_obj_add_event_cb(img, press_setting_cb_key, GUI_EVENT_TOUCH_PRESSED, (void *)i);
             gui_obj_add_event_cb(img, release_setting_cb_key, GUI_EVENT_TOUCH_RELEASED, (void *)i);
+            key_obj_array[i] = (void *)img;
         }
 
     }
     {
         gui_img_t *img = gui_img_create_from_mem(view,
-                                                 0, (void *)FILE_POINTER(IP_INPUT_FIELD_BIN), 50, 50, 0, 0);
+                                                 0, (void *)FILE_POINTER(IP_INPUT_FIELD_BIN), 0, 50, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     }
     {
@@ -887,7 +898,7 @@ static void input_ip4(char *digit)
             }
             key_bin = ip4_input_field_bin[num];
             gui_img_t *img = gui_img_create_from_mem(image_466_466_view_keyboard,
-                                                     0, (void *)FILE_POINTER(key_bin), input_ip4_x + 80, 62, 0, 0);
+                                                     0, (void *)FILE_POINTER(key_bin), input_ip4_x + 75, 56, 0, 0);
             GUI_UNUSED(img);
             ip4_input_field[ip4_input_index] = img;
             ip4_input_index ++;
@@ -922,6 +933,56 @@ static char *ip4_string[] =
     ".",
 
 };
+static bool press_setting_cb_key_win_flag = 0;
+static void release_setting_cb_key_win(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    // gui_obj_t *o = GUI_BASE(obj);
+
+
+    for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]) ; i++)
+    {
+        gui_img_set_image_data((gui_img_t *)key_obj_array[i],
+                               (void *)FILE_POINTER(key_array[i]));
+    }
+
+    gui_log("release key win\n");
+}
+static void press_setting_cb_key_win_timer(void *p)
+{
+    GUI_UNUSED(p);
+    //gui_obj_t *obj = (gui_obj_t *)p;
+    IMPORT_GUI_TOUCHPAD
+    gui_log("tp:%d\n", tp->released);
+    if (tp->released)
+    {
+        //if (press_setting_cb_key_win_flag)
+        {
+            press_setting_cb_key_win_flag = 0;
+            for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]) ; i++)
+            {
+                gui_img_set_image_data((gui_img_t *)key_obj_array[i],
+                                       (void *)FILE_POINTER(key_array[i]));
+            }
+        }
+
+    }
+
+}
+static void press_setting_cb_key_win(void *obj, gui_event_t e, void *param)
+{
+    GUI_UNUSED(obj);
+    GUI_UNUSED(e);
+    GUI_UNUSED(param);
+    // gui_obj_t *o = GUI_BASE(obj);
+
+    press_setting_cb_key_win_flag = 1;
+
+
+    gui_log("press key win\n");
+}
 static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
@@ -931,12 +992,19 @@ static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
     int index = (int)(uintptr_t)param;
     gui_img_set_image_data((gui_img_t *)obj,
                            (void *)FILE_POINTER(key_array[index]));
-    IMPORT_GUI_TOUCHPAD
-    if (_UI_ABS(tp->deltaY) < 5 && _UI_ABS(tp->deltaX) < 5)
+
+    for (size_t i = 0; i < sizeof(key_obj_array) / sizeof(key_obj_array[0]) ; i++)
     {
+        gui_img_set_image_data((gui_img_t *)key_obj_array[i],
+                               (void *)FILE_POINTER(key_array[i]));
+    }
 
+    gui_log("release key\n");
+
+    IMPORT_GUI_TOUCHPAD
+    if (_UI_ABS(tp->deltaY) < 10 && _UI_ABS(tp->deltaX) < 10)
+    {
         {
-
             {
                 gui_log("click button %d\n", index);
                 input_ip4(ip4_string[index]);
@@ -1056,8 +1124,45 @@ static int app_init(void)
 {
     gui_set_bg_color(gui_color_css("#f1f2f1"));
 #ifdef _WIN32
-    resource_root = (unsigned char *)_binary_root_0x00950000_bin_start;
+    resource_root = (unsigned char *)_binary_HoneyGUI_APP_root_0x00950000_bin_start;
 #endif
+    gui_log("UI APP version check");
+    int version_userdata_length = UI_USERDATA_LENGTH;
+    uint8_t *version_in_bin = FILE_POINTER(version_userdata_length - 1);
+    const char *version_head = UI_VERSION_STRING;
+    int version_head_length = strlen(version_head);
+    bool check = 0;
+    for (int i = 0; i < version_head_length; i++)
+    {
+        gui_log("%d, %d\n", *(version_in_bin - 1 - i), version_head[version_head_length - i - 1]);
+        if (*(version_in_bin - 1 - i) != version_head[version_head_length - i - 1])
+        {
+            check = 0;
+            break;
+        }
+        else
+        {
+            check = 1;
+        }
+
+    }
+
+    if (!check)
+    {
+        gui_log("UI APP version error, need: %s\n", UI_VERSION_STRING);
+        return 0;
+    }
+    else
+    {
+        gui_log("UI APP version: %s\n", version_in_bin - version_head_length);
+    }
+
+
+
+
+
+
+
 //     image_466_466_view = gui_view_create(gui_obj_get_root(),
 //     &gui_view_descriptor_image_466_466,
 // 0,0,0,0);
