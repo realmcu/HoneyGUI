@@ -1,5 +1,5 @@
 #if defined _WIN32
-extern unsigned char resource_root[];
+extern unsigned char *resource_root;
 
 #define   FIRE_00000_BIN                          (void *)(resource_root + 0x00000178)
 #define   FIRE_00001_BIN                          (void *)(resource_root + 0x000141b8)
