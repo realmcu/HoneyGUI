@@ -49,7 +49,10 @@ static void low_latency_switch_in(gui_view_t *view)
 {
     GUI_UNUSED(view);
     gui_log("low_latency_view switch in\n");
-
+    gui_view_switch_on_event(view, gui_view_descriptor_get("multiple_layer_animation_view"),
+                             SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
+                             GUI_EVENT_TOUCH_MOVE_RIGHT);
     gui_view_switch_on_event(view, gui_view_descriptor_get("smooth_gradient_image_view"),
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,

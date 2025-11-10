@@ -1,11 +1,11 @@
 #include "gui_view_macro.h"
 #include "gui_video.h"
 #include "gui_obj_event.h"
-#include "root_image/ui_resource.h"
 
-extern const unsigned char __attribute__((aligned(8)))_acearth_420_410_502_60[9457128UL + 1];
 
-// click to play/pause
+
+
+
 static void video_click_cb(void *obj)
 {
     gui_video_t *this = (gui_video_t *)obj;
@@ -21,14 +21,14 @@ static void video_click_cb(void *obj)
 
 }
 
-// long pressing to speed up 2x, 4x
+
 static void video_pressing_cb(void *obj)
 {
     gui_video_t *this = (gui_video_t *)obj;
     static uint32_t cnt = 0;
     uint32_t frame_time = gui_video_get_frame_time(this);
 
-    if (frame_time > 30) // 30 fps -> 50 fps
+    if (frame_time > 30)
     {
         cnt = 0;
         gui_video_set_frame_rate(this, 50.f);
@@ -59,7 +59,8 @@ static void video_support_switch_in(gui_view_t *view)
     gui_log("video_support_view switch in\n");
 
 
-    gui_video_t *video = gui_video_create_from_mem(view, "video", EARTH_420_410_502_40_LQ_MJPG, 0, 0,
+    gui_video_t *video = gui_video_create_from_mem(view, "video",
+                                                   (void *)FILE_POINTER(EARTH_420_410_502_40_LQ_MJPG), 0, 0,
                                                    410,
                                                    502);
     gui_video_set_frame_rate(video, 30.f);

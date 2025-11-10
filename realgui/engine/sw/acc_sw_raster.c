@@ -153,7 +153,9 @@ static void gui_get_target_color(uint8_t *target_red, uint8_t *target_green, uin
 
 static void blend_colors(uint8_t *target_channel, uint8_t source_channel, uint8_t source_alpha)
 {
-    *target_channel = ((255 - source_alpha) * *target_channel + source_alpha * source_channel) / 255;
+    //*target_channel = ((255 - source_alpha) * *target_channel + source_alpha * source_channel) / 255;
+    uint16_t temp = ((255 - source_alpha) * (*target_channel) + source_alpha * source_channel + 127);
+    *target_channel = (uint8_t)((temp * 257) >> 16);
 }
 
 static void gui_apply_blend_mode(uint8_t *target_red, uint8_t *target_green, uint8_t *target_blue,
