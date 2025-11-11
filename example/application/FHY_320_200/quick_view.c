@@ -51,7 +51,6 @@ void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
     // page_playback_design,
     // page_auto_play_pause_design,
     // page_voice_aware_design,
-    // page_find_buds_design,
     // page_timer_design,
     // page_flashlight_design,
     // page_auto_dim_off_screen_design,
@@ -59,8 +58,7 @@ void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
     page_unlock_slider_design,
     page_language_design,
     page_dark_light_design,
-    page_spatial_sound_design,
-    // page_volume_design,
+    page_volume_design,
     // page_ambient_sound_design,
     // page_equalizer_design,
 };
@@ -213,15 +211,24 @@ static void quick_view_design(gui_view_t *view)
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
+    gui_color_t bg_color;
+    gui_color_t charging_color;
+    gui_color_t unvalid_color;
     if (theme_bg_white)
     {
         gui_set_bg_color(SCREEN_BG_LIGHT);
         font_color = FG_1_LIGHT;
+        bg_color = BG_2_LIGHT;
+        charging_color = FG_THEME1_LIGHT;
+        unvalid_color = FG_2_LIGHT;
     }
     else
     {
         gui_set_bg_color(SCREEN_BG_DARK);
         font_color = FG_1_DARK;
+        bg_color = BG_2_DARK;
+        charging_color = FG_THEME1_DARK;
+        unvalid_color = FG_2_DARK;
     }
     gui_list_t *list = gui_list_create(parent, "list", 0, 0, 0, 0, 320, 0, HORIZONTAL,
                                        note_design, NULL,
@@ -248,18 +255,13 @@ static void quick_view_design(gui_view_t *view)
         gui_text_mode_set(text, LEFT);
         pos_x += 36;
     }
-    else
-    {
-        f_status.earbuds_connect_l = 0;
-        f_status.earbuds_connect_r = 0;
-    }
     if (f_status.notification_new)
     {
         gui_img_t *icon = gui_img_create_from_mem(parent, 0, ICON_MESSAGE_SMALL_BIN, pos_x, 14, 0, 0);
         gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
         pos_x += 22;
     }
-    if (f_status.call)
+    if (f_status.call == CALL_ING)
     {
         gui_img_t *icon = gui_img_create_from_mem(parent, 0, ICON_CALL_BIN, pos_x, 13, 0, 0);
         gui_img_a8_recolor(icon, FG_NORMAL.color.argb_full);
@@ -278,172 +280,71 @@ static void quick_view_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
     gui_text_mode_set(text, RIGHT);
 
-    gui_img_t *home_bg = gui_img_create_from_mem(parent, 0, STATUSBAR_HOME_BG_BIN, 131, 12, 0, 0);
-    gui_img_t *barn_inner = gui_img_create_from_mem(home_bg, 0, BARN_INNER_BIN, 23, 6, 0, 0);
-    gui_img_t *barn_outer = gui_img_create_from_mem(home_bg, 0, BARN_OUTER_BIN, 20, 3, 0, 0);
-    gui_img_t *earbuds_connect_l = gui_img_create_from_mem(home_bg, 0, EARPLUG_L_BIN, 7, 3, 0, 0);
-    gui_img_t *earbuds_connect_r = gui_img_create_from_mem(home_bg, 0, EARPLUG_R_BIN, 42, 3, 0, 0);
+    gui_img_t *home_bg = gui_img_create_from_mem(parent, 0, STATUSBAR_HOME_BG_BIN, 131, 8, 0, 0);
+    gui_img_t *tx_inner = gui_img_create_from_mem(home_bg, 0, ICON_TX_INNER_SMALL_BIN, 34, 9, 0, 0);
+    gui_img_t *tx_outer = gui_img_create_from_mem(home_bg, 0, ICON_TX_OUTER_SMALL_BIN, 32, 7, 0, 0);
+    gui_img_t *headband = gui_img_create_from_mem(home_bg, 0, ICON_HEADBAND_SMALL_BIN, 11, 5, 0, 0);
 
-    if (theme_bg_white)
     {
         if (f_status.bt == 0)
         {
             gui_img_set_image_data(bt, ICON_BT_DISCONNECT_BIN);
             gui_img_refresh_size(bt);
-            gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
+            gui_img_a8_recolor(bt, font_color.color.argb_full);
         }
         else if (f_status.bt == 1)
         {
-            gui_img_a8_recolor(bt, FG_1_LIGHT.color.argb_full);
+            gui_img_a8_recolor(bt, font_color.color.argb_full);
         }
         else
         {
-            gui_img_a8_recolor(bt, FG_2_LIGHT.color.argb_full);
+            gui_img_a8_recolor(bt, unvalid_color.color.argb_full);
         }
 
-        gui_img_a8_recolor(home_bg, BG_2_LIGHT.color.argb_full);
+        gui_img_a8_recolor(home_bg, bg_color.color.argb_full);
         {
             uint32_t color;
-            if (battery_barn_val > 50)
+            if (f_status.tx_charging)
             {
-                color = FG_1_LIGHT.color.argb_full;
+                color = charging_color.color.argb_full;
             }
-            else if (battery_barn_val > 10)
+            else if (battery_tx_val > 10)
             {
-                color = FG_THEME1_LIGHT.color.argb_full;
+                color = font_color.color.argb_full;
             }
             else
             {
                 color = FG_WARNING.color.argb_full;
             }
-            gui_img_a8_recolor(barn_inner, color);
-            gui_img_a8_recolor(barn_outer, color);
+            gui_img_a8_recolor(tx_inner, color);
+            gui_img_a8_recolor(tx_outer, color);
         }
-
-        if (f_status.earbuds_connect_l)
+        if (f_status.headband_connect)
         {
             uint32_t color;
-            if (battery_earbuds_connect_l_val > 50)
+            if (f_status.headband_charging)
             {
-                color = FG_1_LIGHT.color.argb_full;
+                color = charging_color.color.argb_full;
             }
-            else if (battery_earbuds_connect_l_val > 10)
+            else if (battery_headband_val > 10)
             {
-                color = FG_THEME1_LIGHT.color.argb_full;
+                color = font_color.color.argb_full;
             }
             else
             {
                 color = FG_WARNING.color.argb_full;
             }
-            gui_img_a8_recolor(earbuds_connect_l, color);
+            gui_img_a8_recolor(headband, color);
         }
         else
         {
-            gui_img_a8_recolor(earbuds_connect_l, FG_2_LIGHT.color.argb_full);
-        }
-        if (f_status.earbuds_connect_r)
-        {
-            uint32_t color;
-            if (battery_earbuds_connect_r_val > 50)
-            {
-                color = FG_1_LIGHT.color.argb_full;
-            }
-            else if (battery_earbuds_connect_r_val > 10)
-            {
-                color = FG_THEME1_LIGHT.color.argb_full;
-            }
-            else
-            {
-                color = FG_WARNING.color.argb_full;
-            }
-            gui_img_a8_recolor(earbuds_connect_r, color);
-        }
-        else
-        {
-            gui_img_a8_recolor(earbuds_connect_r, FG_2_LIGHT.color.argb_full);
-        }
-    }
-    else
-    {
-        if (f_status.bt == 0)
-        {
-            gui_img_set_image_data(bt, ICON_BT_DISCONNECT_BIN);
-            gui_img_refresh_size(bt);
-            gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
-        }
-        else if (f_status.bt == 1)
-        {
-            gui_img_a8_recolor(bt, FG_1_DARK.color.argb_full);
-        }
-        else
-        {
-            gui_img_a8_recolor(bt, FG_2_DARK.color.argb_full);
-        }
-
-        gui_img_a8_recolor(home_bg, BG_2_DARK.color.argb_full);
-        {
-            uint32_t color;
-            if (battery_barn_val > 50)
-            {
-                color = FG_1_DARK.color.argb_full;
-            }
-            else if (battery_barn_val > 10)
-            {
-                color = FG_THEME1_DARK.color.argb_full;
-            }
-            else
-            {
-                color = FG_WARNING.color.argb_full;
-            }
-            gui_img_a8_recolor(barn_inner, color);
-            gui_img_a8_recolor(barn_outer, color);
-        }
-        if (f_status.earbuds_connect_l)
-        {
-            uint32_t color;
-            if (battery_earbuds_connect_l_val > 50)
-            {
-                color = FG_1_DARK.color.argb_full;
-            }
-            else if (battery_earbuds_connect_l_val > 10)
-            {
-                color = FG_THEME1_DARK.color.argb_full;
-            }
-            else
-            {
-                color = FG_WARNING.color.argb_full;
-            }
-            gui_img_a8_recolor(earbuds_connect_l, color);
-        }
-        else
-        {
-            gui_img_a8_recolor(earbuds_connect_l, FG_2_DARK.color.argb_full);
-        }
-        if (f_status.earbuds_connect_r)
-        {
-            uint32_t color;
-            if (battery_earbuds_connect_r_val > 50)
-            {
-                color = FG_1_DARK.color.argb_full;
-            }
-            else if (battery_earbuds_connect_r_val > 10)
-            {
-                color = FG_THEME1_DARK.color.argb_full;
-            }
-            else
-            {
-                color = FG_WARNING.color.argb_full;
-            }
-            gui_img_a8_recolor(earbuds_connect_r, color);
-        }
-        else
-        {
-            gui_img_a8_recolor(earbuds_connect_r, FG_2_DARK.color.argb_full);
+            gui_img_a8_recolor(headband, unvalid_color.color.argb_full);
         }
     }
     gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
-    gui_img_a8_mix_alpha(earbuds_connect_l, earbuds_connect_l->fg_color_set >> 24);
-    gui_img_a8_mix_alpha(earbuds_connect_r, earbuds_connect_r->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(home_bg, home_bg->fg_color_set >> 24);
+    gui_img_a8_mix_alpha(headband, headband->fg_color_set >> 24);
+
     if (quick_page_num)
     {
         update_page_indicator();

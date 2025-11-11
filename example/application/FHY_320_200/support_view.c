@@ -241,15 +241,18 @@ static void reset_note_design(gui_obj_t *obj, void *p)
     int16_t index = note->index;
     gui_color_t font_color;
     gui_color_t img_color;
+    gui_color_t bg_color;
     if (theme_bg_white)
     {
         font_color = FG_1_LIGHT;
         img_color = BG_THEME3_BRIGHT_LIGHT;
+        bg_color = SCREEN_BG_LIGHT;
     }
     else
     {
         font_color = FG_1_DARK;
         img_color = BG_THEME3_BRIGHT_DARK;
+        bg_color = SCREEN_BG_DARK;
     }
     if (index == 0)
     {
@@ -264,6 +267,7 @@ static void reset_note_design(gui_obj_t *obj, void *p)
     {
         gui_img_t *img = gui_img_create_from_mem(note, 0, BUTTON_BG_ELLIPSE_201_80_BIN, 60, 5, 0, 0);
         gui_img_a8_recolor(img, img_color.color.argb_full);
+        gui_img_a8_fix_bg(img, bg_color.color.argb_full);
         if (f_status.ble)
         {
             gui_obj_add_event_cb(img, click_button_reset, GUI_EVENT_TOUCH_CLICKED, NULL);
@@ -350,8 +354,8 @@ static void resetting_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
         img_color = FG_THEME3_DARK;
     }
-    gui_img_t *reset = gui_img_create_from_mem(parent, 0, ICON_RESET_BIG_BIN, 137 + 26, 34 + 17, 0, 0);
-    gui_img_set_focus(reset, 26, 17);
+    gui_img_t *reset = gui_img_create_from_mem(parent, 0, ICON_RESET_BIG_BIN, 138 + 22, 34 + 17, 0, 0);
+    gui_img_set_focus(reset, 22, 17);
     gui_img_set_quality(reset, true);
     gui_obj_create_timer(GUI_BASE(reset), 100, true, resetting_timer_cb);
     gui_img_a8_recolor(reset, img_color.color.argb_full);

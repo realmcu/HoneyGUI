@@ -7,6 +7,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_win.h"
 #include "gui_text.h"
+#include "gui_scroll_text.h"
 #include "gui_list.h"
 #include "gui_canvas_rect.h"
 
@@ -127,10 +128,21 @@ static void note_design(gui_obj_t *obj, void *p)
     }
     char *text = (char *)page_name_array[index];
     int font_size = 30;
-    gui_text_t *t = gui_text_create(note, 0, 56, 15, 260, 56);
-    gui_text_set(t, text, GUI_FONT_SRC_BMP, font_color, strlen(text), font_size);
-    gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(t, LEFT);
+    uint16_t text_length = strlen(text);
+    if (text_length < 23)
+    {
+        gui_text_t *t = gui_text_create(note, 0, 56, 15, 244, 56);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, font_color, text_length, font_size);
+        gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, LEFT);
+    }
+    else
+    {
+        gui_scroll_text_t *t = gui_scroll_text_create(note, 0, 56, 15, 244, 56);
+        gui_scroll_text_set(t, text, GUI_FONT_SRC_BMP, font_color, text_length, font_size);
+        gui_scroll_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+        gui_scroll_text_scroll_set(t, SCROLL_X, 260, 260, 5000, 0);
+    }
     if (design_p->page_design[index] != NULL)
     {
         gui_obj_add_event_cb(note, switch_page, GUI_EVENT_TOUCH_CLICKED,
@@ -151,7 +163,7 @@ static void list_timer_cb(void *obj)
 
 static void audio_menu_view_design(gui_view_t *view)
 {
-    if (gui_view_get_current()->descriptor == menu_view)
+    if (gui_view_get_current() && gui_view_get_current()->descriptor == menu_view)
     {
         list_offset_his = 0;
     }
@@ -170,9 +182,11 @@ static void audio_menu_view_design(gui_view_t *view)
         ICON_EQ_BIN,
         ICON_SMART_TALK_BIN,
         ICON_SPATIAL_SOUND_BIN,
+        ICON_HR_AUDIO_BIN,
         ICON_VOICE_AWARE_BIN,
         ICON_AUTO_PLAY_PAUSE_BIN,
         ICON_BT_SOURCE_BIN,
+        ICON_AURACAST_BIN
     };
 
     int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
@@ -183,9 +197,16 @@ static void audio_menu_view_design(gui_view_t *view)
         page_equalizer_design,
         page_ambient_sound_design,
         page_smart_talk_design,
-        page_spatial_sound_design,
+#if SS_WITH_HEAD_TRACKING
+        page_spatial_sound_with_head_tracking_design,
+#else
+        page_spatial_sound_without_head_tracking_design,
+#endif
+        page_hr_audio_design,
         page_voice_aware_design,
         page_auto_play_pause_design,
+        page_audio_source_design,
+        page_auracast_design
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
     void **func_cb = gui_malloc(array_size * sizeof(void *));

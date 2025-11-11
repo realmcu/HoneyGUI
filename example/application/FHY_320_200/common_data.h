@@ -12,6 +12,7 @@ extern "C" {
 #include "def_color.h"
 #include "gui_img.h"
 #include "root_image/ui_resource.h"
+#include "app_main.h"
 
 /*============================================================================*
  *                           Types
@@ -22,8 +23,11 @@ struct FUNCTION_STATUS
     bool ambient_sound          ;
     bool smart_talk             ;
     bool spatial_sound          ;
+    bool hr_audio               ;
     bool voice_aware            ;
     bool auto_play_pause        ;
+    bool auracast               ;
+    bool password               ;
     bool notification           ;
     bool message_preview        ;
     bool auto_dim_off_screen    ;
@@ -35,29 +39,18 @@ struct FUNCTION_STATUS
 
     uint32_t factory_reset_done : 1;
 
-    // uint32_t equalizer          : 1;
-    // uint32_t ambient_sound      : 1;
-    // uint32_t smart_talk         : 1;
-    // uint32_t spatial_sound      : 1;
-    // uint32_t voice_aware        : 1;
-    // uint32_t auto_play_pause    : 1;
-    // uint32_t notification       : 1;
-    // uint32_t message_preview    : 1;
+    uint32_t tx_charging        : 1;
+    uint32_t headband_charging  : 1;
+
+    uint32_t headband_connect   : 1;
     uint32_t playback           : 1;
     uint32_t flashlight         : 1;
     uint32_t music_input        : 1;
     uint32_t notification_new   : 1;
-    uint32_t call               : 1;
+    uint32_t call               : 2;
+    uint32_t mute               : 1;
     uint32_t timer              : 1;
-
-    uint32_t earbuds_connect_l          : 1;
-    uint32_t earbuds_connect_r          : 1;
-    uint32_t earbuds_in_ear_l           : 1;
-    uint32_t earbuds_in_ear_r           : 1;
-    uint32_t earbuds_find_l             : 1;
-    uint32_t earbuds_find_r             : 1;
-    uint32_t earbuds_shock_l            : 1;
-    uint32_t earbuds_shock_r            : 1;
+    uint32_t ota                : 2;
 
     uint32_t infor_center_func_0        : 1;
     uint32_t infor_center_func_1        : 1;
@@ -69,6 +62,26 @@ struct FUNCTION_STATUS
 
 };
 
+struct AUDIO_SOURCE
+{
+    char connected_name[2][30];
+    char paired_name[4][30];
+    char auracast_name[2][30];
+    char auracast_sub_channel_name[2][30];
+    bool auracast_hq[2];
+    bool connected_auracast_hq[2];
+    bool connected_source_is_cast[2];
+    bool auracast_receiver;
+
+    uint16_t connected_num               : 2; //[0, 2]
+    uint16_t paired_num                  : 3; //[0, 4]
+    uint16_t streaming_index             : 2; //[0, 2]  0: none
+    uint16_t auracast_streaming_index    : 2; //[0, 2]  0: none
+    uint16_t auracast_num                : 2; //[0, 2]
+    uint16_t auracast_sub_channel_num    : 2; //[0, 2]
+    uint16_t wait                        : 1;
+};
+
 typedef enum
 {
     PLAYBACK = 0,
@@ -77,15 +90,19 @@ typedef enum
     EQUALIZER,
     SMART_TALK,
     SPATIAL_SOUND,
+    HR_AUDIO,
     VOICE_AWARE,
     AUTO_PLAY_PAUSE,
-    BT_SOURCE,
+    AUDIO_SOURCE,
+    AURACAST_BROADCAST,
 
-    FIND_MY_BUDS,
     TIMER,
     FLASHLIGHT,
+    SILENTNOW,
+    VOLUME_UNIT_METER,
     JBL_HEADPHONES_APP,
 
+    SMART_TX_MANAGER,
     SCREEN_BRIGHTNESS,
     DARK_LIGHT_MODE,
     LOCK_SCREEN,
@@ -100,7 +117,10 @@ typedef enum
     REORDER_QUICK_ACCESS,
     SUPPORT,
     PRODUCT_TIPS,
-    FACTORY_RESET
+    FACTORY_RESET,
+
+    PASSWORD,
+    MESSAGE_PREVIEW
 } FUNCTION_TYPE;
 typedef enum
 {
@@ -118,10 +138,33 @@ typedef enum
 
 typedef enum
 {
+    SPATIAL_SOUND_OFF = 0,
+    SPATIAL_SOUND_ON,
+    SPATIAL_SOUND_HEAD_TRACKING
+} SPATIAL_SOUND_STATUS;
+
+typedef enum
+{
     BT_DISCONNECT = 0,
     BT_CONNECT,
     BT_UNKNOWN
 } BT_STATUS;
+
+typedef enum
+{
+    OTA_IDLE = 0,
+    OTA_DOING,
+    OTA_DONE,
+    OTA_FAIL
+} OTA_STATUS;
+
+typedef enum
+{
+    CALL_COMING = 0,
+    CALL_ING,
+    CALL_OUTGOING,
+    CALL_CONNECTING
+} CALL_STATUS;
 
 typedef enum
 {
@@ -200,6 +243,9 @@ typedef enum
 #define SCREEN_BG_LIGHT                  gui_rgb(0xF2,0xF2,0xF7)
 #define SCREEN_BG_DARK                   gui_rgb(0,0,0)
 
+#define JBL_ORANGE                       gui_rgb(0xFF,0x59,0x01)
+#define JBL_GREY_5                       gui_rgb(0x88,0x94,0xA7)
+
 // #define FG_THEME1_DARK                   GUI_COLOR_ARGB8888(255, 0xFF,0xB4,0x11)
 // #define FG_THEME2_DARK                   GUI_COLOR_ARGB8888(255, 0x1F,0xE5,0x7F)
 // #define FG_THEME3_DARK                   GUI_COLOR_ARGB8888(255, 0x11,0xC8,0xFF)
@@ -250,7 +296,7 @@ typedef enum
  *============================================================================*/
 /* Time */
 extern struct tm *timeinfo;
-extern struct tm barn_time;
+extern struct tm tx_time;
 extern bool time_format_24; // default 24H format
 
 /* Date */
@@ -258,7 +304,7 @@ extern const char *month[12];
 extern const char *day[7];
 
 /* Page name */
-extern const char *page_name_array[28];
+extern const char *page_name_array[34];
 
 /* Clock style */
 extern int8_t clock_style;
@@ -272,11 +318,11 @@ extern uint32_t theme_color_array[5];
 extern bool theme_bg_white; // default black bg
 
 /* Volume */
-extern int8_t volume_val; // [0, 10]
+extern int8_t volume_val; // [0, 16]
 
 /* Battery */
-extern uint8_t battery_barn_val;
-extern uint8_t battery_earbuds_connect_l_val;
+extern uint8_t battery_tx_val;
+extern uint8_t battery_headband_val;
 extern uint8_t battery_earbuds_connect_r_val;
 
 /* Message */
@@ -296,6 +342,9 @@ extern AMBIENT_SOUND_TYPE ambient_sound_type;
 
 /* Spatial sound type */
 extern SPATIAL_SOUND_TYPE spatial_sound_type;
+#if SS_WITH_HEAD_TRACKING
+extern SPATIAL_SOUND_STATUS spatial_sound_status;
+#endif
 
 /* Voice Aware */
 extern int8_t voice_aware_val; // [1, 3]
@@ -307,6 +356,11 @@ extern uint8_t codec_type_index; // [0, 5]
 extern int8_t timer_max_min_val; // minutes [1, 60]
 extern uint16_t timer_val; // seconds
 extern char timer_str[6];
+
+/* Call */
+extern uint16_t calltime_val; // seconds
+extern char calltime_str[6];
+extern char call_source_str[20];
 
 /* Auto dim off screen*/
 extern int8_t auto_dim_time_val; // [5, 60], step 5
@@ -329,6 +383,17 @@ extern uint8_t quick_page_name_index;
 /* Information center customize */
 extern int8_t info_center_func_cnt; //[0,3]
 extern const char *info_center_func_name[6];
+
+/* Audio source */
+extern struct AUDIO_SOURCE audio_source;
+
+/* OTA */
+extern uint8_t ota_val; // [0, 100]
+extern char ota_str[4];
+
+/* Auracast */
+extern char auracast_password[5];
+
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/

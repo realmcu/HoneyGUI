@@ -126,7 +126,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_a8_recolor(img, FG_THEME3_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
-    char *text = (char *)page_name_array[index + 13];
+    char *text = (char *)page_name_array[index + 16];
     uint16_t text_length = strlen(text);
     int font_size = 30;
     if (text_length < 23)
@@ -163,7 +163,7 @@ static void list_timer_cb(void *obj)
 
 static void settings_menu_view_design(gui_view_t *view)
 {
-    if (gui_view_get_current()->descriptor == menu_view)
+    if (gui_view_get_current() && gui_view_get_current()->descriptor == menu_view)
     {
         list_offset_his = 0;
     }
@@ -176,6 +176,7 @@ static void settings_menu_view_design(gui_view_t *view)
 
     uint32_t *img_data_array[] =
     {
+        ICON_TX_MANAGER_BIN,
         ICON_BRIGHTNESS_BIN,
         ICON_LIGHTDARKMODE_BIN,
         ICON_ICON_WALLPAPER_BIN,

@@ -125,7 +125,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_a8_recolor(img, FG_THEME2_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
-    char *text = (char *)page_name_array[index + 9];
+    char *text = (char *)page_name_array[index + 11];
     int font_size = 30;
     gui_text_t *t = gui_text_create(note, 0, 56, 15, 260, 56);
     gui_text_set(t, text, GUI_FONT_SRC_BMP, font_color, strlen(text), font_size);
@@ -151,7 +151,7 @@ static void list_timer_cb(void *obj)
 
 static void tools_menu_view_design(gui_view_t *view)
 {
-    if (gui_view_get_current()->descriptor == menu_view)
+    if (gui_view_get_current() && gui_view_get_current()->descriptor == menu_view)
     {
         list_offset_his = 0;
     }
@@ -164,16 +164,16 @@ static void tools_menu_view_design(gui_view_t *view)
 
     uint32_t *img_data_array[] =
     {
-        ICON_FINDMYBUDS_BIN,
         ICON_TIMER_BIN,
         ICON_FLASHLIGHT_BIN,
+        ICON_SILENTNOW_BIN,
+        ICON_VOLUME_UNIT_METER_BIN,
         ICON_ICON_APP_BIN,
     };
 
     int array_size = sizeof(img_data_array) / sizeof(img_data_array[0]);
     void *page_design[] =
     {
-        page_find_buds_design,
         page_timer_design,
         page_flashlight_design,
         page_qrcode_design,

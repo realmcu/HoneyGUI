@@ -66,12 +66,7 @@ static void click_button_left(void *obj, gui_event_t e, void *param)
     if (reset_flag)
     {
         reset_flag = 0;
-        gui_msg_t msg =
-        {
-            .event = GUI_EVENT_USER_DEFINE,
-            .cb = regenerate_current_view,
-        };
-        gui_send_msg_to_server(&msg);
+        msg_2_regenerate_current_view();
         return;
     }
     f_status.timer = !f_status.timer;
@@ -271,7 +266,7 @@ static void timer_view_design(gui_view_t *view)
     gui_img_t *button_bg_r = gui_img_create_from_mem(parent, "r", BUTTON_BG_ELLIPSE_134_66_BIN, 174, 92,
                                                      0, 0);
     gui_img_t *icon_l = gui_img_create_from_mem(button_bg_l, 0, TIMER_PAUSE_BIN, 55, 21, 0, 0);
-    gui_img_t *icon_r = gui_img_create_from_mem(button_bg_r, 0, TIMER_CANCEL_BIN, 54, 20, 0, 0);
+    gui_img_t *icon_r = gui_img_create_from_mem(button_bg_r, 0, ICON_CANCEL_BIG_BIN, 54, 20, 0, 0);
     gui_obj_add_event_cb(button_bg_l, click_button_left, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(button_bg_r, click_button_right, GUI_EVENT_TOUCH_CLICKED, NULL);
 

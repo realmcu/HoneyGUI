@@ -146,7 +146,9 @@ static void detail_view_design(gui_view_t *view)
     if (view_c && !(!strcmp(view_c->descriptor->name, "timer_view") ||
                     !strcmp(view_c->descriptor->name, "flashlight_view")        ||
                     !strcmp(view_c->descriptor->name, "button_customize_view")  ||
-                    !strcmp(view_c->descriptor->name, "support_view")))
+                    !strcmp(view_c->descriptor->name, "support_view") ||
+                    !strcmp(view_c->descriptor->name, "auracast_view") ||
+                    !strcmp(view_c->descriptor->name, "ss_view")))
     {
         descriptor_rec = view_c->descriptor;
     }
@@ -161,7 +163,8 @@ static void detail_view_design(gui_view_t *view)
     if (detail_page_design_func == page_case_button_customize_design ||
         detail_page_design_func == page_reorder_quick_access_design  ||
         detail_page_design_func == page_information_center_customize_design ||
-        detail_page_design_func == page_support_design)
+        detail_page_design_func == page_support_design ||
+        detail_page_design_func == page_audio_source_design)
     {
         icon_back->base.y = 8;
     }

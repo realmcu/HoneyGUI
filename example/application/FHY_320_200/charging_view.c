@@ -61,13 +61,13 @@ static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 static void battery_update_cb(void *p)
 {
     gui_text_t *text = (gui_text_t *)p;
-    battery_barn_val++;
-    if (battery_barn_val >= 100)
+    battery_tx_val++;
+    if (battery_tx_val >= 100)
     {
-        battery_barn_val = 0;
+        battery_tx_val = 0;
     }
-    sprintf(battery_barn_str, "%d%%", battery_barn_val);
-    gui_text_content_set(text, battery_barn_str, strlen(battery_barn_str));
+    sprintf(battery_tx_str, "%d%%", battery_tx_val);
+    gui_text_content_set(text, battery_tx_str, strlen(battery_tx_str));
 }
 
 static void entrance_animation(void *p)
@@ -116,9 +116,9 @@ static void entrance_animation(void *p)
     {
         gui_obj_hidden((void *)bg, true);
         gui_obj_stop_timer(GUI_BASE(p));
-        sprintf(battery_barn_str, "%d%%", battery_barn_val);
+        sprintf(battery_tx_str, "%d%%", battery_tx_val);
         gui_text_t *text = gui_text_create(GUI_BASE(p)->parent, 0, 0, 100, 320, 32);
-        gui_text_set(text, battery_barn_str, GUI_FONT_SRC_BMP, FG_WHITE, strlen(battery_barn_str), 32);
+        gui_text_set(text, battery_tx_str, GUI_FONT_SRC_BMP, FG_WHITE, strlen(battery_tx_str), 32);
         gui_text_type_set(text, CAPTION_1_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, CENTER);
         gui_obj_create_timer(GUI_BASE(text), 30, true, battery_update_cb);

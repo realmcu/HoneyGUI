@@ -63,7 +63,7 @@ static uint16_t sleep_cnt = 0;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    test_view = gui_view_descriptor_get("oobe_view");
+    test_view = gui_view_descriptor_get("tools_menu_view");
     clock_view = gui_view_descriptor_get("clock_view");
     menu_view = gui_view_descriptor_get("menu_view");
     quick_view = gui_view_descriptor_get("quick_view");
@@ -226,19 +226,25 @@ static void time_update_cb(void *param)
         sprintf(timer_str, "%02d:%02d", timer_val / 60, timer_val % 60);
     }
 
+    if (f_status.call == CALL_ING)
+    {
+        calltime_val++;
+        sprintf(calltime_str, "%02d:%02d", calltime_val / 60, calltime_val % 60);
+    }
+
 #if defined __WIN32
     time_t rawtime;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 #else
-    barn_time.tm_min++;
-    if (barn_time.tm_min == 60)
+    tx_time.tm_min++;
+    if (tx_time.tm_min == 60)
     {
-        barn_time.tm_min = 0;
-        barn_time.tm_hour++;
-        if (barn_time.tm_hour == 24)
+        tx_time.tm_min = 0;
+        tx_time.tm_hour++;
+        if (tx_time.tm_hour == 24)
         {
-            barn_time.tm_hour = 0;
+            tx_time.tm_hour = 0;
         }
     }
 #endif
@@ -312,25 +318,27 @@ static int app_init(void)
 #endif
     theme_bg_white = false;
     detail_page_design_func = page_dark_light_design;
-    timeinfo = &barn_time;
+    timeinfo = &tx_time;
 
     f_status.bt = BT_CONNECT;
     f_status.ble = 1;
     f_status.music_input = 1;
-    f_status.earbuds_connect_l = 1;
-    f_status.earbuds_connect_r = 1;
     f_status.notification_new = 1;
-    f_status.earbuds_in_ear_l = 1;
-    f_status.earbuds_in_ear_r = 1;
+    f_status.headband_connect = 1;
 
+    info_center_func_cnt = 2;
     f_status.infor_center_func_0 = 1;
     f_status.infor_center_func_1 = 1;
-    f_status.infor_center_func_2 = 1;
+    f_status.infor_center_func_2 = 0;
     f_status.infor_center_func_3 = 0;
     f_status.infor_center_func_4 = 0;
     f_status.infor_center_func_5 = 0;
 
-    // f_status.call = 1;
+    // f_status.call = CALL_ING;
+    // f_status.timer = 1;
+    // f_status.tx_charging = 1;
+    // f_status.headband_charging = 1;
+    // f_status.ota = OTA_DOING;
 
     quick_page_name[0] = page_name_array[0];
     quick_page_name[1] = page_name_array[1];
@@ -348,7 +356,7 @@ static int app_init(void)
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win_view), 1000, true, time_update_cb);
-    gui_view_create(win_view, test_view, 0, 0, 0, 0);
+    gui_view_create(win_view, clock_view, 0, 0, 0, 0);
 
     return 0;
 }

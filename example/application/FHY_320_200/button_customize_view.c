@@ -96,12 +96,7 @@ static void click_note(void *obj, gui_event_t e, void *param)
     int16_t index = *((int16_t *)param);
     if (case_button_customize_type_index != 2 && index == 2) { return; }
     case_button_customize_index_array[case_button_customize_type_index] = index;
-    gui_msg_t msg =
-    {
-        .event = GUI_EVENT_USER_DEFINE,
-        .cb = regenerate_current_view,
-    };
-    gui_send_msg_to_server(&msg);
+    msg_2_regenerate_current_view();
 }
 
 static void note_design(gui_obj_t *obj, void *p)

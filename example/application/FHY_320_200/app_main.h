@@ -16,6 +16,8 @@ extern "C" {
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#define SS_WITH_HEAD_TRACKING 1
+
 #define QUICK_PAGE_NUM_MAX  4
 #define SCROLL_BAR_S_H      25
 #define SCROLL_BAR_M_H      50
@@ -58,12 +60,13 @@ extern void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *paren
 /* Battery */
 extern char battery_earbuds_connect_l_str[4];
 extern char battery_earbuds_connect_r_str[4];
-extern char battery_barn_str[4];
+extern char battery_tx_str[4];
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/
-void regenerate_current_view(void *msg);
+void msg_2_regenerate_current_view(void);
 void set_device_name(const char *name);
+void update_icon_color(gui_obj_t *obj, uint8_t status);
 
 /* Page design */
 void page_playback_design(gui_obj_t *parent);
@@ -71,9 +74,16 @@ void page_volume_design(gui_obj_t *parent);
 void page_equalizer_design(gui_obj_t *parent);
 void page_ambient_sound_design(gui_obj_t *parent);
 void page_smart_talk_design(gui_obj_t *parent);
-void page_spatial_sound_design(gui_obj_t *parent);
+#if SS_WITH_HEAD_TRACKING
+void page_spatial_sound_with_head_tracking_design(gui_obj_t *parent);
+#else
+void page_spatial_sound_without_head_tracking_design(gui_obj_t *parent);
+#endif
+void page_hr_audio_design(gui_obj_t *parent);
 void page_voice_aware_design(gui_obj_t *parent);
 void page_auto_play_pause_design(gui_obj_t *parent);
+void page_audio_source_design(gui_obj_t *parent);
+void page_auracast_design(gui_obj_t *parent);
 
 void page_screen_brightness_design(gui_obj_t *parent);
 void page_dark_light_design(gui_obj_t *parent);
@@ -89,7 +99,6 @@ void page_language_design(gui_obj_t *parent);
 void page_reorder_quick_access_design(gui_obj_t *parent);
 void page_support_design(gui_obj_t *parent);
 
-void page_find_buds_design(gui_obj_t *parent);
 void page_timer_design(gui_obj_t *parent);
 void page_flashlight_design(gui_obj_t *parent);
 void page_qrcode_design(gui_obj_t *parent);
