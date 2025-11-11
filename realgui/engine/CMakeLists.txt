@@ -6,16 +6,11 @@ cmake_minimum_required(VERSION 3.10)
 
 # Define a variable for the library name
 if(1) #set to 1 to enable or variable to for dependency
+    add_compile_definitions(ENABLE_HONEYGUI)
+    target_compile_definitions(${GUI_TARGET_NAME} PRIVATE ENABLE_HONEYGUI)
 
+    file(GLOB SOURCES "*.c" "*.cpp")
     file(GLOB HEADERS "*.h" "*.hpp")
-	set(SOURCES
-			"${CMAKE_CURRENT_SOURCE_DIR}/acc_api.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/draw_img.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/gui_matrix.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/draw_font.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/engine_gray.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/gui_post_process.c"
-	)
 
 
     # Determine if we should create a library

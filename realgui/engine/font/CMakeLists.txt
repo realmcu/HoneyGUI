@@ -17,9 +17,6 @@ if(1) #set to 1 to enable or variable to for dependency
             "${CMAKE_CURRENT_SOURCE_DIR}/font_ttf.c"
     )
 
-    if(CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE)
-        list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/font_freetype.c")
-    endif()
 
 # Determine if we should create a library
     if((NOT HEADERS) AND (NOT SOURCES))

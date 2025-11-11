@@ -147,10 +147,6 @@
 
 // <h> HoneyGUI Config Function
 
-// <c> RTK GUI Font Enable FREETYPE
-// #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
-// </c>
-
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>

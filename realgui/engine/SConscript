@@ -4,18 +4,7 @@ from building import *
 
 cwd = GetCurrentDir()
 list = os.listdir(cwd)
-src = Split("""
-""")
-
-
-src += ['acc_api.c']
-src += ['draw_img.c']
-src += ['gui_matrix.c']
-src += ['draw_font.c']
-src += ['engine_gray.c']
-src += ['gui_post_process.c']
-
-
+src = Glob('*.c')
 CPPPATH = [cwd]
 
 group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = CPPPATH)
