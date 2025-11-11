@@ -48,8 +48,11 @@ typedef struct gui_glass
     gui_obj_t base;                    /* Base object structure. */
     draw_img_t *draw_img;              /* Drawing image structure. */
 
-    float t_x;                         /* Translation in X direction. */
-    float t_y;                         /* Translation in Y direction. */
+    int16_t t_x;                         /* Translation in X direction. */
+    int16_t t_y;                         /* Translation in Y direction. */
+
+    int16_t history_x;
+    int16_t history_y;
 
     void *data;                        /* Glass data (address or filesystem path). */
     union
@@ -240,6 +243,19 @@ void gui_glass_set_data(gui_glass_t *_this, const uint8_t *glass_data_pointer);
  */
 const uint8_t *gui_glass_get_data(gui_glass_t *_this);
 
+/**
+ * @brief Enable long pressing event on glass widget.
+ *
+ * @param widget The pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
+ */
+void gui_glass_enable_pressing_envent(gui_glass_t *_this);
+
+/**
+ * @brief Enable click event on glass widget.
+ *
+ * @param widget The pointer to the glass widget (`gui_glass_t`) from which the glass data should be retrieved.
+ */
+void gui_glass_enable_click_envent(gui_glass_t *_this);
 
 
 

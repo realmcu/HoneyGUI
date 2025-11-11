@@ -72,12 +72,33 @@ static void gui_glass_prepare(gui_obj_t *obj)
     GUI_UNUSED(tp);
 
     GUI_ASSERT(obj != NULL);
-
+    struct gui_dispdev *dc = gui_get_dc();
     _this = (gui_glass_t *)obj;
     tp = tp_get_info();
     matrix_identity(obj->matrix);
-    matrix_translate(_this->t_x + _this->base.x, _this->t_y + _this->base.y, obj->matrix);
-
+    float offset_X = _this->t_x + _this->base.x;
+    float offset_Y = _this->t_y + _this->base.y;
+    if (offset_X < 0)
+    {
+        offset_X = 0;
+    }
+    else if (offset_X + _this->base.w > dc->fb_width)
+    {
+        offset_X = dc->fb_width - _this->base.w;
+    }
+    if (offset_Y < 0)
+    {
+        offset_Y = 0;
+    }
+    else if (offset_Y + _this->base.h > dc->fb_height)
+    {
+        offset_Y = dc->fb_height - _this->base.h;
+    }
+    matrix_translate(offset_X, offset_Y, obj->matrix);
+    obj->x = offset_X;
+    obj->y = offset_Y;
+    _this->t_x = 0;
+    _this->t_y = 0;
     if (gui_obj_out_screen(obj))
     {
         return;
@@ -89,11 +110,8 @@ static void gui_glass_prepare(gui_obj_t *obj)
     _this->draw_img->data = _this->data;
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_RELEASED);
+    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSING);
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_LEFT);
-    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_MOVE_RIGHT);
-    // gui_obj_enable_event(obj, GUI_EVENT_TOUCH_DOUBLE_CLICKED);
 
     memcpy(&_this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&_this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
@@ -339,6 +357,37 @@ static void gui_glass_end(gui_obj_t *obj)
     }
 }
 
+static int16_t previous_deltaX, previous_deltaY;
+static void gui_glass_pressing_cb(void *obj, gui_event_t e, void *param)
+{
+    gui_glass_t *glass = (gui_glass_t *)obj;
+    (void)e;
+    (void)param;
+    // gui_log("g_Offset %d\n", g_Offset);
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    (void)dc;
+    (void)tp;
+    switch (e)
+    {
+    case GUI_EVENT_TOUCH_PRESSED:
+        previous_deltaX = tp->deltaX;
+        previous_deltaY = tp->deltaY;
+        break;
+    case GUI_EVENT_TOUCH_RELEASED:
+        glass->t_x = 0;
+        glass->t_y = 0;
+        break;
+    case GUI_EVENT_TOUCH_PRESSING:
+        glass->t_x = tp->deltaX - previous_deltaX;
+        glass->t_y = tp->deltaY - previous_deltaY;
+        previous_deltaX = tp->deltaX;
+        previous_deltaY = tp->deltaY;
+        break;
+    default:
+        break;
+    }
+}
 
 /**
  * @brief Destroys the GUI image and cleans up associated resources.
@@ -359,6 +408,8 @@ static void gui_glass_end(gui_obj_t *obj)
 static void gui_glass_destroy(gui_obj_t *obj)
 {
     gui_glass_t *_this = (gui_glass_t *)obj;
+    obj->x = _this->history_x;
+    obj->y = _this->history_y;
     GUI_UNUSED(_this);
 }
 
@@ -398,6 +449,20 @@ static void gui_glass_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
+void gui_glass_enable_pressing_envent(gui_glass_t *_this)
+{
+    gui_obj_t *obj = (gui_obj_t *)_this;
+    gui_obj_add_event_cb(obj, gui_glass_pressing_cb, GUI_EVENT_TOUCH_RELEASED, NULL);
+    gui_obj_add_event_cb(obj, gui_glass_pressing_cb, GUI_EVENT_TOUCH_PRESSED, NULL);
+    gui_obj_add_event_cb(obj, gui_glass_pressing_cb, GUI_EVENT_TOUCH_PRESSING, NULL);
+}
+
+void gui_glass_enable_click_event(gui_glass_t *_this)
+{
+    gui_obj_t *obj = (gui_obj_t *)_this;
+    gui_obj_add_event_cb(obj, gui_glass_pressing_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+}
+
 static void gui_glass_ctor(gui_glass_t            *_this,
                            gui_obj_t            *parent,
                            const char           *name,
@@ -423,7 +488,8 @@ static void gui_glass_ctor(gui_glass_t            *_this,
     obj->has_end_cb = true;
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
-
+    _this->history_x = obj->x;
+    _this->history_y = obj->y;
     if (storage_type == IMG_SRC_FILESYS)
     {
 #ifdef _WIN32
@@ -441,8 +507,6 @@ static void gui_glass_ctor(gui_glass_t            *_this,
         _this->data = (void *)path;
         _this->ftl = (void *)path;
     }
-
-
 
     obj->w = gui_glass_get_width(_this);
     obj->h = gui_glass_get_height(_this);
