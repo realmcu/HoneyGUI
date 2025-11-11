@@ -31,6 +31,11 @@ glossary_check_exclude_pattern = [
 
 ]
 
+# A global list of path that bypass glossary reference check rule.
+glossary_check_exclude_path_patterns = [
+    
+]
+
 # A global list of url links that bypass link validation check rule.
 ref_check_exclude_pattern = [
     
