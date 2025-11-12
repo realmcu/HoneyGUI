@@ -15,14 +15,20 @@ Description
 
 HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (GUI) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
-As a comprehensive display framework, HoneyGUI not only includes Realtek's self-developed display engine but also supports direct calls to external APIs such as LVGL and ARM2D for application development. Additionally, HoneyGUI provides a PC-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, :term:`RVD`, to achieve visual programming.
+HoneyGUI provides a :term:`PC`-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, :term:`RVD`, to achieve visual programming.
 
-Here are several common methods for APP development:
+HoneyGUI currently primarily supports the following two efficient APP development methods:
 
-- Develop applications using the RealGUI display engine by calling C/C++ APIs.
-- Directly call `LVGL <https://lvgl.io/>`_ APIs to develop applications.
-- Directly call `ARM-2D <https://github.com/ARM-software/Arm-2D>`_ APIs to develop applications.
-- Front-end development using JavaScript and XML. It is recommended to use ``RVisualDesigner`` as a :term:`PC` -based design tool for low-code development.
+1. C/C++ API development
+
+   - Developers can directly utilize the C/C++ API based on the RealGUI display engine to construct applications.
+   - This approach offers the highest level of flexibility and system performance control, suitable for complex applications with high performance requirements.
+
+2. Front-end low-code development
+
+   - Develop front-end applications using JavaScript and XML.
+   - It is recommended to use ``RVisualDesigner`` to quickly build beautiful UI interfaces through dragging and dropping components and visual configuration, enabling low-code development and significantly improving development efficiency.
+   - The low-code development approach for the front end offers advantages in rapid development and iteration, making it particularly suitable for rapid prototyping and small-scale application development.
 
 The :term:`GUI` framework has good portability, which can run on a variety of chips and :term:`OS`. PC Windows version is provided.
 
