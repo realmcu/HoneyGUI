@@ -51,6 +51,8 @@ struct FUNCTION_STATUS
     uint32_t mute               : 1;
     uint32_t timer              : 1;
     uint32_t ota                : 2;
+    uint32_t silentnow          : 1;
+    uint32_t clock_settings     : 2; // 0:off, 1:hour, 2:minute
 
     uint32_t infor_center_func_0        : 1;
     uint32_t infor_center_func_1        : 1;
@@ -82,6 +84,25 @@ struct AUDIO_SOURCE
     uint16_t wait                        : 1;
 };
 
+struct TX_MANAGEMENT
+{
+    char connected_name[30];
+    char paired_name[4][30];
+    char discovered_name[4][30];
+
+    bool connected;
+    uint8_t paired_num                  : 3; //[0, 4]
+    uint8_t discovered_num              : 3; //[0, 4]
+    uint8_t wait                        : 1;
+    uint8_t pairing                     : 1;
+};
+
+struct NOTIFICATION_CONTENT
+{
+    char source[10];
+    char content[100];
+};
+
 typedef enum
 {
     PLAYBACK = 0,
@@ -102,7 +123,7 @@ typedef enum
     VOLUME_UNIT_METER,
     JBL_HEADPHONES_APP,
 
-    SMART_TX_MANAGER,
+    SMART_TX_MANAGEMENT,
     SCREEN_BRIGHTNESS,
     DARK_LIGHT_MODE,
     LOCK_SCREEN,
@@ -112,6 +133,7 @@ typedef enum
     INFORMATION_CENTER_CUSTOMIZE,
     UNLOCK_SLIDER,
     NOTIFICATION,
+    CLOCK_SETTINGS,
     TIME_FORMAT,
     LANGUAGE,
     REORDER_QUICK_ACCESS,
@@ -196,6 +218,9 @@ typedef enum
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#define NOTIFICATION_MAX_NUM  10
+#define MUSIC_MAX_NUM 20
+
 // Color
 #define FG_THEME1_DARK                   gui_rgb(0xFF,0xB4,0x11)
 #define FG_THEME2_DARK                   gui_rgb(0x1F,0xE5,0x7F)
@@ -212,7 +237,7 @@ typedef enum
 #define FG_2_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.3f)
 #define FG_3_LIGHT                       gui_rgba(0x32,0x32,0x32,0xFF*0.5f)
 #define FG_WHITE                         FG_1_DARK
-#define FG_DARK                          gui_rgb(0,0,0)
+#define FG_BLACK                         gui_rgb(0,0,0)
 #define FG_WARNING                       gui_rgb(0xDF,0x2D,0x00)
 #define FG_NORMAL                        gui_rgb(0x00,0xB4,0x36)
 
@@ -304,7 +329,7 @@ extern const char *month[12];
 extern const char *day[7];
 
 /* Page name */
-extern const char *page_name_array[34];
+extern const char *page_name_array[35];
 
 /* Clock style */
 extern int8_t clock_style;
@@ -316,6 +341,11 @@ extern uint32_t theme_color_array[5];
 
 /* Theme bg */
 extern bool theme_bg_white; // default black bg
+
+/* Playback */
+extern int8_t music_index;
+extern char music_array[MUSIC_MAX_NUM][20];
+extern char lyrics_str[200];
 
 /* Volume */
 extern int8_t volume_val; // [0, 16]
@@ -393,6 +423,25 @@ extern char ota_str[4];
 
 /* Auracast */
 extern char auracast_password[5];
+
+/* Volume unit meter */
+extern uint8_t vu_strength_l; // [0, 13]
+extern uint8_t vu_strength_r; // [0, 13]
+
+/* Silentnow */
+extern uint16_t silent_time_val; // seconds
+
+/* Smart tx management */
+extern struct TX_MANAGEMENT tx_management;
+
+/* Clock settings */
+extern uint8_t hour_val; //[0, 23]
+extern uint8_t min_val; //[0, 59]
+extern char hour_str[3];
+extern char min_str[3];
+
+/* Notification */
+extern struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM];
 
 /*============================================================================*
  *                           Punblic Functions

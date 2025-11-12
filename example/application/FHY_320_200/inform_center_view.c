@@ -35,6 +35,7 @@ static const gui_view_descriptor_t *timer_view = NULL;
 static const gui_view_descriptor_t *flashlight_view = NULL;
 static const gui_view_descriptor_t *detail_view = NULL;
 static const gui_view_descriptor_t *call_view = NULL;
+static const gui_view_descriptor_t *notification_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -43,7 +44,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = inform_center_view_design,
 };
 
-static char time_str[20] = {0};
+static char date_str[20] = {0};
 char battery_headband_str[4] = {0};
 char battery_tx_str[4] = {0};
 static char message_num_str[4] = {0};
@@ -67,6 +68,7 @@ static int gui_view_get_other_view_descriptor_init(void)
     flashlight_view = gui_view_descriptor_get("flashlight_view");
     detail_view = gui_view_descriptor_get("detail_view");
     call_view = gui_view_descriptor_get("call_view");
+    notification_view = gui_view_descriptor_get("notification_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -80,17 +82,17 @@ static void time_update_cb(void *obj)
     }
     if (time_format_24)
     {
-        sprintf(time_str, "%s %s %d %02d:%02d", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
+        sprintf(date_str, "%s %s %d %02d:%02d", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
                 timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min);
     }
     else
     {
         int tm_hour = (timeinfo->tm_hour % 12 == 0 ? 12 : timeinfo->tm_hour % 12);
-        sprintf(time_str, "%s %s %d %d:%02d %s", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
+        sprintf(date_str, "%s %s %d %d:%02d %s", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
                 timeinfo->tm_mday, tm_hour, timeinfo->tm_min, (timeinfo->tm_hour >= 12 ? "PM" : "AM"));
     }
 
-    gui_text_content_set((gui_text_t *)obj, time_str, strlen(time_str));
+    gui_text_content_set((gui_text_t *)obj, date_str, strlen(date_str));
 }
 
 static void click_button_message(void *obj, gui_event_t e, void *param)
@@ -99,7 +101,8 @@ static void click_button_message(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
 
-    gui_log("click message button\n");
+    gui_view_switch_direct(current_view, notification_view, SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+                           SWITCH_IN_ANIMATION_MOVE_FROM_RIGHT);
 }
 
 static void click_button(void *obj, gui_event_t e, void *param)
@@ -620,7 +623,7 @@ static void inform_center_view_design(gui_view_t *view)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);
-    gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color_valid, strlen(time_str), 20);
+    gui_text_set(text, date_str, GUI_FONT_SRC_BMP, font_color_valid, strlen(date_str), 20);
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
     gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);

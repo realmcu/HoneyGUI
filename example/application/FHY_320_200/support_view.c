@@ -155,7 +155,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_2_FG_DARK_BIN;
+                img_data = TIP_2_FG_BLACK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 30, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -176,7 +176,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_3_FG_DARK_BIN;
+                img_data = TIP_3_FG_BLACK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 10, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -197,7 +197,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_4_FG_DARK_BIN;
+                img_data = TIP_4_FG_BLACK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 10, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -218,7 +218,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_5_FG_DARK_BIN;
+                img_data = TIP_5_FG_BLACK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 24, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -374,7 +374,7 @@ static void factory_reset_design(gui_obj_t *parent)
     if (theme_bg_white)
     {
         mask_color = SCREEN_BG_LIGHT;
-        scrollbar_color = FG_DARK;
+        scrollbar_color = FG_BLACK;
     }
     else
     {
@@ -382,7 +382,7 @@ static void factory_reset_design(gui_obj_t *parent)
         scrollbar_color = FG_WHITE;
     }
 
-    gui_list_t *list = gui_list_create(parent, "list", 0, 60, 0, 0, 90, 0,
+    gui_list_t *list = gui_list_create(parent, 0, 0, 60, 0, 0, 90, 0,
                                        VERTICAL, reset_note_design, NULL, 0);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, 2);
@@ -414,7 +414,7 @@ static void product_tips_design(gui_obj_t *parent)
     }
 
     page_index = 0;
-    gui_list_t *list = gui_list_create(parent, "list", 0, 44, 0, 140, 320, 0, HORIZONTAL,
+    gui_list_t *list = gui_list_create(parent, 0, 0, 44, 0, 140, 320, 0, HORIZONTAL,
                                        tips_note_design, NULL, false);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, 5);

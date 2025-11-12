@@ -7,6 +7,7 @@
 #include "gui_win.h"
 #include "gui_text.h"
 #include "gui_list.h"
+#include "tp_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -48,14 +49,15 @@ void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
     // page_lock_screen_design,
     // page_notification_design,
-    // page_playback_design,
+    page_playback_design,
     // page_auto_play_pause_design,
     // page_voice_aware_design,
     // page_timer_design,
     // page_flashlight_design,
     // page_auto_dim_off_screen_design,
     // page_quick_wake_up_screen_design,
-    page_unlock_slider_design,
+    // page_unlock_slider_design,
+    // page_clock_settings_design,
     page_language_design,
     page_dark_light_design,
     page_volume_design,
@@ -122,6 +124,11 @@ static void list_timer_cb(void *obj)
     {
         page_index = index;
         update_page_indicator();
+    }
+    touch_info_t *tp = tp_get_info();
+    if (!tp->pressing && quick_page_name[index] != page_name_array[SILENTNOW])
+    {
+        f_status.silentnow = 0;
     }
 }
 
@@ -230,7 +237,7 @@ static void quick_view_design(gui_view_t *view)
         charging_color = FG_THEME1_DARK;
         unvalid_color = FG_2_DARK;
     }
-    gui_list_t *list = gui_list_create(parent, "list", 0, 0, 0, 0, 320, 0, HORIZONTAL,
+    gui_list_t *list = gui_list_create(parent, 0, 0, 0, 0, 0, 320, 0, HORIZONTAL,
                                        note_design, NULL,
                                        false);
     gui_list_set_style(list, LIST_CLASSIC);
@@ -277,7 +284,7 @@ static void quick_view_design(gui_view_t *view)
     gui_text_t *text = gui_text_create(parent, 0, 200, 13, 110, 15);
     gui_text_set(text, time_str, GUI_FONT_SRC_BMP, font_color, strlen(time_str), 20);
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
-    gui_obj_create_timer(GUI_BASE(text), 30000, true, time_update_cb);
+    gui_obj_create_timer(GUI_BASE(text), 3000, true, time_update_cb);
     gui_text_mode_set(text, RIGHT);
 
     gui_img_t *home_bg = gui_img_create_from_mem(parent, 0, STATUSBAR_HOME_BG_BIN, 131, 8, 0, 0);

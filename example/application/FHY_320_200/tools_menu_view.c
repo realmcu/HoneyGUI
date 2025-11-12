@@ -4,11 +4,9 @@
 #include "app_main.h"
 #include "common_data.h"
 #include "gui_img.h"
-#include "gui_canvas_rect.h"
 #include "gui_win.h"
 #include "gui_text.h"
 #include "gui_list.h"
-#include "gui_canvas_rect.h"
 
 /*============================================================================*
  *                           Types
@@ -82,8 +80,6 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(list, "list", current_view);
-    gui_obj_stop_timer(list);
     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
@@ -159,7 +155,7 @@ static void tools_menu_view_design(gui_view_t *view)
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
-    bg_note = gui_img_create_from_mem(parent, "bg_note", MENU_LISTNOTE_BG_BIN, 0, 0, 0, 0);
+    bg_note = gui_img_create_from_mem(parent, 0, MENU_LISTNOTE_BG_BIN, 0, 0, 0, 0);
     gui_obj_hidden((void *)bg_note, true);
 
     uint32_t *img_data_array[] =
@@ -176,6 +172,8 @@ static void tools_menu_view_design(gui_view_t *view)
     {
         page_timer_design,
         page_flashlight_design,
+        page_silentnow_design,
+        page_volume_unit_meter_design,
         page_qrcode_design,
     };
     design_p = gui_malloc(sizeof(note_design_param_t));
@@ -186,7 +184,7 @@ static void tools_menu_view_design(gui_view_t *view)
     memcpy(data_array, img_data_array, array_size * sizeof(void *));
     design_p->page_design = func_cb;
     design_p->img_data_array = data_array;
-    gui_list_t *list = gui_list_create(view, "list", 0, LIST_Y, 0, 0, 56, 0,
+    gui_list_t *list = gui_list_create(view, 0, 0, LIST_Y, 0, 0, 56, 0,
                                        VERTICAL, note_design, design_p, 0);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, array_size);
@@ -211,9 +209,9 @@ static void tools_menu_view_design(gui_view_t *view)
     }
     gui_img_a8_mix_alpha(bg_note, bg_note->fg_color_set >> 24);
 
-    gui_text_t *title = gui_text_create(parent, 0, 0, 13, gui_get_screen_width(), 30);
-    gui_text_set(title, TITLE, GUI_FONT_SRC_BMP, font_color, strlen(TITLE), 28);
-    gui_text_type_set(title, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+    gui_text_t *title = gui_text_create(parent, 0, 0, 0, 320, 60);;
+    gui_text_set(title, TITLE, GUI_FONT_SRC_BMP, font_color, strlen(TITLE), 30);
+    gui_text_type_set(title, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 
     gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 60, 60);
@@ -228,8 +226,8 @@ static void tools_menu_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
-        gui_img_a8_recolor(scrollbar_bg, FG_DARK.color.argb_full);
-        gui_img_a8_recolor(scrollbar, FG_DARK.color.argb_full);
+        gui_img_a8_recolor(scrollbar_bg, FG_BLACK.color.argb_full);
+        gui_img_a8_recolor(scrollbar, FG_BLACK.color.argb_full);
     }
     else
     {

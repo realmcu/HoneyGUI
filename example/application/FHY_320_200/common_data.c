@@ -59,7 +59,7 @@ const char *day[7] =
 };
 
 /* Page name */
-const char *page_name_array[34] =
+const char *page_name_array[35] =
 {
     "playback",
     "Volume",
@@ -89,6 +89,7 @@ const char *page_name_array[34] =
     "Information Center Customize",
     "Unlock Slider",
     "Notification",
+    "Clock Settings",
     "Time Format",
     "language",
     "Reorder Quick Access",
@@ -118,6 +119,33 @@ uint32_t theme_color_array[5] =
 /* Theme bg */
 bool theme_bg_white = false; // default black bg
 
+/* Playback */
+int8_t music_index = 0;
+char music_array[MUSIC_MAX_NUM][20] =
+{
+    "Watermelon Sugar",
+    "Save Your Tears",
+    "Feels",
+    "Stay",
+    "Blinding Lights",
+    "Levitating",
+    "Peaches",
+    "Montero",
+    "Good 4 U",
+    "Kiss Me More",
+    "Industry Baby",
+    "Heat Waves",
+};
+char lyrics_str[200] =
+{
+    "Never gonna give you up \
+ Never gonna let you down \
+ Never gonna run around and desert you \
+ Never gonna make you cry \
+ Never gonna say goodbye \
+ Never gonna tell a lie and hurt you"
+};
+
 /* Volume */
 int8_t volume_val = 8; // [0, 16]
 
@@ -126,7 +154,7 @@ uint8_t battery_tx_val = 30; //[0,100]
 uint8_t battery_headband_val = 10;
 
 /* Message */
-uint8_t message_num_val = 10;
+uint8_t message_num_val = 9;
 
 /* Function status */
 struct FUNCTION_STATUS f_status = {0};
@@ -217,3 +245,40 @@ char ota_str[4] = {0};
 
 /* Auracast */
 char auracast_password[5] = "1234";
+
+/* Volume unit meter */
+uint8_t vu_strength_l = 6; // [0, 13]
+uint8_t vu_strength_r = 13; // [0, 13]
+
+/* Silentnow */
+uint16_t silent_time_val = 900; // seconds
+
+/* Smart tx management */
+struct TX_MANAGEMENT tx_management =
+{
+    .connected = true,
+    .connected_name = "Headphones 1",
+    .paired_num = 3,
+    .paired_name = {"Headphones 2", "Headphones 3", "Headphones 4"},
+};
+
+/* Clock settings */
+uint8_t hour_val = 0; //[0, 23]
+uint8_t min_val = 0; //[0, 59]
+char hour_str[3] = {0};
+char min_str[3] = {0};
+
+/* Notification */
+struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM] =
+{
+    {"Wechat", "Avocado: Hi how's everything going? I'm planing to visit our grandpa next week."},
+    {"Line", "Orange: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
+    {"QQ", "Banana: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
+    {"Wechat", "Avocado: Hi how's everything going? I'm planing to visit our grandpa next week."},
+    {"Line", "Orange: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
+    {"QQ", "Banana: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
+    {"Wechat", "Avocado: Hi how's everything going? I'm planing to visit our grandpa next week."},
+    {"Line", "Orange: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
+    {"QQ", "Banana: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
+};
+

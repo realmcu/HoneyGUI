@@ -105,6 +105,7 @@ static void click_button_back(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
+    f_status.silentnow = 0;
     gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
                            SWITCH_IN_ANIMATION_MOVE_FROM_LEFT);
 }
@@ -164,7 +165,8 @@ static void detail_view_design(gui_view_t *view)
         detail_page_design_func == page_reorder_quick_access_design  ||
         detail_page_design_func == page_information_center_customize_design ||
         detail_page_design_func == page_support_design ||
-        detail_page_design_func == page_audio_source_design)
+        detail_page_design_func == page_audio_source_design ||
+        detail_page_design_func == page_tx_management_design)
     {
         icon_back->base.y = 8;
     }

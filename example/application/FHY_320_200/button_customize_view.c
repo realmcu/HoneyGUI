@@ -4,12 +4,10 @@
 #include "app_main.h"
 #include "common_data.h"
 #include "gui_img.h"
-#include "gui_canvas_rect.h"
 #include "gui_win.h"
 #include "gui_text.h"
 #include "gui_scroll_text.h"
 #include "gui_list.h"
-#include "gui_canvas_rect.h"
 #include "gui_message.h"
 
 /*============================================================================*
@@ -174,7 +172,7 @@ static void button_customize_view_design(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
     gui_color_t font_color;
 
-    gui_list_t *list = gui_list_create(view, "list", 0, LIST_Y, 0, 0, 56, 0,
+    gui_list_t *list = gui_list_create(view, 0, 0, LIST_Y, 0, 0, 56, 0,
                                        VERTICAL, note_design, NULL, 0);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, 5);
@@ -195,11 +193,11 @@ static void button_customize_view_design(gui_view_t *view)
         font_color = FG_1_DARK;
     }
 
-    gui_text_t *title = gui_text_create(parent, 0, 0, 13, gui_get_screen_width(), 30);
+    gui_text_t *title = gui_text_create(parent, 0, 0, 0, 320, 60);
     gui_text_set(title, (void *)case_button_customize_type[case_button_customize_type_index],
                  GUI_FONT_SRC_BMP, font_color, strlen(case_button_customize_type[case_button_customize_type_index]),
-                 28);
-    gui_text_type_set(title, CAPTION_2_BIN, FONT_SRC_MEMADDR);
+                 30);
+    gui_text_type_set(title, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 
 
@@ -213,8 +211,8 @@ static void button_customize_view_design(gui_view_t *view)
     if (theme_bg_white)
     {
         gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
-        gui_img_a8_recolor(scrollbar_bg, FG_DARK.color.argb_full);
-        gui_img_a8_recolor(scrollbar, FG_DARK.color.argb_full);
+        gui_img_a8_recolor(scrollbar_bg, FG_BLACK.color.argb_full);
+        gui_img_a8_recolor(scrollbar, FG_BLACK.color.argb_full);
     }
     else
     {

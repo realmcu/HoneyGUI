@@ -104,8 +104,6 @@ typedef struct gui_list_note
     bool is_speed_positive;   // To judge move direction.
 
     int16_t index;            // Index of the note in the list.
-
-    uint8_t checksum;
 } gui_list_note_t;
 
 /*============================================================================*

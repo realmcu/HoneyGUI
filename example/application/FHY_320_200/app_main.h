@@ -85,6 +85,7 @@ void page_auto_play_pause_design(gui_obj_t *parent);
 void page_audio_source_design(gui_obj_t *parent);
 void page_auracast_design(gui_obj_t *parent);
 
+void page_tx_management_design(gui_obj_t *parent);
 void page_screen_brightness_design(gui_obj_t *parent);
 void page_dark_light_design(gui_obj_t *parent);
 void page_lock_screen_design(gui_obj_t *parent);
@@ -94,6 +95,7 @@ void page_case_button_customize_design(gui_obj_t *parent);
 void page_information_center_customize_design(gui_obj_t *parent);
 void page_unlock_slider_design(gui_obj_t *parent);
 void page_notification_design(gui_obj_t *parent);
+void page_clock_settings_design(gui_obj_t *parent);
 void page_time_format_design(gui_obj_t *parent);
 void page_language_design(gui_obj_t *parent);
 void page_reorder_quick_access_design(gui_obj_t *parent);
@@ -101,6 +103,8 @@ void page_support_design(gui_obj_t *parent);
 
 void page_timer_design(gui_obj_t *parent);
 void page_flashlight_design(gui_obj_t *parent);
+void page_silentnow_design(gui_obj_t *parent);
+void page_volume_unit_meter_design(gui_obj_t *parent);
 void page_qrcode_design(gui_obj_t *parent);
 
 #ifdef __cplusplus

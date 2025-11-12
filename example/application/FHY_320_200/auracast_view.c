@@ -126,7 +126,7 @@ static void auracast_view_design(gui_view_t *view)
         mask_color = SCREEN_BG_DARK;
     }
 
-    gui_list_t *list = gui_list_create(parent, "list", 0, 60, 0, 0, 174, 0,
+    gui_list_t *list = gui_list_create(parent, 0, 0, 60, 0, 0, 174, 0,
                                        VERTICAL, note_design, NULL, 0);
     gui_list_set_style(list, LIST_CLASSIC);
     gui_list_set_note_num(list, 1);
