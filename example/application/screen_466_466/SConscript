@@ -18,7 +18,7 @@ CPPPATH += [cwd + '\\root_image']
 CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_466_466_DEMO'):
     CPPDEFINES += ['DRV_LCD_WIDTH=466']
-    CPPDEFINES += ['DRV_LCD_HIGHT=466']
+    CPPDEFINES += ['DRV_LCD_HEIGHT=466']
     CPPDEFINES += ['DRV_PIXEL_BITS=32']
     if hasattr(menu_config, 'ARCH') and menu_config.ARCH == 'win32':
         from honeygui import *

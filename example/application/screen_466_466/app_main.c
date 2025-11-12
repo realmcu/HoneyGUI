@@ -380,6 +380,7 @@ static void view_switch_in_ota(gui_view_t *view)
                                 0, (void *)FILE_POINTER(OTA_UPDATE_OVERLAY_BIN), 0, 0, 0, 0);
     }
 }
+#include "gui_text.h"
 static void view_switch_in_about(gui_view_t *view)
 {
     gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
@@ -425,6 +426,30 @@ static void view_switch_in_about(gui_view_t *view)
                                                     0, (void *)FILE_POINTER(HIGHLIGHT_BOTTOM_ROUNDED_BIN), CARD_MARGIN, 200, 0, 0);
         gui_img_set_mode(mask_bottom_about, IMG_SRC_OVER_MODE);
         gui_obj_hidden((void *)mask_bottom_about, true);
+        {
+            gui_text_t *text = gui_text_create(view, 0, 75 + 150, 124 + 2, 466, 26);
+            const char *string = "1ABCD123ab c:;.'!@#$";
+            gui_text_set(text, (void *)string, GUI_FONT_SRC_BMP, gui_color_css("darkgray"), strlen(string), 24);
+            gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
+                              FONT_SRC_MEMADDR);
+            gui_text_mode_set(text, LEFT);
+        }
+        {
+            gui_text_t *text = gui_text_create(view, 0, 75 + 150, 192 + 2, 466, 26);
+            const char *string = "2ABCD123ab c:;.'!@#$";
+            gui_text_set(text, (void *)string, GUI_FONT_SRC_BMP, gui_color_css("darkgray"), strlen(string), 24);
+            gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
+                              FONT_SRC_MEMADDR);
+            gui_text_mode_set(text, LEFT);
+        }
+        {
+            gui_text_t *text = gui_text_create(view, 0, 75 + 150, 258 + 2 + 2, 466, 26);
+            const char *string = "3ABCD123ab c:;.'!@#$";
+            gui_text_set(text, (void *)string, GUI_FONT_SRC_BMP, gui_color_css("darkgray"), strlen(string), 24);
+            gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
+                              FONT_SRC_MEMADDR);
+            gui_text_mode_set(text, LEFT);
+        }
     }
 }
 static  uint32_t key_array[] =
