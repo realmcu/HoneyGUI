@@ -9,6 +9,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_view.h"
+#include "gui_view_instance.h"
 
 #define CURRENT_VIEW_NAME "white_view"
 
@@ -18,45 +19,18 @@ static const gui_view_descriptor_t *blue_view = NULL;
 static const gui_view_descriptor_t *yellow_view = NULL;
 static void app_ui_view_white_design(gui_view_t *view);
 
-static const gui_view_descriptor_t descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-
-    .on_switch_in = app_ui_view_white_design,
-    .on_switch_out = NULL,
-    .keep = false,
-};
-
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    blue_view = gui_view_descriptor_get("blue_view");
-    yellow_view = gui_view_descriptor_get("yellow_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, blue_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(current_view, gui_view_descriptor_get("blue_view"),
+                           SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_OUT_NONE_ANIMATION);
 }
 
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_white_design, NULL);
 static void app_ui_view_white_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);
@@ -65,23 +39,26 @@ static void app_ui_view_white_design(gui_view_t *view)
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_view_switch_on_event(view, blue_view, SWITCH_OUT_TO_RIGHT_USE_CUBE,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("blue_view"), SWITCH_OUT_TO_RIGHT_USE_CUBE,
                              SWITCH_IN_FROM_LEFT_USE_CUBE,
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
-    gui_view_switch_on_event(view, yellow_view, SWITCH_OUT_TO_LEFT_USE_ROTATE,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("yellow_view"),
+                             SWITCH_OUT_TO_LEFT_USE_ROTATE,
                              SWITCH_IN_FROM_RIGHT_USE_ROTATE,
                              GUI_EVENT_TOUCH_MOVE_LEFT);
 
-    gui_view_switch_on_event(view, blue_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("blue_view"),
+                             SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_UP);
 
-    gui_view_switch_on_event(view, yellow_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("yellow_view"),
+                             SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, yellow_view, SWITCH_OUT_ANIMATION_ZOOM,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("yellow_view"), SWITCH_OUT_ANIMATION_ZOOM,
                              SWITCH_IN_ANIMATION_ZOOM,
                              GUI_EVENT_TOUCH_CLICKED);
 
