@@ -57,7 +57,7 @@ static void pair_timer_page_tx_management(void *obj);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static const gui_view_descriptor_t *clock_view = NULL;
+static const gui_view_descriptor_t *lock_view = NULL;
 static const gui_view_descriptor_t *timer_view = NULL;
 static const gui_view_descriptor_t *flashlight_view = NULL;
 static const gui_view_descriptor_t *quick_view = NULL;
@@ -141,7 +141,7 @@ static int16_t page_information_center_customize_list_offset_rec = 0;
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
-    clock_view = gui_view_descriptor_get("clock_view");
+    lock_view = gui_view_descriptor_get("lock_view");
     timer_view = gui_view_descriptor_get("timer_view");
     flashlight_view = gui_view_descriptor_get("flashlight_view");
     quick_view = gui_view_descriptor_get("quick_view");
@@ -1327,14 +1327,14 @@ static void click_button_page_dark_light(void *obj, gui_event_t e, void *param)
                          button_move);
 }
 
-static void click_clock_page_lock_screen(void *obj, gui_event_t e, void *param)
+static void click_wallpaper_page_lock_screen(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     switch_from_lock_screen = true;
     gui_view_set_animate_step(gui_view_get_current(), 400);
-    gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(gui_view_get_current(), lock_view, SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_IN_NONE_ANIMATION);
 }
 
@@ -1349,26 +1349,26 @@ static void click_button_page_lock_screen(void *obj, gui_event_t e, void *param)
     bool is_switch_l = (strcmp(o->name, "l") == 0);
     if (is_switch_l)
     {
-        clock_style--;
+        wallpaper_index--;
         icon_l = (gui_img_t *)gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
         icon_r = (gui_img_t *)gui_list_entry(gui_list_entry(o->brother_list.next, gui_obj_t,
                                                             brother_list)->child_list.next, gui_obj_t, brother_list);
     }
     else
     {
-        clock_style++;
+        wallpaper_index++;
         icon_l = (gui_img_t *)gui_list_entry(gui_list_entry(o->brother_list.prev, gui_obj_t,
                                                             brother_list)->child_list.next, gui_obj_t, brother_list);
         icon_r = (gui_img_t *)gui_list_entry(o->child_list.next, gui_obj_t, brother_list);
     }
-    if (clock_style <= 0)
+    if (wallpaper_index <= 0)
     {
-        clock_style = 0;
+        wallpaper_index = 0;
         gui_img_a8_recolor(icon_l, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
     }
-    else if (clock_style >= 4)
+    else if (wallpaper_index >= 4)
     {
-        clock_style = 4;
+        wallpaper_index = 4;
         gui_img_a8_recolor(icon_r, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
     }
     else
@@ -1380,7 +1380,7 @@ static void click_button_page_lock_screen(void *obj, gui_event_t e, void *param)
     gui_img_a8_mix_alpha((void *)icon_r, icon_r->fg_color_set >> 24);
 
     gui_obj_t *img = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
-    gui_img_set_image_data((gui_img_t *)img, img_data_array[clock_style]);
+    gui_img_set_image_data((gui_img_t *)img, img_data_array[wallpaper_index]);
 }
 
 static void click_button_page_quick_wake_up_screen(void *obj, gui_event_t e, void *param)
@@ -4686,23 +4686,26 @@ void page_dark_light_design(gui_obj_t *parent)
 void page_lock_screen_design(gui_obj_t *parent)
 {
     quick_page_name_index = LOCK_SCREEN;
-    {
-        img_data_array[0] = CLOCK1_BIN;
-        img_data_array[1] = CLOCK2_BIN;
-        img_data_array[2] = CLOCK3_BIN;
-        img_data_array[3] = CLOCK4_BIN;
-        img_data_array[4] = CLOCK5_BIN;
-    }
 
     gui_color_t font_color;
 
     if (theme_bg_white)
     {
         font_color = FG_1_LIGHT;
+        img_data_array[0] = WALLPAPER_1_LIGHT_BIN;
+        img_data_array[1] = WALLPAPER_2_LIGHT_BIN;
+        img_data_array[2] = WALLPAPER_3_LIGHT_BIN;
+        img_data_array[3] = WALLPAPER_4_LIGHT_BIN;
+        img_data_array[4] = WALLPAPER_5_LIGHT_BIN;
     }
     else
     {
         font_color = FG_1_DARK;
+        img_data_array[0] = WALLPAPER_1_DARK_BIN;
+        img_data_array[1] = WALLPAPER_2_DARK_BIN;
+        img_data_array[2] = WALLPAPER_3_DARK_BIN;
+        img_data_array[3] = WALLPAPER_4_DARK_BIN;
+        img_data_array[4] = WALLPAPER_5_DARK_BIN;
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
@@ -4717,19 +4720,20 @@ void page_lock_screen_design(gui_obj_t *parent)
     gui_obj_add_event_cb(win_l, click_button_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_obj_add_event_cb(win_r, click_button_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_img_t *clock = gui_img_create_from_mem(parent, 0, img_data_array[clock_style], 96, 97, 0, 0);
-    gui_img_set_mode(clock, IMG_2D_SW_SRC_OVER_MODE);
-    gui_obj_add_event_cb(clock, click_clock_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_img_t *wallpaper = gui_img_create_from_mem(parent, 0, img_data_array[wallpaper_index], 96, 97,
+                                                   0, 0);
+    gui_img_set_mode(wallpaper, IMG_BYPASS_MODE);
+    gui_obj_add_event_cb(wallpaper, click_wallpaper_page_lock_screen, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     if (theme_bg_white)
     {
         gui_img_a8_recolor(switch_l, FG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(switch_r, FG_1_LIGHT.color.argb_full);
-        if (clock_style == 0)
+        if (wallpaper_index == 0)
         {
             gui_img_a8_recolor(switch_l, FG_2_LIGHT.color.argb_full);
         }
-        else if (clock_style == 4)
+        else if (wallpaper_index == 4)
         {
             gui_img_a8_recolor(switch_r, FG_2_LIGHT.color.argb_full);
         }
@@ -4738,11 +4742,11 @@ void page_lock_screen_design(gui_obj_t *parent)
     {
         gui_img_a8_recolor(switch_l, FG_1_DARK.color.argb_full);
         gui_img_a8_recolor(switch_r, FG_1_DARK.color.argb_full);
-        if (clock_style == 0)
+        if (wallpaper_index == 0)
         {
             gui_img_a8_recolor(switch_l, FG_2_DARK.color.argb_full);
         }
-        else if (clock_style == 4)
+        else if (wallpaper_index == 4)
         {
             gui_img_a8_recolor(switch_r, FG_2_DARK.color.argb_full);
         }

@@ -147,7 +147,6 @@ static void charging_view_design(gui_view_t *view)
         icon_array[7] = ICON_CHARGING_7_BIN;
     }
 
-
     gui_obj_t *parent = GUI_BASE(view);
     gui_img_t *bg = gui_img_create_from_mem(parent, "bg", BATTERY_CHARGING_BG_BIN, 0, 0, 0, 0);
     gui_img_set_mode(bg, IMG_COVER_MODE);

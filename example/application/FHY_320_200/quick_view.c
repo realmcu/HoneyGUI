@@ -47,18 +47,18 @@ static gui_img_t *page_indicator_array[QUICK_PAGE_NUM_MAX] = {0};
 int8_t quick_page_num = 4;
 void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
-    // page_lock_screen_design,
     // page_notification_design,
-    page_playback_design,
+    // page_playback_design,
     // page_auto_play_pause_design,
     // page_voice_aware_design,
     // page_timer_design,
     // page_flashlight_design,
     // page_auto_dim_off_screen_design,
     // page_quick_wake_up_screen_design,
-    // page_unlock_slider_design,
+    page_unlock_slider_design,
+    page_lock_screen_design,
     // page_clock_settings_design,
-    page_language_design,
+    // page_language_design,
     page_dark_light_design,
     page_volume_design,
     // page_ambient_sound_design,
@@ -217,6 +217,31 @@ static void quick_view_design(gui_view_t *view)
                              GUI_EVENT_TOUCH_MOVE_RIGHT);
 
     gui_obj_t *parent = GUI_BASE(view);
+    gui_list_t *list = gui_list_create(parent, 0, 0, 0, 0, 0, 320, 0, HORIZONTAL,
+                                       note_design, NULL,
+                                       false);
+    gui_list_set_style(list, LIST_CLASSIC);
+    gui_list_set_note_num(list, quick_page_num);
+    gui_list_set_auto_align(list, true);
+    gui_list_set_offset(list, -page_index * 320);
+    gui_list_set_inertia(list, false);
+    gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
+
+    create_indicator(parent);
+
+    status_bar_design(parent);
+
+    if (quick_page_num)
+    {
+        update_page_indicator();
+    }
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+void status_bar_design(gui_obj_t *parent)
+{
     gui_color_t font_color;
     gui_color_t bg_color;
     gui_color_t charging_color;
@@ -237,22 +262,8 @@ static void quick_view_design(gui_view_t *view)
         charging_color = FG_THEME1_DARK;
         unvalid_color = FG_2_DARK;
     }
-    gui_list_t *list = gui_list_create(parent, 0, 0, 0, 0, 0, 320, 0, HORIZONTAL,
-                                       note_design, NULL,
-                                       false);
-    gui_list_set_style(list, LIST_CLASSIC);
-    gui_list_set_note_num(list, quick_page_num);
-    gui_list_set_auto_align(list, true);
-    gui_list_set_offset(list, -page_index * 320);
-    gui_list_set_inertia(list, false);
-    gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
-
-    create_indicator(parent);
-
     gui_img_t *bt = gui_img_create_from_mem(parent, 0, ICON_BT_CONNECT_BIN, 12, 13, 0, 0);
-
     int pos_x = 28;
-
     if (f_status.bt != BT_UNKNOWN)
     {
         gui_text_t *text = gui_text_create(parent, 0, pos_x, 12, 32, 20);
@@ -351,9 +362,4 @@ static void quick_view_design(gui_view_t *view)
     gui_img_a8_mix_alpha(bt, bt->fg_color_set >> 24);
     gui_img_a8_mix_alpha(home_bg, home_bg->fg_color_set >> 24);
     gui_img_a8_mix_alpha(headband, headband->fg_color_set >> 24);
-
-    if (quick_page_num)
-    {
-        update_page_indicator();
-    }
 }

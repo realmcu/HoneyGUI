@@ -259,8 +259,9 @@ static void function_icon_design(gui_obj_t *parent)
         gui_img_t *icon = gui_img_create_from_mem(bg, 0, ICON_CUSTOMIZE_INFOCENTER_SMALL_BIN, 18, 24, 0, 0);
         gui_img_t *arrow = gui_img_create_from_mem(bg, 0, ICON_ARROW_R_BIN, 277, 28, 0, 0);
         gui_text_t *text = gui_text_create(bg, 0, 52, 0, 296, 68);
-        gui_text_set(text, (void *)page_name_array[19], GUI_FONT_SRC_BMP, font_color,
-                     strlen((void *)page_name_array[19]), 20);
+        gui_text_set(text, (void *)page_name_array[INFORMATION_CENTER_CUSTOMIZE], GUI_FONT_SRC_BMP,
+                     font_color,
+                     strlen((void *)page_name_array[INFORMATION_CENTER_CUSTOMIZE]), 20);
         gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, MID_LEFT);
         gui_obj_add_event_cb(bg, click_button_2_info_center, GUI_EVENT_TOUCH_CLICKED,
@@ -446,8 +447,9 @@ static void function_icon_design(gui_obj_t *parent)
                              &f_status.auto_play_pause);
         gui_scroll_text_t *text = gui_scroll_text_create(bg, 0, 44, 25, 118, 68);
         gui_scroll_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
-        gui_scroll_text_set(text, (void *)page_name_array[19], GUI_FONT_SRC_BMP, font_color,
-                            strlen(page_name_array[19]), 20);
+        gui_scroll_text_set(text, (void *)page_name_array[INFORMATION_CENTER_CUSTOMIZE], GUI_FONT_SRC_BMP,
+                            font_color,
+                            strlen(page_name_array[INFORMATION_CENTER_CUSTOMIZE]), 20);
         gui_scroll_text_scroll_set(text, SCROLL_X, 118, 118, 3000, 0);
         gui_img_a8_recolor(bg, bg_color_off_invalid.color.argb_full);
         gui_img_a8_recolor(icon, icon_infor_color.color.argb_full);

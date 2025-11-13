@@ -331,8 +331,8 @@ extern const char *day[7];
 /* Page name */
 extern const char *page_name_array[35];
 
-/* Clock style */
-extern int8_t clock_style;
+/* Lock screen */
+extern int8_t wallpaper_index;
 extern bool switch_from_lock_screen;
 
 /* Theme color */

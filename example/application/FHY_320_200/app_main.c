@@ -35,7 +35,7 @@
  *============================================================================*/
 /* VIEW */
 const static gui_view_descriptor_t *test_view = NULL;
-const static gui_view_descriptor_t *clock_view = NULL;
+const static gui_view_descriptor_t *lock_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *quick_view = NULL;
 const static gui_view_descriptor_t *flashlight_view = NULL;
@@ -64,7 +64,7 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     test_view = gui_view_descriptor_get("quick_view");
-    clock_view = gui_view_descriptor_get("clock_view");
+    lock_view = gui_view_descriptor_get("lock_view");
     menu_view = gui_view_descriptor_get("menu_view");
     quick_view = gui_view_descriptor_get("quick_view");
     flashlight_view = gui_view_descriptor_get("flashlight_view");
@@ -130,7 +130,7 @@ static void button_2_view(uint8_t index)
         {
             gui_log("Wake up/dim off screen \n");
             gui_view_set_animate_step(gui_view_get_current(), 400);
-            gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+            gui_view_switch_direct(gui_view_get_current(), lock_view, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_NONE_ANIMATION);
         }
         break;
@@ -254,13 +254,13 @@ static void time_update_cb(void *param)
         if (f_status.timer)
         {
             extern const gui_view_descriptor_t *timer_descriptor_rec;
-            timer_descriptor_rec = clock_view;
+            timer_descriptor_rec = lock_view;
             return;
         }
         gui_view_t *current_view = gui_view_get_current();
         if (current_view->descriptor == charging_view) { return; }
         gui_view_set_animate_step(current_view, 400);
-        gui_view_switch_direct(gui_view_get_current(), clock_view, SWITCH_OUT_NONE_ANIMATION,
+        gui_view_switch_direct(gui_view_get_current(), lock_view, SWITCH_OUT_NONE_ANIMATION,
                                SWITCH_IN_NONE_ANIMATION);
     }
 }
@@ -357,7 +357,7 @@ static int app_init(void)
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win_view), 1000, true, time_update_cb);
-    gui_view_create(win_view, test_view, 0, 0, 0, 0);
+    gui_view_create(win_view, lock_view, 0, 0, 0, 0);
 
     return 0;
 }

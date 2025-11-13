@@ -67,6 +67,7 @@ extern char battery_tx_str[4];
 void msg_2_regenerate_current_view(void);
 void set_device_name(const char *name);
 void update_icon_color(gui_obj_t *obj, uint8_t status);
+void status_bar_design(gui_obj_t *parent);
 
 /* Page design */
 void page_playback_design(gui_obj_t *parent);

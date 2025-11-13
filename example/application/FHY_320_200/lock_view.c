@@ -4,6 +4,7 @@
 #include "app_main.h"
 #include "common_data.h"
 #include "gui_img.h"
+#include "gui_win.h"
 #include "tp_algo.h"
 
 /*============================================================================*
@@ -11,10 +12,8 @@
  *============================================================================*/
 #define CURRENT_VIEW_NAME "lock_view"
 
-#define TAB_START_POS_X 17
-#define TAB_START_POS_Y 64
-#define TAB_STOP_POS_X  224
-#define TAB_SIZE        80
+#define TAB_MAX_POS_X  180
+#define TAB_UNLOCK_POS_X  102
 
 /*============================================================================*
  *                           Function Declaration
@@ -35,6 +34,8 @@ static gui_view_descriptor_t const descriptor =
     .pView = &current_view,
     .on_switch_in = lock_view_design,
 };
+
+static const gui_view_descriptor_t *descriptor_rec = NULL;
 
 /*============================================================================*
  *                           Private Functions
@@ -63,17 +64,16 @@ static void pressing_tab(void *obj)
 
     touch_info_t *tp = tp_get_info();
     gui_img_t *img = (gui_img_t *)obj;
-    if (tp->pressing && tp->x >= TAB_START_POS_X && tp->x <= (TAB_START_POS_X + TAB_SIZE)
-        && tp->y >= TAB_START_POS_Y && tp->y <= (TAB_START_POS_Y + TAB_SIZE))
+    if (tp->pressing && tp->x <= 128 && tp->y >= 28)
     {
         int16_t x = tp->deltaX;
         if (x < 0)
         {
             x = 0;
         }
-        else if (x > TAB_STOP_POS_X - TAB_START_POS_X)
+        else if (x > TAB_MAX_POS_X)
         {
-            x = TAB_STOP_POS_X - TAB_START_POS_X;
+            x = TAB_MAX_POS_X;
         }
         gui_img_translate(img, (float)x, 0);
     }
@@ -81,14 +81,14 @@ static void pressing_tab(void *obj)
     {
         int16_t x = (int16_t)img->t_x;
         const int16_t step = 20;
-        if (x >= TAB_STOP_POS_X - TAB_START_POS_X)
+        if (x >= TAB_MAX_POS_X)
         {
             gui_view_switch_direct(current_view, quick_view, SWITCH_OUT_NONE_ANIMATION,
                                    SWITCH_IN_ANIMATION_FADE);
             gui_obj_stop_timer(GUI_BASE(img));
             return;
         }
-        else if (x >= (TAB_STOP_POS_X - TAB_START_POS_X - 40))
+        else if (x >= TAB_UNLOCK_POS_X)
         {
             x += step;
         }
@@ -99,68 +99,94 @@ static void pressing_tab(void *obj)
         if (x <= 0)
         {
             x = 0;
-            gui_img_set_image_data(img, DEFAULT_BIN);
-            gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
-            gui_obj_stop_timer(GUI_BASE(img));
         }
-        else if (x >= TAB_STOP_POS_X - TAB_START_POS_X)
+        else if (x >= TAB_MAX_POS_X)
         {
-            x = TAB_STOP_POS_X - TAB_START_POS_X;
+            x = TAB_MAX_POS_X;
         }
         gui_img_translate(img, (float)x, 0);
     }
-    else
-    {
-        gui_img_set_image_data(img, DEFAULT_BIN);
-        gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
-        gui_obj_stop_timer(GUI_BASE(img));
-    }
 }
 
-static void tab_scale(void *obj)
-{
-    static uint8_t cnt = 0;
-    cnt++;
-    uint8_t cnt_max = 5;
-    gui_img_t *img = (gui_img_t *)obj;
-    float scale = 0.9f + 0.1f * cnt / (float)cnt_max;
-    gui_img_scale(img, scale, scale);
-    if (cnt >= cnt_max)
-    {
-        cnt = 0;
-        gui_obj_create_timer(GUI_BASE(img), 10, true, pressing_tab);
-    }
-}
-
-static void press_tab(void *obj, gui_event_t e, void *param)
+static void click_button_back(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-
-    gui_img_t *img = (gui_img_t *)obj;
-    gui_img_set_image_data(img, BUTTON_BG_CIRCLE_BIN);
-    gui_img_set_mode(img, IMG_2D_SW_FIX_A8_FG);
-    gui_img_scale(img, 0.9f, 0.9f);
-    gui_obj_create_timer(GUI_BASE(img), 10, true, tab_scale);
-    gui_obj_start_timer(GUI_BASE(img));
+    switch_from_lock_screen = false;
+    gui_view_switch_direct(current_view, descriptor_rec, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
 }
 
 static void lock_view_design(gui_view_t *view)
 {
     gui_obj_t *parent = GUI_BASE(view);
-    gui_set_bg_color(SCREEN_BG_DARK);
-    gui_img_t *bg = gui_img_create_from_mem(parent, "bg", LOCK_SCROLLBAR_BG_BIN, 17, TAB_START_POS_Y, 0,
-                                            0);
-    gui_img_set_mode(bg, IMG_BYPASS_MODE);
 
-    int16_t focus = 40;
-    gui_img_t *tab_bg = gui_img_create_from_mem(parent, "tab_bg", DEFAULT_BIN, TAB_START_POS_X + focus,
-                                                TAB_START_POS_Y + focus, 0, 0);
-    gui_img_set_focus(tab_bg, focus, focus);
-    gui_img_set_mode(tab_bg, IMG_2D_SW_SRC_OVER_MODE);
-    gui_obj_add_event_cb(tab_bg, press_tab, GUI_EVENT_TOUCH_PRESSED, NULL);
+    void *img_data;
+    switch (wallpaper_index)
+    {
+    case 0:
+        img_data = WALLPAPER_1_BIN;
+        break;
+    case 1:
+        img_data = WALLPAPER_2_BIN;
+        break;
+    case 2:
+        img_data = WALLPAPER_3_BIN;
+        break;
+    case 3:
+        img_data = WALLPAPER_4_BIN;
+        break;
+    case 4:
+        img_data = WALLPAPER_5_BIN;
+        break;
+    default:
+        img_data = WALLPAPER_1_BIN;
+        break;
+    }
+    gui_img_t *wallpaper = gui_img_create_from_mem(parent, 0, img_data, 0, 0, 0, 0);
+    gui_img_set_mode(wallpaper, IMG_BYPASS_MODE);
 
-    gui_img_t *unlock = gui_img_create_from_mem(parent, 0, ICON_UNLOCK_BIN, 246, 82, 0, 0);
-    gui_img_a8_recolor(unlock, GUI_COLOR_ARGB8888(255, 0x05, 0x5B, 0x90));
+    if (switch_from_lock_screen)
+    {
+        descriptor_rec = gui_view_get_current()->descriptor;
+        gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(view, 0, 0, 0, 52, 52);
+        gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 0, 0, 0);
+        gui_obj_add_event_cb(win_icon_back, click_button_back, GUI_EVENT_TOUCH_CLICKED, NULL);
+        if (theme_bg_white)
+        {
+            gui_img_a8_recolor(icon_back, FG_1_LIGHT.color.argb_full);
+        }
+        else
+        {
+            gui_img_a8_recolor(icon_back, FG_1_DARK.color.argb_full);
+        }
+    }
+    else
+    {
+        bool theme_bg_rec = theme_bg_white;
+        theme_bg_white = false;
+        status_bar_design(parent);
+        theme_bg_white = theme_bg_rec;
+        if (!f_status.unlock_slider)
+        {
+            gui_view_switch_on_event(view, quick_view, SWITCH_OUT_NONE_ANIMATION,
+                                     SWITCH_IN_NONE_ANIMATION,
+                                     GUI_EVENT_TOUCH_CLICKED);
+            return;
+        }
+        else
+        {
+            gui_img_t *bg = gui_img_create_from_mem(parent, 0, BUTTON_BG_ELLIPSE_240_48_BIN, 40, 128, 0, 0);
+            gui_img_a8_recolor(bg, 0xFFFFFF);
+            gui_img_a8_mix_alpha(bg, 51);
+            gui_img_t *unlock = gui_img_create_from_mem(bg, 0, ICON_UNLOCK_BIN, 192, 7, 0, 0);
+            gui_img_a8_recolor(unlock, 0xFFFFFF);
+            gui_img_a8_mix_alpha(unlock, 153);
+            gui_img_t *tab = gui_img_create_from_mem(bg, 0, ICON_LOCK_TAB_BIN, 0, 0, 0, 0);
+            gui_img_set_mode(tab, IMG_2D_SW_SRC_OVER_MODE);
+            gui_obj_create_timer(GUI_BASE(tab), 10, true, pressing_tab);
+            gui_obj_start_timer(GUI_BASE(tab));
+        }
+    }
 }

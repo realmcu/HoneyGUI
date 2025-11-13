@@ -68,6 +68,6 @@ static void wallpaper_view_design(gui_view_t *view)
                              SWITCH_IN_NONE_ANIMATION, GUI_EVENT_TOUCH_CLICKED);
 
     gui_obj_t *parent = GUI_BASE(view);
-    gui_img_t *img = gui_img_create_from_mem(parent, 0, WALLPAPER_BIN, 0, 0, 0, 0);
+    gui_img_t *img = gui_img_create_from_mem(parent, 0, WALLPAPER_1_BIN, 0, 0, 0, 0);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
 }

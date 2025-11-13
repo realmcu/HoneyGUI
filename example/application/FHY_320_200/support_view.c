@@ -155,7 +155,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_2_FG_BLACK_BIN;
+                img_data = TIP_2_FG_DARK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 30, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -176,7 +176,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_3_FG_BLACK_BIN;
+                img_data = TIP_3_FG_DARK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 10, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -197,7 +197,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_4_FG_BLACK_BIN;
+                img_data = TIP_4_FG_DARK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 10, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
@@ -218,7 +218,7 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             else
             {
                 font_color = FG_1_DARK;
-                img_data = TIP_5_FG_BLACK_BIN;
+                img_data = TIP_5_FG_DARK_BIN;
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 24, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);

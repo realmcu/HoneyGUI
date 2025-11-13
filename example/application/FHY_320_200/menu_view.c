@@ -204,8 +204,8 @@ static void menu_view_design(gui_view_t *view)
         font_color = FG_1_DARK;
     }
     gui_text_t *title = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);
-    gui_text_set(title, "Menu", GUI_FONT_SRC_BMP, font_color, 4, 20);
-    gui_text_type_set(title, HEADING_1_BIN, FONT_SRC_MEMADDR);
+    gui_text_set(title, "Menu", GUI_FONT_SRC_BMP, font_color, 4, 30);
+    gui_text_type_set(title, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 
     int16_t focus = 0;

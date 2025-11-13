@@ -101,8 +101,8 @@ const char *page_name_array[35] =
     "Message Preview"
 };
 
-/* Clock style */
-int8_t clock_style = 0; // [0, 4]
+/* Lock screen */
+int8_t wallpaper_index = 0; // [0, 4]
 bool switch_from_lock_screen = false;
 
 /* Theme color */
