@@ -13,6 +13,7 @@
 #include "gui_view.h"
 #include "app_main_watch.h"
 #include "gui_list.h"
+#include "gui_view_instance.h"
 
 /*============================================================================*
  *                            Macros
@@ -42,16 +43,7 @@ extern void activity_stand_design(gui_obj_t *obj);
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = activity_design,
-    .on_switch_out = clear_activity,
-};
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, activity_design, clear_activity);
 
 extern char *cjson_content;
 static uint8_t *img_ring_data = NULL;
@@ -77,25 +69,11 @@ gui_img_t *img_icon0 = NULL;
 gui_img_t *img_icon1 = NULL;
 gui_img_t *img_icon2 = NULL;
 bool ring_flag_enter;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_activity(gui_view_t *view)
 {
@@ -217,11 +195,11 @@ void drawCircles_cb(NVGcontext *vg)
 static void activity_timer_cb(void *obj)
 {
     GUI_UNUSED(obj);
-    if (current_view->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
-        gui_view_get_next() != NULL)
-    {
-        return;
-    }
+    // if (current_view->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
+    //     gui_view_get_next() != NULL)
+    // {
+    //     return;
+    // }
 
     gui_obj_timer_t *timer = img_ring->base.timer;
 
@@ -400,7 +378,7 @@ static void note_design(gui_obj_t *obj, void *p)
 static void activity_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"), SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 

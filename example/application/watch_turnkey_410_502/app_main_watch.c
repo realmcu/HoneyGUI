@@ -36,7 +36,7 @@ static void inform_generate_cb(void);
 /* VIEW */
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-// const static gui_view_descriptor_t *control_view = NULL;
+const static gui_view_descriptor_t *watchface_select_view = NULL;
 const static gui_view_descriptor_t *bottom_view = NULL;
 const static gui_view_descriptor_t *top_view = NULL;
 static gui_view_descriptor_t const descriptor =
@@ -110,9 +110,9 @@ static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
     menu_view = gui_view_descriptor_get("menu_view");
-    // control_view = gui_view_descriptor_get("control_view");
+    watchface_select_view = gui_view_descriptor_get("watchface_select_view");
     bottom_view = gui_view_descriptor_get("bottom_view");
-    top_view = gui_view_descriptor_get("top_view");
+    top_view = gui_view_descriptor_get("app_top_view");
     gui_log("File: %s, Function: %s\n", __FILE__, __func__);
     return 0;
 }
@@ -358,9 +358,9 @@ static void app_main_watch_ui_design(gui_view_t *view)
     gui_view_switch_on_event(view, top_view, SWITCH_OUT_STILL_USE_BLUR,
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-    // gui_view_switch_on_event(view, control_view, SWITCH_OUT_TO_RIGHT_USE_ROTATE,
-    //                          SWITCH_IN_FROM_LEFT_USE_ROTATE,
-    //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
+    gui_view_switch_on_event(view, watchface_select_view, SWITCH_OUT_ANIMATION_ZOOM,
+                             SWITCH_IN_ANIMATION_ZOOM,
+                             GUI_EVENT_TOUCH_LONG);
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);

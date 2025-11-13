@@ -116,7 +116,7 @@ static uint8_t *img_data_activity = NULL;
 static char *move_content = NULL;
 static char *ex_content = NULL;
 static char *stand_content = NULL;
-
+static int battery_level = 0;
 static gui_list_t *list = NULL;
 /*============================================================================*
  *                           Private Functions
@@ -269,7 +269,7 @@ static void switch_app_cb(void *obj)
     //     gui_view_switch_direct(current_view, app_music_view, SWITCH_OUT_ANIMATION_FADE,
     //                            SWITCH_IN_ANIMATION_FADE);
     // }
-    // else if (strcmp(obj_name, "SPORT") == 0)
+    // else if (strcmp(obj_name, "CHARGE") == 0)
     // {
     //     gui_view_switch_direct(current_view, app_sport_view, SWITCH_OUT_ANIMATION_FADE,
     //                            SWITCH_IN_ANIMATION_FADE);
@@ -381,6 +381,52 @@ static void arc_activity_cb(NVGcontext *vg)
     // clear
     cJSON_Delete(root);
 }
+static void draw_battery_arc(NVGcontext *vg)
+{
+    float cx = 45.0f;
+    float cy = 45.0f;
+    float outer_radius = 39.6f;
+    float inner_radius = 32.4f;
+    float stroke_width = 7.2f;
+    battery_level = 75;
+
+    nvgBeginPath(vg);
+    nvgCircle(vg, cx, cy, outer_radius);
+    nvgFillColor(vg, nvgRGBA(50, 50, 50, 255));
+    nvgFill(vg);
+
+    nvgBeginPath(vg);
+    nvgCircle(vg, cx, cy, outer_radius);
+    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 255));
+    nvgStrokeWidth(vg, stroke_width);
+    nvgStroke(vg);
+
+    nvgBeginPath(vg);
+    nvgArc(vg, cx, cy, outer_radius - stroke_width / 2, 0, 2 * M_PI_F, NVG_CW);
+
+    nvgStrokeColor(vg, battery_level < 10 ? nvgRGBA(255, 0, 0, 80) : nvgRGBA(0, 200, 0, 80));
+    nvgStrokeWidth(vg, stroke_width);
+    nvgStroke(vg);
+
+    float start_angle = -M_PI_F / 2;
+    float sweep_angle = (battery_level / 100.0f) * 2 * M_PI_F;
+
+    nvgBeginPath(vg);
+    nvgArc(vg, cx, cy, outer_radius - stroke_width / 2, start_angle, start_angle + sweep_angle, NVG_CW);
+
+
+    if (battery_level < 10.0f)
+    {
+        nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 255));
+    }
+    else
+    {
+        nvgStrokeColor(vg, nvgRGBA(0, 200, 0, 255));
+    }
+
+    nvgStrokeWidth(vg, stroke_width);
+    nvgStroke(vg);
+}
 static void note_design(gui_obj_t *obj, void *p)
 {
     (void)p;
@@ -466,10 +512,57 @@ static void note_design(gui_obj_t *obj, void *p)
                                                  0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_img_scale(img, 0.7, 0.7);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-        img = gui_img_create_from_mem(canvas_app, "SPORT", APP_STORE_ICON_BIN, 17 + 109, 28, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_scale(img, 0.7, 0.7);
+
+
+        {
+            battery_level = 75;
+
+            int image_h = 100;
+            int image_w = 100;
+            int pixel_bytes = 4;
+            size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
+
+            uint8_t *img_data_battery = NULL;
+
+
+            if (!img_data_battery)
+            {
+                img_data_battery = gui_lower_malloc(buffer_size);
+            }
+            memset(img_data_battery, 0, buffer_size);
+
+
+
+            gui_img_t *img_battery = gui_img_create_from_mem(canvas_app, "battery", img_data_battery, 17 + 109,
+                                                             28, 0, 0);
+
+            img_battery->base.w = image_w;
+            img_battery->base.h = image_h;
+
+            gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, draw_battery_arc,
+                                              img_data_battery);
+            gui_img_set_mode(img_battery, IMG_SRC_OVER_MODE);
+
+            char battery_content[3];
+
+            sprintf(battery_content, "%d", battery_level);
+
+            gui_text_t *battery_text = gui_text_create(canvas_app, "battery", 145, 42, 0, 0);
+            gui_text_set(battery_text, "75", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(battery_content), 50);
+            gui_text_type_set(battery_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
+            gui_text_mode_set(battery_text, LEFT);
+
+
+
+            gui_obj_add_event_cb(img_battery, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        }
+
+        // img = gui_img_create_from_mem(canvas_app, "CHARGE", APP_STORE_ICON_BIN, 17 + 109, 28, 0, 0);
+
+
+
+
+
         gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         img = gui_img_create_from_mem(canvas_app, "MESSAGE", APP_MESSAGE_ICON_BIN, 17 + 109 * 2, 28, 0,
                                       0);
