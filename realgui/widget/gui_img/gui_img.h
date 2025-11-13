@@ -66,7 +66,6 @@ typedef struct gui_img
     gd_GIF *gif;                        /* GIF data */
     uint32_t fg_color_set;  //A8 image set color
     uint32_t bg_color_fix;  //bg color fix for A8 image
-    uint8_t alpha_mix;      //alpha mix for A8 image
 
     uint32_t opacity_value : 8;        /* Opacity value (0-255). */
     uint32_t blend_mode    : 5;        /* Blend mode. */

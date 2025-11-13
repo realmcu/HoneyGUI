@@ -52,7 +52,6 @@ extern "C" {
     int16_t x2 = (dc)->section.x2; GUI_UNUSED(x2);                                                                    \
     uint32_t fg = uint32_to_rgb565(image->fg_color_set); GUI_UNUSED(fg);                                              \
     uint32_t bg = uint32_to_rgb565(image->bg_color_fix); GUI_UNUSED(bg);                                              \
-    uint8_t mix_alpha = (image)->alpha_mix; GUI_UNUSED(mix_alpha);                                                             \
     uint8_t opacity_value = (image)->opacity_value; GUI_UNUSED(opacity_value);
 
 

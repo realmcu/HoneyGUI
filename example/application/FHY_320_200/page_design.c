@@ -2008,7 +2008,7 @@ static void win_timer_page_volume_unit_meter(void *obj)
 static void disconnect_timer_page_audio_source(void *obj)
 {
     gui_obj_t *icon = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
-    uint8_t alpha = ((gui_img_t *)icon)->alpha_mix;
+    uint8_t alpha = ((gui_img_t *)icon)->opacity_value;
     alpha = alpha < 75 ? 255 : alpha - 10;
     gui_img_a8_mix_alpha((void *)icon, alpha);
 
@@ -2085,7 +2085,7 @@ static void connect_timer_page_audio_source(void *obj)
 {
     gui_obj_t *win = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
     gui_obj_t *icon = gui_list_entry(win->child_list.next, gui_obj_t, brother_list);
-    uint8_t alpha = ((gui_img_t *)icon)->alpha_mix;
+    uint8_t alpha = ((gui_img_t *)icon)->opacity_value;
     alpha = alpha >= 255 ? 75 : alpha + 10;
     gui_img_a8_mix_alpha((void *)icon, alpha);
 
@@ -2247,7 +2247,7 @@ static void scan_timer_page_audio_source(void *obj)
 static void delete_timer_page_audio_source(void *obj)
 {
     gui_obj_t *icon = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
-    uint8_t alpha = ((gui_img_t *)icon)->alpha_mix;
+    uint8_t alpha = ((gui_img_t *)icon)->opacity_value;
     alpha = alpha <= 75 ? 255 : alpha - 10;
     gui_img_a8_mix_alpha((void *)icon, alpha);
 
@@ -2281,7 +2281,7 @@ static void delete_timer_page_audio_source(void *obj)
 static void delete_timer_page_tx_management(void *obj)
 {
     gui_obj_t *icon = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
-    uint8_t alpha = ((gui_img_t *)icon)->alpha_mix;
+    uint8_t alpha = ((gui_img_t *)icon)->opacity_value;
     alpha = alpha <= 75 ? 255 : alpha - 10;
     gui_img_a8_mix_alpha((void *)icon, alpha);
 
@@ -2315,7 +2315,7 @@ static void delete_timer_page_tx_management(void *obj)
 static void disconnect_timer_page_tx_management(void *obj)
 {
     gui_obj_t *icon = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
-    uint8_t alpha = ((gui_img_t *)icon)->alpha_mix;
+    uint8_t alpha = ((gui_img_t *)icon)->opacity_value;
     alpha = alpha < 75 ? 255 : alpha - 10;
     gui_img_a8_mix_alpha((void *)icon, alpha);
 
@@ -2348,7 +2348,7 @@ static void connect_timer_page_tx_management(void *obj)
 {
     gui_obj_t *win = gui_list_entry(GUI_BASE(obj)->child_list.prev, gui_obj_t, brother_list);
     gui_obj_t *icon = gui_list_entry(win->child_list.next, gui_obj_t, brother_list);
-    uint8_t alpha = ((gui_img_t *)icon)->alpha_mix;
+    uint8_t alpha = ((gui_img_t *)icon)->opacity_value;
     alpha = alpha >= 255 ? 75 : alpha + 10;
     gui_img_a8_mix_alpha((void *)icon, alpha);
 

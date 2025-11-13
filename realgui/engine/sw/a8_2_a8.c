@@ -40,8 +40,6 @@ static void a8_2_a8_1d_filter(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *
 {
     SETUP_DRAW_VARIABLES;
 
-    opacity_value = _UI_UDIV255(opacity_value * image->alpha_mix);
-
     if (opacity_value == 0)
     {
         return;// fully transparent, nothing to draw
@@ -75,8 +73,6 @@ static void a8_2_a8_1d_filter(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *
 static void a8_2_a8_1d_source_over(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
     SETUP_DRAW_VARIABLES;
-
-    opacity_value = _UI_UDIV255(image->opacity_value * image->alpha_mix);
 
     if (opacity_value == 0)
     {

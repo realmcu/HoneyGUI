@@ -91,7 +91,6 @@ static void gui_img_prepare(gui_obj_t *obj)
     _this->draw_img->opacity_value = obj->parent->opacity_value * _this->opacity_value / UINT8_MAX;
     _this->draw_img->fg_color_set = _this->fg_color_set;
     _this->draw_img->bg_color_fix = _this->bg_color_fix;
-    _this->draw_img->alpha_mix = _this->alpha_mix;
 
 
     gui_obj_enable_event(obj, GUI_EVENT_TOUCH_PRESSED);
@@ -352,7 +351,6 @@ static void gui_img_ctor(gui_img_t            *_this,
     _this->need_clip = false;
     _this->fg_color_set = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
     _this->bg_color_fix = GUI_COLOR_ARGB8888(0xFF, 0xFF, 0xFF, 0xFF);
-    _this->alpha_mix = 255;
 
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
@@ -736,6 +734,6 @@ void gui_img_a8_fix_bg(gui_img_t *_this, uint32_t bg_color_fix)
 
 void gui_img_a8_mix_alpha(gui_img_t *_this, uint32_t alpha_mix)
 {
-    _this->alpha_mix = alpha_mix;
+    _this->opacity_value = alpha_mix;
 }
 
