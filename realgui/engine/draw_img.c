@@ -262,7 +262,7 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
             image->data = gui_acc_jpeg_load(jpeg->jpeg, jpeg->size, &w, &h, &channel);
             image->img_w = w;
             image->img_h = h;
-            gui_log("JPEG image caching is not supported.\n");
+            //gui_log("JPEG image caching is not supported.\n");
             return;
         }
         else if (head->compress)
