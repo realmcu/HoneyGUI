@@ -712,21 +712,21 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     g3m_node_on_disk_t *nodes_on_disk = NULL;
     g3m_mesh_on_disk_t *meshes_on_disk = NULL;
     g3m_primitive_on_disk_t *primitives_on_disk = NULL;
-    g3m_material_on_disk_t *materials_on_disk = NULL;
-    g3m_texture_on_disk_t *textures_on_disk = NULL;
     g3m_skin_on_disk_t *skin_on_disk = NULL;
     g3m_channel_on_disk_t *channels_on_disk = NULL;
     g3m_sampler_on_disk_t *samplers_on_disk = NULL;
+    g3m_material_on_disk_t *materials_on_disk = NULL;
+    g3m_texture_on_disk_t *textures_on_disk = NULL;
 
     // 1. Basic statistical information
     g3m_header_t header = {0};
     header.scene_root_count = model->scene_root_count;
     header.node_count = model->node_count;
     header.mesh_count = model->mesh_count;
-    header.material_count = model->material_count;
     header.skin_count = model->skin_count;
     header.channel_count = model->animation->channel_count;
     header.sampler_count = model->animation->sampler_count;
+    header.material_count = model->material_count;
 
     // Primitive count
     header.primitive_count = 0;
@@ -747,23 +747,22 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
 
     // 2. Allocate on-disk arrays
     scene_roots_on_disk = (int *)malloc(sizeof(int) * header.scene_root_count);
-    nodes_on_disk = (g3m_node_on_disk_t *)malloc(sizeof(g3m_node_on_disk_t) * header.node_count);
-    meshes_on_disk = (g3m_mesh_on_disk_t *)malloc(sizeof(g3m_mesh_on_disk_t) * header.mesh_count);
-    primitives_on_disk = (g3m_primitive_on_disk_t *)malloc(sizeof(g3m_primitive_on_disk_t) *
-                                                           header.primitive_count);
-    materials_on_disk = (g3m_material_on_disk_t *)malloc(sizeof(g3m_material_on_disk_t) *
-                                                         header.material_count);
-    textures_on_disk = (g3m_texture_on_disk_t *)malloc(sizeof(g3m_texture_on_disk_t) *
-                                                       header.texture_count);
-    skin_on_disk = (g3m_skin_on_disk_t *)malloc(sizeof(g3m_skin_on_disk_t) * header.skin_count);
-    channels_on_disk = (g3m_channel_on_disk_t *)malloc(sizeof(g3m_channel_on_disk_t) *
-                                                       header.channel_count);
-    samplers_on_disk = (g3m_sampler_on_disk_t *)malloc(sizeof(g3m_sampler_on_disk_t) *
-                                                       header.sampler_count);
+    nodes_on_disk       = (g3m_node_on_disk_t *)malloc(sizeof(g3m_node_on_disk_t) * header.node_count);
+    meshes_on_disk      = (g3m_mesh_on_disk_t *)malloc(sizeof(g3m_mesh_on_disk_t) * header.mesh_count);
+    primitives_on_disk  = (g3m_primitive_on_disk_t *)malloc(sizeof(g3m_primitive_on_disk_t) *
+                                                            header.primitive_count);
+    skin_on_disk        = (g3m_skin_on_disk_t *)malloc(sizeof(g3m_skin_on_disk_t) * header.skin_count);
+    channels_on_disk    = (g3m_channel_on_disk_t *)malloc(sizeof(g3m_channel_on_disk_t) *
+                                                          header.channel_count);
+    samplers_on_disk    = (g3m_sampler_on_disk_t *)malloc(sizeof(g3m_sampler_on_disk_t) *
+                                                          header.sampler_count);
+    materials_on_disk   = (g3m_material_on_disk_t *)malloc(sizeof(g3m_material_on_disk_t) *
+                                                           header.material_count);
+    textures_on_disk    = (g3m_texture_on_disk_t *)malloc(sizeof(g3m_texture_on_disk_t) *
+                                                          header.texture_count);
 
-
-    if (!nodes_on_disk || !meshes_on_disk || !materials_on_disk || !primitives_on_disk ||
-        !scene_roots_on_disk || !textures_on_disk)
+    if (!scene_roots_on_disk || !nodes_on_disk || !meshes_on_disk || !primitives_on_disk ||
+        !skin_on_disk || !channels_on_disk || !samplers_on_disk || !materials_on_disk || !textures_on_disk)
     {
         fprintf(stderr, "Error: Memory allocation failed for on-disk arrays.\n");
         goto cleanup;
@@ -810,27 +809,6 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
             dst_prim->triangles_offset = append_to_blob(&blob, src_prim->triangles, triangles_size);
 
             primitive_index++;
-        }
-    }
-
-    // Materials
-    uint32_t texture_index = 0;
-    for (uint32_t i = 0; i < model->material_count; ++i)
-    {
-        memcpy(materials_on_disk[i].base_color, model->materials[i].base_color, sizeof(uint8_t) * 4);
-
-        if (model->materials[i].texture_data != NULL)
-        {
-            materials_on_disk[i].texture_index = texture_index;
-            textures_on_disk[texture_index].data_size = model->materials[i].texture_length;
-
-            textures_on_disk[texture_index].data_offset = append_to_blob(&blob,
-                                                                         model->materials[i].texture_data, model->materials[i].texture_length);
-            texture_index++;
-        }
-        else
-        {
-            materials_on_disk[i].texture_index = -1;
         }
     }
 
@@ -899,6 +877,27 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
         dst_sampler->output_type = (uint32_t)src_sampler->output_type;
     }
 
+    // Materials
+    uint32_t texture_index = 0;
+    for (uint32_t i = 0; i < model->material_count; ++i)
+    {
+        memcpy(materials_on_disk[i].base_color, model->materials[i].base_color, sizeof(uint8_t) * 4);
+
+        if (model->materials[i].texture_data != NULL)
+        {
+            materials_on_disk[i].texture_index = texture_index;
+            textures_on_disk[texture_index].data_size = model->materials[i].texture_length;
+
+            textures_on_disk[texture_index].data_offset = append_to_blob(&blob,
+                                                                         model->materials[i].texture_data, model->materials[i].texture_length);
+            texture_index++;
+        }
+        else
+        {
+            materials_on_disk[i].texture_index = -1;
+        }
+    }
+
     // --- Phase 2: Calculate the layout and write it to the file ---
 
     // Calculate the absolute offsets of each data block
@@ -916,12 +915,6 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     header.primitives_offset = current_offset;
     current_offset += sizeof(g3m_primitive_on_disk_t) * header.primitive_count;
 
-    header.materials_offset = current_offset;
-    current_offset += sizeof(g3m_material_on_disk_t) * header.material_count;
-
-    header.textures_offset = current_offset;
-    current_offset += sizeof(g3m_texture_on_disk_t) * header.texture_count ;
-
     header.skins_offset = current_offset;
     current_offset += sizeof(g3m_skin_on_disk_t) * header.skin_count;
 
@@ -931,6 +924,12 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     header.samplers_offset = current_offset;
     current_offset += sizeof(g3m_sampler_on_disk_t) * header.sampler_count;
 
+    header.materials_offset = current_offset;
+    current_offset += sizeof(g3m_material_on_disk_t) * header.material_count;
+
+    header.textures_offset = current_offset;
+    current_offset += sizeof(g3m_texture_on_disk_t) * header.texture_count;
+
 
     header.data_blob_offset = current_offset;
     header.data_blob_size = (uint32_t)blob.size;
@@ -939,25 +938,25 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     fwrite(&header, sizeof(g3m_header_t), 1,
            fp);                                            // 1. Header
     fwrite(scene_roots_on_disk, sizeof(int), header.scene_root_count,
-           fp);                   // 2. Scene Root Nodes
+           fp);                                           // 2. Scene Root Nodes
     fwrite(nodes_on_disk, sizeof(g3m_node_on_disk_t), header.node_count,
-           fp);                // 3. Node Data
+           fp);                                           // 3. Node Data
     fwrite(meshes_on_disk, sizeof(g3m_mesh_on_disk_t), header.mesh_count,
-           fp);               // 4. Mesh Data
+           fp);                                           // 4. Mesh Data
     fwrite(primitives_on_disk, sizeof(g3m_primitive_on_disk_t), header.primitive_count,
-           fp); // 5. Primitive Data
-    fwrite(materials_on_disk, sizeof(g3m_material_on_disk_t), header.material_count,
-           fp);    // 6. Material Data
-    fwrite(textures_on_disk, sizeof(g3m_texture_on_disk_t), header.texture_count,
-           fp);       // 7. Texture Data
+           fp);                                           // 5. Primitive Data
     fwrite(skin_on_disk, sizeof(g3m_skin_on_disk_t), header.skin_count,
-           fp);                 // 8. Skin Data
+           fp);                                           // 6. Skin Data
     fwrite(channels_on_disk, sizeof(g3m_channel_on_disk_t), header.channel_count,
-           fp);       // 9. Animation Channel Data
+           fp);                                           // 7. Animation Channel Data
     fwrite(samplers_on_disk, sizeof(g3m_sampler_on_disk_t), header.sampler_count,
-           fp);       // 10. Animation Sampler Data
+           fp);                                           // 8. Animation Sampler Data
+    fwrite(materials_on_disk, sizeof(g3m_material_on_disk_t), header.material_count,
+           fp);                                           // 9. Material Data
+    fwrite(textures_on_disk, sizeof(g3m_texture_on_disk_t), header.texture_count,
+           fp);                                           // 10. Texture Data
     fwrite(blob.data, 1, blob.size,
-           fp);                                                     // 11. Data Blob
+           fp);                                           // 11. Data Blob
 
     printf("Successfully saved model to %s\n", filename);
     printf("----------------------------------\n");
@@ -965,27 +964,29 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     printf("Node Count:          %u \n", header.node_count);
     printf("Mesh Count:          %u \n", header.mesh_count);
     printf("Primitive Count:     %u \n", header.primitive_count);
-    printf("Material Count:      %u \n", header.material_count);
-    printf("Texture Count:       %u \n", header.texture_count);
     printf("Skin Count:          %u \n", header.skin_count);
     printf("Channel Count:       %u \n", header.channel_count);
     printf("Sampler Count:       %u \n", header.sampler_count);
+    printf("Material Count:      %u \n", header.material_count);
+    printf("Texture Count:       %u \n", header.texture_count);
     printf("Triangle Count:      %d \n", total_triangle_count);
+
     printf("Header Size:         %zu bytes\n", sizeof(g3m_header_t));
     printf("Nodes Array Size:    %zu bytes\n", sizeof(g3m_node_on_disk_t) * header.node_count);
     printf("Meshes Array Size:   %zu bytes\n", sizeof(g3m_mesh_on_disk_t) * header.mesh_count);
     printf("Primitives Array Size:%zu bytes\n",
            sizeof(g3m_primitive_on_disk_t) * header.primitive_count);
-    printf("Materials Array Size:%zu bytes\n", sizeof(g3m_material_on_disk_t) * header.material_count);
-    printf("Textures Array Size:%zu bytes\n", sizeof(g3m_texture_on_disk_t) * header.texture_count);
     printf("Skins Array Size:    %zu bytes\n", sizeof(g3m_skin_on_disk_t) * header.skin_count);
     printf("Channels Array Size: %zu bytes\n", sizeof(g3m_channel_on_disk_t) * header.channel_count);
     printf("Samplers Array Size: %zu bytes\n", sizeof(g3m_sampler_on_disk_t) * header.sampler_count);
+    printf("Materials Array Size:%zu bytes\n", sizeof(g3m_material_on_disk_t) * header.material_count);
+    printf("Textures Array Size:%zu bytes\n", sizeof(g3m_texture_on_disk_t) * header.texture_count);
     printf("Data Blob Size:      %zu bytes\n", blob.size);
     printf("Total File Size:     %ld bytes\n", ftell(fp));
     printf("----------------------------------\n");
 
     fclose(fp);
+    blob_free(&blob);
 
     return true;
 
@@ -996,6 +997,9 @@ cleanup:
     if (nodes_on_disk) { free(nodes_on_disk); }
     if (meshes_on_disk) { free(meshes_on_disk); }
     if (primitives_on_disk) { free(primitives_on_disk); }
+    if (skin_on_disk) { free(skin_on_disk); }
+    if (channels_on_disk) { free(channels_on_disk); }
+    if (samplers_on_disk) { free(samplers_on_disk); }
     if (materials_on_disk) { free(materials_on_disk); }
     if (textures_on_disk) { free(textures_on_disk); }
     return false;
@@ -1046,7 +1050,8 @@ void binary_to_txt_array(const char *binary_filename, const char *txt_filename)
     char *array_name = (char *)malloc(array_name_size);
     snprintf(array_name, array_name_size, "_ac%s", base_name);
 
-    fprintf(txt_file, "static const unsigned char %s[%ld] = {", array_name, file_size);
+    fprintf(txt_file, "__attribute__((aligned(4))) static const unsigned char %s[%ld] = {", array_name,
+            file_size);
     for (long i = 0; i < file_size; i++)
     {
         if (i % 40 == 0)

@@ -56,23 +56,22 @@ typedef struct
     uint32_t node_count;
     uint32_t mesh_count;
     uint32_t primitive_count;
-    uint32_t material_count;
-    uint32_t texture_count;
-
     uint32_t skin_count;
     uint32_t channel_count;
     uint32_t sampler_count;
+    uint32_t material_count;
+    uint32_t texture_count;
 
     // Offset
     uint32_t scene_roots_offset;
     uint32_t nodes_offset;
     uint32_t meshes_offset;
     uint32_t primitives_offset;
-    uint32_t materials_offset;
-    uint32_t textures_offset;
     uint32_t skins_offset;
     uint32_t channels_offset;
     uint32_t samplers_offset;
+    uint32_t materials_offset;
+    uint32_t textures_offset;
 
     // Data blob
     uint32_t data_blob_offset;
@@ -252,14 +251,14 @@ typedef struct
 
 typedef struct
 {
-    gltf_interpolation_type_t interpolation;
-
     float *input_data;
     uint32_t input_count;
 
     // Output: Translation, Rotation, Scale
     float *output_data;
     uint32_t output_count;
+
+    gltf_interpolation_type_t interpolation;
     gltf_data_type output_type;  // Vec3: N*3 float, Vec4: N*4 float
 } l3_gltf_sampler_t;
 

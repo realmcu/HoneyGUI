@@ -324,7 +324,8 @@ void binary_to_txt_array(const char *binary_filename, const char *txt_filename)
     strncat(array_name, base_name, length);
     array_name[length + 3] = '\0';
 
-    fprintf(txt_file, "static const unsigned char %s[%ld] = {", array_name, file_size);
+    fprintf(txt_file, "__attribute__((aligned(4))) static const unsigned char %s[%ld] = {", array_name,
+            file_size);
     for (long i = 0; i < file_size; i++)
     {
         if (i % 40 == 0)

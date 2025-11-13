@@ -39,11 +39,13 @@ static void earth_global_cb(l3_model_t *this)
 
 static int app_init(void)
 {
+    gui_dispdev_t *dc = gui_get_dc();
 #if 1
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_ONLY, 0, 46, 410, 410);
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_ONLY, 0, 0, dc->screen_width,
+                                           dc->screen_height);
 #else
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_no_mtl, L3_DRAW_FRONT_ONLY, 0, 46, 410,
-                                           410);
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_no_mtl, L3_DRAW_FRONT_ONLY, 0, 0,
+                                           dc->screen_width, dc->screen_height);
 #endif
 
     l3_set_global_transform(earth_3d, (l3_global_transform_cb)earth_global_cb);

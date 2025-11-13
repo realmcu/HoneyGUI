@@ -28,18 +28,21 @@ static void update_pikachu_animation(void *param)
 
 static void pikachu_global_cb(l3_gltf_model_t *this)
 {
-    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 40), 1,
+    l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 1), 1,
                              32767,
                              90, this->viewPortWidth, this->viewPortHeight);
 
-    l3_world_initialize(&this->world, 0, 5, 40, 90, -30 + rot_angle, 0, 5);
+    l3_world_initialize(&this->world, 0, 10, 28, 90, -30 + rot_angle, 0, 5);
 }
 
 
 static int app_init(void)
 {
-    l3_gltf_model_t *pikachu_3d = l3_create_gltf_model((void *)_acgltf_desc, LITE_RGB565, 0, 0, 410,
-                                                       502);
+    gui_dispdev_t *dc = gui_get_dc();
+
+    l3_gltf_model_t *pikachu_3d = l3_create_gltf_model((void *)_acgltf_desc, LITE_RGB565, 0, 0,
+                                                       dc->screen_width,
+                                                       dc->screen_height);
 
     l3_gltf_set_global_transform(pikachu_3d, (l3_gltf_global_transform_cb)pikachu_global_cb);
 

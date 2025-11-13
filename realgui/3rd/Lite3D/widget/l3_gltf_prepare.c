@@ -64,8 +64,7 @@ static void slerp_quaternion(l3_4d_point_t *out, const l3_4d_point_t *start,
 
     l3_4d_point_t temp_end = *end;
 
-    // 如果 cos_half_theta < 0, 说明两个四元数夹角大于90度，
-    // 我们应该取 end 的相反数，走更短的路径。
+    // If the angle between two quaternions is greater than 90 degrees, take the opposite of end.
     if (cos_half_theta < 0.0f)
     {
         temp_end.x = -temp_end.x;
@@ -75,7 +74,7 @@ static void slerp_quaternion(l3_4d_point_t *out, const l3_4d_point_t *start,
         cos_half_theta = -cos_half_theta;
     }
 
-    // 如果两个四元数非常接近，直接使用线性插值以避免精度问题和除以零
+    // If two quaternions are very close, directly use linear interpolation.
     if (cos_half_theta > 0.9999f)
     {
         out->x = start->x + t * (temp_end.x - start->x);
@@ -86,7 +85,7 @@ static void slerp_quaternion(l3_4d_point_t *out, const l3_4d_point_t *start,
         return;
     }
 
-    // 标准 Slerp 公式
+    // Standard Slerp Formula
     float half_theta = acosf(cos_half_theta);
     float sin_half_theta = sqrtf(1.0f - cos_half_theta * cos_half_theta);
 
