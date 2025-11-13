@@ -83,7 +83,32 @@ static void argb8565_2_rgb565_2d_src_over(draw_img_t *image, gui_dispdev_t *dc, 
     }
 }
 
-
+static void argb8565_2_rgb565_3d_src_over(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 0)
+    {
+        return;// fully transparent, nothing to draw
+    }
+    else if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_argb8565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_argb8565_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(pixel->color.rgb565, writebuf[write_offset], pixel->a * opacity_value >> 8);
+        };
+        );
+    }
+}
 
 static void argb8565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
@@ -92,10 +117,7 @@ static void argb8565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_
 
 static void argb8565_2_rgb565_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-    GUI_UNUSED(image);
-    GUI_UNUSED(dc);
-    GUI_UNUSED(rect);
-    GUI_ASSERT(0);
+    argb8565_2_rgb565_3d_src_over(image, dc, rect);
 }
 
 

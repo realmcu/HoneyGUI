@@ -293,7 +293,6 @@ static void activity_design(gui_view_t *view)
     }
     memset(img_data, 0, buffer_size);
     img = gui_img_create_from_mem(obj, 0, (void *)img_data, SCREEN_WIDTH / 2 - RADIUS, 0, 0, 0);
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     gui_img_set_quality(img, true);
     draw_flag = 0;
 

@@ -103,6 +103,43 @@ extern "C" {
         }                                                                                                   \
     } while(0)
 
+#define PROCESS_IMAGE_PIXEL_3D(PIXEL_TYPE, PIXEL_ACTION)                                                    \
+    do {                                                                                                    \
+        float m20 = inverse->m[2][0];       \
+        float m21 = inverse->m[2][1];       \
+        float m22 = inverse->m[2][2];       \
+        for (int32_t i = y_start; i <= y_end; i++)                                                          \
+        {                                                                                                   \
+            float deltaX = m01 * i + m02;   \
+            float deltaY = m11 * i + m12;   \
+            float deltaZ = m21 * i + m22;   \
+            float X = m00 * x_start + deltaX;   \
+            float Y = m10 * x_start + deltaY;   \
+            float Z = m20 * x_start + deltaZ;   \
+            int write_off = (i - y1) * (x2 - x1 + 1) - x1;                                               \
+            \
+            for (int32_t j = x_start; j <= x_end; j++)                                                      \
+            {                                                                                               \
+                int x = (int)(X / Z); /*roundf(X / Z);*/    \
+                int y = (int)(Y / Z); /*roundf(Y / Z);*/    \
+                if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))                   \
+                {                                                                               \
+                    X += m00;   \
+                    Y += m10;   \
+                    Z += m20;   \
+                    continue;   \
+                }   \
+                int write_offset = write_off + j;                                                           \
+                int read_offset = y * source_w + x;                                                   \
+                X += m00; \
+                Y += m10; \
+                Z += m20; \
+                PIXEL_TYPE *pixel = (PIXEL_TYPE *)(uintptr_t)image_base + read_offset;               \
+                PIXEL_ACTION;                                                                               \
+            }                                                                                               \
+        }                                                                                                   \
+    } while(0)
+
 #define PROCESS_IMAGE_PIXEL_2D_WITH_2X2_ANTI_ALIASING(PIXEL_TYPE, PIXEL_ACTION)                             \
     do {                                                                                                    \
         for (int32_t i = y_start; i <= y_end; i++)                                                          \

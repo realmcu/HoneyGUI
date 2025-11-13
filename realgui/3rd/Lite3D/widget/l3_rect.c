@@ -58,7 +58,7 @@ static void __l3_push_rect_img_front(l3_model_t *this)
 
         this->img[i].img_w = width;
         this->img[i].img_h = height;
-        this->img[i].blend_mode = L3_IMG_SRC_OVER_MODE;
+        this->img[i].blend_mode = (head->type == LITE_RGB565) ? L3_IMG_FILTER_BLACK : L3_IMG_SRC_OVER_MODE;
         this->img[i].high_quality = true;
         this->img[i].opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
 
@@ -94,7 +94,7 @@ static void __l3_push_rect_img_front_and_back(l3_model_t *this)
 
         this->img[i].img_w = width;
         this->img[i].img_h = height;
-        this->img[i].blend_mode = L3_IMG_SRC_OVER_MODE;
+        this->img[i].blend_mode = (head->type == LITE_RGB565) ? L3_IMG_FILTER_BLACK : L3_IMG_SRC_OVER_MODE;
         this->img[i].high_quality = true;
         this->img[i].opacity_value = this->desc->materials[material_id].dissolve * UINT8_MAX;
 

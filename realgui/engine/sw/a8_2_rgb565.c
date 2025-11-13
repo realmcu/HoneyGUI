@@ -180,6 +180,59 @@ static void a8_2_rgb565_2d_use_bg_with_aa(draw_img_t *image, gui_dispdev_t *dc, 
     }
 }
 
+static void a8_2_rgb565_3d_fix_bg(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 0)
+    {
+        return;// fully transparent, nothing to draw
+    }
+    else if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_a8_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(fg, bg, pixel->a);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_a8_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(fg, bg, pixel->a * opacity_value >> 8);
+        };
+        );
+    }
+}
+
+static void a8_2_rgb565_3d_use_bg(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
+{
+    SETUP_DRAW_VARIABLES;
+    if (opacity_value == 0)
+    {
+        return;// fully transparent, nothing to draw
+    }
+    else if (opacity_value == 255)
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_a8_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(fg, writebuf[write_offset], pixel->a);
+        };
+        );
+    }
+    else
+    {
+        PROCESS_IMAGE_PIXEL_3D(
+            color_a8_t,
+        {
+            writebuf[write_offset] = rgb565_fast_blending(fg, writebuf[write_offset], pixel->a * opacity_value >> 8);
+        };
+        );
+    }
+}
 
 
 static void a8_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
@@ -203,10 +256,14 @@ static void a8_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rec
 
 static void a8_2_rgb565_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
 {
-    GUI_UNUSED(image);
-    GUI_UNUSED(dc);
-    GUI_UNUSED(rect);
-    GUI_ASSERT(0);
+    if (image->blend_mode == IMG_2D_SW_FIX_A8_FG)
+    {
+        a8_2_rgb565_3d_use_bg(image, dc, rect);
+    }
+    else if (image->blend_mode == IMG_2D_SW_FIX_A8_BGFG)
+    {
+        a8_2_rgb565_3d_fix_bg(image, dc, rect);
+    }
 }
 
 
