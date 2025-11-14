@@ -35,7 +35,7 @@
 
 代码
 ~~~~
-函数 ``static void app_ui_koiclock_design(gui_view_t *view)`` 位于文件 ``example/application/screen_410_502/app_3d_koiClock.c``。
+函数 ``static void app_ui_koiclock_design(gui_view_t *view)`` 位于文件 ``example\application\screen_410_502\app_3d_koiClock.c``。
 
 控件树设计
 ~~~~~~~~~~~~~~~~~~~

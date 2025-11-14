@@ -33,7 +33,7 @@ Implementation
 
 Code
 ~~~~
-Function ``static void app_ui_koiclock_design(gui_view_t *view)`` is located in file ``example/application/screen_410_502/app_3d_koiClock.c``.
+Function ``static void app_ui_koiclock_design(gui_view_t *view)`` is located in file ``example\application\screen_410_502\app_3d_koiClock.c``.
 
 Widget Tree Design
 ~~~~~~~~~~~~~~~~~~~

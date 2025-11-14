@@ -13,6 +13,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_canvas_round_rect.h"
 #include "gui_list.h"
+#include "gui_view_instance.h"
 
 /*============================================================================*
  *                            Macros
@@ -38,15 +39,8 @@ const static gui_view_descriptor_t *app_music_view = NULL;
 const static gui_view_descriptor_t *app_message_view = NULL;
 const static gui_view_descriptor_t *app_sport_view = NULL;
 const static gui_view_descriptor_t *menu_view = NULL;
-static gui_view_descriptor_t const descriptor =
-{
-    /* change Here for current view */
-    .name = (const char *)CURRENT_VIEW_NAME,
-    .pView = &current_view,
-    .on_switch_in = bottom_view_design,
-    .on_switch_out = clear_bottom_view,
-};
 
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, bottom_view_design, clear_bottom_view);
 const char *month[12] =
 {
     "January",
@@ -121,13 +115,7 @@ static gui_list_t *list = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static int gui_view_descriptor_register_init(void)
-{
-    gui_view_descriptor_register(&descriptor);
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
+
 
 static int gui_view_get_other_view_descriptor_init(void)
 {
@@ -593,6 +581,7 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void bottom_view_design(gui_view_t *view)
 {
+    current_view = view;
     initialize_text_num_array();
     gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
