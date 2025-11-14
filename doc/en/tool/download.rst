@@ -17,7 +17,7 @@ Select the chip type and language in the MP Tool startup interface, taking RTL87
 
    MP Tool Startup Interface
 
-+ Load the necessary files for burning, including flash map, System Config File, APP Image, etc.
++ Load the necessary files for burning, including flash map, System Config File, :term:`APP` Image, etc.
 + Select User Data.
 
 .. figure:: https://foruda.gitee.com/images/1761026187912386940/43f9518e_13408154.png

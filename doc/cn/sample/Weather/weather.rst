@@ -42,7 +42,7 @@
 
 代码
 ~~~~
-函数 ``static void weather_app(gui_view_t *view)`` 位于文件 ``example/application/screen_410_502/app_weather.c``。
+函数 ``static void weather_app(gui_view_t *view)`` 位于文件 ``example\application\screen_410_502\app_weather.c``。
 
 控件树设计
 ~~~~~~~~~~~~~~~~~~~

@@ -38,6 +38,6 @@ Implementation
 
 Code
 ~~~~
-The function ``static void app_rainbow_analog_ui_design(gui_view_t *view)`` is located in the file ``example/application/screen_410_502/app_box2d_rainbow_analog.cpp``.
+The function ``static void app_rainbow_analog_ui_design(gui_view_t *view)`` is located in the file ``example\application\screen_410_502\app_box2d_rainbow_analog.cpp``.
 
 

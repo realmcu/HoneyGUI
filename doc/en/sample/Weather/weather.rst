@@ -41,7 +41,7 @@ Implementation
 
 Code
 ~~~~
-The function ``static void weather_app(gui_view_t *view)`` is located in the file ``example/application/screen_410_502/app_weather.c``.
+The function ``static void weather_app(gui_view_t *view)`` is located in the file ``example\application\screen_410_502\app_weather.c``.
 
 Widget Tree Design
 ~~~~~~~~~~~~~~~~~~~

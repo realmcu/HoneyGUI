@@ -7,7 +7,7 @@ Use ARM-2D Design An Application
 Arm-2D is an open-source project for 2.5D image processing on Cortex-M processors.
 
 - Initial Targets: IoT terminal devices, white appliances, handheld devices, and wearable devices, especially for resource-constrained and low-power-demand devices.
-- Initial Focus: Graphical User Interface (GUI) development.
+- Initial Focus: Graphical User Interface (:term:`GUI`) development.
 
 
 .. _ARM-2D Introduction:

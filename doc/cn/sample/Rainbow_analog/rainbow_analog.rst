@@ -40,7 +40,7 @@
 
 代码
 ~~~~
-函数 ``static void app_rainbow_analog_ui_design(gui_view_t *view)`` 位于文件 ``example/application/screen_410_502/app_box2d_rainbow_analog.cpp``。
+函数 ``static void app_rainbow_analog_ui_design(gui_view_t *view)`` 位于文件 ``example\application\screen_410_502\app_box2d_rainbow_analog.cpp``。
 
 
 

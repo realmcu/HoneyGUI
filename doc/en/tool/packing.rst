@@ -7,7 +7,7 @@ Pack Tool
 RTL87x2G and RTL8762D
 ----------------------
 
-RTL87x2G is the abbreviation of a series IC type.
+RTL87x2G is the abbreviation of a series :term:`IC` type.
 
 The packaging process for the RTL87x2G and RTL8762D is the same. Take RTL8762G as an example as follows.
 
@@ -24,7 +24,7 @@ The user data generation process is as follows:
 
 1. Copy all generated ``.bin`` files to the folder ``\src\app\dashboard\application\root_image\root``.
 2. In the directory ``\src\app\dashboard\application\root_image``,  double-click the script file ``mkromfs_0xa00000.bat`` to execute it. This will generate an image of the ``root`` folder. After execution, a new ``.bin`` file and a ``.h`` file will appear in this directory.
-3. The ``.h`` file contains the address offset of each file in the file system, allowing direct access without using the file system. Before developing the GUI code, add the folder containing the ``.h`` file to the include directory.
+3. The ``.h`` file contains the address offset of each file in the file system, allowing direct access without using the file system. Before developing the :term:`GUI` code, add the folder containing the ``.h`` file to the include directory.
 4. The ``.bin`` file is the image file of the root folder. Use the MPTool tool to burn the ``root_xx.bin`` file into the Flash storage.
 
 

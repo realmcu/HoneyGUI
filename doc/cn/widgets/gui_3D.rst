@@ -7,8 +7,8 @@
 Lite3D 是由 Realtek 自主研发的轻量级、跨平台的 3D 图形渲染库，支持软件渲染与硬件加速扩展，具有以下特点：
 
    - 轻量级：代码体积小，便于集成。
-   - 跨平台：适配 HoneyGUI、LVGL 等 GUI 框架，支持 FreeRTOS 和 Zephyr 环境运行。
-   - 灵活渲染：提供软件渲染管线，支持扩展 GPU 加速接口。
+   - 跨平台：适配 HoneyGUI、LVGL 等 :term:`GUI` 框架，支持 FreeRTOS 和 Zephyr 环境运行。
+   - 灵活渲染：提供软件渲染管线，支持扩展 :term:`GPU` 加速接口。
 
 
 Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型，能够处理模型的几何形状和材质信息，并支持为模型添加丰富的动画特效以增强视觉表现力。该引擎的工作流程如下：
@@ -48,7 +48,7 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
 
 3. **纹理图片**
 
-   - 通常为 PNG 格式，用于：
+   - 通常为 :term:`PNG` 格式，用于：
 
      - 漫反射贴图
      - 法线贴图
@@ -71,8 +71,8 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
    
    - 在 HoneyGUI 安装目录下找到以下工具：
 
-     - ``your_HoneyGUI_dir/tool/3D-tool/png2c.py``
-     - ``your_HoneyGUI_dir/tool/3D-tool/extract_desc.exe``
+     - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
+     - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
 
 2. **准备模型目录**
    

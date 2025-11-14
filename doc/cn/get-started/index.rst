@@ -13,13 +13,13 @@
 介绍
 ------
 
-HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为资源受限的微控制器和嵌入式系统设计的开源嵌入式图形用户界面（GUI）库。HoneyGUI 具备轻量级、功能丰富和高度可定制性的特点，广泛应用于消费电子、家电、医疗设备和智能手表等领域。
+HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为资源受限的微控制器和嵌入式系统设计的开源嵌入式图形用户界面（:term:`GUI`）库。HoneyGUI 具备轻量级、功能丰富和高度可定制性的特点，广泛应用于消费电子、家电、医疗设备和智能手表等领域。
 
 HoneyGUI 提供基于 :term:`PC` 的仿真环境，使开发者能够快速进行应用开发和调试，而无需依赖嵌入式硬件平台。同时，HoneyGUI 还可以与 Realtek 自研的前端设计工具 :term:`RVD` 配合使用，实现可视化编程。
 
-HoneyGUI 目前主要支持以下两种高效的 APP 开发方式：
+HoneyGUI 目前主要支持以下两种高效的 :term:`APP` 开发方式：
 
-1. C/C++ API 开发
+1. C/C++ :term:`API` 开发
 
    - 开发者可以直接调用基于 RealGUI 显示引擎的 C/C++ API 来构建应用程序。
    - 这种方式提供了最高的灵活性和对系统性能的极致控制，适合开发复杂的、对性能要求高的应用。
@@ -27,10 +27,10 @@ HoneyGUI 目前主要支持以下两种高效的 APP 开发方式：
 2. 前端低代码开发
 
    - 采用 JavaScript 和 XML 进行前端应用的开发。
-   - 推荐使用 ``RVisualDesigner``，通过拖拽组件和可视化配置的方式，快速构建美观的 UI 界面，实现低代码开发，显著提升开发效率。
+   - 推荐使用 ``RVisualDesigner``，通过拖拽组件和可视化配置的方式，快速构建美观的 :term:`UI` 界面，实现低代码开发，显著提升开发效率。
    - 前端低代码开发方式提供了快速开发和迭代的优势，特别适合于快速原型设计和小规模应用开发。
 
-:term:`GUI` 框架具有很强的可移植性，可以在多种芯片和 :term:`OS` 上运行。此次提供了 PC Windows 版本。
+HoneyGUI 框架具有很强的可移植性，可以在多种芯片和 :term:`OS` 上运行。此次提供了 PC Windows 版本。
 
 软件架构
 ----------
@@ -116,14 +116,14 @@ HoneyGUI 目前主要支持以下两种高效的 APP 开发方式：
    > cd build
    > cmake -G "MinGW Makefiles" ..
 
-- 编译：在 ``HoneyGUI/win32_sim/build`` 文件夹中
+- 编译：在 ``HoneyGUI\win32_sim\build`` 文件夹中
 
 .. code-block:: shell
       
    > cmake -G "MinGW Makefiles" ..
    > mingw32-make -j 32
 
-- 配置：在 ``HoneyGUI/win32_sim/build`` 文件夹中
+- 配置：在 ``HoneyGUI\win32_sim\build`` 文件夹中
 
 .. code-block:: shell
 

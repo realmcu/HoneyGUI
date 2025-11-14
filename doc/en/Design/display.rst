@@ -2,7 +2,7 @@
 Display Subsystem
 ==================
 
-The workflow of the display system is very complex, and there are different processes for different UI frameworks and different widgets.
+The workflow of the display system is very complex, and there are different processes for different :term:`UI` frameworks and different widgets.
 
 Display Workflow
 -----------------

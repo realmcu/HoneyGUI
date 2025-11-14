@@ -5,7 +5,7 @@ LiteGFX
 QuDai Introduction
 ----------------------
 
-QuDai Technology is a software service company that leverages its self-developed LiteGfx framework to fully harness the performance of various chips, providing customers with cross-platform, one-stop GUI solutions and a plethora of dazzling visual effects products. By utilizing our proprietary 2.5D effects framework, we simulate 3D technology and integrate particle system physics engine technology. All 2.5D effects are embedded within LiteGfx Designer, allowing customers to easily use and personalize them to create unique visual identities. QuDai Technology will continuously enrich its product portfolio in 2.5D technology, helping clients stand out in the fiercely competitive market. We firmly believe that excellent visual design is the key to enhancing a company's brand value and market competitiveness.
+QuDai Technology is a software service company that leverages its self-developed LiteGfx framework to fully harness the performance of various chips, providing customers with cross-platform, one-stop :term:`GUI` solutions and a plethora of dazzling visual effects products. By utilizing our proprietary 2.5D effects framework, we simulate 3D technology and integrate particle system physics engine technology. All 2.5D effects are embedded within LiteGfx Designer, allowing customers to easily use and personalize them to create unique visual identities. QuDai Technology will continuously enrich its product portfolio in 2.5D technology, helping clients stand out in the fiercely competitive market. We firmly believe that excellent visual design is the key to enhancing a company's brand value and market competitiveness.
 
 .. raw:: html
 

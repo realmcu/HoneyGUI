@@ -13,13 +13,13 @@ Source Project Download
 Description
 -----------
 
-HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (GUI) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
+HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (:term:`GUI`) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
 HoneyGUI provides a :term:`PC`-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, :term:`RVD`, to achieve visual programming.
 
-HoneyGUI currently primarily supports the following two efficient APP development methods:
+HoneyGUI currently primarily supports the following two efficient :term:`APP` development methods:
 
-1. C/C++ API development
+1. C/C++ :term:`API` development
 
    - Developers can directly utilize the C/C++ API based on the RealGUI display engine to construct applications.
    - This approach offers the highest level of flexibility and system performance control, suitable for complex applications with high performance requirements.
@@ -27,10 +27,10 @@ HoneyGUI currently primarily supports the following two efficient APP developmen
 2. Front-end low-code development
 
    - Develop front-end applications using JavaScript and XML.
-   - It is recommended to use ``RVisualDesigner`` to quickly build beautiful UI interfaces through dragging and dropping components and visual configuration, enabling low-code development and significantly improving development efficiency.
+   - It is recommended to use ``RVisualDesigner`` to quickly build beautiful :term:`UI` interfaces through dragging and dropping components and visual configuration, enabling low-code development and significantly improving development efficiency.
    - The low-code development approach for the front end offers advantages in rapid development and iteration, making it particularly suitable for rapid prototyping and small-scale application development.
 
-The :term:`GUI` framework has good portability, which can run on a variety of chips and :term:`OS`. PC Windows version is provided.
+The HoneyGUI framework has good portability, which can run on a variety of chips and :term:`OS`. PC Windows version is provided.
 
 Software Architecture
 -----------------------
@@ -118,14 +118,14 @@ Startup by CMD (CMake)
    > cd build
    > cmake -G "MinGW Makefiles" ..
 
-- Compilation: In the ``HoneyGUI/win32_sim/build`` folder
+- Compilation: In the ``HoneyGUI\win32_sim\build`` folder
 
 .. code-block:: shell
       
    > cmake -G "MinGW Makefiles" ..
    > mingw32-make -j 32
 
-- Configuration: In the ``HoneyGUI/win32_sim/build`` folder
+- Configuration: In the ``HoneyGUI\win32_sim\build`` folder
 
 .. code-block:: shell
 

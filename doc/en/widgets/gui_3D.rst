@@ -7,8 +7,8 @@
 Lite3D is a lightweight, cross-platform 3D graphics rendering library independently developed by Realtek. It supports software rendering and hardware acceleration extensions with the following features:
 
    - Lightweight: Small code size, easy to integrate.
-   - Cross-platform: Compatible with GUI frameworks such as HoneyGUI and LVGL, and supports environments like FreeRTOS and Zephyr.
-   - Flexible Rendering: Provides a software rendering pipeline with support for extending GPU acceleration interfaces.
+   - Cross-platform: Compatible with :term:`GUI` frameworks such as HoneyGUI and LVGL, and supports environments like FreeRTOS and Zephyr.
+   - Flexible Rendering: Provides a software rendering pipeline with support for extending :term:`GPU` acceleration interfaces.
 
 Lite3D supports loading 3D models comprised of :file:`.obj` and :file:`.mtl` files, capable of handling both the geometry and material information of the models. It also supports adding rich animation effects to enhance visual performance. The engine workflow is as follows:
 
@@ -46,7 +46,7 @@ A complete 3D model consists of three core components:
 
 3. **Texture Images**
 
-   - Usually in PNG format, used for:
+   - Usually in :term:`PNG` format, used for:
 
      - Diffuse maps
      - Normal maps
@@ -69,8 +69,8 @@ Before rendering a 3D model, it needs to be converted into a binary format. The 
    
    - Find the following tools in the HoneyGUI installation directory:
 
-     - ``your_HoneyGUI_dir/tool/3D-tool/png2c.py``
-     - ``your_HoneyGUI_dir/tool/3D-tool/extract_desc.exe``
+     - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
+     - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
 
 2. **Prepare the Model Directory**
    

@@ -1,7 +1,7 @@
 ================
 Input Subsystem
 ================
-The UI system can receive input from other peripherals in the device, typical input devices are touchpads and buttons.
+The :term:`UI` system can receive input from other peripherals in the device, typical input devices are touchpads and buttons.
 
 This chapter describes how to use input devices in the UI system and describes the processing of input information in detail.
 
