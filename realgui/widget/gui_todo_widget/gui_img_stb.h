@@ -64,14 +64,17 @@ typedef struct gui_img_stb
     int16_t offset_y;
 } gui_stb_img_t;
 
-/* User defined session identifier */
 typedef struct
 {
-    uint8_t *data;     /* Pointer to the jpeg data */
-    uint32_t size;      /* Size of the jpeg data */
-    uint32_t index;     /* Current position in jpeg data */
-    uint8_t *fbuf;  /* Pointer to the work area */
-    uint8_t *image; /* JPG image read into this buffer */
+    const uint8_t *data;
+    uint32_t size;
+    uint32_t index;
+    uint8_t *fbuf;
+    uint8_t *image;
+    uint8_t *dst;
+    uint32_t width;
+    uint32_t height;
+    uint8_t  bpp;
 } IODEV;
 
 /*============================================================================*
@@ -84,7 +87,7 @@ typedef struct
  *============================================================================*/
 
 //Use tjpgd to replace jpeg decoding in stb
-// #define TJPG
+#define TJPG
 
 
 /*============================================================================*

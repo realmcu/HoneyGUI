@@ -136,94 +136,8 @@ static uint8_t *gui_img_stb_decode_image(gui_stb_img_t *img)
     return NULL;
 }
 
-static void gui_img_stb_modify_img(gui_obj_t *obj)
-{
-    gui_stb_img_t *img = (gui_stb_img_t *)obj;
-
-    if ((img->data_buffer == NULL)
-        || (img->data_length == 0)
-        || (img->src_changed == false))
-    {
-        return;
-    }
 #ifdef TJPG
-    if (img->input_format == JPEG)
-    {
-        return;
-    }
-#endif
-    if ((img->input_format != JPEG)
-        && (img->input_format != BMP)
-        && (img->input_format != PNG))
-    {
-        return;
-    }
-
-    if (img->img)
-    {
-        if (img->img->data != 0)
-        {
-            gui_free(img->img->data);
-            img->img->data = NULL;
-        }
-        img->img->data = gui_img_stb_decode_image(img);
-    }
-    else
-    {
-        img->img = gui_img_create_from_mem(obj, "stb_img", gui_img_stb_decode_image(img), 0, 0, 0, 0);
-    }
-
-    img->src_changed = false;
-}
-static void gui_img_stb_modify_img_static(gui_obj_t *obj)
-{
-    gui_stb_img_t *img = (gui_stb_img_t *)obj;
-
-    if ((img->data_buffer == NULL)
-        || (img->data_length == 0)
-        || (img->src_changed == false))
-    {
-        return;
-    }
-#ifdef TJPG
-    if (img->input_format == JPEG)
-    {
-        return;
-    }
-#endif
-    if ((img->input_format != JPEG)
-        && (img->input_format != BMP)
-        && (img->input_format != PNG))
-    {
-        return;
-    }
-
-    if (img->img)
-    {
-        img->img->data = gui_img_stb_decode_image(img);
-    }
-    else
-    {
-        img->img = gui_img_create_from_mem(obj, "stb_img", gui_img_stb_decode_image(img), 0, 0, 0, 0);
-    }
-
-    img->src_changed = false;
-}
-static void gui_img_stb_image_destroy(gui_obj_t *obj)
-{
-    gui_stb_img_t *img = (gui_stb_img_t *)obj;
-
-    if (img->img != NULL)
-    {
-        if (img->img->data != NULL)
-        {
-            gui_free(img->img->data);
-        }
-    }
-}
-
-#ifdef TJPG
-uint32_t input_func(JDEC *jd, uint8_t *buff, uint32_t nuint8_t)
+size_t input_func(JDEC *jd, uint8_t *buff, size_t nuint8_t)
 {
     IODEV *dev = (IODEV *)jd->device;
     /* Calculate available size left in the jpg data */
@@ -251,92 +165,198 @@ uint32_t input_func(JDEC *jd, uint8_t *buff, uint32_t nuint8_t)
         return nuint8_t;
     }
 }
-int output_func(JDEC *jd, void *bitmap, JRECT *rect, gui_obj_t *obj)
+int output_func(JDEC *jd, void *bitmap, JRECT *rect)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_stb_img_t *img = (gui_stb_img_t *)obj;
-    uint8_t dc_uint8_ts_per_pixel = dc->bit_depth >> 3;
-    /* Convert Y to RGB and put it into the frame buffer */
-    if (dc_uint8_ts_per_pixel == 2)
+    IODEV *dev = (IODEV *)jd->device;
+    if (!dev || !dev->dst || dev->width == 0 || dev->bpp == 0)
     {
-
+        return 0;
     }
-    else if (dc_uint8_ts_per_pixel == 4)
+
+    const uint32_t rx = rect->right  - rect->left + 1;
+    const uint32_t ry = rect->bottom - rect->top  + 1;
+
+    const uint8_t *src = (const uint8_t *)bitmap;
+    for (uint32_t y = 0; y < ry; ++y)
     {
-        uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-        int img_x1, img_x2, img_y1, img_y2;
-        img_x1 = rect->left + img->offset_x;
-        img_x2 = rect->right + img->offset_x;
-        img_y1 = rect->top + img->offset_y;
-        img_y2 = rect->bottom + img->offset_y;
-        // gui_log("rect left %d right %d top %d bot %d \n",img_x1,img_x2,img_y1,img_y2);
-        if (img_x1 >= dc->fb_width ||
-            img_x2 <= 0 ||
-            img_y1 >= dc->fb_height ||
-            img_y2 <= 0)
-        {
-            return 1;
-        }
-        int x_start, x_end, y_start, y_end;
-        int x_left, y_up;
-        int bitmap_width = img_x2 - img_x1 + 1;
-
-        x_start = _UI_MAX(img_x1, 0);
-        x_left = x_start - img_x1;
-        x_end = _UI_MIN(img_x2, dc->fb_width - 1);
-
-        y_start = _UI_MAX(img_y1, 0);
-        y_up = y_start - img_y1;
-        y_end = _UI_MIN(img_y2, dc->fb_height - 1);
-
-        bitmap = (void *)((uint8_t *)bitmap + (bitmap_width * y_up + x_left) * 3);
-        for (uint32_t y = y_start; y <= y_end; y++)
-        {
-            uint8_t *src = (uint8_t *)bitmap;
-            int write_off = (y - dc->section.y1) * dc->fb_width;
-            for (uint32_t x = x_start; x <= x_end; x++)
-            {
-                memcpy(writebuf + write_off + x, src, 3);
-                src = src + 3;
-            }
-            bitmap = (void *)((uint8_t *)bitmap + (3 * bitmap_width));
-        }
+        uint8_t *dst_row = dev->dst + ((rect->top + y) * dev->width + rect->left) * dev->bpp;
+        memcpy(dst_row, src, rx * dev->bpp);
+        src += rx * dev->bpp;
     }
     return 1;
 }
-static void gui_img_tjpgd_image_prepare(gui_obj_t *obj)
-{
-    gui_stb_img_t *this = (gui_stb_img_t *)obj;
-    gui_point3f_t point = {0, 0, 1};
-    matrix_multiply_point(obj->matrix, &point);
-    this->offset_x = point.p[0];
-    this->offset_y = point.p[1];
-}
 
-static void gui_img_tjpgd_image_draw(gui_obj_t *obj)
+static uint8_t *gui_img_tjpgd_decode_image(gui_stb_img_t *img)
 {
-    gui_stb_img_t *img = (gui_stb_img_t *)obj;
-    if (img->input_format != JPEG)
+    if (img == NULL || img->data_buffer == NULL || img->data_length == 0)
     {
-        return;
+        return NULL;
     }
-    JDEC jd;                /* Create a work area for JPEG decompression */
-    IODEV devid;
-    void *work = gui_malloc(3100); /* Pointer to the work area */
+    if ((img->output_format == RGB565 && JD_FORMAT != 1) ||
+        (img->output_format == RGB888 && JD_FORMAT != 0))
+    {
+        gui_log("tjpgd: output_format not supported by JD_FORMAT=%d, please modify JD_FORMAT\n", JD_FORMAT);
+        return NULL;
+    }
 
-    devid.data = img->data_buffer;
+    void *work = gui_malloc(TJPGD_WORKSPACE_SIZE);
+    GUI_ASSERT(work != NULL);
+
+    IODEV devid;
+    memset(&devid, 0, sizeof(devid));
+    devid.data = (const uint8_t *)img->data_buffer;
     devid.size = img->data_length;
     devid.index = 0;
     devid.fbuf = work;
 
-    if (jd_prepare(&jd, input_func, work, 3100, &devid) == JDR_OK)
+    JDEC jd;
+    memset(&jd, 0, sizeof(jd));
+    jd.swap = 0;
+
+    JRESULT ret = jd_prepare(&jd, input_func, work, TJPGD_WORKSPACE_SIZE, &devid);
+    if (ret != JDR_OK)
     {
-        /* Start to decompress */
-        jd_decomp(&jd, output_func, 0, obj);
+        gui_log("tjpgd: jd_prepare failed, ret = %d\n", ret);
+        gui_free(work);
+        return NULL;
+    }
+
+    const uint32_t w = jd.width;
+    const uint32_t h = jd.height;
+
+    gui_rgb_data_head_t head;
+    memset(&head, 0x0, sizeof(head));
+    head.w = w;
+    head.h = h;
+    head.type = img->output_format;
+
+    int head_len = sizeof(gui_rgb_data_head_t);
+    uint8_t *output = NULL;
+    uint8_t bpp = img->output_format == RGB888 ? 3 : 2;
+
+    output = gui_malloc(w * h * bpp + head_len);
+    GUI_ASSERT(output != NULL);
+    memcpy(output, &head, head_len);
+    // gui_log("tjpgd: w = %d, h = %d, bpp = %d, output = %p\n", w, h, bpp, output);
+
+    devid.dst = output + head_len;
+    devid.width = w;
+    devid.height = h;
+    devid.bpp = img->output_format == RGB888 ? 3 : 2;
+
+    ret = jd_decomp(&jd, output_func, 0);
+    if (ret != JDR_OK)
+    {
+        gui_log("jd_decomp failed, ret = %d\n", ret);
+        gui_free(output);
+        gui_free(work);
+        return NULL;
     }
     gui_free(work);
+    return output;
 }
 #endif
+
+static void gui_img_stb_modify_img(gui_obj_t *obj)
+{
+    gui_stb_img_t *img = (gui_stb_img_t *)obj;
+
+    if ((img->data_buffer == NULL)
+        || (img->data_length == 0)
+        || (img->src_changed == false))
+    {
+        return;
+    }
+
+    uint8_t *decoded;
+    switch (img->input_format)
+    {
+    case JPEG:
+#ifdef TJPG
+        decoded = gui_img_tjpgd_decode_image(img);
+        break;
+#endif
+    case BMP:
+    case PNG:
+        decoded = gui_img_stb_decode_image(img);
+        break;
+    default:
+        break;
+    }
+    if (decoded == NULL)
+    {
+        return;
+    }
+    if (img->img)
+    {
+        if (img->img->data != 0)
+        {
+            gui_free(img->img->data);
+            img->img->data = NULL;
+        }
+        img->img->data = decoded;
+    }
+    else
+    {
+        img->img = gui_img_create_from_mem(obj, "stb_img", decoded, 0, 0, 0, 0);
+    }
+    img->src_changed = false;
+}
+
+static void gui_img_stb_modify_img_static(gui_obj_t *obj)
+{
+    gui_stb_img_t *img = (gui_stb_img_t *)obj;
+
+    if ((img->data_buffer == NULL)
+        || (img->data_length == 0)
+        || (img->src_changed == false))
+    {
+        return;
+    }
+
+    uint8_t *decoded;
+    switch (img->input_format)
+    {
+    case JPEG:
+#ifdef TJPG
+        decoded = gui_img_tjpgd_decode_image(img);
+        break;
+#endif
+    case BMP:
+    case PNG:
+        decoded = gui_img_stb_decode_image(img);
+        break;
+    default:
+        break;
+    }
+    if (decoded == NULL)
+    {
+        return;
+    }
+    if (img->img)
+    {
+        img->img->data = decoded;
+    }
+    else
+    {
+        img->img = gui_img_create_from_mem(obj, "stb_img", decoded, 0, 0, 0, 0);
+    }
+    img->src_changed = false;
+}
+
+static void gui_img_stb_image_destroy(gui_obj_t *obj)
+{
+    gui_stb_img_t *img = (gui_stb_img_t *)obj;
+
+    if (img->img != NULL)
+    {
+        if (img->img->data != NULL)
+        {
+            gui_free(img->img->data);
+        }
+    }
+}
+
 
 static void gui_stb_image_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
@@ -344,15 +364,6 @@ static void gui_stb_image_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
-#ifdef TJPG
-        case OBJ_PREPARE:
-            gui_img_tjpgd_image_prepare(obj);
-            break;
-
-        case OBJ_DRAW:
-            gui_img_tjpgd_image_draw(obj);
-            break;
-#endif
         case OBJ_DESTROY:
             gui_img_stb_image_destroy(obj);
             break;
@@ -378,10 +389,6 @@ static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
     gui_obj_ctor(root, parent, name, x, y, 0, 0);
     root->type = IMAGE_FROM_MEM;
     root->obj_cb = gui_stb_image_cb;
-#ifdef TJPG
-    root->has_prepare_cb = true;
-    root->has_draw_cb = true;
-#endif
     root->has_destroy_cb = true;
 
     //for self
