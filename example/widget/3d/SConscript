@@ -28,4 +28,8 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_FLAG_GLTF_3D'):
     src += ['app_ui_realgui_3d_flag_gltf.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
 
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_ROBOT_GLTF_3D'):
+    src += ['app_ui_realgui_3d_robot_gltf.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES) 
+
 Return('group')

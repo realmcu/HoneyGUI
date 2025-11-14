@@ -51,6 +51,10 @@
 // #define CONFIG_REALTEK_BUILD_REAL_FLAG_GLTF_3D
 // </c>
 
+// <c> RTK GUI 3D GLTF Demo
+// #define CONFIG_REALTEK_BUILD_REAL_ROBOT_GLTF_3D
+// </c>
+
 // <c> RTK GUI View Demo
 // #define CONFIG_REALTEK_BUILD_REAL_VIEW
 // </c>
