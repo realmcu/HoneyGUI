@@ -36,7 +36,7 @@ The flowchart depicts the image resource processing flow accelerated by software
        char rsvd2;
    } gui_rgb_data_head_t;
 
-- The value of img_type is depicted in the enum below. If the value is IMDC_COMPRESS, it indicates that the image is compressed and enters the rle processing flow; otherwise, it enters the no rle processing flow.
+- The value of img_type is depicted in the enum below. If the value is IMDC_COMPRESS, it indicates that the image is compressed and enters the :term:`RLE` processing flow; otherwise, it enters the no RLE processing flow.
 
 .. code-block:: c 
 
@@ -305,7 +305,7 @@ The following flow describes the cover mode process for RLE compressed image. Se
        :width: 800px
        :name: Rle_cover_mode_path
         
-       Rle_cover_mode_path
+       RLE_cover_mode_path
 
 RLE Cover No Matrix
 ~~~~~~~~~~~~~~~~~~~~
@@ -317,7 +317,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 700px
        :name: Rle_cover_blit_2_rgb565
         
-       Rle_cover_blit_2_rgb565
+       RLE_cover_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -333,7 +333,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 700px
        :name: Rle_cover_matrix_blit_2_rgb565
         
-       Rle_cover_matrix_blit_2_rgb565
+       RLE_cover_matrix_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -362,7 +362,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 900px
        :name: Rle_bypass_blit_2_rgb565
         
-       Rle_bypass_blit_2_rgb565
+       RLE_bypass_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -382,7 +382,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 45%
        :name: Rle_bypass_matrix_blit_2_rgb565
         
-       Rle_bypass_matrix_blit_2_rgb565
+       RLE_bypass_matrix_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -403,7 +403,7 @@ The following flow describes the filter mode process for RLE compressed image. S
        :width: 800px
        :name: Rle_filter_mode_path
         
-       Rle_filter_mode_path
+       RLE_filter_mode_path
 
 RLE Filter
 ~~~~~~~~~~~
@@ -415,7 +415,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 900px
        :name: Rle_filter_blit_2_rgb565
         
-       Rle_filter_blit_2_rgb565
+       RLE_filter_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -436,7 +436,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 900px
        :name: fig-rle_filter_matrix_blit_2_rgb565
         
-       Rle_filter_matrix_blit_2_rgb565
+       RLE_filter_matrix_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -458,7 +458,7 @@ The following flow describes the source_over mode process for RLE compressed ima
        :width: 900px
        :name: Rle_alpha_mode_path
         
-       Rle_alpha_mode_path
+       RLE_alpha_mode_path
 
 RLE Source_over No Matrix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -470,7 +470,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 900px
        :name: fig-rle_alpha_blit_2_rgb565
 
-       Rle_alpha_blit_2_rgb565
+       RLE_alpha_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.
@@ -490,7 +490,7 @@ The following flowchart describes the process of writing compressed images to a 
        :width: 900px
        :name: Rle_alpha_matrix_blit_2_rgb565
         
-       Rle_alpha_matrix_blit_2_rgb565
+       RLE_alpha_matrix_blit_2_rgb565
 
 1. Perform different processing steps based on the img_type from the head of compression data.
 2. Decompress the compressed image data.

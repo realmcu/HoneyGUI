@@ -36,7 +36,7 @@
        char rsvd2;
    } gui_rgb_data_head_t;
 
-- img_type 的枚举值如下。如果值为 IMDC_COMPRESS，则表示图像已压缩，并进入 rle 处理流程；否则，进入 no rle 处理流程。
+- img_type 的枚举值如下。如果值为 IMDC_COMPRESS，则表示图像已压缩，并进入 :term:`RLE` 处理流程；否则，进入 no RLE 处理流程。
 
 .. code-block:: c 
 
@@ -302,7 +302,7 @@ RLE 覆盖模式概述
        :width: 800px
        :name: 图-rle_cover_mode_path
         
-       Rle_cover_mode_path
+       RLE_cover_mode_path
 
 RLE 覆盖模式（不带矩阵变换）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -314,7 +314,7 @@ RLE 覆盖模式（不带矩阵变换）
        :width: 700px
        :name: 图-rle_cover_blit_2_rgb565
         
-       Rle_cover_blit_2_rgb565
+       RLE_cover_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -330,7 +330,7 @@ RLE 覆盖模式（带矩阵变换）
        :width: 700px
        :name: 图-rle_cover_matrix_blit_2_rgb565
         
-       Rle_cover_matrix_blit_2_rgb565
+       RLE_cover_matrix_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -359,7 +359,7 @@ RLE 旁路模式（不带矩阵变换）
        :width: 900px
        :name: 图-rle_bypass_blit_2_rgb565
         
-       Rle_bypass_blit_2_rgb565
+       RLE_bypass_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -379,7 +379,7 @@ RLE 旁路模式（带矩阵变换）
        :width: 45%
        :name: 图-rle_bypass_matrix_blit_2_rgb565
         
-       Rle_bypass_matrix_blit_2_rgb565
+       RLE_bypass_matrix_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -400,7 +400,7 @@ RLE 滤黑模式概述
        :width: 800px
        :name: 图-rle_filter_mode_path
         
-       Rle_filter_mode_path
+       RLE_filter_mode_path
 
 RLE 滤黑模式（不带矩阵变换）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -412,7 +412,7 @@ RLE 滤黑模式（不带矩阵变换）
        :width: 900px
        :name: 图-rle_filter_blit_2_rgb565
         
-       Rle_filter_blit_2_rgb565
+       RLE_filter_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -433,7 +433,7 @@ RLE 滤黑模式（带矩阵变换）
        :width: 900px
        :name: 图-rle_filter_matrix_blit_2_rgb565
         
-       Rle_filter_matrix_blit_2_rgb565
+       RLE_filter_matrix_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -455,7 +455,7 @@ RLE 混合模式概述
        :width: 800px
        :name: 图-rle_alpha_mode_path
         
-       Rle_alpha_mode_path
+       RLE_alpha_mode_path
 
 RLE 混合模式（不带矩阵变换）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -467,7 +467,7 @@ RLE 混合模式（不带矩阵变换）
        :width: 900px
        :name: 图-rle_alpha_blit_2_rgb565
         
-       Rle_alpha_blit_2_rgb565
+       RLE_alpha_blit_2_rgb565
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -487,7 +487,7 @@ RLE 源覆盖模式（带矩阵变换）
        :width: 900px
        :name: 图-rle_alpha_matrix_blit_2_rgb565
         
-       Rle_alpha_matrix_blit_2_rgb565
+       RLE_alpha_matrix_blit_2_rgb565
 
 
 1. 根据压缩数据头部的 img_type 执行不同的处理步骤。
