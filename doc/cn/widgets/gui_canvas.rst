@@ -18,10 +18,10 @@
 
 组件概述
 --------
-GUI Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
+ :term:`GUI` Canvas 是基于 NanoVG 的 2D 绘图组件，提供：
 
 - 基础形状绘制（矩形/圆形/弧形等）
-- 支持 RGBA/RGB565/PNG/JPG 输出格式
+- 支持 RGBA/RGB565/ :term:`PNG` / :term:`JPG` 输出格式
 - NanoVG 软件加速渲染（通过 AGGE 后端）
 - 直接缓冲区输出功能
 - 空白缓冲区初始化支持

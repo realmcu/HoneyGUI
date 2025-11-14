@@ -18,10 +18,10 @@ The Canvas widget provides 2D graphics rendering capabilities based on NanoVG, s
 
 Overview
 --------
-GUI Canvas is a 2D drawing component based on NanoVG, providing:
+:term:`GUI` Canvas is a 2D drawing component based on NanoVG, providing:
 
 - Basic shape drawing (rectangles, circles, arcs, etc.)
-- Support for RGBA/RGB565/PNG/JPG output formats
+- Support for RGBA/RGB565/:term:`PNG`/JPG output formats
 - NanoVG software-accelerated rendering (via AGGE backend)
 - Direct buffer output functionality
 - Blank buffer initialization support
