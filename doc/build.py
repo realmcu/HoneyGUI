@@ -72,21 +72,16 @@ def record_doc_generate_time(index_path):
   with open(index_md, mode='w+', newline='', errors='surrogateescape') as fd:
       fd.write(stream)
 
-def move_contents(src_dir, dst_dir):
-    if not os.path.exists(dst_dir):
-        os.makedirs(dst_dir)
-
-    for filename in os.listdir(src_dir):
-        src_file_path = os.path.join(src_dir, filename)
-        dst_file_path = os.path.join(dst_dir, filename)
-
-        if os.path.isdir(src_file_path):
-            move_contents(src_file_path, dst_file_path)
-        else:
-            shutil.move(src_file_path, dst_file_path)
-
-    if os.path.exists(src_dir) and not os.listdir(src_dir):
-        os.rmdir(src_dir)
+def update_md(language):
+  # !!! remember add _en and _cn files into exclude pattern
+  rename_file_list = [(os.path.join(doc_path, language.lower(), f'404/README.rst'), os.path.join(doc_path, language.lower(), 'page-not-found.rst')),]
+  for src, dest in rename_file_list:
+    if os.path.exists(src):
+      if os.path.exists(dest): 
+        os.remove(dest)
+      shutil.copy2(src, dest)
+      print(f"Copy {src} to {dest}")
+      os.remove(src)
 
 #Enter pipenv
 #cmd("pipenv shell")
@@ -158,6 +153,8 @@ for l, p in en_cn_build:
 
   os.environ['current_sdk_type'] = sdk_name
   os.environ['current_language'] = p
+
+  update_md(p)
   
   # BUILD PDF
   if not skip_latex:
