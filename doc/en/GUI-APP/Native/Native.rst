@@ -10,7 +10,7 @@ C Application
 
 Create C Application Widget Tree
 ---------------------------------
-- The root node of the number of widgets can be obtained through the :cpp:any:`gui_obj_get_root()` function, and a new widget tree is created based on this. The root node of the widget tree is an object of type ``gui_obj_t``, representing the top-level container of the entire application.
+- The root node of the widget tree can be obtained through the :cpp:any:`gui_obj_get_root()` function, and a new widget tree is created based on this. The root node of the widget tree is an object of type ``gui_obj_t``, representing the top-level container of the entire application.
 
 - Through functions for creating widgets, such as :cpp:any:`gui_img_create_from_mem()`, various widgets can be created under the root node. Each widget is based on an object of type ``gui_obj_t``, representing a specific user interface element.
 
