@@ -12,17 +12,17 @@
 JS 分配堆内存
 --------------
 
-JS（JavaScript）包含在 GUI 模块中，JS 使用的堆空间可能会受到资源限制，导致 ``malloc`` 失败。如果 SoC 支持 psram 特性，可以将此堆空间重定位到 psram。具体信息请参考 API ``void *context_alloc(size_t size, void *cb_data_p)``。
+JS ( JavaScript ) 包含在 term:`GUI` 模块中， JS 使用的堆空间可能会受到资源限制，导致 ``malloc`` 失败。如果 SoC 支持 term:`PSRAM` 特性，可以将此堆空间重定位到 PSRAM 。具体信息请参考 API ``void *context_alloc(size_t size, void *cb_data_p)``。
 
 喂狗
 ----
 
-GUI 任务不支持喂狗功能，因此应用程序应在 APP 注册的 hook 函数中进行喂狗操作，并由 GUI 使用。注册函数为 ``void gui_task_ext_execution_sethook(void (*hook)(void))``。
+GUI 任务不支持喂狗功能，因此应用程序应在 term:`APP` 注册的 hook 函数中进行喂狗操作，并由 GUI 使用。注册函数为 ``void gui_task_ext_execution_sethook(void (*hook)(void))``。
 
 不支持 FPU
 -----------
 
-如果 SoC 不支持 FPU，一些头文件和代码不应该包含在内，例如 RTL8763EP。
+如果 SoC 不支持 FPU ，一些头文件和代码不应该包含在内，例如 RTL8763EP。
 
 文件系统
 --------
@@ -32,12 +32,12 @@ SoC 需要通过文件系统从 flash 中读取图像和字体资源，文件系
 Flash 设置
 ----------
 
-Flash 速度模式应设置为 4 位模式；根据芯片的能力，Flash 时钟应设置为更高的值。
+Flash 速度模式应设置为 4 位模式；根据芯片的能力， Flash 时钟应设置为更高的值。
 
 CPU 频率
 --------
 
-根据芯片的能力，CPU 频率应设置为更高的值。
+根据芯片的能力， CPU 频率应设置为更高的值。
 
 SCONS 版本
 ----------

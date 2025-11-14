@@ -8,9 +8,9 @@ LVGL Introduction
 - `LVGL Document <https://docs.lvgl.io/8.3/intro/index.html>`_
 - `LVGL Intro <https://docs.lvgl.io/8.3/intro/index.html>`_
 
-LVGL (Light and Versatile Graphics Library) is the most popular free and open-source embedded graphics library to create beautiful UIs for any MCU, MPU and display type. LVGL  provides everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
+LVGL (Light and Versatile Graphics Library) is the most popular free and open-source embedded graphics library to create beautiful UIs for any MCU, MPU and display type. LVGL provides everything you need to create an embedded term:`GUI` with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
 
-LVGL showcases Demo effects on its official website to demonstrate the UI building capabilities of LVGL. The online documentation serves as the primary development resource for LVGL, providing detailed information on the design and operational logic of LVGL, instructions on using various widgets, a wide range of example programs, and guidelines for porting LVGL. Whether you are a beginner or an experienced developer, you can quickly get started and gain a deep understanding of LVGL's functionality and features based on the online documentation.
+LVGL showcases Demo effects on its official website to demonstrate the term:`UI` building capabilities of LVGL. The online documentation serves as the primary development resource for LVGL, providing detailed information on the design and operational logic of LVGL, instructions on using various widgets, a wide range of example programs, and guidelines for porting LVGL. Whether you are a beginner or an experienced developer, you can quickly get started and gain a deep understanding of LVGL's functionality and features based on the online documentation.
 
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_
@@ -41,7 +41,7 @@ Run LVGL in HoneyGUI Simulator
 --------------------------------
 HoneyGUI Simulator is based on the scons tool and MinGW-w64 toolchain. It can be run and debugged in VScode. For specific environment setup and running instructions, please refer to the :ref:`Get Started` section.
 
-After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path :file:`your HoneyGUI dir/win32_sim/` and open the file :file:`menu_config.h`, which is the configuration file for the simulator. Under the section **HoneyGUI Demo Select**, comment out all the demos. Under the section **HoneyGUI Enable LVGL**, enable ``CONFIG_REALTEK_BUILD_LVGL_GUI``. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
+After completing the environment setup for the HoneyGUI Simulator, when you start running it, you will see the default HoneyGUI project in the simulator. To modify the simulator configuration file to run an LVGL project, go to the path :file:`your HoneyGUI dir\\win32_sim\\` and open the file :file:`menu_config.h`, which is the configuration file for the simulator. Under the section **HoneyGUI Demo Select**, comment out all the demos. Under the section **HoneyGUI Enable LVGL**, enable ``CONFIG_REALTEK_BUILD_LVGL_GUI``. Then, start running it again in VScode. After the build is successful, you will see the default LVGL demo project running in the simulator.
 
 .. figure:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
    :align: center
@@ -50,7 +50,7 @@ After completing the environment setup for the HoneyGUI Simulator, when you star
    Simulator Configuration File
 
 
-If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir/realgui/example/demo/`, and modify the values of ``DRV_LCD_WIDTH`` and ``DRV_LCD_HEIGHT`` to the desired pixel values.
+If you need to modify the screen size, open the file :file:`SConscript` under the directory :file:`your HoneyGUI dir\\realgui\\example\\demo\\`, and modify the values of ``DRV_LCD_WIDTH`` and ``DRV_LCD_HEIGHT`` to the desired pixel values.
 
 .. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center
@@ -59,7 +59,7 @@ If you need to modify the screen size, open the file :file:`SConscript` under th
    Simulator Screen Size Configuration File
 
 
-HoneyGUI LVGL 
+HoneyGUI LVGL
 ----------------
 The directories and files related to LVGL in HoneyGUI are as follows:
 
@@ -82,9 +82,9 @@ The directories and files related to LVGL in HoneyGUI are as follows:
     |     |  |__ app_ui_lvgl.c               // simulator LVGL UI entrance
     |     :
     |     :
-    |     |__ screen_lvgl    
-    |        |-- assets                       // LVGL user image and font C files    
-    |        |  |__ lvgl_example_assets.c     // assets example                
+    |     |__ screen_lvgl
+    |        |-- assets                       // LVGL user image and font C files
+    |        |  |__ lvgl_example_assets.c     // assets example
     |        |
     |        |-- root                         // file system root folder
     |        |-- _bin_mkromfs.py
@@ -116,13 +116,13 @@ The directories and files related to LVGL in HoneyGUI are as follows:
     |  |  |-- porting                         // LVGL porting template
     |  |  |-- scroll
     |  |  |-- styles
-    |  |  |__ widgets                         // LVGL example widges 
+    |  |  |__ widgets                         // LVGL example widges
     |  |
     |  |-- rlottie
     |  |-- scripts
     |  |-- src
     |  |  :
-    |  |  |-- widgets 
+    |  |  |-- widgets
     |  |  |__ font                            // LVGL internal font
     |  |
     |  |__ tests
@@ -134,21 +134,21 @@ The directories and files related to LVGL in HoneyGUI are as follows:
         :
         |__ port                              // Simulator porting
             |-- realgui_port                  // Simulator HoneyGUI porting
-            |-- lvgl_port                     // Simulator LVGLv8 porting 
+            |-- lvgl_port                     // Simulator LVGLv8 porting
             |    |-- lv_conf.h                // Simulator LVGL configuration
-            |    |-- lv_port_disp.c                  
+            |    |-- lv_port_disp.c
             |    |-- lv_port_disp.h
             |    |-- lv_port_fs.c
             |    |-- lv_port_fs.h
             |    |-- lv_port_indev.c
-            |    |__ lv_port_indev.h                      
+            |    |__ lv_port_indev.h
             |
-            |__ lvglv9_port                    // Simulator LVGLv9 porting 
+            |__ lvglv9_port                    // Simulator LVGLv9 porting
 
 
 
 
-1. In HoneyGUI, the LVGL source files are located in the directory :file:`your HoneyGUI dir/lvgl`:
+1. In HoneyGUI, the LVGL source files are located in the directory :file:`your HoneyGUI dir\\lvgl\\`:
 
    - demos: Contains various comprehensive built-in examples of LVGL. Some examples can be experienced on  `LVGL Demo <https://lvgl.io/demos>`_ .
 
@@ -164,9 +164,9 @@ The directories and files related to LVGL in HoneyGUI are as follows:
 
    - tests: Contains some CI testing files that are not used when using LVGL.
 
-2. When running LVGL with the HoneyGUI simulator, the LVGL UI will start running from the file :file:`app_ui_lvgl.c` under the directory :file:`your HoneyGUI dir/realgui/example/demo`.
+2. When running LVGL with the HoneyGUI simulator, the LVGL UI will start running from the file :file:`app_ui_lvgl.c` under the directory :file:`your HoneyGUI dir\\realgui\\example\\demo\\`.
 
-3. When running LVGL with the HoneyGUI simulator, the root directory pointed to by the LVGL file system interface is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root/`.
+3. When running LVGL with the HoneyGUI simulator, the root directory pointed to by the LVGL file system interface is :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\root\\`.
 
 
 Porting
@@ -175,8 +175,8 @@ Porting
 
 LVGL provides extensive porting support, allowing developers to easily integrate it into various embedded systems and platforms. It supports drivers for various display devices, touchscreens, input devices, and custom GPUs. Developers can configure the porting according to the requirements of their projects, such as adjusting the display parameters when changing display devices, or adapting the input interface when replacing input devices. This article focuses on the porting process and methods for display devices, input devices, and file systems. For more details, please refer to `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_.
 
-.. note:: 
-    The following examples do not include the specific implementation of hardware device drivers. They only illustrate how to integrate drivers with the LVGL interface. When implementing hardware device drivers, developers can complete the driver functionality under a consistent API framework with the example driver, in order to interface with the HoneyGUI driver layer. The porting interfaces of the example projects can be reused in higher layers.
+.. note::
+    The following examples do not include the specific implementation of hardware device drivers. They only illustrate how to integrate drivers with the LVGL interface. When implementing hardware device drivers, developers can complete the driver functionality under a consistent term:`API` framework with the example driver, in order to interface with the HoneyGUI driver layer. The porting interfaces of the example projects can be reused in higher layers.
 
 Display
 ----------------
@@ -186,11 +186,11 @@ Once the developers have completed the debugging of the display device driver, a
 
 The display interface of LVGL is implemented in the file :file:`lv_port_disp.c`. Display parameters are configured in the initialization function ``void lv_port_disp_init(void)``, such as screen size and frame buffer configuration. The display refresh function is defined as ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``.
 
-The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure ``DISPLAY_FLUSH_TYPE`` to switch modes, where ``RAMLESS_XXX`` is suitable for display ICs without RAM, ``RAM_XXX`` is suitable for display ICs with RAM, ``XXX_FULL_SCREEN_XXX`` indicates pushing the entire screen each time, and ``XXX_TWO_SEC`` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by ``SECTION_HEIGHT``.
+The file :file:`lv_port_disp.c` has been configured with different rendering and screen-pushing methods for reference. Configure ``DISPLAY_FLUSH_TYPE`` to switch modes, where ``RAMLESS_XXX`` is suitable for display ICs without term:`RAM` , ``RAM_XXX`` is suitable for display ICs with RAM, ``XXX_FULL_SCREEN_XXX`` indicates pushing the entire screen each time, and ``XXX_TWO_SEC`` indicates rendering only the changed display content, with the unit being the size of two buffers. The pixel height of the buffer is defined by ``SECTION_HEIGHT``.
 
-For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display IC without RAM:
+For detailed display device porting methods and considerations, please refer to the documentation `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_. The following code snippet demonstrates porting a display term:`IC` without RAM:
 
-- When using a display IC without RAM, a frame buffer that covers the entire screen size needs to be allocated. Therefore, two frame buffers with a size equal to the screen size are allocated on the PSRAM for display. The macro definitions for display parameters are defined in the file :file:`lv_conf.h`.
+- When using a display IC without RAM, a frame buffer that covers the entire screen size needs to be allocated. Therefore, two frame buffers with a size equal to the screen size are allocated on the term:`PSRAM` for display. The macro definitions for display parameters are defined in the file :file:`lv_conf.h`.
 - If the display IC used has RAM, the size of the frame buffer does not need to be the same as the screen size. Due to different screen update methods, the ``LVGL_USE_EDPI`` in :file:`lv_port_disp.c` needs to be configured as not enabled (0) to switch the ``disp_flush`` function for screen update adaptation.
 
 .. code-block:: c
@@ -217,7 +217,7 @@ For detailed display device porting methods and considerations, please refer to 
     #endif
 
 
-    // frame buffer config 
+    // frame buffer config
     #define LV_PORT_BUF1        (uint32_t)0x08000000   // address in PSRAM
     #define LV_PORT_BUF2        (uint32_t)(0x08000000 + MY_DISP_HOR_RES * MY_DISP_VER_RES * LV_COLOR_DEPTH / 8)
 
@@ -439,7 +439,7 @@ Using a file system to manage storage media makes data more organized and easier
 
 The file system interface of LVGL is implemented in the file :file:`lv_port_fs.c`. The file system is configured in the initialization function ``void lv_port_fs_init(void)``, which includes initializing the file system and mounting drive letters. Developers need to integrate the interfaces of various file system functions into the corresponding LVGL fs porting functions, ensuring that the input and output data formats are consistent with the interface definitions.
 
-For detailed file system porting methods and considerations, please refer to the documentation `LVGL Overview File System <https://docs.lvgl.io/8.3/overview/file-system.html>`_. The following example demonstrates the porting of **ROMFS**. 
+For detailed file system porting methods and considerations, please refer to the documentation `LVGL Overview File System <https://docs.lvgl.io/8.3/overview/file-system.html>`_. The following example demonstrates the porting of **ROMFS**.
 
 .. note::
   ROMFS is a read-only file system, thus it does not support file writing.
@@ -574,7 +574,7 @@ ROMFS File System Image
 
 HoneyGUI provides support for packaging `ROMFS` file system images:
 
-1. The working directory is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/`. The packaging process requires Python environment support. The external file resources used in the project need to be packaged as a file system image and downloaded as :guilabel:`User Data`.
+1. The working directory is :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\`. The packaging process requires Python environment support. The external file resources used in the project need to be packaged as a file system image and downloaded as :guilabel:`User Data`.
 
 2. Open the working directory and place the files to be packaged in the :file:`root/` folder. Double-click the :file:`mkromfs_0x4600000.bat` script to generate the file system image :file:`root(0x4600000).bin` and the resource mapping address :file:`resource.h`. The default :guilabel:`base address` of the files is `0x4600000`. :file:`resource.h` records the mapping address of the packaged files. Since `ROMFS` supports direct access using physical addresses, developers can access the resource files directly through the mapping address.
 
@@ -601,7 +601,7 @@ LittleFS File System Image
 
 The LittleFS file system supports read and write operations and features power-loss protection. HoneyGUI provides packaging support for LittleFS file system images:
 
-1. The working directory is :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`. External file resources used by the project will be packaged into a file system image and ultimately downloaded as :guilabel:`User Data`.
+1. The working directory is :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\root_lfs`. External file resources used by the project will be packaged into a file system image and ultimately downloaded as :guilabel:`User Data`.
 2. Open the working directory and place the files you need to package under the :file:`root/` folder. Double-click the script :file:`mklittlefs_img.bat` to generate the file system image :file:`root.bin`.
 3. Use the :guilabel:`User Data` function in MP Tool to download and write the file system image to flash. To change the size of the file system, modify the **'-s <number>'** parameter in the script :file:`mklittlefs_img.bat`. When using interfaces from :file:`rtk_fs.c` for file operations, ensure that ``RTK_FS_MNT_ADDR`` matches the write address, and ``MAX_LFS_SIZE`` matches the file system size.
 4. If you need to unpack a file system image, double-click the script :file:`unpack_littlefs_img.bat` to unpack :file:`root.bin` into the :file:`root_up/` folder.
@@ -618,7 +618,7 @@ The LittleFS file system supports read and write operations and features power-l
     #
     # -p <number>,  --page <number>
     # fs page size, in bytes
-    # 
+    #
     # -s <number>,  --size <number>
     # fs image size, in bytes
 
@@ -644,7 +644,7 @@ LVGL Benchmark
 ==========================
 
 LVGL Benchmark is a performance testing tool designed to evaluate the graphical display performance of the LVGL library in various hardware and software environments. By running the Benchmark, users can obtain data on frame rate, rendering speed, and memory usage, helping to optimize display configurations and debug performance issues. The Benchmark includes various test scenarios such as graphical drawing, animations, and text rendering, each simulating common operations in real applications. Users can use these tests to compare the performance of different configurations and platforms, enabling targeted optimization adjustments.
-The official documentation for the LVGL benchmark test is located at :file:`your HoneyGUI dir/lvgl/demos/benchmark/README.md`.
+The official documentation for the LVGL benchmark test is located at :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\lvgl\\demos\\benchmark\\README.md`.
 
 Benchmark for Reference
 -----------------------------
@@ -652,7 +652,7 @@ Benchmark for Reference
 .. csv-table:: Benchmark Result
   :header: Chip Model, CPU CLK, Accelerator, Display Size, Buffering Configurations, Result
   :align: center
-  
+
   RTL8762E, 40MHz, SW, 240*280, Double buffing, Weighted FPS:15; Opa. speed: 100%
   RTL8762E, 40MHz, SW, 80*160,  Double buffing, Weighted FPS:34; Opa. speed: 95%
   RTL8762D, 90MHz, SW, 240*280, Double buffing, Weighted FPS:161; Opa. speed: 77%
@@ -662,9 +662,9 @@ Benchmark for Reference
   RTL8773E, 100MHz, PPE2.0, 390*450, Double buffing, Weighted FPS:159; Opa. speed: 86%
 
 .. csv-table:: Render acceleration on different platforms
-  :header: Chip Model, CPU CLK, Hardware Accelerator, Image Rendering, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Filling, RLE Decoding, Characters, Lines
+  :header: Chip Model, CPU CLK, Hardware Accelerator, Image Rendering, Image Transparency, Image Scaling, Image Rotation, Rounded Rectangle, Rectangle Filling, term:`RLE` Decoding, Characters, Lines
   :align: center
-  
+
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
   RTL8773E, 100MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
 
@@ -686,17 +686,17 @@ It is recommended for developers to read and understand the `LVGL Overview <http
 
 LVGL provides a rich set of demos and examples to help developers understand and familiarize themselves with the usage of various widgets and features.
 
-- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/demo`. Developers can directly invoke the corresponding ``lv_demo_xxx()`` function to explore and understand them.
+- The `LVGL Demo <https://lvgl.io/demos>`_ showcases comprehensive demos with their source code stored in the directory :file:`your HoneyGUI dir\\lvgl\\src\\demo`. Developers can directly invoke the corresponding ``lv_demo_xxx()`` function to explore and understand them.
 
-- The online documentation `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ demonstrates the running effects of various examples, with their source code stored in the directory :file:`your HoneyGUI dir/lvgl/src/example`. Developers can directly call the corresponding ``lv_example_xxx()`` function to familiarize themselves with widgets and understand their features.
+- The online documentation `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ demonstrates the running effects of various examples, with their source code stored in the directory :file:`your HoneyGUI dir\\lvgl\\src\\example`. Developers can directly call the corresponding ``lv_example_xxx()`` function to familiarize themselves with widgets and understand their features.
 
 Resource Converter
 ==========================
-To use images and fonts in LVGL, they need to be converted to formats that LVGL can recognize using specific tools. LVGL supports converting resources to C array format and bin binary file format. 
+To use images and fonts in LVGL, they need to be converted to formats that LVGL can recognize using specific tools. LVGL supports converting resources to C array format and bin binary file format.
 
-In the C array format, the resources will be included in the compilation process. They will be compiled every time the program logic changes, and the size of the resources will be included in the APP image. 
+In the C array format, the resources will be included in the compilation process. They will be compiled every time the program logic changes, and the size of the resources will be included in the APP image.
 
-In the bin binary file format, the resources are not included in the compilation. They are stored separately and require a file system or other means to access them. An example :file:`lvgl_example_assets.c` is provided in the path :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` to demonstrate how to configure resources of different formats for the widgets.
+In the bin binary file format, the resources are not included in the compilation. They are stored separately and require a file system or other means to access them. An example :file:`lvgl_example_assets.c` is provided in the path :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets` to demonstrate how to configure resources of different formats for the widgets.
 
 Image Converter
 -----------------------------
@@ -712,14 +712,14 @@ Please refer to the following steps for usage in `LVGL Overview Images - Online 
 
 1. Select the LVGL version.
 2. Choose the image file.
-3. Select the color format for the output file. 
+3. Select the color format for the output file.
 
    For color format details, please refer to  `LVGL Overview Images - Color Format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_.
 4. Choose the type of output image (C array/binary file).
 5. Click :guilabel:`Convert` to obtain the output file.
 
 
-The `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
+The `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets` directory.
 
 It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of ``4 Byte header + data``. The ``lv_img_header_t`` contains information such as ``color format``, ``width``, and ``height``. To construct a complete ``lv_img_dsc_t`` to describe the image, you can calculate the ``data_size`` using the information from the ``lv_img_header_t``.
 
@@ -757,7 +757,7 @@ Compressing Images
 ^^^^^^^^^^^^^^^^^^^^^^
 Users can utilize the HoneyGUI Image Convert Tool to convert image resources into RLE-compressed binary file format. For detailed usage steps, please refer to  `HoneyGUI Image Converter - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_:
 
-1. Select the image file to be compressed (supports PNG, JPEG, etc.)
+1. Select the image file to be compressed (supports term:`PNG`, JPEG, etc.)
 2. Configure the image conversion parameters: enable :guilabel:`Compress`, choose :guilabel:`Compress Mode` as :guilabel:`RLE`, enable :guilabel:`Color Head`, and select :guilabel:`Color Space` as needed
 3. Click to :guilabel:`Convert` and generate a compressed binary file
 
@@ -768,7 +768,7 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
 1. If importing as a file
 
- **Note**: Modify the file extension to **.rle**, then place it into the file system at :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root`
+ **Note**: Modify the file extension to **.rle**, then place it into the file system at :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\root`
 
    .. code-block:: c
 
@@ -791,10 +791,10 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
  - c. Export the converted image file as a C file, for example, :file:`logo_lvgl_rle.c`
 
-  **Note1: The storage path of the converted file:** Place the converted C file in the following reference path: :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets` 
+  **Note1: The storage path of the converted file:** Place the converted C file in the following reference path: :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets`
 
   **Note2: Modify the color format (cf) in the image descriptor:** The exported C file, for example :file:`logo_lvgl_rle.c`, needs to be modified to ensure ``LV_IMG_CF_RAW``:
-    
+
     .. code-block:: c
 
         // file:logo_lvgl_rle.c
@@ -830,10 +830,10 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
     .. code-block:: c
 
         // file: lvgl_example_assets.c
-        #include "resource.h" 
+        #include "resource.h"
 
         const lv_img_dsc_t lvgl_test_img_rle = {
-            .header.cf = LV_IMG_CF_RAW, 
+            .header.cf = LV_IMG_CF_RAW,
             .header.always_zero = 0,
             .header.reserved = 0,
             .header.w = 0,
@@ -844,7 +844,7 @@ The binary files generated by the HoneyGUI Image Convert Tool can be imported in
 
 
  **Note: Set the color format in the image descriptor to cf = LV_IMG_CF_RAW**
- 
+
  - b. Access the image resources and create the widget:
 
     .. code-block:: c
@@ -900,16 +900,16 @@ Please refer to the following steps for usage in `LVGL Overview Font - Add a New
 
 1. Set the name of the output font.
 2. Set the height of the font in pixels.
-3. Set the bpp (bits per pixel) of the font. 
-   
+3. Set the bpp (bits per pixel) of the font.
+
    It represents how many bits are used to describe each pixel. Higher values result in better anti-aliasing and smoother edges, but larger font file size.
 4. Choose the type of output font (C array/bin file).
 5. Select the font file (TTF/WOFF).
 6. Set the Unicode range of characters to convert, or directly list the characters that need to be converted.
 
-The `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, ``lv_example_label_3()`` demonstrates how to configure a specific font for a label widget. To automatically build font resources generated as C arrays, place them under the directory :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` directory.
+The `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, ``lv_example_label_3()`` demonstrates how to configure a specific font for a label widget. To automatically build font resources generated as C arrays, place them under the directory :file:`your HoneyGUI di\\realgui\\example\\screen_lvgl\\assets` directory.
 
-LVGL provides built-in fonts, which are saved as arrays in the directory :file:`your HoneyGUI dir/lvgl/src/font/`. Each font file specifies the included characters at the beginning of the file. The built-in fonts include a Chinese font, :file:`lv_font_simsun_16_cjk.c`, which is a CJK (Chinese, Japanese, and Korean) 16px font, but it is a single font size with a limited character set.
+LVGL provides built-in fonts, which are saved as arrays in the directory :file:`your HoneyGUI dir\\lvgl\\src\\font`. Each font file specifies the included characters at the beginning of the file. The built-in fonts include a Chinese font, :file:`lv_font_simsun_16_cjk.c`, which is a CJK (Chinese, Japanese, and Korean) 16px font, but it is a single font size with a limited character set.
 
 Development Resources
 ==========================
@@ -1029,7 +1029,7 @@ Background: RTL8772G, RGB565, uncompressed images, test for the performance of d
 .. csv-table:: RAM Block Drawing
   :header: Test Case, HoneyGUI FPS (SW), HoneyGUI FPS (PPE), LVGL FPS (SW), LVGL FPS (PPE)
   :align: center
-  
+
   Draw Image,             73,     74,     70,     73
   Fill Rectangle,          3,     85,     74,     74
   Rotate Image 45°,        3,      3,      4,      4
@@ -1040,7 +1040,7 @@ Background: RTL8772G, RGB565, uncompressed images, test for the performance of d
 .. csv-table:: RAM Block Drawing Test Data
   :header: Section, HoneyGUI FPS, LVGL FPS
   :align: center
-  
+
   10,   70,     45
   20,   73,     73
   30,   74,     73
@@ -1054,7 +1054,7 @@ Background: RTL8772G, RGB565, image size 315x316, uncompressed images, RGB scree
 .. csv-table:: PSRAM Full Frame Buffer Drawing
   :header: Test Case, HoneyGUI FPS (SW), HoneyGUI FPS (PPE), LVGL FPS (SW), LVGL FPS (PPE)
   :align: center
-  
+
   Draw Image,             76,     76,     17,     25
   Fill Rectangle,          4,     78,     25,     26
   Rotate Image 45°,        3,      3,      6,      4
@@ -1075,7 +1075,7 @@ HoneyGUI vs LVGL RAM Consumption
 .. csv-table:: GRAM Screen (280x456) Dynamic RAM Consumption
   :header: Test Case, HoneyGUI (Bytes), LVGL Widget Consumption (Bytes)
   :align: center
-  
+
   Draw Image,          156,     176
   Fill Rectangle,       64,     200
   Rotate Image 45°,    156,     208
@@ -1087,7 +1087,7 @@ HoneyGUI vs LVGL RAM Consumption
 .. csv-table:: GRAM Screen (280x456) Static RAM Consumption
   :header: Test Case, HoneyGUI (Bytes), LVGL Widget Consumption (Bytes)
   :align: center
-  
+
   Draw Image,           41892(40KB),     55300(54KB)
   Fill Rectangle,       41892(40KB),     55300(54KB)
   Rotate Image 45°,     41892(40KB),     55300(54KB)

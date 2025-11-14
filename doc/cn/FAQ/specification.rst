@@ -15,7 +15,7 @@
      - RTL8772F
      - RTL87X2G
      - RTL8763E
-     - PC
+     - term:`PC`
    * - RGB565
      - 是
      - 是

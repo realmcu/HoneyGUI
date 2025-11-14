@@ -91,7 +91,7 @@ The text control currently supports 21 types of layout modes, including the foll
  + Single-line layout modes (3 types): Suitable for scenarios displaying only one line of text, such as single-line centered, left-aligned, right-aligned, etc.
  + Multi-line layout modes (6 types): Used for displaying multiple lines of text, supporting various arrangements like multi-line centered, multi-line left-aligned, multi-line right-aligned, etc.
  + Scrolling layout modes (4 types): Ideal for displaying content that exceeds the display area by scrolling, such as horizontal auto-scrolling, vertical scrolling, etc.
- + Vertical layout modes (2 types): Supports vertical text display from top to bottom.
+ + Vertical layout modes (6 types): Supports vertical text display from top to bottom, and can also be used as a general layout method for rotated text, including top alignment, middle alignment, and bottom alignment.
  + RTL (right-to-left) layout modes (6 types): Designed for languages written from right to left, such as Arabic and Hebrew, supporting corresponding layout modes.
 
 Each layout mode can be selected based on the actual application scenario to meet diverse text display needs. Use :cpp:any:`gui_text_mode_set` to set the text layout mode.
@@ -103,51 +103,59 @@ All type setting modes are as follows.
    :align: center
    :name: Text_Mode_Table
 
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | Type               | Line Type     | X Direction      | Y Direction      | Widget                   |
-   +====================+===============+==================+==================+==========================+
-   | `LEFT`             | Single-line   | Left             | Top              | Text widget (Default)    |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `CENTER`           | Single-line   | Center           | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RIGHT`            | Single-line   | Right            | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `MULTI_LEFT`       | Multi-line    | Left             | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `MULTI_CENTER`     | Multi-line    | Center           | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `MULTI_RIGHT`      | Multi-line    | Right            | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `MID_LEFT`         | Multi-line    | Left             | Mid              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `MID_CENTER`       | Multi-line    | Center           | Mid              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `MID_RIGHT`        | Multi-line    | Right            | Mid              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `SCROLL_X`         | Single-line   | Right to Left    | Top              | Scroll text widget       |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `SCROLL_Y`         | Multi-line    | Left             | Bottom to Top    | Scroll text widget       |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `SCROLL_X_REVERSE` | Multi-line    | Left to Right    | Top              | Scroll text widget       |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `SCROLL_Y_REVERSE` | Multi-line    | Right            | Top to Bottom    | Scroll text widget       |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `VERTICAL_LEFT`    | Multi-line    | Left             | Top to Bottom    | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `VERTICAL_RIGHT`   | Multi-line    | Right            | Bottom to Top    | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RTL_RIGHT`        | Multi-line    | Right            | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RTL_CENTER`       | Multi-line    | Center           | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RTL_LEFT`         | Multi-line    | Left             | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RTL_MULTI_RIGHT`  | Multi-line    | Right            | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RTL_MULTI_CENTER` | Multi-line    | Center           | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
-   | `RTL_MULTI_LEFT`   | Multi-line    | Left             | Top              | Text widget              |
-   +--------------------+---------------+------------------+------------------+--------------------------+
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | Type                 | Line Type     | X Direction      | Y Direction                   | Widget                   |
+   +======================+===============+==================+===============================+==========================+
+   | `LEFT`               | Single-line   | Left             | Top                           | Text widget (Default)    |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `CENTER`             | Single-line   | Center           | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RIGHT`              | Single-line   | Right            | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_LEFT`         | Multi-line    | Left             | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_CENTER`       | Multi-line    | Center           | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MULTI_RIGHT`        | Multi-line    | Right            | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MID_LEFT`           | Multi-line    | Left             | Mid                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MID_CENTER`         | Multi-line    | Center           | Mid                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `MID_RIGHT`          | Multi-line    | Right            | Mid                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X`           | Single-line   | Right to Left    | Top                           | Scroll text widget       |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_Y`           | Multi-line    | Left             | Bottom to Top                 | Scroll text widget       |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_X_REVERSE`   | Multi-line    | Left to Right    | Top                           | Scroll text widget       |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `SCROLL_Y_REVERSE`   | Multi-line    | Right            | Top to Bottom                 | Scroll text widget       |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_LEFT_TOP`  | Multi-line    | Left             | Top to Bottom, top aligned    | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_LEFT_MID`  | Multi-line    | Left             | Top to Bottom, middle aligned | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_LEFT_BOT`  | Multi-line    | Left             | Top to Bottom, bottom aligned | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_RIGHT_TOP` | Multi-line    | Right            | Bottom to Top, top aligned    | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_RIGHT_MID` | Multi-line    | Right            | Bottom to Top, middle aligned | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `VERTICAL_RIGHT_BOT` | Multi-line    | Right            | Bottom to Top, bottom aligned | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_RIGHT`          | Multi-line    | Right            | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_CENTER`         | Multi-line    | Center           | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_LEFT`           | Multi-line    | Left             | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_MULTI_RIGHT`    | Multi-line    | Right            | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_MULTI_CENTER`   | Multi-line    | Center           | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
+   | `RTL_MULTI_LEFT`     | Multi-line    | Left             | Top                           | Text widget              |
+   +----------------------+---------------+------------------+-------------------------------+--------------------------+
 
 .. literalinclude:: ../../../realgui/widget/gui_text/gui_text.h
    :language: c

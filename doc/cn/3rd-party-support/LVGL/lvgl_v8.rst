@@ -10,9 +10,9 @@ LVGL 简介
 - `LVGL 在线文档 <https://docs.lvgl.io/8.3/intro/index.html>`_
 - `LVGL 简介 <https://docs.lvgl.io/8.3/intro/index.html>`_
 
-LVGL（Light and Versatile Graphics Library）是最受欢迎的免费开源嵌入式图形库，可为任何 MCU、MPU 和显示类型创建漂亮的用户界面，提供了一切你需要创建嵌入式 GUI 所需的功能，包括易于使用的图形元素、美观的视觉效果和低内存占用。
+LVGL（Light and Versatile Graphics Library）是最受欢迎的免费开源嵌入式图形库，可为任何 MCU、MPU 和显示类型创建漂亮的用户界面，提供了一切你需要创建嵌入式 term:`GUI` 所需的功能，包括易于使用的图形元素、美观的视觉效果和低内存占用。
 
-LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解LVGL的功能和特性。
+LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 term:`UI` 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解 LVGL 的功能和特性。
 
 - `LVGL Demo <https://lvgl.io/demos>`_
 - `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_
@@ -23,7 +23,7 @@ LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。�
 
 HoneyGUI 模拟器
 ==========================
-..  PC 模拟器运行 lvgl demo（脱离EVB开发）
+..  term:`PC` 模拟器运行 lvgl demo（脱离EVB开发）
 
 模拟器是开发 UI 时使用的一个强大的工具，用于在计算机上模拟嵌入式设备的UI界面。它可以模拟真实硬件平台的行为和外观，提供给开发人员一个便捷的环境来快速创建、调试和测试UI设计。
 
@@ -44,7 +44,7 @@ HoneyGUI 模拟器
 -----------------------------
 HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中运行和进行调试，具体的环境配置和启动运行请参考 :ref:`入门指南` 章节。
 
-完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir/win32_sim/` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 ``CONFIG_REALTEK_BUILD_LVGL_GUI``。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
+完成 HoneyGUI 模拟器的环境安装后，启动运行将看到模拟器默认的 HoneyGUI 工程。修改模拟器配置文件以运行 LVGL 的工程，在路径 :file:`your HoneyGUI dir\\win32_sim\\` 下的 :file:`menu_config.h` 文件为模拟器的配置文件，在 **HoneyGUI Demo Select** 下注释掉所有的 Demo，在 **HoneyGUI Enable LVGL** 下使能 ``CONFIG_REALTEK_BUILD_LVGL_GUI``。在 VScode 中再次启动运行，构建编译通过后即可看到 LVGL 默认的 Demo 工程运行。
 
 
 .. figure:: https://foruda.gitee.com/images/1729750006337280334/445a33a3_9218678.png
@@ -54,7 +54,7 @@ HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中�
    模拟器配置文件
 
 
-当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir/realgui/example/demo/` 下的 :file:`SConscript` 文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HEIGHT``，均为像素单位。
+当需要修改屏幕尺寸时，修改文件 :file:`your HoneyGUI dir\\realgui\\example\\demo\\` 下的 :file:`SConscript` 文件，修改其中的屏幕宽度 ``DRV_LCD_WIDTH`` 和 屏幕高度 ``DRV_LCD_HEIGHT``，均为像素单位。
 
 .. figure:: https://foruda.gitee.com/images/1727161740835693997/89fd9c57_9218678.png
    :align: center
@@ -66,7 +66,7 @@ HoneyGUI 模拟器基于 scons 工具 和 MinGW-w64 工具链，在 VScode 中�
 .. .. <!-- - 运行流程，结构 -->
 
 
-HoneyGUI LVGL 
+HoneyGUI LVGL
 ----------------
 
 以下为 HoneyGUI 中与 LVGL 相关的目录及文件：
@@ -91,9 +91,9 @@ HoneyGUI LVGL
     |     |  |__ app_ui_lvgl.c                // 模拟器 LVGL UI 入口
     |     :
     |     :
-    |     |__ screen_lvgl   
-    |        |-- assets                       // LVGL 用户图片和字库 C 文件 
-    |        |  |__ lvgl_example_assets.c     // assets example 
+    |     |__ screen_lvgl
+    |        |-- assets                       // LVGL 用户图片和字库 C 文件
+    |        |  |__ lvgl_example_assets.c     // assets example
     |        |
     |        |-- root                         // 文件系统根目录
     |        |-- _bin_mkromfs.py
@@ -131,7 +131,7 @@ HoneyGUI LVGL
     |  |-- scripts
     |  |-- src
     |  |  :
-    |  |  |-- widgets 
+    |  |  |-- widgets
     |  |  |__ font                            // LVGL 内置字库
     |  |
     |  |__ tests
@@ -144,16 +144,16 @@ HoneyGUI LVGL
         :
         |__ port                              // 模拟器 porting
             |-- realgui_port                  // 模拟器 HoneyGUI porting
-            |-- lvgl_port                     // 模拟器 LVGLv8 porting 
+            |-- lvgl_port                     // 模拟器 LVGLv8 porting
             |    |-- lv_conf.h                // 模拟器 LVGL 配置定义
-            |    |-- lv_port_disp.c                  
+            |    |-- lv_port_disp.c
             |    |-- lv_port_disp.h
             |    |-- lv_port_fs.c
             |    |-- lv_port_fs.h
             |    |-- lv_port_indev.c
-            |    |__ lv_port_indev.h                      
+            |    |__ lv_port_indev.h
             |
-            |__ lvglv9_port                    // 模拟器 LVGLv9 porting 
+            |__ lvglv9_port                    // 模拟器 LVGLv9 porting
 
 
 
@@ -173,9 +173,9 @@ HoneyGUI LVGL
 
 - tests：存放一些 CI 测试文件，在使用 LVGL 时不会用到。
 
-2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 :file:`your HoneyGUI dir/realgui/example/demo` 下的 :file:`app_ui_lvgl.c` 开始运行。
+2. HoneyGUI 模拟器运行 LVGL 时，LVGL UI 将从目录 :file:`your HoneyGUI dir\\realgui\\example\\demo\\` 下的 :file:`app_ui_lvgl.c` 开始运行。
 
-3. 使用 HoneyGUI 模拟器运行 LVGL 时，调用的 LVGL 文件系统接口所指向的根目录为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root/`。
+3. 使用 HoneyGUI 模拟器运行 LVGL 时，调用的 LVGL 文件系统接口所指向的根目录为 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\root\\`。
 
 
 
@@ -183,12 +183,12 @@ HoneyGUI LVGL
 ==========================
 - 文档说明： `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_
 
-LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 GPU 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_。
+LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到各种嵌入式系统和平台中。它支持各种显示设备的驱动、触摸屏、输入设备和自定义 term:`GPU` 等。开发者可以根据项目的需求进行移植配置，例如更换显示设备时调整显示参数，替换输入设备时适配输入接口等。本文以显示设备、输入设备和文件系统为例，介绍移植过程和方法，更多细节请参考 `LVGL Porting <https://docs.lvgl.io/8.3/porting/index.html>`_。
 
 
 
-.. note:: 
-    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 api 框架下来完成驱动功能，以对接到 HoneyGUI driver 层接口，往上则可复用示例工程的 porting 接口。
+.. note::
+    以下示例不包含硬件设备驱动的具体实现，仅示例如何将驱动对接到 LVGL 的接口。开发者在实现硬件设备驱动时，可在与示例驱动一致的 term:`API` 框架下来完成驱动功能，以对接到 HoneyGUI driver 层接口，往上则可复用示例工程的 porting 接口。
 
 
 显示
@@ -199,12 +199,12 @@ LVGL 提供了广泛的移植支持，使开发者可以将其轻松地集成到
 
 LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在初始化函数 ``void lv_port_disp_init(void)`` 中进行配置，如屏幕尺寸和 frame buffer 配置准备等，显示刷新函数为 ``void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)``。
 
-文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有 RAM 的 display IC， ``RAM_XXX`` 适用于带有 RAM 的 display IC， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小，buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
+文件 :file:`lv_port_disp.c` 中已配置好不同的绘制和推屏方式供参考，配置 ``DISPLAY_FLUSH_TYPE`` 以切换模式，其中 ``RAMLESS_XXX`` 适用于不带有 RAM 的 display term:`IC` ， ``RAM_XXX`` 适用于带有 RAM 的 display IC ， ``XXX_FULL_SCREEN_XXX`` 表示为每次整屏推出， ``XXX_TWO_SEC`` 表示为只绘制变化的显示内容，单位为两个 buffer 大小， buffer 的像素高度由 ``SECTION_HEIGHT`` 定义。
 
 
-详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 RAM 的 display IC：
+详尽的显示设备移植方法和注意事项请参阅文档 `LVGL Porting Display <https://docs.lvgl.io/8.3/porting/display.html>`_，以下代码段示例了 porting 不带有 term:`RAM` 的 display IC：
 
-- 使用不带有 RAM 的 display IC 时，必须为其分配整屏尺寸的 frame buffer，因此在 PSRAM 上分配了两个整屏尺寸的 frame buffer 用于显示。显示的参数宏定义已定义在文件 :file:`lv_conf.h` 中。
+- 使用不带有 RAM 的 display IC 时，必须为其分配整屏尺寸的 frame buffer，因此在 term:`PSRAM` 上分配了两个整屏尺寸的 frame buffer 用于显示。显示的参数宏定义已定义在文件 :file:`lv_conf.h` 中。
 - 若使用的 display IC 带有 RAM，则 frame buffer 的大小不必为整屏尺寸。由于刷屏方式的不同，需要配置 :file:`lv_port_disp.c` 中的 ``LVGL_USE_EDPI`` 为不启用(0)，以切换 ``disp_flush`` 函数适配刷屏。
 
 
@@ -232,7 +232,7 @@ LVGL 的显示接口在文件 :file:`lv_port_disp.c` 中实现，显示参数在
     #endif
 
 
-    // frame buffer config 
+    // frame buffer config
     #define LV_PORT_BUF1        (uint32_t)0x08000000   // address in PSRAM
     #define LV_PORT_BUF2        (uint32_t)(0x08000000 + MY_DISP_HOR_RES * MY_DISP_VER_RES * LV_COLOR_DEPTH / 8)
 
@@ -586,7 +586,7 @@ ROMFS 文件系统镜像
 
 HoneyGUI 提供 `ROMFS` 文件系统镜像的打包支持：
 
-1. 工作路径为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/`，执行打包过程需要有 python 环境支持，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
+1. 工作路径为 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\`，执行打包过程需要有 python 环境支持，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
 2. 打开工作路径，将需要打包的文件放置于 :file:`root/` 文件夹下，双击脚本 :file:`mkromfs_0x4600000.bat` 生成文件系统镜像 :file:`root(0x4600000).bin` 和资源映射地址 :file:`resource.h`。文件的默认 :guilabel:`base address` 为 `0x4600000`，:file:`resource.h` 中记录了打包文件的映射地址，由于 `ROMFS` 支持物理地址直接访问，开发者可通过映射地址直接访问资源文件。
 3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash，烧录地址需与 :guilabel:`base address` 保持一致。若需要修改 :guilabel:`base address`, 修改脚本 :file:`mkromfs_0x4600000.bat` 中的 **"--addr <number>"** 参数即可，如下示例为修改 :guilabel:`base address` 从 `0x4600000` 改为 `0x4000000`。
 
@@ -612,7 +612,7 @@ LittleFS 文件系统镜像
 
 LittleFS 文件系统支持读写操作，且具有掉电保护的特点，HoneyGUI 提供 `LittleFS` 文件系统镜像的打包支持：
 
-1. 工作路径为 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root_lfs`，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
+1. 工作路径为 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\root_lfs\\`，工程用到的外部文件资源将打包为文件系统镜像最终作为 :guilabel:`User Data` 下载。
 2. 打开工作路径，将需要打包的文件放置于 :file:`root/` 文件夹下，双击脚本 :file:`mklittlefs_img.bat` 生成文件系统镜像 :file:`root.bin`。
 3. 请使用 MP Tool 的 :guilabel:`User Data` 功能下载烧录文件系统镜像到 flash。若需要修改文件系统的大小, 修改脚本 :file:`mklittlefs_img.bat` 中的 **"-s <number>"** 参数即可。当使用 :file:`rtk_fs.c` 中的接口进行文件操作时，其中的 ``RTK_FS_MNT_ADDR`` 需与烧录地址一致， ``MAX_LFS_SIZE`` 需与文件系统大小一致。
 4. 如需解包文件系统镜像，双击脚本 :file:`unpack_littlefs_img.bat` 将 :file:`root.bin` 解包到 :file:`root_up/` 文件夹下。
@@ -628,7 +628,7 @@ LittleFS 文件系统支持读写操作，且具有掉电保护的特点，Honey
     #
     # -p <number>,  --page <number>
     # fs page size, in bytes
-    # 
+    #
     # -s <number>,  --size <number>
     # fs image size, in bytes
 
@@ -661,16 +661,16 @@ LVGL Benchmark 测试
 
 
 LVGL 的 Benchmark 是一个性能测试工具，用于评估 LVGL 库在各种硬件和软件环境下的图形显示性能。通过运行 Benchmark，用户可以获取帧率、渲染速度和内存使用情况等数据，从而帮助优化显示配置和调试性能问题。Benchmark 包括多种测试场景，如图形绘制、动画和文本渲染，每个场景模拟实际应用中的常见操作。用户可以通过这些测试来比较不同配置和平台的性能表现，从而做出针对性的优化调整。
-LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/benchmark/README.md`。
+LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir\\lvgl\\demos\\benchmark\\README.md`。
 
-参考 Benchmark 
+参考 Benchmark
 -----------------------------
 
 
 .. csv-table:: Benchmark 测试结果
   :header: 芯片型号, 处理器主频, 加速器, 显示面积, 缓冲区配置, 结果
   :align: center
-  
+
   RTL8762E, 40MHz, SW, 240*280, Double buffing, Weighted FPS:15; Opa. speed: 100%
   RTL8762E, 40MHz, SW, 80*160,  Double buffing, Weighted FPS:34; Opa. speed: 95%
   RTL8762D, 90MHz, SW, 240*280, Double buffing, Weighted FPS:161; Opa. speed: 77%
@@ -681,9 +681,9 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/bench
 
 
 .. csv-table:: 不同平台渲染加速
-  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, RLE 解码, 字符, 线条
+  :header: 芯片型号, 处理器主频, 硬件加速器, 图片绘制, 图片透明度, 图片缩放, 图片旋转, 圆角矩形, 矩形填充, term:`RLE` 解码, 字符, 线条
   :align: center
-  
+
   RTL8772G, 125MHz, PPE1.0, HW, HW, HW, SW, SW+HW, HW, HW, SW, SW
   RTL8773E, 100MHz, PPE2.0, HW, HW, HW, HW, SW+HW, HW, HW, SW, SW
 
@@ -710,16 +710,16 @@ LVGL 基准测试的官方文档位于 :file:`your HoneyGUI dir/lvgl/demos/bench
 
 LVGL 提供了丰富的 demo 和 example 来帮助开发者了解熟悉各个控件和特性的使用。
 
-- `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/demo` 下，开发者可直接调用对应的 ``lv_demo_xxx()`` 函数来熟悉了解。
+- `LVGL Demo <https://lvgl.io/demos>`_ 中展示了综合性比较强的 Demo ，其源码保存在目录 :file:`your HoneyGUI dir\\lvgl\\src\\demo\\` 下，开发者可直接调用对应的 ``lv_demo_xxx()`` 函数来熟悉了解。
 
-- 在线文档 `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your HoneyGUI dir/lvgl/src/example` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
+- 在线文档 `LVGL Example <https://docs.lvgl.io/8.3/examples.html>`_ 中展示了各个 example 的运行效果，其源码保存在目录 :file:`your HoneyGUI dir\\lvgl\\src\\example\\` 下，开发者可直接调用对应的 ``lv_example_xxx()`` 函数来熟悉控件和理解特性。
 
 
 资源转换器
 ==========================
 .. <!-- （Img + font，介绍和演示） -->
 
-LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 APP image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下已提供 example :file:`lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
+LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，才能在 UI 中使用。LVGL 支持转换为 C 数组格式和 bin 二进制文件的资源，其中 C 数组格式的资源将会参与编译过程，每当程序逻辑发生变化时，都会参与编译，资源大小计入 term:`APP` image（OTA 时需要更大空间），bin 二进制文件格式的资源不参与编译，单独存储，需要文件系统等来支持访问。在路径 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\` 下已提供 example :file:`lvgl_example_assets.c` 示例如何为控件配置不同格式的资源。
 
 图片转换器
 -----------------------------
@@ -739,12 +739,12 @@ LVGL 在线转换工具
 1. 选择 LVGL 版本
 2. 选取图片文件
 3. 选择输出文件的颜色格式
-   
+
    颜色格式的说明请参考 `LVGL Overview Images - Color Format <https://docs.lvgl.io/8.3/overview/image.html#color-formats>`_
 4. 选择输出图片的类型 (C array/binary file)
 5. 点击 :guilabel:`Convert` 获取输出文件
 
-在文档 `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
+在文档 `LVGL Overview Images <https://docs.lvgl.io/8.3/overview/image.html>`_ 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\` 下即可被自动构建到工程中。
 
 值得一提的是，使用 bin 文件的图片资源时，bin 文件中数据的格式为 ``4 Byte lv_img_header_t + data``, 其中 ``lv_img_header_t`` 中包含有 ``Color format``, ``width`` 和 ``height``，此时利用 ``lv_img_header_t`` 信息来计算出 ``data_size`` 即可构建一个完整的 ``lv_img_dsc_t`` 来描述图片。
 
@@ -785,7 +785,7 @@ HoneyGUI 图像转换工具
 
 用户可利用 HoneyGUI 图像转换工具将图片资源转换为 RLE 压缩的二进制文件格式，具体使用步骤请参考 `HoneyGUI Image Converter - Doc <https://docs.realmcu.com/HoneyGUI/cn/latest/tool/Resource/image.html>`_：
 
-1. 选择需要压缩的图片文件（支持 PNG、JPEG 等格式）
+1. 选择需要压缩的图片文件（支持 term:`PNG` 、JPEG 等格式）
 2. 配置图片的转换参数：启用 :guilabel:`Compress`，:guilabel:`Compress Mode` 选择 :guilabel:`RLE`， 启用 :guilabel:`Color Head`，:guilabel:`Color Space` 按需选择
 3. 点击 :guilabel:`Convert` 生成压缩的二进制文件
 
@@ -797,7 +797,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
 1. 若作为文件导入
 
-   **注意**: 修改文件扩展名为 **.rle** , 即可放入文件系统使用 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/root`
+   **注意**: 修改文件扩展名为 **.rle** , 即可放入文件系统使用 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\root\\`
 
    .. code-block:: c
 
@@ -808,7 +808,7 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
             lv_img_set_src(icon, "F:/logo_lvgl.rle");
             lv_obj_set_pos(icon, 0, 0);
         }
-   
+
 
    **备注**：使用 RLE 解码器 + ROMFS 时，解码器将会直接从文件系统即 FLASH 上获取图片，不做额外缓存，需要做缓存处理的情况请使用文件系统接口将文件读到内存中，作为数组方式使用。
 
@@ -819,10 +819,10 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
  - c. 将转换后的图片文件导出为C文件格式，例如 :file:`logo_lvgl_rle.c`
 
     **注意1：转换结果文件的存放路径:** 将转换后的 C 文件存放在以下参考路径：
-    :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets`
-    
+    :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\`
+
     **注意2：修改图像描述符中的色彩格式 cf:** 导出的 C 文件，例如 :file:`logo_lvgl_rle.c`，需要对其中的图像描述符进行修改，保证 `cf` 设置为 ``LV_IMG_CF_RAW``：
-    
+
     .. code-block:: c
 
         // file:logo_lvgl_rle.c
@@ -835,11 +835,11 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
         .data_size = 1889,
         .data = logo_lvgl_rle_map,
         };
-    
+
  - d. 在项目中声明图片后即可作为图片源使用
 
    .. code-block:: c
-    
+
         // file:lvgl_example_assets.c
         void load_img_rle_c_file(void)
         {
@@ -853,14 +853,14 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 3. 若作为文件导入,以文件地址的方式访问图片资源
 
  - a. 构建 ``lv_img_dsc_t`` ，例如：
-   
+
    .. code-block:: c
-    
+
         // file:lvgl_example_assets.c
-        #include "resource.h" 
-        
+        #include "resource.h"
+
         const lv_img_dsc_t lvgl_test_img_rle = {
-            .header.cf = LV_IMG_CF_RAW, 
+            .header.cf = LV_IMG_CF_RAW,
             .header.always_zero = 0,
             .header.reserved = 0,
             .header.w = 0,
@@ -871,11 +871,11 @@ HoneyGUI 图像转换工具生成的二进制文件可导入 LVGL 使用：
 
 
    **注意：图像描述符中的色彩格式设置为 cf = LV_IMG_CF_RAW**
- 
+
  - b. 图片资源访问，控件创建：
-   
+
    .. code-block:: c
-    
+
         // file: lvgl_example_assets.c
         void load_img_rle_dataAddr_file(void)
         {
@@ -932,16 +932,16 @@ LVGL 启用 RLE 解码器
 1. 设定输出字库的名字
 2. 设定字体的高度 height，像素单位
 3. 设定字体的 bpp(bit-per-piel)
-   
+
    表示采用多少个 bit 来描述一个像素，当数值越大时，字符的抗锯齿效果越好，边缘越平滑，字库占用空间越大
 4. 选择输出字库的类型 (C array/bin file)
 5. 选择字体文件 (TTF/WOFF)
 6. 设定需要转换的字符 Unicode 范围，也可直接列出需要转换的字符
 
 
-在文档 `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 ``lv_example_label_3()`` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 :file:`your HoneyGUI dir/realgui/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
+在文档 `LVGL Overview Fonts <https://docs.lvgl.io/8.3/overview/font.html>`_ 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 ``lv_example_label_3()`` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets\\` 下即可被自动构建到工程中。
 
-在 LVGL 中提供了内置的字库，以数组的形式保存在目录 :file:`your HoneyGUI dir/lvgl/src/font/` 下，每份字库所包含的字符均注明在文件开头。内置字库中包含有一份汉字字库 :file:`lv_font_simsun_16_cjk.c` cjk 16 号字库，但为单一字号，字符数有限。
+在 LVGL 中提供了内置的字库，以数组的形式保存在目录 :file:`your HoneyGUI dir\\lvgl\\src\\font\\` 下，每份字库所包含的字符均注明在文件开头。内置字库中包含有一份汉字字库 :file:`lv_font_simsun_16_cjk.c` cjk 16 号字库，但为单一字号，字符数有限。
 
 
 开发资源支持
@@ -1012,7 +1012,7 @@ LVGL Designer 具有以下特点和功能：
 
 
 
-论坛 
+论坛
 -----------------------------
 - `LVGL Forum <https://forum.lvgl.io/>`_
 
@@ -1070,7 +1070,7 @@ GRAM 屏幕 (280x456)SRAM 分块绘制
 .. csv-table:: RAM 分块绘制 测试结果
   :header: 测试类型, HoneyGUI 帧率(FPS) SW, HoneyGUI 帧率(FPS) PPE, LVGL 帧率(FPS) SW, LVGL 帧率(FPS) PPE
   :align: center
-  
+
   绘制图片,             73,     74,     70,     73
   普通填充矩形,          3,     85,     74,     74
   图像旋转 45° ,         3,      3,     4,       4
@@ -1082,7 +1082,7 @@ GRAM 屏幕 (280x456)SRAM 分块绘制
 .. csv-table:: RAM 分块绘制测试数据
   :header: Section, HoneyGUI 帧率(FPS), LVGL 帧率(FPS)
   :align: center
-  
+
   10,   70,     45
   20,   73,     73
   30,   74,     73
@@ -1092,13 +1092,13 @@ GRAM 屏幕 (280x456)SRAM 分块绘制
 PSRAM 整帧 buffer 绘制（800x480）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-背景：RTL8772G 平台，RGB565，图片尺寸 315x316，非压缩图片，RGB 屏幕，测试单张图片的显示绘制性能。
+背景： RTL8772G 平台， RGB565 ，图片尺寸 315x316 ，非压缩图片， RGB 屏幕，测试单张图片的显示绘制性能。
 
 
 .. csv-table:: PSRAM 整帧 buffer 绘制
   :header: 测试类型, HoneyGUI SW (FPS), HoneyGUI PPE (FPS), LVGL SW (FPS), LVGL PPE (FPS)
   :align: center
-  
+
   绘制图片,             76,     76,     17,     25
   普通填充矩形,          4,     78,     25,     26
   图像旋转 45° ,         3,      3,      6,      4
@@ -1108,7 +1108,7 @@ PSRAM 整帧 buffer 绘制（800x480）
 
 分析
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-对于 RGB 屏幕需要额外的 psram 作为缓存 buffer，LVGL完全使用psram作为图像缓存buffer，相比于 HoneyGUI 采用 ram 与 sram 结合的方式，LVGL 各方面性能表现较差；
+对于 RGB 屏幕需要额外的 PSRAM 作为缓存 buffer ， LVGL 完全使用 PSRAM 作为图像缓存 buffer ，相比于 HoneyGUI 采用 RAM 与 SRAM 结合的方式， LVGL 各方面性能表现较差；
 
 
 HoneyGUI vs LVGL RAM消耗
@@ -1117,7 +1117,7 @@ HoneyGUI vs LVGL RAM消耗
 .. csv-table:: GRAM 屏幕 (280x456) 动态 RAM 消耗
   :header: 测试类型, HoneyGUI (Bytes), LVGL 控件消耗 (Bytes)
   :align: center
-  
+
   绘制图片,          156,     176
   普通填充矩形,       64,     200
   图像旋转,          156,     208
@@ -1129,7 +1129,7 @@ HoneyGUI vs LVGL RAM消耗
 .. csv-table:: GRAM 屏幕 (280x456) 静态 RAM 消耗
   :header: 测试类型, HoneyGUI (Bytes), LVGL 控件消耗 (Bytes)
   :align: center
-  
+
   绘制图片,          41892(40KB),     55300(54KB)
   普通填充矩形,      41892(40KB),     55300(54KB)
   图像旋转,          41892(40KB),     55300(54KB)
@@ -1140,9 +1140,9 @@ HoneyGUI vs LVGL RAM消耗
 结论
 -----------------------------
 
-- **适用场景**: 需要推动大尺寸的屏幕（例如 800x480），并且整帧绘制的情况，推荐选择 HoneyGUI，对于需要频繁刷新脏块的项目，推荐使用 LVGL；分块绘制场景，在ram资源紧张的情况下，推荐使用 HoneyGUI，section 推荐参数 10。
+- **适用场景**: 需要推动大尺寸的屏幕（例如 800x480），并且整帧绘制的情况，推荐选择 HoneyGUI ，对于需要频繁刷新脏块的项目，推荐使用 LVGL ；分块绘制场景，在 RAM 资源紧张的情况下，推荐使用 HoneyGUI ，section 推荐参数 10。
 
-- **旋转，放大缩小**：LVGL 在图像旋转方面由于采用 2x2 的矩阵，在二维图渲染方面，相比于 HoneyGUI 的 3x3 矩阵，运算方面数据量更少，因此表现更快，而对于显示 2.5D，仿三维效果时，HoneyGUI将表现更好。
+- **旋转，放大缩小**：LVGL 在图像旋转方面由于采用 2x2 的矩阵，在二维图渲染方面，相比于 HoneyGUI 的 3x3 矩阵，运算方面数据量更少，因此表现更快，而对于显示 2.5D ，仿三维效果时， HoneyGUI 将表现更好。
 
 - 在实际项目中，可以根据具体的帧率需求、系统资源情况以及其他功能需求，选择合适的显示框架。如果可行，进行具体的性能测试和评估是最为理想的做法。
 

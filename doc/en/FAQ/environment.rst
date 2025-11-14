@@ -22,4 +22,4 @@ There is no guarantee that all later versions of the MinGW will function properl
 Adding Toolchain to System Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Make sure ``C:/mingw64/bin`` is already added to system environment variable ``Path``.
+Make sure ``C:\\mingw64\\bin`` is already added to system environment variable ``Path``.

@@ -14,7 +14,7 @@ Hardware Acceleration
 ---------------------
 
 Use hardware acceleration to render images instead of software acceleration whenever possible.
-Different chip models may have different GPU, please refer to the guidance document in the SDK for
+Different chip models may have different term:`GPU`, please refer to the guidance document in the SDK for
 details.
 
 Data Transmission Speed
@@ -25,7 +25,7 @@ Using hardware decompression modules is very fast, but software decompression re
 amount of time. Compressed images can reduce the size of the original image resources, allowing more
 resources to be stored in user data, and will also reduce the time needed to read from flash.
 
-UI Design
+term:`UI` Design
 ---------
 
 Reducing complexity in the UI, as well as the number and size of images in a single interface, can

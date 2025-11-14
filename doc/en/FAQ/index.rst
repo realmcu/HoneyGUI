@@ -4,7 +4,7 @@
 FAQ
 ==========
 
-Some common problems that arise during the use of GUI can be referred to in this chapter.
+Some common problems that arise during the use of term:`GUI` can be referred to in this chapter.
 
 .. toctree::
     :maxdepth: 2

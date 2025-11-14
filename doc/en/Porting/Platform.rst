@@ -104,8 +104,8 @@ The following table lists the LCD-related interfaces supported by mainstream chi
     'Y' means the driver is already included in the library.
     'NA' means the driver is not yet included in the library.
 
-Driver IC
-~~~~~~~~~
+Driver term:`IC`
+~~~~~~~~~~~~~~~~~~
 
 The following table lists the LCD-related driver ICs supported by mainstream chips. If you want to know more information, please click on the specific chip name.
 
@@ -225,7 +225,7 @@ To reduce power consumption and increase the device's usage time, sleep (low pow
         bool close_sync;
     };
 
-``active_ms`` is the standby time of the GUI application, which can be defined as different values in different applications.
+``active_ms`` is the standby time of the term:`GUI` application, which can be defined as different values in different applications.
 Like other types of electronic devices, when the screen continuously displays an interface for the standby time, the device will enter sleep mode.
 In sleep mode, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
 In the chip manual, this low power state where peripherals can be turned off is called Deep Low Power State (DLPS). More information about DLPS can be found in the relevant SDK documentation.
