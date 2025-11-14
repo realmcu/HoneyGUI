@@ -321,6 +321,6 @@ static void multiple_layer_animation_switch_out(gui_view_t *view)
 
 }
 
-GUI_VIEW_INSTANCE("multiple_layer_animation_view", false, multiple_layer_animation_switch_in,
+GUI_VIEW_INSTANCE("multiple_layer_animation_view", 1, multiple_layer_animation_switch_in,
                   multiple_layer_animation_switch_out);
 

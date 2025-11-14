@@ -100,6 +100,7 @@ static void switch_widget_play_watchface3(void *p)
 
 static void transparent_gradient_animation_switch_in(gui_view_t *view)
 {
+
     gui_view_switch_on_event(view, gui_view_descriptor_get("vector_graphic_view"),
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
@@ -151,6 +152,6 @@ static void transparent_gradient_animation_switch_out(gui_view_t *view)
     gui_log("transparent_gradient_animation_view switch out\n");
 }
 
-GUI_VIEW_INSTANCE("transparent_gradient_animation_view", false,
+GUI_VIEW_INSTANCE("transparent_gradient_animation_view", 1,
                   transparent_gradient_animation_switch_in, transparent_gradient_animation_switch_out);
 

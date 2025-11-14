@@ -1,14 +1,15 @@
+
 #include "gui_view_macro.h"
 #include "gui_text.h"
 #include "gui_canvas_rect.h"
 
-static void fps_create(void *parent);
+
 /* FPS */
 static char fps[10];
 static char widget_count_string[20];
 static char mem_string[20];
 static char low_mem_string[20];
-
+void fps_create(void *parent);
 static void fps_show_switch_in(gui_view_t *view)
 {
     GUI_UNUSED(view);
@@ -30,7 +31,7 @@ static void fps_show_switch_out(gui_view_t *view)
     gui_log("fps_show_view switch out\n");
 }
 
-GUI_VIEW_INSTANCE("fps_show_view", false, fps_show_switch_in, fps_show_switch_out);
+GUI_VIEW_INSTANCE("fps_show_view", 1, fps_show_switch_in, fps_show_switch_out);
 static void gui_fps_cb(void *p)
 {
     int fps_num = gui_fps();
@@ -53,7 +54,7 @@ static void gui_fps_cb(void *p)
 }
 
 
-static void fps_create(void *parent)
+void fps_create(void *parent)
 {
     char *text;
     int font_size = 20;
@@ -79,7 +80,6 @@ static void fps_create(void *parent)
     gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_text_type_set(low_mem, (void *)FILE_POINTER(HEADING_1_BIN), FONT_SRC_MEMADDR);
 }
-
 
 
 

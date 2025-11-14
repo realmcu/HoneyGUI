@@ -33,12 +33,9 @@ static void update_animation(float dt)
     anim.offset_x = 8.0f * sinf(anim.time * 1.1f);
     anim.offset_y = 6.0f * cosf(anim.time * 1.4f);
 }
-
-static void canvas_rect_cb(gui_canvas_t *canvas)
+static void render(NVGcontext *vg)
 {
-
-    NVGcontext *vg = canvas->vg;
-    float dt = 0.001f;
+    float dt = 0.01f;
     if (dt <= 0) { dt = 0.016f; }
 
     update_animation(dt);
@@ -73,11 +70,27 @@ static void canvas_rect_cb(gui_canvas_t *canvas)
     nvgFill(vg);
 
     nvgRestore(vg);
+}
+static void canvas_rect_cb(gui_canvas_t *canvas)
+{
+
+    NVGcontext *vg = canvas->vg;
+    render(vg);
     canvas->render = 1;
 }
 
-
-static void vector_graphic_switch_in(gui_view_t *view)
+#define CANVAS_W 480
+#define CANVAS_H 480
+#define CANVAS_BUFFER_LENGTH CANVAS_W*CANVAS_H*4
+static uint8_t *buffer = 0;
+static void vector_graphic_switch_in_timer(void *p)
+{
+    GUI_UNUSED(p); gui_log("111\n");
+    memset(buffer, 0,  CANVAS_BUFFER_LENGTH);
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+                                      0, 480, 480, render, buffer);
+}
+static int resource(void)
 {
 #ifdef _WIN32
     extern const unsigned char _binary_root_0x00950000_bin_start[];
@@ -85,11 +98,30 @@ static void vector_graphic_switch_in(gui_view_t *view)
 #else
     resource_root = 0x704D1400;
 #endif
+    return 0;
+}
+static void vector_graphic_switch_in(gui_view_t *view)
+{
+
 
     GUI_UNUSED(view);
     gui_log("vector_graphic_view switch in\n");
-    gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, 480, 480);
-    gui_canvas_set_canvas_cb(canvas, canvas_rect_cb);
+    // gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, CANVAS_W, CANVAS_H);
+    // gui_canvas_set_canvas_cb(canvas, canvas_rect_cb111);
+
+    buffer = gui_lower_malloc(CANVAS_W * CANVAS_H * 4);
+    memset(buffer, 0,  CANVAS_BUFFER_LENGTH);
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+                                      0, 480, 480, render, buffer);
+    gui_img_t *img = gui_img_create_from_mem(view, 0, buffer, 0, 0, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+//gui_obj_create_timer(img, 10, 1, vector_graphic_switch_in_timer);
+
+
+
+
+
+
     gui_view_switch_on_event(view, gui_view_descriptor_get("transparent_gradient_animation_view"),
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
@@ -104,17 +136,24 @@ static void vector_graphic_switch_out(gui_view_t *view)
 {
     GUI_UNUSED(view);
     gui_log("vector_graphic_view switch out\n");
+    if (buffer)
+    {
+        gui_lower_free(buffer);
+    }
+
 }
-
-GUI_VIEW_INSTANCE("vector_graphic_view", true, vector_graphic_switch_in, vector_graphic_switch_out);
+#include "gui_win.h"
+GUI_VIEW_INSTANCE("vector_graphic_view", 1, vector_graphic_switch_in, vector_graphic_switch_out);
 unsigned char *resource_root = 0;
-
+void fps_create(void *parent);
 static int chargecase_demo_entry(void)
 {
 
-    gui_view_create(gui_obj_get_root(), gui_view_descriptor_get("vector_graphic_view"), 0, 0, 0, 0);
+    gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
+    gui_view_create(win, gui_view_descriptor_get("vector_graphic_view"), 0, 0, 0, 0);
+    fps_create(gui_obj_get_root());
     return 0;
 }
-
+GUI_INIT_VIEW_DESCRIPTOR_REGISTER(resource);
 GUI_INIT_APP_EXPORT(chargecase_demo_entry);
 

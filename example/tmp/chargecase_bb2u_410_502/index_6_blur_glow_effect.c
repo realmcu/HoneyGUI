@@ -2,12 +2,14 @@
 #include "gui_canvas.h"
 #include "nanovg.h"
 #include <math.h>
+#include "gui_img.h"
 
-static float glow_time = 0.0f;
+static float glow_time = 1.3f;
 
 static void update_glow(float dt)
 {
-    glow_time += dt;
+    //glow_time += dt;
+    GUI_UNUSED(dt);
 }
 
 static void draw_glowing_sphere(
@@ -17,14 +19,14 @@ static void draw_glowing_sphere(
 {
     float t = glow_time;
 
-    float pulse = 0.5f + 0.5f * sinf(t * 2.2f);
+    float pulse = 0.5f + 0.5f * 1;
     float glow_radius = radius + 80.0f + 120.0f * pulse;
     float glow_alpha = 0.4f + 0.4f * pulse;
     float hue = fmodf(t * 45.0f, 360.0f);
 
     nvgSave(vg);
 
-    NVGcolor outer_glow = nvgHSLA(hue / 360.0f, 0.9f, 0.7f, (unsigned char)(255 * glow_alpha * 0.5f));
+    NVGcolor outer_glow = nvgHSLA(hue / 360.0f, 0.9f, 0.7f, (unsigned char)(255 * glow_alpha));
     NVGcolor transparent = nvgRGBA(0, 0, 0, 0);
 
     NVGpaint glow_paint = nvgRadialGradient(
@@ -80,9 +82,8 @@ static void draw_glowing_sphere(
 
     nvgRestore(vg);
 }
-static void canvas_rect_cb(gui_canvas_t *canvas)
+static void render(NVGcontext *vg)
 {
-    NVGcontext *vg = canvas->vg;
     float dt = 0.001f;
     if (dt <= 0) { dt = 0.016f; }
 
@@ -90,12 +91,31 @@ static void canvas_rect_cb(gui_canvas_t *canvas)
 
     draw_glowing_sphere(vg, 200, 300, 80.0f);
 }
+static void canvas_rect_cb(gui_canvas_t *canvas)
+{
+    NVGcontext *vg = canvas->vg;
+    render(vg);
+}
+#define CANVAS_W2 480
+#define CANVAS_H2 480
+#define CANVAS_BUFFER_LENGTH2 CANVAS_W2*CANVAS_H2*4
+static uint8_t *buffer = 0;
 static void blur_glow_effect_switch_in(gui_view_t *view)
 {
-    GUI_UNUSED(view);
+    GUI_UNUSED(view); GUI_UNUSED(buffer);
     gui_log("blur_glow_effect_view switch in\n");
-    gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, 480, 480);
-    gui_canvas_set_canvas_cb(canvas, canvas_rect_cb);
+    // gui_canvas_t *canvas = gui_canvas_create(view, "canvas", 0, 0, 0, CANVAS_W2, CANVAS_H2);
+    // gui_canvas_set_canvas_cb(canvas, canvas_rect_cb222);
+
+    buffer = gui_lower_malloc(CANVAS_W2 * CANVAS_H2 * 4);
+    memset(buffer, 0, CANVAS_W2 * CANVAS_H2 * 4);
+    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA,
+                                      0, 480, 480, render, buffer);
+    gui_img_t *img = gui_img_create_from_mem(view, 0, buffer, 0, 0, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+
+
     gui_view_switch_on_event(view, gui_view_descriptor_get("gif_apng_support_view"),
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
@@ -110,8 +130,12 @@ static void blur_glow_effect_switch_out(gui_view_t *view)
 {
     GUI_UNUSED(view);
     gui_log("blur_glow_effect_view switch out\n");
+    if (buffer)
+    {
+        gui_lower_free(buffer);
+    }
 }
 
-GUI_VIEW_INSTANCE("blur_glow_effect_view", false, blur_glow_effect_switch_in,
+GUI_VIEW_INSTANCE("blur_glow_effect_view", 1, blur_glow_effect_switch_in,
                   blur_glow_effect_switch_out);
 

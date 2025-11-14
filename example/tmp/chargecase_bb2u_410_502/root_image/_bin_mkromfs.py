@@ -213,7 +213,7 @@ class Folder(object):
                 #                '(void *)(resource_root + ' + '0x%08x' % data_addr + ' - ' + '0x%08x' % BASE_ADDR + ')' + '\n')
                 
                 H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
-                               '(uint32_t)(' + '0x%08x' % (data_addr - BASE_ADDR) + ')' + '\n')
+                               ' (uint32_t)(' + '0x%08x' % (data_addr - BASE_ADDR) + ')' + '\n')
 
                 
             # pad the data to 4 bytes boundary

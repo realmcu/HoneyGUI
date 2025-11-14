@@ -97,5 +97,5 @@ static void video_support_switch_out(gui_view_t *view)
     gui_log("video_support_view switch out\n");
 }
 
-GUI_VIEW_INSTANCE("video_support_view", false, video_support_switch_in, video_support_switch_out);
+GUI_VIEW_INSTANCE("video_support_view", 1, video_support_switch_in, video_support_switch_out);
 

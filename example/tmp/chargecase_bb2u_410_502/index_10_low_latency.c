@@ -74,5 +74,5 @@ static void low_latency_switch_out(gui_view_t *view)
     gui_log("low_latency_view switch out\n");
 }
 
-GUI_VIEW_INSTANCE("low_latency_view", false, low_latency_switch_in, low_latency_switch_out);
+GUI_VIEW_INSTANCE("low_latency_view", 1, low_latency_switch_in, low_latency_switch_out);
 
