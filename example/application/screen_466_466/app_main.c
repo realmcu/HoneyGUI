@@ -288,7 +288,7 @@ static uint32_t ip4_input_field_bin[] =
     DIGIT_8_BIN,
     DIGIT_9_BIN,
 };
-static char ip_string_buffer[16];
+static char ip_string_buffer[16] = {0};
 static int ip_string_buffer_index = 0;
 static void jump_to_camera_view(void)
 {
@@ -327,8 +327,10 @@ static void jump_to_keyboard_view_ota(void)
 static void reset(void)
 {
     gui_log("reset called\n");
+#ifndef _WIN32
     extern void wifi_reset_enter_cb(void);
     wifi_reset_enter_cb();
+#endif
 }
 static button_t buttons[] =
 {
@@ -404,7 +406,10 @@ static void view_switch_in_camera(gui_view_t *view)
     extern void wifi_camera_enter_cb(char *ip_addr);
     extern char *get_ip4_string(void);
     char *ip_addr = get_ip4_string();
+    GUI_UNUSED(ip_addr);
+#ifndef _WIN32
     wifi_camera_enter_cb(ip_addr);
+#endif
 }
 
 void update_video_image(uint8_t *jpeg_disp_image)
@@ -416,8 +421,11 @@ void update_video_image(uint8_t *jpeg_disp_image)
 
 static void view_switch_out_camera(gui_view_t *view)
 {
+    GUI_UNUSED(view);
+#ifndef _WIN32
     void wifi_camera_exit_cb(void);
     wifi_camera_exit_cb();
+#endif
 }
 static void view_switch_in_ota(gui_view_t *view)
 {
@@ -434,15 +442,23 @@ static void view_switch_in_ota(gui_view_t *view)
     extern void wifi_ota_enter_cb(char *ip_addr);
     extern char *get_ip4_string(void);
     char *ip_addr = get_ip4_string();
+    GUI_UNUSED(ip_addr);
+#ifndef _WIN32
     wifi_ota_enter_cb(ip_addr);
+#endif
 }
 #include "gui_text.h"
 static void view_switch_in_about(gui_view_t *view)
 {
     char *bd_addr, *bb2u, *wifi;
+#ifndef _WIN32
     extern void wifi_about_enter_cb(char **bd_addr, char **bb2u, char **wifi);
     wifi_about_enter_cb(&bd_addr, &bb2u, &wifi);
-
+#else
+    bd_addr = "bd_addr";
+    bb2u = "bb2u";
+    wifi = "wifi";
+#endif
     gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
                              SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
@@ -543,13 +559,13 @@ static  uint32_t key_highlight_array[] =
     BUTTON_BACKSPACE_HIGHLIGHT_BIN,
     BUTTON_DOT_HIGHLIGHT_BIN,
 };
-
+static void input_ip4(char *digit);
 static void view_switch_in_keyboard(gui_view_t *view)
 {
     input_ip4_x = 0;
     memset(ip4_input_field, 0, sizeof(ip4_input_field));
     ip4_input_index = 0;
-    memset(ip_string_buffer, 0, sizeof(ip_string_buffer));
+    // memset(ip_string_buffer, 0, sizeof(ip_string_buffer));
     ip_string_buffer_index = 0;
     gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466,
                              SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
@@ -590,6 +606,35 @@ static void view_switch_in_keyboard(gui_view_t *view)
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_obj_add_event_cb(img, press_setting_cb_enter, GUI_EVENT_TOUCH_PRESSED, 0);
         gui_obj_add_event_cb(img, release_setting_cb_enter, GUI_EVENT_TOUCH_RELEASED, 0);
+
+    }
+    {
+
+        char *ip_str = ip_string_buffer;
+        if (ip_str)
+        {
+            int length = strlen(ip_str);
+            for (int i = 0; i < length; i++)
+            {
+                char str[2];
+                str[0] = ip_str[i];
+                str[1] = 0;
+                input_ip4(str);
+            }
+
+        }
+        if (password_flag)
+        {
+            gui_img_t *enter_img = NULL;
+            gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
+            if (enter_img)
+            {
+                gui_img_set_image_data(enter_img,
+                                       (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN));
+            }
+        }
+
+
 
     }
 }
@@ -707,8 +752,8 @@ static void press_setting_cb(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_obj_create_timer(obj, 1, true, press_setting_cb_timer);
-    gui_obj_start_timer(obj);
+    // gui_obj_create_timer(obj, 1, true, press_setting_cb_timer);
+    // gui_obj_start_timer(obj);
     gui_obj_t *o = GUI_BASE(obj);
     IMPORT_GUI_TOUCHPAD
     for (size_t i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++)
@@ -787,6 +832,8 @@ static void press_setting_cb_key(void *obj, gui_event_t e, void *param)
     int index = (int)(uintptr_t)param;
     gui_img_set_image_data((gui_img_t *)obj,
                            (void *)FILE_POINTER(key_highlight_array[index]));
+    IMPORT_GUI_TOUCHPAD
+    gui_log("press key win tpy:%d,%d\n", tp->y, tp->deltaY);
 }
 static void press_setting_cb_enter(void *obj, gui_event_t e, void *param)
 {
@@ -1033,8 +1080,8 @@ static void release_setting_cb_key_win(void *obj, gui_event_t e, void *param)
         gui_img_set_image_data((gui_img_t *)key_obj_array[i],
                                (void *)FILE_POINTER(key_array[i]));
     }
-
-    gui_log("release key win\n");
+    IMPORT_GUI_TOUCHPAD
+    gui_log("release key win tpy:%d,%d\n", tp->y, tp->deltaY);
 }
 static void press_setting_cb_key_win_timer(void *p)
 {
@@ -1067,7 +1114,8 @@ static void press_setting_cb_key_win(void *obj, gui_event_t e, void *param)
     press_setting_cb_key_win_flag = 1;
 
 
-    gui_log("press key win\n");
+
+
 }
 static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
 {
@@ -1117,6 +1165,18 @@ static void release_setting_cb_key(void *obj, gui_event_t e, void *param)
                                                    (void *)FILE_POINTER(IP_INPUT_FIELD_HL_BIN));
                         }
                     }
+                    else if (count < 3 || (count == 3 && ipstring[strlen(ipstring) - 1] == '.'))
+                    {
+                        password_flag = false;
+                        gui_img_t *enter_img = NULL;
+                        gui_obj_tree_get_widget_by_name(gui_obj_get_root(), WIFI_ENTER_IMAGE_NAME, (void *)&enter_img);
+                        if (enter_img)
+                        {
+                            gui_img_set_image_data(enter_img,
+                                                   (void *)FILE_POINTER(ENTER_WIFI_BIN));
+                        }
+                    }
+
                 }
 
                 // if (buttons[i].func)
@@ -1297,9 +1357,10 @@ static int app_init(void)
 GUI_INIT_APP_EXPORT(app_init);
 static void view_switch_in(gui_view_t *view)
 {
+#ifndef _WIN32
     extern void wifi_setting_enter_cb(void);
     wifi_setting_enter_cb();
-
+#endif
     gui_view_switch_on_event(view, &gui_view_descriptor_image_466_466_watchface,
                              SWITCH_OUT_TO_LEFT_USE_TRANSLATION,
                              SWITCH_IN_FROM_RIGHT_USE_TRANSLATION,
