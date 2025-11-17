@@ -1355,6 +1355,14 @@ static int app_init(void)
     return 0;
 }
 GUI_INIT_APP_EXPORT(app_init);
+
+static void battery_update_callback(void *p)
+{
+    extern char *wifi_get_bat_level(void);
+    gui_text_t *text = (gui_text_t *)p;
+    char *bat_level = wifi_get_bat_level();
+    gui_text_content_set(text, bat_level, strlen(bat_level));
+}
 static void view_switch_in(gui_view_t *view)
 {
 #ifndef _WIN32
@@ -1380,6 +1388,17 @@ static void view_switch_in(gui_view_t *view)
             GUI_UNUSED(switch_widget);
             gui_obj_add_event_cb(switch_widget, click_switch_widget_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
+
+        char *bat_level = "100";
+        gui_text_t *text = gui_text_create(img, 0, 210, 15, 466, 26);
+        // const char *string = "1ABCD123ab c:;.'!@#$";
+        gui_text_set(text, (void *)bat_level, GUI_FONT_SRC_BMP, gui_color_css("black"),
+                     strlen(bat_level), 24);
+        gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
+                          FONT_SRC_MEMADDR);
+        gui_text_mode_set(text, LEFT);
+        gui_obj_create_timer((void *)text, 5000, true, battery_update_callback);
+
 
         {
             gui_img_t *img2 =
