@@ -44,6 +44,9 @@ static void switch_app_butterfly(void *obj, gui_event_t e, void *param);
 static void switch_app_applist(void *obj, gui_event_t e, void *param);
 static void switch_app_disc(void *obj, gui_event_t e, void *param);
 static void switch_app_face(void *obj, gui_event_t e, void *param);
+static void switch_app_earth(void *obj, gui_event_t e, void *param);
+static void switch_app_robot(void *obj, gui_event_t e, void *param);
+static void switch_app_flag(void *obj, gui_event_t e, void *param);
 static void switch_app_prism_thick(void *obj, gui_event_t e, void *param);
 static void switch_app_prism_mirror(void *obj, gui_event_t e, void *param);
 static void switch_app_windmill(void *obj, gui_event_t e, void *param);
@@ -80,6 +83,9 @@ const static gui_view_descriptor_t *butterfly_view = NULL;
 const static gui_view_descriptor_t *applist_view = NULL;
 const static gui_view_descriptor_t *disc_view = NULL;
 const static gui_view_descriptor_t *face_view = NULL;
+const static gui_view_descriptor_t *earth_view = NULL;
+const static gui_view_descriptor_t *robot_view = NULL;
+const static gui_view_descriptor_t *flag_view = NULL;
 const static gui_view_descriptor_t *prism_thick_view = NULL;
 const static gui_view_descriptor_t *prism3d_mirror_view = NULL;
 const static gui_view_descriptor_t *windmill_view = NULL;
@@ -129,6 +135,9 @@ static const char *text_array[] =
     "App List",
     "Disc",
     "Face",
+    "Earth",
+    "Robot",
+    "Flag",
     "Prism Thick",
     "Prism Mirror",
     "Windmill",
@@ -178,6 +187,9 @@ static int gui_view_get_other_view_descriptor_init(void)
     applist_view = gui_view_descriptor_get("applist_view");
     disc_view = gui_view_descriptor_get("disc_view");
     face_view = gui_view_descriptor_get("face_view");
+    earth_view = gui_view_descriptor_get("earth_view");
+    robot_view = gui_view_descriptor_get("robot_view");
+    flag_view = gui_view_descriptor_get("flag_view");
     prism_thick_view = gui_view_descriptor_get("prism_thick_view");
     prism3d_mirror_view = gui_view_descriptor_get("prism3d_mirror_view");
     windmill_view = gui_view_descriptor_get("windmill_view");
@@ -310,6 +322,36 @@ static void switch_app_face(void *obj, gui_event_t e, void *param)
                            SWITCH_IN_NONE_ANIMATION);
     gui_view_set_animate_step(gui_view_get_current(), 1000);
     gui_obj_hidden(GUI_BASE(current_view), true);
+}
+
+static void switch_app_earth(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    gui_view_switch_direct(current_view, earth_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
+}
+
+static void switch_app_robot(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    gui_view_switch_direct(current_view, robot_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
+}
+
+static void switch_app_flag(void *obj, gui_event_t e, void *param)
+{
+    (void)obj;
+    (void)e;
+    (void)param;
+    gui_view_switch_direct(current_view, flag_view, SWITCH_OUT_NONE_ANIMATION,
+                           SWITCH_IN_NONE_ANIMATION);
+    gui_view_set_animate_step(gui_view_get_current(), 1000);
 }
 
 static void switch_app_prism_thick(void *obj, gui_event_t e, void *param)
@@ -580,6 +622,9 @@ static void app_menu_design(gui_view_t *view)
             switch_app_applist,
             switch_app_disc,
             switch_app_face,
+            switch_app_earth,
+            switch_app_robot,
+            switch_app_flag,
             switch_app_prism_thick,
             switch_app_prism_mirror,
             switch_app_windmill,
@@ -616,6 +661,9 @@ static void app_menu_design(gui_view_t *view)
             APPLIST_ICON_BIN,
             DISC_ICON_BIN,
             FACE_ICON_BIN,
+            EARTH_ICON_BIN,
+            ROBOT_ICON_BIN,
+            FLAG_ICON_BIN,
             PRISM_THICK_ICON_BIN,
             PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
@@ -676,6 +724,9 @@ static void app_menu_design(gui_view_t *view)
             APPLIST_ICON_BIN,
             DISC_ICON_BIN,
             FACE_ICON_BIN,
+            EARTH_ICON_BIN,
+            ROBOT_ICON_BIN,
+            FLAG_ICON_BIN,
             PRISM_THICK_ICON_BIN,
             PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
@@ -707,6 +758,9 @@ static void app_menu_design(gui_view_t *view)
             APPLIST_ICON_BIN,
             DISC_ICON_BIN,
             FACE_ICON_BIN,
+            EARTH_ICON_BIN,
+            ROBOT_ICON_BIN,
+            FLAG_ICON_BIN,
             PRISM_THICK_ICON_BIN,
             PRISM3D_ICON_BIN,
             WINDMILL_ICON_BIN,
@@ -740,21 +794,22 @@ static void app_menu_design(gui_view_t *view)
             {
                 {switch_app_heart_rate, NULL}, {switch_app_fruit_ninja, NULL}, {switch_app_box2d_ring, NULL}, {switch_app_activity, NULL},
                 {switch_app_soccer, NULL}, {switch_app_flower, NULL}, {switch_app_weather, NULL}, {switch_app_butterfly, NULL},
-                {switch_app_applist, NULL}, {switch_app_disc, NULL}, {switch_app_face, NULL}, {switch_app_prism_thick, NULL},
-                {switch_app_prism_mirror, NULL}, {switch_app_windmill, NULL}, {switch_app_pandkoi, NULL}, {switch_app_seawater, NULL},
-                {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL}, {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL},
-                {switch_app_countdown, NULL}, {switch_app_firework, NULL}, {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL},
-                {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL}, {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL},
-                {switch_app_rainbow_analog, NULL}, {switch_app_music, NULL},
+                {switch_app_applist, NULL}, {switch_app_disc, NULL}, {switch_app_face, NULL}, {switch_app_earth, NULL}, {switch_app_robot, NULL},
+                {switch_app_flag, NULL}, {switch_app_prism_thick, NULL}, {switch_app_prism_mirror, NULL}, {switch_app_windmill, NULL},
+                {switch_app_pandkoi, NULL}, {switch_app_seawater, NULL}, {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL},
+                {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL}, {switch_app_countdown, NULL}, {switch_app_firework, NULL},
+                {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL}, {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL},
+                {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL}, {switch_app_rainbow_analog, NULL}, {switch_app_music, NULL},
 
                 {switch_app_heart_rate, NULL}, {switch_app_fruit_ninja, NULL}, {switch_app_box2d_ring, NULL}, {switch_app_activity, NULL},
                 {switch_app_soccer, NULL}, {switch_app_flower, NULL}, {switch_app_weather, NULL}, {switch_app_butterfly, NULL},
-                {switch_app_applist, NULL}, {switch_app_disc, NULL}, {switch_app_face, NULL}, {switch_app_prism_thick, NULL},
-                {switch_app_prism_mirror, NULL}, {switch_app_windmill, NULL}, {switch_app_pandkoi, NULL}, {switch_app_seawater, NULL},
-                {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL}, {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL},
-                {switch_app_countdown, NULL}, {switch_app_firework, NULL}, {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL},
-                {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL}, {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL},
-                {switch_app_rainbow_analog, NULL}, {switch_app_music, NULL},
+                {switch_app_applist, NULL}, {switch_app_disc, NULL}, {switch_app_face, NULL}, {switch_app_earth, NULL}, {switch_app_robot, NULL},
+                {switch_app_flag, NULL}, {switch_app_prism_thick, NULL}, {switch_app_prism_mirror, NULL}, {switch_app_windmill, NULL},
+                {switch_app_pandkoi, NULL}, {switch_app_seawater, NULL}, {switch_app_firefly, NULL}, {switch_app_rainbow_digital, NULL},
+                {switch_app_koiclock, NULL}, {switch_app_digital_clock, NULL}, {switch_app_countdown, NULL}, {switch_app_firework, NULL},
+                {switch_app_heart_particle, NULL}, {switch_app_butterfly_particle, NULL}, {switch_app_butterflys, NULL}, {switch_app_earth_clock, NULL},
+                {switch_app_labubu_digital, NULL}, {switch_app_flower_clock, NULL}, {switch_app_rainbow_analog, NULL}, {switch_app_music, NULL},
+
             };
             gui_menu_cellular_on_click(menu, gesture_parameter_array,
                                        sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));

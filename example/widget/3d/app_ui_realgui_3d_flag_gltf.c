@@ -23,6 +23,15 @@ static void update_flag_animation(void *param)
     if (tp->pressed || tp->pressing)
     {
         rot_angle += tp->deltaX / 5.0f;
+
+        if (rot_angle > 45.0f)
+        {
+            rot_angle = 45.0f;
+        }
+        else if (rot_angle < -45.0f)
+        {
+            rot_angle = -45.0f;
+        }
     }
 }
 
