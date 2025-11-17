@@ -1,0 +1,21 @@
+# building script for HoneyGUI
+from building import *
+import os
+import menu_config
+
+cwd = GetCurrentDir()
+CPPPATH = [cwd]
+src = Split("""
+""")
+
+group = []
+CPPDEFINES = ['DRV_LCD_WIDTH=480']
+CPPDEFINES += ['DRV_LCD_HIGHT=480']
+CPPDEFINES += ['DRV_PIXEL_BITS=16']
+
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_LITE_RECT'):
+    src += ['example_gui_lite_geometry_rect.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+    
+Return('group')
+

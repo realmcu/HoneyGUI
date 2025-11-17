@@ -1,0 +1,95 @@
+.. _Circle (Geometry Circle):
+
+圆形 (Geometry Circle)
+=====================
+
+概述
+----
+
+圆形控件是一个轻量级的 :term:`GUI` 绘图组件，专门用于在用户界面中绘制圆形图形。该控件提供了简洁易用的 :term:`API` ，支持自定义圆形的中心位置、半径、颜色等属性，能够创建各种圆形 :term:`UI` 元素。
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://foruda.gitee.com/images/1763463135933874666/f2c5f5f8_13406851.png" width= "400" /></div>
+   <br>
+
+核心功能
+--------
+
+.. list-table::
+   :header-rows: 1
+
+   * - 描述
+     - API 
+   * - 创建控件
+     - :cpp:any:`gui_lite_circle_create`  
+   * - 设置属性
+     - :cpp:any:`gui_lite_circle_set_style`
+   * - 设置位置
+     - :cpp:any:`gui_lite_circle_set_position` 
+   * - 设置半径
+     - :cpp:any:`gui_lite_circle_set_radius`
+   * - 设置颜色
+     - :cpp:any:`gui_lite_circle_set_color`
+   * - 注册点击事件回调
+     - :cpp:any:`gui_lite_circle_on_click`
+
+圆形特性
+--------
+
+圆形控件具有以下几何特性：
+
+- **圆心定位**: 通过中心点坐标精确定位
+- **半径控制**: 支持任意大小的半径值
+- **完美圆形**: 确保绘制完美的几何圆形
+- **边界处理**: 自动处理圆形与边界的裁剪
+
+特性亮点
+--------
+
+- **高性能**: 采用优化的圆形绘制算法，确保流畅的渲染性能
+- **抗锯齿**: 支持边缘抗锯齿，提供平滑的圆形边缘效果
+- **灵活配置**: 支持自定义半径、位置和颜色
+- **透明度支持**: 支持 RGBA 颜色格式，可创建半透明圆形效果
+- **轻量级**: 内存占用小，适合嵌入式系统和资源受限环境
+- **动态更新**: 支持运行时动态修改位置和样式
+
+应用场景
+--------
+
+圆形控件适用于以下场景：
+
+- **状态指示器**: 创建圆形状态指示灯
+- **用户头像**: 实现圆形用户头像显示
+- **图标设计**: 绘制各种圆形图标元素
+- **进度指示**: 创建圆形进度条或加载动画
+- **按钮设计**: 实现圆形交互按钮
+- **装饰元素**: 作为 UI 界面的装饰性圆形元素
+- **数据可视化**: 用于饼图、雷达图等数据可视化组件
+
+配置说明
+--------
+
+要使用圆形控件，需要在配置文件中启用相应的宏定义：
+
+在 :file:`menu_config.h` 中添加：
+
+.. code-block:: c
+
+   #define CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE 1
+
+完整示例
+--------
+
+.. literalinclude:: ../../../example/widget/lite_geometry_circle/example_gui_lite_geometry_circle.c
+   :language: c
+   :start-after: /* gui lite geometry circle example start */
+   :end-before: /* gui lite geometry circle example end */
+
+
+
+API
+-------
+
+.. doxygenfile:: gui_lite_geometry_circle.h

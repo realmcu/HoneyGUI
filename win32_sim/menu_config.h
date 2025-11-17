@@ -71,6 +71,20 @@
 // #define CONFIG_REALTEK_BUILD_REAL_CANVAS
 // </c>
 
+
+// <c> RTK GUI Geometry ARC Demo
+// #define CONFIG_REALTEK_BUILD_REAL_LITE_ARC
+// </c>
+
+
+// <c> RTK GUI Geometry RECT Demo
+// #define CONFIG_REALTEK_BUILD_REAL_LITE_RECT
+// </c>
+
+// <c> RTK GUI Geometry CIRCLE Demo
+// #define CONFIG_REALTEK_BUILD_REAL_LITE_CIRCLE
+// </c>
+
 // <c> RTK GUI Menu Cellular Demo
 // #define CONFIG_REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET
 // </c>
