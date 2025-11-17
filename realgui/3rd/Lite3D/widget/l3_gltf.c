@@ -89,13 +89,19 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
 
     // 2. Allocate memory for the top-level arrays.
     desc->nodes = (l3_gltf_node_t *)l3_malloc(sizeof(l3_gltf_node_t) * desc->node_count);
+    memset(desc->nodes, 0, sizeof(l3_gltf_node_t) * desc->node_count);
     desc->meshes = (l3_gltf_mesh_t *)l3_malloc(sizeof(l3_gltf_mesh_t) * desc->mesh_count);
+    memset(desc->meshes, 0, sizeof(l3_gltf_mesh_t) * desc->mesh_count);
     l3_gltf_primitive_t *all_primitives_ram = (l3_gltf_primitive_t *)l3_malloc(sizeof(
                                                                                    l3_gltf_primitive_t) * header->primitive_count);
+    memset(all_primitives_ram, 0, sizeof(l3_gltf_primitive_t) * header->primitive_count);
     desc->skins = (l3_gltf_skin_t *)l3_malloc(sizeof(l3_gltf_skin_t) * desc->skin_count);
+    memset(desc->skins, 0, sizeof(l3_gltf_skin_t) * desc->skin_count);
     desc->animation = (l3_gltf_single_animation_t *)l3_malloc(sizeof(l3_gltf_single_animation_t));
+    memset(desc->animation, 0, sizeof(l3_gltf_single_animation_t));
     desc->materials = (l3_gltf_material_t *)l3_malloc(sizeof(l3_gltf_material_t) *
                                                       desc->material_count);
+    memset(desc->materials, 0, sizeof(l3_gltf_material_t) * desc->material_count);
 
     // 2. Pointer Redirection
     // 2.1 Scene root
@@ -213,7 +219,7 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
         g3m_material_on_disk_t *src_mat = &materials_on_disk[i];
         l3_gltf_material_t *dst_mat = &desc->materials[i];
 
-        memcpy(dst_mat->base_color, src_mat->base_color, sizeof(float) * 4);
+        memcpy(dst_mat->base_color, src_mat->base_color, sizeof(uint8_t) * 4);
 
         if (src_mat->texture_index != -1)
         {
@@ -369,6 +375,7 @@ void l3_free_gltf_model(l3_gltf_model_t *_this)
             for (uint32_t i = 0; i < _this->desc->skin_count; ++i)
             {
                 l3_free(_this->desc->skins[i].joint_matrices);
+                _this->desc->skins[i].joint_matrices = NULL;
             }
             l3_free(_this->desc->skins);
             _this->desc->skins = NULL;
