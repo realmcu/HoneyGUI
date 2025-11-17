@@ -350,6 +350,7 @@ static void inform_generate_cb(void)
     // add_information(&payload);
 }
 
+watchface_type_t current_watchface_type = WATCHFACE_BIG_NUM;
 static void app_main_watch_ui_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
@@ -364,8 +365,22 @@ static void app_main_watch_ui_design(gui_view_t *view)
     gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
-    extern void create_watchface_number(gui_obj_t *parent);
-    create_watchface_number((void *)view);
+
+    // select watchface
+    if (current_watchface_type == WATCHFACE_BIG_NUM)
+    {
+        extern void create_watchface_number(gui_view_t *view);
+        create_watchface_number((void *)view);
+    }
+    else if (current_watchface_type == WATCHFACE_SPORT)
+    {
+        extern void create_watchface_sport(gui_view_t *view);
+        create_watchface_sport((void *)view);
+    }
+    else if (current_watchface_type == WATCHFACE_VIDEO)
+    {
+        gui_log("Video watchface not implemented yet\n");
+    }
 }
 
 extern const unsigned char _binary_root_0x704D1400_bin_start[];

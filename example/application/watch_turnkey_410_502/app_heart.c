@@ -43,8 +43,6 @@ extern void resting_heartrate_design(gui_obj_t *obj);
  *                            Variables
  *============================================================================*/
 static gui_img_t *img_heart = NULL;
-static gui_img_t *img_heart_bg = NULL;
-static uint8_t *img_heart_bg_data = NULL;
 extern uint8_t activeIndex;
 static char time_text_content[10];
 static char time_status_content[20];
@@ -53,7 +51,6 @@ static gui_win_t *win_heart = NULL;
 gui_win_t *win_heart_menu = NULL;
 static uint8_t *img_dot_data = NULL;
 static gui_img_t *img_dot;
-static char *heartrate_json_content = NULL;
 
 // wave background animation variables
 static uint8_t *wave_bg_data = NULL;
@@ -69,12 +66,10 @@ static uint8_t *heart_reflection_data = NULL;
 
 static gui_text_t *text_current = NULL;
 static gui_text_t *text_heart_rate = NULL;
-static gui_text_t *text_bpm = NULL;
 static gui_text_t *text_status = NULL;
 
 static gui_view_t *current_view = NULL;
 const static gui_view_descriptor_t *watchface_view = NULL;
-const static gui_view_descriptor_t *pre_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -495,14 +490,6 @@ static void update_measurement_text(bool isMeasuring, int heartRate)
 
         if (text_heart_rate)
         {
-            char rate_text[32];
-            // if (heartRate > 0) {
-            //     sprintf(rate_text, "%d", heartRate);
-            // } else {
-            //     strcpy(rate_text, "--");
-            // }
-            // gui_log("Setting heart rate text to: %s\n", rate_text);
-
             gui_text_set(text_heart_rate, "--BPM", GUI_FONT_SRC_TTF,
                          gui_rgb(255, 255, 255), strlen("--BPM"), 60);
         }
@@ -616,7 +603,7 @@ void heart_drawCircles_cb(NVGcontext *vg)
 
 static void hr_timer_cb(void *obj)
 {
-    gui_img_t *img = (gui_img_t *)obj;
+    GUI_UNUSED(obj);
     static uint8_t count = 0;
     static int simulated_heart_rate = 0;
     float scale_factor;

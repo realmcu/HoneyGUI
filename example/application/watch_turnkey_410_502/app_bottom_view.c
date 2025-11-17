@@ -34,11 +34,7 @@ static void clear_bottom_view(gui_view_t *view);
  *                            Variables
  *============================================================================*/
 static gui_view_t *current_view = NULL;
-const static gui_view_descriptor_t *watchface_view = NULL;
-const static gui_view_descriptor_t *app_music_view = NULL;
-const static gui_view_descriptor_t *app_message_view = NULL;
-const static gui_view_descriptor_t *app_sport_view = NULL;
-const static gui_view_descriptor_t *menu_view = NULL;
+extern watchface_type_t current_watchface_type;
 
 GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, bottom_view_design, clear_bottom_view);
 const char *month[12] =
@@ -103,9 +99,6 @@ static char date_content[20] = "January0\nSun";
 static char time_timecard_content[10] =  "00:00";
 static char date_timecard_content[10] = "Sun 0";
 
-static char calendar_name[10] = "Calendar";
-static char calendar_content[30] = "No proximity schedules.";
-
 static uint8_t *img_data_activity = NULL;
 static char *move_content = NULL;
 static char *ex_content = NULL;
@@ -115,20 +108,6 @@ static gui_list_t *list = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-
-
-static int gui_view_get_other_view_descriptor_init(void)
-{
-    /* you can get other view descriptor point here */
-    watchface_view = gui_view_descriptor_get("watchface_view");
-    app_music_view = gui_view_descriptor_get("app_music_view");
-    app_sport_view = gui_view_descriptor_get("app_sport_view");
-    app_message_view = gui_view_descriptor_get("app_message_view");
-    menu_view = gui_view_descriptor_get("menu_view");
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
-    return 0;
-}
-static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
 static void clear_bottom_view(gui_view_t *view)
 {
@@ -251,25 +230,28 @@ static void timer_cb(void *obj)
 
 static void switch_app_cb(void *obj)
 {
+    GUI_UNUSED(obj);
     const char *obj_name = ((gui_obj_t *)obj)->name;
-    // if (strcmp(obj_name, "MUSIC") == 0)
-    // {
-    //     gui_view_switch_direct(current_view, app_music_view, SWITCH_OUT_ANIMATION_FADE,
-    //                            SWITCH_IN_ANIMATION_FADE);
-    // }
-    // else if (strcmp(obj_name, "CHARGE") == 0)
-    // {
-    //     gui_view_switch_direct(current_view, app_sport_view, SWITCH_OUT_ANIMATION_FADE,
-    //                            SWITCH_IN_ANIMATION_FADE);
-    // }
+    if (strcmp(obj_name, "note_weather") == 0)
+    {
+        gui_view_switch_direct(current_view, gui_view_descriptor_get("weather_view"),
+                               SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
+    else if (strcmp(obj_name, "note_ac") == 0)
+    {
+        gui_view_switch_direct(current_view, gui_view_descriptor_get("activity_view"),
+                               SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
     // else if (strcmp(obj_name, "MESSAGE") == 0)
     // {
-    //     gui_view_switch_direct(current_view, app_message_view, SWITCH_OUT_ANIMATION_FADE,
+    //     gui_view_switch_direct(current_view, gui_view_descriptor_get("app_message_view"), SWITCH_OUT_ANIMATION_FADE,
     //                            SWITCH_IN_ANIMATION_FADE);
     // }
     // else if (strcmp(obj_name, "app_menu") == 0)
     // {
-    //     gui_view_switch_direct(current_view, menu_view, SWITCH_OUT_ANIMATION_FADE,
+    //     gui_view_switch_direct(current_view, gui_view_descriptor_get("menu_view"), SWITCH_OUT_ANIMATION_FADE,
     //                            SWITCH_IN_ANIMATION_FADE);
     // }
 }
@@ -374,7 +356,7 @@ static void draw_battery_arc(NVGcontext *vg)
     float cx = 45.0f;
     float cy = 45.0f;
     float outer_radius = 39.6f;
-    float inner_radius = 32.4f;
+    // float inner_radius = 32.4f;
     float stroke_width = 7.2f;
     battery_level = 75;
 
@@ -423,25 +405,21 @@ static void note_design(gui_obj_t *obj, void *p)
 
     if (index == 0)
     {
-        // note_calendar
-        gui_img_t *img = gui_img_create_from_mem(obj, "music", UI_CARD_WEATHER_BIN, offset_X,
-                                                 0, 0, 0);
+        // note_weather
+        gui_img_t *img = gui_img_create_from_mem(obj, "note_weather", UI_CARD_WEATHER_BIN, offset_X, 0, 0,
+                                                 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     }
     else if (index == 1)
-    {
-        // note_weather
-        gui_img_t *img = gui_img_create_from_mem(obj, "weather", UI_CARD_WEATHER_BIN, offset_X, 0, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    }
-    else if (index == 2)
     {
         // note_activity
         {
             gui_img_t *canvas = (gui_img_t *)gui_canvas_round_rect_create(obj, "note_ac", offset_X, 0, 352, 157,
                                                                           20,
                                                                           gui_rgba(98, 101, 98, 255 * 0.7));
-            gui_img_set_mode(canvas, IMG_SRC_OVER_MODE);
+            // gui_img_set_mode(canvas, IMG_SRC_OVER_MODE);
 
             if (move_content == NULL)
             {
@@ -488,20 +466,22 @@ static void note_design(gui_obj_t *obj, void *p)
                 gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 100, 100, arc_activity_cb,
                                                   img_data_activity);
             }
+            gui_obj_add_event_cb(canvas, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
     }
-    else if (index == 3)
+    else if (index == 2)
     {
-        // note_app
-
-        gui_img_t *canvas_app = (gui_img_t *)gui_canvas_round_rect_create(GUI_BASE(obj), "note_ac",
+        // Information Statistics Quick Bar
+        gui_img_t *canvas_app = (gui_img_t *)gui_canvas_round_rect_create(GUI_BASE(obj), "APP_CANVAS",
                                                                           offset_X, 0, 352, 157, 20, gui_rgba(98, 101, 98, 255 * 0.7));
-        gui_img_t *img = gui_img_create_from_mem(canvas_app, "MUSIC", APP_MUSIC_ICON_BIN, 17, 28,
-                                                 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_scale(img, 0.7, 0.7);
-
-
+        //music
+        {
+            gui_img_t *img = gui_img_create_from_mem(canvas_app, "MUSIC", APP_MUSIC_ICON_BIN, 17, 28,
+                                                     0, 0);;
+            gui_img_scale(img, 0.7, 0.7);
+            // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        }
+        //battery
         {
             battery_level = 75;
 
@@ -521,7 +501,7 @@ static void note_design(gui_obj_t *obj, void *p)
 
 
 
-            gui_img_t *img_battery = gui_img_create_from_mem(canvas_app, "battery", img_data_battery, 17 + 109,
+            gui_img_t *img_battery = gui_img_create_from_mem(canvas_app, "BATTERY", img_data_battery, 17 + 109,
                                                              28, 0, 0);
 
             img_battery->base.w = image_w;
@@ -535,39 +515,28 @@ static void note_design(gui_obj_t *obj, void *p)
 
             sprintf(battery_content, "%d", battery_level);
 
-            gui_text_t *battery_text = gui_text_create(canvas_app, "battery", 145, 42, 0, 0);
+            gui_text_t *battery_text = gui_text_create(canvas_app, "battery_text", 145, 42, 0, 0);
             gui_text_set(battery_text, "75", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(battery_content), 50);
             gui_text_type_set(battery_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(battery_text, LEFT);
 
-
-
             gui_obj_add_event_cb(img_battery, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
+        //message
+        {
 
-        // img = gui_img_create_from_mem(canvas_app, "CHARGE", APP_STORE_ICON_BIN, 17 + 109, 28, 0, 0);
-
-
-
-
-
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
-        img = gui_img_create_from_mem(canvas_app, "MESSAGE", APP_MESSAGE_ICON_BIN, 17 + 109 * 2, 28, 0,
-                                      0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_scale(img, 0.7, 0.7);
-        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+            gui_img_t *img = gui_img_create_from_mem(canvas_app, "MESSAGE", APP_MESSAGE_ICON_BIN, 17 + 109 * 2,
+                                                     28, 0,
+                                                     0);
+            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_img_scale(img, 0.7, 0.7);
+            gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        }
     }
-    else if (index == 4)
+    else if (index == 3)
     {
         gui_img_t *canvas = (gui_img_t *)gui_canvas_round_rect_create(GUI_BASE(obj), "note_ac", 76, 0, 258,
                                                                       76, 38, gui_rgba(98, 101, 98, 255 * 0.7));
-
-        // note_app_menu
-        // gui_canvas_round_rect_t *canvas = gui_canvas_round_rect_create(GUI_BASE(note_appview), "app_menu",
-        //                                                                57, 0, 292, 76, 40, gui_rgb(100, 100, 100));
-        // img = gui_img_create_from_mem(canvas, 0, APP_MENU_ICON_BIN, 38, 20, 0, 0);
-        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
         gui_text_t *text = gui_text_create(canvas, 0, 90, 20, 0, 0);
         gui_text_set(text, (void *)"EDIT", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 4, 32);
@@ -583,15 +552,27 @@ static void bottom_view_design(gui_view_t *view)
 {
     current_view = view;
     initialize_text_num_array();
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+                             SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
-
+    gui_view_set_opacity(view, 200);
     gui_obj_t *parent = GUI_BASE(view);
     // draw background
-    gui_canvas_rect_t *canvas_bg = gui_canvas_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
-                                                          SCREEN_HEIGHT, gui_rgb(219, 122, 147));
+    gui_canvas_rect_t *canvas_bg = NULL;
+    if (current_watchface_type == WATCHFACE_BIG_NUM)
+    {
+        canvas_bg = gui_canvas_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
+                                           SCREEN_HEIGHT, gui_rgb(219, 122, 147));
+
+    }
+    else
+    {
+        canvas_bg = gui_canvas_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
+                                           SCREEN_HEIGHT, gui_rgb(0, 0, 0));
+    }
     gui_obj_create_timer(GUI_BASE(canvas_bg), 100, true, timer_cb);
+
 
     //clock circle
     gui_win_t *win = gui_win_create(parent, __WIN0_NAME, 38, 30, 335, 180);
@@ -628,7 +609,7 @@ static void bottom_view_design(gui_view_t *view)
     list = gui_list_create(parent, "list", 0, 0, 0, 0, length, space, VERTICAL, note_design, NULL,
                            false);
     gui_list_set_style(list, LIST_CARD);
-    gui_list_set_note_num(list, 5);
+    gui_list_set_note_num(list, 4);
     gui_list_set_offset(list, 215);
     gui_list_set_card_stack_location(list, 20);
 

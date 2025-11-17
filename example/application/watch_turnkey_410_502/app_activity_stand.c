@@ -49,7 +49,6 @@ extern void time_update_cb(void *p);
  *============================================================================*/
 
 extern char *cjson_content;
-static uint8_t *img_ring_data = NULL;
 static uint8_t *img_chart_data = NULL;
 static gui_img_t *img_ring;
 extern gui_img_t *img_dot;
@@ -58,17 +57,13 @@ static gui_img_t *img_chart;
 
 static uint16_t count = COUNT_MAX; //for timer
 static bool draw_flag = 0; //0: get new json data
-static char stand_content[30] = {0};
-static char ex_content[30] = {0};
-
-static char time_text_content[10];
 extern gui_text_t *time_text;
 static char stand_text_content[10];
 static char per_text_content[10];
 static char cal_text_content[10];
 static char calTotal_text_content[10];
 static char calUnit_text_content[10];
-static char am_text_content[10];
+
 extern uint8_t activeIndex;
 extern gui_win_t *win_activity;
 extern gui_win_t *win_menu_activity;
@@ -235,11 +230,7 @@ void activity_stand_design(gui_obj_t *obj)
     gui_img_create_from_mem(obj, "bg_stand", (void *)ACTIVITY_APP_BG3_BIN, 0, 0, 0, 0);
     gui_img_create_from_mem(obj, "icon2", (void *)ACTIVITY_RIGHT_CONTROL_BIN, 326, 397, 0, 0);
 
-
-    // win_activity = gui_win_create(obj, "ring_win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // img_ring ring
-    int ring_image_h = RADIUS_SCALE * 2;
-    int ring_image_w = RADIUS_SCALE * 2;
     int pixel_bytes = 4;
     size_t buffer_size = 0;
 

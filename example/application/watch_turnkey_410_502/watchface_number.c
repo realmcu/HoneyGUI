@@ -11,12 +11,13 @@
 #include "gui_text.h"
 #include "app_main_watch.h"
 #include "gui_canvas.h"
+#include "gui_view_instance.h"
 /*============================================================================*
  *                            Macros
  *============================================================================*/
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-
+#define CURRENT_VIEW_NAME "watchface_big_num_view"
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
@@ -25,8 +26,8 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static char time_content[6] = {0};
-static char date_content[10] = {0};
+static char hour_content[6] = {0};
+static char minute_content[10] = {0};
 
 static gui_win_t *win_dot = NULL;
 static gui_img_t *img_dot = NULL;
@@ -44,12 +45,12 @@ static void time_update_cb(void *p)
         return;
     }
 
-    sprintf(time_content, "%02d", timeinfo->tm_hour);
-    sprintf(date_content, "%02d", timeinfo->tm_min);
+    sprintf(hour_content, "%02d", timeinfo->tm_hour);
+    sprintf(minute_content, "%02d", timeinfo->tm_min);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "t_time", obj);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(t_date, "t_date", obj);
-    gui_text_content_set((gui_text_t *)t_time, time_content, strlen(time_content));
-    gui_text_content_set((gui_text_t *)t_date, date_content, strlen(date_content));
+    gui_text_content_set((gui_text_t *)t_time, hour_content, strlen(hour_content));
+    gui_text_content_set((gui_text_t *)t_date, minute_content, strlen(minute_content));
 }
 
 static void Circles_cb(NVGcontext *vg)
@@ -111,9 +112,10 @@ static void bg_cb(NVGcontext *vg)
     nvgFillColor(vg, bgColor);
     nvgFill(vg);
 }
-void create_watchface_number(gui_obj_t *parent)
+void create_watchface_number(gui_view_t *view)
 {
 
+    gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     size_t *buffer_bg_size = SCREEN_WIDTH * SCREEN_HEIGHT * 2 + sizeof(gui_rgb_data_head_t);
@@ -124,17 +126,17 @@ void create_watchface_number(gui_obj_t *parent)
                                       img_bg_data);
     gui_img_create_from_mem(win, "watchface", (void *)img_bg_data, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    sprintf(time_content, "%02d", timeinfo->tm_hour);
-    sprintf(date_content, "%02d", timeinfo->tm_min);
+    sprintf(hour_content, "%02d", timeinfo->tm_hour);
+    sprintf(minute_content, "%02d", timeinfo->tm_min);
     gui_text_t *t_time = gui_text_create(win, "t_time", -58, 10, 0, 0);
-    gui_text_set(t_time, time_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(time_content),
+    gui_text_set(t_time, hour_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(hour_content),
                  250);
     gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
     gui_text_t *t_date = gui_text_create(win, "t_date", -58, 200, 0, 0);
-    gui_text_set(t_date, date_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(date_content),
+    gui_text_set(t_date, minute_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(minute_content),
                  250);
     gui_text_type_set(t_date, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_date, RIGHT);
@@ -156,3 +158,4 @@ void create_watchface_number(gui_obj_t *parent)
     gui_obj_create_timer(GUI_BASE(win), 30000, true, time_update_cb);
     gui_obj_create_timer(GUI_BASE(win_dot), 50, true, time_dot_cb);
 }
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_number, NULL);

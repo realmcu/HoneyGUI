@@ -53,9 +53,6 @@ gui_img_t *img_dot;
 static uint16_t count = COUNT_MAX; //for timer
 // static bool draw_flag = 0; //0: get new json data
 bool has_draw_bg = 0; // only draw background once
-static char move_content[30] = {0};
-static char ex_content[30] = {0};
-static char stand_content[30] = {0};
 
 static char time_text_content[10];
 gui_text_t *time_text;
@@ -225,19 +222,10 @@ static void activity_timer_cb(void *obj)
 
 static void enter_timer_cb(void *obj)
 {
-    gui_view_t *view = gui_view_get_current();
     // if (strcmp(GUI_BASE(view)->name, CURRENT_VIEW_NAME) == 0)
     {
         count = 0;
         has_draw_bg = false;
-        activeIndex = 0;
-        uint8_t *img_ring_data = (void *)gui_img_get_image_data(img_ring);
-// gui_log("Function: %s line: %d\n", __func__, __LINE__);
-        // int image_h = RADIUS * 2;
-        // int image_w = RADIUS * 2;
-        // int pixel_bytes = 4;
-        // size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-        // memset(img_ring_data, 0, buffer_size);
         gui_obj_create_timer(GUI_BASE(img_ring), 10, true, activity_timer_cb);
         gui_obj_start_timer(GUI_BASE(img_ring));
         gui_obj_stop_timer(GUI_BASE(obj));

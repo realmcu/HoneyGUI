@@ -455,8 +455,8 @@ static void slide_win_cb(void *p)
 }
 static void note3_design(gui_list_note_t *note)
 {
-    gui_img_t *img_bg3 = gui_img_create_from_mem(note, "bg3", WEATHER_BACKGROUND3_BIN, 0, 0,
-                                                 SCREEN_WIDTH, SCREEN_HEIGHT);
+    gui_img_create_from_mem(note, "bg3", WEATHER_BACKGROUND3_BIN, 0, 0,
+                            SCREEN_WIDTH, SCREEN_HEIGHT);
 
     gui_win_t *win_list = gui_win_create(note, "win_list", 0, 160, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -522,6 +522,9 @@ static void note_design(gui_obj_t *obj, void *p)
 
 static void weather_design(gui_view_t *view)
 {
+    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"), SWITCH_OUT_ANIMATION_FADE,
+                             SWITCH_IN_ANIMATION_FADE,
+                             GUI_EVENT_KB_SHORT_CLICKED);
     weather_data_init();
     weather_condition_init();
     weather_list = gui_list_create(view, "weather_list", 0, 0, 0, 0, 502, 0, VERTICAL,

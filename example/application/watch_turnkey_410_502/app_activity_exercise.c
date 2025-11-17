@@ -52,7 +52,6 @@ extern void time_update_cb(void *p);
 
 
 extern char *cjson_content;
-static uint8_t *img_ring_data = NULL;
 static uint8_t *img_chart_data = NULL;
 static gui_img_t *img_chart;
 extern gui_img_t *img_ring;
@@ -61,8 +60,6 @@ extern uint8_t *img_dot_data;
 
 static uint16_t count = COUNT_MAX; //for timer
 static bool draw_flag = 0; //0: get new json data
-// static char exercise_content[30] = {0};
-static char ex_content[30] = {0};
 
 // static char time_text_content[10];
 extern gui_text_t *time_text;
@@ -71,7 +68,7 @@ static char per_text_content[10];
 static char cal_text_content[10];
 static char calTotal_text_content[10];
 static char calUnit_text_content[10];
-static char am_text_content[10];
+
 extern uint8_t activeIndex;
 extern gui_win_t *win_activity;
 extern gui_win_t *win_menu_activity;
@@ -293,8 +290,6 @@ void activity_exercise_design(gui_obj_t *obj)
 
     // win_activity = gui_win_create(obj, "ring_win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // img_ring ring
-    int ring_image_h = RADIUS_SCALE * 2;
-    int ring_image_w = RADIUS_SCALE * 2;
     int pixel_bytes = 4;
     size_t buffer_size = 0;
 

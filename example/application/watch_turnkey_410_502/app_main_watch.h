@@ -24,7 +24,12 @@ typedef struct information
     const char *time;
     app_name app;
 } information_t;
-
+typedef enum
+{
+    WATCHFACE_BIG_NUM = 0,  // watchface number
+    WATCHFACE_SPORT = 1,    // watchface sport
+    WATCHFACE_VIDEO = 2     // watchface video
+} watchface_type_t;
 /*============================================================================*
  *                            Macros
  *============================================================================*/

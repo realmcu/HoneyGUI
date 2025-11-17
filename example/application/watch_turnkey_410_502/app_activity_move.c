@@ -50,7 +50,6 @@ extern void time_update_cb(void *p);
  *============================================================================*/
 
 extern char *cjson_content;
-static uint8_t *img_ring_data = NULL;
 static uint8_t *img_chart_data = NULL;
 extern gui_img_t *img_ring;
 extern gui_img_t *img_dot;
@@ -60,18 +59,13 @@ static gui_img_t *img_chart;
 static uint16_t count = 0; //for timer
 static bool draw_flag = 0; //0: get new json data
 
-static char move_content[30] = {0};
-static char ex_content[30] = {0};
-static char stand_content[30] = {0};
 
-static char time_text_content[10];
 extern gui_text_t *time_text;
 static char move_text_content[10];
 static char per_text_content[10];
 static char cal_text_content[10];
 static char calTotal_text_content[10];
 static char calUnit_text_content[10];
-static char am_text_content[10];
 const char *majorLabels[] = {"12AM", "6AM", "12PM", "6PM", ""};
 extern uint8_t activeIndex;
 extern gui_win_t *win_activity;
@@ -291,22 +285,9 @@ void activity_move_design(gui_obj_t *obj)
     gui_img_create_from_mem(obj, "bg_move", (void *)ACTIVITY_APP_BG1_BIN, 0, 0, 0, 0);
     gui_img_create_from_mem(obj, "icon2", (void *)ACTIVITY_RIGHT_CONTROL_BIN, 326, 397, 0, 0);
 
-
-    // win_activity = gui_win_create(obj, "ring_win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    // img_ring ring
-    int ring_image_h = RADIUS_SCALE * 2;
-    int ring_image_w = RADIUS_SCALE * 2;
     int pixel_bytes = 4;
     size_t buffer_size = 0;
-    // size_t buffer_size = ring_image_h * ring_image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
-    // if (img_ring_data == NULL)
-    // {
-    //     img_ring_data = gui_lower_malloc(buffer_size);
-    // }
-    // memset(img_ring_data, 0, buffer_size);
-    // img_ring = gui_img_create_from_mem(obj, 0, (void *)img_ring_data, RADIUS_SCALE, RADIUS_SCALE, 0, 0);
-    // gui_img_set_mode(img_ring, IMG_SRC_OVER_MODE);
-    // gui_img_set_quality(img_ring, true);
+
     // img_ring dot
     buffer_size = 12 * 96 * pixel_bytes + sizeof(gui_rgb_data_head_t);
     if (img_dot_data == NULL)
