@@ -722,8 +722,8 @@ section[id*="deprecated-api"] .highlight-cpp {
 /* ==== Render back-to-top icon style ==== */
 #back-to-top {
     position: fixed;
-    bottom: 80px;
-    right: 20px;
+    bottom: 90px;
+    right: 21px;
     width: 42px;
     height: 42px;
     padding: 0;
@@ -915,24 +915,3 @@ a.no-cursor-link {
     }
 }
 /* ====== Render ai summary style ====== */
-
-/* ======== Render ai ask style ======== */
-chat-widget .toggle-chat-modal {
-    position: fixed;
-    bottom: 25px;
-    right: 20px;
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    text-align: center;
-    border: none;
-    border-radius: 50%;
-    background: url('../image/aiask.png') center center / cover no-repeat;
-    box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.5);
-    cursor: pointer;
-    z-index: 1001;
-}
-chat-widget .toggle-chat-modal:hover {
-    background: url('../image/aiask-hover.png') center center / cover no-repeat;
-}
-/* ======== Render ai ask style ======== */

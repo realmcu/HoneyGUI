@@ -1,4 +1,4 @@
-
+/* 3d robot demo start*/
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_obj.h"
@@ -59,4 +59,4 @@ static int app_init(void)
 
 GUI_INIT_APP_EXPORT(app_init);
 
-
+/* 3d robot demo end*/

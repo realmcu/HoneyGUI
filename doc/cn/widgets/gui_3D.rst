@@ -11,7 +11,12 @@ Lite3D 是由 Realtek 自主研发的轻量级、跨平台的 3D 图形渲染库
    - 灵活渲染：提供软件渲染管线，支持扩展 :term:`GPU` 加速接口。
 
 
-Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型，能够处理模型的几何形状和材质信息，并支持为模型添加丰富的动画特效以增强视觉表现力。该引擎的工作流程如下：
+Lite3D 支持加载多种 3D 模型格式，以满足不同应用场景的需求：
+
+   - 静态模型：支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的静态 3D 模型，能够精确处理模型的几何形状和材质信息。
+   - 骨骼动画模型：支持加载 :file:`.gltf` 格式，能够渲染包含骨骼动画的 3D 模型，为应用带来更生动、丰富的视觉表现力。
+
+该引擎的工作流程如下：
 
 .. figure:: https://foruda.gitee.com/images/1755252209828076518/c91dad94_13408154.png
    :width: 800px
@@ -21,14 +26,22 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
 
 
 
-3D 模型组成要素
+3D 模型资源处理
 ---------------
 
-完整的 3D 模型包含三个核心组件：
+OBJ 静态模型
+~~~~~~~~~~~~~
 
-1. **.obj 文件**
+OBJ 是一种广泛使用的静态模型文件格式，适用于无需复杂动画的场景，如产品展示、UI 装饰元素等。
 
-   - 存储几何数据，包括：
+模型组成要素
+^^^^^^^^^^^^^
+
+一个完整的 OBJ 模型通常由以下三个核心组件构成：
+
+1. .obj 文件
+
+   - 存储模型的几何数据，是模型的主体文件。内容包括：
 
      - 顶点坐标
      - 法线向量
@@ -36,55 +49,53 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
      - 面定义
    - 需引用 :file:`.mtl` 文件中的材质信息。
 
-2. **.mtl 文件（材质库）**
+2. .mtl 文件（材质库）
 
-   - 定义表面属性，包括：
+  定义模型表面的光学属性。内容包括：
 
-     - 环境光/漫反射/镜面反射颜色
-     - 折射率
-     - 透明度
-     - 光照模型
-     - 纹理贴图引用
+      - 环境光/漫反射/镜面反射颜色
+      - 折射率
+      - 透明度
+      - 光照模型
+      - 纹理贴图引用
 
-3. **纹理图片**
+3. 纹理图片
 
-   - 通常为 :term:`PNG` 格式，用于：
+   通常为 :term:`PNG` 格式，用于赋予模型表面细节和真实感。常见的贴图类型有：
 
-     - 漫反射贴图
-     - 法线贴图
-     - 高光贴图
-     - 透明贴图
+      - 漫反射贴图
+      - 法线贴图
+      - 高光贴图
+      - 透明贴图
 
 .. figure:: https://foruda.gitee.com/images/1735113754178839767/916a3f95_13408154.png
    :width: 800px
    :align: center
    
-   3D 模型组成示例
+   OBJ 模型组成示例
 
 
-3D 模型预处理
----------------
+模型预处理
+^^^^^^^^^^^
 
-在绘制 3D 模型前，需要将其转换为二进制格式。以下是处理流程：
+在绘制 OBJ 模型前，需要将其转换为二进制格式。以下是处理流程：
 
-1. **定位转换工具**
-   
-   - 在 HoneyGUI 安装目录下找到以下工具：
+1. 定位转换工具
 
-     - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
-     - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
+   在 HoneyGUI 安装目录下找到以下工具：
 
-2. **准备模型目录**
-   
-   - 将上述工具复制到模型目录。
+      - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
+      - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
 
-   - 该模型目录确保包含：
+2. 准备模型目录
 
-     - :file:`.obj` 文件
-     - :file:`.mtl` 文件
-     - 所有引用的纹理图片
+   将上述工具与模型文件放在同一个目录下，确保目录内包含：
 
-3. **生成描述文件**
+      - :file:`.obj` 文件
+      - :file:`.mtl` 文件
+      - 所有引用的纹理图片
+
+3. 生成描述文件
    
    - 使用提取器处理模型: ``extract_desc.exe xxx.obj``，该可执行文件会自动调用 :file:`png2c.py` 将所有的 PNG 纹理转换为二进制数组。
    
@@ -106,6 +117,53 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
 
       生成二进制数组
 
+GLTF 骨骼动画模型
+~~~~~~~~~~~~~~~~~
+GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和模型而设计的开放标准。它被誉为 "3D 领域的 JPEG"，特别适合用于渲染包含骨骼动画的动态模型。
+
+模型组成要素
+^^^^^^^^^^^^^
+一个完整的 GLTF 模型通常由以下三个核心组件构成：
+
+   - :file:`.gltf` 文件：JSON 格式的文件，以结构化的方式描述场景的层次关系与组成元素。
+   - :file:`.bin` 文件：包含模型的二进制数据，如顶点坐标、法线向量、纹理坐标等。
+   - 所有引用的纹理图片：如 PNG 格式的贴图。
+
+其核心数据组件包括：
+
+   - 场景图 (Scene Graph)：由节点 (Node) 组成的层级结构，定义了模型各部件的位置、旋转和缩放。
+   - 网格 (Mesh)：模型的几何信息，包括顶点属性（坐标、法线、UV）和索引。
+   - 材质 (Material)：基于物理的渲染 (PBR) 属性，如基础颜色、金属度、粗糙度等。
+   - 皮肤 (Skin)：定义骨骼动画的关键部分，包含骨骼关节 (Joints) 的层级关系和反向绑定矩阵 (Inverse Bind Matrices)。
+   - 动画 (Animation)：存储了节点（骨骼）随时间变化的位移、旋转、缩放等关键帧数据。
+   - 纹理 (Texture)：由材质引用的图像数据。
+
+模型预处理
+^^^^^^^^^^^
+与 OBJ 模型类似，GLTF 模型也需要经过预处理，转换为适用于嵌入式平台的优化格式。
+
+1. 定位转换工具
+
+   在 HoneyGUI 安装目录下找到以下工具：
+
+      - ``your_HoneyGUI_dir\tool\3D-tool\extract_gltf_desc.exe``
+
+2. 准备模型目录
+   
+   将上述工具与模型文件放在同一个目录下，确保目录内包含：
+
+      - :file:`.gltf` 文件
+      - :file:`.bin` 文件
+      - 所有引用的纹理图片
+
+3. 生成描述文件
+   
+   - 使用提取器处理模型: ``extract_gltf_desc.exe xxx.gltf``，该可执行文件会自动调用 :file:`png2c.py` 将所有的 PNG 纹理转换为二进制数组。
+   - 生成的 :file:`gltf_desc.txt` 和 :file:`gltf_desc.bin` 文件包含以下内容：
+
+     - gltf 解析数据
+     - bin 解析数据
+     - 内嵌纹理数据
 
 
 3D 模型生成
@@ -113,19 +171,56 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
 
 创建模型
 ~~~~~~~~
-调用 Lite3D 库中的 ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)`` 函数创建 3D 模型，导入的 ``desc_addr`` 文件即为脚本中提取的解析数据， ``draw_type`` 为模型绘制方式，支持以下三种方式：
 
-+ ``L3_DRAW_FRONT_ONLY``：仅绘制模型的正面，适用于需要隐藏背面的场景，如蝴蝶模型。
-+ ``L3_DRAW_FRONT_AND_BACK``：绘制模型的正面和背面，适用于需要双面可见的场景，如棱镜模型。
-+ ``L3_DRAW_FRONT_AND_SORT``：绘制模型的正面并排序，适用于前后景遮挡的场景，如人脸模型。
+.. table:: 3D 模型创建
+   :widths: 10 40 50 
+   :align: center
+   :name: 3D 模型创建
 
+   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+   | 模型格式 | 函数                                                                                                                      | 关键参数说明                                                                               |
+   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+   | OBJ      | ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)``        | ``draw_type`` 模型绘制方式：                                                               |
+   |          |                                                                                                                           |                                                                                            |
+   |          |                                                                                                                           | - ``L3_DRAW_FRONT_ONLY``：仅绘制模型的正面，适用于需要隐藏背面的场景，如蝴蝶模型。         |
+   |          |                                                                                                                           |                                                                                            |
+   |          |                                                                                                                           | - ``L3_DRAW_FRONT_AND_BACK``：绘制模型的正面和背面，适用于需要双面可见的场景，如棱镜模型。 |
+   |          |                                                                                                                           |                                                                                            |
+   |          |                                                                                                                           | - ``L3_DRAW_FRONT_AND_SORT``：绘制模型的正面并排序，适用于前后景遮挡的场景，如人脸模型。   |
+   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+   | GLTF     | ``l3_create_gltf_model(void *desc_addr, L3_IMAGE_TYPE image_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)`` | ``image_type`` 输出格式：                                                                  |
+   |          |                                                                                                                           |                                                                                            |
+   |          |                                                                                                                           | - ``LITE_RGB565``                                                                          |
+   |          |                                                                                                                           |                                                                                            |
+   |          |                                                                                                                           | - ``LITE_ARGB8888``                                                                        |
+   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+
+通用参数说明：
+
+- ``desc_addr``： 指向脚本中提取的解析数据地址。
+- ``x`` ， ``y``： 模型视口在屏幕上的左上角坐标。
+- ``view_w``， ``view_h``： 模型视口的宽度和高度。
 
 变换控制
 ~~~~~~~~~~~~
 
 全局变换
 ^^^^^^^^
-使用 ``l3_set_global_transform(l3_model_t *_this, l3_global_transform_cb cb)`` 函数对 3D 模型进行整体变换，其中 ``l3_global_transform_cb`` 类型的回调函数可以为物体的所有面设置相同的形状变换。例如 ``world`` 世界坐标变换和 ``camera`` 相机视角投影。
+全局变换是对模型的所有顶点应用一个统一的矩阵变换，常用于实现模型的整体旋转、平移和缩放。
+
+- OBJ 模型
+
+   .. code-block:: c
+
+      void l3_set_global_transform(l3_model_t *_this, l3_global_transform_cb cb);
+
+- GLTF 模型
+
+   .. code-block:: c
+
+      void l3_gltf_set_global_transform(l3_gltf_model_t *_this, l3_gltf_global_transform_cb cb);
+
+用户需要实现一个回调函数，类型为 ``l3_global_transform_cb`` 或 ``l3_gltf_global_transform_cb`` ，并在该函数内部定义变换逻辑，例如 ``world`` 世界坐标变换和 ``camera`` 相机视角投影。
 
 **典型应用场景：**
 
@@ -187,7 +282,7 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
 
 面变换
 ^^^^^^^^
-使用 ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)`` 函数对 3D 模型进行局部变换，其中 ``l3_face_transform_cb`` 类型的回调函数可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。
+使用 ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)`` 函数对 OBJ 模型进行局部变换，其中 ``l3_face_transform_cb`` 类型的回调函数可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。
 
 **功能特点：**
 
@@ -200,11 +295,11 @@ Lite3D 支持加载由 :file:`.obj` 和 :file:`.mtl` 文件组成的 3D 模型�
 
 创建控件
 ~~~~~~~~~~
-HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 控件，使用 :cpp:any:`gui_lite3d_create` 函数可以创建 3D 模型控件。
+HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 和 ``gui_lite3d_gltf`` 控件，使用 :cpp:any:`gui_lite3d_create` 和 :cpp:any:`gui_lite3d_gltf_create` 函数可以分别创建 OBJ 模型和 GLTF 模型控件。
 
 设置点击事件
 ~~~~~~~~~~~~~
-:cpp:any:`gui_lite3d_on_click` 函数可以为 3D 模型控件设置点击事件，当用户点击模型时，会触发回调函数。
+:cpp:any:`gui_lite3d_on_click` 或 :cpp:any:`gui_lite3d_gltf_on_click` 函数可以为 3D 模型控件设置点击事件，当用户点击模型时，会触发回调函数。
 
 设置动画
 ~~~~~~~~~~
@@ -289,21 +384,41 @@ HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 控件，使�
    <br>
 
 
+.. _3D 机器人:
+
+3D 机器人
+~~~~~~~~~~~~
+
+该模型为 GLTF 格式，带骨骼动画，Lite3D 默认循环播放该动画。
+
+.. literalinclude:: ../../../example/widget/3d/app_ui_realgui_3d_robot_gltf.c
+   :language: c
+   :start-after: /* 3d robot demo start*/
+   :end-before: /* 3d robot demo end*/
+
+.. raw:: html
+
+   <br>
+   <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/Lite3D/3d_robot.gif" width= "400" /></div>
+   <br>
+
+
 帧率测试
 --------
 
-以下表格展示了不同芯片平台上，各个示例的帧率表现。编译环境采用 ``ARMCLANG V6.22``，编译选项为 ``-O3 LTO``。
+以下表格展示了不同芯片平台上，各个示例的帧率表现。编译环境采用 ``ARMCLANG V6.22``，编译选项为 ``-O2 LTO``。
 
 .. csv-table:: 帧率测试结果
-   :header: 芯片型号,处理器主频,分辨率,:ref:`3D 蝴蝶`,:ref:`3D 人脸`,:ref:`3D 小狗`,:ref:`3D 应用列表`
+   :header: 芯片型号,处理器主频,分辨率,:ref:`3D 蝴蝶`,:ref:`3D 人脸`,:ref:`3D 小狗`,:ref:`3D 应用列表`,:ref:`3D 机器人`
    :align: center
    :name: 帧率测试结果
 
-   RTL8773E,100MHz,410 x 502,33 FPS,13 FPS,22 FPS,24 FPS
-   RTL8773G,200MHz,410 x 502,58 FPS,24 FPS,46 FPS,56 FPS
+   RTL8773E,100MHz,410 x 502,38 FPS,13 FPS,22 FPS,28 FPS,7 FPS
+   RTL8773G,200MHz,410 x 502,61 FPS,27 FPS,50 FPS,61 FPS,13 FPS
 
 
 API
 ---
 
 .. doxygenfile:: gui_lite3d.h
+.. doxygenfile:: gui_lite3d_gltf.h
