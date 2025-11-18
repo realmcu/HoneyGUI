@@ -35,6 +35,40 @@ static gui_view_descriptor_t const descriptor =
 static const gui_view_descriptor_t *descriptor_rec = NULL;
 static const gui_view_descriptor_t *quick_view = NULL;
 
+static const char *connecting_str[13] =
+{
+    "Connecting...",        // English
+    "Connexion...",         // French
+    "Verbinden...",         // German
+    "Conectando...",        // Spanish
+    "Connessione...",       // Italian
+    "Verbinden...",         // Dutch
+    "A estabelecer...",     // Portuguese
+    "Подключение…",         // Russian
+    "正在连接……",           // Chinese Simplified
+    "接続中…",              // Japanese
+    "연결 중...",           // Korean
+    "กำลังเชื่อมต่อ...",        // Thai
+    "Đang kết nối…"         // Vietnamese
+};
+static const char *calling_str[13] =
+{
+    "Calling...",        // English
+    "Appel...",          // French
+    "...wird angerufen", // German
+    "Llamando...",       // Spanish
+    "Chiamo...",         // Italian
+    "Bellen...",         // Dutch
+    "A chamar...",       // Portuguese
+    "Вызов…",           // Russian
+    "正在呼叫……",       // Chinese Simplified
+    "通話中…",          // Japanese
+    "통화 중...",        // Korean
+    "กำลังโทร...",      // Thai
+    "Đang gọi…"         // Vietnamese
+};
+
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -55,6 +89,19 @@ static int gui_view_get_other_view_descriptor_init(void)
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
 
+static void switch_call_view(void *msg)
+{
+    GUI_UNUSED(msg);
+
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c)
+    {
+        gui_view_set_animate_step(view_c, 400);
+        gui_view_switch_direct(view_c, &descriptor, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_IN_NONE_ANIMATION);
+    }
+}
+
 static void click_button_back(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
@@ -70,7 +117,11 @@ static void click_button_cancel(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     // to do: cancel call
-    f_status.call = CALL_COMING;
+    if (gui_call && gui_call->call_end)
+    {
+        gui_call->call_end();
+    }
+    f_status.call = CALL_COMING; //reset status
     if (!descriptor_rec)
     {
         descriptor_rec = quick_view;
@@ -86,6 +137,10 @@ static void click_button_take(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(e);
     GUI_UNUSED(param);
     // to do: take call
+    if (gui_call && gui_call->call_start)
+    {
+        gui_call->call_start();
+    }
     f_status.call = CALL_ING;
     msg_2_regenerate_current_view();
 }
@@ -97,6 +152,10 @@ static void click_button_mute(void *obj, gui_event_t e, void *param)
     GUI_UNUSED(param);
     // to do: mute
     f_status.mute = !f_status.mute;
+    if (gui_call && gui_call->call_set_speaker)
+    {
+        gui_call->call_set_speaker(!f_status.mute);
+    }
     msg_2_regenerate_current_view();
 }
 
@@ -110,7 +169,7 @@ static void calling_timer(void *p)
 static void call_wait_timer(void *p)
 {
     GUI_UNUSED(p);
-    // to do: wait for calling
+    // wait for calling
     if (f_status.call == CALL_ING)
     {
         msg_2_regenerate_current_view();
@@ -203,7 +262,8 @@ static void call_view_design(gui_view_t *view)
         {
             gui_obj_create_timer(parent, 1000, true, call_wait_timer);
             gui_text_t *text = gui_text_create(parent, 0, 0, 40, 320, 40);
-            gui_text_set(text, "Calling...", GUI_FONT_SRC_BMP, FG_1_DARK, 10, 20);
+            gui_text_set(text, (void *)calling_str[language_index], GUI_FONT_SRC_BMP, FG_1_DARK,
+                         strlen(calling_str[language_index]), 20);
             gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(text, MID_CENTER);
 
@@ -220,7 +280,8 @@ static void call_view_design(gui_view_t *view)
         {
             gui_obj_create_timer(parent, 1000, true, call_wait_timer);
             gui_text_t *text = gui_text_create(parent, 0, 0, 40, 320, 40);
-            gui_text_set(text, "Connecting...", GUI_FONT_SRC_BMP, FG_1_DARK, 13, 20);
+            gui_text_set(text, (void *)connecting_str[language_index], GUI_FONT_SRC_BMP, FG_1_DARK,
+                         strlen(connecting_str[language_index]), 20);
             gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(text, MID_CENTER);
 
@@ -244,4 +305,17 @@ static void call_view_design(gui_view_t *view)
     default:
         break;
     }
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+void msg_2_switch_call_view(void)
+{
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .cb = switch_call_view,
+    };
+    gui_send_msg_to_server(&msg);
 }

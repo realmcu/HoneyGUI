@@ -97,6 +97,13 @@ struct TX_MANAGEMENT
     uint8_t pairing                     : 1;
 };
 
+typedef struct gui_call
+{
+    void (*call_start)(void);
+    void (*call_end)(void);
+    void (*call_set_speaker)(bool); // True: on, false: off
+} gui_call_t;
+
 struct NOTIFICATION_CONTENT
 {
     char source[10];
@@ -325,11 +332,11 @@ extern struct tm tx_time;
 extern bool time_format_24; // default 24H format
 
 /* Date */
-extern const char *month[12];
-extern const char *day[7];
+extern const char *month[13][12];
+extern const char *day[13][7];
 
 /* Page name */
-extern const char *page_name_array[35];
+extern const char *page_name_array[13][35];
 
 /* Lock screen */
 extern int8_t wallpaper_index;
@@ -391,6 +398,7 @@ extern char timer_str[6];
 extern uint16_t calltime_val; // seconds
 extern char calltime_str[6];
 extern char call_source_str[20];
+extern gui_call_t *gui_call;
 
 /* Auto dim off screen*/
 extern int8_t auto_dim_time_val; // [5, 60], step 5
@@ -404,7 +412,7 @@ extern uint8_t case_button_customize_type_index;
 extern const char *case_button_customize_type[3];
 
 /* Language */
-extern int8_t language_type_index;
+extern int8_t language_index;
 
 /* Reorder quick access */
 extern const char *quick_page_name[4];
@@ -436,9 +444,9 @@ extern struct TX_MANAGEMENT tx_management;
 
 /* Clock settings */
 extern uint8_t hour_val; //[0, 23]
-extern uint8_t min_val; //[0, 59]
+extern uint8_t minutes_val; //[0, 59]
 extern char hour_str[3];
-extern char min_str[3];
+extern char minutes_str[3];
 
 /* Notification */
 extern struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM];
@@ -446,7 +454,12 @@ extern struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM];
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/
+void msg_2_regenerate_current_view(void);
+void msg_2_switch_ota_view(void);
+void msg_2_switch_charging_view(void);
+void msg_2_switch_call_view(void);
 
+void set_device_name(const char *name);
 
 #ifdef __cplusplus
 }

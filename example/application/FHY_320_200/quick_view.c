@@ -55,10 +55,10 @@ void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
     // page_flashlight_design,
     // page_auto_dim_off_screen_design,
     // page_quick_wake_up_screen_design,
-    page_unlock_slider_design,
-    page_lock_screen_design,
+    // page_unlock_slider_design,
+    // page_lock_screen_design,
     // page_clock_settings_design,
-    // page_language_design,
+    page_language_design,
     page_dark_light_design,
     page_volume_design,
     // page_ambient_sound_design,
@@ -126,7 +126,7 @@ static void list_timer_cb(void *obj)
         update_page_indicator();
     }
     touch_info_t *tp = tp_get_info();
-    if (!tp->pressing && quick_page_name[index] != page_name_array[SILENTNOW])
+    if (!tp->pressing && quick_page_name[index] != page_name_array[language_index][SILENTNOW])
     {
         f_status.silentnow = 0;
     }
@@ -164,7 +164,7 @@ static void note_design(gui_obj_t *obj, void *p)
     GUI_UNUSED(p);
     uint16_t index = ((gui_list_note_t *)obj)->index;
     quick_page_design_func_array[index](obj);
-    quick_page_name[index] = page_name_array[quick_page_name_index];
+    quick_page_name[index] = page_name_array[language_index][quick_page_name_index];
 }
 
 static void create_indicator(gui_obj_t *parent)

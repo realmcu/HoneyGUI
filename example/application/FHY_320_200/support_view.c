@@ -41,19 +41,148 @@ static gui_view_descriptor_t const descriptor =
 static int8_t page_index = 0;
 static gui_img_t **page_indicator_array = NULL;
 
-static char reset_warning_str[] =
-    "You're about to reset your\nearbuds and smart charging\ncase to default settings.";
-static char resetting_warning_str[] = "Resetting your\nheadphones...";
-static char *tips_str_array[5] =
+static const char *reset_warning_str[] =
 {
-    "More in JBL\nHeadphones app.",
-    "Horizontal swipe\nto browse Quick\nAccess.",
-    "Swipe up to enter\nmenu.",
-    "Swipe down to\ncheck more\ninformation.",
-    "Add more feature\nto Quick Access."
+    "Your headphones will be restored\nto default and disconnect from\nthe app."
+    "Les valeurs par défaut de votre casque\nseront restaurées et celui-ci sera dé\nconnecté de l'application.",
+    "Dein Kopfhörer wird auf die\nStandardeinstellungen zurückgesetzt\nund von der App getrennt.",
+    "Los auriculares se restablecerán a los\najustes predeterminados y se\ndesconectarán de la aplicación.",
+    "Le cuffie verranno ripristinate ai valori\npredefiniti e scollegate dall'app.",
+    "Je koptelefoon wordt hersteld naar de\nstandaardinstelling en verbreekt de\nverbinding met the app.",
+    "Os auscultadores serão restaurados à\npredefinição e desligados da app.",
+    "Настройки наушников будут восстан\nовлены по умолчанию, и наушники\nбудут отключены от приложения.",
+    "你的耳机将恢复为默认状态并断开与该\napp 的连接。",
+    "ヘッドホンは初期設定に復元され、ア\nプリとの接続は切れます。",
+    "헤드폰이 기본값으로 복원되고 앱 연결\n이 해제됩니다.",
+    "หูฟังของคุณจะถูกคืนค่าเป็นค่าเริ่มต้น\nและตัดการเชื่อมต่อจากแอป",
+    "Tai nghe của bạn sẽ được khôi phục\nvề mặc định và ngắt kết nối khỏi ứng\ndụng."
+};
+static const char *resetting_warning_str[] =
+{
+    "Resetting your headphones...",
+    "Réinitialisation de votre casque…",
+    "Kopfhörer wird zurückgesetzt…",
+    "Restableciendo tus auriculares…",
+    "Ripristino delle cuffie...",
+    "Je koptelefoon resetten…",
+    "A redefinir os auscultadores…",
+    "Сброс настроек наушников…",
+    "正在重置你的耳机……",
+    "ヘッドホンをリセットします…",
+    "헤드폰 재설정…",
+    "กำลังรีเซ็ตหูฟังของคุณ...",
+    "Đang đặt lại tai nghe của bạn…"
+};
+static const char *tips_str_array[13][5] =
+{
+    // English
+    {
+        "Download JBL\nHeadphones\nApp for more\ncustomization.",
+        "Swipe left\nand right to\nbrowse Quick\nAccess",
+        "Swipe up to\nenter feature\nmenu.",
+        "Swipe down\nto check\nmore\ninformation.",
+        "Add favorite\nfeatures to\nQuick Access."
+    },
+    // French
+    {
+        "Téléchargez l'application JBL Headphones pour plus de personnalisation.",
+        "Balayez vers la gauche et la droite pour parcourir l'accès rapide",
+        "Balayez vers le haut pour accéder au menu des fonctions.",
+        "Balayez vers le bas pour consulter plus d'informations.",
+        "Ajoutez vos fonctions favorites à l'accès rapide."
+    },
+    // German
+    {
+        "Lade die JBL Headphones App herunter, um weitere Anpassungen vorzunehmen.",
+        "Wische nach links und rechts, um den Schnellzugriff zu durchsuchen",
+        "Wische nach oben, um das Funktionsmenü aufzurufen.",
+        "Wische nach unten, um weitere Informationen anzuzeigen.",
+        "Füge dem Schnellzugriff deine Lieblingsfunktionen hinzu."
+    },
+    // Spanish
+    {
+        "Descarga la aplicación JBL Headphones para una mayor personalización.",
+        "Desliza hacia la izquierda y la derecha para navegar por el acceso rápido",
+        "Desliza hacia arriba para entrar en el menú de funciones.",
+        "Desliza hacia abajo para ver más información.",
+        "Añade tus funciones favoritas al acceso rápido."
+    },
+    // Italian
+    {
+        "Scarica l'app JBL Headphones per ulteriori personalizzazioni.",
+        "Scorri a sinistra e a destra per sfogliare Quick Access",
+        "Scorri verso l'alto per accedere al menu delle funzioni.",
+        "Scorri verso il basso per controllare ulteriori informazioni.",
+        "Aggiungi le funzioni preferite a Quick Access."
+    },
+    // Dutch
+    {
+        "Download JBL Headphones App voor meer aanpassingsmogelijkheden.",
+        "Veeg naar links en naar rechts om door Quick Access te bladeren",
+        "Veeg naar boven voor het functiemenu.",
+        "Veeg naar beneden voor toegang tot meer informatie.",
+        "Voeg favoriete functies toe aan Quick Access."
+    },
+    // Portuguese
+    {
+        "Descarregue a Aplicação JBL Headphones para mais personalização.",
+        "Deslize para a esquerda e para a direita para navegar no Acesso Rápido",
+        "Deslize para cima para aceder ao menu de funcionalidades.",
+        "Deslize para baixo para mais informações.",
+        "Adicione funcionalidades favoritas ao Acesso Rápido."
+    },
+    // Russian
+    {
+        "Загрузите приложение JBL Headphones для дополнительных настроек.",
+        "Проведите пальцем влево и вправо,чтобы просмотреть быстрый доступ",
+        "Проведите пальцем вверх,чтобы открыть меню функций.",
+        "Проведите пальцем вниз,чтобы просмотреть дополнительную информацию.",
+        "Добавьте избранные функции в быстрый доступ."
+    },
+    // Chinese Simplified
+    {
+        "下载 JBL Headphones app，获取更多自定义功能。",
+        "向左或向右滑动浏览快速访问",
+        "向上滑动进入功能菜单。",
+        "向下滑动查看更多信息。",
+        "将收藏的功能添加到快速访问。"
+    },
+    // Japanese
+    {
+        "さらにカスタマイズするにはJBL Headphonesアプリをダウンロードします。",
+        "クイックアクセスをブラウズするには左右にスワイプ",
+        "機能メニューに入るには上にスワイプ。",
+        "詳細情報を確認するには下にスワイプ。",
+        "クイックアクセスにお気に入りの機能を追加。"
+    },
+    // Korean
+    {
+        "JBL Headphones 앱을 다운로드하여 더 많은 사용자 설정 기능을 활용하세요.",
+        "좌우로스와이프하여빠른접근을탐색하세요.",
+        "위로 스와이프하여 기능 메뉴로 들어가세요.",
+        "아래로 스와이프하여 더 많은 정보를 확인하세요.",
+        "좋아하는 기능을 빠른 접근에 추가하세요."
+    },
+    // Thai
+    {
+        "ดาวน์โหลดแอปJBL Headphonesเพื่อการปรับแต่งเพิ่มเติม",
+        "ปัดซ้ายและขวาเพื่อเรียกดูการเข้าถึงด่วน",
+        "ปัดขึ้นเพื่อเข้าสู่เมนูคุณสมบัติ",
+        "ปัดลงเพื่อตรวจสอบข้อมูลเพิ่มเติม",
+        "เพิ่มคุณสมบัติโปรดในการเข้าถึงด่วน"
+    },
+    // Vietnamese
+    {
+        "Tải ứng dụng JBL Headphones để tùy chỉnh nhiều hơn.",
+        "Vuốt sang trái và phải để duyệt Truy cập nhanh",
+        "Vuốt lên để vào menu tính năng.",
+        "Vuốt xuống để xem thêm thông tin.",
+        "Thêm các tính năng yêu thích vào Truy cập nhanh."
+    }
 };
 
 bool support_reset = false;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -138,8 +267,9 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, QRCODE_BIN, 16, 14, 0, 0);
             gui_img_set_mode(img, IMG_2D_SW_SRC_OVER_MODE);
-            gui_text_t *t = gui_text_create(img, 0, 140, 33, 164, 60);
-            gui_text_set(t, tips_str_array[index], GUI_FONT_SRC_BMP, font_color, strlen(tips_str_array[index]),
+            gui_text_t *t = gui_text_create(obj, 0, 140, 33, 164, 60);
+            gui_text_set(t, (void *)tips_str_array[language_index][index], GUI_FONT_SRC_BMP, font_color,
+                         strlen(tips_str_array[language_index][index]),
                          20);
             gui_text_type_set(t, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MULTI_CENTER);
@@ -159,8 +289,9 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 30, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
-            gui_text_t *t = gui_text_create(img, 0, 156, 10, 148, 60);
-            gui_text_set(t, tips_str_array[index], GUI_FONT_SRC_BMP, font_color, strlen(tips_str_array[index]),
+            gui_text_t *t = gui_text_create(obj, 0, 156, 33, 160, 100);
+            gui_text_set(t, (void *)tips_str_array[language_index][index], GUI_FONT_SRC_BMP, font_color,
+                         strlen(tips_str_array[language_index][index]),
                          20);
             gui_text_type_set(t, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MULTI_CENTER);
@@ -180,8 +311,9 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 10, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
-            gui_text_t *t = gui_text_create(img, 0, 156, 33, 148, 60);
-            gui_text_set(t, tips_str_array[index], GUI_FONT_SRC_BMP, font_color, strlen(tips_str_array[index]),
+            gui_text_t *t = gui_text_create(obj, 0, 156, 33, 148, 60);
+            gui_text_set(t, (void *)tips_str_array[language_index][index], GUI_FONT_SRC_BMP, font_color,
+                         strlen(tips_str_array[language_index][index]),
                          20);
             gui_text_type_set(t, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MULTI_CENTER);
@@ -201,8 +333,9 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 10, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
-            gui_text_t *t = gui_text_create(img, 0, 156, 20, 148, 60);
-            gui_text_set(t, tips_str_array[index], GUI_FONT_SRC_BMP, font_color, strlen(tips_str_array[index]),
+            gui_text_t *t = gui_text_create(obj, 0, 156, 20, 148, 60);
+            gui_text_set(t, (void *)tips_str_array[language_index][index], GUI_FONT_SRC_BMP, font_color,
+                         strlen(tips_str_array[language_index][index]),
                          20);
             gui_text_type_set(t, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MULTI_CENTER);
@@ -222,8 +355,9 @@ static void tips_note_design(gui_obj_t *obj, void *p)
             }
             gui_img_t *img = gui_img_create_from_mem(obj, 0, img_data, 16, 24, 0, 0);
             gui_img_set_mode(img, IMG_BYPASS_MODE);
-            gui_text_t *t = gui_text_create(img, 0, 156, 20, 148, 60);
-            gui_text_set(t, tips_str_array[index], GUI_FONT_SRC_BMP, font_color, strlen(tips_str_array[index]),
+            gui_text_t *t = gui_text_create(obj, 0, 156, 33, 148, 60);
+            gui_text_set(t, (void *)tips_str_array[language_index][index], GUI_FONT_SRC_BMP, font_color,
+                         strlen(tips_str_array[language_index][index]),
                          20);
             gui_text_type_set(t, HEADING_1_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, MULTI_CENTER);
@@ -258,7 +392,8 @@ static void reset_note_design(gui_obj_t *obj, void *p)
     {
         int font_size = 30;
         gui_text_t *t = gui_text_create(note, 0, 12, 0, 296, 90);
-        gui_text_set(t, reset_warning_str, GUI_FONT_SRC_BMP, font_color, strlen(reset_warning_str),
+        gui_text_set(t, (void *)reset_warning_str[language_index], GUI_FONT_SRC_BMP, font_color,
+                     strlen(reset_warning_str[language_index]),
                      font_size);
         gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MULTI_LEFT);
@@ -361,8 +496,8 @@ static void resetting_design(gui_obj_t *parent)
     gui_img_a8_recolor(reset, img_color.color.argb_full);
 
     gui_text_t *t = gui_text_create(parent, 0, 0, 100, 320, 60);
-    gui_text_set(t, (void *)resetting_warning_str, GUI_FONT_SRC_BMP, font_color,
-                 strlen(resetting_warning_str), 30);
+    gui_text_set(t, (void *)resetting_warning_str[language_index], GUI_FONT_SRC_BMP, font_color,
+                 strlen(resetting_warning_str[language_index]), 30);
     gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t, MULTI_CENTER);
 }
@@ -449,8 +584,9 @@ static void support_view_design(gui_view_t *view)
     {
         factory_reset_design(parent);
         gui_text_t *t = gui_text_create(parent, 0, 0, 0, 320, 60);
-        gui_text_set(t, (void *)page_name_array[FACTORY_RESET], GUI_FONT_SRC_BMP,
-                     theme_bg_white ? FG_1_LIGHT : FG_1_DARK, strlen(page_name_array[FACTORY_RESET]), 30);
+        gui_text_set(t, (void *)page_name_array[language_index][FACTORY_RESET], GUI_FONT_SRC_BMP,
+                     theme_bg_white ? FG_1_LIGHT : FG_1_DARK, strlen(page_name_array[language_index][FACTORY_RESET]),
+                     30);
         gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_CENTER);
     }
@@ -458,8 +594,8 @@ static void support_view_design(gui_view_t *view)
     {
         product_tips_design(parent);
         gui_text_t *t = gui_text_create(parent, 0, 0, 0, 320, 60);
-        gui_text_set(t, (void *)page_name_array[PRODUCT_TIPS], GUI_FONT_SRC_BMP,
-                     theme_bg_white ? FG_1_LIGHT : FG_1_DARK, strlen(page_name_array[PRODUCT_TIPS]), 30);
+        gui_text_set(t, (void *)page_name_array[language_index][PRODUCT_TIPS], GUI_FONT_SRC_BMP,
+                     theme_bg_white ? FG_1_LIGHT : FG_1_DARK, strlen(page_name_array[language_index][PRODUCT_TIPS]), 30);
         gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_CENTER);
     }

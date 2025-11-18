@@ -53,6 +53,22 @@ static bool pressed_audio = false;
 static bool pressed_tools = false;
 static bool pressed_settings = false;
 
+static const char *title[] =
+{
+    "Menu",
+    "Menü",
+    "Menú",
+    "Menu",
+    "Menu",
+    "Menu",
+    "Меню",
+    "菜单",
+    "メニュー",
+    "메뉴",
+    "เมนู",
+    "Menu",
+};
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -203,21 +219,22 @@ static void menu_view_design(gui_view_t *view)
         gui_set_bg_color(SCREEN_BG_DARK);
         font_color = FG_1_DARK;
     }
-    gui_text_t *title = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);
-    gui_text_set(title, "Menu", GUI_FONT_SRC_BMP, font_color, 4, 30);
-    gui_text_type_set(title, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(title, MID_CENTER);
+    gui_text_t *text = gui_text_create(parent, 0, 0, 0, gui_get_screen_width(), 40);
+    gui_text_set(text, (void *)title[language_index], GUI_FONT_SRC_BMP, font_color,
+                 strlen(title[language_index]), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, MID_CENTER);
 
     int16_t focus = 0;
-    gui_img_t *audio_bg = gui_img_create_from_mem(parent, "audio", MENU_BUTTON_BG_BIN,
+    gui_img_t *audio_bg = gui_img_create_from_mem(parent, 0, MENU_BUTTON_BG_BIN,
                                                   BG_AUDIO_X + focus,
                                                   BG_Y + focus, 0, 0);
     gui_img_t *audio = gui_img_create_from_mem(audio_bg, 0, MENU_AUDIO_BIN, ICON_POS, ICON_POS, 0, 0);
-    gui_img_t *tools_bg = gui_img_create_from_mem(parent, "tools", MENU_BUTTON_BG_BIN,
+    gui_img_t *tools_bg = gui_img_create_from_mem(parent, 0, MENU_BUTTON_BG_BIN,
                                                   BG_TOOLS_X + focus,
                                                   BG_Y + focus, 0, 0);
     gui_img_t *tools = gui_img_create_from_mem(tools_bg, 0, MENU_TOOLS_BIN, ICON_POS, ICON_POS, 0, 0);
-    gui_img_t *settings_bg = gui_img_create_from_mem(parent, "settings", MENU_BUTTON_BG_BIN,
+    gui_img_t *settings_bg = gui_img_create_from_mem(parent, 0, MENU_BUTTON_BG_BIN,
                                                      BG_SETTINGS_X + focus, BG_Y + focus, 0, 0);
     gui_img_t *settings = gui_img_create_from_mem(settings_bg, 0, MENU_SETTINGS_BIN, ICON_POS, ICON_POS,
                                                   0, 0);

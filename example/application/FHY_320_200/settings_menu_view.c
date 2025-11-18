@@ -23,8 +23,6 @@ typedef struct note_design_param
  *============================================================================*/
 #define CURRENT_VIEW_NAME "settings_menu_view"
 
-#define TITLE "Case Settings"
-
 #define LIST_Y  60
 
 /*============================================================================*
@@ -51,8 +49,23 @@ static gui_view_descriptor_t const descriptor =
 
 static note_design_param_t *design_p = NULL;
 static int16_t list_offset_his = 0;
-
 static gui_img_t *bg_note = NULL;
+static const char *title[] =
+{
+    "Case Settings",
+    "Paramètres du boîtier",
+    "Ladebox-Einstellungen",
+    "Configuración de la funda",
+    "Impostazioni custodia",
+    "Opladerinstellingen",
+    "Definições da caixa de carregamento",
+    "Настройки футляра",
+    "充电盒设置",
+    "ケースの設定",
+    "케이스 설정",
+    "การตั้งค่าเคส",
+    "Cài đặt hộp sạc"
+};
 
 /*============================================================================*
  *                           Private Functions
@@ -122,7 +135,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_a8_recolor(img, FG_THEME3_DARK.color.argb_full);
         font_color = FG_1_DARK;
     }
-    char *text = (char *)page_name_array[index + 16];
+    char *text = (char *)page_name_array[language_index][index + 16];
     uint16_t text_length = strlen(text);
     int font_size = 30;
     if (text_length < 23)
@@ -240,10 +253,11 @@ static void settings_menu_view_design(gui_view_t *view)
     }
     gui_img_a8_mix_alpha(bg_note, bg_note->fg_color_set >> 24);
 
-    gui_text_t *title = gui_text_create(parent, 0, 0, 0, 320, 60);
-    gui_text_set(title, TITLE, GUI_FONT_SRC_BMP, font_color, strlen(TITLE), 30);
-    gui_text_type_set(title, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(title, MID_CENTER);
+    gui_text_t *text = gui_text_create(parent, 0, 0, 0, 320, 60);
+    gui_text_set(text, (void *)title[language_index], GUI_FONT_SRC_BMP, font_color,
+                 strlen(title[language_index]), 30);
+    gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(text, MID_CENTER);
 
     gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 60, 60);
     gui_img_t *icon_back = gui_img_create_from_mem(win_icon_back, 0, ICON_BACK_BIN, 0, 8, 0, 0);

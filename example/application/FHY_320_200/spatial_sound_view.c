@@ -138,8 +138,9 @@ static void spatial_sound_view_design(gui_view_t *view)
     }
 
     gui_text_t *t = gui_text_create(parent, 0, 0, 0, 320, 60);
-    gui_text_set(t, (void *)page_name_array[SPATIAL_SOUND], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SPATIAL_SOUND]), 30);
+    gui_text_set(t, (void *)page_name_array[language_index][SPATIAL_SOUND], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][SPATIAL_SOUND]), 30);
     gui_text_type_set(t, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t, MID_CENTER);
     gui_win_t *win_icon_back = (gui_win_t *)gui_win_create(parent, 0, 0, 0, 60, 60);
@@ -148,7 +149,8 @@ static void spatial_sound_view_design(gui_view_t *view)
     gui_img_a8_recolor(icon_back, font_color.color.argb_full);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[SPATIAL_SOUND],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][SPATIAL_SOUND],
                                                    BUTTON_BG_ELLIPSE_BIN,
                                                    spatial_sound_type * 99, 0, 0, 0);
     gui_img_t *movie = gui_img_create_from_mem(control_bg, "l", SPATIAL_SOUND_MOVIE_BIN, 25, 21, 0,

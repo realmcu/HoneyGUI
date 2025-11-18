@@ -47,8 +47,6 @@ extern "C" {
  *                            Variables
  *============================================================================*/
 extern struct tm *timeinfo;
-extern const char *month[12];
-extern const char *day[7];
 
 /* Detail view page design func */
 extern void (*detail_page_design_func)(gui_obj_t *parent);
@@ -64,8 +62,6 @@ extern char battery_tx_str[4];
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/
-void msg_2_regenerate_current_view(void);
-void set_device_name(const char *name);
 void update_icon_color(gui_obj_t *obj, uint8_t status);
 void status_bar_design(gui_obj_t *parent);
 

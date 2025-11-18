@@ -82,12 +82,24 @@ static const char quick_wake_up_warning_str[] =
     "When disabled, only the\nbutton or opening the case will work. When enabled,\nusethe preferred method to\nwake up the screen."
 };
 
-static const char unlock_slider_warning_str[] =
+static const char *unlock_slider_warning_str[13] =
 {
-    "Use unlock slider to prevent\naccidental screen touches."
+    "Use unlock slider to prevent\naccidental screen touches.",
+    "Utilisez le curseur de déverrouillage pour éviter les actions accidentelles à l'écran",
+    "Verwende den Entsperrschieber, um versehentliche Berührungen des Bildschirms zu verhindern",
+    "Usa el deslizador de desbloqueo para evitar tocar la pantalla accidentalmente",
+    "Utilizza il cursore di sblocco per evitare tocchi accidentali dello schermo",
+    "Gebruik de schuifontgrendelaar om onbedoelde aanrakingen van het scherm te voorkomen",
+    "Use o controlo deslizante de desbloqueio para evitar toques acidentais no ecrã",
+    "Используйте ползунок разблокировки для предотвращения случайных касаний экрана",
+    "使用解锁滑块以避免误触屏幕",
+    "スライダーのアンロックを使って 予想外の画面タッチを防ぐ",
+    "잠금 해제 슬라이더를 사용하여 잘못된 화면 터치 방지",
+    "ใช้แถบเลื่อนปลดล็อกเพื่อป้องกันการสัมผัสหน้าจอโดยไม่ตั้งใจ",
+    "Sử dụng thanh trượt mở khóa để tránh chạm nhầm màn hình"
 };
 
-const char *language_type[13] =
+static const char *language_type[13] =
 {
     "English",
     "French",
@@ -128,7 +140,24 @@ static const char *tx_management_pair_str[] =
     "Pairing..."
 };
 
-static char page_str[11] = {0};
+static const char *min_str[] =
+{
+    "min",
+    "min",
+    "Min.",
+    "min",
+    "min",
+    "min",
+    "min",
+    "мин",
+    "分钟",
+    "分",
+    "분",
+    "นาที",
+    "phút"
+};
+
+static char page_str[15] = {0};
 
 static int16_t page_audio_source_list_offset_rec = 0; // page tx management also use
 static int16_t page_quick_wake_up_list_offset_rec = 0;
@@ -180,16 +209,16 @@ static void toggle_move(void *p)
     if (obj->x == toggle_target_x)
     {
         gui_obj_delete_timer(obj);
-        if (obj->name == (void *)page_name_array[NOTIFICATION] ||
-            obj->name == (void *)page_name_array[QUICK_WAKE_UP_SCREEN])
+        if (obj->name == (void *)page_name_array[language_index][NOTIFICATION] ||
+            obj->name == (void *)page_name_array[language_index][QUICK_WAKE_UP_SCREEN])
         {
             msg_2_regenerate_current_view();
         }
-        else if (obj->name == (void *)page_name_array[AURACAST_BROADCAST])
+        else if (obj->name == (void *)page_name_array[language_index][AURACAST_BROADCAST])
         {
             //to do: Enable/Disable Auracast.
         }
-        else if (obj->name == (void *)page_name_array[PASSWORD])
+        else if (obj->name == (void *)page_name_array[language_index][PASSWORD])
         {
             if (f_status.auracast)
             {
@@ -204,7 +233,7 @@ static void toggle_move(void *p)
                 msg_2_regenerate_current_view();
             }
         }
-        else if (obj->name == (void *)page_name_array[AUDIO_SOURCE])
+        else if (obj->name == (void *)page_name_array[language_index][AUDIO_SOURCE])
         {
             if (audio_source.auracast_receiver)
             {
@@ -325,20 +354,20 @@ static void button_move(void *p)
     if (obj->x == button_bg_target_x)
     {
         gui_obj_delete_timer(obj);
-        if (obj->name == (void *)page_name_array[AMBIENT_SOUND])
+        if (obj->name == (void *)page_name_array[language_index][AMBIENT_SOUND])
         {
             update_icon_color(obj->parent, ambient_sound_type);
         }
-        else if (obj->name == (void *)page_name_array[DARK_LIGHT_MODE] ||
-                 obj->name == (void *)page_name_array[TIME_FORMAT])
+        else if (obj->name == (void *)page_name_array[language_index][DARK_LIGHT_MODE] ||
+                 obj->name == (void *)page_name_array[language_index][TIME_FORMAT])
         {
             msg_2_regenerate_current_view();
         }
-        else if (obj->name == (void *)page_name_array[SMART_TALK])
+        else if (obj->name == (void *)page_name_array[language_index][SMART_TALK])
         {
             update_icon_color(obj->parent, smart_talk_time_type);
         }
-        else if (obj->name == (void *)page_name_array[SPATIAL_SOUND])
+        else if (obj->name == (void *)page_name_array[language_index][SPATIAL_SOUND])
         {
 #if SS_WITH_HEAD_TRACKING
             update_icon_color(obj->parent, spatial_sound_status);
@@ -355,7 +384,7 @@ static void button_move(void *p)
             update_icon_color(obj->parent, spatial_sound_type);
 #endif
         }
-        else if (obj->name == (void *)page_name_array[QUICK_WAKE_UP_SCREEN])
+        else if (obj->name == (void *)page_name_array[language_index][QUICK_WAKE_UP_SCREEN])
         {
             update_icon_color(obj->parent, quick_wake_up_click_num);
         }
@@ -692,14 +721,16 @@ static void press_button_page_playback(void *obj)
             if (pressed_l)
             {
                 music_index--;
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(text, (void *)page_name_array[PLAYBACK], o->parent->parent);
+                GUI_WIDGET_POINTER_BY_NAME_ROOT(text, (void *)page_name_array[language_index][PLAYBACK],
+                                                o->parent->parent);
                 gui_scroll_text_content_set((void *)text, (void *)music_array[music_index],
                                             strlen(music_array[music_index]));
             }
             else if (pressed_r)
             {
                 music_index++;
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(text, (void *)page_name_array[PLAYBACK], o->parent->parent);
+                GUI_WIDGET_POINTER_BY_NAME_ROOT(text, (void *)page_name_array[language_index][PLAYBACK],
+                                                o->parent->parent);
                 gui_scroll_text_content_set((void *)text, (void *)music_array[music_index],
                                             strlen(music_array[music_index]));
             }
@@ -913,7 +944,7 @@ static void press_button_page_clock_settings(void *obj)
         {
             time_rec = gui_ms_get();
             flag = 1;
-            uint8_t *val = (f_status.clock_settings == 1) ? &hour_val : &min_val;
+            uint8_t *val = (f_status.clock_settings == 1) ? &hour_val : &minutes_val;
 
             if (pressed_r)
             {
@@ -924,7 +955,7 @@ static void press_button_page_clock_settings(void *obj)
                 *val -= 5;
             }
             hour_val %= 24;
-            min_val %= 60;
+            minutes_val %= 60;
             gui_obj_t *min_bg = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
             if (f_status.clock_settings == 1)
             {
@@ -936,8 +967,8 @@ static void press_button_page_clock_settings(void *obj)
             else
             {
                 gui_obj_t *text = gui_list_entry(min_bg->child_list.prev, gui_obj_t, brother_list);
-                sprintf(min_str, "%02d", min_val);
-                gui_text_content_set((void *)text, min_str, 2);
+                sprintf(minutes_str, "%02d", minutes_val);
+                gui_text_content_set((void *)text, minutes_str, 2);
             }
         }
     }
@@ -948,7 +979,7 @@ static void press_button_page_clock_settings(void *obj)
         {
             if (!flag)
             {
-                uint8_t *val = (f_status.clock_settings == 1) ? &hour_val : &min_val;
+                uint8_t *val = (f_status.clock_settings == 1) ? &hour_val : &minutes_val;
                 if (pressed_r)
                 {
                     *val += 1;
@@ -963,7 +994,7 @@ static void press_button_page_clock_settings(void *obj)
                 flag = 0;
             }
             hour_val %= 24;
-            min_val %= 60;
+            minutes_val %= 60;
             gui_obj_t *min_bg = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
             if (f_status.clock_settings == 1)
             {
@@ -975,8 +1006,8 @@ static void press_button_page_clock_settings(void *obj)
             else
             {
                 gui_obj_t *text = gui_list_entry(min_bg->child_list.prev, gui_obj_t, brother_list);
-                sprintf(min_str, "%02d", min_val);
-                gui_text_content_set((void *)text, min_str, 2);
+                sprintf(minutes_str, "%02d", minutes_val);
+                gui_text_content_set((void *)text, minutes_str, 2);
             }
         }
         pressed_r = false;
@@ -1101,7 +1132,7 @@ static void press_button_page_language(void *obj)
     {
         if (strcmp(o->name, "l") == 0)
         {
-            if (language_type_index != 0)
+            if (language_index != 0)
             {
                 pressed_l = true;
                 gui_obj_hidden(o, false);
@@ -1109,7 +1140,7 @@ static void press_button_page_language(void *obj)
         }
         else
         {
-            if (language_type_index != 12)
+            if (language_index != 12)
             {
                 pressed_r = true;
                 gui_obj_hidden(o, false);
@@ -1139,18 +1170,18 @@ static void press_button_page_language(void *obj)
             gui_obj_t *text = gui_list_entry(o->parent->child_list.prev, gui_obj_t, brother_list);
             if (pressed_l)
             {
-                language_type_index--;
-                gui_text_content_set((void *)text, (void *)language_type[language_type_index],
-                                     strlen(language_type[language_type_index]));
+                language_index--;
+                gui_text_content_set((void *)text, (void *)language_type[language_index],
+                                     strlen(language_type[language_index]));
             }
             else if (pressed_r)
             {
-                language_type_index++;
-                gui_text_content_set((void *)text, (void *)language_type[language_type_index],
-                                     strlen(language_type[language_type_index]));
+                language_index++;
+                gui_text_content_set((void *)text, (void *)language_type[language_index],
+                                     strlen(language_type[language_index]));
             }
 
-            if (language_type_index == compare)
+            if (language_index == compare)
             {
                 gui_img_a8_recolor(icon, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
             }
@@ -1159,6 +1190,7 @@ static void press_button_page_language(void *obj)
                 gui_img_a8_recolor(icon, theme_bg_white ? FG_1_LIGHT.color.argb_full : FG_1_DARK.color.argb_full);
             }
             gui_img_a8_mix_alpha(icon, icon->fg_color_set >> 24);
+            msg_2_regenerate_current_view();
         }
         pressed_l = false;
         pressed_r = false;
@@ -1515,7 +1547,7 @@ static void click_button_settings_page_clock_settings(void *obj, gui_event_t e, 
         gui_img_a8_recolor((void *)sub, fg_2_color.color.argb_full);
 
         timeinfo->tm_hour = hour_val;
-        timeinfo->tm_min = min_val;
+        timeinfo->tm_min = minutes_val;
     }
     else
     {
@@ -2808,7 +2840,8 @@ static void note_design_page_audio_source(gui_obj_t *obj, void *p)
 
     y += 24;
     gui_img_t *toggle_bg = gui_img_create_from_mem(obj, 0, TOGGLE_BG_BIN, 244, y, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[AUDIO_SOURCE],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][AUDIO_SOURCE],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle_bg, toggle_bg_color.color.argb_full);
@@ -3124,15 +3157,16 @@ static void note_design_page_auracast(gui_obj_t *obj, void *p)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 5, 200, 15);
-    gui_text_set(text, (void *)page_name_array[AURACAST_BROADCAST], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[AURACAST_BROADCAST]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][AURACAST_BROADCAST], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][AURACAST_BROADCAST]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_auracast_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 0, 0,
                                                             0);
     gui_img_t *toggle_auracast = gui_img_create_from_mem(toggle_auracast_bg,
-                                                         (void *)page_name_array[AURACAST_BROADCAST],
+                                                         (void *)page_name_array[language_index][AURACAST_BROADCAST],
                                                          TOGGLE_BIN, TOGGLE_OFF_X,
                                                          TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle_auracast, FG_1_DARK.color.argb_full);
@@ -3140,13 +3174,13 @@ static void note_design_page_auracast(gui_obj_t *obj, void *p)
                          &(f_status.auracast));
 
     text = gui_text_create(parent, 0, 12, 45, 300, 15);
-    gui_text_set(text, (void *)page_name_array[PASSWORD], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[PASSWORD]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][PASSWORD], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][PASSWORD]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
     gui_img_t *toggle_password_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 50, 0, 0);
     gui_img_t *toggle_password = gui_img_create_from_mem(toggle_password_bg,
-                                                         (void *)page_name_array[PASSWORD],
+                                                         (void *)page_name_array[language_index][PASSWORD],
                                                          TOGGLE_BIN,
                                                          TOGGLE_OFF_X,
                                                          TOGGLE_Y, 0, 0);
@@ -3576,7 +3610,8 @@ void page_playback_design(gui_obj_t *parent)
     {
         font_color = FG_1_DARK;
     }
-    gui_scroll_text_t *music_name = gui_scroll_text_create(parent, (void *)page_name_array[PLAYBACK],
+    gui_scroll_text_t *music_name = gui_scroll_text_create(parent,
+                                                           (void *)page_name_array[language_index][PLAYBACK],
                                                            12, 40, 308, 56);
     gui_scroll_text_type_set(music_name, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_scroll_text_scroll_set(music_name, SCROLL_X, 0, 308, 5000, 0);
@@ -3704,8 +3739,8 @@ void page_volume_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[VOLUME], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[VOLUME]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][VOLUME], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][VOLUME]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -3789,13 +3824,15 @@ void page_ambient_sound_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[AMBIENT_SOUND], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[AMBIENT_SOUND]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][AMBIENT_SOUND], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][AMBIENT_SOUND]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[AMBIENT_SOUND],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][AMBIENT_SOUND],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -3803,7 +3840,8 @@ void page_ambient_sound_design(gui_obj_t *parent)
                          &(f_status.ambient_sound));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[AMBIENT_SOUND],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][AMBIENT_SOUND],
                                                    BUTTON_BG_ELLIPSE_BIN,
                                                    ambient_sound_type * 99, 0, 0, 0);
     gui_img_t *anc = gui_img_create_from_mem(control_bg, "l", ICON_ANC_BIN, 25, 21, 0, 0);
@@ -3874,13 +3912,14 @@ void page_equalizer_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[EQUALIZER], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[EQUALIZER]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][EQUALIZER], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][EQUALIZER]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[EQUALIZER],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][EQUALIZER],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -3976,20 +4015,23 @@ void page_smart_talk_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[SMART_TALK], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SMART_TALK]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SMART_TALK], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][SMART_TALK]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[SMART_TALK],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][SMART_TALK],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
     gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED, &(f_status.smart_talk));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[SMART_TALK],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][SMART_TALK],
                                                    BUTTON_BG_ELLIPSE_BIN,
                                                    smart_talk_time_type * 99, 0, 0, 0);
     gui_img_t *st_5 = gui_img_create_from_mem(control_bg, "l", SMART_TALK_5S_BIN, 22, 20, 0, 0);
@@ -4053,8 +4095,9 @@ void page_spatial_sound_with_head_tracking_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[SPATIAL_SOUND], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SPATIAL_SOUND]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SPATIAL_SOUND], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][SPATIAL_SOUND]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -4065,7 +4108,8 @@ void page_spatial_sound_with_head_tracking_design(gui_obj_t *parent)
                          GUI_EVENT_TOUCH_CLICKED, NULL);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[SPATIAL_SOUND],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][SPATIAL_SOUND],
                                                    BUTTON_BG_ELLIPSE_BIN,
                                                    spatial_sound_status * 99, 0, 0, 0);
     gui_img_t *icon_l = gui_img_create_from_mem(control_bg, "l", ICON_SS_OFF_BIN, 30, 26, 0,
@@ -4116,13 +4160,15 @@ void page_spatial_sound_without_head_tracking_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[SPATIAL_SOUND], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SPATIAL_SOUND]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SPATIAL_SOUND], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][SPATIAL_SOUND]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[SPATIAL_SOUND],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][SPATIAL_SOUND],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -4130,7 +4176,8 @@ void page_spatial_sound_without_head_tracking_design(gui_obj_t *parent)
                          &(f_status.spatial_sound));
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[SPATIAL_SOUND],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][SPATIAL_SOUND],
                                                    BUTTON_BG_ELLIPSE_BIN,
                                                    spatial_sound_type * 99, 0, 0, 0);
     gui_img_t *movie = gui_img_create_from_mem(control_bg, "l", SPATIAL_SOUND_MOVIE_BIN, 25, 21, 0,
@@ -4200,14 +4247,15 @@ void page_hr_audio_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 30, 170, 60);
-    gui_text_set(text, (void *)page_name_array[HR_AUDIO], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[HR_AUDIO]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][HR_AUDIO], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][HR_AUDIO]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MULTI_LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0,
                                                    0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[HR_AUDIO],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][HR_AUDIO],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -4265,13 +4313,15 @@ void page_voice_aware_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[VOICE_AWARE], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[VOICE_AWARE]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][VOICE_AWARE], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][VOICE_AWARE]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[VOICE_AWARE],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][VOICE_AWARE],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -4371,14 +4421,16 @@ void page_auto_play_pause_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[AUTO_PLAY_PAUSE], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[AUTO_PLAY_PAUSE]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][AUTO_PLAY_PAUSE], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][AUTO_PLAY_PAUSE]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0,
                                                    0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[AUTO_PLAY_PAUSE],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][AUTO_PLAY_PAUSE],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -4448,8 +4500,9 @@ void page_audio_source_design(gui_obj_t *parent)
 
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
     gui_text_t *text = gui_text_create(parent, 0, 0, 0, 320, 60);
-    gui_text_set(text, (void *)page_name_array[AUDIO_SOURCE], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[AUDIO_SOURCE]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][AUDIO_SOURCE], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][AUDIO_SOURCE]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
 
@@ -4530,8 +4583,9 @@ void page_tx_management_design(gui_obj_t *parent)
 
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
     gui_text_t *text = gui_text_create(parent, 0, 0, 0, 320, 60);
-    gui_text_set(text, (void *)page_name_array[SMART_TX_MANAGEMENT], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SMART_TX_MANAGEMENT]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SMART_TX_MANAGEMENT], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][SMART_TX_MANAGEMENT]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
 
@@ -4575,8 +4629,9 @@ void page_screen_brightness_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[SCREEN_BRIGHTNESS], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SCREEN_BRIGHTNESS]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SCREEN_BRIGHTNESS], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][SCREEN_BRIGHTNESS]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -4651,13 +4706,15 @@ void page_dark_light_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[DARK_LIGHT_MODE], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[DARK_LIGHT_MODE]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][DARK_LIGHT_MODE], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][DARK_LIGHT_MODE]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[DARK_LIGHT_MODE],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][DARK_LIGHT_MODE],
                                                    BUTTON_BG_ELLIPSE_148_88_BIN, BUTTON_X_DARK, 0, 0, 0);
     gui_img_t *light = gui_img_create_from_mem(control_bg, "light", ICON_LIGHT_BIN, 198, 21, 0, 0);
     gui_img_t *dark = gui_img_create_from_mem(control_bg, "dark", ICON_DARK_BIN, 50, 21, 0, 0);
@@ -4709,8 +4766,9 @@ void page_lock_screen_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[LOCK_SCREEN], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[LOCK_SCREEN]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][LOCK_SCREEN], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][LOCK_SCREEN]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
     gui_win_t *win_l = gui_win_create(parent, "l", 18, 98, 78, 78);
@@ -4769,13 +4827,15 @@ void page_auto_dim_off_screen_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 250, 15);
-    gui_text_set(text, (void *)page_name_array[AUTO_DIM_OFF_SCREEN], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[AUTO_DIM_OFF_SCREEN]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][AUTO_DIM_OFF_SCREEN], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][AUTO_DIM_OFF_SCREEN]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[AUTO_DIM_OFF_SCREEN],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][AUTO_DIM_OFF_SCREEN],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -4862,14 +4922,15 @@ void page_quick_wake_up_screen_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 30, 170, 60);
-    gui_text_set(text, (void *)page_name_array[QUICK_WAKE_UP_SCREEN], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[QUICK_WAKE_UP_SCREEN]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][QUICK_WAKE_UP_SCREEN], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][QUICK_WAKE_UP_SCREEN]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MULTI_LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
     gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
-                                                (void *)page_name_array[QUICK_WAKE_UP_SCREEN], TOGGLE_BIN, TOGGLE_OFF_X,
+                                                (void *)page_name_array[language_index][QUICK_WAKE_UP_SCREEN], TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
     gui_obj_add_event_cb(toggle_bg, click_toggle_cb, GUI_EVENT_TOUCH_CLICKED,
@@ -4879,7 +4940,7 @@ void page_quick_wake_up_screen_design(gui_obj_t *parent)
     {
         gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
         gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
-                                                       (void *)page_name_array[QUICK_WAKE_UP_SCREEN], BUTTON_BG_ELLIPSE_BIN,
+                                                       (void *)page_name_array[language_index][QUICK_WAKE_UP_SCREEN], BUTTON_BG_ELLIPSE_BIN,
                                                        BUTTON_X_MID * quick_wake_up_click_num, 0, 0, 0);
         gui_img_t *l = gui_img_create_from_mem(control_bg, "l", ICON_CLICK_BIN, 30, 23, 0, 0);
         gui_img_t *m = gui_img_create_from_mem(control_bg, "m", ICON_CLICK_DOUBLE_BIN, 129, 23, 0, 0);
@@ -5008,8 +5069,9 @@ void page_case_button_customize_design(gui_obj_t *parent)
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
     gui_scroll_text_t *text = gui_scroll_text_create(parent, 0, 44, 16, 260, 30);
     gui_scroll_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_scroll_text_set(text, (void *)page_name_array[CASE_BUTTON_CUSTOMIZE], GUI_FONT_SRC_BMP,
-                        font_color, strlen((void *)page_name_array[CASE_BUTTON_CUSTOMIZE]), 30);
+    gui_scroll_text_set(text, (void *)page_name_array[language_index][CASE_BUTTON_CUSTOMIZE],
+                        GUI_FONT_SRC_BMP,
+                        font_color, strlen((void *)page_name_array[language_index][CASE_BUTTON_CUSTOMIZE]), 30);
     gui_scroll_text_scroll_set(text, SCROLL_X, 20, 260, 5000, 0);
 
     gui_img_t *scrollbar_bg = gui_img_create_from_mem(parent, 0, SCROLLBAR_BG_BIN, 310, 72, 0, 0);
@@ -5068,8 +5130,9 @@ void page_information_center_customize_design(gui_obj_t *parent)
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
     gui_scroll_text_t *text = gui_scroll_text_create(parent, 0, 44, 16, 260, 30);
     gui_scroll_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_scroll_text_set(text, (void *)page_name_array[INFORMATION_CENTER_CUSTOMIZE], GUI_FONT_SRC_BMP,
-                        font_color, strlen((void *)page_name_array[INFORMATION_CENTER_CUSTOMIZE]), 30);
+    gui_scroll_text_set(text, (void *)page_name_array[language_index][INFORMATION_CENTER_CUSTOMIZE],
+                        GUI_FONT_SRC_BMP,
+                        font_color, strlen((void *)page_name_array[language_index][INFORMATION_CENTER_CUSTOMIZE]), 30);
     gui_scroll_text_scroll_set(text, SCROLL_X, 20, 260, 5000, 0);
 
     gui_img_t *scrollbar_bg = gui_img_create_from_mem(parent, 0, SCROLLBAR_BG_BIN, 310, 72, 0, 0);
@@ -5097,13 +5160,15 @@ void page_unlock_slider_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 250, 15);
-    gui_text_set(text, (void *)page_name_array[UNLOCK_SLIDER], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[UNLOCK_SLIDER]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][UNLOCK_SLIDER], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][UNLOCK_SLIDER]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0, 0);
-    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg, (void *)page_name_array[UNLOCK_SLIDER],
+    gui_img_t *toggle = gui_img_create_from_mem(toggle_bg,
+                                                (void *)page_name_array[language_index][UNLOCK_SLIDER],
                                                 TOGGLE_BIN, TOGGLE_OFF_X,
                                                 TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle, FG_1_DARK.color.argb_full);
@@ -5111,8 +5176,9 @@ void page_unlock_slider_design(gui_obj_t *parent)
                          &(f_status.unlock_slider));
 
     text = gui_text_create(parent, 0, 12, 96, 296, 170);
-    gui_text_set(text, (void *)unlock_slider_warning_str, GUI_FONT_SRC_BMP, font_color_warning,
-                 strlen(unlock_slider_warning_str), 30);
+    gui_text_set(text, (void *)unlock_slider_warning_str[language_index], GUI_FONT_SRC_BMP,
+                 font_color_warning,
+                 strlen(unlock_slider_warning_str[language_index]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MULTI_LEFT);
 
@@ -5159,15 +5225,16 @@ void page_notification_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[NOTIFICATION], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[NOTIFICATION]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][NOTIFICATION], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][NOTIFICATION]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *toggle_notification_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 40, 0,
                                                                 0);
     gui_img_t *toggle_notification = gui_img_create_from_mem(toggle_notification_bg,
-                                                             (void *)page_name_array[NOTIFICATION],
+                                                             (void *)page_name_array[language_index][NOTIFICATION],
                                                              TOGGLE_BIN, TOGGLE_OFF_X,
                                                              TOGGLE_Y, 0, 0);
     gui_img_a8_recolor(toggle_notification, FG_1_DARK.color.argb_full);
@@ -5179,13 +5246,14 @@ void page_notification_design(gui_obj_t *parent)
     if (f_status.notification)
     {
         text = gui_text_create(parent, 0, 12, 95, 300, 15);
-        gui_text_set(text, (void *)page_name_array[MESSAGE_PREVIEW], GUI_FONT_SRC_BMP, font_color,
-                     strlen((void *)page_name_array[MESSAGE_PREVIEW]), 30);
+        gui_text_set(text, (void *)page_name_array[language_index][MESSAGE_PREVIEW], GUI_FONT_SRC_BMP,
+                     font_color,
+                     strlen((void *)page_name_array[language_index][MESSAGE_PREVIEW]), 30);
         gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, LEFT);
         toggle_message_bg = gui_img_create_from_mem(parent, 0, TOGGLE_BG_BIN, 244, 90, 0, 0);
         toggle_message = gui_img_create_from_mem(toggle_message_bg,
-                                                 (void *)page_name_array[MESSAGE_PREVIEW],
+                                                 (void *)page_name_array[language_index][MESSAGE_PREVIEW],
                                                  TOGGLE_BIN,
                                                  TOGGLE_OFF_X,
                                                  TOGGLE_Y, 0, 0);
@@ -5272,8 +5340,9 @@ void page_clock_settings_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[CLOCK_SETTINGS], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[CLOCK_SETTINGS]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][CLOCK_SETTINGS], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][CLOCK_SETTINGS]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -5323,10 +5392,10 @@ void page_clock_settings_design(gui_obj_t *parent)
                                                       0);
     gui_obj_hidden((void *)min_bg_inner, 1);
     gui_obj_add_event_cb(min_bg, click_button_page_clock_settings, GUI_EVENT_TOUCH_CLICKED, NULL);
-    min_val = timeinfo->tm_min;
-    sprintf(min_str, "%02d", min_val);
+    minutes_val = timeinfo->tm_min;
+    sprintf(minutes_str, "%02d", minutes_val);
     text = gui_text_create(min_bg, 0, 0, 0, 60, 64);
-    gui_text_set(text, min_str, GUI_FONT_SRC_BMP, font_color, 2, 30);
+    gui_text_set(text, minutes_str, GUI_FONT_SRC_BMP, font_color, 2, 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
 
@@ -5358,13 +5427,15 @@ void page_time_format_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[TIME_FORMAT], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[TIME_FORMAT]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][TIME_FORMAT], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][TIME_FORMAT]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
     gui_img_t *control_bg = gui_img_create_from_mem(parent, 0, CONTROL_BG_BIN, 12, 92, 0, 0);
-    gui_img_t *button_bg = gui_img_create_from_mem(control_bg, (void *)page_name_array[DARK_LIGHT_MODE],
+    gui_img_t *button_bg = gui_img_create_from_mem(control_bg,
+                                                   (void *)page_name_array[language_index][DARK_LIGHT_MODE],
                                                    BUTTON_BG_ELLIPSE_148_88_BIN, BUTTON_X_FORMAT_12, 0, 0, 0);
     gui_img_t *format_12 = gui_img_create_from_mem(control_bg, 0, TIME_FORMAT_12_BIN, 45, 34, 0, 0);
     gui_img_t *format_24 = gui_img_create_from_mem(control_bg, 0, TIME_FORMAT_24_BIN, 186, 34, 0, 0);
@@ -5416,8 +5487,8 @@ void page_language_design(gui_obj_t *parent)
         font_color = FG_1_DARK;
     }
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[LANGUAGE], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[LANGUAGE]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][LANGUAGE], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][LANGUAGE]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -5434,8 +5505,8 @@ void page_language_design(gui_obj_t *parent)
     gui_obj_create_timer(GUI_BASE(button_switch_r_bg), 10, true, press_button_page_language);
 
     text = gui_text_create(control_bg, 0, 0, 0, 296, 90);
-    gui_text_set(text, (void *)language_type[language_type_index], GUI_FONT_SRC_BMP, font_color,
-                 strlen(language_type[language_type_index]), 30);
+    gui_text_set(text, (void *)language_type[language_index], GUI_FONT_SRC_BMP, font_color,
+                 strlen(language_type[language_index]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
 
@@ -5446,11 +5517,11 @@ void page_language_design(gui_obj_t *parent)
         gui_img_a8_recolor(button_switch_r_bg, BG_THEME3_MID_LIGHT.color.argb_full);
         gui_img_a8_recolor(switch_l, FG_1_LIGHT.color.argb_full);
         gui_img_a8_recolor(switch_r, FG_1_LIGHT.color.argb_full);
-        if (language_type_index == 0)
+        if (language_index == 0)
         {
             gui_img_a8_recolor(switch_l, FG_2_LIGHT.color.argb_full);
         }
-        else if (language_type_index == 12)
+        else if (language_index == 12)
         {
             gui_img_a8_recolor(switch_r, FG_2_LIGHT.color.argb_full);
         }
@@ -5462,11 +5533,11 @@ void page_language_design(gui_obj_t *parent)
         gui_img_a8_recolor(button_switch_r_bg, BG_THEME3_MID_DARK.color.argb_full);
         gui_img_a8_recolor(switch_l, FG_1_DARK.color.argb_full);
         gui_img_a8_recolor(switch_r, FG_1_DARK.color.argb_full);
-        if (language_type_index == 0)
+        if (language_index == 0)
         {
             gui_img_a8_recolor(switch_l, FG_2_DARK.color.argb_full);
         }
-        else if (language_type_index == 12)
+        else if (language_index == 12)
         {
             gui_img_a8_recolor(switch_r, FG_2_DARK.color.argb_full);
         }
@@ -5511,8 +5582,9 @@ void page_reorder_quick_access_design(gui_obj_t *parent)
     gui_img_t *mask = gui_img_create_from_mem(parent, 0, MASK_BIN, 0, 0, 0, 0);
     gui_scroll_text_t *text = gui_scroll_text_create(parent, 0, 44, 16, 260, 30);
     gui_scroll_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
-    gui_scroll_text_set(text, (void *)page_name_array[REORDER_QUICK_ACCESS], GUI_FONT_SRC_BMP,
-                        font_color, strlen((void *)page_name_array[REORDER_QUICK_ACCESS]), 30);
+    gui_scroll_text_set(text, (void *)page_name_array[language_index][REORDER_QUICK_ACCESS],
+                        GUI_FONT_SRC_BMP,
+                        font_color, strlen((void *)page_name_array[language_index][REORDER_QUICK_ACCESS]), 30);
     gui_scroll_text_scroll_set(text, SCROLL_X, 20, 260, 5000, 0);
 
     if (quick_page_num > 2)
@@ -5570,18 +5642,20 @@ void page_support_design(gui_obj_t *parent)
     gui_img_a8_recolor(reset, img_color.color.argb_full);
 
     gui_text_t *text = gui_text_create(parent, 0, 0, 0, 320, 60);
-    gui_text_set(text, (void *)page_name_array[SUPPORT], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SUPPORT]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SUPPORT], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][SUPPORT]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
     text = gui_text_create(win_tips, 0, 56, 8, 248, 40);
-    gui_text_set(text, (void *)page_name_array[PRODUCT_TIPS], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[PRODUCT_TIPS]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][PRODUCT_TIPS], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][PRODUCT_TIPS]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_LEFT);
     text = gui_text_create(win_reset, 0, 56, 8, 248, 40);
-    gui_text_set(text, (void *)page_name_array[FACTORY_RESET], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[FACTORY_RESET]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][FACTORY_RESET], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][FACTORY_RESET]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_LEFT);
 }
@@ -5601,8 +5675,8 @@ void page_timer_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[TIMER], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[TIMER]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][TIMER], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][TIMER]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -5619,7 +5693,8 @@ void page_timer_design(gui_obj_t *parent)
     gui_img_t *add = gui_img_create_from_mem(control_bg, 0, ADD_BIN, 237, 31, 0, 0);
 
     text = gui_text_create(control_bg, 0, 30, 0, 266, 90);
-    gui_text_set(text, "min", GUI_FONT_SRC_BMP, font_color, 3, 20);
+    gui_text_set(text, (void *)min_str[language_index], GUI_FONT_SRC_BMP, font_color,
+                 strlen(min_str[language_index]), 20);
     gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, MID_CENTER);
     sprintf(page_str, "%d", timer_max_min_val);
@@ -5673,8 +5748,9 @@ void page_flashlight_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[FLASHLIGHT], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[FLASHLIGHT]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][FLASHLIGHT], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][FLASHLIGHT]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -5713,8 +5789,8 @@ void page_silentnow_design(gui_obj_t *parent)
     silent_time_val = 900;
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[SILENTNOW], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[SILENTNOW]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][SILENTNOW], GUI_FONT_SRC_BMP, font_color,
+                 strlen((void *)page_name_array[language_index][SILENTNOW]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 
@@ -5762,12 +5838,14 @@ void page_silentnow_design(gui_obj_t *parent)
         icon = gui_img_create_from_mem(control_bg, 0, ICON_BELL_TOP_BIN, 257, 33, 0, 0);
         gui_img_a8_recolor(icon, font_color.color.argb_full);
 
+        sprintf(page_str, "15 %s", min_str[language_index]);
         gui_text_t *text = gui_text_create(control_bg, 0, 52, 0, 70, 90);
-        gui_text_set(text, "15 min", GUI_FONT_SRC_BMP, font_color, 6, 20);
+        gui_text_set(text, page_str, GUI_FONT_SRC_BMP, font_color, 6, 20);
         gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, MID_LEFT);
+        sprintf(page_str + 7, "30 %s", min_str[language_index]);
         text = gui_text_create(control_bg, 0, 168, 0, 70, 90);
-        gui_text_set(text, "30 min", GUI_FONT_SRC_BMP, font_color, 6, 20);
+        gui_text_set(text, page_str + 7, GUI_FONT_SRC_BMP, font_color, 6, 20);
         gui_text_type_set(text, HEADING_1_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, MID_LEFT);
     }
@@ -5787,8 +5865,9 @@ void page_volume_unit_meter_design(gui_obj_t *parent)
     }
 
     gui_text_t *text = gui_text_create(parent, 0, 12, 45, 200, 15);
-    gui_text_set(text, (void *)page_name_array[VOLUME_UNIT_METER], GUI_FONT_SRC_BMP, font_color,
-                 strlen((void *)page_name_array[VOLUME_UNIT_METER]), 30);
+    gui_text_set(text, (void *)page_name_array[language_index][VOLUME_UNIT_METER], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen((void *)page_name_array[language_index][VOLUME_UNIT_METER]), 30);
     gui_text_type_set(text, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(text, LEFT);
 

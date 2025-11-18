@@ -32,74 +32,84 @@ struct tm tx_time =
 bool time_format_24 = false; // default 24H format
 
 /* Date */
-const char *month[12] =
+const char *month[13][12] =
 {
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
+    /* 0: English */
+    {"Jan",      "Feb",      "Mar",      "Apr",      "May",      "Jun",      "Jul",      "Aug",      "Sep",      "Oct",      "Nov",           "Dec"          },
+    /* 1: French */
+    {"Jan",      "Fév",      "Mar",      "Avr",      "Mai",      "Jun",      "Jui",      "Aoû",      "Sep",      "Oct",      "Nov",           "Déc"          },
+    /* 2: German */
+    {"Jan",      "Feb",      "Mär",      "Apr",      "Mai",      "Jun",      "Jul",      "Aug",      "Sep",      "Okt",      "Nov",           "Dez"          },
+    /* 3: Spanish */
+    {"Ene",      "Feb",      "Marzo",    "Abr",      "Mayo",     "Jun",      "Jul",      "Ago",      "Sep",      "Oct",      "Nov",           "Dic"          },
+    /* 4: Italian */
+    {"Gen",      "Feb",      "Mar",      "Apr",      "Mag",      "Giu",      "Lug",      "Ago",      "Set",      "Ott",      "Nov",           "Dic"          },
+    /* 5: Indonesian */
+    {"Jan",      "Feb",      "Mar",      "Apr",      "Mei",      "Jun",      "Jul",      "Aug",      "Sep",      "Oct",      "Nov",           "Dec"          },
+    /* 6: Portuguese */
+    {"Jan",      "Fev",      "Mar",      "Abr",      "Mai",      "Jun",      "Jul",      "Ago",      "Set",      "Out",      "Nov",           "Dez"          },
+    /* 7: Russian */
+    {"Янв",      "Февр",     "Март",     "Апр",      "Май",      "Июнь",     "Июль",     "Авг",      "Сент",     "Окт",      "Ноя",           "Дек"          },
+    /* 8: Simplified Chinese */
+    {"一月",     "二月",     "三月",     "四月",     "五月",     "六月",     "七月",     "八月",     "九月",     "十月",     "十一月",        "十二月"        },
+    /* 9: Japanese */
+    {"1月",      "2月",      "3月",      "4月",      "5月",      "6月",      "7月",      "8月",      "9月",      "10月",     "11月",          "12月"         },
+    /* 10: Korean */
+    {"1월",      "2월",      "3월",      "4월",      "5월",      "6월",      "7월",      "8월",      "9월",      "10월",     "11월",          "12월"         },
+    /* 11: Thai */
+    {"ม.ค.",     "ก.พ.",     "มี.ค.",    "เม.ย.",    "พ.ค.",     "มิ.ย.",    "ก.ค.",     "ส.ค.",     "ก.ย.",     "ต.ค.",     "พ.ย.",          "ธ.ค."         },
+    /* 12: Vietnamese */
+    {"Tháng Một", "Tháng Hai", "Tháng Ba",  "Tháng Tư", "Tháng Năm", "Tháng Sáu", "Tháng Bảy", "Tháng Tám", "Tháng Chín", "Tháng Mười", "Tháng Mười Một", "Tháng Mười Hai"}
 };
-const char *day[7] =
+
+const char *day[13][7] =
 {
-    "Sun",
-    "Mon",
-    "Tue",
-    "Wen",
-    "Thu",
-    "Fri",
-    "Sat"
+    /* 0: English */
+    {"Mon",     "Tue",     "Wed",     "Thu",     "Fri",     "Sat",      "Sun"     },
+    /* 1: French */
+    {"Lun",     "Mar",     "Mer",     "Jeu",     "Ven",     "Sam",      "Dim"     },
+    /* 2: German */
+    {"Mo",      "Di",      "Mi",      "Do",      "Fr",      "Sa",       "So"      },
+    /* 3: Spanish */
+    {"Lun",     "Mar",     "Mié",     "Jue",     "Vie",     "Sáb",      "Dom"     },
+    /* 4: Italian */
+    {"Lun",     "Mar",     "Mer",     "Gio",     "Ven",     "Sab",      "Dom"     },
+    /* 5: Dutch */
+    {"Ma",      "Di",      "Wo",      "Do",      "Vr",      "Za",       "Zo"      },
+    /* 6: Portuguese */
+    {"Seg",     "Ter",     "Qua",     "Qui",     "Sex",     "Sáb",      "Dom"     },
+    /* 7: Russian */
+    {"Пн",      "Вт",      "Ср",      "Чт",      "Пт",      "Сб",       "Вс"      },
+    /* 8: Simplified Chinese */
+    {"周一",    "周二",    "周三",    "周四",    "周五",    "周六",     "周日"    },
+    /* 9: Japanese */
+    {"月曜",    "火曜",    "水曜",    "木曜",    "金曜",    "土曜",     "日曜"    },
+    /* 10: Korean */
+    {"월",      "화",      "수",      "목",      "금",      "토",       "일"      },
+    /* 11: Thai */
+    {"จ.",      "อ.",      "พ.",      "พฤ.",     "ศ.",      "ส.",       "อา."     },
+    /* 12: Vietnamese */
+    {"Thứ Hai", "Thứ Ba",  "Thứ Tư",  "Thứ Năm", "Thứ Sáu", "Thứ Bảy",  "Chủ Nhật"}
 };
 
 /* Page name */
-const char *page_name_array[35] =
+const char *page_name_array[13][35] =
 {
-    "playback",
-    "Volume",
-    "Ambient Sound",
-    "Equalizer",
-    "Smart Talk",
-    "Spatial Sound",
-    "High-Resolution Audio (LDAC)",
-    "Voice Aware",
-    "Auto Play/Pause",
-    "Audio Source",
-    "Auracast Broadcast",
-
-    "Timer",
-    "Flashlight",
-    "SilentNow",
-    "Volume Unit Meter",
-    "JBL Headphones App",
-
-    "Smart Tx Management",
-    "Screen Brightness",
-    "Dark/Light Mode",
-    "Lock Screen",
-    "Auto Dim Off Screen",
-    "Quick Wake Up Screen",
-    "Case Button Customize",
-    "Information Center Customize",
-    "Unlock Slider",
-    "Notification",
-    "Clock Settings",
-    "Time Format",
-    "language",
-    "Reorder Quick Access",
-    "Support",
-    "Product Tips",
-    "Factory Reset",
-
-    "Password",
-    "Message Preview"
+    {"playback",        "Volume",               "Ambient Sound",      "Equalizer",              "Smart Talk",    "Spatial Sound",                 "High-Resolution Audio (LDAC)", "VoiceAware",          "Auto Play/Pause",                        "Audio Source", "Auracast Broadcast", "Timer",        "Flashlight",       "SilentNow", "Volume Unit Meter", "JBL Headphones App",         "Smart Tx Management", "Screen Brightness",              "Dark/Light Mode",         "Lock Screen",           "Auto Dim Off Screen",                       "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Unlock Slider",                   "Notification",     "Clock Settings", "Time Format",          "language", "Reorder Quick Access",               "Support",       "Product Tips",               "Factory Reset",                             "Password", "Message Preview"},
+    {"Lecture",         "Volume",               "Son d'ambiance",     "Égaliseur",              "Smart Talk",    "Son Spatial",                   "High-Resolution Audio (LDAC)", "VoiceAware",          "Lecture et pause auto",                  "Audio Source", "Auracast Broadcast", "Minuteur",     "Lampe torche",     "SilentNow", "Volume Unit Meter", "Application JBL Headphones", "Smart Tx Management", "Luminosité de l'écran",          "Mode sombre/clair",       "Écran de verrouillage", "Écran arrêt atténuation auto",              "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Curseur de déverrouillage",       "Notification",     "Clock Settings", "Format de l'heure",    "Langue",   "Réorganiser l'accès rapide",         "Assistance",    "Conseils sur le produit",    "Réinitialisation d'usine",                  "Password", "Aperçu du message"},
+    {"Wiedergabe",      "Lautstärke",           "Umgebungsgeräusche", "Equalizer",              "Smart Talk",    "Raumsound",                     "High-Resolution Audio (LDAC)", "VoiceAware",          "Autom. Wiedergabe und Pause",            "Audio Source", "Auracast Broadcast", "Timer",        "Taschenlampe",     "SilentNow", "Volume Unit Meter", "JBL Headphones-App",         "Smart Tx Management", "Bildschirmhelligkeit",           "Dunkel-/Hell-Modus",      "Sperrbildschirm",       "Automatische Bildschirmabdunkelung",        "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Entsperrschieber",                "Benachrichtigung", "Clock Settings", "Uhrzeitformat",        "Sprache",  "Schnellzugriff neu anordnen",        "Unterstützung", "Tipps zum Gerät",            "Reset auf die Werkseinstellungen",          "Password", "Vorschau für Nachricht"},
+    {"Reproducción",    "Volumen",              "Sonido ambiental",   "Ecualizador",            "Smart Talk",    "Sonido espacial",               "High-Resolution Audio (LDAC)", "VoiceAware",          "Reproducción/pausa automática",          "Audio Source", "Auracast Broadcast", "Temporizador", "Linterna",         "SilentNow", "Volume Unit Meter", "Aplicación JBL Headphones",  "Smart Tx Management", "BildschirBrillo de la pantalla", "Modo oscuro/claro",       "Pantalla de bloqueo",   "Atenuación automática de la pantalla",      "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Deslizador de desbloqueo",        "Notificación",     "Clock Settings", "Formato de hora",      "Idioma",   "Reordenar acceso rápido",            "Asistencia",    "Consejos sobre el producto", "Restablecer a la configuración de fábrica", "Password", "Vista previa del mensaje"},
+    {"Riproduzione",    "Volume",               "Suono ambientale",   "Equalizzatore",          "Smart Talk",    "Suono Spaziale",                "High-Resolution Audio (LDAC)", "VoiceAware",          "Play & Pausa automatici",                "Audio Source", "Auracast Broadcast", "Timer",        "Torcia",           "SilentNow", "Volume Unit Meter", "App JBL Headphones",         "Smart Tx Management", "Luminosità schermo",             "Modalità scura/luminosa", "Schermata di blocco",   "Spegnimento graduale automatico schermo",   "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Cursore di sblocco",              "Notifiche",        "Clock Settings", "Formato ora",          "Lingua",   "Riordina Quick Access",              "Supporto",      "Suggerimenti sul prodotto",  "Ripristino delle impostazioni predefinite", "Password", "Anteprima dei messaggi"},
+    {"Afspelen",        "Volume",               "Omgevingsgeluid",    "Equalizer",              "Smart Talk",    "Ruimtelijk geluid",             "High-Resolution Audio (LDAC)", "VoiceAware",          "Automatisch afspelen en pauzeren",       "Audio Source", "Auracast Broadcast", "Timer",        "Zaklamp",          "SilentNow", "Volume Unit Meter", "JBL Headphones-app",         "Smart Tx Management", "Schermhelderheid",               "Donker/lichte modus",     "Vergrendelscherm",      "Scherm automatisch dimmen uit",             "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Schuif ontgrendelen",             "Melding",          "Clock Settings", "Tijdnotatie",          "Taal",     "Quick Access herordenen",            "Ondersteuning", "Producttips",                "Fabrieksreset",                             "Password", "Berichtvoorbeeld"},
+    {"Reprodução",      "Volume",               "Som Ambiente",       "Equalizador",            "Smart Talk",    "Som espacial",                  "High-Resolution Audio (LDAC)", "VoiceAware",          "Reproduzir e pausa automáticos",         "Audio Source", "Auracast Broadcast", "Temporizador", "Lanterna",         "SilentNow", "Volume Unit Meter", "Aplicação JBL Headphones",   "Smart Tx Management", "Luminosidade do Ecrã",           "Modo Escuro/Claro",       "Ecrã de Bloqueio",      "Desligar Escurecimento Automático do Ecrã", "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Desbloquear Controlo Deslizante", "Notificação",      "Clock Settings", "Formato da Hora",      "Idioma",   "Reordenar Acesso Rápido",            "Suporte",       "Sugestões do Produto",       "Redefinir de fábrica",                      "Password", "Pré-visualização da mensagem"},
+    {"Воспроизведение", "Громкость",            "Фоновый звук",       "Эквалайзер",             "Smart Talk",    "Объемное Звучание",             "High-Resolution Audio (LDAC)", "Функция VoiceAware",  "Автоматическое воспроизведение и пауза", "Audio Source", "Auracast Broadcast", "Таймер",       "Фонарик",          "SilentNow", "Volume Unit Meter", "Приложение JBL Headphones",  "Smart Tx Management", "Яркость экрана",                 "Темный/светлый режим",    "Экран блокировки",      "Авто-затемнение экрана выключено",          "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Ползунок разблокировки",          "Уведомление",      "Clock Settings", "Формат времени",       "Язык",     "Изменение порядка быстрого доступа", "Поддержка",     "Советы по устройству",       "Сброс до заводских настроек",               "Password", "Предварительный просмотр сообщения"},
+    {"回放",            "音量",                 "环境音",               "均衡器",                 "智能通话",       "空间音频",                      "High-Resolution Audio (LDAC)", "语音感知",             "自动播放和暂停",                          "Audio Source", "Auracast Broadcast", "定时器",        "手电筒",           "SilentNow", "Volume Unit Meter", "JBL Headphones app",         "Smart Tx Management", "屏幕亮度",                        "深色/浅色模式",            "锁屏",                   "自动熄屏调暗",                               "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "解锁滑块",                        "通知",              "Clock Settings", "时间格式",             "语言",      "重新排序快速访问",                    "支持",           "产品小贴士",                  "恢复出厂设置",                               "Password", "消息预览"},
+    {"再生",            "音量",                 "アンビエントサウンド",  "イコライザー",            "スマートトーク", "空間サウンド",                   "High-Resolution Audio (LDAC)", "ボイスアウェア",       "自動再生&一時停止",                        "Audio Source", "Auracast Broadcast", "タイマー",      "フラッシュライト", "SilentNow", "Volume Unit Meter", "JBL Headphonesアプリ",        "Smart Tx Management", "画面の輝度",                      "ダーク/ライトモード",       "ロック画面",             "自動ディムオフ画面",                          "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "スライダーをアンロック",           "通知",              "Clock Settings", "時間のフォーマット",    "言語",      "クイックアクセスの並び替え",           "サポート",       "製品のヒント",                 "初期化",                                    "Password", "メッセージのプレビュー"},
+    {"재생",            "볼륨",                 "주변 소리",            "이퀄라이저",              "Smart Talk",   "공간 음향",                      "High-Resolution Audio (LDAC)", "VoiceAware",          "자동 재생 및 일시 중지",                   "Audio Source", "Auracast Broadcast", "타이머",       "플래시",           "SilentNow", "Volume Unit Meter", "JBL Headphones 앱",           "Smart Tx Management", "화면 밝기",                       "다크/라이트 모드",         "잠금 화면",              "화면 자동 어둡게 꺼짐",                       "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "잠금 해제 슬라이더",               "알림",              "Clock Settings", "시간 형식",            "언어",     "빠른 접근 재정렬",                    "지원",           "제품 팁",                     "공장 초기화",                                "Password", "메시지 미리 보기"},
+    {"การเล่น",          "เสียงรอบข้าง",           "Ambient Sound",       "อีควอไลเซอร์",             "Smart Talk",    "เสียงรอบทิศทาง",                  "High-Resolution Audio (LDAC)", "การรับรู้เสียงพูด",        "เล่นและหยุดอัตโนมัติ",                        "Audio Source", "Auracast Broadcast", "ตัวจับเวลา",     "ไฟฉาย",           "SilentNow", "Volume Unit Meter", "แอป JBL Headphones",         "Smart Tx Management", "ความสว่างหน้าจอ",                  "โหมดมืด/สว่าง",             "ล็อกหน้าจอ",              "หน้าจอมืดอัตโนมัติ",                            "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "แถบเลื่อนปลดล็อก",                 "การแจ้งเตือน",         "Clock Settings", "รูปแบบเวลา",           "ภาษา",     "จัดลำดับการเข้าถึงด่วนใหม่",               "การสนับสนุน",     "เคล็ดลับผลิตภัณฑ์",             "รีเซ็ตเป็นค่าจากโรงงาน",                         "Password", "ตัวอย่างข้อความ"},
+    {"Phát lại",        "Âm thanh môi trường", "Ambient Sound",       "Bộ điều chỉnh âm thanh", "Smart Talk",    "Tính năng âm thanh không gian", "High-Resolution Audio (LDAC)", "Phát hiện giọng nói", "Tự động phát & tạm dừng",                "Audio Source", "Auracast Broadcast", "Bộ đếm giờ",   "Đèn pin",         "SilentNow", "Volume Unit Meter", "Ứng dụng JBL Headphones",    "Smart Tx Management", "Độ sáng màn hình",                "Chế độ Tối/Sáng",         "Màn hình khóa",         "Tự động làm mờ khi tắt màn hình",           "Quick Wake Up Screen", "Case Button Customize", "Information Center Customize", "Thanh trượt mở khóa",             "Thông báo",         "Clock Settings", "Định dạng thời gian", "Ngôn ngữ", "Sắp xếp lại Truy cập nhanh",         "Hỗ trợ",        "Mẹo sử dụng sản phẩm",       "Khôi phục cài đặt gốc",                     "Password", "Xem trước tin nhắn"},
 };
+
 
 /* Lock screen */
 int8_t wallpaper_index = 0; // [0, 4]
@@ -189,6 +199,7 @@ char timer_str[6] = {0};
 uint16_t calltime_val = 0; // seconds
 char calltime_str[6] = {0};
 char call_source_str[20] = "+8618888888888";
+gui_call_t *gui_call = NULL;
 
 /* Auto dim off screen*/
 int8_t auto_dim_time_val = 30; // [5, 60], step 5
@@ -207,7 +218,7 @@ const char *case_button_customize_type[3] =
 };
 
 /* Language */
-int8_t language_type_index = ENGLISH;
+int8_t language_index = ENGLISH;
 
 /* Reorder quick access */
 const char *quick_page_name[4] = {0};
@@ -264,9 +275,9 @@ struct TX_MANAGEMENT tx_management =
 
 /* Clock settings */
 uint8_t hour_val = 0; //[0, 23]
-uint8_t min_val = 0; //[0, 59]
+uint8_t minutes_val = 0; //[0, 59]
 char hour_str[3] = {0};
-char min_str[3] = {0};
+char minutes_str[3] = {0};
 
 /* Notification */
 struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM] =
@@ -282,3 +293,7 @@ struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM] =
     {"QQ", "Banana: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
 };
 
+void gui_call_register(gui_call_t *call)
+{
+    gui_call = call;
+}

@@ -5,6 +5,7 @@
 #include "common_data.h"
 #include "gui_img.h"
 #include "gui_text.h"
+#include "gui_message.h"
 
 /*============================================================================*
  *                            Macros
@@ -53,6 +54,19 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+static void switch_ota_view(void *msg)
+{
+    GUI_UNUSED(msg);
+
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c)
+    {
+        gui_view_set_animate_step(view_c, 10);
+        gui_view_switch_direct(view_c, &descriptor, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
+}
 
 static void exit_wait(void *p)
 {
@@ -248,4 +262,17 @@ static void ota_view_design(gui_view_t *view)
         gui_text_mode_set(text, MID_CENTER);
         gui_obj_add_event_cb(button_bg, click_button_retry, GUI_EVENT_TOUCH_CLICKED, NULL); //test
     }
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+void msg_2_switch_ota_view(void)
+{
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .cb = switch_ota_view,
+    };
+    gui_send_msg_to_server(&msg);
 }

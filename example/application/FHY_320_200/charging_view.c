@@ -5,6 +5,7 @@
 #include "common_data.h"
 #include "gui_img.h"
 #include "gui_text.h"
+#include "gui_message.h"
 
 /*============================================================================*
  *                            Macros
@@ -57,6 +58,19 @@ static int gui_view_get_other_view_descriptor_init(void)
     return 0;
 }
 static GUI_INIT_VIEW_DESCRIPTOR_GET(gui_view_get_other_view_descriptor_init);
+
+static void switch_charging_view(void *msg)
+{
+    GUI_UNUSED(msg);
+
+    gui_view_t *view_c = gui_view_get_current();
+    if (view_c)
+    {
+        gui_view_set_animate_step(view_c, 400);
+        gui_view_switch_direct(view_c, &descriptor, SWITCH_OUT_NONE_ANIMATION,
+                               SWITCH_IN_NONE_ANIMATION);
+    }
+}
 
 static void battery_update_cb(void *p)
 {
@@ -159,4 +173,17 @@ static void charging_view_design(gui_view_t *view)
     gui_img_a8_recolor(charging_icon, GUI_COLOR_ARGB8888(255, 0, 0xFF, 0xF6));
 
     gui_obj_create_timer(GUI_BASE(bg), 10, true, entrance_animation);
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+void msg_2_switch_charging_view(void)
+{
+    gui_msg_t msg =
+    {
+        .event = GUI_EVENT_USER_DEFINE,
+        .cb = switch_charging_view,
+    };
+    gui_send_msg_to_server(&msg);
 }

@@ -122,7 +122,7 @@ static void notification_note_design(gui_obj_t *obj, void *p)
     gui_img_a8_recolor(img, fg_1_color.color.argb_full);
 
     char *text;
-    if (!f_status.message_preview || language_type_index != ENGLISH)
+    if (!f_status.message_preview || language_index != ENGLISH)
     {
         text = (char *)preview_off_str;
     }
@@ -152,7 +152,7 @@ static void detail_note_design(gui_obj_t *obj, void *p)
         fg_1_color = FG_1_DARK;
     }
     char *text;
-    if (!f_status.message_preview || language_type_index != ENGLISH)
+    if (!f_status.message_preview || language_index != ENGLISH)
     {
         text = (char *)preview_off_str;
     }
@@ -263,8 +263,9 @@ static void notification_design(gui_obj_t *parent)
     gui_img_a8_mix_alpha(bg_note, bg_note->fg_color_set >> 24);
 
     gui_text_t *title = gui_text_create(parent, 0, 0, 0, 320, 60);
-    gui_text_set(title, (void *)page_name_array[NOTIFICATION], GUI_FONT_SRC_BMP, font_color,
-                 strlen(page_name_array[NOTIFICATION]), 30);
+    gui_text_set(title, (void *)page_name_array[language_index][NOTIFICATION], GUI_FONT_SRC_BMP,
+                 font_color,
+                 strlen(page_name_array[language_index][NOTIFICATION]), 30);
     gui_text_type_set(title, CAPTION_3_30_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(title, MID_CENTER);
 

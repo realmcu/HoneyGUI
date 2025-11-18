@@ -341,10 +341,10 @@ static int app_init(void)
     // f_status.headband_charging = 1;
     // f_status.ota = OTA_DOING;
 
-    quick_page_name[0] = page_name_array[0];
-    quick_page_name[1] = page_name_array[1];
-    quick_page_name[2] = page_name_array[2];
-    quick_page_name[3] = page_name_array[3];
+    quick_page_name[0] = page_name_array[language_index][0];
+    quick_page_name[1] = page_name_array[language_index][1];
+    quick_page_name[2] = page_name_array[language_index][2];
+    quick_page_name[3] = page_name_array[language_index][3];
     detail_page_design_func = page_information_center_customize_design;
 
     gui_win_t *win_touch = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
@@ -357,7 +357,7 @@ static int app_init(void)
     gui_win_t *win_view = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
     // fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win_view), 1000, true, time_update_cb);
-    gui_view_create(win_view, lock_view, 0, 0, 0, 0);
+    gui_view_create(win_view, test_view, 0, 0, 0, 0);
 
     return 0;
 }
