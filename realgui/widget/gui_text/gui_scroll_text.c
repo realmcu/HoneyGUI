@@ -176,7 +176,7 @@ static void gui_scroll_text_font_destroy(gui_text_t *text)
     {
     case GUI_FONT_SRC_BMP:
         {
-            gui_font_mem_obj_destroy(text);
+            gui_font_mem_destroy(text);
         }
         break;
 

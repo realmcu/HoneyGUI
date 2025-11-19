@@ -95,7 +95,7 @@ uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr);
  * @param font_bin_addr font file address
  * @return uint8_t
  */
-uint8_t gui_font_mem_destroy(uint8_t *font_bin_addr);
+uint8_t gui_font_mem_delate(uint8_t *font_bin_addr);
 
 /**
  * @brief Preprocessing of bitmap fonts using internal engines
@@ -125,7 +125,7 @@ void gui_font_mem_unload(gui_text_t *text);
  *
  * @param text Widget pointer
  */
-void gui_font_mem_obj_destroy(gui_text_t *text);
+void gui_font_mem_destroy(gui_text_t *text);
 
 /**
  * @brief Get the pixel width of the text in the current font file.

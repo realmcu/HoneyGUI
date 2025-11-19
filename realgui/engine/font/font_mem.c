@@ -970,7 +970,7 @@ void gui_font_mem_unload(gui_text_t *text)
     return;
 }
 
-void gui_font_mem_obj_destroy(gui_text_t *text)
+void gui_font_mem_destroy(gui_text_t *text)
 {
     if (text->data)
     {
@@ -1201,7 +1201,7 @@ uint8_t gui_font_mem_init(uint8_t *font_bin_addr)
     return i;
 }
 
-uint8_t gui_font_mem_destroy(uint8_t *font_bin_addr)
+uint8_t gui_font_mem_delate(uint8_t *font_bin_addr)
 {
     if (!font_bin_addr)
     {

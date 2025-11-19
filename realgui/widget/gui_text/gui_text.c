@@ -24,6 +24,7 @@
 #include "font_stb.h"
 #include "font_mem_img.h"
 #include "font_mem_matrix.h"
+#include "font_custom.h"
 #include "tp_algo.h"
 #include "gui_fb.h"
 
@@ -124,6 +125,12 @@ static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
+    case GUI_FONT_SRC_CUS:
+        {
+            gui_font_custom_load(text, rect);
+        }
+        break;
+
     default:
         break;
     }
@@ -177,6 +184,12 @@ static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
+    case GUI_FONT_SRC_CUS:
+        {
+            gui_font_custom_draw(text, rect);
+        }
+        break;
+
     default:
         break;
     }
@@ -223,6 +236,12 @@ static void gui_text_font_unload(gui_text_t *text)
         }
         break;
 
+    case GUI_FONT_SRC_CUS:
+        {
+            gui_font_custom_unload(text);
+        }
+        break;
+
     default:
         break;
     }
@@ -239,7 +258,7 @@ static void gui_text_font_destroy(gui_text_t *text)
     {
     case GUI_FONT_SRC_BMP:
         {
-            gui_font_mem_obj_destroy(text);
+            gui_font_mem_destroy(text);
         }
         break;
 
@@ -270,6 +289,12 @@ static void gui_text_font_destroy(gui_text_t *text)
     case GUI_FONT_SRC_TTF:
         {
 
+        }
+        break;
+
+    case GUI_FONT_SRC_CUS:
+        {
+            gui_font_custom_destroy(text);
         }
         break;
 

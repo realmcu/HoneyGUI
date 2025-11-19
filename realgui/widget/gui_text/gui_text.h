@@ -87,6 +87,7 @@ typedef enum
     GUI_FONT_SRC_MAT = 3,
     GUI_FONT_SRC_FT  = 4,
     GUI_FONT_SRC_TTF = 5,
+    GUI_FONT_SRC_CUS = 6,
 } FONT_SRC_TYPE;
 
 typedef enum
