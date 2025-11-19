@@ -461,6 +461,8 @@ void msg_2_switch_call_view(void);
 
 void set_device_name(const char *name);
 
+void gui_call_register(gui_call_t *call);
+
 #ifdef __cplusplus
 }
 #endif

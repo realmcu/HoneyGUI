@@ -293,6 +293,9 @@ struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM] =
     {"QQ", "Banana: Yo sup bro how's everything going? I'm planing to visit our grandpa next week."},
 };
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void gui_call_register(gui_call_t *call)
 {
     gui_call = call;
