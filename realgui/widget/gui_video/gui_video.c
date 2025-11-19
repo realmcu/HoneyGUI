@@ -278,6 +278,7 @@ static void gui_video_play_cb(void *p)
 static void gui_video_draw(gui_obj_t *obj)
 {
     gui_video_t *this = (gui_video_t *)obj;
+    uint8_t *img_data_raw = NULL;
     uint8_t *img_data = NULL;
     uint32_t img_sz = 0;
     uint8_t *frame_buff = NULL;
@@ -311,17 +312,18 @@ static void gui_video_draw(gui_obj_t *obj)
 
     if (this->img_type == VIDEO_TYPE_MJPEG || this->img_type == VIDEO_TYPE_AVI)
     {
-        if (this->src_mode == IMG_SRC_FILESYS)
+        if (this->storage_type == IMG_SRC_FILESYS)
         {
             uint32_t *array = (uint32_t *)this->array;
             img_sz = array[this->frame_cur + 1] - array[this->frame_cur];
             // gui_log(" %d  %d, %d, sz %d \n", this->frame_cur, array[this->frame_cur + 1], array[this->frame_cur], img_sz);
-            img_data = (uint8_t *)gui_malloc(img_sz);
-            if (!img_data)
+            img_data_raw = (uint8_t *)gui_malloc(img_sz + 8);
+            if (!img_data_raw)
             {
                 gui_log("gui_video_draw malloc error! \n");
                 return ;
             }
+            img_data = (uint8_t *)((((uintptr_t)img_data_raw + 7) >> 3) << 3);
 
             const char *fn = this->data;
             int fp;
@@ -345,10 +347,33 @@ static void gui_video_draw(gui_obj_t *obj)
             }
 
         }
-        else if (this->src_mode == IMG_SRC_MEMADDR)
+        else if (this->storage_type == IMG_SRC_MEMADDR)
         {
             img_data = this->array[this->frame_cur];
             img_sz = this->array[this->frame_cur + 1] - this->array[this->frame_cur];
+        }
+        else if (this->storage_type == IMG_SRC_FTL)
+        {
+            uint32_t *array = (uint32_t *)this->array;
+            img_sz = array[this->frame_cur + 1] - array[this->frame_cur];
+            // gui_log(" %d  %d, %d, sz %d \n", this->frame_cur, array[this->frame_cur + 1], array[this->frame_cur], img_sz);
+            img_data_raw = (uint8_t *)gui_malloc(img_sz + 8);
+            if (!img_data_raw)
+            {
+                gui_log("gui_video_draw malloc error! \n");
+                return ;
+            }
+            img_data = (uint8_t *)((((uintptr_t)img_data_raw + 7) >> 3) << 3);
+
+            uint32_t fp = (uintptr_t)this->data;
+
+            fp += array[this->frame_cur];
+            gui_ftl_read(fp, img_data, img_sz);
+
+            if (*(uint16_t *)img_data != 0xd8ff || *(uint16_t *)(img_data + img_sz - 2) != 0xd9ff)
+            {
+                gui_log("gui_video_draw load error! \n");
+            }
         }
         // gui_log("%d off 0x%x, %d\n", this->frame_cur, img_data - (uint8_t *)this->data, img_sz);
 
@@ -371,21 +396,21 @@ static void gui_video_draw(gui_obj_t *obj)
 
         // gui_log("this frame_buff  0x%x\n", this->frame_buff);
 
-        if (this->src_mode == IMG_SRC_FILESYS)
+        if (this->storage_type == IMG_SRC_FILESYS || this->storage_type == IMG_SRC_FTL)
         {
-            if (img_data)
+            if (img_data_raw)
             {
-                gui_free(img_data);
+                gui_free(img_data_raw);
             }
         }
 
     }
     else if (this->img_type == VIDEO_TYPE_H264)
     {
-        if (this->src_mode == IMG_SRC_FILESYS)
+        if (this->storage_type == IMG_SRC_FILESYS)
         {
         }
-        else if (this->src_mode == IMG_SRC_MEMADDR)
+        else if (this->storage_type == IMG_SRC_MEMADDR)
         {
             gui_h264_header_t *header = (gui_h264_header_t *)this->data;
 
@@ -408,9 +433,13 @@ static void gui_video_draw(gui_obj_t *obj)
                 gui_log("gui_video_draw malloc h264 fb error! \n");
             }
             this->frame_buff = this->frame_buff_raw;
+            // gui_log("dec frame %d\n", this->frame_cur);
             int ret = gui_h264bsd_get_frame(this->decoder, this->frame_buff + sizeof(gui_rgb_data_head_t),
                                             header->w * header->h * 2);
-            if (ret) { gui_log("dec h264 %d\n", ret); }
+            if (ret)
+            {
+                gui_log("h264 dec ret: %d\n", ret);
+            }
 
             gui_rgb_data_head_t *pheader = (gui_rgb_data_head_t *)this->frame_buff;
             memcpy(pheader, &(this->header), sizeof(gui_rgb_data_head_t));
@@ -454,7 +483,7 @@ static void gui_video_destory(gui_obj_t *obj)
 {
     gui_video_t *this = (gui_video_t *)obj;
 
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (this->storage_type == IMG_SRC_FILESYS)
     {
 
     }
@@ -507,10 +536,10 @@ static void gui_video_prepare(gui_obj_t *obj)
 static int video_src_init_avi(gui_video_t  *this)
 {
 
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (this->storage_type == IMG_SRC_FILESYS)
     {
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (this->storage_type == IMG_SRC_MEMADDR)
     {
         uint8_t *img_data = (uint8_t *)this->data;
         gui_obj_t *obj = (gui_obj_t *)this;
@@ -632,10 +661,10 @@ static int video_src_init_h264(gui_video_t  *this)
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_h264_header_t *header = NULL;
 
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (this->storage_type == IMG_SRC_FILESYS)
     {
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (this->storage_type == IMG_SRC_MEMADDR)
     {
         header = this->data;
         obj->w = header->w;
@@ -662,11 +691,13 @@ static int video_src_init_h264(gui_video_t  *this)
 
 static int video_src_init_mjpg(gui_video_t  *this)
 {
+#define VIDEO_INIT_LOAD_BUFF_SZ  (2*1024)
     uint8_t **slice_array = NULL;
     uint32_t slice_cnt = 0;
-    uint32_t sz_file = 0;  // IMG_SRC_MEMADDR: should be set
+    uint32_t sz_file = 0;
 
-    if (this->src_mode == IMG_SRC_FILESYS)
+
+    if (this->storage_type == IMG_SRC_FILESYS)
     {
         uint32_t *array = NULL;
         const char *fn = this->data;
@@ -682,7 +713,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
         {
             return -1;
         }
-        buff = (uint8_t *)gui_malloc(2 * 1024);
+        buff = (uint8_t *)gui_malloc(VIDEO_INIT_LOAD_BUFF_SZ);
         if (!buff)
         {
             gui_log("mjpeg2jpeg_slicer malloc error! \n");
@@ -692,12 +723,13 @@ static int video_src_init_mjpg(gui_video_t  *this)
         uint32_t cur_start = 0;
         uint32_t cur_rd = 0;
         gui_obj_t *obj = (gui_obj_t *)this;
-        uint8_t scan_state = 0;
+        uint8_t scan_state = MJPEG_SCAN_INIT;
         uint32_t offset = 0;
         while (cur_start + cur_rd < sz_file)
         {
-            cur_start += (cur_rd ? (cur_rd - 1) : cur_rd);
-            cur_rd = (sz_file - cur_start < 2 * 1024) ? (sz_file - cur_start) : 2 * 1024;
+            cur_start += cur_rd ;
+            cur_rd = (sz_file - cur_start < VIDEO_INIT_LOAD_BUFF_SZ) ? (sz_file - cur_start) :
+                     VIDEO_INIT_LOAD_BUFF_SZ;
             gui_fs_lseek(fp, cur_start, 0);
             gui_fs_read(fp, buff, cur_rd);
             if (cur_start < cur_rd)
@@ -714,12 +746,12 @@ static int video_src_init_mjpg(gui_video_t  *this)
             {
                 if (*((uint16_t *)pdata) == MGPEG_SEG_SOI)
                 {
-                    scan_state = 1;
+                    scan_state = MJPEG_SCAN_START;
                     offset = pdata - buff + cur_start;
                 }
-                else if ((scan_state == 1) && (*((uint16_t *)pdata) == MGPEG_SEG_EOI))
+                else if ((scan_state == MJPEG_SCAN_START) && (*((uint16_t *)pdata) == MGPEG_SEG_EOI))
                 {
-                    scan_state = 2;
+                    scan_state = MJPEG_SCAN_END;
                     slice_cnt++;
                     // TODO: fix realloc
                     if (!array)
@@ -748,7 +780,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     array[slice_cnt] = pdata + 2 - buff + cur_start;
                     gui_log("%d -> %d ,sz %d\n", array[slice_cnt - 1], array[slice_cnt],
                             array[slice_cnt] - array[slice_cnt - 1]);
-                    scan_state = 0;
+                    scan_state = MJPEG_SCAN_INIT;
                 }
                 pdata++;
             }
@@ -759,7 +791,7 @@ static int video_src_init_mjpg(gui_video_t  *this)
         this->array = (uint8_t **)array;
         this->num_frame = slice_cnt;
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (this->storage_type == IMG_SRC_MEMADDR)
     {
         uint8_t *img_data = (uint8_t *)this->data;
         gui_obj_t *obj = (gui_obj_t *)this;
@@ -777,6 +809,96 @@ static int video_src_init_mjpg(gui_video_t  *this)
         this->array = slice_array;
         this->num_frame = slice_cnt;
     }
+    else if (this->storage_type == IMG_SRC_FTL)
+    {
+        uint32_t *array = NULL;
+        uint32_t fn = (uintptr_t)this->data;
+        uint32_t fp = 0;
+        uint8_t *buff = NULL;
+
+        buff = (uint8_t *)gui_malloc(VIDEO_INIT_LOAD_BUFF_SZ);
+        if (!buff)
+        {
+            gui_log("mjpeg2jpeg_slicer malloc error! \n");
+            return -1;
+        }
+
+        uint32_t cur_start = 0;
+        uint32_t cur_rd = 0;
+        gui_obj_t *obj = (gui_obj_t *)this;
+        uint8_t scan_state = MJPEG_SCAN_INIT;
+        uint32_t offset = 0;
+        while (scan_state != MJPEG_SCAN_EOF)
+        {
+            // no need overlap reading, cus already aligned and padded inside
+            // cur_start += (cur_rd ? (cur_rd - 0) : 0);
+            cur_start += cur_rd ;
+            cur_rd = VIDEO_INIT_LOAD_BUFF_SZ;
+            fp = fn + cur_start;
+            gui_ftl_read(fp, buff, cur_rd);
+            if (cur_start < cur_rd)
+            {
+                // first time to get size
+                uint16_t w = 0, h = 0;
+                get_jpeg_size(buff, cur_rd, &w, &h);
+                obj->w = w;
+                obj->h = h;
+            }
+
+            uint8_t *pdata = buff;
+            while (pdata < buff + cur_rd)
+            {
+                if (*((uint16_t *)pdata) == MGPEG_SEG_SOI)
+                {
+                    scan_state = MJPEG_SCAN_START;
+                    offset = pdata - buff + cur_start;
+                }
+                else if ((scan_state == MJPEG_SCAN_START) && (*((uint16_t *)pdata) == MGPEG_SEG_EOI))
+                {
+                    scan_state = MJPEG_SCAN_END;
+                    slice_cnt++;
+                    if (!array)
+                    {
+                        gui_log("%s %d\n", __FUNCTION__, __LINE__);
+                        array = (uint32_t *)gui_malloc(2 * sizeof(uint32_t));
+                    }
+                    else
+                    {
+                        uint32_t *temp = NULL;
+                        // gui_log("%s %d cnt %d array 0x%x\n", __FUNCTION__, __LINE__, slice_cnt, array);
+                        temp = (uint32_t *)gui_malloc((slice_cnt + 1) * sizeof(uint32_t));
+                        memcpy(temp, array, slice_cnt  * sizeof(uint32_t));
+                        gui_free(array);
+                        array = temp;
+                    }
+
+                    if (!array)
+                    {
+                        gui_log("array malloc error!\n");
+                        gui_free(buff);
+                        return -1;
+                    }
+                    array[slice_cnt - 1] = offset;
+                    array[slice_cnt] = pdata + 2 - buff + cur_start;
+                    gui_log("%d: %d -> %d ,sz %d\n", slice_cnt - 1, array[slice_cnt - 1], array[slice_cnt],
+                            array[slice_cnt] - array[slice_cnt - 1]);
+                    pdata++; // +1 +1 -> EOI
+                    // scan_state = MJPEG_SCAN_INIT;
+                }
+                else if ((scan_state == MJPEG_SCAN_END) && (*((uint16_t *)pdata) != MGPEG_SEG_SOI))
+                {
+                    // case: 0xffd9 | 0xffd8 will get into the first "if"
+                    gui_log("mjpeg EOF\n");
+                    scan_state = MJPEG_SCAN_EOF;
+                }
+                pdata++;
+            }
+            memset(buff, 0, cur_rd);
+        }
+        gui_free(buff);
+        this->array = (uint8_t **)array;
+        this->num_frame = slice_cnt;
+    }
     return 0;
 }
 
@@ -786,7 +908,7 @@ static int gui_video_src_init(gui_video_t  *this)
     uint8_t header[16];
 
     memset(header, 0, sizeof(header));
-    if (this->src_mode == IMG_SRC_FILESYS)
+    if (this->storage_type == IMG_SRC_FILESYS)
     {
         char *file = this->data;
         int fp = gui_fs_open(file, 0);
@@ -802,9 +924,13 @@ static int gui_video_src_init(gui_video_t  *this)
         rdlen = gui_fs_read(fp, header, sizeof(header));
         gui_fs_close(fp);
     }
-    else if (this->src_mode == IMG_SRC_MEMADDR)
+    else if (this->storage_type == IMG_SRC_MEMADDR)
     {
         memcpy(header, this->data, sizeof(header));
+    }
+    else if (this->storage_type == IMG_SRC_FTL)
+    {
+        gui_ftl_read((uintptr_t)this->data, (uint8_t *)header, sizeof(header));
     }
 
 
@@ -1027,7 +1153,7 @@ void gui_video_refresh_size(gui_video_t *this)
     uint8_t *img_data = NULL;
     uint16_t w = 0, h = 0;
 
-    switch (this->src_mode)
+    switch (this->storage_type)
     {
     case IMG_SRC_MEMADDR:
         {
@@ -1066,7 +1192,7 @@ void gui_video_refresh_type(gui_video_t *this)
     uint8_t *img_data = NULL;
 
     this->img_type = VIDEO_TYPE_NULL;
-    switch (this->src_mode)
+    switch (this->storage_type)
     {
     case IMG_SRC_MEMADDR:
         {
@@ -1107,6 +1233,34 @@ void gui_video_refresh_type(gui_video_t *this)
     }
 }
 
+gui_video_t *gui_video_create_from_ftl(void           *parent,
+                                       const char     *name,
+                                       void           *addr,
+                                       int16_t         x,
+                                       int16_t         y,
+                                       int16_t         w,
+                                       int16_t         h)
+{
+    GUI_ASSERT(parent != NULL);
+
+    if (name == NULL)
+    {
+        name = "DEFAULT_LIVE_IMAGE";
+    }
+
+    gui_video_t *img = gui_malloc(sizeof(gui_video_t));
+    GUI_ASSERT(img != NULL);
+
+    memset(img, 0x00, sizeof(gui_video_t));
+    img->storage_type = IMG_SRC_FTL;
+
+    gui_img_video_ctor(img, (gui_obj_t *)parent, name, addr, x, y, w, h);
+
+    GET_BASE(img)->create_done = true;
+
+    return img;
+}
+
 gui_video_t *gui_video_create_from_fs(void           *parent,
                                       const char     *name,
                                       void           *addr,
@@ -1126,7 +1280,7 @@ gui_video_t *gui_video_create_from_fs(void           *parent,
     GUI_ASSERT(img != NULL);
 
     memset(img, 0x00, sizeof(gui_video_t));
-    img->src_mode = IMG_SRC_FILESYS;
+    img->storage_type = IMG_SRC_FILESYS;
 
     gui_img_video_ctor(img, (gui_obj_t *)parent, name, addr, x, y, w, h);
 
@@ -1154,7 +1308,7 @@ gui_video_t *gui_video_create_from_mem(void           *parent,
     GUI_ASSERT(img != NULL);
 
     memset(img, 0x00, sizeof(gui_video_t));
-    img->src_mode = IMG_SRC_MEMADDR;
+    img->storage_type = IMG_SRC_MEMADDR;
 
     gui_img_video_ctor(img, (gui_obj_t *)parent, name, addr, x, y, w, h);
 

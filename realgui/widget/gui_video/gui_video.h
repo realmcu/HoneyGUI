@@ -65,6 +65,14 @@ typedef enum
 
 } GUI_VIDEO_RES;
 
+typedef enum
+{
+    MJPEG_SCAN_INIT = 0,
+    MJPEG_SCAN_START,
+    MJPEG_SCAN_END,
+    MJPEG_SCAN_EOF,
+
+} VIDEO_MJPEG_SCAN_STATE; // Widget Internal use only
 
 typedef enum
 {
@@ -138,7 +146,7 @@ typedef struct
     int32_t frame_last;        // for cache management
     int32_t repeat_cnt;
     uint8_t img_type;
-    uint8_t src_mode;
+    uint8_t storage_type;
 
     uint8_t state;
 
@@ -156,8 +164,7 @@ typedef struct
  *============================================================================*/
 
 #define IMG_LIVE_FPS (25)  // default 25 fps, 40 ms
-// #define IMG_LIVE_TJPGDEC
-// #define USE_JPU_DECODER
+
 
 
 /*============================================================================*
@@ -175,8 +182,27 @@ uint32_t gui_video_get_frame_time(gui_video_t *this);
 
 void gui_video_set_scale(gui_video_t *this, float scale_x, float scale_y);
 
+/**
+ * @brief   Set the playback state of a video widget.
+ *
+ * @param[in] this    Pointer to the video widget (must be valid).
+ * @param[in] state   Target state, as defined by GUI_VIDEO_STATE (e.g., Play, Pause, Stop).
+ *
+ * @note   When set state Play at state Stop, widget will play from the beginning.
+ */
 void gui_video_set_state(gui_video_t *this, GUI_VIDEO_STATE state);
 
+
+/**
+ * @brief Set the repeat (loop) count for video playback.
+ *
+ * Parameters:
+ *   this - Pointer to the video widget (must be valid).
+ *   cnt  - Number of times to repeat playback after the first run:
+ *          - cnt > 0: Play the video cnt additional times (total plays = 1 + cnt).
+ *          - cnt = 0: Do not repeat (play once).
+ *          - GUI_VIDEO_REPEAT_INFINITE: Repeat indefinitely (infinite loop).
+ */
 void gui_video_set_repeat_count(gui_video_t *this, int32_t cnt);
 
 GUI_VIDEO_STATE gui_video_get_state(gui_video_t *this);
@@ -189,18 +215,43 @@ void gui_video_refresh_size(gui_video_t *this);
 
 void gui_video_refresh_type(gui_video_t *this);
 
+
+
 /**
- * @brief Create an image live widget with buffer.
- * @note This widget is used to display live images which can be played.
- * @note The data of the image can be static char or data transformed by BLE.
- * @param parent The father widget.
- * @param name The widget's name.
- * @param addr The data address of the image.
- * @param x The X-axis coordinate.
- * @param y The Y-axis coordinate.
- * @param w The widget width.
- * @param h The widget height.
- * @return gui_video_t*
+ * @brief Create a video widget from an FTL source(cannot be accessed directly) and attach it to a parent container.
+ *
+ * Parameters:
+ *   parent - Pointer to the parent GUI object (must be valid).
+ *   name   - Widget name/identifier.
+ *   addr   - Pointer to the FTL source handle or buffer.
+ *   x, y   - Top-left position relative to the parent.
+ *   w, h   - Width and height in pixels (will be overwritten by the video file).
+ *
+ * Returns:
+ *   Pointer to gui_video_t on success; NULL on failure.
+ *
+ */
+gui_video_t *gui_video_create_from_ftl(void           *parent,
+                                       const char     *name,
+                                       void           *addr,
+                                       int16_t         x,
+                                       int16_t         y,
+                                       int16_t         w,
+                                       int16_t         h);
+
+/**
+ * @brief Create a video widget from a memory buffer and attach it to a parent container.
+ *
+ * Parameters:
+ *   parent - Pointer to the parent GUI object (must be valid).
+ *   name   - Widget name/identifier.
+ *   addr   - Pointer to the memory buffer containing video data.
+ *   x, y   - Top-left position relative to the parent.
+ *   w, h   - Width and height in pixels.(width and height will be overwritten by video file)
+ *
+ * Returns:
+ *   Pointer to gui_video_t on success; NULL on failure.
+ *
  */
 gui_video_t *gui_video_create_from_mem(void           *parent,
                                        const char     *name,
