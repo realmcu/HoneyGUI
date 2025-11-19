@@ -91,6 +91,10 @@ typedef enum
     SWITCH_OUT_ANIMATION_FADE,
     SWITCH_OUT_ANIMATION_MOVE_TO_RIGHT,
     SWITCH_OUT_ANIMATION_MOVE_TO_LEFT,
+    SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,       // scale to top left
+    SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_RIGHT,      // scale to top right
+    SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT,      // scale from top left
+    SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_RIGHT,     // scale from top right
     SWITCH_IN_NONE_ANIMATION,           ///< No animation.
     SWITCH_IN_ANIMATION_ZOOM,
     SWITCH_IN_ANIMATION_FADE,

@@ -48,9 +48,9 @@ static void time_update_cb(void *p)
     sprintf(hour_content, "%02d", timeinfo->tm_hour);
     sprintf(minute_content, "%02d", timeinfo->tm_min);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "t_time", obj);
-    GUI_WIDGET_POINTER_BY_NAME_ROOT(t_date, "t_date", obj);
+    GUI_WIDGET_POINTER_BY_NAME_ROOT(t_min, "t_min", obj);
     gui_text_content_set((gui_text_t *)t_time, hour_content, strlen(hour_content));
-    gui_text_content_set((gui_text_t *)t_date, minute_content, strlen(minute_content));
+    gui_text_content_set((gui_text_t *)t_min, minute_content, strlen(minute_content));
 }
 
 static void Circles_cb(NVGcontext *vg)
@@ -126,6 +126,7 @@ void create_watchface_number(gui_view_t *view)
                                       img_bg_data);
     gui_img_create_from_mem(win, "watchface", (void *)img_bg_data, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    // create time-text
     sprintf(hour_content, "%02d", timeinfo->tm_hour);
     sprintf(minute_content, "%02d", timeinfo->tm_min);
     gui_text_t *t_time = gui_text_create(win, "t_time", -58, 10, 0, 0);
@@ -135,12 +136,12 @@ void create_watchface_number(gui_view_t *view)
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
-    gui_text_t *t_date = gui_text_create(win, "t_date", -58, 200, 0, 0);
-    gui_text_set(t_date, minute_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(minute_content),
+    gui_text_t *t_min = gui_text_create(win, "t_min", -58, 200, 0, 0);
+    gui_text_set(t_min, minute_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(minute_content),
                  250);
-    gui_text_type_set(t_date, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
-    gui_text_mode_set(t_date, RIGHT);
-    gui_text_rendermode_set(t_date, 2);
+    gui_text_type_set(t_min, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(t_min, RIGHT);
+    gui_text_rendermode_set(t_min, 2);
 
     // create time-dot
     win_dot = gui_win_create(parent, "win_dot", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

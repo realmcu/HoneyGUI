@@ -522,8 +522,9 @@ static void note_design(gui_obj_t *obj, void *p)
 
 static void weather_design(gui_view_t *view)
 {
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"), SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+                             SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,
+                             SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT,
                              GUI_EVENT_KB_SHORT_CLICKED);
     weather_data_init();
     weather_condition_init();

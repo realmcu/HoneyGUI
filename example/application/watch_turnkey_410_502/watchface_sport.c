@@ -192,13 +192,23 @@ static void img_heart_press_cb(void *p)
                            SWITCH_OUT_ANIMATION_FADE,
                            SWITCH_IN_ANIMATION_FADE);
 }
+static void img_weather_press_cb(void *p)
+{
+    gui_obj_t *obj = (gui_obj_t *)p;
+    if (!obj)
+    {
+        return;
+    }
+    gui_view_switch_direct(gui_view_get_current(), gui_view_descriptor_get("weather_view"),
+                           SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,
+                           SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT);
+}
 void create_watchface_sport(gui_view_t *view)
 {
 
     current_view = view;
     gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
 
     sprintf(time_text_content, "%02d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
     gui_text_t *t_time = gui_text_create(win, "t_time", -25, 120, 0, 0);
@@ -208,7 +218,6 @@ void create_watchface_sport(gui_view_t *view)
     gui_text_type_set(t_time, SF_COMPACT_TEXT_SEMIBOLD_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
-
 
     {
         //text sport
@@ -256,9 +265,6 @@ void create_watchface_sport(gui_view_t *view)
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, image_w, image_h, arc_activity_cb,
                                           img_data_activity);
-
-
-
     }
     {
         gui_img_t *img_sport = gui_img_create_from_mem(win, "sport_icon", APP_WORKOUT_ICON_BIN, 310, 30, 0,
@@ -274,7 +280,8 @@ void create_watchface_sport(gui_view_t *view)
                                                          0, 0);
         gui_img_set_mode(img_weather, IMG_SRC_OVER_MODE);
         gui_img_scale(img_weather, 0.7, 0.7);
-        // gui_obj_add_event_cb(GUI_BASE(img_weather), (gui_event_cb_t)img_weather_press_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        gui_obj_add_event_cb(GUI_BASE(img_weather), (gui_event_cb_t)img_weather_press_cb,
+                             GUI_EVENT_TOUCH_CLICKED, NULL);
     }
     //heart text
     {
@@ -295,5 +302,5 @@ void create_watchface_sport(gui_view_t *view)
     }
     gui_obj_create_timer(GUI_BASE(win), 500, true, time_update_cb);
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, (gui_view_t *)create_watchface_sport,
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_sport,
                   clear_watchface_sport_view);

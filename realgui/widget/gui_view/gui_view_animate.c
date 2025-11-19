@@ -302,6 +302,103 @@ static void view_transition_animation_collapse_to_center(float pro, gui_view_t *
     unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
     GUI_BASE(view)->opacity_value = opacity_value;
 }
+static void view_transition_animation_zoom_from_top_left(float pro, gui_view_t *view,
+                                                         float *scale_x,
+                                                         float *scale_y)
+{
+    // Ensure progress is between 0.0f and 1.0f
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function
+    float eased_pro = ease_in_out(pro);
+
+    // Calculate scaling factor (scale from 0.0 to 1.0)
+    float scale_rate = 0.3f + 0.7f * eased_pro;
+    *scale_x = scale_rate;
+    *scale_y = scale_rate;
+
+    // Calculate and set opacity (from 0 to 255)
+    unsigned char opacity_value = (unsigned char)(255 * eased_pro);
+    GUI_BASE(view)->opacity_value = opacity_value;
+
+    GUI_BASE(view)->x = 0;
+    GUI_BASE(view)->y = 0;
+}
+static void view_transition_animation_zoom_from_top_right(float pro, gui_view_t *view,
+                                                          float *scale_x,
+                                                          float *scale_y)
+{
+    // Ensure progress is between 0.0f and 1.0f
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function
+    float eased_pro = ease_in_out(pro);
+
+    // Calculate scaling factor (scale from 0.0 to 1.0)
+    float scale_rate = 0.3f + 0.7f * eased_pro;
+    *scale_x = scale_rate;
+    *scale_y = scale_rate;
+
+    // Calculate and set opacity (from 0 to 255)
+    unsigned char opacity_value = (unsigned char)(255 * eased_pro);
+    GUI_BASE(view)->opacity_value = opacity_value;
+
+    uint32_t screen_width = gui_get_screen_width();
+    GUI_BASE(view)->x = screen_width - GUI_BASE(view)->w;
+    GUI_BASE(view)->y = 0;
+}
+static void view_transition_animation_zoom_to_top_left(float pro, gui_view_t *view, float *scale_x,
+                                                       float *scale_y)
+{
+    // Ensure progress is between 0.0f and 1.0f
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function
+    float eased_pro = ease_in_out(pro);
+
+    // Calculate scaling factor (scale from 1.0 to 0.0)
+    float scale_rate = 1.0f - eased_pro;
+    *scale_x = scale_rate;
+    *scale_y = scale_rate;
+
+    // Calculate and set opacity (from 255 to 0)
+    unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
+    GUI_BASE(view)->opacity_value = opacity_value;
+
+    // Move from current position to top left corner while scaling down
+    GUI_BASE(view)->x = 0;
+    GUI_BASE(view)->y = 0;
+}
+static void view_transition_animation_zoom_to_top_right(float pro, gui_view_t *view, float *scale_x,
+                                                        float *scale_y)
+{
+    // Ensure progress is between 0.0f and 1.0f
+    if (pro < 0.0f) { pro = 0.0f; }
+    if (pro > 1.0f) { pro = 1.0f; }
+
+    // Use easing function
+    float eased_pro = ease_in_out(pro);
+
+    // Calculate scaling factor (scale from 1.0 to 0.0)
+    float scale_rate = 1.0f - 0.7f * eased_pro;
+    *scale_x = scale_rate;
+    *scale_y = scale_rate;
+
+    // Calculate and set opacity (from 255 to 0)
+    unsigned char opacity_value = (unsigned char)(255 * (1.0f - eased_pro));
+    GUI_BASE(view)->opacity_value = opacity_value;
+
+    uint32_t screen_width = gui_get_screen_width();
+    GUI_BASE(view)->x = screen_width - GUI_BASE(view)->w;
+    GUI_BASE(view)->y = 0;
+}
+
+/*============================================================================*
+ *                           Animation Case Handler
+ *============================================================================*/
 
 static void animation_case(gui_view_t *this, float pro)
 {
@@ -367,25 +464,66 @@ static void animation_case(gui_view_t *this, float pro)
             view_transition_animation_to_opacity0(ease_in_out(pro), this);
         }
         break;
+    case SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT:
+        {
+            view_transition_animation_zoom_from_top_left(pro, this, &scale_x, &scale_y);
+        }
+        break;
+    case SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_RIGHT:
+        {
+            view_transition_animation_zoom_from_top_right(pro, this, &scale_x, &scale_y);
+        }
+        break;
+    case SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT:
+        {
+            view_transition_animation_zoom_to_top_left(pro, this, &scale_x, &scale_y);
+        }
+        break;
+    case SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_RIGHT:
+        {
+            view_transition_animation_zoom_to_top_right(pro, this, &scale_x, &scale_y);
+        }
+        break;
+
     default:
         break;
     }
+    // Apply scale transformation with different pivot points
     if (scale_x != 0 || scale_y != 0)
     {
-        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
-        if (scale_x == 0)
+        switch (style)
         {
-            matrix_scale(1, scale_y, obj->matrix);
-        }
-        else if (scale_y == 0)
-        {
-            matrix_scale(scale_x, 1, obj->matrix);
-        }
-        else
-        {
+        case SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT:
+        case SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT:
+            // left top scale:(0, 0)
             matrix_scale(scale_x, scale_y, obj->matrix);
+            break;
+
+        case SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_RIGHT:
+        case SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_RIGHT:
+            // Top-right corner zoom: First pan to the top-right corner, then zoom, then pan back.
+            matrix_translate(obj->w, 0, obj->matrix);
+            matrix_scale(scale_x, scale_y, obj->matrix);
+            matrix_translate(-obj->w, 0, obj->matrix);
+            break;
+
+        default:
+            matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
+            if (scale_x == 0)
+            {
+                matrix_scale(1, scale_y, obj->matrix);
+            }
+            else if (scale_y == 0)
+            {
+                matrix_scale(scale_x, 1, obj->matrix);
+            }
+            else
+            {
+                matrix_scale(scale_x, scale_y, obj->matrix);
+            }
+            matrix_translate(obj->w / -2, obj->h / -2, obj->matrix);
+            break;
         }
-        matrix_translate(obj->w / -2, obj->h / -2, obj->matrix);
     }
 }
 

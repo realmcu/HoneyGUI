@@ -97,7 +97,7 @@ static void note_design(gui_obj_t *obj, void *p)
     }
     if (index == 2)
     {
-        gui_img_t *img = gui_img_create_from_mem(obj, "VIODE", watchface_icons[index], offset_x, offset_y,
+        gui_img_t *img = gui_img_create_from_mem(obj, "VIDEO", watchface_icons[index], offset_x, offset_y,
                                                  0, 0);
 
         gui_text_t *label = gui_text_create(obj, "watchface_video", offset_x + 40, offset_y - 30, 200, 40);
@@ -106,9 +106,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_text_type_set(label, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(label, LEFT);
 
-        GUI_UNUSED(img);
-
-        gui_log("Under development\n");
+        gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
     if (index == 3)
     {

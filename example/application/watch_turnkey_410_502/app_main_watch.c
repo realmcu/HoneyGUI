@@ -379,7 +379,8 @@ static void app_main_watch_ui_design(gui_view_t *view)
     }
     else if (current_watchface_type == WATCHFACE_VIDEO)
     {
-        gui_log("Video watchface not implemented yet\n");
+        extern void create_watchface_earth(gui_view_t *view);
+        create_watchface_earth((void *)view);
     }
 }
 
