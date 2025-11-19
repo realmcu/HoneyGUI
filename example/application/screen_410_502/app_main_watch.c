@@ -445,6 +445,10 @@ static int app_init(void)
     gui_audio_info.music_current_time = win32_music_get_music_current_time;
     gui_audio_info.record_stop = local_record_stop;
 #endif
+
+    extern int l3_init(void);
+    l3_init();
+
     if (gui_get_audio() == NULL)
     {
         gui_audio_info_register(&gui_audio_info);

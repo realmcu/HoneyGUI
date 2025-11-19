@@ -94,8 +94,9 @@ static void flag_global_cb(l3_gltf_model_t *this)
 static void flag_app(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
+    gui_view_set_animate_step(view, 1000);
+    gui_view_switch_on_event(view, menu_view, SWITCH_OUT_NONE_ANIMATION,
+                             SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
     l3_gltf_model_t *flag_3d = l3_create_gltf_model(GLTF_DESC_FLAG_BIN, LITE_RGB565, 0, 0, 410, 502);

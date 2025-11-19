@@ -107,17 +107,7 @@ const uint8_t CAPSULE_COLOR_COUNT = 8;
 const uint8_t CAPSULES_PER_COLOR = 5;
 const uint8_t CAPSULE_IMG_HALF_WIDTH = 20;
 const uint8_t CAPSULE_IMG_HALF_HEIGHT = 7;
-void *Capsule_Img[CAPSULE_COLOR_COUNT] =
-{
-    RAINBOWACLOCK_CAPSULE00_BIN,
-    RAINBOWACLOCK_CAPSULE01_BIN,
-    RAINBOWACLOCK_CAPSULE02_BIN,
-    RAINBOWACLOCK_CAPSULE03_BIN,
-    RAINBOWACLOCK_CAPSULE04_BIN,
-    RAINBOWACLOCK_CAPSULE05_BIN,
-    RAINBOWACLOCK_CAPSULE06_BIN,
-    RAINBOWACLOCK_CAPSULE07_BIN,
-};
+void *Capsule_Img[CAPSULE_COLOR_COUNT] = {0};
 
 const NVGcolor Capsule_Color[CAPSULE_COLOR_COUNT] =
 {
@@ -462,6 +452,16 @@ int ui_design(gui_obj_t *obj)
     b2Vec2 gravity(0.0f, 0.0f); // Remove gravity to make it purely rotational
     world = new (gui_malloc(sizeof(b2World))) b2World(gravity);
 
+    {
+        Capsule_Img[0] = RAINBOWACLOCK_CAPSULE00_BIN;
+        Capsule_Img[1] = RAINBOWACLOCK_CAPSULE01_BIN;
+        Capsule_Img[2] = RAINBOWACLOCK_CAPSULE02_BIN;
+        Capsule_Img[3] = RAINBOWACLOCK_CAPSULE03_BIN;
+        Capsule_Img[4] = RAINBOWACLOCK_CAPSULE04_BIN;
+        Capsule_Img[5] = RAINBOWACLOCK_CAPSULE05_BIN;
+        Capsule_Img[6] = RAINBOWACLOCK_CAPSULE06_BIN;
+        Capsule_Img[7] = RAINBOWACLOCK_CAPSULE07_BIN;
+    }
     // Create capsules
     gui_win_t *win = gui_win_create(parent, "Rainbow Analog Clock", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     create_capsules(world);
