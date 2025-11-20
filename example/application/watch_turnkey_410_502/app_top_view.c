@@ -166,7 +166,7 @@ static void note_design(gui_obj_t *obj, void *p)
         // gui_img_set_mode(canvas, IMG_SRC_OVER_MODE);
         gui_img_t *img = gui_img_create_from_mem(canvas, "music", APP_MUSIC_ICON_BIN, 20,
                                                  -50, 0, 0);
-        gui_img_scale(img, 0.8, 0.8);
+        gui_img_scale(img, 0.85, 0.85);
         gui_text_t *sport_text0 = gui_text_create(canvas, "music_text0", 184, 10, 0, 0);
         gui_text_set(sport_text0, "45 mimute ago", GUI_FONT_SRC_TTF, gui_rgb(200, 200, 200),
                      strlen("45 mimute ago"), 24);

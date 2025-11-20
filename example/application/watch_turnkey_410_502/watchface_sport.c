@@ -270,7 +270,7 @@ void create_watchface_sport(gui_view_t *view)
         gui_img_t *img_sport = gui_img_create_from_mem(win, "sport_icon", APP_WORKOUT_ICON_BIN, 310, 30, 0,
                                                        0);
         gui_img_set_mode(img_sport, IMG_SRC_OVER_MODE);
-        gui_img_scale(img_sport, 0.7, 0.7);
+        gui_img_scale(img_sport, 0.85, 0.85);
         gui_obj_add_event_cb(GUI_BASE(img_sport), (gui_event_cb_t)img_sport_press_cb,
                              GUI_EVENT_TOUCH_CLICKED, NULL);
     }
@@ -279,7 +279,7 @@ void create_watchface_sport(gui_view_t *view)
         gui_img_t *img_weather = gui_img_create_from_mem(win, "weather_icon", APP_WEATHER_ICON_BIN, 20, 30,
                                                          0, 0);
         gui_img_set_mode(img_weather, IMG_SRC_OVER_MODE);
-        gui_img_scale(img_weather, 0.7, 0.7);
+        gui_img_scale(img_weather, 0.85, 0.85);
         gui_obj_add_event_cb(GUI_BASE(img_weather), (gui_event_cb_t)img_weather_press_cb,
                              GUI_EVENT_TOUCH_CLICKED, NULL);
     }

@@ -281,8 +281,6 @@ static void note_design(gui_obj_t *obj, void *p)
     // note_design_param_t *design_p = (note_design_param_t *)p;
     gui_list_note_t *note = (gui_list_note_t *)obj;
     uint16_t index = note->index;
-    // static const char *text_array[4];
-    gui_log("index: %d ring_flag_enter: %d\n", index, ring_flag_enter);
     if (index < 5)
     {
         if (index == 0)
@@ -366,14 +364,28 @@ static void note_design(gui_obj_t *obj, void *p)
 static void activity_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"), SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
+    const char *obj_name = gui_view_get_current()->descriptor->name;
+    VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
+    VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
+    if (strcmp(obj_name, "bottom_view") == 0)
+    {
+        swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
+        swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
+    }
+    else if (strcmp(obj_name, "watchface_view") == 0)
+    {
+        swtich_in = SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT;
+        swtich_out = SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT;
+
+    }
+    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+                             swtich_out,
+                             swtich_in,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
     has_draw_bg = false;
     ring_flag_enter = false;
     activeIndex = 0;
-    gui_log("File: %s, Function: %s\n", __FILE__, __func__);
 
     //create list
     int length = 502;

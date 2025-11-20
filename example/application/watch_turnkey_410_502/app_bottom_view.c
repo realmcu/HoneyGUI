@@ -80,19 +80,18 @@ void *text_num_array[11] = {0};
 
 void initialize_text_num_array(void)
 {
-    text_num_array[0] = (void *)(resource_root + 0x000001b8); // UI_TEXT_0_BIN
-    text_num_array[1] = (void *)(resource_root + 0x00000b38); // UI_TEXT_1_BIN
-    text_num_array[2] = (void *)(resource_root + 0x00001138); // UI_TEXT_2_BIN
-    text_num_array[3] = (void *)(resource_root + 0x000018b8); // UI_TEXT_3_BIN
-    text_num_array[4] = (void *)(resource_root + 0x00002178); // UI_TEXT_4_BIN
-    text_num_array[5] = (void *)(resource_root + 0x000029b8); // UI_TEXT_5_BIN
-    text_num_array[6] = (void *)(resource_root + 0x00003178); // UI_TEXT_6_BIN
-    text_num_array[7] = (void *)(resource_root + 0x00003af8); // UI_TEXT_7_BIN
-    text_num_array[8] = (void *)(resource_root + 0x000040b8); // UI_TEXT_8_BIN
-    text_num_array[9] = (void *)(resource_root + 0x00004b78); // UI_TEXT_9_BIN
-    text_num_array[10] = (void *)(resource_root + 0x000054f8); // UI_TEXT_COLON_BIN
+    text_num_array[0] = (void *)(resource_root + 0x00002d38); // UI_TEXT_0_BIN
+    text_num_array[1] = (void *)(resource_root + 0x000036b8); // UI_TEXT_1_BIN
+    text_num_array[2] = (void *)(resource_root + 0x00003cb8); // UI_TEXT_2_BIN
+    text_num_array[3] = (void *)(resource_root + 0x00004438); // UI_TEXT_3_BIN
+    text_num_array[4] = (void *)(resource_root + 0x00004cf8); // UI_TEXT_4_BIN
+    text_num_array[5] = (void *)(resource_root + 0x00005538); // UI_TEXT_5_BIN
+    text_num_array[6] = (void *)(resource_root + 0x00005cf8); // UI_TEXT_6_BIN
+    text_num_array[7] = (void *)(resource_root + 0x00006678); // UI_TEXT_7_BIN
+    text_num_array[8] = (void *)(resource_root + 0x00006c38); // UI_TEXT_8_BIN
+    text_num_array[9] = (void *)(resource_root + 0x000076f8); // UI_TEXT_9_BIN
+    text_num_array[10] = (void *)(resource_root + 0x00008078); // UI_TEXT_COLON_BIN
 }
-
 extern struct tm *timeinfo;
 static char time_content[10] = "00:00";
 static char date_content[20] = "January0\nSun";
@@ -235,25 +234,26 @@ static void switch_app_cb(void *obj)
     if (strcmp(obj_name, "note_weather") == 0)
     {
         gui_view_switch_direct(current_view, gui_view_descriptor_get("weather_view"),
-                               SWITCH_OUT_ANIMATION_FADE,
+                               SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
                                SWITCH_IN_ANIMATION_FADE);
     }
     else if (strcmp(obj_name, "note_ac") == 0)
     {
         gui_view_switch_direct(current_view, gui_view_descriptor_get("activity_view"),
+                               SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+                               SWITCH_IN_ANIMATION_FADE);
+    }
+    else if (strcmp(obj_name, "MESSAGE") == 0)
+    {
+        // gui_view_switch_direct(current_view, gui_view_descriptor_get("app_message_view"), SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION,
+        //                        SWITCH_IN_ANIMATION_FADE);
+    }
+    else if (strcmp(obj_name, "APP_MENU") == 0)
+    {
+        gui_view_switch_direct(current_view, gui_view_descriptor_get("menu_view"),
                                SWITCH_OUT_ANIMATION_FADE,
                                SWITCH_IN_ANIMATION_FADE);
     }
-    // else if (strcmp(obj_name, "MESSAGE") == 0)
-    // {
-    //     gui_view_switch_direct(current_view, gui_view_descriptor_get("app_message_view"), SWITCH_OUT_ANIMATION_FADE,
-    //                            SWITCH_IN_ANIMATION_FADE);
-    // }
-    // else if (strcmp(obj_name, "app_menu") == 0)
-    // {
-    //     gui_view_switch_direct(current_view, gui_view_descriptor_get("menu_view"), SWITCH_OUT_ANIMATION_FADE,
-    //                            SWITCH_IN_ANIMATION_FADE);
-    // }
 }
 static int steps_to_calories(int steps)
 {
@@ -477,8 +477,8 @@ static void note_design(gui_obj_t *obj, void *p)
         //music
         {
             gui_img_t *img = gui_img_create_from_mem(canvas_app, "MUSIC", APP_MUSIC_ICON_BIN, 17, 28,
-                                                     0, 0);;
-            gui_img_scale(img, 0.7, 0.7);
+                                                     0, 0);
+            gui_img_scale(img, 0.85, 0.85);
             // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
         //battery
@@ -520,7 +520,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_text_type_set(battery_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
             gui_text_mode_set(battery_text, LEFT);
 
-            gui_obj_add_event_cb(img_battery, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+            // gui_obj_add_event_cb(img_battery, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
         //message
         {
@@ -529,23 +529,20 @@ static void note_design(gui_obj_t *obj, void *p)
                                                      28, 0,
                                                      0);
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-            gui_img_scale(img, 0.7, 0.7);
-            gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+            gui_img_scale(img, 0.85, 0.85);
+            // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
     }
     else if (index == 3)
     {
-        gui_img_t *canvas = (gui_img_t *)gui_canvas_round_rect_create(GUI_BASE(obj), "note_ac", 76, 0, 258,
+        gui_img_t *canvas = (gui_img_t *)gui_canvas_round_rect_create(GUI_BASE(obj), "APP_MENU", 76, 0, 258,
                                                                       76, 38, gui_rgba(98, 101, 98, 255 * 0.7));
 
-        gui_text_t *text = gui_text_create(canvas, 0, 90, 20, 0, 0);
-        gui_text_set(text, (void *)"EDIT", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 4, 32);
+        gui_text_t *text = gui_text_create(canvas, 0, 70, 20, 0, 0);
+        gui_text_set(text, "APP MENU", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen("APP MENU"), 32);
         gui_text_type_set(text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(text, LEFT);
-
-        // gui_img_t *img = gui_img_create_from_mem(obj, "app_menu", UI_APPVIEW_CARD_BIN, 76, 0, 0, 0);
-        // gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        // gui_obj_add_event_cb(img, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+        gui_obj_add_event_cb(canvas, (gui_event_cb_t)switch_app_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
     }
 }
 static void bottom_view_design(gui_view_t *view)

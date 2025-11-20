@@ -118,7 +118,29 @@ static void video_enter_cb(void *p)
         gui_obj_stop_timer(GUI_BASE(p));
     }
 }
-
+static void earth_change_cb(void *obj, gui_event_t e, void *param)
+{
+    (void)e;
+    (void)param;
+    {
+        if (!obj)
+        {
+            return;
+        }
+        gui_obj_t *p = GUI_BASE(obj)->parent;
+        if (obj)
+        {
+            gui_obj_tree_free(GUI_BASE(obj));
+        }
+        video = gui_video_create_from_mem(p, "earth",
+                                          (void *)EARTH_420_336_416_MJPG,
+                                          X_TARGET, Y_TARGET, 410, 502);
+        gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
+        gui_video_set_repeat_count(video, 0);
+        gui_video_set_frame_rate(video, 60.f);
+    }
+    gui_obj_add_event_cb(video, earth_change_cb, GUI_EVENT_TOUCH_CLICKED, 0);
+}
 void create_watchface_earth(gui_view_t *view)
 {
     current_view = view;
@@ -129,10 +151,11 @@ void create_watchface_earth(gui_view_t *view)
     video = gui_video_create_from_mem(win_video, "earth", (void *)EARTH_420_336_416_MJPG, 0, 0, 410,
                                       502);
     gui_video_set_state(video, GUI_VIDEO_STATE_PLAYING);
-    gui_video_set_repeat_count(video, GUI_VIDEO_REPEAT_INFINITE);
     gui_img_translate(video->img, X_ORIGIN, Y_ORIGIN);
     gui_img_scale(video->img, 1.5f, 1.5f);
     gui_video_set_frame_rate(video, 60.f);
+
+    gui_obj_add_event_cb(video, earth_change_cb, GUI_EVENT_TOUCH_CLICKED, 0);
 
     // start video enter animation timer
     gui_obj_create_timer(GUI_BASE(win_video), 17, true, video_enter_cb);

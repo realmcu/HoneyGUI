@@ -178,26 +178,26 @@ static void kb_button_cb(void)
     static uint32_t time_press = 0;
     static bool hold = 0;
     static bool press_his = 0;
-    // static uint32_t release_his = 0;
+    static uint32_t release_his = 0;
     if (hold)
     {
         if (kb->event == GUI_KB_EVENT_UP)
         {
             hold = 0;
-            // uint32_t time = kb->timestamp_ms_release - time_press;
-            // if (time <= 150)
-            // {
-            //     // Press twice quickly to change menu style
-            //     if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
-            //     {
-            //         gui_log("change menu style\n");
-            //         menu_style = !menu_style;
-            //     }
-            //     press_his = !press_his;
-            //     release_his = kb->timestamp_ms_release;
-            //     return;
-            // }
-            // else
+            uint32_t time = kb->timestamp_ms_release - time_press;
+            if (time <= 150)
+            {
+                // Press twice quickly to change menu style
+                if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
+                {
+                    gui_log("change menu style\n");
+                    menu_style = !menu_style;
+                }
+                press_his = !press_his;
+                release_his = kb->timestamp_ms_release;
+                return;
+            }
+            else
             {
                 // Press once to enter menu
                 press_his = 0;
@@ -382,6 +382,8 @@ static void app_main_watch_ui_design(gui_view_t *view)
         extern void create_watchface_earth(gui_view_t *view);
         create_watchface_earth((void *)view);
     }
+    gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
+    gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
 }
 
 extern const unsigned char _binary_root_0x704D1400_bin_start[];

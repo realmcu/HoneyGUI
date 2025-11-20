@@ -37,6 +37,18 @@ static int fade_counter = 0;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
+static void clear_num_view(gui_view_t *view)
+{
+    (void)view;
+    if (img_dot_data != NULL)
+    {
+        gui_lower_free(img_dot_data);
+        img_dot_data = NULL;
+    }
+
+    fade_counter = 0;
+    dot_alpha = 255;
+}
 static void time_update_cb(void *p)
 {
     gui_obj_t *obj = (gui_obj_t *)p;
@@ -118,7 +130,7 @@ void create_watchface_number(gui_view_t *view)
     gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    size_t *buffer_bg_size = SCREEN_WIDTH * SCREEN_HEIGHT * 2 + sizeof(gui_rgb_data_head_t);
+    size_t buffer_bg_size = SCREEN_WIDTH * SCREEN_HEIGHT * 2 + sizeof(gui_rgb_data_head_t);
     uint8_t *img_bg_data = NULL;
     img_bg_data = gui_lower_malloc(buffer_bg_size);
     memset(img_bg_data, 0, buffer_bg_size);
@@ -145,7 +157,7 @@ void create_watchface_number(gui_view_t *view)
 
     // create time-dot
     win_dot = gui_win_create(parent, "win_dot", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    size_t *buffer_img_size = 50 * 200 * 4 + sizeof(gui_rgb_data_head_t);
+    size_t buffer_img_size = 50 * 200 * 4 + sizeof(gui_rgb_data_head_t);
     if (!img_dot_data)
     {
         img_dot_data = gui_lower_malloc(buffer_img_size);
@@ -159,4 +171,4 @@ void create_watchface_number(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(win), 30000, true, time_update_cb);
     gui_obj_create_timer(GUI_BASE(win_dot), 50, true, time_dot_cb);
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_number, NULL);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_number, clear_num_view);

@@ -520,11 +520,49 @@ static void note_design(gui_obj_t *obj, void *p)
     return;
 }
 
+static void switch_app_cb(void *obj)
+{
+    const char *obj_name = ((gui_obj_t *)obj)->name;
+    if (strcmp(obj_name, "BIG_NUM") == 0)
+    {
+        extern watchface_type_t current_watchface_type;
+        current_watchface_type = WATCHFACE_BIG_NUM;
+
+        gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),
+                               SWITCH_OUT_ANIMATION_ZOOM,
+                               SWITCH_IN_ANIMATION_ZOOM);
+    }
+    else if (strcmp(obj_name, "SPORT") == 0)
+    {
+        extern watchface_type_t current_watchface_type;
+        current_watchface_type = WATCHFACE_SPORT;
+
+        gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),
+                               SWITCH_OUT_ANIMATION_ZOOM,
+                               SWITCH_IN_ANIMATION_ZOOM);
+    }
+
+}
 static void weather_design(gui_view_t *view)
 {
+    const char *obj_name = gui_view_get_current()->descriptor->name;
+    // gui_log("obj_name: %s\n", obj_name);
+    VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
+    VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
+    if (strcmp(obj_name, "bottom_view") == 0)
+    {
+        swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
+        swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
+    }
+    else if (strcmp(obj_name, "watchface_view") == 0)
+    {
+        swtich_in = SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT;
+        swtich_out = SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT;
+
+    }
     gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
-                             SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,
-                             SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT,
+                             swtich_out,
+                             swtich_in,
                              GUI_EVENT_KB_SHORT_CLICKED);
     weather_data_init();
     weather_condition_init();
