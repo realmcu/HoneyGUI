@@ -8,14 +8,7 @@ cmake_minimum_required(VERSION 3.10)
 if(1) #set to 1 to enable or variable to for dependency
 
     file(GLOB HEADERS "*.h" "*.hpp")
-    set(SOURCES
-            "${CMAKE_CURRENT_SOURCE_DIR}/font_rendering_utils.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/font_mem.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/font_mem_img.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/font_mem_matrix.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/font_stb.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/font_ttf.c"
-    )
+    file(GLOB SOURCES "*.c" "*.cpp")
 
 
 # Determine if we should create a library
