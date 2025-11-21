@@ -30,7 +30,8 @@
 typedef struct
 {
     uint16_t spread_out;
-    uint16_t switch_line;
+    uint16_t switch_line_x;
+    uint16_t switch_line_y;
 } glass_spread_desc;
 
 /*============================================================================*
@@ -151,66 +152,109 @@ void gui_put_glass_on_bg(draw_img_t *image, struct gui_dispdev *dc)
     uint32_t fb_width = dc->fb_width;
     uint32_t fb_height = dc->fb_height;
     glass_spread_desc *spread = (glass_spread_desc *)((int8_t *)image->data + 8);
-    int mid = spread->switch_line;
+    int mid_x = spread->switch_line_x;
+    int mid_y = spread->switch_line_y;
+    uint32_t area_x_offset_max = (area_x_max - x_min) * 2;
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
     uint32_t glass_width = head->w * 2;
     uint32_t area_x_offset = (area_x_min - x_min) * 2;
     int8_t *glass_offset = (int8_t *)image->data + 12;
     uint32_t *bg_u32 = (uint32_t *)dc->frame_buf;
-    int decrease_start, decrease_end, increase_start, increase_end;
+    int decrease_start_y, decrease_end_y, increase_start_y, increase_end_y;
+    int decrease_start_x, decrease_end_x, increase_start_x, increase_end_x;
     if (spread->spread_out)
     {
-        decrease_start = mid + y_min;
-        decrease_end = area_y_min - 1;
-        increase_start = mid + y_min + 1;
-        increase_end = area_y_max;
-        if (mid == 0)
+        decrease_start_y = mid_y + y_min;
+        decrease_end_y = area_y_min - 1;
+        increase_start_y = mid_y + y_min + 1;
+        increase_end_y = area_y_max;
+        if (mid_y == 0)
         {
-            decrease_start = area_y_max;
-            increase_start = area_y_max + 1;
+            decrease_start_y = area_y_max;
+            increase_start_y = area_y_max + 1;
+        }
+        decrease_start_x = mid_x + x_min;
+        decrease_end_x = area_x_min - 1;
+        increase_start_x = mid_x + x_min + 1;
+        increase_end_x = area_x_max;
+        if (mid_x == 0)
+        {
+            decrease_start_x = area_x_max;
+            increase_start_x = area_x_max + 1;
         }
     }
     else
     {
-        decrease_start = area_y_max;
-        decrease_end = mid + y_min;
-        increase_start = area_y_min;
-        increase_end = mid + y_min;
-        if (mid == 0)
+        decrease_start_y = area_y_max;
+        decrease_end_y = mid_y + y_min;
+        increase_start_y = area_y_min;
+        increase_end_y = mid_y + y_min;
+        if (mid_y == 0)
         {
-            decrease_start = area_y_min - 1;
-            increase_end = area_y_max;
+            decrease_start_y = area_y_min - 1;
+            increase_end_y = area_y_max;
+        }
+        decrease_start_x = area_x_max;
+        decrease_end_x = mid_x + x_min;
+        increase_start_x = area_x_min;
+        increase_end_x = mid_x + x_min;
+        if (mid_x == 0)
+        {
+            decrease_start_x = area_x_min - 1;
+            increase_end_x = area_x_max;
         }
     }
 
-    for (int y = increase_start; y <= increase_end; y++)
+    for (int y = increase_start_y; y <= increase_end_y; y++)
     {
         uint32_t glass_y = y - y_min;
         uint32_t offset = glass_y * glass_width + area_x_offset;
         uint32_t bg_offset = (y * fb_width + area_x_min);
-        for (int x = area_x_min; x <= area_x_max; x++)
+        for (int x = increase_start_x; x <= increase_end_x; x++)
         {
-            int x1 = x + glass_offset[offset];
-            int y1 = y + glass_offset[offset + 1];
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
             uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
                              bg_u32[y1 * fb_width + x1] : 0;
             bg_u32[bg_offset++] = pixel;
             offset += 2;
         }
+        offset = glass_y * glass_width + area_x_offset_max;
+        bg_offset = (y * fb_width + area_x_max);
+        for (int x = decrease_start_x; x > decrease_end_x; x--)
+        {
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
+            uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
+                             bg_u32[y1 * fb_width + x1] : 0;
+            bg_u32[bg_offset--] = pixel;
+            offset -= 2;
+        }
     }
-    for (int y = decrease_start; y > decrease_end; y--)
+    for (int y = decrease_start_y; y > decrease_end_y; y--)
     {
         uint32_t glass_y = y - y_min;
         uint32_t offset = glass_y * glass_width + area_x_offset;
         uint32_t bg_offset = (y * fb_width + area_x_min);
-        for (int x = area_x_min; x <= area_x_max; x++)
+        for (int x = increase_start_x; x <= increase_end_x; x++)
         {
-            int x1 = x + glass_offset[offset];
-            int y1 = y + glass_offset[offset + 1];
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
             uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
                              bg_u32[y1 * fb_width + x1] : 0;
             bg_u32[bg_offset++] = pixel;
             offset += 2;
+        }
+        offset = glass_y * glass_width + area_x_offset_max;
+        bg_offset = (y * fb_width + area_x_max);
+        for (int x = decrease_start_x; x > decrease_end_x; x--)
+        {
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
+            uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
+                             bg_u32[y1 * fb_width + x1] : 0;
+            bg_u32[bg_offset--] = pixel;
+            offset -= 2;
         }
     }
 }
@@ -233,66 +277,109 @@ static void gui_put_glass_on_bg_16(draw_img_t *image, struct gui_dispdev *dc)
     uint32_t fb_width = dc->fb_width;
     uint32_t fb_height = dc->fb_height;
     glass_spread_desc *spread = (glass_spread_desc *)((int8_t *)image->data + 8);
-    int mid = spread->switch_line;
+    int mid_y = spread->switch_line_y;
+    int mid_x = spread->switch_line_x;
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
     uint32_t glass_width = head->w * 2;
     uint32_t area_x_offset = (area_x_min - x_min) * 2;
     int8_t *glass_offset = (int8_t *)image->data + 12;
     uint16_t *bg_u16 = (uint16_t *)dc->frame_buf;
-    int decrease_start, decrease_end, increase_start, increase_end;
+    uint32_t area_x_offset_max = (area_x_max - x_min) * 2;
+    int decrease_start_y, decrease_end_y, increase_start_y, increase_end_y;
+    int decrease_start_x, decrease_end_x, increase_start_x, increase_end_x;
     if (spread->spread_out)
     {
-        decrease_start = mid + y_min;
-        decrease_end = area_y_min - 1;
-        increase_start = mid + y_min + 1;
-        increase_end = area_y_max;
-        if (mid == 0)
+        decrease_start_y = mid_y + y_min;
+        decrease_end_y = area_y_min - 1;
+        increase_start_y = mid_y + y_min + 1;
+        increase_end_y = area_y_max;
+        if (mid_y == 0)
         {
-            decrease_start = area_y_max;
-            increase_start = area_y_max + 1;
+            decrease_start_y = area_y_max;
+            increase_start_y = area_y_max + 1;
+        }
+        decrease_start_x = mid_x + x_min;
+        decrease_end_x = area_x_min - 1;
+        increase_start_x = mid_x + x_min + 1;
+        increase_end_x = area_x_max;
+        if (mid_x == 0)
+        {
+            decrease_start_x = area_x_max;
+            increase_start_x = area_x_max + 1;
         }
     }
     else
     {
-        decrease_start = area_y_max;
-        decrease_end = mid + y_min;
-        increase_start = area_y_min;
-        increase_end = mid + y_min;
-        if (mid == 0)
+        decrease_start_y = area_y_max;
+        decrease_end_y = mid_y + y_min;
+        increase_start_y = area_y_min;
+        increase_end_y = mid_y + y_min;
+        if (mid_y == 0)
         {
-            decrease_start = area_y_min - 1;
-            increase_end = area_y_max;
+            decrease_start_y = area_y_min - 1;
+            increase_end_y = area_y_max;
+        }
+        decrease_start_x = area_x_max;
+        decrease_end_x = mid_x + x_min;
+        increase_start_x = area_x_min;
+        increase_end_x = mid_x + x_min;
+        if (mid_x == 0)
+        {
+            decrease_start_x = area_x_min - 1;
+            increase_end_x = area_x_max;
         }
     }
 
-    for (int y = increase_start; y <= increase_end; y++)
+    for (int y = increase_start_y; y <= increase_end_y; y++)
     {
         uint32_t glass_y = y - y_min;
         uint32_t offset = glass_y * glass_width + area_x_offset;
         uint32_t bg_offset = (y * fb_width + area_x_min);
-        for (int x = area_x_min; x <= area_x_max; x++)
+        for (int x = increase_start_x; x <= increase_end_x; x++)
         {
-            int x1 = x + glass_offset[offset];
-            int y1 = y + glass_offset[offset + 1];
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
             uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
                              bg_u16[y1 * fb_width + x1] : 0;
             bg_u16[bg_offset++] = pixel;
             offset += 2;
         }
+        offset = glass_y * glass_width + area_x_offset_max;
+        bg_offset = (y * fb_width + area_x_max);
+        for (int x = decrease_start_x; x > decrease_end_x; x--)
+        {
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
+            uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
+                             bg_u16[y1 * fb_width + x1] : 0;
+            bg_u16[bg_offset--] = pixel;
+            offset -= 2;
+        }
     }
-    for (int y = decrease_start; y > decrease_end; y--)
+    for (int y = decrease_start_y; y > decrease_end_y; y--)
     {
         uint32_t glass_y = y - y_min;
         uint32_t offset = glass_y * glass_width + area_x_offset;
         uint32_t bg_offset = (y * fb_width + area_x_min);
-        for (int x = area_x_min; x <= area_x_max; x++)
+        for (int x = increase_start_x; x <= increase_end_x; x++)
         {
-            int x1 = x + glass_offset[offset];
-            int y1 = y + glass_offset[offset + 1];
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
             uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
                              bg_u16[y1 * fb_width + x1] : 0;
             bg_u16[bg_offset++] = pixel;
             offset += 2;
+        }
+        offset = glass_y * glass_width + area_x_offset_max;
+        bg_offset = (y * fb_width + area_x_max);
+        for (int x = decrease_start_x; x > decrease_end_x; x--)
+        {
+            int x1 = x + *(glass_offset + offset);
+            int y1 = y + *(glass_offset + offset + 1);
+            uint16_t pixel = ((uint32_t)x1 < fb_width && (uint32_t)y1 < fb_height) ?
+                             bg_u16[y1 * fb_width + x1] : 0;
+            bg_u16[bg_offset--] = pixel;
+            offset -= 2;
         }
     }
 }
