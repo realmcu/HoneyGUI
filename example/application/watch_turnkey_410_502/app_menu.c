@@ -34,11 +34,15 @@ typedef struct note_design_param
  *============================================================================*/
 static void app_menu_design(gui_view_t *view);
 static void clear_menu(gui_view_t *view);
+
+/*============================================================================*
+ *                           GUI_VIEW_INSTANCE
+ *============================================================================*/
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_menu_design, clear_menu);
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-
 static note_design_param_t *design_p = NULL;
 extern uint8_t menu_style;
 static int16_t list_offset_his = 0;
@@ -378,6 +382,11 @@ static void list_timer_cb(void *obj)
 {
     gui_list_t *list = (gui_list_t *)obj;
     list_offset_his = list->offset;
+    int range = list->base.h - list->total_length;
+    int t_y = list_offset_his * (SCROLLBAR_BG_H - SCROLLBAR_S_H) / range;
+    gui_obj_t *scrollbar = gui_list_entry(GUI_BASE(obj)->parent->child_list.prev, gui_obj_t,
+                                          brother_list);
+    gui_img_translate((void *)scrollbar, 0, t_y);
 }
 
 /*============================================================================*
@@ -385,7 +394,6 @@ static void list_timer_cb(void *obj)
  *============================================================================*/
 static void app_menu_design(gui_view_t *view)
 {
-    current_view = view;
     gui_win_t *win = gui_win_create(view, "win_app_menu", 0, 0, 0, 0);
     gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"), SWITCH_OUT_ANIMATION_FADE,
                              SWITCH_IN_ANIMATION_FADE,
@@ -445,13 +453,17 @@ static void app_menu_design(gui_view_t *view)
         int length = 100;
         uint8_t space = 5;
         gui_list_t *list = gui_list_create(view, "list", 0, 0, 0, 0, length, space,
-                                           VERTICAL, note_design, design_p, 1);
+                                           VERTICAL, note_design, design_p, 0);
         gui_list_set_style(list, LIST_CIRCLE);
         gui_list_set_note_num(list, array_size);
         gui_list_set_offset(list, list_offset_his);
         gui_list_set_out_scope(list, 50);
-        gui_list_set_bar_color(list, APP_COLOR_SILVER);
         gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
+
+        gui_img_t *scrollbar_bg = gui_img_create_from_mem(view, 0, SCROLLBAR_BG_BIN, 395, 30, 0, 0);
+        gui_img_set_mode(scrollbar_bg, IMG_SRC_OVER_MODE);
+        gui_img_t *scrollbar = gui_img_create_from_mem(view, 0, SCROLLBAR_S_BIN, 394, 30, 0, 0);
+        gui_img_set_mode(scrollbar, IMG_SRC_OVER_MODE);
     }
     else
     {
@@ -521,4 +533,3 @@ static void app_menu_design(gui_view_t *view)
 
     }
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_menu_design, clear_menu);

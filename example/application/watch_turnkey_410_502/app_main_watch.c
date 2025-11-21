@@ -28,7 +28,9 @@
  *                           Function Declaration
  *============================================================================*/
 static void app_main_watch_ui_design(gui_view_t *view);
+static void clear_mem(gui_view_t *view);
 static void inform_generate_cb(void);
+
 
 /*============================================================================*
  *                            Variables
@@ -45,7 +47,7 @@ static gui_view_descriptor_t const descriptor =
     .name = (const char *)CURRENT_VIEW_NAME,
     .pView = &current_view,
     .on_switch_in = app_main_watch_ui_design,
-    .on_switch_out = NULL,
+    .on_switch_out = clear_mem,
     .keep = false,
 };
 
@@ -56,6 +58,10 @@ struct tm *timeinfo;
 #ifndef __WIN32
 static struct tm watch_time;
 #endif
+char time_str[] = "00:00";
+
+watchface_type_t current_watchface_type = WATCHFACE_BIG_NUM;
+void (*watchface_clear_mem)(void) = NULL;
 
 /* FPS */
 static char fps[10];
@@ -66,34 +72,6 @@ static char low_mem_string[20];
 #ifdef _WIN32
 unsigned char *resource_root = NULL;
 #endif
-
-/* Date */
-// const char *month[12] =
-// {
-//     "JAN",
-//     "FEB",
-//     "MAR",
-//     "APR",
-//     "MAY",
-//     "JUN",
-//     "JUL",
-//     "AUG",
-//     "SEP",
-//     "OCT",
-//     "NOV",
-//     "DEC"
-// };
-
-// const char *day[7] =
-// {
-//     "SUN",
-//     "MON",
-//     "TUE",
-//     "WED",
-//     "THU",
-//     "FRI",
-//     "SAT"
-// };
 
 /*============================================================================*
  *                           Private Functions
@@ -309,6 +287,8 @@ static void win_cb(void *param)
 #else
     timeinfo = &watch_time;
 #endif
+    sprintf(time_str, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+
     // kb_button_cb();
     // inform_generate_cb();
 }
@@ -350,7 +330,15 @@ static void inform_generate_cb(void)
     // add_information(&payload);
 }
 
-watchface_type_t current_watchface_type = WATCHFACE_BIG_NUM;
+static void clear_mem(gui_view_t *view)
+{
+    GUI_UNUSED(view);
+    if (watchface_clear_mem)
+    {
+        watchface_clear_mem();
+    }
+}
+
 static void app_main_watch_ui_design(gui_view_t *view)
 {
     gui_view_switch_on_event(view, bottom_view, SWITCH_INIT_STATE,
@@ -382,8 +370,8 @@ static void app_main_watch_ui_design(gui_view_t *view)
         extern void create_watchface_earth(gui_view_t *view);
         create_watchface_earth((void *)view);
     }
-    gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
-    gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
+    // gui_win_t *win_kb = gui_win_create(view, "win_kb", 0, 0, 0, 0);
+    // gui_obj_create_timer(GUI_BASE(win_kb), 10, true, kb_button_cb);
 }
 
 extern const unsigned char _binary_root_0x704D1400_bin_start[];
@@ -401,7 +389,7 @@ static int app_init(void)
     json_refreash();
 
     gui_win_t *win = gui_win_create(gui_obj_get_root(), 0, 0, 0, 0, 0);
-    // fps_create(gui_obj_get_root());
+    fps_create(gui_obj_get_root());
     gui_obj_create_timer(GUI_BASE(win), 1000, true, win_cb);
     gui_obj_start_timer(GUI_BASE(win));
     win_cb(NULL);

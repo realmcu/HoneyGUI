@@ -35,10 +35,13 @@
 static void top_view_design(gui_view_t *view);
 
 /*============================================================================*
+ *                           GUI_VIEW_INSTANCE
+ *============================================================================*/
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, top_view_design, NULL);
+
+/*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-
 static gui_list_t *list;
 static gui_canvas_round_rect_t *canvas_clear;
 static bool is_cleared  = false;
@@ -49,8 +52,6 @@ static uint8_t *img_data_activity = NULL;
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, top_view_design, NULL);
-
 static void clear_all_note_cb(gui_event_t *e)
 {
     (void)e;
@@ -182,7 +183,6 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void top_view_design(gui_view_t *view)
 {
-    current_view = view;
     gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
                              SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_STILL_USE_BLUR,

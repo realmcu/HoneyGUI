@@ -17,7 +17,6 @@
  *============================================================================*/
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-#define CURRENT_VIEW_NAME "watchface_big_num_view"
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
@@ -26,24 +25,27 @@
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static char hour_content[6] = {0};
-static char minute_content[10] = {0};
-
 static gui_win_t *win_dot = NULL;
 static gui_img_t *img_dot = NULL;
 static uint8_t *img_dot_data = NULL;
+static uint8_t *img_bg_data = NULL;
 static uint8_t dot_alpha = 255;  // opacity time-dot
 static int fade_counter = 0;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void clear_num_view(gui_view_t *view)
+static void clear_num_view(void)
 {
-    (void)view;
     if (img_dot_data != NULL)
     {
         gui_lower_free(img_dot_data);
         img_dot_data = NULL;
+    }
+    if (img_bg_data != NULL)
+    {
+        gui_lower_free(img_bg_data);
+        img_bg_data = NULL;
     }
 
     fade_counter = 0;
@@ -57,12 +59,10 @@ static void time_update_cb(void *p)
         return;
     }
 
-    sprintf(hour_content, "%02d", timeinfo->tm_hour);
-    sprintf(minute_content, "%02d", timeinfo->tm_min);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "t_time", obj);
     GUI_WIDGET_POINTER_BY_NAME_ROOT(t_min, "t_min", obj);
-    gui_text_content_set((gui_text_t *)t_time, hour_content, strlen(hour_content));
-    gui_text_content_set((gui_text_t *)t_min, minute_content, strlen(minute_content));
+    gui_text_content_set((gui_text_t *)t_time, time_str, 2);
+    gui_text_content_set((gui_text_t *)t_min, time_str + 3, 2);
 }
 
 static void Circles_cb(NVGcontext *vg)
@@ -124,32 +124,34 @@ static void bg_cb(NVGcontext *vg)
     nvgFillColor(vg, bgColor);
     nvgFill(vg);
 }
+
 void create_watchface_number(gui_view_t *view)
 {
+    watchface_clear_mem = clear_num_view;
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     size_t buffer_bg_size = SCREEN_WIDTH * SCREEN_HEIGHT * 2 + sizeof(gui_rgb_data_head_t);
-    uint8_t *img_bg_data = NULL;
-    img_bg_data = gui_lower_malloc(buffer_bg_size);
+    if (!img_bg_data)
+    {
+        img_bg_data = gui_lower_malloc(buffer_bg_size);
+    }
     memset(img_bg_data, 0, buffer_bg_size);
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, SCREEN_WIDTH, SCREEN_HEIGHT, bg_cb,
                                       img_bg_data);
     gui_img_create_from_mem(win, "watchface", (void *)img_bg_data, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // create time-text
-    sprintf(hour_content, "%02d", timeinfo->tm_hour);
-    sprintf(minute_content, "%02d", timeinfo->tm_min);
     gui_text_t *t_time = gui_text_create(win, "t_time", -58, 10, 0, 0);
-    gui_text_set(t_time, hour_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(hour_content),
+    gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), 2,
                  250);
     gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
 
     gui_text_t *t_min = gui_text_create(win, "t_min", -58, 200, 0, 0);
-    gui_text_set(t_min, minute_content, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), strlen(minute_content),
+    gui_text_set(t_min, time_str + 3, GUI_FONT_SRC_TTF, gui_rgb(87, 55, 65), 2,
                  250);
     gui_text_type_set(t_min, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_min, RIGHT);
@@ -171,4 +173,3 @@ void create_watchface_number(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(win), 30000, true, time_update_cb);
     gui_obj_create_timer(GUI_BASE(win_dot), 50, true, time_dot_cb);
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_number, clear_num_view);

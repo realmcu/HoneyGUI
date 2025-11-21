@@ -525,7 +525,6 @@ static void switch_app_cb(void *obj)
     const char *obj_name = ((gui_obj_t *)obj)->name;
     if (strcmp(obj_name, "BIG_NUM") == 0)
     {
-        extern watchface_type_t current_watchface_type;
         current_watchface_type = WATCHFACE_BIG_NUM;
 
         gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),
@@ -534,7 +533,6 @@ static void switch_app_cb(void *obj)
     }
     else if (strcmp(obj_name, "SPORT") == 0)
     {
-        extern watchface_type_t current_watchface_type;
         current_watchface_type = WATCHFACE_SPORT;
 
         gui_view_switch_direct(current_view, gui_view_descriptor_get("watchface_view"),

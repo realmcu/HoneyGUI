@@ -33,6 +33,11 @@ typedef enum
 /*============================================================================*
  *                            Macros
  *============================================================================*/
+#define SCROLLBAR_S_H      10
+#define SCROLLBAR_M_H      25
+#define SCROLLBAR_L_H      45
+#define SCROLLBAR_BG_H     60
+
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT(obj != NULL);GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
 
 /**
@@ -53,10 +58,15 @@ typedef enum
 /*============================================================================*
  *                            Variables
  *============================================================================*/
+/* time */
 extern struct tm *timeinfo;
+extern char time_str[];
 extern const char *month[12];
 extern const char *day[7];
 
+/* Watchface */
+extern void (*watchface_clear_mem)(void);
+extern watchface_type_t current_watchface_type;
 
 /*============================================================================*
  *                           Public Functions

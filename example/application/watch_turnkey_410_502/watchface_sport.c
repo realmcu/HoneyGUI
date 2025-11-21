@@ -18,18 +18,16 @@
  *============================================================================*/
 #define SCREEN_WIDTH (int16_t)gui_get_screen_width()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-#define CURRENT_VIEW_NAME "watchface_sport_view"
 
 #define RADIUS 210
 /*============================================================================*
  *                           Function Declaration
  *============================================================================*/
-
+void create_watchface_sport(gui_view_t *view);
 
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
 static char time_text_content[10] = {0};
 
 static uint8_t *img_data_activity = NULL;
@@ -37,12 +35,13 @@ static char *move_content = NULL;
 static char *ex_content = NULL;
 static char *stand_content = NULL;
 
+gui_text_t *move_text = NULL;
+
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-static void clear_watchface_sport_view(gui_view_t *view)
+static void clear_watchface_sport_view(void)
 {
-    (void)view;
     if (img_data_activity)
     {
         gui_lower_free(img_data_activity);
@@ -151,19 +150,15 @@ static void arc_activity_cb(NVGcontext *vg)
             nvgStrokeWidth(vg, 20);
             nvgStrokeColor(vg, nvgRGB(117, 230, 229));
             nvgStroke(vg);
-
             {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(move_text, "ac_move", current_view);
                 sprintf(move_content, "%d",  calories);
                 gui_text_content_set((gui_text_t *)move_text, move_content, strlen(move_content));
-            }
-            {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(ex_text, "ac_ex", current_view);
+
+                gui_obj_t *ex_text = gui_list_entry(move_text->base.brother_list.next, gui_obj_t, brother_list);
                 sprintf(ex_content, "%d", ex->valueint);
                 gui_text_content_set((gui_text_t *)ex_text, ex_content, strlen(ex_content));
-            }
-            {
-                GUI_WIDGET_POINTER_BY_NAME_ROOT(stand_text, "ac_stand", current_view);
+
+                gui_obj_t *stand_text = gui_list_entry(ex_text->brother_list.next, gui_obj_t, brother_list);
                 sprintf(stand_content, "%d", stand->valueint);
                 gui_text_content_set((gui_text_t *)stand_text, stand_content, strlen(stand_content));
             }
@@ -203,10 +198,14 @@ static void img_weather_press_cb(void *p)
                            SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT,
                            SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT);
 }
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void create_watchface_sport(gui_view_t *view)
 {
+    watchface_clear_mem = clear_watchface_sport_view;
 
-    current_view = view;
     gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -229,7 +228,7 @@ void create_watchface_sport(gui_view_t *view)
                 stand_content = (char *)gui_malloc(30);
             }
             sprintf(move_content, "0");
-            gui_text_t *move_text = gui_text_create(win, "ac_move", -25, 20 + 180, 0, 0);
+            move_text = gui_text_create(win, "ac_move", -25, 20 + 180, 0, 0);
             gui_text_set(move_text, (void *)move_content, GUI_FONT_SRC_TTF, gui_rgb(230, 67, 79),
                          strlen(move_content), 80);
             gui_text_type_set(move_text, SF_COMPACT_TEXT_BOLD_BIN, FONT_SRC_MEMADDR);
@@ -302,5 +301,4 @@ void create_watchface_sport(gui_view_t *view)
     }
     gui_obj_create_timer(GUI_BASE(win), 500, true, time_update_cb);
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_sport,
-                  clear_watchface_sport_view);
+

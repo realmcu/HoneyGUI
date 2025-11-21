@@ -53,6 +53,26 @@ Set List Widget Note Number
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_list_set_note_num` function can be used to set note number of list widget.
 
+
+Set Card Style Stacking Position
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_card_stack_location` function can be used to set card style stacking position.
+
+
+Set List Widget Out Scope
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_out_scope` function can be used to set list widget out scope.
+
+
+Set List Widget Auto Align
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_auto_align` function can be used to set list widget auto align.
+
+
+Set List Widget Inertia
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_set_inertia` function can be used to set list widget inertia.
+
 Example
 ---------
 

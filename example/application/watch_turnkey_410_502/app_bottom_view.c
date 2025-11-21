@@ -31,71 +31,41 @@ static void bottom_view_design(gui_view_t *view);
 static void clear_bottom_view(gui_view_t *view);
 
 /*============================================================================*
+ *                           GUI_VIEW_INSTANCE
+ *============================================================================*/
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, bottom_view_design, clear_bottom_view);
+
+/*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-extern watchface_type_t current_watchface_type;
-
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, bottom_view_design, clear_bottom_view);
 const char *month[12] =
 {
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC"
 };
 const char *day[7] =
 {
-    "Sun",
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat"
+    "SUN",
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT"
 };
 
-void *text_num_array[11] = {0};
-// {
-//     UI_TEXT_0_BIN,
-//     UI_TEXT_1_BIN,
-//     UI_TEXT_2_BIN,
-//     UI_TEXT_3_BIN,
-//     UI_TEXT_4_BIN,
-//     UI_TEXT_5_BIN,
-//     UI_TEXT_6_BIN,
-//     UI_TEXT_7_BIN,
-//     UI_TEXT_8_BIN,
-//     UI_TEXT_9_BIN,
-//     UI_TEXT_COLON_BIN,
-// };
 
-void initialize_text_num_array(void)
-{
-    text_num_array[0] = (void *)(resource_root + 0x00002d38); // UI_TEXT_0_BIN
-    text_num_array[1] = (void *)(resource_root + 0x000036b8); // UI_TEXT_1_BIN
-    text_num_array[2] = (void *)(resource_root + 0x00003cb8); // UI_TEXT_2_BIN
-    text_num_array[3] = (void *)(resource_root + 0x00004438); // UI_TEXT_3_BIN
-    text_num_array[4] = (void *)(resource_root + 0x00004cf8); // UI_TEXT_4_BIN
-    text_num_array[5] = (void *)(resource_root + 0x00005538); // UI_TEXT_5_BIN
-    text_num_array[6] = (void *)(resource_root + 0x00005cf8); // UI_TEXT_6_BIN
-    text_num_array[7] = (void *)(resource_root + 0x00006678); // UI_TEXT_7_BIN
-    text_num_array[8] = (void *)(resource_root + 0x00006c38); // UI_TEXT_8_BIN
-    text_num_array[9] = (void *)(resource_root + 0x000076f8); // UI_TEXT_9_BIN
-    text_num_array[10] = (void *)(resource_root + 0x00008078); // UI_TEXT_COLON_BIN
-}
-extern struct tm *timeinfo;
-static char time_content[10] = "00:00";
-static char date_content[20] = "January0\nSun";
-static char time_timecard_content[10] =  "00:00";
+static char date_content[] = "WED\nNOV\n19";
 static char date_timecard_content[10] = "Sun 0";
 
 static uint8_t *img_data_activity = NULL;
@@ -136,42 +106,25 @@ static void time_update_cb(void)
     else
     {
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_time", current_view);
-            sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-            gui_text_content_set((gui_text_t *)obj, time_timecard_content, strlen(time_timecard_content));
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "time_s", current_view);
+            gui_text_content_set((gui_text_t *)obj, time_str, strlen(time_str));
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_date_1", current_view);
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "date_s", current_view);
             sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
             gui_text_content_set((gui_text_t *)obj, date_timecard_content, strlen(date_timecard_content));
         }
         {
-            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "timecard_date_2", current_view);
-            sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
-                    day[timeinfo->tm_wday]);
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(obj, "date_b", current_view);
+            sprintf(date_content, "%s\n%s\n%d", day[timeinfo->tm_wday], month[timeinfo->tm_mon],
+                    timeinfo->tm_mday);
             gui_text_content_set((gui_text_t *)obj, date_content, strlen(date_content));
         }
+        {
+            GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "time_b", current_view);
+            gui_text_content_set((gui_text_t *)t_time, time_str, strlen(time_str));
+        }
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_decimal, "circle_hour_decimal",
-                                        current_view);
-        gui_img_set_attribute((gui_img_t *)img_hour_decimal, img_hour_decimal->name,
-                              text_num_array[timeinfo->tm_hour / 10], img_hour_decimal->x, img_hour_decimal->y);
-        gui_img_refresh_size((gui_img_t *)img_hour_decimal);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_hour_single, "circle_hour_single",
-                                        current_view);
-        gui_img_set_attribute((gui_img_t *)img_hour_single, img_hour_single->name,
-                              text_num_array[timeinfo->tm_hour % 10], img_hour_single->x, img_hour_single->y);
-        gui_img_refresh_size((gui_img_t *)img_hour_single);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_decimal, "circle_minute_decimal",
-                                        current_view);
-        gui_img_set_attribute((gui_img_t *)img_minute_decimal, img_minute_decimal->name,
-                              text_num_array[timeinfo->tm_min / 10], img_minute_decimal->x, img_minute_decimal->y);
-        gui_img_refresh_size((gui_img_t *)img_minute_decimal);
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(img_minute_single, "circle_minute_single",
-                                        current_view);
-        gui_img_set_attribute((gui_img_t *)img_minute_single, img_minute_single->name,
-                              text_num_array[timeinfo->tm_min % 10], img_minute_single->x, img_minute_single->y);
-        gui_img_refresh_size((gui_img_t *)img_minute_single);
     }
 }
 
@@ -184,17 +137,17 @@ static void draw_timecard(void *parent)
                                                                             35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
 
     // text
-    gui_text_t *timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
+    gui_text_t *timecard_date_text = gui_text_create(canvas_timecard, "date_s",  15, 20, 0, 0);
     gui_text_set(timecard_date_text, (void *)date_timecard_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_timecard_content),
                  32);
     gui_text_type_set(timecard_date_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
-    gui_text_t *timecard_time_text = gui_text_create(canvas_timecard, "timecard_time",  -10, 20, 0,
+    gui_text_t *timecard_time_text = gui_text_create(canvas_timecard, "time_s",  -10, 20, 0,
                                                      0);
-    gui_text_set(timecard_time_text, (void *)time_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
-                 strlen(time_content),
+    gui_text_set(timecard_time_text, (void *)time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
+                 strlen(time_str),
                  32);
     gui_text_type_set(timecard_time_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_time_text, RIGHT);
@@ -547,8 +500,6 @@ static void note_design(gui_obj_t *obj, void *p)
 }
 static void bottom_view_design(gui_view_t *view)
 {
-    current_view = view;
-    initialize_text_num_array();
     gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
                              SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION,
                              SWITCH_INIT_STATE,
@@ -561,7 +512,6 @@ static void bottom_view_design(gui_view_t *view)
     {
         canvas_bg = gui_canvas_rect_create(parent, "bg", 0, 0, SCREEN_WIDTH,
                                            SCREEN_HEIGHT, gui_rgb(219, 122, 147));
-
     }
     else
     {
@@ -570,33 +520,21 @@ static void bottom_view_design(gui_view_t *view)
     }
     gui_obj_create_timer(GUI_BASE(canvas_bg), 100, true, timer_cb);
 
-
     //clock circle
     gui_win_t *win = gui_win_create(parent, __WIN0_NAME, 38, 30, 335, 180);
-    gui_img_t *img_clock = gui_img_create_from_mem(win, 0, UI_CARD_CLOCKCIRCLE_BIN, 157, 0, 0, 0);
+    gui_img_t *img_clock = gui_img_create_from_mem(win, 0, UI_CARD_CLOCKCIRCLE_BIN, 163, 0, 0, 0);
     gui_img_set_mode(img_clock, IMG_SRC_OVER_MODE);
-    {
-        int text_w = 26;
-        gui_img_t *img = gui_img_create_from_mem(win, "circle_hour_decimal", text_num_array[0], 185,
-                                                 67, 0, 0);
-        gui_img_scale(img, 0.7, 0.7);
-        img = gui_img_create_from_mem(win, "circle_hour_single", text_num_array[0], 185 + text_w, 67,
-                                      0, 0);
-        gui_img_scale(img, 0.7, 0.7);
-        img = gui_img_create_from_mem(win, "colon", text_num_array[10], 185 + text_w * 2 + 5, 67 + 5,
-                                      0, 0);
-        gui_img_scale(img, 0.7, 0.7);
-        img = gui_img_create_from_mem(win, "circle_minute_decimal", text_num_array[0],
-                                      185 + text_w * 2 + 17, 67, 0, 0);
-        gui_img_scale(img, 0.7, 0.7);
-        img = gui_img_create_from_mem(win, "circle_minute_single", text_num_array[0],
-                                      185 + text_w * 3 + 17, 67, 0, 0);
-        gui_img_scale(img, 0.7, 0.7);
-    }
-    gui_text_t *date_text = gui_text_create(win, "timecard_date_2",  0, 42, 0, 0);
+    gui_text_t *t_time = gui_text_create(img_clock, "time_b", 0, 0, 190, 190);
+    gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
+                 strlen(time_str), 60);
+    gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
+    gui_text_mode_set(t_time, MID_CENTER);
+    gui_text_rendermode_set(t_time, 2);
+
+    gui_text_t *date_text = gui_text_create(win, "date_b",  0, 22, 0, 0);
     gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_content),
-                 32);
+                 48);
     gui_text_type_set(date_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(date_text, MULTI_LEFT);
 
@@ -607,7 +545,7 @@ static void bottom_view_design(gui_view_t *view)
                            false);
     gui_list_set_style(list, LIST_CARD);
     gui_list_set_note_num(list, 4);
-    gui_list_set_offset(list, 215);
+    gui_list_set_offset(list, 250);
     gui_list_set_card_stack_location(list, 20);
 
     draw_timecard(parent);

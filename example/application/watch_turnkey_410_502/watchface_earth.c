@@ -18,7 +18,6 @@
  *============================================================================*/
 #define SCREEN_WIDTH  (int16_t)gui_get_width_height()
 #define SCREEN_HEIGHT (int16_t)gui_get_screen_height()
-#define CURRENT_VIEW_NAME "watchface_video_view"
 #define X_TARGET  37
 #define Y_TARGET  42
 #define X_ORIGIN -300
@@ -30,15 +29,12 @@
  *                           Function Declaration
  *============================================================================*/
 
+
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-static gui_view_t *current_view = NULL;
-extern void *text_num_array[11];
-extern const char *day[7];
 static gui_video_t *video = NULL;
 static char date_text_content[10] = {0};
-static char time_content[6] = {0};
 static char compass_content[20] = {0};
 static char weather_content[20] = {0};
 static uint16_t compass_degree = 0;  // compass angle
@@ -47,7 +43,6 @@ static const char *compass_directions[8] = {"N", "NE", "E", "SE", "S", "SW", "W"
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-
 static const char *get_compass_direction(uint16_t degree)
 {
     int index = ((degree + 22) % 360) / 45;  // 45° one direction
@@ -56,20 +51,19 @@ static const char *get_compass_direction(uint16_t degree)
 static void simulate_data_update_cb(void *p)
 {
     GUI_UNUSED(p);
-    //extern struct tm *timeinfo;
     if (!timeinfo)
     {
         return;
     }
     //update date and time
+    gui_obj_t *parent = p;
     {
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", current_view);
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(text, "date_text", parent);
         sprintf(date_text_content, "%d", timeinfo->tm_mday);
         gui_text_content_set((gui_text_t *)text, date_text_content, strlen(date_text_content));
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "t_time", current_view);
-        sprintf(time_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-        gui_text_content_set((gui_text_t *)t_time, time_content, strlen(time_content));
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(t_time, "t_time", parent);
+        gui_text_content_set((gui_text_t *)t_time, time_str, strlen(time_str));
     }
 
     // simulate compass angle change (change 3 degrees per second)
@@ -77,7 +71,7 @@ static void simulate_data_update_cb(void *p)
         compass_degree = (compass_degree + 3) % 360;
         sprintf(compass_content, "%s %d°", get_compass_direction(compass_degree), compass_degree);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text_compass, "text_compass", current_view);
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(text_compass, "text_compass", parent);
         if (text_compass)
         {
             gui_text_content_set((gui_text_t *)text_compass, compass_content, strlen(compass_content));
@@ -92,7 +86,7 @@ static void simulate_data_update_cb(void *p)
 
         sprintf(weather_content, "%s %d°", weather_conditions[condition_index], temperature);
 
-        GUI_WIDGET_POINTER_BY_NAME_ROOT(text_weather, "text_weather", current_view);
+        GUI_WIDGET_POINTER_BY_NAME_ROOT(text_weather, "text_weather", parent);
         if (text_weather)
         {
             gui_text_content_set((gui_text_t *)text_weather, weather_content, strlen(weather_content));
@@ -141,9 +135,11 @@ static void earth_change_cb(void *obj, gui_event_t e, void *param)
     }
     gui_obj_add_event_cb(video, earth_change_cb, GUI_EVENT_TOUCH_CLICKED, 0);
 }
+
 void create_watchface_earth(gui_view_t *view)
 {
-    current_view = view;
+    watchface_clear_mem = NULL;
+
     gui_win_t *win_video = gui_win_create(view, "win_video", 0, 0, 0, 0);
     gui_win_t *win_main = gui_win_create(view, "win_main", 0, 0, 0, 0);
 
@@ -179,12 +175,9 @@ void create_watchface_earth(gui_view_t *view)
     gui_text_rendermode_set(text, 2);
 
     // time text init
-    extern struct tm *timeinfo;
-    sprintf(time_content, "%02d:%02d", timeinfo ? timeinfo->tm_hour : 12,
-            timeinfo ? timeinfo->tm_min : 0);
     gui_text_t *t_time = gui_text_create(win_main, "t_time", -40, 60, 0, 0);
-    gui_text_set(t_time, time_content, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
-                 strlen(time_content), 80);
+    gui_text_set(t_time, time_str, GUI_FONT_SRC_TTF, gui_rgb(255, 255, 255),
+                 strlen(time_str), 80);
     gui_text_type_set(t_time, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_time, RIGHT);
     gui_text_rendermode_set(t_time, 2);
@@ -200,9 +193,3 @@ void create_watchface_earth(gui_view_t *view)
 
     gui_obj_create_timer(GUI_BASE(win_main), 1000, true, simulate_data_update_cb);
 }
-
-/*============================================================================*
- *                           GUI_VIEW_INSTANCE
- *============================================================================*/
-
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, create_watchface_earth, NULL);
