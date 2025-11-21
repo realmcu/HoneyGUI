@@ -282,10 +282,26 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
             .y2 = y_end
         },
         .render_mode = 8,
-        .target_format = (dc->bit_depth == 32) ? ARGB8888 :
-        (dc->bit_depth == 24) ? RGB888 :
-        (dc->bit_depth == 16) ? RGB565 : RGB565
     };
+
+    switch (dc->bit_depth)
+    {
+    case 16:
+        render_font.target_format = RGB565;
+        break;
+    case 24:
+        render_font.target_format = RGB888;
+        // render_font.target_format = ARGB8565;
+        break;
+    case 32:
+        render_font.target_format = ARGB8888;
+        break;
+    case 8:
+        render_font.target_format = GRAY8;
+        break;
+    default:
+        break;
+    }
 
     font_glyph_t glyph =
     {

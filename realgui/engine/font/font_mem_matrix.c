@@ -626,7 +626,8 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
                 memcpy(&draw_img.inverse, &draw_img.matrix, sizeof(gui_matrix_t));
                 matrix_inverse(&draw_img.inverse);
 
-                memcpy(&font_matrix[0], &draw_img.matrix, sizeof(gui_matrix_t) * 2);
+                memcpy(&draw_img.matrix, &font_matrix[0], sizeof(gui_matrix_t));
+                memcpy(&draw_img.inverse, &font_matrix[1], sizeof(gui_matrix_t));
 
                 chr[i].buf = (uint8_t *)font_matrix;
             }
