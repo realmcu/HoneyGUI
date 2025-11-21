@@ -694,7 +694,7 @@ Resource Converter
 ==========================
 To use images and fonts in LVGL, they need to be converted to formats that LVGL can recognize using specific tools. LVGL supports converting resources to C array format and bin binary file format.
 
-In the C array format, the resources will be included in the compilation process. They will be compiled every time the program logic changes, and the size of the resources will be included in the APP image.
+In the C array format, the resources will be included in the compilation process. They will be compiled every time the program logic changes, and the size of the resources will be included in the term:`APP` image.
 
 In the bin binary file format, the resources are not included in the compilation. They are stored separately and require a file system or other means to access them. An example :file:`lvgl_example_assets.c` is provided in the path :file:`your HoneyGUI dir\\realgui\\example\\screen_lvgl\\assets` to demonstrate how to configure resources of different formats for the widgets.
 

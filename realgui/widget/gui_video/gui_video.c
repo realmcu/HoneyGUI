@@ -458,25 +458,6 @@ static void gui_video_draw_end(gui_obj_t *obj)
     (void)obj;
     // gui_log("gui_video_draw_end \n");
     // not free fb here
-#if 0
-    gui_video_t *this = (gui_video_t *)obj;
-    uint8_t *data = NULL;
-
-
-    extern void stbi_image_free(void *retval_from_stbi_load);
-    if (this->frame_buff)
-    {
-#ifdef USE_JPU
-        hal_jpu_fb_free();
-#else
-        stbi_image_free(this->frame_buff_raw);
-#endif
-        // gui_log("gui_img_live_draw_end free 0x%x\n", this->frame_buff);
-        this->frame_buff = NULL;
-    }
-
-#endif
-
 }
 
 static void gui_video_destory(gui_obj_t *obj)
@@ -517,13 +498,9 @@ static void gui_video_destory(gui_obj_t *obj)
     }
 }
 
-// only get image info here, not decode(sw)
 static void gui_video_prepare(gui_obj_t *obj)
 {
     gui_video_t *this = (gui_video_t *)obj;
-
-    // TODO: tp event cb
-    // click play once
 
     // gui_log("gui_video_prepare  %d %d", this->frame_cur, this->frame_last);
     gui_img_set_image_data(this->img, (const uint8_t *) & (this->header));
@@ -890,6 +867,11 @@ static int video_src_init_mjpg(gui_video_t  *this)
                     // case: 0xffd9 | 0xffd8 will get into the first "if"
                     gui_log("mjpeg EOF\n");
                     scan_state = MJPEG_SCAN_EOF;
+                }
+                else if (scan_state == MJPEG_SCAN_EOF)
+                {
+                    // case: 0xffd9 , 0xXXXX  ... |  should break
+                    break;
                 }
                 pdata++;
             }
