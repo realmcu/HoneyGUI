@@ -29,6 +29,10 @@
  *============================================================================*/
 #ifdef _WIN32
 unsigned char *resource_root = NULL;
+char *wifi_get_bat_level(void)
+{
+    return " ";
+}
 #endif
 
 /*============================================================================*
@@ -341,9 +345,9 @@ static button_t buttons[] =
 static button_t buttons_about[] =
 {
     {100, 70, 0, 0, 0},
-    {170, 70, 2, 0, 0},
-    {240, 70, 2, 0, 0},
-    {310, 70, 1, 0, 0},
+    {200 - 4, 70, 2, 0, 0},
+    {295 - 1, 70, 2, 0, 0},
+
 };
 #ifdef _WIN32
 #define FILE_POINTER(ADDRESS) ( uint8_t *)(resource_root + ADDRESS)
@@ -477,13 +481,13 @@ static void view_switch_in_about(gui_view_t *view)
         {
             gui_img_t *img2 =
                 gui_img_create_from_mem(img,
-                                        0, (void *)FILE_POINTER(RECT7_BIN), 75 + 5, 192, 0, 0);
+                                        0, (void *)FILE_POINTER(SQUARE4_BIN), 75 + 2, 219 + 3, 0, 0);
             gui_img_set_mode(img2, IMG_SRC_OVER_MODE);
         }
         {
             gui_img_t *img2 =
                 gui_img_create_from_mem(img,
-                                        0, (void *)FILE_POINTER(SQUARE4_BIN), 75 + 1, 258 + 2, 0, 0);
+                                        0, (void *)FILE_POINTER(RECT7_BIN), 75 + 5, 317 + 1, 0, 0);
             gui_img_set_mode(img2, IMG_SRC_OVER_MODE);
         }
 
@@ -491,37 +495,37 @@ static void view_switch_in_about(gui_view_t *view)
         gui_obj_add_event_cb(img, press_setting_cb_about, GUI_EVENT_TOUCH_PRESSED, NULL);
         gui_obj_add_event_cb(img, release_setting_cb_about, GUI_EVENT_TOUCH_RELEASED, NULL);
         mask_top_about = gui_img_create_from_mem(img,
-                                                 0, (void *)FILE_POINTER(HIGHLIGHT_TOP_ROUNDED_BIN), CARD_MARGIN, 0, 0, 0);
+                                                 0, (void *)FILE_POINTER(HIGHLIGHT_ROUNDED_BIN), CARD_MARGIN, 0, 0, 0);
         gui_img_set_mode(mask_top_about, IMG_SRC_OVER_MODE);
         gui_obj_hidden((void *)mask_top_about, true);
         mask_middle_about = gui_img_create_from_mem(img,
-                                                    0, (void *)FILE_POINTER(HIGHLIGHT_MIDDLE_RECT_BIN), CARD_MARGIN, 100, 0, 0);
+                                                    0, (void *)FILE_POINTER(HIGHLIGHT_ROUNDED_BIN), CARD_MARGIN, 100, 0, 0);
         gui_img_set_mode(mask_middle_about, IMG_SRC_OVER_MODE);
         gui_obj_hidden((void *)mask_middle_about, true);
         mask_bottom_about = gui_img_create_from_mem(img,
-                                                    0, (void *)FILE_POINTER(HIGHLIGHT_BOTTOM_ROUNDED_BIN), CARD_MARGIN, 200, 0, 0);
+                                                    0, (void *)FILE_POINTER(HIGHLIGHT_ROUNDED_BIN), CARD_MARGIN, 200, 0, 0);
         gui_img_set_mode(mask_bottom_about, IMG_SRC_OVER_MODE);
         gui_obj_hidden((void *)mask_bottom_about, true);
         {
-            gui_text_t *text = gui_text_create(view, 0, 75 + 150, 124 + 2, 466, 26);
+            gui_text_t *text = gui_text_create(view, 0, 120, 178 - 5, 466, 26);
             // const char *string = "1ABCD123ab c:;.'!@#$";
-            gui_text_set(text, (void *)wifi, GUI_FONT_SRC_BMP, gui_color_css("darkgray"), strlen(wifi), 24);
+            gui_text_set(text, (void *)wifi, GUI_FONT_SRC_BMP, gui_color_css("#666666"), strlen(wifi), 24);
             gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
                               FONT_SRC_MEMADDR);
             gui_text_mode_set(text, LEFT);
         }
         {
-            gui_text_t *text = gui_text_create(view, 0, 75 + 150, 192 + 2, 466, 26);
+            gui_text_t *text = gui_text_create(view, 0, 120, 276 - 5, 466, 26);
             // const char *string = "2ABCD123ab c:;.'!@#$";
-            gui_text_set(text, (void *)bb2u, GUI_FONT_SRC_BMP, gui_color_css("darkgray"), strlen(bb2u), 24);
+            gui_text_set(text, (void *)bb2u, GUI_FONT_SRC_BMP, gui_color_css("#666666"), strlen(bb2u), 24);
             gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
                               FONT_SRC_MEMADDR);
             gui_text_mode_set(text, LEFT);
         }
         {
-            gui_text_t *text = gui_text_create(view, 0, 75 + 150, 258 + 2 + 2, 466, 26);
+            gui_text_t *text = gui_text_create(view, 0, 120, 373 - 5, 466, 26);
             // const char *string = "3ABCD123ab c:;.'!@#$";
-            gui_text_set(text, (void *)bd_addr, GUI_FONT_SRC_BMP, gui_color_css("darkgray"), strlen(bd_addr),
+            gui_text_set(text, (void *)bd_addr, GUI_FONT_SRC_BMP, gui_color_css("#666666"), strlen(bd_addr),
                          24);
             gui_text_type_set(text, (void *)FILE_POINTER(SFPRODISPLAYREGULAR_SIZE24_BITS4_FONT_BIN),
                               FONT_SRC_MEMADDR);
