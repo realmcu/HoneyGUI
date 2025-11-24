@@ -1,0 +1,116 @@
+{
+    "NotoSans-Chinese-16": {
+        "size": 16,
+        "metrics": [
+            19,
+            5
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 0,
+        "family": "NotoSans",
+        "lang": [
+            "Chinese"
+        ]
+    },
+    "NotoSans-Chinese-24": {
+        "size": 24,
+        "metrics": [
+            28,
+            7
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 1476500,
+        "family": "NotoSans",
+        "lang": [
+            "Chinese"
+        ]
+    },
+    "OpenSans-Latin-14": {
+        "size": 14,
+        "metrics": [
+            15,
+            5
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 4622584,
+        "family": "OpenSans",
+        "lang": [
+            "Latin"
+        ]
+    },
+    "OpenSans-Latin-20": {
+        "size": 20,
+        "metrics": [
+            22,
+            6
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 4707916,
+        "family": "OpenSans",
+        "lang": [
+            "Latin"
+        ]
+    },
+    "OpenSans-Latin-20-bold": {
+        "size": 20,
+        "metrics": [
+            22,
+            6
+        ],
+        "bit_width": 8,
+        "bold": true,
+        "offset": 4867404,
+        "family": "OpenSans",
+        "lang": [
+            "Latin"
+        ]
+    },
+    "OpenSans-Latin-32-bold": {
+        "size": 32,
+        "metrics": [
+            35,
+            10
+        ],
+        "bit_width": 8,
+        "bold": true,
+        "offset": 5033352,
+        "family": "OpenSans",
+        "lang": [
+            "Latin"
+        ]
+    },
+    "NotoSans-ThaiViet-20": {
+        "size": 20,
+        "metrics": [
+            22,
+            9
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 5439228,
+        "family": "NotoSans",
+        "lang": [
+            "Thai",
+            "Viet"
+        ]
+    },
+    "NotoSans-ThaiViet-32": {
+        "size": 32,
+        "metrics": [
+            35,
+            15
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 5484828,
+        "family": "NotoSans",
+        "lang": [
+            "Thai",
+            "Viet"
+        ]
+    }
+}

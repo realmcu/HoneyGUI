@@ -30,6 +30,11 @@
 uint8_t *font_root3 = NULL;
 uint8_t *font_root4 = NULL;
 
+static bool scroll_need_update = false;
+
+/**
+*@brief A:11 B:10 C:10 D:11 E:8 F:8
+*/
 /*ABCDEFG*/
 uint8_t text[] = {0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x47, 0x00};
 
@@ -40,16 +45,25 @@ uint8_t text[] = {0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x44, 0x00, 0x45, 0x00, 0x
 #if 1
 static int smarttx_font_test(void)
 {
-    uint8_t font_size = 16;
-    uint16_t text_width = 320;
-    uint16_t text_height = font_size;
-    uint16_t x = 0;
+    /*Available font sizes and languages can be retrieved from the font1.json and font2.json files.*/
+    uint8_t font_size = 24;
+    /*Text widget width*/
+    uint16_t width = 120;
+    /*Text widget height is equal to font size.*/
+    uint16_t height = font_size;
+    /*Text widget position*/
+    uint16_t x = 64;
     uint16_t y = 0;
+    /*Text widget font color*/
+    gui_color_t color = APP_COLOR_WHITE;
 
-    gui_text_t *text_widget = gui_text_create(gui_obj_get_root(), "font_text", x, y, text_width,
-                                              text_height);
-    gui_text_set(text_widget, text, GUI_FONT_SRC_CUS, APP_COLOR_WHITE, sizeof(text) / 2, font_size);
-    gui_text_mode_set(text_widget, RIGHT);
+    gui_text_t *text_widget = gui_text_create(gui_obj_get_root(), "font_text", x, y, width, height);
+    gui_text_set(text_widget, text, GUI_FONT_SRC_CUS, color, sizeof(text) / 2, font_size);
+
+    /*Support LEFT, RIGHT, CENTER and SCROLL_X*/
+    /*Only support single line*/
+    gui_text_mode_set(text_widget, CENTER);
+    return 0;
 }
 #else
 static int smarttx_font_test(void)
@@ -117,7 +131,14 @@ static void font_load(gui_text_t *text, gui_text_rect_t *rect)
     GUI_UNUSED(text);
     GUI_UNUSED(rect);
 
-    gui_log("font_load\n");
+    if (scroll_need_update)
+    {
+#ifndef __WIN32
+        gui_font_scroll_update();
+#endif
+        scroll_need_update = false;
+    }
+    // gui_log("font_load\n");
 
 }
 
@@ -126,7 +147,7 @@ static void font_draw(gui_text_t *text, gui_text_rect_t *rect)
     GUI_UNUSED(text);
     GUI_UNUSED(rect);
 
-    gui_log("font_draw\n");
+    // gui_log("font_draw\n");
 
     gui_dispdev_t *dc = gui_get_dc();
 
@@ -134,8 +155,8 @@ static void font_draw(gui_text_t *text, gui_text_rect_t *rect)
     {
         .x = text->base.x,
         .y = text->base.y,
-        .width = text->base.h,
-        .height = text->base.w,
+        .width = text->base.w,
+        .height = text->base.h,
         .active_ys = 0,
         .active_ye = 0,
         .addr_ptr = text->content,
@@ -187,13 +208,16 @@ static void font_draw(gui_text_t *text, gui_text_rect_t *rect)
     }
 
     uint8_t *buf = dc->frame_buf;
-    gui_log("input font x %d, y %d, width %d, height %d, active_ys %d, active_ye %d \n", font.x, font.y,
-            font.width, font.height, font.active_ys, font.active_ye);
-    gui_log("input font size %d, string_len %d, align %d \n", font.string_mem.font_size,
-            font.string_mem.string_len, font.string_mem.align);
-    gui_log("input zs %d, ze %d, buf %p \n", zs, ze, buf);
+    // gui_log("input font x %d, y %d, width %d, height %d, active_ys %d, active_ye %d \n", font.x, font.y,
+    //         font.width, font.height, font.active_ys, font.active_ye);
+    // gui_log("input font size %d, string_len %d, align %d \n", font.string_mem.font_size,
+    //         font.string_mem.string_len, font.string_mem.align);
+    // gui_log("input zs %d, ze %d, buf %p \n", zs, ze, buf);
+
 #ifndef __WIN32
     uint8_t res = rtl_gui_show_string_transparency(&font, 0, 0, zs, ze, buf);
+#else
+    GUI_UNUSED(buf);
 #endif
 
 }
@@ -202,7 +226,8 @@ static void font_unload(gui_text_t *text)
 {
     GUI_UNUSED(text);
 
-    gui_log("font_unload\n");
+    scroll_need_update = true;
+    // gui_log("font_unload\n");
 
 }
 
@@ -210,7 +235,7 @@ static void font_destroy(gui_text_t *text)
 {
     GUI_UNUSED(text);
 
-    gui_log("font_destroy\n");
+    // gui_log("font_destroy\n");
 
 }
 
@@ -228,19 +253,19 @@ GUI_INIT_APP_EXPORT(custom_font_rendering_init);
 /*lib debug*/
 #ifndef __WIN32
 #include "trace.h"
-void dump_font_align_info(uint32_t line, uint8_t dirty, uint8_t align, int16_t delta_ys,
-                          int16_t string_width, int16_t icon_height)
-{
-    gui_log("output: line %d, dirty %d, align %d, delta_ys %d, string_width %d, icon_height %d", line,
-            dirty, align, delta_ys, string_width, icon_height);
-}
+// void dump_font_align_info(uint32_t line, uint8_t dirty, uint8_t align, int16_t delta_ys,
+//                           int16_t string_width, int16_t icon_height)
+// {
+//     gui_log("output: line %d, dirty %d, align %d, delta_ys %d, string_width %d, icon_height %d", line,
+//             dirty, align, delta_ys, string_width, icon_height);
+// }
 
-void dump_font_info(int16_t xs, int16_t ys, int16_t zs, int16_t ze, int8_t top, int8_t bottom,
-                    int8_t left, int8_t right)
-{
-    gui_log("output: xs %d, ys %d, zs %d, ze %d, top %d, bottom %d, left %d, right %d", xs, ys, zs, ze,
-            top, bottom, left, right);
-}
+// void dump_font_info(int16_t xs, int16_t ys, int16_t zs, int16_t ze, int8_t top, int8_t bottom,
+//                     int8_t left, int8_t right)
+// {
+//     gui_log("output: xs %d, ys %d, zs %d, ze %d, top %d, bottom %d, left %d, right %d", xs, ys, zs, ze,
+//             top, bottom, left, right);
+// }
 #endif //  __WIN32
 
 

@@ -95,6 +95,17 @@ typedef struct _UI_WidgetTypeDef
 void set_font_language_type(Language_type_e type);
 Language_type_e get_font_language_type(void);
 
+/**
+ * @brief Reset scroll info of font.
+ *
+ */
+void gui_font_reset_scroll_info(void);
+
+/**
+ * @brief Update scroll info of font.
+ *
+ */
+void gui_font_scroll_update(void);
 
 uint8_t rtl_gui_show_string_transparency(UI_WidgetTypeDef *icon_font, int16_t delta_x,
                                          int16_t delta_y, int Zs, int Ze, uint8_t *writebuf);

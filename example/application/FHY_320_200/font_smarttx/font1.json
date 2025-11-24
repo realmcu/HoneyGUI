@@ -1,0 +1,128 @@
+{
+    "OpenSans-Latin-16": {
+        "size": 16,
+        "metrics": [
+            18,
+            5
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 0,
+        "family": "OpenSans",
+        "lang": [
+            "Latin"
+        ]
+    },
+    "OpenSans-Latin-24": {
+        "size": 24,
+        "metrics": [
+            26,
+            8
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 110920,
+        "family": "OpenSans",
+        "lang": [
+            "Latin"
+        ]
+    },
+    "NotoSans-ThaiViet-16": {
+        "size": 16,
+        "metrics": [
+            18,
+            8
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 336424,
+        "family": "NotoSans",
+        "lang": [
+            "Thai",
+            "Viet"
+        ]
+    },
+    "NotoSans-ThaiViet-24": {
+        "size": 24,
+        "metrics": [
+            26,
+            11
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 368468,
+        "family": "NotoSans",
+        "lang": [
+            "Thai",
+            "Viet"
+        ]
+    },
+    "NotoSans-Japanese-16": {
+        "size": 16,
+        "metrics": [
+            19,
+            5
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 430364,
+        "family": "NotoSans",
+        "lang": [
+            "Japanese"
+        ]
+    },
+    "NotoSans-Japanese-24": {
+        "size": 24,
+        "metrics": [
+            28,
+            7
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 1424748,
+        "family": "NotoSans",
+        "lang": [
+            "Japanese"
+        ]
+    },
+    "NotoSans-Korean-16": {
+        "size": 16,
+        "metrics": [
+            19,
+            5
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 3516348,
+        "family": "NotoSans",
+        "lang": [
+            "Korean"
+        ]
+    },
+    "NotoSans-Korean-24": {
+        "size": 24,
+        "metrics": [
+            28,
+            7
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 4245852,
+        "family": "NotoSans",
+        "lang": [
+            "Korean"
+        ]
+    },
+    "Missing": {
+        "size": 32,
+        "metrics": [
+            34,
+            15
+        ],
+        "bit_width": 8,
+        "bold": false,
+        "offset": 5755952,
+        "family": null,
+        "lang": null
+    }
+}
