@@ -6,7 +6,6 @@
 #include "gui_img.h"
 #include "gui_win.h"
 #include "gui_text.h"
-#include "gui_list.h"
 
 /*============================================================================*
  *                           Types

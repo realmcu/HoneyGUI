@@ -4,8 +4,6 @@
 #include "app_main.h"
 #include "common_data.h"
 #include "gui_img.h"
-#include "gui_win.h"
-#include "gui_text.h"
 
 /*============================================================================*
  *                            Macros

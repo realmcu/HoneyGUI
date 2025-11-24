@@ -455,6 +455,7 @@ extern struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM];
  *                           Punblic Functions
  *============================================================================*/
 void msg_2_regenerate_current_view(void);
+
 void msg_2_switch_ota_view(void);
 void msg_2_switch_charging_view(void);
 void msg_2_switch_call_view(void);

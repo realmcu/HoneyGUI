@@ -43,7 +43,7 @@ static gui_img_t **page_indicator_array = NULL;
 
 static const char *reset_warning_str[] =
 {
-    "Your headphones will be restored\nto default and disconnect from\nthe app."
+    "Your headphones will be restored\nto default and disconnect from\nthe app.",
     "Les valeurs par défaut de votre casque\nseront restaurées et celui-ci sera dé\nconnecté de l'application.",
     "Dein Kopfhörer wird auf die\nStandardeinstellungen zurückgesetzt\nund von der App getrennt.",
     "Los auriculares se restablecerán a los\najustes predeterminados y se\ndesconectarán de la aplicación.",

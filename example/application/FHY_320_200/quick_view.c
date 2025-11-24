@@ -44,7 +44,7 @@ static char time_str[8] = {0};
 static int8_t page_index = 0;
 static gui_img_t *page_indicator_array[QUICK_PAGE_NUM_MAX] = {0};
 
-int8_t quick_page_num = 3;
+int8_t quick_page_num = 4;
 void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent) =
 {
     // page_notification_design,

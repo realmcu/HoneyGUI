@@ -701,7 +701,7 @@ static void press_button_page_playback(void *obj)
         }
         else
         {
-            if (music_index != MUSIC_MAX_NUM - 1 && music_array[music_index + 1] != NULL)
+            if (music_index != MUSIC_MAX_NUM - 1 && strlen(music_array[music_index + 1]) != 0)
             {
                 pressed_r = true;
                 gui_obj_hidden(o, false);
@@ -748,7 +748,7 @@ static void press_button_page_playback(void *obj)
             }
             else
             {
-                if (music_index == MUSIC_MAX_NUM - 1 || music_array[music_index + 1] == NULL)
+                if (music_index == MUSIC_MAX_NUM - 1 || strlen(music_array[music_index + 1]) == 0)
                 {
                     gui_img_a8_recolor(icon, theme_bg_white ? FG_2_LIGHT.color.argb_full : FG_2_DARK.color.argb_full);
                 }
@@ -1232,7 +1232,7 @@ static void click_button_page_playback(void *obj, gui_event_t e, void *param)
     f_status.playback = !f_status.playback;
     gui_scroll_text_t *lyrics = (void *)gui_list_entry(o->parent->brother_list.prev, gui_obj_t,
                                                        brother_list);
-    gui_scroll_text_t *name = (void *)gui_list_entry(GUI_BASE(lyrics)->brother_list.next, gui_obj_t,
+    gui_scroll_text_t *name = (void *)gui_list_entry(GUI_BASE(lyrics)->brother_list.prev, gui_obj_t,
                                                      brother_list);
     if (f_status.playback)
     {
@@ -3654,7 +3654,7 @@ void page_playback_design(gui_obj_t *parent)
         {
             gui_img_a8_recolor(last, FG_2_LIGHT.color.argb_full);
         }
-        else if (music_index == MUSIC_MAX_NUM - 1 || music_array[music_index + 1] == NULL)
+        else if (music_index == MUSIC_MAX_NUM - 1 || strlen(music_array[music_index + 1]) == 0)
         {
             gui_img_a8_recolor(next, FG_2_LIGHT.color.argb_full);
         }
@@ -3671,7 +3671,7 @@ void page_playback_design(gui_obj_t *parent)
         {
             gui_img_a8_recolor(last, FG_2_DARK.color.argb_full);
         }
-        else if (music_index == MUSIC_MAX_NUM - 1 || music_array[music_index + 1] == NULL)
+        else if (music_index == MUSIC_MAX_NUM - 1 || strlen(music_array[music_index + 1]) == 0)
         {
             gui_img_a8_recolor(next, FG_2_DARK.color.argb_full);
         }
@@ -4140,10 +4140,6 @@ void page_spatial_sound_with_head_tracking_design(gui_obj_t *parent)
         gui_img_a8_recolor(control_bg, BG_THEME1_DARK_DARK.color.argb_full);
         gui_img_a8_recolor(button_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
         gui_img_a8_recolor(settings_bg, BG_THEME1_BRIGHT_DARK.color.argb_full);
-    }
-    if (spatial_sound_status == SPATIAL_SOUND_OFF)
-    {
-        gui_img_a8_mix_alpha(settings_bg, 102);
     }
 }
 #else

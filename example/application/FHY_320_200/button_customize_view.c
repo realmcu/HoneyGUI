@@ -8,7 +8,6 @@
 #include "gui_text.h"
 #include "gui_scroll_text.h"
 #include "gui_list.h"
-#include "gui_message.h"
 
 /*============================================================================*
  *                           Types
