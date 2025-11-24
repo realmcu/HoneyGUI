@@ -262,9 +262,22 @@ typedef struct
 
 } l3_material_t;
 
+typedef struct
+{
+    uint16_t magic;      // "3D"  = 0x3344
+    uint8_t model_type;  // 0: obj, 1: gltf
+    uint8_t version;
+    uint32_t file_size;
+    uint8_t face_type;   // 0: rect, 1: triangle, 2: other
+    uint8_t payload_offset;
+    uint8_t extension[6];
+
+} l3_desc_file_head_t;
+
 typedef struct l3_description
 {
-    L3_FACE_TYPE face_type;
+    l3_desc_file_head_t file_head;
+
     l3_attrib_t attrib;
 
     unsigned int num_shapes;

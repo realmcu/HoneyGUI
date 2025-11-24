@@ -59,7 +59,12 @@ static float get_animation_duration(l3_gltf_single_animation_t *anim)
 static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
 {
     unsigned char *ptr = (unsigned char *)desc_addr;
-    g3m_header_t *header = (g3m_header_t *)ptr;
+    l3_desc_file_head_t *file_head = (l3_desc_file_head_t *)ptr;
+    if (file_head->magic != 0x3344 || file_head->model_type != 1 || file_head->face_type != 1)
+    {
+        return NULL;
+    }
+    g3m_header_t *header = (g3m_header_t *)(ptr + file_head->payload_offset);
 
     int                     *roots_on_disk      = (int *)(ptr + header->scene_roots_offset);
     g3m_node_on_disk_t      *nodes_on_disk      = (g3m_node_on_disk_t *)(ptr + header->nodes_offset);

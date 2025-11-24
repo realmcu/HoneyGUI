@@ -18,13 +18,11 @@
  *                        Header Files
  *============================================================================*/
 #include <string.h>
-#include <math.h>
 #include "guidef.h"
 #include "gui_obj.h"
 #include "gui_fb.h"
 #include "gui_lite3d_gltf.h"
 #include "draw_img.h"
-#include "acc_api.h"
 #include "tp_algo.h"
 
 static void gui_lite3d_gltf_prepare(gui_obj_t *obj)

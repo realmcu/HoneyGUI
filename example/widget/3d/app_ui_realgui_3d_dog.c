@@ -10,7 +10,7 @@
 
 #include "gui_lite3d.h"
 #include "tp_algo.h"
-#include "dog3d/desc.txt"
+#include "dog3d/desc_dog.txt"
 
 static float rot_angle = 0.0f;
 
@@ -35,7 +35,7 @@ static void dog_global_cb(l3_model_t *this)
 
 static int app_init(void)
 {
-    l3_model_t *dog_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_AND_SORT, 50, 50, 380, 380);
+    l3_model_t *dog_3d = l3_create_model((void *)_acdesc_dog, L3_DRAW_FRONT_AND_SORT, 50, 50, 380, 380);
 
     l3_set_global_transform(dog_3d, (l3_global_transform_cb)dog_global_cb);
 

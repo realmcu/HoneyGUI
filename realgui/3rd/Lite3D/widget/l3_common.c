@@ -781,9 +781,15 @@ l3_description_t *l3_load_description(void *desc_addr)
     unsigned char *ptr = (unsigned char *)desc_addr;
     l3_description_t *desc = (l3_description_t *)l3_malloc(sizeof(l3_description_t));
 
-    // face type
-    desc->face_type = (L3_FACE_TYPE) * ((int *)ptr);
-    ptr += sizeof(int);
+    // file head
+    desc->file_head = *((l3_desc_file_head_t *)ptr);
+    if (desc->file_head.magic != 0x3344 || desc->file_head.model_type != 0 ||
+        desc->file_head.face_type == 2)
+    {
+        l3_free(desc);
+        return NULL;
+    }
+    ptr += desc->file_head.payload_offset;
 
     // attrib
     desc->attrib.num_vertices = *((unsigned int *)ptr);

@@ -68,7 +68,7 @@ l3_model_t *l3_create_model(void                 *desc_addr,
     this->desc = desc;
     this->draw_type = draw_type;
 
-    switch (this->desc->face_type)
+    switch (this->desc->file_head.face_type)
     {
     case LITE_3D_FACE_RECTANGLE:
         {
@@ -142,7 +142,7 @@ void l3_set_target_canvas(l3_model_t *_this, \
 
 void l3_set_face_image(l3_model_t *_this, uint8_t face_index, void *image_addr)
 {
-    if (_this->desc->face_type == LITE_3D_FACE_RECTANGLE)
+    if (_this->desc->file_head.face_type == LITE_3D_FACE_RECTANGLE)
     {
         l3_set_rect_face_image(_this, face_index, image_addr);
     }
@@ -169,7 +169,7 @@ void l3_push(l3_model_t *_this)
         return;
     }
 
-    switch (_this->desc->face_type)
+    switch (_this->desc->file_head.face_type)
     {
     case LITE_3D_FACE_RECTANGLE:
         l3_rect_push(_this);
@@ -191,7 +191,7 @@ void l3_draw(l3_model_t *_this)
         return;
     }
 
-    switch (_this->desc->face_type)
+    switch (_this->desc->file_head.face_type)
     {
     case LITE_3D_FACE_RECTANGLE:
         l3_rect_draw(_this);
@@ -209,7 +209,7 @@ void l3_draw(l3_model_t *_this)
 
 void l3_free_model(l3_model_t *_this)
 {
-    switch (_this->desc->face_type)
+    switch (_this->desc->file_head.face_type)
     {
     case LITE_3D_FACE_RECTANGLE:
         l3_rect_free_model(_this);

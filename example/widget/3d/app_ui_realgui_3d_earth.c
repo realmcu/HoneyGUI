@@ -10,8 +10,8 @@
 
 #include "gui_lite3d.h"
 #include "tp_algo.h"
-#include "earth3d/desc.txt"
-#include "earth3d/desc_no_mtl.txt"
+#include "earth3d/desc_earth_tria.txt"
+#include "earth3d/desc_earth_tria_no_mtl.txt"
 
 static float rot_x_angle = 0.0f;
 static float rot_y_angle = 0.0f;
@@ -41,10 +41,11 @@ static int app_init(void)
 {
     gui_dispdev_t *dc = gui_get_dc();
 #if 1
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc, L3_DRAW_FRONT_ONLY, 0, 0, dc->screen_width,
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_earth_tria, L3_DRAW_FRONT_ONLY, 0, 0,
+                                           dc->screen_width,
                                            dc->screen_height);
 #else
-    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_no_mtl, L3_DRAW_FRONT_ONLY, 0, 0,
+    l3_model_t *earth_3d = l3_create_model((void *)_acdesc_earth_tria_no_mtl, L3_DRAW_FRONT_ONLY, 0, 0,
                                            dc->screen_width, dc->screen_height);
 #endif
 

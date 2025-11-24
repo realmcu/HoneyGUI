@@ -7,7 +7,10 @@
 #include <unistd.h>
 
 #define TINYOBJ_LOADER_C_IMPLEMENTATION
-#include "tinyobj_loader_c.h"
+#include "../../realgui/3rd/tinyobj/tinyobj_loader_c.h"
+#include "../../realgui/3rd/Lite3D/widget/l3_common.h"
+
+
 
 typedef struct
 {
@@ -22,7 +25,7 @@ typedef struct
     unsigned int *texture_sizes;
     unsigned char **textures;
 
-} gui_description_t;
+} tinyobj_description_t;
 
 
 void loadFile(void *ctx, const char *filename, const int is_mtl, const char *obj_filename,
@@ -176,7 +179,7 @@ void write_string(FILE *file, const char *string)
     }
 }
 
-void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
+void save_desc_to_binary_file(tinyobj_description_t *desc, const char *filename)
 {
     FILE *file = fopen(filename, "wb");
     if (!file)
@@ -184,6 +187,13 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
         perror("Failed to open file for writing");
         return;
     }
+
+    // Save file header
+    l3_desc_file_head_t file_header;
+    memset(&file_header, 0, sizeof(l3_desc_file_head_t));
+    file_header.magic = 0x3344;
+    file_header.model_type = 0;
+    file_header.version = 1;
     // Save face type
     bool allRectangle = true;
     bool allTriangle = true;
@@ -211,7 +221,15 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
     {
         defalutValue = 2;
     }
-    fwrite(&defalutValue, sizeof(int), 1, file);
+    file_header.face_type = defalutValue;
+    file_header.payload_offset = sizeof(l3_desc_file_head_t);
+    fwrite(&file_header, sizeof(l3_desc_file_head_t), 1, file);
+
+    long payload_start_pos = ftell(file);
+    if (payload_start_pos != file_header.payload_offset)
+    {
+        printf("Warning: Header size mismatch!\n");
+    }
 
     // Save attribute
     fwrite(&desc->attrib.num_vertices, sizeof(unsigned int), 1, file);
@@ -276,6 +294,20 @@ void save_desc_to_binary_file(gui_description_t *desc, const char *filename)
         }
     }
 
+    long total_file_size = ftell(file);
+    if (total_file_size == -1L)
+    {
+        perror("Failed to get file size with ftell");
+        fclose(file);
+    }
+    printf("Final calculated file size: %ld bytes\n", total_file_size);
+    if (fseek(file, 0, SEEK_SET) != 0)
+    {
+        perror("Failed to seek back to the beginning of the file");
+        fclose(file);
+    }
+    file_header.file_size = (uint32_t)total_file_size; // update file_size
+    fwrite(&file_header, sizeof(l3_desc_file_head_t), 1, file);
 
     fclose(file);
     printf("Write description to bin file successfully!\n");
@@ -358,7 +390,23 @@ int main(int argc, char **argv)
     }
 
     const char *obj_filename = argv[1];
-    gui_description_t *desc = malloc(sizeof(gui_description_t));
+    char prefix[100];
+    strncpy(prefix, obj_filename, sizeof(prefix) - 1);
+    prefix[sizeof(prefix) - 1] = '\0';
+    // Find last point
+    char *dot = strrchr(prefix, '.');
+    if (dot != NULL)
+    {
+        *dot = '\0';
+    }
+    char bin_filename[100];
+    char txt_filename[100];
+
+    snprintf(bin_filename, sizeof(bin_filename), "desc_%s.bin", prefix);
+    snprintf(txt_filename, sizeof(txt_filename), "desc_%s.txt", prefix);
+
+
+    tinyobj_description_t *desc = malloc(sizeof(tinyobj_description_t));
 
     tinyobj_parse_obj(&desc->attrib, &desc->shapes, &desc->num_shapes, &desc->materials,
                       &desc->num_materials, obj_filename, loadFile, NULL, 0);
@@ -405,8 +453,8 @@ int main(int argc, char **argv)
 
     free(material_processed);
 
-    save_desc_to_binary_file(desc, "desc.bin");
-    binary_to_txt_array("desc.bin", "desc.txt");
+    save_desc_to_binary_file(desc, bin_filename);
+    binary_to_txt_array(bin_filename, txt_filename);
 
     return 0;
 }

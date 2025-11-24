@@ -11,7 +11,7 @@
 #include "gui_lite3d_gltf.h"
 #include "gui_lite3d.h"
 #include "tp_algo.h"
-#include "pikachu_gltf/gltf_desc.txt"
+#include "pikachu_gltf/gltf_desc_Pikachu_resize.txt"
 
 static float rot_angle = 0.0f;
 
@@ -40,7 +40,8 @@ static int app_init(void)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    l3_gltf_model_t *pikachu_3d = l3_create_gltf_model((void *)_acgltf_desc, LITE_RGB565, 0, 0,
+    l3_gltf_model_t *pikachu_3d = l3_create_gltf_model((void *)_acgltf_desc_Pikachu_resize, LITE_RGB565,
+                                                       0, 0,
                                                        dc->screen_width,
                                                        dc->screen_height);
 

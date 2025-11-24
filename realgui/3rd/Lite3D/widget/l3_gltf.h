@@ -293,6 +293,8 @@ typedef struct
 
 typedef struct
 {
+    l3_desc_file_head_t head;
+
     // Scene root indices in nodes array
     int *scene_root_indices;
     unsigned int scene_root_count;

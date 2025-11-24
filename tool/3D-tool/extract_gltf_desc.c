@@ -1,8 +1,8 @@
 
 
 #define CGLTF_IMPLEMENTATION
-#include "cgltf.h"
-#include "l3_gltf.h"
+#include "../../realgui/3rd/cgltf/cgltf.h"
+#include "../../realgui/3rd/Lite3D/widget/l3_gltf.h"
 #include <stdio.h>
 #include <libgen.h>
 
@@ -707,6 +707,15 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     g3m_data_blob_t blob;
     blob_init(&blob);
 
+    // Save file header
+    l3_desc_file_head_t file_header;
+    memset(&file_header, 0, sizeof(l3_desc_file_head_t));
+    file_header.magic = 0x3344;
+    file_header.model_type = 1;
+    file_header.version = 1;
+    file_header.face_type = 1;
+    file_header.payload_offset = sizeof(l3_desc_file_head_t);
+
     // --- Phase 1: Prepare all on-disk data structures ---
     int *scene_roots_on_disk = NULL;
     g3m_node_on_disk_t *nodes_on_disk = NULL;
@@ -724,8 +733,16 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     header.node_count = model->node_count;
     header.mesh_count = model->mesh_count;
     header.skin_count = model->skin_count;
-    header.channel_count = model->animation->channel_count;
-    header.sampler_count = model->animation->sampler_count;
+    if (model->animation)
+    {
+        header.channel_count = model->animation->channel_count;
+        header.sampler_count = model->animation->sampler_count;
+    }
+    else
+    {
+        header.channel_count = 0;
+        header.sampler_count = 0;
+    }
     header.material_count = model->material_count;
 
     // Primitive count
@@ -844,38 +861,43 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
         }
     }
 
-    // Channels
-    for (uint32_t i = 0; i < model->animation->channel_count; ++i)
-    {
-        l3_gltf_channel_t *src_channel = &model->animation->channels[i];
-        g3m_channel_on_disk_t *dst_channel = &channels_on_disk[i];
 
-        dst_channel->sampler_index = src_channel->sampler_index;
-        dst_channel->target_node_index = src_channel->target_node_index;
-        dst_channel->target_path = (uint32_t)src_channel->target_path;
+    if (model->animation)
+    {
+        // Channels
+        for (uint32_t i = 0; i < model->animation->channel_count; ++i)
+        {
+            l3_gltf_channel_t *src_channel = &model->animation->channels[i];
+            g3m_channel_on_disk_t *dst_channel = &channels_on_disk[i];
+
+            dst_channel->sampler_index = src_channel->sampler_index;
+            dst_channel->target_node_index = src_channel->target_node_index;
+            dst_channel->target_path = (uint32_t)src_channel->target_path;
+        }
+
+        // Samplers
+        for (uint32_t i = 0; i < model->animation->sampler_count; ++i)
+        {
+            l3_gltf_sampler_t *src_sampler = &model->animation->samplers[i];
+            g3m_sampler_on_disk_t *dst_sampler = &samplers_on_disk[i];
+
+            // Input time axis
+            size_t input_data_size = src_sampler->input_count * sizeof(float);
+            dst_sampler->input_offset = append_to_blob(&blob, src_sampler->input_data, input_data_size);
+            dst_sampler->input_count = src_sampler->input_count;
+
+            // Output keyframe values
+            size_t output_element_size = (src_sampler->output_type == GLTF_TYPE_VEC3) ? sizeof(
+                                             float) * 3 : sizeof(float) * 4;
+            size_t output_data_size = src_sampler->output_count * output_element_size;
+            dst_sampler->output_offset = append_to_blob(&blob, src_sampler->output_data, output_data_size);
+            dst_sampler->output_count = src_sampler->output_count;
+
+            dst_sampler->interpolation_type = (uint32_t)src_sampler->interpolation;
+            dst_sampler->output_type = (uint32_t)src_sampler->output_type;
+        }
     }
 
-    // Samplers
-    for (uint32_t i = 0; i < model->animation->sampler_count; ++i)
-    {
-        l3_gltf_sampler_t *src_sampler = &model->animation->samplers[i];
-        g3m_sampler_on_disk_t *dst_sampler = &samplers_on_disk[i];
-
-        // Input time axis
-        size_t input_data_size = src_sampler->input_count * sizeof(float);
-        dst_sampler->input_offset = append_to_blob(&blob, src_sampler->input_data, input_data_size);
-        dst_sampler->input_count = src_sampler->input_count;
-
-        // Output keyframe values
-        size_t output_element_size = (src_sampler->output_type == GLTF_TYPE_VEC3) ? sizeof(
-                                         float) * 3 : sizeof(float) * 4;
-        size_t output_data_size = src_sampler->output_count * output_element_size;
-        dst_sampler->output_offset = append_to_blob(&blob, src_sampler->output_data, output_data_size);
-        dst_sampler->output_count = src_sampler->output_count;
-
-        dst_sampler->interpolation_type = (uint32_t)src_sampler->interpolation;
-        dst_sampler->output_type = (uint32_t)src_sampler->output_type;
-    }
 
     // Materials
     uint32_t texture_index = 0;
@@ -901,7 +923,7 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     // --- Phase 2: Calculate the layout and write it to the file ---
 
     // Calculate the absolute offsets of each data block
-    uint32_t current_offset = sizeof(g3m_header_t);
+    uint32_t current_offset = sizeof(l3_desc_file_head_t) + sizeof(g3m_header_t);
 
     header.scene_roots_offset = current_offset;
     current_offset += sizeof(int) * header.scene_root_count;
@@ -934,6 +956,12 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     header.data_blob_offset = current_offset;
     header.data_blob_size = (uint32_t)blob.size;
 
+    fwrite(&file_header, sizeof(l3_desc_file_head_t), 1, fp);
+    long payload_start_pos = ftell(fp);
+    if (payload_start_pos != file_header.payload_offset)
+    {
+        printf("Warning: Header size mismatch!\n");
+    }
 
     fwrite(&header, sizeof(g3m_header_t), 1,
            fp);                                            // 1. Header
@@ -982,8 +1010,23 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     printf("Materials Array Size:%zu bytes\n", sizeof(g3m_material_on_disk_t) * header.material_count);
     printf("Textures Array Size:%zu bytes\n", sizeof(g3m_texture_on_disk_t) * header.texture_count);
     printf("Data Blob Size:      %zu bytes\n", blob.size);
-    printf("Total File Size:     %ld bytes\n", ftell(fp));
     printf("----------------------------------\n");
+
+    long total_file_size = ftell(fp);
+    if (total_file_size == -1L)
+    {
+        perror("Failed to get file size with ftell");
+        fclose(fp);
+    }
+    printf("Final calculated file size: %ld bytes\n", total_file_size);
+    if (fseek(fp, 0, SEEK_SET) != 0)
+    {
+        perror("Failed to seek back to the beginning of the file");
+        fclose(fp);
+    }
+    file_header.file_size = (uint32_t)total_file_size; // update file_size
+    fwrite(&file_header, sizeof(l3_desc_file_head_t), 1, fp);
+
 
     fclose(fp);
     blob_free(&blob);
@@ -1080,7 +1123,22 @@ void binary_to_txt_array(const char *binary_filename, const char *txt_filename)
 
 int main(int argc, char **argv)
 {
-    const char *gltf_path = argv[1];
+    const char *gltf_filename = argv[1];
+    char prefix[100];
+    strncpy(prefix, gltf_filename, sizeof(prefix) - 1);
+    prefix[sizeof(prefix) - 1] = '\0';
+    // Find last point
+    char *dot = strrchr(prefix, '.');
+    if (dot != NULL)
+    {
+        *dot = '\0';
+    }
+    char bin_filename[100];
+    char txt_filename[100];
+
+    snprintf(bin_filename, sizeof(bin_filename), "gltf_desc_%s.bin", prefix);
+    snprintf(txt_filename, sizeof(txt_filename), "gltf_desc_%s.txt", prefix);
+
     l3_gltf_model_description_t *gltf_desc = malloc(sizeof(l3_gltf_model_description_t));
     memset(gltf_desc, 0, sizeof(l3_gltf_model_description_t));
 
@@ -1088,16 +1146,16 @@ int main(int argc, char **argv)
     memset(&options, 0, sizeof(cgltf_options));
     cgltf_data *data = NULL;
     // 1. Analyze the structure of gltf file
-    cgltf_result result = cgltf_parse_file(&options, gltf_path, &data);
+    cgltf_result result = cgltf_parse_file(&options, gltf_filename, &data);
     if (result != cgltf_result_success)
     {
-        printf("Error: Failed to parse file: %s\n", gltf_path);
+        printf("Error: Failed to parse file: %s\n", gltf_filename);
     }
     // 2. Load the related buffer data (from .bin file or base64)
-    result = cgltf_load_buffers(&options, data, gltf_path);
+    result = cgltf_load_buffers(&options, data, gltf_filename);
     if (result != cgltf_result_success)
     {
-        printf("Error: Failed to load buffers for: %s\n", gltf_path);
+        printf("Error: Failed to load buffers for: %s\n", gltf_filename);
     }
 
     // 3. Construct l3_gltf_model_description_t
@@ -1105,10 +1163,10 @@ int main(int argc, char **argv)
     printf("Parsing and data conversion complete. Now writing to binary file...\n");
 
     // 4. Save the descriptive information to a binary file
-    save_desc_to_binary_file(gltf_desc, "gltf_desc.bin");
+    save_desc_to_binary_file(gltf_desc, bin_filename);
 
     // 5. Convert the binary file to a txt array file
-    binary_to_txt_array("gltf_desc.bin", "gltf_desc.txt");
+    binary_to_txt_array(bin_filename, txt_filename);
 
     cgltf_free(data);
     free_gltf_description(gltf_desc);
