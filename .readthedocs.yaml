@@ -20,7 +20,7 @@ build:
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
-  configuration: doc/en/conf.py
+  configuration: doc/cn/conf.py
   fail_on_warning: false
 
 # Optional but recommended, declare the Python requirements required
