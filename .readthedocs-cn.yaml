@@ -14,7 +14,7 @@ build:
     - graphviz
   jobs:
     pre_build:
-      - cd doc && python doxygen.py
+      - cd doc/doxyxml && doxygen Doxyfile
     post_build:
       - echo "Build completed at $(date)"
 
