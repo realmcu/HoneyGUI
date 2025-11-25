@@ -73,6 +73,7 @@ static char *move_content = NULL;
 static char *ex_content = NULL;
 static char *stand_content = NULL;
 static int battery_level = 0;
+uint8_t *img_data_battery = NULL;
 static gui_list_t *list = NULL;
 /*============================================================================*
  *                           Private Functions
@@ -85,6 +86,11 @@ static void clear_bottom_view(gui_view_t *view)
     {
         gui_lower_free(img_data_activity);
         img_data_activity = NULL;
+    }
+    if (img_data_battery)
+    {
+        gui_lower_free(img_data_battery);
+        img_data_battery = NULL;
     }
     if (move_content)
     {
@@ -443,7 +449,7 @@ static void note_design(gui_obj_t *obj, void *p)
             int pixel_bytes = 4;
             size_t buffer_size = image_h * image_w * pixel_bytes + sizeof(gui_rgb_data_head_t);
 
-            uint8_t *img_data_battery = NULL;
+
 
 
             if (!img_data_battery)

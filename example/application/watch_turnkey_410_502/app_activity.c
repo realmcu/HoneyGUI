@@ -372,12 +372,6 @@ static void activity_design(gui_view_t *view)
         swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
     }
-    else if (strcmp(obj_name, "watchface_view") == 0)
-    {
-        swtich_in = SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT;
-        swtich_out = SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT;
-
-    }
     gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
                              swtich_out,
                              swtich_in,

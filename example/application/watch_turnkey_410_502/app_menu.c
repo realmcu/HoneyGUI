@@ -162,7 +162,8 @@ static void switch_app_music(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, gui_view_descriptor_get("music_view"), SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    gui_view_switch_direct(current_view, gui_view_descriptor_get("music_view"),
+                           SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_map(void *obj, gui_event_t e, void *param)
@@ -405,8 +406,33 @@ static void app_menu_design(gui_view_t *view)
             switch_app_activity,
             switch_app_heart_rate,
             switch_app_weather,
+            switch_app_reminders,
+            switch_app_message,
+            switch_app_phone,
+            switch_app_noise,
+            switch_app_music,
+            switch_app_map,
+            switch_app_stopwatch,
+            switch_app_timers,
+            switch_app_alarm_clock,
+            switch_app_audio_books,
+            switch_app_workout,
+            switch_app_calendar,
+            switch_app_compass,
+            switch_app_home,
+            switch_app_contacts,
+            switch_app_cycle_tracking,
+            switch_app_mail,
+            switch_app_now_playing,
+            switch_app_news,
+            switch_app_photo,
+            switch_app_podcasts,
+            switch_app_sleep,
+            switch_app_stocks,
+            switch_app_world_clock,
+            switch_app_store,
 
-            switch_menu_style_cb, //must last
+            // switch_menu_style_cb, //must last
         };
         uint32_t *img_data_array[] =
         {

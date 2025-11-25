@@ -148,49 +148,6 @@ static void fps_create(void *parent)
     gui_text_rendermode_set(low_mem, 2);
 }
 
-// Enter menu and change menu style by button
-static void kb_button_cb(void)
-{
-    extern gui_kb_port_data_t *kb_get_data(void);
-    gui_kb_port_data_t *kb = kb_get_data();
-    static uint32_t time_press = 0;
-    static bool hold = 0;
-    static bool press_his = 0;
-    static uint32_t release_his = 0;
-    if (hold)
-    {
-        if (kb->event == GUI_KB_EVENT_UP)
-        {
-            hold = 0;
-            uint32_t time = kb->timestamp_ms_release - time_press;
-            if (time <= 150)
-            {
-                // Press twice quickly to change menu style
-                if (press_his && (kb->timestamp_ms_release - release_his) < 1000)
-                {
-                    gui_log("change menu style\n");
-                    menu_style = !menu_style;
-                }
-                press_his = !press_his;
-                release_his = kb->timestamp_ms_release;
-                return;
-            }
-            else
-            {
-                // Press once to enter menu
-                press_his = 0;
-                gui_view_switch_direct(gui_view_get_current(), menu_view, SWITCH_OUT_ANIMATION_FADE,
-                                       SWITCH_IN_ANIMATION_FADE);
-            }
-        }
-    }
-    else if (kb->event == GUI_KB_EVENT_DOWN)
-    {
-        time_press = kb->timestamp_ms_press;
-        hold = 1;
-    }
-}
-
 /* Generate a pseudo-random number */
 uint16_t xorshift16(void)
 {
