@@ -5,8 +5,15 @@
             "type": "shell",
             "label": "g++.exe build active file",
             "command": "scons",
-            "options": {
-                "cwd": "${workspaceFolder}\\win32_sim"
+            "windows": {
+                "options": {
+                    "cwd": "${workspaceFolder}\\win32_sim"
+                }
+            },
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceFolder}/win32_sim"
+                }
             },
             "problemMatcher": [
                 "$gcc"

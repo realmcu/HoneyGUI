@@ -56,9 +56,9 @@ extern int8_t quick_page_num;
 extern void (*quick_page_design_func_array[QUICK_PAGE_NUM_MAX])(gui_obj_t *parent);
 
 /* Battery */
-extern char battery_earbuds_connect_l_str[4];
-extern char battery_earbuds_connect_r_str[4];
-extern char battery_tx_str[4];
+extern char battery_earbuds_connect_l_str[8];
+extern char battery_earbuds_connect_r_str[8];
+extern char battery_tx_str[8];
 /*============================================================================*
  *                           Punblic Functions
  *============================================================================*/

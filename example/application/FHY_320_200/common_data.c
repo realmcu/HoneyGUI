@@ -193,11 +193,11 @@ uint8_t codec_type_index = AAC; // [0, 5]
 /* Timer */
 int8_t timer_max_min_val = 5; // minutes [1, 60]
 uint16_t timer_val = 300; // seconds
-char timer_str[6] = {0};
+char timer_str[8] = {0};
 
 /* Call */
 uint16_t calltime_val = 0; // seconds
-char calltime_str[6] = {0};
+char calltime_str[8] = {0};
 char call_source_str[20] = "+8618888888888";
 gui_call_t *gui_call = NULL;
 
@@ -252,7 +252,7 @@ struct AUDIO_SOURCE audio_source =
 
 /* OTA */
 uint8_t ota_val = 0; // [0, 100]
-char ota_str[4] = {0};
+char ota_str[8] = {0};
 
 /* Auracast */
 char auracast_password[5] = "1234";
@@ -276,8 +276,8 @@ struct TX_MANAGEMENT tx_management =
 /* Clock settings */
 uint8_t hour_val = 0; //[0, 23]
 uint8_t minutes_val = 0; //[0, 59]
-char hour_str[3] = {0};
-char minutes_str[3] = {0};
+char hour_str[8] = {0};
+char minutes_str[8] = {0};
 
 /* Notification */
 struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM] =

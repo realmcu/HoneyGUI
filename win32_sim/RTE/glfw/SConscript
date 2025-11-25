@@ -1,18 +1,22 @@
 from building import *
+import sys
 
 cwd = GetCurrentDir()
 
 src = []
 libs = ['']
-libs += ['glfw3','gdi32'] #carefully gdi32 must later than glfw3
 
-
-libpath = [cwd]
-libpath += [cwd + '/lib']
-
-
-include = [cwd]        
-include += [cwd + '/include']
+if sys.platform == 'win32':
+    libs += ['glfw3','gdi32'] #carefully gdi32 must later than glfw3
+    libpath = [cwd]
+    libpath += [cwd + '/lib']
+    include = [cwd]        
+    include += [cwd + '/include']
+else:  # Linux/WSL - use system glfw or skip if not needed
+    # glfw is optional, comment out if not using
+    # libs += ['glfw']
+    libpath = []
+    include = []
 
 
 group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_HONEYGUI'], CPPPATH = include, LIBS = libs, LIBPATH = libpath)

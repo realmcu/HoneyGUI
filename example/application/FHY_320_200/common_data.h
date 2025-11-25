@@ -392,11 +392,11 @@ extern uint8_t codec_type_index; // [0, 5]
 /* Timer */
 extern int8_t timer_max_min_val; // minutes [1, 60]
 extern uint16_t timer_val; // seconds
-extern char timer_str[6];
+extern char timer_str[8];
 
 /* Call */
 extern uint16_t calltime_val; // seconds
-extern char calltime_str[6];
+extern char calltime_str[8];
 extern char call_source_str[20];
 extern gui_call_t *gui_call;
 
@@ -427,7 +427,7 @@ extern struct AUDIO_SOURCE audio_source;
 
 /* OTA */
 extern uint8_t ota_val; // [0, 100]
-extern char ota_str[4];
+extern char ota_str[8];
 
 /* Auracast */
 extern char auracast_password[5];
@@ -445,8 +445,8 @@ extern struct TX_MANAGEMENT tx_management;
 /* Clock settings */
 extern uint8_t hour_val; //[0, 23]
 extern uint8_t minutes_val; //[0, 59]
-extern char hour_str[3];
-extern char minutes_str[3];
+extern char hour_str[8];
+extern char minutes_str[8];
 
 /* Notification */
 extern struct NOTIFICATION_CONTENT notification_content[NOTIFICATION_MAX_NUM];

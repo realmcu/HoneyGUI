@@ -5,7 +5,13 @@ import sys
 ARCH='win32'
 CROSS_TOOL='gcc'
 PLATFORM    = 'gcc'
-EXEC_PATH   = r'C:/mingw64/bin'
+
+# Auto-detect platform: use system gcc on Linux/WSL, MinGW on Windows
+if sys.platform.startswith('linux'):
+    EXEC_PATH = '/usr/bin'
+else:
+    EXEC_PATH = r'C:/mingw64/bin'
+
 BSP_LIBRARY_TYPE = None
 
 
@@ -43,9 +49,13 @@ CFLAGS_BASE += ' -Werror=implicit-fallthrough '
 CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion'
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 
-LFLAGS = ' -T default.ld'
-# LFLAGS += ' -flto' #for arm2d
-LFLAGS += ' -pthread -static-libgcc -static-libstdc++ -static'
+if sys.platform.startswith('linux'):
+    LFLAGS = ' -T honeygui_linux.ld'  # Linux: use ELF linker script
+    LFLAGS += ' -pthread'
+else:
+    LFLAGS = ' -T honeygui_mingw.ld'  # Windows: use PE linker script
+    # LFLAGS += ' -flto' #for arm2d
+    LFLAGS += ' -pthread -static-libgcc -static-libstdc++ -static'
 LFLAGS += ' -Wl,-Map=gui.map'
 
 POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n'

@@ -1,5 +1,6 @@
 # for module compiling
 import os
+import sys
 Import('TOOL_ROOT')
 Import('RTK_GUI_ENGINE')
 
@@ -13,7 +14,8 @@ CPPPATH = [cwd,
 
 #src = Glob('*.c')
 src = ['main.c']
-src += ['version.o']
+if sys.platform == 'win32':
+    src += ['version.o']
 
 
 CPPDEFINES = ['GUI_WIN32_SIM']

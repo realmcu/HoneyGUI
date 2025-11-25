@@ -43,8 +43,8 @@ static gui_view_descriptor_t const descriptor =
 };
 
 static char date_str[20] = {0};
-char battery_headband_str[4] = {0};
-char battery_tx_str[4] = {0};
+char battery_headband_str[8] = {0};
+char battery_tx_str[8] = {0};
 static char message_num_str[4] = {0};
 
 /*============================================================================*

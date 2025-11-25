@@ -1,18 +1,21 @@
 from building import *
+import sys
 
 cwd = GetCurrentDir()
 
 src = []
 libs = ['']
-libs += ['SDL2main','SDL2']
 
-
-libpath = [cwd]
-libpath += [cwd + '/lib']
-
-
-include = [cwd]        
-include += [cwd + '/include/SDL2']
+if sys.platform == 'win32':
+    libs += ['SDL2main','SDL2']
+    libpath = [cwd]
+    libpath += [cwd + '/lib']
+    include = [cwd]        
+    include += [cwd + '/include/SDL2']
+else:  # Linux/WSL - use system SDL2
+    libs += ['SDL2']
+    libpath = []
+    include = ['/usr/include/SDL2']
 
 
 group = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = include, LIBS = libs, LIBPATH = libpath)

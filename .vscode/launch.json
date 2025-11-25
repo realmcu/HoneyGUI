@@ -5,14 +5,21 @@
             "name": "g++.exe build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\win32_sim\\gui.exe",
+            "program": "${workspaceFolder}/win32_sim/gui${command:pickPlatform}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe",
+            "windows": {
+                "program": "${workspaceFolder}\\win32_sim\\gui.exe",
+                "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe"
+            },
+            "linux": {
+                "program": "${workspaceFolder}/win32_sim/gui",
+                "miDebuggerPath": "/usr/bin/gdb"
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -21,6 +28,6 @@
                 }
             ],
             "preLaunchTask": "g++.exe build active file"
-        },
+        }
     ]
 }

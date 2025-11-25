@@ -43,10 +43,10 @@ const static gui_view_descriptor_t *timer_view = NULL;
 const static gui_view_descriptor_t *charging_view = NULL;
 
 /* FPS */
-static char fps[10];
-static char widget_count_string[20];
-static char mem_string[20];
-static char low_mem_string[20];
+static char fps[10] __attribute__((unused));
+static char widget_count_string[20] __attribute__((unused));
+static char mem_string[20] __attribute__((unused));
+static char low_mem_string[20] __attribute__((unused));
 
 #ifdef _WIN32
 unsigned char *resource_root = NULL;

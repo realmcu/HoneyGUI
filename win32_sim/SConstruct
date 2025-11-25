@@ -15,15 +15,28 @@ except:
     print('Cannot found Scons tool root directory, please check TOOL_ROOT')
     exit(-1)
 
-TARGET = 'gui.' + 'exe'
+if sys.platform == 'win32':
+    TARGET = 'gui.exe'
+else:
+    TARGET = 'gui'
 
+print(f"Platform: {sys.platform}, TARGET: {TARGET}")
 
-env = Environment(tools = ['mingw'],
-                  CC=menu_config.CC, 
-                  CFLAGS = menu_config.CFLAGS,
-                  CXX = menu_config.CXX, 
-                  CXXFLAGS = menu_config.CXXFLAGS,
-                  LINKFLAGS = menu_config.LFLAGS)
+if sys.platform == 'win32':
+    env = Environment(tools = ['mingw'],
+                      CC=menu_config.CC, 
+                      CFLAGS = menu_config.CFLAGS,
+                      CXX = menu_config.CXX, 
+                      CXXFLAGS = menu_config.CXXFLAGS,
+                      LINKFLAGS = menu_config.LFLAGS)
+else:
+    env = Environment(tools = ['default'],
+                      CC=menu_config.CC, 
+                      CFLAGS = menu_config.CFLAGS,
+                      CXX = menu_config.CXX, 
+                      CXXFLAGS = menu_config.CXXFLAGS,
+                      LINKFLAGS = menu_config.LFLAGS,
+                      PROGSUFFIX = '')  # No .exe suffix on Linux
 
 
 
@@ -50,6 +63,7 @@ print('RTK GUI ENGINE ROOT = ' + RTK_GUI_ENGINE)
 
 
 import subprocess
+import sys
 
 def compile_resource(rc_file, output_file):
     try:
@@ -60,7 +74,9 @@ def compile_resource(rc_file, output_file):
     except FileNotFoundError:
         print('windres command not found. Ensure MinGW is installed and windres is in the system PATH.')
 
-compile_resource('version.rc', 'version.o')
+# Only compile resource file on Windows
+if sys.platform == 'win32':
+    compile_resource('version.rc', 'version.o')
 
 # prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
@@ -100,23 +116,34 @@ if platform.system() == 'Windows':
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
 
-env.Append(LIBS = [
-    'mingw32',
-    'user32',
-    'gdi32',
-    'winmm',
-    'imm32',
-    'ole32',
-    'oleaut32',
-    'version',
-    'uuid',
-    'advapi32',
-    'setupapi',
-    'shell32',
-    'dinput8',
-    'opengl32',
-    'm'
-])
+# Platform-specific libraries
+if sys.platform == 'win32':
+    env.Append(LIBS = [
+        'mingw32',
+        'user32',
+        'gdi32',
+        'winmm',
+        'imm32',
+        'ole32',
+        'oleaut32',
+        'version',
+        'uuid',
+        'advapi32',
+        'setupapi',
+        'shell32',
+        'dinput8',
+        'opengl32',
+        'm'
+    ])
+else:  # Linux/WSL
+    env.Append(LIBS = [
+        'SDL2',
+        'GL',
+        'GLEW',
+        'pthread',
+        'm',
+        'dl'
+    ])
 
 # make a building
 DoBuilding(TARGET, objs)

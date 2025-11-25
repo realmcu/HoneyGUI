@@ -169,6 +169,8 @@ unsigned int userGetTick()
 
 static short userShellWrite(char *data, unsigned short len)
 {
+    (void)data;
+    (void)len;
     return 0;
 }
 

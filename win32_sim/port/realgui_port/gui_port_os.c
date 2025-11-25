@@ -110,7 +110,11 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
 
         struct timeval now;
         struct timespec outtime;
+#ifdef _WIN32
         mingw_gettimeofday(&now, NULL);
+#else
+        gettimeofday(&now, NULL);
+#endif
         outtime.tv_sec = now.tv_sec + timeout;
         outtime.tv_nsec = now.tv_usec * 1000;
 

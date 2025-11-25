@@ -40,7 +40,7 @@ static gui_view_descriptor_t const descriptor =
     .on_switch_in = quick_view_design,
 };
 
-static char time_str[8] = {0};
+static char time_str[16] = {0};
 static int8_t page_index = 0;
 static gui_img_t *page_indicator_array[QUICK_PAGE_NUM_MAX] = {0};
 

@@ -3,9 +3,15 @@
 #include "gui_port.h"
 #include <pthread.h>
 #include <stdio.h>
+#include <string.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 #if 0
 /* file api port*/
@@ -127,7 +133,11 @@ static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
     int d_name_length = strlen(dirent->d_name) + 1;
     fs_dirent->d_name = malloc(d_name_length);
     memcpy(fs_dirent->d_name, dirent->d_name,  d_name_length);
+#ifdef _WIN32
     fs_dirent->d_namlen = dirent->d_namlen;
+#else
+    fs_dirent->d_namlen = d_name_length - 1;
+#endif
     fs_dirent->d_reclen = dirent->d_reclen;
     fs_dirent->d_type = dirent->d_ino;
     fs_dirent->dirent = dirent;
