@@ -8902,12 +8902,15 @@ STBIDEF int gui_stbi_info(char const *filename, int *x, int *y, int *comp)
 
 STBIDEF int gui_stbi_info_from_file(FILE *f, int *x, int *y, int *comp)
 {
-    int r;
+    int r = -1;
     stbi__context s;
     long pos = ftell(f);
-    stbi__start_file(&s, f);
-    r = stbi__info_main(&s, x, y, comp);
-    fseek(f, pos, SEEK_SET);
+    if (pos >= 0)
+    {
+        stbi__start_file(&s, f);
+        r = stbi__info_main(&s, x, y, comp);
+        fseek(f, pos, SEEK_SET);
+    }
     return r;
 }
 
@@ -8923,12 +8926,15 @@ STBIDEF int gui_stbi_is_16_bit(char const *filename)
 
 STBIDEF int gui_stbi_is_16_bit_from_file(FILE *f)
 {
-    int r;
+    int r = -1;
     stbi__context s;
     long pos = ftell(f);
-    stbi__start_file(&s, f);
-    r = stbi__is_16_main(&s);
-    fseek(f, pos, SEEK_SET);
+    if (pos >= 0)
+    {
+        stbi__start_file(&s, f);
+        r = stbi__is_16_main(&s);
+        fseek(f, pos, SEEK_SET);
+    }
     return r;
 }
 #endif // !STBI_NO_STDIO

@@ -538,6 +538,7 @@ static int video_src_init_avi(gui_video_t  *this)
 
             memset(sig, 0, sizeof(sig));
             memset(list_type, 0, sizeof(list_type));
+            memset(&main_hdr, 0, sizeof(main_hdr));
             pos = 4;
             file_size = *(uint32_t *)(img_data + pos);
             pos += 4;
