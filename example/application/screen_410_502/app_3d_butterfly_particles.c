@@ -188,18 +188,19 @@ static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes
     gui_img_set_opacity(wing, 180);
 }
 
-static void update_butterfly_wing_bg(l3_model_t *model)
+static void update_butterfly_wing_bg(l3_model_base_t *model)
 {
     gui_obj_hidden(GUI_BASE(butterfly_wing1), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing2), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing3), false);
     gui_obj_hidden(GUI_BASE(butterfly_wing4), false);
+    l3_obj_model_t *this = (l3_obj_model_t *)model;
 
     // Update each wing with calculated position and scale
-    update_wing_position_and_scale(butterfly_wing1, model->face.rect_face[0].transform_vertex, 0);
-    update_wing_position_and_scale(butterfly_wing2, model->face.rect_face[1].transform_vertex, 1);
-    update_wing_position_and_scale(butterfly_wing3, model->face.rect_face[2].transform_vertex, 2);
-    update_wing_position_and_scale(butterfly_wing4, model->face.rect_face[3].transform_vertex, 3);
+    update_wing_position_and_scale(butterfly_wing1, this->face.rect_face[0].transform_vertex, 0);
+    update_wing_position_and_scale(butterfly_wing2, this->face.rect_face[1].transform_vertex, 1);
+    update_wing_position_and_scale(butterfly_wing3, this->face.rect_face[2].transform_vertex, 2);
+    update_wing_position_and_scale(butterfly_wing4, this->face.rect_face[3].transform_vertex, 3);
 }
 
 static void update_butterfly(void *param)
@@ -266,7 +267,7 @@ static void update_butterfly(void *param)
     update_butterfly_wing_bg(lite3d_butterfly_particle->model);
 }
 
-static void butterfly_particle_global_cb(l3_model_t *this)
+static void butterfly_particle_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 40), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -275,7 +276,7 @@ static void butterfly_particle_global_cb(l3_model_t *this)
                         4.5f);
 }
 
-static l3_4x4_matrix_t butterfly_particle_face_cb(l3_model_t *this,
+static l3_4x4_matrix_t butterfly_particle_face_cb(l3_model_base_t *this,
                                                   size_t face_index/*face offset*/)
 {
     l3_4x4_matrix_t face_matrix;
@@ -562,8 +563,9 @@ static void butterfly_particle_app(gui_view_t *view)
     gui_img_set_mode(butterfly_wing3, IMG_SRC_OVER_MODE);
     gui_img_set_mode(butterfly_wing4, IMG_SRC_OVER_MODE);
 
-    l3_model_t *butterfly_particle_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0,
-                                                        410, 502);
+    l3_model_base_t *butterfly_particle_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0,
+                                                             0,
+                                                             410, 502);
     l3_set_global_transform(butterfly_particle_3d,
                             (l3_global_transform_cb)butterfly_particle_global_cb);
     l3_set_face_transform(butterfly_particle_3d, (l3_face_transform_cb)butterfly_particle_face_cb);

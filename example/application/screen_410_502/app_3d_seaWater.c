@@ -490,7 +490,7 @@ static void app_animate_cb(void *p)
     can_update_param_cb();
 }
 
-static void fish_global_cb(l3_model_t *this)
+static void fish_global_cb(l3_model_base_t *this)
 {
     static uint8_t index = 0;
 
@@ -503,7 +503,7 @@ static void fish_global_cb(l3_model_t *this)
     index %= 4;
 }
 
-static l3_4x4_matrix_t fish_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t fish_face_cb(l3_model_base_t *this, size_t face_index/*face offset*/)
 {
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
@@ -528,10 +528,10 @@ static void app_ui_wave_nums_design(gui_view_t *view)
 
     gui_img_create_from_mem(view, "background", SEABACKGROUND_BIN, 0, 0, 0, 0);
 
-    l3_model_t *fish0 = l3_create_model(DESC_SEAFISH0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish1 = l3_create_model(DESC_SEAFISH1_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish2 = l3_create_model(DESC_SEAFISH2_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish3 = l3_create_model(DESC_SEAFISH3_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish0 = l3_create_model(DESC_SEAFISH0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish1 = l3_create_model(DESC_SEAFISH1_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish2 = l3_create_model(DESC_SEAFISH2_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish3 = l3_create_model(DESC_SEAFISH3_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
     l3_set_global_transform(fish0, (l3_global_transform_cb)fish_global_cb);
     l3_set_face_transform(fish0, (l3_face_transform_cb)fish_face_cb);

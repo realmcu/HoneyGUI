@@ -8,7 +8,6 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 
-#include "gui_lite3d_gltf.h"
 #include "gui_lite3d.h"
 #include "tp_algo.h"
 #include "flag_gltf/gltf_desc_flag.txt"
@@ -35,7 +34,7 @@ static void update_flag_animation(void *param)
     }
 }
 
-static void flag_global_cb(l3_gltf_model_t *this)
+static void flag_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 1), 1,
                              32767,
@@ -49,14 +48,14 @@ static int app_init(void)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
-    l3_gltf_model_t *flag_3d = l3_create_gltf_model((void *)_acgltf_desc_flag, LITE_RGB565, 0, 0,
-                                                    dc->screen_width,
-                                                    dc->screen_height);
+    l3_model_base_t *flag_3d = l3_create_model((void *)_acgltf_desc_flag, L3_DRAW_FRONT_AND_SORT, 0, 0,
+                                               dc->screen_width,
+                                               dc->screen_height);
 
-    l3_gltf_set_global_transform(flag_3d, (l3_gltf_global_transform_cb)flag_global_cb);
+    l3_set_global_transform(flag_3d, (l3_global_transform_cb)flag_global_cb);
 
-    gui_lite3d_gltf_t *lite3d_flag = gui_lite3d_gltf_create(gui_obj_get_root(), "lite3d-widget",
-                                                            flag_3d, 0, 0, 0, 0);
+    gui_lite3d_t *lite3d_flag = gui_lite3d_create(gui_obj_get_root(), "lite3d-widget",
+                                                  flag_3d, 0, 0, 0, 0);
 
     gui_obj_create_timer(GUI_BASE(lite3d_flag), 20, true, update_flag_animation);
 

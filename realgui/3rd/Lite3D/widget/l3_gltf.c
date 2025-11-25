@@ -22,12 +22,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "l3.h"
 #include "l3_common.h"
 #include "l3_gltf.h"
 #include "l3_rect_raster.h"
-#include "gui_api.h"
 
+/*============================================================================*
+ *                               Types
+ *============================================================================*/
+
+static const l3_model_ops_t gltf_model_ops =
+{
+    .push = l3_gltf_push,
+    .draw = l3_gltf_draw,
+    .model_free = l3_free_gltf_model,
+
+    .set_global_transform = l3_gltf_set_global_transform,
+    .set_face_transform = NULL,
+    .set_target_canvas = l3_gltf_set_target_canvas,
+    .set_face_image = NULL,
+    .on_click = l3_gltf_model_on_click,
+};
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
@@ -60,7 +74,7 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
 {
     unsigned char *ptr = (unsigned char *)desc_addr;
     l3_desc_file_head_t *file_head = (l3_desc_file_head_t *)ptr;
-    if (file_head->magic != 0x3344 || file_head->model_type != 1 || file_head->face_type != 1)
+    if (file_head->face_type != LITE_3D_FACE_TRIANGLE)
     {
         return NULL;
     }
@@ -261,7 +275,7 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
  *============================================================================*/
 
 l3_gltf_model_t *l3_create_gltf_model(void                 *desc_addr,
-                                      L3_IMAGE_TYPE         image_type,
+                                      L3_DRAW_TYPE          draw_type,
                                       int16_t               x,
                                       int16_t               y,
                                       int16_t               w,
@@ -272,79 +286,80 @@ l3_gltf_model_t *l3_create_gltf_model(void                 *desc_addr,
     l3_gltf_model_t *this = l3_malloc(sizeof(l3_gltf_model_t));
     memset(this, 0x00, sizeof(l3_gltf_model_t));
 
-    this->x = x;
-    this->y = y;
-    this->viewPortWidth = w;
-    this->viewPortHeight = h;
+    this->base.ops = &gltf_model_ops;
+
+    this->base.x = x;
+    this->base.y = y;
+    this->base.viewPortWidth = w;
+    this->base.viewPortHeight = h;
+    this->base.draw_type = draw_type;
 
     this->desc = desc;
 
-    this->combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
-    memset(this->combined_img, 0x00, sizeof(l3_draw_rect_img_t));
+    this->base.combined_img = l3_malloc(sizeof(l3_draw_rect_img_t));
+    memset(this->base.combined_img, 0x00, sizeof(l3_draw_rect_img_t));
 
     this->depthBuffer = l3_malloc(w * h * sizeof(float));
     memset(this->depthBuffer, 0x00, w * h * sizeof(float));
 
-    if (image_type == LITE_RGB565)
-    {
-        this->combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
-        memset(this->combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
 
-        l3_img_head_t *head = (l3_img_head_t *)this->combined_img->data;
-        head->w = w;
-        head->h = h;
-        head->type = LITE_RGB565;
-    }
-    else if (image_type == LITE_ARGB8888)
-    {
-        this->combined_img->data = l3_malloc(w * h * 4 + sizeof(l3_img_head_t));
-        memset(this->combined_img->data, 0x00, w * h * 4 + sizeof(l3_img_head_t));
+    this->base.combined_img->data = l3_malloc(w * h * 2 + sizeof(l3_img_head_t));
+    memset(this->base.combined_img->data, 0x00, w * h * 2 + sizeof(l3_img_head_t));
 
-        l3_img_head_t *head = (l3_img_head_t *)this->combined_img->data;
-        head->w = w;
-        head->h = h;
-        head->type = LITE_ARGB8888;
-    }
+    l3_img_head_t *head = (l3_img_head_t *)this->base.combined_img->data;
+    head->w = w;
+    head->h = h;
+    head->type = LITE_RGB565;
 
     return this;
 }
 
-void l3_gltf_set_target_canvas(l3_gltf_model_t *_this, \
+void l3_gltf_set_target_canvas(l3_model_base_t *base, \
                                uint16_t x, uint16_t y, \
                                uint16_t w, uint16_t h, \
                                uint16_t bit_depth, \
                                uint8_t *canvas)
 {
-    _this->canvas.frame_buf = canvas;
-    _this->canvas.bit_depth = bit_depth;
-    _this->canvas.section.x1 = x;
-    _this->canvas.section.y1 = y;
-    _this->canvas.section.x2 = x + w - 1;
-    _this->canvas.section.y2 = y + h - 1;
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+    _this->base.canvas.frame_buf = canvas;
+    _this->base.canvas.bit_depth = bit_depth;
+    _this->base.canvas.section.x1 = x;
+    _this->base.canvas.section.y1 = y;
+    _this->base.canvas.section.x2 = x + w - 1;
+    _this->base.canvas.section.y2 = y + h - 1;
 }
 
 
-void l3_gltf_set_global_transform(l3_gltf_model_t *_this, l3_gltf_global_transform_cb cb)
+void l3_gltf_set_global_transform(l3_model_base_t *base, l3_global_transform_cb cb)
 {
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
     _this->global_transform_cb = (void (*)(l3_gltf_model_t *))cb;
 }
 
-
-void l3_gltf_draw(l3_gltf_model_t *_this)
+void l3_gltf_push(l3_model_base_t *base)
 {
-    l3_draw_rect_img_to_canvas(_this->combined_img, &_this->canvas, NULL);
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+    extern void l3_gltf_prepare(l3_gltf_model_t *_this);
+    l3_gltf_prepare(_this);
+}
+
+void l3_gltf_draw(l3_model_base_t *base)
+{
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+    l3_draw_rect_img_to_canvas(_this->base.combined_img, &_this->base.canvas, NULL);
 }
 
 
-void l3_free_gltf_model(l3_gltf_model_t *_this)
+void l3_free_gltf_model(l3_model_base_t *base)
 {
-    if (_this->combined_img != NULL)
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+    if (_this->base.combined_img != NULL)
     {
-        l3_free(_this->combined_img->data);
-        _this->combined_img->data = NULL;
+        l3_free(_this->base.combined_img->data);
+        _this->base.combined_img->data = NULL;
 
-        l3_free(_this->combined_img);
-        _this->combined_img = NULL;
+        l3_free(_this->base.combined_img);
+        _this->base.combined_img = NULL;
     }
 
     if (_this->depthBuffer != NULL)
@@ -404,6 +419,33 @@ void l3_free_gltf_model(l3_gltf_model_t *_this)
         l3_free(_this->desc);
         _this->desc = NULL;
     }
+
+    if (_this->base.raw_data_from_ftl != NULL)
+    {
+        l3_free(_this->base.raw_data_from_ftl);
+        _this->base.raw_data_from_ftl = NULL;
+    }
+
     l3_free(_this);
 
+}
+
+bool l3_gltf_model_on_click(l3_model_base_t *base, int16_t x, int16_t y)
+{
+    l3_gltf_model_t *_this = (l3_gltf_model_t *)base;
+
+    if (_this->base.draw_type == L3_DRAW_FRONT_AND_SORT)
+    {
+        const int target_x = _this->base.combined_img->img_target_x;
+        const int target_y = _this->base.combined_img->img_target_y;
+        const int target_w = _this->base.combined_img->img_target_w;
+        const int target_h = _this->base.combined_img->img_target_h;
+
+        if (x >= target_x && x <= (target_x + target_w) &&
+            y >= target_y && y <= (target_y + target_h))
+        {
+            return true;
+        }
+    }
+    return false;
 }

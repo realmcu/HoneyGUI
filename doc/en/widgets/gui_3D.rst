@@ -32,9 +32,6 @@ OBJ Static Model
 
 OBJ is a widely used static model file format, suitable for scenarios that do not require complex animations, such as product showcases or UI decorative elements.
 
-Model Components
-^^^^^^^^^^^^^^^^
-
 A complete OBJ model typically consists of the following three core components:
 
 1. .obj File
@@ -72,56 +69,10 @@ A complete OBJ model typically consists of the following three core components:
    
    Example of OBJ Model Components
 
-
-Model Preprocessing
-^^^^^^^^^^^^^^^^^^^^
-
-Before an OBJ model can be rendered, it needs to be converted into a binary format. The following is the processing workflow:
-
-1. Locate Conversion Tools
-   
-   Find the following tools in the HoneyGUI installation directory:
-
-     - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
-     - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
-
-2. Prepare the Model Directory
-   
-   Place the tools mentioned above in the same directory as the model files, ensuring the directory contains:
-
-     - :file:`.obj` file
-     - :file:`.mtl` file
-     - All referenced texture images
-
-3. Generate Descriptor File
-   
-   - Use the extractor to process the model: ``extract_desc.exe xxx.obj``. This executable will automatically call :file:`png2c.py` to convert all PNG textures into binary arrays.
-   
-   .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
-      :width: 800px
-      :align: center
-
-      Script Processing
-   
-   - The generated :file:`desc.txt` and :file:`desc.bin` files contain the following:
-
-     - Parsed obj data
-     - Parsed mtl data
-     - Embedded texture data
-   
-   .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
-      :width: 800px
-      :align: center
-
-      Generating Binary Arrays
-
-
 GLTF Skeletal Animation Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 GLTF (GL Transmission Format) is an open standard designed for the efficient transmission and loading of 3D scenes and models. It is often hailed as the 'JPEG of 3D' and is particularly suitable for rendering dynamic models that contain skeletal animations.
 
-Model Components
-^^^^^^^^^^^^^^^^
 A complete GLTF model typically consists of the following three core components:
 
    - :file:`.gltf` file: A JSON-formatted file that describes the scene's hierarchy and constituent elements in a structured manner.
@@ -137,32 +88,62 @@ Its core data components include:
    - Animation: Stores keyframe data for the transformation (translation, rotation, scale) of nodes (bones) over time.
    - Texture: Image data referenced by materials.
 
+
 Model Preprocessing
-^^^^^^^^^^^^^^^^^^^
-Similar to OBJ models, GLTF models also require preprocessing to be converted into an optimized format suitable for embedded platforms.
+~~~~~~~~~~~~~~~~~~~~~
 
-1. Locate the Conversion Tool
+Before a 3D model can be rendered, it needs to be converted into a binary format. The following is the processing workflow:
 
-   Find the following tool in the HoneyGUI installation directory:
-
-      - ``your_HoneyGUI_dir\tool\3D-tool\extract_gltf_desc.exe``
-
-2. Prepare the Model Directory
+1. **Locate Conversion Tools**
    
-   Place the tool mentioned above in the same directory as the model files, ensuring the directory contains:
+   Find the following tools in the HoneyGUI installation directory:
 
-      - The :file:`.gltf` file
-      - The :file:`.bin` file
-      - All referenced texture images
+     - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
+     - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
 
-3. Generate the Description File
+2. **Prepare the Model Directory**
    
-   - Process the model using the extractor: ``extract_gltf_desc.exe xxx.gltf``. This executable will automatically call :file:`png2c.py` to convert all PNG textures into binary arrays.
-   - The generated :file:`gltf_desc.txt` and :file:`gltf_desc.bin` files contain the following:
+   Place the ``extract_desc.exe`` and ``png2c.py`` tools in the same directory as your model files.
 
-     - GLTF parsed data
-     - BIN parsed data
-     - Embedded texture data
+      - For OBJ models, ensure the directory contains:
+
+         - :file:`.obj` file
+         - :file:`.mtl` file
+         - All referenced texture images
+
+      - For GLTF models, ensure the directory contains:
+
+         - :file:`.gltf` file
+         - :file:`.bin` file
+         - All referenced texture images
+
+3. **Generate Descriptor File**
+   
+   Open a command line terminal, navigate to the model's directory, and use ``extract_desc.exe`` to process the model file. The tool will automatically detect the file type and perform the corresponding actions.
+   
+   - Processing OBJ Model
+
+      Run the command: :kbd:`extract_desc.exe xxx.obj`. This command will automatically invoke :file:`png2c.py` to convert all PNG textures into C-language binary arrays.
+
+      .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
+         :width: 800px
+         :align: center
+
+         Script Processing
+   
+      After execution, :file:`desc_xxx.txt` and :file:`desc_xxx.bin` files will be generated. These files contain the parsed obj, mtl data, and the embedded texture data.
+
+      .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
+         :width: 800px
+         :align: center
+
+      Generating Binary Arrays
+
+   - Processing GLTF Model
+
+      Run the command: :kbd:`extract_desc.exe xxx.gltf`. This command will also automatically process all referenced texture images.
+
+      After execution, :file:`gltf_desc_xxx.txt` and :file:`gltf_desc_xxx.bin` files will be generated. These files contain the parsed gltf, bin data, and the embedded texture data.
 
 
 3D Model Generation
@@ -171,32 +152,17 @@ Similar to OBJ models, GLTF models also require preprocessing to be converted in
 Create Model
 ~~~~~~~~~~~~~
 
-.. table:: 3D Model Creation
-   :widths: 10 40 50 
-   :align: center
-   :name: 3D Model Creation
+Both OBJ and GLTF models can be created using the function ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)``.
 
-   +--------------+---------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | Model Format | Function                                                                                                                  | Key Parameter Description                                                                                                                                       |
-   +--------------+---------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | OBJ          | ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)``        | ``draw_type`` Model drawing method:                                                                                                                             |
-   |              |                                                                                                                           |                                                                                                                                                                 |
-   |              |                                                                                                                           | - ``L3_DRAW_FRONT_ONLY``: Renders only the front of the model, suitable for scenarios like a butterfly model where the back needs to be hidden.                 |
-   |              |                                                                                                                           |                                                                                                                                                                 |
-   |              |                                                                                                                           | - ``L3_DRAW_FRONT_AND_BACK``: Renders both the front and the back of the model, suitable for scenarios where both sides need to be visible, like a prism model. |
-   |              |                                                                                                                           |                                                                                                                                                                 |
-   |              |                                                                                                                           | - ``L3_DRAW_FRONT_AND_SORT``: Renders the front of the model with sorting, suitable for scenarios with foreground and background occlusion, like a face model.  |
-   +--------------+---------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | GLTF         | ``l3_create_gltf_model(void *desc_addr, L3_IMAGE_TYPE image_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)`` | ``image_type`` Output format:                                                                                                                                   |
-   |              |                                                                                                                           |                                                                                                                                                                 |
-   |              |                                                                                                                           | - ``LITE_RGB565``                                                                                                                                               |
-   |              |                                                                                                                           |                                                                                                                                                                 |
-   |              |                                                                                                                           | - ``LITE_ARGB8888``                                                                                                                                             |
-   +--------------+---------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-Common Parameter Description:
+**Parameter Description:**
 
 - ``desc_addr``: Pointer to the address of the parsed data extracted by the script.
+- ``draw_type``: The rendering method for the model:
+
+   - ``L3_DRAW_FRONT_ONLY``: Renders only the front of the model, suitable for scenarios like a butterfly model where the back needs to be hidden.
+   - ``L3_DRAW_FRONT_AND_BACK``: Renders both the front and the back of the model, suitable for scenarios where both sides need to be visible, like a prism model.
+   - ``L3_DRAW_FRONT_AND_SORT``: Renders the front of the model with sorting, suitable for scenarios with foreground and background occlusion, like a face model.
+
 - ``x``, ``y``: The top-left coordinates of the model's viewport on the screen.
 - ``view_w``, ``view_h``: The width and height of the model's viewport.
 
@@ -207,19 +173,12 @@ Global Transformation
 ^^^^^^^^^^^^^^^^^^^^^
 Global transformation applies a uniform matrix transformation to all vertices of the model, commonly used to implement the overall rotation, translation, and scaling of the model.
 
-- OBJ Model
+.. code-block:: c
 
-   .. code-block:: c
+   void l3_set_global_transform(l3_model_base_t *_this, l3_global_transform_cb cb);
 
-      void l3_set_global_transform(l3_model_t *_this, l3_global_transform_cb cb);
 
-- GLTF Model
-
-   .. code-block:: c
-
-      void l3_gltf_set_global_transform(l3_gltf_model_t *_this, l3_gltf_global_transform_cb cb);
-
-The user needs to implement a callback function of type ``l3_global_transform_cb`` or ``l3_gltf_global_transform_cb`` and define the transformation logic within it, such as the ``world`` transformation for world coordinates and the ``camera`` projection for the camera view.
+The user needs to implement a callback function of type ``l3_global_transform_cb``, and define the transformation logic within it, such as the ``world`` transformation for world coordinates and the ``camera`` projection for the camera view.
 
 **Typical use cases:**
 
@@ -282,7 +241,13 @@ The initialization function is ``l3_world_initialize(l3_4x4_matrix_t *world, flo
 
 Face Transformation
 ^^^^^^^^^^^^^^^^^^^^
-Use the function ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)`` for local transformations on an OBJ model. The callback function of type ``l3_face_transform_cb`` can apply different shape transformations to each face of the object, with ``face_index`` specifying the face to transform.
+Supports applying local transformations to the model.
+
+.. code-block:: c
+
+   void l3_set_face_transform(l3_model_base_t *_this, l3_face_transform_cb cb);
+
+The callback function of type ``l3_face_transform_cb`` can set a different shape transformation for each face of the object, where ``face_index`` specifies the face to be transformed.
 
 **Features:**
 
@@ -296,11 +261,11 @@ Use the function ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb
 
 Create Widget
 ~~~~~~~~~~~~~
-The Lite3D library has been integrated into HoneyGUI and is encapsulated as the ``gui_lite3d`` and ``gui_lite3d_gltf`` widgets. The :cpp:any:`gui_lite3d_create` and :cpp:any:`gui_lite3d_gltf_create` functions can be used to create widgets for OBJ models and GLTF models, respectively.
+The Lite3D library has been integrated into HoneyGUI and is encapsulated as the ``gui_lite3d`` widget. The :cpp:any:`gui_lite3d_create` function can be used to create widgets for 3D models.
 
 Set Click Event
 ~~~~~~~~~~~~~~~
-The :cpp:any:`gui_lite3d_on_click` or :cpp:any:`gui_lite3d_gltf_on_click` function can set a click event for the 3D model widget. When a user clicks the model, a callback function is triggered.
+The :cpp:any:`gui_lite3d_on_click` function can set a click event for the 3D model widget. When a user clicks the model, a callback function is triggered.
 
 Set Animations
 ~~~~~~~~~~~~~~~
@@ -315,7 +280,7 @@ Example
 3D Butterfly
 ~~~~~~~~~~~~~
 
-This model consists of 8 rectangular faces, each with a corresponding texture map, and uses the ``L3_DRAW_FRONT_ONLY`` rendering method. By calling the function ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)``, you can set local transformations for different faces to achieve animation effects.
+This model consists of 8 rectangular faces, each with a corresponding texture map, and uses the ``L3_DRAW_FRONT_ONLY`` rendering method. By calling the function ``l3_set_face_transform(l3_model_base_t *_this, l3_face_transform_cb cb)``, you can set local transformations for different faces to achieve animation effects.
 
 .. literalinclude:: ../../../example/application/screen_410_502/app_3d_butterfly.c
    :language: c
@@ -372,7 +337,7 @@ To run this example, enable the macro definition ``CONFIG_REALTEK_BUILD_REAL_DOG
 3D App List
 ~~~~~~~~~~~~
 
-This interface consists of 6 3D application icons. By calling the function ``l3_set_face_image(l3_model_t *_this, uint8_t face_index, void *image_addr)``, you can replace the texture map of a specified face of the 3D model.
+This interface consists of 6 3D application icons. By calling the function ``l3_set_face_image(l3_model_base_t *_this, uint8_t face_index, void *image_addr)``, you can replace the texture map of a specified face of the 3D model.
 
 .. literalinclude:: ../../../example/application/screen_410_502/app_3d_applist.c
    :language: c
@@ -423,4 +388,3 @@ API
 ---
 
 .. doxygenfile:: gui_lite3d.h
-.. doxygenfile:: gui_lite3d_gltf.h

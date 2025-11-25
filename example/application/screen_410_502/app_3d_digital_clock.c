@@ -138,7 +138,7 @@ static void update_digital_clock_animation(void *param)
     }
 }
 
-static void digital_clock_global_cb(l3_model_t *this)
+static void digital_clock_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 10), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -165,8 +165,9 @@ static void digital_clock_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    l3_model_t *digital_clock_3d = l3_create_model(DESC_DIGITAL_CLOCK_BIN, L3_DRAW_FRONT_AND_BACK, 0, 0,
-                                                   410, 502);
+    l3_model_base_t *digital_clock_3d = l3_create_model(DESC_DIGITAL_CLOCK_BIN, L3_DRAW_FRONT_AND_BACK,
+                                                        0, 0,
+                                                        410, 502);
     l3_set_global_transform(digital_clock_3d, (l3_global_transform_cb)digital_clock_global_cb);
     gui_lite3d_t *lite3d_clock = gui_lite3d_create(obj, "lite3d_clock", digital_clock_3d, 0, 0, 410,
                                                    502);

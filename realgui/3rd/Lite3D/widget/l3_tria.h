@@ -37,12 +37,12 @@ extern "C" {
  *============================================================================*/
 
 
-void l3_tria_push(l3_model_t *_this);
+void l3_tria_push(l3_obj_model_t *_this);
 
-void l3_tria_draw(l3_model_t *_this);
+void l3_tria_draw(l3_obj_model_t *_this);
 
 
-void l3_tria_free_model(l3_model_t *_this);
+void l3_tria_free_model(l3_obj_model_t *_this);
 
 #ifdef __cplusplus
 }

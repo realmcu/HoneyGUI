@@ -75,7 +75,7 @@ static void update_earth_animation(void *param)
 }
 
 
-static void earth_global_cb(l3_model_t *this)
+static void earth_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 10), 1,
                              32767,
@@ -92,7 +92,7 @@ static void earth_app(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    l3_model_t *earth_3d = l3_create_model(DESC_EARTH_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *earth_3d = l3_create_model(DESC_EARTH_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
     l3_set_global_transform(earth_3d, (l3_global_transform_cb)earth_global_cb);
 
     gui_lite3d_t *lite3d_earth = gui_lite3d_create(obj, "lite3d-widget", earth_3d,

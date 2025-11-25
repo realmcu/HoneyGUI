@@ -1,127 +1,14 @@
 
-
-#define CGLTF_IMPLEMENTATION
-#include "../../realgui/3rd/cgltf/cgltf.h"
-#include "../../realgui/3rd/Lite3D/widget/l3_gltf.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 #include <libgen.h>
+#include "extract_gltf_desc.h"
+#define CGLTF_IMPLEMENTATION
 
 static int total_triangle_count = 0;
-
-static char *get_img_file(const char *filename)
-{
-    const char *dot = strchr(filename, '.');
-    size_t len = dot - filename;
-    char *txtFilename = (char *)malloc(len + 5);;
-    strncpy(txtFilename, filename, len);
-    strcpy(txtFilename + len, ".txt");
-    return txtFilename;
-}
-
-// png
-static unsigned char *read_array_from_file(const char *filename, uint32_t *length)
-{
-    FILE *file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        perror("Failed to open file");
-        return NULL;
-    }
-
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *file_content = (char *)malloc(file_size + 1);
-    if (file_content == NULL)
-    {
-        perror("Failed to allocate memory");
-        fclose(file);
-        return NULL;
-    }
-
-    fread(file_content, 1, file_size, file);
-    file_content[file_size] = '\0';
-    fclose(file);
-
-    char *start = strchr(file_content, '{');
-    if (start == NULL)
-    {
-        fprintf(stderr, "Failed to find array start\n");
-        free(file_content);
-        return NULL;
-    }
-    start++;
-
-    char *end = strchr(start, '}');
-    if (end == NULL)
-    {
-        fprintf(stderr, "Failed to find array end\n");
-        free(file_content);
-        return NULL;
-    }
-    *end = '\0';
-
-    size_t count = 0;
-    for (char *p = start; p < end; p++)
-    {
-        if (*p == ',')
-        {
-            count++;
-        }
-    }
-    count++;
-
-    unsigned char *array = (unsigned char *)malloc(count);
-    if (array == NULL)
-    {
-        perror("Failed to allocate memory for array");
-        free(file_content);
-        return NULL;
-    }
-
-    char *token = strtok(start, ", \n\t");
-
-    size_t i = 0;
-    while (token != NULL && i < count)
-    {
-        while (*token == ' ' || *token == '\n' || *token == '\t') { token++; }
-        if (*token == '\n') { token++; }
-        if (strlen(token) == 0)
-        {
-            token = strtok(NULL, ", \n\t");
-            continue;
-        }
-        unsigned int value;
-        if (sscanf(token, "%x", &value) != 1)
-        {
-            fprintf(stderr, "i: %zu Failed to parse value: %s\n", i, token);
-            free(array);
-            free(file_content);
-            return NULL;
-        }
-        array[i++] = (unsigned char)value;
-        token = strtok(NULL, ", \n\t");
-    }
-
-    if (i != count)
-    {
-        fprintf(stderr, "Mismatch between found and counted values (found %zu, expected %zu)\n", i, count);
-        free(array);
-        free(file_content);
-        return NULL;
-    }
-
-    free(file_content);
-
-    if (length != NULL)
-    {
-        *length = count;
-    }
-
-    return array;
-}
-
 
 static int find_node_index(cgltf_node *target_node, cgltf_node *all_nodes, int num_nodes)
 {
@@ -129,18 +16,7 @@ static int find_node_index(cgltf_node *target_node, cgltf_node *all_nodes, int n
     return (target_node - all_nodes);
 }
 
-static void transpose_matrix(const float *src, float *dst)
-{
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            dst[i * 4 + j] = src[j * 4 + i];
-        }
-    }
-}
-
-static void create_gltf_description(cgltf_data *data, l3_gltf_model_description_t *gltf_desc)
+void create_gltf_description(cgltf_data *data, l3_gltf_model_description_t *gltf_desc)
 {
     gltf_desc->node_count = data->nodes_count;
     gltf_desc->mesh_count = data->meshes_count;
@@ -242,13 +118,15 @@ static void create_gltf_description(cgltf_data *data, l3_gltf_model_description_
                 if (uri_name != NULL)
                 {
                     printf("Found texture uri: %s\n", uri_name);
+                    extern char *get_img_file(const char *filename);
                     char *txt_file = get_img_file(uri_name);
                     if (txt_file == NULL)
                     {
                         fprintf(stderr, "Failed to convert filename for material %s\n", uri_name);
                         continue;
                     }
-                    uint32_t length;
+                    uint32_t length = 0;
+                    extern unsigned char *read_array_from_file(const char *filename, uint32_t *length);
                     unsigned char *array = read_array_from_file(txt_file, &length);
                     if (array != NULL)
                     {
@@ -695,7 +573,7 @@ static uint32_t append_to_blob(g3m_data_blob_t *blob, const void *data_to_append
     return offset;
 }
 
-static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, const char *filename)
+bool save_gltf_desc_to_binary_file(const l3_gltf_model_description_t *model, const char *filename)
 {
     FILE *fp = fopen(filename, "wb");
     if (!fp)
@@ -712,7 +590,8 @@ static bool save_desc_to_binary_file(const l3_gltf_model_description_t *model, c
     memset(&file_header, 0, sizeof(l3_desc_file_head_t));
     file_header.magic = 0x3344;
     file_header.model_type = 1;
-    file_header.version = 1;
+    extern uint8_t tool_version;
+    file_header.version = tool_version;
     file_header.face_type = 1;
     file_header.payload_offset = sizeof(l3_desc_file_head_t);
 
@@ -1048,129 +927,3 @@ cleanup:
     return false;
 }
 
-void binary_to_txt_array(const char *binary_filename, const char *txt_filename)
-{
-
-    FILE *binary_file = fopen(binary_filename, "rb");
-    if (!binary_file)
-    {
-        perror("Failed to open binary file for reading");
-        return;
-    }
-
-    FILE *txt_file = fopen(txt_filename, "w");
-    if (!txt_file)
-    {
-        perror("Failed to open txt file for writing");
-        fclose(binary_file);
-        return;
-    }
-
-    fseek(binary_file, 0, SEEK_END);
-    long file_size = ftell(binary_file);
-    fseek(binary_file, 0, SEEK_SET);
-
-    unsigned char *buffer = (unsigned char *)malloc(file_size);
-    if (!buffer)
-    {
-        perror("Failed to allocate memory");
-        fclose(binary_file);
-        fclose(txt_file);
-        return;
-    }
-
-    fread(buffer, 1, file_size, binary_file);
-    fclose(binary_file);
-
-    char *file_copy = strdup(binary_filename);
-    char *base_name = basename(file_copy);
-    char *dot_position = strrchr(base_name, '.');
-    if (dot_position != NULL)
-    {
-        *dot_position = '\0';
-    }
-    size_t array_name_size = strlen(base_name) + 4;
-    char *array_name = (char *)malloc(array_name_size);
-    snprintf(array_name, array_name_size, "_ac%s", base_name);
-
-    fprintf(txt_file, "__attribute__((aligned(4))) static const unsigned char %s[%ld] = {", array_name,
-            file_size);
-    for (long i = 0; i < file_size; i++)
-    {
-        if (i % 40 == 0)
-        {
-            fprintf(txt_file, "\n    ");
-        }
-        if (i == file_size - 1)
-        {
-            fprintf(txt_file, "0x%02x", buffer[i]);
-        }
-        else
-        {
-            fprintf(txt_file, "0x%02x, ", buffer[i]);
-        }
-    }
-    fprintf(txt_file, "\n};\n");
-
-    free(buffer);
-    fclose(txt_file);
-
-    printf("Convert binary file to txt array file successfully!\n");
-}
-
-
-
-
-int main(int argc, char **argv)
-{
-    const char *gltf_filename = argv[1];
-    char prefix[100];
-    strncpy(prefix, gltf_filename, sizeof(prefix) - 1);
-    prefix[sizeof(prefix) - 1] = '\0';
-    // Find last point
-    char *dot = strrchr(prefix, '.');
-    if (dot != NULL)
-    {
-        *dot = '\0';
-    }
-    char bin_filename[100];
-    char txt_filename[100];
-
-    snprintf(bin_filename, sizeof(bin_filename), "gltf_desc_%s.bin", prefix);
-    snprintf(txt_filename, sizeof(txt_filename), "gltf_desc_%s.txt", prefix);
-
-    l3_gltf_model_description_t *gltf_desc = malloc(sizeof(l3_gltf_model_description_t));
-    memset(gltf_desc, 0, sizeof(l3_gltf_model_description_t));
-
-    cgltf_options options;
-    memset(&options, 0, sizeof(cgltf_options));
-    cgltf_data *data = NULL;
-    // 1. Analyze the structure of gltf file
-    cgltf_result result = cgltf_parse_file(&options, gltf_filename, &data);
-    if (result != cgltf_result_success)
-    {
-        printf("Error: Failed to parse file: %s\n", gltf_filename);
-    }
-    // 2. Load the related buffer data (from .bin file or base64)
-    result = cgltf_load_buffers(&options, data, gltf_filename);
-    if (result != cgltf_result_success)
-    {
-        printf("Error: Failed to load buffers for: %s\n", gltf_filename);
-    }
-
-    // 3. Construct l3_gltf_model_description_t
-    create_gltf_description(data, gltf_desc);
-    printf("Parsing and data conversion complete. Now writing to binary file...\n");
-
-    // 4. Save the descriptive information to a binary file
-    save_desc_to_binary_file(gltf_desc, bin_filename);
-
-    // 5. Convert the binary file to a txt array file
-    binary_to_txt_array(bin_filename, txt_filename);
-
-    cgltf_free(data);
-    free_gltf_description(gltf_desc);
-    free(gltf_desc);
-    return 0;
-
-}

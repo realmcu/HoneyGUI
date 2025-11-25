@@ -262,7 +262,7 @@ static void l3_draw_single_tria(l3_gltf_model_t *_this, l3_gltf_primitive_t *pri
             tria_img.fill_data = &render_color;
         }
 
-        l3_draw_tria_to_canvas(&tria_img, _this->combined_img, _this->depthBuffer);
+        l3_draw_tria_to_canvas(&tria_img, _this->base.combined_img, _this->depthBuffer);
     }
 }
 
@@ -296,7 +296,7 @@ static void render_primitive_no_skin(l3_gltf_model_t *_this, l3_gltf_primitive_t
             face.transform_vertex[2].v = v2->texcoord.v;
         }
 
-        l3_tria_scene(&face, &_this->camera);
+        l3_tria_scene(&face, &_this->base.camera);
         l3_draw_single_tria(_this, prim, &face);
     }
 }
@@ -339,7 +339,7 @@ static void render_primitive_with_skin(l3_gltf_model_t *_this, l3_gltf_primitive
             face.transform_vertex[v_idx].v = v->texcoord.v;
         }
 
-        l3_tria_scene(&face, &_this->camera);
+        l3_tria_scene(&face, &_this->base.camera);
         l3_draw_single_tria(_this, prim, &face);
     }
 
@@ -391,7 +391,7 @@ static void render_node_recursive(l3_gltf_model_t *_this, int node_index,
     }
 }
 
-void l3_gltf_push(l3_gltf_model_t *_this)
+void l3_gltf_prepare(l3_gltf_model_t *_this)
 {
     // global transform
     if (_this->global_transform_cb != NULL)
@@ -399,28 +399,27 @@ void l3_gltf_push(l3_gltf_model_t *_this)
         _this->global_transform_cb(_this);
     }
 
-    l3_camera_build_UVN_matrix(&_this->camera);
+    l3_camera_build_UVN_matrix(&_this->base.camera);
     l3_4x4_matrix_t view_matrix;
-    l3_4x4_matrix_mul(&_this->camera.mat_cam, &_this->world, &view_matrix);
+    l3_4x4_matrix_mul(&_this->base.camera.mat_cam, &_this->base.world, &view_matrix);
 
-    uint32_t width = _this->viewPortWidth;
-    uint32_t height = _this->viewPortHeight;
+    uint32_t width = _this->base.viewPortWidth;
+    uint32_t height = _this->base.viewPortHeight;
     memset(_this->depthBuffer, 0x00, width * height * sizeof(float));
 
-    l3_img_head_t *head = (l3_img_head_t *)_this->combined_img->data;
+    l3_img_head_t *head = (l3_img_head_t *)_this->base.combined_img->data;
     if (head->type == LITE_RGB565)
     {
-        memset((uint8_t *)_this->combined_img->data + sizeof(l3_img_head_t), 0xFF, width * height * 2);
+        memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0xFF, width * height * 2);
     }
     else if (head->type == LITE_ARGB8888)
     {
-        memset((uint8_t *)_this->combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 4);
+        memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 4);
     }
 
     // Update animation
     static uint32_t current_time_ms = 0;
     current_time_ms = gui_ms_get();
-    // gui_log("current_time_ms: %d\n", current_time_ms);
     l3_gltf_update_animation(_this, (current_time_ms - _this->last_time_ms) / 1000.0f);
     _this->last_time_ms = current_time_ms;
 
@@ -432,15 +431,16 @@ void l3_gltf_push(l3_gltf_model_t *_this)
         render_node_recursive(_this, root_node_index, &view_matrix);
     }
 
-    _this->combined_img->img_w = width;
-    _this->combined_img->img_h = height;
-    _this->combined_img->opacity_value = UINT8_MAX;
-    _this->combined_img->blend_mode = L3_IMG_FILTER_BLACK;
+    _this->base.combined_img->img_w = width;
+    _this->base.combined_img->img_h = height;
+    _this->base.combined_img->opacity_value = UINT8_MAX;
+    _this->base.combined_img->blend_mode = L3_IMG_FILTER_BLACK;
 
-    l3_3x3_matrix_translate(&_this->combined_img->matrix, _this->x, _this->y);
-    memcpy(&_this->combined_img->inverse, &_this->combined_img->matrix, sizeof(l3_3x3_matrix_t));
-    l3_3x3_matrix_inverse(&_this->combined_img->inverse);
-    l3_calulate_draw_img_target_area(_this->combined_img, NULL);
+    l3_3x3_matrix_translate(&_this->base.combined_img->matrix, _this->base.x, _this->base.y);
+    memcpy(&_this->base.combined_img->inverse, &_this->base.combined_img->matrix,
+           sizeof(l3_3x3_matrix_t));
+    l3_3x3_matrix_inverse(&_this->base.combined_img->inverse);
+    l3_calulate_draw_img_target_area(_this->base.combined_img, NULL);
 
 }
 

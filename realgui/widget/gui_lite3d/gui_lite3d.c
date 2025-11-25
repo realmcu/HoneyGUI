@@ -33,45 +33,11 @@ static void gui_lite3d_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     if (tp->type == TOUCH_SHORT)
     {
-        if (this->model->draw_type == L3_DRAW_FRONT_AND_SORT)
+        if (l3_model_on_click(this->model, tp->x, tp->y) == true)
         {
-            const int target_x = this->model->combined_img->img_target_x;
-            const int target_y = this->model->combined_img->img_target_y;
-            const int target_w = this->model->combined_img->img_target_w;
-            const int target_h = this->model->combined_img->img_target_h;
-
-            if (tp->x >= target_x &&
-                tp->x <= (target_x + target_w) &&
-                tp->y >= target_y &&
-                tp->y <= (target_y + target_h))
-            {
-                gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-            }
+            gui_log("l3_model_on_click\n");
+            gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
         }
-        else
-        {
-            // Cache the num_face_num_verts
-            const int num_face_vertices = this->model->desc->attrib.num_face_num_verts;
-
-            for (int i = 0; i < num_face_vertices; ++i)
-            {
-                // Cache the img_target and face attributes
-                const int target_x = this->model->img[i].img_target_x;
-                const int target_y = this->model->img[i].img_target_y;
-                const int target_w = this->model->img[i].img_target_w;
-                const int target_h = this->model->img[i].img_target_h;
-
-                if (tp->x >= target_x &&
-                    tp->x <= (target_x + target_w) &&
-                    tp->y >= target_y &&
-                    tp->y <= (target_y + target_h))
-                {
-                    gui_obj_enable_event(obj, GUI_EVENT_TOUCH_CLICKED);
-                    break;
-                }
-            }
-        }
-
     }
 
     gui_fb_change();
@@ -88,21 +54,6 @@ static void gui_lite3d_draw(gui_obj_t *obj)
 
 }
 
-static void gui_lite3d_end(gui_obj_t *obj)
-{
-    gui_lite3d_t *this = (gui_lite3d_t *)obj;
-    if (this->model->img != NULL)
-    {
-        for (unsigned int i = 0; i < this->model->desc->attrib.num_face_num_verts; i++)
-        {
-            if (draw_img_acc_end_cb != NULL)
-            {
-                l3_draw_rect_img_t *img = &this->model->img[i];
-                draw_img_acc_end_cb((draw_img_t *)img);
-            }
-        }
-    }
-}
 
 static void gui_lite3d_destroy(gui_obj_t *obj)
 {
@@ -126,10 +77,6 @@ static void gui_lite3d_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
         case OBJ_DRAW:
             gui_lite3d_draw(obj);
-            break;
-
-        case OBJ_END:
-            gui_lite3d_end(obj);
             break;
 
         case OBJ_DESTROY:
@@ -159,7 +106,7 @@ static void gui_lite3d_ctor(gui_lite3d_t  *this,
     obj->obj_cb = gui_lite3d_cb;
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
-    obj->has_end_cb = true;
+    obj->has_end_cb = false;
     obj->has_destroy_cb = true;
 }
 
@@ -169,7 +116,7 @@ static void gui_lite3d_ctor(gui_lite3d_t  *this,
 
 gui_lite3d_t *gui_lite3d_create(void                  *parent,
                                 const char            *name,
-                                l3_model_t            *model,
+                                l3_model_base_t       *model,
                                 int16_t                x,
                                 int16_t                y,
                                 int16_t                w,

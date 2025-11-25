@@ -11,7 +11,6 @@
 #include "app_main_watch.h"
 #include "gui_view.h"
 #include "gui_lite3d.h"
-#include "gui_lite3d_gltf.h"
 
 /*============================================================================*
  *                            Macros
@@ -82,7 +81,7 @@ static void update_flag_animation(void *param)
 }
 
 
-static void flag_global_cb(l3_gltf_model_t *this)
+static void flag_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 1), 1,
                              32767,
@@ -99,11 +98,12 @@ static void flag_app(gui_view_t *view)
                              SWITCH_IN_NONE_ANIMATION,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    l3_gltf_model_t *flag_3d = l3_create_gltf_model(GLTF_DESC_FLAG_BIN, LITE_RGB565, 0, 0, 410, 502);
+    l3_model_base_t *flag_3d = l3_create_model(GLTF_DESC_FLAG_BIN, L3_DRAW_FRONT_AND_SORT, 0, 0, 410,
+                                               502);
 
-    l3_gltf_set_global_transform(flag_3d, (l3_gltf_global_transform_cb)flag_global_cb);
+    l3_set_global_transform(flag_3d, (l3_global_transform_cb)flag_global_cb);
 
-    gui_lite3d_gltf_t *lite3d_flag = gui_lite3d_gltf_create(obj, "lite3d-widget", flag_3d, 0, 0, 0, 0);
+    gui_lite3d_t *lite3d_flag = gui_lite3d_create(obj, "lite3d-widget", flag_3d, 0, 0, 0, 0);
 
     gui_obj_create_timer(GUI_BASE(lite3d_flag), 17, true, update_flag_animation);
 

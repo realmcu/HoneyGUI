@@ -223,44 +223,12 @@ typedef struct
     float u, v;
 } l3_texcoord_coordinate_t;
 
-typedef struct
+typedef enum
 {
-    unsigned int num_vertices;
-    unsigned int num_normals;
-    unsigned int num_texcoords;
-    unsigned int num_faces;
-    unsigned int num_face_num_verts;
-
-    int pad0;
-
-    l3_vertex_coordinate_t *vertices;
-    l3_vertex_coordinate_t *normals;
-    l3_texcoord_coordinate_t *texcoords;
-    l3_vertex_index_t *faces;
-    int *face_num_verts;
-    int *material_ids;
-} l3_attrib_t;
-
-typedef struct
-{
-    unsigned int face_offset;
-    unsigned int length;
-} l3_shape_t;
-
-typedef struct
-{
-    float ambient[3];
-    float diffuse[3];
-    float specular[3];
-    float transmittance[3];
-    float emission[3];
-    float shininess;
-    float ior;      /* index of refraction */
-    float dissolve; /* 1 == opaque; 0 == fully transparent */
-    /* illumination model (see http://www.fileformat.info/format/material/) */
-    int illum;
-
-} l3_material_t;
+    L3_MODEL_TYPE_OBJ,
+    L3_MODEL_TYPE_GLTF,
+    L3_MODEL_TYPE_UNKNOWN,
+} L3_MODEL_TYPE;
 
 typedef struct
 {
@@ -274,22 +242,7 @@ typedef struct
 
 } l3_desc_file_head_t;
 
-typedef struct l3_description
-{
-    l3_desc_file_head_t file_head;
 
-    l3_attrib_t attrib;
-
-    unsigned int num_shapes;
-    l3_shape_t *shapes;
-
-    unsigned int num_materials;
-    l3_material_t *materials;
-
-    unsigned int *texture_sizes;
-    unsigned char **textures;
-
-} l3_description_t;
 
 typedef struct l3_rect_face
 {
@@ -437,36 +390,7 @@ typedef struct l3_canvas
 } l3_canvas_t;
 
 
-typedef struct l3_model
-{
-    l3_description_t *desc;
 
-    union
-    {
-        l3_rect_face_t *rect_face;
-        l3_tria_face_t *tria_face;
-    } face;
-
-    l3_draw_rect_img_t *img;          // material image
-    // l3_img_head_t *mask_img;     // mask image for light
-    l3_draw_rect_img_t *combined_img;  // sort image buffer
-
-    l3_canvas_t canvas;
-
-    L3_DRAW_TYPE draw_type;
-
-    int16_t x;
-    int16_t y;
-    float viewPortWidth;
-    float viewPortHeight;
-    l3_world_t world;
-    l3_camera_t camera;
-    l3_light_t light;
-
-    void (*global_transform_cb)(struct l3_model *this);
-    l3_4x4_matrix_t(*face_transform_cb)(struct l3_model *this, size_t face_index);
-
-} l3_model_t;
 
 /*============================================================================*
  *                            Functions
@@ -501,7 +425,6 @@ bool l3_4x4_matrix_mul(l3_4x4_matrix_t *input_left, l3_4x4_matrix_t *input_right
                        l3_4x4_matrix_t *output);
 bool l3_calulate_draw_img_target_area(l3_draw_rect_img_t *img, l3_rect_t *rect);
 
-l3_description_t *l3_load_description(void *desc_addr);
 void l3_camera_build_UVN_matrix(l3_camera_t *camera);
 
 /**

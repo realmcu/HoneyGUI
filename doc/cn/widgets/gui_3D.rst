@@ -34,9 +34,6 @@ OBJ 静态模型
 
 OBJ 是一种广泛使用的静态模型文件格式，适用于无需复杂动画的场景，如产品展示、UI 装饰元素等。
 
-模型组成要素
-^^^^^^^^^^^^^
-
 一个完整的 OBJ 模型通常由以下三个核心组件构成：
 
 1. .obj 文件
@@ -74,55 +71,10 @@ OBJ 是一种广泛使用的静态模型文件格式，适用于无需复杂动�
    
    OBJ 模型组成示例
 
-
-模型预处理
-^^^^^^^^^^^
-
-在绘制 OBJ 模型前，需要将其转换为二进制格式。以下是处理流程：
-
-1. 定位转换工具
-
-   在 HoneyGUI 安装目录下找到以下工具：
-
-      - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
-      - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
-
-2. 准备模型目录
-
-   将上述工具与模型文件放在同一个目录下，确保目录内包含：
-
-      - :file:`.obj` 文件
-      - :file:`.mtl` 文件
-      - 所有引用的纹理图片
-
-3. 生成描述文件
-   
-   - 使用提取器处理模型: ``extract_desc.exe xxx.obj``，该可执行文件会自动调用 :file:`png2c.py` 将所有的 PNG 纹理转换为二进制数组。
-   
-   .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
-      :width: 800px
-      :align: center
-
-      脚本处理
-   
-   - 生成的 :file:`desc.txt` 和 :file:`desc.bin` 文件包含以下内容：
-
-     - obj 解析数据
-     - mtl 解析数据
-     - 内嵌纹理数据
-   
-   .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
-      :width: 800px
-      :align: center
-
-      生成二进制数组
-
 GLTF 骨骼动画模型
 ~~~~~~~~~~~~~~~~~
 GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和模型而设计的开放标准。它被誉为 "3D 领域的 JPEG"，特别适合用于渲染包含骨骼动画的动态模型。
 
-模型组成要素
-^^^^^^^^^^^^^
 一个完整的 GLTF 模型通常由以下三个核心组件构成：
 
    - :file:`.gltf` 文件：JSON 格式的文件，以结构化的方式描述场景的层次关系与组成元素。
@@ -138,32 +90,62 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
    - 动画 (Animation)：存储了节点（骨骼）随时间变化的位移、旋转、缩放等关键帧数据。
    - 纹理 (Texture)：由材质引用的图像数据。
 
-模型预处理
-^^^^^^^^^^^
-与 OBJ 模型类似，GLTF 模型也需要经过预处理，转换为适用于嵌入式平台的优化格式。
 
-1. 定位转换工具
+模型预处理
+~~~~~~~~~~~~~
+
+在绘制 3D 模型前，需要将其转换为二进制格式。以下是处理流程：
+
+1. **定位转换工具**
 
    在 HoneyGUI 安装目录下找到以下工具：
 
-      - ``your_HoneyGUI_dir\tool\3D-tool\extract_gltf_desc.exe``
+      - ``your_HoneyGUI_dir\tool\3D-tool\png2c.py``
+      - ``your_HoneyGUI_dir\tool\3D-tool\extract_desc.exe``
 
-2. 准备模型目录
-   
-   将上述工具与模型文件放在同一个目录下，确保目录内包含：
+2. **准备模型目录**
+
+   将上述 ``extract_desc.exe`` 和 ``png2c.py`` 工具与模型文件放在同一个目录下。
+
+   - 对于 OBJ 模型，请确保目录内包含：
+
+      - :file:`.obj` 文件
+      - :file:`.mtl` 文件
+      - 所有引用的纹理图片
+
+   - 对于 GLTF 模型，请确保目录内包含：
 
       - :file:`.gltf` 文件
       - :file:`.bin` 文件
       - 所有引用的纹理图片
 
-3. 生成描述文件
-   
-   - 使用提取器处理模型: ``extract_gltf_desc.exe xxx.gltf``，该可执行文件会自动调用 :file:`png2c.py` 将所有的 PNG 纹理转换为二进制数组。
-   - 生成的 :file:`gltf_desc.txt` 和 :file:`gltf_desc.bin` 文件包含以下内容：
+3. **生成描述文件**
 
-     - gltf 解析数据
-     - bin 解析数据
-     - 内嵌纹理数据
+   打开命令行终端，进入模型所在目录，使用 ``extract_desc.exe`` 处理模型文件，该工具会自动识别文件类型并执行相应操作。
+   
+   - 处理 OBJ 模型
+
+      运行命令: :kbd:`extract_desc.exe xxx.obj`，该命令会自动调用 :file:`png2c.py` 将所有 PNG 纹理转换为C语言的二进制数组。
+
+      .. figure:: https://foruda.gitee.com/images/1735540370568112173/cf1c0126_13408154.png
+         :width: 800px
+         :align: center
+
+         脚本处理
+      
+      执行后会生成 :file:`desc_xxx.txt` 和 :file:`desc_xxx.bin` 文件，其中包含了解析后的 obj、mtl 数据以及内嵌的纹理数据。
+   
+      .. figure:: https://foruda.gitee.com/images/1735114445910760790/2a41eeab_13408154.png
+         :width: 800px
+         :align: center
+
+         生成二进制数组
+
+   - 处理 GLTF 模型
+
+      运行命令: :kbd:`extract_desc.exe xxx.gltf`，该命令也会自动处理所有引用的纹理图片。
+
+      执行后会生成 :file:`gltf_desc_xxx.txt` 和 :file:`gltf_desc_xxx.bin` 文件，其中包含了解析后的 gltf、bin 数据以及内嵌的纹理数据。
 
 
 3D 模型生成
@@ -172,34 +154,19 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 创建模型
 ~~~~~~~~
 
-.. table:: 3D 模型创建
-   :widths: 10 40 50 
-   :align: center
-   :name: 3D 模型创建
+对于 OBJ 模型和 GLTF 模型都可使用函数 ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)`` 创建。
 
-   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
-   | 模型格式 | 函数                                                                                                                      | 关键参数说明                                                                               |
-   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
-   | OBJ      | ``l3_create_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)``        | ``draw_type`` 模型绘制方式：                                                               |
-   |          |                                                                                                                           |                                                                                            |
-   |          |                                                                                                                           | - ``L3_DRAW_FRONT_ONLY``：仅绘制模型的正面，适用于需要隐藏背面的场景，如蝴蝶模型。         |
-   |          |                                                                                                                           |                                                                                            |
-   |          |                                                                                                                           | - ``L3_DRAW_FRONT_AND_BACK``：绘制模型的正面和背面，适用于需要双面可见的场景，如棱镜模型。 |
-   |          |                                                                                                                           |                                                                                            |
-   |          |                                                                                                                           | - ``L3_DRAW_FRONT_AND_SORT``：绘制模型的正面并排序，适用于前后景遮挡的场景，如人脸模型。   |
-   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
-   | GLTF     | ``l3_create_gltf_model(void *desc_addr, L3_IMAGE_TYPE image_type, int16_t x, int16_t y, int16_t view_w, int16_t view_h)`` | ``image_type`` 输出格式：                                                                  |
-   |          |                                                                                                                           |                                                                                            |
-   |          |                                                                                                                           | - ``LITE_RGB565``                                                                          |
-   |          |                                                                                                                           |                                                                                            |
-   |          |                                                                                                                           | - ``LITE_ARGB8888``                                                                        |
-   +----------+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------+
+**参数说明：**
 
-通用参数说明：
+- ``desc_addr``：指向脚本中提取的解析数据地址。
+- ``draw_type``：模型绘制方式：
 
-- ``desc_addr``： 指向脚本中提取的解析数据地址。
-- ``x`` ， ``y``： 模型视口在屏幕上的左上角坐标。
-- ``view_w``， ``view_h``： 模型视口的宽度和高度。
+   - ``L3_DRAW_FRONT_ONLY``：仅绘制模型的正面，适用于需要隐藏背面的场景，如蝴蝶模型。
+   - ``L3_DRAW_FRONT_AND_BACK``：绘制模型的正面和背面，适用于需要双面可见的场景，如棱镜模型。
+   - ``L3_DRAW_FRONT_AND_SORT``：绘制模型的正面并排序，适用于前后景遮挡的场景，如人脸模型。
+
+- ``x``， ``y``：模型视口在屏幕上的左上角坐标。
+- ``view_w``， ``view_h``：模型视口的宽度和高度。
 
 变换控制
 ~~~~~~~~~~~~
@@ -208,19 +175,12 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 ^^^^^^^^
 全局变换是对模型的所有顶点应用一个统一的矩阵变换，常用于实现模型的整体旋转、平移和缩放。
 
-- OBJ 模型
+.. code-block:: c
 
-   .. code-block:: c
+   void l3_set_global_transform(l3_model_base_t *_this, l3_global_transform_cb cb);
 
-      void l3_set_global_transform(l3_model_t *_this, l3_global_transform_cb cb);
 
-- GLTF 模型
-
-   .. code-block:: c
-
-      void l3_gltf_set_global_transform(l3_gltf_model_t *_this, l3_gltf_global_transform_cb cb);
-
-用户需要实现一个回调函数，类型为 ``l3_global_transform_cb`` 或 ``l3_gltf_global_transform_cb`` ，并在该函数内部定义变换逻辑，例如 ``world`` 世界坐标变换和 ``camera`` 相机视角投影。
+用户需要实现一个回调函数，类型为 ``l3_global_transform_cb``，并在该函数内部定义变换逻辑，例如 ``world`` 世界坐标变换和 ``camera`` 相机视角投影。
 
 **典型应用场景：**
 
@@ -282,7 +242,13 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 
 面变换
 ^^^^^^^^
-使用 ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)`` 函数对 OBJ 模型进行局部变换，其中 ``l3_face_transform_cb`` 类型的回调函数可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。
+支持对模型进行局部变换。
+
+.. code-block:: c
+
+   void l3_set_face_transform(l3_model_base_t *_this, l3_face_transform_cb cb);
+
+其中 ``l3_face_transform_cb`` 类型的回调函数可以为物体的每个面设置不同的形状变换， ``face_index`` 为指定变换的面。
 
 **功能特点：**
 
@@ -295,11 +261,11 @@ GLTF (GL Transmission Format) 是一种专为高效传输和加载 3D 场景和�
 
 创建控件
 ~~~~~~~~~~
-HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 和 ``gui_lite3d_gltf`` 控件，使用 :cpp:any:`gui_lite3d_create` 和 :cpp:any:`gui_lite3d_gltf_create` 函数可以分别创建 OBJ 模型和 GLTF 模型控件。
+HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 控件，使用 :cpp:any:`gui_lite3d_create` 函数可以创建 3D 模型控件。
 
 设置点击事件
 ~~~~~~~~~~~~~
-:cpp:any:`gui_lite3d_on_click` 或 :cpp:any:`gui_lite3d_gltf_on_click` 函数可以为 3D 模型控件设置点击事件，当用户点击模型时，会触发回调函数。
+:cpp:any:`gui_lite3d_on_click` 函数可以为 3D 模型控件设置点击事件，当用户点击模型时，会触发回调函数。
 
 设置动画
 ~~~~~~~~~~
@@ -314,7 +280,7 @@ HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 和 ``gui_lite
 3D 蝴蝶
 ~~~~~~~~
 
-该模型由 8 个矩形面构成，每个面都有相应的纹理贴图，绘制方式为 ``L3_DRAW_FRONT_ONLY``。通过调用 ``l3_set_face_transform(l3_model_t *_this, l3_face_transform_cb cb)`` 函数，可以为不同的面设置局部变换，从而实现动画效果。
+该模型由 8 个矩形面构成，每个面都有相应的纹理贴图，绘制方式为 ``L3_DRAW_FRONT_ONLY``。通过调用 ``l3_set_face_transform(l3_model_base_t *_this, l3_face_transform_cb cb)`` 函数，可以为不同的面设置局部变换，从而实现动画效果。
 
 .. literalinclude:: ../../../example/application/screen_410_502/app_3d_butterfly.c
    :language: c
@@ -370,7 +336,7 @@ HoneyGUI 中已集成了 Lite3D 库，并封装成 ``gui_lite3d`` 和 ``gui_lite
 3D 应用列表
 ~~~~~~~~~~~~
 
-该界面由 6 个 3D 应用图标组成，通过调用 ``l3_set_face_image(l3_model_t *_this, uint8_t face_index, void *image_addr)`` 函数可以为 3D 模型的指定面替换纹理贴图。
+该界面由 6 个 3D 应用图标组成，通过调用 ``l3_set_face_image(l3_model_base_t *_this, uint8_t face_index, void *image_addr)`` 函数可以为 3D 模型的指定面替换纹理贴图。
 
 .. literalinclude:: ../../../example/application/screen_410_502/app_3d_applist.c
    :language: c
@@ -421,4 +387,3 @@ API
 ---
 
 .. doxygenfile:: gui_lite3d.h
-.. doxygenfile:: gui_lite3d_gltf.h

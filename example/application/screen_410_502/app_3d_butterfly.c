@@ -147,7 +147,7 @@ static void update_animation(void *param)
 
 }
 
-static void butterfly_global_cb(l3_model_t *this)
+static void butterfly_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 45), 1,
                              32767,
@@ -158,7 +158,7 @@ static void butterfly_global_cb(l3_model_t *this)
 
 }
 
-static l3_4x4_matrix_t butterfly_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t butterfly_face_cb(l3_model_base_t *this, size_t face_index/*face offset*/)
 {
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
@@ -193,7 +193,8 @@ static void butterfly_app(gui_view_t *view)
                              GUI_EVENT_KB_SHORT_CLICKED);
 
 
-    l3_model_t *butterfly_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *butterfly_3d = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                    502);
 
     l3_set_global_transform(butterfly_3d, (l3_global_transform_cb)butterfly_global_cb);
     l3_set_face_transform(butterfly_3d, (l3_face_transform_cb)butterfly_face_cb);

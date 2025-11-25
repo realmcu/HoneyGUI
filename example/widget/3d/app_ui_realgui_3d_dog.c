@@ -25,7 +25,7 @@ static void update_dog_animation(void *param)
     }
 }
 
-static void dog_global_cb(l3_model_t *this)
+static void dog_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 3, 30), 1, 32767,
                              90,  this->viewPortWidth, this->viewPortHeight);
@@ -35,7 +35,8 @@ static void dog_global_cb(l3_model_t *this)
 
 static int app_init(void)
 {
-    l3_model_t *dog_3d = l3_create_model((void *)_acdesc_dog, L3_DRAW_FRONT_AND_SORT, 50, 50, 380, 380);
+    l3_model_base_t *dog_3d = l3_create_model((void *)_acdesc_dog, L3_DRAW_FRONT_AND_SORT, 50, 50, 380,
+                                              380);
 
     l3_set_global_transform(dog_3d, (l3_global_transform_cb)dog_global_cb);
 

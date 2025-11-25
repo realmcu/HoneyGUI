@@ -37,13 +37,13 @@ extern "C" {
  *============================================================================*/
 
 
-void l3_rect_draw(l3_model_t *_this);
+void l3_rect_draw(l3_obj_model_t *_this);
 
-void l3_rect_push(l3_model_t *_this);
+void l3_rect_push(l3_obj_model_t *_this);
 
-void l3_set_rect_face_image(l3_model_t *_this, uint8_t face_index, void *image_addr);
+void l3_set_rect_face_image(l3_obj_model_t *_this, uint8_t face_index, void *image_addr);
 
-void l3_rect_free_model(l3_model_t *_this);
+void l3_rect_free_model(l3_obj_model_t *_this);
 
 #ifdef __cplusplus
 }

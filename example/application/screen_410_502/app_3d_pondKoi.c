@@ -262,7 +262,7 @@ static void wave_animate_cb(void *param)
     }
 }
 
-static void fish0_global_cb(l3_model_t *this)
+static void fish0_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -270,7 +270,7 @@ static void fish0_global_cb(l3_model_t *this)
     l3_world_initialize(&this->world, koi_pos[0].x, koi_pos[0].y, 80, 0, 0, koi_pos[0].angle, 5);
 }
 
-static void fish0_shadow_global_cb(l3_model_t *this)
+static void fish0_shadow_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -279,7 +279,7 @@ static void fish0_shadow_global_cb(l3_model_t *this)
                         5);
 }
 
-static void fish1_global_cb(l3_model_t *this)
+static void fish1_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -287,7 +287,7 @@ static void fish1_global_cb(l3_model_t *this)
     l3_world_initialize(&this->world, koi_pos[1].x, koi_pos[1].y, 80, 0, 0, koi_pos[1].angle, 4);
 }
 
-static void fish1_shadow_global_cb(l3_model_t *this)
+static void fish1_shadow_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -296,7 +296,7 @@ static void fish1_shadow_global_cb(l3_model_t *this)
                         4);
 }
 
-static void fish2_global_cb(l3_model_t *this)
+static void fish2_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -304,7 +304,7 @@ static void fish2_global_cb(l3_model_t *this)
     l3_world_initialize(&this->world, koi_pos[2].x, koi_pos[2].y, 80, 0, 0, koi_pos[2].angle, 4);
 }
 
-static void fish2_shadow_global_cb(l3_model_t *this)
+static void fish2_shadow_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -313,7 +313,7 @@ static void fish2_shadow_global_cb(l3_model_t *this)
                         4);
 }
 
-static void fish3_global_cb(l3_model_t *this)
+static void fish3_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -321,7 +321,7 @@ static void fish3_global_cb(l3_model_t *this)
     l3_world_initialize(&this->world, koi_pos[3].x, koi_pos[3].y, 80, 0, 0, koi_pos[3].angle, 4);
 }
 
-static void fish3_shadow_global_cb(l3_model_t *this)
+static void fish3_shadow_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 80), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -330,7 +330,7 @@ static void fish3_shadow_global_cb(l3_model_t *this)
                         4);
 }
 
-static l3_4x4_matrix_t fish_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t fish_face_cb(l3_model_base_t *this, size_t face_index/*face offset*/)
 {
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
@@ -368,15 +368,19 @@ static void app_ui_pond_koi_design(gui_view_t *view)
     gui_img_create_from_mem(obj, "img_1_test", PONDGROUND_BIN, 0, 0, 0, 0);
 
     // Shadow
-    l3_model_t *fish0_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish1_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish2_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish3_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish0_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                    502);
+    l3_model_base_t *fish1_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                    502);
+    l3_model_base_t *fish2_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                    502);
+    l3_model_base_t *fish3_shadow = l3_create_model(DESC_KOI_SHADOW_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                    502);
     // Fish
-    l3_model_t *fish0 = l3_create_model(DESC_KOI0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish1 = l3_create_model(DESC_KOI1_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish2 = l3_create_model(DESC_KOI2_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *fish3 = l3_create_model(DESC_KOI0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish0 = l3_create_model(DESC_KOI0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish1 = l3_create_model(DESC_KOI1_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish2 = l3_create_model(DESC_KOI2_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *fish3 = l3_create_model(DESC_KOI0_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
 
     koi_pos_init();
 

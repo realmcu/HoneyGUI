@@ -170,7 +170,7 @@ static void update_butterfly(void *param)
 
 }
 
-static void butterfly0_global_cb(l3_model_t *this)
+static void butterfly0_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 70), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -180,7 +180,7 @@ static void butterfly0_global_cb(l3_model_t *this)
                         3);
 }
 
-static void butterfly1_global_cb(l3_model_t *this)
+static void butterfly1_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 70), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -190,7 +190,7 @@ static void butterfly1_global_cb(l3_model_t *this)
                         3);
 }
 
-static void butterfly2_global_cb(l3_model_t *this)
+static void butterfly2_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 70), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -200,7 +200,7 @@ static void butterfly2_global_cb(l3_model_t *this)
                         3);
 }
 
-static l3_4x4_matrix_t butterfly_face_cb(l3_model_t *this, size_t face_index/*face offset*/)
+static l3_4x4_matrix_t butterfly_face_cb(l3_model_base_t *this, size_t face_index/*face offset*/)
 {
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
@@ -266,7 +266,7 @@ static void update_wing_position_and_scale(gui_img_t *wing, l3_vertex_t vertexes
 
     gui_img_set_opacity(wing, 180);
 }
-
+#include "l3_obj.h"
 static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *win)
 {
     GUI_WIDGET_POINTER_BY_NAME_ROOT(wing1, "wing1", GUI_BASE(win))
@@ -278,17 +278,19 @@ static void update_butterfly_wing_bg(gui_lite3d_t *lite3d_butterfly, gui_win_t *
     gui_obj_hidden(wing3, false);
     gui_obj_hidden(wing4, false);
 
+    l3_obj_model_t *this = (l3_obj_model_t *)lite3d_butterfly->model;
+
     // Define a reasonable base scale factor
 
     // Update each wing with calculated position and scale
     update_wing_position_and_scale((gui_img_t *)wing1,
-                                   lite3d_butterfly->model->face.rect_face[0].transform_vertex, 0);
+                                   this->face.rect_face[0].transform_vertex, 0);
     update_wing_position_and_scale((gui_img_t *)wing2,
-                                   lite3d_butterfly->model->face.rect_face[1].transform_vertex, 1);
+                                   this->face.rect_face[1].transform_vertex, 1);
     update_wing_position_and_scale((gui_img_t *)wing3,
-                                   lite3d_butterfly->model->face.rect_face[2].transform_vertex, 2);
+                                   this->face.rect_face[2].transform_vertex, 2);
     update_wing_position_and_scale((gui_img_t *)wing4,
-                                   lite3d_butterfly->model->face.rect_face[3].transform_vertex, 3);
+                                   this->face.rect_face[3].transform_vertex, 3);
 }
 
 // Calculate butterfly tail position based on current position and rotation
@@ -476,9 +478,12 @@ static void app_ui_butterflys_design(gui_view_t *view)
     init_butterfly_bg(butterfly_win[2], &particles[2]);
 
     // Butterflies
-    l3_model_t *butterfly0 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *butterfly1 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
-    l3_model_t *butterfly2 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410, 502);
+    l3_model_base_t *butterfly0 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                  502);
+    l3_model_base_t *butterfly1 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                  502);
+    l3_model_base_t *butterfly2 = l3_create_model(DESC_BUTTERFLY_BIN, L3_DRAW_FRONT_ONLY, 0, 0, 410,
+                                                  502);
 
     butterfly_pos_init();
     l3_set_global_transform(butterfly0, (l3_global_transform_cb)butterfly0_global_cb);
@@ -497,7 +502,7 @@ static void app_ui_butterflys_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(lite3d_butterflies[0]), 17, true, update_butterfly);
 
 
-    gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 26,
+    gui_img_t *clock_img = gui_img_create_from_mem(obj, "img_clock", CLOCK_BIN, 55,
                                                    (gui_get_screen_height() - 189) / 3, 0, 0);
     gui_img_set_mode(clock_img, IMG_SRC_OVER_MODE);
 

@@ -20,24 +20,25 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+#include "l3_obj.h"
 #include "l3_common.h"
 #include "l3_tria_transform.h"
 #include "l3_tria_raster.h"
 #include "l3_rect_raster.h"
 
-static void __l3_push_tria_img(l3_model_t *_this)
+static void __l3_push_tria_img(l3_obj_model_t *_this)
 {
-    uint32_t width = _this->viewPortWidth;
-    uint32_t height = _this->viewPortHeight;
+    uint32_t width = _this->base.viewPortWidth;
+    uint32_t height = _this->base.viewPortHeight;
 
     float *depthBuffer = NULL;
-    if (_this->draw_type == L3_DRAW_FRONT_AND_SORT)
+    if (_this->base.draw_type == L3_DRAW_FRONT_AND_SORT)
     {
         depthBuffer = l3_malloc(width * height * sizeof(float));
         memset(depthBuffer, 0x00, width * height * sizeof(float));
     }
 
-    memset((uint8_t *)_this->combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
+    memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
 
     uint16_t render_color = 0;
     uint8_t opacity_value = UINT8_MAX;
@@ -94,41 +95,42 @@ static void __l3_push_tria_img(l3_model_t *_this)
             tria_img.fill_data = &render_color;
         }
 
-        l3_draw_tria_to_canvas(&tria_img, _this->combined_img, depthBuffer);
+        l3_draw_tria_to_canvas(&tria_img, _this->base.combined_img, depthBuffer);
     }
 
-    if (_this->draw_type == L3_DRAW_FRONT_AND_SORT)
+    if (_this->base.draw_type == L3_DRAW_FRONT_AND_SORT)
     {
         l3_free(depthBuffer);
     }
 
-    _this->combined_img->img_w = width;
-    _this->combined_img->img_h = height;
-    _this->combined_img->opacity_value = UINT8_MAX;
-    _this->combined_img->blend_mode = L3_IMG_FILTER_BLACK;
+    _this->base.combined_img->img_w = width;
+    _this->base.combined_img->img_h = height;
+    _this->base.combined_img->opacity_value = UINT8_MAX;
+    _this->base.combined_img->blend_mode = L3_IMG_FILTER_BLACK;
 
-    l3_3x3_matrix_translate(&_this->combined_img->matrix, _this->x, _this->y);
-    memcpy(&_this->combined_img->inverse, &_this->combined_img->matrix, sizeof(l3_3x3_matrix_t));
-    l3_3x3_matrix_inverse(&_this->combined_img->inverse);
-    l3_calulate_draw_img_target_area(_this->combined_img, NULL);
+    l3_3x3_matrix_translate(&_this->base.combined_img->matrix, _this->base.x, _this->base.y);
+    memcpy(&_this->base.combined_img->inverse, &_this->base.combined_img->matrix,
+           sizeof(l3_3x3_matrix_t));
+    l3_3x3_matrix_inverse(&_this->base.combined_img->inverse);
+    l3_calulate_draw_img_target_area(_this->base.combined_img, NULL);
 }
 
-void l3_tria_push(l3_model_t *_this)
+void l3_tria_push(l3_obj_model_t *_this)
 {
-    _this->light.initialized = false;
+    _this->base.light.initialized = false;
     l3_4x4_matrix_t transform_matrix;
 
     // global transform
     if (_this->global_transform_cb != NULL)
     {
         _this->global_transform_cb(_this);
-        transform_matrix = _this->world;
+        transform_matrix = _this->base.world;
     }
 
-    l3_camera_build_UVN_matrix(&_this->camera);
+    l3_camera_build_UVN_matrix(&_this->base.camera);
 
     l3_4x4_matrix_t view_matrix;
-    l3_4x4_matrix_mul(&_this->camera.mat_cam, &transform_matrix, &view_matrix);
+    l3_4x4_matrix_mul(&_this->base.camera.mat_cam, &transform_matrix, &view_matrix);
 
     MEASURE_CPU_CYCLES(
     {
@@ -141,7 +143,7 @@ void l3_tria_push(l3_model_t *_this)
             // }
 
             l3_tria_face_t *face = &_this->face.tria_face[i];
-            l3_attrib_t *attrib = &_this->desc->attrib;
+            l3_obj_attrib_t *attrib = &_this->desc->attrib;
 
             size_t vertex_offset = i * 3;
 
@@ -177,7 +179,7 @@ void l3_tria_push(l3_model_t *_this)
                 face->transform_vertex[2].v = vt->v;
             }
 
-            l3_tria_scene(face, &_this->camera);
+            l3_tria_scene(face, &_this->base.camera);
         }
     }
     );
@@ -187,14 +189,14 @@ void l3_tria_push(l3_model_t *_this)
     );
 }
 
-void l3_tria_draw(l3_model_t *_this)
+void l3_tria_draw(l3_obj_model_t *_this)
 {
-    l3_draw_rect_img_to_canvas(_this->combined_img, &_this->canvas, NULL);
+    l3_draw_rect_img_to_canvas(_this->base.combined_img, &_this->base.canvas, NULL);
 }
 
 
 
-void l3_tria_free_model(l3_model_t *_this)
+void l3_tria_free_model(l3_obj_model_t *_this)
 {
     l3_free(_this->face.tria_face);
     _this->face.tria_face = NULL;

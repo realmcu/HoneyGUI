@@ -160,7 +160,7 @@ static void update_windmill_animation(void *param)
 
 }
 
-static void windmill_global_cb(l3_model_t *this)
+static void windmill_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 40), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -168,7 +168,7 @@ static void windmill_global_cb(l3_model_t *this)
     l3_world_initialize(&this->world, 0, 0, 40, 0, rot_y_angle, 0, 5);
 
 }
-static l3_4x4_matrix_t windmill_face_cb(l3_model_t *this, size_t face_index)
+static l3_4x4_matrix_t windmill_face_cb(l3_model_base_t *this, size_t face_index)
 {
     (void)face_index; // unused parameter
     l3_4x4_matrix_t face_matrix;
@@ -195,8 +195,9 @@ static void windmill_app(gui_view_t *view)
 
     gui_img_create_from_mem(obj, "stick", WINDMILL_STICK_BIN, 202, 246, 0, 0);
 
-    l3_model_t *windmill_3d = l3_create_model(DESC_WINDMILL_BIN, L3_DRAW_FRONT_AND_BACK, 15, 52, 380,
-                                              380);
+    l3_model_base_t *windmill_3d = l3_create_model(DESC_WINDMILL_BIN, L3_DRAW_FRONT_AND_BACK, 15, 52,
+                                                   380,
+                                                   380);
     l3_set_global_transform(windmill_3d, (l3_global_transform_cb)windmill_global_cb);
     l3_set_face_transform(windmill_3d, (l3_face_transform_cb)windmill_face_cb);
     gui_lite3d_t *lite3d_windmill = gui_lite3d_create(obj, "lite3d_windmill", windmill_3d, 0, 0, 410,

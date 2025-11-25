@@ -32,6 +32,8 @@ extern "C" {
 #include "gui_api.h"
 #include "gui_obj.h"
 #include "l3.h"
+#include "l3_obj.h"
+#include "l3_gltf.h"
 
 /*============================================================================*
  *                         Types
@@ -40,7 +42,7 @@ typedef struct gui_lite3d
 {
     gui_obj_t base;
 
-    l3_model_t *model;
+    l3_model_base_t *model;
 
 } gui_lite3d_t;
 
@@ -76,7 +78,7 @@ typedef struct gui_lite3d
  */
 gui_lite3d_t *gui_lite3d_create(void                  *parent,
                                 const char            *name,
-                                l3_model_t            *model,
+                                l3_model_base_t       *model,
                                 int16_t                x,
                                 int16_t                y,
                                 int16_t                w,

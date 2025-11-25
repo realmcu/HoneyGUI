@@ -10,7 +10,7 @@
 #define MODEL_CANVAS_HEIGHT 480
 
 
-static void face_global_cb(l3_model_t *this)
+static void face_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 60), 1,
                              32767,
@@ -27,8 +27,8 @@ static int lite3D_example(void)
     uint8_t *pixel = malloc(DRV_LCD_WIDTH * DRV_LCD_HEIGHT * sizeof(uint16_t));
     memset(pixel, 0x0, DRV_LCD_WIDTH * DRV_LCD_HEIGHT * sizeof(uint16_t));
 
-    l3_model_t *face_3d = l3_create_model((void *)(_acdesc_face), L3_DRAW_FRONT_AND_SORT, 0, 0,
-                                          MODEL_CANVAS_WIDTH, MODEL_CANVAS_HEIGHT);
+    l3_model_base_t *face_3d = l3_create_model((void *)(_acdesc_face), L3_DRAW_FRONT_AND_SORT, 0, 0,
+                                               MODEL_CANVAS_WIDTH, MODEL_CANVAS_HEIGHT);
 
     l3_set_global_transform(face_3d, (l3_global_transform_cb)face_global_cb);
 

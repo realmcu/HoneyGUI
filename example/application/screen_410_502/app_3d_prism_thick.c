@@ -113,7 +113,7 @@ static void update_prism_thick_angle(void *param)
 }
 
 
-static void prism_thick_global_cb(l3_model_t *this)
+static void prism_thick_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0),
                              l3_4d_point(world_pos_temp.pos_x, world_pos_temp.pos_y, world_pos_temp.pos_z),
@@ -210,8 +210,9 @@ static void prism_thick_app(gui_view_t *view)
     gui_view_set_animate_step(view, 1000);
 #ifdef DESC_PRISM_THICK_BIN
     gui_obj_t *obj = GUI_BASE(view);
-    l3_model_t *prism_thick_3d = l3_create_model(DESC_PRISM_THICK_BIN, L3_DRAW_FRONT_AND_SORT, 0, 0,
-                                                 410, 502);
+    l3_model_base_t *prism_thick_3d = l3_create_model(DESC_PRISM_THICK_BIN, L3_DRAW_FRONT_AND_SORT, 0,
+                                                      0,
+                                                      410, 502);
     l3_set_global_transform(prism_thick_3d, (l3_global_transform_cb)prism_thick_global_cb);
     gui_lite3d_t *lite3d_prism_thick = gui_lite3d_create(obj, "lite3d_prism_thick", prism_thick_3d, 0,
                                                          0, 0, 0);

@@ -20,12 +20,13 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+#include "l3_obj.h"
 #include "l3_common.h"
 #include "l3_rect_transform.h"
 #include "l3_tria_raster.h"
 #include "l3_rect_raster.h"
 
-static void __l3_push_rect_img_front(l3_model_t *this)
+static void __l3_push_rect_img_front(l3_obj_model_t *this)
 {
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
@@ -48,8 +49,8 @@ static void __l3_push_rect_img_front(l3_model_t *this)
             src[j].x = this->face.rect_face[i].transform_vertex[j].u * width;
             src[j].y = (1.0f - this->face.rect_face[i].transform_vertex[j].v) * height;
 
-            dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x + this->x;
-            dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y + this->y;
+            dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x + this->base.x;
+            dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y + this->base.y;
         }
 
         l3_generate_3x3_matrix(src, dst, (float *)&this->img[i].matrix);
@@ -66,7 +67,7 @@ static void __l3_push_rect_img_front(l3_model_t *this)
     }
 }
 
-static void __l3_push_rect_img_front_and_back(l3_model_t *this)
+static void __l3_push_rect_img_front_and_back(l3_obj_model_t *this)
 {
     for (uint32_t i = 0; i < this->desc->attrib.num_face_num_verts; i++)
     {
@@ -84,8 +85,8 @@ static void __l3_push_rect_img_front_and_back(l3_model_t *this)
             src[j].x = this->face.rect_face[i].transform_vertex[j].u * width;
             src[j].y = (1.0f - this->face.rect_face[i].transform_vertex[j].v) * height;
 
-            dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x + this->x;
-            dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y + this->y;
+            dst[j].x = this->face.rect_face[i].transform_vertex[j].position.x + this->base.x;
+            dst[j].y = this->face.rect_face[i].transform_vertex[j].position.y + this->base.y;
         }
 
         l3_generate_3x3_matrix(src, dst, (float *)&this->img[i].matrix);
@@ -102,15 +103,15 @@ static void __l3_push_rect_img_front_and_back(l3_model_t *this)
     }
 }
 
-static void __l3_push_rect_img_front_and_sort(l3_model_t *_this)
+static void __l3_push_rect_img_front_and_sort(l3_obj_model_t *_this)
 {
-    uint32_t width = _this->viewPortWidth;
-    uint32_t height = _this->viewPortHeight;
+    uint32_t width = _this->base.viewPortWidth;
+    uint32_t height = _this->base.viewPortHeight;
 
     float *depthBuffer = l3_malloc(width * height * sizeof(float));
     memset(depthBuffer, 0x00, width * height * sizeof(float));
 
-    memset((uint8_t *)_this->combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
+    memset((uint8_t *)_this->base.combined_img->data + sizeof(l3_img_head_t), 0x00, width * height * 2);
 
     uint16_t render_color = 0;
     uint8_t opacity_value = UINT8_MAX;
@@ -172,29 +173,30 @@ static void __l3_push_rect_img_front_and_sort(l3_model_t *_this)
         tria_img->p0 = vertices[0];
         tria_img->p1 = vertices[1];
         tria_img->p2 = vertices[2];
-        l3_draw_tria_to_canvas(tria_img, _this->combined_img, depthBuffer);
+        l3_draw_tria_to_canvas(tria_img, _this->base.combined_img, depthBuffer);
         tria_img->p0 = vertices[2];
         tria_img->p1 = vertices[3];
         tria_img->p2 = vertices[0];
-        l3_draw_tria_to_canvas(tria_img, _this->combined_img, depthBuffer);
+        l3_draw_tria_to_canvas(tria_img, _this->base.combined_img, depthBuffer);
 
     }
 
     l3_free(tria_img);
     l3_free(depthBuffer);
 
-    _this->combined_img->img_w = width;
-    _this->combined_img->img_h = height;
-    _this->combined_img->opacity_value = UINT8_MAX;
-    _this->combined_img->blend_mode = L3_IMG_FILTER_BLACK;
+    _this->base.combined_img->img_w = width;
+    _this->base.combined_img->img_h = height;
+    _this->base.combined_img->opacity_value = UINT8_MAX;
+    _this->base.combined_img->blend_mode = L3_IMG_FILTER_BLACK;
 
-    l3_3x3_matrix_translate(&_this->combined_img->matrix, _this->x, _this->y);
-    memcpy(&_this->combined_img->inverse, &_this->combined_img->matrix, sizeof(l3_3x3_matrix_t));
-    l3_3x3_matrix_inverse(&_this->combined_img->inverse);
-    l3_calulate_draw_img_target_area(_this->combined_img, NULL);
+    l3_3x3_matrix_translate(&_this->base.combined_img->matrix, _this->base.x, _this->base.y);
+    memcpy(&_this->base.combined_img->inverse, &_this->base.combined_img->matrix,
+           sizeof(l3_3x3_matrix_t));
+    l3_3x3_matrix_inverse(&_this->base.combined_img->inverse);
+    l3_calulate_draw_img_target_area(_this->base.combined_img, NULL);
 }
 
-void l3_rect_push_prepare(l3_model_t *_this)
+void l3_rect_push_prepare(l3_obj_model_t *_this)
 {
     l3_4x4_matrix_t transform_matrix;
 
@@ -202,10 +204,10 @@ void l3_rect_push_prepare(l3_model_t *_this)
     if (_this->global_transform_cb != NULL)
     {
         _this->global_transform_cb(_this);
-        transform_matrix = _this->world;
+        transform_matrix = _this->base.world;
     }
 
-    l3_camera_build_UVN_matrix(&_this->camera);
+    l3_camera_build_UVN_matrix(&_this->base.camera);
 
 
     for (size_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
@@ -217,10 +219,10 @@ void l3_rect_push_prepare(l3_model_t *_this)
         }
 
         l3_4x4_matrix_t view_matrix;
-        l3_4x4_matrix_mul(&_this->camera.mat_cam, &transform_matrix, &view_matrix);
+        l3_4x4_matrix_mul(&_this->base.camera.mat_cam, &transform_matrix, &view_matrix);
 
         l3_rect_face_t *face = &_this->face.rect_face[i];
-        l3_attrib_t *attrib = &_this->desc->attrib;
+        l3_obj_attrib_t *attrib = &_this->desc->attrib;
 
         size_t vertex_offset = i * 4;
 
@@ -237,32 +239,32 @@ void l3_rect_push_prepare(l3_model_t *_this)
             face->transform_vertex[j].v = vt->v;
         }
 
-        l3_rect_scene(face, &_this->camera);
+        l3_rect_scene(face, &_this->base.camera);
     }
 
 }
 
-void l3_rect_push(l3_model_t *_this)
+void l3_rect_push(l3_obj_model_t *_this)
 {
     l3_rect_push_prepare(_this);
 
-    if (_this->draw_type == L3_DRAW_FRONT_ONLY)
+    if (_this->base.draw_type == L3_DRAW_FRONT_ONLY)
     {
         __l3_push_rect_img_front(_this);
     }
-    else if (_this->draw_type == L3_DRAW_FRONT_AND_BACK)
+    else if (_this->base.draw_type == L3_DRAW_FRONT_AND_BACK)
     {
         __l3_push_rect_img_front_and_back(_this);
     }
-    else if (_this->draw_type == L3_DRAW_FRONT_AND_SORT)
+    else if (_this->base.draw_type == L3_DRAW_FRONT_AND_SORT)
     {
         __l3_push_rect_img_front_and_sort(_this);
     }
 }
 
-void l3_rect_draw(l3_model_t *_this)
+void l3_rect_draw(l3_obj_model_t *_this)
 {
-    if (_this->draw_type == L3_DRAW_FRONT_ONLY)
+    if (_this->base.draw_type == L3_DRAW_FRONT_ONLY)
     {
         for (uint32_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
         {
@@ -270,10 +272,10 @@ void l3_rect_draw(l3_model_t *_this)
             {
                 continue;
             }
-            l3_draw_rect_img_to_canvas(_this->img + i, &_this->canvas, NULL);
+            l3_draw_rect_img_to_canvas(_this->img + i, &_this->base.canvas, NULL);
         }
     }
-    else if (_this->draw_type == L3_DRAW_FRONT_AND_BACK)
+    else if (_this->base.draw_type == L3_DRAW_FRONT_AND_BACK)
     {
         for (uint32_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
         {
@@ -281,7 +283,7 @@ void l3_rect_draw(l3_model_t *_this)
             {
                 continue;
             }
-            l3_draw_rect_img_to_canvas(_this->img + i, &_this->canvas, NULL);
+            l3_draw_rect_img_to_canvas(_this->img + i, &_this->base.canvas, NULL);
         }
 
         for (uint32_t i = 0; i < _this->desc->attrib.num_face_num_verts; i++)
@@ -290,23 +292,23 @@ void l3_rect_draw(l3_model_t *_this)
             {
                 continue;
             }
-            l3_draw_rect_img_to_canvas(_this->img + i, &_this->canvas, NULL);
+            l3_draw_rect_img_to_canvas(_this->img + i, &_this->base.canvas, NULL);
         }
     }
-    else if (_this->draw_type == L3_DRAW_FRONT_AND_SORT)
+    else if (_this->base.draw_type == L3_DRAW_FRONT_AND_SORT)
     {
-        l3_draw_rect_img_to_canvas(_this->combined_img, &_this->canvas, NULL);
+        l3_draw_rect_img_to_canvas(_this->base.combined_img, &_this->base.canvas, NULL);
     }
 
 }
 
-void l3_set_rect_face_image(l3_model_t *_this, uint8_t face_index, void *image_addr)
+void l3_set_rect_face_image(l3_obj_model_t *_this, uint8_t face_index, void *image_addr)
 {
     int material_id = _this->desc->attrib.material_ids[face_index];
     _this->desc->textures[material_id] = image_addr;
 }
 
-void l3_rect_free_model(l3_model_t *_this)
+void l3_rect_free_model(l3_obj_model_t *_this)
 {
     if (_this->img != NULL)
     {

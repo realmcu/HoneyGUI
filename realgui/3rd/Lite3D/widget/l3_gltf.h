@@ -4,8 +4,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file l3_gltf.h
-  * @brief Lite 3D widget
-  * @details Lite 3D widget
+  * @brief Lite 3D gltf widget
+  * @details Lite 3D gltf widget
   * @author sienna_shen@realsil.com.cn
   * @date 2025/10/28
   * @version 1.0
@@ -31,6 +31,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "l3.h"
 #include "l3_common.h"
 
 /*============================================================================*
@@ -320,44 +321,18 @@ typedef struct
 
 typedef struct l3_gltf_model
 {
+    l3_model_base_t base;
+
     l3_gltf_model_description_t *desc;
-
-    l3_draw_rect_img_t *combined_img;  // sort image buffer
     float *depthBuffer;
-
-    l3_canvas_t canvas;
-
-    int16_t x;
-    int16_t y;
-    float viewPortWidth;
-    float viewPortHeight;
-    l3_world_t world;
-    l3_camera_t camera;
-    l3_light_t light;
-
-    uint32_t last_time_ms;   // Last animation time in ms
+    uint32_t last_time_ms;
 
     void (*global_transform_cb)(struct l3_gltf_model *_this);
     l3_4x4_matrix_t(*face_transform_cb)(struct l3_gltf_model *_this, size_t face_index);
 
 } l3_gltf_model_t;
 
-/**
- * @brief Callback type for global transformations.
- *
- * This callback is used to apply transformations to the entire 3D model,
- * including world coordinates and camera coordinates.
- */
-typedef void (*l3_gltf_global_transform_cb)(l3_gltf_model_t *__this);
 
-/**
- * @brief Callback type for face-specific transformations.
- *
- * This callback is used to apply transformations to a specific face of the 3D model.
- * @param face_index The index of the face to transform.
- */
-typedef void (*l3_gltf_face_transform_cb)(l3_gltf_model_t *__this,
-                                          size_t face_index/*face offset*/);
 /*============================================================================*
  *                            Functions
  *============================================================================*/
@@ -366,19 +341,20 @@ typedef void (*l3_gltf_face_transform_cb)(l3_gltf_model_t *__this,
  * @brief Create a new 3D GLTF model.
  *
  * @param desc_addr Address of the model descriptor.
+ * @param draw_type Drawing type for the model.
  * @param x X-coordinate of the model.
  * @param y Y-coordinate of the model.
  * @param view_w Width of the view.
  * @param view_h Height of the view.
  * @return Pointer to the created 3D model.
  */
-l3_gltf_model_t *l3_create_gltf_model(void *desc_addr, L3_IMAGE_TYPE image_type, int16_t x,
+l3_gltf_model_t *l3_create_gltf_model(void *desc_addr, L3_DRAW_TYPE draw_type, int16_t x,
                                       int16_t y, int16_t view_w, int16_t view_h);
 
 /**
  * @brief Set the target canvas for rendering.
  *
- * @param _this Pointer to the 3D model.
+ * @param base Pointer to the 3D base model.
  * @param x X-coordinate of the canvas.
  * @param y Y-coordinate of the canvas.
  * @param w Width of the canvas.
@@ -386,7 +362,7 @@ l3_gltf_model_t *l3_create_gltf_model(void *desc_addr, L3_IMAGE_TYPE image_type,
  * @param bit_depth Bit depth of the canvas.
  * @param canvas Pointer to the canvas buffer.
  */
-void l3_gltf_set_target_canvas(l3_gltf_model_t *_this, \
+void l3_gltf_set_target_canvas(l3_model_base_t *base, \
                                uint16_t x, uint16_t y, \
                                uint16_t w, uint16_t h, \
                                uint16_t bit_depth, \
@@ -397,35 +373,43 @@ void l3_gltf_set_target_canvas(l3_gltf_model_t *_this, \
 /**
  * @brief Set global transform callback.
  *
- * @param _this the 3D model pointer
+ * @param base Pointer to the 3D base model.
  * @param cb Set callback functions for the world coordinate system, camera coordinate system,
- *           and light source for all faces
+ *           and light source for all faces.
  */
-void l3_gltf_set_global_transform(l3_gltf_model_t *_this, l3_gltf_global_transform_cb cb);
+void l3_gltf_set_global_transform(l3_model_base_t *base, l3_global_transform_cb cb);
 
 /**
  * @brief Push the model's state to the rendering pipeline.
  *
- * @param _this Pointer to the 3D model.
+ * @param base Pointer to the 3D base model.
  */
-void l3_gltf_push(l3_gltf_model_t *_this);
+void l3_gltf_push(l3_model_base_t *base);
 
 /**
  * @brief Render the model.
  *
- * @param _this Pointer to the 3D model.
+ * @param base Pointer to the 3D base model.
  */
-void l3_gltf_draw(l3_gltf_model_t *_this);
+void l3_gltf_draw(l3_model_base_t *base);
 
 
 /**
  * @brief Free the memory allocated for the 3D model.
  *
- * @param _this Pointer to the 3D model.
+ * @param base Pointer to the 3D base model.
  */
-void l3_free_gltf_model(l3_gltf_model_t *_this);
+void l3_free_gltf_model(l3_model_base_t *base);
 
-
+/**
+ * @brief Check if the model is clicked at the given coordinates.
+ *
+ * @param base Pointer to the 3D base model.
+ * @param x X-coordinate of the click.
+ * @param y Y-coordinate of the click.
+ * @return True if the model is clicked, false otherwise.
+ */
+bool l3_gltf_model_on_click(l3_model_base_t *base, int16_t x, int16_t y);
 
 #ifdef __cplusplus
 }

@@ -113,7 +113,7 @@ static void update_disc_animation(void *param)
     }
 }
 
-static void disc_global_cb(l3_model_t *this)
+static void disc_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0), l3_4d_point(0, 0, 50), 1, 32767,
                              90, this->viewPortWidth, this->viewPortHeight);
@@ -122,7 +122,7 @@ static void disc_global_cb(l3_model_t *this)
 
 }
 
-static l3_4x4_matrix_t disc_face_cb(l3_model_t *this, size_t face_index)
+static l3_4x4_matrix_t disc_face_cb(l3_model_base_t *this, size_t face_index)
 {
     (void)face_index;
     l3_4x4_matrix_t face_matrix;
@@ -137,7 +137,7 @@ static l3_4x4_matrix_t disc_face_cb(l3_model_t *this, size_t face_index)
 
 }
 
-static l3_4x4_matrix_t disc_cube_face_cb(l3_model_t *this, size_t face_index)
+static l3_4x4_matrix_t disc_cube_face_cb(l3_model_base_t *this, size_t face_index)
 {
     l3_4x4_matrix_t face_matrix;
     l3_4x4_matrix_t transform_matrix;
@@ -224,14 +224,14 @@ static void disc_app(gui_view_t *view)
     step_direction[0] = 1;
 
     // Disc
-    l3_model_t *disc_3d = l3_create_model(DESC_DISC_BIN, L3_DRAW_FRONT_ONLY, 15, 0, 380, 380);
+    l3_model_base_t *disc_3d = l3_create_model(DESC_DISC_BIN, L3_DRAW_FRONT_ONLY, 15, 0, 380, 380);
     l3_set_global_transform(disc_3d, (l3_global_transform_cb)disc_global_cb);
     l3_set_face_transform(disc_3d, (l3_face_transform_cb)disc_face_cb);
     gui_lite3d_t *lite3d_disc = gui_lite3d_create(obj, "lite3d_disc", disc_3d, 15, 0, 380, 380);
 
     // Cube
-    l3_model_t *disc_cube = l3_create_model(DESC_DISC_CUBE_BIN, L3_DRAW_FRONT_AND_SORT, 15, 0, 380,
-                                            380);
+    l3_model_base_t *disc_cube = l3_create_model(DESC_DISC_CUBE_BIN, L3_DRAW_FRONT_AND_SORT, 15, 0, 380,
+                                                 380);
     l3_set_global_transform(disc_cube, (l3_global_transform_cb)disc_global_cb);
     l3_set_face_transform(disc_cube, (l3_face_transform_cb)disc_cube_face_cb);
     gui_lite3d_create(obj, "lite3d_disc_cube", disc_cube, 0, 0, 0, 0);

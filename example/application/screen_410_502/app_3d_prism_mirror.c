@@ -140,7 +140,7 @@ static void prism_mirror3d_update_angle_cb(void *param)
     }
 }
 
-static void prism_global_cb(l3_model_t *this)
+static void prism_global_cb(l3_model_base_t *this)
 {
     l3_camera_UVN_initialize(&this->camera, l3_4d_point(0, 0, 0),
                              l3_4d_point(0, 0, prism_world_pos_temp.pos_z), 0, 0,
@@ -306,8 +306,7 @@ static void app_ui_prism_mirror_design(gui_view_t *view)
                              SWITCH_IN_ANIMATION_FADE,
                              GUI_EVENT_KB_SHORT_CLICKED);
 
-    l3_model_t *prism_3d = l3_create_model(DESC_PRISM_BIN, L3_DRAW_FRONT_AND_BACK, 0, 0,
-                                           410, 502);
+    l3_model_base_t *prism_3d = l3_create_model(DESC_PRISM_BIN, L3_DRAW_FRONT_AND_BACK, 0, 0, 410, 502);
 
     l3_set_face_image(prism_3d, 0, PRISM_FACE0_BIN);
     l3_set_face_image(prism_3d, 1, PRISM_FACE1_BIN);
