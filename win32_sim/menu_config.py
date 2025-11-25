@@ -36,7 +36,6 @@ CFLAGS_BASE += ' -Werror=sign-compare '
 CFLAGS_BASE += ' -Werror=unused-parameter '
 CFLAGS_BASE += ' -Werror=type-limits '
 CFLAGS_BASE += ' -Werror=missing-braces '
-CFLAGS_BASE += ' -Werror=strict-prototypes '
 CFLAGS_BASE += ' -Werror=missing-field-initializers '
 CFLAGS_BASE += ' -Werror=empty-body '
 CFLAGS_BASE += ' -Werror=unused-variable '
@@ -46,7 +45,7 @@ CFLAGS_BASE += ' -Werror=parentheses '
 CFLAGS_BASE += ' -Werror=implicit-fallthrough '
 
 
-CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion'
+CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-promotion -Werror=strict-prototypes'
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 
 if sys.platform.startswith('linux'):

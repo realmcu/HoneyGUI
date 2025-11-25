@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "guidef.h"
 #include "gui_port.h"
 #include "gui_api.h"
@@ -6,6 +7,7 @@
 #include "stdarg.h"
 #include <pthread.h>
 #include <time.h>
+#include <sys/time.h>
 #include "gui_queue.h"
 #include <unistd.h>
 
@@ -188,7 +190,7 @@ static uint8_t gui_lower_memheap[PORT_GUI_LOWER_MEMHEAP_SIZE] = {0};
 
 static struct gui_os_api os_api =
 {
-    .name = "win_gcc",
+    .name = "posix_pthread",
     .thread_create = port_thread_create,
     .thread_delete = port_thread_delete,
     .thread_mdelay = port_thread_mdelay,
