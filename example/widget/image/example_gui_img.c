@@ -38,7 +38,7 @@ void test_timer_cb(void *param)
 static int app_init(void)
 {
 
-    void *addr = (void *)_acclock3_Vector;
+    void *addr = (void *)_actiger_blue;
     // void *addr = (void *)_acgreen;
     // void *addr = (void *)_acgif_demo;
 
