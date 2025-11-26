@@ -120,6 +120,26 @@ The key highlights of this release include:
         with open(file_path, encoding='utf-8',newline='', errors='surrogateescape', mode='w') as fd:
             fd.writelines(all_lines)
 
+    def enable_config_option(self, option_name, file_path):
+        '''Enable a config option in .config file'''
+        with open(file_path, encoding='utf-8', newline='', errors='surrogateescape', mode='r') as fd:
+            content = fd.read()
+        # Replace "# CONFIG_XXX is not set" with "CONFIG_XXX=y"
+        pattern = r'^# (' + re.escape(option_name) + r') is not set'
+        content = re.sub(pattern, r'\1=y', content, flags=re.M)
+        with open(file_path, encoding='utf-8', newline='', errors='surrogateescape', mode='w') as fd:
+            fd.write(content)
+
+    def disable_config_option(self, option_name, file_path):
+        '''Disable a config option in .config file'''
+        with open(file_path, encoding='utf-8', newline='', errors='surrogateescape', mode='r') as fd:
+            content = fd.read()
+        # Replace "CONFIG_XXX=y" with "# CONFIG_XXX is not set"
+        pattern = r'^(' + re.escape(option_name) + r')=y'
+        content = re.sub(pattern, r'# \1 is not set', content, flags=re.M)
+        with open(file_path, encoding='utf-8', newline='', errors='surrogateescape', mode='w') as fd:
+            fd.write(content)
+
 
     def do_copy(self, src_list, dest_dir):
         """
@@ -271,10 +291,10 @@ class HoneyGUIRelease(WindowsToolRelease):
 
     def before_build(self):
 
-        self.uncomment_code_line(line_content=r'#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP',
-                                 file_path=os.path.join(os.getcwd(), r"win32_sim/menu_config.h"))
-        self.add_comment_code_line(line_content=r'#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO',
-                                 file_path=os.path.join(os.getcwd(), r"win32_sim/menu_config.h"))
+        self.enable_config_option(option_name=r'CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP',
+                                 file_path=os.path.join(os.getcwd(), r"win32_sim/.config"))
+        self.disable_config_option(option_name=r'CONFIG_REALTEK_BUILD_GUI_454_454_DEMO',
+                                 file_path=os.path.join(os.getcwd(), r"win32_sim/.config"))
         self.print_git_diff()
 
     def jenkins_build_tool(self):

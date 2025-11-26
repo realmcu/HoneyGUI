@@ -17,10 +17,6 @@ CPPDEFINES = ['GUI_KEIL_SIM']
 
 path = [cwd]
 
-config = [RTK_GUI_ENGINE + './../keil_sim/ac6/menu_config.h']
-
-DefineGroup('menuconfig', config, depend = [''], CPPPATH = path, CPPDEFINES = CPPDEFINES)
-
 src = ['main.c']
 
 

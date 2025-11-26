@@ -1,82 +1,270 @@
-
-
+# HoneyGUI Configuration
 
 menuconfig REALTEK_HONEYGUI
-    bool "Enalbe RealTek HoneyGUI"
+    bool "Enable HoneyGUI Framework"
+    default y
+    help
+      Enable Realtek HoneyGUI graphics framework
+
+if REALTEK_HONEYGUI
+
+choice
+    prompt "Select HoneyGUI Demo"
+    default REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+    optional
+    help
+      Select one demo to build (mutually exclusive, or select none)
+
+config REALTEK_BUILD_EXAMPLE_IMAGE_WIDGET
+    bool "Image Widget Demo"
+    help
+      RTK GUI Base Demo - Image Widget
+
+config REALTEK_BUILD_EXAMPLE_TEXT_WIDGET
+    bool "Text Widget Demo"
+    help
+      RTK GUI Base Demo - Text Widget
+
+config REALTEK_BUILD_EXAMPLE_GRAY_WIDGET
+    bool "Gray Widget Demo"
+    help
+      RTK GUI Base Demo - Gray Widget
+
+config REALTEK_BUILD_REAL_DOG_3D
+    bool "3D Dog Demo"
+    help
+      RTK GUI 3D Demo
+
+config REALTEK_BUILD_REAL_EARTH_3D
+    bool "3D Earth Demo"
+    help
+      RTK GUI 3D Demo
+
+config REALTEK_BUILD_REAL_PIKACHU_GLTF_3D
+    bool "3D Pikachu GLTF Demo"
+    help
+      RTK GUI 3D GLTF Demo
+
+config REALTEK_BUILD_REAL_FLAG_GLTF_3D
+    bool "3D Flag GLTF Demo"
+    help
+      RTK GUI 3D GLTF Demo
+
+config REALTEK_BUILD_REAL_ROBOT_GLTF_3D
+    bool "3D Robot GLTF Demo"
+    help
+      RTK GUI 3D GLTF Demo
+
+config REALTEK_BUILD_REAL_VIEW
+    bool "View Demo"
+    help
+      RTK GUI View Demo
+
+config REALTEK_BUILD_EXAMPLE_LIST_WIDGET
+    bool "List Widget Demo"
+    help
+      RTK GUI List Demo
+
+config REALTEK_BUILD_EXAMPLE_MENU_CELLULAR_WIDGET
+    bool "Menu Cellular Widget Demo"
+    help
+      RTK GUI Menu Cellular Demo
+
+config REALTEK_BUILD_REAL_CANVAS
+    bool "Canvas Demo"
+    help
+      RTK GUI Canvas Demo
+
+config REALTEK_BUILD_REAL_LITE_ARC
+    bool "Geometry ARC Demo"
+    help
+      RTK GUI Geometry ARC Demo
+
+config REALTEK_BUILD_REAL_LITE_RECT
+    bool "Geometry RECT Demo"
+    help
+      RTK GUI Geometry RECT Demo
+
+config REALTEK_BUILD_REAL_LITE_CIRCLE
+    bool "Geometry CIRCLE Demo"
+    help
+      RTK GUI Geometry CIRCLE Demo
+
+config REALTEK_BUILD_EXAMPLE_QBCODE_WIDGET
+    bool "QRCode Widget Demo"
+    help
+      RTK GUI QRCode Widget Demo
+
+config REALTEK_BUILD_EXAMPLE_GLASS_EFFECT_WIDGET
+    bool "Glass Effect Demo"
+    help
+      RTK GUI Glass Effect Demo
+
+config REALTEK_BUILD_REAL_PAINTENGINE
+    bool "Paint Engine Demo"
+    help
+      RTK GUI Paint Engine Demo
+
+config REALTEK_BUILD_REAL_NANOVG
+    bool "NanoVG Demo"
+    help
+      RTK GUI NanoVG Demo
+
+config REALTEK_BUILD_REAL_BOX2D
+    bool "Box2D Demo"
+    help
+      RTK GUI Box2D Demo
+
+config REALTEK_BUILD_REAL_LITEGFX_DEMO
+    bool "LiteGFX Demo"
+    help
+      RTK GUI LiteGFX Demo
+
+config REALTEK_BUILD_GUI_448_368_DEMO
+    bool "GUI Demo 448x368"
+    help
+      RTK GUI Demo for 448x368 resolution
+
+config REALTEK_BUILD_GUI_454_454_DEMO
+    bool "GUI Demo 454x454"
+    help
+      RTK GUI Demo for 454x454 resolution
+
+config REALTEK_BUILD_GUI_410_502_DEMO
+    bool "GUI Demo 410x502"
+    help
+      RTK GUI Demo for 410x502 resolution
+
+config REALTEK_BUILD_GUI_WATCH_TURNKEY_410_502_DEMO
+    bool "Watch Turnkey Demo 410x502"
+    help
+      RTK GUI Demo 410x502 Watch Turnkey
+
+config REALTEK_BUILD_GUI_FHY_320_200_DEMO
+    bool "FHY Demo 320x200"
+    help
+      RTK GUI Demo for 320x200 resolution
+
+config REALTEK_BUILD_GUI_466_466_DEMO
+    bool "GUI Demo 466x466"
+    help
+      RTK GUI Demo for 466x466 resolution
+
+config REALTEK_BUILD_CHARGECASE_410_502_DEMO
+    bool "Charge Case Demo 410x502"
+    help
+      RTK GUI Charge Case Demo
+
+config REALTEK_BUILD_TEST
+    bool "GUI Test"
+    help
+      RTK GUI TEST
+
+config REALTEK_BUILD_HONEYGUI_AUTO_TEST
+    bool "GUI Auto Test"
+    help
+      RTK GUI AUTO TEST
+
+config REALTEK_BUILD_GUI_280_456_DEMO
+    bool "GUI Demo 280x456"
+    help
+      RTK GUI Demo for 280x456 resolution
+
+config REALTEK_BUILD_GUI_240_240_DEMO
+    bool "GUI Demo 240x240"
+    help
+      RTK GUI Demo for 240x240 resolution
+
+config REALTEK_BUILD_GUI_240_320_DEMO
+    bool "GUI Demo 240x320"
+    help
+      RTK GUI Demo for 240x320 resolution
+
+config REALTEK_BUILD_GUI_320_384_DEMO
+    bool "GUI Demo 320x384"
+    help
+      RTK GUI Demo for 320x384 resolution
+
+config REALTEK_BUILD_GUI_320_385_DEMO
+    bool "GUI Demo 320x385"
+    help
+      RTK GUI Demo for 320x385 resolution
+
+config REALTEK_BUILD_GUI_800_480_DEMO
+    bool "GUI Demo 800x480"
+    help
+      RTK GUI Demo for 800x480 resolution
+
+endchoice
+
+menu "HoneyGUI Feature Configuration"
+
+config REALTEK_BUILD_SCRIPT_AS_A_APP
+    bool "Enable Script as App (SaaA)"
     default n
+    help
+      RTK GUI Enable Script as a App
 
-    if REALTEK_HONEYGUI
+config REALTEK_BUILD_CJSON
+    bool "Enable cJSON"
+    default y
+    help
+      RTK GUI Enable cJSON library
 
-        config REALTEK_BUILD_LITE3D
-            bool "Enable Lite3D Library"
-            default n
+config REALTEK_BUILD_WEB
+    bool "Enable Web"
+    default n
+    help
+      RTK GUI Enable web support
 
-        config REALTEK_BUILD_GUI_BOX2D
-        bool "Enable Box2D"
-        default n
+config REALTEK_BUILD_PINYIN
+    bool "Enable Keyboard and Pinyin"
+    default y
+    help
+      RTK GUI Enable KeyBoard And Pinyin input
 
-        config REALTEK_BUILD_GUI_FONT_FREETYPE
-        bool "Enable FreeTYPE FONT"
-        default n
+config REALTEK_BUILD_U8G2
+    bool "Enable u8g2"
+    default n
+    help
+      RTK GUI Enable u8g2 library
 
-        config REALTEK_BUILD_SCRIPT_AS_A_APP
-        bool "Enable SaaA"
-        default n
-        
-        config REALTEK_HONEYGUI_HW_ACC
-        bool "Enable HoneyGUI HW ACC"
-        default n
+config REALTEK_BUILD_LITE_GFX
+    bool "Enable LiteGFX"
+    default n
+    help
+      RTK GUI Enable LiteGFX library
 
-        config REALTEK_H264_DECODER
-            bool "Enable REALTEK_H264_DECODER support"
-            default n
+config REALTEK_BUILD_LETTER_SHELL
+    bool "Enable LetterShell"
+    default y
+    help
+      RTK GUI Enable LetterShell
 
-        if REALTEK_H264_DECODER
+config REALTEK_BUILD_MONKEY_TEST
+    bool "Enable Monkey Test Log"
+    default n
+    help
+      RTK GUI Enable Monkey Test Log
 
-            config REALTEK_H264BSD
-                bool "Enable REALTEK H264BSD"
+config REALTEK_BUILD_GUI_BOX2D
+    bool "Enable Box2D"
+    default n
+    help
+      RTK GUI BOX2D physics engine
 
-        endif
+config REALTEK_BUILD_GUI_XML_DOM
+    bool "Enable XML DOM"
+    default n
+    help
+      RTK GUI XML_DOM parser
 
-        
-        if REALTEK_HONEYGUI_HW_ACC
-            choice
-                prompt "Select hw ACC type"
-                default REALTEK_BUILD_PPE
+config REALTEK_BUILD_LITE3D
+    bool "Enable Lite3D library"
+    default n
+    help
+      RTK GUI Enable Lite3D library
 
-                config REALTEK_BUILD_VG_LITE
-                    bool "Enable VG LITE GPU acc"
+endmenu
 
-                config REALTEK_BUILD_PPE
-                    bool "Enable PPE ACC"
-
-            endchoice
-        endif
-
-        config REALTEK_HONEYGUI_DEMO
-        bool "Select a HoneyGUI demo"
-        default n
-        
-        if REALTEK_HONEYGUI_DEMO
-            choice
-                prompt "select gui demo"
-                default REALTEK_BUILD_GUI_410_502_DEMO
-
-                config REALTEK_BUILD_GUI_410_502_DEMO
-                    bool "Enable 410_502_DEMO"
-                   
-                config REALTEK_BUILD_GUI_466_466_DEMO
-                    bool "Enable 466_466_DEMO"
-
-                config REALTEK_BUILD_GUI_800_480_DEMO
-                    bool "Enable 800_480_DEMO"
-
-                config REALTEK_BUILD_GUI_IMAGE_EXAMPLE
-                    bool "Enable HoneyGUI image widget example"
-
-                config REALTEK_BUILD_GUI_320_384_DEMO
-                    bool "Enable 320_384_DEMO"
-            endchoice
-        endif
-    endif
-
+endif # CONFIG_REALTEK_HONEYGUI

@@ -315,7 +315,7 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
 
     # add program path
     env.PrependENVPath('PATH', os.environ['PATH'])
-    # add menu_config.h/BSP path into Kernel group
+    # add hgconfig.h/BSP path into Kernel group
     DefineGroup("Kernel", [], [], CPPPATH=[str(Dir('#').abspath)])
 
     # add library build action
@@ -323,18 +323,66 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
     bld = Builder(action = act)
     Env.Append(BUILDERS = {'BuildLib': bld})
 
-    # parse menu_config.h to get used component
-    PreProcessor = PatchedPreProcessor()
+    # parse .config to get used component and generate hgconfig.h
+    def parse_config_file(config_path):
+        """Parse .config file and return configuration dictionary"""
+        config = {}
+        with open(config_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                # Skip comments and empty lines
+                if not line or line.startswith('#'):
+                    continue
+                # Parse CONFIG_XXX=y format
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    if value == 'y':
+                        config[key] = '1'
+                    elif value == 'n':
+                        continue  # Don't add disabled options
+                    else:
+                        # Remove quotes from string values
+                        config[key] = value.strip('"')
+        return config
 
-    if os.path.exists('menu_config.h'):
-        f = open('menu_config.h', 'r', encoding='utf-8')
-    else:
-        f = open('../../win32_sim/menu_config.h', 'r', encoding='utf-8')
+    def generate_hgconfig_header(config_dict, output_path):
+        """Generate hgconfig.h from configuration dictionary"""
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('/* Automatically generated file; DO NOT EDIT. */\n')
+            f.write('/* HoneyGUI Configuration */\n\n')
+            f.write('#ifndef HGCONFIG_H__\n')
+            f.write('#define HGCONFIG_H__\n\n')
+            
+            for key, value in sorted(config_dict.items()):
+                f.write(f'#define {key} {value}\n')
+            
+            f.write('\n#endif /* HGCONFIG_H__ */\n')
+        print(f"Generated {output_path}")
+
+    # Find .config file in scons execution directory or project root
+    config_path = None
+    hgconfig_path = None
     
-    contents = f.read()
-    f.close()
-    PreProcessor.process_contents(contents)
-    BuildOptions = PreProcessor.cpp_namespace
+    if os.path.exists('.config'):
+        config_path = '.config'
+        hgconfig_path = 'hgconfig.h'
+    else:
+        # Try parent directory (project root)
+        root_config = '../.config'
+        if os.path.exists(root_config):
+            config_path = root_config
+            hgconfig_path = '../hgconfig.h'
+    
+    if not config_path:
+        print("Error: .config not found!")
+        print("Please run 'menuconfig Kconfig.gui' to generate configuration")
+        Exit(1)
+    
+    # Parse .config and generate hgconfig.h
+    BuildOptions = parse_config_file(config_path)
+    generate_hgconfig_header(BuildOptions, hgconfig_path)
 
     if GetOption('clang-analyzer'):
         # perform what scan-build does
@@ -445,44 +493,6 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
 
     return objs
 
-def PrepareModuleBuilding(env, root_directory, bsp_directory):
-    import menu_config
-
-    global BuildOptions
-    global Env
-    global Tool_ROOT
-
-    # patch for win32 spawn
-    if env['PLATFORM'] == 'win32':
-        win32_spawn = Win32Spawn()
-        win32_spawn.env = env
-        env['SPAWN'] = win32_spawn.spawn
-
-    Env = env
-    Tool_ROOT = root_directory
-
-    # parse bsp menu_config.h to get used component
-    PreProcessor = PatchedPreProcessor()
-    f = open(bsp_directory + '/menu_config.h', 'r')
-    contents = f.read()
-    f.close()
-    PreProcessor.process_contents(contents)
-    BuildOptions = PreProcessor.cpp_namespace
-
-    # add build/clean library option for library checking
-    AddOption('--buildlib',
-              dest='buildlib',
-              type='string',
-              help='building library of a component')
-    AddOption('--cleanlib',
-              dest='cleanlib',
-              action='store_true',
-              default=False,
-              help='clean up the library by --buildlib')
-
-    # add program path
-    env.PrependENVPath('PATH', menu_config.EXEC_PATH)
-
 def GetConfigValue(name):
     assert type(name) == str, 'GetConfigValue: only string parameter is valid'
     try:
@@ -504,39 +514,6 @@ def GetDepend(depend):
     for item in depend:
         if item != '':
             if not item in BuildOptions or BuildOptions[item] == 0:
-                building = False
-
-    return building
-
-def LocalOptions(config_filename):
-    from SCons.Script import SCons
-
-    # parse wiced_config.h to get used component
-    PreProcessor = SCons.cpp.PreProcessor()
-
-    f = open(config_filename, 'r')
-    contents = f.read()
-    f.close()
-
-    PreProcessor.process_contents(contents)
-    local_options = PreProcessor.cpp_namespace
-
-    return local_options
-
-def GetLocalDepend(options, depend):
-    building = True
-    if type(depend) == type('str'):
-        if not depend in options or options[depend] == 0:
-            building = False
-        elif options[depend] != '':
-            return options[depend]
-
-        return building
-
-    # for list type depend
-    for item in depend:
-        if item != '':
-            if not item in options or options[item] == 0:
                 building = False
 
     return building

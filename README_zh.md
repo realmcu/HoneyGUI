@@ -79,6 +79,26 @@ GUI框架具有很强的可移植性，可以在多种芯片和 OS 上运行。�
 > pip install scons==4.4.0
 ```
 
+### 安装 kconfiglib
+安装 kconfiglib 用于配置管理：
+```
+> pip install kconfiglib
+```
+
+### 配置 HoneyGUI
+在编译之前，需要配置要构建的 Demo。
+
+```shell
+> cd win32_sim
+> menuconfig ../Kconfig.gui
+```
+
+这将打开一个配置菜单，您可以选择：
+- 要构建哪个 Demo（互斥选择）
+- 要启用哪些功能（cJSON、拼音输入等）
+
+配置将保存到 `win32_sim/.config` 文件中。
+
 安装 `mingw-w64` 工具链和 `scons` 库后，可以通过两种方式启动应用程序：通过 CMD 启动或通过 GUI 启动。
 
 ### 通过CMD启动

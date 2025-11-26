@@ -1,0 +1,89 @@
+# 3rd Party Libraries Configuration
+
+menu "Framework Configuration"
+
+config REALTEK_BUILD_TVG
+    bool "Enable ThorVG"
+    default n
+    help
+      Enable ThorVG vector graphics library
+
+config REALTEK_BUILD_GIFDEC
+    bool "Enable GIFDEC"
+    default n
+    help
+      Enable GIF decoder library
+
+config REALTEK_BUILD_LITE3D
+    bool "Enable RTK Lite3D"
+    default y
+    help
+      Enable RTK Lite3D library
+
+config REALTEK_BUILD_GUI_USE_ARM2D
+    bool "Enable ARM2D"
+    default y
+    help
+      Enable ARM2D acceleration library
+
+endmenu
+
+menu "Lite3D Source Configuration"
+    depends on REALTEK_BUILD_LITE3D
+
+config REALTEK_BUILD_LITE3D_SOURCE
+    bool "Enable Lite3D Source"
+    default y
+    help
+      Enable Lite3D source code
+
+config REALTEK_BUILD_REAL_BUTTERFLY_3D
+    bool "Butterfly 3D Demo"
+    default y
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable Butterfly 3D demo
+
+config REALTEK_BUILD_REAL_PRISM_MIRROR_3D
+    bool "Prism Mirror 3D Demo"
+    default n
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable Prism Mirror 3D demo
+
+config REALTEK_BUILD_REAL_FACE_3D
+    bool "Face 3D Demo"
+    default n
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable Face 3D demo
+
+config REALTEK_BUILD_REAL_DOG_3D
+    bool "Dog 3D Demo"
+    default n
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable Dog 3D demo
+
+config REALTEK_BUILD_REAL_DISC_3D
+    bool "Disc 3D Demo"
+    default n
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable Disc 3D demo
+
+config REALTEK_BUILD_REAL_PRISM_THICK_3D
+    bool "Prism Thick 3D Demo"
+    default n
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable Prism Thick 3D demo
+
+config REALTEK_BUILD_REAL_APPLIST_3D
+    bool "AppList 3D Demo"
+    default n
+    depends on REALTEK_BUILD_LITE3D_SOURCE
+    help
+      Enable AppList 3D demo
+
+endmenu

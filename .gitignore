@@ -82,6 +82,7 @@ doxygen_graphviz/_build
 # editor config
 .vscode/
 win32_sim/gui.bin
+win32_sim/gui
 
 # example
 gui_engine/example/screen_480_480/Visual_Disigner_Prj/480x480/Simulate/

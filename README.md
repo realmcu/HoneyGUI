@@ -78,6 +78,26 @@ Open a CMD window and execute the following commands to install the Python scons
 > pip install scons==4.4.0
 ```
 
+### Install kconfiglib
+Install kconfiglib for configuration management.
+```
+> pip install kconfiglib
+```
+
+### Configure HoneyGUI
+Before building, you need to configure which demo to build.
+
+```shell
+> cd win32_sim
+> menuconfig ../Kconfig.gui
+```
+
+This will open a configuration menu where you can select:
+- Which demo to build (mutually exclusive)
+- Which features to enable (cJSON, Pinyin input, etc.)
+
+The configuration will be saved to `win32_sim/.config` file.
+
 After installing the `MinGW-w64` toolchain and `scons` library, you can launch the application in two ways: stratup by CMD or startup by GUI.
 
 ### Startup by CMD

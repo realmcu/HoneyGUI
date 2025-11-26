@@ -4,7 +4,13 @@ import sys
 # toolchains options
 CROSS_TOOL='gcc'
 PLATFORM    = 'gcc'
-EXEC_PATH   = r'C:/mingw64/bin'
+
+# Auto-detect platform
+if sys.platform.startswith('linux'):
+    EXEC_PATH = '/usr/bin'
+else:
+    EXEC_PATH = r'C:/mingw64/bin'
+
 BSP_LIBRARY_TYPE = None
 
 
@@ -36,5 +42,6 @@ LFLAGS += ' -Wl,-Map=sdl_sim.map'
 
 POST_ACTION = OBJCPY + ' -O binary $TARGET sdl_sim.bin\n'
 POST_ACTION += SIZE + ' $TARGET \n'
+
 
 

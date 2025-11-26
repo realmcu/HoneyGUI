@@ -21,24 +21,26 @@ def get_file_single(pathname):
         return None
     return file_matches[0]
 
-menu_config_path = r'win32_sim/menu_config.h'
+config_path = r'win32_sim/.config'
 def HoneyGUI_CMD_preBuild():
-    with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='r', newline='', errors='surrogateescape') as fd:
+    with open(os.path.join(HONEYGUI_ROOT, config_path), mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
-    stream = re.sub(r'(#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO)', lambda objs: "//" + objs.group(1), stream, count=1, flags=re.M)
-    stream = re.sub(r'//\s*(#define CONFIG_REALTEK_BUILD_HONEYGUI_AUTO_TEST)', lambda objs: objs.group(1), stream, count=1, flags=re.M)
-    stream = re.sub(r'//\s*(#define CONFIG_REALTEK_BUILD_GUI_410_502_DEMO)', lambda objs: objs.group(1), stream, count=1, flags=re.M)
-    stream = re.sub(r'//\s*(#define CONFIG_REALTEK_BUILD_GUI_800_480_DEMO)', lambda objs: objs.group(1), stream, count=1, flags=re.M)
-    with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='w+', newline='', errors='surrogateescape') as fd:
+    # Disable current demo
+    stream = re.sub(r'^(CONFIG_REALTEK_BUILD_GUI_454_454_DEMO=y)', r'# \1 is not set', stream, count=1, flags=re.M)
+    # Enable test demos
+    stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_HONEYGUI_AUTO_TEST) is not set', r'\1=y', stream, count=1, flags=re.M)
+    stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_GUI_410_502_DEMO) is not set', r'\1=y', stream, count=1, flags=re.M)
+    stream = re.sub(r'^# (CONFIG_REALTEK_BUILD_GUI_800_480_DEMO) is not set', r'\1=y', stream, count=1, flags=re.M)
+    with open(os.path.join(HONEYGUI_ROOT, config_path), mode='w+', newline='', errors='surrogateescape') as fd:
         fd.write(stream)
-    print(f"git diff {menu_config_path}")
-    subprocess.check_call(["git", "diff", menu_config_path], cwd=HONEYGUI_ROOT)
+    print(f"git diff {config_path}")
+    subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
 
 
 def HoneyGUI_CMD_afterBuild():
-    subprocess.check_call(["git", "checkout", "--",menu_config_path], cwd=HONEYGUI_ROOT)
-    print(f"after checkout {menu_config_path}")
-    subprocess.check_call(["git", "diff", menu_config_path], cwd=HONEYGUI_ROOT)
+    subprocess.check_call(["git", "checkout", "--", config_path], cwd=HONEYGUI_ROOT)
+    print(f"after checkout {config_path}")
+    subprocess.check_call(["git", "diff", config_path], cwd=HONEYGUI_ROOT)
 
 
 HoneyGUI_build_hook = {
