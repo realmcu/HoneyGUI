@@ -30,7 +30,7 @@ The engine's workflow is as follows:
 OBJ Static Model
 ~~~~~~~~~~~~~~~~~
 
-OBJ is a widely used static model file format, suitable for scenarios that do not require complex animations, such as product showcases or UI decorative elements.
+OBJ is a widely used static model file format, suitable for scenarios that do not require complex animations, such as product showcases or :term:`UI` decorative elements.
 
 A complete OBJ model typically consists of the following three core components:
 

@@ -20,7 +20,7 @@ System initialization mainly includes the initialization of the system clock, th
 GUI Server
 ^^^^^^^^^^^^^^^^^
 
-First, the parts of the GUI port that have been filled in advance are initialized, including the operating system, display, input, and file system. The GUI server thread is then created and the GUI server runs continuously in GUI thread.
+First, the parts of the :term:`GUI` port that have been filled in advance are initialized, including the operating system, display, input, and file system. The GUI server thread is then created and the GUI server runs continuously in GUI thread.
 
 GUI Application
 ^^^^^^^^^^^^^^^^^

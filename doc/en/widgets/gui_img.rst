@@ -47,12 +47,12 @@ It can move an image widget to a new coordinate without changing the original co
 Rotation
 ~~~~~~~~
 
-Rotate the image widget around the center of the circle with this API :cpp:any:`gui_img_rotation`.
+Rotate the image widget around the center of the circle by :cpp:any:`gui_img_rotation`.
 
 Zoom
 ~~~~
 
-You can adjust the size of the image widget to fit your requirements by this API :cpp:any:`gui_img_scale`.
+You can adjust the size of the image widget to fit your requirements by :cpp:any:`gui_img_scale`.
 
 Opacity
 ~~~~~~~

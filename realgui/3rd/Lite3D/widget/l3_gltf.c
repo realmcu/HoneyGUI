@@ -114,10 +114,12 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
     l3_gltf_primitive_t *all_primitives_ram = (l3_gltf_primitive_t *)l3_malloc(sizeof(
                                                                                    l3_gltf_primitive_t) * header->primitive_count);
     memset(all_primitives_ram, 0, sizeof(l3_gltf_primitive_t) * header->primitive_count);
-    desc->skins = (l3_gltf_skin_t *)l3_malloc(sizeof(l3_gltf_skin_t) * desc->skin_count);
-    memset(desc->skins, 0, sizeof(l3_gltf_skin_t) * desc->skin_count);
-    desc->animation = (l3_gltf_single_animation_t *)l3_malloc(sizeof(l3_gltf_single_animation_t));
-    memset(desc->animation, 0, sizeof(l3_gltf_single_animation_t));
+    if (desc->skin_count > 0)
+    {
+        desc->skins = (l3_gltf_skin_t *)l3_malloc(sizeof(l3_gltf_skin_t) * desc->skin_count);
+        memset(desc->skins, 0, sizeof(l3_gltf_skin_t) * desc->skin_count);
+    }
+
     desc->materials = (l3_gltf_material_t *)l3_malloc(sizeof(l3_gltf_material_t) *
                                                       desc->material_count);
     memset(desc->materials, 0, sizeof(l3_gltf_material_t) * desc->material_count);
@@ -201,10 +203,16 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
     }
 
     // 2.6 Sampler Reconstruction
-    desc->animation->sampler_count = header->sampler_count;
-    desc->animation->samplers = (l3_gltf_sampler_t *)l3_malloc(sizeof(l3_gltf_sampler_t) *
-                                                               desc->animation->sampler_count);
-    for (uint32_t i = 0; i < desc->animation->sampler_count; ++i)
+    if (header->sampler_count > 0)
+    {
+        desc->animation = (l3_gltf_single_animation_t *)l3_malloc(sizeof(l3_gltf_single_animation_t));
+        memset(desc->animation, 0, sizeof(l3_gltf_single_animation_t));
+        desc->animation->sampler_count = header->sampler_count;
+        desc->animation->samplers = (l3_gltf_sampler_t *)l3_malloc(sizeof(l3_gltf_sampler_t) *
+                                                                   desc->animation->sampler_count);
+
+    }
+    for (uint32_t i = 0; i < header->sampler_count; ++i)
     {
         g3m_sampler_on_disk_t *src_sampler = &samplers_on_disk[i];
         l3_gltf_sampler_t *dst_sampler = &desc->animation->samplers[i];
@@ -219,10 +227,13 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
     }
 
     // 2.7 Channel Reconstruction
-    desc->animation->channel_count = header->channel_count;
-    desc->animation->channels = (l3_gltf_channel_t *)l3_malloc(sizeof(l3_gltf_channel_t) *
-                                                               desc->animation->channel_count);
-    for (uint32_t i = 0; i < desc->animation->channel_count; ++i)
+    if (header->channel_count > 0)
+    {
+        desc->animation->channel_count = header->channel_count;
+        desc->animation->channels = (l3_gltf_channel_t *)l3_malloc(sizeof(l3_gltf_channel_t) *
+                                                                   desc->animation->channel_count);
+    }
+    for (uint32_t i = 0; i < header->channel_count; ++i)
     {
         g3m_channel_on_disk_t *src_channel = &channels_on_disk[i];
         l3_gltf_channel_t *dst_channel = &desc->animation->channels[i];
@@ -264,8 +275,11 @@ static l3_gltf_model_description_t *l3_load_gltf_description(void *desc_addr)
     // gui_log("Channels Array Size:%zu bytes\n", sizeof(g3m_channel_on_disk_t) * header->channel_count);
     // gui_log("Samplers Array Size:%zu bytes\n", sizeof(g3m_sampler_on_disk_t) * header->sampler_count);
 
-    desc->animation->duration = get_animation_duration(desc->animation);
-    desc->animation->animation_time = 0.0f;
+    if (desc->animation != NULL)
+    {
+        desc->animation->duration = get_animation_duration(desc->animation);
+        desc->animation->animation_time = 0.0f;
+    }
 
     return desc;
 }

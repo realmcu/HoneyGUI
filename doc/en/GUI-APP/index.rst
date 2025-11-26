@@ -2,7 +2,7 @@
 GUI Application
 ================
 
-The GUI framework diagram is shown in the figure below:
+HoneyGUI framework diagram is shown in the figure below:
   
   
 .. figure:: https://foruda.gitee.com/images/1753344638505538859/b08edaa1_10737458.png

@@ -132,11 +132,6 @@ static void l3_gltf_update_animation(l3_gltf_model_t *_this, float dt)
     l3_gltf_model_description_t *desc = _this->desc;
     l3_gltf_single_animation_t *anim = desc->animation;
 
-    if (!anim || anim->channel_count == 0)
-    {
-        return;
-    }
-
     // 1. Update the animation time
     anim->animation_time += dt;
 
@@ -418,15 +413,24 @@ void l3_gltf_prepare(l3_gltf_model_t *_this)
     }
 
     // Update animation
-    static uint32_t current_time_ms = 0;
-    current_time_ms = gui_ms_get();
-    l3_gltf_update_animation(_this, (current_time_ms - _this->last_time_ms) / 1000.0f);
-    _this->last_time_ms = current_time_ms;
+    if (_this->desc->animation != NULL)
+    {
+        static uint32_t current_time_ms = 0;
+        current_time_ms = gui_ms_get();
+        l3_gltf_update_animation(_this, (current_time_ms - _this->last_time_ms) / 1000.0f);
+        _this->last_time_ms = current_time_ms;
+    }
 
     // Start recursive rendering from the root node of all scenes.
     for (size_t i = 0; i < _this->desc->scene_root_count; ++i)
     {
         int root_node_index = _this->desc->scene_root_indices[i];
+
+        if (_this->desc->animation == NULL)
+        {
+            l3_gltf_node_t *node = &_this->desc->nodes[root_node_index];
+            l3_4x4_matrix_compose_trs(&node->global_transform, node->translation, node->rotation, node->scale);
+        }
 
         render_node_recursive(_this, root_node_index, &view_matrix);
     }
