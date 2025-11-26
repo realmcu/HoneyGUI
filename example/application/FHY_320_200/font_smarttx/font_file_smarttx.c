@@ -42,6 +42,119 @@ uint8_t text[] = {0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x44, 0x00, 0x45, 0x00, 0x
  *                           Private Functions
  *============================================================================*/
 
+static uint8_t get_utf8_byte_num(uint8_t first_byte)
+{
+    if (first_byte < 0x80)
+    {
+        return 1;   // 1-byte (ASCII character)
+    }
+    else if ((first_byte >> 5) == 0x6)
+    {
+        return 2;   // 2-byte sequence
+    }
+    else if ((first_byte >> 4) == 0xE)
+    {
+        return 3;   // 3-byte sequence
+    }
+    else if ((first_byte >> 3) == 0x1E)
+    {
+        return 4;   // 4-byte sequence
+    }
+    else
+    {
+        return 0;   // Invalid first byte
+    }
+}
+
+static uint16_t utf8_to_unicode_length(uint8_t *utf8, uint32_t utf8_len)
+{
+    uint16_t unicode_len = 0;
+    uint16_t i = 0;
+
+    while (i < utf8_len)
+    {
+        uint8_t char_len = get_utf8_byte_num(utf8[i]);
+
+        if (char_len == 0 || i + char_len > utf8_len)
+        {
+            break;
+        }
+
+        i += char_len;
+        unicode_len++;
+    }
+
+    return unicode_len;
+}
+
+static uint16_t utf8_to_utf16le(const uint8_t *utf8_str, uint16_t utf8_len, uint8_t *utf16le_buf,
+                                uint16_t buf_size)
+{
+    uint16_t utf16_index = 0;
+    uint16_t char_count = 0;
+
+    for (uint16_t i = 0; i < utf8_len && utf16_index + 1 < buf_size;)
+    {
+        uint8_t utf8_bytes = get_utf8_byte_num(utf8_str[i]);
+        uint32_t unicode_char = 0;
+
+        switch (utf8_bytes)
+        {
+        case 1:
+            unicode_char = utf8_str[i];
+            i += 1;
+            break;
+
+        case 2:
+            if (i + 1 < utf8_len)
+            {
+                unicode_char = ((utf8_str[i] & 0x1F) << 6) | (utf8_str[i + 1] & 0x3F);
+                i += 2;
+            }
+            else
+            {
+                i = utf8_len;
+                continue;
+            }
+            break;
+
+        case 3:
+            if (i + 2 < utf8_len)
+            {
+                unicode_char = ((utf8_str[i] & 0x0F) << 12) |
+                               ((utf8_str[i + 1] & 0x3F) << 6) |
+                               (utf8_str[i + 2] & 0x3F);
+                i += 3;
+            }
+            else
+            {
+                i = utf8_len;
+                continue;
+            }
+            break;
+
+        default:
+            i++;
+            continue;
+        }
+
+        if (unicode_char <= 0xFFFF)
+        {
+            utf16le_buf[utf16_index++] = unicode_char & 0xFF;
+            utf16le_buf[utf16_index++] = (unicode_char >> 8) & 0xFF;
+            char_count++;
+        }
+        else
+        {
+            utf16le_buf[utf16_index++] = 0xFF;
+            utf16le_buf[utf16_index++] = 0xFD;
+            char_count++;
+        }
+    }
+
+    return char_count;
+}
+
 #if 1
 static int smarttx_font_test(void)
 {
@@ -58,8 +171,8 @@ static int smarttx_font_test(void)
     gui_color_t color = APP_COLOR_WHITE;
 
     gui_text_t *text_widget = gui_text_create(gui_obj_get_root(), "font_text", x, y, width, height);
-    gui_text_set(text_widget, text, GUI_FONT_SRC_CUS, color, sizeof(text) / 2, font_size);
-
+    gui_text_set(text_widget, text, GUI_FONT_SRC_CUS, color, sizeof(text), font_size);
+    gui_text_encoding_set(text_widget, UTF_16LE);
     /*Support LEFT, RIGHT, CENTER and SCROLL_X*/
     /*Only support single line*/
     gui_text_mode_set(text_widget, CENTER);
@@ -131,6 +244,25 @@ static void font_load(gui_text_t *text, gui_text_rect_t *rect)
     GUI_UNUSED(text);
     GUI_UNUSED(rect);
 
+    if (text->charset == UTF_8)
+    {
+        uint16_t unicode_len = utf8_to_unicode_length(text->content, text->len);
+        uint8_t *utf16le_buf = gui_malloc(unicode_len * 2);
+        text->font_len = unicode_len;
+        utf8_to_utf16le(text->content, text->len, utf16le_buf, unicode_len * 2);
+        text->data = utf16le_buf;
+        text->charset = UTF_16LE;
+    }
+    else if (text->charset == UTF_16LE)
+    {
+        text->font_len = text->len / 2;
+        text->data = NULL;
+    }
+    else
+    {
+        gui_log("charset not support in font smarttx");
+    }
+
     if (scroll_need_update)
     {
 #if !defined(__WIN32) && !defined(_WIN32) && !defined(__linux__)
@@ -153,16 +285,18 @@ static void font_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     UI_WidgetTypeDef font =
     {
-        .x = text->base.x,
-        .y = text->base.y,
+        .x = text->base.y,
+        .y = text->base.x,
+        // .x = text->base.x,
+        // .y = text->base.y,
         .width = text->base.w,
         .height = text->base.h,
         .active_ys = 0,
         .active_ye = 0,
-        .addr_ptr = text->content,
+        .addr_ptr = text->data == NULL ? text->content : text->data,
 
         .string_mem = {
-            .font_color = RGB565(255, 255, 255),
+            .font_color = RGB565(text->color.color.rgba.r, text->color.color.rgba.g, text->color.color.rgba.b),
             .font_size = text->font_height,
             .string_len = text->len,
             // .align = 0,
@@ -236,6 +370,11 @@ static void font_unload(gui_text_t *text)
 static void font_destroy(gui_text_t *text)
 {
     GUI_UNUSED(text);
+    if (text->data)
+    {
+        gui_free(text->data);
+        text->data = NULL;
+    }
 
     // gui_log("font_destroy\n");
 
