@@ -123,6 +123,10 @@ static void rgb565_2_rgb565_1d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
     {
         rgb565_2_rgb565_1d_cover(image, dc, rect);
     }
+    else
+    {
+        rgb565_2_rgb565_1d_bypass(image, dc, rect);
+    }
 }
 
 static void rgb565_2_rgb565_2d_filter(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
@@ -310,6 +314,10 @@ static void rgb565_2_rgb565_2d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
             rgb565_2_rgb565_2d_filter(image, dc, rect);
         }
     }
+    else
+    {
+        GUI_ASSERT(NULL);
+    }
 }
 
 static void rgb565_2_rgb565_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect)
@@ -321,6 +329,10 @@ static void rgb565_2_rgb565_3d(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t 
     else if (image->blend_mode == IMG_FILTER_BLACK)
     {
         rgb565_2_rgb565_3d_filter(image, dc, rect);
+    }
+    else
+    {
+        GUI_ASSERT(NULL);
     }
 }
 
