@@ -15,6 +15,7 @@ CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
 if GetDepend('CONFIG_REALTEK_BUILD_REAL_LITE_RECT'):
     src += ['example_gui_lite_geometry_rect.c']
+    src += ['rect_view.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
     
 Return('group')

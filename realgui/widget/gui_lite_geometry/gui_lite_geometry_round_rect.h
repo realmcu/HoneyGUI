@@ -4,7 +4,7 @@
 #include "guidef.h"
 #include "gui_obj.h"
 #include "draw_img.h"
-#include "lite_geometry.h"
+// #include "lite_geometry.h"
 
 #define BLOCK_SIZE 100           /**< Tile size for block-based rendering */
 
@@ -12,17 +12,15 @@
 typedef struct
 {
     gui_obj_t base;             /**< Base widget */
-
-    // Drawing resources
-    draw_img_t *draw_img;       /**< Drawing image object */
-    uint8_t *block_buffer;      /**< Block buffer for tiled rendering */
-    uint32_t block_buffer_size; /**< Block buffer size */
-    bool use_block_drawing;     /**< Use block drawing mode */
-    uint16_t block_cols;        /**< Number of block columns */
-    uint16_t block_rows;        /**< Number of block rows */
-
-    // Drawing context
-    DrawContext draw_ctx;       /**< Drawing context */
+    draw_img_t *circle_00;
+    draw_img_t *circle_01;
+    draw_img_t *circle_10;
+    draw_img_t *circle_11;
+    uint8_t *circle_data;
+    draw_img_t *rect_0;
+    draw_img_t *rect_1;
+    draw_img_t *rect_2;
+    uint8_t *rect_data;
     uint8_t opacity_value;      /**< Opacity value */
 
     // Round rect geometry data
@@ -31,7 +29,7 @@ typedef struct
     int w;                      /**< Round rect width */
     int h;                      /**< Round rect height */
     int radius;                 /**< Round rect radius */
-    uint32_t color;             /**< Round rect color */
+    gui_color_t color;             /**< Round rect color */
 } gui_lite_round_rect_t;
 /**
  * @brief Create a new lite arc widget
@@ -53,7 +51,7 @@ gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name
  */
 void gui_lite_round_rect_set_style(gui_lite_round_rect_t *this,
                                    int x, int y, int w, int h,
-                                   int radius, uint32_t color);
+                                   int radius, gui_color_t color);
 
 /**
  * @brief Set the position of the lite round rect widget
@@ -80,7 +78,7 @@ void gui_lite_round_rect_set_radius(gui_lite_round_rect_t *this, int radius);
  * @param this Pointer to the lite round rect widget
  * @param color Round rect color
  */
-void gui_lite_round_rect_set_color(gui_lite_round_rect_t *this, uint32_t color);
+void gui_lite_round_rect_set_color(gui_lite_round_rect_t *this, gui_color_t color);
 /**
  * @brief Register a click event callback for the lite round rect widget
  * @param this Pointer to the lite round rect widget

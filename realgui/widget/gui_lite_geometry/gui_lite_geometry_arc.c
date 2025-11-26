@@ -289,7 +289,7 @@ static bool init_block_drawing(gui_lite_arc_t *this, gui_obj_t *obj)
     }
     memset(this->draw_img, 0x00, sizeof(draw_img_t));
     this->draw_img->data = this->block_buffer;
-    // this->draw_img->blend_mode = IMG_SRC_OVER_MODE;
+    this->draw_img->blend_mode = IMG_SRC_OVER_MODE;
     this->draw_img->opacity_value = this->opacity_value;
     this->draw_img->high_quality = 0;
 
