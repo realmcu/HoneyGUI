@@ -179,7 +179,8 @@ static void switch_app_stopwatch(void *obj, gui_event_t e, void *param)
     (void)obj;
     (void)e;
     (void)param;
-    // gui_view_switch_direct(current_view, gui_view_descriptor_get("stopwatch_view"), SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
+    gui_view_switch_direct(current_view, gui_view_descriptor_get("stopwatch_view"),
+                           SWITCH_OUT_ANIMATION_FADE, SWITCH_IN_ANIMATION_FADE);
 }
 
 static void switch_app_timers(void *obj, gui_event_t e, void *param)
@@ -350,7 +351,7 @@ static void note_design(gui_obj_t *obj, void *p)
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         char *text = (char *)text_array[index];
         int font_size = 42;
-        gui_text_t *t = gui_text_create(note, "txt", 140, 0, 300, 120);
+        gui_text_t *t = gui_text_create(note, "txt", 140, 0, 300, 100);
         gui_text_set(t, text, GUI_FONT_SRC_TTF, APP_COLOR_WHITE, strlen(text), font_size);
         gui_text_type_set(t, SF_COMPACT_REGULAR_BIN, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MID_LEFT);

@@ -41,6 +41,7 @@ const static gui_view_descriptor_t *menu_view = NULL;
 const static gui_view_descriptor_t *watchface_select_view = NULL;
 const static gui_view_descriptor_t *bottom_view = NULL;
 const static gui_view_descriptor_t *top_view = NULL;
+const static gui_view_descriptor_t *test_view = NULL;
 static gui_view_descriptor_t const descriptor =
 {
     /* change Here for current view */
@@ -87,6 +88,7 @@ static GUI_INIT_VIEW_DESCRIPTOR_REGISTER(gui_view_descriptor_register_init);
 static int gui_view_get_other_view_descriptor_init(void)
 {
     /* you can get other view descriptor point here */
+    test_view = gui_view_descriptor_get("stopwatch_view");
     menu_view = gui_view_descriptor_get("menu_view");
     watchface_select_view = gui_view_descriptor_get("watchface_select_view");
     bottom_view = gui_view_descriptor_get("bottom_view");

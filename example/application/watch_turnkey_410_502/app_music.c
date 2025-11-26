@@ -157,7 +157,7 @@ static void list_timer_cb(void *obj)
     list_offset_his = list->offset;
     int range = list->base.h - list->total_length - list->out_scope;
 
-    int t_y = list_offset_his * (SCROLLBAR_BG_H - SCROLLBAR_S_H) / range;
+    int t_y = list_offset_his * (SCROLLBAR_BG_H - SCROLLBAR_L_H) / range;
     gui_obj_t *scrollbar_bg = gui_list_entry(GUI_BASE(obj)->brother_list.next, gui_obj_t,
                                              brother_list);
     gui_obj_t *scrollbar = gui_list_entry(scrollbar_bg->brother_list.next, gui_obj_t,
@@ -197,7 +197,7 @@ static void music_view_design(gui_view_t *view)
     gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
     gui_img_t *scrollbar_bg = gui_img_create_from_mem(parent, 0, SCROLLBAR_BG_BIN, 395, 80, 0, 0);
     gui_img_set_mode(scrollbar_bg, IMG_SRC_OVER_MODE);
-    gui_img_t *scrollbar = gui_img_create_from_mem(parent, 0, SCROLLBAR_S_BIN, 394, 80, 0, 0);
+    gui_img_t *scrollbar = gui_img_create_from_mem(parent, 0, SCROLLBAR_L_BIN, 394, 80, 0, 0);
     gui_img_set_mode(scrollbar, IMG_SRC_OVER_MODE);
 
     // ----------time-----------------//

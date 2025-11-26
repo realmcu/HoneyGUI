@@ -4,7 +4,7 @@
 Fruit Ninja
 ==============
 
-This example demonstrates how to develop a simple 'Fruit Ninja' APP, from which you can learn and understand the basic methods and processes of developing a UI application. Earn points by cutting fruits within one minute, and the game will be over if cut a bomb. Watch the demo video below to see its full functionality.
+This example demonstrates how to develop a simple 'Fruit Ninja' :term:`APP`, from which you can learn and understand the basic methods and processes of developing a :term:`UI` application. Earn points by cutting fruits within one minute, and the game will be over if cut a bomb. Watch the demo video below to see its full functionality.
 
 .. raw:: html
 
@@ -40,7 +40,7 @@ Configurations
 Usage Steps
 ------------
 
-Step 1:  Declare the app ui design function
+Step 1:  Declare the APP ui design function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: C
@@ -67,7 +67,7 @@ Step 2:  Call function
 
 Design Ideas
 -------------
-+ In this app, box2d was used to create solids to simulate the movement of objects in a gravitational environment, given parameters such as the initial velocity of the x-axis and y-axis during initialization.
++ In this APP, box2d was used to create solids to simulate the movement of objects in a gravitational environment, given parameters such as the initial velocity of the x-axis and y-axis during initialization.
 
    .. code-block:: c
 

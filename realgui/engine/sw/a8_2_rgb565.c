@@ -153,7 +153,7 @@ static void a8_2_rgb565_2d_use_bg_with_aa(draw_img_t *image, gui_dispdev_t *dc, 
     }
     else if (opacity_value == 255)
     {
-#if 1
+#if 0
         PROCESS_IMAGE_PIXEL_2D_WITH_1X2_ANTI_ALIASING(
             color_a8_t,
         {
@@ -171,12 +171,21 @@ static void a8_2_rgb565_2d_use_bg_with_aa(draw_img_t *image, gui_dispdev_t *dc, 
     }
     else
     {
+#if 0
         PROCESS_IMAGE_PIXEL_2D_WITH_1X2_ANTI_ALIASING(
             color_a8_t,
         {
             writebuf[write_offset] = pixel_aliasing_a8_1x2(fg, writebuf[write_offset], pixel_00->a * opacity_value >> 8, pixel_01->a * opacity_value >> 8, xRatio);
         };
         );
+#else
+        PROCESS_IMAGE_PIXEL_2D_WITH_2X2_ANTI_ALIASING(
+            color_a8_t,
+        {
+            writebuf[write_offset] = pixel_aliasing_a8_2x2(fg, writebuf[write_offset], pixel_00->a * opacity_value >> 8, pixel_01->a * opacity_value >> 8, pixel_10->a * opacity_value >> 8, pixel_11->a * opacity_value >> 8, (uint8_t)(xRatio * 255), (uint8_t)(yRatio * 255));
+        };
+        );
+#endif
     }
 }
 

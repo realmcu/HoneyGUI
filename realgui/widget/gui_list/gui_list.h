@@ -43,10 +43,10 @@ typedef enum
     LIST_CIRCLE,           ///< Circle list.
     LIST_ZOOM,             ///< Zoom center list.
     LIST_CARD,             ///< Stack like card.
+    LIST_FADE,             ///< Fade in.
     LIST_FAN,              ///< Rotate like fan.
     LIST_HELIX,            ///< Rotate like helix.
     LIST_CURL,             ///< Rotate curly.
-    LIST_FADE,             ///< Fade in.
 } LIST_STYLE;
 
 /* LIST_STYLE enum end*/
