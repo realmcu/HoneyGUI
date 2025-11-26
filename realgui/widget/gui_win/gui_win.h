@@ -50,7 +50,8 @@ typedef struct gui_win
     uint8_t checksum;
     bool scope;
     bool hold_tp;
-    uint8_t animate_array_length;
+    void *blur_param;
+    uint8_t blur_degree;
 } gui_win_t;
 
 /*============================================================================*
@@ -168,14 +169,6 @@ void gui_win_click(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 void gui_win_hold_tp(gui_win_t *_this, bool hold_tp);
 
 /**
- * @brief get the animation progress percentage.
- *
- * @param win pointer to the window structure that contains the animation.
- * @return the current animation progress percentage.
- */
-float gui_win_get_animation_progress_percent(gui_win_t *win);
-
-/**
  * @brief set the scale rate for the window both horizontally and vertically.
  *
  * @param win pointer to the window structure.
@@ -207,30 +200,6 @@ void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value);
  */
 void gui_win_prepare(gui_obj_t *obj);
 
-/**
- * @brief append an animation to a GUI window.
- *
- * This function appends an animation to the specified GUI window. The animation
- * will run for the specified duration, repeat the specified number of times, and
- * call the provided callback function at each frame.
- *
- * @param win pointer to the GUI window object.
- * @param dur duration of the animation in milliseconds.
- * @param repeat_count number of times the animation should repeat.
- * @param callback function to be called at each frame.
- * @param p user data to be passed to the callback function.
- * @param name animate name.
- *
- * @note The `callback` function should match the expected signature for animation
- *       callbacks in the GUI library being used. The `p` parameter allows the
- *       passing of additional data to the callback function.
- */
-void gui_win_append_animate(gui_win_t  *win,
-                            uint32_t    dur,
-                            int         repeat_count,
-                            void       *callback,
-                            void       *p,
-                            const char *name);
 /**
  * @brief Move the GUI window to the specified coordinates.
  *
@@ -269,6 +238,20 @@ int gui_win_get_y(gui_win_t *win);
  * @param y The y-coordinate to compensate.
  */
 void gui_win_compensate(gui_win_t *win, int x, int y);
+
+/**
+ * @brief Enable GUI window's blur effect
+ * @param win Pointer to the GUI window.
+ * @param use_blur true to enable blur effect, false to disable.
+ */
+void gui_win_enable_blur(gui_win_t *win, bool enable);
+
+/**
+ * @brief Set the blur degree for the GUI window.
+ * @param win Pointer to the GUI window.
+ * @param degree The blur degree value (0-255) and default value is 225.
+ */
+void gui_win_set_blur_degree(gui_win_t *win, uint8_t degree);
 
 #ifdef __cplusplus
 }

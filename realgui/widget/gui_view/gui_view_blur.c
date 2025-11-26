@@ -83,41 +83,43 @@ void gui_view_blur(gui_view_t *this, int16_t release)
     static float blur_ratio = 0.0f;
     static BLUR_DIRECTION dir = BLUR_HORIZONTAL;
     gui_view_t *next_view = gui_view_get_next();
+    gui_view_t *current_view = gui_view_get_current();
 
-    if (this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR)
+    if (current_view->current_transition_style == SWITCH_OUT_STILL_USE_BLUR)
     {
-        if (!next_view) {}
-        else if (next_view->current_transition_style == SWITCH_IN_FROM_LEFT_USE_TRANSLATION)
+        if (next_view)
         {
-            x2 = release - 1;
-            blur_ratio = abs(release) / (float)w;
-            dir = BLUR_HORIZONTAL;
-        }
-        else if (next_view->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_TRANSLATION)
-        {
-            x1 = w + release;
-            blur_ratio = abs(release) / (float)w;
-            dir = BLUR_HORIZONTAL_REVERSE;
-        }
-        else if (next_view->current_transition_style == SWITCH_IN_FROM_TOP_USE_TRANSLATION)
-        {
-            y2 = release - 1;
-            blur_ratio = abs(release) / (float)h;
-            dir = BLUR_VERTICAL;
+            if (next_view->current_transition_style == SWITCH_IN_FROM_LEFT_USE_TRANSLATION)
+            {
+                x2 = release - 1;
+                blur_ratio = abs(release) / (float)w;
+                dir = BLUR_HORIZONTAL;
+            }
+            else if (next_view->current_transition_style == SWITCH_IN_FROM_RIGHT_USE_TRANSLATION)
+            {
+                x1 = w + release;
+                blur_ratio = abs(release) / (float)w;
+                dir = BLUR_HORIZONTAL_REVERSE;
+            }
+            else if (next_view->current_transition_style == SWITCH_IN_FROM_TOP_USE_TRANSLATION)
+            {
+                y2 = release - 1;
+                blur_ratio = abs(release) / (float)h;
+                dir = BLUR_VERTICAL;
 
-        }
-        else if (next_view->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION)
-        {
-            y1 = h + release;
-            blur_ratio = abs(release) / (float)h;
-            dir = BLUR_VERTICAL_REVERSE;
+            }
+            else if (next_view->current_transition_style == SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION)
+            {
+                y1 = h + release;
+                blur_ratio = abs(release) / (float)h;
+                dir = BLUR_VERTICAL_REVERSE;
+            }
+            this = next_view;
         }
     }
     else
     {
-        gui_view_t *current_view = gui_view_get_current();
-        if (!next_view) {}
-        else if (current_view->current_transition_style == SWITCH_OUT_TO_LEFT_USE_TRANSLATION)
+        if (current_view->current_transition_style == SWITCH_OUT_TO_LEFT_USE_TRANSLATION)
         {
             x2 = w + release - 1;
             blur_ratio = 1 - abs(release) / (float)w;
@@ -141,7 +143,9 @@ void gui_view_blur(gui_view_t *this, int16_t release)
             blur_ratio = 1 - abs(release) / (float)h;
             dir = BLUR_VERTICAL_REVERSE;
         }
+        this = current_view;
     }
+    this->base.need_preprocess = true;
     gui_rect_t new_rect = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
     prepare_blur_param(this, new_rect, blur_ratio, dir);
 }

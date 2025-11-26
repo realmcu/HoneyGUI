@@ -320,7 +320,6 @@ static void gui_view_transition(gui_view_t *_this, int16_t release)
     else if ((_this->current_transition_style == SWITCH_OUT_STILL_USE_BLUR ||
               _this->current_transition_style == SWITCH_IN_STILL_USE_BLUR) && blur_prepare != NULL)
     {
-        _this->base.need_preprocess = true;
         gui_view_blur(_this, release);
     }
 }
@@ -466,7 +465,6 @@ static void gui_view_prepare(gui_obj_t *obj)
 
     gui_view_t *_this = (gui_view_t *)obj;
     obj->opacity_value = _this->opacity;
-    _this->base.need_preprocess = false;
 
     if (!g_SurpressEvent && _this == g_CurrentView)
     {
@@ -584,6 +582,7 @@ static void gui_view_end(gui_obj_t *obj)
             _this->blur_param = NULL;
         }
     }
+    obj->need_preprocess = false;
 }
 
 static void gui_view_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)

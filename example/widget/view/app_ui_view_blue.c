@@ -15,20 +15,18 @@
 #define CURRENT_VIEW_NAME "blue_view"
 
 
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *yellow_view_descriptor = NULL;
-static const gui_view_descriptor_t *white_view_descriptor = NULL;
-static const gui_view_descriptor_t *lime_view_descriptor = NULL;
 static void switch_in_cb(gui_view_t *view);
 static void switch_out_cb(gui_view_t *view);
 
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
     GUI_UNUSED(obj);
     GUI_UNUSED(e);
     GUI_UNUSED(param);
-    gui_view_switch_direct(current_view, white_view_descriptor, SWITCH_OUT_NONE_ANIMATION,
+    gui_view_switch_direct(current_view, gui_view_descriptor_get("white_view"),
+                           SWITCH_OUT_NONE_ANIMATION,
                            SWITCH_OUT_NONE_ANIMATION);
 }
 
@@ -67,7 +65,8 @@ static void switch_in_cb(gui_view_t *view)
 
 
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, true, switch_in_cb, switch_out_cb);
+
+
 static int app_init(void)
 {
     gui_view_create(gui_obj_get_root(), gui_view_descriptor_get(CURRENT_VIEW_NAME), 0, 0, 0, 0);

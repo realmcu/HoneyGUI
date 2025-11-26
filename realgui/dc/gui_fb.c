@@ -218,11 +218,11 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             continue;
         }
-        obj_draw_scan(obj);
         if (obj->need_preprocess)
         {
             obj->obj_cb(obj, OBJ_PREPROCESS);
         }
+        obj_draw_scan(obj);
     }
 }
 

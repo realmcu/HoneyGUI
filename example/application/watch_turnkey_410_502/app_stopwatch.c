@@ -12,7 +12,6 @@
 #include "app_main_watch.h"
 #include "gui_view_instance.h"
 #include "gui_message.h"
-#include "tp_algo.h"
 
 /*============================================================================*
  *                           Types
@@ -56,11 +55,12 @@ typedef enum
  *                           Function Declaration
  *============================================================================*/
 static void stopwatch_design(gui_view_t *view);
+static void clear_mem(gui_view_t *view);
 
 /*============================================================================*
  *                           GUI_VIEW_INSTANCE
  *============================================================================*/
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, stopwatch_design, NULL);
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, stopwatch_design, clear_mem);
 
 /*============================================================================*
  *                            Variables
@@ -160,9 +160,11 @@ static void update_page_1_lap(void)
         gui_text_color_set(t_lap, font_color);
         gui_obj_hidden((void *)t_lap, false);
     }
+
+    gui_obj_t *t_base = gui_list_entry(t_lap_array[0]->base.brother_list.prev, gui_obj_t, brother_list);
+    gui_obj_hidden(t_base, false);
     if (time_count_index == 0)
     {
-        gui_obj_t *t_base = gui_list_entry(t_lap_array[0]->base.brother_list.prev, gui_obj_t, brother_list);
         uint32_t cnt = time_count_array[0];
         if (cnt >= 30000)
         {
@@ -177,7 +179,6 @@ static void update_page_1_lap(void)
             count_base = sec * 1000;
         }
         gui_text_content_set((void *)t_base, base_str, strlen(base_str));
-        gui_obj_hidden(t_base, false);
     }
 }
 
@@ -534,7 +535,7 @@ static void page_0_design(gui_obj_t *parent)
 
     sprintf(count_str, "00:00.00");
     gui_text_t *t_count = gui_text_create(parent, 0, 125, 282, SCREEN_WIDTH, 48);
-    gui_text_set(t_count, count_str, GUI_FONT_SRC_TTF, gui_rgb(0xFF, 0xFF, 0xFF),
+    gui_text_set(t_count, count_str, GUI_FONT_SRC_TTF, gui_rgb(0, 0, 0),
                  strlen(count_str), 48);
     gui_text_type_set(t_count, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(t_count, MID_LEFT);

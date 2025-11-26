@@ -13,15 +13,10 @@
 
 #define CURRENT_VIEW_NAME "yellow_view"
 
-
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *blue_view = NULL;
-static const gui_view_descriptor_t *white_view = NULL;
 static void app_ui_view_yellow_design(gui_view_t *view);
 
-
-
 GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_yellow_design, NULL);
+
 static void app_ui_view_yellow_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);

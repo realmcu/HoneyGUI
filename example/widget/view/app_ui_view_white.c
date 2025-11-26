@@ -14,11 +14,9 @@
 #define CURRENT_VIEW_NAME "white_view"
 
 
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *blue_view = NULL;
-static const gui_view_descriptor_t *yellow_view = NULL;
 static void app_ui_view_white_design(gui_view_t *view);
 
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_white_design, NULL);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
@@ -30,7 +28,6 @@ static void img_cb(void *obj, gui_event_t e, void *param)
                            SWITCH_OUT_NONE_ANIMATION);
 }
 
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_white_design, NULL);
 static void app_ui_view_white_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);

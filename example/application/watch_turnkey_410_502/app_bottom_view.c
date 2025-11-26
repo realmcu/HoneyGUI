@@ -137,27 +137,27 @@ static void time_update_cb(void)
 // draw timecard and not display
 static void draw_timecard(void *parent)
 {
-    // gui_win_t *win = gui_win_create(parent, __WIN1_NAME, 0, 0, SCREEN_WIDTH, 60);
-    gui_canvas_round_rect_t *canvas_timecard = gui_canvas_round_rect_create(GUI_BASE(parent),
-                                                                            __WIN1_NAME,
-                                                                            35, 0, 340, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
+    gui_win_t *win = gui_win_create(parent, __WIN1_NAME, 0, 0, SCREEN_WIDTH, 60);
+    gui_canvas_round_rect_t *canvas_timecard = gui_canvas_round_rect_create(GUI_BASE(win), 0, 29, 0,
+                                                                            352, 60, 20, gui_rgba(39, 43, 44, 255 * 0.7));
 
     // text
-    gui_text_t *timecard_date_text = gui_text_create(canvas_timecard, "date_s",  15, 20, 0, 0);
+    gui_text_t *timecard_date_text = gui_text_create(canvas_timecard, "date_s", 15, 20, 0, 0);
     gui_text_set(timecard_date_text, (void *)date_timecard_content, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(date_timecard_content),
                  32);
     gui_text_type_set(timecard_date_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
-    gui_text_t *timecard_time_text = gui_text_create(canvas_timecard, "time_s",  -10, 20, 0,
+    gui_text_t *timecard_time_text = gui_text_create(canvas_timecard, "time_s", -10, 20, 0,
                                                      0);
     gui_text_set(timecard_time_text, (void *)time_str, GUI_FONT_SRC_TTF, APP_COLOR_WHITE,
                  strlen(time_str),
                  32);
     gui_text_type_set(timecard_time_text, SF_COMPACT_TEXT_MEDIUM_BIN, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_time_text, RIGHT);
-    GUI_BASE(canvas_timecard)->not_show = 1;
+    GUI_BASE(win)->not_show = 1;
+    gui_win_enable_blur(win, false);
 }
 
 static void timer_cb(void *obj)
@@ -178,11 +178,13 @@ static void timer_cb(void *obj)
     {
         img_timecard->not_show = 1;
         canvas_timecard->not_show = 0;
+        gui_win_enable_blur((void *)canvas_timecard, true);
     }
     else
     {
         img_timecard->not_show = 0;
         canvas_timecard->not_show = 1;
+        gui_win_enable_blur((void *)canvas_timecard, false);
     }
 }
 

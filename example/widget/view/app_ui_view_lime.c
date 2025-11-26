@@ -14,11 +14,9 @@
 #define CURRENT_VIEW_NAME "lime_view"
 
 
-static gui_view_t *current_view = NULL;
-static const gui_view_descriptor_t *blue_view = NULL;
-static const gui_view_descriptor_t *white_view = NULL;
 static void app_ui_view_lime_design(gui_view_t *view);
 
+GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_lime_design, NULL);
 
 static void img_cb(void *obj, gui_event_t e, void *param)
 {
@@ -29,7 +27,7 @@ static void img_cb(void *obj, gui_event_t e, void *param)
                            SWITCH_OUT_ANIMATION_ZOOM,
                            SWITCH_IN_ANIMATION_ZOOM);
 }
-GUI_VIEW_INSTANCE(CURRENT_VIEW_NAME, false, app_ui_view_lime_design, NULL);
+
 static void app_ui_view_lime_design(gui_view_t *view)
 {
     gui_view_set_animate_step(view, 20);
@@ -38,7 +36,8 @@ static void app_ui_view_lime_design(gui_view_t *view)
 
     gui_obj_add_event_cb(img, (gui_event_cb_t)img_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    gui_view_switch_on_event(view, blue_view, SWITCH_OUT_TO_TOP_USE_TRANSLATION,
+    gui_view_switch_on_event(view, gui_view_descriptor_get("blue_view"),
+                             SWITCH_OUT_TO_TOP_USE_TRANSLATION,
                              SWITCH_IN_STILL_USE_BLUR,
                              GUI_EVENT_TOUCH_MOVE_UP);
 

@@ -383,12 +383,31 @@ static void canvas_timer_cb(void *p)
 static void list_timer_cb(void *obj)
 {
     gui_list_t *list = (gui_list_t *)obj;
-    list_offset_his = list->offset;
-    int range = list->base.h - list->total_length;
-    int t_y = list_offset_his * (SCROLLBAR_BG_H - SCROLLBAR_S_H) / range;
-    gui_obj_t *scrollbar = gui_list_entry(GUI_BASE(obj)->parent->child_list.prev, gui_obj_t,
+    gui_obj_t *scrollbar_bg = gui_list_entry(GUI_BASE(obj)->parent->child_list.prev, gui_obj_t,
+                                             brother_list);
+    gui_obj_t *scrollbar = gui_list_entry(scrollbar_bg->child_list.next, gui_obj_t,
                                           brother_list);
-    gui_img_translate((void *)scrollbar, 0, t_y);
+    static uint8_t cnt = 0;
+    if (list_offset_his != list->offset)
+    {
+        list_offset_his = list->offset;
+        int range = list->base.h - list->total_length;
+        int t_y = list_offset_his * (SCROLLBAR_BG_H - SCROLLBAR_S_H) / range;
+        gui_img_translate((void *)scrollbar, 0, t_y);
+        gui_obj_hidden(scrollbar_bg, false);
+        gui_obj_hidden(scrollbar, false);
+        cnt = 0;
+    }
+    else
+    {
+        cnt++;
+        if (cnt >= 50) //1s
+        {
+            cnt = 0;
+            gui_obj_hidden(scrollbar_bg, true);
+            gui_obj_hidden(scrollbar, true);
+        }
+    }
 }
 
 /*============================================================================*
@@ -489,8 +508,10 @@ static void app_menu_design(gui_view_t *view)
 
         gui_img_t *scrollbar_bg = gui_img_create_from_mem(view, 0, SCROLLBAR_BG_BIN, 395, 30, 0, 0);
         gui_img_set_mode(scrollbar_bg, IMG_SRC_OVER_MODE);
-        gui_img_t *scrollbar = gui_img_create_from_mem(view, 0, SCROLLBAR_S_BIN, 394, 30, 0, 0);
+        gui_img_t *scrollbar = gui_img_create_from_mem(scrollbar_bg, 0, SCROLLBAR_S_BIN, -1, 0, 0, 0);
         gui_img_set_mode(scrollbar, IMG_SRC_OVER_MODE);
+        gui_obj_hidden((void *)scrollbar_bg, true);
+        gui_obj_hidden((void *)scrollbar, true);
     }
     else
     {
