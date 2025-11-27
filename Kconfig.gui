@@ -120,16 +120,6 @@ config REALTEK_BUILD_REAL_LITEGFX_DEMO
     help
       RTK GUI LiteGFX Demo
 
-config REALTEK_BUILD_GUI_448_368_DEMO
-    bool "GUI Demo 448x368"
-    help
-      RTK GUI Demo for 448x368 resolution
-
-config REALTEK_BUILD_GUI_454_454_DEMO
-    bool "GUI Demo 454x454"
-    help
-      RTK GUI Demo for 454x454 resolution
-
 config REALTEK_BUILD_GUI_410_502_DEMO
     bool "GUI Demo 410x502"
     help
