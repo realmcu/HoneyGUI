@@ -113,8 +113,15 @@ if platform.system() == 'Windows':
     env['SPAWN'] = ourspawn
 
 # include app
-objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
-objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
+if os.path.exists(os.path.join(RTK_GUI_ENGINE, 'SConscript')):
+    objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
+if os.path.exists(os.path.join(GUI_EXAMPLE, 'SConscript')):
+    objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
+
+GUI_AUTOGEN_CODE = os.path.abspath('./../autogen/')
+if os.path.exists(os.path.join(GUI_AUTOGEN_CODE, 'SConscript')):
+    objs.extend(SConscript(os.path.join(GUI_AUTOGEN_CODE, 'SConscript')))
+
 
 # Platform-specific libraries
 if sys.platform == 'win32':
