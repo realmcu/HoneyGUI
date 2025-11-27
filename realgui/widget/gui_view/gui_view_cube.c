@@ -57,7 +57,7 @@ void gui_view_cube(gui_view_t *_this, int16_t release)
     gui_matrix_t rotate_3D;
     float w = _this->base.w;
     float h = _this->base.h;
-    float d = (w + h) / 2;
+    float d = (float)(w + h) / 2;
     float rotate_degree_x = 0;
     float rotate_degree_y = 0;
     float xoff;
@@ -98,8 +98,8 @@ void gui_view_cube(gui_view_t *_this, int16_t release)
     {
         offset_y = release;
     }
-    rotate_degree_x = 90 * offset_y / (_this->base.h);
-    rotate_degree_y = 90 * offset_x / (_this->base.w);
+    rotate_degree_x = 90.f * offset_y / (_this->base.h);
+    rotate_degree_y = 90.f * offset_x / (_this->base.w);
     matrix_compute_rotate(-rotate_degree_x, rotate_degree_y, 0, &rotate_3D);
 
     gui_vertex_t normal = {0, 0, 0};

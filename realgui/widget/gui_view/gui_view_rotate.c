@@ -97,8 +97,8 @@ void gui_view_rotate(gui_view_t *_this, int16_t release)
     {
         offset_y = release;
     }
-    rotate_degree_x = 90 * offset_y / (_this->base.h / 2);
-    rotate_degree_y = 90 * offset_x / (_this->base.w / 2);
+    rotate_degree_x = 90.f * offset_y / (_this->base.h / 2.f);
+    rotate_degree_y = 90.f * offset_x / (_this->base.w / 2.f);
     matrix_compute_rotate(-rotate_degree_x, rotate_degree_y, 0, &rotate_3D);
 
     matrix_transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
