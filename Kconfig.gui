@@ -2,7 +2,7 @@
 
 menuconfig REALTEK_HONEYGUI
     bool "Enable HoneyGUI Framework"
-    default y
+    default n
     help
       Enable Realtek HoneyGUI graphics framework
 
