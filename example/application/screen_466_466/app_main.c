@@ -430,8 +430,8 @@ static void view_switch_in_camera(gui_view_t *view)
     GUI_UNUSED(ip_addr);
 #ifndef _WIN32
     //wifi_camera_enter_cb(ip_addr);
-    void wifi_gui_msg_handler(uint8_t *ip_addr);
-    wifi_gui_msg_handler(ip_addr);
+    void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
+    wifi_gui_msg_handler(0, ip_addr);
 #endif
 }
 
@@ -524,12 +524,15 @@ void update_video_image(uint8_t *jpeg_disp_image)
     gui_fb_change();
 }
 
+
 static void view_switch_out_camera(gui_view_t *view)
 {
     GUI_UNUSED(view);
 #ifndef _WIN32
-    void wifi_camera_exit_cb(void);
-    wifi_camera_exit_cb();
+    // void wifi_camera_exit_cb(void);
+    // wifi_camera_exit_cb();
+    void wifi_gui_msg_handler(uint32_t type, void *ip_addr);
+    wifi_gui_msg_handler(1, NULL);
 #endif
 
 #ifndef _WIN32
