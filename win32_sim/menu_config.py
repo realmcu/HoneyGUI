@@ -49,7 +49,7 @@ CFLAGS = CFLAGS_BASE + ' -fno-strict-aliasing -std=gnu11 -Wcomment -Wdouble-prom
 CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 
 if sys.platform.startswith('linux'):
-    LFLAGS = ' -T honeygui_linux.ld'  # Linux: use ELF linker script
+    LFLAGS = ' -T honeygui_linux.lds'  # Linux: use default linker script
     LFLAGS += ' -pthread'
 else:
     LFLAGS = ' -T honeygui_mingw.ld'  # Windows: use PE linker script

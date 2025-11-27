@@ -22,7 +22,13 @@ static uint32_t gui_obj_count;
 static uint32_t obj_count;
 static int frame_count_per_second;
 
-static gui_color_t fb_bg_color = {0};
+static gui_color_t fb_bg_color =
+{
+    .color.rgba.r = 0,
+    .color.rgba.g = 0,
+    .color.rgba.b = 0,
+    .color.rgba.a = 255,
+};
 
 void gui_set_bg_color(gui_color_t color)
 {

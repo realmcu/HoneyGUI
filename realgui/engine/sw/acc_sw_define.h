@@ -31,7 +31,7 @@ extern "C" {
         return;                                                                                        \
     }                                                                                                  \
     \
-    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)((image)->data);            \
+    uintptr_t image_base = sizeof(gui_rgb_data_head_t) + (uintptr_t)((image)->data);            \
     uint16_t *writebuf = (uint16_t *)(dc)->frame_buf;                                                   \
     uint16_t *readbuf = (uint16_t *)(uintptr_t)image_base; GUI_UNUSED(readbuf);                                              \
     \
