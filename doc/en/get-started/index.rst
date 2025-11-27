@@ -53,7 +53,7 @@ Download the MinGW-w64 toolchain, unzip it to drive C, and add it to the system 
 
 1.  `MinGW-w64 Download <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z>`_
 2.  Unzip and copy to directory: ``C:\mingw64``
-3.  Add a environment variable: ``C:\mingw64\bin``:
+3.  Add a environment variable: ``C:\mingw64\bin``
 
    - Open the Start Menu and search for ``Advanced system setting``.
    - Show ``System Properties`` and then go to the ``Advanced`` tab.
@@ -77,7 +77,32 @@ Open a CMD window and execute the following commands to install the Python scons
 
    > pip install scons==4.4.0
 
-After installing the ``MinGW-w64`` toolchain and ``scons`` library, you can launch the application in two ways: stratup by CMD or startup by GUI.
+Install Kconfiglib
+^^^^^^^^^^^^^^^^^^^
+
+Install kconfiglib for configuration management:
+
+.. code-block:: shell
+
+   > pip install kconfiglib
+
+Configure HoneyGUI
+^^^^^^^^^^^^^^^^^^^
+Before building, you need to configure which demo to build.
+
+.. code-block:: shell
+
+   > cd win32_sim
+   > menuconfig ../Kconfig.gui
+
+This will open a configuration menu where you can select:
+
+   - Which demo to build (mutually exclusive)
+   - Which features to enable (cJSON, pinyin input, etc.)
+
+The configuration will be saved to the ``win32_sim/.config`` file.
+
+After installing the ``MinGW-w64`` toolchain and ``scons`` library, you can launch the application in two ways: stratup by CMD or startup by VSCode.
 
 Startup by CMD (Scons)
 ^^^^^^^^^^^^^^^^^^^^^^^^

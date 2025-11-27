@@ -98,7 +98,7 @@ This will open a configuration menu where you can select:
 
 The configuration will be saved to `win32_sim/.config` file.
 
-After installing the `MinGW-w64` toolchain and `scons` library, you can launch the application in two ways: stratup by CMD or startup by GUI.
+After installing the `MinGW-w64` toolchain and `scons` library, you can launch the application in two ways: stratup by CMD or startup by VSCode.
 
 ### Startup by CMD
 Open a CMD window in the `HoneyGUI` or `gui` folder, and then run the following command to start the application.
