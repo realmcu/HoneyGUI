@@ -104,7 +104,7 @@ The following table lists the LCD-related interfaces supported by mainstream chi
     'Y' means the driver is already included in the library.
     'NA' means the driver is not yet included in the library.
 
-Driver term:`IC`
+Driver IC
 ~~~~~~~~~~~~~~~~~~
 
 The following table lists the LCD-related driver ICs supported by mainstream chips. If you want to know more information, please click on the specific chip name.
