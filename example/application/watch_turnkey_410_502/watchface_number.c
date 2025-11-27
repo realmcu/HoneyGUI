@@ -12,6 +12,7 @@
 #include "app_main_watch.h"
 #include "gui_canvas.h"
 #include "gui_view_instance.h"
+#include "gui_lite_geometry_round_rect.h"
 /*============================================================================*
  *                            Macros
  *============================================================================*/
@@ -101,31 +102,14 @@ static void time_dot1_cb(void *p)
     opacity -= 4;
     dot0->opacity_value = opacity;
 }
-
-static void bg_cb(NVGcontext *vg)
-{
-    NVGcolor bgColor = nvgRGB(219, 122, 147); // pink background color
-    nvgBeginPath(vg);
-    nvgRect(vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    nvgFillColor(vg, bgColor);
-    nvgFill(vg);
-}
-
 void create_watchface_number(gui_view_t *view)
 {
     watchface_clear_mem = clear_num_view;
     gui_obj_t *parent = GUI_BASE(view);
     gui_win_t *win = gui_win_create(parent, "win", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    size_t buffer_bg_size = SCREEN_WIDTH * SCREEN_HEIGHT * 2 + sizeof(gui_rgb_data_head_t);
-    if (!img_bg_data)
-    {
-        img_bg_data = gui_malloc(buffer_bg_size);
-    }
-    memset(img_bg_data, 0, buffer_bg_size);
-    gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGB565, 0, SCREEN_WIDTH, SCREEN_HEIGHT, bg_cb,
-                                      img_bg_data);
-    gui_img_create_from_mem(win, "watchface", (void *)img_bg_data, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gui_lite_round_rect_create(win, "rect_bg", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, gui_rgba(219, 122,
+                               147, 255));
 
     // create time-text
     gui_text_t *t_time = gui_text_create(win, "t_time", -58, 10, 0, 0);

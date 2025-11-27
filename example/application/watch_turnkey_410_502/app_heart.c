@@ -696,9 +696,28 @@ static void note_design(gui_obj_t *obj, void *p)
 static void heartrate_design(gui_view_t *view)
 {
     gui_obj_t *obj = GUI_BASE(view);
-    gui_view_switch_on_event(view, watchface_view, SWITCH_OUT_ANIMATION_FADE,
-                             SWITCH_IN_ANIMATION_FADE,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+    const char *obj_name = gui_view_get_current()->descriptor->name;
+    VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
+    VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
+    if (strcmp(obj_name, "bottom_view") == 0)
+    {
+        swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
+        swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
+    }
+    if (strcmp(obj_name, "menu_view") == 0)
+    {
+        gui_view_switch_on_event(current_view, gui_view_descriptor_get("menu_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
+    else
+    {
+        gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
     g_lastUpdateTime = gui_ms_get();
 
     win_heart = gui_win_create(obj, "win_heart", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

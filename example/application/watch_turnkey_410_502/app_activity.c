@@ -192,12 +192,6 @@ void drawCircles_cb(NVGcontext *vg)
 static void activity_timer_cb(void *obj)
 {
     GUI_UNUSED(obj);
-    // if (current_view->current_transition_style < SWITCH_OUT_NONE_ANIMATION &&
-    //     gui_view_get_next() != NULL)
-    // {
-    //     return;
-    // }
-
     gui_obj_timer_t *timer = img_ring->base.timer;
 
     count += timer->interval_ms;
@@ -205,13 +199,8 @@ static void activity_timer_cb(void *obj)
     gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, RADIUS * 2, RADIUS * 2,
                                       arc_activity_cb, img_ring_data);
     gui_img_set_image_data(img_ring, img_ring_data);
+    gui_img_set_mode(img_ring, IMG_SRC_OVER_MODE);
     gui_img_refresh_size(img_ring);
-
-    // dot img
-    // gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
-    //     drawCircles_cb, img_dot_data);
-    // gui_img_set_image_data(img_dot, img_dot_data);
-    // gui_img_refresh_size(img_dot);
 
     if (count >= COUNT_MAX)
     {
@@ -292,6 +281,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                               drawCircles_cb, img_dot_data);
             gui_img_set_image_data(img_dot, img_dot_data);
+            gui_img_set_mode(img_dot, IMG_SRC_OVER_MODE);
             gui_img_refresh_size(img_dot);
 
             if (ring_flag_enter == true)
@@ -337,6 +327,7 @@ static void note_design(gui_obj_t *obj, void *p)
             gui_canvas_render_to_image_buffer(GUI_CANVAS_OUTPUT_RGBA, 0, 12, 96,
                                               drawCircles_cb, img_dot_data);
             gui_img_set_image_data(img_dot, img_dot_data);
+            gui_img_set_mode(img_dot, IMG_SRC_OVER_MODE);
             gui_img_refresh_size(img_dot);
 
             char *text_today = "Today";
@@ -372,10 +363,20 @@ static void activity_design(gui_view_t *view)
         swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
     }
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
-                             swtich_out,
-                             swtich_in,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+    if (strcmp(obj_name, "menu_view") == 0)
+    {
+        gui_view_switch_on_event(current_view, gui_view_descriptor_get("menu_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
+    else
+    {
+        gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
 
     has_draw_bg = false;
     ring_flag_enter = false;
@@ -395,7 +396,7 @@ static void activity_design(gui_view_t *view)
 
     win_activity = gui_win_create(obj, "win_activity", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    // draw_flag = 0;
+    // // draw_flag = 0;
 
     win_menu_activity = gui_win_create(obj, "win_menu_activity", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     win_activity_arc = gui_win_create(obj, "win_activity_arc", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -412,7 +413,6 @@ static void activity_design(gui_view_t *view)
     memset(img_ring_data, 0, buffer_size);
     img_ring = gui_img_create_from_mem(win_activity_arc, 0, (void *)img_ring_data,
                                        SCREEN_WIDTH / 2 - RADIUS, 66, 0, 0);
-    gui_img_set_mode(img_ring, IMG_SRC_OVER_MODE);
     gui_img_set_quality(img_ring, true);
 
     //img dot
@@ -424,7 +424,6 @@ static void activity_design(gui_view_t *view)
     memset(img_dot_data, 0, buffer_size);
     img_dot = gui_img_create_from_mem(win_menu_activity, "dot_img", (void *)img_dot_data,
                                       393, 82, 0, 0);
-    gui_img_set_mode(img_dot, IMG_SRC_OVER_MODE);
     gui_img_set_quality(img_dot, true);
 
     sprintf(time_text_content, "14:21");
@@ -442,7 +441,7 @@ static void activity_design(gui_view_t *view)
     img_icon2 = gui_img_create_from_mem(win_activity, "icon2", (void *)ACTIVITY_RIGHT_CONTROL0_BIN, 326,
                                         397, 0, 0);
     time_update_cb(NULL);
-    // gui_obj_create_timer(obj, 10, true, enter_timer_cb);
+    gui_obj_create_timer(obj, 10, true, enter_timer_cb);
     gui_obj_create_timer(GUI_BASE(img_ring), 10, true, activity_timer_cb);
     gui_obj_start_timer(GUI_BASE(img_ring));
     return;

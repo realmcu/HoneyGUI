@@ -81,13 +81,11 @@ static void note_design(gui_obj_t *obj, void *p)
     uint16_t index = ((gui_list_note_t *)obj)->index;
     int16_t offset_X = 29;
     int16_t offset_x_icon = 20;
-    // gui_lite_round_rect_t *rect_bg = gui_lite_round_rect_create(obj, "rect_bg");
-    // gui_lite_round_rect_set_style(rect_bg, offset_X, 0, 352, 115, 30, RGBA_color(98, 101, 98, 255 * 0.7));
-    // gui_canvas_round_rect_t *rect_bg = gui_canvas_round_rect_create(obj, "canvas_bg",offset_X, 0, 352, 115, 30, gui_rgba(98, 101, 98, 255 * 0.7));
-
+    gui_lite_round_rect_t *rect_bg = gui_lite_round_rect_create(obj, "canvas_bg", offset_X, 0, 352, 115,
+                                                                30, gui_rgba(98, 101, 98, 255 * 0.7));
     if (index == 0)
     {
-        // rect_bg->base.not_show = true;
+        rect_bg->base.not_show = true;
         gui_text_t *sport_text = gui_text_create(current_view, "ac_text1", SCREEN_WIDTH / 2 - 40, 60, 0, 0);
         gui_text_set(sport_text, "Music", GUI_FONT_SRC_TTF, gui_rgb(231, 31, 69),
                      strlen("Music"), 40);
@@ -103,8 +101,6 @@ static void note_design(gui_obj_t *obj, void *p)
     {
         // note_activity
         {
-            gui_canvas_round_rect_t *rect_bg = gui_canvas_round_rect_create(obj, "canvas_bg", offset_X, 0, 352,
-                                                                            115, 30, gui_rgba(98, 101, 98, 255 * 0.7));
             gui_img_create_from_mem(rect_bg, "Homepage", MUSIC_HOMEPAGE_BIN, offset_x_icon,
                                     20, 0, 0);
 
@@ -120,8 +116,6 @@ static void note_design(gui_obj_t *obj, void *p)
     else if (index == 2)
     {
         // note_music
-        gui_canvas_round_rect_t *rect_bg = gui_canvas_round_rect_create(obj, "canvas_bg", offset_X, 0, 352,
-                                                                        115, 30, gui_rgba(98, 101, 98, 255 * 0.7));
         gui_img_create_from_mem(rect_bg, "music", MUSIC_BROADCAST_ICON_BIN, offset_x_icon,
                                 20, 0, 0);
 
@@ -136,8 +130,6 @@ static void note_design(gui_obj_t *obj, void *p)
     else if (index == 3)
     {
         // note_music
-        gui_canvas_round_rect_t *rect_bg = gui_canvas_round_rect_create(obj, "canvas_bg", offset_X, 0, 352,
-                                                                        115, 30, gui_rgba(98, 101, 98, 255 * 0.7));
         gui_img_t *img = gui_img_create_from_mem(rect_bg, "music", MUSIC_LIB_BIN, offset_x_icon,
                                                  20, 0, 0);
         gui_img_scale(img, 0.7, 0.7);
@@ -175,13 +167,28 @@ static void music_view_design(gui_view_t *view)
     VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
     if (strcmp(obj_name, "bottom_view") == 0)
     {
-        swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
+        gui_view_set_animate_step(current_view, 60);
+        swtich_in = SWITCH_IN_FROM_TOP_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
+        gui_view_switch_on_event(current_view, gui_view_descriptor_get("bottom_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
     }
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
-                             swtich_out,
-                             swtich_in,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+    if (strcmp(obj_name, "menu_view") == 0)
+    {
+        gui_view_switch_on_event(current_view, gui_view_descriptor_get("menu_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
+    else
+    {
+        gui_view_switch_on_event(current_view, gui_view_descriptor_get("watchface_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
     gui_obj_t *parent = GUI_BASE(view);
 
 

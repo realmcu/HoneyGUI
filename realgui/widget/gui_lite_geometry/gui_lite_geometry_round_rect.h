@@ -23,21 +23,25 @@ typedef struct
     uint8_t *rect_data;
     uint8_t opacity_value;      /**< Opacity value */
 
-    // Round rect geometry data
-    int x;                      /**< Center X coordinate relative to widget */
-    int y;                      /**< Center Y coordinate relative to widget */
-    int w;                      /**< Round rect width */
-    int h;                      /**< Round rect height */
     int radius;                 /**< Round rect radius */
     gui_color_t color;             /**< Round rect color */
+    uint8_t checksum;                  /* Checksum for change detection. */
 } gui_lite_round_rect_t;
 /**
- * @brief Create a new lite arc widget
+ * @brief Create a new lite round rect widget
  * @param parent Parent widget or NULL for root widget
  * @param name Widget name or NULL for default name
- * @return Pointer to the created lite arc widget
+ * @param x Center X coordinate relative to widget
+ * @param y Center Y coordinate relative to widget
+ * @param w Round rect width
+ * @param h Round rect height
+ * @param radius Round rect radius
+ * @param color Round rect color
+ * @return Pointer to the created lite round rect widget
  */
-gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name);
+gui_lite_round_rect_t *gui_lite_round_rect_create(void *parent, const char *name, int x, int y,
+                                                  int w, int h,
+                                                  int radius, gui_color_t color);
 
 /**
  * @brief Set the style of the lite arc widget

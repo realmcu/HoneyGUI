@@ -544,7 +544,6 @@ static void switch_app_cb(void *obj)
 static void weather_design(gui_view_t *view)
 {
     const char *obj_name = gui_view_get_current()->descriptor->name;
-    // gui_log("obj_name: %s\n", obj_name);
     VIEW_SWITCH_STYLE swtich_in = SWITCH_IN_ANIMATION_FADE;
     VIEW_SWITCH_STYLE swtich_out = SWITCH_OUT_ANIMATION_FADE;
     if (strcmp(obj_name, "bottom_view") == 0)
@@ -552,16 +551,20 @@ static void weather_design(gui_view_t *view)
         swtich_in = SWITCH_IN_FROM_BOTTOM_USE_TRANSLATION;
         swtich_out = SWITCH_OUT_TO_BOTTOM_USE_TRANSLATION;
     }
-    else if (strcmp(obj_name, "watchface_view") == 0)
+    if (strcmp(obj_name, "menu_view") == 0)
     {
-        swtich_in = SWITCH_IN_ANIMATION_ZOOM_FROM_TOP_LEFT;
-        swtich_out = SWITCH_OUT_ANIMATION_ZOOM_TO_TOP_LEFT;
-
+        gui_view_switch_on_event(current_view, gui_view_descriptor_get("menu_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
     }
-    gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
-                             swtich_out,
-                             swtich_in,
-                             GUI_EVENT_KB_SHORT_CLICKED);
+    else
+    {
+        gui_view_switch_on_event(view, gui_view_descriptor_get("watchface_view"),
+                                 swtich_out,
+                                 swtich_in,
+                                 GUI_EVENT_KB_SHORT_CLICKED);
+    }
     weather_data_init();
     weather_condition_init();
     weather_list = gui_list_create(view, "weather_list", 0, 0, 0, 0, 502, 0, VERTICAL,
