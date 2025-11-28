@@ -670,7 +670,12 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
 {
     if (font_mode == FONT_SRC_FTL)
     {
-        gui_font_mem_init_ftl(font_source);
+        uint8_t flag = 0;
+        gui_ftl_read((uintptr_t)(uint8_t *)font_source + 1, &flag, sizeof(uint8_t));
+        if (flag == FONT_FILE_BMP_FLAG)
+        {
+            gui_font_mem_init_ftl(font_source);
+        }
     }
     this->path = font_source;
     this->font_mode = font_mode;

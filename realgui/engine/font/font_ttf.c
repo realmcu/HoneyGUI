@@ -316,12 +316,11 @@ void font_ttf_draw_bitmap_classic(gui_text_t *text, uint8_t *buf,
     font_glyph_render(&render_font, &glyph);
 }
 
-uint32_t getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
+uint32_t getGlyphOffsetFromMemory(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint8_t *table_ptr)
 {
     if (ttfbin->index_method == 0)
     {
-        uint8_t *ptr = (uint8_t *)ttfbin + offsetof(GUI_FONT_HEAD_TTF,
-                                                    font_name) + ttfbin->font_name_length;
+        uint8_t *ptr = table_ptr;
         uint32_t glyphOffset = *((uint32_t *)ptr + unicode);
         if (glyphOffset != 0xffffffff)
         {
@@ -330,8 +329,7 @@ uint32_t getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
     }
     else
     {
-        uint8_t *ptr = (uint8_t *)ttfbin + offsetof(GUI_FONT_HEAD_TTF,
-                                                    font_name) + ttfbin->font_name_length;
+        uint8_t *ptr = table_ptr;
         uint32_t indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(uint32_t));
         for (uint32_t i = 0; i < indexEntries; ++i)
         {
@@ -339,6 +337,41 @@ uint32_t getGlyphOffsetFromMemory(uint16_t unicode, GUI_FONT_HEAD_TTF *ttfbin)
             ptr += sizeof(uint16_t);
 
             uint32_t glyphOffset = *(uint32_t *)ptr;
+            ptr += sizeof(uint32_t);
+
+            if (currentUnicode == unicode)
+            {
+                return glyphOffset;
+            }
+        }
+    }
+    return 0;
+}
+uint32_t getGlyphOffsetFromFtl(uint32_t unicode, GUI_FONT_HEAD_TTF *ttfbin, uint8_t *table_ptr)
+{
+    if (ttfbin->index_method == 0)
+    {
+        uint8_t *ptr = table_ptr;
+        uint32_t glyphOffset = 0;
+        gui_ftl_read((uintptr_t)ptr + unicode * sizeof(uint32_t), (uint8_t *)&glyphOffset,
+                     sizeof(uint32_t));
+        if (glyphOffset != 0xffffffff)
+        {
+            return glyphOffset;
+        }
+    }
+    else
+    {
+        uint8_t *ptr = table_ptr;
+        uint32_t indexEntries = ttfbin->index_area_size / (sizeof(uint16_t) + sizeof(uint32_t));
+        for (uint32_t i = 0; i < indexEntries; ++i)
+        {
+            uint16_t currentUnicode = 0;
+            gui_ftl_read((uintptr_t)ptr, (uint8_t *)&currentUnicode, sizeof(uint16_t));
+            ptr += sizeof(uint16_t);
+
+            uint32_t glyphOffset = 0;
+            gui_ftl_read((uintptr_t)ptr, (uint8_t *)&glyphOffset, sizeof(uint32_t));
             ptr += sizeof(uint32_t);
 
             if (currentUnicode == unicode)
@@ -576,11 +609,30 @@ void makeImageBuffer(uint8_t *img_out, const uint32_t *img, uint8_t raster_prec,
  *============================================================================*/
 void gui_font_get_ttf_info(gui_text_t *text)
 {
-    GUI_FONT_HEAD_TTF *ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
-    GUI_ASSERT(ttfbin != NULL);
+    GUI_ASSERT(text->path != NULL);
+    GUI_FONT_HEAD_TTF *ttfbin;
+    if (text->font_mode == FONT_SRC_MEMADDR)
+    {
+        ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
+    }
+    else if (text->font_mode == FONT_SRC_FTL)
+    {
+        ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+        gui_ftl_read((uintptr_t)text->path, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+        return;
+    }
+
     if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
     {
         gui_log("this ttf-bin font file is not valid \n");
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            gui_free(ttfbin);
+        }
         return;
     }
 
@@ -591,6 +643,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
     {
         gui_log("Warning! After process, unicode len of text: %s is 0!\n", text->base.name);
         text->font_len = 0;
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            gui_free(ttfbin);
+        }
         return;
     }
     if (text->arabic)
@@ -601,6 +657,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
     if (chr == NULL)
     {
         GUI_ASSERT(NULL != NULL);
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            gui_free(ttfbin);
+        }
         return;
     }
     memset(chr, 0, sizeof(mem_char_t) * unicode_len);
@@ -639,30 +699,80 @@ void gui_font_get_ttf_info(gui_text_t *text)
             // chr[chr_i].w = 0;
             chr[chr_i].h = text->font_height;
             // chr[chr_i].char_y = 0;
-            chr[chr_i].char_w = (text->font_height + 1) / 2;
-            chr[chr_i].char_h = (text->font_height + 1) / 2;
+            chr[chr_i].char_w = (text->font_height + 3) / 4;
+            chr[chr_i].char_h = (text->font_height + 3) / 4;
             // chr[chr_i].dot_addr = 0;
         }
         else
         {
-            uint32_t ttfoffset = getGlyphOffsetFromMemory(unicode_buf[uni_i], ttfbin);
-            if (ttfoffset == 0)
+            if (text->font_mode == FONT_SRC_MEMADDR)
             {
-                gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
-                continue;
-            }
-            uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
-            FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
+                uint32_t ttfoffset = getGlyphOffsetFromMemory(unicode_buf[uni_i], ttfbin,
+                                                              (uint8_t *)text->path + ttfbin->head_length);
+                if (ttfoffset == 0)
+                {
+                    gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
+                    continue;
+                }
+                uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
+                FontGlyphData *glyphData = (FontGlyphData *)font_ptr;
 
-            chr[chr_i].unicode = unicode_buf[uni_i];
-            // chr[chr_i].x = 0;
-            // chr[chr_i].y = 0;
-            // chr[chr_i].w = 0;
-            chr[chr_i].h = text->font_height;
-            // chr[chr_i].char_y = 0;
-            chr[chr_i].char_w = glyphData->advance * scale;
-            chr[chr_i].char_h = text->font_height;
-            chr[chr_i].dot_addr = font_ptr;
+                chr[chr_i].unicode = unicode_buf[uni_i];
+                // chr[chr_i].x = 0;
+                // chr[chr_i].y = 0;
+                // chr[chr_i].w = 0;
+                chr[chr_i].h = text->font_height;
+                // chr[chr_i].char_y = 0;
+                chr[chr_i].char_w = glyphData->advance * scale;
+                chr[chr_i].char_h = text->font_height;
+                chr[chr_i].dot_addr = font_ptr;
+            }
+            else if (text->font_mode == FONT_SRC_FTL)
+            {
+                uint32_t ttfoffset = getGlyphOffsetFromFtl(unicode_buf[uni_i], ttfbin,
+                                                           (uint8_t *)text->path + ttfbin->head_length);
+                if (ttfoffset == 0)
+                {
+                    gui_log("Character %x not found in TTF-BIN file \n", unicode_buf[uni_i]);
+                    continue;
+                }
+                uint8_t *font_ptr = (uint8_t *)text->path + ttfoffset;
+
+                FontGlyphData *glyphData = gui_malloc(sizeof(FontGlyphData));
+                gui_ftl_read((uintptr_t)font_ptr, (uint8_t *)glyphData, sizeof(FontGlyphData));
+
+                int line_count = 0;
+                uint8_t winding_length = glyphData->winding_count;
+                uint8_t *winding_lengths = gui_malloc(winding_length);
+                gui_ftl_read((uintptr_t)(uint8_t *)(font_ptr + offsetof(FontGlyphData, winding_lengths)),
+                             winding_lengths, winding_length);
+                for (int i = 0; i < glyphData->winding_count; i++)
+                {
+                    line_count += winding_lengths[i];
+                }
+
+                uint8_t *dot_addr = gui_malloc(sizeof(FontGlyphData) + winding_length + line_count * sizeof(
+                                                   FontWindings));
+                memcpy(dot_addr, glyphData, sizeof(FontGlyphData));
+                memcpy(dot_addr + offsetof(FontGlyphData, winding_lengths), winding_lengths, winding_length);
+                gui_ftl_read((uintptr_t)font_ptr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                             dot_addr + offsetof(FontGlyphData, winding_lengths) + winding_length,
+                             line_count * sizeof(FontWindings));
+
+
+                chr[chr_i].unicode = unicode_buf[uni_i];
+                // chr[chr_i].x = 0;
+                // chr[chr_i].y = 0;
+                // chr[chr_i].w = 0;
+                chr[chr_i].h = text->font_height;
+                // chr[chr_i].char_y = 0;
+                chr[chr_i].char_w = glyphData->advance * scale;
+                chr[chr_i].char_h = text->font_height;
+                chr[chr_i].dot_addr = dot_addr;
+
+                gui_free(glyphData);
+                gui_free(winding_lengths);
+            }
         }
 
         all_char_w += chr[chr_i].char_w;
@@ -673,6 +783,10 @@ void gui_font_get_ttf_info(gui_text_t *text)
     text->font_len = unicode_len;
     text->active_font_len = chr_i;
     gui_free(unicode_buf);
+    if (text->font_mode == FONT_SRC_FTL)
+    {
+        gui_free(ttfbin);
+    }
 }
 
 void gui_font_ttf_adapt_rect(gui_text_t *text, gui_text_rect_t *rect)
@@ -720,6 +834,13 @@ void gui_font_ttf_unload(gui_text_t *text)
     if (text->data)
     {
         mem_char_t *chr = text->data;
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            for (int i = 0; i < text->font_len; i++)
+            {
+                gui_free(chr[i].dot_addr);
+            }
+        }
         for (int i = 0; i < text->font_len; i++)
         {
             if (chr[i].buf != NULL)
@@ -735,10 +856,30 @@ void gui_font_ttf_unload(gui_text_t *text)
 
 void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
-    GUI_FONT_HEAD_TTF *ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
+    GUI_ASSERT(text->path != NULL);
+    GUI_FONT_HEAD_TTF *ttfbin;
+    if (text->font_mode == FONT_SRC_MEMADDR)
+    {
+        ttfbin = (GUI_FONT_HEAD_TTF *)text->path;
+    }
+    else if (text->font_mode == FONT_SRC_FTL)
+    {
+        ttfbin = gui_malloc(sizeof(GUI_FONT_HEAD_TTF));
+        gui_ftl_read((uintptr_t)text->path, (uint8_t *)ttfbin, sizeof(GUI_FONT_HEAD_TTF));
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+        return;
+    }
+
     if (ttfbin->file_type != FONT_FILE_TTF_FLAG)
     {
         gui_log("this ttf-bin font file is not valid \n");
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            gui_free(ttfbin);
+        }
         return;
     }
     mem_char_t *chr = text->data;
@@ -751,6 +892,10 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
 
     if (scale <= 0)
     {
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            gui_free(ttfbin);
+        }
         return;
     }
 
@@ -1233,5 +1378,9 @@ void gui_font_ttf_draw(gui_text_t *text, gui_text_rect_t *rect)
         {
             gui_free(img_out);
         }
+    }
+    if (text->font_mode == FONT_SRC_FTL)
+    {
+        gui_free(ttfbin);
     }
 }

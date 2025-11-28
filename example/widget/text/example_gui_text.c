@@ -300,6 +300,10 @@ static int app_init(void)
 
     /* gui text font scroll function test */
     // text_font_scroll_function_test();
+
+    /* gui text font source mode test */
+    // text_font_source_mode_test();
+
     return 0;
 }
 
