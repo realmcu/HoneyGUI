@@ -120,6 +120,9 @@ static void time_update_cb(void *obj)
 static void list_timer_cb(void *obj)
 {
     uint8_t index = ((gui_list_t *)obj)->last_created_note_index;
+    index %= quick_page_num;
+    index += quick_page_num;
+    index %= quick_page_num;
     if (index != page_index)
     {
         page_index = index;
@@ -163,6 +166,9 @@ static void note_design(gui_obj_t *obj, void *p)
 {
     GUI_UNUSED(p);
     uint16_t index = ((gui_list_note_t *)obj)->index;
+    index %= quick_page_num;
+    index += quick_page_num;
+    index %= quick_page_num;
     quick_page_design_func_array[index](obj);
     quick_page_name[index] = page_name_array[language_index][quick_page_name_index];
 }
@@ -212,9 +218,9 @@ static void quick_view_design(gui_view_t *view)
                              SWITCH_IN_FROM_TOP_USE_TRANSLATION,
                              GUI_EVENT_TOUCH_MOVE_DOWN);
 
-    gui_view_switch_on_event(view, wallpaper_view, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
-                             SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
-                             GUI_EVENT_TOUCH_MOVE_RIGHT);
+    // gui_view_switch_on_event(view, wallpaper_view, SWITCH_OUT_TO_RIGHT_USE_TRANSLATION,
+    //                          SWITCH_IN_FROM_LEFT_USE_TRANSLATION,
+    //                          GUI_EVENT_TOUCH_MOVE_RIGHT);
 
     gui_obj_t *parent = GUI_BASE(view);
     gui_list_t *list = gui_list_create(parent, 0, 0, 0, 0, 0, 320, 0, HORIZONTAL,
@@ -225,6 +231,7 @@ static void quick_view_design(gui_view_t *view)
     gui_list_set_auto_align(list, true);
     gui_list_set_offset(list, -page_index * 320);
     gui_list_set_inertia(list, false);
+    gui_list_enable_loop(list, true);
     gui_obj_create_timer(GUI_BASE(list), 10, true, list_timer_cb);
 
     create_indicator(parent);

@@ -174,7 +174,7 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
     }
     if (!_this->inertia || _this->speed == 0)
     {
-        if (_this->offset > hard_offset_max || _this->offset < hard_offset_min)
+        if (!_this->loop && (_this->offset > hard_offset_max || _this->offset < hard_offset_min))
         {
             float e_factor = 0.2f;
             int16_t target = _this->offset >= 0 ? hard_offset_max : hard_offset_min;
@@ -216,15 +216,18 @@ static void gui_list_inertia_motion(gui_obj_t *obj)
     {
         _this->offset += _this->speed;
         _this->speed = (int16_t)((1 - _this->factor) * _this->speed);
-        if (_this->offset > soft_offset_max)
+        if (!_this->loop)
         {
-            _this->offset = soft_offset_max;
-            _this->speed = 0;
-        }
-        else if (_this->offset < soft_offset_min)
-        {
-            _this->offset = soft_offset_min;
-            _this->speed = 0;
+            if (_this->offset > soft_offset_max)
+            {
+                _this->offset = soft_offset_max;
+                _this->speed = 0;
+            }
+            else if (_this->offset < soft_offset_min)
+            {
+                _this->offset = soft_offset_min;
+                _this->speed = 0;
+            }
         }
     }
     _this->hold = _this->offset;
@@ -242,30 +245,33 @@ static void gui_list_free_notes(gui_obj_t *obj)
         gui_list_note_t *note = (gui_list_note_t *)o;
         int16_t pos = 0;
         int16_t range = 0;
+        int16_t temp = 0;
         if (_this->dir == HORIZONTAL)
         {
             pos = obj->x + note->start_x + _this->offset;
             range = obj->x + obj->w;
+            temp = obj->x;
         }
         else
         {
             pos = obj->y + note->start_y + _this->offset;
             range = obj->y + obj->h;
+            temp = obj->y;
         }
         if (_this->style == LIST_CARD)
         {
             range += (1.2 * _this->note_length); // scale_1 = 0.8f;
         }
 
-        if (pos + _this->note_length <= 0)
+        if (pos + _this->note_length <= temp)
         {
-            // gui_log("free note %d\n", note->index);
+            gui_log("free note %d\n", note->index);
             _this->last_created_note_index += (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
         }
         else if (pos >= range)
         {
-            // gui_log("free note %d\n", note->index);
+            gui_log("free note %d\n", note->index);
             _this->last_created_note_index -= (_this->last_created_note_index == note->index);
             gui_obj_tree_free(o);
             _this->max_created_note_index -= 1;
@@ -323,7 +329,7 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         }
         while (pos < range - _this->space)
         {
-            if (++index >= _this->note_num) {break;}
+            if (++index >= _this->note_num * (_this->loop + 1)) {break;}
             gui_list_add_note(_this, index);
             pos += (_this->note_length + _this->space);
         }
@@ -334,17 +340,20 @@ static void gui_list_input_prepare(gui_obj_t *obj)
         gui_list_note_t *note = (gui_list_note_t *)o;
         int16_t index = note->index;
         int16_t pos = 0;
+        int16_t temp = 0;
         if (_this->dir == HORIZONTAL)
         {
             pos = obj->x + note->start_x + _this->offset;
+            temp = obj->x;
         }
         else
         {
             pos = obj->y + note->start_y + _this->offset;
+            temp = obj->y;
         }
-        while (pos > _this->space)
+        while (pos > _this->space + temp)
         {
-            if (--index < 0) {break;}
+            if (--index < -((_this->loop ? 2 : 0) * _this->note_num)) {break;}
             gui_list_note_t *note = gui_list_add_note(_this, index);
             if (_this->dir == HORIZONTAL)
             {
@@ -812,6 +821,8 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
     gui_list_t *_this = (gui_list_t *)object;
     g_Limit = false;
 
+    int offset_min = 0;
+    int offset_max = 0;
     switch (_this->dir)
     {
     case HORIZONTAL:
@@ -819,25 +830,13 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
             gui_list_update_speed(_this, tp->deltaX);
 
             _this->offset = _this->hold + tp->deltaX;
-            int offset_min = obj->w - _this->total_length - _this->out_scope;
-            int offset_max = _this->out_scope;
+            offset_min = obj->w - _this->total_length - _this->out_scope;
+            offset_max = _this->out_scope;
             if (_this->style == LIST_CARD)
             {
                 offset_max = obj->w - _this->note_length;
                 offset_min -= _this->card_stack_location;
             }
-            // Limiting the range of movement
-            if (_this->offset > offset_max)
-            {
-                _this->offset = offset_max;
-                g_Limit = true;
-            }
-            else if (_this->offset < offset_min)
-            {
-                _this->offset = offset_min;
-                g_Limit = true;
-            }
-            // gui_log("_this->offset = %d\n", _this->offset);
         }
         break;
     case VERTICAL:
@@ -845,31 +844,35 @@ static void gui_list_pressing_cb(void *object, gui_event_t e, void *param)
             gui_list_update_speed(_this, tp->deltaY);
 
             _this->offset = _this->hold + tp->deltaY;
-            int offset_min = obj->h - _this->total_length - _this->out_scope;
-            int offset_max = _this->out_scope;
+            offset_min = obj->h - _this->total_length - _this->out_scope;
+            offset_max = _this->out_scope;
             if (_this->style == LIST_CARD)
             {
                 offset_max = obj->h - _this->note_length;
                 offset_min -= _this->card_stack_location;
             }
-            // Limiting the range of movement
-            if (_this->offset > offset_max)
-            {
-                _this->offset = offset_max;
-                g_Limit = true;
-            }
-            else if (_this->offset < offset_min)
-            {
-                _this->offset = offset_min;
-                g_Limit = true;
-            }
-            // gui_log("_this->offset = %d\n", _this->offset);
         }
         break;
 
     default:
         break;
     }
+    // Limiting the range of movement
+    if (!_this->loop)
+    {
+        if (_this->offset > offset_max)
+        {
+            _this->offset = offset_max;
+            g_Limit = true;
+        }
+        else if (_this->offset < offset_min)
+        {
+            _this->offset = offset_min;
+            g_Limit = true;
+        }
+    }
+
+    // gui_log("_this->offset = %d\n", _this->offset);
 }
 
 static void gui_list_released_cb(void *obj, gui_event_t e, void *param)
@@ -877,6 +880,33 @@ static void gui_list_released_cb(void *obj, gui_event_t e, void *param)
     (void)e;
     (void)param;
     gui_list_t *_this = (gui_list_t *)obj;
+    if (_this->loop && abs(_this->offset) >= _this->total_length)
+    {
+        // gui_log("loop offset %d\n", _this->offset);
+        _this->offset %= _this->total_length;
+        _this->max_created_note_index %= _this->note_num;
+        _this->last_created_note_index %= _this->note_num;
+
+        gui_node_list_t *node = NULL;
+        gui_node_list_t *tmp = NULL;
+        gui_list_for_each_safe(node, tmp, &(_this->base.child_list))
+        {
+            gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+            gui_list_note_t *note = (gui_list_note_t *)o;
+            uint16_t index = note->index;
+            index %= _this->note_num;
+            // gui_log("index %d to %d\n", note->index, index);
+            note->index = index;
+            if (_this->dir == HORIZONTAL)
+            {
+                note->start_x = index * (_this->note_length + _this->space);
+            }
+            else
+            {
+                note->start_y = index * (_this->note_length + _this->space);
+            }
+        }
+    }
     _this->hold = _this->offset;
 
     memset(_this->record, 0, sizeof(_this->record));
@@ -920,7 +950,11 @@ static void gui_list_create_bar(gui_list_t *_this,
 
 static gui_list_note_t *gui_list_add_note(gui_list_t *list, int16_t index)
 {
-    GUI_ASSERT(index < list->note_num);
+    // if (!list->loop)
+    // {
+    //     GUI_ASSERT(index < list->note_num);
+    // }
+
     list->last_created_note_index = index;
     // gui_log("add note %d\n", index);
 
@@ -1138,4 +1172,16 @@ void gui_list_set_bar_color(gui_list_t *list, gui_color_t color)
 void gui_list_set_card_stack_location(gui_list_t *list, int16_t location)
 {
     list->card_stack_location = location;
+}
+
+void gui_list_enable_loop(gui_list_t *list, bool loop)
+{
+    int16_t temp = list->dir == HORIZONTAL ? list->base.w : list->base.h;
+    if (list->total_length <= temp)
+    {
+        gui_log("warning: list loop is disabled");
+        list->loop = false;
+        return;
+    }
+    list->loop = loop;
 }

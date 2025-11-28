@@ -73,6 +73,12 @@ Set List Widget Inertia
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The :cpp:any:`gui_list_set_inertia` function can be used to set list widget inertia.
 
+Set List Widget Loop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The :cpp:any:`gui_list_enable_loop` function can be used to set list widget loop. When the total length of the list widget is greater than the width or height of the list widget, the loop effect will be enabled.
+
+
+
 Example
 ---------
 

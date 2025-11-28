@@ -14,10 +14,10 @@
 // #define RUN_VERTICAL_CARD_STYLE
 // #define RUN_HORIZONTAL_ZOOM_STYLE
 // #define RUN_VERTICAL_FAN_STYLE
-// #define RUN_VERTICAL_HELIX_STYLE
+#define RUN_VERTICAL_HELIX_STYLE
 // #define RUN_VERTICAL_CURL_STYLE
 // #define RUN_VERTICAL_CLASSIC_STYLE
-#define RUN_VERTICAL_FADE_STYLE
+// #define RUN_VERTICAL_FADE_STYLE
 
 #define NOTE_NUM 20
 
@@ -138,10 +138,11 @@ static int app_init(void)
     /* VERTICAL HELIX STYLE */
 #ifdef RUN_VERTICAL_HELIX_STYLE
     gui_list_t *list = gui_list_create(gui_obj_get_root(), "list", 0, 0, 0, 0, length, space, VERTICAL,
-                                       note_design, NULL, true);
+                                       note_design, NULL, false);
     gui_list_set_note_num(list, NOTE_NUM);
     gui_list_set_style(list, LIST_HELIX);
     gui_list_set_auto_align(list, true);
+    gui_list_enable_loop(list, true);
     return 0;
 #endif
 

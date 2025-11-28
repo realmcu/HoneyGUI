@@ -65,6 +65,7 @@ typedef struct gui_list
     uint32_t style           : 4; // List style.
     uint32_t auto_align      : 1; // Automatic alignment of notes.
     uint32_t inertia         : 1; // Enable inertia effect while tp released.
+    uint32_t loop            : 1; // Enable loop effect.
     uint32_t need_update_bar : 1;
     uint32_t note_num        : 8; // number of whole notes.
     uint32_t space           : 8;
@@ -80,8 +81,8 @@ typedef struct gui_list
     int16_t out_scope;           // Out scope of list. Don't support CARD style.
     int16_t card_stack_location; // The distance from stack location to the screen bottom. Only support CARD style.
 
-    uint16_t max_created_note_index; // Max index of the created notes.
-    uint16_t last_created_note_index; // Index of the last created note.
+    int16_t max_created_note_index; // Max index of the created notes.
+    int16_t last_created_note_index; // Index of the last created note.
     void (* note_design)(gui_obj_t *obj, void *param);
     void *design_param;
 
@@ -211,6 +212,12 @@ void gui_list_set_auto_align(gui_list_t *list, bool auto_align);
  * @param inertia Default is true. true: enable inertia, false: disable inertia.
  */
 void gui_list_set_inertia(gui_list_t *list, bool inertia);
+
+/**
+ * @brief Set loop of list, which is used to enable loop effect. Only valid when list total length is greater than list width or height.
+ * @param loop Default is false. true: enable loop, false: disable loop.
+ */
+void gui_list_enable_loop(gui_list_t *list, bool loop);
 
 #ifdef __cplusplus
 }
