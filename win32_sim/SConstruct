@@ -40,9 +40,9 @@ else:
 
 
 
-
 RTK_GUI_ENGINE = os.path.abspath('./../realgui/')
 GUI_EXAMPLE = os.path.abspath('./../example/')
+GUI_SIM_LIBS = os.path.abspath('./../lib/sim/')
 
 PLATFORM = menu_config.PLATFORM
 
@@ -122,11 +122,16 @@ GUI_AUTOGEN_CODE = os.path.abspath('./../autogen/')
 if os.path.exists(os.path.join(GUI_AUTOGEN_CODE, 'SConscript')):
     objs.extend(SConscript(os.path.join(GUI_AUTOGEN_CODE, 'SConscript')))
 
+if os.path.exists(os.path.join(GUI_SIM_LIBS, 'SConscript')):
+    objs.extend(SConscript(os.path.join(GUI_SIM_LIBS, 'SConscript')))
+
 
 # Platform-specific libraries
 if sys.platform == 'win32':
     env.Append(LIBS = [
         'mingw32',
+        'SDL2main',
+        'SDL2',
         'user32',
         'gdi32',
         'winmm',
@@ -146,7 +151,6 @@ else:  # Linux/WSL
     env.Append(LIBS = [
         'SDL2',
         'GL',
-        'GLEW',
         'pthread',
         'm',
         'dl'

@@ -1,0 +1,28 @@
+from building import *
+import sys
+import os
+
+cwd = GetCurrentDir()
+
+src = []
+
+if sys.platform == 'win32':
+    # Library path and include path for Windows
+    libpath = [os.path.join(cwd, 'lib')]
+    include = [os.path.join(cwd, 'include', 'SDL2')]
+    
+    # Export library path to environment
+    Import('env')
+    env.Append(LIBPATH = libpath)
+    env.Append(CPPPATH = include)
+else:  # Linux/WSL - use system SDL2
+    libpath = []
+    include = ['/usr/include/SDL2']
+    
+    Import('env')
+    env.Append(CPPPATH = include)
+
+
+group = DefineGroup('rtk_gui', src, depend = [''])
+
+Return('group')

@@ -26,10 +26,8 @@ ci_check_config = {
         }
     },
     "ignore_file_encoding":[
-        r"win32_sim/RTE/",
+        r"lib/sim/",
         r"realgui/3rd/",
-        r"lvgl_v8/",
-        r"lvgl_v9/",
         r"example/application/screen_454_454",
         r"example/application/screen_320_385",
         r"doc/cn",
@@ -46,10 +44,8 @@ ci_check_config = {
         r"example/application/FHY_320_200",
     ],
     "ignore_cpp_astyle_check":[
-        r"win32_sim/RTE/",
+        r"lib/RTE/",
         r"realgui/3rd/",
-        r"lvgl_v8/",
-        r"lvgl_v9/",
     ],
     "commit_version_check": {
         "ANCESTOR_ACCEPT_LENGTH": 5, # the 5th commit is the parent, ok // first priority
