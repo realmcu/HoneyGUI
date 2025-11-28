@@ -171,11 +171,6 @@ endchoice
 
 menu "HoneyGUI Feature Configuration"
 
-config REALTEK_BUILD_SCRIPT_AS_A_APP
-    bool "Enable Script as App (SaaA)"
-    default n
-    help
-      RTK GUI Enable Script as a App
 
 config REALTEK_BUILD_CJSON
     bool "Enable cJSON"
