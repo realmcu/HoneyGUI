@@ -336,7 +336,7 @@ void *gui_get_file_address(const char *file)
             return NULL;
         }
         void *rst;
-        rst = (void *)gui_fs_ioctl(fd, 0);
+        rst = (void *)(intptr_t)gui_fs_ioctl(fd, 0);
         gui_fs_close(fd);
         gui_log("filename = %s, rst:%p\n", file, rst);
         return rst;

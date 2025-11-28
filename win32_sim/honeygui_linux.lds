@@ -12,4 +12,4 @@ SECTIONS
       _shell_command_end = .;
   }
 }
-INSERT AFTER .text;
+INSERT AFTER .rodata;

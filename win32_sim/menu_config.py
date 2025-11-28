@@ -51,6 +51,7 @@ CXXFLAGS = CFLAGS_BASE + ' -std=c++11 -Wmissing-field-initializers'
 if sys.platform.startswith('linux'):
     LFLAGS = ' -T honeygui_linux.lds'  # Linux: use default linker script
     LFLAGS += ' -pthread'
+    LFLAGS += ' -Wl,-z,noexecstack'
 else:
     LFLAGS = ' -T honeygui_mingw.ld'  # Windows: use PE linker script
     # LFLAGS += ' -flto' #for arm2d
