@@ -1,69 +1,52 @@
 import os
 import sys
-import menu_config
-from SCons.Script import *
 import subprocess
 import platform
 import uuid
+import menu_config
+from SCons.Script import *
 
-TOOL_ROOT="../tool/scons-tool"
+# Get project root directory (parent of win32_sim)
+PROJECT_ROOT = os.path.dirname(os.getcwd())
+TOOL_ROOT = os.path.join(PROJECT_ROOT, 'tool/scons-tool')
 
-sys.path = sys.path + [os.path.join(TOOL_ROOT, '')]
+sys.path.append(TOOL_ROOT)
 try:
     from building import *
 except:
     print('Cannot found Scons tool root directory, please check TOOL_ROOT')
     exit(-1)
 
-if sys.platform == 'win32':
-    TARGET = 'gui.exe'
-else:
-    TARGET = 'gui'
-
+TARGET = 'gui.exe' if sys.platform == 'win32' else 'gui'
 print(f"Platform: {sys.platform}, TARGET: {TARGET}")
 
+# Environment setup
+env_params = {
+    'CC': menu_config.CC,
+    'CFLAGS': menu_config.CFLAGS,
+    'CXX': menu_config.CXX,
+    'CXXFLAGS': menu_config.CXXFLAGS,
+    'LINKFLAGS': menu_config.LFLAGS
+}
+
 if sys.platform == 'win32':
-    env = Environment(tools = ['mingw'],
-                      CC=menu_config.CC, 
-                      CFLAGS = menu_config.CFLAGS,
-                      CXX = menu_config.CXX, 
-                      CXXFLAGS = menu_config.CXXFLAGS,
-                      LINKFLAGS = menu_config.LFLAGS)
+    env = Environment(tools=['mingw'], **env_params)
 else:
-    env = Environment(tools = ['default'],
-                      CC=menu_config.CC, 
-                      CFLAGS = menu_config.CFLAGS,
-                      CXX = menu_config.CXX, 
-                      CXXFLAGS = menu_config.CXXFLAGS,
-                      LINKFLAGS = menu_config.LFLAGS,
-                      PROGSUFFIX = '')  # No .exe suffix on Linux
+    env = Environment(tools=['default'], PROGSUFFIX='', **env_params)
 
-
-
-RTK_GUI_ENGINE = os.path.abspath('./../realgui/')
-GUI_EXAMPLE = os.path.abspath('./../example/')
-GUI_SIM_LIBS = os.path.abspath('./../lib/sim/')
-
+RTK_GUI_ENGINE = os.path.join(PROJECT_ROOT, 'realgui')
+GUI_EXAMPLE = os.path.join(PROJECT_ROOT, 'example')
+GUI_SIM_LIBS = os.path.join(PROJECT_ROOT, 'lib/sim')
 PLATFORM = menu_config.PLATFORM
 
-Export('PLATFORM')
-Export('TOOL_ROOT')
-Export('RTK_GUI_ENGINE')
-Export('env')
+Export('PLATFORM', 'TOOL_ROOT', 'RTK_GUI_ENGINE', 'env')
 
-
-
-print("CC: ", env['CC'])
-print("CFLAGS: ", env['CFLAGS'])
-print("CXXFLAGS: ", env['CXXFLAGS'])
-print("LINKFLAGS: ", env['LINKFLAGS'])
-
-print('TOOL ROOT = ' + TOOL_ROOT)
-print('RTK GUI ENGINE ROOT = ' + RTK_GUI_ENGINE)
-
-
-import subprocess
-import sys
+print("CC:", env['CC'])
+print("CFLAGS:", env['CFLAGS'])
+print("CXXFLAGS:", env['CXXFLAGS'])
+print("LINKFLAGS:", env['LINKFLAGS'])
+print('TOOL ROOT =', TOOL_ROOT)
+print('RTK GUI ENGINE ROOT =', RTK_GUI_ENGINE)
 
 def compile_resource(rc_file, output_file):
     try:
@@ -74,29 +57,28 @@ def compile_resource(rc_file, output_file):
     except FileNotFoundError:
         print('windres command not found. Ensure MinGW is installed and windres is in the system PATH.')
 
-# prepare building environment
+# Prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
 
-# Only compile resource file on Windows
+# Compile resource file on Windows
 if sys.platform == 'win32':
     compile_resource('version.rc', 'version.o')
     objs.append('version.o')
 
-# set spawn: save & load long param as temp file
+# Set spawn: save & load long param as temp file
 def ourspawn(sh, escape, cmd, args, e):
     filename = str(uuid.uuid4())
-    newargs = ' '.join(args[1:])
-    cmdline = cmd + " " + newargs
-    if (len(cmdline) > 16 * 1024):
-        f = open(filename, 'w')
-        f.write(' '.join(args[1:]).replace('\\', '/'))
-        f.close()
-        # exec
+    cmdline = cmd + " " + ' '.join(args[1:])
+    if len(cmdline) > 16 * 1024:
+        with open(filename, 'w') as f:
+            f.write(' '.join(args[1:]).replace('\\', '/'))
         cmdline = cmd + " @" + filename
+    
     proc = subprocess.Popen(cmdline, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, shell = False, env = e)
+                           stderr=subprocess.PIPE, shell=False, env=e)
     data, err = proc.communicate()
     rv = proc.wait()
+    
     def res_output(_output, _s):
         if len(_s):
             if isinstance(_s, str):
@@ -105,54 +87,31 @@ def ourspawn(sh, escape, cmd, args, e):
                 _output(str(_s, 'UTF-8'))
             else:
                 _output(str(_s))
+    
     res_output(sys.stderr.write, err)
     res_output(sys.stdout.write, data)
     if os.path.isfile(filename):
         os.remove(filename)
     return rv
-if platform.system() == 'Windows':
+
+if sys.platform == 'win32':
     env['SPAWN'] = ourspawn
 
-# include app
-if os.path.exists(os.path.join(RTK_GUI_ENGINE, 'SConscript')):
-    objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
-
-if os.path.exists(os.path.join(GUI_EXAMPLE, 'SConscript')):
-    objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
-
-if os.path.exists(os.path.join(GUI_SIM_LIBS, 'SConscript')):
-    objs.extend(SConscript(os.path.join(GUI_SIM_LIBS, 'SConscript')))
-
+# Include app SConscripts
+for path in [RTK_GUI_ENGINE, GUI_EXAMPLE, GUI_SIM_LIBS]:
+    sconscript = os.path.join(path, 'SConscript')
+    if os.path.exists(sconscript):
+        objs.extend(SConscript(sconscript))
 
 # Platform-specific libraries
 if sys.platform == 'win32':
-    env.Append(LIBS = [
-        'mingw32',
-        'SDL2main',
-        'SDL2',
-        'user32',
-        'gdi32',
-        'winmm',
-        'imm32',
-        'ole32',
-        'oleaut32',
-        'version',
-        'uuid',
-        'advapi32',
-        'setupapi',
-        'shell32',
-        'dinput8',
-        'opengl32',
-        'm'
+    env.Append(LIBS=[
+        'mingw32', 'SDL2main', 'SDL2', 'user32', 'gdi32', 'winmm',
+        'imm32', 'ole32', 'oleaut32', 'version', 'uuid', 'advapi32',
+        'setupapi', 'shell32', 'dinput8', 'opengl32', 'm'
     ])
 else:  # Linux/WSL
-    env.Append(LIBS = [
-        'SDL2',
-        'GL',
-        'pthread',
-        'm',
-        'dl'
-    ])
+    env.Append(LIBS=['SDL2', 'GL', 'pthread', 'm', 'dl'])
 
-# make a building
+# Build
 DoBuilding(TARGET, objs)
