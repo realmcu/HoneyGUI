@@ -155,30 +155,12 @@ config REALTEK_BUILD_HONEYGUI_AUTO_TEST
     help
       RTK GUI AUTO TEST
 
-config REALTEK_BUILD_GUI_280_456_DEMO
-    bool "GUI Demo 280x456"
-    help
-      RTK GUI Demo for 280x456 resolution
 
 config REALTEK_BUILD_GUI_240_240_DEMO
     bool "GUI Demo 240x240"
     help
       RTK GUI Demo for 240x240 resolution
 
-config REALTEK_BUILD_GUI_240_320_DEMO
-    bool "GUI Demo 240x320"
-    help
-      RTK GUI Demo for 240x320 resolution
-
-config REALTEK_BUILD_GUI_320_384_DEMO
-    bool "GUI Demo 320x384"
-    help
-      RTK GUI Demo for 320x384 resolution
-
-config REALTEK_BUILD_GUI_320_385_DEMO
-    bool "GUI Demo 320x385"
-    help
-      RTK GUI Demo for 320x385 resolution
 
 config REALTEK_BUILD_GUI_800_480_DEMO
     bool "GUI Demo 800x480"
