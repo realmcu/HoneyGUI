@@ -7,6 +7,7 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include "sdl_driver.h"
+#include "gui_api.h"
 
 static uint32_t sdl_driver_width = 480;
 static uint32_t sdl_driver_height = 480;
@@ -143,8 +144,9 @@ void *sdl_driver_thread(void *arg)
             break;
         case SDL_KEYDOWN:
             {
-                // gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_DOWN;
+                kb_port_data.timestamp_ms_press = gui_ms_get();  // record press timestamp
+                kb_port_data.timestamp_ms_pressing = gui_ms_get();  // record pressing timestamp
                 memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
 
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
@@ -156,6 +158,7 @@ void *sdl_driver_thread(void *arg)
             {
                 // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
+                kb_port_data.timestamp_ms_release = gui_ms_get();  // record release timestamp
                 memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
 
                 const char *key_name = SDL_GetKeyName(event.key.keysym.sym);

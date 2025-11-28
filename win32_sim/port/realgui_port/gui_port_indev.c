@@ -25,8 +25,6 @@ gui_touch_port_data_t *port_touchpad_get_data(void)
 
 gui_kb_port_data_t *port_kb_get_data(void)
 {
-    kb_port_data.timestamp_ms_press = gui_ms_get();
-    kb_port_data.timestamp_ms_pressing = gui_ms_get();
     return &kb_port_data;
 }
 
