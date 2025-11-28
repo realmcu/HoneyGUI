@@ -190,7 +190,12 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
-        obj->opacity_value = obj->parent->opacity_value;
+        if (!obj->opacity_force)
+        {
+            obj->opacity_value = obj->parent->opacity_value;
+        }
+
+
 
         if (obj->parent->matrix)
         {

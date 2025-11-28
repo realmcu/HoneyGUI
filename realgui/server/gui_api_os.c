@@ -68,7 +68,7 @@ static void walker(void *ptr, size_t size, int used, void *user)
 
 void gui_os_api_register(gui_os_api_t *info)
 {
-
+    os_api = info;
     if ((info->mem_addr != NULL) && (info->mem_size != 0))
     {
         tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
@@ -79,7 +79,11 @@ void gui_os_api_register(gui_os_api_t *info)
     {
         lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
     }
-    os_api = info;
+    gui_log("gui_os_api_register done\n");
+    gui_log("sram pool: addr=%p, size=%d\n", info->mem_addr, info->mem_size);
+    gui_log("psram pool: addr=%p, size=%d\n", info->lower_mem_addr, info->lower_mem_size);
+    gui_log("sram addr: %p\n", (tlsf));
+    gui_log("psram addr: %p\n", (lower_tlsf));
 }
 
 void *gui_thread_create(const char *name, void (*entry)(void *param), void *param,
@@ -350,8 +354,10 @@ void *gui_lower_malloc(size_t n)
     void *ptr = NULL;
     GUI_ASSERT(lower_tlsf != NULL);
     ptr = tlsf_malloc(lower_tlsf, n);
+    // gui_log("psram malloc: %p, size=%d\n", ptr, n);
     if (ptr == NULL)
     {
+        gui_log("PSRAM OVERFLOW!!!%d\n", n);
         GUI_ASSERT(NULL != NULL);
     }
     return ptr;

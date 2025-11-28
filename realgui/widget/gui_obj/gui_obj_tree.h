@@ -120,7 +120,7 @@ gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
 
 /**
- * @brief get widget in tree by type.
+ * @brief get first widget in tree by type.
  *
  * @param root tree.
  * @param type widget type.
@@ -128,7 +128,15 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t
  * @return void.
  */
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
-
+/**
+ * @brief get first widget in tree by type which not hidden.
+ *
+ * @param root tree.
+ * @param type widget type.
+ * @param output widget.
+ * @return void.
+ */
+void gui_obj_tree_get_widget_by_type_hidden(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
 /**
  * @brief print name by bfs order.
  *

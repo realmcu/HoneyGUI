@@ -144,6 +144,7 @@ typedef struct gui_indev
     gui_kb_port_data_t *(*kb_get_port_data)(void);
 
     gui_knob_port_data_t *(*knob_get_port_data)(void);
+    gui_wheel_port_data_t *(*wheel_get_port_data)(void);
 } gui_indev_t;
 /* gui_indev struct define end */
 

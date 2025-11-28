@@ -2043,7 +2043,12 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
         int16_t w = gui_get_screen_width();
         int16_t h = 50;
         const char *text = "text";
+#define FONT_FORMAT_HONEYGUI_DOT 1
+#define FONT_FORMAT_HONEYGUI_VECTOR 2
+#define FONT_FORMAT_TTF 3
 
+
+        uint8_t font_format = 0;
         char *font = 0;
 
         gui_color_t color = APP_COLOR_WHITE;
@@ -2121,7 +2126,24 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
             {
                 hidden = true;
             }
+            else if (!strcmp(p->attr[i], "fontFormat"))
+            {
+                char *font_format_s = p->attr[++i];
+                if (GUI_STRINGS_EQUAL(font_format_s, "RVDdot"))
+                {
+                    font_format = FONT_FORMAT_HONEYGUI_DOT;
+                }
+                else if (GUI_STRINGS_EQUAL(font_format_s, "RVDvector"))
+                {
+                    font_format = FONT_FORMAT_HONEYGUI_VECTOR;
+                }
+                else if (GUI_STRINGS_EQUAL(font_format_s, "ttf"))
+                {
+                    font_format = FONT_FORMAT_TTF;
+                }
 
+
+            }
             else if (!strcmp(p->attr[i], "lineMode"))
             {
                 lineMode = p->attr[++i];
@@ -2310,6 +2332,15 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 w = gui_get_screen_width();
                 font = "app/system/resource/font/arialbd_size16_bits4_font.bin";
             }
+            FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
+            if (font_format == FONT_FORMAT_HONEYGUI_DOT)
+            {
+                font_type2 = GUI_FONT_SRC_BMP;
+            }
+            else if (font_format == FONT_FORMAT_HONEYGUI_VECTOR)
+            {
+                font_type2 = GUI_FONT_SRC_TTF;
+            }
             if (!(style == LEFT || style == CENTER || style == RIGHT || style == SCROLL_X))
             {
                 text = unescape_string(text);
@@ -2342,47 +2373,23 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                     gui_text_extra_line_spacing_set(t, line_space);
                 }
                 {
-                    FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
+
+
                     char *font_type = font;
                     if (strstr(font_type, ".bin") != NULL)
                     {
-                        font_type2 = GUI_FONT_SRC_BMP;
+
                         void *addr1 = gui_get_file_address(font_type);
                         //gui_font_mem_init(addr1);
                         t->font_height = fontSize;
                         t->path = 0;
-                        t->font_type = GUI_FONT_SRC_BMP;
+                        t->font_type = font_type2;
                         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
                         gui_text_mode_set(t, style);
                         // t->font_height = fontSize;
                         //t->path = 0;
                     }
-                    else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
-                    {
-#ifdef __WIN32
-                        font_type2 = GUI_FONT_SRC_TTF;
-                        t->path = gui_get_file_address(font);
-                        t->font_height = fontSize;
-                        t->font_type = GUI_FONT_SRC_TTF;
-#else
-                        font_type =
-                            "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
-                        {
-                            font_type2 = GUI_FONT_SRC_BMP;
-                            char b[100] = {0};
-                            strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
-                            void *addr1 = gui_get_file_address(b);
-                            memset(b, 0, sizeof(b));
-                            char *a = font_type;
-                            strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
-                                                                                                 ".bin;") - a + strlen(".bin;")));
-                            void *addr2 = gui_get_file_address(b);
-                            // gui_set_font_mem_resourse(fontSize, addr1,  addr2);
-                            t->path = 0;
-                            t->font_type = GUI_FONT_SRC_BMP;
-                        }
-#endif
-                    }
+
 
                 }
             }
@@ -2393,7 +2400,7 @@ static gui_obj_t *widget_create_textbox(ezxml_t p, gui_obj_t *parent, T_OBJ_TYPE
                 gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
                 char *font_type = font;
                 void *addr1 = gui_get_file_address(font_type);
-                gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_BMP, color,
+                gui_scroll_text_set(scroll_text, gui_strdup(text), font_type2, color,
                                     strlen(text),
                                     fontSize);
                 if (strstr(font_type, ".bin") != NULL)
@@ -13957,34 +13964,36 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             {
                 gui_img_t *img = GUI_TYPE(gui_img_t, to);
                 bool create = 1;
-                bool new_trigger = 0;
-                for (size_t i = 0; i < img->animate_array_length; i++)
-                {
-                    if (!(((gui_animate_t **)(img->animate))[i]->trigger_name == to_name[2]))
-                    {
-                        new_trigger = 1;
-                    }
-                }
-                if (new_trigger)
-                {
-                    for (size_t i = 0; i < img->animate_array_length; i++)
-                    {
+                // bool new_trigger = 0;
+                // for (size_t i = 0; i < img->animate_array_length; i++)
+                // {
+                //     char *a = ((gui_animate_t **)(img->animate))[i]->name;
+                //     char *b = to_name[1];
+                //     if (!(((gui_animate_t **)(img->animate))[i]->trigger_name == to_name[2]))
+                //     {
+                //         new_trigger = 1;
+                //     }
+                // }
+                // if (new_trigger)
+                // {
+                //     for (size_t i = 0; i < img->animate_array_length; i++)
+                //     {
 
-                        for (size_t i = 0; i < img->animate_array_length; i++)
-                        {
-                            image_animate_params_t *params = ((((gui_animate_t **)(img->animate))[i])->p);
-                            //gui_free(params->animate_type);
-                            gui_free((((gui_animate_t **)(img->animate))[i])->p);
-                            gui_free(((gui_animate_t **)(img->animate))[i]);
-                            ((gui_animate_t **)(img->animate))[i] = NULL;
-                        }
-                        gui_free(img->animate);
-                        img->animate = 0;
-                        img->animate_array_length = 0;
+                //         for (size_t i = 0; i < img->animate_array_length; i++)
+                //         {
+                //             image_animate_params_t *params = ((((gui_animate_t **)(img->animate))[i])->p);
+                //             //gui_free(params->animate_type);
+                //             gui_free((((gui_animate_t **)(img->animate))[i])->p);
+                //             gui_free(((gui_animate_t **)(img->animate))[i]);
+                //             ((gui_animate_t **)(img->animate))[i] = NULL;
+                //         }
+                //         gui_free(img->animate);
+                //         img->animate = 0;
+                //         img->animate_array_length = 0;
 
 
-                    }
-                }
+                //     }
+                // }
 
                 {
                     for (size_t i = 0; i < img->animate_array_length; i++)
@@ -13992,6 +14001,7 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         if (GUI_STRINGS_EQUAL(((gui_animate_t **)(img->animate))[i]->name, to_name[1]))
                         {
                             create = 0;
+                            gui_obj_restart_animate(((gui_animate_t **)(img->animate))[i]);
                         }
                     }
                 }
@@ -14018,13 +14028,7 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         ezxml_free(f);
                     }
                 }
-                else
-                {
-                    for (size_t i = 0; i < GUI_TYPE(gui_img_t, to)->animate_array_length; i++)
-                    {
-                        ((gui_animate_t **)(img->animate))[i]->animate = 1;
-                    }
-                }
+
             }
             else  if (to->type == SEEKBAR)
             {

@@ -407,6 +407,30 @@ void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t
     }
 }
 
+void gui_obj_tree_get_widget_by_type_hidden(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &root->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->magic != GUI_MAGIC_NUMBER)
+        {
+            gui_log("list NULL @line:%d, @%p", __LINE__, root);
+            gui_log("@name:%s, @type:%d\n", root->name, root->type);
+            return;
+        }
+        gui_log("check obj name:%s, not_show=%d\n", obj->name, obj->not_show);
+        if (type == obj->type &&  !obj ->not_show)
+        {
+            gui_log("found obj name:%s\n", obj->name);
+            *output = obj;
+            return;
+        }
+
+        gui_obj_tree_get_widget_by_type_hidden(obj, type, output);
+    }
+}
 void gui_obj_tree_get_widget_by_type_and_index(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output,
                                                int index)
 {

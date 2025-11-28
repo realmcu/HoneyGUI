@@ -455,6 +455,7 @@ void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)
         return;
     }
     GUI_BASE(win)->opacity_value = opacity_value;
+    GUI_BASE(win)->opacity_force = 1;
 }
 // Function to retrieve the end_frame value from the window's animation structure
 bool gui_win_is_animation_end_frame(gui_win_t *win)

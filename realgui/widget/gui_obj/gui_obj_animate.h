@@ -130,6 +130,18 @@ void gui_obj_stop_animate(gui_animate_t *animate);
  */
 gui_animate_t *gui_get_animation_from_array(gui_animate_t **animation_array, int array_length,
                                             int index);
+
+gui_error_t gui_aniamtion_set_name(gui_animate_t *animate, const char *name);
+
+gui_animate_t *gui_aniamtion_get_by_name(gui_obj_t *widget, const char *name);
+
+
+
+
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

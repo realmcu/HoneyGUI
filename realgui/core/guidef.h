@@ -134,6 +134,8 @@ extern "C" {
 #define GUI_SUCCESS (gui_error_t)0
 typedef int gui_error_t;
 #define GUI_MAGIC_NUMBER 0x0b
+/*true if valid*/
+#define GUI_WIDGET_VALID(obj) ((obj != NULL)&&(GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT(obj != NULL);GUI_ASSERT((GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
 #define GUI_WIDGET_TRY_EXCEPT_SOFT(obj) {if(obj == NULL){gui_log("obj is NULL");return;}if((GUI_BASE(obj)->magic != GUI_MAGIC_NUMBER)){gui_log("obj magic is broken");return;}}
 /**

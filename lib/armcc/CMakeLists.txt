@@ -2,11 +2,10 @@ cmake_minimum_required (VERSION 3.10)
 
 set(CMAKE_SYSTEM_NAME Generic)
 
-set(ARMCLANG_PATH "C:/Keil_v5/ARM/ARMCC/bin")
 
-set(CMAKE_C_COMPILER "${ARMCLANG_PATH}/armcc.exe")
-set(CMAKE_CXX_COMPILER "${ARMCLANG_PATH}/armcc.exe")
 
+set(CMAKE_C_COMPILER "armcc.exe")
+set(CMAKE_CXX_COMPILER "armcc.exe")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS ON) 

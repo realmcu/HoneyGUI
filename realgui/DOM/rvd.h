@@ -350,4 +350,128 @@ int radio_group_get_array(gui_obj_t *root,
  * @return The result of the hover operation (e.g., GUI_SUCCESS or an error code).
  */
 int rvd_tab_first(void);
+
+
+
+/**
+ * @brief Stops the animation of an image movie widget.
+ *
+ * This function halts any ongoing frame-by-frame animation associated with
+ * an IMAGE_FROM_MEM widget that has been configured as an image movie
+ * (i.e., created from a folder of image files).
+ *
+ * @param[in] obj Pointer to the GUI object (must be an image widget created
+ *                from a folder, i.e. type IMAGE_FROM_MEM with animation).
+ *
+ * @note The function is safe to call on a non-animated image - it simply
+ *       does nothing in that case.
+ * @warning The object must be of type IMAGE_FROM_MEM, otherwise a runtime
+ *          exception is triggered via GUI_WIDGET_TYPE_TRY_EXCEPT().
+ *
+ * @par Usage example - Stop animation and jump to the last frame
+ * @code
+ *      // Get widget created in XML as: <img folder="..." >imagemovie4</img>
+ *      GUI_WIDGET_POINTER_BY_NAME(movie, "imagemovie4");
+ *
+ *      // Stop any running animation
+ *      rvd_ImageMovie_stop(movie);
+ *
+ *      // Optionally go to the last frame (useful for "pause on end" effect)
+ *      int index = rvd_ImageMovie_frame_count(movie);
+ *      if (index > 0)
+ *      {
+ *          rvd_ImageMovie_frame(movie, index - 1);  // show last frame
+ *      }
+ * @endcode
+ *
+ * @see rvd_ImageMovie_frame()
+ * @see rvd_ImageMovie_frame_count()
+ */
+void rvd_ImageMovie_stop(gui_obj_t *obj);
+
+/**
+ * @brief Sets a specific frame of an image movie widget.
+ *
+ * Immediately stops any running animation and displays the requested frame
+ * identified by zero-based index. Useful for implementing frame-by-frame
+ * control, seeking, thumbnails, or manual animation.
+ *
+ * @param[in] obj         Pointer to the image movie widget.
+ * @param[in] frame_index Zero-based index of the frame to display
+ *                        (0 <= frame_index < frame_count).
+ *
+ * @pre The widget must have been created with a "folder" attribute containing
+ *      one or more image files.
+ * @note If the widget has no animation or the index is out of bounds,
+ *       the function returns silently without changing the displayed image.
+ *
+ * @par Usage example - Jump to last frame (see full example in rvd_ImageMovie_stop())
+ *
+ * @see rvd_ImageMovie_stop()
+ * @see rvd_ImageMovie_frame_count()
+ */
+void rvd_ImageMovie_frame(gui_obj_t *obj, int frame_index);
+
+
+/**
+ * @brief Returns the total number of frames in an image movie widget.
+ *
+ * @param[in] obj Pointer to the image movie widget (created from a folder).
+ *
+ * @return Number of frames in the animation sequence.
+ *         Returns 0 if the widget has no animation data.
+ *
+ * @par Usage example - Used together with the other functions to seek to a specific frame
+ * @code
+ *      GUI_WIDGET_POINTER_BY_NAME(movie, "imagemovie4");
+ *      rvd_ImageMovie_stop(movie);
+ *      int index = rvd_ImageMovie_frame_count(movie);
+ *      rvd_ImageMovie_frame(movie, index - 1);  // display last frame
+ * @endcode
+ *
+ * @see rvd_ImageMovie_frame()
+ * @see rvd_ImageMovie_stop()
+ */
+int rvd_ImageMovie_frame_count(gui_obj_t *obj);
+/**
+ * @brief Starts (or restarts) the animation of an image movie widget.
+ *
+ * This function resumes or restarts the frame-by-frame animation for an
+ * IMAGE_FROM_MEM widget that was created from a folder of images
+ * (commonly referred to as an "image movie" or animated sequence).
+ *
+ * If the animation is already running, it is restarted from the first frame.
+ * If it was previously stopped (e.g. via rvd_ImageMovie_stop()), this call
+ * will resume playback from the beginning.
+ *
+ * @param[in] obj Pointer to the image movie widget (must be of type
+ *                IMAGE_FROM_MEM and have an associated animation).
+ *
+ * @return None
+ *
+ * @warning Triggers a runtime exception via GUI_WIDGET_TYPE_TRY_EXCEPT()
+ *          if obj is not an IMAGE_FROM_MEM widget.
+ * @note   Safe to call on a widget that has no animation - the call is ignored.
+ *
+ * @par Usage example - Start animation (typically after stopping or seeking)
+ * @code
+ *      // Retrieve the widget defined in XML as: <img folder="..." >imagemovie4</img>
+ *      GUI_WIDGET_POINTER_BY_NAME(movie, "imagemovie4");
+ *
+ *      // Example: Stop on last frame, then later restart from the beginning
+ *      rvd_ImageMovie_stop(movie);
+ *      int count = rvd_ImageMovie_frame_count(movie);
+ *      if (count > 0)
+ *      {
+ *          rvd_ImageMovie_frame(movie, count - 1);  // show final frame
+ *      }
+ *
+ *      rvd_ImageMovie_start(movie);  // restart animation from frame 0
+ * @endcode
+ *
+ * @see rvd_ImageMovie_stop()
+ * @see rvd_ImageMovie_frame()
+ * @see rvd_ImageMovie_frame_count()
+ */
+void rvd_ImageMovie_start(gui_obj_t *obj);
 #endif /* _RVD_H_ */

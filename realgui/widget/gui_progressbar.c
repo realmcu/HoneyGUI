@@ -131,7 +131,7 @@ size_t gui_progressbar_get_progress(gui_progressbar_t *this)
 {
     return (size_t)(this->per  * ((float)this->max));
 }
-
+#include <math.h>
 void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
 {
     this->per = percentage;
@@ -154,7 +154,7 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
     }
     else if (this->image_type == IMAGE_ARRAY)
     {
-        size_t p = percentage * (this->max - 1);
+        size_t p = roundf(percentage * (this->max));
 
         GUI_TYPE(gui_img_t, this->c)->data = ((void **)(uintptr_t)(this->color_hl))[p];
         GET_BASE(this->c)->w = gui_img_get_width((void *)(this->c)) + 1;

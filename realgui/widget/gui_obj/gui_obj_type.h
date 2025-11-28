@@ -137,6 +137,7 @@ typedef struct _gui_obj_t
     void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
     //end of run time
     T_OBJ_TYPE type;                      //no need this , only use name
+    uint8_t opacity_value        ;
     uint32_t active               : 1;    // this_widget flag means obj location in screen
     uint32_t not_show             : 1;
 
@@ -151,7 +152,7 @@ typedef struct _gui_obj_t
 
     uint32_t create_done          : 1;
     uint32_t event_dsc_cnt        : 5;
-    uint32_t opacity_value        : 8;
+    uint32_t opacity_force          : 1;
     uint32_t has_input_prepare_cb : 1;
     uint32_t has_prepare_cb       : 1;
     uint32_t has_draw_cb          : 1;

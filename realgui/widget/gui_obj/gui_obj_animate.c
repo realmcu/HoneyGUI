@@ -187,6 +187,12 @@ void gui_obj_restart_animate(gui_animate_t *animate)
 }
 void gui_obj_stop_animate(gui_animate_t *animate)
 {
+    if (!animate)
+    {
+        gui_log("gui_obj_stop_animate failed\n");
+        return;
+    }
+
     gui_log("gui_obj_stop_animate\n");
     animate->animate = false;
 }
@@ -211,4 +217,56 @@ gui_animate_t *gui_get_animation_from_array(gui_animate_t **animation_array, int
         return 0;
     }
     return animation_array[index];
+}
+gui_error_t gui_aniamtion_set_name(gui_animate_t *animate, const char *name)
+{
+    if (!animate || !name)
+    {
+        return GUI_ERROR_NULL;
+    }
+    animate->name = name;
+    return GUI_SUCCESS;
+}
+#include "gui_img.h"
+gui_animate_t *gui_aniamtion_get_by_name(gui_obj_t *widget, const char *name)
+{
+    if (!GUI_WIDGET_VALID(widget) || !name)
+    {
+        return 0;
+    }
+    {
+        switch (widget->type)
+        {
+        case IMAGE_FROM_MEM:
+            {
+                gui_img_t *img = GUI_CAST widget;
+                if (img->animate_array_length == 0)
+                {
+                    if (img->animate && img->animate->name && GUI_STRINGS_EQUAL(img->animate->name, name))
+                    {
+                        return img->animate;
+                    }
+                }
+                else
+                {
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+                        if (((gui_animate_t **)img->animate)[i]
+                            && ((gui_animate_t **)img->animate)[i]->name
+                            && GUI_STRINGS_EQUAL(((gui_animate_t **)img->animate)[i]->name, name))
+                        {
+                            return (((gui_animate_t **)img->animate)[i]);
+                        }
+                    }
+
+                }
+
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+    return 0;
 }

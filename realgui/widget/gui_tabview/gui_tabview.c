@@ -114,6 +114,51 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         return;
     }
 
+
+    static float animation_progress = 0.0f;
+
+
+    if (this->force_right)
+    {
+        animation_progress += 5.0f / obj->w;
+        float t = animation_progress;
+        float eased_t = 1.0f - (1.0f - t) * (1.0f - t);
+        this->release_x = (int)(-eased_t *obj->w);
+
+        if (this->release_x <= -obj->w)
+        {
+            this->release_x = 0;
+            this->force_right = 0;
+            this->cur_id.x++;
+            if (this->cur_id.x > this->tab_cnt_right)
+            {
+                this->cur_id.x = this->tab_cnt_left;
+            }
+
+            animation_progress = 0.0f;
+        }
+        return;
+    }
+    if (this->force_left)
+    {
+        animation_progress += 5.0f / obj->w;
+        float t = animation_progress;
+        float eased_t = 1.0f - (1.0f - t) * (1.0f - t);
+        this->release_x = (int)(eased_t *obj->w);
+
+        if (this->release_x >= obj->w)
+        {
+            this->release_x = 0;
+            this->force_left = 0;
+            this->cur_id.x--;
+            if (this->cur_id.x < this->tab_cnt_left)
+            {
+                this->cur_id.x = this->tab_cnt_right;
+            }
+            animation_progress = 0.0f;
+        }
+        return;
+    }
     if (tabview->tp_disable)
     {
         this->checksum = 0;
@@ -456,6 +501,8 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     {
         this->tab_need_pre_load = false;
     }
+
+
     if (tp->pressing == false)
     {
         if (this->release_x >= GUI_FRAME_STEP)
