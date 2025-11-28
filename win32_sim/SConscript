@@ -1,29 +1,14 @@
 # for module compiling
 import os
 import sys
-Import('TOOL_ROOT')
-Import('RTK_GUI_ENGINE')
 
 from building import *
 
 cwd = GetCurrentDir()
-CPPPATH = [cwd,
-           RTK_GUI_ENGINE + '/example/root_image/']
+inc = [cwd]
+src = Glob('*.c')
 
-
-
-#src = Glob('*.c')
-src = ['main.c']
-if sys.platform == 'win32':
-    src += ['version.o']
-
-
-CPPDEFINES = ['GUI_WIN32_SIM']
-
-
-objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
-
-
+objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = inc)
 list = os.listdir(cwd)
 for d in list:
     path = os.path.join(cwd, d)

@@ -1,11 +1,15 @@
 # for module compiling
 import os
+import sys
+
 from building import *
 
-objs = []
-cwd  = GetCurrentDir()
-list = os.listdir(cwd)
+cwd = GetCurrentDir()
+inc = [cwd]
+src = Glob('*.c')
 
+objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = inc)
+list = os.listdir(cwd)
 for d in list:
     path = os.path.join(cwd, d)
     if os.path.isfile(os.path.join(path, 'SConscript')):

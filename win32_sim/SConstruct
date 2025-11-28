@@ -74,12 +74,13 @@ def compile_resource(rc_file, output_file):
     except FileNotFoundError:
         print('windres command not found. Ensure MinGW is installed and windres is in the system PATH.')
 
+# prepare building environment
+objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
+
 # Only compile resource file on Windows
 if sys.platform == 'win32':
     compile_resource('version.rc', 'version.o')
-
-# prepare building environment
-objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
+    objs.append('version.o')
 
 # set spawn: save & load long param as temp file
 def ourspawn(sh, escape, cmd, args, e):
@@ -115,12 +116,9 @@ if platform.system() == 'Windows':
 # include app
 if os.path.exists(os.path.join(RTK_GUI_ENGINE, 'SConscript')):
     objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
+
 if os.path.exists(os.path.join(GUI_EXAMPLE, 'SConscript')):
     objs.extend(SConscript(os.path.join(GUI_EXAMPLE, 'SConscript')))
-
-GUI_AUTOGEN_CODE = os.path.abspath('./../autogen/')
-if os.path.exists(os.path.join(GUI_AUTOGEN_CODE, 'SConscript')):
-    objs.extend(SConscript(os.path.join(GUI_AUTOGEN_CODE, 'SConscript')))
 
 if os.path.exists(os.path.join(GUI_SIM_LIBS, 'SConscript')):
     objs.extend(SConscript(os.path.join(GUI_SIM_LIBS, 'SConscript')))
